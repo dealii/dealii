@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,8 +25,8 @@ namespace internal
     template <int dim>
     void
     TriaLevel<dim>::reserve_space (const unsigned int total_cells,
-				   const unsigned int dimension,
-				   const unsigned int space_dimension)
+                                   const unsigned int dimension,
+                                   const unsigned int space_dimension)
     {
                                        // we need space for total_cells
                                        // cells. Maybe we have more already
@@ -52,15 +52,15 @@ namespace internal
                                 total_cells - subdomain_ids.size(),
                                 0);
 
-	  if (dimension < space_dimension)
-	    {
-	      direction_flags.reserve (total_cells);
-	      direction_flags.insert (direction_flags.end(),
-				      total_cells - direction_flags.size(),
-				      true);
-	    }
-	  else
-	    direction_flags.clear ();
+          if (dimension < space_dimension)
+            {
+              direction_flags.reserve (total_cells);
+              direction_flags.insert (direction_flags.end(),
+                                      total_cells - direction_flags.size(),
+                                      true);
+            }
+          else
+            direction_flags.clear ();
 
           parents.reserve ((int) (total_cells + 1) / 2);
           parents.insert (parents.end (),
@@ -87,7 +87,7 @@ namespace internal
                                        // as many elements as an integer
                                        // has bits
       Assert (refine_flags.size() <=
-	      refine_flags.capacity()  + DEAL_II_MIN_VECTOR_CAPACITY,
+              refine_flags.capacity()  + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("refine_flags",
                                refine_flags.size(), refine_flags.capacity()));
       Assert (coarsen_flags.size() <= coarsen_flags.capacity() + sizeof(int)*8 ||
@@ -95,15 +95,15 @@ namespace internal
               ExcMemoryWasted ("coarsen_flags",
                                coarsen_flags.size(), coarsen_flags.capacity()));
       Assert (neighbors.size() <=
-	      neighbors.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              neighbors.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("neighbors",
                                neighbors.size(), neighbors.capacity()));
       Assert (subdomain_ids.size() <=
-	      subdomain_ids.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              subdomain_ids.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("subdomain_ids",
                                subdomain_ids.size(), subdomain_ids.capacity()));
       Assert (direction_flags.size() <=
-	      direction_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              direction_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("direction_flags",
                                direction_flags.size(), direction_flags.capacity()));
 
@@ -119,11 +119,11 @@ namespace internal
     TriaLevel<dim>::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (refine_flags) +
-	      MemoryConsumption::memory_consumption (coarsen_flags) +
+              MemoryConsumption::memory_consumption (coarsen_flags) +
               MemoryConsumption::memory_consumption (neighbors) +
-	      MemoryConsumption::memory_consumption (subdomain_ids) +
-	      MemoryConsumption::memory_consumption (parents) +
-	      MemoryConsumption::memory_consumption (direction_flags) +
+              MemoryConsumption::memory_consumption (subdomain_ids) +
+              MemoryConsumption::memory_consumption (parents) +
+              MemoryConsumption::memory_consumption (direction_flags) +
               MemoryConsumption::memory_consumption (cells));
     }
 
@@ -132,8 +132,8 @@ namespace internal
 
     void
     TriaLevel<3>::reserve_space (const unsigned int total_cells,
-				 const unsigned int dimension,
-				 const unsigned int space_dimension)
+                                 const unsigned int dimension,
+                                 const unsigned int space_dimension)
     {
                                        // we need space for total_cells
                                        // cells. Maybe we have more already
@@ -159,15 +159,15 @@ namespace internal
                                 total_cells - subdomain_ids.size(),
                                 0);
 
-	  if (dimension < space_dimension)
-	    {
-	      direction_flags.reserve (total_cells);
-	      direction_flags.insert (direction_flags.end(),
-				      total_cells - direction_flags.size(),
-				      true);
-	    }
-	  else
-	    direction_flags.clear ();
+          if (dimension < space_dimension)
+            {
+              direction_flags.reserve (total_cells);
+              direction_flags.insert (direction_flags.end(),
+                                      total_cells - direction_flags.size(),
+                                      true);
+            }
+          else
+            direction_flags.clear ();
 
           parents.reserve ((int) (total_cells + 1) / 2);
           parents.insert (parents.end (),
@@ -193,7 +193,7 @@ namespace internal
                                        // as many elements as an integer
                                        // has bits
       Assert (refine_flags.size() <=
-	      refine_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              refine_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("refine_flags",
                                refine_flags.size(), refine_flags.capacity()));
       Assert (coarsen_flags.size() <= coarsen_flags.capacity() + sizeof(int)*8 ||
@@ -201,15 +201,15 @@ namespace internal
               ExcMemoryWasted ("coarsen_flags",
                                coarsen_flags.size(), coarsen_flags.capacity()));
       Assert (neighbors.size() <=
-	      neighbors.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              neighbors.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("neighbors",
                                neighbors.size(), neighbors.capacity()));
       Assert (subdomain_ids.size () <=
-	      subdomain_ids.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              subdomain_ids.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("subdomain_ids",
                                subdomain_ids.size(), subdomain_ids.capacity()));
       Assert (direction_flags.size() <=
-	      direction_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              direction_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("direction_flags",
                                direction_flags.size(), direction_flags.capacity()));
       Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
@@ -223,11 +223,11 @@ namespace internal
     TriaLevel<3>::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (refine_flags) +
-	      MemoryConsumption::memory_consumption (coarsen_flags) +
+              MemoryConsumption::memory_consumption (coarsen_flags) +
               MemoryConsumption::memory_consumption (neighbors) +
-	      MemoryConsumption::memory_consumption (subdomain_ids) +
-	      MemoryConsumption::memory_consumption (parents) +
-	      MemoryConsumption::memory_consumption (direction_flags) +
+              MemoryConsumption::memory_consumption (subdomain_ids) +
+              MemoryConsumption::memory_consumption (parents) +
+              MemoryConsumption::memory_consumption (direction_flags) +
               MemoryConsumption::memory_consumption (cells));
     }
   }

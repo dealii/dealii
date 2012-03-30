@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2008, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,7 @@
 
 
 #include <deal.II/lac/petsc_parallel_block_vector.h>
-  
+
 #ifdef DEAL_II_USE_PETSC
 
 #  include <deal.II/lac/petsc_block_vector.h>
@@ -32,7 +32,7 @@ namespace PETScWrappers
 
       for (unsigned int i=0; i<this->n_blocks(); ++i)
         this->block(i) = v.block(i);
-      
+
       return *this;
     }
   }

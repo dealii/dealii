@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,7 @@ namespace internal
     template<>
     void
     TriaObjects<TriaObject<1> >::reserve_space (const unsigned int new_lines_in_pairs,
-				      const unsigned int new_lines_single)
+                                      const unsigned int new_lines_single)
     {
       Assert(new_lines_in_pairs%2==0, ExcInternalError());
 
@@ -40,87 +40,87 @@ namespace internal
       next_free_pair=0;
       reverse_order_next_free_single=false;
 
-				       // count the number of lines, of
-				       // unused single lines and of
-				       // unused pairs of lines
+                                       // count the number of lines, of
+                                       // unused single lines and of
+                                       // unused pairs of lines
       unsigned int n_lines=0;
       unsigned int n_unused_pairs=0;
       unsigned int n_unused_singles=0;
       for (unsigned int i=0; i<used.size(); ++i)
-	{
-	  if (used[i])
-	    ++n_lines;
-	  else if (i+1<used.size())
-	    {
-	      if (used[i+1])
-		{
-		  ++n_unused_singles;
-		  if (next_free_single==0)
-		    next_free_single=i;
-		}
-	      else
-		{
-		  ++n_unused_pairs;
-		  if (next_free_pair==0)
-		    next_free_pair=i;
-		  ++i;
-		}
-	    }
-	  else
-	    ++n_unused_singles;
-	}
+        {
+          if (used[i])
+            ++n_lines;
+          else if (i+1<used.size())
+            {
+              if (used[i+1])
+                {
+                  ++n_unused_singles;
+                  if (next_free_single==0)
+                    next_free_single=i;
+                }
+              else
+                {
+                  ++n_unused_pairs;
+                  if (next_free_pair==0)
+                    next_free_pair=i;
+                  ++i;
+                }
+            }
+          else
+            ++n_unused_singles;
+        }
       Assert(n_lines+2*n_unused_pairs+n_unused_singles==used.size(),
-	     ExcInternalError());
+             ExcInternalError());
 
-				       // how many single lines are needed in
-				       // addition to n_unused_singles?
+                                       // how many single lines are needed in
+                                       // addition to n_unused_singles?
       const int additional_single_lines=
-	new_lines_single-n_unused_singles;
+        new_lines_single-n_unused_singles;
 
       unsigned int new_size=
-	used.size() + new_lines_in_pairs - 2*n_unused_pairs;
+        used.size() + new_lines_in_pairs - 2*n_unused_pairs;
       if (additional_single_lines>0)
-	new_size+=additional_single_lines;
+        new_size+=additional_single_lines;
 
                                        // only allocate space if necessary
       if (new_size>cells.size())
         {
           cells.reserve (new_size);
           cells.insert (cells.end(),
-			new_size-cells.size(),
-			TriaObject<1> ());
+                        new_size-cells.size(),
+                        TriaObject<1> ());
 
           used.reserve (new_size);
           used.insert (used.end(),
-		       new_size-used.size(),
-		       false);
+                       new_size-used.size(),
+                       false);
 
           user_flags.reserve (new_size);
           user_flags.insert (user_flags.end(),
-			     new_size-user_flags.size(),
-			     false);
+                             new_size-user_flags.size(),
+                             false);
 
           children.reserve (new_size);
           children.insert (children.end(),
-			   new_size-children.size(),
-			   -1);
+                           new_size-children.size(),
+                           -1);
 
           boundary_or_material_id.reserve (new_size);
           boundary_or_material_id.insert (boundary_or_material_id.end(),
-			      new_size-boundary_or_material_id.size(),
-			      BoundaryOrMaterialId());
+                              new_size-boundary_or_material_id.size(),
+                              BoundaryOrMaterialId());
 
           user_data.reserve (new_size);
           user_data.insert (user_data.end(),
-			    new_size-user_data.size(),
-			    UserData());
-	}
+                            new_size-user_data.size(),
+                            UserData());
+        }
 
       if (n_unused_singles==0)
-	{
-	  next_free_single=new_size-1;
-	  reverse_order_next_free_single=true;
-	}
+        {
+          next_free_single=new_size-1;
+          reverse_order_next_free_single=true;
+        }
     }
 
 
@@ -129,46 +129,46 @@ namespace internal
     typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
     TriaObjects<TriaObject<1> >::next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria)
     {
-				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+                                       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos=next_free_single,
-	 last=used.size()-1;
+         last=used.size()-1;
       if (!reverse_order_next_free_single)
-	{
-					   // first sweep forward, only use
-					   // really single slots, do not use
-					   // pair slots
-	  for (; pos<last; ++pos)
-	    if (!used[pos])
-	      if (used[++pos])
-		{
-						   // this was a single slot
-		  pos-=1;
-		  break;
-		}
-	  if (pos>=last)
-	    {
-	      reverse_order_next_free_single=true;
-	      next_free_single=used.size()-1;
-	      pos=used.size()-1;
-	    }
-	  else
-	    next_free_single=pos+1;
-	}
+        {
+                                           // first sweep forward, only use
+                                           // really single slots, do not use
+                                           // pair slots
+          for (; pos<last; ++pos)
+            if (!used[pos])
+              if (used[++pos])
+                {
+                                                   // this was a single slot
+                  pos-=1;
+                  break;
+                }
+          if (pos>=last)
+            {
+              reverse_order_next_free_single=true;
+              next_free_single=used.size()-1;
+              pos=used.size()-1;
+            }
+          else
+            next_free_single=pos+1;
+        }
 
       if(reverse_order_next_free_single)
-	{
-					   // second sweep, use all slots, even
-					   // in pairs
-	  for(;pos>=0;--pos)
-	    if (!used[pos])
-	      break;
-	  if (pos>0)
-	    next_free_single=pos-1;
-	  else
-					     // no valid single line anymore
-	    return tria.end_line();
-	}
+        {
+                                           // second sweep, use all slots, even
+                                           // in pairs
+          for(;pos>=0;--pos)
+            if (!used[pos])
+              break;
+          if (pos>0)
+            next_free_single=pos-1;
+          else
+                                             // no valid single line anymore
+            return tria.end_line();
+        }
 
       return typename dealii::Triangulation<dim,spacedim>::raw_line_iterator(&tria,0,pos);
     }
@@ -180,23 +180,23 @@ namespace internal
     typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
     TriaObjects<TriaObject<1> >::next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria)
     {
-				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+                                       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos=next_free_pair,
-	 last=used.size()-1;
+         last=used.size()-1;
       for (; pos<last; ++pos)
-	if (!used[pos])
-	  if (!used[++pos])
-	    {
-					       // this was a pair slot
-	      pos-=1;
-	      break;
-	    }
+        if (!used[pos])
+          if (!used[++pos])
+            {
+                                               // this was a pair slot
+              pos-=1;
+              break;
+            }
       if (pos>=last)
-					 // no free slot
-	return tria.end_line();
+                                         // no free slot
+        return tria.end_line();
       else
-	next_free_pair=pos+2;
+        next_free_pair=pos+2;
 
       return typename dealii::Triangulation<dim,spacedim>::raw_line_iterator(&tria,0,pos);
     }
@@ -228,7 +228,7 @@ namespace internal
     template<>
     void
     TriaObjects<TriaObject<2> >::reserve_space (const unsigned int new_quads_in_pairs,
-				      const unsigned int new_quads_single)
+                                      const unsigned int new_quads_single)
     {
       Assert(new_quads_in_pairs%2==0, ExcInternalError());
 
@@ -236,93 +236,93 @@ namespace internal
       next_free_pair=0;
       reverse_order_next_free_single=false;
 
-				       // count the number of lines, of
-				       // unused single lines and of
-				       // unused pairs of lines
+                                       // count the number of lines, of
+                                       // unused single lines and of
+                                       // unused pairs of lines
       unsigned int n_quads=0;
       unsigned int n_unused_pairs=0;
       unsigned int n_unused_singles=0;
       for (unsigned int i=0; i<used.size(); ++i)
-	{
-	  if (used[i])
-	    ++n_quads;
-	  else if (i+1<used.size())
-	    {
-	      if (used[i+1])
-		{
-		  ++n_unused_singles;
-		  if (next_free_single==0)
-		    next_free_single=i;
-		}
-	      else
-		{
-		  ++n_unused_pairs;
-		  if (next_free_pair==0)
-		    next_free_pair=i;
-		  ++i;
-		}
-	    }
-	  else
-	    ++n_unused_singles;
-	}
+        {
+          if (used[i])
+            ++n_quads;
+          else if (i+1<used.size())
+            {
+              if (used[i+1])
+                {
+                  ++n_unused_singles;
+                  if (next_free_single==0)
+                    next_free_single=i;
+                }
+              else
+                {
+                  ++n_unused_pairs;
+                  if (next_free_pair==0)
+                    next_free_pair=i;
+                  ++i;
+                }
+            }
+          else
+            ++n_unused_singles;
+        }
       Assert(n_quads+2*n_unused_pairs+n_unused_singles==used.size(),
-	     ExcInternalError());
+             ExcInternalError());
 
-				       // how many single quads are needed in
-				       // addition to n_unused_quads?
+                                       // how many single quads are needed in
+                                       // addition to n_unused_quads?
       const int additional_single_quads=
-	new_quads_single-n_unused_singles;
+        new_quads_single-n_unused_singles;
 
       unsigned int new_size=
-	used.size() + new_quads_in_pairs - 2*n_unused_pairs;
+        used.size() + new_quads_in_pairs - 2*n_unused_pairs;
       if (additional_single_quads>0)
-	new_size+=additional_single_quads;
+        new_size+=additional_single_quads;
 
                                        // only allocate space if necessary
       if (new_size>cells.size())
         {
           cells.reserve (new_size);
           cells.insert (cells.end(),
-			new_size-cells.size(),
-			TriaObject<2> ());
+                        new_size-cells.size(),
+                        TriaObject<2> ());
 
           used.reserve (new_size);
           used.insert (used.end(),
-		       new_size-used.size(),
-		       false);
+                       new_size-used.size(),
+                       false);
 
           user_flags.reserve (new_size);
           user_flags.insert (user_flags.end(),
-			     new_size-user_flags.size(),
-			     false);
+                             new_size-user_flags.size(),
+                             false);
 
           children.reserve (2*new_size);
           children.insert (children.end(),
-			   2*new_size-children.size(),
-			   -1);
+                           2*new_size-children.size(),
+                           -1);
 
-	  refinement_cases.reserve (new_size);
-	  refinement_cases.insert (refinement_cases.end(),
-			       new_size - refinement_cases.size(),
-			       RefinementCase<2>::no_refinement);
+          refinement_cases.reserve (new_size);
+          refinement_cases.insert (refinement_cases.end(),
+                               new_size - refinement_cases.size(),
+                               RefinementCase<2>::no_refinement);
 
 
           boundary_or_material_id.reserve (new_size);
           boundary_or_material_id.insert (boundary_or_material_id.end(),
-			      new_size-boundary_or_material_id.size(),
-			      BoundaryOrMaterialId());
+                              new_size-boundary_or_material_id.size(),
+                              BoundaryOrMaterialId());
 
           user_data.reserve (new_size);
           user_data.insert (user_data.end(),
-			    new_size-user_data.size(),
-			    UserData());
+                            new_size-user_data.size(),
+                            UserData());
         }
 
       if (n_unused_singles==0)
-	{
-	  next_free_single=new_size-1;
-	  reverse_order_next_free_single=true;
-	}
+        {
+          next_free_single=new_size-1;
+          reverse_order_next_free_single=true;
+        }
     }
 
 
@@ -333,46 +333,46 @@ namespace internal
     typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
     TriaObjects<TriaObject<2> >::next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria)
     {
-				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+                                       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos=next_free_single,
-	 last=used.size()-1;
+         last=used.size()-1;
       if (!reverse_order_next_free_single)
-	{
-					   // first sweep forward, only use
-					   // really single slots, do not use
-					   // pair slots
-	  for (; pos<last; ++pos)
-	    if (!used[pos])
-	      if (used[++pos])
-		{
-						   // this was a single slot
-		  pos-=1;
-		  break;
-		}
-	  if (pos>=last)
-	    {
-	      reverse_order_next_free_single=true;
-	      next_free_single=used.size()-1;
-	      pos=used.size()-1;
-	    }
-	  else
-	    next_free_single=pos+1;
-	}
+        {
+                                           // first sweep forward, only use
+                                           // really single slots, do not use
+                                           // pair slots
+          for (; pos<last; ++pos)
+            if (!used[pos])
+              if (used[++pos])
+                {
+                                                   // this was a single slot
+                  pos-=1;
+                  break;
+                }
+          if (pos>=last)
+            {
+              reverse_order_next_free_single=true;
+              next_free_single=used.size()-1;
+              pos=used.size()-1;
+            }
+          else
+            next_free_single=pos+1;
+        }
 
       if(reverse_order_next_free_single)
-	{
-					   // second sweep, use all slots, even
-					   // in pairs
-	  for(;pos>=0;--pos)
-	    if (!used[pos])
-	      break;
-	  if (pos>0)
-	    next_free_single=pos-1;
-	  else
-					     // no valid single quad anymore
-	    return tria.end_quad();
-	}
+        {
+                                           // second sweep, use all slots, even
+                                           // in pairs
+          for(;pos>=0;--pos)
+            if (!used[pos])
+              break;
+          if (pos>0)
+            next_free_single=pos-1;
+          else
+                                             // no valid single quad anymore
+            return tria.end_quad();
+        }
 
       return typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator(&tria,0,pos);
     }
@@ -384,23 +384,23 @@ namespace internal
     typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
     TriaObjects<TriaObject<2> >::next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria)
     {
-				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+                                       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos=next_free_pair,
-	 last=used.size()-1;
+         last=used.size()-1;
       for (; pos<last; ++pos)
-	if (!used[pos])
-	  if (!used[++pos])
-	    {
-					       // this was a pair slot
-	      pos-=1;
-	      break;
-	    }
+        if (!used[pos])
+          if (!used[++pos])
+            {
+                                               // this was a pair slot
+              pos-=1;
+              break;
+            }
       if (pos>=last)
-					 // no free slot
-	return tria.end_quad();
+                                         // no free slot
+        return tria.end_quad();
       else
-	next_free_pair=pos+2;
+        next_free_pair=pos+2;
 
       return typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator(&tria,0,pos);
     }
@@ -433,24 +433,24 @@ namespace internal
     template <int dim, int spacedim>
     typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator
     TriaObjects<TriaObject<3> >::next_free_hex (const dealii::Triangulation<dim,spacedim> &tria,
-					    const unsigned int               level)
+                                            const unsigned int               level)
     {
-				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+                                       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos=next_free_pair,
-	 last=used.size()-1;
+         last=used.size()-1;
       for (; pos<last; ++pos)
-	if (!used[pos])
-	  {
-					     // this should be a pair slot
-	      Assert(!used[pos+1], ExcInternalError());
-	      break;
-	    }
+        if (!used[pos])
+          {
+                                             // this should be a pair slot
+              Assert(!used[pos+1], ExcInternalError());
+              break;
+            }
       if (pos>=last)
-					 // no free slot
-	return tria.end_hex();
+                                         // no free slot
+        return tria.end_hex();
       else
-	next_free_pair=pos+2;
+        next_free_pair=pos+2;
 
       return typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator(&tria,level,pos);
     }
@@ -472,55 +472,55 @@ namespace internal
         {
           cells.reserve (new_size);
           cells.insert (cells.end(),
-			new_size-cells.size(),
-			TriaObject<3> ());
+                        new_size-cells.size(),
+                        TriaObject<3> ());
 
           used.reserve (new_size);
           used.insert (used.end(),
-		       new_size-used.size(),
-		       false);
+                       new_size-used.size(),
+                       false);
 
           user_flags.reserve (new_size);
           user_flags.insert (user_flags.end(),
-			     new_size-user_flags.size(),
-			     false);
+                             new_size-user_flags.size(),
+                             false);
 
           children.reserve (4*new_size);
           children.insert (children.end(),
-			   4*new_size-children.size(),
-			   -1);
+                           4*new_size-children.size(),
+                           -1);
 
           boundary_or_material_id.reserve (new_size);
           boundary_or_material_id.insert (boundary_or_material_id.end(),
-			      new_size-boundary_or_material_id.size(),
-			      BoundaryOrMaterialId());
+                              new_size-boundary_or_material_id.size(),
+                              BoundaryOrMaterialId());
 
           user_data.reserve (new_size);
           user_data.insert (user_data.end(),
-			    new_size-user_data.size(),
-			    UserData());
+                            new_size-user_data.size(),
+                            UserData());
 
           face_orientations.reserve (new_size * GeometryInfo<3>::faces_per_cell);
           face_orientations.insert (face_orientations.end(),
-				    new_size * GeometryInfo<3>::faces_per_cell
-				    - face_orientations.size(),
-				    true);
+                                    new_size * GeometryInfo<3>::faces_per_cell
+                                    - face_orientations.size(),
+                                    true);
 
-	  refinement_cases.reserve (new_size);
-	  refinement_cases.insert (refinement_cases.end(),
-			       new_size-refinement_cases.size(),
-			       RefinementCase<3>::no_refinement);
+          refinement_cases.reserve (new_size);
+          refinement_cases.insert (refinement_cases.end(),
+                               new_size-refinement_cases.size(),
+                               RefinementCase<3>::no_refinement);
 
           face_flips.reserve (new_size * GeometryInfo<3>::faces_per_cell);
           face_flips.insert (face_flips.end(),
-				    new_size * GeometryInfo<3>::faces_per_cell
-				    - face_flips.size(),
-				    false);
+                                    new_size * GeometryInfo<3>::faces_per_cell
+                                    - face_flips.size(),
+                                    false);
           face_rotations.reserve (new_size * GeometryInfo<3>::faces_per_cell);
           face_rotations.insert (face_rotations.end(),
-				    new_size * GeometryInfo<3>::faces_per_cell
-				    - face_rotations.size(),
-				    false);
+                                    new_size * GeometryInfo<3>::faces_per_cell
+                                    - face_rotations.size(),
+                                    false);
         }
       next_free_single=next_free_pair=0;
     }
@@ -528,7 +528,7 @@ namespace internal
 
     void
     TriaObjectsQuad3D::reserve_space (const unsigned int new_quads_in_pairs,
-				      const unsigned int new_quads_single)
+                                      const unsigned int new_quads_single)
     {
       Assert(new_quads_in_pairs%2==0, ExcInternalError());
 
@@ -536,67 +536,67 @@ namespace internal
       next_free_pair=0;
       reverse_order_next_free_single=false;
 
-				       // count the number of lines, of unused
-				       // single lines and of unused pairs of
-				       // lines
+                                       // count the number of lines, of unused
+                                       // single lines and of unused pairs of
+                                       // lines
       unsigned int n_quads=0;
       unsigned int n_unused_pairs=0;
       unsigned int n_unused_singles=0;
       for (unsigned int i=0; i<used.size(); ++i)
-	{
-	  if (used[i])
-	    ++n_quads;
-	  else if (i+1<used.size())
-	    {
-	      if (used[i+1])
-		{
-		  ++n_unused_singles;
-		  if (next_free_single==0)
-		    next_free_single=i;
-		}
-	      else
-		{
-		  ++n_unused_pairs;
-		  if (next_free_pair==0)
-		    next_free_pair=i;
-		  ++i;
-		}
-	    }
-	  else
-	    ++n_unused_singles;
-	}
+        {
+          if (used[i])
+            ++n_quads;
+          else if (i+1<used.size())
+            {
+              if (used[i+1])
+                {
+                  ++n_unused_singles;
+                  if (next_free_single==0)
+                    next_free_single=i;
+                }
+              else
+                {
+                  ++n_unused_pairs;
+                  if (next_free_pair==0)
+                    next_free_pair=i;
+                  ++i;
+                }
+            }
+          else
+            ++n_unused_singles;
+        }
       Assert(n_quads+2*n_unused_pairs+n_unused_singles==used.size(),
-	     ExcInternalError());
+             ExcInternalError());
 
-				       // how many single quads are needed in
-				       // addition to n_unused_quads?
+                                       // how many single quads are needed in
+                                       // addition to n_unused_quads?
       const int additional_single_quads=
-	new_quads_single-n_unused_singles;
+        new_quads_single-n_unused_singles;
 
       unsigned int new_size=
-	used.size() + new_quads_in_pairs - 2*n_unused_pairs;
+        used.size() + new_quads_in_pairs - 2*n_unused_pairs;
       if (additional_single_quads>0)
-	new_size+=additional_single_quads;
+        new_size+=additional_single_quads;
 
                                        // see above...
       if (new_size>cells.size())
         {
-					   // reseve space for the base class
-	  TriaObjects<TriaObject<2> >::reserve_space(new_quads_in_pairs,new_quads_single);
-					   // reserve the field of the derived
-					   // class
+                                           // reseve space for the base class
+          TriaObjects<TriaObject<2> >::reserve_space(new_quads_in_pairs,new_quads_single);
+                                           // reserve the field of the derived
+                                           // class
           line_orientations.reserve (new_size * GeometryInfo<2>::lines_per_cell);
           line_orientations.insert (line_orientations.end(),
-				    new_size * GeometryInfo<2>::lines_per_cell
-				    - line_orientations.size(),
-				    true);
+                                    new_size * GeometryInfo<2>::lines_per_cell
+                                    - line_orientations.size(),
+                                    true);
         }
 
       if (n_unused_singles==0)
-	{
-	  next_free_single=new_size-1;
-	  reverse_order_next_free_single=true;
-	}
+        {
+          next_free_single=new_size-1;
+          reverse_order_next_free_single=true;
+        }
     }
 
 
@@ -612,11 +612,11 @@ namespace internal
                                        // as many elements as an integer
                                        // has bits
       Assert (cells.size() <=
-	      cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("lines",
                                cells.size(), cells.capacity()));
       Assert (children.size() <=
-	      children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("children",
                                children.size(), children.capacity()));
       Assert (used.size() <= used.capacity() + sizeof(int)*8 ||
@@ -652,11 +652,11 @@ namespace internal
                                        // as many elements as an integer
                                        // has bits
       Assert (cells.size() <=
-	      cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("quads",
                                cells.size(), cells.capacity()));
       Assert (children.size() <=
-	      children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("children",
                                children.size(), children.capacity()));
       Assert (used.size() <= used.capacity() + sizeof(int)*8 ||
@@ -693,11 +693,11 @@ namespace internal
                                        // as many elements as an integer
                                        // has bits
       Assert (cells.size() <=
-	      cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("hexes",
                                cells.size(), cells.capacity()));
       Assert (children.size() <=
-	      children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("children",
                                children.size(), children.capacity()));
       Assert (used.size() <= used.capacity() + sizeof(int)*8 ||
@@ -795,7 +795,7 @@ namespace internal
               MemoryConsumption::memory_consumption (user_flags) +
               MemoryConsumption::memory_consumption (boundary_or_material_id) +
               MemoryConsumption::memory_consumption (refinement_cases) +
-	      user_data.capacity() * sizeof(UserData) + sizeof(user_data));
+              user_data.capacity() * sizeof(UserData) + sizeof(user_data));
     }
 
 
@@ -803,9 +803,9 @@ namespace internal
     TriaObjectsHex::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (face_orientations) +
-	      MemoryConsumption::memory_consumption (face_flips) +
-	      MemoryConsumption::memory_consumption (face_rotations) +
-	      TriaObjects<TriaObject<3> >::memory_consumption() );
+              MemoryConsumption::memory_consumption (face_flips) +
+              MemoryConsumption::memory_consumption (face_rotations) +
+              TriaObjects<TriaObject<3> >::memory_consumption() );
     }
 
 
@@ -813,7 +813,7 @@ namespace internal
     TriaObjectsQuad3D::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (line_orientations) +
-	      this->TriaObjects<TriaObject<2> >::memory_consumption() );
+              this->TriaObjects<TriaObject<2> >::memory_consumption() );
     }
 
 

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,10 +27,10 @@ namespace MeshWorker
       R[i].reinit(bi);
     for (unsigned int i=0;i<M1.size();++i)
       M1[i].matrix.reinit(bi.block_size(M1[i].row),
-			  bi.block_size(M1[i].column));
+                          bi.block_size(M1[i].column));
     for (unsigned int i=0;i<M2.size();++i)
       M2[i].matrix.reinit(bi.block_size(M2[i].row),
-			  bi.block_size(M2[i].column));
+                          bi.block_size(M2[i].column));
     quadrature_data.reset_values();
   }
 
@@ -40,11 +40,11 @@ namespace MeshWorker
   LocalResults<number>::memory_consumption () const
   {
     std::size_t mem = sizeof(*this)
-		       + MemoryConsumption::memory_consumption(J)
-		       + MemoryConsumption::memory_consumption(R)
-		       + MemoryConsumption::memory_consumption(M1)
-		       + MemoryConsumption::memory_consumption(M2)
-		       + MemoryConsumption::memory_consumption(quadrature_data);
+                       + MemoryConsumption::memory_consumption(J)
+                       + MemoryConsumption::memory_consumption(R)
+                       + MemoryConsumption::memory_consumption(M1)
+                       + MemoryConsumption::memory_consumption(M2)
+                       + MemoryConsumption::memory_consumption(quadrature_data);
     return mem;
   }
 

@@ -2,7 +2,7 @@
 //      $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -97,65 +97,65 @@ namespace Utilities
 
     std::vector<unsigned int>
     compute_point_to_point_communication_pattern (const MPI_Comm & mpi_comm,
-						  const std::vector<unsigned int> & destinations)
+                                                  const std::vector<unsigned int> & destinations)
     {
       unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
       unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
 
       for (unsigned int i=0; i<destinations.size(); ++i)
-	{
-	  Assert (destinations[i] < n_procs,
-		  ExcIndexRange (destinations[i], 0, n_procs));
-	  Assert (destinations[i] != myid,
-		  ExcMessage ("There is no point in communicating with ourselves."));
-	}
+        {
+          Assert (destinations[i] < n_procs,
+                  ExcIndexRange (destinations[i], 0, n_procs));
+          Assert (destinations[i] != myid,
+                  ExcMessage ("There is no point in communicating with ourselves."));
+        }
 
 
-				       // let all processors
-				       // communicate the maximal
-				       // number of destinations they
-				       // have
+                                       // let all processors
+                                       // communicate the maximal
+                                       // number of destinations they
+                                       // have
       const unsigned int max_n_destinations
-	= Utilities::MPI::max (destinations.size(), mpi_comm);
+        = Utilities::MPI::max (destinations.size(), mpi_comm);
 
-				       // now that we know the number
-				       // of data packets every
-				       // processor wants to send, set
-				       // up a buffer with the maximal
-				       // size and copy our
-				       // destinations in there,
-				       // padded with -1's
+                                       // now that we know the number
+                                       // of data packets every
+                                       // processor wants to send, set
+                                       // up a buffer with the maximal
+                                       // size and copy our
+                                       // destinations in there,
+                                       // padded with -1's
       std::vector<unsigned int> my_destinations(max_n_destinations,
-						numbers::invalid_unsigned_int);
+                                                numbers::invalid_unsigned_int);
       std::copy (destinations.begin(), destinations.end(),
-		 my_destinations.begin());
+                 my_destinations.begin());
 
-				       // now exchange these (we could
-				       // communicate less data if we
-				       // used MPI_Allgatherv, but
-				       // we'd have to communicate
-				       // my_n_destinations to all
-				       // processors in this case,
-				       // which is more expensive than
-				       // the reduction operation
-				       // above in MPI_Allreduce)
+                                       // now exchange these (we could
+                                       // communicate less data if we
+                                       // used MPI_Allgatherv, but
+                                       // we'd have to communicate
+                                       // my_n_destinations to all
+                                       // processors in this case,
+                                       // which is more expensive than
+                                       // the reduction operation
+                                       // above in MPI_Allreduce)
       std::vector<unsigned int> all_destinations (max_n_destinations * n_procs);
       MPI_Allgather (&my_destinations[0], max_n_destinations, MPI_UNSIGNED,
-		     &all_destinations[0], max_n_destinations, MPI_UNSIGNED,
-		     mpi_comm);
+                     &all_destinations[0], max_n_destinations, MPI_UNSIGNED,
+                     mpi_comm);
 
-				       // now we know who is going to
-				       // communicate with
-				       // whom. collect who is going
-				       // to communicate with us!
+                                       // now we know who is going to
+                                       // communicate with
+                                       // whom. collect who is going
+                                       // to communicate with us!
       std::vector<unsigned int> origins;
       for (unsigned int i=0; i<n_procs; ++i)
-	for (unsigned int j=0; j<max_n_destinations; ++j)
-	  if (all_destinations[i*max_n_destinations + j] == myid)
-	    origins.push_back (i);
-	  else if (all_destinations[i*max_n_destinations + j] ==
-		   numbers::invalid_unsigned_int)
-	    break;
+        for (unsigned int j=0; j<max_n_destinations; ++j)
+          if (all_destinations[i*max_n_destinations + j] == myid)
+            origins.push_back (i);
+          else if (all_destinations[i*max_n_destinations + j] ==
+                   numbers::invalid_unsigned_int)
+            break;
 
       return origins;
     }
@@ -163,40 +163,40 @@ namespace Utilities
 
     namespace
     {
-				       // custom MIP_Op for
-				       // calculate_collective_mpi_min_max_avg
+                                       // custom MIP_Op for
+                                       // calculate_collective_mpi_min_max_avg
       void max_reduce ( const void * in_lhs_,
-			void * inout_rhs_,
-			int * len,
-			MPI_Datatype * )
+                        void * inout_rhs_,
+                        int * len,
+                        MPI_Datatype * )
       {
-	const MinMaxAvg * in_lhs = static_cast<const MinMaxAvg*>(in_lhs_);
-	MinMaxAvg * inout_rhs = static_cast<MinMaxAvg*>(inout_rhs_);
+        const MinMaxAvg * in_lhs = static_cast<const MinMaxAvg*>(in_lhs_);
+        MinMaxAvg * inout_rhs = static_cast<MinMaxAvg*>(inout_rhs_);
 
-	Assert(*len==1, ExcInternalError());
+        Assert(*len==1, ExcInternalError());
 
-	inout_rhs->sum += in_lhs->sum;
-	if (inout_rhs->min>in_lhs->min)
-	  {
-	    inout_rhs->min = in_lhs->min;
-	    inout_rhs->min_index = in_lhs->min_index;
-	  }
-	else if (inout_rhs->min == in_lhs->min)
-	  { // choose lower cpu index when tied to make operator cumutative
-	    if (inout_rhs->min_index > in_lhs->min_index)
-	      inout_rhs->min_index = in_lhs->min_index;
-	  }
+        inout_rhs->sum += in_lhs->sum;
+        if (inout_rhs->min>in_lhs->min)
+          {
+            inout_rhs->min = in_lhs->min;
+            inout_rhs->min_index = in_lhs->min_index;
+          }
+        else if (inout_rhs->min == in_lhs->min)
+          { // choose lower cpu index when tied to make operator cumutative
+            if (inout_rhs->min_index > in_lhs->min_index)
+              inout_rhs->min_index = in_lhs->min_index;
+          }
 
-	if (inout_rhs->max < in_lhs->max)
-	  {
-	  inout_rhs->max = in_lhs->max;
-	  inout_rhs->max_index = in_lhs->max_index;
-	  }
-	else if (inout_rhs->max == in_lhs->max)
-	  { // choose lower cpu index when tied to make operator cumutative
-	    if (inout_rhs->max_index > in_lhs->max_index)
-	      inout_rhs->max_index = in_lhs->max_index;
-	  }
+        if (inout_rhs->max < in_lhs->max)
+          {
+          inout_rhs->max = in_lhs->max;
+          inout_rhs->max_index = in_lhs->max_index;
+          }
+        else if (inout_rhs->max == in_lhs->max)
+          { // choose lower cpu index when tied to make operator cumutative
+            if (inout_rhs->max_index > in_lhs->max_index)
+              inout_rhs->max_index = in_lhs->max_index;
+          }
       }
     }
 
@@ -204,14 +204,14 @@ namespace Utilities
 
     MinMaxAvg
     min_max_avg(const double my_value,
-		const MPI_Comm &mpi_communicator)
+                const MPI_Comm &mpi_communicator)
     {
       MinMaxAvg result;
 
       const unsigned int my_id
-	= dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
+        = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
       const unsigned int numproc
-	= dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
+        = dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
 
       MPI_Op op;
       int ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
@@ -269,7 +269,7 @@ namespace Utilities
 
     MinMaxAvg
     min_max_avg(const double my_value,
-		const MPI_Comm &)
+                const MPI_Comm &)
     {
       MinMaxAvg result;
 
@@ -289,28 +289,28 @@ namespace Utilities
 
 
     MPI_InitFinalize::MPI_InitFinalize (int    &argc,
-					char** &argv)
-		    :
-		    owns_mpi (true)
+                                        char** &argv)
+                    :
+                    owns_mpi (true)
     {
       static bool constructor_has_already_run = false;
       Assert (constructor_has_already_run == false,
-	      ExcMessage ("You can only create a single object of this class "
-			  "in a program since it initializes the MPI system."));
+              ExcMessage ("You can only create a single object of this class "
+                          "in a program since it initializes the MPI system."));
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
       AssertThrow (MPI_has_been_started == 0,
-		   ExcMessage ("MPI error. You can only start MPI once!"));
+                   ExcMessage ("MPI error. You can only start MPI once!"));
 
       int mpi_err;
       mpi_err = MPI_Init (&argc, &argv);
       AssertThrow (mpi_err == 0,
-		   ExcMessage ("MPI could not be initialized."));
+                   ExcMessage ("MPI could not be initialized."));
 #else
-				       // make sure the compiler doesn't warn
-				       // about these variables
+                                       // make sure the compiler doesn't warn
+                                       // about these variables
       (void)argc;
       (void)argv;
 #endif
@@ -324,30 +324,30 @@ namespace Utilities
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 
 #  if defined(DEAL_II_USE_TRILINOS) && !defined(__APPLE__)
-				       // make memory pool release all
-				       // vectors that are no longer
-				       // used at this point. this is
-				       // relevant because the static
-				       // object destructors run for
-				       // these vectors at the end of
-				       // the program would run after
-				       // MPI_Finalize is called,
-				       // leading to errors
-				       //
-				       // TODO: On Mac OS X, shared libs can
- 				       // only depend on other libs listed
- 				       // later on the command line. This
- 				       // means that libbase can't depend on
- 				       // liblac, and we can't destroy the
- 				       // memory pool here as long as we have
- 				       // separate libraries. Consequently,
- 				       // the #ifdef above. Deal will then
- 				       // just continue to seg fault upon
- 				       // completion of main()
+                                       // make memory pool release all
+                                       // vectors that are no longer
+                                       // used at this point. this is
+                                       // relevant because the static
+                                       // object destructors run for
+                                       // these vectors at the end of
+                                       // the program would run after
+                                       // MPI_Finalize is called,
+                                       // leading to errors
+                                       //
+                                       // TODO: On Mac OS X, shared libs can
+                                       // only depend on other libs listed
+                                       // later on the command line. This
+                                       // means that libbase can't depend on
+                                       // liblac, and we can't destroy the
+                                       // memory pool here as long as we have
+                                       // separate libraries. Consequently,
+                                       // the #ifdef above. Deal will then
+                                       // just continue to seg fault upon
+                                       // completion of main()
       GrowingVectorMemory<TrilinosWrappers::MPI::Vector>
-	::release_unused_memory ();
+        ::release_unused_memory ();
       GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>
-	::release_unused_memory ();
+        ::release_unused_memory ();
 #  endif
 
       int mpi_err = 0;
@@ -355,22 +355,22 @@ namespace Utilities
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
       if (Utilities::System::program_uses_mpi() == true && owns_mpi == true &&
-	  MPI_has_been_started != 0)
-	{
-	  if (std::uncaught_exception())
-	    {
-	      std::cerr << "ERROR: Uncaught exception in MPI_InitFinalize on proc "
-			<< this_mpi_process(MPI_COMM_WORLD)
-			<< ". Skipping MPI_Finalize() to avoid a deadlock."
-			<< std::endl;
-	    }
-	  else
-	    mpi_err = MPI_Finalize();
-	}
+          MPI_has_been_started != 0)
+        {
+          if (std::uncaught_exception())
+            {
+              std::cerr << "ERROR: Uncaught exception in MPI_InitFinalize on proc "
+                        << this_mpi_process(MPI_COMM_WORLD)
+                        << ". Skipping MPI_Finalize() to avoid a deadlock."
+                        << std::endl;
+            }
+          else
+            mpi_err = MPI_Finalize();
+        }
 
 
       AssertThrow (mpi_err == 0,
-		   ExcMessage ("An error occurred while calling MPI_Finalize()"));
+                   ExcMessage ("An error occurred while calling MPI_Finalize()"));
 #endif
     }
 

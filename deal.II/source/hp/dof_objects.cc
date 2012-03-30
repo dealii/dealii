@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,15 +30,15 @@ namespace internal
     }
 
 
-				     // explicit instantiations
+                                     // explicit instantiations
     template
     std::size_t
     DoFObjects<1>::memory_consumption () const;
-    
+
     template
     std::size_t
     DoFObjects<2>::memory_consumption () const;
-    
+
     template
     std::size_t
     DoFObjects<3>::memory_consumption () const;

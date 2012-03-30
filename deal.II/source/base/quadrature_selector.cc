@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,7 +22,7 @@ template <int dim>
 Quadrature<dim>
 QuadratureSelector<dim>::
 create_quadrature (const std::string &s,
-		   const unsigned int order)
+                   const unsigned int order)
 {
   if(s == "gauss")
     {
@@ -40,11 +40,11 @@ create_quadrature (const std::string &s,
       else if (s == "weddle")     return QWeddle<dim>();
     }
 
-				   // we didn't find this name
+                                   // we didn't find this name
   AssertThrow (false, ExcInvalidQuadrature(s));
-				   // return something to suppress
-				   // stupid warnings by some
-				   // compilers
+                                   // return something to suppress
+                                   // stupid warnings by some
+                                   // compilers
   return Quadrature<dim>();
 }
 
@@ -52,11 +52,11 @@ create_quadrature (const std::string &s,
 
 template <int dim>
 QuadratureSelector<dim>::QuadratureSelector (const std::string &s,
-					     const unsigned int order)
-		:
-		Quadrature<dim> (create_quadrature(s, order).get_points(),
-				 create_quadrature(s, order).get_weights())
-{ 
+                                             const unsigned int order)
+                :
+                Quadrature<dim> (create_quadrature(s, order).get_points(),
+                                 create_quadrature(s, order).get_weights())
+{
 }
 
 

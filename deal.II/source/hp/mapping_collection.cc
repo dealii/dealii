@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2006, 2011 by the deal.II authors
+//    Copyright (C) 2003, 2006, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,7 +62,7 @@ namespace hp
   MappingCollection<dim,spacedim>::memory_consumption () const
   {
     return (sizeof(*this) +
-	    MemoryConsumption::memory_consumption (mappings));
+            MemoryConsumption::memory_consumption (mappings));
   }
 
 

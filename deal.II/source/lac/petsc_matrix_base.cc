@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -284,7 +284,7 @@ namespace PETScWrappers
 
     ierr = MatAssemblyEnd (matrix,MAT_FINAL_ASSEMBLY);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
     last_action = LastAction::none;
   }
 
@@ -351,7 +351,7 @@ namespace PETScWrappers
 #endif
       begin, end;
     const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
-					   &begin, &end);
+                                           &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return std::make_pair (begin, end);
@@ -615,7 +615,7 @@ namespace PETScWrappers
   MatrixBase::is_symmetric (const double tolerance)
   {
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    PetscTruth 
+    PetscTruth
 #else
       PetscBool
 #endif
@@ -634,17 +634,17 @@ namespace PETScWrappers
   MatrixBase::is_hermitian (const double tolerance)
   {
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    PetscTruth 
+    PetscTruth
 #else
       PetscBool
 #endif
       truth;
 
-				     // First flush PETSc caches
+                                     // First flush PETSc caches
     compress ();
 
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
-				     // avoid warning about unused variables
+                                     // avoid warning about unused variables
     (void) tolerance;
 
     MatIsHermitian (matrix, &truth);
@@ -663,10 +663,10 @@ namespace PETScWrappers
                                        // Set options
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
     PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-			  PETSC_VIEWER_ASCII_DEFAULT);
+                          PETSC_VIEWER_ASCII_DEFAULT);
 #else
     PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-			  PETSC_VIEWER_DEFAULT);
+                          PETSC_VIEWER_DEFAULT);
 #endif
                                        // Write to screen
     MatView (matrix,PETSC_VIEWER_STDOUT_WORLD);

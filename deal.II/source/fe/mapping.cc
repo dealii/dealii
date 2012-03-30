@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2005, 2006, 2009, 2011 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2005, 2006, 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -90,10 +90,10 @@ Mapping<dim,spacedim>::transform_contravariant (
 
 template <int dim, int spacedim>
 Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
-		update_flags(update_default),
-		update_once(update_default),
-		update_each(update_default),
-		first_cell(true)
+                update_flags(update_default),
+                update_once(update_default),
+                update_each(update_default),
+                first_cell(true)
 {}
 
 

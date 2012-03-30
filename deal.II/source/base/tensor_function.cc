@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,8 +27,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int rank, int dim>
 TensorFunction<rank, dim>::TensorFunction (const double initial_time)
-		:
-		FunctionTime (initial_time)
+                :
+                FunctionTime (initial_time)
 {}
 
 
@@ -50,10 +50,10 @@ TensorFunction<rank, dim>::value (const Point<dim> &) const
 template <int rank, int dim>
 void
 TensorFunction<rank, dim>::value_list (const std::vector<Point<dim> > &points,
-				       std::vector<value_type>        &values) const
+                                       std::vector<value_type>        &values) const
 {
   Assert (values.size() == points.size(),
-	  ExcDimensionMismatch(values.size(), points.size()));
+          ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     values[i]  = this->value (points[i]);
@@ -72,10 +72,10 @@ TensorFunction<rank, dim>::gradient (const Point<dim> &) const
 template <int rank, int dim>
 void
 TensorFunction<rank, dim>::gradient_list (const std::vector<Point<dim> >   &points,
-					  std::vector<gradient_type> &gradients) const
+                                          std::vector<gradient_type> &gradients) const
 {
   Assert (gradients.size() == points.size(),
-	  ExcDimensionMismatch(gradients.size(), points.size()));
+          ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     gradients[i] = gradient(points[i]);

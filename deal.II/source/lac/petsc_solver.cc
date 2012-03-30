@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2006, 2008, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -39,7 +39,7 @@ namespace PETScWrappers
 #else
     int ierr = KSPDestroy (&ksp);
 #endif
-    
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // and destroy the solver object if we
@@ -96,8 +96,8 @@ namespace PETScWrappers
                                          // preconditioner
         set_solver_type (solver_data->ksp);
 
-	ierr = KSPSetPC (solver_data->ksp, preconditioner.get_pc());
-	AssertThrow (ierr == 0, ExcPETScError(ierr));
+        ierr = KSPSetPC (solver_data->ksp, preconditioner.get_pc());
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                          // then a convergence monitor
                                          // function. that function simply
@@ -110,7 +110,7 @@ namespace PETScWrappers
 #else
         KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
                                reinterpret_cast<void *>(&solver_control),
-			       PETSC_NULL);
+                               PETSC_NULL);
 #endif
 
       }
@@ -118,15 +118,15 @@ namespace PETScWrappers
                                      // set the command line option prefix name
     ierr = KSPSetOptionsPrefix(solver_data->ksp, prefix_name.c_str());
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
                                      // set the command line options provided
                                      // by the user to override the defaults
     ierr = KSPSetFromOptions (solver_data->ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
                                      // then do the real work: set up solver
                                      // internal data and solve the
-                                     // system. 
+                                     // system.
     ierr = KSPSetUp (solver_data->ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -169,9 +169,9 @@ namespace PETScWrappers
   int
   SolverBase::convergence_test (KSP                 /*ksp*/,
 #ifdef PETSC_USE_64BIT_INDICES
-				const PetscInt      iteration,
+                                const PetscInt      iteration,
 #else
-				const int           iteration,
+                                const int           iteration,
 #endif
                                 const PetscReal     residual_norm,
                                 KSPConvergedReason *reason,
@@ -248,21 +248,21 @@ namespace PETScWrappers
                                      // solution vector. do so here as well:
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
 
-				     // Hand over the absolute
-				     // tolerance and the maximum
-				     // iteration number to the PETSc
-				     // convergence criterion. The
-				     // custom deal.II SolverControl
-				     // object is ignored by the PETSc
-				     // Richardson method (when no
-				     // PETSc monitoring is present),
-				     // since in this case PETSc
-				     // uses a faster version of
-				     // the Richardson iteration,
-				     // where no residual is
-				     // available.
+                                     // Hand over the absolute
+                                     // tolerance and the maximum
+                                     // iteration number to the PETSc
+                                     // convergence criterion. The
+                                     // custom deal.II SolverControl
+                                     // object is ignored by the PETSc
+                                     // Richardson method (when no
+                                     // PETSc monitoring is present),
+                                     // since in this case PETSc
+                                     // uses a faster version of
+                                     // the Richardson iteration,
+                                     // where no residual is
+                                     // available.
     KSPSetTolerances(ksp, PETSC_DEFAULT, this->solver_control.tolerance(),
-		     PETSC_DEFAULT, this->solver_control.max_steps()+1);
+                     PETSC_DEFAULT, this->solver_control.max_steps()+1);
   }
 
 
@@ -357,10 +357,10 @@ namespace PETScWrappers
 
   SolverGMRES::AdditionalData::
   AdditionalData (const unsigned int restart_parameter,
-		  const bool right_preconditioning)
+                  const bool right_preconditioning)
                   :
                   restart_parameter (restart_parameter),
-		  right_preconditioning (right_preconditioning)
+                  right_preconditioning (right_preconditioning)
   {}
 
 
@@ -414,17 +414,17 @@ namespace PETScWrappers
     ierr = (*fun_ptr)(ksp,additional_data.restart_parameter);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-				     // Set preconditioning side to
-				     // right
+                                     // Set preconditioning side to
+                                     // right
     if (additional_data.right_preconditioning)
       {
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-	ierr = KSPSetPreconditionerSide(ksp, PC_RIGHT);
+        ierr = KSPSetPreconditionerSide(ksp, PC_RIGHT);
 #else
-	ierr = KSPSetPCSide(ksp, PC_RIGHT);
+        ierr = KSPSetPCSide(ksp, PC_RIGHT);
 #endif
 
-	AssertThrow (ierr == 0, ExcPETScError(ierr));
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
                                      // in the deal.II solvers, we always
@@ -611,8 +611,8 @@ namespace PETScWrappers
 /* ---------------------- SolverPreOnly ------------------------ */
 
   SolverPreOnly::SolverPreOnly (SolverControl        &cn,
-				const MPI_Comm       &mpi_communicator,
-				const AdditionalData &data)
+                                const MPI_Comm       &mpi_communicator,
+                                const AdditionalData &data)
                   :
                   SolverBase (cn, mpi_communicator),
                   additional_data (data)

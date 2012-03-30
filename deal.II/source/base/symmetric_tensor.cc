@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,13 +34,13 @@ invert<3,double> (const SymmetricTensor<4,3,double> &t)
                                    // references between libbase and liblac
   const unsigned int N = 6;
 
-				   // first get an estimate of the
-				   // size of the elements of this
-				   // matrix, for later checks whether
-				   // the pivot element is large
-				   // enough, or whether we have to
-				   // fear that the matrix is not
-				   // regular
+                                   // first get an estimate of the
+                                   // size of the elements of this
+                                   // matrix, for later checks whether
+                                   // the pivot element is large
+                                   // enough, or whether we have to
+                                   // fear that the matrix is not
+                                   // regular
   double diagonal_sum = 0;
   for (unsigned int i=0; i<N; ++i)
     diagonal_sum += std::fabs(tmp.data[i][i]);
@@ -52,10 +52,10 @@ invert<3,double> (const SymmetricTensor<4,3,double> &t)
 
   for (unsigned int j=0; j<N; ++j)
     {
-				       // pivot search: search that
-				       // part of the line on and
-				       // right of the diagonal for
-				       // the largest element
+                                       // pivot search: search that
+                                       // part of the line on and
+                                       // right of the diagonal for
+                                       // the largest element
       double       max = std::fabs(tmp.data[j][j]);
       unsigned int r   = j;
       for (unsigned int i=j+1; i<N; ++i)
@@ -64,47 +64,47 @@ invert<3,double> (const SymmetricTensor<4,3,double> &t)
             max = std::fabs(tmp.data[i][j]);
             r = i;
           }
-				       // check whether the pivot is
-				       // too small
+                                       // check whether the pivot is
+                                       // too small
       Assert(max > 1.e-16*typical_diagonal_element,
-	     ExcMessage("This tensor seems to be noninvertible"));
+             ExcMessage("This tensor seems to be noninvertible"));
 
-				       // row interchange
+                                       // row interchange
       if (r>j)
-	{
-	  for (unsigned int k=0; k<N; ++k)
-	    std::swap (tmp.data[j][k], tmp.data[r][k]);
+        {
+          for (unsigned int k=0; k<N; ++k)
+            std::swap (tmp.data[j][k], tmp.data[r][k]);
 
-	  std::swap (p[j], p[r]);
-	}
+          std::swap (p[j], p[r]);
+        }
 
-				       // transformation
+                                       // transformation
       const double hr = 1./tmp.data[j][j];
       tmp.data[j][j] = hr;
       for (unsigned int k=0; k<N; ++k)
-	{
-	  if (k==j) continue;
-	  for (unsigned int i=0; i<N; ++i)
-	    {
-	      if (i==j) continue;
-	      tmp.data[i][k] -= tmp.data[i][j]*tmp.data[j][k]*hr;
-	    }
-	}
+        {
+          if (k==j) continue;
+          for (unsigned int i=0; i<N; ++i)
+            {
+              if (i==j) continue;
+              tmp.data[i][k] -= tmp.data[i][j]*tmp.data[j][k]*hr;
+            }
+        }
       for (unsigned int i=0; i<N; ++i)
-	{
-	  tmp.data[i][j] *= hr;
-	  tmp.data[j][i] *= -hr;
-	}
+        {
+          tmp.data[i][j] *= hr;
+          tmp.data[j][i] *= -hr;
+        }
       tmp.data[j][j] = hr;
     }
-				   // column interchange
+                                   // column interchange
   double hv[N];
   for (unsigned int i=0; i<N; ++i)
     {
       for (unsigned int k=0; k<N; ++k)
-	hv[p[k]] = tmp.data[i][k];
+        hv[p[k]] = tmp.data[i][k];
       for (unsigned int k=0; k<N; ++k)
-	tmp.data[i][k] = hv[k];
+        tmp.data[i][k] = hv[k];
     }
 
                                    // scale rows and columns. the mult matrix

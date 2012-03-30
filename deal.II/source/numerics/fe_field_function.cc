@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
 {
-#  include "fe_field_function.inst"  
+#  include "fe_field_function.inst"
 }
 
 DEAL_II_NAMESPACE_CLOSE

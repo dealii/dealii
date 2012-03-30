@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,7 +41,7 @@ namespace internal
     DoFFaces<3>::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (quads) +
-	      MemoryConsumption::memory_consumption (lines) );
+              MemoryConsumption::memory_consumption (lines) );
     }
   }
 }

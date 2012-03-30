@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,9 +28,9 @@ namespace Algorithms
     names.push_back(name);
 
     Event result;
-				     // The constructor generated an
-				     // object with all flags equal
-				     // zero. Now we set the new one.
+                                     // The constructor generated an
+                                     // object with all flags equal
+                                     // zero. Now we set the new one.
     result.flags[index] = true;
 
     return result;
@@ -38,9 +38,9 @@ namespace Algorithms
 
 
   Event::Event ()
-		  :
-		  all_true(false),
-		  flags(names.size(), false)
+                  :
+                  all_true(false),
+                  flags(names.size(), false)
   {}
 
 

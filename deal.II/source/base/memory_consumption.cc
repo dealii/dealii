@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,7 +17,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace MemoryConsumption 
+namespace MemoryConsumption
 {
   std::size_t
   memory_consumption (const std::vector<std::string> &v)
@@ -27,7 +27,7 @@ namespace MemoryConsumption
       mem += memory_consumption(v[i]);
     return mem;
   }
-  
+
 
 }
 

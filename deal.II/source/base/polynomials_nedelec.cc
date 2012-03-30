@@ -30,9 +30,9 @@ PolynomialsNedelec<dim>::create_polynomials (const unsigned int k)
 }
 
 
-								// Compute the values, gradients
-								// and double gradients of the
-								// polynomial at the given point.
+                                                                // Compute the values, gradients
+                                                                // and double gradients of the
+                                                                // polynomial at the given point.
 template<int dim>
 void
 PolynomialsNedelec<dim>::compute (const Point<dim> &unit_point,
@@ -47,11 +47,11 @@ const
          ExcDimensionMismatch(grads.size (), n_pols));
   Assert(grad_grads.size () == n_pols || grad_grads.size () == 0,
          ExcDimensionMismatch(grad_grads.size (), n_pols));
-  
-   								// Declare the values, derivatives
-   								// and second derivatives vectors of
-   								// <tt>polynomial_space</tt> at
-   								// <tt>unit_point</tt>
+
+                                                                // Declare the values, derivatives
+                                                                // and second derivatives vectors of
+                                                                // <tt>polynomial_space</tt> at
+                                                                // <tt>unit_point</tt>
   const unsigned int& n_basis = polynomial_space.n ();
   std::vector<double> unit_point_values ((values.size () == 0) ? 0 : n_basis);
   std::vector<Tensor<1, dim> >
@@ -65,9 +65,9 @@ const
         {
           polynomial_space.compute (unit_point, unit_point_values,
                                     unit_point_grads, unit_point_grad_grads);
-          
-          						// Assign the correct values to the
-          						// corresponding shape functions.
+
+                                                        // Assign the correct values to the
+                                                        // corresponding shape functions.
           if (values.size () > 0)
             for (unsigned int i = 0; i < unit_point_values.size (); ++i)
               values[i][0] = unit_point_values[i];
@@ -87,27 +87,27 @@ const
         {
           polynomial_space.compute (unit_point, unit_point_values,
                                     unit_point_grads, unit_point_grad_grads);
-          
-         						// Declare the values, derivatives and
-         						// second derivatives vectors of
-         						// <tt>polynomial_space</tt> at
-         						// <tt>unit_point</tt> with coordinates
-         						// shifted one step in positive direction
+
+                                                        // Declare the values, derivatives and
+                                                        // second derivatives vectors of
+                                                        // <tt>polynomial_space</tt> at
+                                                        // <tt>unit_point</tt> with coordinates
+                                                        // shifted one step in positive direction
           Point<dim> p;
 
           p (0) = unit_point (1);
           p (1) = unit_point (0);
-          
+
           std::vector<double> p_values ((values.size () == 0) ? 0 : n_basis);
           std::vector<Tensor<1, dim> >
             p_grads ((grads.size () == 0) ? 0 : n_basis);
           std::vector<Tensor<2, dim> >
             p_grad_grads ((grad_grads.size () == 0) ? 0 : n_basis);
-          
+
           polynomial_space.compute (p, p_values, p_grads, p_grad_grads);
-          
-         						// Assign the correct values to the
-         						// corresponding shape functions.
+
+                                                        // Assign the correct values to the
+                                                        // corresponding shape functions.
           if (values.size () > 0)
             {
               for (unsigned int i = 0; i <= my_degree; ++i)
@@ -152,7 +152,7 @@ const
                           = unit_point_grads[i + j * (my_degree + 1)][k];
                         grads[i + (j + 2) * (my_degree + 1)][1][k] = 0.0;
                       }
-                  
+
                     grads[i + j * (my_degree + 1)][1][0]
                       = p_grads[i + j * (my_degree + 1)][1];
                     grads[i + j * (my_degree + 1)][1][1]
@@ -178,7 +178,7 @@ const
                                        + GeometryInfo<dim>::lines_per_cell)
                                 * (my_degree + 1)][0][k] = 0.0;
                         }
-                     
+
                      grads[i + (j + my_degree
                                   + GeometryInfo<dim>::lines_per_cell)
                            * (my_degree + 1)][1][0]
@@ -205,7 +205,7 @@ const
                           grad_grads[i + (j + 2) * (my_degree + 1)][1][k][l]
                             = 0.0;
                         }
-                  
+
                     grad_grads[i + j * (my_degree + 1)][1][0][0]
                       = p_grad_grads[i + j * (my_degree + 1)][1][1];
                     grad_grads[i + j * (my_degree + 1)][1][0][1]
@@ -237,7 +237,7 @@ const
                                             + GeometryInfo<dim>::lines_per_cell)
                                        * (my_degree + 1)][0][k][l] = 0.0;
                           }
-                        
+
                       grad_grads[i + (j + my_degree
                                         + GeometryInfo<dim>::lines_per_cell)
                                  * (my_degree + 1)][1][0][0]
@@ -264,13 +264,13 @@ const
         {
           polynomial_space.compute (unit_point, unit_point_values,
                                     unit_point_grads, unit_point_grad_grads);
-          
-         							// Declare the values, derivatives
-         							// and second derivatives vectors of
-         							// <tt>polynomial_space</tt> at
-         							// <tt>unit_point</tt> with coordinates
-         							// shifted two steps in positive
-         							// direction
+
+                                                                // Declare the values, derivatives
+                                                                // and second derivatives vectors of
+                                                                // <tt>polynomial_space</tt> at
+                                                                // <tt>unit_point</tt> with coordinates
+                                                                // shifted two steps in positive
+                                                                // direction
           Point<dim> p1, p2;
           std::vector<double> p1_values ((values.size () == 0) ? 0 : n_basis);
           std::vector<Tensor<1, dim> >
@@ -291,9 +291,9 @@ const
           p2 (1) = unit_point (0);
           p2 (2) = unit_point (1);
           polynomial_space.compute (p2, p2_values, p2_grads, p2_grad_grads);
-          
-         							// Assign the correct values to the
-         							// corresponding shape functions.
+
+                                                                // Assign the correct values to the
+                                                                // corresponding shape functions.
           if (values.size () > 0)
             {
               for (unsigned int i = 0; i <= my_degree; ++i)
@@ -432,7 +432,7 @@ const
                                  * my_degree + j
                                  + GeometryInfo<dim>::lines_per_cell][2]
                             = p2_values[i + (j + k * (my_degree + 2) + 2)
-                                          * (my_degree + 1)]; 
+                                          * (my_degree + 1)];
                           values[i + (j + (2 * k + 5) * my_degree
                                       + GeometryInfo<dim>::lines_per_cell)
                                  * (my_degree + 1)][0]
@@ -476,7 +476,7 @@ const
                               grads[i + (j + 4 * k + 2) * (my_degree + 1)][0][l]
                                 = unit_point_grads[i + (j + k * (my_degree + 2))
                                                    * (my_degree + 1)][l];
-                        
+
                             grads[i + (j + 2 * (k + 4)) * (my_degree + 1)][2][0]
                               = p2_grads[i + (j + k * (my_degree + 2))
                                          * (my_degree + 1)][1];
@@ -556,7 +556,7 @@ const
                                                         * (my_degree + 2) + 2)
                                                    * (my_degree + 1)][l];
                             }
-                           
+
                           grads[(i + (j + 2 * GeometryInfo<dim>::faces_per_cell
                                       + my_degree) * (my_degree + 1)
                                  + GeometryInfo<dim>::lines_per_cell)
@@ -607,8 +607,8 @@ const
                           for (unsigned int l = 0; l < 2; ++l)
                             for (unsigned int m = 0; m < dim; ++m)
                               {
-                           	    for (unsigned int n = 0; n < 2; ++n)
-                           	      {
+                                    for (unsigned int n = 0; n < 2; ++n)
+                                      {
                                     grads[i + (j + (2 * (k + 2 * l) + 1)
                                                * my_degree
                                                + GeometryInfo<dim>::lines_per_cell)
@@ -750,7 +750,7 @@ const
                                                           * (my_degree + 1)][l]
                                                          [m];
                               }
-                     
+
                           grad_grads[i + (j + 2 * (k + 4)) * (my_degree + 1)]
                                     [2][0][0]
                             = p2_grad_grads[i + (j + k * (my_degree + 2))
@@ -916,7 +916,7 @@ const
                                                           + 2) * (my_degree
                                                                   + 1)][l][m];
                               }
-                           
+
                           grad_grads[(i + (j + 2
                                            * GeometryInfo<dim>::faces_per_cell
                                            + my_degree)
@@ -1099,7 +1099,7 @@ const
                                                * (my_degree + 1)][2 * n][l][m]
                                       = 0.0;
                                   }
-                              
+
                                 grad_grads[i + (j + (2 * k + 5) * my_degree
                                                 + GeometryInfo<dim>::lines_per_cell)
                                              * (my_degree + 1)]
@@ -1331,10 +1331,10 @@ const
                         }
                     }
             }
-         
+
           break;
         }
-        
+
       default:
         Assert (false, ExcNotImplemented ());
     }

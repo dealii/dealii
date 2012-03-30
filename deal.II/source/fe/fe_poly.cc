@@ -33,10 +33,10 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values
  FEValuesData<1,2>                         &data,
  CellSimilarity::Similarity           &cell_similarity) const
 {
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
+                                   // convert data object to internal
+                                   // data for this class. fails with
+                                   // an exception if that is not
+                                   // possible
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 
@@ -45,17 +45,17 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       if (flags & update_values)
-	for (unsigned int i=0; i<quadrature.size(); ++i)
-	  data.shape_values(k,i) = fe_data.shape_values[k][i];
+        for (unsigned int i=0; i<quadrature.size(); ++i)
+          data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-	mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
-			  mapping_data, mapping_covariant);
+        mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
+                          mapping_data, mapping_covariant);
     }
 
   if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     this->compute_2nd (mapping, cell, QProjector<1>::DataSetDescriptor::cell(),
-		       mapping_data, fe_data, data);
+                       mapping_data, fe_data, data);
 }
 
 
@@ -72,8 +72,8 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values
  CellSimilarity::Similarity         &cell_similarity) const
 {
 
-				   // assert that the following dynamics
-				   // cast is really well-defined.
+                                   // assert that the following dynamics
+                                   // cast is really well-defined.
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 
@@ -82,17 +82,17 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       if (flags & update_values)
-	for (unsigned int i=0; i<quadrature.size(); ++i)
-	  data.shape_values(k,i) = fe_data.shape_values[k][i];
+        for (unsigned int i=0; i<quadrature.size(); ++i)
+          data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-	mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
-			  mapping_data, mapping_covariant);
+        mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
+                          mapping_data, mapping_covariant);
     }
 
   if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     this->compute_2nd (mapping, cell, QProjector<2>::DataSetDescriptor::cell(),
-		       mapping_data, fe_data, data);
+                       mapping_data, fe_data, data);
 }
 
 
@@ -107,10 +107,10 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
   FEValuesData<1,2>                       &data,
   CellSimilarity::Similarity         &cell_similarity) const
 {
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
+                                   // convert data object to internal
+                                   // data for this class. fails with
+                                   // an exception if that is not
+                                   // possible
 
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
@@ -120,17 +120,17 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       if (flags & update_values)
-	for (unsigned int i=0; i<quadrature.size(); ++i)
-	  data.shape_values(k,i) = fe_data.shape_values[k][i];
+        for (unsigned int i=0; i<quadrature.size(); ++i)
+          data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-	mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
-			  mapping_data, mapping_covariant);
+        mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
+                          mapping_data, mapping_covariant);
     }
 
   if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     this->compute_2nd (mapping, cell, QProjector<1>::DataSetDescriptor::cell(),
-		       mapping_data, fe_data, data);
+                       mapping_data, fe_data, data);
 }
 
 
@@ -153,18 +153,18 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       if (flags & update_values)
-	for (unsigned int i=0; i<quadrature.size(); ++i)
-	  data.shape_values(k,i) = fe_data.shape_values[k][i];
+        for (unsigned int i=0; i<quadrature.size(); ++i)
+          data.shape_values(k,i) = fe_data.shape_values[k][i];
 
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-	mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
-			  mapping_data, mapping_covariant);
+        mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
+                          mapping_data, mapping_covariant);
     }
 
   if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     this->compute_2nd (mapping, cell, QProjector<2>::DataSetDescriptor::cell(),
-		       mapping_data, fe_data, data);
+                       mapping_data, fe_data, data);
 }
 
 

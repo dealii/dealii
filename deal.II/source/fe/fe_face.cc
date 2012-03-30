@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2011 by the deal.II authors
+//    Copyright (C) 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,11 +19,11 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
-		:
+                :
                 FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim> (
-		  TensorProductPolynomials<dim-1>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
-		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-		  std::vector<bool>(1,true))
+                  TensorProductPolynomials<dim-1>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
+                  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+                  std::vector<bool>(1,true))
 {}
 
 
@@ -39,12 +39,12 @@ template <int dim, int spacedim>
 std::string
 FE_FaceQ<dim,spacedim>::get_name () const
 {
-				   // note that the
-				   // FETools::get_fe_from_name
-				   // function depends on the
-				   // particular format of the string
-				   // this function returns, so they
-				   // have to be kept in synch
+                                   // note that the
+                                   // FETools::get_fe_from_name
+                                   // function depends on the
+                                   // particular format of the string
+                                   // this function returns, so they
+                                   // have to be kept in synch
 
   std::ostringstream namebuf;
   namebuf << "FE_FaceQ<" << dim << ">(" << this->degree << ")";

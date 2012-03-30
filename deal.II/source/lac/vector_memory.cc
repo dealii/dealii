@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,8 +36,8 @@ Threads::ThreadMutex GrowingVectorMemory<VECTOR>::mutex;
 template <typename VECTOR>
 inline
 GrowingVectorMemory<VECTOR>::Pool::Pool()
-		:
-		data(0)
+                :
+                data(0)
 {}
 
 
@@ -46,20 +46,20 @@ template <typename VECTOR>
 inline
 GrowingVectorMemory<VECTOR>::Pool::~Pool()
 {
-				   // Nothing to do if memory was unused.
+                                   // Nothing to do if memory was unused.
   if (data == 0) return;
 
-				   // First, delete all remaining
-				   // vectors. Actually, there should
-				   // be none, if there is no memory
-				   // leak
+                                   // First, delete all remaining
+                                   // vectors. Actually, there should
+                                   // be none, if there is no memory
+                                   // leak
   unsigned int n=0;
   for (typename std::vector<entry_type>::iterator i=data->begin();
        i != data->end();
        ++i)
     {
       if (i->first == true)
-	++n;
+        ++n;
       delete i->second;
     }
   delete data;
@@ -76,12 +76,12 @@ GrowingVectorMemory<VECTOR>::Pool::initialize(const unsigned int size)
       data = new std::vector<entry_type>(size);
 
       for (typename std::vector<entry_type>::iterator i= data->begin();
-	   i != data->end();
-	   ++i)
-	{
-	  i->first = false;
-	  i->second = new VECTOR;
-	}
+           i != data->end();
+           ++i)
+        {
+          i->first = false;
+          i->second = new VECTOR;
+        }
     }
 }
 
@@ -89,12 +89,12 @@ GrowingVectorMemory<VECTOR>::Pool::initialize(const unsigned int size)
 template <typename VECTOR>
 inline
 GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const unsigned int initial_size,
-						  const bool log_statistics)
+                                                  const bool log_statistics)
 
-		:
-		total_alloc(0),
-		current_alloc(0),
-		log_statistics(log_statistics)
+                :
+                total_alloc(0),
+                current_alloc(0),
+                log_statistics(log_statistics)
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
   pool.initialize(initial_size);
@@ -106,13 +106,13 @@ inline
 GrowingVectorMemory<VECTOR>::~GrowingVectorMemory()
 {
   AssertThrow(current_alloc == 0,
-	      StandardExceptions::ExcMemoryLeak(current_alloc));
+              StandardExceptions::ExcMemoryLeak(current_alloc));
   if (log_statistics)
     {
       deallog << "GrowingVectorMemory:Overall allocated vectors: "
-	      << total_alloc << std::endl;
+              << total_alloc << std::endl;
       deallog << "GrowingVectorMemory:Maximum allocated vectors: "
-	      << pool.data->size() << std::endl;
+              << pool.data->size() << std::endl;
     }
 }
 
@@ -126,20 +126,20 @@ GrowingVectorMemory<VECTOR>::alloc ()
   Threads::ThreadMutex::ScopedLock lock(mutex);
   ++total_alloc;
   ++current_alloc;
-				   // see if there is a free vector
-				   // available in our list
+                                   // see if there is a free vector
+                                   // available in our list
   for (typename std::vector<entry_type>::iterator i=pool.data->begin();
        i != pool.data->end(); ++i)
     {
       if (i->first == false)
-	{
-	  i->first = true;
-	  return (i->second);
-	}
+        {
+          i->first = true;
+          return (i->second);
+        }
     }
 
-				   // no free vector found, so let's
-				   // just allocate a new one
+                                   // no free vector found, so let's
+                                   // just allocate a new one
   const entry_type t (true, new VECTOR);
   pool.data->push_back(t);
 
@@ -158,11 +158,11 @@ GrowingVectorMemory<VECTOR>::free(const VECTOR* const v)
        i != pool.data->end(); ++i)
     {
       if (v == (i->second))
-	{
-	  i->first = false;
-	  --current_alloc;
-	  return;
-	}
+        {
+          i->first = false;
+          --current_alloc;
+          return;
+        }
     }
   Assert(false, typename VectorMemory<VECTOR>::ExcNotAllocatedHere());
 }
@@ -181,13 +181,13 @@ GrowingVectorMemory<VECTOR>::release_unused_memory ()
   if (pool.data != 0)
     {
       const typename std::vector<entry_type>::const_iterator
-	end = pool.data->end();
+        end = pool.data->end();
       for (typename std::vector<entry_type>::const_iterator
-	     i = pool.data->begin(); i != end ; ++i)
-	if (i->first == false)
-	  delete i->second;
-	else
-	  new_data.push_back (*i);
+             i = pool.data->begin(); i != end ; ++i)
+        if (i->first == false)
+          delete i->second;
+        else
+          new_data.push_back (*i);
 
       *pool.data = new_data;
     }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2006, 2011 by the deal.II authors
+//    Copyright (C) 2003, 2006, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,7 @@ namespace internal
       return (DoFLevel<0>::memory_consumption() +
               MemoryConsumption::memory_consumption (lines));
     }
-    
+
 
 
     std::size_t
@@ -54,7 +54,7 @@ namespace internal
     {
       return MemoryConsumption::memory_consumption (active_fe_indices);
     }
-    
+
   }
 }
 

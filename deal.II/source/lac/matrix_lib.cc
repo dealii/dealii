@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,8 +18,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 MeanValueFilter::MeanValueFilter(unsigned int component)
-		:
-		component(component)
+                :
+                component(component)
 {}
 
 
@@ -28,10 +28,10 @@ ProductSparseMatrix<number, vnumber>::ProductSparseMatrix(
   const MatrixType& mat1,
   const MatrixType& mat2,
   VectorMemory<VectorType>& mem)
-		:
-		m1(&mat1, typeid(*this).name()),
-		m2(&mat2, typeid(*this).name()),
-		mem(&mem, typeid(*this).name())
+                :
+                m1(&mat1, typeid(*this).name()),
+                m2(&mat2, typeid(*this).name()),
+                mem(&mem, typeid(*this).name())
 {
   Assert(mat1.n() == mat2.m(), ExcDimensionMismatch(mat1.n(),mat2.m()));
 }
@@ -39,10 +39,10 @@ ProductSparseMatrix<number, vnumber>::ProductSparseMatrix(
 
 template<typename number, typename vnumber>
 ProductSparseMatrix<number, vnumber>::ProductSparseMatrix()
-		:
-		m1(0, typeid(*this).name()),
-		m2(0, typeid(*this).name()),
-		mem(0, typeid(*this).name())
+                :
+                m1(0, typeid(*this).name()),
+                m2(0, typeid(*this).name()),
+                mem(0, typeid(*this).name())
 {}
 
 
@@ -76,7 +76,7 @@ ProductSparseMatrix<number, vnumber>::vmult (VectorType& dst, const VectorType& 
   Assert(mem != 0, ExcNotInitialized());
   Assert(m1 != 0, ExcNotInitialized());
   Assert(m2 != 0, ExcNotInitialized());
-  
+
   VectorType* v = mem->alloc();
   v->reinit(m1->n());
   m2->vmult (*v, src);
@@ -92,7 +92,7 @@ ProductSparseMatrix<number, vnumber>::vmult_add (VectorType& dst, const VectorTy
   Assert(mem != 0, ExcNotInitialized());
   Assert(m1 != 0, ExcNotInitialized());
   Assert(m2 != 0, ExcNotInitialized());
-  
+
   VectorType* v = mem->alloc();
   v->reinit(m1->n());
   m2->vmult (*v, src);
@@ -108,7 +108,7 @@ ProductSparseMatrix<number, vnumber>::Tvmult (VectorType& dst, const VectorType&
   Assert(mem != 0, ExcNotInitialized());
   Assert(m1 != 0, ExcNotInitialized());
   Assert(m2 != 0, ExcNotInitialized());
-  
+
   VectorType* v = mem->alloc();
   v->reinit(m1->n());
   m1->Tvmult (*v, src);
@@ -124,7 +124,7 @@ ProductSparseMatrix<number, vnumber>::Tvmult_add (VectorType& dst, const VectorT
   Assert(mem != 0, ExcNotInitialized());
   Assert(m1 != 0, ExcNotInitialized());
   Assert(m2 != 0, ExcNotInitialized());
-  
+
   VectorType* v = mem->alloc();
   v->reinit(m1->n());
   m1->Tvmult (*v, src);
@@ -151,22 +151,22 @@ template void MeanValueFilter::filter(Vector<double>&) const;
 template void MeanValueFilter::filter(BlockVector<float>&) const;
 template void MeanValueFilter::filter(BlockVector<double>&) const;
 template void MeanValueFilter::vmult(Vector<float>&,
-				     const Vector<float>&) const;
+                                     const Vector<float>&) const;
 template void MeanValueFilter::vmult(Vector<double>&,
-				     const Vector<double>&) const;
+                                     const Vector<double>&) const;
 template void MeanValueFilter::vmult(BlockVector<float>&,
-				     const BlockVector<float>&) const;
+                                     const BlockVector<float>&) const;
 template void MeanValueFilter::vmult(BlockVector<double>&,
-				     const BlockVector<double>&) const;
+                                     const BlockVector<double>&) const;
 
 template void MeanValueFilter::vmult_add(Vector<float>&,
-					 const Vector<float>&) const;
+                                         const Vector<float>&) const;
 template void MeanValueFilter::vmult_add(Vector<double>&,
-					 const Vector<double>&) const;
+                                         const Vector<double>&) const;
 template void MeanValueFilter::vmult_add(BlockVector<float>&,
-					 const BlockVector<float>&) const;
+                                         const BlockVector<float>&) const;
 template void MeanValueFilter::vmult_add(BlockVector<double>&,
-					 const BlockVector<double>&) const;
+                                         const BlockVector<double>&) const;
 
 template class InverseMatrixRichardson<Vector<float> >;
 template class InverseMatrixRichardson<Vector<double> >;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,20 +22,20 @@ ConvergenceTable::ConvergenceTable()
 
 
 void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
-						  const std::string &reference_column_key,
-						  const RateMode     rate_mode)
+                                                  const std::string &reference_column_key,
+                                                  const RateMode     rate_mode)
 {
   Assert(columns.count(data_column_key),
-	 ExcColumnNotExistent(data_column_key));
+         ExcColumnNotExistent(data_column_key));
   Assert(columns.count(reference_column_key),
-	 ExcColumnNotExistent(reference_column_key));
+         ExcColumnNotExistent(reference_column_key));
 
   if (rate_mode==none)
     return;
 
-				   // reset the auto fill mode flag since we
-				   // are going to fill columns from the top
-				   // that don't yet exist
+                                   // reset the auto fill mode flag since we
+                                   // are going to fill columns from the top
+                                   // that don't yet exist
   set_auto_fill_mode (false);
 
   std::vector<internal::TableEntry> &entries=columns[data_column_key].entries;
@@ -58,29 +58,29 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
   switch (rate_mode)
     {
       case none:
-	    break;
+            break;
       case reduction_rate:
-	    rate_key+="red.rate";
-	    Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
-					     // no value available for the
-					     // first row
-	    add_value(rate_key, std::string("-"));
-	    for (unsigned int i=1; i<n; ++i)
-		add_value(rate_key, values[i-1]/values[i] *
-			            ref_values[i]/ref_values[i-1]);
-	    break;
+            rate_key+="red.rate";
+            Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
+                                             // no value available for the
+                                             // first row
+            add_value(rate_key, std::string("-"));
+            for (unsigned int i=1; i<n; ++i)
+                add_value(rate_key, values[i-1]/values[i] *
+                                    ref_values[i]/ref_values[i-1]);
+            break;
       case reduction_rate_log2:
-	    rate_key+="red.rate";
-	    Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
-					     // no value available for the
-					     // first row
-	    add_value(rate_key, std::string("-"));
-	    for (unsigned int i=1; i<n; ++i)
-		add_value(rate_key, 2*std::log(std::fabs(values[i-1]/values[i])) /
-			  std::log(std::fabs(ref_values[i]/ref_values[i-1])));
-	    break;
+            rate_key+="red.rate";
+            Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
+                                             // no value available for the
+                                             // first row
+            add_value(rate_key, std::string("-"));
+            for (unsigned int i=1; i<n; ++i)
+                add_value(rate_key, 2*std::log(std::fabs(values[i-1]/values[i])) /
+                          std::log(std::fabs(ref_values[i]/ref_values[i-1])));
+            break;
       default:
-	    Assert(false, ExcNotImplemented());
+            Assert(false, ExcNotImplemented());
     }
 
   Assert(columns.count(rate_key), ExcInternalError());
@@ -105,9 +105,9 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
 {
   Assert(columns.count(data_column_key), ExcColumnNotExistent(data_column_key));
 
-				   // reset the auto fill mode flag since we
-				   // are going to fill columns from the top
-				   // that don't yet exist
+                                   // reset the auto fill mode flag since we
+                                   // are going to fill columns from the top
+                                   // that don't yet exist
   set_auto_fill_mode (false);
 
   std::vector<internal::TableEntry> &entries = columns[data_column_key].entries;
@@ -122,40 +122,40 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
   switch (rate_mode)
     {
       case none:
-	    break;
+            break;
 
       case reduction_rate:
-	    rate_key+="red.rate";
-	    Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
-					     // no value available for the
-					     // first row
-	    add_value(rate_key, std::string("-"));
-	    for (unsigned int i=1; i<n; ++i)
-	      add_value(rate_key, values[i-1]/values[i]);
-	    break;
+            rate_key+="red.rate";
+            Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
+                                             // no value available for the
+                                             // first row
+            add_value(rate_key, std::string("-"));
+            for (unsigned int i=1; i<n; ++i)
+              add_value(rate_key, values[i-1]/values[i]);
+            break;
 
       case reduction_rate_log2:
-	    rate_key+="red.rate.log2";
-	    Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
-					     // no value availble for the
-					     // first row
-	    add_value(rate_key, std::string("-"));
-	    for (unsigned int i=1; i<n; ++i)
-	      add_value(rate_key, std::log(std::fabs(values[i-1]/values[i]))/std::log(2.0));
-	    break;
+            rate_key+="red.rate.log2";
+            Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
+                                             // no value availble for the
+                                             // first row
+            add_value(rate_key, std::string("-"));
+            for (unsigned int i=1; i<n; ++i)
+              add_value(rate_key, std::log(std::fabs(values[i-1]/values[i]))/std::log(2.0));
+            break;
 
       default:
-	    ExcNotImplemented();
+            ExcNotImplemented();
     }
 
   Assert(columns.count(rate_key), ExcInternalError());
   columns[rate_key].flag=1;
   set_precision(rate_key, 2);
 
-				   // set the superkey equal to the key
+                                   // set the superkey equal to the key
   std::string superkey=data_column_key;
-				   // and set the tex caption of the supercolumn
-				   // to the tex caption of the data_column.
+                                   // and set the tex caption of the supercolumn
+                                   // to the tex caption of the data_column.
   if (!supercolumns.count(superkey))
     {
       add_column_to_supercolumn(data_column_key, superkey);

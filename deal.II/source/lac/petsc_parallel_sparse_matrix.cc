@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2008, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -198,20 +198,20 @@ namespace PETScWrappers
 #ifdef DEAL_II_USE_PETSC_DEV
       ierr
         = MatCreateAIJ (communicator,
-			local_rows, local_columns,
-			m, n,
-			n_nonzero_per_row, 0, 0, 0,
-			&matrix);
+                        local_rows, local_columns,
+                        m, n,
+                        n_nonzero_per_row, 0, 0, 0,
+                        &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       ierr = MatSetOption (matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
 #else
       ierr
         = MatCreateMPIAIJ (communicator,
-			   local_rows, local_columns,
-			   m, n,
-			   n_nonzero_per_row, 0, 0, 0,
-			   &matrix);
+                           local_rows, local_columns,
+                           m, n,
+                           n_nonzero_per_row, 0, 0, 0,
+                           &matrix);
 #endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -222,8 +222,8 @@ namespace PETScWrappers
           const int ierr
             = MatSetOption (matrix, MAT_SYMMETRIC);
 #else
-	  const int ierr
-	    = MatSetOption (matrix, MAT_SYMMETRIC, PETSC_TRUE);
+          const int ierr
+            = MatSetOption (matrix, MAT_SYMMETRIC, PETSC_TRUE);
 #endif
 
           AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -245,15 +245,15 @@ namespace PETScWrappers
       Assert (row_lengths.size() == m,
               ExcDimensionMismatch (row_lengths.size(), m));
 
-				       // For the case that
-				       // local_columns is smaller
-				       // than one of the row lengths
-				       // MatCreateMPIAIJ throws an
-				       // error. In this case use a
-				       // PETScWrappers::SparseMatrix
+                                       // For the case that
+                                       // local_columns is smaller
+                                       // than one of the row lengths
+                                       // MatCreateMPIAIJ throws an
+                                       // error. In this case use a
+                                       // PETScWrappers::SparseMatrix
       for (unsigned int i=0; i<row_lengths.size(); ++i)
-	Assert(row_lengths[i]<=local_columns,
-	       ExcIndexRange(row_lengths[i], 1, local_columns+1));
+        Assert(row_lengths[i]<=local_columns,
+               ExcIndexRange(row_lengths[i], 1, local_columns+1));
 
                                        // use the call sequence indicating a
                                        // maximal number of elements for each
@@ -265,7 +265,7 @@ namespace PETScWrappers
                                        // tricks with conversions of pointers
 #ifdef PETSC_USE_64BIT_INDICES
       const std::vector<PetscInt> int_row_lengths (row_lengths.begin(),
-						   row_lengths.end());
+                                                   row_lengths.end());
 #else
       const std::vector<signed int> int_row_lengths (row_lengths.begin(),
                                                      row_lengths.end());
@@ -278,10 +278,10 @@ namespace PETScWrappers
 #ifdef DEAL_II_USE_PETSC_DEV
       ierr
         = MatCreateAIJ (communicator,
-			local_rows, local_columns,
-			m, n,
-			0, &int_row_lengths[0], 0, 0,
-			&matrix);
+                        local_rows, local_columns,
+                        m, n,
+                        0, &int_row_lengths[0], 0, 0,
+                        &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 //TODO: Sometimes the actual number of nonzero entries allocated is greater than the number of nonzero entries, which petsc will complain about unless explicitly disabled with MatSetOption. There is probably a way to prevent a different number nonzero elements being allocated in the first place. (See also previous TODO).
@@ -290,10 +290,10 @@ namespace PETScWrappers
 #else
       ierr
         = MatCreateMPIAIJ (communicator,
-			   local_rows, local_columns,
-			   m, n,
-			   0, &int_row_lengths[0], 0, 0,
-			   &matrix);
+                           local_rows, local_columns,
+                           m, n,
+                           0, &int_row_lengths[0], 0, 0,
+                           &matrix);
 #endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -304,8 +304,8 @@ namespace PETScWrappers
           const int ierr
             = MatSetOption (matrix, MAT_SYMMETRIC);
 #else
-	  const int ierr
-	    = MatSetOption (matrix, MAT_SYMMETRIC, PETSC_TRUE);
+          const int ierr
+            = MatSetOption (matrix, MAT_SYMMETRIC, PETSC_TRUE);
 #endif
 
           AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -346,14 +346,14 @@ namespace PETScWrappers
         local_row_end = local_row_start + local_rows_per_process[this_process];
 
 #if DEAL_II_PETSC_VERSION_LT(2,3,3)
-				       //old version to create the matrix, we
-				       //can skip calculating the row length
-				       //at least starting from 2.3.3 (tested,
-				       //see below)
+                                       //old version to create the matrix, we
+                                       //can skip calculating the row length
+                                       //at least starting from 2.3.3 (tested,
+                                       //see below)
 
       const unsigned int
-        local_col_end = local_col_start + local_columns_per_process[this_process];      
-	  
+        local_col_end = local_col_start + local_columns_per_process[this_process];
+
                                        // then count the elements in- and
                                        // out-of-window for the rows we own
 #ifdef PETSC_USE_64BIT_INDICES
@@ -361,8 +361,8 @@ namespace PETScWrappers
 #else
       std::vector<int>
 #endif
-	row_lengths_in_window (local_row_end - local_row_start),
-	row_lengths_out_of_window (local_row_end - local_row_start);
+        row_lengths_in_window (local_row_end - local_row_start),
+        row_lengths_out_of_window (local_row_end - local_row_start);
       for (unsigned int row = local_row_start; row<local_row_end; ++row)
         for (unsigned int c=0; c<sparsity_pattern.row_length(row); ++c)
           {
@@ -385,36 +385,36 @@ namespace PETScWrappers
                                        // _all_ rows.
       const int ierr
         = MatCreateMPIAIJ(communicator,
-			  local_rows_per_process[this_process],
+                          local_rows_per_process[this_process],
                           local_columns_per_process[this_process],
-			  sparsity_pattern.n_rows(),
+                          sparsity_pattern.n_rows(),
                           sparsity_pattern.n_cols(),
                           0, &row_lengths_in_window[0],
                           0, &row_lengths_out_of_window[0],
                           &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-      
+
 #else //PETSC_VERSION>=2.3.3
-				       // new version to create the matrix. We
-				       // do not set row length but set the
-				       // correct SparsityPattern later.
+                                       // new version to create the matrix. We
+                                       // do not set row length but set the
+                                       // correct SparsityPattern later.
       int ierr;
-      
+
       ierr = MatCreate(communicator,&matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-      
+
       ierr = MatSetSizes(matrix,
-			 local_rows_per_process[this_process],
-			 local_columns_per_process[this_process],
-			 sparsity_pattern.n_rows(),
-			 sparsity_pattern.n_cols());
+                         local_rows_per_process[this_process],
+                         local_columns_per_process[this_process],
+                         sparsity_pattern.n_rows(),
+                         sparsity_pattern.n_cols());
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-      
+
       ierr = MatSetType(matrix,MATMPIAIJ);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif
-      
-      
+
+
                                        // next preset the exact given matrix
                                        // entries with zeros, if the user
                                        // requested so. this doesn't avoid any
@@ -475,8 +475,8 @@ namespace PETScWrappers
 #else
           std::vector<int>
 #endif
-	    rowstart_in_window (local_row_end - local_row_start + 1, 0),
-	    colnums_in_window;
+            rowstart_in_window (local_row_end - local_row_start + 1, 0),
+            colnums_in_window;
           {
             unsigned int n_cols = 0;
             for (unsigned int i=local_row_start; i<local_row_end; ++i)
@@ -491,25 +491,25 @@ namespace PETScWrappers
 
                                            // now copy over the information
                                            // from the sparsity pattern.
-	  {
+          {
 #ifdef PETSC_USE_64BIT_INDICES
-	    PetscInt
+            PetscInt
 #else
-	    int
+            int
 #endif
-	      * ptr = & colnums_in_window[0];
-	      
-            for (unsigned int i=local_row_start; i<local_row_end; ++i)
-	      {
-		typename SparsityType::row_iterator
-		  row_start = sparsity_pattern.row_begin(i),
-		  row_end = sparsity_pattern.row_end(i);
+              * ptr = & colnums_in_window[0];
 
-		std::copy(row_start, row_end, ptr);
-		ptr += row_end - row_start;
-	      }
-	  }
-	  
+            for (unsigned int i=local_row_start; i<local_row_end; ++i)
+              {
+                typename SparsityType::row_iterator
+                  row_start = sparsity_pattern.row_begin(i),
+                  row_end = sparsity_pattern.row_end(i);
+
+                std::copy(row_start, row_end, ptr);
+                ptr += row_end - row_start;
+              }
+          }
+
 
                                            // then call the petsc function
                                            // that summarily allocates these
@@ -520,10 +520,10 @@ namespace PETScWrappers
                                         0);
 
 #if DEAL_II_PETSC_VERSION_LT(2,3,3)
-					   // this is only needed for old
-					   // PETSc versions:
-	  
-					   // for some reason, it does not
+                                           // this is only needed for old
+                                           // PETSc versions:
+
+                                           // for some reason, it does not
                                            // seem to be possible to force
                                            // actual allocation of actual
                                            // entries by using the last
@@ -547,11 +547,11 @@ namespace PETScWrappers
             for (unsigned int i=local_row_start; i<local_row_end; ++i)
               {
 #ifdef PETSC_USE_64BIT_INDICES
-		PetscInt
+                PetscInt
 #else
-		int
+                int
 #endif
-		  petsc_i = i;
+                  petsc_i = i;
                 MatSetValues (matrix, 1, &petsc_i,
                               sparsity_pattern.row_length(i),
                               &colnums_in_window[rowstart_in_window[i-local_row_start]],
@@ -569,47 +569,47 @@ namespace PETScWrappers
 
 #endif
 
-				           // Tell PETSc that we are not
-				           // planning on adding new entries
-				           // to the matrix. Generate errors
-				           // in debug mode.
+                                           // Tell PETSc that we are not
+                                           // planning on adding new entries
+                                           // to the matrix. Generate errors
+                                           // in debug mode.
           int ierr;
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
 #ifdef DEBUG
-	  ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR);
-	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
 #else
-	  ierr = MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
-	  AssertThrow (ierr == 0, ExcPETScError(ierr));
-#endif  
+          ierr = MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+#endif
 #else
 #ifdef DEBUG
-	  ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
-	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
 #else
-	  ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
-	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif
 #endif
 
-					   // Tell PETSc to keep the
-					   // SparsityPattern entries even if
-					   // we delete a row with
-					   // clear_rows() which calls
-					   // MatZeroRows(). Otherwise one can
-					   // not write into that row
-					   // afterwards.
+                                           // Tell PETSc to keep the
+                                           // SparsityPattern entries even if
+                                           // we delete a row with
+                                           // clear_rows() which calls
+                                           // MatZeroRows(). Otherwise one can
+                                           // not write into that row
+                                           // afterwards.
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
-	  ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS);
-	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
 #elif DEAL_II_PETSC_VERSION_LT(3,1,0)
-	  ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
-	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
 #else
-	  ierr = MatSetOption (matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
-	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = MatSetOption (matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif
-	  
+
         }
     }
 
@@ -619,66 +619,66 @@ namespace PETScWrappers
     //
     template
     SparseMatrix::SparseMatrix (const MPI_Comm &,
-				const SparsityPattern &,
-				const std::vector<unsigned int> &,
-				const std::vector<unsigned int> &,
-				const unsigned int,
-				const bool);
+                                const SparsityPattern &,
+                                const std::vector<unsigned int> &,
+                                const std::vector<unsigned int> &,
+                                const unsigned int,
+                                const bool);
     template
     SparseMatrix::SparseMatrix (const MPI_Comm &,
-				const CompressedSparsityPattern &,
-				const std::vector<unsigned int> &,
-				const std::vector<unsigned int> &,
-				const unsigned int,
-				const bool);
+                                const CompressedSparsityPattern &,
+                                const std::vector<unsigned int> &,
+                                const std::vector<unsigned int> &,
+                                const unsigned int,
+                                const bool);
     template
     SparseMatrix::SparseMatrix (const MPI_Comm &,
-				const CompressedSimpleSparsityPattern &,
-				const std::vector<unsigned int> &,
-				const std::vector<unsigned int> &,
-				const unsigned int,
-				const bool);
+                                const CompressedSimpleSparsityPattern &,
+                                const std::vector<unsigned int> &,
+                                const std::vector<unsigned int> &,
+                                const unsigned int,
+                                const bool);
 
     template void
     SparseMatrix::reinit (const MPI_Comm &,
-			  const SparsityPattern &,
-			  const std::vector<unsigned int> &,
-			  const std::vector<unsigned int> &,
-			  const unsigned int,
-			  const bool);
+                          const SparsityPattern &,
+                          const std::vector<unsigned int> &,
+                          const std::vector<unsigned int> &,
+                          const unsigned int,
+                          const bool);
     template void
     SparseMatrix::reinit (const MPI_Comm &,
-			  const CompressedSparsityPattern &,
-			  const std::vector<unsigned int> &,
-			  const std::vector<unsigned int> &,
-			  const unsigned int,
-			  const bool);
+                          const CompressedSparsityPattern &,
+                          const std::vector<unsigned int> &,
+                          const std::vector<unsigned int> &,
+                          const unsigned int,
+                          const bool);
     template void
     SparseMatrix::reinit (const MPI_Comm &,
-			  const CompressedSimpleSparsityPattern &,
-			  const std::vector<unsigned int> &,
-			  const std::vector<unsigned int> &,
-			  const unsigned int,
-			  const bool);
+                          const CompressedSimpleSparsityPattern &,
+                          const std::vector<unsigned int> &,
+                          const std::vector<unsigned int> &,
+                          const unsigned int,
+                          const bool);
 
     template void
     SparseMatrix::do_reinit (const SparsityPattern &,
-			     const std::vector<unsigned int> &,
-			     const std::vector<unsigned int> &,
-			     const unsigned int ,
-			     const bool);
+                             const std::vector<unsigned int> &,
+                             const std::vector<unsigned int> &,
+                             const unsigned int ,
+                             const bool);
     template void
     SparseMatrix::do_reinit (const CompressedSparsityPattern &,
-			     const std::vector<unsigned int> &,
-			     const std::vector<unsigned int> &,
-			     const unsigned int ,
-			     const bool);
+                             const std::vector<unsigned int> &,
+                             const std::vector<unsigned int> &,
+                             const unsigned int ,
+                             const bool);
     template void
     SparseMatrix::do_reinit (const CompressedSimpleSparsityPattern &,
-			     const std::vector<unsigned int> &,
-			     const std::vector<unsigned int> &,
-			     const unsigned int ,
-			     const bool);
+                             const std::vector<unsigned int> &,
+                             const std::vector<unsigned int> &,
+                             const unsigned int ,
+                             const bool);
   }
 }
 

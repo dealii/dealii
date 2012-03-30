@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,10 +22,10 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FunctionDerivative<dim>::FunctionDerivative (const Function<dim> &f,
-					     const Point<dim>    &dir,
-					     const double         h)
-		:
-		AutoDerivativeFunction<dim> (h, f.n_components, f.get_time()),
+                                             const Point<dim>    &dir,
+                                             const double         h)
+                :
+                AutoDerivativeFunction<dim> (h, f.n_components, f.get_time()),
                 f(f),
                 h(h),
                 incr(1, h*dir)
@@ -37,10 +37,10 @@ FunctionDerivative<dim>::FunctionDerivative (const Function<dim> &f,
 
 template <int dim>
 FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
-					     const std::vector<Point<dim> >& dir,
-					     const double h)
-		:
-		AutoDerivativeFunction<dim> (h, f.n_components, f.get_time()),
+                                             const std::vector<Point<dim> >& dir,
+                                             const double h)
+                :
+                AutoDerivativeFunction<dim> (h, f.n_components, f.get_time()),
   f(f),
   h(h),
   incr(dir.size())
@@ -75,22 +75,22 @@ FunctionDerivative<dim>::set_h (const double new_h)
 template <int dim>
 double
 FunctionDerivative<dim>::value (const Point<dim>   &p,
-				const unsigned int  component) const
+                                const unsigned int  component) const
 {
   Assert (incr.size() == 1,
-	  ExcMessage ("FunctionDerivative was not initialized for constant direction"));
+          ExcMessage ("FunctionDerivative was not initialized for constant direction"));
 
   switch (formula)
     {
       case AutoDerivativeFunction<dim>::Euler:
-	    return (f.value(p+incr[0], component)-f.value(p-incr[0], component))/(2*h);
+            return (f.value(p+incr[0], component)-f.value(p-incr[0], component))/(2*h);
       case AutoDerivativeFunction<dim>::UpwindEuler:
-	    return (f.value(p, component)-f.value(p-incr[0], component))/h;
+            return (f.value(p, component)-f.value(p-incr[0], component))/h;
       case AutoDerivativeFunction<dim>::FourthOrder:
-	    return (-f.value(p+2*incr[0], component) + 8*f.value(p+incr[0], component)
-		    -8*f.value(p-incr[0], component) + f.value(p-2*incr[0], component))/(12*h);
+            return (-f.value(p+2*incr[0], component) + 8*f.value(p+incr[0], component)
+                    -8*f.value(p-incr[0], component) + f.value(p-2*incr[0], component))/(12*h);
       default:
-	    Assert(false, ExcInvalidFormula());
+            Assert(false, ExcInvalidFormula());
     }
   return 0.;
 }
@@ -104,36 +104,36 @@ FunctionDerivative<dim>::vector_value (
   Vector<double>& result) const
 {
   Assert (incr.size() == 1,
-	  ExcMessage ("FunctionDerivative was not initialized for constant direction"));
+          ExcMessage ("FunctionDerivative was not initialized for constant direction"));
   Vector<double> aux(result.size());
 
-				   // Formulas are the same as in
-				   // value, but here we have to use
-				   // Vector arithmetic
+                                   // Formulas are the same as in
+                                   // value, but here we have to use
+                                   // Vector arithmetic
   switch (formula)
     {
       case AutoDerivativeFunction<dim>::Euler:
-	    f.vector_value(p+incr[0], result);
-	    f.vector_value(p-incr[0], aux);
-	    result.sadd(1./(2*h), -1./(2*h), aux);
-	    return;
+            f.vector_value(p+incr[0], result);
+            f.vector_value(p-incr[0], aux);
+            result.sadd(1./(2*h), -1./(2*h), aux);
+            return;
       case AutoDerivativeFunction<dim>::UpwindEuler:
-	    f.vector_value(p, result);
-	    f.vector_value(p-incr[0], aux);
-	    result.sadd(1./h, -1./h, aux);
-	    return;
+            f.vector_value(p, result);
+            f.vector_value(p-incr[0], aux);
+            result.sadd(1./h, -1./h, aux);
+            return;
       case AutoDerivativeFunction<dim>::FourthOrder:
-	    f.vector_value(p-2*incr[0], result);
-	    f.vector_value(p+2*incr[0], aux);
-	    result.add(-1., aux);
-	    f.vector_value(p-incr[0], aux);
-	    result.add(-8., aux);
-	    f.vector_value(p+incr[0], aux);
-	    result.add(8., aux);
-	    result.scale(1./(12*h));
-	    return;
+            f.vector_value(p-2*incr[0], result);
+            f.vector_value(p+2*incr[0], aux);
+            result.add(-1., aux);
+            f.vector_value(p-incr[0], aux);
+            result.add(-8., aux);
+            f.vector_value(p+incr[0], aux);
+            result.add(8., aux);
+            result.scale(1./(12*h));
+            return;
       default:
-	    Assert(false, ExcInvalidFormula());
+            Assert(false, ExcInvalidFormula());
     }
 }
 
@@ -142,64 +142,64 @@ FunctionDerivative<dim>::vector_value (
 template <int dim>
 void
 FunctionDerivative<dim>::value_list (const std::vector<Point<dim> > &points,
-				     std::vector<double>            &values,
-				     const unsigned int              component) const
+                                     std::vector<double>            &values,
+                                     const unsigned int              component) const
 {
   const unsigned int n = points.size();
   const bool variable_direction = (incr.size() == 1) ? false : true;
   if (variable_direction)
     Assert (incr.size() == points.size(),
-	    ExcDimensionMismatch(incr.size(), points.size()));
+            ExcDimensionMismatch(incr.size(), points.size()));
 
-				   // Vector of auxiliary values
+                                   // Vector of auxiliary values
   std::vector<double> aux(n);
-				   // Vector of auxiliary points
+                                   // Vector of auxiliary points
   std::vector<Point<dim> > paux(n);
-				   // Use the same formulas as in
-				   // value, but with vector
-				   // arithmetic
+                                   // Use the same formulas as in
+                                   // value, but with vector
+                                   // arithmetic
   switch (formula)
     {
       case AutoDerivativeFunction<dim>::Euler:
-	    for (unsigned int i=0; i<n; ++i)
-	      paux[i] = points[i]+incr[(variable_direction) ? i : 0U];
-	    f.value_list(paux, values, component);
-	    for (unsigned int i=0; i<n; ++i)
-	      paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
-	    f.value_list(paux, aux, component);
-	    for (unsigned int i=0; i<n; ++i)
-	      values[i] = (values[i]-aux[i])/(2*h);
-	    return;
+            for (unsigned int i=0; i<n; ++i)
+              paux[i] = points[i]+incr[(variable_direction) ? i : 0U];
+            f.value_list(paux, values, component);
+            for (unsigned int i=0; i<n; ++i)
+              paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
+            f.value_list(paux, aux, component);
+            for (unsigned int i=0; i<n; ++i)
+              values[i] = (values[i]-aux[i])/(2*h);
+            return;
       case AutoDerivativeFunction<dim>::UpwindEuler:
-	    f.value_list(points, values, component);
-	    for (unsigned int i=0; i<n; ++i)
-	      paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
-	    f.value_list(paux, aux, component);
-	    for (unsigned int i=0; i<n; ++i)
-	      values[i] = (values[i]-aux[i])/h;
-	    return;
+            f.value_list(points, values, component);
+            for (unsigned int i=0; i<n; ++i)
+              paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
+            f.value_list(paux, aux, component);
+            for (unsigned int i=0; i<n; ++i)
+              values[i] = (values[i]-aux[i])/h;
+            return;
       case AutoDerivativeFunction<dim>::FourthOrder:
-	    for (unsigned int i=0; i<n; ++i)
-	      paux[i] = points[i]-2*incr[(variable_direction) ? i : 0U];
-	    f.value_list(paux, values, component);
-	    for (unsigned int i=0; i<n; ++i)
-	      paux[i] = points[i]+2*incr[(variable_direction) ? i : 0U];
-	    f.value_list(paux, aux, component);
-	    for (unsigned int i=0; i<n; ++i)
-	      values[i] -= aux[i];
-	    for (unsigned int i=0; i<n; ++i)
-	      paux[i] = points[i]+incr[(variable_direction) ? i : 0U];
-	    f.value_list(paux, aux, component);
-	    for (unsigned int i=0; i<n; ++i)
-	      values[i] += 8.*aux[i];
-	    for (unsigned int i=0; i<n; ++i)
-	      paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
-	    f.value_list(paux, aux, component);
-	    for (unsigned int i=0; i<n; ++i)
-	      values[i] = (values[i] - 8.*aux[i])/(12*h);
-	    return;
+            for (unsigned int i=0; i<n; ++i)
+              paux[i] = points[i]-2*incr[(variable_direction) ? i : 0U];
+            f.value_list(paux, values, component);
+            for (unsigned int i=0; i<n; ++i)
+              paux[i] = points[i]+2*incr[(variable_direction) ? i : 0U];
+            f.value_list(paux, aux, component);
+            for (unsigned int i=0; i<n; ++i)
+              values[i] -= aux[i];
+            for (unsigned int i=0; i<n; ++i)
+              paux[i] = points[i]+incr[(variable_direction) ? i : 0U];
+            f.value_list(paux, aux, component);
+            for (unsigned int i=0; i<n; ++i)
+              values[i] += 8.*aux[i];
+            for (unsigned int i=0; i<n; ++i)
+              paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
+            f.value_list(paux, aux, component);
+            for (unsigned int i=0; i<n; ++i)
+              values[i] = (values[i] - 8.*aux[i])/(12*h);
+            return;
       default:
-	    Assert(false, ExcInvalidFormula());
+            Assert(false, ExcInvalidFormula());
     }
 }
 
@@ -209,8 +209,8 @@ template <int dim>
 std::size_t
 FunctionDerivative<dim>::memory_consumption () const
 {
-				   // only simple data elements, so
-				   // use sizeof operator
+                                   // only simple data elements, so
+                                   // use sizeof operator
   return sizeof (*this);
 }
 

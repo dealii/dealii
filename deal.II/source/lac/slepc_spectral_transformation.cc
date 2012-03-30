@@ -3,7 +3,7 @@
 //    Version: $Name$
 //    Author: Toby D. Young, Polish Academy of Sciences, 2009
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,7 +43,7 @@ namespace SLEPcWrappers
   void TransformationBase::set_context (EPS &eps)
   {
     AssertThrow (transformation_data.get() == 0,
-		 SolverBase::ExcSLEPcWrappersUsageError());
+                 SolverBase::ExcSLEPcWrappersUsageError());
     transformation_data.reset (new TransformationData());
 
     int ierr = EPSGetST(eps, &transformation_data->st);
@@ -133,15 +133,15 @@ namespace SLEPcWrappers
 
   TransformationCayley::AdditionalData::
   AdditionalData (const double shift_parameter,
-		  const double antishift_parameter)
+                  const double antishift_parameter)
                   :
                   shift_parameter (shift_parameter),
-		  antishift_parameter (antishift_parameter)
+                  antishift_parameter (antishift_parameter)
   {
   }
 
   TransformationCayley::TransformationCayley (const double shift,
-					      const double antishift)
+                                              const double antishift)
     :
     additional_data (shift, antishift)
   {}

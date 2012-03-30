@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,86 +30,86 @@ DEAL_II_NAMESPACE_OPEN
 // anonymous namespace for helper functions
 namespace
 {
-				   // given the number of face's child
-				   // (subface_no), return the number of the
-				   // subface concerning the FaceRefineCase of
-				   // the face
+                                   // given the number of face's child
+                                   // (subface_no), return the number of the
+                                   // subface concerning the FaceRefineCase of
+                                   // the face
   inline
   unsigned int translate_subface_no(const TriaIterator<TriaAccessor<2, 3, 3> > &face,
-				    const unsigned int                           subface_no)
+                                    const unsigned int                           subface_no)
   {
     Assert(face->has_children(), ExcInternalError());
     Assert(subface_no<face->n_children(), ExcInternalError());
 
     if(face->child(subface_no)->has_children())
-				       // although the subface is refine, it
-				       // still matches the face of the cell
-				       // invoking the
-				       // neighbor_of_coarser_neighbor
-				       // function. this means that we are
-				       // looking from one cell (anisotropic
-				       // child) to a coarser neighbor which is
-				       // refined stronger than we are
-				       // (isotropically). So we won't be able
-				       // to use the neighbor_child_on_subface
-				       // function anyway, as the neighbor is
-				       // not active. In this case, simply
-				       // return the subface_no.
+                                       // although the subface is refine, it
+                                       // still matches the face of the cell
+                                       // invoking the
+                                       // neighbor_of_coarser_neighbor
+                                       // function. this means that we are
+                                       // looking from one cell (anisotropic
+                                       // child) to a coarser neighbor which is
+                                       // refined stronger than we are
+                                       // (isotropically). So we won't be able
+                                       // to use the neighbor_child_on_subface
+                                       // function anyway, as the neighbor is
+                                       // not active. In this case, simply
+                                       // return the subface_no.
       return subface_no;
 
     const bool first_child_has_children=face->child(0)->has_children();
-				     // if the first child has children
-				     // (FaceRefineCase case_x1y or case_y1x),
-				     // then the current subface_no needs to be
-				     // 1 and the result of this function is 2,
-				     // else simply return the given number,
-				     // which is 0 or 1 in an anisotropic case
-				     // (case_x, case_y, casex2y or casey2x) or
-				     // 0...3 in an isotropic case (case_xy)
+                                     // if the first child has children
+                                     // (FaceRefineCase case_x1y or case_y1x),
+                                     // then the current subface_no needs to be
+                                     // 1 and the result of this function is 2,
+                                     // else simply return the given number,
+                                     // which is 0 or 1 in an anisotropic case
+                                     // (case_x, case_y, casex2y or casey2x) or
+                                     // 0...3 in an isotropic case (case_xy)
     return subface_no + first_child_has_children;
   }
 
 
 
-				   // given the number of face's child
-				   // (subface_no) and grandchild
-				   // (subsubface_no), return the number of the
-				   // subface concerning the FaceRefineCase of
-				   // the face
+                                   // given the number of face's child
+                                   // (subface_no) and grandchild
+                                   // (subsubface_no), return the number of the
+                                   // subface concerning the FaceRefineCase of
+                                   // the face
   inline
   unsigned int translate_subface_no(const TriaIterator<TriaAccessor<2, 3, 3> > &face,
-				    const unsigned int                           subface_no,
-				    const unsigned int                           subsubface_no)
+                                    const unsigned int                           subface_no,
+                                    const unsigned int                           subsubface_no)
   {
     Assert(face->has_children(), ExcInternalError());
-				     // the subface must be refined, otherwise
-				     // we would have ended up in the second
-				     // function of this name...
+                                     // the subface must be refined, otherwise
+                                     // we would have ended up in the second
+                                     // function of this name...
     Assert(face->child(subface_no)->has_children(), ExcInternalError());
     Assert(subsubface_no<face->child(subface_no)->n_children(), ExcInternalError());
-				     // This can only be an anisotropic refinement case
+                                     // This can only be an anisotropic refinement case
     Assert(face->refinement_case() < RefinementCase<2>::isotropic_refinement,
-	   ExcInternalError());
+           ExcInternalError());
 
     const bool first_child_has_children=face->child(0)->has_children();
 
     static const unsigned int e = deal_II_numbers::invalid_unsigned_int;
 
-				     // array containing the translation of the
-				     // numbers,
-				     //
-				     // first index: subface_no
-				     // second index: subsubface_no
-				     // third index: does the first subface have children? -> no and yes
+                                     // array containing the translation of the
+                                     // numbers,
+                                     //
+                                     // first index: subface_no
+                                     // second index: subsubface_no
+                                     // third index: does the first subface have children? -> no and yes
     static const unsigned int translated_subface_no[2][2][2]
       =
       {{{e,0},       // first  subface, first  subsubface, first_child_has_children==no and yes
-	{e,1}},      // first  subface, second subsubface, first_child_has_children==no and yes
+        {e,1}},      // first  subface, second subsubface, first_child_has_children==no and yes
        {{1,2},       // second subface, first  subsubface, first_child_has_children==no and yes
-	{2,3}}};     // second subface, second subsubface, first_child_has_children==no and yes
+        {2,3}}};     // second subface, second subsubface, first_child_has_children==no and yes
 
     Assert(translated_subface_no[subface_no][subsubface_no][first_child_has_children]!=e,
-	   ExcInternalError());
+           ExcInternalError());
 
     return translated_subface_no[subface_no][subsubface_no][first_child_has_children];
   }
@@ -126,10 +126,10 @@ namespace
   Point<2>
   barycenter (const TriaAccessor<2, 2, 2> &accessor)
   {
-				     // the evaluation of the formulae
-				     // is a bit tricky when done dimension
-				     // independently, so we write this function
-				     // for 2D and 3D separately
+                                     // the evaluation of the formulae
+                                     // is a bit tricky when done dimension
+                                     // independently, so we write this function
+                                     // for 2D and 3D separately
 /*
   Get the computation of the barycenter by this little Maple script. We
   use the bilinear mapping of the unit quad to the real quad. However,
@@ -164,13 +164,13 @@ namespace
 */
 
     const double x[4] = { accessor.vertex(0)(0),
-			  accessor.vertex(1)(0),
-			  accessor.vertex(2)(0),
-			  accessor.vertex(3)(0)  };
+                          accessor.vertex(1)(0),
+                          accessor.vertex(2)(0),
+                          accessor.vertex(3)(0)  };
     const double y[4] = { accessor.vertex(0)(1),
-			  accessor.vertex(1)(1),
-			  accessor.vertex(2)(1),
-			  accessor.vertex(3)(1)  };
+                          accessor.vertex(1)(1),
+                          accessor.vertex(2)(1),
+                          accessor.vertex(3)(1)  };
     const double t1 = x[0]*x[1];
     const double t3 = x[0]*x[0];
     const double t5 = x[1]*x[1];
@@ -269,600 +269,600 @@ namespace
 */
 
     const double x[8] = { accessor.vertex(0)(0),
-			  accessor.vertex(1)(0),
-			  accessor.vertex(5)(0),
-			  accessor.vertex(4)(0),
-			  accessor.vertex(2)(0),
-			  accessor.vertex(3)(0),
-			  accessor.vertex(7)(0),
-			  accessor.vertex(6)(0)   };
+                          accessor.vertex(1)(0),
+                          accessor.vertex(5)(0),
+                          accessor.vertex(4)(0),
+                          accessor.vertex(2)(0),
+                          accessor.vertex(3)(0),
+                          accessor.vertex(7)(0),
+                          accessor.vertex(6)(0)   };
     const double y[8] = { accessor.vertex(0)(1),
-			  accessor.vertex(1)(1),
-			  accessor.vertex(5)(1),
-			  accessor.vertex(4)(1),
-			  accessor.vertex(2)(1),
-			  accessor.vertex(3)(1),
-			  accessor.vertex(7)(1),
-			  accessor.vertex(6)(1)   };
+                          accessor.vertex(1)(1),
+                          accessor.vertex(5)(1),
+                          accessor.vertex(4)(1),
+                          accessor.vertex(2)(1),
+                          accessor.vertex(3)(1),
+                          accessor.vertex(7)(1),
+                          accessor.vertex(6)(1)   };
     const double z[8] = { accessor.vertex(0)(2),
-			  accessor.vertex(1)(2),
-			  accessor.vertex(5)(2),
-			  accessor.vertex(4)(2),
-			  accessor.vertex(2)(2),
-			  accessor.vertex(3)(2),
-			  accessor.vertex(7)(2),
-			  accessor.vertex(6)(2)   };
+                          accessor.vertex(1)(2),
+                          accessor.vertex(5)(2),
+                          accessor.vertex(4)(2),
+                          accessor.vertex(2)(2),
+                          accessor.vertex(3)(2),
+                          accessor.vertex(7)(2),
+                          accessor.vertex(6)(2)   };
 
     double s1, s2, s3, s4, s5, s6, s7, s8;
 
     s1 = 1.0/6.0;
     s8 = -x[2]*x[2]*y[0]*z[3]-2.0*z[6]*x[7]*x[7]*y[4]-z[5]*x[7]*x[7]*y[4]-z
-	 [6]*x[7]*x[7]*y[5]+2.0*y[6]*x[7]*x[7]*z[4]-z[5]*x[6]*x[6]*y[4]+x[6]*x[6]*y[4]*z
-	 [7]-z[1]*x[0]*x[0]*y[2]-x[6]*x[6]*y[7]*z[4]+2.0*x[6]*x[6]*y[5]*z[7]-2.0*x[6]*x
-	 [6]*y[7]*z[5]+y[5]*x[6]*x[6]*z[4]+2.0*x[5]*x[5]*y[4]*z[6]+x[0]*x[0]*y[7]*z[4]
-	 -2.0*x[5]*x[5]*y[6]*z[4];
+         [6]*x[7]*x[7]*y[5]+2.0*y[6]*x[7]*x[7]*z[4]-z[5]*x[6]*x[6]*y[4]+x[6]*x[6]*y[4]*z
+         [7]-z[1]*x[0]*x[0]*y[2]-x[6]*x[6]*y[7]*z[4]+2.0*x[6]*x[6]*y[5]*z[7]-2.0*x[6]*x
+         [6]*y[7]*z[5]+y[5]*x[6]*x[6]*z[4]+2.0*x[5]*x[5]*y[4]*z[6]+x[0]*x[0]*y[7]*z[4]
+         -2.0*x[5]*x[5]*y[6]*z[4];
     s7 = s8-y[6]*x[5]*x[5]*z[7]+z[6]*x[5]*x[5]*y[7]-y[1]*x[0]*x[0]*z[5]+x[7]*
-	 z[5]*x[4]*y[7]-x[7]*y[6]*x[5]*z[7]-2.0*x[7]*x[6]*y[7]*z[4]+2.0*x[7]*x[6]*y[4]*z
-	 [7]-x[7]*x[5]*y[7]*z[4]-2.0*x[7]*y[6]*x[4]*z[7]-x[7]*y[5]*x[4]*z[7]+x[2]*x[2]*y
-	 [3]*z[0]-x[7]*x[6]*y[7]*z[5]+x[7]*x[6]*y[5]*z[7]+2.0*x[1]*x[1]*y[0]*z[5]+x[7]*z
-	 [6]*x[5]*y[7];
+         z[5]*x[4]*y[7]-x[7]*y[6]*x[5]*z[7]-2.0*x[7]*x[6]*y[7]*z[4]+2.0*x[7]*x[6]*y[4]*z
+         [7]-x[7]*x[5]*y[7]*z[4]-2.0*x[7]*y[6]*x[4]*z[7]-x[7]*y[5]*x[4]*z[7]+x[2]*x[2]*y
+         [3]*z[0]-x[7]*x[6]*y[7]*z[5]+x[7]*x[6]*y[5]*z[7]+2.0*x[1]*x[1]*y[0]*z[5]+x[7]*z
+         [6]*x[5]*y[7];
     s8 = -2.0*x[1]*x[1]*y[5]*z[0]+z[1]*x[0]*x[0]*y[5]+2.0*x[2]*x[2]*y[3]*z[1]
-	 -z[5]*x[4]*x[4]*y[1]+y[5]*x[4]*x[4]*z[1]-2.0*x[5]*x[5]*y[4]*z[1]+2.0*x[5]*x[5]*
-	 y[1]*z[4]-2.0*x[2]*x[2]*y[1]*z[3]-y[1]*x[2]*x[2]*z[0]+x[7]*y[2]*x[3]*z[7]+x[7]*
-	 z[2]*x[6]*y[3]+2.0*x[7]*z[6]*x[4]*y[7]+z[5]*x[1]*x[1]*y[4]+z[1]*x[2]*x[2]*y[0]
-	 -2.0*y[0]*x[3]*x[3]*z[7];
+         -z[5]*x[4]*x[4]*y[1]+y[5]*x[4]*x[4]*z[1]-2.0*x[5]*x[5]*y[4]*z[1]+2.0*x[5]*x[5]*
+         y[1]*z[4]-2.0*x[2]*x[2]*y[1]*z[3]-y[1]*x[2]*x[2]*z[0]+x[7]*y[2]*x[3]*z[7]+x[7]*
+         z[2]*x[6]*y[3]+2.0*x[7]*z[6]*x[4]*y[7]+z[5]*x[1]*x[1]*y[4]+z[1]*x[2]*x[2]*y[0]
+         -2.0*y[0]*x[3]*x[3]*z[7];
     s6 = s8+2.0*z[0]*x[3]*x[3]*y[7]-x[7]*x[2]*y[3]*z[7]-x[7]*z[2]*x[3]*y[7]+x
-	 [7]*x[2]*y[7]*z[3]-x[7]*y[2]*x[6]*z[3]+x[4]*x[5]*y[1]*z[4]-x[4]*x[5]*y[4]*z[1]+
-	 x[4]*z[5]*x[1]*y[4]-x[4]*y[5]*x[1]*z[4]-2.0*x[5]*z[5]*x[4]*y[1]-2.0*x[5]*y[5]*x
-	 [1]*z[4]+2.0*x[5]*z[5]*x[1]*y[4]+2.0*x[5]*y[5]*x[4]*z[1]-x[6]*z[5]*x[7]*y[4]-z
-	 [2]*x[3]*x[3]*y[6]+s7;
+         [7]*x[2]*y[7]*z[3]-x[7]*y[2]*x[6]*z[3]+x[4]*x[5]*y[1]*z[4]-x[4]*x[5]*y[4]*z[1]+
+         x[4]*z[5]*x[1]*y[4]-x[4]*y[5]*x[1]*z[4]-2.0*x[5]*z[5]*x[4]*y[1]-2.0*x[5]*y[5]*x
+         [1]*z[4]+2.0*x[5]*z[5]*x[1]*y[4]+2.0*x[5]*y[5]*x[4]*z[1]-x[6]*z[5]*x[7]*y[4]-z
+         [2]*x[3]*x[3]*y[6]+s7;
     s8 = -2.0*x[6]*z[6]*x[7]*y[5]-x[6]*y[6]*x[4]*z[7]+y[2]*x[3]*x[3]*z[6]+x
-	 [6]*y[6]*x[7]*z[4]+2.0*y[2]*x[3]*x[3]*z[7]+x[0]*x[1]*y[0]*z[5]+x[0]*y[1]*x[5]*z
-	 [0]-x[0]*z[1]*x[5]*y[0]-2.0*z[2]*x[3]*x[3]*y[7]+2.0*x[6]*z[6]*x[5]*y[7]-x[0]*x
-	 [1]*y[5]*z[0]-x[6]*y[5]*x[4]*z[6]-2.0*x[3]*z[0]*x[7]*y[3]-x[6]*z[6]*x[7]*y[4]
-	 -2.0*x[1]*z[1]*x[5]*y[0];
+         [6]*y[6]*x[7]*z[4]+2.0*y[2]*x[3]*x[3]*z[7]+x[0]*x[1]*y[0]*z[5]+x[0]*y[1]*x[5]*z
+         [0]-x[0]*z[1]*x[5]*y[0]-2.0*z[2]*x[3]*x[3]*y[7]+2.0*x[6]*z[6]*x[5]*y[7]-x[0]*x
+         [1]*y[5]*z[0]-x[6]*y[5]*x[4]*z[6]-2.0*x[3]*z[0]*x[7]*y[3]-x[6]*z[6]*x[7]*y[4]
+         -2.0*x[1]*z[1]*x[5]*y[0];
     s7 = s8+2.0*x[1]*y[1]*x[5]*z[0]+2.0*x[1]*z[1]*x[0]*y[5]+2.0*x[3]*y[0]*x
-	 [7]*z[3]+2.0*x[3]*x[0]*y[3]*z[7]-2.0*x[3]*x[0]*y[7]*z[3]-2.0*x[1]*y[1]*x[0]*z
-	 [5]-2.0*x[6]*y[6]*x[5]*z[7]+s6-y[5]*x[1]*x[1]*z[4]+x[6]*z[6]*x[4]*y[7]-2.0*x[2]
-	 *y[2]*x[3]*z[1]+x[6]*z[5]*x[4]*y[6]+x[6]*x[5]*y[4]*z[6]-y[6]*x[7]*x[7]*z[2]-x
-	 [6]*x[5]*y[6]*z[4];
+         [7]*z[3]+2.0*x[3]*x[0]*y[3]*z[7]-2.0*x[3]*x[0]*y[7]*z[3]-2.0*x[1]*y[1]*x[0]*z
+         [5]-2.0*x[6]*y[6]*x[5]*z[7]+s6-y[5]*x[1]*x[1]*z[4]+x[6]*z[6]*x[4]*y[7]-2.0*x[2]
+         *y[2]*x[3]*z[1]+x[6]*z[5]*x[4]*y[6]+x[6]*x[5]*y[4]*z[6]-y[6]*x[7]*x[7]*z[2]-x
+         [6]*x[5]*y[6]*z[4];
     s8 = x[3]*x[3]*y[7]*z[4]-2.0*y[6]*x[7]*x[7]*z[3]+z[6]*x[7]*x[7]*y[2]+2.0*
-	 z[6]*x[7]*x[7]*y[3]+2.0*y[1]*x[0]*x[0]*z[3]+2.0*x[0]*x[1]*y[3]*z[0]-2.0*x[0]*y
-	 [0]*x[3]*z[4]-2.0*x[0]*z[1]*x[4]*y[0]-2.0*x[0]*y[1]*x[3]*z[0]+2.0*x[0]*y[0]*x
-	 [4]*z[3]-2.0*x[0]*z[0]*x[4]*y[3]+2.0*x[0]*x[1]*y[0]*z[4]+2.0*x[0]*z[1]*x[3]*y
-	 [0]-2.0*x[0]*x[1]*y[0]*z[3]-2.0*x[0]*x[1]*y[4]*z[0]+2.0*x[0]*y[1]*x[4]*z[0];
+         z[6]*x[7]*x[7]*y[3]+2.0*y[1]*x[0]*x[0]*z[3]+2.0*x[0]*x[1]*y[3]*z[0]-2.0*x[0]*y
+         [0]*x[3]*z[4]-2.0*x[0]*z[1]*x[4]*y[0]-2.0*x[0]*y[1]*x[3]*z[0]+2.0*x[0]*y[0]*x
+         [4]*z[3]-2.0*x[0]*z[0]*x[4]*y[3]+2.0*x[0]*x[1]*y[0]*z[4]+2.0*x[0]*z[1]*x[3]*y
+         [0]-2.0*x[0]*x[1]*y[0]*z[3]-2.0*x[0]*x[1]*y[4]*z[0]+2.0*x[0]*y[1]*x[4]*z[0];
     s5 = s8+2.0*x[0]*z[0]*x[3]*y[4]+x[1]*y[1]*x[0]*z[3]-x[1]*z[1]*x[4]*y[0]-x
-	 [1]*y[1]*x[0]*z[4]+x[1]*z[1]*x[0]*y[4]-x[1]*y[1]*x[3]*z[0]-x[1]*z[1]*x[0]*y[3]-
-	 x[0]*z[5]*x[4]*y[1]+x[0]*y[5]*x[4]*z[1]-2.0*x[4]*x[0]*y[4]*z[7]-2.0*x[4]*y[5]*x
-	 [0]*z[4]+2.0*x[4]*z[5]*x[0]*y[4]-2.0*x[4]*x[5]*y[4]*z[0]-2.0*x[4]*y[0]*x[7]*z
-	 [4]-x[5]*y[5]*x[0]*z[4]+s7;
+         [1]*y[1]*x[0]*z[4]+x[1]*z[1]*x[0]*y[4]-x[1]*y[1]*x[3]*z[0]-x[1]*z[1]*x[0]*y[3]-
+         x[0]*z[5]*x[4]*y[1]+x[0]*y[5]*x[4]*z[1]-2.0*x[4]*x[0]*y[4]*z[7]-2.0*x[4]*y[5]*x
+         [0]*z[4]+2.0*x[4]*z[5]*x[0]*y[4]-2.0*x[4]*x[5]*y[4]*z[0]-2.0*x[4]*y[0]*x[7]*z
+         [4]-x[5]*y[5]*x[0]*z[4]+s7;
     s8 = x[5]*z[5]*x[0]*y[4]-x[5]*z[5]*x[4]*y[0]+x[1]*z[5]*x[0]*y[4]+x[5]*y
-	 [5]*x[4]*z[0]-x[0]*y[0]*x[7]*z[4]-x[0]*z[5]*x[4]*y[0]-x[1]*y[5]*x[0]*z[4]+x[0]*
-	 z[0]*x[7]*y[4]+x[0]*y[5]*x[4]*z[0]-x[0]*z[0]*x[4]*y[7]+x[0]*x[5]*y[0]*z[4]+x[0]
-	 *y[0]*x[4]*z[7]-x[0]*x[5]*y[4]*z[0]-x[3]*x[3]*y[4]*z[7]+2.0*x[2]*z[2]*x[3]*y[1]
-	 ;
+         [5]*x[4]*z[0]-x[0]*y[0]*x[7]*z[4]-x[0]*z[5]*x[4]*y[0]-x[1]*y[5]*x[0]*z[4]+x[0]*
+         z[0]*x[7]*y[4]+x[0]*y[5]*x[4]*z[0]-x[0]*z[0]*x[4]*y[7]+x[0]*x[5]*y[0]*z[4]+x[0]
+         *y[0]*x[4]*z[7]-x[0]*x[5]*y[4]*z[0]-x[3]*x[3]*y[4]*z[7]+2.0*x[2]*z[2]*x[3]*y[1]
+         ;
     s7 = s8-x[5]*x[5]*y[4]*z[0]+2.0*y[5]*x[4]*x[4]*z[0]-2.0*z[0]*x[4]*x[4]*y
-	 [7]+2.0*y[0]*x[4]*x[4]*z[7]-2.0*z[5]*x[4]*x[4]*y[0]+x[5]*x[5]*y[4]*z[7]-x[5]*x
-	 [5]*y[7]*z[4]-2.0*y[5]*x[4]*x[4]*z[7]+2.0*z[5]*x[4]*x[4]*y[7]-x[0]*x[0]*y[7]*z
-	 [3]+y[2]*x[0]*x[0]*z[3]+x[0]*x[0]*y[3]*z[7]-x[5]*x[1]*y[4]*z[0]+x[5]*y[1]*x[4]*
-	 z[0]-x[4]*y[0]*x[3]*z[4];
+         [7]+2.0*y[0]*x[4]*x[4]*z[7]-2.0*z[5]*x[4]*x[4]*y[0]+x[5]*x[5]*y[4]*z[7]-x[5]*x
+         [5]*y[7]*z[4]-2.0*y[5]*x[4]*x[4]*z[7]+2.0*z[5]*x[4]*x[4]*y[7]-x[0]*x[0]*y[7]*z
+         [3]+y[2]*x[0]*x[0]*z[3]+x[0]*x[0]*y[3]*z[7]-x[5]*x[1]*y[4]*z[0]+x[5]*y[1]*x[4]*
+         z[0]-x[4]*y[0]*x[3]*z[4];
     s8 = -x[4]*y[1]*x[0]*z[4]+x[4]*z[1]*x[0]*y[4]+x[4]*x[0]*y[3]*z[4]-x[4]*x
-	 [0]*y[4]*z[3]+x[4]*x[1]*y[0]*z[4]-x[4]*x[1]*y[4]*z[0]+x[4]*z[0]*x[3]*y[4]+x[5]*
-	 x[1]*y[0]*z[4]+x[1]*z[1]*x[3]*y[0]+x[1]*y[1]*x[4]*z[0]-x[5]*z[1]*x[4]*y[0]-2.0*
-	 y[1]*x[0]*x[0]*z[4]+2.0*z[1]*x[0]*x[0]*y[4]+2.0*x[0]*x[0]*y[3]*z[4]-2.0*z[1]*x
-	 [0]*x[0]*y[3];
+         [0]*y[4]*z[3]+x[4]*x[1]*y[0]*z[4]-x[4]*x[1]*y[4]*z[0]+x[4]*z[0]*x[3]*y[4]+x[5]*
+         x[1]*y[0]*z[4]+x[1]*z[1]*x[3]*y[0]+x[1]*y[1]*x[4]*z[0]-x[5]*z[1]*x[4]*y[0]-2.0*
+         y[1]*x[0]*x[0]*z[4]+2.0*z[1]*x[0]*x[0]*y[4]+2.0*x[0]*x[0]*y[3]*z[4]-2.0*z[1]*x
+         [0]*x[0]*y[3];
     s6 = s8-2.0*x[0]*x[0]*y[4]*z[3]+x[1]*x[1]*y[3]*z[0]+x[1]*x[1]*y[0]*z[4]-x
-	 [1]*x[1]*y[0]*z[3]-x[1]*x[1]*y[4]*z[0]-z[1]*x[4]*x[4]*y[0]+y[0]*x[4]*x[4]*z[3]-
-	 z[0]*x[4]*x[4]*y[3]+y[1]*x[4]*x[4]*z[0]-x[0]*x[0]*y[4]*z[7]-y[5]*x[0]*x[0]*z[4]
-	 +z[5]*x[0]*x[0]*y[4]+x[5]*x[5]*y[0]*z[4]-x[0]*y[0]*x[3]*z[7]+x[0]*z[0]*x[3]*y
-	 [7]+s7;
+         [1]*x[1]*y[0]*z[3]-x[1]*x[1]*y[4]*z[0]-z[1]*x[4]*x[4]*y[0]+y[0]*x[4]*x[4]*z[3]-
+         z[0]*x[4]*x[4]*y[3]+y[1]*x[4]*x[4]*z[0]-x[0]*x[0]*y[4]*z[7]-y[5]*x[0]*x[0]*z[4]
+         +z[5]*x[0]*x[0]*y[4]+x[5]*x[5]*y[0]*z[4]-x[0]*y[0]*x[3]*z[7]+x[0]*z[0]*x[3]*y
+         [7]+s7;
     s8 = s6+x[0]*x[2]*y[3]*z[0]-x[0]*x[2]*y[0]*z[3]+x[0]*y[0]*x[7]*z[3]-x[0]*
-	 y[2]*x[3]*z[0]+x[0]*z[2]*x[3]*y[0]-x[0]*z[0]*x[7]*y[3]+x[1]*x[2]*y[3]*z[0]-z[2]
-	 *x[0]*x[0]*y[3]+x[3]*z[2]*x[6]*y[3]-x[3]*x[2]*y[3]*z[6]+x[3]*x[2]*y[6]*z[3]-x
-	 [3]*y[2]*x[6]*z[3]-2.0*x[3]*y[2]*x[7]*z[3]+2.0*x[3]*z[2]*x[7]*y[3];
+         y[2]*x[3]*z[0]+x[0]*z[2]*x[3]*y[0]-x[0]*z[0]*x[7]*y[3]+x[1]*x[2]*y[3]*z[0]-z[2]
+         *x[0]*x[0]*y[3]+x[3]*z[2]*x[6]*y[3]-x[3]*x[2]*y[3]*z[6]+x[3]*x[2]*y[6]*z[3]-x
+         [3]*y[2]*x[6]*z[3]-2.0*x[3]*y[2]*x[7]*z[3]+2.0*x[3]*z[2]*x[7]*y[3];
     s7 = s8+2.0*x[4]*y[5]*x[7]*z[4]+2.0*x[4]*x[5]*y[4]*z[7]-2.0*x[4]*z[5]*x
-	 [7]*y[4]-2.0*x[4]*x[5]*y[7]*z[4]+x[5]*y[5]*x[7]*z[4]-x[5]*z[5]*x[7]*y[4]-x[5]*y
-	 [5]*x[4]*z[7]+x[5]*z[5]*x[4]*y[7]+2.0*x[3]*x[2]*y[7]*z[3]-2.0*x[2]*z[2]*x[1]*y
-	 [3]+2.0*x[4]*z[0]*x[7]*y[4]+2.0*x[4]*x[0]*y[7]*z[4]+2.0*x[4]*x[5]*y[0]*z[4]-x
-	 [7]*x[6]*y[2]*z[7]-2.0*x[3]*x[2]*y[3]*z[7]-x[0]*x[4]*y[7]*z[3];
+         [7]*y[4]-2.0*x[4]*x[5]*y[7]*z[4]+x[5]*y[5]*x[7]*z[4]-x[5]*z[5]*x[7]*y[4]-x[5]*y
+         [5]*x[4]*z[7]+x[5]*z[5]*x[4]*y[7]+2.0*x[3]*x[2]*y[7]*z[3]-2.0*x[2]*z[2]*x[1]*y
+         [3]+2.0*x[4]*z[0]*x[7]*y[4]+2.0*x[4]*x[0]*y[7]*z[4]+2.0*x[4]*x[5]*y[0]*z[4]-x
+         [7]*x[6]*y[2]*z[7]-2.0*x[3]*x[2]*y[3]*z[7]-x[0]*x[4]*y[7]*z[3];
     s8 = x[0]*x[3]*y[7]*z[4]-x[0]*x[3]*y[4]*z[7]+x[0]*x[4]*y[3]*z[7]-2.0*x[7]
-	 *z[6]*x[3]*y[7]+x[3]*x[7]*y[4]*z[3]-x[3]*x[4]*y[7]*z[3]-x[3]*x[7]*y[3]*z[4]+x
-	 [3]*x[4]*y[3]*z[7]+2.0*x[2]*y[2]*x[1]*z[3]+y[6]*x[3]*x[3]*z[7]-z[6]*x[3]*x[3]*y
-	 [7]-x[1]*z[5]*x[4]*y[1]-x[1]*x[5]*y[4]*z[1]-x[1]*z[2]*x[0]*y[3]-x[1]*x[2]*y[0]*
-	 z[3]+x[1]*y[2]*x[0]*z[3];
+         *z[6]*x[3]*y[7]+x[3]*x[7]*y[4]*z[3]-x[3]*x[4]*y[7]*z[3]-x[3]*x[7]*y[3]*z[4]+x
+         [3]*x[4]*y[3]*z[7]+2.0*x[2]*y[2]*x[1]*z[3]+y[6]*x[3]*x[3]*z[7]-z[6]*x[3]*x[3]*y
+         [7]-x[1]*z[5]*x[4]*y[1]-x[1]*x[5]*y[4]*z[1]-x[1]*z[2]*x[0]*y[3]-x[1]*x[2]*y[0]*
+         z[3]+x[1]*y[2]*x[0]*z[3];
     s4 = s8+x[1]*x[5]*y[1]*z[4]+x[1]*y[5]*x[4]*z[1]+x[4]*y[0]*x[7]*z[3]-x[4]*
-	 z[0]*x[7]*y[3]-x[4]*x[4]*y[7]*z[3]+x[4]*x[4]*y[3]*z[7]+x[3]*z[6]*x[7]*y[3]-x[3]
-	 *x[6]*y[3]*z[7]+x[3]*x[6]*y[7]*z[3]-x[3]*z[6]*x[2]*y[7]-x[3]*y[6]*x[7]*z[3]+x
-	 [3]*z[6]*x[7]*y[2]+x[3]*y[6]*x[2]*z[7]+2.0*x[5]*z[5]*x[4]*y[6]+s5+s7;
+         z[0]*x[7]*y[3]-x[4]*x[4]*y[7]*z[3]+x[4]*x[4]*y[3]*z[7]+x[3]*z[6]*x[7]*y[3]-x[3]
+         *x[6]*y[3]*z[7]+x[3]*x[6]*y[7]*z[3]-x[3]*z[6]*x[2]*y[7]-x[3]*y[6]*x[7]*z[3]+x
+         [3]*z[6]*x[7]*y[2]+x[3]*y[6]*x[2]*z[7]+2.0*x[5]*z[5]*x[4]*y[6]+s5+s7;
     s8 = s4-2.0*x[5]*z[5]*x[6]*y[4]-x[5]*z[6]*x[7]*y[5]+x[5]*x[6]*y[5]*z[7]-x
-	 [5]*x[6]*y[7]*z[5]-2.0*x[5]*y[5]*x[4]*z[6]+2.0*x[5]*y[5]*x[6]*z[4]-x[3]*y[6]*x
-	 [7]*z[2]+x[4]*x[7]*y[4]*z[3]+x[4]*x[3]*y[7]*z[4]-x[4]*x[7]*y[3]*z[4]-x[4]*x[3]*
-	 y[4]*z[7]-z[1]*x[5]*x[5]*y[0]+y[1]*x[5]*x[5]*z[0]+x[4]*y[6]*x[7]*z[4];
+         [5]*x[6]*y[7]*z[5]-2.0*x[5]*y[5]*x[4]*z[6]+2.0*x[5]*y[5]*x[6]*z[4]-x[3]*y[6]*x
+         [7]*z[2]+x[4]*x[7]*y[4]*z[3]+x[4]*x[3]*y[7]*z[4]-x[4]*x[7]*y[3]*z[4]-x[4]*x[3]*
+         y[4]*z[7]-z[1]*x[5]*x[5]*y[0]+y[1]*x[5]*x[5]*z[0]+x[4]*y[6]*x[7]*z[4];
     s7 = s8-x[4]*x[6]*y[7]*z[4]+x[4]*x[6]*y[4]*z[7]-x[4]*z[6]*x[7]*y[4]-x[5]*
-	 y[6]*x[4]*z[7]-x[5]*x[6]*y[7]*z[4]+x[5]*x[6]*y[4]*z[7]+x[5]*z[6]*x[4]*y[7]-y[6]
-	 *x[4]*x[4]*z[7]+z[6]*x[4]*x[4]*y[7]+x[7]*x[5]*y[4]*z[7]-y[2]*x[7]*x[7]*z[3]+z
-	 [2]*x[7]*x[7]*y[3]-y[0]*x[3]*x[3]*z[4]-y[1]*x[3]*x[3]*z[0]+z[1]*x[3]*x[3]*y[0];
+         y[6]*x[4]*z[7]-x[5]*x[6]*y[7]*z[4]+x[5]*x[6]*y[4]*z[7]+x[5]*z[6]*x[4]*y[7]-y[6]
+         *x[4]*x[4]*z[7]+z[6]*x[4]*x[4]*y[7]+x[7]*x[5]*y[4]*z[7]-y[2]*x[7]*x[7]*z[3]+z
+         [2]*x[7]*x[7]*y[3]-y[0]*x[3]*x[3]*z[4]-y[1]*x[3]*x[3]*z[0]+z[1]*x[3]*x[3]*y[0];
     s8 = z[0]*x[3]*x[3]*y[4]-x[2]*y[1]*x[3]*z[0]+x[2]*z[1]*x[3]*y[0]+x[3]*y
-	 [1]*x[0]*z[3]+x[3]*x[1]*y[3]*z[0]+x[3]*x[0]*y[3]*z[4]-x[3]*z[1]*x[0]*y[3]-x[3]*
-	 x[0]*y[4]*z[3]+x[3]*y[0]*x[4]*z[3]-x[3]*z[0]*x[4]*y[3]-x[3]*x[1]*y[0]*z[3]+x[3]
-	 *z[0]*x[7]*y[4]-x[3]*y[0]*x[7]*z[4]+z[0]*x[7]*x[7]*y[4]-y[0]*x[7]*x[7]*z[4];
+         [1]*x[0]*z[3]+x[3]*x[1]*y[3]*z[0]+x[3]*x[0]*y[3]*z[4]-x[3]*z[1]*x[0]*y[3]-x[3]*
+         x[0]*y[4]*z[3]+x[3]*y[0]*x[4]*z[3]-x[3]*z[0]*x[4]*y[3]-x[3]*x[1]*y[0]*z[3]+x[3]
+         *z[0]*x[7]*y[4]-x[3]*y[0]*x[7]*z[4]+z[0]*x[7]*x[7]*y[4]-y[0]*x[7]*x[7]*z[4];
     s6 = s8+y[1]*x[0]*x[0]*z[2]-2.0*y[2]*x[3]*x[3]*z[0]+2.0*z[2]*x[3]*x[3]*y
-	 [0]-2.0*x[1]*x[1]*y[0]*z[2]+2.0*x[1]*x[1]*y[2]*z[0]-y[2]*x[3]*x[3]*z[1]+z[2]*x
-	 [3]*x[3]*y[1]-y[5]*x[4]*x[4]*z[6]+z[5]*x[4]*x[4]*y[6]+x[7]*x[0]*y[7]*z[4]-x[7]*
-	 z[0]*x[4]*y[7]-x[7]*x[0]*y[4]*z[7]+x[7]*y[0]*x[4]*z[7]-x[0]*x[1]*y[0]*z[2]+x[0]
-	 *z[1]*x[2]*y[0]+s7;
+         [0]-2.0*x[1]*x[1]*y[0]*z[2]+2.0*x[1]*x[1]*y[2]*z[0]-y[2]*x[3]*x[3]*z[1]+z[2]*x
+         [3]*x[3]*y[1]-y[5]*x[4]*x[4]*z[6]+z[5]*x[4]*x[4]*y[6]+x[7]*x[0]*y[7]*z[4]-x[7]*
+         z[0]*x[4]*y[7]-x[7]*x[0]*y[4]*z[7]+x[7]*y[0]*x[4]*z[7]-x[0]*x[1]*y[0]*z[2]+x[0]
+         *z[1]*x[2]*y[0]+s7;
     s8 = s6+x[0]*x[1]*y[2]*z[0]-x[0]*y[1]*x[2]*z[0]-x[3]*z[1]*x[0]*y[2]+2.0*x
-	 [3]*x[2]*y[3]*z[0]+y[0]*x[7]*x[7]*z[3]-z[0]*x[7]*x[7]*y[3]-2.0*x[3]*z[2]*x[0]*y
-	 [3]-2.0*x[3]*x[2]*y[0]*z[3]+2.0*x[3]*y[2]*x[0]*z[3]+x[3]*x[2]*y[3]*z[1]-x[3]*x
-	 [2]*y[1]*z[3]-x[5]*y[1]*x[0]*z[5]+x[3]*y[1]*x[0]*z[2]+x[4]*y[6]*x[7]*z[5];
+         [3]*x[2]*y[3]*z[0]+y[0]*x[7]*x[7]*z[3]-z[0]*x[7]*x[7]*y[3]-2.0*x[3]*z[2]*x[0]*y
+         [3]-2.0*x[3]*x[2]*y[0]*z[3]+2.0*x[3]*y[2]*x[0]*z[3]+x[3]*x[2]*y[3]*z[1]-x[3]*x
+         [2]*y[1]*z[3]-x[5]*y[1]*x[0]*z[5]+x[3]*y[1]*x[0]*z[2]+x[4]*y[6]*x[7]*z[5];
     s7 = s8-x[5]*x[1]*y[5]*z[0]+2.0*x[1]*z[1]*x[2]*y[0]-2.0*x[1]*z[1]*x[0]*y
-	 [2]+x[1]*x[2]*y[3]*z[1]-x[1]*x[2]*y[1]*z[3]+2.0*x[1]*y[1]*x[0]*z[2]-2.0*x[1]*y
-	 [1]*x[2]*z[0]-z[2]*x[1]*x[1]*y[3]+y[2]*x[1]*x[1]*z[3]+y[5]*x[7]*x[7]*z[4]+y[6]*
-	 x[7]*x[7]*z[5]+x[7]*x[6]*y[7]*z[2]+x[7]*y[6]*x[2]*z[7]-x[7]*z[6]*x[2]*y[7]-2.0*
-	 x[7]*x[6]*y[3]*z[7];
+         [2]+x[1]*x[2]*y[3]*z[1]-x[1]*x[2]*y[1]*z[3]+2.0*x[1]*y[1]*x[0]*z[2]-2.0*x[1]*y
+         [1]*x[2]*z[0]-z[2]*x[1]*x[1]*y[3]+y[2]*x[1]*x[1]*z[3]+y[5]*x[7]*x[7]*z[4]+y[6]*
+         x[7]*x[7]*z[5]+x[7]*x[6]*y[7]*z[2]+x[7]*y[6]*x[2]*z[7]-x[7]*z[6]*x[2]*y[7]-2.0*
+         x[7]*x[6]*y[3]*z[7];
     s8 = s7+2.0*x[7]*x[6]*y[7]*z[3]+2.0*x[7]*y[6]*x[3]*z[7]-x[3]*z[2]*x[1]*y
-	 [3]+x[3]*y[2]*x[1]*z[3]+x[5]*x[1]*y[0]*z[5]+x[4]*y[5]*x[6]*z[4]+x[5]*z[1]*x[0]*
-	 y[5]-x[4]*z[6]*x[7]*y[5]-x[4]*x[5]*y[6]*z[4]+x[4]*x[5]*y[4]*z[6]-x[4]*z[5]*x[6]
-	 *y[4]-x[1]*y[2]*x[3]*z[1]+x[1]*z[2]*x[3]*y[1]-x[2]*x[1]*y[0]*z[2]-x[2]*z[1]*x
-	 [0]*y[2];
+         [3]+x[3]*y[2]*x[1]*z[3]+x[5]*x[1]*y[0]*z[5]+x[4]*y[5]*x[6]*z[4]+x[5]*z[1]*x[0]*
+         y[5]-x[4]*z[6]*x[7]*y[5]-x[4]*x[5]*y[6]*z[4]+x[4]*x[5]*y[4]*z[6]-x[4]*z[5]*x[6]
+         *y[4]-x[1]*y[2]*x[3]*z[1]+x[1]*z[2]*x[3]*y[1]-x[2]*x[1]*y[0]*z[2]-x[2]*z[1]*x
+         [0]*y[2];
     s5 = s8+x[2]*x[1]*y[2]*z[0]-x[2]*z[2]*x[0]*y[3]+x[2]*y[2]*x[0]*z[3]-x[2]*
-	 y[2]*x[3]*z[0]+x[2]*z[2]*x[3]*y[0]+x[2]*y[1]*x[0]*z[2]+x[5]*y[6]*x[7]*z[5]+x[6]
-	 *y[5]*x[7]*z[4]+2.0*x[6]*y[6]*x[7]*z[5]-x[7]*y[0]*x[3]*z[7]+x[7]*z[0]*x[3]*y[7]
-	 -x[7]*x[0]*y[7]*z[3]+x[7]*x[0]*y[3]*z[7]+2.0*x[7]*x[7]*y[4]*z[3]-2.0*x[7]*x[7]*
-	 y[3]*z[4]-2.0*x[1]*x[1]*y[2]*z[5];
+         y[2]*x[3]*z[0]+x[2]*z[2]*x[3]*y[0]+x[2]*y[1]*x[0]*z[2]+x[5]*y[6]*x[7]*z[5]+x[6]
+         *y[5]*x[7]*z[4]+2.0*x[6]*y[6]*x[7]*z[5]-x[7]*y[0]*x[3]*z[7]+x[7]*z[0]*x[3]*y[7]
+         -x[7]*x[0]*y[7]*z[3]+x[7]*x[0]*y[3]*z[7]+2.0*x[7]*x[7]*y[4]*z[3]-2.0*x[7]*x[7]*
+         y[3]*z[4]-2.0*x[1]*x[1]*y[2]*z[5];
     s8 = s5-2.0*x[7]*x[4]*y[7]*z[3]+2.0*x[7]*x[3]*y[7]*z[4]-2.0*x[7]*x[3]*y
-	 [4]*z[7]+2.0*x[7]*x[4]*y[3]*z[7]+2.0*x[1]*x[1]*y[5]*z[2]-x[1]*x[1]*y[2]*z[6]+x
-	 [1]*x[1]*y[6]*z[2]+z[1]*x[5]*x[5]*y[2]-y[1]*x[5]*x[5]*z[2]-x[1]*x[1]*y[6]*z[5]+
-	 x[1]*x[1]*y[5]*z[6]+x[5]*x[5]*y[6]*z[2]-x[5]*x[5]*y[2]*z[6]-2.0*y[1]*x[5]*x[5]*
-	 z[6];
+         [4]*z[7]+2.0*x[7]*x[4]*y[3]*z[7]+2.0*x[1]*x[1]*y[5]*z[2]-x[1]*x[1]*y[2]*z[6]+x
+         [1]*x[1]*y[6]*z[2]+z[1]*x[5]*x[5]*y[2]-y[1]*x[5]*x[5]*z[2]-x[1]*x[1]*y[6]*z[5]+
+         x[1]*x[1]*y[5]*z[6]+x[5]*x[5]*y[6]*z[2]-x[5]*x[5]*y[2]*z[6]-2.0*y[1]*x[5]*x[5]*
+         z[6];
     s7 = s8+2.0*z[1]*x[5]*x[5]*y[6]+2.0*x[1]*z[1]*x[5]*y[2]+2.0*x[1]*y[1]*x
-	 [2]*z[5]-2.0*x[1]*z[1]*x[2]*y[5]-2.0*x[1]*y[1]*x[5]*z[2]-x[1]*y[1]*x[6]*z[2]-x
-	 [1]*z[1]*x[2]*y[6]+x[1]*z[1]*x[6]*y[2]+x[1]*y[1]*x[2]*z[6]-x[5]*x[1]*y[2]*z[5]+
-	 x[5]*y[1]*x[2]*z[5]-x[5]*z[1]*x[2]*y[5]+x[5]*x[1]*y[5]*z[2]-x[5]*y[1]*x[6]*z[2]
-	 -x[5]*x[1]*y[2]*z[6];
+         [2]*z[5]-2.0*x[1]*z[1]*x[2]*y[5]-2.0*x[1]*y[1]*x[5]*z[2]-x[1]*y[1]*x[6]*z[2]-x
+         [1]*z[1]*x[2]*y[6]+x[1]*z[1]*x[6]*y[2]+x[1]*y[1]*x[2]*z[6]-x[5]*x[1]*y[2]*z[5]+
+         x[5]*y[1]*x[2]*z[5]-x[5]*z[1]*x[2]*y[5]+x[5]*x[1]*y[5]*z[2]-x[5]*y[1]*x[6]*z[2]
+         -x[5]*x[1]*y[2]*z[6];
     s8 = s7+x[5]*x[1]*y[6]*z[2]+x[5]*z[1]*x[6]*y[2]+x[1]*x[2]*y[5]*z[6]-x[1]*
-	 x[2]*y[6]*z[5]-x[1]*z[1]*x[6]*y[5]-x[1]*y[1]*x[5]*z[6]+x[1]*z[1]*x[5]*y[6]+x[1]
-	 *y[1]*x[6]*z[5]-x[5]*x[6]*y[5]*z[2]+x[5]*x[2]*y[5]*z[6]-x[5]*x[2]*y[6]*z[5]+x
-	 [5]*x[6]*y[2]*z[5]-2.0*x[5]*z[1]*x[6]*y[5]-2.0*x[5]*x[1]*y[6]*z[5]+2.0*x[5]*x
-	 [1]*y[5]*z[6];
+         x[2]*y[6]*z[5]-x[1]*z[1]*x[6]*y[5]-x[1]*y[1]*x[5]*z[6]+x[1]*z[1]*x[5]*y[6]+x[1]
+         *y[1]*x[6]*z[5]-x[5]*x[6]*y[5]*z[2]+x[5]*x[2]*y[5]*z[6]-x[5]*x[2]*y[6]*z[5]+x
+         [5]*x[6]*y[2]*z[5]-2.0*x[5]*z[1]*x[6]*y[5]-2.0*x[5]*x[1]*y[6]*z[5]+2.0*x[5]*x
+         [1]*y[5]*z[6];
     s6 = s8+2.0*x[5]*y[1]*x[6]*z[5]+2.0*x[2]*x[1]*y[6]*z[2]+2.0*x[2]*z[1]*x
-	 [6]*y[2]-2.0*x[2]*x[1]*y[2]*z[6]+x[2]*x[5]*y[6]*z[2]+x[2]*x[6]*y[2]*z[5]-x[2]*x
-	 [5]*y[2]*z[6]+y[1]*x[2]*x[2]*z[5]-z[1]*x[2]*x[2]*y[5]-2.0*x[2]*y[1]*x[6]*z[2]-x
-	 [2]*x[6]*y[5]*z[2]-2.0*z[1]*x[2]*x[2]*y[6]+x[2]*x[2]*y[5]*z[6]-x[2]*x[2]*y[6]*z
-	 [5]+2.0*y[1]*x[2]*x[2]*z[6]+x[2]*z[1]*x[5]*y[2];
+         [6]*y[2]-2.0*x[2]*x[1]*y[2]*z[6]+x[2]*x[5]*y[6]*z[2]+x[2]*x[6]*y[2]*z[5]-x[2]*x
+         [5]*y[2]*z[6]+y[1]*x[2]*x[2]*z[5]-z[1]*x[2]*x[2]*y[5]-2.0*x[2]*y[1]*x[6]*z[2]-x
+         [2]*x[6]*y[5]*z[2]-2.0*z[1]*x[2]*x[2]*y[6]+x[2]*x[2]*y[5]*z[6]-x[2]*x[2]*y[6]*z
+         [5]+2.0*y[1]*x[2]*x[2]*z[6]+x[2]*z[1]*x[5]*y[2];
     s8 = s6-x[2]*x[1]*y[2]*z[5]+x[2]*x[1]*y[5]*z[2]-x[2]*y[1]*x[5]*z[2]+x[6]*
-	 y[1]*x[2]*z[5]-x[6]*z[1]*x[2]*y[5]-z[1]*x[6]*x[6]*y[5]+y[1]*x[6]*x[6]*z[5]-y[1]
-	 *x[6]*x[6]*z[2]-2.0*x[6]*x[6]*y[5]*z[2]+2.0*x[6]*x[6]*y[2]*z[5]+z[1]*x[6]*x[6]*
-	 y[2]-x[6]*x[1]*y[6]*z[5]-x[6]*y[1]*x[5]*z[6]+x[6]*x[1]*y[5]*z[6];
+         y[1]*x[2]*z[5]-x[6]*z[1]*x[2]*y[5]-z[1]*x[6]*x[6]*y[5]+y[1]*x[6]*x[6]*z[5]-y[1]
+         *x[6]*x[6]*z[2]-2.0*x[6]*x[6]*y[5]*z[2]+2.0*x[6]*x[6]*y[2]*z[5]+z[1]*x[6]*x[6]*
+         y[2]-x[6]*x[1]*y[6]*z[5]-x[6]*y[1]*x[5]*z[6]+x[6]*x[1]*y[5]*z[6];
     s7 = s8+x[6]*z[1]*x[5]*y[6]-x[6]*z[1]*x[2]*y[6]-x[6]*x[1]*y[2]*z[6]+2.0*x
-	 [6]*x[5]*y[6]*z[2]+2.0*x[6]*x[2]*y[5]*z[6]-2.0*x[6]*x[2]*y[6]*z[5]-2.0*x[6]*x
-	 [5]*y[2]*z[6]+x[6]*x[1]*y[6]*z[2]+x[6]*y[1]*x[2]*z[6]-x[2]*x[2]*y[3]*z[7]+x[2]*
-	 x[2]*y[7]*z[3]-x[2]*z[2]*x[3]*y[7]-x[2]*y[2]*x[7]*z[3]+x[2]*z[2]*x[7]*y[3]+x[2]
-	 *y[2]*x[3]*z[7]-x[6]*x[6]*y[3]*z[7];
+         [6]*x[5]*y[6]*z[2]+2.0*x[6]*x[2]*y[5]*z[6]-2.0*x[6]*x[2]*y[6]*z[5]-2.0*x[6]*x
+         [5]*y[2]*z[6]+x[6]*x[1]*y[6]*z[2]+x[6]*y[1]*x[2]*z[6]-x[2]*x[2]*y[3]*z[7]+x[2]*
+         x[2]*y[7]*z[3]-x[2]*z[2]*x[3]*y[7]-x[2]*y[2]*x[7]*z[3]+x[2]*z[2]*x[7]*y[3]+x[2]
+         *y[2]*x[3]*z[7]-x[6]*x[6]*y[3]*z[7];
     s8 = s7+x[6]*x[6]*y[7]*z[3]-x[6]*x[2]*y[3]*z[7]+x[6]*x[2]*y[7]*z[3]-x[6]*
-	 y[6]*x[7]*z[3]+x[6]*y[6]*x[3]*z[7]-x[6]*z[6]*x[3]*y[7]+x[6]*z[6]*x[7]*y[3]+y[6]
-	 *x[2]*x[2]*z[7]-z[6]*x[2]*x[2]*y[7]+2.0*x[2]*x[2]*y[6]*z[3]-x[2]*y[6]*x[7]*z[2]
-	 -2.0*x[2]*y[2]*x[6]*z[3]-2.0*x[2]*x[2]*y[3]*z[6]+2.0*x[2]*y[2]*x[3]*z[6]-x[2]*x
-	 [6]*y[2]*z[7];
+         y[6]*x[7]*z[3]+x[6]*y[6]*x[3]*z[7]-x[6]*z[6]*x[3]*y[7]+x[6]*z[6]*x[7]*y[3]+y[6]
+         *x[2]*x[2]*z[7]-z[6]*x[2]*x[2]*y[7]+2.0*x[2]*x[2]*y[6]*z[3]-x[2]*y[6]*x[7]*z[2]
+         -2.0*x[2]*y[2]*x[6]*z[3]-2.0*x[2]*x[2]*y[3]*z[6]+2.0*x[2]*y[2]*x[3]*z[6]-x[2]*x
+         [6]*y[2]*z[7];
     s3 = s8+x[2]*x[6]*y[7]*z[2]+x[2]*z[6]*x[7]*y[2]+2.0*x[2]*z[2]*x[6]*y[3]
-	 -2.0*x[2]*z[2]*x[3]*y[6]-y[2]*x[6]*x[6]*z[3]-2.0*x[6]*x[6]*y[2]*z[7]+2.0*x[6]*x
-	 [6]*y[7]*z[2]+z[2]*x[6]*x[6]*y[3]-2.0*x[6]*y[6]*x[7]*z[2]+x[6]*y[2]*x[3]*z[6]-x
-	 [6]*x[2]*y[3]*z[6]+2.0*x[6]*z[6]*x[7]*y[2]+2.0*x[6]*y[6]*x[2]*z[7]-2.0*x[6]*z
-	 [6]*x[2]*y[7]+x[6]*x[2]*y[6]*z[3]-x[6]*z[2]*x[3]*y[6];
+         -2.0*x[2]*z[2]*x[3]*y[6]-y[2]*x[6]*x[6]*z[3]-2.0*x[6]*x[6]*y[2]*z[7]+2.0*x[6]*x
+         [6]*y[7]*z[2]+z[2]*x[6]*x[6]*y[3]-2.0*x[6]*y[6]*x[7]*z[2]+x[6]*y[2]*x[3]*z[6]-x
+         [6]*x[2]*y[3]*z[6]+2.0*x[6]*z[6]*x[7]*y[2]+2.0*x[6]*y[6]*x[2]*z[7]-2.0*x[6]*z
+         [6]*x[2]*y[7]+x[6]*x[2]*y[6]*z[3]-x[6]*z[2]*x[3]*y[6];
     s8 = y[1]*x[0]*z[3]+x[1]*y[3]*z[0]-y[0]*x[3]*z[7]-x[1]*y[5]*z[0]-y[0]*x
-	 [3]*z[4]-x[1]*y[0]*z[2]+z[1]*x[2]*y[0]-y[1]*x[0]*z[5]-z[1]*x[0]*y[2]-y[1]*x[0]*
-	 z[4]+z[1]*x[5]*y[2]+z[0]*x[7]*y[4]+z[0]*x[3]*y[7]+z[1]*x[0]*y[4]-x[1]*y[2]*z[5]
-	 +x[2]*y[3]*z[0]+y[1]*x[2]*z[5]-x[2]*y[3]*z[7];
+         [3]*z[4]-x[1]*y[0]*z[2]+z[1]*x[2]*y[0]-y[1]*x[0]*z[5]-z[1]*x[0]*y[2]-y[1]*x[0]*
+         z[4]+z[1]*x[5]*y[2]+z[0]*x[7]*y[4]+z[0]*x[3]*y[7]+z[1]*x[0]*y[4]-x[1]*y[2]*z[5]
+         +x[2]*y[3]*z[0]+y[1]*x[2]*z[5]-x[2]*y[3]*z[7];
     s7 = s8-z[1]*x[2]*y[5]-y[1]*x[3]*z[0]-x[0]*y[7]*z[3]-z[1]*x[0]*y[3]+y[5]*
-	 x[4]*z[0]-x[0]*y[4]*z[3]+y[5]*x[7]*z[4]-z[0]*x[4]*y[3]+x[1]*y[0]*z[4]-z[2]*x[3]
-	 *y[7]-y[6]*x[7]*z[2]+x[1]*y[5]*z[2]+y[6]*x[7]*z[5]+x[0]*y[7]*z[4]+x[1]*y[2]*z
-	 [0]-z[1]*x[4]*y[0]-z[0]*x[4]*y[7]-z[2]*x[0]*y[3];
+         x[4]*z[0]-x[0]*y[4]*z[3]+y[5]*x[7]*z[4]-z[0]*x[4]*y[3]+x[1]*y[0]*z[4]-z[2]*x[3]
+         *y[7]-y[6]*x[7]*z[2]+x[1]*y[5]*z[2]+y[6]*x[7]*z[5]+x[0]*y[7]*z[4]+x[1]*y[2]*z
+         [0]-z[1]*x[4]*y[0]-z[0]*x[4]*y[7]-z[2]*x[0]*y[3];
     s8 = x[5]*y[0]*z[4]+z[1]*x[0]*y[5]-x[2]*y[0]*z[3]-z[1]*x[5]*y[0]+y[1]*x
-	 [5]*z[0]-x[1]*y[0]*z[3]-x[1]*y[4]*z[0]-y[1]*x[5]*z[2]+x[2]*y[7]*z[3]+y[0]*x[4]*
-	 z[3]-x[0]*y[4]*z[7]+x[1]*y[0]*z[5]-y[1]*x[6]*z[2]-y[2]*x[6]*z[3]+y[0]*x[7]*z[3]
-	 -y[2]*x[7]*z[3]+z[2]*x[7]*y[3]+y[2]*x[0]*z[3];
+         [5]*z[0]-x[1]*y[0]*z[3]-x[1]*y[4]*z[0]-y[1]*x[5]*z[2]+x[2]*y[7]*z[3]+y[0]*x[4]*
+         z[3]-x[0]*y[4]*z[7]+x[1]*y[0]*z[5]-y[1]*x[6]*z[2]-y[2]*x[6]*z[3]+y[0]*x[7]*z[3]
+         -y[2]*x[7]*z[3]+z[2]*x[7]*y[3]+y[2]*x[0]*z[3];
     s6 = s8+y[2]*x[3]*z[7]-y[2]*x[3]*z[0]-x[6]*y[5]*z[2]-y[5]*x[0]*z[4]+z[2]*
-	 x[3]*y[0]+x[2]*y[3]*z[1]+x[0]*y[3]*z[7]-x[2]*y[1]*z[3]+y[1]*x[4]*z[0]+y[1]*x[0]
-	 *z[2]-z[1]*x[2]*y[6]+y[2]*x[3]*z[6]-y[1]*x[2]*z[0]+z[1]*x[3]*y[0]-x[1]*y[2]*z
-	 [6]-x[2]*y[3]*z[6]+x[0]*y[3]*z[4]+z[0]*x[3]*y[4]+s7;
+         x[3]*y[0]+x[2]*y[3]*z[1]+x[0]*y[3]*z[7]-x[2]*y[1]*z[3]+y[1]*x[4]*z[0]+y[1]*x[0]
+         *z[2]-z[1]*x[2]*y[6]+y[2]*x[3]*z[6]-y[1]*x[2]*z[0]+z[1]*x[3]*y[0]-x[1]*y[2]*z
+         [6]-x[2]*y[3]*z[6]+x[0]*y[3]*z[4]+z[0]*x[3]*y[4]+s7;
     s8 = x[5]*y[4]*z[7]+s6+y[5]*x[6]*z[4]-y[5]*x[4]*z[6]+z[6]*x[5]*y[7]-x[6]*
-	 y[2]*z[7]-x[6]*y[7]*z[5]+x[5]*y[6]*z[2]+x[6]*y[5]*z[7]+x[6]*y[7]*z[2]+y[6]*x[7]
-	 *z[4]-y[6]*x[4]*z[7]-y[6]*x[7]*z[3]+z[6]*x[7]*y[2]+x[2]*y[5]*z[6]-x[2]*y[6]*z
-	 [5]+y[6]*x[2]*z[7]+x[6]*y[2]*z[5];
+         y[2]*z[7]-x[6]*y[7]*z[5]+x[5]*y[6]*z[2]+x[6]*y[5]*z[7]+x[6]*y[7]*z[2]+y[6]*x[7]
+         *z[4]-y[6]*x[4]*z[7]-y[6]*x[7]*z[3]+z[6]*x[7]*y[2]+x[2]*y[5]*z[6]-x[2]*y[6]*z
+         [5]+y[6]*x[2]*z[7]+x[6]*y[2]*z[5];
     s7 = s8-x[5]*y[2]*z[6]-z[6]*x[7]*y[5]-z[5]*x[7]*y[4]+z[5]*x[0]*y[4]-y[5]*
-	 x[4]*z[7]+y[0]*x[4]*z[7]-z[6]*x[2]*y[7]-x[5]*y[4]*z[0]-x[5]*y[7]*z[4]-y[0]*x[7]
-	 *z[4]+y[5]*x[4]*z[1]-x[6]*y[7]*z[4]+x[7]*y[4]*z[3]-x[4]*y[7]*z[3]+x[3]*y[7]*z
-	 [4]-x[7]*y[3]*z[4]-x[6]*y[3]*z[7]+x[6]*y[4]*z[7];
+         x[4]*z[7]+y[0]*x[4]*z[7]-z[6]*x[2]*y[7]-x[5]*y[4]*z[0]-x[5]*y[7]*z[4]-y[0]*x[7]
+         *z[4]+y[5]*x[4]*z[1]-x[6]*y[7]*z[4]+x[7]*y[4]*z[3]-x[4]*y[7]*z[3]+x[3]*y[7]*z
+         [4]-x[7]*y[3]*z[4]-x[6]*y[3]*z[7]+x[6]*y[4]*z[7];
     s8 = -x[3]*y[4]*z[7]+x[4]*y[3]*z[7]-z[6]*x[7]*y[4]-z[1]*x[6]*y[5]+x[6]*y
-	 [7]*z[3]-x[1]*y[6]*z[5]-y[1]*x[5]*z[6]+z[5]*x[4]*y[7]-z[5]*x[4]*y[0]+x[1]*y[5]*
-	 z[6]-y[6]*x[5]*z[7]-y[2]*x[3]*z[1]+z[1]*x[5]*y[6]-y[5]*x[1]*z[4]+z[6]*x[4]*y[7]
-	 +x[5]*y[1]*z[4]-x[5]*y[6]*z[4]+y[6]*x[3]*z[7]-x[5]*y[4]*z[1];
+         [7]*z[3]-x[1]*y[6]*z[5]-y[1]*x[5]*z[6]+z[5]*x[4]*y[7]-z[5]*x[4]*y[0]+x[1]*y[5]*
+         z[6]-y[6]*x[5]*z[7]-y[2]*x[3]*z[1]+z[1]*x[5]*y[6]-y[5]*x[1]*z[4]+z[6]*x[4]*y[7]
+         +x[5]*y[1]*z[4]-x[5]*y[6]*z[4]+y[6]*x[3]*z[7]-x[5]*y[4]*z[1];
     s5 = s8+x[5]*y[4]*z[6]+z[5]*x[1]*y[4]+y[1]*x[6]*z[5]-z[6]*x[3]*y[7]+z[6]*
-	 x[7]*y[3]-z[5]*x[6]*y[4]-z[5]*x[4]*y[1]+z[5]*x[4]*y[6]+x[1]*y[6]*z[2]+x[2]*y[6]
-	 *z[3]+z[2]*x[6]*y[3]+z[1]*x[6]*y[2]+z[2]*x[3]*y[1]-z[2]*x[1]*y[3]-z[2]*x[3]*y
-	 [6]+y[2]*x[1]*z[3]+y[1]*x[2]*z[6]-z[0]*x[7]*y[3]+s7;
+         x[7]*y[3]-z[5]*x[6]*y[4]-z[5]*x[4]*y[1]+z[5]*x[4]*y[6]+x[1]*y[6]*z[2]+x[2]*y[6]
+         *z[3]+z[2]*x[6]*y[3]+z[1]*x[6]*y[2]+z[2]*x[3]*y[1]-z[2]*x[1]*y[3]-z[2]*x[3]*y
+         [6]+y[2]*x[1]*z[3]+y[1]*x[2]*z[6]-z[0]*x[7]*y[3]+s7;
     s4 = 1/s5;
     s2 = s3*s4;
     const double unknown0 = s1*s2;
     s1 = 1.0/6.0;
     s8 = 2.0*x[1]*y[0]*y[0]*z[4]+x[5]*y[0]*y[0]*z[4]-x[1]*y[4]*y[4]*z[0]+z[1]
-	 *x[0]*y[4]*y[4]+x[1]*y[0]*y[0]*z[5]-z[1]*x[5]*y[0]*y[0]-2.0*z[1]*x[4]*y[0]*y[0]
-	 +2.0*z[1]*x[3]*y[0]*y[0]+z[2]*x[3]*y[0]*y[0]+y[0]*y[0]*x[7]*z[3]+2.0*y[0]*y[0]*
-	 x[4]*z[3]-2.0*x[1]*y[0]*y[0]*z[3]-2.0*x[5]*y[4]*y[4]*z[0]+2.0*z[5]*x[0]*y[4]*y
-	 [4]+2.0*y[4]*y[5]*x[7]*z[4];
+         *x[0]*y[4]*y[4]+x[1]*y[0]*y[0]*z[5]-z[1]*x[5]*y[0]*y[0]-2.0*z[1]*x[4]*y[0]*y[0]
+         +2.0*z[1]*x[3]*y[0]*y[0]+z[2]*x[3]*y[0]*y[0]+y[0]*y[0]*x[7]*z[3]+2.0*y[0]*y[0]*
+         x[4]*z[3]-2.0*x[1]*y[0]*y[0]*z[3]-2.0*x[5]*y[4]*y[4]*z[0]+2.0*z[5]*x[0]*y[4]*y
+         [4]+2.0*y[4]*y[5]*x[7]*z[4];
     s7 = s8-x[3]*y[4]*y[4]*z[7]+x[7]*y[4]*y[4]*z[3]+z[0]*x[3]*y[4]*y[4]-2.0*x
-	 [0]*y[4]*y[4]*z[7]-y[1]*x[1]*y[4]*z[0]-x[0]*y[4]*y[4]*z[3]+2.0*z[0]*x[7]*y[4]*y
-	 [4]+y[4]*z[6]*x[4]*y[7]-y[0]*y[0]*x[7]*z[4]+y[0]*y[0]*x[4]*z[7]+2.0*y[4]*z[5]*x
-	 [4]*y[7]-2.0*y[4]*x[5]*y[7]*z[4]-y[4]*x[6]*y[7]*z[4]-y[4]*y[6]*x[4]*z[7]-2.0*y
-	 [4]*y[5]*x[4]*z[7];
+         [0]*y[4]*y[4]*z[7]-y[1]*x[1]*y[4]*z[0]-x[0]*y[4]*y[4]*z[3]+2.0*z[0]*x[7]*y[4]*y
+         [4]+y[4]*z[6]*x[4]*y[7]-y[0]*y[0]*x[7]*z[4]+y[0]*y[0]*x[4]*z[7]+2.0*y[4]*z[5]*x
+         [4]*y[7]-2.0*y[4]*x[5]*y[7]*z[4]-y[4]*x[6]*y[7]*z[4]-y[4]*y[6]*x[4]*z[7]-2.0*y
+         [4]*y[5]*x[4]*z[7];
     s8 = y[4]*y[6]*x[7]*z[4]-y[7]*y[2]*x[7]*z[3]+y[7]*z[2]*x[7]*y[3]+y[7]*y
-	 [2]*x[3]*z[7]+2.0*x[5]*y[4]*y[4]*z[7]-y[7]*x[2]*y[3]*z[7]-y[0]*z[0]*x[4]*y[7]+z
-	 [6]*x[7]*y[3]*y[3]-y[0]*x[0]*y[4]*z[7]+y[0]*x[0]*y[7]*z[4]-2.0*x[2]*y[3]*y[3]*z
-	 [7]-z[5]*x[4]*y[0]*y[0]+y[0]*z[0]*x[7]*y[4]-2.0*z[6]*x[3]*y[7]*y[7]+z[1]*x[2]*y
-	 [0]*y[0];
+         [2]*x[3]*z[7]+2.0*x[5]*y[4]*y[4]*z[7]-y[7]*x[2]*y[3]*z[7]-y[0]*z[0]*x[4]*y[7]+z
+         [6]*x[7]*y[3]*y[3]-y[0]*x[0]*y[4]*z[7]+y[0]*x[0]*y[7]*z[4]-2.0*x[2]*y[3]*y[3]*z
+         [7]-z[5]*x[4]*y[0]*y[0]+y[0]*z[0]*x[7]*y[4]-2.0*z[6]*x[3]*y[7]*y[7]+z[1]*x[2]*y
+         [0]*y[0];
     s6 = s8+y[4]*y[0]*x[4]*z[3]-2.0*y[4]*z[0]*x[4]*y[7]+2.0*y[4]*x[0]*y[7]*z
-	 [4]-y[4]*z[0]*x[4]*y[3]-y[4]*x[0]*y[7]*z[3]+y[4]*z[0]*x[3]*y[7]-y[4]*y[0]*x[3]*
-	 z[4]+y[0]*x[4]*y[3]*z[7]-y[0]*x[7]*y[3]*z[4]-y[0]*x[3]*y[4]*z[7]+y[0]*x[7]*y[4]
-	 *z[3]+x[2]*y[7]*y[7]*z[3]-z[2]*x[3]*y[7]*y[7]-2.0*z[2]*x[0]*y[3]*y[3]+2.0*y[0]*
-	 z[1]*x[0]*y[4]+s7;
+         [4]-y[4]*z[0]*x[4]*y[3]-y[4]*x[0]*y[7]*z[3]+y[4]*z[0]*x[3]*y[7]-y[4]*y[0]*x[3]*
+         z[4]+y[0]*x[4]*y[3]*z[7]-y[0]*x[7]*y[3]*z[4]-y[0]*x[3]*y[4]*z[7]+y[0]*x[7]*y[4]
+         *z[3]+x[2]*y[7]*y[7]*z[3]-z[2]*x[3]*y[7]*y[7]-2.0*z[2]*x[0]*y[3]*y[3]+2.0*y[0]*
+         z[1]*x[0]*y[4]+s7;
     s8 = -2.0*y[0]*y[1]*x[0]*z[4]-y[0]*y[1]*x[0]*z[5]-y[0]*y[0]*x[3]*z[7]-z
-	 [1]*x[0]*y[3]*y[3]-y[0]*x[1]*y[5]*z[0]-2.0*z[0]*x[7]*y[3]*y[3]+x[0]*y[3]*y[3]*z
-	 [4]+2.0*x[0]*y[3]*y[3]*z[7]-z[0]*x[4]*y[3]*y[3]+2.0*x[2]*y[3]*y[3]*z[0]+x[1]*y
-	 [3]*y[3]*z[0]+2.0*y[7]*z[6]*x[7]*y[3]+2.0*y[7]*y[6]*x[3]*z[7]-2.0*y[7]*y[6]*x
-	 [7]*z[3]-2.0*y[7]*x[6]*y[3]*z[7];
+         [1]*x[0]*y[3]*y[3]-y[0]*x[1]*y[5]*z[0]-2.0*z[0]*x[7]*y[3]*y[3]+x[0]*y[3]*y[3]*z
+         [4]+2.0*x[0]*y[3]*y[3]*z[7]-z[0]*x[4]*y[3]*y[3]+2.0*x[2]*y[3]*y[3]*z[0]+x[1]*y
+         [3]*y[3]*z[0]+2.0*y[7]*z[6]*x[7]*y[3]+2.0*y[7]*y[6]*x[3]*z[7]-2.0*y[7]*y[6]*x
+         [7]*z[3]-2.0*y[7]*x[6]*y[3]*z[7];
     s7 = s8+y[4]*x[4]*y[3]*z[7]-y[4]*x[4]*y[7]*z[3]+y[4]*x[3]*y[7]*z[4]-y[4]*
-	 x[7]*y[3]*z[4]+2.0*y[4]*y[0]*x[4]*z[7]-2.0*y[4]*y[0]*x[7]*z[4]+2.0*x[6]*y[7]*y
-	 [7]*z[3]+y[4]*x[0]*y[3]*z[4]+y[0]*y[1]*x[5]*z[0]+y[0]*z[1]*x[0]*y[5]-x[2]*y[0]*
-	 y[0]*z[3]+x[4]*y[3]*y[3]*z[7]-x[7]*y[3]*y[3]*z[4]-x[5]*y[4]*y[4]*z[1]+y[3]*z[0]
-	 *x[3]*y[4];
+         x[7]*y[3]*z[4]+2.0*y[4]*y[0]*x[4]*z[7]-2.0*y[4]*y[0]*x[7]*z[4]+2.0*x[6]*y[7]*y
+         [7]*z[3]+y[4]*x[0]*y[3]*z[4]+y[0]*y[1]*x[5]*z[0]+y[0]*z[1]*x[0]*y[5]-x[2]*y[0]*
+         y[0]*z[3]+x[4]*y[3]*y[3]*z[7]-x[7]*y[3]*y[3]*z[4]-x[5]*y[4]*y[4]*z[1]+y[3]*z[0]
+         *x[3]*y[4];
     s8 = y[3]*y[0]*x[4]*z[3]+2.0*y[3]*y[0]*x[7]*z[3]+2.0*y[3]*y[2]*x[0]*z[3]
-	 -2.0*y[3]*y[2]*x[3]*z[0]+2.0*y[3]*z[2]*x[3]*y[0]+y[3]*z[1]*x[3]*y[0]-2.0*y[3]*x
-	 [2]*y[0]*z[3]-y[3]*x[1]*y[0]*z[3]-y[3]*y[1]*x[3]*z[0]-2.0*y[3]*x[0]*y[7]*z[3]-y
-	 [3]*x[0]*y[4]*z[3]-2.0*y[3]*y[0]*x[3]*z[7]-y[3]*y[0]*x[3]*z[4]+2.0*y[3]*z[0]*x
-	 [3]*y[7]+y[3]*y[1]*x[0]*z[3]+z[5]*x[1]*y[4]*y[4];
+         -2.0*y[3]*y[2]*x[3]*z[0]+2.0*y[3]*z[2]*x[3]*y[0]+y[3]*z[1]*x[3]*y[0]-2.0*y[3]*x
+         [2]*y[0]*z[3]-y[3]*x[1]*y[0]*z[3]-y[3]*y[1]*x[3]*z[0]-2.0*y[3]*x[0]*y[7]*z[3]-y
+         [3]*x[0]*y[4]*z[3]-2.0*y[3]*y[0]*x[3]*z[7]-y[3]*y[0]*x[3]*z[4]+2.0*y[3]*z[0]*x
+         [3]*y[7]+y[3]*y[1]*x[0]*z[3]+z[5]*x[1]*y[4]*y[4];
     s5 = s8-2.0*y[0]*y[0]*x[3]*z[4]-2.0*y[0]*x[1]*y[4]*z[0]+y[3]*x[7]*y[4]*z
-	 [3]-y[3]*x[4]*y[7]*z[3]+y[3]*x[3]*y[7]*z[4]-y[3]*x[3]*y[4]*z[7]+y[3]*x[0]*y[7]*
-	 z[4]-y[3]*z[0]*x[4]*y[7]-2.0*y[4]*y[5]*x[0]*z[4]+s6+y[7]*x[0]*y[3]*z[7]-y[7]*z
-	 [0]*x[7]*y[3]+y[7]*y[0]*x[7]*z[3]-y[7]*y[0]*x[3]*z[7]+2.0*y[0]*y[1]*x[4]*z[0]+
-	 s7;
+         [3]-y[3]*x[4]*y[7]*z[3]+y[3]*x[3]*y[7]*z[4]-y[3]*x[3]*y[4]*z[7]+y[3]*x[0]*y[7]*
+         z[4]-y[3]*z[0]*x[4]*y[7]-2.0*y[4]*y[5]*x[0]*z[4]+s6+y[7]*x[0]*y[3]*z[7]-y[7]*z
+         [0]*x[7]*y[3]+y[7]*y[0]*x[7]*z[3]-y[7]*y[0]*x[3]*z[7]+2.0*y[0]*y[1]*x[4]*z[0]+
+         s7;
     s8 = -2.0*y[7]*x[7]*y[3]*z[4]-2.0*y[7]*x[3]*y[4]*z[7]+2.0*y[7]*x[4]*y[3]*
-	 z[7]+y[7]*y[0]*x[4]*z[7]-y[7]*y[0]*x[7]*z[4]+2.0*y[7]*x[7]*y[4]*z[3]-y[7]*x[0]*
-	 y[4]*z[7]+y[7]*z[0]*x[7]*y[4]+z[5]*x[4]*y[7]*y[7]+2.0*z[6]*x[4]*y[7]*y[7]-x[5]*
-	 y[7]*y[7]*z[4]-2.0*x[6]*y[7]*y[7]*z[4]+2.0*y[7]*x[6]*y[4]*z[7]-2.0*y[7]*z[6]*x
-	 [7]*y[4]+2.0*y[7]*y[6]*x[7]*z[4];
+         z[7]+y[7]*y[0]*x[4]*z[7]-y[7]*y[0]*x[7]*z[4]+2.0*y[7]*x[7]*y[4]*z[3]-y[7]*x[0]*
+         y[4]*z[7]+y[7]*z[0]*x[7]*y[4]+z[5]*x[4]*y[7]*y[7]+2.0*z[6]*x[4]*y[7]*y[7]-x[5]*
+         y[7]*y[7]*z[4]-2.0*x[6]*y[7]*y[7]*z[4]+2.0*y[7]*x[6]*y[4]*z[7]-2.0*y[7]*z[6]*x
+         [7]*y[4]+2.0*y[7]*y[6]*x[7]*z[4];
     s7 = s8-2.0*y[7]*y[6]*x[4]*z[7]-y[7]*z[5]*x[7]*y[4]-y[7]*y[5]*x[4]*z[7]-x
-	 [0]*y[7]*y[7]*z[3]+z[0]*x[3]*y[7]*y[7]+y[7]*x[5]*y[4]*z[7]+y[7]*y[5]*x[7]*z[4]-
-	 y[4]*x[1]*y[5]*z[0]-x[1]*y[0]*y[0]*z[2]-y[4]*y[5]*x[1]*z[4]-2.0*y[4]*z[5]*x[4]*
-	 y[0]-y[4]*y[1]*x[0]*z[4]+y[4]*y[5]*x[4]*z[1]+y[0]*z[0]*x[3]*y[7]-y[0]*z[1]*x[0]
-	 *y[2];
+         [0]*y[7]*y[7]*z[3]+z[0]*x[3]*y[7]*y[7]+y[7]*x[5]*y[4]*z[7]+y[7]*y[5]*x[7]*z[4]-
+         y[4]*x[1]*y[5]*z[0]-x[1]*y[0]*y[0]*z[2]-y[4]*y[5]*x[1]*z[4]-2.0*y[4]*z[5]*x[4]*
+         y[0]-y[4]*y[1]*x[0]*z[4]+y[4]*y[5]*x[4]*z[1]+y[0]*z[0]*x[3]*y[7]-y[0]*z[1]*x[0]
+         *y[2];
     s8 = 2.0*y[0]*x[1]*y[3]*z[0]+y[4]*y[1]*x[4]*z[0]+2.0*y[0]*y[1]*x[0]*z[3]+
-	 y[4]*x[1]*y[0]*z[5]-y[4]*z[1]*x[5]*y[0]+y[4]*z[1]*x[0]*y[5]-y[4]*z[1]*x[4]*y[0]
-	 +y[4]*x[1]*y[0]*z[4]-y[4]*z[5]*x[4]*y[1]+x[5]*y[4]*y[4]*z[6]-z[5]*x[6]*y[4]*y
-	 [4]+y[4]*x[5]*y[1]*z[4]-y[0]*z[2]*x[0]*y[3]+y[0]*y[5]*x[4]*z[0]+y[0]*x[1]*y[2]*
-	 z[0];
+         y[4]*x[1]*y[0]*z[5]-y[4]*z[1]*x[5]*y[0]+y[4]*z[1]*x[0]*y[5]-y[4]*z[1]*x[4]*y[0]
+         +y[4]*x[1]*y[0]*z[4]-y[4]*z[5]*x[4]*y[1]+x[5]*y[4]*y[4]*z[6]-z[5]*x[6]*y[4]*y
+         [4]+y[4]*x[5]*y[1]*z[4]-y[0]*z[2]*x[0]*y[3]+y[0]*y[5]*x[4]*z[0]+y[0]*x[1]*y[2]*
+         z[0];
     s6 = s8-2.0*y[0]*z[0]*x[4]*y[3]-2.0*y[0]*x[0]*y[4]*z[3]-2.0*y[0]*z[1]*x
-	 [0]*y[3]-y[0]*x[0]*y[7]*z[3]-2.0*y[0]*y[1]*x[3]*z[0]+y[0]*x[2]*y[3]*z[0]-y[0]*y
-	 [1]*x[2]*z[0]+y[0]*y[1]*x[0]*z[2]-y[0]*x[2]*y[1]*z[3]+y[0]*x[0]*y[3]*z[7]+y[0]*
-	 x[2]*y[3]*z[1]-y[0]*y[2]*x[3]*z[0]+y[0]*y[2]*x[0]*z[3]-y[0]*y[5]*x[0]*z[4]-y[4]
-	 *y[5]*x[4]*z[6]+s7;
+         [0]*y[3]-y[0]*x[0]*y[7]*z[3]-2.0*y[0]*y[1]*x[3]*z[0]+y[0]*x[2]*y[3]*z[0]-y[0]*y
+         [1]*x[2]*z[0]+y[0]*y[1]*x[0]*z[2]-y[0]*x[2]*y[1]*z[3]+y[0]*x[0]*y[3]*z[7]+y[0]*
+         x[2]*y[3]*z[1]-y[0]*y[2]*x[3]*z[0]+y[0]*y[2]*x[0]*z[3]-y[0]*y[5]*x[0]*z[4]-y[4]
+         *y[5]*x[4]*z[6]+s7;
     s8 = s6+y[4]*z[6]*x[5]*y[7]-y[4]*x[6]*y[7]*z[5]+y[4]*x[6]*y[5]*z[7]-y[4]*
-	 z[6]*x[7]*y[5]-y[4]*x[5]*y[6]*z[4]+y[4]*z[5]*x[4]*y[6]+y[4]*y[5]*x[6]*z[4]-2.0*
-	 y[1]*y[1]*x[0]*z[5]+2.0*y[1]*y[1]*x[5]*z[0]-2.0*y[2]*y[2]*x[6]*z[3]+x[5]*y[1]*y
-	 [1]*z[4]-z[5]*x[4]*y[1]*y[1]-x[6]*y[2]*y[2]*z[7]+z[6]*x[7]*y[2]*y[2];
+         z[6]*x[7]*y[5]-y[4]*x[5]*y[6]*z[4]+y[4]*z[5]*x[4]*y[6]+y[4]*y[5]*x[6]*z[4]-2.0*
+         y[1]*y[1]*x[0]*z[5]+2.0*y[1]*y[1]*x[5]*z[0]-2.0*y[2]*y[2]*x[6]*z[3]+x[5]*y[1]*y
+         [1]*z[4]-z[5]*x[4]*y[1]*y[1]-x[6]*y[2]*y[2]*z[7]+z[6]*x[7]*y[2]*y[2];
     s7 = s8-x[1]*y[5]*y[5]*z[0]+z[1]*x[0]*y[5]*y[5]+y[1]*y[5]*x[4]*z[1]-y[1]*
-	 y[5]*x[1]*z[4]-2.0*y[2]*z[2]*x[3]*y[6]+2.0*y[1]*z[1]*x[0]*y[5]-2.0*y[1]*z[1]*x
-	 [5]*y[0]+2.0*y[1]*x[1]*y[0]*z[5]-y[2]*x[2]*y[3]*z[7]-y[2]*z[2]*x[3]*y[7]+y[2]*x
-	 [2]*y[7]*z[3]+y[2]*z[2]*x[7]*y[3]-2.0*y[2]*x[2]*y[3]*z[6]+2.0*y[2]*x[2]*y[6]*z
-	 [3]+2.0*y[2]*z[2]*x[6]*y[3]-y[3]*y[2]*x[6]*z[3];
+         y[5]*x[1]*z[4]-2.0*y[2]*z[2]*x[3]*y[6]+2.0*y[1]*z[1]*x[0]*y[5]-2.0*y[1]*z[1]*x
+         [5]*y[0]+2.0*y[1]*x[1]*y[0]*z[5]-y[2]*x[2]*y[3]*z[7]-y[2]*z[2]*x[3]*y[7]+y[2]*x
+         [2]*y[7]*z[3]+y[2]*z[2]*x[7]*y[3]-2.0*y[2]*x[2]*y[3]*z[6]+2.0*y[2]*x[2]*y[6]*z
+         [3]+2.0*y[2]*z[2]*x[6]*y[3]-y[3]*y[2]*x[6]*z[3];
     s8 = y[3]*y[2]*x[3]*z[6]+y[3]*x[2]*y[6]*z[3]-y[3]*z[2]*x[3]*y[6]-y[2]*y
-	 [2]*x[7]*z[3]+2.0*y[2]*y[2]*x[3]*z[6]+y[2]*y[2]*x[3]*z[7]-2.0*y[1]*x[1]*y[5]*z
-	 [0]-x[2]*y[3]*y[3]*z[6]+z[2]*x[6]*y[3]*y[3]+2.0*y[6]*x[2]*y[5]*z[6]+2.0*y[6]*x
-	 [6]*y[2]*z[5]-2.0*y[6]*x[5]*y[2]*z[6]+2.0*y[3]*x[2]*y[7]*z[3]-2.0*y[3]*z[2]*x
-	 [3]*y[7]-y[0]*z[0]*x[7]*y[3]-y[0]*z[2]*x[1]*y[3];
+         [2]*x[7]*z[3]+2.0*y[2]*y[2]*x[3]*z[6]+y[2]*y[2]*x[3]*z[7]-2.0*y[1]*x[1]*y[5]*z
+         [0]-x[2]*y[3]*y[3]*z[6]+z[2]*x[6]*y[3]*y[3]+2.0*y[6]*x[2]*y[5]*z[6]+2.0*y[6]*x
+         [6]*y[2]*z[5]-2.0*y[6]*x[5]*y[2]*z[6]+2.0*y[3]*x[2]*y[7]*z[3]-2.0*y[3]*z[2]*x
+         [3]*y[7]-y[0]*z[0]*x[7]*y[3]-y[0]*z[2]*x[1]*y[3];
     s4 = s8-y[2]*y[6]*x[7]*z[2]+y[0]*z[2]*x[3]*y[1]+y[1]*z[5]*x[1]*y[4]-y[1]*
-	 x[5]*y[4]*z[1]+2.0*y[0]*z[0]*x[3]*y[4]+2.0*y[0]*x[0]*y[3]*z[4]+2.0*z[2]*x[7]*y
-	 [3]*y[3]-2.0*z[5]*x[7]*y[4]*y[4]+x[6]*y[4]*y[4]*z[7]-z[6]*x[7]*y[4]*y[4]+y[1]*y
-	 [1]*x[0]*z[3]+y[3]*x[6]*y[7]*z[2]-y[3]*z[6]*x[2]*y[7]+2.0*y[3]*y[2]*x[3]*z[7]+
-	 s5+s7;
+         x[5]*y[4]*z[1]+2.0*y[0]*z[0]*x[3]*y[4]+2.0*y[0]*x[0]*y[3]*z[4]+2.0*z[2]*x[7]*y
+         [3]*y[3]-2.0*z[5]*x[7]*y[4]*y[4]+x[6]*y[4]*y[4]*z[7]-z[6]*x[7]*y[4]*y[4]+y[1]*y
+         [1]*x[0]*z[3]+y[3]*x[6]*y[7]*z[2]-y[3]*z[6]*x[2]*y[7]+2.0*y[3]*y[2]*x[3]*z[7]+
+         s5+s7;
     s8 = s4+y[2]*x[6]*y[7]*z[2]-y[2]*y[6]*x[7]*z[3]+y[2]*y[6]*x[2]*z[7]-y[2]*
-	 z[6]*x[2]*y[7]-y[2]*x[6]*y[3]*z[7]+y[2]*y[6]*x[3]*z[7]+y[2]*z[6]*x[7]*y[3]-2.0*
-	 y[3]*y[2]*x[7]*z[3]-x[6]*y[3]*y[3]*z[7]+y[1]*y[1]*x[4]*z[0]-y[1]*y[1]*x[3]*z[0]
-	 +x[2]*y[6]*y[6]*z[3]-z[2]*x[3]*y[6]*y[6]-y[1]*y[1]*x[0]*z[4];
+         z[6]*x[2]*y[7]-y[2]*x[6]*y[3]*z[7]+y[2]*y[6]*x[3]*z[7]+y[2]*z[6]*x[7]*y[3]-2.0*
+         y[3]*y[2]*x[7]*z[3]-x[6]*y[3]*y[3]*z[7]+y[1]*y[1]*x[4]*z[0]-y[1]*y[1]*x[3]*z[0]
+         +x[2]*y[6]*y[6]*z[3]-z[2]*x[3]*y[6]*y[6]-y[1]*y[1]*x[0]*z[4];
     s7 = s8+y[5]*x[1]*y[0]*z[5]+y[6]*x[2]*y[7]*z[3]-y[6]*y[2]*x[6]*z[3]+y[6]*
-	 y[2]*x[3]*z[6]-y[6]*x[2]*y[3]*z[6]+y[6]*z[2]*x[6]*y[3]-y[5]*y[1]*x[0]*z[5]-y[5]
-	 *z[1]*x[5]*y[0]+y[5]*y[1]*x[5]*z[0]-y[6]*z[2]*x[3]*y[7]-y[7]*y[6]*x[7]*z[2]+2.0
-	 *y[6]*y[6]*x[2]*z[7]+y[6]*y[6]*x[3]*z[7]+x[6]*y[7]*y[7]*z[2]-z[6]*x[2]*y[7]*y
-	 [7];
+         y[2]*x[3]*z[6]-y[6]*x[2]*y[3]*z[6]+y[6]*z[2]*x[6]*y[3]-y[5]*y[1]*x[0]*z[5]-y[5]
+         *z[1]*x[5]*y[0]+y[5]*y[1]*x[5]*z[0]-y[6]*z[2]*x[3]*y[7]-y[7]*y[6]*x[7]*z[2]+2.0
+         *y[6]*y[6]*x[2]*z[7]+y[6]*y[6]*x[3]*z[7]+x[6]*y[7]*y[7]*z[2]-z[6]*x[2]*y[7]*y
+         [7];
     s8 = -x[2]*y[1]*y[1]*z[3]+2.0*y[1]*y[1]*x[0]*z[2]-2.0*y[1]*y[1]*x[2]*z[0]
-	 +z[2]*x[3]*y[1]*y[1]-z[1]*x[0]*y[2]*y[2]+x[1]*y[2]*y[2]*z[0]+y[2]*y[2]*x[0]*z
-	 [3]-y[2]*y[2]*x[3]*z[0]-2.0*y[2]*y[2]*x[3]*z[1]+y[1]*x[1]*y[3]*z[0]-2.0*y[6]*y
-	 [6]*x[7]*z[2]+2.0*y[5]*y[5]*x[4]*z[1]-2.0*y[5]*y[5]*x[1]*z[4]-y[6]*y[6]*x[7]*z
-	 [3]-2.0*y[1]*x[1]*y[0]*z[2];
+         +z[2]*x[3]*y[1]*y[1]-z[1]*x[0]*y[2]*y[2]+x[1]*y[2]*y[2]*z[0]+y[2]*y[2]*x[0]*z
+         [3]-y[2]*y[2]*x[3]*z[0]-2.0*y[2]*y[2]*x[3]*z[1]+y[1]*x[1]*y[3]*z[0]-2.0*y[6]*y
+         [6]*x[7]*z[2]+2.0*y[5]*y[5]*x[4]*z[1]-2.0*y[5]*y[5]*x[1]*z[4]-y[6]*y[6]*x[7]*z
+         [3]-2.0*y[1]*x[1]*y[0]*z[2];
     s6 = s8+2.0*y[1]*z[1]*x[2]*y[0]-2.0*y[1]*z[1]*x[0]*y[2]+2.0*y[1]*x[1]*y
-	 [2]*z[0]+y[1]*x[2]*y[3]*z[1]-y[1]*y[2]*x[3]*z[1]-y[1]*z[2]*x[1]*y[3]+y[1]*y[2]*
-	 x[1]*z[3]-y[2]*x[1]*y[0]*z[2]+y[2]*z[1]*x[2]*y[0]+y[2]*x[2]*y[3]*z[0]-y[7]*x[6]
-	 *y[2]*z[7]+y[7]*z[6]*x[7]*y[2]+y[7]*y[6]*x[2]*z[7]-y[6]*x[6]*y[3]*z[7]+y[6]*x
-	 [6]*y[7]*z[3]+s7;
+         [2]*z[0]+y[1]*x[2]*y[3]*z[1]-y[1]*y[2]*x[3]*z[1]-y[1]*z[2]*x[1]*y[3]+y[1]*y[2]*
+         x[1]*z[3]-y[2]*x[1]*y[0]*z[2]+y[2]*z[1]*x[2]*y[0]+y[2]*x[2]*y[3]*z[0]-y[7]*x[6]
+         *y[2]*z[7]+y[7]*z[6]*x[7]*y[2]+y[7]*y[6]*x[2]*z[7]-y[6]*x[6]*y[3]*z[7]+y[6]*x
+         [6]*y[7]*z[3]+s7;
     s8 = s6-y[6]*z[6]*x[3]*y[7]+y[6]*z[6]*x[7]*y[3]+2.0*y[2]*y[2]*x[1]*z[3]+x
-	 [2]*y[3]*y[3]*z[1]-z[2]*x[1]*y[3]*y[3]+y[1]*x[1]*y[0]*z[4]+y[1]*z[1]*x[3]*y[0]-
-	 y[1]*x[1]*y[0]*z[3]+2.0*y[5]*x[5]*y[1]*z[4]-2.0*y[5]*x[5]*y[4]*z[1]+2.0*y[5]*z
-	 [5]*x[1]*y[4]-2.0*y[5]*z[5]*x[4]*y[1]-2.0*y[6]*x[6]*y[2]*z[7]+2.0*y[6]*x[6]*y
-	 [7]*z[2];
+         [2]*y[3]*y[3]*z[1]-z[2]*x[1]*y[3]*y[3]+y[1]*x[1]*y[0]*z[4]+y[1]*z[1]*x[3]*y[0]-
+         y[1]*x[1]*y[0]*z[3]+2.0*y[5]*x[5]*y[1]*z[4]-2.0*y[5]*x[5]*y[4]*z[1]+2.0*y[5]*z
+         [5]*x[1]*y[4]-2.0*y[5]*z[5]*x[4]*y[1]-2.0*y[6]*x[6]*y[2]*z[7]+2.0*y[6]*x[6]*y
+         [7]*z[2];
     s7 = s8+2.0*y[6]*z[6]*x[7]*y[2]-2.0*y[6]*z[6]*x[2]*y[7]-y[1]*z[1]*x[4]*y
-	 [0]+y[1]*z[1]*x[0]*y[4]-y[1]*z[1]*x[0]*y[3]+2.0*y[6]*y[6]*x[7]*z[5]+2.0*y[5]*y
-	 [5]*x[6]*z[4]-2.0*y[5]*y[5]*x[4]*z[6]+x[6]*y[5]*y[5]*z[7]-y[3]*x[2]*y[1]*z[3]-y
-	 [3]*y[2]*x[3]*z[1]+y[3]*z[2]*x[3]*y[1]+y[3]*y[2]*x[1]*z[3]-y[2]*x[2]*y[0]*z[3]+
-	 y[2]*z[2]*x[3]*y[0];
+         [0]+y[1]*z[1]*x[0]*y[4]-y[1]*z[1]*x[0]*y[3]+2.0*y[6]*y[6]*x[7]*z[5]+2.0*y[5]*y
+         [5]*x[6]*z[4]-2.0*y[5]*y[5]*x[4]*z[6]+x[6]*y[5]*y[5]*z[7]-y[3]*x[2]*y[1]*z[3]-y
+         [3]*y[2]*x[3]*z[1]+y[3]*z[2]*x[3]*y[1]+y[3]*y[2]*x[1]*z[3]-y[2]*x[2]*y[0]*z[3]+
+         y[2]*z[2]*x[3]*y[0];
     s8 = s7+2.0*y[2]*x[2]*y[3]*z[1]-2.0*y[2]*x[2]*y[1]*z[3]+y[2]*y[1]*x[0]*z
-	 [2]-y[2]*y[1]*x[2]*z[0]+2.0*y[2]*z[2]*x[3]*y[1]-2.0*y[2]*z[2]*x[1]*y[3]-y[2]*z
-	 [2]*x[0]*y[3]+y[5]*z[6]*x[5]*y[7]-y[5]*x[6]*y[7]*z[5]-y[5]*y[6]*x[4]*z[7]-y[5]*
-	 y[6]*x[5]*z[7]-2.0*y[5]*x[5]*y[6]*z[4]+2.0*y[5]*x[5]*y[4]*z[6]-2.0*y[5]*z[5]*x
-	 [6]*y[4]+2.0*y[5]*z[5]*x[4]*y[6];
+         [2]-y[2]*y[1]*x[2]*z[0]+2.0*y[2]*z[2]*x[3]*y[1]-2.0*y[2]*z[2]*x[1]*y[3]-y[2]*z
+         [2]*x[0]*y[3]+y[5]*z[6]*x[5]*y[7]-y[5]*x[6]*y[7]*z[5]-y[5]*y[6]*x[4]*z[7]-y[5]*
+         y[6]*x[5]*z[7]-2.0*y[5]*x[5]*y[6]*z[4]+2.0*y[5]*x[5]*y[4]*z[6]-2.0*y[5]*z[5]*x
+         [6]*y[4]+2.0*y[5]*z[5]*x[4]*y[6];
     s5 = s8-y[1]*y[5]*x[0]*z[4]-z[6]*x[7]*y[5]*y[5]+y[6]*y[6]*x[7]*z[4]-y[6]*
-	 y[6]*x[4]*z[7]-2.0*y[6]*y[6]*x[5]*z[7]-x[5]*y[6]*y[6]*z[4]+z[5]*x[4]*y[6]*y[6]+
-	 z[6]*x[5]*y[7]*y[7]-x[6]*y[7]*y[7]*z[5]+y[1]*y[5]*x[4]*z[0]+y[7]*y[6]*x[7]*z[5]
-	 +y[6]*y[5]*x[7]*z[4]+y[5]*y[6]*x[7]*z[5]+y[6]*y[5]*x[6]*z[4]-y[6]*y[5]*x[4]*z
-	 [6]+2.0*y[6]*z[6]*x[5]*y[7];
+         y[6]*x[4]*z[7]-2.0*y[6]*y[6]*x[5]*z[7]-x[5]*y[6]*y[6]*z[4]+z[5]*x[4]*y[6]*y[6]+
+         z[6]*x[5]*y[7]*y[7]-x[6]*y[7]*y[7]*z[5]+y[1]*y[5]*x[4]*z[0]+y[7]*y[6]*x[7]*z[5]
+         +y[6]*y[5]*x[7]*z[4]+y[5]*y[6]*x[7]*z[5]+y[6]*y[5]*x[6]*z[4]-y[6]*y[5]*x[4]*z
+         [6]+2.0*y[6]*z[6]*x[5]*y[7];
     s8 = s5-2.0*y[6]*x[6]*y[7]*z[5]+2.0*y[6]*x[6]*y[5]*z[7]-2.0*y[6]*z[6]*x
-	 [7]*y[5]-y[6]*x[5]*y[7]*z[4]-y[6]*x[6]*y[7]*z[4]+y[6]*x[6]*y[4]*z[7]-y[6]*z[6]*
-	 x[7]*y[4]+y[6]*z[5]*x[4]*y[7]+y[6]*z[6]*x[4]*y[7]+y[6]*x[5]*y[4]*z[6]-y[6]*z[5]
-	 *x[6]*y[4]+y[7]*x[6]*y[5]*z[7]-y[7]*z[6]*x[7]*y[5]-2.0*y[6]*x[6]*y[5]*z[2];
+         [7]*y[5]-y[6]*x[5]*y[7]*z[4]-y[6]*x[6]*y[7]*z[4]+y[6]*x[6]*y[4]*z[7]-y[6]*z[6]*
+         x[7]*y[4]+y[6]*z[5]*x[4]*y[7]+y[6]*z[6]*x[4]*y[7]+y[6]*x[5]*y[4]*z[6]-y[6]*z[5]
+         *x[6]*y[4]+y[7]*x[6]*y[5]*z[7]-y[7]*z[6]*x[7]*y[5]-2.0*y[6]*x[6]*y[5]*z[2];
     s7 = s8-y[7]*y[6]*x[5]*z[7]+2.0*y[4]*y[5]*x[4]*z[0]+2.0*x[3]*y[7]*y[7]*z
-	 [4]-2.0*x[4]*y[7]*y[7]*z[3]-z[0]*x[4]*y[7]*y[7]+x[0]*y[7]*y[7]*z[4]-y[0]*z[5]*x
-	 [4]*y[1]+y[0]*x[5]*y[1]*z[4]-y[0]*x[5]*y[4]*z[0]+y[0]*z[5]*x[0]*y[4]-y[5]*y[5]*
-	 x[0]*z[4]+y[5]*y[5]*x[4]*z[0]+2.0*y[1]*y[1]*x[2]*z[5]-2.0*y[1]*y[1]*x[5]*z[2]+z
-	 [1]*x[5]*y[2]*y[2];
+         [4]-2.0*x[4]*y[7]*y[7]*z[3]-z[0]*x[4]*y[7]*y[7]+x[0]*y[7]*y[7]*z[4]-y[0]*z[5]*x
+         [4]*y[1]+y[0]*x[5]*y[1]*z[4]-y[0]*x[5]*y[4]*z[0]+y[0]*z[5]*x[0]*y[4]-y[5]*y[5]*
+         x[0]*z[4]+y[5]*y[5]*x[4]*z[0]+2.0*y[1]*y[1]*x[2]*z[5]-2.0*y[1]*y[1]*x[5]*z[2]+z
+         [1]*x[5]*y[2]*y[2];
     s8 = s7-x[1]*y[2]*y[2]*z[5]-y[5]*z[5]*x[4]*y[0]+y[5]*z[5]*x[0]*y[4]-y[5]*
-	 x[5]*y[4]*z[0]-y[2]*x[1]*y[6]*z[5]-y[2]*y[1]*x[5]*z[6]+y[2]*z[1]*x[5]*y[6]+y[2]
-	 *y[1]*x[6]*z[5]-y[1]*z[1]*x[6]*y[5]-y[1]*x[1]*y[6]*z[5]+y[1]*x[1]*y[5]*z[6]+y
-	 [1]*z[1]*x[5]*y[6]+y[5]*x[5]*y[0]*z[4]+y[2]*y[1]*x[2]*z[5]-y[2]*z[1]*x[2]*y[5];
+         x[5]*y[4]*z[0]-y[2]*x[1]*y[6]*z[5]-y[2]*y[1]*x[5]*z[6]+y[2]*z[1]*x[5]*y[6]+y[2]
+         *y[1]*x[6]*z[5]-y[1]*z[1]*x[6]*y[5]-y[1]*x[1]*y[6]*z[5]+y[1]*x[1]*y[5]*z[6]+y
+         [1]*z[1]*x[5]*y[6]+y[5]*x[5]*y[0]*z[4]+y[2]*y[1]*x[2]*z[5]-y[2]*z[1]*x[2]*y[5];
     s6 = s8+y[2]*x[1]*y[5]*z[2]-y[2]*y[1]*x[5]*z[2]-y[1]*y[1]*x[5]*z[6]+y[1]*
-	 y[1]*x[6]*z[5]-z[1]*x[2]*y[5]*y[5]+x[1]*y[5]*y[5]*z[2]+2.0*y[1]*z[1]*x[5]*y[2]
-	 -2.0*y[1]*x[1]*y[2]*z[5]-2.0*y[1]*z[1]*x[2]*y[5]+2.0*y[1]*x[1]*y[5]*z[2]-y[1]*y
-	 [1]*x[6]*z[2]+y[1]*y[1]*x[2]*z[6]-2.0*y[5]*x[1]*y[6]*z[5]-2.0*y[5]*y[1]*x[5]*z
-	 [6]+2.0*y[5]*z[1]*x[5]*y[6]+2.0*y[5]*y[1]*x[6]*z[5];
+         y[1]*x[6]*z[5]-z[1]*x[2]*y[5]*y[5]+x[1]*y[5]*y[5]*z[2]+2.0*y[1]*z[1]*x[5]*y[2]
+         -2.0*y[1]*x[1]*y[2]*z[5]-2.0*y[1]*z[1]*x[2]*y[5]+2.0*y[1]*x[1]*y[5]*z[2]-y[1]*y
+         [1]*x[6]*z[2]+y[1]*y[1]*x[2]*z[6]-2.0*y[5]*x[1]*y[6]*z[5]-2.0*y[5]*y[1]*x[5]*z
+         [6]+2.0*y[5]*z[1]*x[5]*y[6]+2.0*y[5]*y[1]*x[6]*z[5];
     s8 = s6-y[6]*z[1]*x[6]*y[5]-y[6]*y[1]*x[5]*z[6]+y[6]*x[1]*y[5]*z[6]+y[6]*
-	 y[1]*x[6]*z[5]-2.0*z[1]*x[6]*y[5]*y[5]+2.0*x[1]*y[5]*y[5]*z[6]-x[1]*y[6]*y[6]*z
-	 [5]+z[1]*x[5]*y[6]*y[6]+y[5]*z[1]*x[5]*y[2]-y[5]*x[1]*y[2]*z[5]+y[5]*y[1]*x[2]*
-	 z[5]-y[5]*y[1]*x[5]*z[2]-y[6]*z[1]*x[2]*y[5]+y[6]*x[1]*y[5]*z[2];
+         y[1]*x[6]*z[5]-2.0*z[1]*x[6]*y[5]*y[5]+2.0*x[1]*y[5]*y[5]*z[6]-x[1]*y[6]*y[6]*z
+         [5]+z[1]*x[5]*y[6]*y[6]+y[5]*z[1]*x[5]*y[2]-y[5]*x[1]*y[2]*z[5]+y[5]*y[1]*x[2]*
+         z[5]-y[5]*y[1]*x[5]*z[2]-y[6]*z[1]*x[2]*y[5]+y[6]*x[1]*y[5]*z[2];
     s7 = s8-y[1]*z[1]*x[2]*y[6]-y[1]*x[1]*y[2]*z[6]+y[1]*x[1]*y[6]*z[2]+y[1]*
-	 z[1]*x[6]*y[2]+y[5]*x[5]*y[6]*z[2]-y[5]*x[2]*y[6]*z[5]+y[5]*x[6]*y[2]*z[5]-y[5]
-	 *x[5]*y[2]*z[6]-x[6]*y[5]*y[5]*z[2]+x[2]*y[5]*y[5]*z[6]-y[5]*y[5]*x[4]*z[7]+y
-	 [5]*y[5]*x[7]*z[4]-y[1]*x[6]*y[5]*z[2]+y[1]*x[2]*y[5]*z[6]-y[2]*x[6]*y[5]*z[2]
-	 -2.0*y[2]*y[1]*x[6]*z[2];
+         z[1]*x[6]*y[2]+y[5]*x[5]*y[6]*z[2]-y[5]*x[2]*y[6]*z[5]+y[5]*x[6]*y[2]*z[5]-y[5]
+         *x[5]*y[2]*z[6]-x[6]*y[5]*y[5]*z[2]+x[2]*y[5]*y[5]*z[6]-y[5]*y[5]*x[4]*z[7]+y
+         [5]*y[5]*x[7]*z[4]-y[1]*x[6]*y[5]*z[2]+y[1]*x[2]*y[5]*z[6]-y[2]*x[6]*y[5]*z[2]
+         -2.0*y[2]*y[1]*x[6]*z[2];
     s8 = s7-2.0*y[2]*z[1]*x[2]*y[6]+2.0*y[2]*x[1]*y[6]*z[2]+2.0*y[2]*y[1]*x
-	 [2]*z[6]-2.0*x[1]*y[2]*y[2]*z[6]+2.0*z[1]*x[6]*y[2]*y[2]+x[6]*y[2]*y[2]*z[5]-x
-	 [5]*y[2]*y[2]*z[6]+2.0*x[5]*y[6]*y[6]*z[2]-2.0*x[2]*y[6]*y[6]*z[5]-z[1]*x[2]*y
-	 [6]*y[6]-y[6]*y[1]*x[6]*z[2]-y[6]*x[1]*y[2]*z[6]+y[6]*z[1]*x[6]*y[2]+y[6]*y[1]*
-	 x[2]*z[6]+x[1]*y[6]*y[6]*z[2];
+         [2]*z[6]-2.0*x[1]*y[2]*y[2]*z[6]+2.0*z[1]*x[6]*y[2]*y[2]+x[6]*y[2]*y[2]*z[5]-x
+         [5]*y[2]*y[2]*z[6]+2.0*x[5]*y[6]*y[6]*z[2]-2.0*x[2]*y[6]*y[6]*z[5]-z[1]*x[2]*y
+         [6]*y[6]-y[6]*y[1]*x[6]*z[2]-y[6]*x[1]*y[2]*z[6]+y[6]*z[1]*x[6]*y[2]+y[6]*y[1]*
+         x[2]*z[6]+x[1]*y[6]*y[6]*z[2];
     s3 = s8+y[2]*x[5]*y[6]*z[2]+y[2]*x[2]*y[5]*z[6]-y[2]*x[2]*y[6]*z[5]+y[5]*
-	 z[5]*x[4]*y[7]+y[5]*x[5]*y[4]*z[7]-y[5]*z[5]*x[7]*y[4]-y[5]*x[5]*y[7]*z[4]+2.0*
-	 y[4]*x[5]*y[0]*z[4]-y[3]*z[6]*x[3]*y[7]+y[3]*y[6]*x[3]*z[7]+y[3]*x[6]*y[7]*z[3]
-	 -y[3]*y[6]*x[7]*z[3]-y[2]*y[1]*x[3]*z[0]-y[2]*z[1]*x[0]*y[3]+y[2]*y[1]*x[0]*z
-	 [3]+y[2]*x[1]*y[3]*z[0];
+         z[5]*x[4]*y[7]+y[5]*x[5]*y[4]*z[7]-y[5]*z[5]*x[7]*y[4]-y[5]*x[5]*y[7]*z[4]+2.0*
+         y[4]*x[5]*y[0]*z[4]-y[3]*z[6]*x[3]*y[7]+y[3]*y[6]*x[3]*z[7]+y[3]*x[6]*y[7]*z[3]
+         -y[3]*y[6]*x[7]*z[3]-y[2]*y[1]*x[3]*z[0]-y[2]*z[1]*x[0]*y[3]+y[2]*y[1]*x[0]*z
+         [3]+y[2]*x[1]*y[3]*z[0];
     s8 = y[1]*x[0]*z[3]+x[1]*y[3]*z[0]-y[0]*x[3]*z[7]-x[1]*y[5]*z[0]-y[0]*x
-	 [3]*z[4]-x[1]*y[0]*z[2]+z[1]*x[2]*y[0]-y[1]*x[0]*z[5]-z[1]*x[0]*y[2]-y[1]*x[0]*
-	 z[4]+z[1]*x[5]*y[2]+z[0]*x[7]*y[4]+z[0]*x[3]*y[7]+z[1]*x[0]*y[4]-x[1]*y[2]*z[5]
-	 +x[2]*y[3]*z[0]+y[1]*x[2]*z[5]-x[2]*y[3]*z[7];
+         [3]*z[4]-x[1]*y[0]*z[2]+z[1]*x[2]*y[0]-y[1]*x[0]*z[5]-z[1]*x[0]*y[2]-y[1]*x[0]*
+         z[4]+z[1]*x[5]*y[2]+z[0]*x[7]*y[4]+z[0]*x[3]*y[7]+z[1]*x[0]*y[4]-x[1]*y[2]*z[5]
+         +x[2]*y[3]*z[0]+y[1]*x[2]*z[5]-x[2]*y[3]*z[7];
     s7 = s8-z[1]*x[2]*y[5]-y[1]*x[3]*z[0]-x[0]*y[7]*z[3]-z[1]*x[0]*y[3]+y[5]*
-	 x[4]*z[0]-x[0]*y[4]*z[3]+y[5]*x[7]*z[4]-z[0]*x[4]*y[3]+x[1]*y[0]*z[4]-z[2]*x[3]
-	 *y[7]-y[6]*x[7]*z[2]+x[1]*y[5]*z[2]+y[6]*x[7]*z[5]+x[0]*y[7]*z[4]+x[1]*y[2]*z
-	 [0]-z[1]*x[4]*y[0]-z[0]*x[4]*y[7]-z[2]*x[0]*y[3];
+         x[4]*z[0]-x[0]*y[4]*z[3]+y[5]*x[7]*z[4]-z[0]*x[4]*y[3]+x[1]*y[0]*z[4]-z[2]*x[3]
+         *y[7]-y[6]*x[7]*z[2]+x[1]*y[5]*z[2]+y[6]*x[7]*z[5]+x[0]*y[7]*z[4]+x[1]*y[2]*z
+         [0]-z[1]*x[4]*y[0]-z[0]*x[4]*y[7]-z[2]*x[0]*y[3];
     s8 = x[5]*y[0]*z[4]+z[1]*x[0]*y[5]-x[2]*y[0]*z[3]-z[1]*x[5]*y[0]+y[1]*x
-	 [5]*z[0]-x[1]*y[0]*z[3]-x[1]*y[4]*z[0]-y[1]*x[5]*z[2]+x[2]*y[7]*z[3]+y[0]*x[4]*
-	 z[3]-x[0]*y[4]*z[7]+x[1]*y[0]*z[5]-y[1]*x[6]*z[2]-y[2]*x[6]*z[3]+y[0]*x[7]*z[3]
-	 -y[2]*x[7]*z[3]+z[2]*x[7]*y[3]+y[2]*x[0]*z[3];
+         [5]*z[0]-x[1]*y[0]*z[3]-x[1]*y[4]*z[0]-y[1]*x[5]*z[2]+x[2]*y[7]*z[3]+y[0]*x[4]*
+         z[3]-x[0]*y[4]*z[7]+x[1]*y[0]*z[5]-y[1]*x[6]*z[2]-y[2]*x[6]*z[3]+y[0]*x[7]*z[3]
+         -y[2]*x[7]*z[3]+z[2]*x[7]*y[3]+y[2]*x[0]*z[3];
     s6 = s8+y[2]*x[3]*z[7]-y[2]*x[3]*z[0]-x[6]*y[5]*z[2]-y[5]*x[0]*z[4]+z[2]*
-	 x[3]*y[0]+x[2]*y[3]*z[1]+x[0]*y[3]*z[7]-x[2]*y[1]*z[3]+y[1]*x[4]*z[0]+y[1]*x[0]
-	 *z[2]-z[1]*x[2]*y[6]+y[2]*x[3]*z[6]-y[1]*x[2]*z[0]+z[1]*x[3]*y[0]-x[1]*y[2]*z
-	 [6]-x[2]*y[3]*z[6]+x[0]*y[3]*z[4]+z[0]*x[3]*y[4]+s7;
+         x[3]*y[0]+x[2]*y[3]*z[1]+x[0]*y[3]*z[7]-x[2]*y[1]*z[3]+y[1]*x[4]*z[0]+y[1]*x[0]
+         *z[2]-z[1]*x[2]*y[6]+y[2]*x[3]*z[6]-y[1]*x[2]*z[0]+z[1]*x[3]*y[0]-x[1]*y[2]*z
+         [6]-x[2]*y[3]*z[6]+x[0]*y[3]*z[4]+z[0]*x[3]*y[4]+s7;
     s8 = x[5]*y[4]*z[7]+s6+y[5]*x[6]*z[4]-y[5]*x[4]*z[6]+z[6]*x[5]*y[7]-x[6]*
-	 y[2]*z[7]-x[6]*y[7]*z[5]+x[5]*y[6]*z[2]+x[6]*y[5]*z[7]+x[6]*y[7]*z[2]+y[6]*x[7]
-	 *z[4]-y[6]*x[4]*z[7]-y[6]*x[7]*z[3]+z[6]*x[7]*y[2]+x[2]*y[5]*z[6]-x[2]*y[6]*z
-	 [5]+y[6]*x[2]*z[7]+x[6]*y[2]*z[5];
+         y[2]*z[7]-x[6]*y[7]*z[5]+x[5]*y[6]*z[2]+x[6]*y[5]*z[7]+x[6]*y[7]*z[2]+y[6]*x[7]
+         *z[4]-y[6]*x[4]*z[7]-y[6]*x[7]*z[3]+z[6]*x[7]*y[2]+x[2]*y[5]*z[6]-x[2]*y[6]*z
+         [5]+y[6]*x[2]*z[7]+x[6]*y[2]*z[5];
     s7 = s8-x[5]*y[2]*z[6]-z[6]*x[7]*y[5]-z[5]*x[7]*y[4]+z[5]*x[0]*y[4]-y[5]*
-	 x[4]*z[7]+y[0]*x[4]*z[7]-z[6]*x[2]*y[7]-x[5]*y[4]*z[0]-x[5]*y[7]*z[4]-y[0]*x[7]
-	 *z[4]+y[5]*x[4]*z[1]-x[6]*y[7]*z[4]+x[7]*y[4]*z[3]-x[4]*y[7]*z[3]+x[3]*y[7]*z
-	 [4]-x[7]*y[3]*z[4]-x[6]*y[3]*z[7]+x[6]*y[4]*z[7];
+         x[4]*z[7]+y[0]*x[4]*z[7]-z[6]*x[2]*y[7]-x[5]*y[4]*z[0]-x[5]*y[7]*z[4]-y[0]*x[7]
+         *z[4]+y[5]*x[4]*z[1]-x[6]*y[7]*z[4]+x[7]*y[4]*z[3]-x[4]*y[7]*z[3]+x[3]*y[7]*z
+         [4]-x[7]*y[3]*z[4]-x[6]*y[3]*z[7]+x[6]*y[4]*z[7];
     s8 = -x[3]*y[4]*z[7]+x[4]*y[3]*z[7]-z[6]*x[7]*y[4]-z[1]*x[6]*y[5]+x[6]*y
-	 [7]*z[3]-x[1]*y[6]*z[5]-y[1]*x[5]*z[6]+z[5]*x[4]*y[7]-z[5]*x[4]*y[0]+x[1]*y[5]*
-	 z[6]-y[6]*x[5]*z[7]-y[2]*x[3]*z[1]+z[1]*x[5]*y[6]-y[5]*x[1]*z[4]+z[6]*x[4]*y[7]
-	 +x[5]*y[1]*z[4]-x[5]*y[6]*z[4]+y[6]*x[3]*z[7]-x[5]*y[4]*z[1];
+         [7]*z[3]-x[1]*y[6]*z[5]-y[1]*x[5]*z[6]+z[5]*x[4]*y[7]-z[5]*x[4]*y[0]+x[1]*y[5]*
+         z[6]-y[6]*x[5]*z[7]-y[2]*x[3]*z[1]+z[1]*x[5]*y[6]-y[5]*x[1]*z[4]+z[6]*x[4]*y[7]
+         +x[5]*y[1]*z[4]-x[5]*y[6]*z[4]+y[6]*x[3]*z[7]-x[5]*y[4]*z[1];
     s5 = s8+x[5]*y[4]*z[6]+z[5]*x[1]*y[4]+y[1]*x[6]*z[5]-z[6]*x[3]*y[7]+z[6]*
-	 x[7]*y[3]-z[5]*x[6]*y[4]-z[5]*x[4]*y[1]+z[5]*x[4]*y[6]+x[1]*y[6]*z[2]+x[2]*y[6]
-	 *z[3]+z[2]*x[6]*y[3]+z[1]*x[6]*y[2]+z[2]*x[3]*y[1]-z[2]*x[1]*y[3]-z[2]*x[3]*y
-	 [6]+y[2]*x[1]*z[3]+y[1]*x[2]*z[6]-z[0]*x[7]*y[3]+s7;
+         x[7]*y[3]-z[5]*x[6]*y[4]-z[5]*x[4]*y[1]+z[5]*x[4]*y[6]+x[1]*y[6]*z[2]+x[2]*y[6]
+         *z[3]+z[2]*x[6]*y[3]+z[1]*x[6]*y[2]+z[2]*x[3]*y[1]-z[2]*x[1]*y[3]-z[2]*x[3]*y
+         [6]+y[2]*x[1]*z[3]+y[1]*x[2]*z[6]-z[0]*x[7]*y[3]+s7;
     s4 = 1/s5;
     s2 = s3*s4;
     const double unknown1 = s1*s2;
     s1 = 1.0/6.0;
     s8 = -z[2]*x[1]*y[2]*z[5]+z[2]*y[1]*x[2]*z[5]-z[2]*z[1]*x[2]*y[5]+z[2]*z
-	 [1]*x[5]*y[2]+2.0*y[5]*x[7]*z[4]*z[4]-y[1]*x[2]*z[0]*z[0]+x[0]*y[3]*z[7]*z[7]
-	 -2.0*z[5]*z[5]*x[4]*y[1]+2.0*z[5]*z[5]*x[1]*y[4]+z[5]*z[5]*x[0]*y[4]-2.0*z[2]*z
-	 [2]*x[1]*y[3]+2.0*z[2]*z[2]*x[3]*y[1]-x[0]*y[4]*z[7]*z[7]-y[0]*x[3]*z[7]*z[7]+x
-	 [1]*y[0]*z[5]*z[5];
+         [1]*x[5]*y[2]+2.0*y[5]*x[7]*z[4]*z[4]-y[1]*x[2]*z[0]*z[0]+x[0]*y[3]*z[7]*z[7]
+         -2.0*z[5]*z[5]*x[4]*y[1]+2.0*z[5]*z[5]*x[1]*y[4]+z[5]*z[5]*x[0]*y[4]-2.0*z[2]*z
+         [2]*x[1]*y[3]+2.0*z[2]*z[2]*x[3]*y[1]-x[0]*y[4]*z[7]*z[7]-y[0]*x[3]*z[7]*z[7]+x
+         [1]*y[0]*z[5]*z[5];
     s7 = s8-y[1]*x[0]*z[5]*z[5]+z[1]*y[1]*x[2]*z[6]+y[1]*x[0]*z[2]*z[2]+z[2]*
-	 z[2]*x[3]*y[0]-z[2]*z[2]*x[0]*y[3]-x[1]*y[0]*z[2]*z[2]+2.0*z[5]*z[5]*x[4]*y[6]
-	 -2.0*z[5]*z[5]*x[6]*y[4]-z[5]*z[5]*x[7]*y[4]-x[6]*y[7]*z[5]*z[5]+2.0*z[2]*y[1]*
-	 x[2]*z[6]-2.0*z[2]*x[1]*y[2]*z[6]+2.0*z[2]*z[1]*x[6]*y[2]-y[6]*x[5]*z[7]*z[7]+
-	 2.0*x[6]*y[4]*z[7]*z[7];
+         z[2]*x[3]*y[0]-z[2]*z[2]*x[0]*y[3]-x[1]*y[0]*z[2]*z[2]+2.0*z[5]*z[5]*x[4]*y[6]
+         -2.0*z[5]*z[5]*x[6]*y[4]-z[5]*z[5]*x[7]*y[4]-x[6]*y[7]*z[5]*z[5]+2.0*z[2]*y[1]*
+         x[2]*z[6]-2.0*z[2]*x[1]*y[2]*z[6]+2.0*z[2]*z[1]*x[6]*y[2]-y[6]*x[5]*z[7]*z[7]+
+         2.0*x[6]*y[4]*z[7]*z[7];
     s8 = -2.0*y[6]*x[4]*z[7]*z[7]+x[6]*y[5]*z[7]*z[7]-2.0*z[2]*z[1]*x[2]*y[6]
-	 +z[4]*y[6]*x[7]*z[5]+x[5]*y[4]*z[6]*z[6]+z[6]*z[6]*x[4]*y[7]-z[6]*z[6]*x[7]*y
-	 [4]-2.0*z[6]*z[6]*x[7]*y[5]+2.0*z[6]*z[6]*x[5]*y[7]-y[5]*x[4]*z[6]*z[6]+2.0*z
-	 [0]*z[0]*x[3]*y[4]-x[6]*y[5]*z[2]*z[2]+z[1]*z[1]*x[5]*y[6]-z[1]*z[1]*x[6]*y[5]-
-	 z[5]*z[5]*x[4]*y[0];
+         +z[4]*y[6]*x[7]*z[5]+x[5]*y[4]*z[6]*z[6]+z[6]*z[6]*x[4]*y[7]-z[6]*z[6]*x[7]*y
+         [4]-2.0*z[6]*z[6]*x[7]*y[5]+2.0*z[6]*z[6]*x[5]*y[7]-y[5]*x[4]*z[6]*z[6]+2.0*z
+         [0]*z[0]*x[3]*y[4]-x[6]*y[5]*z[2]*z[2]+z[1]*z[1]*x[5]*y[6]-z[1]*z[1]*x[6]*y[5]-
+         z[5]*z[5]*x[4]*y[0];
     s6 = s8+2.0*x[1]*y[3]*z[0]*z[0]+2.0*x[1]*y[6]*z[2]*z[2]-2.0*y[1]*x[6]*z
-	 [2]*z[2]-y[1]*x[5]*z[2]*z[2]-z[1]*z[1]*x[2]*y[6]-2.0*z[1]*z[1]*x[2]*y[5]+2.0*z
-	 [1]*z[1]*x[5]*y[2]+z[1]*y[1]*x[6]*z[5]+y[1]*x[2]*z[5]*z[5]+z[2]*z[1]*x[2]*y[0]+
-	 z[1]*x[1]*y[5]*z[6]-z[1]*x[1]*y[6]*z[5]-z[1]*y[1]*x[5]*z[6]-z[1]*x[2]*y[6]*z[5]
-	 +z[1]*x[6]*y[2]*z[5]+s7;
+         [2]*z[2]-y[1]*x[5]*z[2]*z[2]-z[1]*z[1]*x[2]*y[6]-2.0*z[1]*z[1]*x[2]*y[5]+2.0*z
+         [1]*z[1]*x[5]*y[2]+z[1]*y[1]*x[6]*z[5]+y[1]*x[2]*z[5]*z[5]+z[2]*z[1]*x[2]*y[0]+
+         z[1]*x[1]*y[5]*z[6]-z[1]*x[1]*y[6]*z[5]-z[1]*y[1]*x[5]*z[6]-z[1]*x[2]*y[6]*z[5]
+         +z[1]*x[6]*y[2]*z[5]+s7;
     s8 = -x[1]*y[2]*z[5]*z[5]+z[1]*x[5]*y[6]*z[2]-2.0*z[2]*z[2]*x[3]*y[6]+2.0
-	 *z[2]*z[2]*x[6]*y[3]+z[2]*z[2]*x[7]*y[3]-z[2]*z[2]*x[3]*y[7]-z[1]*x[6]*y[5]*z
-	 [2]+2.0*z[1]*x[1]*y[5]*z[2]-2.0*x[3]*y[4]*z[7]*z[7]+2.0*x[4]*y[3]*z[7]*z[7]+x
-	 [5]*y[6]*z[2]*z[2]+y[1]*x[2]*z[6]*z[6]+y[0]*x[4]*z[7]*z[7]+z[2]*x[2]*y[3]*z[0]-
-	 x[1]*y[2]*z[6]*z[6];
+         *z[2]*z[2]*x[6]*y[3]+z[2]*z[2]*x[7]*y[3]-z[2]*z[2]*x[3]*y[7]-z[1]*x[6]*y[5]*z
+         [2]+2.0*z[1]*x[1]*y[5]*z[2]-2.0*x[3]*y[4]*z[7]*z[7]+2.0*x[4]*y[3]*z[7]*z[7]+x
+         [5]*y[6]*z[2]*z[2]+y[1]*x[2]*z[6]*z[6]+y[0]*x[4]*z[7]*z[7]+z[2]*x[2]*y[3]*z[0]-
+         x[1]*y[2]*z[6]*z[6];
     s7 = s8-z[7]*z[2]*x[3]*y[7]+x[2]*y[6]*z[3]*z[3]-y[2]*x[6]*z[3]*z[3]-z[6]*
-	 x[2]*y[3]*z[7]-z[2]*z[1]*x[0]*y[2]+z[6]*z[2]*x[6]*y[3]-z[6]*z[2]*x[3]*y[6]+z[6]
-	 *x[2]*y[6]*z[3]+z[2]*x[1]*y[2]*z[0]+z[6]*y[2]*x[3]*z[7]-z[4]*z[5]*x[6]*y[4]+z
-	 [4]*z[5]*x[4]*y[6]-z[4]*y[6]*x[5]*z[7]+z[4]*z[6]*x[4]*y[7]+z[4]*x[5]*y[4]*z[6];
+         x[2]*y[3]*z[7]-z[2]*z[1]*x[0]*y[2]+z[6]*z[2]*x[6]*y[3]-z[6]*z[2]*x[3]*y[6]+z[6]
+         *x[2]*y[6]*z[3]+z[2]*x[1]*y[2]*z[0]+z[6]*y[2]*x[3]*z[7]-z[4]*z[5]*x[6]*y[4]+z
+         [4]*z[5]*x[4]*y[6]-z[4]*y[6]*x[5]*z[7]+z[4]*z[6]*x[4]*y[7]+z[4]*x[5]*y[4]*z[6];
     s8 = -z[6]*y[2]*x[6]*z[3]-z[4]*y[5]*x[4]*z[6]-z[2]*y[1]*x[5]*z[6]+z[2]*x
-	 [1]*y[5]*z[6]+z[4]*x[6]*y[4]*z[7]+2.0*z[4]*z[5]*x[4]*y[7]-z[4]*z[6]*x[7]*y[4]+x
-	 [6]*y[7]*z[3]*z[3]-2.0*z[4]*z[5]*x[7]*y[4]-2.0*z[4]*y[5]*x[4]*z[7]-z[4]*y[6]*x
-	 [4]*z[7]+z[4]*x[6]*y[5]*z[7]-z[4]*x[6]*y[7]*z[5]+2.0*z[4]*x[5]*y[4]*z[7]+z[2]*x
-	 [2]*y[5]*z[6]-z[2]*x[2]*y[6]*z[5];
+         [1]*y[5]*z[6]+z[4]*x[6]*y[4]*z[7]+2.0*z[4]*z[5]*x[4]*y[7]-z[4]*z[6]*x[7]*y[4]+x
+         [6]*y[7]*z[3]*z[3]-2.0*z[4]*z[5]*x[7]*y[4]-2.0*z[4]*y[5]*x[4]*z[7]-z[4]*y[6]*x
+         [4]*z[7]+z[4]*x[6]*y[5]*z[7]-z[4]*x[6]*y[7]*z[5]+2.0*z[4]*x[5]*y[4]*z[7]+z[2]*x
+         [2]*y[5]*z[6]-z[2]*x[2]*y[6]*z[5];
     s5 = s8+z[2]*x[6]*y[2]*z[5]-z[2]*x[5]*y[2]*z[6]-z[2]*x[2]*y[3]*z[7]-x[2]*
-	 y[3]*z[7]*z[7]+2.0*z[2]*x[2]*y[3]*z[1]-z[2]*y[2]*x[3]*z[0]+z[2]*y[2]*x[0]*z[3]-
-	 z[2]*x[2]*y[0]*z[3]-z[7]*y[2]*x[7]*z[3]+z[7]*z[2]*x[7]*y[3]+z[7]*x[2]*y[7]*z[3]
-	 +z[6]*y[1]*x[2]*z[5]-z[6]*x[1]*y[2]*z[5]+z[5]*x[1]*y[5]*z[2]+s6+s7;
+         y[3]*z[7]*z[7]+2.0*z[2]*x[2]*y[3]*z[1]-z[2]*y[2]*x[3]*z[0]+z[2]*y[2]*x[0]*z[3]-
+         z[2]*x[2]*y[0]*z[3]-z[7]*y[2]*x[7]*z[3]+z[7]*z[2]*x[7]*y[3]+z[7]*x[2]*y[7]*z[3]
+         +z[6]*y[1]*x[2]*z[5]-z[6]*x[1]*y[2]*z[5]+z[5]*x[1]*y[5]*z[2]+s6+s7;
     s8 = z[5]*z[1]*x[5]*y[2]-z[5]*z[1]*x[2]*y[5]-y[6]*x[7]*z[2]*z[2]+2.0*z[2]
-	 *x[2]*y[6]*z[3]-2.0*z[2]*x[2]*y[3]*z[6]+2.0*z[2]*y[2]*x[3]*z[6]+y[2]*x[3]*z[6]*
-	 z[6]+y[6]*x[7]*z[5]*z[5]+z[2]*y[2]*x[3]*z[7]-z[2]*y[2]*x[7]*z[3]-2.0*z[2]*y[2]*
-	 x[6]*z[3]+z[2]*x[2]*y[7]*z[3]+x[6]*y[2]*z[5]*z[5]-2.0*z[2]*x[2]*y[1]*z[3]-x[2]*
-	 y[6]*z[5]*z[5];
+         *x[2]*y[6]*z[3]-2.0*z[2]*x[2]*y[3]*z[6]+2.0*z[2]*y[2]*x[3]*z[6]+y[2]*x[3]*z[6]*
+         z[6]+y[6]*x[7]*z[5]*z[5]+z[2]*y[2]*x[3]*z[7]-z[2]*y[2]*x[7]*z[3]-2.0*z[2]*y[2]*
+         x[6]*z[3]+z[2]*x[2]*y[7]*z[3]+x[6]*y[2]*z[5]*z[5]-2.0*z[2]*x[2]*y[1]*z[3]-x[2]*
+         y[6]*z[5]*z[5];
     s7 = s8-y[1]*x[5]*z[6]*z[6]+z[6]*x[1]*y[6]*z[2]-z[3]*z[2]*x[3]*y[6]+z[6]*
-	 z[1]*x[6]*y[2]-z[6]*z[1]*x[2]*y[6]-z[6]*y[1]*x[6]*z[2]-2.0*x[5]*y[2]*z[6]*z[6]+
-	 z[4]*z[1]*x[0]*y[4]-z[3]*x[2]*y[3]*z[6]-z[5]*y[1]*x[5]*z[2]+z[3]*y[2]*x[3]*z[6]
-	 +2.0*x[2]*y[5]*z[6]*z[6]-z[5]*x[1]*y[5]*z[0]+y[2]*x[3]*z[7]*z[7]-x[2]*y[3]*z[6]
-	 *z[6];
+         z[1]*x[6]*y[2]-z[6]*z[1]*x[2]*y[6]-z[6]*y[1]*x[6]*z[2]-2.0*x[5]*y[2]*z[6]*z[6]+
+         z[4]*z[1]*x[0]*y[4]-z[3]*x[2]*y[3]*z[6]-z[5]*y[1]*x[5]*z[2]+z[3]*y[2]*x[3]*z[6]
+         +2.0*x[2]*y[5]*z[6]*z[6]-z[5]*x[1]*y[5]*z[0]+y[2]*x[3]*z[7]*z[7]-x[2]*y[3]*z[6]
+         *z[6];
     s8 = z[5]*y[5]*x[4]*z[0]+z[3]*z[2]*x[6]*y[3]+x[1]*y[5]*z[6]*z[6]+z[5]*y
-	 [5]*x[7]*z[4]-z[1]*x[1]*y[2]*z[6]+z[1]*x[1]*y[6]*z[2]+2.0*z[6]*y[6]*x[7]*z[5]-z
-	 [7]*y[6]*x[7]*z[2]-z[3]*y[6]*x[7]*z[2]+x[6]*y[7]*z[2]*z[2]-2.0*z[6]*y[6]*x[7]*z
-	 [2]-2.0*x[6]*y[3]*z[7]*z[7]-x[6]*y[2]*z[7]*z[7]-z[5]*x[6]*y[5]*z[2]+y[6]*x[2]*z
-	 [7]*z[7];
+         [5]*x[7]*z[4]-z[1]*x[1]*y[2]*z[6]+z[1]*x[1]*y[6]*z[2]+2.0*z[6]*y[6]*x[7]*z[5]-z
+         [7]*y[6]*x[7]*z[2]-z[3]*y[6]*x[7]*z[2]+x[6]*y[7]*z[2]*z[2]-2.0*z[6]*y[6]*x[7]*z
+         [2]-2.0*x[6]*y[3]*z[7]*z[7]-x[6]*y[2]*z[7]*z[7]-z[5]*x[6]*y[5]*z[2]+y[6]*x[2]*z
+         [7]*z[7];
     s6 = s8+2.0*y[6]*x[3]*z[7]*z[7]+z[6]*z[6]*x[7]*y[3]-y[6]*x[7]*z[3]*z[3]+z
-	 [5]*x[5]*y[0]*z[4]+2.0*z[6]*z[6]*x[7]*y[2]-2.0*z[6]*z[6]*x[2]*y[7]-z[6]*z[6]*x
-	 [3]*y[7]+z[7]*y[6]*x[7]*z[5]+z[7]*y[5]*x[7]*z[4]-2.0*z[7]*x[7]*y[3]*z[4]+2.0*z
-	 [7]*x[3]*y[7]*z[4]-2.0*z[7]*x[4]*y[7]*z[3]+2.0*z[7]*x[7]*y[4]*z[3]-z[7]*y[0]*x
-	 [7]*z[4]-2.0*z[7]*z[6]*x[3]*y[7]+s7;
+         [5]*x[5]*y[0]*z[4]+2.0*z[6]*z[6]*x[7]*y[2]-2.0*z[6]*z[6]*x[2]*y[7]-z[6]*z[6]*x
+         [3]*y[7]+z[7]*y[6]*x[7]*z[5]+z[7]*y[5]*x[7]*z[4]-2.0*z[7]*x[7]*y[3]*z[4]+2.0*z
+         [7]*x[3]*y[7]*z[4]-2.0*z[7]*x[4]*y[7]*z[3]+2.0*z[7]*x[7]*y[4]*z[3]-z[7]*y[0]*x
+         [7]*z[4]-2.0*z[7]*z[6]*x[3]*y[7]+s7;
     s8 = s6+2.0*z[7]*z[6]*x[7]*y[3]+2.0*z[7]*x[6]*y[7]*z[3]+z[7]*x[6]*y[7]*z
-	 [2]-2.0*z[7]*y[6]*x[7]*z[3]+z[7]*z[6]*x[7]*y[2]-z[7]*z[6]*x[2]*y[7]+z[5]*y[1]*x
-	 [5]*z[0]-z[5]*z[1]*x[5]*y[0]+2.0*y[1]*x[6]*z[5]*z[5]-2.0*x[1]*y[6]*z[5]*z[5]+z
-	 [5]*z[1]*x[0]*y[5]+z[6]*y[6]*x[3]*z[7]+2.0*z[6]*x[6]*y[7]*z[2]-z[6]*y[6]*x[7]*z
-	 [3];
+         [2]-2.0*z[7]*y[6]*x[7]*z[3]+z[7]*z[6]*x[7]*y[2]-z[7]*z[6]*x[2]*y[7]+z[5]*y[1]*x
+         [5]*z[0]-z[5]*z[1]*x[5]*y[0]+2.0*y[1]*x[6]*z[5]*z[5]-2.0*x[1]*y[6]*z[5]*z[5]+z
+         [5]*z[1]*x[0]*y[5]+z[6]*y[6]*x[3]*z[7]+2.0*z[6]*x[6]*y[7]*z[2]-z[6]*y[6]*x[7]*z
+         [3];
     s7 = s8+2.0*z[6]*y[6]*x[2]*z[7]-z[6]*x[6]*y[3]*z[7]+z[6]*x[6]*y[7]*z[3]
-	 -2.0*z[6]*x[6]*y[2]*z[7]-2.0*z[1]*y[1]*x[5]*z[2]-z[1]*y[1]*x[6]*z[2]-z[7]*z[0]*
-	 x[7]*y[3]-2.0*z[6]*x[6]*y[5]*z[2]-z[2]*z[6]*x[3]*y[7]+z[2]*x[6]*y[7]*z[3]-z[2]*
-	 z[6]*x[2]*y[7]+y[5]*x[6]*z[4]*z[4]+z[2]*y[6]*x[2]*z[7]+y[6]*x[7]*z[4]*z[4]+z[2]
-	 *z[6]*x[7]*y[2]-2.0*x[5]*y[7]*z[4]*z[4];
+         -2.0*z[6]*x[6]*y[2]*z[7]-2.0*z[1]*y[1]*x[5]*z[2]-z[1]*y[1]*x[6]*z[2]-z[7]*z[0]*
+         x[7]*y[3]-2.0*z[6]*x[6]*y[5]*z[2]-z[2]*z[6]*x[3]*y[7]+z[2]*x[6]*y[7]*z[3]-z[2]*
+         z[6]*x[2]*y[7]+y[5]*x[6]*z[4]*z[4]+z[2]*y[6]*x[2]*z[7]+y[6]*x[7]*z[4]*z[4]+z[2]
+         *z[6]*x[7]*y[2]-2.0*x[5]*y[7]*z[4]*z[4];
     s8 = -x[6]*y[7]*z[4]*z[4]-z[5]*y[5]*x[0]*z[4]-z[2]*x[6]*y[2]*z[7]-x[5]*y
-	 [6]*z[4]*z[4]-2.0*z[5]*y[1]*x[5]*z[6]+2.0*z[5]*z[1]*x[5]*y[6]+2.0*z[5]*x[1]*y
-	 [5]*z[6]-2.0*z[5]*z[1]*x[6]*y[5]-z[5]*x[5]*y[2]*z[6]+z[5]*x[5]*y[6]*z[2]+z[5]*x
-	 [2]*y[5]*z[6]+z[5]*z[5]*x[4]*y[7]-y[5]*x[4]*z[7]*z[7]+x[5]*y[4]*z[7]*z[7]+z[6]*
-	 z[1]*x[5]*y[6]+z[6]*y[1]*x[6]*z[5];
+         [6]*z[4]*z[4]-2.0*z[5]*y[1]*x[5]*z[6]+2.0*z[5]*z[1]*x[5]*y[6]+2.0*z[5]*x[1]*y
+         [5]*z[6]-2.0*z[5]*z[1]*x[6]*y[5]-z[5]*x[5]*y[2]*z[6]+z[5]*x[5]*y[6]*z[2]+z[5]*x
+         [2]*y[5]*z[6]+z[5]*z[5]*x[4]*y[7]-y[5]*x[4]*z[7]*z[7]+x[5]*y[4]*z[7]*z[7]+z[6]*
+         z[1]*x[5]*y[6]+z[6]*y[1]*x[6]*z[5];
     s4 = s8-z[6]*z[1]*x[6]*y[5]-z[6]*x[1]*y[6]*z[5]+z[2]*z[6]*x[7]*y[3]+2.0*z
-	 [6]*x[6]*y[2]*z[5]+2.0*z[6]*x[5]*y[6]*z[2]-2.0*z[6]*x[2]*y[6]*z[5]+z[7]*z[0]*x
-	 [3]*y[7]+z[7]*z[0]*x[7]*y[4]+z[3]*z[6]*x[7]*y[3]-z[3]*z[6]*x[3]*y[7]-z[3]*x[6]*
-	 y[3]*z[7]+z[3]*y[6]*x[2]*z[7]-z[3]*x[6]*y[2]*z[7]+z[5]*x[5]*y[4]*z[7]+s5+s7;
+         [6]*x[6]*y[2]*z[5]+2.0*z[6]*x[5]*y[6]*z[2]-2.0*z[6]*x[2]*y[6]*z[5]+z[7]*z[0]*x
+         [3]*y[7]+z[7]*z[0]*x[7]*y[4]+z[3]*z[6]*x[7]*y[3]-z[3]*z[6]*x[3]*y[7]-z[3]*x[6]*
+         y[3]*z[7]+z[3]*y[6]*x[2]*z[7]-z[3]*x[6]*y[2]*z[7]+z[5]*x[5]*y[4]*z[7]+s5+s7;
     s8 = s4+z[3]*y[6]*x[3]*z[7]-z[7]*x[0]*y[7]*z[3]+z[6]*x[5]*y[4]*z[7]+z[7]*
-	 y[0]*x[7]*z[3]+z[5]*z[6]*x[4]*y[7]-2.0*z[5]*x[5]*y[6]*z[4]+2.0*z[5]*x[5]*y[4]*z
-	 [6]-z[5]*x[5]*y[7]*z[4]-z[5]*y[6]*x[5]*z[7]-z[5]*z[6]*x[7]*y[4]-z[7]*z[0]*x[4]*
-	 y[7]-z[5]*z[6]*x[7]*y[5]-z[5]*y[5]*x[4]*z[7]+z[7]*x[0]*y[7]*z[4];
+         y[0]*x[7]*z[3]+z[5]*z[6]*x[4]*y[7]-2.0*z[5]*x[5]*y[6]*z[4]+2.0*z[5]*x[5]*y[4]*z
+         [6]-z[5]*x[5]*y[7]*z[4]-z[5]*y[6]*x[5]*z[7]-z[5]*z[6]*x[7]*y[4]-z[7]*z[0]*x[4]*
+         y[7]-z[5]*z[6]*x[7]*y[5]-z[5]*y[5]*x[4]*z[7]+z[7]*x[0]*y[7]*z[4];
     s7 = s8-2.0*z[5]*y[5]*x[4]*z[6]+z[5]*z[6]*x[5]*y[7]+z[5]*x[6]*y[5]*z[7]+
-	 2.0*z[5]*y[5]*x[6]*z[4]+z[6]*z[5]*x[4]*y[6]-z[6]*x[5]*y[6]*z[4]-z[6]*z[5]*x[6]*
-	 y[4]-z[6]*x[6]*y[7]*z[4]-2.0*z[6]*y[6]*x[5]*z[7]+z[6]*x[6]*y[4]*z[7]-z[6]*y[5]*
-	 x[4]*z[7]-z[6]*y[6]*x[4]*z[7]+z[6]*y[6]*x[7]*z[4]+z[6]*y[5]*x[6]*z[4]+2.0*z[6]*
-	 x[6]*y[5]*z[7];
+         2.0*z[5]*y[5]*x[6]*z[4]+z[6]*z[5]*x[4]*y[6]-z[6]*x[5]*y[6]*z[4]-z[6]*z[5]*x[6]*
+         y[4]-z[6]*x[6]*y[7]*z[4]-2.0*z[6]*y[6]*x[5]*z[7]+z[6]*x[6]*y[4]*z[7]-z[6]*y[5]*
+         x[4]*z[7]-z[6]*y[6]*x[4]*z[7]+z[6]*y[6]*x[7]*z[4]+z[6]*y[5]*x[6]*z[4]+2.0*z[6]*
+         x[6]*y[5]*z[7];
     s8 = -2.0*z[6]*x[6]*y[7]*z[5]-z[2]*y[1]*x[2]*z[0]+2.0*z[7]*z[6]*x[4]*y[7]
-	 -2.0*z[7]*x[6]*y[7]*z[4]-2.0*z[7]*z[6]*x[7]*y[4]+z[7]*z[5]*x[4]*y[7]-z[7]*z[5]*
-	 x[7]*y[4]-z[7]*x[5]*y[7]*z[4]+2.0*z[7]*y[6]*x[7]*z[4]-z[7]*z[6]*x[7]*y[5]+z[7]*
-	 z[6]*x[5]*y[7]-z[7]*x[6]*y[7]*z[5]+z[1]*z[1]*x[6]*y[2]+s7+x[1]*y[5]*z[2]*z[2];
+         -2.0*z[7]*x[6]*y[7]*z[4]-2.0*z[7]*z[6]*x[7]*y[4]+z[7]*z[5]*x[4]*y[7]-z[7]*z[5]*
+         x[7]*y[4]-z[7]*x[5]*y[7]*z[4]+2.0*z[7]*y[6]*x[7]*z[4]-z[7]*z[6]*x[7]*y[5]+z[7]*
+         z[6]*x[5]*y[7]-z[7]*x[6]*y[7]*z[5]+z[1]*z[1]*x[6]*y[2]+s7+x[1]*y[5]*z[2]*z[2];
     s6 = s8+2.0*z[2]*y[2]*x[1]*z[3]-2.0*z[2]*y[2]*x[3]*z[1]-2.0*x[1]*y[4]*z
-	 [0]*z[0]+2.0*y[1]*x[4]*z[0]*z[0]+2.0*x[2]*y[7]*z[3]*z[3]-2.0*y[2]*x[7]*z[3]*z
-	 [3]-x[1]*y[5]*z[0]*z[0]+z[0]*z[0]*x[7]*y[4]+z[0]*z[0]*x[3]*y[7]+x[2]*y[3]*z[0]*
-	 z[0]-2.0*y[1]*x[3]*z[0]*z[0]+y[5]*x[4]*z[0]*z[0]-2.0*z[0]*z[0]*x[4]*y[3]+x[1]*y
-	 [2]*z[0]*z[0]-z[0]*z[0]*x[4]*y[7]+y[1]*x[5]*z[0]*z[0];
+         [0]*z[0]+2.0*y[1]*x[4]*z[0]*z[0]+2.0*x[2]*y[7]*z[3]*z[3]-2.0*y[2]*x[7]*z[3]*z
+         [3]-x[1]*y[5]*z[0]*z[0]+z[0]*z[0]*x[7]*y[4]+z[0]*z[0]*x[3]*y[7]+x[2]*y[3]*z[0]*
+         z[0]-2.0*y[1]*x[3]*z[0]*z[0]+y[5]*x[4]*z[0]*z[0]-2.0*z[0]*z[0]*x[4]*y[3]+x[1]*y
+         [2]*z[0]*z[0]-z[0]*z[0]*x[4]*y[7]+y[1]*x[5]*z[0]*z[0];
     s8 = s6-y[2]*x[3]*z[0]*z[0]+y[1]*x[0]*z[3]*z[3]-2.0*x[0]*y[7]*z[3]*z[3]-x
-	 [0]*y[4]*z[3]*z[3]-2.0*x[2]*y[0]*z[3]*z[3]-x[1]*y[0]*z[3]*z[3]+y[0]*x[4]*z[3]*z
-	 [3]-2.0*z[0]*y[1]*x[0]*z[4]+2.0*z[0]*z[1]*x[0]*y[4]+2.0*z[0]*x[1]*y[0]*z[4]-2.0
-	 *z[0]*z[1]*x[4]*y[0]-2.0*z[3]*x[2]*y[3]*z[7]-2.0*z[3]*z[2]*x[3]*y[7]+2.0*z[3]*z
-	 [2]*x[7]*y[3];
+         [0]*y[4]*z[3]*z[3]-2.0*x[2]*y[0]*z[3]*z[3]-x[1]*y[0]*z[3]*z[3]+y[0]*x[4]*z[3]*z
+         [3]-2.0*z[0]*y[1]*x[0]*z[4]+2.0*z[0]*z[1]*x[0]*y[4]+2.0*z[0]*x[1]*y[0]*z[4]-2.0
+         *z[0]*z[1]*x[4]*y[0]-2.0*z[3]*x[2]*y[3]*z[7]-2.0*z[3]*z[2]*x[3]*y[7]+2.0*z[3]*z
+         [2]*x[7]*y[3];
     s7 = s8+2.0*z[3]*y[2]*x[3]*z[7]+2.0*z[5]*y[5]*x[4]*z[1]+2.0*z[0]*y[1]*x
-	 [0]*z[3]-z[0]*y[0]*x[3]*z[7]-2.0*z[0]*y[0]*x[3]*z[4]-z[0]*x[1]*y[0]*z[2]+z[0]*z
-	 [1]*x[2]*y[0]-z[0]*y[1]*x[0]*z[5]-z[0]*z[1]*x[0]*y[2]-z[0]*x[0]*y[7]*z[3]-2.0*z
-	 [0]*z[1]*x[0]*y[3]-z[5]*x[5]*y[4]*z[0]-2.0*z[0]*x[0]*y[4]*z[3]+z[0]*x[0]*y[7]*z
-	 [4]-z[0]*z[2]*x[0]*y[3];
+         [0]*z[3]-z[0]*y[0]*x[3]*z[7]-2.0*z[0]*y[0]*x[3]*z[4]-z[0]*x[1]*y[0]*z[2]+z[0]*z
+         [1]*x[2]*y[0]-z[0]*y[1]*x[0]*z[5]-z[0]*z[1]*x[0]*y[2]-z[0]*x[0]*y[7]*z[3]-2.0*z
+         [0]*z[1]*x[0]*y[3]-z[5]*x[5]*y[4]*z[0]-2.0*z[0]*x[0]*y[4]*z[3]+z[0]*x[0]*y[7]*z
+         [4]-z[0]*z[2]*x[0]*y[3];
     s8 = s7+z[0]*x[5]*y[0]*z[4]+z[0]*z[1]*x[0]*y[5]-z[0]*x[2]*y[0]*z[3]-z[0]*
-	 z[1]*x[5]*y[0]-2.0*z[0]*x[1]*y[0]*z[3]+2.0*z[0]*y[0]*x[4]*z[3]-z[0]*x[0]*y[4]*z
-	 [7]+z[0]*x[1]*y[0]*z[5]+z[0]*y[0]*x[7]*z[3]+z[0]*y[2]*x[0]*z[3]-z[0]*y[5]*x[0]*
-	 z[4]+z[0]*z[2]*x[3]*y[0]+z[0]*x[2]*y[3]*z[1]+z[0]*x[0]*y[3]*z[7]-z[0]*x[2]*y[1]
-	 *z[3];
+         z[1]*x[5]*y[0]-2.0*z[0]*x[1]*y[0]*z[3]+2.0*z[0]*y[0]*x[4]*z[3]-z[0]*x[0]*y[4]*z
+         [7]+z[0]*x[1]*y[0]*z[5]+z[0]*y[0]*x[7]*z[3]+z[0]*y[2]*x[0]*z[3]-z[0]*y[5]*x[0]*
+         z[4]+z[0]*z[2]*x[3]*y[0]+z[0]*x[2]*y[3]*z[1]+z[0]*x[0]*y[3]*z[7]-z[0]*x[2]*y[1]
+         *z[3];
     s5 = s8+z[0]*y[1]*x[0]*z[2]+z[3]*x[1]*y[3]*z[0]-2.0*z[3]*y[0]*x[3]*z[7]-z
-	 [3]*y[0]*x[3]*z[4]-z[3]*x[1]*y[0]*z[2]+z[3]*z[0]*x[7]*y[4]+2.0*z[3]*z[0]*x[3]*y
-	 [7]+2.0*z[3]*x[2]*y[3]*z[0]-z[3]*y[1]*x[3]*z[0]-z[3]*z[1]*x[0]*y[3]-z[3]*z[0]*x
-	 [4]*y[3]+z[3]*x[1]*y[2]*z[0]-z[3]*z[0]*x[4]*y[7]-2.0*z[3]*z[2]*x[0]*y[3]-z[3]*x
-	 [0]*y[4]*z[7]-2.0*z[3]*y[2]*x[3]*z[0];
+         [3]*y[0]*x[3]*z[4]-z[3]*x[1]*y[0]*z[2]+z[3]*z[0]*x[7]*y[4]+2.0*z[3]*z[0]*x[3]*y
+         [7]+2.0*z[3]*x[2]*y[3]*z[0]-z[3]*y[1]*x[3]*z[0]-z[3]*z[1]*x[0]*y[3]-z[3]*z[0]*x
+         [4]*y[3]+z[3]*x[1]*y[2]*z[0]-z[3]*z[0]*x[4]*y[7]-2.0*z[3]*z[2]*x[0]*y[3]-z[3]*x
+         [0]*y[4]*z[7]-2.0*z[3]*y[2]*x[3]*z[0];
     s8 = s5+2.0*z[3]*z[2]*x[3]*y[0]+z[3]*x[2]*y[3]*z[1]+2.0*z[3]*x[0]*y[3]*z
-	 [7]+z[3]*y[1]*x[0]*z[2]-z[4]*y[0]*x[3]*z[7]-z[4]*x[1]*y[5]*z[0]-z[4]*y[1]*x[0]*
-	 z[5]+2.0*z[4]*z[0]*x[7]*y[4]+z[4]*z[0]*x[3]*y[7]+2.0*z[4]*y[5]*x[4]*z[0]+2.0*y
-	 [0]*x[7]*z[3]*z[3]+2.0*y[2]*x[0]*z[3]*z[3]-x[2]*y[1]*z[3]*z[3]-y[0]*x[3]*z[4]*z
-	 [4];
+         [7]+z[3]*y[1]*x[0]*z[2]-z[4]*y[0]*x[3]*z[7]-z[4]*x[1]*y[5]*z[0]-z[4]*y[1]*x[0]*
+         z[5]+2.0*z[4]*z[0]*x[7]*y[4]+z[4]*z[0]*x[3]*y[7]+2.0*z[4]*y[5]*x[4]*z[0]+2.0*y
+         [0]*x[7]*z[3]*z[3]+2.0*y[2]*x[0]*z[3]*z[3]-x[2]*y[1]*z[3]*z[3]-y[0]*x[3]*z[4]*z
+         [4];
     s7 = s8-y[1]*x[0]*z[4]*z[4]+x[1]*y[0]*z[4]*z[4]+2.0*x[0]*y[7]*z[4]*z[4]+
-	 2.0*x[5]*y[0]*z[4]*z[4]-2.0*y[5]*x[0]*z[4]*z[4]+2.0*z[1]*z[1]*x[2]*y[0]-2.0*z
-	 [1]*z[1]*x[0]*y[2]+z[1]*z[1]*x[0]*y[4]-z[1]*z[1]*x[0]*y[3]-z[1]*z[1]*x[4]*y[0]+
-	 2.0*z[1]*z[1]*x[0]*y[5]-2.0*z[1]*z[1]*x[5]*y[0]+x[2]*y[3]*z[1]*z[1]-x[5]*y[4]*z
-	 [0]*z[0]-z[0]*z[0]*x[7]*y[3];
+         2.0*x[5]*y[0]*z[4]*z[4]-2.0*y[5]*x[0]*z[4]*z[4]+2.0*z[1]*z[1]*x[2]*y[0]-2.0*z
+         [1]*z[1]*x[0]*y[2]+z[1]*z[1]*x[0]*y[4]-z[1]*z[1]*x[0]*y[3]-z[1]*z[1]*x[4]*y[0]+
+         2.0*z[1]*z[1]*x[0]*y[5]-2.0*z[1]*z[1]*x[5]*y[0]+x[2]*y[3]*z[1]*z[1]-x[5]*y[4]*z
+         [0]*z[0]-z[0]*z[0]*x[7]*y[3];
     s8 = s7+x[7]*y[4]*z[3]*z[3]-x[4]*y[7]*z[3]*z[3]+y[2]*x[1]*z[3]*z[3]+x[0]*
-	 y[3]*z[4]*z[4]-2.0*y[0]*x[7]*z[4]*z[4]+x[3]*y[7]*z[4]*z[4]-x[7]*y[3]*z[4]*z[4]-
-	 y[5]*x[1]*z[4]*z[4]+x[5]*y[1]*z[4]*z[4]+z[1]*z[1]*x[3]*y[0]+y[5]*x[4]*z[1]*z[1]
-	 -y[2]*x[3]*z[1]*z[1]-x[5]*y[4]*z[1]*z[1]-z[4]*x[0]*y[4]*z[3]-z[4]*z[0]*x[4]*y
-	 [3];
+         y[3]*z[4]*z[4]-2.0*y[0]*x[7]*z[4]*z[4]+x[3]*y[7]*z[4]*z[4]-x[7]*y[3]*z[4]*z[4]-
+         y[5]*x[1]*z[4]*z[4]+x[5]*y[1]*z[4]*z[4]+z[1]*z[1]*x[3]*y[0]+y[5]*x[4]*z[1]*z[1]
+         -y[2]*x[3]*z[1]*z[1]-x[5]*y[4]*z[1]*z[1]-z[4]*x[0]*y[4]*z[3]-z[4]*z[0]*x[4]*y
+         [3];
     s6 = s8-z[4]*z[1]*x[4]*y[0]-2.0*z[4]*z[0]*x[4]*y[7]+z[4]*y[1]*x[5]*z[0]
-	 -2.0*z[5]*x[5]*y[4]*z[1]-z[4]*x[1]*y[4]*z[0]+z[4]*y[0]*x[4]*z[3]-2.0*z[4]*x[0]*
-	 y[4]*z[7]+z[4]*x[1]*y[0]*z[5]-2.0*z[1]*x[1]*y[2]*z[5]+z[4]*x[0]*y[3]*z[7]+2.0*z
-	 [5]*x[5]*y[1]*z[4]+z[4]*y[1]*x[4]*z[0]+z[1]*y[1]*x[0]*z[3]+z[1]*x[1]*y[3]*z[0]
-	 -2.0*z[1]*x[1]*y[5]*z[0]-2.0*z[1]*x[1]*y[0]*z[2];
+         -2.0*z[5]*x[5]*y[4]*z[1]-z[4]*x[1]*y[4]*z[0]+z[4]*y[0]*x[4]*z[3]-2.0*z[4]*x[0]*
+         y[4]*z[7]+z[4]*x[1]*y[0]*z[5]-2.0*z[1]*x[1]*y[2]*z[5]+z[4]*x[0]*y[3]*z[7]+2.0*z
+         [5]*x[5]*y[1]*z[4]+z[4]*y[1]*x[4]*z[0]+z[1]*y[1]*x[0]*z[3]+z[1]*x[1]*y[3]*z[0]
+         -2.0*z[1]*x[1]*y[5]*z[0]-2.0*z[1]*x[1]*y[0]*z[2];
     s8 = s6-2.0*z[1]*y[1]*x[0]*z[5]-z[1]*y[1]*x[0]*z[4]+2.0*z[1]*y[1]*x[2]*z
-	 [5]-z[1]*y[1]*x[3]*z[0]-2.0*z[5]*y[5]*x[1]*z[4]+z[1]*y[5]*x[4]*z[0]+z[1]*x[1]*y
-	 [0]*z[4]+2.0*z[1]*x[1]*y[2]*z[0]-z[1]*z[2]*x[0]*y[3]+2.0*z[1]*y[1]*x[5]*z[0]-z
-	 [1]*x[1]*y[0]*z[3]-z[1]*x[1]*y[4]*z[0]+2.0*z[1]*x[1]*y[0]*z[5]-z[1]*y[2]*x[3]*z
-	 [0];
+         [5]-z[1]*y[1]*x[3]*z[0]-2.0*z[5]*y[5]*x[1]*z[4]+z[1]*y[5]*x[4]*z[0]+z[1]*x[1]*y
+         [0]*z[4]+2.0*z[1]*x[1]*y[2]*z[0]-z[1]*z[2]*x[0]*y[3]+2.0*z[1]*y[1]*x[5]*z[0]-z
+         [1]*x[1]*y[0]*z[3]-z[1]*x[1]*y[4]*z[0]+2.0*z[1]*x[1]*y[0]*z[5]-z[1]*y[2]*x[3]*z
+         [0];
     s7 = s8+z[1]*z[2]*x[3]*y[0]-z[1]*x[2]*y[1]*z[3]+z[1]*y[1]*x[4]*z[0]+2.0*z
-	 [1]*y[1]*x[0]*z[2]+2.0*z[0]*z[1]*x[3]*y[0]+2.0*z[0]*x[0]*y[3]*z[4]+z[0]*z[5]*x
-	 [0]*y[4]+z[0]*y[0]*x[4]*z[7]-z[0]*y[0]*x[7]*z[4]-z[0]*x[7]*y[3]*z[4]-z[0]*z[5]*
-	 x[4]*y[0]-z[0]*x[5]*y[4]*z[1]+z[3]*z[1]*x[3]*y[0]+z[3]*x[0]*y[3]*z[4]+z[3]*z[0]
-	 *x[3]*y[4]+z[3]*y[0]*x[4]*z[7];
+         [1]*y[1]*x[0]*z[2]+2.0*z[0]*z[1]*x[3]*y[0]+2.0*z[0]*x[0]*y[3]*z[4]+z[0]*z[5]*x
+         [0]*y[4]+z[0]*y[0]*x[4]*z[7]-z[0]*y[0]*x[7]*z[4]-z[0]*x[7]*y[3]*z[4]-z[0]*z[5]*
+         x[4]*y[0]-z[0]*x[5]*y[4]*z[1]+z[3]*z[1]*x[3]*y[0]+z[3]*x[0]*y[3]*z[4]+z[3]*z[0]
+         *x[3]*y[4]+z[3]*y[0]*x[4]*z[7];
     s8 = s7+z[3]*x[3]*y[7]*z[4]-z[3]*x[7]*y[3]*z[4]-z[3]*x[3]*y[4]*z[7]+z[3]*
-	 x[4]*y[3]*z[7]-z[3]*y[2]*x[3]*z[1]+z[3]*z[2]*x[3]*y[1]-z[3]*z[2]*x[1]*y[3]-2.0*
-	 z[3]*z[0]*x[7]*y[3]+z[4]*z[0]*x[3]*y[4]+2.0*z[4]*z[5]*x[0]*y[4]+2.0*z[4]*y[0]*x
-	 [4]*z[7]-2.0*z[4]*x[5]*y[4]*z[0]+z[4]*y[5]*x[4]*z[1]+z[4]*x[7]*y[4]*z[3]-z[4]*x
-	 [4]*y[7]*z[3];
+         x[4]*y[3]*z[7]-z[3]*y[2]*x[3]*z[1]+z[3]*z[2]*x[3]*y[1]-z[3]*z[2]*x[1]*y[3]-2.0*
+         z[3]*z[0]*x[7]*y[3]+z[4]*z[0]*x[3]*y[4]+2.0*z[4]*z[5]*x[0]*y[4]+2.0*z[4]*y[0]*x
+         [4]*z[7]-2.0*z[4]*x[5]*y[4]*z[0]+z[4]*y[5]*x[4]*z[1]+z[4]*x[7]*y[4]*z[3]-z[4]*x
+         [4]*y[7]*z[3];
     s3 = s8-z[4]*x[3]*y[4]*z[7]+z[4]*x[4]*y[3]*z[7]-2.0*z[4]*z[5]*x[4]*y[0]-z
-	 [4]*x[5]*y[4]*z[1]+z[4]*z[5]*x[1]*y[4]-z[4]*z[5]*x[4]*y[1]-2.0*z[1]*y[1]*x[2]*z
-	 [0]+z[1]*z[5]*x[0]*y[4]-z[1]*z[5]*x[4]*y[0]-z[1]*y[5]*x[1]*z[4]+z[1]*x[5]*y[1]*
-	 z[4]+z[1]*z[5]*x[1]*y[4]-z[1]*z[5]*x[4]*y[1]+z[1]*z[2]*x[3]*y[1]-z[1]*z[2]*x[1]
-	 *y[3]+z[1]*y[2]*x[1]*z[3];
+         [4]*x[5]*y[4]*z[1]+z[4]*z[5]*x[1]*y[4]-z[4]*z[5]*x[4]*y[1]-2.0*z[1]*y[1]*x[2]*z
+         [0]+z[1]*z[5]*x[0]*y[4]-z[1]*z[5]*x[4]*y[0]-z[1]*y[5]*x[1]*z[4]+z[1]*x[5]*y[1]*
+         z[4]+z[1]*z[5]*x[1]*y[4]-z[1]*z[5]*x[4]*y[1]+z[1]*z[2]*x[3]*y[1]-z[1]*z[2]*x[1]
+         *y[3]+z[1]*y[2]*x[1]*z[3];
     s8 = y[1]*x[0]*z[3]+x[1]*y[3]*z[0]-y[0]*x[3]*z[7]-x[1]*y[5]*z[0]-y[0]*x
-	 [3]*z[4]-x[1]*y[0]*z[2]+z[1]*x[2]*y[0]-y[1]*x[0]*z[5]-z[1]*x[0]*y[2]-y[1]*x[0]*
-	 z[4]+z[1]*x[5]*y[2]+z[0]*x[7]*y[4]+z[0]*x[3]*y[7]+z[1]*x[0]*y[4]-x[1]*y[2]*z[5]
-	 +x[2]*y[3]*z[0]+y[1]*x[2]*z[5]-x[2]*y[3]*z[7];
+         [3]*z[4]-x[1]*y[0]*z[2]+z[1]*x[2]*y[0]-y[1]*x[0]*z[5]-z[1]*x[0]*y[2]-y[1]*x[0]*
+         z[4]+z[1]*x[5]*y[2]+z[0]*x[7]*y[4]+z[0]*x[3]*y[7]+z[1]*x[0]*y[4]-x[1]*y[2]*z[5]
+         +x[2]*y[3]*z[0]+y[1]*x[2]*z[5]-x[2]*y[3]*z[7];
     s7 = s8-z[1]*x[2]*y[5]-y[1]*x[3]*z[0]-x[0]*y[7]*z[3]-z[1]*x[0]*y[3]+y[5]*
-	 x[4]*z[0]-x[0]*y[4]*z[3]+y[5]*x[7]*z[4]-z[0]*x[4]*y[3]+x[1]*y[0]*z[4]-z[2]*x[3]
-	 *y[7]-y[6]*x[7]*z[2]+x[1]*y[5]*z[2]+y[6]*x[7]*z[5]+x[0]*y[7]*z[4]+x[1]*y[2]*z
-	 [0]-z[1]*x[4]*y[0]-z[0]*x[4]*y[7]-z[2]*x[0]*y[3];
+         x[4]*z[0]-x[0]*y[4]*z[3]+y[5]*x[7]*z[4]-z[0]*x[4]*y[3]+x[1]*y[0]*z[4]-z[2]*x[3]
+         *y[7]-y[6]*x[7]*z[2]+x[1]*y[5]*z[2]+y[6]*x[7]*z[5]+x[0]*y[7]*z[4]+x[1]*y[2]*z
+         [0]-z[1]*x[4]*y[0]-z[0]*x[4]*y[7]-z[2]*x[0]*y[3];
     s8 = x[5]*y[0]*z[4]+z[1]*x[0]*y[5]-x[2]*y[0]*z[3]-z[1]*x[5]*y[0]+y[1]*x
-	 [5]*z[0]-x[1]*y[0]*z[3]-x[1]*y[4]*z[0]-y[1]*x[5]*z[2]+x[2]*y[7]*z[3]+y[0]*x[4]*
-	 z[3]-x[0]*y[4]*z[7]+x[1]*y[0]*z[5]-y[1]*x[6]*z[2]-y[2]*x[6]*z[3]+y[0]*x[7]*z[3]
-	 -y[2]*x[7]*z[3]+z[2]*x[7]*y[3]+y[2]*x[0]*z[3];
+         [5]*z[0]-x[1]*y[0]*z[3]-x[1]*y[4]*z[0]-y[1]*x[5]*z[2]+x[2]*y[7]*z[3]+y[0]*x[4]*
+         z[3]-x[0]*y[4]*z[7]+x[1]*y[0]*z[5]-y[1]*x[6]*z[2]-y[2]*x[6]*z[3]+y[0]*x[7]*z[3]
+         -y[2]*x[7]*z[3]+z[2]*x[7]*y[3]+y[2]*x[0]*z[3];
     s6 = s8+y[2]*x[3]*z[7]-y[2]*x[3]*z[0]-x[6]*y[5]*z[2]-y[5]*x[0]*z[4]+z[2]*
-	 x[3]*y[0]+x[2]*y[3]*z[1]+x[0]*y[3]*z[7]-x[2]*y[1]*z[3]+y[1]*x[4]*z[0]+y[1]*x[0]
-	 *z[2]-z[1]*x[2]*y[6]+y[2]*x[3]*z[6]-y[1]*x[2]*z[0]+z[1]*x[3]*y[0]-x[1]*y[2]*z
-	 [6]-x[2]*y[3]*z[6]+x[0]*y[3]*z[4]+z[0]*x[3]*y[4]+s7;
+         x[3]*y[0]+x[2]*y[3]*z[1]+x[0]*y[3]*z[7]-x[2]*y[1]*z[3]+y[1]*x[4]*z[0]+y[1]*x[0]
+         *z[2]-z[1]*x[2]*y[6]+y[2]*x[3]*z[6]-y[1]*x[2]*z[0]+z[1]*x[3]*y[0]-x[1]*y[2]*z
+         [6]-x[2]*y[3]*z[6]+x[0]*y[3]*z[4]+z[0]*x[3]*y[4]+s7;
     s8 = x[5]*y[4]*z[7]+s6+y[5]*x[6]*z[4]-y[5]*x[4]*z[6]+z[6]*x[5]*y[7]-x[6]*
-	 y[2]*z[7]-x[6]*y[7]*z[5]+x[5]*y[6]*z[2]+x[6]*y[5]*z[7]+x[6]*y[7]*z[2]+y[6]*x[7]
-	 *z[4]-y[6]*x[4]*z[7]-y[6]*x[7]*z[3]+z[6]*x[7]*y[2]+x[2]*y[5]*z[6]-x[2]*y[6]*z
-	 [5]+y[6]*x[2]*z[7]+x[6]*y[2]*z[5];
+         y[2]*z[7]-x[6]*y[7]*z[5]+x[5]*y[6]*z[2]+x[6]*y[5]*z[7]+x[6]*y[7]*z[2]+y[6]*x[7]
+         *z[4]-y[6]*x[4]*z[7]-y[6]*x[7]*z[3]+z[6]*x[7]*y[2]+x[2]*y[5]*z[6]-x[2]*y[6]*z
+         [5]+y[6]*x[2]*z[7]+x[6]*y[2]*z[5];
     s7 = s8-x[5]*y[2]*z[6]-z[6]*x[7]*y[5]-z[5]*x[7]*y[4]+z[5]*x[0]*y[4]-y[5]*
-	 x[4]*z[7]+y[0]*x[4]*z[7]-z[6]*x[2]*y[7]-x[5]*y[4]*z[0]-x[5]*y[7]*z[4]-y[0]*x[7]
-	 *z[4]+y[5]*x[4]*z[1]-x[6]*y[7]*z[4]+x[7]*y[4]*z[3]-x[4]*y[7]*z[3]+x[3]*y[7]*z
-	 [4]-x[7]*y[3]*z[4]-x[6]*y[3]*z[7]+x[6]*y[4]*z[7];
+         x[4]*z[7]+y[0]*x[4]*z[7]-z[6]*x[2]*y[7]-x[5]*y[4]*z[0]-x[5]*y[7]*z[4]-y[0]*x[7]
+         *z[4]+y[5]*x[4]*z[1]-x[6]*y[7]*z[4]+x[7]*y[4]*z[3]-x[4]*y[7]*z[3]+x[3]*y[7]*z
+         [4]-x[7]*y[3]*z[4]-x[6]*y[3]*z[7]+x[6]*y[4]*z[7];
     s8 = -x[3]*y[4]*z[7]+x[4]*y[3]*z[7]-z[6]*x[7]*y[4]-z[1]*x[6]*y[5]+x[6]*y
-	 [7]*z[3]-x[1]*y[6]*z[5]-y[1]*x[5]*z[6]+z[5]*x[4]*y[7]-z[5]*x[4]*y[0]+x[1]*y[5]*
-	 z[6]-y[6]*x[5]*z[7]-y[2]*x[3]*z[1]+z[1]*x[5]*y[6]-y[5]*x[1]*z[4]+z[6]*x[4]*y[7]
-	 +x[5]*y[1]*z[4]-x[5]*y[6]*z[4]+y[6]*x[3]*z[7]-x[5]*y[4]*z[1];
+         [7]*z[3]-x[1]*y[6]*z[5]-y[1]*x[5]*z[6]+z[5]*x[4]*y[7]-z[5]*x[4]*y[0]+x[1]*y[5]*
+         z[6]-y[6]*x[5]*z[7]-y[2]*x[3]*z[1]+z[1]*x[5]*y[6]-y[5]*x[1]*z[4]+z[6]*x[4]*y[7]
+         +x[5]*y[1]*z[4]-x[5]*y[6]*z[4]+y[6]*x[3]*z[7]-x[5]*y[4]*z[1];
     s5 = s8+x[5]*y[4]*z[6]+z[5]*x[1]*y[4]+y[1]*x[6]*z[5]-z[6]*x[3]*y[7]+z[6]*
-	 x[7]*y[3]-z[5]*x[6]*y[4]-z[5]*x[4]*y[1]+z[5]*x[4]*y[6]+x[1]*y[6]*z[2]+x[2]*y[6]
-	 *z[3]+z[2]*x[6]*y[3]+z[1]*x[6]*y[2]+z[2]*x[3]*y[1]-z[2]*x[1]*y[3]-z[2]*x[3]*y
-	 [6]+y[2]*x[1]*z[3]+y[1]*x[2]*z[6]-z[0]*x[7]*y[3]+s7;
+         x[7]*y[3]-z[5]*x[6]*y[4]-z[5]*x[4]*y[1]+z[5]*x[4]*y[6]+x[1]*y[6]*z[2]+x[2]*y[6]
+         *z[3]+z[2]*x[6]*y[3]+z[1]*x[6]*y[2]+z[2]*x[3]*y[1]-z[2]*x[1]*y[3]-z[2]*x[3]*y
+         [6]+y[2]*x[1]*z[3]+y[1]*x[2]*z[6]-z[0]*x[7]*y[3]+s7;
     s4 = 1/s5;
     s2 = s3*s4;
     const double unknown2 = s1*s2;
@@ -876,8 +876,8 @@ namespace
   Point<spacedim>
   barycenter (const TriaAccessor<structdim, dim, spacedim> &)
   {
-				     // this function catches all the cases not
-				     // explicitly handled above
+                                     // this function catches all the cases not
+                                     // explicitly handled above
     Assert (false, ExcNotImplemented());
     return Point<spacedim>();
   }
@@ -889,8 +889,8 @@ namespace
   double
   measure (const TriaAccessor<1, dim, spacedim> &accessor)
   {
-				     // remember that we use (dim-)linear
-				     // mappings
+                                     // remember that we use (dim-)linear
+                                     // mappings
     return std::sqrt((accessor.vertex(1)-accessor.vertex(0)).square());
   }
 
@@ -899,10 +899,10 @@ namespace
   double
   measure (const TriaAccessor<2,2,2> &accessor)
   {
-				     // the evaluation of the formulae
-				     // is a bit tricky when done dimension
-				     // independently, so we write this function
-				     // for 2D and 3D separately
+                                     // the evaluation of the formulae
+                                     // is a bit tricky when done dimension
+                                     // independently, so we write this function
+                                     // for 2D and 3D separately
 /*
   Get the computation of the measure by this little Maple script. We
   use the blinear mapping of the unit quad to the real quad. However,
@@ -933,13 +933,13 @@ namespace
 */
 
     const double x[4] = { accessor.vertex(0)(0),
-			  accessor.vertex(1)(0),
-			  accessor.vertex(2)(0),
-			  accessor.vertex(3)(0)  };
+                          accessor.vertex(1)(0),
+                          accessor.vertex(2)(0),
+                          accessor.vertex(3)(0)  };
     const double y[4] = { accessor.vertex(0)(1),
-			  accessor.vertex(1)(1),
-			  accessor.vertex(2)(1),
-			  accessor.vertex(3)(1)  };
+                          accessor.vertex(1)(1),
+                          accessor.vertex(2)(1),
+                          accessor.vertex(3)(1)  };
 
     return (-x[1]*y[0]+x[1]*y[3]+y[0]*x[2]+x[0]*y[1]-x[0]*y[2]-y[1]*x[3]-x[2]*y[3]+x[3]*y[2])/2;
   }
@@ -953,7 +953,7 @@ namespace
       vertex_indices[i] = accessor.vertex_index(i);
 
     return GridTools::cell_measure<3>(accessor.get_triangulation().get_vertices(),
-				      vertex_indices);
+                                      vertex_indices);
   }
 
 
@@ -962,8 +962,8 @@ namespace
   double
   measure (const TriaAccessor<structdim, dim, spacedim> &)
   {
-				     // catch-all for all cases not explicitly
-				     // listed above
+                                     // catch-all for all cases not explicitly
+                                     // listed above
     Assert (false, ExcNotImplemented());
     return -1e10;
   }
@@ -990,8 +990,8 @@ Point<spacedim>
 TriaAccessor<structdim, dim, spacedim>::
 barycenter () const
 {
-				   // call the function in the anonymous
-				   // namespace above
+                                   // call the function in the anonymous
+                                   // namespace above
   return dealii::barycenter (*this);
 }
 
@@ -1002,8 +1002,8 @@ double
 TriaAccessor<structdim, dim, spacedim>::
 measure () const
 {
-				   // call the function in the anonymous
-				   // namespace above
+                                   // call the function in the anonymous
+                                   // namespace above
   return dealii::measure (*this);
 }
 
@@ -1031,43 +1031,43 @@ template <>
 double TriaAccessor<2,2,2>::extent_in_direction(const unsigned int axis) const
 {
   const unsigned int lines[2][2] = {{2,3}, /// Lines along x-axis, see GeometryInfo
-				    {0,1}};/// Lines along y-axis
+                                    {0,1}};/// Lines along y-axis
 
   Assert (axis < 2, ExcIndexRange (axis, 0, 2));
 
   return std::max(this->line(lines[axis][0])->diameter(),
-		  this->line(lines[axis][1])->diameter());
+                  this->line(lines[axis][1])->diameter());
 }
 
 template <>
 double TriaAccessor<2,2,3>::extent_in_direction(const unsigned int axis) const
 {
   const unsigned int lines[2][2] = {{2,3}, /// Lines along x-axis, see GeometryInfo
-				    {0,1}};/// Lines along y-axis
+                                    {0,1}};/// Lines along y-axis
 
   Assert (axis < 2, ExcIndexRange (axis, 0, 2));
 
   return std::max(this->line(lines[axis][0])->diameter(),
-		  this->line(lines[axis][1])->diameter());
+                  this->line(lines[axis][1])->diameter());
 }
 
 
 template <>
 double TriaAccessor<3,3,3>::extent_in_direction(const unsigned int axis) const
 {
-  const unsigned int lines[3][4] = {{2,3,6,7},	   /// Lines along x-axis, see GeometryInfo
-				    {0,1,4,5},    /// Lines along y-axis
-				    {8,9,10,11}}; /// Lines along z-axis
+  const unsigned int lines[3][4] = {{2,3,6,7},     /// Lines along x-axis, see GeometryInfo
+                                    {0,1,4,5},    /// Lines along y-axis
+                                    {8,9,10,11}}; /// Lines along z-axis
 
   Assert (axis < 3, ExcIndexRange (axis, 0, 3));
 
   double lengths[4] = { this->line(lines[axis][0])->diameter(),
-			this->line(lines[axis][1])->diameter(),
-			this->line(lines[axis][2])->diameter(),
-			this->line(lines[axis][3])->diameter() };
+                        this->line(lines[axis][1])->diameter(),
+                        this->line(lines[axis][2])->diameter(),
+                        this->line(lines[axis][3])->diameter() };
 
   return std::max(std::max(lengths[0], lengths[1]),
-		  std::max(lengths[2], lengths[3]));
+                  std::max(lengths[2], lengths[3]));
 }
 
 
@@ -1094,54 +1094,54 @@ bool CellAccessor<1>::point_inside (const Point<1> &p) const
 template <>
 bool CellAccessor<2>::point_inside (const Point<2> &p) const
 {
-				   // we check whether the point is
-				   // inside the cell by making sure
-				   // that it on the inner side of
-				   // each line defined by the faces,
-				   // i.e. for each of the four faces
-				   // we take the line that connects
-				   // the two vertices and subdivide
-				   // the whole domain by that in two
-				   // and check whether the point is
-				   // on the `cell-side' (rather than
-				   // the `out-side') of this line. if
-				   // the point is on the `cell-side'
-				   // for all four faces, it must be
-				   // inside the cell.
+                                   // we check whether the point is
+                                   // inside the cell by making sure
+                                   // that it on the inner side of
+                                   // each line defined by the faces,
+                                   // i.e. for each of the four faces
+                                   // we take the line that connects
+                                   // the two vertices and subdivide
+                                   // the whole domain by that in two
+                                   // and check whether the point is
+                                   // on the `cell-side' (rather than
+                                   // the `out-side') of this line. if
+                                   // the point is on the `cell-side'
+                                   // for all four faces, it must be
+                                   // inside the cell.
 
-				   // we want the faces in counter
-				   // clockwise orientation
+                                   // we want the faces in counter
+                                   // clockwise orientation
   static const int direction[4]={-1,1,1,-1};
   for (unsigned int f=0; f<4; ++f)
     {
-				       // vector from the first vertex
-				       // of the line to the point
+                                       // vector from the first vertex
+                                       // of the line to the point
       const Point<2> to_p = p-this->vertex(
-	GeometryInfo<2>::face_to_cell_vertices(f,0));
-				       // vector describing the line
+        GeometryInfo<2>::face_to_cell_vertices(f,0));
+                                       // vector describing the line
       const Point<2> face = direction[f]*(
-	this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,1)) -
-	this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,0)));
+        this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,1)) -
+        this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,0)));
 
-				       // if we rotate the face vector
-				       // by 90 degrees to the left
-				       // (i.e. it points to the
-				       // inside) and take the scalar
-				       // product with the vector from
-				       // the vertex to the point,
-				       // then the point is in the
-				       // `cell-side' if the scalar
-				       // product is positive. if this
-				       // is not the case, we can be
-				       // sure that the point is
-				       // outside
+                                       // if we rotate the face vector
+                                       // by 90 degrees to the left
+                                       // (i.e. it points to the
+                                       // inside) and take the scalar
+                                       // product with the vector from
+                                       // the vertex to the point,
+                                       // then the point is in the
+                                       // `cell-side' if the scalar
+                                       // product is positive. if this
+                                       // is not the case, we can be
+                                       // sure that the point is
+                                       // outside
       if ((-face(1)*to_p(0)+face(0)*to_p(1))<0)
-	return false;
+        return false;
     };
 
-				   // if we arrived here, then the
-				   // point is inside for all four
-				   // faces, and thus inside
+                                   // if we arrived here, then the
+                                   // point is inside for all four
+                                   // faces, and thus inside
   return true;
 }
 
@@ -1158,8 +1158,8 @@ bool CellAccessor<2>::point_inside (const Point<2> &p) const
 template <>
 bool CellAccessor<3>::point_inside (const Point<3> &p) const
 {
-				   // original implementation by Joerg
-				   // Weimar
+                                   // original implementation by Joerg
+                                   // Weimar
 
                                    // we first eliminate points based
                                    // on the maximum and minumum of
@@ -1174,23 +1174,23 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
   for (unsigned int v=1; v<GeometryInfo<dim>::vertices_per_cell; ++v)
     for (unsigned int d=0; d<dim; ++d)
       {
-	maxp[d] = std::max (maxp[d],this->vertex(v)[d]);
-	minp[d] = std::min (minp[d],this->vertex(v)[d]);
+        maxp[d] = std::max (maxp[d],this->vertex(v)[d]);
+        minp[d] = std::min (minp[d],this->vertex(v)[d]);
       }
 
-				   // rule out points outside the
-				   // bounding box of this cell
+                                   // rule out points outside the
+                                   // bounding box of this cell
   for (unsigned int d=0; d<dim; d++)
     if ((p[d] < minp[d]) || (p[d] > maxp[d]))
       return false;
 
-				   // now we need to check more
-				   // carefully: transform to the
-				   // unit cube
-				   // and check there.
+                                   // now we need to check more
+                                   // carefully: transform to the
+                                   // unit cube
+                                   // and check there.
   const TriaRawIterator< CellAccessor<dim,spacedim> > cell_iterator (*this);
   return (GeometryInfo<dim>::is_inside_unit_cell (
-	      StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell_iterator, p)));
+              StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell_iterator, p)));
 }
 
 
@@ -1199,10 +1199,10 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
 
 /*------------------------ Functions: CellAccessor<dim,spacedim> -----------------------*/
 
-				 // For codim>0 we proceed as follows:
-				 // 1) project point onto manifold and
-				 // 2) transform to the unit cell with a Q1 mapping
-				 // 3) then check if inside unit cell
+                                 // For codim>0 we proceed as follows:
+                                 // 1) project point onto manifold and
+                                 // 2) transform to the unit cell with a Q1 mapping
+                                 // 3) then check if inside unit cell
 template<int dim, int spacedim>
 template<int dim_,int spacedim_ >
 bool CellAccessor<dim,spacedim>::
@@ -1246,17 +1246,17 @@ bool CellAccessor<dim, spacedim>::at_boundary () const
   switch (dim)
     {
       case 1:
-	    return at_boundary(0) || at_boundary(1);
+            return at_boundary(0) || at_boundary(1);
       case 2:
-	    return (at_boundary(0) || at_boundary(1) ||
-		    at_boundary(2) || at_boundary(3));
+            return (at_boundary(0) || at_boundary(1) ||
+                    at_boundary(2) || at_boundary(3));
       case 3:
-	    return (at_boundary(0) || at_boundary(1) ||
-		    at_boundary(2) || at_boundary(3) ||
-		    at_boundary(4) || at_boundary(5));
+            return (at_boundary(0) || at_boundary(1) ||
+                    at_boundary(2) || at_boundary(3) ||
+                    at_boundary(4) || at_boundary(5));
       default:
-	    Assert (false, ExcNotImplemented());
-	    return false;
+            Assert (false, ExcNotImplemented());
+            return false;
     }
 }
 
@@ -1334,8 +1334,8 @@ CellAccessor<dim, spacedim>::set_direction_flag (const bool new_direction_flag) 
       = new_direction_flag;
   else
     Assert (new_direction_flag == true,
-	    ExcMessage ("If dim==spacedim, direction flags are always true and "
-			"can not be set to anything else."));
+            ExcMessage ("If dim==spacedim, direction flags are always true and "
+                        "can not be set to anything else."));
 }
 
 
@@ -1369,27 +1369,27 @@ recursively_set_subdomain_id (const types::subdomain_id_t new_subdomain_id) cons
 
 template <int dim, int spacedim>
 void CellAccessor<dim, spacedim>::set_neighbor (const unsigned int i,
-						const TriaIterator<CellAccessor<dim, spacedim> > &pointer) const
+                                                const TriaIterator<CellAccessor<dim, spacedim> > &pointer) const
 {
   AssertIndexRange (i, GeometryInfo<dim>::faces_per_cell);
 
   if (pointer.state() == IteratorState::valid)
     {
       this->tria->levels[this->present_level]->
-	neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].first
-	= pointer->present_level;
+        neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].first
+        = pointer->present_level;
       this->tria->levels[this->present_level]->
-	neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].second
-	= pointer->present_index;
+        neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].second
+        = pointer->present_index;
     }
   else
     {
       this->tria->levels[this->present_level]->
-	neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].first
-	= -1;
+        neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].first
+        = -1;
       this->tria->levels[this->present_level]->
-	neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].second
-	= -1;
+        neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].second
+        = -1;
     };
 }
 
@@ -1400,33 +1400,33 @@ unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor_internal (const un
 {
   AssertIndexRange (neighbor, GeometryInfo<dim>::faces_per_cell);
 
-				   // if we have a 1d mesh in 1d, we
-				   // can assume that the left
-				   // neighbor of the right neigbor is
-				   // the current cell. but that is an
-				   // invariant that isn't true if the
-				   // mesh is embedded in a higher
-				   // dimensional space, so we have to
-				   // fall back onto the generic code
-				   // below
+                                   // if we have a 1d mesh in 1d, we
+                                   // can assume that the left
+                                   // neighbor of the right neigbor is
+                                   // the current cell. but that is an
+                                   // invariant that isn't true if the
+                                   // mesh is embedded in a higher
+                                   // dimensional space, so we have to
+                                   // fall back onto the generic code
+                                   // below
   if ((dim==1) && (spacedim==dim))
     return GeometryInfo<dim>::opposite_face[neighbor];
 
   const TriaIterator<CellAccessor<dim, spacedim> > neighbor_cell = this->neighbor(neighbor);
 
-				   // usually, on regular patches of
-				   // the grid, this cell is just on
-				   // the opposite side of the
-				   // neighbor that the neighbor is of
-				   // this cell. for example in 2d, if
-				   // we want to know the
-				   // neighbor_of_neighbor if
-				   // neighbor==1 (the right
-				   // neighbor), then we will get 3
-				   // (the left neighbor) in most
-				   // cases. look up this relationship
-				   // in the table provided by
-				   // GeometryInfo and try it
+                                   // usually, on regular patches of
+                                   // the grid, this cell is just on
+                                   // the opposite side of the
+                                   // neighbor that the neighbor is of
+                                   // this cell. for example in 2d, if
+                                   // we want to know the
+                                   // neighbor_of_neighbor if
+                                   // neighbor==1 (the right
+                                   // neighbor), then we will get 3
+                                   // (the left neighbor) in most
+                                   // cases. look up this relationship
+                                   // in the table provided by
+                                   // GeometryInfo and try it
   const unsigned int this_face_index=face_index(neighbor);
 
   const unsigned int neighbor_guess
@@ -1435,22 +1435,22 @@ unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor_internal (const un
   if (neighbor_cell->face_index (neighbor_guess) == this_face_index)
     return neighbor_guess;
   else
-				     // if the guess was false, then
-				     // we need to loop over all
-				     // neighbors and find the number
-				     // the hard way
+                                     // if the guess was false, then
+                                     // we need to loop over all
+                                     // neighbors and find the number
+                                     // the hard way
     {
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-	if (neighbor_cell->face_index (face_no) == this_face_index)
-	  return face_no;
+        if (neighbor_cell->face_index (face_no) == this_face_index)
+          return face_no;
 
-				       // running over all neighbors
-				       // faces we did not find the
-				       // present face. Thereby the
-				       // neighbor must be coarser
-				       // than the present
-				       // cell. Return an invalid
-				       // unsigned int in this case.
+                                       // running over all neighbors
+                                       // faces we did not find the
+                                       // present face. Thereby the
+                                       // neighbor must be coarser
+                                       // than the present
+                                       // cell. Return an invalid
+                                       // unsigned int in this case.
       return numbers::invalid_unsigned_int;
     }
 }
@@ -1462,7 +1462,7 @@ unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor (const unsigned in
 {
   const unsigned int n2=neighbor_of_neighbor_internal(neighbor);
   Assert (n2!=numbers::invalid_unsigned_int,
-	  TriaAccessorExceptions::ExcNeighborIsCoarser());
+          TriaAccessorExceptions::ExcNeighborIsCoarser());
 
   return n2;
 }
@@ -1483,155 +1483,155 @@ std::pair<unsigned int, unsigned int>
 CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) const
 {
   AssertIndexRange (neighbor, GeometryInfo<dim>::faces_per_cell);
-				   // make sure that the neighbor is
-				   // on a coarser level
+                                   // make sure that the neighbor is
+                                   // on a coarser level
   Assert (neighbor_is_coarser(neighbor),
-	  TriaAccessorExceptions::ExcNeighborIsNotCoarser());
+          TriaAccessorExceptions::ExcNeighborIsNotCoarser());
 
   switch (dim)
     {
       case 2:
       {
-	const int this_face_index=face_index(neighbor);
-	const TriaIterator<CellAccessor<2,spacedim> > neighbor_cell = this->neighbor(neighbor);
+        const int this_face_index=face_index(neighbor);
+        const TriaIterator<CellAccessor<2,spacedim> > neighbor_cell = this->neighbor(neighbor);
 
-					 // usually, on regular patches of
-					 // the grid, this cell is just on
-					 // the opposite side of the
-					 // neighbor that the neighbor is of
-					 // this cell. for example in 2d, if
-					 // we want to know the
-					 // neighbor_of_neighbor if
-					 // neighbor==1 (the right
-					 // neighbor), then we will get 0
-					 // (the left neighbor) in most
-					 // cases. look up this relationship
-					 // in the table provided by
-					 // GeometryInfo and try it
-	const unsigned int face_no_guess
-	  = GeometryInfo<2>::opposite_face[neighbor];
+                                         // usually, on regular patches of
+                                         // the grid, this cell is just on
+                                         // the opposite side of the
+                                         // neighbor that the neighbor is of
+                                         // this cell. for example in 2d, if
+                                         // we want to know the
+                                         // neighbor_of_neighbor if
+                                         // neighbor==1 (the right
+                                         // neighbor), then we will get 0
+                                         // (the left neighbor) in most
+                                         // cases. look up this relationship
+                                         // in the table provided by
+                                         // GeometryInfo and try it
+        const unsigned int face_no_guess
+          = GeometryInfo<2>::opposite_face[neighbor];
 
-	const TriaIterator<TriaAccessor<1, 2, spacedim> > face_guess
-	  =neighbor_cell->face(face_no_guess);
+        const TriaIterator<TriaAccessor<1, 2, spacedim> > face_guess
+          =neighbor_cell->face(face_no_guess);
 
-	if (face_guess->has_children())
-	  for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
-	    if (face_guess->child_index(subface_no)==this_face_index)
-	      return std::make_pair (face_no_guess, subface_no);
+        if (face_guess->has_children())
+          for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
+            if (face_guess->child_index(subface_no)==this_face_index)
+              return std::make_pair (face_no_guess, subface_no);
 
-					 // if the guess was false, then
-					 // we need to loop over all faces
-					 // and subfaces and find the
-					 // number the hard way
-	for (unsigned int face_no=0; face_no<GeometryInfo<2>::faces_per_cell; ++face_no)
-	  {
-	    if (face_no!=face_no_guess)
-	      {
-		const TriaIterator<TriaAccessor<1, 2, spacedim> > face
-		  =neighbor_cell->face(face_no);
-		if (face->has_children())
-		  for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
-		    if (face->child_index(subface_no)==this_face_index)
-		      return std::make_pair (face_no, subface_no);
-	      }
-	  }
+                                         // if the guess was false, then
+                                         // we need to loop over all faces
+                                         // and subfaces and find the
+                                         // number the hard way
+        for (unsigned int face_no=0; face_no<GeometryInfo<2>::faces_per_cell; ++face_no)
+          {
+            if (face_no!=face_no_guess)
+              {
+                const TriaIterator<TriaAccessor<1, 2, spacedim> > face
+                  =neighbor_cell->face(face_no);
+                if (face->has_children())
+                  for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
+                    if (face->child_index(subface_no)==this_face_index)
+                      return std::make_pair (face_no, subface_no);
+              }
+          }
 
-					 // we should never get here,
-					 // since then we did not find
-					 // our way back...
-	Assert (false, ExcInternalError());
-	return std::make_pair (deal_II_numbers::invalid_unsigned_int,
-			       deal_II_numbers::invalid_unsigned_int);
+                                         // we should never get here,
+                                         // since then we did not find
+                                         // our way back...
+        Assert (false, ExcInternalError());
+        return std::make_pair (deal_II_numbers::invalid_unsigned_int,
+                               deal_II_numbers::invalid_unsigned_int);
       }
 
       case 3:
       {
-	const int this_face_index=face_index(neighbor);
-	const TriaIterator<CellAccessor<3, spacedim> >
-	  neighbor_cell = this->neighbor(neighbor);
+        const int this_face_index=face_index(neighbor);
+        const TriaIterator<CellAccessor<3, spacedim> >
+          neighbor_cell = this->neighbor(neighbor);
 
-					 // usually, on regular patches of
-					 // the grid, this cell is just on
-					 // the opposite side of the
-					 // neighbor that the neighbor is of
-					 // this cell. for example in 2d, if
-					 // we want to know the
-					 // neighbor_of_neighbor if
-					 // neighbor==1 (the right
-					 // neighbor), then we will get 0
-					 // (the left neighbor) in most
-					 // cases. look up this relationship
-					 // in the table provided by
-					 // GeometryInfo and try it
-	const unsigned int face_no_guess
-	  = GeometryInfo<3>::opposite_face[neighbor];
+                                         // usually, on regular patches of
+                                         // the grid, this cell is just on
+                                         // the opposite side of the
+                                         // neighbor that the neighbor is of
+                                         // this cell. for example in 2d, if
+                                         // we want to know the
+                                         // neighbor_of_neighbor if
+                                         // neighbor==1 (the right
+                                         // neighbor), then we will get 0
+                                         // (the left neighbor) in most
+                                         // cases. look up this relationship
+                                         // in the table provided by
+                                         // GeometryInfo and try it
+        const unsigned int face_no_guess
+          = GeometryInfo<3>::opposite_face[neighbor];
 
-	const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face_guess
-	  =neighbor_cell->face(face_no_guess);
+        const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face_guess
+          =neighbor_cell->face(face_no_guess);
 
-	if (face_guess->has_children())
-	  for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
-	    if (face_guess->child_index(subface_no)==this_face_index)
-					       // call a helper function, that
-					       // translates the current subface
-					       // number to a subface number for
-					       // the current FaceRefineCase
-	      return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no));
-	    else if (face_guess->child(subface_no)->has_children())
-	      for (unsigned int subsub_no=0; subsub_no<face_guess->child(subface_no)->n_children(); ++subsub_no)
-		if (face_guess->child(subface_no)->child_index(subsub_no)==this_face_index)
-						   // call a helper function, that
-						   // translates the current subface
-						   // number and subsubface number to
-						   // a subface number for the current
-						   // FaceRefineCase
-		  return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no, subsub_no));
+        if (face_guess->has_children())
+          for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
+            if (face_guess->child_index(subface_no)==this_face_index)
+                                               // call a helper function, that
+                                               // translates the current subface
+                                               // number to a subface number for
+                                               // the current FaceRefineCase
+              return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no));
+            else if (face_guess->child(subface_no)->has_children())
+              for (unsigned int subsub_no=0; subsub_no<face_guess->child(subface_no)->n_children(); ++subsub_no)
+                if (face_guess->child(subface_no)->child_index(subsub_no)==this_face_index)
+                                                   // call a helper function, that
+                                                   // translates the current subface
+                                                   // number and subsubface number to
+                                                   // a subface number for the current
+                                                   // FaceRefineCase
+                  return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no, subsub_no));
 
 
 
-					 // if the guess was false, then
-					 // we need to loop over all faces
-					 // and subfaces and find the
-					 // number the hard way
-	for (unsigned int face_no=0; face_no<GeometryInfo<3>::faces_per_cell; ++face_no)
-	  {
-	    if (face_no!=face_no_guess)
-	      {
-		const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face
-		  =neighbor_cell->face(face_no);
-		if (face->has_children())
-		  for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
-		    if (face->child_index(subface_no)==this_face_index)
-						       // call a helper function, that
-						       // translates the current subface
-						       // number to a subface number for
-						       // the current FaceRefineCase
-		      return std::make_pair (face_no, translate_subface_no(face, subface_no));
-		    else if (face->child(subface_no)->has_children())
-		      for (unsigned int subsub_no=0; subsub_no<face->child(subface_no)->n_children(); ++subsub_no)
-			if (face->child(subface_no)->child_index(subsub_no)==this_face_index)
-							   // call a helper function, that
-							   // translates the current subface
-							   // number and subsubface number to
-							   // a subface number for the current
-							   // FaceRefineCase
-			  return std::make_pair (face_no, translate_subface_no(face, subface_no, subsub_no));
-	      }
-	  }
+                                         // if the guess was false, then
+                                         // we need to loop over all faces
+                                         // and subfaces and find the
+                                         // number the hard way
+        for (unsigned int face_no=0; face_no<GeometryInfo<3>::faces_per_cell; ++face_no)
+          {
+            if (face_no!=face_no_guess)
+              {
+                const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face
+                  =neighbor_cell->face(face_no);
+                if (face->has_children())
+                  for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
+                    if (face->child_index(subface_no)==this_face_index)
+                                                       // call a helper function, that
+                                                       // translates the current subface
+                                                       // number to a subface number for
+                                                       // the current FaceRefineCase
+                      return std::make_pair (face_no, translate_subface_no(face, subface_no));
+                    else if (face->child(subface_no)->has_children())
+                      for (unsigned int subsub_no=0; subsub_no<face->child(subface_no)->n_children(); ++subsub_no)
+                        if (face->child(subface_no)->child_index(subsub_no)==this_face_index)
+                                                           // call a helper function, that
+                                                           // translates the current subface
+                                                           // number and subsubface number to
+                                                           // a subface number for the current
+                                                           // FaceRefineCase
+                          return std::make_pair (face_no, translate_subface_no(face, subface_no, subsub_no));
+              }
+          }
 
-					 // we should never get here,
-					 // since then we did not find
-					 // our way back...
-	Assert (false, ExcInternalError());
-	return std::make_pair (numbers::invalid_unsigned_int,
-			       numbers::invalid_unsigned_int);
+                                         // we should never get here,
+                                         // since then we did not find
+                                         // our way back...
+        Assert (false, ExcInternalError());
+        return std::make_pair (numbers::invalid_unsigned_int,
+                               numbers::invalid_unsigned_int);
       }
 
       default:
       {
-	Assert(false, ExcImpossibleInDim(1));
-	return std::make_pair (numbers::invalid_unsigned_int,
-			       numbers::invalid_unsigned_int);
+        Assert(false, ExcImpossibleInDim(1));
+        return std::make_pair (numbers::invalid_unsigned_int,
+                               numbers::invalid_unsigned_int);
       }
     }
 }
@@ -1643,7 +1643,7 @@ bool CellAccessor<dim, spacedim>::at_boundary (const unsigned int i) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert (i<GeometryInfo<dim>::faces_per_cell,
-	  ExcIndexRange (i,0,GeometryInfo<dim>::faces_per_cell));
+          ExcIndexRange (i,0,GeometryInfo<dim>::faces_per_cell));
 
   return (neighbor_index(i) == -1);
 }
@@ -1658,8 +1658,8 @@ bool CellAccessor<dim, spacedim>::has_boundary_lines () const
   else
     {
       for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
-	if (this->line(l)->at_boundary())
-	  return true;
+        if (this->line(l)->at_boundary())
+          return true;
 
       return false;
     }
@@ -1671,7 +1671,7 @@ template <int dim, int spacedim>
 TriaIterator<CellAccessor<dim,spacedim> >
 CellAccessor<dim, spacedim>::
 neighbor_child_on_subface (const unsigned int face,
-			   const unsigned int subface) const
+                           const unsigned int subface) const
 {
   Assert (!this->has_children(),
           ExcMessage ("The present cell must not have children!"));
@@ -1684,362 +1684,362 @@ neighbor_child_on_subface (const unsigned int face,
     {
       case 2:
       {
-	const unsigned int neighbor_neighbor
-	  = this->neighbor_of_neighbor (face);
-	const unsigned int neighbor_child_index
-	  = GeometryInfo<dim>::child_cell_on_face(
-	    this->neighbor(face)->refinement_case(),neighbor_neighbor,subface);
+        const unsigned int neighbor_neighbor
+          = this->neighbor_of_neighbor (face);
+        const unsigned int neighbor_child_index
+          = GeometryInfo<dim>::child_cell_on_face(
+            this->neighbor(face)->refinement_case(),neighbor_neighbor,subface);
 
-	TriaIterator<CellAccessor<dim,spacedim> > sub_neighbor
-	  = this->neighbor(face)->child(neighbor_child_index);
-					 // the neighbors child can have children,
-					 // which are not further refined along the
-					 // face under consideration. as we are
-					 // normally interested in one of this
-					 // child's child, search for the right one.
-	while(sub_neighbor->has_children())
-	  {
-	    Assert ((GeometryInfo<dim>::face_refinement_case(sub_neighbor->refinement_case(),
-							     neighbor_neighbor) ==
-		     RefinementCase<dim>::no_refinement),
-		    ExcInternalError());
-	    sub_neighbor = sub_neighbor->child(GeometryInfo<dim>::child_cell_on_face(
-						 sub_neighbor->refinement_case(),neighbor_neighbor,0));
+        TriaIterator<CellAccessor<dim,spacedim> > sub_neighbor
+          = this->neighbor(face)->child(neighbor_child_index);
+                                         // the neighbors child can have children,
+                                         // which are not further refined along the
+                                         // face under consideration. as we are
+                                         // normally interested in one of this
+                                         // child's child, search for the right one.
+        while(sub_neighbor->has_children())
+          {
+            Assert ((GeometryInfo<dim>::face_refinement_case(sub_neighbor->refinement_case(),
+                                                             neighbor_neighbor) ==
+                     RefinementCase<dim>::no_refinement),
+                    ExcInternalError());
+            sub_neighbor = sub_neighbor->child(GeometryInfo<dim>::child_cell_on_face(
+                                                 sub_neighbor->refinement_case(),neighbor_neighbor,0));
 
-	  }
+          }
 
-	return sub_neighbor;
+        return sub_neighbor;
       }
 
 
       case 3:
       {
-					 // this function returns the neighbor's
-					 // child on a given face and
-					 // subface.
+                                         // this function returns the neighbor's
+                                         // child on a given face and
+                                         // subface.
 
-					 // we have to consider one other aspect here:
-					 // The face might be refined
-					 // anisotropically. In this case, the subface
-					 // number refers to the following, where we
-					 // look at the face from the current cell,
-					 // thus the subfaces are in standard
-					 // orientation concerning the cell
-					 //
-					 // for isotropic refinement
-					 //
-					 // *---*---*
-					 // | 2 | 3 |
-					 // *---*---*
-					 // | 0 | 1 |
-					 // *---*---*
-					 //
-					 // for 2*anisotropic refinement
-					 // (first cut_y, then cut_x)
-					 //
-					 // *---*---*
-					 // | 2 | 3 |
-					 // *---*---*
-					 // | 0 | 1 |
-					 // *---*---*
-					 //
-					 // for 2*anisotropic refinement
-					 // (first cut_x, then cut_y)
-					 //
-					 // *---*---*
-					 // | 1 | 3 |
-					 // *---*---*
-					 // | 0 | 2 |
-					 // *---*---*
-					 //
-					 // for purely anisotropic refinement:
-					 //
-					 // *---*---*      *-------*
-					 // |   |   |	     |   1   |
-					 // | 0 | 1 |  or  *-------*
-					 // |   |   |	     |   0   |
-					 // *---*---*	     *-------*
-					 //
-					 // for "mixed" refinement:
-					 //
-					 // *---*---*      *---*---*      *---*---*      *-------*
-					 // |   | 2 |      | 1 |   |      | 1 | 2 |      |   2   |
-					 // | 0 *---*  or  *---* 2 |  or  *---*---*  or  *---*---*
-					 // |   | 1 |      | 0 |   |      |   0   |      | 0 | 1 |
-					 // *---*---*      *---*---*      *-------*      *---*---*
+                                         // we have to consider one other aspect here:
+                                         // The face might be refined
+                                         // anisotropically. In this case, the subface
+                                         // number refers to the following, where we
+                                         // look at the face from the current cell,
+                                         // thus the subfaces are in standard
+                                         // orientation concerning the cell
+                                         //
+                                         // for isotropic refinement
+                                         //
+                                         // *---*---*
+                                         // | 2 | 3 |
+                                         // *---*---*
+                                         // | 0 | 1 |
+                                         // *---*---*
+                                         //
+                                         // for 2*anisotropic refinement
+                                         // (first cut_y, then cut_x)
+                                         //
+                                         // *---*---*
+                                         // | 2 | 3 |
+                                         // *---*---*
+                                         // | 0 | 1 |
+                                         // *---*---*
+                                         //
+                                         // for 2*anisotropic refinement
+                                         // (first cut_x, then cut_y)
+                                         //
+                                         // *---*---*
+                                         // | 1 | 3 |
+                                         // *---*---*
+                                         // | 0 | 2 |
+                                         // *---*---*
+                                         //
+                                         // for purely anisotropic refinement:
+                                         //
+                                         // *---*---*      *-------*
+                                         // |   |   |        |   1   |
+                                         // | 0 | 1 |  or  *-------*
+                                         // |   |   |        |   0   |
+                                         // *---*---*        *-------*
+                                         //
+                                         // for "mixed" refinement:
+                                         //
+                                         // *---*---*      *---*---*      *---*---*      *-------*
+                                         // |   | 2 |      | 1 |   |      | 1 | 2 |      |   2   |
+                                         // | 0 *---*  or  *---* 2 |  or  *---*---*  or  *---*---*
+                                         // |   | 1 |      | 0 |   |      |   0   |      | 0 | 1 |
+                                         // *---*---*      *---*---*      *-------*      *---*---*
 
-	const typename Triangulation<3,spacedim>::face_iterator
-	  mother_face = this->face(face);
-	const unsigned int total_children=mother_face->number_of_children();
-	Assert (subface<total_children,ExcIndexRange(subface,0,total_children));
-	Assert (total_children<=GeometryInfo<3>::max_children_per_face, ExcInternalError());
+        const typename Triangulation<3,spacedim>::face_iterator
+          mother_face = this->face(face);
+        const unsigned int total_children=mother_face->number_of_children();
+        Assert (subface<total_children,ExcIndexRange(subface,0,total_children));
+        Assert (total_children<=GeometryInfo<3>::max_children_per_face, ExcInternalError());
 
-	unsigned int neighbor_neighbor;
-	TriaIterator<CellAccessor<3,spacedim> > neighbor_child;
-	const TriaIterator<CellAccessor<3,spacedim> > neighbor
-	  = this->neighbor(face);
-
-
-	const RefinementCase<2> mother_face_ref_case
-	  = mother_face->refinement_case();
-	if (mother_face_ref_case==RefinementCase<2>::cut_xy) // total_children==4
-	  {
-					     // this case is quite easy. we are sure,
-					     // that the neighbor is not coarser.
-
-					     // get the neighbor's number for the given
-					     // face and the neighbor
-	    neighbor_neighbor
-	      = this->neighbor_of_neighbor (face);
-
-					     // now use the info provided by GeometryInfo
-					     // to extract the neighbors child number
-	    const unsigned int neighbor_child_index
-	      = GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
-						      neighbor_neighbor, subface,
-						      neighbor->face_orientation(neighbor_neighbor),
-						      neighbor->face_flip(neighbor_neighbor),
-						      neighbor->face_rotation(neighbor_neighbor));
-	    neighbor_child = neighbor->child(neighbor_child_index);
-
-					     // make sure that the neighbor child cell we
-					     // have found shares the desired subface.
-	    Assert((this->face(face)->child(subface) ==
-		    neighbor_child->face(neighbor_neighbor)),
-		   ExcInternalError());
-	  }
-	else //-> the face is refined anisotropically
-	  {
-					     // first of all, we have to find the
-					     // neighbor at one of the anisotropic
-					     // children of the
-					     // mother_face. determine, which of
-					     // these we need.
-	    unsigned int first_child_to_find;
-	    unsigned int neighbor_child_index;
-	    if (total_children==2)
-	      first_child_to_find=subface;
-	    else
-	      {
-		first_child_to_find=subface/2;
-		if (total_children==3 &&
-		    subface==1 &&
-		    !mother_face->child(0)->has_children())
-		  first_child_to_find=1;
-	      }
-	    if (neighbor_is_coarser(face))
-	      {
-		std::pair<unsigned int, unsigned int> indices=neighbor_of_coarser_neighbor(face);
-		neighbor_neighbor=indices.first;
+        unsigned int neighbor_neighbor;
+        TriaIterator<CellAccessor<3,spacedim> > neighbor_child;
+        const TriaIterator<CellAccessor<3,spacedim> > neighbor
+          = this->neighbor(face);
 
 
-						 // we have to translate our
-						 // subface_index according to the
-						 // RefineCase and subface index of
-						 // the coarser face (our face is an
-						 // anisotropic child of the coarser
-						 // face), 'a' denotes our
-						 // subface_index 0 and 'b' denotes
-						 // our subface_index 1, whereas 0...3
-						 // denote isotropic subfaces of the
-						 // coarser face
-						 //
-						 // cut_x and coarser_subface_index=0
-						 //
-						 // *---*---*
-						 // |b=2|   |
-						 // |   |   |
-						 // |a=0|   |
-						 // *---*---*
-						 //
-						 // cut_x and coarser_subface_index=1
-						 //
-						 // *---*---*
-						 // |   |b=3|
-						 // |   |   |
-						 // |   |a=1|
-						 // *---*---*
-						 //
-						 // cut_y and coarser_subface_index=0
-						 //
-						 // *-------*
-						 // |       |
-						 // *-------*
-						 // |a=0 b=1|
-						 // *-------*
-						 //
-						 // cut_y and coarser_subface_index=1
-						 //
-						 // *-------*
-						 // |a=2 b=3|
-						 // *-------*
-						 // |       |
-						 // *-------*
-		unsigned int iso_subface;
-		if (neighbor->face(neighbor_neighbor)->refinement_case()==RefinementCase<2>::cut_x)
-		  iso_subface=2*first_child_to_find + indices.second;
-		else
-		  {
-		    Assert(neighbor->face(neighbor_neighbor)->refinement_case()==RefinementCase<2>::cut_y,
-			   ExcInternalError());
-		    iso_subface=first_child_to_find + 2*indices.second;
-		  }
-		neighbor_child_index
-		  = GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
-							  neighbor_neighbor,
-							  iso_subface,
-							  neighbor->face_orientation(neighbor_neighbor),
-							  neighbor->face_flip(neighbor_neighbor),
-							  neighbor->face_rotation(neighbor_neighbor));
-	      }
-	    else //neighbor is not coarser
-	      {
-		neighbor_neighbor=neighbor_of_neighbor(face);
-		neighbor_child_index
-		  = GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
-							  neighbor_neighbor,
-							  first_child_to_find,
-							  neighbor->face_orientation(neighbor_neighbor),
-							  neighbor->face_flip(neighbor_neighbor),
-							  neighbor->face_rotation(neighbor_neighbor),
-							  mother_face_ref_case);
-	      }
+        const RefinementCase<2> mother_face_ref_case
+          = mother_face->refinement_case();
+        if (mother_face_ref_case==RefinementCase<2>::cut_xy) // total_children==4
+          {
+                                             // this case is quite easy. we are sure,
+                                             // that the neighbor is not coarser.
 
-	    neighbor_child=neighbor->child(neighbor_child_index);
-					     // it might be, that the neighbor_child
-					     // has children, which are not refined
-					     // along the given subface. go down that
-					     // list and deliver the last of those.
-	    while (neighbor_child->has_children() &&
-		   GeometryInfo<3>::face_refinement_case(neighbor_child->refinement_case(),
-							   neighbor_neighbor)
-		   == RefinementCase<2>::no_refinement)
-	      neighbor_child =
-		neighbor_child->child(GeometryInfo<3>::
-				      child_cell_on_face(neighbor_child->refinement_case(),
-							 neighbor_neighbor,
-							 0));
+                                             // get the neighbor's number for the given
+                                             // face and the neighbor
+            neighbor_neighbor
+              = this->neighbor_of_neighbor (face);
 
-					     // if there are two total subfaces, we
-					     // are finished. if there are four we
-					     // have to get a child of our current
-					     // neighbor_child. If there are three,
-					     // we have to check which of the two
-					     // possibilities applies.
-	    if (total_children==3)
-	      {
-		if (mother_face->child(0)->has_children())
-		  {
-		    if (subface<2)
-		      neighbor_child =
-			neighbor_child->child(GeometryInfo<3>::
-					      child_cell_on_face(neighbor_child->refinement_case(),
-								 neighbor_neighbor,subface,
-								 neighbor_child->face_orientation(neighbor_neighbor),
-								 neighbor_child->face_flip(neighbor_neighbor),
-								 neighbor_child->face_rotation(neighbor_neighbor),
-								 mother_face->child(0)->refinement_case()));
-		  }
-		else
-		  {
-		    Assert(mother_face->child(1)->has_children(), ExcInternalError());
-		    if (subface>0)
-		      neighbor_child =
-			neighbor_child->child(GeometryInfo<3>::
-					      child_cell_on_face(neighbor_child->refinement_case(),
-								 neighbor_neighbor,subface-1,
-								 neighbor_child->face_orientation(neighbor_neighbor),
-								 neighbor_child->face_flip(neighbor_neighbor),
-								 neighbor_child->face_rotation(neighbor_neighbor),
-								 mother_face->child(1)->refinement_case()));
-		  }
-	      }
-	    else if (total_children==4)
-	      {
-		neighbor_child =
-		  neighbor_child->child(GeometryInfo<3>::
-					child_cell_on_face(neighbor_child->refinement_case(),
-							   neighbor_neighbor,subface%2,
-							   neighbor_child->face_orientation(neighbor_neighbor),
-							   neighbor_child->face_flip(neighbor_neighbor),
-							   neighbor_child->face_rotation(neighbor_neighbor),
-							   mother_face->child(subface/2)->refinement_case()));
-	      }
-	  }
+                                             // now use the info provided by GeometryInfo
+                                             // to extract the neighbors child number
+            const unsigned int neighbor_child_index
+              = GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
+                                                      neighbor_neighbor, subface,
+                                                      neighbor->face_orientation(neighbor_neighbor),
+                                                      neighbor->face_flip(neighbor_neighbor),
+                                                      neighbor->face_rotation(neighbor_neighbor));
+            neighbor_child = neighbor->child(neighbor_child_index);
 
-					 // it might be, that the neighbor_child has
-					 // children, which are not refined along the
-					 // given subface. go down that list and
-					 // deliver the last of those.
-	while (neighbor_child->has_children())
-	  neighbor_child
-	    = neighbor_child->child(GeometryInfo<3>::
-				    child_cell_on_face(neighbor_child->refinement_case(),
-						       neighbor_neighbor,
-						       0));
+                                             // make sure that the neighbor child cell we
+                                             // have found shares the desired subface.
+            Assert((this->face(face)->child(subface) ==
+                    neighbor_child->face(neighbor_neighbor)),
+                   ExcInternalError());
+          }
+        else //-> the face is refined anisotropically
+          {
+                                             // first of all, we have to find the
+                                             // neighbor at one of the anisotropic
+                                             // children of the
+                                             // mother_face. determine, which of
+                                             // these we need.
+            unsigned int first_child_to_find;
+            unsigned int neighbor_child_index;
+            if (total_children==2)
+              first_child_to_find=subface;
+            else
+              {
+                first_child_to_find=subface/2;
+                if (total_children==3 &&
+                    subface==1 &&
+                    !mother_face->child(0)->has_children())
+                  first_child_to_find=1;
+              }
+            if (neighbor_is_coarser(face))
+              {
+                std::pair<unsigned int, unsigned int> indices=neighbor_of_coarser_neighbor(face);
+                neighbor_neighbor=indices.first;
+
+
+                                                 // we have to translate our
+                                                 // subface_index according to the
+                                                 // RefineCase and subface index of
+                                                 // the coarser face (our face is an
+                                                 // anisotropic child of the coarser
+                                                 // face), 'a' denotes our
+                                                 // subface_index 0 and 'b' denotes
+                                                 // our subface_index 1, whereas 0...3
+                                                 // denote isotropic subfaces of the
+                                                 // coarser face
+                                                 //
+                                                 // cut_x and coarser_subface_index=0
+                                                 //
+                                                 // *---*---*
+                                                 // |b=2|   |
+                                                 // |   |   |
+                                                 // |a=0|   |
+                                                 // *---*---*
+                                                 //
+                                                 // cut_x and coarser_subface_index=1
+                                                 //
+                                                 // *---*---*
+                                                 // |   |b=3|
+                                                 // |   |   |
+                                                 // |   |a=1|
+                                                 // *---*---*
+                                                 //
+                                                 // cut_y and coarser_subface_index=0
+                                                 //
+                                                 // *-------*
+                                                 // |       |
+                                                 // *-------*
+                                                 // |a=0 b=1|
+                                                 // *-------*
+                                                 //
+                                                 // cut_y and coarser_subface_index=1
+                                                 //
+                                                 // *-------*
+                                                 // |a=2 b=3|
+                                                 // *-------*
+                                                 // |       |
+                                                 // *-------*
+                unsigned int iso_subface;
+                if (neighbor->face(neighbor_neighbor)->refinement_case()==RefinementCase<2>::cut_x)
+                  iso_subface=2*first_child_to_find + indices.second;
+                else
+                  {
+                    Assert(neighbor->face(neighbor_neighbor)->refinement_case()==RefinementCase<2>::cut_y,
+                           ExcInternalError());
+                    iso_subface=first_child_to_find + 2*indices.second;
+                  }
+                neighbor_child_index
+                  = GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
+                                                          neighbor_neighbor,
+                                                          iso_subface,
+                                                          neighbor->face_orientation(neighbor_neighbor),
+                                                          neighbor->face_flip(neighbor_neighbor),
+                                                          neighbor->face_rotation(neighbor_neighbor));
+              }
+            else //neighbor is not coarser
+              {
+                neighbor_neighbor=neighbor_of_neighbor(face);
+                neighbor_child_index
+                  = GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
+                                                          neighbor_neighbor,
+                                                          first_child_to_find,
+                                                          neighbor->face_orientation(neighbor_neighbor),
+                                                          neighbor->face_flip(neighbor_neighbor),
+                                                          neighbor->face_rotation(neighbor_neighbor),
+                                                          mother_face_ref_case);
+              }
+
+            neighbor_child=neighbor->child(neighbor_child_index);
+                                             // it might be, that the neighbor_child
+                                             // has children, which are not refined
+                                             // along the given subface. go down that
+                                             // list and deliver the last of those.
+            while (neighbor_child->has_children() &&
+                   GeometryInfo<3>::face_refinement_case(neighbor_child->refinement_case(),
+                                                           neighbor_neighbor)
+                   == RefinementCase<2>::no_refinement)
+              neighbor_child =
+                neighbor_child->child(GeometryInfo<3>::
+                                      child_cell_on_face(neighbor_child->refinement_case(),
+                                                         neighbor_neighbor,
+                                                         0));
+
+                                             // if there are two total subfaces, we
+                                             // are finished. if there are four we
+                                             // have to get a child of our current
+                                             // neighbor_child. If there are three,
+                                             // we have to check which of the two
+                                             // possibilities applies.
+            if (total_children==3)
+              {
+                if (mother_face->child(0)->has_children())
+                  {
+                    if (subface<2)
+                      neighbor_child =
+                        neighbor_child->child(GeometryInfo<3>::
+                                              child_cell_on_face(neighbor_child->refinement_case(),
+                                                                 neighbor_neighbor,subface,
+                                                                 neighbor_child->face_orientation(neighbor_neighbor),
+                                                                 neighbor_child->face_flip(neighbor_neighbor),
+                                                                 neighbor_child->face_rotation(neighbor_neighbor),
+                                                                 mother_face->child(0)->refinement_case()));
+                  }
+                else
+                  {
+                    Assert(mother_face->child(1)->has_children(), ExcInternalError());
+                    if (subface>0)
+                      neighbor_child =
+                        neighbor_child->child(GeometryInfo<3>::
+                                              child_cell_on_face(neighbor_child->refinement_case(),
+                                                                 neighbor_neighbor,subface-1,
+                                                                 neighbor_child->face_orientation(neighbor_neighbor),
+                                                                 neighbor_child->face_flip(neighbor_neighbor),
+                                                                 neighbor_child->face_rotation(neighbor_neighbor),
+                                                                 mother_face->child(1)->refinement_case()));
+                  }
+              }
+            else if (total_children==4)
+              {
+                neighbor_child =
+                  neighbor_child->child(GeometryInfo<3>::
+                                        child_cell_on_face(neighbor_child->refinement_case(),
+                                                           neighbor_neighbor,subface%2,
+                                                           neighbor_child->face_orientation(neighbor_neighbor),
+                                                           neighbor_child->face_flip(neighbor_neighbor),
+                                                           neighbor_child->face_rotation(neighbor_neighbor),
+                                                           mother_face->child(subface/2)->refinement_case()));
+              }
+          }
+
+                                         // it might be, that the neighbor_child has
+                                         // children, which are not refined along the
+                                         // given subface. go down that list and
+                                         // deliver the last of those.
+        while (neighbor_child->has_children())
+          neighbor_child
+            = neighbor_child->child(GeometryInfo<3>::
+                                    child_cell_on_face(neighbor_child->refinement_case(),
+                                                       neighbor_neighbor,
+                                                       0));
 
 #ifdef DEBUG
-					 // check, whether the face neighbor_child
-					 // matches the requested subface
-	typename Triangulation<3,spacedim>::face_iterator requested;
-	switch (this->subface_case(face))
-	  {
-	    case internal::SubfaceCase<3>::case_x:
-	    case internal::SubfaceCase<3>::case_y:
-	    case internal::SubfaceCase<3>::case_xy:
-		  requested = mother_face->child(subface);
-		  break;
-	    case internal::SubfaceCase<3>::case_x1y2y:
-	    case internal::SubfaceCase<3>::case_y1x2x:
-		  requested = mother_face->child(subface/2)->child(subface%2);
-		  break;
+                                         // check, whether the face neighbor_child
+                                         // matches the requested subface
+        typename Triangulation<3,spacedim>::face_iterator requested;
+        switch (this->subface_case(face))
+          {
+            case internal::SubfaceCase<3>::case_x:
+            case internal::SubfaceCase<3>::case_y:
+            case internal::SubfaceCase<3>::case_xy:
+                  requested = mother_face->child(subface);
+                  break;
+            case internal::SubfaceCase<3>::case_x1y2y:
+            case internal::SubfaceCase<3>::case_y1x2x:
+                  requested = mother_face->child(subface/2)->child(subface%2);
+                  break;
 
-	    case internal::SubfaceCase<3>::case_x1y:
-	    case internal::SubfaceCase<3>::case_y1x:
-		  switch (subface)
-		    {
-		      case 0:
-		      case 1:
-			    requested = mother_face->child(0)->child(subface);
-			    break;
-		      case 2:
-			    requested = mother_face->child(1);
-			    break;
-		      default:
-			    Assert(false, ExcInternalError());
-		    }
-		  break;
-	    case internal::SubfaceCase<3>::case_x2y:
-	    case internal::SubfaceCase<3>::case_y2x:
-		  switch (subface)
-		    {
-		      case 0:
-			    requested=mother_face->child(0);
-			    break;
-		      case 1:
-		      case 2:
-			    requested=mother_face->child(1)->child(subface-1);
-			    break;
-		      default:
-			    Assert(false, ExcInternalError());
-		    }
-		  break;
-	    default:
-		  Assert(false, ExcInternalError());
-		  break;
-	  }
-	Assert (requested==neighbor_child->face(neighbor_neighbor),
-		ExcInternalError());
+            case internal::SubfaceCase<3>::case_x1y:
+            case internal::SubfaceCase<3>::case_y1x:
+                  switch (subface)
+                    {
+                      case 0:
+                      case 1:
+                            requested = mother_face->child(0)->child(subface);
+                            break;
+                      case 2:
+                            requested = mother_face->child(1);
+                            break;
+                      default:
+                            Assert(false, ExcInternalError());
+                    }
+                  break;
+            case internal::SubfaceCase<3>::case_x2y:
+            case internal::SubfaceCase<3>::case_y2x:
+                  switch (subface)
+                    {
+                      case 0:
+                            requested=mother_face->child(0);
+                            break;
+                      case 1:
+                      case 2:
+                            requested=mother_face->child(1)->child(subface-1);
+                            break;
+                      default:
+                            Assert(false, ExcInternalError());
+                    }
+                  break;
+            default:
+                  Assert(false, ExcInternalError());
+                  break;
+          }
+        Assert (requested==neighbor_child->face(neighbor_neighbor),
+                ExcInternalError());
 #endif
 
-	return neighbor_child;
+        return neighbor_child;
 
       }
 
       default:
-					     // 1d or more than 3d
-	    Assert (false, ExcNotImplemented());
-	    return TriaIterator<CellAccessor<dim,spacedim> >();
+                                             // 1d or more than 3d
+            Assert (false, ExcNotImplemented());
+            return TriaIterator<CellAccessor<dim,spacedim> >();
     }
 }
 

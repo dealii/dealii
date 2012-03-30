@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,34 +69,34 @@ namespace Threads
 
     void handle_std_exception (const std::exception &exc)
     {
-				       // lock the following context
-				       // to ensure that we don't
-				       // print things over each other
-				       // if we have trouble from
-				       // multiple threads. release
-				       // the lock before calling
-				       // std::abort, though
+                                       // lock the following context
+                                       // to ensure that we don't
+                                       // print things over each other
+                                       // if we have trouble from
+                                       // multiple threads. release
+                                       // the lock before calling
+                                       // std::abort, though
       static Mutex mutex;
       {
-	Mutex::ScopedLock lock(mutex);
+        Mutex::ScopedLock lock(mutex);
 
-	std::cerr << std::endl << std::endl
-		  << "---------------------------------------------------------"
-		  << std::endl
-		  << "In one of the sub-threads of this program, an exception\n"
-		  << "was thrown and not caught. Since exceptions do not\n"
-		  << "propagate to the main thread, the library has caught it.\n"
-		  << "The information carried by this exception is given below.\n"
-		  << std::endl
-		  << "---------------------------------------------------------"
-		  << std::endl;
-	std::cerr << "Exception message: " << std::endl
-		  << "  " << exc.what() << std::endl
-		  << "Exception type: " << std::endl
-		  << "  " << typeid(exc).name() << std::endl;
-	std::cerr << "Aborting!" << std::endl
-		  << "---------------------------------------------------------"
-		  << std::endl;
+        std::cerr << std::endl << std::endl
+                  << "---------------------------------------------------------"
+                  << std::endl
+                  << "In one of the sub-threads of this program, an exception\n"
+                  << "was thrown and not caught. Since exceptions do not\n"
+                  << "propagate to the main thread, the library has caught it.\n"
+                  << "The information carried by this exception is given below.\n"
+                  << std::endl
+                  << "---------------------------------------------------------"
+                  << std::endl;
+        std::cerr << "Exception message: " << std::endl
+                  << "  " << exc.what() << std::endl
+                  << "Exception type: " << std::endl
+                  << "  " << typeid(exc).name() << std::endl;
+        std::cerr << "Aborting!" << std::endl
+                  << "---------------------------------------------------------"
+                  << std::endl;
       }
 
       std::abort ();
@@ -106,30 +106,30 @@ namespace Threads
 
     void handle_unknown_exception ()
     {
-				       // lock the following context
-				       // to ensure that we don't
-				       // print things over each other
-				       // if we have trouble from
-				       // multiple threads. release
-				       // the lock before calling
-				       // std::abort, though
+                                       // lock the following context
+                                       // to ensure that we don't
+                                       // print things over each other
+                                       // if we have trouble from
+                                       // multiple threads. release
+                                       // the lock before calling
+                                       // std::abort, though
       static Mutex mutex;
       {
-	Mutex::ScopedLock lock(mutex);
+        Mutex::ScopedLock lock(mutex);
 
-	std::cerr << std::endl << std::endl
-		  << "---------------------------------------------------------"
-		  << std::endl
-		  << "In one of the sub-threads of this program, an exception\n"
-		  << "was thrown and not caught. Since exceptions do not\n"
-		  << "propagate to the main thread, the library has caught it.\n"
-		  << std::endl
-		  << "---------------------------------------------------------"
-		  << std::endl;
-	std::cerr << "Type of exception is unknown, but not std::exception.\n"
-		  << "No additional information is available.\n"
-		  << "---------------------------------------------------------"
-		  << std::endl;
+        std::cerr << std::endl << std::endl
+                  << "---------------------------------------------------------"
+                  << std::endl
+                  << "In one of the sub-threads of this program, an exception\n"
+                  << "was thrown and not caught. Since exceptions do not\n"
+                  << "propagate to the main thread, the library has caught it.\n"
+                  << std::endl
+                  << "---------------------------------------------------------"
+                  << std::endl;
+        std::cerr << "Type of exception is unknown, but not std::exception.\n"
+                  << "No additional information is available.\n"
+                  << "---------------------------------------------------------"
+                  << std::endl;
       }
       std::abort ();
     }
@@ -160,8 +160,8 @@ namespace Threads
 
 #if DEAL_II_USE_MT != 1
   DummyBarrier::DummyBarrier (const unsigned int  count,
-			      const char         *,
-			      void               *)
+                              const char         *,
+                              void               *)
   {
     Assert (count == 1, ExcBarrierSizeNotUseful(count));
   }
@@ -173,8 +173,8 @@ namespace Threads
 
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
   PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
-					  const char         *,
-					  void               *)
+                                          const char         *,
+                                          void               *)
   {
     pthread_barrier_init (&barrier, 0, count);
   }
@@ -182,8 +182,8 @@ namespace Threads
 #else
 
   PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
-					  const char         *,
-					  void               *)
+                                          const char         *,
+                                          void               *)
                   : count (count)
   {
                                      // throw an exception unless we
@@ -193,10 +193,10 @@ namespace Threads
                                      // a no-op, and we don't need the
                                      // POSIX functionality
     AssertThrow (count == 1,
-		 ExcMessage ("Your local POSIX installation does not support\n"
-			     "POSIX barriers. You will not be able to use\n"
-			     "this class, but the rest of the threading\n"
-			     "functionality is available."));
+                 ExcMessage ("Your local POSIX installation does not support\n"
+                             "POSIX barriers. You will not be able to use\n"
+                             "this class, but the rest of the threading\n"
+                             "functionality is available."));
   }
 #endif
 
@@ -247,8 +247,8 @@ namespace Threads
 
   std::vector<std::pair<unsigned int,unsigned int> >
   split_interval (const unsigned int begin,
-		  const unsigned int end,
-		  const unsigned int n_intervals)
+                  const unsigned int end,
+                  const unsigned int n_intervals)
   {
     Assert (end >= begin, ExcInternalError());
 
@@ -261,20 +261,20 @@ namespace Threads
     return_values[0].first = begin;
     for (unsigned int i=0; i<n_intervals; ++i)
       {
-	if (i != n_intervals-1)
-	  {
-	    return_values[i].second = (return_values[i].first
-				       + n_elements_per_interval);
-					     // distribute residual in
-					     // division equally among
-					     // the first few
-					     // subintervals
-	    if (i < residual)
-	      ++return_values[i].second;
-	    return_values[i+1].first = return_values[i].second;
-	  }
-	else
-	  return_values[i].second = end;
+        if (i != n_intervals-1)
+          {
+            return_values[i].second = (return_values[i].first
+                                       + n_elements_per_interval);
+                                             // distribute residual in
+                                             // division equally among
+                                             // the first few
+                                             // subintervals
+            if (i < residual)
+              ++return_values[i].second;
+            return_values[i+1].first = return_values[i].second;
+          }
+        else
+          return_values[i].second = end;
       };
     return return_values;
   }

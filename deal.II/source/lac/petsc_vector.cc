@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2006, 2008, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,7 +36,7 @@ namespace PETScWrappers
     Vector::create_vector (n);
   }
 
-  
+
 
   Vector::Vector (const Vector &v)
                   :
@@ -76,15 +76,15 @@ namespace PETScWrappers
 //         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                          // so let's go the slow way:
-	if (attained_ownership)
-	  {
+        if (attained_ownership)
+          {
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-	    int ierr = VecDestroy (vector);
+            int ierr = VecDestroy (vector);
 #else
-	    int ierr = VecDestroy (&vector);
+            int ierr = VecDestroy (&vector);
 #endif
-	    AssertThrow (ierr == 0, ExcPETScError(ierr));
-	  }
+            AssertThrow (ierr == 0, ExcPETScError(ierr));
+          }
 
         create_vector (n);
       }
@@ -103,9 +103,9 @@ namespace PETScWrappers
   {
     reinit (v.size(), fast);
   }
-  
 
-  
+
+
   void
   Vector::create_vector (const unsigned int n)
   {
