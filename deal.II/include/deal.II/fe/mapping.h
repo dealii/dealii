@@ -453,7 +453,7 @@ class Mapping : public Subscriptor
  * \mathbf u(\mathbf x) = J*(J^{T} J)^{-1}(\mathbf{\hat x})\mathbf{\hat
  * u}(\mathbf{\hat x}).
  * @f]
- In the case when dim=spacedim the previous formula reduces to
+ * In the case when dim=spacedim the previous formula reduces to
  * @f[
  * \mathbf u(\mathbf x) = J^{-T}(\mathbf{\hat x})\mathbf{\hat
  * u}(\mathbf{\hat x}).
