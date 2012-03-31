@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -129,7 +129,7 @@ derivative_norm(const Tensor<3,deal_II_dimension> &derivative);
 
 
 // static variables
-// 
+//
 // on AIX, the linker is unhappy about some missing symbols. they
 // should really be there, but explicitly instantiating them will also
 // not hurt
