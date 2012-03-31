@@ -2018,6 +2018,44 @@ class ParameterHandler : public Subscriptor
                                       * given to the
                                       * declare_entry() function
                                       * if available.
+                                      *
+                                      * In <tt>Text</tt> format, the
+                                      * output contains the same information
+                                      * but in a format so that the
+                                      * resulting file can be input into
+                                      * a latex document such as a manual
+                                      * for the code for which this object
+                                      * handles run-time parameters.
+                                      * The various sections of parameters
+                                      * are then represented by latex
+                                      * section and subsection commands
+                                      * as well as by nested enumerations.
+                                      *
+                                      * In addition, all parameter names
+                                      * are listed with <code>@\index</code>
+                                      * statements in two indices called
+                                      * <code>prmindex</code> (where the
+                                      * name of each parameter is listed
+                                      * in the index) and <code>prmindexfull</code>
+                                      * where parameter names are listed
+                                      * sorted by the section in which
+                                      * they exist. By default, the LaTeX
+                                      * program ignores these <code>@\index</code>
+                                      * commands, but they can be used to
+                                      * generate an index by using the
+                                      * following commands in the preamble
+                                      * of the latex file:
+                                      * @code
+                                      * \usepackage{imakeidx}
+                                      * \makeindex[name=prmindex, title=Index of run-time parameter entries]
+                                      * \makeindex[name=prmindexfull, title=Index of run-time parameters with section names]
+                                      * @endcode
+                                      * and at the end of the file
+                                      * this:
+                                      * @code
+                                      * \printindex[prmindex]
+                                      * \printindex[prmindexfull]
+                                      * @endcode
                                       */
     std::ostream & print_parameters (std::ostream      &out,
                                      const OutputStyle  style);

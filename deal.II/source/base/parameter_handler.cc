@@ -1748,10 +1748,21 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
             {
               const std::string value = p->second.get<std::string>("value");
 
-                                               // print name and value
+                                               // print name
               out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n\n"
-                  << std::endl
-                  << "{\\it Value:} " << value << "\n\n"
+                  << std::endl;
+
+              out << "\\index[prmindex]{"
+                  << demangle(p->first)
+                  << "}\n";
+              out << "\\index[prmindexfull]{";
+              for (unsigned int i=0; i<subsection_path.size(); ++i)
+                out << subsection_path[i] << "!";
+              out << demangle(p->first)
+                  << "}\n";
+
+                                               // finally print value and default
+              out << "{\\it Value:} " << value << "\n\n"
                   << std::endl
                   << "{\\it Default:} "
                   << p->second.get<std::string>("default_value") << "\n\n"
