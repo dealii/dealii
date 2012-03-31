@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,7 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int, int> class DoFHandler;
 template <int, int> class MGDoFHandler;
-  
+
 namespace internal
 {
 /**
@@ -33,7 +33,7 @@ namespace internal
   namespace DoFHandler
   {
 
-/**    
+/**
  *
  * <h4>DoFFaces</h4>
  *
@@ -57,17 +57,17 @@ namespace internal
  * present hierarchy of classes as well as the dealii::DoFHandler class.
  *
  * @author Tobias Leicht, 2006
- */    
+ */
     template<int dim>
     class DoFFaces
     {
-					 /**
-					  * Make the constructor private to prevent the use
-					  * of this template, only the specializations
-					  * should be used
-					  */
+                                         /**
+                                          * Make the constructor private to prevent the use
+                                          * of this template, only the specializations
+                                          * should be used
+                                          */
       private:
-	DoFFaces();
+        DoFFaces();
     };
 
 /**
@@ -80,20 +80,20 @@ namespace internal
     class DoFFaces<1>
     {
       public:
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
 
-	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
     };
 
 /**
@@ -105,26 +105,26 @@ namespace internal
     class DoFFaces<2>
     {
       public:
-					 /**
-					  * The object containing the
-					  * data of DoFs on lines.
-					  */
-	internal::DoFHandler::DoFObjects<1> lines;
+                                         /**
+                                          * The object containing the
+                                          * data of DoFs on lines.
+                                          */
+        internal::DoFHandler::DoFObjects<1> lines;
 
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
 
-	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
     };
 
 /**
@@ -136,57 +136,57 @@ namespace internal
     class DoFFaces<3>
     {
       public:
-					 /**
-					  * The object containing the
-					  * data of DoFs on lines.
-					  */
-	internal::DoFHandler::DoFObjects<1> lines;
+                                         /**
+                                          * The object containing the
+                                          * data of DoFs on lines.
+                                          */
+        internal::DoFHandler::DoFObjects<1> lines;
 
-					 /**
-					  * The object containing the
-					  * data of DoFs on quads.
-					  */
-	internal::DoFHandler::DoFObjects<2> quads;
+                                         /**
+                                          * The object containing the
+                                          * data of DoFs on quads.
+                                          */
+        internal::DoFHandler::DoFObjects<2> quads;
 
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
 
-	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
     };
 
-    
-    
+
+
     template <class Archive>
     void DoFFaces<1>::serialize (Archive &,
-				 const unsigned int)
-    {}    
+                                 const unsigned int)
+    {}
 
-    
+
     template <class Archive>
     void DoFFaces<2>::serialize (Archive &ar,
-				 const unsigned int)
+                                 const unsigned int)
     {
       ar & lines;
     }
 
-    
+
     template <class Archive>
     void DoFFaces<3>::serialize (Archive &ar,
-				 const unsigned int)
+                                 const unsigned int)
     {
       ar & lines & quads;
-    }    
-    
+    }
+
   }
 }
 

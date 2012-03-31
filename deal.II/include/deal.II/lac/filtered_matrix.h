@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -205,95 +205,95 @@ class FilteredMatrix : public Subscriptor
 {
   public:
         class const_iterator;
-    
-				     /**
-				      * Accessor class for iterators
-				      */
+
+                                     /**
+                                      * Accessor class for iterators
+                                      */
     class Accessor
     {
-					 /**
-					  * Constructor. Since we use
-					  * accessors only for read
-					  * access, a const matrix
-					  * pointer is sufficient.
-					  */
-	Accessor (const FilteredMatrix<VECTOR> *matrix,
-		  const unsigned int index);
+                                         /**
+                                          * Constructor. Since we use
+                                          * accessors only for read
+                                          * access, a const matrix
+                                          * pointer is sufficient.
+                                          */
+        Accessor (const FilteredMatrix<VECTOR> *matrix,
+                  const unsigned int index);
 
       public:
-					 /**
-					  * Row number of the element
-					  * represented by this
-					  * object.
-					  */
-	unsigned int row() const;
+                                         /**
+                                          * Row number of the element
+                                          * represented by this
+                                          * object.
+                                          */
+        unsigned int row() const;
 
-					 /**
-					  * Column number of the
-					  * element represented by
-					  * this object.
-					  */
-	unsigned int column() const;
+                                         /**
+                                          * Column number of the
+                                          * element represented by
+                                          * this object.
+                                          */
+        unsigned int column() const;
 
-					 /**
-					  * Value of the right hand
-					  * side for this row.
-					  */
-	double value() const;
-	
+                                         /**
+                                          * Value of the right hand
+                                          * side for this row.
+                                          */
+        double value() const;
+
       private:
-					 /**
-					  * Advance to next entry
-					  */
-	void advance ();
-	
-					 /**
-					  * The matrix accessed.
-					  */
-	const FilteredMatrix<VECTOR>* matrix;
+                                         /**
+                                          * Advance to next entry
+                                          */
+        void advance ();
 
-					 /**
-					  * Current row number.
-					  */
-	unsigned int index;
-					 /*
-					  * Make enclosing class a
-					  * friend.
-					  */
-	friend class const_iterator;
+                                         /**
+                                          * The matrix accessed.
+                                          */
+        const FilteredMatrix<VECTOR>* matrix;
+
+                                         /**
+                                          * Current row number.
+                                          */
+        unsigned int index;
+                                         /*
+                                          * Make enclosing class a
+                                          * friend.
+                                          */
+        friend class const_iterator;
     };
 
-				     /**
-				      * STL conforming iterator.
-				      */
+                                     /**
+                                      * STL conforming iterator.
+                                      */
     class const_iterator
     {
       public:
                                          /**
                                           * Constructor.
-                                          */ 
-	const_iterator(const FilteredMatrix<VECTOR> *matrix,
-		       const unsigned int index);
-	  
+                                          */
+        const_iterator(const FilteredMatrix<VECTOR> *matrix,
+                       const unsigned int index);
+
                                          /**
                                           * Prefix increment.
                                           */
-	const_iterator& operator++ ();
+        const_iterator& operator++ ();
 
                                          /**
                                           * Postfix increment.
                                           */
-	const_iterator& operator++ (int);
+        const_iterator& operator++ (int);
 
                                          /**
                                           * Dereferencing operator.
                                           */
-	const Accessor& operator* () const;
+        const Accessor& operator* () const;
 
                                          /**
                                           * Dereferencing operator.
                                           */
-	const Accessor* operator-> () const;
+        const Accessor* operator-> () const;
 
                                          /**
                                           * Comparison. True, if
@@ -301,11 +301,11 @@ class FilteredMatrix : public Subscriptor
                                           * the same matrix
                                           * position.
                                           */
-	bool operator == (const const_iterator&) const;
+        bool operator == (const const_iterator&) const;
                                          /**
                                           * Inverse of <tt>==</tt>.
                                           */
-	bool operator != (const const_iterator&) const;
+        bool operator != (const const_iterator&) const;
 
                                          /**
                                           * Comparison operator. Result is
@@ -314,15 +314,15 @@ class FilteredMatrix : public Subscriptor
                                           * numbers are equal and the first
                                           * index is smaller.
                                           */
-	bool operator < (const const_iterator&) const;
+        bool operator < (const const_iterator&) const;
 
                                          /**
                                           * Comparison operator. Compares just
                                           * the other way around than the
                                           * operator above.
                                           */
-	bool operator > (const const_iterator&) const;
-        
+        bool operator > (const const_iterator&) const;
+
       private:
                                          /**
                                           * Store an object of the
@@ -331,317 +331,317 @@ class FilteredMatrix : public Subscriptor
         Accessor accessor;
     };
 
-				     /**
-				      * Typedef defining a type that
-				      * represents a pair of degree of
-				      * freedom index and the value it
-				      * shall have.
-				      */
+                                     /**
+                                      * Typedef defining a type that
+                                      * represents a pair of degree of
+                                      * freedom index and the value it
+                                      * shall have.
+                                      */
     typedef std::pair<unsigned int, double> IndexValuePair;
-    
+
 /**
  * @name Constructors and initialization
  */
 //@{
-				     /**
-				      * Default constructor. You will
-				      * have to set the matrix to be
-				      * used later using
-				      * initialize().
-				      */
+                                     /**
+                                      * Default constructor. You will
+                                      * have to set the matrix to be
+                                      * used later using
+                                      * initialize().
+                                      */
     FilteredMatrix ();
 
-				     /**
-				      * Copy constructor. Use the
-				      * matrix and the constraints set
-				      * in the given object for the
-				      * present one as well.
-				      */
+                                     /**
+                                      * Copy constructor. Use the
+                                      * matrix and the constraints set
+                                      * in the given object for the
+                                      * present one as well.
+                                      */
     FilteredMatrix (const FilteredMatrix &fm);
-    
- 				     /**
-				      * Constructor. Use the given
-				      * matrix for future operations.
-				      *
-				      * @arg @p m: The matrix being used in multiplications.
-				      *
-				      * @arg @p
-				      * expect_constrained_source: See
-				      * documentation of
-				      * #expect_constrained_source.
-				      */
+
+                                     /**
+                                      * Constructor. Use the given
+                                      * matrix for future operations.
+                                      *
+                                      * @arg @p m: The matrix being used in multiplications.
+                                      *
+                                      * @arg @p
+                                      * expect_constrained_source: See
+                                      * documentation of
+                                      * #expect_constrained_source.
+                                      */
     template <class MATRIX>
     FilteredMatrix (const MATRIX &matrix,
-		    bool expect_constrained_source = false);
-    
-				     /**
-				      * Copy operator. Take over
-				      * matrix and constraints from
-				      * the other object.
-				      */
+                    bool expect_constrained_source = false);
+
+                                     /**
+                                      * Copy operator. Take over
+                                      * matrix and constraints from
+                                      * the other object.
+                                      */
     FilteredMatrix & operator = (const FilteredMatrix &fm);
-    
-				     /**
-				      * Set the matrix to be used
-				      * further on. You will probably
-				      * also want to call the
-				      * clear_constraints()
-				      * function if constraits were
-				      * previously added.
-				      *
-				      * @arg @p m: The matrix being used in multiplications.
-				      *
-				      * @arg @p
-				      * expect_constrained_source: See
-				      * documentation of
-				      * #expect_constrained_source.
-				      */
+
+                                     /**
+                                      * Set the matrix to be used
+                                      * further on. You will probably
+                                      * also want to call the
+                                      * clear_constraints()
+                                      * function if constraits were
+                                      * previously added.
+                                      *
+                                      * @arg @p m: The matrix being used in multiplications.
+                                      *
+                                      * @arg @p
+                                      * expect_constrained_source: See
+                                      * documentation of
+                                      * #expect_constrained_source.
+                                      */
     template <class MATRIX>
     void initialize (const MATRIX &m,
-		     bool expect_constrained_source = false);
+                     bool expect_constrained_source = false);
 
-				     /**
-				      * Delete all constraints and the
-				      * matrix pointer.
-				      */
+                                     /**
+                                      * Delete all constraints and the
+                                      * matrix pointer.
+                                      */
     void clear ();
 //@}
 /**
  * @name Managing constraints
  */
 //@{
-				     /**
-				      * Add the constraint that the
-				      * value with index <tt>i</tt>
-				      * should have the value
-				      * <tt>v</tt>.
-				      */
+                                     /**
+                                      * Add the constraint that the
+                                      * value with index <tt>i</tt>
+                                      * should have the value
+                                      * <tt>v</tt>.
+                                      */
     void add_constraint (const unsigned int i, const double v);
-    
-				     /**
-				      * Add a list of constraints to
-				      * the ones already managed by
-				      * this object. The actual data
-				      * type of this list must be so
-				      * that dereferenced iterators
-				      * are pairs of indices and the
-				      * corresponding values to be
-				      * enforced on the respective
-				      * solution vector's entry. Thus,
-				      * the data type might be, for
-				      * example, a @p std::list or
-				      * @p std::vector of
-				      * IndexValuePair objects,
-				      * but also a
-				      * <tt>std::map<unsigned, double></tt>.
-				      *
-				      * The second component of these
-				      * pairs will only be used in
-				      * apply_constraints(). The first
-				      * is used to set values to zero
-				      * in matrix vector
-				      * multiplications.
-				      *
-				      * It is an error if the argument
-				      * contains an entry for a degree
-				      * of freedom that has already
-				      * been constrained
-				      * previously.
-				      */
+
+                                     /**
+                                      * Add a list of constraints to
+                                      * the ones already managed by
+                                      * this object. The actual data
+                                      * type of this list must be so
+                                      * that dereferenced iterators
+                                      * are pairs of indices and the
+                                      * corresponding values to be
+                                      * enforced on the respective
+                                      * solution vector's entry. Thus,
+                                      * the data type might be, for
+                                      * example, a @p std::list or
+                                      * @p std::vector of
+                                      * IndexValuePair objects,
+                                      * but also a
+                                      * <tt>std::map<unsigned, double></tt>.
+                                      *
+                                      * The second component of these
+                                      * pairs will only be used in
+                                      * apply_constraints(). The first
+                                      * is used to set values to zero
+                                      * in matrix vector
+                                      * multiplications.
+                                      *
+                                      * It is an error if the argument
+                                      * contains an entry for a degree
+                                      * of freedom that has already
+                                      * been constrained
+                                      * previously.
+                                      */
     template <class ConstraintList>
     void add_constraints (const ConstraintList &new_constraints);
-    
-				     /**
-				      * Delete the list of constraints
-				      * presently in use.
-				      */
+
+                                     /**
+                                      * Delete the list of constraints
+                                      * presently in use.
+                                      */
     void clear_constraints ();
 //@}
 /**
  * Vector operations
  */
 //@{
-				     /**
-				      * Apply the constraints to a
-				      * right hand side vector. This
-				      * needs to be done before
-				      * starting to solve with the
-				      * filtered matrix. If the matrix
-				      * is symmetric (i.e. the matrix
-				      * itself, not only its sparsity
-				      * pattern), set the second
-				      * parameter to @p true to use a
-				      * faster algorithm.
-				      */
+                                     /**
+                                      * Apply the constraints to a
+                                      * right hand side vector. This
+                                      * needs to be done before
+                                      * starting to solve with the
+                                      * filtered matrix. If the matrix
+                                      * is symmetric (i.e. the matrix
+                                      * itself, not only its sparsity
+                                      * pattern), set the second
+                                      * parameter to @p true to use a
+                                      * faster algorithm.
+                                      */
     void apply_constraints (VECTOR     &v,
-			    const bool  matrix_is_symmetric) const;
+                            const bool  matrix_is_symmetric) const;
 
-				     /**
-				      * Matrix-vector multiplication:
-				      * this operation performs
-				      * pre_filter(), multiplication
-				      * with the stored matrix and
-				      * post_filter() in that order.
-				      */
+                                     /**
+                                      * Matrix-vector multiplication:
+                                      * this operation performs
+                                      * pre_filter(), multiplication
+                                      * with the stored matrix and
+                                      * post_filter() in that order.
+                                      */
     void vmult (VECTOR       &dst,
-		const VECTOR &src) const;
-    
-				     /**
-				      * Matrix-vector multiplication:
-				      * this operation performs
-				      * pre_filter(), transposed
-				      * multiplication with the stored
-				      * matrix and post_filter() in
-				      * that order.
-				      */
+                const VECTOR &src) const;
+
+                                     /**
+                                      * Matrix-vector multiplication:
+                                      * this operation performs
+                                      * pre_filter(), transposed
+                                      * multiplication with the stored
+                                      * matrix and post_filter() in
+                                      * that order.
+                                      */
     void Tvmult (VECTOR       &dst,
-		 const VECTOR &src) const;
-  
-				     /**
-				      * Adding matrix-vector multiplication.
-				      *
-				      * @note The result vector of
-				      * this multiplication will have
-				      * the constraint entries set to
-				      * zero, independent of the
-				      * previous value of
-				      * <tt>dst</tt>. We excpect that
-				      * in most cases this is the
-				      * required behavior.
-				      */
+                 const VECTOR &src) const;
+
+                                     /**
+                                      * Adding matrix-vector multiplication.
+                                      *
+                                      * @note The result vector of
+                                      * this multiplication will have
+                                      * the constraint entries set to
+                                      * zero, independent of the
+                                      * previous value of
+                                      * <tt>dst</tt>. We excpect that
+                                      * in most cases this is the
+                                      * required behavior.
+                                      */
     void vmult_add (VECTOR       &dst,
-		    const VECTOR &src) const;
-    
-				     /**
-				      * Adding transpose matrix-vector multiplication:
-				      *
-				      * @note The result vector of
-				      * this multiplication will have
-				      * the constraint entries set to
-				      * zero, independent of the
-				      * previous value of
-				      * <tt>dst</tt>. We excpect that
-				      * in most cases this is the
-				      * required behavior.
-				      */
+                    const VECTOR &src) const;
+
+                                     /**
+                                      * Adding transpose matrix-vector multiplication:
+                                      *
+                                      * @note The result vector of
+                                      * this multiplication will have
+                                      * the constraint entries set to
+                                      * zero, independent of the
+                                      * previous value of
+                                      * <tt>dst</tt>. We excpect that
+                                      * in most cases this is the
+                                      * required behavior.
+                                      */
     void Tvmult_add (VECTOR       &dst,
-		     const VECTOR &src) const;
+                     const VECTOR &src) const;
 //@}
 
 /**
  * @name Iterators
  */
 //@{
-				     /**
-				      * Iterator to the first
-				      * constraint.
-				      */
+                                     /**
+                                      * Iterator to the first
+                                      * constraint.
+                                      */
     const_iterator begin () const;
-				     /**
-				      * Final iterator.
-				      */
+                                     /**
+                                      * Final iterator.
+                                      */
     const_iterator end () const;
 //@}
-    
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object. Since we are
-				      * not the owner of the matrix
-				      * referenced, its memory
-				      * consumption is not included.
-				      */
+
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object. Since we are
+                                      * not the owner of the matrix
+                                      * referenced, its memory
+                                      * consumption is not included.
+                                      */
     std::size_t memory_consumption () const;
-    
+
   private:
-				     /**
-				      * Determine, whether
-				      * multiplications can expect
-				      * that the source vector has all
-				      * constrained entries set to
-				      * zero.
-				      *
-				      * If so, the auxiliary vector
-				      * can be avoided and memory as
-				      * well as time can be saved.
-				      *
-				      * We expect this for instance in
-				      * Newton's method, where the
-				      * residual already should be
-				      * zero on constrained
-				      * nodes. This is, because there
-				      * is no testfunction in these
-				      * nodes.
-				      */
+                                     /**
+                                      * Determine, whether
+                                      * multiplications can expect
+                                      * that the source vector has all
+                                      * constrained entries set to
+                                      * zero.
+                                      *
+                                      * If so, the auxiliary vector
+                                      * can be avoided and memory as
+                                      * well as time can be saved.
+                                      *
+                                      * We expect this for instance in
+                                      * Newton's method, where the
+                                      * residual already should be
+                                      * zero on constrained
+                                      * nodes. This is, because there
+                                      * is no testfunction in these
+                                      * nodes.
+                                      */
     bool expect_constrained_source;
-    
-				     /**
-				      * Declare an abbreviation for an
-				      * iterator into the array
-				      * constraint pairs, since that
-				      * data type is so often used and
-				      * is rather awkward to write out
-				      * each time.
-				      */
+
+                                     /**
+                                      * Declare an abbreviation for an
+                                      * iterator into the array
+                                      * constraint pairs, since that
+                                      * data type is so often used and
+                                      * is rather awkward to write out
+                                      * each time.
+                                      */
     typedef typename std::vector<IndexValuePair>::const_iterator const_index_value_iterator;
-    
-				     /**
-				      * Helper class used to sort
-				      * pairs of indices and
-				      * values. Only the index is
-				      * considered as sort key.
-				      */
-    struct PairComparison 
+
+                                     /**
+                                      * Helper class used to sort
+                                      * pairs of indices and
+                                      * values. Only the index is
+                                      * considered as sort key.
+                                      */
+    struct PairComparison
     {
-					 /**
-					  * Function comparing the
-					  * pairs @p i1 and @p i2
-					  * for their keys.
-					  */
-	bool operator () (const IndexValuePair &i1,
-			  const IndexValuePair &i2) const;
+                                         /**
+                                          * Function comparing the
+                                          * pairs @p i1 and @p i2
+                                          * for their keys.
+                                          */
+        bool operator () (const IndexValuePair &i1,
+                          const IndexValuePair &i2) const;
     };
-    
-				     /**
-				      * Pointer to the sparsity
-				      * pattern used for this
-				      * matrix.
-				      */
+
+                                     /**
+                                      * Pointer to the sparsity
+                                      * pattern used for this
+                                      * matrix.
+                                      */
     std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
 
-				     /**
-				      * Sorted list of pairs denoting
-				      * the index of the variable and
-				      * the value to which it shall be
-				      * fixed.
-				      */
+                                     /**
+                                      * Sorted list of pairs denoting
+                                      * the index of the variable and
+                                      * the value to which it shall be
+                                      * fixed.
+                                      */
     std::vector<IndexValuePair> constraints;
-    
-				     /**
-				      * Do the pre-filtering step,
-				      * i.e. zero out those components
-				      * that belong to constrained
-				      * degrees of freedom.
-				      */
+
+                                     /**
+                                      * Do the pre-filtering step,
+                                      * i.e. zero out those components
+                                      * that belong to constrained
+                                      * degrees of freedom.
+                                      */
     void pre_filter (VECTOR &v) const;
 
-				     /**
-				      * Do the postfiltering step,
-				      * i.e. set constrained degrees
-				      * of freedom to the value of the
-				      * input vector, as the matrix
-				      * contains only ones on the
-				      * diagonal for these degrees of
-				      * freedom.
-				      */
+                                     /**
+                                      * Do the postfiltering step,
+                                      * i.e. set constrained degrees
+                                      * of freedom to the value of the
+                                      * input vector, as the matrix
+                                      * contains only ones on the
+                                      * diagonal for these degrees of
+                                      * freedom.
+                                      */
     void post_filter (const VECTOR &in,
-		      VECTOR       &out) const;
-    
+                      VECTOR       &out) const;
+
     friend class Accessor;
-				     /**
-				      * FilteredMatrixBlock accesses
-				      * pre_filter() and post_filter().
-				      */
+                                     /**
+                                      * FilteredMatrixBlock accesses
+                                      * pre_filter() and post_filter().
+                                      */
     friend class FilteredMatrixBlock<VECTOR>;
 };
 
@@ -656,12 +656,12 @@ inline
 FilteredMatrix<VECTOR>::Accessor::Accessor(
   const FilteredMatrix<VECTOR> *matrix,
   const unsigned int index)
-		:
-		matrix(matrix),
-		index(index)
+                :
+                matrix(matrix),
+                index(index)
 {
   Assert (index <= matrix->constraints.size(),
-	  ExcIndexRange(index, 0, matrix->constraints.size()));
+          ExcIndexRange(index, 0, matrix->constraints.size()));
 }
 
 
@@ -713,8 +713,8 @@ inline
 FilteredMatrix<VECTOR>::const_iterator::const_iterator(
   const FilteredMatrix<VECTOR> *matrix,
   const unsigned int index)
-		:
-		accessor(matrix, index)
+                :
+                accessor(matrix, index)
 {}
 
 
@@ -754,7 +754,7 @@ FilteredMatrix<number>::const_iterator::
 operator == (const const_iterator& other) const
 {
   return (accessor.index == other.accessor.index
-	  && accessor.matrix == other.accessor.matrix);
+          && accessor.matrix == other.accessor.matrix);
 }
 
 
@@ -794,7 +794,7 @@ inline
 bool
 FilteredMatrix<VECTOR>::PairComparison::
 operator () (const IndexValuePair &i1,
-	     const IndexValuePair &i2) const
+             const IndexValuePair &i2) const
 {
   return (i1.first < i2.first);
 }
@@ -808,7 +808,7 @@ void
 FilteredMatrix<VECTOR>::initialize (const MATRIX &m, bool ecs)
 {
   matrix.reset (new_pointer_matrix_base(m, VECTOR()));
-  
+
   expect_constrained_source = ecs;
 }
 
@@ -824,11 +824,11 @@ FilteredMatrix<VECTOR>::FilteredMatrix ()
 template <class VECTOR>
 inline
 FilteredMatrix<VECTOR>::FilteredMatrix (const FilteredMatrix &fm)
-		:
-		Subscriptor(),
-		expect_constrained_source(fm.expect_constrained_source),
-		matrix(fm.matrix),
-		constraints (fm.constraints)
+                :
+                Subscriptor(),
+                expect_constrained_source(fm.expect_constrained_source),
+                matrix(fm.matrix),
+                constraints (fm.constraints)
 {}
 
 
@@ -862,7 +862,7 @@ inline
 void
 FilteredMatrix<VECTOR>::add_constraint (const unsigned int index, const double value)
 {
-				   // add new constraint to end
+                                   // add new constraint to end
   constraints.push_back(IndexValuePair(index, value));
 }
 
@@ -874,18 +874,18 @@ inline
 void
 FilteredMatrix<VECTOR>::add_constraints (const ConstraintList &new_constraints)
 {
-				   // add new constraints to end
+                                   // add new constraints to end
   const unsigned int old_size = constraints.size();
   constraints.reserve (old_size + new_constraints.size());
   constraints.insert (constraints.end(),
-		      new_constraints.begin(),
-		      new_constraints.end());
-				   // then merge the two arrays to
-				   // form one sorted one
+                      new_constraints.begin(),
+                      new_constraints.end());
+                                   // then merge the two arrays to
+                                   // form one sorted one
   std::inplace_merge (constraints.begin(),
-		      constraints.begin()+old_size,
-		      constraints.end(),
-		      PairComparison());
+                      constraints.begin()+old_size,
+                      constraints.end(),
+                      PairComparison());
 }
 
 
@@ -895,7 +895,7 @@ inline
 void
 FilteredMatrix<VECTOR>::clear_constraints ()
 {
-				   // swap vectors to release memory
+                                   // swap vectors to release memory
   std::vector<IndexValuePair> empty;
   constraints.swap (empty);
 }
@@ -930,13 +930,13 @@ FilteredMatrix<VECTOR>::apply_constraints (
       Assert(numbers::is_finite(i->second), ExcNumberNotFinite());
       (*tmp_vector)(i->first) = -i->second;
     }
-  
-				   // This vmult is without bc, to get
-				   // the rhs correction in a correct
-				   // way.
+
+                                   // This vmult is without bc, to get
+                                   // the rhs correction in a correct
+                                   // way.
   matrix->vmult_add(v, *tmp_vector);
-				   // finally set constrained
-				   // entries themselves
+                                   // finally set constrained
+                                   // entries themselves
   for (i=constraints.begin(); i!=e; ++i)
     {
       Assert(numbers::is_finite(i->second), ExcNumberNotFinite());
@@ -956,7 +956,7 @@ FilteredMatrix<VECTOR>::pre_filter (VECTOR &v) const
     const_index_value_iterator       i = constraints.begin();
     const const_index_value_iterator e = constraints.end();
     for (; i!=e; ++i)
-	v(i->first) = 0;
+        v(i->first) = 0;
 }
 
 
@@ -965,7 +965,7 @@ template <class VECTOR>
 inline
 void
 FilteredMatrix<VECTOR>::post_filter (const VECTOR &in,
-	VECTOR       &out) const
+        VECTOR       &out) const
 {
     // iterate over all constraints and
     // set value correctly
@@ -973,8 +973,8 @@ FilteredMatrix<VECTOR>::post_filter (const VECTOR &in,
     const const_index_value_iterator e = constraints.end();
     for (; i!=e; ++i)
       {
-	Assert(numbers::is_finite(in(i->first)), ExcNumberNotFinite());
-	out(i->first) = in(i->first);
+        Assert(numbers::is_finite(in(i->first)), ExcNumberNotFinite());
+        out(i->first) = in(i->first);
       }
 }
 
@@ -989,12 +989,12 @@ FilteredMatrix<VECTOR>::vmult (VECTOR& dst, const VECTOR& src) const
     {
       GrowingVectorMemory<VECTOR> mem;
       VECTOR* tmp_vector = mem.alloc();
-				       // first copy over src vector and
-				       // pre-filter
+                                       // first copy over src vector and
+                                       // pre-filter
       tmp_vector->reinit(src, true);
       *tmp_vector = src;
       pre_filter (*tmp_vector);
-				       // then let matrix do its work
+                                       // then let matrix do its work
       matrix->vmult (dst, *tmp_vector);
       mem.free(tmp_vector);
     }
@@ -1002,8 +1002,8 @@ FilteredMatrix<VECTOR>::vmult (VECTOR& dst, const VECTOR& src) const
     {
       matrix->vmult (dst, src);
     }
-  
-				   // finally do post-filtering
+
+                                   // finally do post-filtering
   post_filter (src, dst);
 }
 
@@ -1018,12 +1018,12 @@ FilteredMatrix<VECTOR>::Tvmult (VECTOR& dst, const VECTOR& src) const
     {
       GrowingVectorMemory<VECTOR> mem;
       VECTOR* tmp_vector = mem.alloc();
-				       // first copy over src vector and
-				       // pre-filter
+                                       // first copy over src vector and
+                                       // pre-filter
       tmp_vector->reinit(src, true);
       *tmp_vector = src;
       pre_filter (*tmp_vector);
-				       // then let matrix do its work
+                                       // then let matrix do its work
       matrix->Tvmult (dst, *tmp_vector);
       mem.free(tmp_vector);
     }
@@ -1031,8 +1031,8 @@ FilteredMatrix<VECTOR>::Tvmult (VECTOR& dst, const VECTOR& src) const
     {
       matrix->Tvmult (dst, src);
     }
-  
-				   // finally do post-filtering
+
+                                   // finally do post-filtering
   post_filter (src, dst);
 }
 
@@ -1047,12 +1047,12 @@ FilteredMatrix<VECTOR>::vmult_add (VECTOR& dst, const VECTOR& src) const
     {
       GrowingVectorMemory<VECTOR> mem;
       VECTOR* tmp_vector = mem.alloc();
-				       // first copy over src vector and
-				       // pre-filter
+                                       // first copy over src vector and
+                                       // pre-filter
       tmp_vector->reinit(src, true);
       *tmp_vector = src;
       pre_filter (*tmp_vector);
-				       // then let matrix do its work
+                                       // then let matrix do its work
       matrix->vmult_add (dst, *tmp_vector);
       mem.free(tmp_vector);
     }
@@ -1060,8 +1060,8 @@ FilteredMatrix<VECTOR>::vmult_add (VECTOR& dst, const VECTOR& src) const
     {
       matrix->vmult_add (dst, src);
     }
-  
-				   // finally do post-filtering
+
+                                   // finally do post-filtering
   post_filter (src, dst);
 }
 
@@ -1076,12 +1076,12 @@ FilteredMatrix<VECTOR>::Tvmult_add (VECTOR& dst, const VECTOR& src) const
     {
       GrowingVectorMemory<VECTOR> mem;
       VECTOR* tmp_vector = mem.alloc();
-				       // first copy over src vector and
-				       // pre-filter
+                                       // first copy over src vector and
+                                       // pre-filter
       tmp_vector->reinit(src, true);
       *tmp_vector = src;
       pre_filter (*tmp_vector);
-				       // then let matrix do its work
+                                       // then let matrix do its work
       matrix->Tvmult_add (dst, *tmp_vector);
       mem.free(tmp_vector);
     }
@@ -1089,8 +1089,8 @@ FilteredMatrix<VECTOR>::Tvmult_add (VECTOR& dst, const VECTOR& src) const
     {
       matrix->Tvmult_add (dst, src);
     }
-  
-				   // finally do post-filtering
+
+                                   // finally do post-filtering
   post_filter (src, dst);
 }
 
@@ -1102,7 +1102,7 @@ std::size_t
 FilteredMatrix<VECTOR>::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (matrix) +
-	  MemoryConsumption::memory_consumption (constraints));
+          MemoryConsumption::memory_consumption (constraints));
 }
 
 

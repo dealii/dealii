@@ -2,7 +2,7 @@
 //    mg_transfer.templates.h,v 1.22 2006/01/29 15:03:55 guido Exp
 //    Version:
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -159,12 +159,12 @@ MGTransferSelect<number>::do_copy_from_mg (
   const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
     endc = mg_dof_handler.end();
 
-				   // traverse all cells and copy the
-				   // data appropriately to the output
-				   // vector
+                                   // traverse all cells and copy the
+                                   // data appropriately to the output
+                                   // vector
 
-				   // Note that the level is
-				   // monotonuosly increasing
+                                   // Note that the level is
+                                   // monotonuosly increasing
   dst = 0;
   for (; level_cell != endc; ++level_cell)
   {
@@ -196,12 +196,12 @@ MGTransferSelect<number>::do_copy_from_mg_add (
   const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
     endc = mg_dof_handler.end();
 
-				   // traverse all cells and copy the
-				   // data appropriately to the output
-				   // vector
+                                   // traverse all cells and copy the
+                                   // data appropriately to the output
+                                   // vector
 
-				   // Note that the level is
-				   // monotonuosly increasing
+                                   // Note that the level is
+                                   // monotonuosly increasing
   dst = 0;
   for (; level_cell != endc; ++level_cell)
     {
@@ -209,7 +209,7 @@ MGTransferSelect<number>::do_copy_from_mg_add (
       typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
       for (IT i=copy_to_and_from_indices[level].begin();
         i != copy_to_and_from_indices[level].end(); ++i)
-	      dst(i->first) += src[level](i->second);
+              dst(i->first) += src[level](i->second);
     }
 }
 

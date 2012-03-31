@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2007, 2008, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,9 +69,9 @@ DEAL_II_NAMESPACE_OPEN
  * former. Furthermore, this number has to match the number of computed
  * quantities, of course.
  *
- * 
+ *
  * <h3>Use in simpler cases</h3>
- * 
+ *
  * Deriving from the current class allows to implement very general postprocessors.
  * For example, in the step-32 program, we implement a postprocessor that
  * takes a solution that consists of velocity, pressure and temperature (dim+2
@@ -79,18 +79,18 @@ DEAL_II_NAMESPACE_OPEN
  * are vector valued and some of which are scalar. On the other hand,
  * in step-28 we implement a postprocessor that only computes the magnitude
  * of a complex number given by a two-component finite element. It seems silly
- * to have to implement four virtual functions for this 
+ * to have to implement four virtual functions for this
  * (compute_derived_quantities_scalar() or compute_derived_quantities_vector(),
  * get_names(), get_update_flags() and get_data_component_interpretation()).
- * 
- * To this end there are two classes DataPostprocessorScalar and 
+ *
+ * To this end there are two classes DataPostprocessorScalar and
  * DataPostprocessorVector that are meant to be used if the output quantity
  * is either a single scalar or a single vector (here used meaning to have
  * exactly dim components). When using these classes, one only has to write a
  * constructor that passes the name of the output variable and the update
  * flags to the constructor of the base class and overload the function
  * that actually computes the results.
- * 
+ *
  * @ingroup output
  * @author Tobias Leicht, 2007
  */
@@ -98,169 +98,169 @@ template <int dim>
 class DataPostprocessor: public Subscriptor
 {
   public:
-				     /**
-				      * Virtual desctructor for safety. Does not
-				      * do anything.
-				      */
+                                     /**
+                                      * Virtual desctructor for safety. Does not
+                                      * do anything.
+                                      */
     virtual ~DataPostprocessor ();
 
-				     /**
-				      * @deprecated
-				      *
-				      * This function only exists for backward
-				      * compatibility as this is the interface
-				      * provided by previous versions of the
-				      * library. The default implementation of
-				      * the other function of same name below
-				      * calls this function by simply dropping
-				      * the argument that denotes the
-				      * evaluation points. Since this function
-				      * might at one point go away, you should
-				      * overload the other function instead.
-				      */
+                                     /**
+                                      * @deprecated
+                                      *
+                                      * This function only exists for backward
+                                      * compatibility as this is the interface
+                                      * provided by previous versions of the
+                                      * library. The default implementation of
+                                      * the other function of same name below
+                                      * calls this function by simply dropping
+                                      * the argument that denotes the
+                                      * evaluation points. Since this function
+                                      * might at one point go away, you should
+                                      * overload the other function instead.
+                                      */
     virtual
     void
     compute_derived_quantities_scalar (const std::vector<double>         &uh,
-				       const std::vector<Tensor<1,dim> > &duh,
-				       const std::vector<Tensor<2,dim> > &dduh,
-				       const std::vector<Point<dim> >    &normals,
-				       std::vector<Vector<double> >      &computed_quantities) const;
+                                       const std::vector<Tensor<1,dim> > &duh,
+                                       const std::vector<Tensor<2,dim> > &dduh,
+                                       const std::vector<Point<dim> >    &normals,
+                                       std::vector<Vector<double> >      &computed_quantities) const;
 
-				     /**
-				      * This is the main function which actually
-				      * performs the postprocessing. The last
-				      * argument is a reference to the
-				      * postprocessed data which has correct
-				      * size already and must be filled by this
-				      * function. @p uh is a reference to a
-				      * vector of data values at all points, @p
-				      * duh the same for gradients, @p dduh for
-				      * second derivatives and @p normals is a
-				      * reference to the normal vectors. Note,
-				      * that the last four references will only
-				      * contain valid data, if the respective
-				      * flags are returned by @p
-				      * get_needed_update_flags, otherwise those
-				      * vectors will be in an unspecified
-				      * state. @p normals will always be an
-				      * empty vector when working on cells, not
-				      * on faces.
-				      *
-				      * This function is called when
-				      * the original data vector
-				      * represents scalar data,
-				      * i.e. the finite element in use
-				      * has only a single vector
-				      * component.
-				      */
+                                     /**
+                                      * This is the main function which actually
+                                      * performs the postprocessing. The last
+                                      * argument is a reference to the
+                                      * postprocessed data which has correct
+                                      * size already and must be filled by this
+                                      * function. @p uh is a reference to a
+                                      * vector of data values at all points, @p
+                                      * duh the same for gradients, @p dduh for
+                                      * second derivatives and @p normals is a
+                                      * reference to the normal vectors. Note,
+                                      * that the last four references will only
+                                      * contain valid data, if the respective
+                                      * flags are returned by @p
+                                      * get_needed_update_flags, otherwise those
+                                      * vectors will be in an unspecified
+                                      * state. @p normals will always be an
+                                      * empty vector when working on cells, not
+                                      * on faces.
+                                      *
+                                      * This function is called when
+                                      * the original data vector
+                                      * represents scalar data,
+                                      * i.e. the finite element in use
+                                      * has only a single vector
+                                      * component.
+                                      */
     virtual
     void
     compute_derived_quantities_scalar (const std::vector<double>         &uh,
-				       const std::vector<Tensor<1,dim> > &duh,
-				       const std::vector<Tensor<2,dim> > &dduh,
-				       const std::vector<Point<dim> >    &normals,
-				       const std::vector<Point<dim> >    &evaluation_points,
-				       std::vector<Vector<double> >      &computed_quantities) const;
+                                       const std::vector<Tensor<1,dim> > &duh,
+                                       const std::vector<Tensor<2,dim> > &dduh,
+                                       const std::vector<Point<dim> >    &normals,
+                                       const std::vector<Point<dim> >    &evaluation_points,
+                                       std::vector<Vector<double> >      &computed_quantities) const;
 
-				     /**
-				      * @deprecated
-				      *
-				      * This function only exists for backward
-				      * compatibility as this is the interface
-				      * provided by previous versions of the
-				      * library. The default implementation of
-				      * the other function of same name below
-				      * calls this function by simply dropping
-				      * the argument that denotes the
-				      * evaluation points. Since this function
-				      * might at one point go away, you should
-				      * overload the other function instead.
-				      */
+                                     /**
+                                      * @deprecated
+                                      *
+                                      * This function only exists for backward
+                                      * compatibility as this is the interface
+                                      * provided by previous versions of the
+                                      * library. The default implementation of
+                                      * the other function of same name below
+                                      * calls this function by simply dropping
+                                      * the argument that denotes the
+                                      * evaluation points. Since this function
+                                      * might at one point go away, you should
+                                      * overload the other function instead.
+                                      */
     virtual
     void
     compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-				       const std::vector<std::vector<Tensor<1,dim> > > &duh,
-				       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-				       const std::vector<Point<dim> >                  &normals,
-				       std::vector<Vector<double> >                    &computed_quantities) const;
+                                       const std::vector<std::vector<Tensor<1,dim> > > &duh,
+                                       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+                                       const std::vector<Point<dim> >                  &normals,
+                                       std::vector<Vector<double> >                    &computed_quantities) const;
 
-				     /**
-				      * Same as the
-				      * compute_derived_quantities_scalar()
-				      * function, but this function is called
-				      * when the original data vector
-				      * represents vector data, i.e. the
-				      * finite element in use has multiple
-				      * vector components.
-				      */
+                                     /**
+                                      * Same as the
+                                      * compute_derived_quantities_scalar()
+                                      * function, but this function is called
+                                      * when the original data vector
+                                      * represents vector data, i.e. the
+                                      * finite element in use has multiple
+                                      * vector components.
+                                      */
     virtual
     void
     compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-				       const std::vector<std::vector<Tensor<1,dim> > > &duh,
-				       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-				       const std::vector<Point<dim> >                  &normals,
-				       const std::vector<Point<dim> >                  &evaluation_points,
-				       std::vector<Vector<double> >                    &computed_quantities) const;
+                                       const std::vector<std::vector<Tensor<1,dim> > > &duh,
+                                       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+                                       const std::vector<Point<dim> >                  &normals,
+                                       const std::vector<Point<dim> >                  &evaluation_points,
+                                       std::vector<Vector<double> >                    &computed_quantities) const;
 
-				     /**
-				      * Return the vector of strings describing
-				      * the names of the computed quantities.
-				      */
+                                     /**
+                                      * Return the vector of strings describing
+                                      * the names of the computed quantities.
+                                      */
     virtual std::vector<std::string> get_names () const = 0;
 
-				     /**
-				      * This functions returns
-				      * information about how the
-				      * individual components of
-				      * output files that consist of
-				      * more than one data set are to
-				      * be interpreted.
-				      *
-				      * For example, if one has a finite
-				      * element for the Stokes equations in
-				      * 2d, representing components (u,v,p),
-				      * one would like to indicate that the
-				      * first two, u and v, represent a
-				      * logical vector so that later on when
-				      * we generate graphical output we can
-				      * hand them off to a visualization
-				      * program that will automatically know
-				      * to render them as a vector field,
-				      * rather than as two separate and
-				      * independent scalar fields.
-				      *
-				      * The default implementation of this
-				      * function returns a vector of values
-				      * DataComponentInterpretation::component_is_scalar,
-				      * indicating that all output components
-				      * are independent scalar
-				      * fields. However, if a derived class
-				      * produces data that represents vectors,
-				      * it may return a vector that contains
-				      * values
-				      * DataComponentInterpretation::component_is_part_of_vector. In
-				      * the example above, one would return a
-				      * vector with components
-				      * (DataComponentInterpretation::component_is_part_of_vector,
-				      * DataComponentInterpretation::component_is_part_of_vector,
-				      * DataComponentInterpretation::component_is_scalar)
-				      * for (u,v,p).
-				      */
+                                     /**
+                                      * This functions returns
+                                      * information about how the
+                                      * individual components of
+                                      * output files that consist of
+                                      * more than one data set are to
+                                      * be interpreted.
+                                      *
+                                      * For example, if one has a finite
+                                      * element for the Stokes equations in
+                                      * 2d, representing components (u,v,p),
+                                      * one would like to indicate that the
+                                      * first two, u and v, represent a
+                                      * logical vector so that later on when
+                                      * we generate graphical output we can
+                                      * hand them off to a visualization
+                                      * program that will automatically know
+                                      * to render them as a vector field,
+                                      * rather than as two separate and
+                                      * independent scalar fields.
+                                      *
+                                      * The default implementation of this
+                                      * function returns a vector of values
+                                      * DataComponentInterpretation::component_is_scalar,
+                                      * indicating that all output components
+                                      * are independent scalar
+                                      * fields. However, if a derived class
+                                      * produces data that represents vectors,
+                                      * it may return a vector that contains
+                                      * values
+                                      * DataComponentInterpretation::component_is_part_of_vector. In
+                                      * the example above, one would return a
+                                      * vector with components
+                                      * (DataComponentInterpretation::component_is_part_of_vector,
+                                      * DataComponentInterpretation::component_is_part_of_vector,
+                                      * DataComponentInterpretation::component_is_scalar)
+                                      * for (u,v,p).
+                                      */
     virtual
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     get_data_component_interpretation () const;
 
-				     /**
-				      * Return, which data has to be provided to
-				      * compute the derived quantities. This has
-				      * to be a combination of @p update_values,
-				      * @p update_gradients and @p
-				      * update_hessians. If the
-				      * DataPostprocessor is to be used in
-				      * combination with DataOutFaces, you may
-				      * also ask for a update of normals via the
-				      * @p update_normal_vectors flag.
-				      */
+                                     /**
+                                      * Return, which data has to be provided to
+                                      * compute the derived quantities. This has
+                                      * to be a combination of @p update_values,
+                                      * @p update_gradients and @p
+                                      * update_hessians. If the
+                                      * DataPostprocessor is to be used in
+                                      * combination with DataOutFaces, you may
+                                      * also ask for a update of normals via the
+                                      * @p update_normal_vectors flag.
+                                      */
     virtual UpdateFlags get_needed_update_flags () const = 0;
 };
 
@@ -275,13 +275,13 @@ class DataPostprocessor: public Subscriptor
  * be and we pass the values returned by get_names() and get_needed_update_flags()
  * to the constructor so that derived classes do not have to implement these
  * functions by hand.
- * 
+ *
  * All derived classes have to do is implement a constructor and overload
- * either DataPostprocessor::compute_derived_quantities_scalar() or 
+ * either DataPostprocessor::compute_derived_quantities_scalar() or
  * DataPostprocessor::compute_derived_quantities_vector().
- * 
+ *
  * An example of how this class can be used can be found in step-29.
- * 
+ *
  * @ingroup output
  * @author Wolfgang Bangerth, 2011
  */
@@ -307,40 +307,40 @@ public:
    * @p update_normal_vectors flag.
    **/
   DataPostprocessorScalar (const std::string &name,
-			   const UpdateFlags  update_flags);
-  
-				     /**
-				      * Return the vector of strings describing
-				      * the names of the computed quantities.
-				      * Given the purpose of this class, this
-				      * is a vector with a single entry equal
-				      * to the name given to the constructor.
-				      */
+                           const UpdateFlags  update_flags);
+
+                                     /**
+                                      * Return the vector of strings describing
+                                      * the names of the computed quantities.
+                                      * Given the purpose of this class, this
+                                      * is a vector with a single entry equal
+                                      * to the name given to the constructor.
+                                      */
     virtual std::vector<std::string> get_names () const;
 
-				     /**
-				      * This functions returns
-				      * information about how the
-				      * individual components of
-				      * output files that consist of
-				      * more than one data set are to
-				      * be interpreted. Since the current
-				      * class is meant to be used for a
-				      * single scalar result variable,
-				      * the returned value is obviously
-				      * DataComponentInterpretation::component_is_scalar.
-				      */
+                                     /**
+                                      * This functions returns
+                                      * information about how the
+                                      * individual components of
+                                      * output files that consist of
+                                      * more than one data set are to
+                                      * be interpreted. Since the current
+                                      * class is meant to be used for a
+                                      * single scalar result variable,
+                                      * the returned value is obviously
+                                      * DataComponentInterpretation::component_is_scalar.
+                                      */
     virtual
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     get_data_component_interpretation () const;
 
-				     /**
-				      * Return, which data has to be provided to
-				      * compute the derived quantities.
-				      * The flags returned here are the ones
-				      * passed to the constructor of this
-				      * class.
-				      */
+                                     /**
+                                      * Return, which data has to be provided to
+                                      * compute the derived quantities.
+                                      * The flags returned here are the ones
+                                      * passed to the constructor of this
+                                      * class.
+                                      */
     virtual UpdateFlags get_needed_update_flags () const;
 
 private:
@@ -364,14 +364,14 @@ private:
  * be and we pass the values returned by get_names() and get_needed_update_flags()
  * to the constructor so that derived classes do not have to implement these
  * functions by hand.
- * 
+ *
  * All derived classes have to do is implement a constructor and overload
- * either DataPostprocessor::compute_derived_quantities_scalar() or 
+ * either DataPostprocessor::compute_derived_quantities_scalar() or
  * DataPostprocessor::compute_derived_quantities_vector().
- * 
+ *
  * An example of how the closely related class DataPostprocessorScalar is
  * used can be found in step-29.
- * 
+ *
  * @ingroup output
  * @author Wolfgang Bangerth, 2011
  */
@@ -397,41 +397,41 @@ public:
    * @p update_normal_vectors flag.
    **/
   DataPostprocessorVector (const std::string &name,
-			   const UpdateFlags  update_flags);
-  
-				     /**
-				      * Return the vector of strings describing
-				      * the names of the computed quantities.
-				      * Given the purpose of this class, this
-				      * is a vector with dim entries all equal
-				      * to the name given to the constructor.
-				      */
+                           const UpdateFlags  update_flags);
+
+                                     /**
+                                      * Return the vector of strings describing
+                                      * the names of the computed quantities.
+                                      * Given the purpose of this class, this
+                                      * is a vector with dim entries all equal
+                                      * to the name given to the constructor.
+                                      */
     virtual std::vector<std::string> get_names () const;
 
-				     /**
-				      * This functions returns
-				      * information about how the
-				      * individual components of
-				      * output files that consist of
-				      * more than one data set are to
-				      * be interpreted. Since the current
-				      * class is meant to be used for a
-				      * single vector result variable,
-				      * the returned value is obviously
-				      * DataComponentInterpretation::component_is_part
-				      * repeated dim times.
-				      */
+                                     /**
+                                      * This functions returns
+                                      * information about how the
+                                      * individual components of
+                                      * output files that consist of
+                                      * more than one data set are to
+                                      * be interpreted. Since the current
+                                      * class is meant to be used for a
+                                      * single vector result variable,
+                                      * the returned value is obviously
+                                      * DataComponentInterpretation::component_is_part
+                                      * repeated dim times.
+                                      */
     virtual
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     get_data_component_interpretation () const;
 
-				     /**
-				      * Return which data has to be provided to
-				      * compute the derived quantities.
-				      * The flags returned here are the ones
-				      * passed to the constructor of this
-				      * class.
-				      */
+                                     /**
+                                      * Return which data has to be provided to
+                                      * compute the derived quantities.
+                                      * The flags returned here are the ones
+                                      * passed to the constructor of this
+                                      * class.
+                                      */
     virtual UpdateFlags get_needed_update_flags () const;
 
 private:

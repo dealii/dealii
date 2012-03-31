@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2006, 2008, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,7 +34,7 @@ namespace internal
   namespace hp
   {
 
-/**    
+/**
  *
  * <h4>DoFFaces</h4>
  *
@@ -70,13 +70,13 @@ namespace internal
     template<int dim>
     class DoFFaces
     {
-					 /**
-					  * Make the constrctor private to prevent the use
-					  * of this template, only the specializations
-					  * should be used
-					  */
+                                         /**
+                                          * Make the constrctor private to prevent the use
+                                          * of this template, only the specializations
+                                          * should be used
+                                          */
       private:
-	DoFFaces();
+        DoFFaces();
     };
 
 /**
@@ -90,7 +90,7 @@ namespace internal
     class DoFFaces<1>
     {
       public:
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
@@ -108,9 +108,9 @@ namespace internal
     class DoFFaces<2>
     {
       public:
-	internal::hp::DoFObjects<1> lines;
+        internal::hp::DoFObjects<1> lines;
 
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
@@ -129,19 +129,19 @@ namespace internal
     class DoFFaces<3>
     {
       public:
-	internal::hp::DoFObjects<1> lines;
-	internal::hp::DoFObjects<2> quads;
+        internal::hp::DoFObjects<1> lines;
+        internal::hp::DoFObjects<2> quads;
 
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
     };
-    
+
   } // namespace hp
-  
+
 } // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

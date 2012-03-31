@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -76,59 +76,59 @@ template <class VECTOR>
 class IterativeInverse : public Subscriptor
 {
   public:
-				     /**
-				      * Initialization
-				      * function. Provide a matrix and
-				      * preconditioner for th solve in
-				      * vmult().
-				      */
+                                     /**
+                                      * Initialization
+                                      * function. Provide a matrix and
+                                      * preconditioner for th solve in
+                                      * vmult().
+                                      */
     template <class MATRIX, class PRECONDITION>
     void initialize (const MATRIX&, const PRECONDITION&);
 
-				     /**
-				      * Delete the pointers to matrix
-				      * and preconditioner.
-				      */
+                                     /**
+                                      * Delete the pointers to matrix
+                                      * and preconditioner.
+                                      */
     void clear();
 
-				     /**
-				      * Solve for right hand side <tt>src</tt>.
-				      */
+                                     /**
+                                      * Solve for right hand side <tt>src</tt>.
+                                      */
     void vmult (VECTOR& dst, const VECTOR& src) const;
 
-				     /**
-				      * Solve the transposed system
-				      * for right hand side
-				      * <tt>src</tt>.
-				      */
+                                     /**
+                                      * Solve the transposed system
+                                      * for right hand side
+                                      * <tt>src</tt>.
+                                      */
 //    void Tvmult (VECTOR& dst, const VECTOR& src) const;
 
-				     /**
-				      * The solver, which allows
-				      * selection of the actual solver
-				      * as well as adjuxtment of
-				      * parameters.
-				      */
+                                     /**
+                                      * The solver, which allows
+                                      * selection of the actual solver
+                                      * as well as adjuxtment of
+                                      * parameters.
+                                      */
     SolverSelector<VECTOR> solver;
 
   private:
-				     /**
-				      * The matrix in use.
-				      */
+                                     /**
+                                      * The matrix in use.
+                                      */
     std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
 
-				     /**
-				      * The preconditioner to use.
-				      */
+                                     /**
+                                      * The preconditioner to use.
+                                      */
     std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > preconditioner;
-				     /**
-				      * The transpose of the matrix in use.
-				      */
+                                     /**
+                                      * The transpose of the matrix in use.
+                                      */
     std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_matrix;
 
-				     /**
-				      * The transpose of the preconditioner to use.
-				      */
+                                     /**
+                                      * The transpose of the preconditioner to use.
+                                      */
     std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_preconditioner;
 };
 
@@ -139,7 +139,7 @@ inline
 void
 IterativeInverse<VECTOR>::initialize(const MATRIX& m, const PRECONDITION& p)
 {
-				   // dummy variable
+                                   // dummy variable
   VECTOR* v = 0;
   matrix = std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(m, *v));
   preconditioner = std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(p, *v));

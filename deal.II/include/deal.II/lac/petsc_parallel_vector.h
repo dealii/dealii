@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,7 +46,7 @@ namespace PETScWrappers
  */
   namespace MPI
   {
-    
+
 /**
  * Implementation of a parallel vector class based on PETSC and using MPI
  * communication to synchronise distributed operations. All the functionality
@@ -158,7 +158,7 @@ namespace PETScWrappers
                                           * vector as empty.
                                           */
         Vector ();
-      
+
                                          /**
                                           * Constructor. Set dimension to
                                           * @p n and initialize all
@@ -172,7 +172,7 @@ namespace PETScWrappers
                                           * communicator over which the
                                           * different parts of the vector
                                           * shall communicate
-                                          * 
+                                          *
                                           * The constructor is made explicit
                                           * to avoid accidents like this:
                                           * <tt>v=0;</tt>. Presumably, the user
@@ -187,13 +187,13 @@ namespace PETScWrappers
                          const unsigned int  n,
                          const unsigned int  local_size);
 
-	
+
                                          /**
                                           * Copy-constructor from deal.II
                                           * vectors. Sets the dimension to that
                                           * of the given vector, and copies all
                                           * elements.
-                                          * 
+                                          *
                                           * @arg local_size denotes the size
                                           * of the chunk that shall be stored
                                           * on the present process.
@@ -208,12 +208,12 @@ namespace PETScWrappers
                          const dealii::Vector<Number> &v,
                          const unsigned int      local_size);
 
-	
+
                                          /**
                                           * Copy-constructor the
                                           * values from a PETSc wrapper vector
                                           * class.
-                                          * 
+                                          *
                                           * @arg local_size denotes the size
                                           * of the chunk that shall be stored
                                           * on the present process.
@@ -228,29 +228,29 @@ namespace PETScWrappers
                          const unsigned int  local_size);
 
 
-					 /**
-					  * Constructs a new parallel PETSc
-					  * vector from an Indexset. Note that
-					  * @p local must be contiguous and
-					  * the global size of the vector is
-					  * determined by local.size(). The
-					  * global indices in @p ghost are
-					  * supplied as ghost indices that can
-					  * also be read locally.
-					  *
-					  * Note that the @p ghost IndexSet
-					  * may be empty and that any indices
-					  * already contained in @p local are
-					  * ignored during construction. That
-					  * way, the ghost parameter can equal
-					  * the set of locally relevant
-					  * degrees of freedom, see step-32.
-					  */
-	explicit Vector (const MPI_Comm     &communicator,
+                                         /**
+                                          * Constructs a new parallel PETSc
+                                          * vector from an Indexset. Note that
+                                          * @p local must be contiguous and
+                                          * the global size of the vector is
+                                          * determined by local.size(). The
+                                          * global indices in @p ghost are
+                                          * supplied as ghost indices that can
+                                          * also be read locally.
+                                          *
+                                          * Note that the @p ghost IndexSet
+                                          * may be empty and that any indices
+                                          * already contained in @p local are
+                                          * ignored during construction. That
+                                          * way, the ghost parameter can equal
+                                          * the set of locally relevant
+                                          * degrees of freedom, see step-32.
+                                          */
+        explicit Vector (const MPI_Comm     &communicator,
                          const IndexSet &  local,
                          const IndexSet & ghost = IndexSet(0));
-	
-	
+
+
                                          /**
                                           * Copy the given vector. Resize the
                                           * present vector if necessary. Also
@@ -259,43 +259,43 @@ namespace PETScWrappers
                                           */
         Vector & operator = (const Vector &v);
 
-	
+
                                          /**
-					  * Copy the given sequential
-					  * (non-distributed) vector
-					  * into the present parallel
-					  * vector. It is assumed that
-					  * they have the same size,
-					  * and this operation does
-					  * not change the
-					  * partitioning of the
-					  * parallel vector by which
-					  * its elements are
-					  * distributed across several
-					  * MPI processes. What this
-					  * operation therefore does
-					  * is to copy that chunk of
-					  * the given vector @p v that
-					  * corresponds to elements of
-					  * the target vector that are
-					  * stored locally, and copies
-					  * them. Elements that are
-					  * not stored locally are not
-					  * touched.
-					  *
-					  * This being a parallel
-					  * vector, you must make sure
-					  * that @em all processes
-					  * call this function at the
-					  * same time. It is not
-					  * possible to change the
-					  * local part of a parallel
-					  * vector on only one
-					  * process, independent of
-					  * what other processes do,
-					  * with this function.
-					  */
-	Vector & operator = (const PETScWrappers::Vector &v);
+                                          * Copy the given sequential
+                                          * (non-distributed) vector
+                                          * into the present parallel
+                                          * vector. It is assumed that
+                                          * they have the same size,
+                                          * and this operation does
+                                          * not change the
+                                          * partitioning of the
+                                          * parallel vector by which
+                                          * its elements are
+                                          * distributed across several
+                                          * MPI processes. What this
+                                          * operation therefore does
+                                          * is to copy that chunk of
+                                          * the given vector @p v that
+                                          * corresponds to elements of
+                                          * the target vector that are
+                                          * stored locally, and copies
+                                          * them. Elements that are
+                                          * not stored locally are not
+                                          * touched.
+                                          *
+                                          * This being a parallel
+                                          * vector, you must make sure
+                                          * that @em all processes
+                                          * call this function at the
+                                          * same time. It is not
+                                          * possible to change the
+                                          * local part of a parallel
+                                          * vector on only one
+                                          * process, independent of
+                                          * what other processes do,
+                                          * with this function.
+                                          */
+        Vector & operator = (const PETScWrappers::Vector &v);
 
                                          /**
                                           * Set all components of the vector to
@@ -346,17 +346,17 @@ namespace PETScWrappers
                                           * @p communicator denotes the MPI
                                           * communicator henceforth to be used
                                           * for this vector.
-                                          * 
+                                          *
                                           * If @p fast is false, the vector
                                           * is filled by zeros. Otherwise, the
                                           * elements are left an unspecified
                                           * state.
-                                          */ 
+                                          */
         void reinit (const MPI_Comm     &communicator,
                      const unsigned int  N,
                      const unsigned int  local_size,
                      const bool          fast = false);
-    
+
                                          /**
                                           * Change the dimension to that of
                                           * the vector @p v, and also take
@@ -374,16 +374,16 @@ namespace PETScWrappers
         void reinit (const Vector &v,
                      const bool    fast = false);
 
-					 /**
-					  * Reinit as a ghosted vector. See
-					  * constructor with same signature
-					  * for more details.
-					  */
-	void reinit (const MPI_Comm     &communicator,
+                                         /**
+                                          * Reinit as a ghosted vector. See
+                                          * constructor with same signature
+                                          * for more details.
+                                          */
+        void reinit (const MPI_Comm     &communicator,
                      const IndexSet &  local,
                      const IndexSet & ghost = IndexSet(0));
 
-	
+
                                          /**
                                           * Return a reference to the MPI
                                           * communicator object in use with
@@ -406,18 +406,18 @@ namespace PETScWrappers
 
 
 
-					 /**
-					  * Create a vector of global length
-					  * @p n, local size @p local_size and
-					  * with the specified ghost
-					  * indices. Note that you need to
-					  * call update_ghost_values() before
-					  * accessing those.
-					  */
-	virtual void create_vector (const unsigned int  n,
-				    const unsigned int  local_size,
-				    const IndexSet & ghostnodes);
-	
+                                         /**
+                                          * Create a vector of global length
+                                          * @p n, local size @p local_size and
+                                          * with the specified ghost
+                                          * indices. Note that you need to
+                                          * call update_ghost_values() before
+                                          * accessing those.
+                                          */
+        virtual void create_vector (const unsigned int  n,
+                                    const unsigned int  local_size,
+                                    const IndexSet & ghostnodes);
+
 
       private:
                                          /**
@@ -460,8 +460,8 @@ namespace PETScWrappers
       *this = v;
     }
 
-  
-  
+
+
     inline
     Vector &
     Vector::operator = (const PetscScalar s)
@@ -470,7 +470,7 @@ namespace PETScWrappers
 
       return *this;
     }
-  
+
 
 
     inline
@@ -481,10 +481,10 @@ namespace PETScWrappers
                                        // then first resize the present one
       if (size() != v.size())
         reinit (v.communicator, v.size(), v.local_size(), true);
-    
+
       const int ierr = VecCopy (v.vector, vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
       return *this;
     }
 
@@ -493,7 +493,7 @@ namespace PETScWrappers
     template <typename number>
     inline
     Vector &
-    Vector::operator = (const dealii::Vector<number> &v) 
+    Vector::operator = (const dealii::Vector<number> &v)
     {
       Assert (size() == v.size(),
               ExcDimensionMismatch (size(), v.size()));

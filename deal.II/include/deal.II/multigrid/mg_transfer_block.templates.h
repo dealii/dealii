@@ -2,7 +2,7 @@
 //    mg_transfer.templates.h,v 1.22 2006/01/29 15:03:55 guido Exp
 //    Version:
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,7 +44,7 @@ MGTransferBlockSelect<number>::copy_from_mg (
 {
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
     for (IT i= copy_indices[selected_block][level].begin();
-	 i != copy_indices[selected_block][level].end();++i)
+         i != copy_indices[selected_block][level].end();++i)
       dst.block(selected_block)(i->first) = src[level](i->second);
 }
 
@@ -60,7 +60,7 @@ MGTransferBlockSelect<number>::copy_from_mg (
 {
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
     for (IT i= copy_indices[selected_block][level].begin();
-	 i != copy_indices[selected_block][level].end();++i)
+         i != copy_indices[selected_block][level].end();++i)
       dst(i->first) = src[level](i->second);
 }
 
@@ -76,7 +76,7 @@ MGTransferBlockSelect<number>::copy_from_mg_add (
 {
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
     for (IT i= copy_indices[selected_block][level].begin();
-	 i != copy_indices[selected_block][level].end();++i)
+         i != copy_indices[selected_block][level].end();++i)
       dst.block(selected_block)(i->first) += src[level](i->second);
 }
 
@@ -92,7 +92,7 @@ MGTransferBlockSelect<number>::copy_from_mg_add (
 {
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
     for (IT i= copy_indices[selected_block][level].begin();
-	 i != copy_indices[selected_block][level].end();++i)
+         i != copy_indices[selected_block][level].end();++i)
       dst(i->first) += src[level](i->second);
 }
 
@@ -121,9 +121,9 @@ MGTransferBlock<number>::copy_from_mg (
   for (unsigned int block=0;block<selected.size();++block)
     if (selected[block])
       for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
-	for (IT i= copy_indices[block][level].begin();
-	     i != copy_indices[block][level].end();++i)
-	  dst.block(block)(i->first) = src[level].block(mg_block[block])(i->second);
+        for (IT i= copy_indices[block][level].begin();
+             i != copy_indices[block][level].end();++i)
+          dst.block(block)(i->first) = src[level].block(mg_block[block])(i->second);
 }
 
 
@@ -139,9 +139,9 @@ MGTransferBlock<number>::copy_from_mg_add (
   for (unsigned int block=0;block<selected.size();++block)
     if (selected[block])
       for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
-	for (IT i= copy_indices[block][level].begin();
-	     i != copy_indices[block][level].end();++i)
-	  dst.block(block)(i->first) += src[level].block(mg_block[block])(i->second);
+        for (IT i= copy_indices[block][level].begin();
+             i != copy_indices[block][level].end();++i)
+          dst.block(block)(i->first) += src[level].block(mg_block[block])(i->second);
 }
 
 DEAL_II_NAMESPACE_CLOSE

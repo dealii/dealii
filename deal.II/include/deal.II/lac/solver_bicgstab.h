@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,187 +62,187 @@ template <class VECTOR = Vector<double> >
 class SolverBicgstab : public Solver<VECTOR>
 {
   public:
-    				     /**
-				      * There are two possibilities to
-				      * compute the residual: one is an
-				      * estimate using the computed value @p
-				      * tau. The other is exact computation
-				      * using another matrix vector
-				      * multiplication. This increases the
-				      * costs of the algorithm, so it is
-				      * should be set to false whenever the
-				      * problem allows it.
-				      *
-				      * Bicgstab is susceptible to breakdowns, so
-				      * we need a parameter telling us, which
-				      * numbers are considered zero.
-				      */
+                                     /**
+                                      * There are two possibilities to
+                                      * compute the residual: one is an
+                                      * estimate using the computed value @p
+                                      * tau. The other is exact computation
+                                      * using another matrix vector
+                                      * multiplication. This increases the
+                                      * costs of the algorithm, so it is
+                                      * should be set to false whenever the
+                                      * problem allows it.
+                                      *
+                                      * Bicgstab is susceptible to breakdowns, so
+                                      * we need a parameter telling us, which
+                                      * numbers are considered zero.
+                                      */
     struct AdditionalData
     {
-					 /**
-					  * Constructor.
-					  *
-					  * The default is to perform an
-					  * exact residual computation and
-					  * breakdown parameter 1e-10.
-					  */
-	AdditionalData(const bool   exact_residual = true,
-		       const double breakdown      = 1.e-10) :
-			exact_residual(exact_residual),
-			breakdown(breakdown)
-	  {}
-					 /**
-					  * Flag for exact computation of residual.
-					  */
-	bool exact_residual;
-					 /**
-					  * Breakdown threshold.
-					  */
-	double breakdown;
+                                         /**
+                                          * Constructor.
+                                          *
+                                          * The default is to perform an
+                                          * exact residual computation and
+                                          * breakdown parameter 1e-10.
+                                          */
+        AdditionalData(const bool   exact_residual = true,
+                       const double breakdown      = 1.e-10) :
+                        exact_residual(exact_residual),
+                        breakdown(breakdown)
+          {}
+                                         /**
+                                          * Flag for exact computation of residual.
+                                          */
+        bool exact_residual;
+                                         /**
+                                          * Breakdown threshold.
+                                          */
+        double breakdown;
     };
 
-				     /**
-				      * Constructor.
-				      */
+                                     /**
+                                      * Constructor.
+                                      */
     SolverBicgstab (SolverControl        &cn,
-		    VectorMemory<VECTOR> &mem,
-		    const AdditionalData &data=AdditionalData());
+                    VectorMemory<VECTOR> &mem,
+                    const AdditionalData &data=AdditionalData());
 
-				     /**
-				      * Constructor. Use an object of
-				      * type GrowingVectorMemory as
-				      * a default to allocate memory.
-				      */
+                                     /**
+                                      * Constructor. Use an object of
+                                      * type GrowingVectorMemory as
+                                      * a default to allocate memory.
+                                      */
     SolverBicgstab (SolverControl        &cn,
-		    const AdditionalData &data=AdditionalData());
-    
-				     /**
-				      * Virtual destructor.
-				      */
+                    const AdditionalData &data=AdditionalData());
+
+                                     /**
+                                      * Virtual destructor.
+                                      */
     virtual ~SolverBicgstab ();
 
-				     /**
-				      * Solve primal problem only.
-				      */
+                                     /**
+                                      * Solve primal problem only.
+                                      */
     template<class MATRIX, class PRECONDITIONER>
     void
     solve (const MATRIX &A,
-	   VECTOR       &x,
-	   const VECTOR &b,
-	   const PRECONDITIONER& precondition);
+           VECTOR       &x,
+           const VECTOR &b,
+           const PRECONDITIONER& precondition);
 
   protected:
-				     /**
-				      * Computation of the stopping criterion.
-				      */
+                                     /**
+                                      * Computation of the stopping criterion.
+                                      */
     template <class MATRIX>
     double criterion (const MATRIX& A, const VECTOR& x, const VECTOR& b);
 
-				     /**
-				      * Interface for derived class.
-				      * This function gets the current
-				      * iteration vector, the residual
-				      * and the update vector in each
-				      * step. It can be used for a
-				      * graphical output of the
-				      * convergence history.
-				      */
+                                     /**
+                                      * Interface for derived class.
+                                      * This function gets the current
+                                      * iteration vector, the residual
+                                      * and the update vector in each
+                                      * step. It can be used for a
+                                      * graphical output of the
+                                      * convergence history.
+                                      */
     virtual void print_vectors(const unsigned int step,
-			       const VECTOR& x,
-			       const VECTOR& r,
-			       const VECTOR& d) const;
+                               const VECTOR& x,
+                               const VECTOR& r,
+                               const VECTOR& d) const;
 
-				     /**
-				      * Auxiliary vector.
-				      */
+                                     /**
+                                      * Auxiliary vector.
+                                      */
     VECTOR *Vx;
-				     /**
-				      * Auxiliary vector.
-				      */
+                                     /**
+                                      * Auxiliary vector.
+                                      */
     VECTOR *Vr;
-				     /**
-				      * Auxiliary vector.
-				      */
+                                     /**
+                                      * Auxiliary vector.
+                                      */
     VECTOR *Vrbar;
-				     /**
-				      * Auxiliary vector.
-				      */
+                                     /**
+                                      * Auxiliary vector.
+                                      */
     VECTOR *Vp;
-				     /**
-				      * Auxiliary vector.
-				      */
+                                     /**
+                                      * Auxiliary vector.
+                                      */
     VECTOR *Vy;
-				     /**
-				      * Auxiliary vector.
-				      */
+                                     /**
+                                      * Auxiliary vector.
+                                      */
     VECTOR *Vz;
-				     /**
-				      * Auxiliary vector.
-				      */
+                                     /**
+                                      * Auxiliary vector.
+                                      */
     VECTOR *Vs;
-				     /**
-				      * Auxiliary vector.
-				      */
+                                     /**
+                                      * Auxiliary vector.
+                                      */
     VECTOR *Vt;
-				     /**
-				      * Auxiliary vector.
-				      */
+                                     /**
+                                      * Auxiliary vector.
+                                      */
     VECTOR *Vv;
-				     /**
-				      * Right hand side vector.
-				      */
+                                     /**
+                                      * Right hand side vector.
+                                      */
     const VECTOR *Vb;
-  
-				     /**
-				      * Auxiliary value.
-				      */
+
+                                     /**
+                                      * Auxiliary value.
+                                      */
     double alpha;
-				     /**
-				      * Auxiliary value.
-				      */
+                                     /**
+                                      * Auxiliary value.
+                                      */
     double beta;
-				     /**
-				      * Auxiliary value.
-				      */
+                                     /**
+                                      * Auxiliary value.
+                                      */
     double omega;
-				     /**
-				      * Auxiliary value.
-				      */
+                                     /**
+                                      * Auxiliary value.
+                                      */
     double rho;
-				     /**
-				      * Auxiliary value.
-				      */
+                                     /**
+                                      * Auxiliary value.
+                                      */
     double rhobar;
-  
-				     /**
-				      * Current iteration step.
-				      */
+
+                                     /**
+                                      * Current iteration step.
+                                      */
     unsigned int step;
-  
-				     /**
-				      * Residual.
-				      */
+
+                                     /**
+                                      * Residual.
+                                      */
     double res;
 
-				     /**
-				      * Additional parameters.
-				      */
+                                     /**
+                                      * Additional parameters.
+                                      */
     AdditionalData additional_data;
-  
+
   private:
-				     /**
-				      * Everything before the iteration loop.
-				      */
+                                     /**
+                                      * Everything before the iteration loop.
+                                      */
     template <class MATRIX>
     SolverControl::State start(const MATRIX& A);
 
-				     /**
-				      * The iteration loop itself.
-				      */
+                                     /**
+                                      * The iteration loop itself.
+                                      */
     template<class MATRIX, class PRECONDITIONER>
     bool
     iterate(const MATRIX& A, const PRECONDITIONER& precondition);
-  
+
 };
 
 /*@}*/
@@ -252,21 +252,21 @@ class SolverBicgstab : public Solver<VECTOR>
 
 template<class VECTOR>
 SolverBicgstab<VECTOR>::SolverBicgstab (SolverControl &cn,
-					VectorMemory<VECTOR> &mem,
-					const AdditionalData &data)
-		:
-		Solver<VECTOR>(cn,mem),
-		additional_data(data)
+                                        VectorMemory<VECTOR> &mem,
+                                        const AdditionalData &data)
+                :
+                Solver<VECTOR>(cn,mem),
+                additional_data(data)
 {}
 
 
 
 template<class VECTOR>
 SolverBicgstab<VECTOR>::SolverBicgstab (SolverControl &cn,
-					const AdditionalData &data)
-		:
-		Solver<VECTOR>(cn),
-		additional_data(data)
+                                        const AdditionalData &data)
+                :
+                Solver<VECTOR>(cn),
+                additional_data(data)
 {}
 
 
@@ -285,7 +285,7 @@ SolverBicgstab<VECTOR>::criterion (const MATRIX& A, const VECTOR& x, const VECTO
   A.vmult(*Vt, x);
   Vt->sadd(-1.,1.,b);
   res = Vt->l2_norm();
-  
+
   return res;
 }
 
@@ -299,7 +299,7 @@ SolverBicgstab<VECTOR>::start(const MATRIX& A)
   A.vmult(*Vr, *Vx);
   Vr->sadd(-1.,1.,*Vb);
   res = Vr->l2_norm();
-  
+
   Vp->reinit(*Vx);
   Vv->reinit(*Vx);
   *Vrbar = *Vr;
@@ -311,9 +311,9 @@ SolverBicgstab<VECTOR>::start(const MATRIX& A)
 template<class VECTOR>
 void
 SolverBicgstab<VECTOR>::print_vectors(const unsigned int,
-				      const VECTOR&,
-				      const VECTOR&,
-				      const VECTOR&) const
+                                      const VECTOR&,
+                                      const VECTOR&,
+                                      const VECTOR&) const
 {}
 
 
@@ -322,7 +322,7 @@ template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 bool
 SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
-				const PRECONDITIONER& precondition)
+                                const PRECONDITIONER& precondition)
 {
 //TODO:[GK] Implement "use the length of the computed orthogonal residual" in the BiCGStab method.
   SolverControl::State state = SolverControl::iterate;
@@ -336,11 +336,11 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
   VECTOR& s = *Vs;
   VECTOR& t = *Vt;
   VECTOR& v = *Vv;
-  
+
   do
     {
       ++step;
-      
+
       rhobar = r*rbar;
       beta   = rhobar * alpha / (rho * omega);
       rho    = rhobar;
@@ -354,21 +354,21 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
 //TODO:[?] Find better breakdown criterion
 
       if (std::fabs(alpha) > 1.e10)
-	return true;
-      
+        return true;
+
       s.equ(1., r, -alpha, v);
 
-				       // check for early success, see
-				       // the lac/bicgstab_early
-				       // testcase as to why this is
-				       // necessary
+                                       // check for early success, see
+                                       // the lac/bicgstab_early
+                                       // testcase as to why this is
+                                       // necessary
       if (this->control().check(step, s.l2_norm()/Vb->l2_norm())
-	  == SolverControl::success)
-	{
-	  Vx->add(alpha, y);
-	  print_vectors(step, *Vx, r, y);
-	  return false;
-	}
+          == SolverControl::success)
+        {
+          Vx->add(alpha, y);
+          print_vectors(step, *Vx, r, y);
+          return false;
+        }
 
       precondition.vmult(z,s);
       A.vmult(t,z);
@@ -378,10 +378,10 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
       r.equ(1., s, -omega, t);
 
       if (additional_data.exact_residual)
-	res = criterion(A, *Vx, *Vb);
+        res = criterion(A, *Vx, *Vb);
       else
-	res = r.l2_norm();
-      
+        res = r.l2_norm();
+
       state = this->control().check(step, res);
       print_vectors(step, *Vx, r, y);
     }
@@ -394,9 +394,9 @@ template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 void
 SolverBicgstab<VECTOR>::solve(const MATRIX &A,
-			      VECTOR       &x,
-			      const VECTOR &b,
-			      const PRECONDITIONER& precondition)
+                              VECTOR       &x,
+                              const VECTOR &b,
+                              const PRECONDITIONER& precondition)
 {
   deallog.push("Bicgstab");
   Vr    = this->memory.alloc(); Vr->reinit(x);
@@ -414,13 +414,13 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
   step = 0;
 
   bool state;
-  
-  do 
+
+  do
     {
       if (step != 0)
-	deallog << "Restart step " << step << std::endl;
+        deallog << "Restart step " << step << std::endl;
       if (start(A) == SolverControl::success)
-	break;
+        break;
       state = iterate(A, precondition);
     }
   while (state);
@@ -433,15 +433,15 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
   this->memory.free(Vs);
   this->memory.free(Vt);
   this->memory.free(Vv);
-  
+
   deallog.pop();
-  
-				   // in case of failure: throw
-				   // exception
+
+                                   // in case of failure: throw
+                                   // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
-					this->control().last_value());
-				   // otherwise exit as normal
+                                        this->control().last_value());
+                                   // otherwise exit as normal
 }
 
 #endif // DOXYGEN

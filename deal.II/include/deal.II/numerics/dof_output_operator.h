@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,7 @@ namespace Algorithms
     public:
       void initialize (DoFHandler<dim, spacedim>& dof_handler);
 
-      virtual OutputOperator<VECTOR>& 
+      virtual OutputOperator<VECTOR>&
         operator<<(const NamedData<VECTOR*>& vectors);
 
     private:
@@ -43,7 +43,7 @@ namespace Algorithms
   void DoFOutputOperator<VECTOR, dim, spacedim>::initialize(
       DoFHandler<dim, spacedim>& dof_handler)
   {
-    dof = &dof_handler;  
+    dof = &dof_handler;
   }
 }
 

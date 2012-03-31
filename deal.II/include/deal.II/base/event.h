@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,93 +44,93 @@ namespace Algorithms
   class Event
   {
     public:
-				       /**
-					* This function registers a
-					* new event type and assigns a
-					* unique identifier to it. The
-					* result of this function
-					* should be stored for later
-					* use.
-					*/
+                                       /**
+                                        * This function registers a
+                                        * new event type and assigns a
+                                        * unique identifier to it. The
+                                        * result of this function
+                                        * should be stored for later
+                                        * use.
+                                        */
       static Event assign (const char* name);
 
-				       /**
-					* If you forgot to store the
-					* result of assign, here is
-					* how to retrieve it knowing
-					* the name.
-					*/
+                                       /**
+                                        * If you forgot to store the
+                                        * result of assign, here is
+                                        * how to retrieve it knowing
+                                        * the name.
+                                        */
 //      static Event find(const std::string& name);
 
-				       /**
-					* Constructor, generating a
-					* clear Event.
-					*/
+                                       /**
+                                        * Constructor, generating a
+                                        * clear Event.
+                                        */
       Event ();
 
-				       /**
-					* Clear all flags
-					*/
+                                       /**
+                                        * Clear all flags
+                                        */
       void clear();
 
-				       /**
-					* Set all flags
-					*/
+                                       /**
+                                        * Set all flags
+                                        */
       void all();
 
-				       /**
-					* Add the flags of the other event
-					*/
+                                       /**
+                                        * Add the flags of the other event
+                                        */
       Event& operator += (const Event& event);
 
-				       /**
-					* Clear the flags of the other event
-					*/
+                                       /**
+                                        * Clear the flags of the other event
+                                        */
       Event& operator -= (const Event& event);
 
-				       /**
-					* Test whether all the flags
-					* set in the other Event are
-					* also set in this one.
-					*/
+                                       /**
+                                        * Test whether all the flags
+                                        * set in the other Event are
+                                        * also set in this one.
+                                        */
       bool test (const Event& event) const;
 
-				       /**
-					* Return <tt>true</tt> if any
-					* event is set.
-					*/
+                                       /**
+                                        * Return <tt>true</tt> if any
+                                        * event is set.
+                                        */
       bool any () const;
 
-				       /**
-					* List the flags to a stream.
-					*/
+                                       /**
+                                        * List the flags to a stream.
+                                        */
       template <class OS>
       void print (OS& os) const;
 
-				       /**
-					* List all assigned events.
-					*/
+                                       /**
+                                        * List all assigned events.
+                                        */
       template <class OS>
       static void print_assigned (OS& os);
 
     private:
-				       /**
-					* Sometimes, actions have to
-					* be taken by all
-					* means. Therefore, if this
-					* value is true, test() always
-					* returns true.
-					*/
+                                       /**
+                                        * Sometimes, actions have to
+                                        * be taken by all
+                                        * means. Therefore, if this
+                                        * value is true, test() always
+                                        * returns true.
+                                        */
       bool all_true;
 
-				       /**
-					* The actual list of events
-					*/
+                                       /**
+                                        * The actual list of events
+                                        */
       std::vector<bool> flags;
 
-				       /**
-					* The names of registered events
-					*/
+                                       /**
+                                        * The names of registered events
+                                        */
       static std::vector<std::string> names;
   };
 
@@ -139,29 +139,29 @@ namespace Algorithms
  */
   namespace Events
   {
-				     /**
-				      * The program has just started
-				      * and everything should be
-				      * new.
-				      */
+                                     /**
+                                      * The program has just started
+                                      * and everything should be
+                                      * new.
+                                      */
     extern const Event initial;
 
-				     /**
-				      * The current derivative leads
-				      * to slow convergence of
-				      * Newton's method.
-				      */
+                                     /**
+                                      * The current derivative leads
+                                      * to slow convergence of
+                                      * Newton's method.
+                                      */
     extern const Event bad_derivative;
 
-				     /**
-				      * The time stepping scheme
-				      * starts a new time step.
-				      */
+                                     /**
+                                      * The time stepping scheme
+                                      * starts a new time step.
+                                      */
     extern const Event new_time;
 
-				     /**
-				      * The time stepping scheme has changed the time step size.
-				      */
+                                     /**
+                                      * The time stepping scheme has changed the time step size.
+                                      */
     extern const Event new_timestep_size;
   }
 
@@ -175,7 +175,7 @@ namespace Algorithms
   {
     if (all_true) return true;
     for (std::vector<bool>::const_iterator i=flags.begin();
-	 i != flags.end(); ++i)
+         i != flags.end(); ++i)
       if (*i) return true;
     return false;
   }
@@ -186,41 +186,41 @@ namespace Algorithms
   Event::test (const Event& event) const
   {
 
-				     // First, test all_true in this
+                                     // First, test all_true in this
     if (all_true) return true;
 
     const unsigned int n = flags.size();
     const unsigned int m = event.flags.size();
     const unsigned int n_min = std::min(n, m);
 
-				     // Now, if all_true set in the
-				     // other, then all must be true
-				     // in this
+                                     // Now, if all_true set in the
+                                     // other, then all must be true
+                                     // in this
     if (event.all_true)
       {
-					 // Non existing flags are
-					 // always assumed false
-	if (m > n)
-	  return false;
+                                         // Non existing flags are
+                                         // always assumed false
+        if (m > n)
+          return false;
 
-					 // Test all flags separately
-					 // and return false if one is
-					 // not set
-	for (std::vector<bool>::const_iterator i=flags.begin();
-	     i != flags.end(); ++i)
-	  if (!*i) return false;
-					 // All flags are set
-	return true;
+                                         // Test all flags separately
+                                         // and return false if one is
+                                         // not set
+        for (std::vector<bool>::const_iterator i=flags.begin();
+             i != flags.end(); ++i)
+          if (!*i) return false;
+                                         // All flags are set
+        return true;
       }
 
-				     // Finally, compare each flag
-				     // separately
+                                     // Finally, compare each flag
+                                     // separately
     for (unsigned int i=0;i<n_min;++i)
       if (event.flags[i] && !flags[i])
-	return false;
+        return false;
     for (unsigned int i=n_min;i<m;++i)
       if (event.flags[i])
-	return false;
+        return false;
     return true;
   }
 
@@ -249,10 +249,10 @@ namespace Algorithms
     all_true = false;
     if(event.all_true)
       {
-	for (std::vector<bool>::iterator i=flags.begin();
-	     i != flags.end(); ++i)
-	  *i = false;
-	return *this;
+        for (std::vector<bool>::iterator i=flags.begin();
+             i != flags.end(); ++i)
+          *i = false;
+        return *this;
       }
 
     if (flags.size() < event.flags.size())
@@ -274,7 +274,7 @@ namespace Algorithms
 
     for (unsigned int i=0;i<flags.size();++i)
       if (flags[i])
-	os << ' ' << names[i];
+        os << ' ' << names[i];
   }
 
 
@@ -288,12 +288,12 @@ namespace Algorithms
   }
 
 
-				   /**
-				    * Output shift operator for
-				    * events. Calls Event::print().
-				    *
-				    * @relates Event
-				    */
+                                   /**
+                                    * Output shift operator for
+                                    * events. Calls Event::print().
+                                    *
+                                    * @relates Event
+                                    */
   template <class OS>
   OS& operator << (OS& o, const Event& e)
   {

@@ -47,7 +47,7 @@ template <int dim, int spacedim> class FESubfaceValues;
                                       * the transform() functions of
                                       * inheriting classes in order to
                                       * work.
-				      */
+                                      */
 enum MappingType
 {
 /// No mapping
@@ -60,36 +60,36 @@ enum MappingType
       mapping_covariant_gradient = 0x0003,
 /// Mapping of the gradient of a contravariant vector field (see Mapping::transform() for details)
       mapping_contravariant_gradient = 0x0004,
-				       /**
-					* The Piola transform usually used for Hdiv elements.
-					* Piola transform is the
-					* standard transformation of
-					* vector valued elements in
-					* H<sup>div</sup>. It amounts
-					* to a contravariant
-					* transformation scaled by the
-					* inverse of the volume
-					* element.
-					*/
+                                       /**
+                                        * The Piola transform usually used for Hdiv elements.
+                                        * Piola transform is the
+                                        * standard transformation of
+                                        * vector valued elements in
+                                        * H<sup>div</sup>. It amounts
+                                        * to a contravariant
+                                        * transformation scaled by the
+                                        * inverse of the volume
+                                        * element.
+                                        */
       mapping_piola = 0x0100,
-				       /**
-					  transformation for the gradient of
-					  for a vector field
-					  correspoing to a mapping_piola
-					  transformation (see Mapping::transform() for details).
-				       */
-      
-      mapping_piola_gradient = 0x0101, 
+                                       /**
+                                          transformation for the gradient of
+                                          for a vector field
+                                          correspoing to a mapping_piola
+                                          transformation (see Mapping::transform() for details).
+                                       */
+
+      mapping_piola_gradient = 0x0101,
 /// The mapping used for Nedelec elements
-				       /**
-					* curl-conforming elements are
-					* mapped as covariant
-					* vectors. Nevertheless, we
-					* introduce a separate mapping
-					* type, such that we can use
-					* the same flag for the vector
-					* and its gradient (see Mapping::transform() for details).
-					*/
+                                       /**
+                                        * curl-conforming elements are
+                                        * mapped as covariant
+                                        * vectors. Nevertheless, we
+                                        * introduce a separate mapping
+                                        * type, such that we can use
+                                        * the same flag for the vector
+                                        * and its gradient (see Mapping::transform() for details).
+                                        */
       mapping_nedelec = 0x0200,
 /// The mapping used for Raviart-Thomas elements
       mapping_raviart_thomas = 0x0300,
@@ -220,128 +220,128 @@ class Mapping : public Subscriptor
 {
   public:
 
-				     /**
-				      * Virtual destructor.
-				      */
+                                     /**
+                                      * Virtual destructor.
+                                      */
     virtual ~Mapping ();
 
-				     /**
-				      * Transforms the point @p p on
-				      * the unit cell to the point
-				      * @p p_real on the real cell
-				      * @p cell and returns @p p_real.
-				      */
+                                     /**
+                                      * Transforms the point @p p on
+                                      * the unit cell to the point
+                                      * @p p_real on the real cell
+                                      * @p cell and returns @p p_real.
+                                      */
     virtual Point<spacedim>
     transform_unit_to_real_cell (
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       const Point<dim>                                 &p) const = 0;
 
-				     /**
-				      * Transforms the point @p p on
-				      * the real cell to the point
-				      * @p p_unit on the unit cell
-				      * @p cell and returns @p p_unit.
-				      *
-				      * In the codimension one case,
-				      * this function returns the
-				      * normal projection of the real
-				      * point @p p on the curve or
-				      * surface identified by the @p
-				      * cell.
-				      */
+                                     /**
+                                      * Transforms the point @p p on
+                                      * the real cell to the point
+                                      * @p p_unit on the unit cell
+                                      * @p cell and returns @p p_unit.
+                                      *
+                                      * In the codimension one case,
+                                      * this function returns the
+                                      * normal projection of the real
+                                      * point @p p on the curve or
+                                      * surface identified by the @p
+                                      * cell.
+                                      */
     virtual Point<dim>
     transform_real_to_unit_cell (
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       const Point<spacedim>                            &p) const = 0;
 
-				     /**
-				      * Base class for internal data
-				      * of finite element and mapping
-				      * objects. The internal
-				      * mechanism is that upon
-				      * construction of a @p FEValues
-				      * objects, it asks the mapping
-				      * and finite element classes
-				      * that are to be used to
-				      * allocate memory for their own
-				      * purpose in which they may
-				      * store data that only needs to
-				      * be computed once. For example,
-				      * most finite elements will
-				      * store the values of the shape
-				      * functions at the quadrature
-				      * points in this object, since
-				      * they do not change from cell
-				      * to cell and only need to be
-				      * computed once. Since different
-				      * @p FEValues objects using
-				      * different quadrature rules
-				      * might access the same finite
-				      * element object at the same
-				      * time, it is necessary to
-				      * create one such object per
-				      * @p FEValues object. Ownership
-				      * of this object is then
-				      * transferred to the
-				      * @p FEValues object, but a
-				      * pointer to this object is
-				      * passed to the finite element
-				      * object every time it shall
-				      * compute some data so that it
-				      * has access to the precomputed
-				      * values stored there.
-				      */
+                                     /**
+                                      * Base class for internal data
+                                      * of finite element and mapping
+                                      * objects. The internal
+                                      * mechanism is that upon
+                                      * construction of a @p FEValues
+                                      * objects, it asks the mapping
+                                      * and finite element classes
+                                      * that are to be used to
+                                      * allocate memory for their own
+                                      * purpose in which they may
+                                      * store data that only needs to
+                                      * be computed once. For example,
+                                      * most finite elements will
+                                      * store the values of the shape
+                                      * functions at the quadrature
+                                      * points in this object, since
+                                      * they do not change from cell
+                                      * to cell and only need to be
+                                      * computed once. Since different
+                                      * @p FEValues objects using
+                                      * different quadrature rules
+                                      * might access the same finite
+                                      * element object at the same
+                                      * time, it is necessary to
+                                      * create one such object per
+                                      * @p FEValues object. Ownership
+                                      * of this object is then
+                                      * transferred to the
+                                      * @p FEValues object, but a
+                                      * pointer to this object is
+                                      * passed to the finite element
+                                      * object every time it shall
+                                      * compute some data so that it
+                                      * has access to the precomputed
+                                      * values stored there.
+                                      */
     class InternalDataBase: public Subscriptor
     {
       private:
-					 /**
-					  * Copy constructor forbidden.
-					  */
+                                         /**
+                                          * Copy constructor forbidden.
+                                          */
         InternalDataBase (const InternalDataBase&);
 
       public:
-					 /**
-					  * Constructor. Sets
-					  * @p UpdateFlags to
-					  * @p update_default and
-					  * @p first_cell to @p true.
-					  */
+                                         /**
+                                          * Constructor. Sets
+                                          * @p UpdateFlags to
+                                          * @p update_default and
+                                          * @p first_cell to @p true.
+                                          */
         InternalDataBase ();
 
-					 /**
-					  * Virtual destructor for
-					  * derived classes
-					  */
-	virtual ~InternalDataBase ();
+                                         /**
+                                          * Virtual destructor for
+                                          * derived classes
+                                          */
+        virtual ~InternalDataBase ();
 
-	                                 /**
-					  * Values updated by the constructor or
-					  * by reinit.
-					  */
-	UpdateFlags          update_flags;
+                                         /**
+                                          * Values updated by the constructor or
+                                          * by reinit.
+                                          */
+        UpdateFlags          update_flags;
 
-					 /**
-					  * Values computed by
-					  * constructor.
-					  */
-	UpdateFlags          update_once;
+                                         /**
+                                          * Values computed by
+                                          * constructor.
+                                          */
+        UpdateFlags          update_once;
 
-					 /**
-					  * Values updated on each
-					  * cell by reinit.
-					  */
-	UpdateFlags          update_each;
+                                         /**
+                                          * Values updated on each
+                                          * cell by reinit.
+                                          */
+        UpdateFlags          update_each;
 
-					 /**
-					  * If <tt>first_cell==true</tt>
-					  * this function returns
-					  * @p update_flags,
-					  * i.e. <tt>update_once|update_each</tt>.
-					  * If <tt>first_cell==false</tt>
-					  * it returns
-					  * @p update_each.
-					  */
-	UpdateFlags  current_update_flags() const;
+                                         /**
+                                          * If <tt>first_cell==true</tt>
+                                          * this function returns
+                                          * @p update_flags,
+                                          * i.e. <tt>update_once|update_each</tt>.
+                                          * If <tt>first_cell==false</tt>
+                                          * it returns
+                                          * @p update_each.
+                                          */
+        UpdateFlags  current_update_flags() const;
 
                                          /**
                                           * Return whether we are
@@ -375,45 +375,45 @@ class Mapping : public Subscriptor
                                           */
         virtual void clear_first_cell ();
 
-					 /**
-					  * Return an estimate (in
-					  * bytes) or the memory
-					  * consumption of this
-					  * object.
-					  */
-	virtual std::size_t memory_consumption () const;
+                                         /**
+                                          * Return an estimate (in
+                                          * bytes) or the memory
+                                          * consumption of this
+                                          * object.
+                                          */
+        virtual std::size_t memory_consumption () const;
 
-					 /**
-					  * The determinant of the
-					  * Jacobian in each
-					  * quadrature point. Filled
-					  * if #update_volume_elements.
-					  */
-	std::vector<double> volume_elements;
+                                         /**
+                                          * The determinant of the
+                                          * Jacobian in each
+                                          * quadrature point. Filled
+                                          * if #update_volume_elements.
+                                          */
+        std::vector<double> volume_elements;
 
-					 /**
-					  * The positions of the
-					  * mapped (generalized)
-					  * support points.
-					  */
-	std::vector<Point<spacedim> > support_point_values;
+                                         /**
+                                          * The positions of the
+                                          * mapped (generalized)
+                                          * support points.
+                                          */
+        std::vector<Point<spacedim> > support_point_values;
 
-					 /*
-					  * The Jacobian of the
-					  * transformation in the
-					  * (generalized) support
-					  * points.
-					  */
-	std::vector<Tensor<2,spacedim> > support_point_gradients;
+                                         /*
+                                          * The Jacobian of the
+                                          * transformation in the
+                                          * (generalized) support
+                                          * points.
+                                          */
+        std::vector<Tensor<2,spacedim> > support_point_gradients;
 
-					 /*
-					  * The inverse of the
-					  * Jacobian of the
-					  * transformation in the
-					  * (generalized) support
-					  * points.
-					  */
-	std::vector<Tensor<2,spacedim> > support_point_inverse_gradients;
+                                         /*
+                                          * The inverse of the
+                                          * Jacobian of the
+                                          * transformation in the
+                                          * (generalized) support
+                                          * points.
+                                          */
+        std::vector<Tensor<2,spacedim> > support_point_inverse_gradients;
 
 
       private:
@@ -462,7 +462,7 @@ class Mapping : public Subscriptor
  *
  * <li> #mapping_piola: A field of <i>n-1</i>-forms on the reference cell is also
  * represented by a vector field, but again transforms differently,
- * namely by the Piola transform 
+ * namely by the Piola transform
  * @f[
  *  \mathbf u(\mathbf x) = \frac{1}{\text{det}J(\mathbf x)}
  * J(\mathbf x) \mathbf{\hat u}(\mathbf x).
@@ -479,7 +479,7 @@ class Mapping : public Subscriptor
                const MappingType type) const = 0;
 
 
-    
+
 /**
    Transform a field of differential forms from the reference cell to the physical cell.
 
@@ -509,7 +509,7 @@ class Mapping : public Subscriptor
    DerivativeForm<1, dim, 1> with a Tensor<1,dim> when using  mapping_covariant
    in the function transform above this one.
 */
-    
+
     virtual
     void
     transform (const VectorSlice<const std::vector< DerivativeForm<1, dim, spacedim> > > input,
@@ -517,8 +517,8 @@ class Mapping : public Subscriptor
                const InternalDataBase &internal,
                const MappingType type) const = 0;
 
-    
-    
+
+
 /**
    Transform a tensor field from the reference cell to the physical cell.
    This tensors are most of times the jacobians in the reference cell of
@@ -542,7 +542,7 @@ class Mapping : public Subscriptor
    J^{-T}(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
    J^{-1}(\mathbf{\hat x}).
    @f]
-   
+
    <li> #mapping_piola_gradient, it
    assumes $\mathbf u(\mathbf x) = \frac{1}{\text{det}J(\mathbf x)}
    J(\mathbf x) \mathbf{\hat u}(\mathbf x)$
@@ -554,13 +554,13 @@ class Mapping : public Subscriptor
    J^{-1}(\mathbf{\hat x}).
    @f]
    </ul>
- 
+
    @todo The formulas for #mapping_covariant_gradient,
    #mapping_contravariant_gradient and #mapping_piola_gradient
    are only true as stated for linear mappings,
    if the mapping is bilinear for example then there is a missing
    term associated with the derivative of of J.
-   
+
 */
     virtual
     void
@@ -577,67 +577,67 @@ class Mapping : public Subscriptor
 
 
 
-				     /**
-				      * @deprecated Use transform() instead.
-				      */
+                                     /**
+                                      * @deprecated Use transform() instead.
+                                      */
     void
     transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                          const unsigned int                                    offset,
                          VectorSlice<std::vector<Tensor<1,spacedim> > >        output,
-			 const InternalDataBase &internal) const;
+                         const InternalDataBase &internal) const;
 
                                      /**
-				      * @deprecated Use transform() instead.
+                                      * @deprecated Use transform() instead.
                                       */
     void
     transform_covariant (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> > > input,
                          const unsigned int                 offset,
-			 VectorSlice<std::vector<Tensor<2,spacedim> > >      output,
-			 const InternalDataBase &internal) const;
+                         VectorSlice<std::vector<Tensor<2,spacedim> > >      output,
+                         const InternalDataBase &internal) const;
 
-				     /**
-				      * @deprecated Use transform() instead.
-				      */
+                                     /**
+                                      * @deprecated Use transform() instead.
+                                      */
     void
     transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                              const unsigned int                 offset,
-			     VectorSlice<std::vector<Tensor<1,spacedim> > >      output,
-			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
+                             VectorSlice<std::vector<Tensor<1,spacedim> > >      output,
+                             const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
 
                                      /**
-				      * @deprecated Use transform() instead.
+                                      * @deprecated Use transform() instead.
                                       */
 
     void
     transform_contravariant (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
                              const unsigned int                 offset,
-			     const VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
+                             const VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+                             const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
 
-				     /**
-				      * The transformed (generalized)
-				      * support point.
-				      */
+                                     /**
+                                      * The transformed (generalized)
+                                      * support point.
+                                      */
     const Point<spacedim>& support_point_value(
       const unsigned int index,
       const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
 
-				     /**
-				      * The Jacobian
-				      * matrix of the transformation
-				      * in the (generalized) support
-				      * point.
-				      */
+                                     /**
+                                      * The Jacobian
+                                      * matrix of the transformation
+                                      * in the (generalized) support
+                                      * point.
+                                      */
     const Tensor<2,spacedim>& support_point_gradient(
       const unsigned int index,
       const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
 
-				     /**
-				      * The inverse Jacobian
-				      * matrix of the transformation
-				      * in the (generalized) support
-				      * point.
-				      */
+                                     /**
+                                      * The inverse Jacobian
+                                      * matrix of the transformation
+                                      * in the (generalized) support
+                                      * point.
+                                      */
     const Tensor<2,spacedim>& support_point_inverse_gradient(
       const unsigned int index,
       const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
@@ -658,186 +658,186 @@ class Mapping : public Subscriptor
     virtual
     Mapping<dim,spacedim> * clone () const = 0;
 
-				     /**
-				      * Returns whether the mapping preserves
-				      * vertex locations, i.e. whether the
-				      * mapped location of the reference cell
-				      * vertices (given by
-				      * GeometryInfo::unit_cell_vertex())
-				      * equals the result of
-				      * <code>cell-@>vertex()</code>.
-				      *
-				      * For example, implementations in
-				      * derived classes return @p true for
-				      * MappingQ, MappingQ1, MappingCartesian,
-				      * but @p false for MappingQEulerian,
-				      * MappingQ1Eulerian.
-				      */
+                                     /**
+                                      * Returns whether the mapping preserves
+                                      * vertex locations, i.e. whether the
+                                      * mapped location of the reference cell
+                                      * vertices (given by
+                                      * GeometryInfo::unit_cell_vertex())
+                                      * equals the result of
+                                      * <code>cell-@>vertex()</code>.
+                                      *
+                                      * For example, implementations in
+                                      * derived classes return @p true for
+                                      * MappingQ, MappingQ1, MappingCartesian,
+                                      * but @p false for MappingQEulerian,
+                                      * MappingQ1Eulerian.
+                                      */
     virtual
     bool preserves_vertex_locations () const = 0;
 
-				     /**
-				      * Exception
-				      */
+                                     /**
+                                      * Exception
+                                      */
     DeclException0 (ExcInvalidData);
 
   private:
 
-				     /**
-				      * Indicate fields to be updated
-				      * in the constructor of
-				      * FEValues. Especially,
-				      * fields not asked for by
-				      * FEValues, but computed
-				      * for efficiency reasons will be
-				      * notified here.
-				      *
-				      * See @ref UpdateFlagsEssay.
-				      */
+                                     /**
+                                      * Indicate fields to be updated
+                                      * in the constructor of
+                                      * FEValues. Especially,
+                                      * fields not asked for by
+                                      * FEValues, but computed
+                                      * for efficiency reasons will be
+                                      * notified here.
+                                      *
+                                      * See @ref UpdateFlagsEssay.
+                                      */
     virtual UpdateFlags update_once (const UpdateFlags) const = 0;
 
-				     /**
-				      * The same as update_once(),
-				      * but for the flags to be updated for
-				      * each grid cell.
-				      *
-				      * See @ref UpdateFlagsEssay.
-				      */
+                                     /**
+                                      * The same as update_once(),
+                                      * but for the flags to be updated for
+                                      * each grid cell.
+                                      *
+                                      * See @ref UpdateFlagsEssay.
+                                      */
     virtual UpdateFlags update_each (const UpdateFlags) const = 0;
 
-				     /**
-				      * Prepare internal data
-				      * structures and fill in values
-				      * independent of the cell.
-				      */
+                                     /**
+                                      * Prepare internal data
+                                      * structures and fill in values
+                                      * independent of the cell.
+                                      */
     virtual InternalDataBase*
     get_data (const UpdateFlags,
-	      const Quadrature<dim>& quadrature) const = 0;
+              const Quadrature<dim>& quadrature) const = 0;
 
-				     /**
-				      * Prepare internal data
-				      * structure for transformation
-				      * of faces and fill in values
-				      * independent of the cell.
-				      */
+                                     /**
+                                      * Prepare internal data
+                                      * structure for transformation
+                                      * of faces and fill in values
+                                      * independent of the cell.
+                                      */
     virtual InternalDataBase*
     get_face_data (const UpdateFlags flags,
-		   const Quadrature<dim-1>& quadrature) const = 0;
+                   const Quadrature<dim-1>& quadrature) const = 0;
 
-				     /**
-				      * Prepare internal data
-				      * structure for transformation
-				      * of children of faces and fill
-				      * in values independent of the
-				      * cell.
-				      */
+                                     /**
+                                      * Prepare internal data
+                                      * structure for transformation
+                                      * of children of faces and fill
+                                      * in values independent of the
+                                      * cell.
+                                      */
     virtual InternalDataBase*
     get_subface_data (const UpdateFlags flags,
-		      const Quadrature<dim-1>& quadrature) const = 0;
+                      const Quadrature<dim-1>& quadrature) const = 0;
 
 
-				     /**
-				      * Fill the transformation fields
-				      * of @p FEValues.  Given a grid
-				      * cell and the quadrature points
-				      * on the unit cell, it computes
-				      * all values specified by
-				      * @p flags. The arrays to be
-				      * filled have to have the
-				      * correct size.
-				      *
-				      * Values are split into two
-				      * groups: first,
-				      * @p quadrature_points and
-				      * @p JxW_values are
-				      * filled with the quadrature
-				      * rule transformed to the
-				      * cell in physical space.
-				      *
-				      * The second group contains the
-				      * matrices needed to transform
-				      * vector-valued functions,
-				      * namely
-				      * @p jacobians,
-				      * the derivatives
-				      * @p jacobian_grads,
-				      * and the inverse operations in
-				      * @p inverse_jacobians.
-				      */
+                                     /**
+                                      * Fill the transformation fields
+                                      * of @p FEValues.  Given a grid
+                                      * cell and the quadrature points
+                                      * on the unit cell, it computes
+                                      * all values specified by
+                                      * @p flags. The arrays to be
+                                      * filled have to have the
+                                      * correct size.
+                                      *
+                                      * Values are split into two
+                                      * groups: first,
+                                      * @p quadrature_points and
+                                      * @p JxW_values are
+                                      * filled with the quadrature
+                                      * rule transformed to the
+                                      * cell in physical space.
+                                      *
+                                      * The second group contains the
+                                      * matrices needed to transform
+                                      * vector-valued functions,
+                                      * namely
+                                      * @p jacobians,
+                                      * the derivatives
+                                      * @p jacobian_grads,
+                                      * and the inverse operations in
+                                      * @p inverse_jacobians.
+                                      */
 /*     virtual void */
 /*     fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell, */
-/* 		    const Quadrature<dim>                         &quadrature, */
-/* 		    InternalDataBase                              &internal, */
-/* 		    std::vector<Point<spacedim> >                 &quadrature_points, */
-/* 		    std::vector<double>                           &JxW_values) const = 0; */
+/*                  const Quadrature<dim>                         &quadrature, */
+/*                  InternalDataBase                              &internal, */
+/*                  std::vector<Point<spacedim> >                 &quadrature_points, */
+/*                  std::vector<double>                           &JxW_values) const = 0; */
 
                                       /** The function above adjusted
-				       * with the variable
-				       * cell_normal_vectors for the
-				       * case of codimension 1
-				       */
+                                       * with the variable
+                                       * cell_normal_vectors for the
+                                       * case of codimension 1
+                                       */
     virtual void
     fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-		    const Quadrature<dim>                                     &quadrature,
-		    InternalDataBase                                          &internal,
-		    std::vector<Point<spacedim> >                             &quadrature_points,
-		    std::vector<double>                                       &JxW_values,
-		    std::vector<DerivativeForm<1,dim,spacedim>  >       &jacobians,
-		    std::vector<DerivativeForm<2,dim,spacedim>  >       &jacobian_grads,
-		    std::vector<DerivativeForm<1,spacedim,dim>  >       &inverse_jacobians,
-		    std::vector<Point<spacedim> >                             &cell_normal_vectors,
-		    CellSimilarity::Similarity                           &cell_similarity
-	           ) const=0;
+                    const Quadrature<dim>                                     &quadrature,
+                    InternalDataBase                                          &internal,
+                    std::vector<Point<spacedim> >                             &quadrature_points,
+                    std::vector<double>                                       &JxW_values,
+                    std::vector<DerivativeForm<1,dim,spacedim>  >       &jacobians,
+                    std::vector<DerivativeForm<2,dim,spacedim>  >       &jacobian_grads,
+                    std::vector<DerivativeForm<1,spacedim,dim>  >       &inverse_jacobians,
+                    std::vector<Point<spacedim> >                             &cell_normal_vectors,
+                    CellSimilarity::Similarity                           &cell_similarity
+                   ) const=0;
 
 
 
-				     /**
-				      * Performs the same as @p
-				      * fill_fe_values on a face.
-				      * Additionally, @p boundary_form
-				      * (see @ref GlossBoundaryForm)
-				      * and @p normal_vectors can be
-				      * computed on surfaces. Since
-				      * the boundary form already
-				      * contains the determinant of
-				      * the Jacobian of the
-				      * transformation, it is
-				      * sometimes more economic to use
-				      * the boundary form instead of
-				      * the product of the unit normal
-				      * and the transformed quadrature
-				      * weight.
-				      */
+                                     /**
+                                      * Performs the same as @p
+                                      * fill_fe_values on a face.
+                                      * Additionally, @p boundary_form
+                                      * (see @ref GlossBoundaryForm)
+                                      * and @p normal_vectors can be
+                                      * computed on surfaces. Since
+                                      * the boundary form already
+                                      * contains the determinant of
+                                      * the Jacobian of the
+                                      * transformation, it is
+                                      * sometimes more economic to use
+                                      * the boundary form instead of
+                                      * the product of the unit normal
+                                      * and the transformed quadrature
+                                      * weight.
+                                      */
     virtual void
     fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-			 const unsigned int                                        face_no,
-			 const Quadrature<dim-1>                                   &quadrature,
-			 InternalDataBase                                          &internal,
-			 std::vector<Point<spacedim> >                             &quadrature_points,
-			 std::vector<double>                                       &JxW_values,
-			 std::vector<Tensor<1,spacedim> >                          &boundary_form,
-			 std::vector<Point<spacedim> >                             &normal_vectors) const = 0;
+                         const unsigned int                                        face_no,
+                         const Quadrature<dim-1>                                   &quadrature,
+                         InternalDataBase                                          &internal,
+                         std::vector<Point<spacedim> >                             &quadrature_points,
+                         std::vector<double>                                       &JxW_values,
+                         std::vector<Tensor<1,spacedim> >                          &boundary_form,
+                         std::vector<Point<spacedim> >                             &normal_vectors) const = 0;
 
-				     /**
-				      * See above.
-				      */
+                                     /**
+                                      * See above.
+                                      */
     virtual void
     fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-			    const unsigned int                        face_no,
-			    const unsigned int                        sub_no,
-			    const Quadrature<dim-1>                  &quadrature,
-			    InternalDataBase                         &internal,
-			    std::vector<Point<spacedim> >        &quadrature_points,
-			    std::vector<double>                      &JxW_values,
-			    std::vector<Tensor<1,spacedim> >     &boundary_form,
-			    std::vector<Point<spacedim> >        &normal_vectors) const = 0;
+                            const unsigned int                        face_no,
+                            const unsigned int                        sub_no,
+                            const Quadrature<dim-1>                  &quadrature,
+                            InternalDataBase                         &internal,
+                            std::vector<Point<spacedim> >        &quadrature_points,
+                            std::vector<double>                      &JxW_values,
+                            std::vector<Tensor<1,spacedim> >     &boundary_form,
+                            std::vector<Point<spacedim> >        &normal_vectors) const = 0;
 
-				     /**
-				      * Give class @p FEValues access
-				      * to the private <tt>get_...data</tt>
-				      * and <tt>fill_fe_...values</tt>
-				      * functions.
-				      */
+                                     /**
+                                      * Give class @p FEValues access
+                                      * to the private <tt>get_...data</tt>
+                                      * and <tt>fill_fe_...values</tt>
+                                      * functions.
+                                      */
   friend class FEValuesBase<dim,spacedim>;
   friend class FEValues<dim,spacedim>;
   friend class FEFaceValues<dim,spacedim>;

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -80,9 +80,9 @@ DEAL_II_NAMESPACE_OPEN
  *    {
  *      const Point<dim>& p = this->unit_support_point[i];
  *
- *      for (unsigned int j=0;j<n_dofs;++j)		
- *  	  for (unsigned int d=0;d<dim;++d)		
- *	    N(i,j) += node_vector[i][d]
+ *      for (unsigned int j=0;j<n_dofs;++j)
+ *        for (unsigned int d=0;d<dim;++d)
+ *          N(i,j) += node_vector[i][d]
  *                  * this->shape_value_component(j, p, d);
  *    }
  *
@@ -115,222 +115,222 @@ template <class POLY, int dim, int spacedim=dim>
 class FE_PolyTensor : public FiniteElement<dim,spacedim>
 {
   public:
-				     /**
-				      * Constructor.
-				      *
-				      * @arg @c degree: constructor
-				      * argument for poly. May be
-				      * different from @p
-				      * fe_data.degree.
-				      */
+                                     /**
+                                      * Constructor.
+                                      *
+                                      * @arg @c degree: constructor
+                                      * argument for poly. May be
+                                      * different from @p
+                                      * fe_data.degree.
+                                      */
     FE_PolyTensor (const unsigned int degree,
-		   const FiniteElementData<dim> &fe_data,
-		   const std::vector<bool> &restriction_is_additive_flags,
-		   const std::vector<std::vector<bool> > &nonzero_components);
+                   const FiniteElementData<dim> &fe_data,
+                   const std::vector<bool> &restriction_is_additive_flags,
+                   const std::vector<std::vector<bool> > &nonzero_components);
 
-				     /**
-				      * Since these elements are
-				      * vector valued, an exception is
-				      * thrown.
-				      */
+                                     /**
+                                      * Since these elements are
+                                      * vector valued, an exception is
+                                      * thrown.
+                                      */
     virtual double shape_value (const unsigned int i,
-			        const Point<dim> &p) const;
-    
-    virtual double shape_value_component (const unsigned int i,
-					  const Point<dim> &p,
-					  const unsigned int component) const;
+                                const Point<dim> &p) const;
 
-				     /**
-				      * Since these elements are
-				      * vector valued, an exception is
-				      * thrown.
-				      */
+    virtual double shape_value_component (const unsigned int i,
+                                          const Point<dim> &p,
+                                          const unsigned int component) const;
+
+                                     /**
+                                      * Since these elements are
+                                      * vector valued, an exception is
+                                      * thrown.
+                                      */
     virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-				      const Point<dim>   &p) const;
+                                      const Point<dim>   &p) const;
 
     virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-						const Point<dim> &p,
-						const unsigned int component) const;
+                                                const Point<dim> &p,
+                                                const unsigned int component) const;
 
-				     /**
-				      * Since these elements are
-				      * vector valued, an exception is
-				      * thrown.
-				      */
+                                     /**
+                                      * Since these elements are
+                                      * vector valued, an exception is
+                                      * thrown.
+                                      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim> &p) const;
+                                           const Point<dim> &p) const;
 
     virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-						     const Point<dim> &p,
-						     const unsigned int component) const;
-    
-				     /**
-				      * Given <tt>flags</tt>,
-				      * determines the values which
-				      * must be computed only for the
-				      * reference cell. Make sure,
-				      * that #mapping_type is set by
-				      * the derived class, such that
-				      * this function can operate
-				      * correctly.
-				      */
+                                                     const Point<dim> &p,
+                                                     const unsigned int component) const;
+
+                                     /**
+                                      * Given <tt>flags</tt>,
+                                      * determines the values which
+                                      * must be computed only for the
+                                      * reference cell. Make sure,
+                                      * that #mapping_type is set by
+                                      * the derived class, such that
+                                      * this function can operate
+                                      * correctly.
+                                      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const;
-				     /**
-				      * Given <tt>flags</tt>,
-				      * determines the values which
-				      * must be computed in each cell
-				      * cell. Make sure, that
-				      * #mapping_type is set by the
-				      * derived class, such that this
-				      * function can operate
-				      * correctly.
-				      */
+                                     /**
+                                      * Given <tt>flags</tt>,
+                                      * determines the values which
+                                      * must be computed in each cell
+                                      * cell. Make sure, that
+                                      * #mapping_type is set by the
+                                      * derived class, such that this
+                                      * function can operate
+                                      * correctly.
+                                      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
-    
+
   protected:
-				     /**
-				      * The mapping type to be used to
-				      * map shape functions from the
-				      * reference cell to the mesh
-				      * cell.
-				      */
+                                     /**
+                                      * The mapping type to be used to
+                                      * map shape functions from the
+                                      * reference cell to the mesh
+                                      * cell.
+                                      */
     MappingType mapping_type;
-    
+
     virtual
     typename Mapping<dim,spacedim>::InternalDataBase *
     get_data (const UpdateFlags,
-	      const Mapping<dim,spacedim>& mapping,
-	      const Quadrature<dim>& quadrature) const ;
+              const Mapping<dim,spacedim>& mapping,
+              const Quadrature<dim>& quadrature) const ;
 
     virtual void
     fill_fe_values (const Mapping<dim,spacedim>                       &mapping,
-		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-		    const Quadrature<dim>                             &quadrature,
-		    typename Mapping<dim,spacedim>::InternalDataBase  &mapping_internal,
-		    typename Mapping<dim,spacedim>::InternalDataBase  &fe_internal,
-		    FEValuesData<dim,spacedim>                        &data,
-		    CellSimilarity::Similarity                   &cell_similarity) const;
-    
+                    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                    const Quadrature<dim>                             &quadrature,
+                    typename Mapping<dim,spacedim>::InternalDataBase  &mapping_internal,
+                    typename Mapping<dim,spacedim>::InternalDataBase  &fe_internal,
+                    FEValuesData<dim,spacedim>                        &data,
+                    CellSimilarity::Similarity                   &cell_similarity) const;
+
     virtual void
     fill_fe_face_values (const Mapping<dim,spacedim> &mapping,
-			 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-			 const unsigned int                                  face_no,
-			 const Quadrature<dim-1>                            &quadrature,
-			 typename Mapping<dim,spacedim>::InternalDataBase   &mapping_internal,
-			 typename Mapping<dim,spacedim>::InternalDataBase   &fe_internal,
-			 FEValuesData<dim,spacedim>& data) const ;
-    
+                         const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                         const unsigned int                                  face_no,
+                         const Quadrature<dim-1>                            &quadrature,
+                         typename Mapping<dim,spacedim>::InternalDataBase   &mapping_internal,
+                         typename Mapping<dim,spacedim>::InternalDataBase   &fe_internal,
+                         FEValuesData<dim,spacedim>& data) const ;
+
     virtual void
     fill_fe_subface_values (const Mapping<dim,spacedim> &mapping,
-			    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-			    const unsigned int                    face_no,
-			    const unsigned int                    sub_no,
-			    const Quadrature<dim-1>                &quadrature,
-			    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
-			    typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
-			    FEValuesData<dim,spacedim>& data) const ;
+                            const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                            const unsigned int                    face_no,
+                            const unsigned int                    sub_no,
+                            const Quadrature<dim-1>                &quadrature,
+                            typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+                            typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+                            FEValuesData<dim,spacedim>& data) const ;
 
-				     /**
-				      * Fields of cell-independent
-				      * data for FE_PolyTensor. Stores
-				      * the values of the shape
-				      * functions and their
-				      * derivatives on the reference
-				      * cell for later use.
-				      *
-				      * All tables are organized in a
-				      * way, that the value for shape
-				      * function <i>i</i> at
-				      * quadrature point <i>k</i> is
-				      * accessed by indices
-				      * <i>(i,k)</i>.
-				      */
+                                     /**
+                                      * Fields of cell-independent
+                                      * data for FE_PolyTensor. Stores
+                                      * the values of the shape
+                                      * functions and their
+                                      * derivatives on the reference
+                                      * cell for later use.
+                                      *
+                                      * All tables are organized in a
+                                      * way, that the value for shape
+                                      * function <i>i</i> at
+                                      * quadrature point <i>k</i> is
+                                      * accessed by indices
+                                      * <i>(i,k)</i>.
+                                      */
     class InternalData : public FiniteElement<dim,spacedim>::InternalDataBase
     {
       public:
-					 /**
-					  * Array with shape function
-					  * values in quadrature
-					  * points. There is one
-					  * row for each shape
-					  * function, containing
-					  * values for each quadrature
-					  * point.
-					  */
-	std::vector<std::vector<Tensor<1,dim> > > shape_values;
+                                         /**
+                                          * Array with shape function
+                                          * values in quadrature
+                                          * points. There is one
+                                          * row for each shape
+                                          * function, containing
+                                          * values for each quadrature
+                                          * point.
+                                          */
+        std::vector<std::vector<Tensor<1,dim> > > shape_values;
 
-					 /**
-					  * Array with shape function
-					  * gradients in quadrature
-					  * points. There is one
-					  * row for each shape
-					  * function, containing
-					  * values for each quadrature
-					  * point.
-					  */      
-	std::vector< std::vector< DerivativeForm<1, dim, spacedim> > > shape_grads;
+                                         /**
+                                          * Array with shape function
+                                          * gradients in quadrature
+                                          * points. There is one
+                                          * row for each shape
+                                          * function, containing
+                                          * values for each quadrature
+                                          * point.
+                                          */
+        std::vector< std::vector< DerivativeForm<1, dim, spacedim> > > shape_grads;
     };
-    
+
                                      /**
                                       * The polynomial space. Its type
                                       * is given by the template
                                       * parameter POLY.
-                                      */    
+                                      */
     POLY poly_space;
-    
-				     /**
-				      * The inverse of the matrix
-				      * <i>a<sub>ij</sub></i> of node
-				      * values <i>N<sub>i</sub></i>
-				      * applied to polynomial
-				      * <i>p<sub>j</sub></i>. This
-				      * matrix is used to convert
-				      * polynomials in the "raw" basis
-				      * provided in #poly_space to the
-				      * basis dual to the node
-				      * functionals on the reference cell.
-				      *
-				      * This object is not filled by
-				      * FE_PolyTensor, but is a chance
-				      * for a derived class to allow
-				      * for reorganization of the
-				      * basis functions. If it is left
-				      * empty, the basis in
-				      * #poly_space is used.
-				      */
+
+                                     /**
+                                      * The inverse of the matrix
+                                      * <i>a<sub>ij</sub></i> of node
+                                      * values <i>N<sub>i</sub></i>
+                                      * applied to polynomial
+                                      * <i>p<sub>j</sub></i>. This
+                                      * matrix is used to convert
+                                      * polynomials in the "raw" basis
+                                      * provided in #poly_space to the
+                                      * basis dual to the node
+                                      * functionals on the reference cell.
+                                      *
+                                      * This object is not filled by
+                                      * FE_PolyTensor, but is a chance
+                                      * for a derived class to allow
+                                      * for reorganization of the
+                                      * basis functions. If it is left
+                                      * empty, the basis in
+                                      * #poly_space is used.
+                                      */
     FullMatrix<double> inverse_node_matrix;
 
-				     /**
-				      * If a shape function is
-				      * computed at a single point, we
-				      * must compute all of them to
-				      * apply #inverse_node_matrix. In
-				      * order to avoid too much
-				      * overhead, we cache the point
-				      * and the function values for
-				      * the next evaluation.
-				      */ 
+                                     /**
+                                      * If a shape function is
+                                      * computed at a single point, we
+                                      * must compute all of them to
+                                      * apply #inverse_node_matrix. In
+                                      * order to avoid too much
+                                      * overhead, we cache the point
+                                      * and the function values for
+                                      * the next evaluation.
+                                      */
     mutable Point<dim> cached_point;
-    
-				     /**
-				      * Cached shape function values after
-				      * call to
-				      * shape_value_component().
-				      */
+
+                                     /**
+                                      * Cached shape function values after
+                                      * call to
+                                      * shape_value_component().
+                                      */
     mutable std::vector<Tensor<1,dim> > cached_values;
-    
-				     /**
-				      * Cached shape function gradients after
-				      * call to
-				      * shape_grad_component().
-				      */
+
+                                     /**
+                                      * Cached shape function gradients after
+                                      * call to
+                                      * shape_grad_component().
+                                      */
     mutable std::vector<Tensor<2,dim> > cached_grads;
-    
-				     /**
-				      * Cached second derivatives of
-				      * shape functions after call to
-				      * shape_grad_grad_component().
-				      */
+
+                                     /**
+                                      * Cached second derivatives of
+                                      * shape functions after call to
+                                      * shape_grad_grad_component().
+                                      */
     mutable std::vector<Tensor<3,dim> > cached_grad_grads;
 };
 

@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2007, 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,8 +52,8 @@ namespace internal
     struct Iterators<DH<1, spacedim> >
     {
         typedef DH<1,spacedim> DoFHandler_type;
-	typedef dealii::DoFCellAccessor<DoFHandler_type> CellAccessor;
-	typedef dealii::DoFAccessor<0,DoFHandler_type> FaceAccessor;
+        typedef dealii::DoFCellAccessor<DoFHandler_type> CellAccessor;
+        typedef dealii::DoFAccessor<0,DoFHandler_type> FaceAccessor;
 
         typedef TriaRawIterator   <CellAccessor> raw_line_iterator;
         typedef TriaIterator      <CellAccessor> line_iterator;
@@ -93,8 +93,8 @@ namespace internal
     struct Iterators<DH<2, spacedim> >
     {
         typedef DH<2,spacedim> DoFHandler_type;
-	typedef dealii::DoFCellAccessor<DoFHandler_type> CellAccessor;
-	typedef dealii::DoFAccessor<1, DoFHandler_type> FaceAccessor;
+        typedef dealii::DoFCellAccessor<DoFHandler_type> CellAccessor;
+        typedef dealii::DoFAccessor<1, DoFHandler_type> FaceAccessor;
 
         typedef TriaRawIterator   <FaceAccessor> raw_line_iterator;
         typedef TriaIterator      <FaceAccessor> line_iterator;
@@ -134,8 +134,8 @@ namespace internal
     struct Iterators<DH<3, spacedim> >
     {
         typedef DH<3, spacedim> DoFHandler_type;
-	typedef dealii::DoFCellAccessor<DoFHandler_type> CellAccessor;
-	typedef dealii::DoFAccessor<2, DoFHandler_type> FaceAccessor;
+        typedef dealii::DoFCellAccessor<DoFHandler_type> CellAccessor;
+        typedef dealii::DoFAccessor<2, DoFHandler_type> FaceAccessor;
 
         typedef TriaRawIterator   <dealii::DoFAccessor<1, DoFHandler_type> > raw_line_iterator;
         typedef TriaIterator      <dealii::DoFAccessor<1, DoFHandler_type> > line_iterator;

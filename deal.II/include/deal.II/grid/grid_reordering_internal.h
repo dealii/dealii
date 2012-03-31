@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2011 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,8 +53,8 @@ namespace internal
                                       */
     bool
     is_consistent (const std::vector<CellData<2> > &cells);
-    
-    
+
+
 /**
  * Defines a variety of variables related to the connectivity of a
  * simple quad element. This includes the nodes on each edge, which
@@ -63,42 +63,42 @@ namespace internal
  *
  * @verbatim
  *       s2
- *       
- *     +-->--+       
- *     |3   2|     
- * s3  ^     ^ s1   
- *     |0   1|     
- *     +-->--+               
- *   
- *       s0           
+ *
+ *     +-->--+
+ *     |3   2|
+ * s3  ^     ^ s1
+ *     |0   1|
+ *     +-->--+
+ *
+ *       s0
  * @endverbatim
  *
  * @author Michael Anderson, 2003
- */ 
+ */
     class ConnectGlobals
     {
       public:
-					 /**	
-					  * The nodes on each edge in
-					  * anti-clockwise order
-					  * { {0,1},{1,2},{2,3},{3,0} }
-					  */
-	static const int EdgeToNode[4][2];
+                                         /**
+                                          * The nodes on each edge in
+                                          * anti-clockwise order
+                                          * { {0,1},{1,2},{2,3},{3,0} }
+                                          */
+        static const int EdgeToNode[4][2];
 
-					 /**
-					  * The edges comin into each
-					  * node, in anti-clockwise
-					  * order
-					  * { {3,0},{0,1},{1,2},{2,3} }
-					  */
-	static const int NodeToEdge[4][2];
-  
-					 /**
-					  * The nodes on each edge in
-					  * "default direction order".
-					  * {{0,1},{1,2},{3,2},{0,3}}
-					  */
-	static const int DefaultOrientation[4][2];
+                                         /**
+                                          * The edges comin into each
+                                          * node, in anti-clockwise
+                                          * order
+                                          * { {3,0},{0,1},{1,2},{2,3} }
+                                          */
+        static const int NodeToEdge[4][2];
+
+                                         /**
+                                          * The nodes on each edge in
+                                          * "default direction order".
+                                          * {{0,1},{1,2},{3,2},{0,3}}
+                                          */
+        static const int DefaultOrientation[4][2];
     };
 
 
@@ -111,37 +111,37 @@ namespace internal
     class MQuad
     {
       public:
-					 /**
-					  * v0 - v3 are indexes of the
-					  * vertices of the quad, s0 -
-					  * s3 are indexes for the
-					  * sides of the quad
-					  */
-	MQuad (const unsigned int  v0,
-	       const unsigned int  v1,
-	       const unsigned int  v2,
-	       const unsigned int  v3,
-	       const unsigned int  s0,
-	       const unsigned int  s1,
-	       const unsigned int  s2,
-	       const unsigned int  s3,
-	       const CellData<2>  &cd);
-	
-					 /**
-					  * Stores the vertex numbers
-					  */
-	unsigned int v[4];
-					 /**
-					  * Stores the side numbers
-					  */
-	unsigned int side[4]; 
+                                         /**
+                                          * v0 - v3 are indexes of the
+                                          * vertices of the quad, s0 -
+                                          * s3 are indexes for the
+                                          * sides of the quad
+                                          */
+        MQuad (const unsigned int  v0,
+               const unsigned int  v1,
+               const unsigned int  v2,
+               const unsigned int  v3,
+               const unsigned int  s0,
+               const unsigned int  s1,
+               const unsigned int  s2,
+               const unsigned int  s3,
+               const CellData<2>  &cd);
 
-					 /**
-					  * Copy of the @p CellData object
-					  * from which we construct the
-					  * data of this object.
-					  */
-	CellData<2>  original_cell_data;
+                                         /**
+                                          * Stores the vertex numbers
+                                          */
+        unsigned int v[4];
+                                         /**
+                                          * Stores the side numbers
+                                          */
+        unsigned int side[4];
+
+                                         /**
+                                          * Copy of the @p CellData object
+                                          * from which we construct the
+                                          * data of this object.
+                                          */
+        CellData<2>  original_cell_data;
     };
 
 /**
@@ -153,47 +153,47 @@ namespace internal
  */
     struct MSide
     {
-					 /**
-					  * Constructor.
-					  */
-	MSide (const unsigned int initv0,
-	       const unsigned int initv1);
+                                         /**
+                                          * Constructor.
+                                          */
+        MSide (const unsigned int initv0,
+               const unsigned int initv1);
 
-					 /**
-					  * Return whether the sides
-					  * are equal, even if their
-					  * ends are reversed.
-					  */
-	bool operator==(const MSide& s2) const;
+                                         /**
+                                          * Return whether the sides
+                                          * are equal, even if their
+                                          * ends are reversed.
+                                          */
+        bool operator==(const MSide& s2) const;
 
-					 /**
-					  * Return the opposite.
-					  */
-	bool operator!=(const MSide& s2) const;
-	
-	unsigned int v0;
-	unsigned int v1;
-	unsigned int Q0;
-	unsigned int Q1;
+                                         /**
+                                          * Return the opposite.
+                                          */
+        bool operator!=(const MSide& s2) const;
 
-					 /**
-					  * Local side numbers on quads 0 and 1.
-					  */
-	unsigned int lsn0, lsn1;
-	bool Oriented;
+        unsigned int v0;
+        unsigned int v1;
+        unsigned int Q0;
+        unsigned int Q1;
 
-					 /**
-					  * This class makes a MSide have v0<v1
-					  */
-	struct SideRectify;
+                                         /**
+                                          * Local side numbers on quads 0 and 1.
+                                          */
+        unsigned int lsn0, lsn1;
+        bool Oriented;
 
-					 /**
-					  * Provides a side ordering,
-					  * s1<s2, without assuming
-					  * v0<v1 in either of the
-					  * sides.
-					  */
-	struct SideSortLess;
+                                         /**
+                                          * This class makes a MSide have v0<v1
+                                          */
+        struct SideRectify;
+
+                                         /**
+                                          * Provides a side ordering,
+                                          * s1<s2, without assuming
+                                          * v0<v1 in either of the
+                                          * sides.
+                                          */
+        struct SideSortLess;
     };
 
 
@@ -203,158 +203,158 @@ namespace internal
  * documentation of the GridReordering class.
  *
  * @author Michael Anderson, 2003
- */   
+ */
     class GridReordering
     {
       public:
 
-					 /**
-					  * Do the work intended by
-					  * this class.
-					  */
-	void reorient(std::vector<CellData<2> > &quads);
+                                         /**
+                                          * Do the work intended by
+                                          * this class.
+                                          */
+        void reorient(std::vector<CellData<2> > &quads);
       private:
-	
-					 /** 
-					  * Sets up the internal data
-					  * structures so that the we can
-					  * do side hopping and face
-					  * switching efficiently. This
-					  * means we need a whole bunch of
-					  * connectivity information
-					  */
-	void build_graph (const std::vector<CellData<2> > &inquads);
 
-					 /** 
-					  * Orient the internal data
-					  * into deal.II format The
-					  * orientation algorith is as
-					  * follows
-					  *
-					  * 1) Find an unoriented quad
+                                         /**
+                                          * Sets up the internal data
+                                          * structures so that the we can
+                                          * do side hopping and face
+                                          * switching efficiently. This
+                                          * means we need a whole bunch of
+                                          * connectivity information
+                                          */
+        void build_graph (const std::vector<CellData<2> > &inquads);
+
+                                         /**
+                                          * Orient the internal data
+                                          * into deal.II format The
+                                          * orientation algorith is as
+                                          * follows
+                                          *
+                                          * 1) Find an unoriented quad
                                           (A)
-					  *
-					  * 2) Orient an un_oriented
+                                          *
+                                          * 2) Orient an un_oriented
                                           side (s) of (A)
-					  *
-					  * 3) side hop on (s) of (A)
+                                          *
+                                          * 3) side hop on (s) of (A)
                                           to get (B)
-					  *
-					  * 4) if opposite side to (s)
-					  * of (B) is unoriented
-					  * orient it
-					  *
-					  * 5) repeat 3) and 4) until
-					  * side-hoppong fails (we've
-					  * reached a boundary) or (s)
-					  * has already been oriented
-					  * (we've closed a loop or
-					  * unoriented sides).
-					  *
-					  * 6) Repeat 2), 3) ,4) and
-					  * 5) on other unoriented
-					  * sides of (A)
-					  *
-					  * 7) Choose a new unoriented
-					  * A.
-					  */
-	void orient();
-  
-					 /**
-					  * Get the (now correctly
-					  * oriented if we've called
-					  * orient) quads.
-					  */
-	void get_quads(std::vector<CellData<2> > &outquads) const;
+                                          *
+                                          * 4) if opposite side to (s)
+                                          * of (B) is unoriented
+                                          * orient it
+                                          *
+                                          * 5) repeat 3) and 4) until
+                                          * side-hoppong fails (we've
+                                          * reached a boundary) or (s)
+                                          * has already been oriented
+                                          * (we've closed a loop or
+                                          * unoriented sides).
+                                          *
+                                          * 6) Repeat 2), 3) ,4) and
+                                          * 5) on other unoriented
+                                          * sides of (A)
+                                          *
+                                          * 7) Choose a new unoriented
+                                          * A.
+                                          */
+        void orient();
 
-					 /**
-					  * Orient_side(qnum,lsn)
-					  * orients the local side lsn
-					  * of the quad qnum in the
-					  * triangulation. If the side
-					  * opposite lsn is oriented
-					  * then lsn is oriented to
-					  * match it. Otherwise it is
-					  * oriented in the "default"
-					  * direction for the quad.
-					  */
-	void orient_side (const unsigned int quadnum,
-			  const unsigned int localsidenum);
- 
-					 /**
-					  * Returns true if all sides
-					  * of the quad quadnum are
-					  * oriented.
-					  */
-	bool is_fully_oriented_quad (const unsigned int quadnum) const;
-  
-					 /**
-					  * Returns true if the side lsn
-					  * of the quad quadnum is
-					  * oriented.
-					  */
-	bool is_oriented_side (const unsigned int quadnum,
-			       const unsigned int lsn) const;
+                                         /**
+                                          * Get the (now correctly
+                                          * oriented if we've called
+                                          * orient) quads.
+                                          */
+        void get_quads(std::vector<CellData<2> > &outquads) const;
 
-					 /**
-					  * Returns true is the side is
-					  * oriented in the "default"
-					  * direction
-					  */
-	bool is_side_default_oriented (const unsigned int qnum,
-				       const unsigned int lsn) const;
-  
-					 /**
-					  * Increases UnOrQLoc from
-					  * it's original value to the
-					  * next quad with an
-					  * unoriented side. Returns
-					  * true if there was another
-					  * unoriented quad.
-					  */
-	bool get_unoriented_quad (unsigned int &UnOrQLoc) const;
+                                         /**
+                                          * Orient_side(qnum,lsn)
+                                          * orients the local side lsn
+                                          * of the quad qnum in the
+                                          * triangulation. If the side
+                                          * opposite lsn is oriented
+                                          * then lsn is oriented to
+                                          * match it. Otherwise it is
+                                          * oriented in the "default"
+                                          * direction for the quad.
+                                          */
+        void orient_side (const unsigned int quadnum,
+                          const unsigned int localsidenum);
 
-					 /**
-					  * Sets sidenum to the local
-					  * sidenumber of an
-					  * unoriented side of the
-					  * quad quadnum. Returns true
-					  * if such a side exists.
-					  */
-	bool get_unoriented_side (const unsigned int quadnum,
-				  unsigned int &sidenum) const;
-  
-					 /**
-					  * side_hop(&qnum, &lsn) has
-					  * qnum being the quadnumber
-					  * of a quad in the
-					  * triangulation, and a local
-					  * side number. side_hop then
-					  * sets qnum to the
-					  * quadnumber across the
-					  * other side of the side,
-					  * and sets lsn so that
-					  * quads[qnum].sides[lsn] is
-					  * the same before and after
-					  * the call.  if there is no
-					  * other quad on the other
-					  * side of the current quad,
-					  * then side_hop returns
-					  * false.
-					  */
-	bool side_hop (unsigned int &qnum,
-		       unsigned int &lsn) const;
+                                         /**
+                                          * Returns true if all sides
+                                          * of the quad quadnum are
+                                          * oriented.
+                                          */
+        bool is_fully_oriented_quad (const unsigned int quadnum) const;
 
-					 /**
-					  * A list of enriched
-					  * sides/edges of the mesh.
-					  */
-	std::vector<MSide> sides;
-					 /**
-					  * A list of enriched quads
-					  * in the mesh.
-					  */
-	std::vector<MQuad> mquads;
+                                         /**
+                                          * Returns true if the side lsn
+                                          * of the quad quadnum is
+                                          * oriented.
+                                          */
+        bool is_oriented_side (const unsigned int quadnum,
+                               const unsigned int lsn) const;
+
+                                         /**
+                                          * Returns true is the side is
+                                          * oriented in the "default"
+                                          * direction
+                                          */
+        bool is_side_default_oriented (const unsigned int qnum,
+                                       const unsigned int lsn) const;
+
+                                         /**
+                                          * Increases UnOrQLoc from
+                                          * it's original value to the
+                                          * next quad with an
+                                          * unoriented side. Returns
+                                          * true if there was another
+                                          * unoriented quad.
+                                          */
+        bool get_unoriented_quad (unsigned int &UnOrQLoc) const;
+
+                                         /**
+                                          * Sets sidenum to the local
+                                          * sidenumber of an
+                                          * unoriented side of the
+                                          * quad quadnum. Returns true
+                                          * if such a side exists.
+                                          */
+        bool get_unoriented_side (const unsigned int quadnum,
+                                  unsigned int &sidenum) const;
+
+                                         /**
+                                          * side_hop(&qnum, &lsn) has
+                                          * qnum being the quadnumber
+                                          * of a quad in the
+                                          * triangulation, and a local
+                                          * side number. side_hop then
+                                          * sets qnum to the
+                                          * quadnumber across the
+                                          * other side of the side,
+                                          * and sets lsn so that
+                                          * quads[qnum].sides[lsn] is
+                                          * the same before and after
+                                          * the call.  if there is no
+                                          * other quad on the other
+                                          * side of the current quad,
+                                          * then side_hop returns
+                                          * false.
+                                          */
+        bool side_hop (unsigned int &qnum,
+                       unsigned int &lsn) const;
+
+                                         /**
+                                          * A list of enriched
+                                          * sides/edges of the mesh.
+                                          */
+        std::vector<MSide> sides;
+                                         /**
+                                          * A list of enriched quads
+                                          * in the mesh.
+                                          */
+        std::vector<MQuad> mquads;
     };
   }  // namespace GridReordering2d
 
@@ -367,73 +367,73 @@ namespace internal
  */
   namespace GridReordering3d
   {
-				     /**
-				      * A structure indicating the
-				      * direction of an edge. In the
-				      * implementation file, we define
-				      * three objects,
-				      * <tt>unoriented_edge</tt>,
-				      * <tt>forward_edge</tt>, and
-				      * <tt>backward_edge</tt>, that
-				      * denote whether an edge has
-				      * already been oriented, whether
-				      * it is in standard orientation,
-				      * or whether it has reverse
-				      * direction. The state that each
-				      * of these objects encode is
-				      * stored in the
-				      * <tt>orientation</tt> member
-				      * variable -- we would really
-				      * need only three such values,
-				      * which we pick in the
-				      * implementation file, and make
-				      * sure when we compare such
-				      * objects that only these three
-				      * special values are actually
-				      * used.
-				      *
-				      * The reason for this way of
-				      * implementing things is as
-				      * follows. Usually, such a
-				      * property would be implemented
-				      * as an enum. However, in the
-				      * previous implementation, a
-				      * signed integer was used with
-				      * unoriented=0, forward=+1, and
-				      * backward=-1. A number of
-				      * operations, such as equality
-				      * of ordered edges were mapped
-				      * to checking whether the
-				      * product of two edge
-				      * orientations equals +1. Such
-				      * arithmetic isn't always
-				      * portable and sometimes flagged
-				      * when using -ftrapv with
-				      * gcc. Using this class instead
-				      * makes sure that there isn't
-				      * going to be any arithmetic
-				      * going on on edge orientations,
-				      * just comparisons for equality
-				      * or inequality.
-				      *
-				      * @author Wolfgang Bangerth, 2005
-				      */
-    struct EdgeOrientation 
+                                     /**
+                                      * A structure indicating the
+                                      * direction of an edge. In the
+                                      * implementation file, we define
+                                      * three objects,
+                                      * <tt>unoriented_edge</tt>,
+                                      * <tt>forward_edge</tt>, and
+                                      * <tt>backward_edge</tt>, that
+                                      * denote whether an edge has
+                                      * already been oriented, whether
+                                      * it is in standard orientation,
+                                      * or whether it has reverse
+                                      * direction. The state that each
+                                      * of these objects encode is
+                                      * stored in the
+                                      * <tt>orientation</tt> member
+                                      * variable -- we would really
+                                      * need only three such values,
+                                      * which we pick in the
+                                      * implementation file, and make
+                                      * sure when we compare such
+                                      * objects that only these three
+                                      * special values are actually
+                                      * used.
+                                      *
+                                      * The reason for this way of
+                                      * implementing things is as
+                                      * follows. Usually, such a
+                                      * property would be implemented
+                                      * as an enum. However, in the
+                                      * previous implementation, a
+                                      * signed integer was used with
+                                      * unoriented=0, forward=+1, and
+                                      * backward=-1. A number of
+                                      * operations, such as equality
+                                      * of ordered edges were mapped
+                                      * to checking whether the
+                                      * product of two edge
+                                      * orientations equals +1. Such
+                                      * arithmetic isn't always
+                                      * portable and sometimes flagged
+                                      * when using -ftrapv with
+                                      * gcc. Using this class instead
+                                      * makes sure that there isn't
+                                      * going to be any arithmetic
+                                      * going on on edge orientations,
+                                      * just comparisons for equality
+                                      * or inequality.
+                                      *
+                                      * @author Wolfgang Bangerth, 2005
+                                      */
+    struct EdgeOrientation
     {
-					 /**
-					  * A value indicating the orientation.
-					  */
-	char orientation;
+                                         /**
+                                          * A value indicating the orientation.
+                                          */
+        char orientation;
 
-					 /**
-					  * Comparison operator.
-					  */
-	bool operator == (const EdgeOrientation &edge_orientation) const;
-	
-					 /**
-					  * Comparison operator.
-					  */
-	bool operator != (const EdgeOrientation &edge_orientation) const;
+                                         /**
+                                          * Comparison operator.
+                                          */
+        bool operator == (const EdgeOrientation &edge_orientation) const;
+
+                                         /**
+                                          * Comparison operator.
+                                          */
+        bool operator != (const EdgeOrientation &edge_orientation) const;
     };
 
                                      /**
@@ -459,7 +459,7 @@ namespace internal
                                           */
         const unsigned int node0;
 
-					 /**
+                                         /**
                                           * The second node
                                           */
         const unsigned int node1;
@@ -470,7 +470,7 @@ namespace internal
                                           * them sorted.
                                           */
         CheapEdge (const unsigned int n0,
-		   const unsigned int n1);
+                   const unsigned int n1);
 
                                          /**
                                           * Need a partial ordering
@@ -479,7 +479,7 @@ namespace internal
         bool operator< (const CheapEdge & e2) const;
     };
 
-  
+
 
                                      /**
                                       * A connectivity and orientation
@@ -491,14 +491,14 @@ namespace internal
                                           * Simple constructor
                                           */
         Edge (const unsigned int n0,
-	      const unsigned int n1);      
-      
+              const unsigned int n1);
+
                                          /**
                                           * The IDs for the end nodes
                                           */
         unsigned int nodes[2];
 
-                                         /** 
+                                         /**
                                           * Whether the edge has not
                                           * already been oriented,
                                           * points from node 0 to node
@@ -508,7 +508,7 @@ namespace internal
                                           */
         EdgeOrientation orientation_flag;
 
-                                         /** 
+                                         /**
                                           * Used to determine which
                                           * "sheet" or equivalence
                                           * class of parallel edges
@@ -524,9 +524,9 @@ namespace internal
                                           */
         unsigned int group;
 
-					 /**
-					  * Indices of neighboring cubes.
-					  */
+                                         /**
+                                          * Indices of neighboring cubes.
+                                          */
         std::vector<unsigned int> neighboring_cubes;
     };
 
@@ -548,7 +548,7 @@ namespace internal
                                       * are the second four, and the
                                       * third four.
                                       *
-                                      * TODO: Need to move connectivity information out 
+                                      * TODO: Need to move connectivity information out
                                       *       of cell and into edge.
                                       */
     struct Cell
@@ -562,11 +562,11 @@ namespace internal
                                           * The IDs for each of the edges.
                                           */
         unsigned int edges[GeometryInfo<3>::lines_per_cell];
-        
+
                                          /**
                                           * The IDs for each of the nodes.
-                                          */        
-        unsigned int nodes[GeometryInfo<3>::vertices_per_cell];  
+                                          */
+        unsigned int nodes[GeometryInfo<3>::vertices_per_cell];
 
                                          /**
                                           * Which way do the edges
@@ -577,7 +577,7 @@ namespace internal
                                           * (-1).
                                           */
         EdgeOrientation local_orientation_flags[GeometryInfo<3>::lines_per_cell];
-        
+
                                          /**
                                           * An internal flag used to
                                           * determine whether the cell
@@ -592,7 +592,7 @@ namespace internal
                                      /**
                                       * This holds all the pieces for
                                       * orientation together.
-                                      * 
+                                      *
                                       * Contains lists of nodes, edges
                                       * and cells.  As well as the
                                       * information about how they all
@@ -618,10 +618,10 @@ namespace internal
 
       private:
                                          /**
-                                          * The list of edges 
+                                          * The list of edges
                                           */
         std::vector<Edge> edge_list;
-	
+
                                          /**
                                           * The list of cells
                                           */
@@ -647,21 +647,21 @@ namespace internal
                                           * constructor to disable it.
                                           */
         Mesh (const Mesh&);
-	
+
                                          /**
                                           * Unimplemented private
                                           * assignment operator to
                                           * disable it.
                                           */
         Mesh& operator=(const Mesh&);
-        
+
                                          /**
                                           * Checks that each edge
                                           * going into a node is
                                           * correctly set up.
                                           */
         void sanity_check_node (const Cell        &cell,
-				const unsigned int local_node_num) const;
+                                const unsigned int local_node_num) const;
 
                                          /**
                                           * Let the orienter access
@@ -693,10 +693,10 @@ namespace internal
                                           * single entry point to the
                                           * functionality of this
                                           * class.
-					  *
-					  * Returns, whether a consistent
-					  * orientation of lines was possible
-					  * for the given mesh.
+                                          *
+                                          * Returns, whether a consistent
+                                          * orientation of lines was possible
+                                          * for the given mesh.
                                           */
         static
         bool
@@ -710,13 +710,13 @@ namespace internal
                                           * information and the like.
                                           */
         Mesh mesh;
-        
+
                                          /**
                                           * The cube we're looking at
                                           * presently.
                                           */
         unsigned int cur_posn;
-        
+
                                          /**
                                           * We have fully oriented all
                                           * cubes before this one.
@@ -742,11 +742,11 @@ namespace internal
 
 
                                           /**
-					   * Which edges of the current 
-					   * cell have been oriented 
-					   * during the current iteration.
-					   * Is reset when moving on to 
-					   * the next cube.
+                                           * Which edges of the current
+                                           * cell have been oriented
+                                           * during the current iteration.
+                                           * Is reset when moving on to
+                                           * the next cube.
                                            */
         bool edge_orient_array[12];
 
@@ -768,9 +768,9 @@ namespace internal
                                          /**
                                           * Orient all the edges of a
                                           * mesh.
-					  *
-					  * Returns, whether this action was
-					  * carried out successfully.
+                                          *
+                                          * Returns, whether this action was
+                                          * carried out successfully.
                                           */
         bool orient_edges ();
 
@@ -781,7 +781,7 @@ namespace internal
                                           * direction.
                                           */
         void orient_cubes ();
-      
+
         bool get_next_unoriented_cube ();
 
                                          /**
@@ -812,7 +812,7 @@ namespace internal
 
         void get_adjacent_cubes ();
         bool get_next_active_cube ();
-    };    
+    };
   }  // namespace GridReordering3d
 }  // namespace internal
 

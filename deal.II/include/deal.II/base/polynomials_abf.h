@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,123 +51,123 @@ template <int dim>
 class PolynomialsABF
 {
   public:
-				     /**
-				      * Constructor. Creates all basis
-				      * functions for Raviart-Thomas polynomials
-				      * of given degree.
-				      *
-				      * @arg k: the degree of the
-				      * Raviart-Thomas-space, which is the degree
-				      * of the largest tensor product
-				      * polynomial space
-				      * <i>Q<sub>k</sub></i> contained.
-				      */
+                                     /**
+                                      * Constructor. Creates all basis
+                                      * functions for Raviart-Thomas polynomials
+                                      * of given degree.
+                                      *
+                                      * @arg k: the degree of the
+                                      * Raviart-Thomas-space, which is the degree
+                                      * of the largest tensor product
+                                      * polynomial space
+                                      * <i>Q<sub>k</sub></i> contained.
+                                      */
     PolynomialsABF (const unsigned int k);
 
-				     /**
-				      * Destructor deleting the polynomials.
-				      */
+                                     /**
+                                      * Destructor deleting the polynomials.
+                                      */
     ~PolynomialsABF ();
 
-				     /**
-				      * Computes the value and the
-				      * first and second derivatives
-				      * of each Raviart-Thomas
-				      * polynomial at @p unit_point.
-				      *
-				      * The size of the vectors must
-				      * either be zero or equal
-				      * <tt>n()</tt>.  In the
-				      * first case, the function will
-				      * not compute these values.
-				      *
-				      * If you need values or
-				      * derivatives of all tensor
-				      * product polynomials then use
-				      * this function, rather than
-				      * using any of the
-				      * <tt>compute_value</tt>,
-				      * <tt>compute_grad</tt> or
-				      * <tt>compute_grad_grad</tt>
-				      * functions, see below, in a
-				      * loop over all tensor product
-				      * polynomials.
-				      */
+                                     /**
+                                      * Computes the value and the
+                                      * first and second derivatives
+                                      * of each Raviart-Thomas
+                                      * polynomial at @p unit_point.
+                                      *
+                                      * The size of the vectors must
+                                      * either be zero or equal
+                                      * <tt>n()</tt>.  In the
+                                      * first case, the function will
+                                      * not compute these values.
+                                      *
+                                      * If you need values or
+                                      * derivatives of all tensor
+                                      * product polynomials then use
+                                      * this function, rather than
+                                      * using any of the
+                                      * <tt>compute_value</tt>,
+                                      * <tt>compute_grad</tt> or
+                                      * <tt>compute_grad_grad</tt>
+                                      * functions, see below, in a
+                                      * loop over all tensor product
+                                      * polynomials.
+                                      */
     void compute (const Point<dim>            &unit_point,
                   std::vector<Tensor<1,dim> > &values,
                   std::vector<Tensor<2,dim> > &grads,
                   std::vector<Tensor<3,dim> > &grad_grads) const;
 
-				     /**
-				      * Returns the number of ABF polynomials.
-				      */
+                                     /**
+                                      * Returns the number of ABF polynomials.
+                                      */
     unsigned int n () const;
 
-				     /**
-				      * Returns the degree of the ABF
-				      * space, which is two less than
-				      * the highest polynomial degree.
-				      */
+                                     /**
+                                      * Returns the degree of the ABF
+                                      * space, which is two less than
+                                      * the highest polynomial degree.
+                                      */
     unsigned int degree () const;
 
-				     /**
-				      * Return the name of the space ,
-				      * which is <tt>ABF</tt>.
-				      */
+                                     /**
+                                      * Return the name of the space ,
+                                      * which is <tt>ABF</tt>.
+                                      */
     std::string name () const;
-    
-				     /**
-				      * Return the number of
-				      * polynomials in the space
-				      * <TT>RT(degree)</tt> without
-				      * requiring to build an object
-				      * of PolynomialsABF. This is
-				      * required by the FiniteElement
-				      * classes.
-				      */
+
+                                     /**
+                                      * Return the number of
+                                      * polynomials in the space
+                                      * <TT>RT(degree)</tt> without
+                                      * requiring to build an object
+                                      * of PolynomialsABF. This is
+                                      * required by the FiniteElement
+                                      * classes.
+                                      */
     static unsigned int compute_n_pols(unsigned int degree);
 
   private:
-				     /**
-				      * The degree of this object as
-				      * given to the constructor.
-				      */
+                                     /**
+                                      * The degree of this object as
+                                      * given to the constructor.
+                                      */
     const unsigned int my_degree;
 
-				     /**
-				      * An object representing the
-				      * polynomial space for a single
-				      * component. We can re-use it by
-				      * rotating the coordinates of
-				      * the evaluation point.
-				      */
+                                     /**
+                                      * An object representing the
+                                      * polynomial space for a single
+                                      * component. We can re-use it by
+                                      * rotating the coordinates of
+                                      * the evaluation point.
+                                      */
     AnisotropicPolynomials<dim>* polynomial_space;
 
-				     /**
-				      * Number of Raviart-Thomas
-				      * polynomials.
-				      */
+                                     /**
+                                      * Number of Raviart-Thomas
+                                      * polynomials.
+                                      */
     unsigned int n_pols;
 
-				     /**
-				      * A mutex that guards the
-				      * following scratch arrays.
-				      */
+                                     /**
+                                      * A mutex that guards the
+                                      * following scratch arrays.
+                                      */
     mutable Threads::Mutex mutex;
 
-				     /**
-				      * Auxiliary memory.
-				      */
+                                     /**
+                                      * Auxiliary memory.
+                                      */
     mutable std::vector<double> p_values;
 
-				     /**
-				      * Auxiliary memory.
-				      */
+                                     /**
+                                      * Auxiliary memory.
+                                      */
     mutable std::vector<Tensor<1,dim> > p_grads;
 
-				     /**
-				      * Auxiliary memory.
-				      */
+                                     /**
+                                      * Auxiliary memory.
+                                      */
     mutable std::vector<Tensor<2,dim> > p_grad_grads;
 };
 

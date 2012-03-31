@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -105,65 +105,65 @@ namespace MeshWorker
     class ResidualLocalBlocksToGlobalBlocks
     {
       public:
-					 /**
-					  * Copy the BlockInfo and the
-					  * matrix pointers into local
-					  * variables.
-					  */
-	void initialize(const BlockInfo* block_info,
-			NamedData<VECTOR*>& residuals);
-					 /**
-					  * Initialize the constraints. 
-					  */
+                                         /**
+                                          * Copy the BlockInfo and the
+                                          * matrix pointers into local
+                                          * variables.
+                                          */
+        void initialize(const BlockInfo* block_info,
+                        NamedData<VECTOR*>& residuals);
+                                         /**
+                                          * Initialize the constraints.
+                                          */
         void initialize(const ConstraintMatrix& constraints);
-					 /**
-					  * Initialize the local data
-					  * in the
-					  * DoFInfo
-					  * object used later for
-					  * assembling.
-					  *
-					  * The info object refers to
-					  * a cell if
-					  * <code>!face</code>, or
-					  * else to an interior or
-					  * boundary face.
-					  */
-	template <class DOFINFO>
-	void initialize_info(DOFINFO& info, bool face) const;
-	
+                                         /**
+                                          * Initialize the local data
+                                          * in the
+                                          * DoFInfo
+                                          * object used later for
+                                          * assembling.
+                                          *
+                                          * The info object refers to
+                                          * a cell if
+                                          * <code>!face</code>, or
+                                          * else to an interior or
+                                          * boundary face.
+                                          */
+        template <class DOFINFO>
+        void initialize_info(DOFINFO& info, bool face) const;
 
-					 /**
-					  * Assemble the local residuals
-					  * into the global residuals.
-					  */
-	template<class DOFINFO>
-	void assemble(const DOFINFO& info);
-	
-					 /**
-					  * Assemble both local residuals
-					  * into the global residuals.
-					  */
-	template<class DOFINFO>
-	void assemble(const DOFINFO& info1,
-		      const DOFINFO& info2);
+
+                                         /**
+                                          * Assemble the local residuals
+                                          * into the global residuals.
+                                          */
+        template<class DOFINFO>
+        void assemble(const DOFINFO& info);
+
+                                         /**
+                                          * Assemble both local residuals
+                                          * into the global residuals.
+                                          */
+        template<class DOFINFO>
+        void assemble(const DOFINFO& info1,
+                      const DOFINFO& info2);
       private:
-					 /**
-					  * Assemble a single local
-					  * residual into the global.
-					  */
-	void assemble(VECTOR& global,
-		      const BlockVector<double>& local,
-		      const std::vector<unsigned int>& dof);
-	
-					 /**
-					  * The global matrices,
-					  * stored as a vector of
-					  * pointers.
-					  */
-	NamedData<SmartPointer<VECTOR,
+                                         /**
+                                          * Assemble a single local
+                                          * residual into the global.
+                                          */
+        void assemble(VECTOR& global,
+                      const BlockVector<double>& local,
+                      const std::vector<unsigned int>& dof);
+
+                                         /**
+                                          * The global matrices,
+                                          * stored as a vector of
+                                          * pointers.
+                                          */
+        NamedData<SmartPointer<VECTOR,
           ResidualLocalBlocksToGlobalBlocks<VECTOR> > > residuals;
-       
+
       /**
        * A pointer to the object containing the block structure.
        */
@@ -208,103 +208,103 @@ namespace MeshWorker
     class MatrixLocalBlocksToGlobalBlocks
     {
       public:
-					 /**
-					  * Constructor, initializing
-					  * the #threshold, which
-					  * limits how small numbers
-					  * may be to be entered into
-					  * the matrix.
-					  */
-	MatrixLocalBlocksToGlobalBlocks(double threshold = 1.e-12);
-	
-					 /**
-					  * Copy the BlockInfo and the
-					  * matrix pointers into local
-					  * variables and initialize
-					  * cell matrix vectors.
-					  */
+                                         /**
+                                          * Constructor, initializing
+                                          * the #threshold, which
+                                          * limits how small numbers
+                                          * may be to be entered into
+                                          * the matrix.
+                                          */
+        MatrixLocalBlocksToGlobalBlocks(double threshold = 1.e-12);
+
+                                         /**
+                                          * Copy the BlockInfo and the
+                                          * matrix pointers into local
+                                          * variables and initialize
+                                          * cell matrix vectors.
+                                          */
       void initialize(const BlockInfo* block_info,
-		      MatrixBlockVector<MATRIX>& matrices);
+                      MatrixBlockVector<MATRIX>& matrices);
 
-					 /**
-					  * Initialize the constraints. 
-					  */
+                                         /**
+                                          * Initialize the constraints.
+                                          */
       void initialize(const ConstraintMatrix& constraints);
-					 /**
-					  * Initialize the local data
-					  * in the
-					  * DoFInfo
-					  * object used later for
-					  * assembling.
-					  *
-					  * The info object refers to
-					  * a cell if
-					  * <code>!face</code>, or
-					  * else to an interior or
-					  * boundary face.
-					  */
-	template <class DOFINFO>
-	void initialize_info(DOFINFO& info, bool face) const;
-	
+                                         /**
+                                          * Initialize the local data
+                                          * in the
+                                          * DoFInfo
+                                          * object used later for
+                                          * assembling.
+                                          *
+                                          * The info object refers to
+                                          * a cell if
+                                          * <code>!face</code>, or
+                                          * else to an interior or
+                                          * boundary face.
+                                          */
+        template <class DOFINFO>
+        void initialize_info(DOFINFO& info, bool face) const;
 
-					 /**
-					  * Assemble the local matrices
-					  * into the global matrices.
-					  */
-	template<class DOFINFO>
-	void assemble(const DOFINFO& info);
-	
-					 /**
-					  * Assemble all local matrices
-					  * into the global matrices.
-					  */
-	template<class DOFINFO>
-	void assemble(const DOFINFO& info1,
-		      const DOFINFO& info2);
-	
+
+                                         /**
+                                          * Assemble the local matrices
+                                          * into the global matrices.
+                                          */
+        template<class DOFINFO>
+        void assemble(const DOFINFO& info);
+
+                                         /**
+                                          * Assemble all local matrices
+                                          * into the global matrices.
+                                          */
+        template<class DOFINFO>
+        void assemble(const DOFINFO& info1,
+                      const DOFINFO& info2);
+
       private:
-					 /**
-					  * Assemble a single local
-					  * matrix into a global one.
-					  */
-	void assemble(
-	  MatrixBlock<MATRIX>& global,
-	  const FullMatrix<number>& local,
-	  unsigned int block_row,
-	  unsigned int block_col,
-	  const std::vector<unsigned int>& dof1,
-	  const std::vector<unsigned int>& dof2);
-	
-					 /**
-					  * The global matrices,
-					  * stored as a vector of
-					  * pointers.
-					  */
-	SmartPointer<MatrixBlockVector<MATRIX>,
-		     MatrixLocalBlocksToGlobalBlocks<MATRIX, number> > matrices;
-      
+                                         /**
+                                          * Assemble a single local
+                                          * matrix into a global one.
+                                          */
+        void assemble(
+          MatrixBlock<MATRIX>& global,
+          const FullMatrix<number>& local,
+          unsigned int block_row,
+          unsigned int block_col,
+          const std::vector<unsigned int>& dof1,
+          const std::vector<unsigned int>& dof2);
+
+                                         /**
+                                          * The global matrices,
+                                          * stored as a vector of
+                                          * pointers.
+                                          */
+        SmartPointer<MatrixBlockVector<MATRIX>,
+                     MatrixLocalBlocksToGlobalBlocks<MATRIX, number> > matrices;
+
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo, 
+      SmartPointer<const BlockInfo,
         MatrixLocalBlocksToGlobalBlocks<MATRIX, number> > block_info;
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const ConstraintMatrix, 
+      SmartPointer<const ConstraintMatrix,
        MatrixLocalBlocksToGlobalBlocks<MATRIX,number> > constraints;
-      
-					 /**
-					  * The smallest positive
-					  * number that will be
-					  * entered into the global
-					  * matrix. All smaller
-					  * absolute values will be
-					  * treated as zero and will
-					  * not be assembled.
-					  */
-	const double threshold;
-	
+
+                                         /**
+                                          * The smallest positive
+                                          * number that will be
+                                          * entered into the global
+                                          * matrix. All smaller
+                                          * absolute values will be
+                                          * treated as zero and will
+                                          * not be assembled.
+                                          */
+        const double threshold;
+
     };
 
 /**
@@ -335,212 +335,212 @@ namespace MeshWorker
     class MGMatrixLocalBlocksToGlobalBlocks
     {
       public:
-	typedef MGMatrixBlockVector<MATRIX> MatrixPtrVector;
-	typedef SmartPointer<MatrixPtrVector, MGMatrixLocalBlocksToGlobalBlocks<MATRIX,number> >
-	MatrixPtrVectorPtr;
-	
-					 /**
-					  * Constructor, initializing
-					  * the #threshold, which
-					  * limits how small numbers
-					  * may be to be entered into
-					  * the matrix.
-					  */
-	MGMatrixLocalBlocksToGlobalBlocks(double threshold = 1.e-12);
-	
-					 /**
-					  * Copy the BlockInfo and the
-					  * matrix pointers into local
-					  * variables and initialize
-					  * cell matrix vectors.
-					  */
-	void initialize(const BlockInfo* block_info,
-			MatrixPtrVector& matrices);
+        typedef MGMatrixBlockVector<MATRIX> MatrixPtrVector;
+        typedef SmartPointer<MatrixPtrVector, MGMatrixLocalBlocksToGlobalBlocks<MATRIX,number> >
+        MatrixPtrVectorPtr;
 
-					 /**
-					  * Initialize the multilevel
-                                          * constraints. 
-					  */
+                                         /**
+                                          * Constructor, initializing
+                                          * the #threshold, which
+                                          * limits how small numbers
+                                          * may be to be entered into
+                                          * the matrix.
+                                          */
+        MGMatrixLocalBlocksToGlobalBlocks(double threshold = 1.e-12);
+
+                                         /**
+                                          * Copy the BlockInfo and the
+                                          * matrix pointers into local
+                                          * variables and initialize
+                                          * cell matrix vectors.
+                                          */
+        void initialize(const BlockInfo* block_info,
+                        MatrixPtrVector& matrices);
+
+                                         /**
+                                          * Initialize the multilevel
+                                          * constraints.
+                                          */
         void initialize(const MGConstrainedDoFs& mg_constrained_dofs);
 
-					 /**
-					  * Multigrid methods on
-					  * locally refined meshes
-					  * need additional
-					  * matrices. For
-					  * discontinuous Galerkin
-					  * methods, these are two
-					  * flux matrices across the
-					  * refinement edge, which are
-					  * set by this method.
-					  */
-	void initialize_edge_flux(MatrixPtrVector& up, MatrixPtrVector& down);
+                                         /**
+                                          * Multigrid methods on
+                                          * locally refined meshes
+                                          * need additional
+                                          * matrices. For
+                                          * discontinuous Galerkin
+                                          * methods, these are two
+                                          * flux matrices across the
+                                          * refinement edge, which are
+                                          * set by this method.
+                                          */
+        void initialize_edge_flux(MatrixPtrVector& up, MatrixPtrVector& down);
 
-					 /**
-					  * Multigrid methods on
-					  * locally refined meshes
-					  * need additional
-					  * matrices. For
-					  * discontinuous Galerkin
-					  * methods, these are two
-					  * flux matrices across the
-					  * refinement edge, which are
-					  * set by this method.
-					  */
-	void initialize_interfaces (MatrixPtrVector& interface_in, MatrixPtrVector& interface_out);
-					 /**
-					  * Initialize the local data
-					  * in the
-					  * DoFInfo
-					  * object used later for
-					  * assembling.
-					  *
-					  * The info object refers to
-					  * a cell if
-					  * <code>!face</code>, or
-					  * else to an interior or
-					  * boundary face.
-					  */
-	template <class DOFINFO>
-	void initialize_info(DOFINFO& info, bool face) const;
-	
-	
-					 /**
-					  * Assemble the local matrices
-					  * into the global matrices.
-					  */
-	template<class DOFINFO>
-	void assemble(const DOFINFO& info);
-	
-					 /**
-					  * Assemble all local matrices
-					  * into the global matrices.
-					  */
-	template<class DOFINFO>
-	void assemble(const DOFINFO& info1,
-		      const DOFINFO& info2);
-	
+                                         /**
+                                          * Multigrid methods on
+                                          * locally refined meshes
+                                          * need additional
+                                          * matrices. For
+                                          * discontinuous Galerkin
+                                          * methods, these are two
+                                          * flux matrices across the
+                                          * refinement edge, which are
+                                          * set by this method.
+                                          */
+        void initialize_interfaces (MatrixPtrVector& interface_in, MatrixPtrVector& interface_out);
+                                         /**
+                                          * Initialize the local data
+                                          * in the
+                                          * DoFInfo
+                                          * object used later for
+                                          * assembling.
+                                          *
+                                          * The info object refers to
+                                          * a cell if
+                                          * <code>!face</code>, or
+                                          * else to an interior or
+                                          * boundary face.
+                                          */
+        template <class DOFINFO>
+        void initialize_info(DOFINFO& info, bool face) const;
+
+
+                                         /**
+                                          * Assemble the local matrices
+                                          * into the global matrices.
+                                          */
+        template<class DOFINFO>
+        void assemble(const DOFINFO& info);
+
+                                         /**
+                                          * Assemble all local matrices
+                                          * into the global matrices.
+                                          */
+        template<class DOFINFO>
+        void assemble(const DOFINFO& info1,
+                      const DOFINFO& info2);
+
       private:
-					 /**
-					  * Assemble a single local
-					  * matrix into a global one.
-					  */
-	void assemble(
-	  MATRIX& global,
-	  const FullMatrix<number>& local,
-	  unsigned int block_row,
-	  unsigned int block_col,
-	  const std::vector<unsigned int>& dof1,
-	  const std::vector<unsigned int>& dof2,
-	  unsigned int level1,
-	  unsigned int level2,
-	  bool transpose = false);
+                                         /**
+                                          * Assemble a single local
+                                          * matrix into a global one.
+                                          */
+        void assemble(
+          MATRIX& global,
+          const FullMatrix<number>& local,
+          unsigned int block_row,
+          unsigned int block_col,
+          const std::vector<unsigned int>& dof1,
+          const std::vector<unsigned int>& dof2,
+          unsigned int level1,
+          unsigned int level2,
+          bool transpose = false);
 
-					 /**
-					  * Assemble a single local
-					  * matrix into a global one.
-					  */
-	void assemble_fluxes(
-	  MATRIX& global,
-	  const FullMatrix<number>& local,
-	  unsigned int block_row,
-	  unsigned int block_col,
-	  const std::vector<unsigned int>& dof1,
-	  const std::vector<unsigned int>& dof2,
-	  unsigned int level1,
-	  unsigned int level2);
+                                         /**
+                                          * Assemble a single local
+                                          * matrix into a global one.
+                                          */
+        void assemble_fluxes(
+          MATRIX& global,
+          const FullMatrix<number>& local,
+          unsigned int block_row,
+          unsigned int block_col,
+          const std::vector<unsigned int>& dof1,
+          const std::vector<unsigned int>& dof2,
+          unsigned int level1,
+          unsigned int level2);
 
-					 /**
-					  * Assemble a single local
-					  * matrix into a global one.
-					  */
-	void assemble_up(
-	  MATRIX& global,
-	  const FullMatrix<number>& local,
-	  unsigned int block_row,
-	  unsigned int block_col,
-	  const std::vector<unsigned int>& dof1,
-	  const std::vector<unsigned int>& dof2,
-	  unsigned int level1,
-	  unsigned int level2);
-	
-					 /**
-					  * Assemble a single local
-					  * matrix into a global one.
-					  */
-	void assemble_down(
-	  MATRIX& global,
-	  const FullMatrix<number>& local,
-	  unsigned int block_row,
-	  unsigned int block_col,
-	  const std::vector<unsigned int>& dof1,
-	  const std::vector<unsigned int>& dof2,
-	  unsigned int level1,
-	  unsigned int level2);
-	
-					 /**
-					  * Assemble a single local
-					  * matrix into a global one.
-					  */
-	void assemble_in(
-	  MATRIX& global,
-	  const FullMatrix<number>& local,
-	  unsigned int block_row,
-	  unsigned int block_col,
-	  const std::vector<unsigned int>& dof1,
-	  const std::vector<unsigned int>& dof2,
-	  unsigned int level1,
-	  unsigned int level2);
-	
-					 /**
-					  * Assemble a single local
-					  * matrix into a global one.
-					  */
-	void assemble_out(
-	  MATRIX& global,
-	  const FullMatrix<number>& local,
-	  unsigned int block_row,
-	  unsigned int block_col,
-	  const std::vector<unsigned int>& dof1,
-	  const std::vector<unsigned int>& dof2,
-	  unsigned int level1,
-	  unsigned int level2);
-	
-					 /**
-					  * The level matrices,
-					  * stored as a vector of
-					  * pointers.
-					  */
-	MatrixPtrVectorPtr matrices;
-	
-					 /**
-					  * The flux matrix between
-					  * the fine and the coarse
-					  * level at refinement edges.
-					  */
-	MatrixPtrVectorPtr flux_down;
-	
-					 /**
-					  * The flux matrix between
-					  * the coarse and the fine
-					  * level at refinement edges.
-					  */
-	MatrixPtrVectorPtr flux_up;	
+                                         /**
+                                          * Assemble a single local
+                                          * matrix into a global one.
+                                          */
+        void assemble_up(
+          MATRIX& global,
+          const FullMatrix<number>& local,
+          unsigned int block_row,
+          unsigned int block_col,
+          const std::vector<unsigned int>& dof1,
+          const std::vector<unsigned int>& dof2,
+          unsigned int level1,
+          unsigned int level2);
 
-					 /**
-					  * The interface matrix between
-					  * the fine and the coarse
-					  * level at refinement edges.
-					  */
-	MatrixPtrVectorPtr interface_out;
-	
-					 /**
-					  * The interface matrix between
-					  * the coarse and the fine
-					  * level at refinement edges.
-					  */
-	MatrixPtrVectorPtr interface_in;	
-      
+                                         /**
+                                          * Assemble a single local
+                                          * matrix into a global one.
+                                          */
+        void assemble_down(
+          MATRIX& global,
+          const FullMatrix<number>& local,
+          unsigned int block_row,
+          unsigned int block_col,
+          const std::vector<unsigned int>& dof1,
+          const std::vector<unsigned int>& dof2,
+          unsigned int level1,
+          unsigned int level2);
+
+                                         /**
+                                          * Assemble a single local
+                                          * matrix into a global one.
+                                          */
+        void assemble_in(
+          MATRIX& global,
+          const FullMatrix<number>& local,
+          unsigned int block_row,
+          unsigned int block_col,
+          const std::vector<unsigned int>& dof1,
+          const std::vector<unsigned int>& dof2,
+          unsigned int level1,
+          unsigned int level2);
+
+                                         /**
+                                          * Assemble a single local
+                                          * matrix into a global one.
+                                          */
+        void assemble_out(
+          MATRIX& global,
+          const FullMatrix<number>& local,
+          unsigned int block_row,
+          unsigned int block_col,
+          const std::vector<unsigned int>& dof1,
+          const std::vector<unsigned int>& dof2,
+          unsigned int level1,
+          unsigned int level2);
+
+                                         /**
+                                          * The level matrices,
+                                          * stored as a vector of
+                                          * pointers.
+                                          */
+        MatrixPtrVectorPtr matrices;
+
+                                         /**
+                                          * The flux matrix between
+                                          * the fine and the coarse
+                                          * level at refinement edges.
+                                          */
+        MatrixPtrVectorPtr flux_down;
+
+                                         /**
+                                          * The flux matrix between
+                                          * the coarse and the fine
+                                          * level at refinement edges.
+                                          */
+        MatrixPtrVectorPtr flux_up;
+
+                                         /**
+                                          * The interface matrix between
+                                          * the fine and the coarse
+                                          * level at refinement edges.
+                                          */
+        MatrixPtrVectorPtr interface_out;
+
+                                         /**
+                                          * The interface matrix between
+                                          * the coarse and the fine
+                                          * level at refinement edges.
+                                          */
+        MatrixPtrVectorPtr interface_in;
+
       /**
        * A pointer to the object containing the block structure.
        */
@@ -551,18 +551,18 @@ namespace MeshWorker
        */
       SmartPointer<const MGConstrainedDoFs,MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number> > mg_constrained_dofs;
 
-      
-					 /**
-					  * The smallest positive
-					  * number that will be
-					  * entered into the global
-					  * matrix. All smaller
-					  * absolute values will be
-					  * treated as zero and will
-					  * not be assembled.
-					  */
-	const double threshold;
-	
+
+                                         /**
+                                          * The smallest positive
+                                          * number that will be
+                                          * entered into the global
+                                          * matrix. All smaller
+                                          * absolute values will be
+                                          * treated as zero and will
+                                          * not be assembled.
+                                          */
+        const double threshold;
+
     };
 
 //----------------------------------------------------------------------//
@@ -570,10 +570,10 @@ namespace MeshWorker
     template <class VECTOR>
     inline void
     ResidualLocalBlocksToGlobalBlocks<VECTOR>::initialize(const BlockInfo* b,
-							  NamedData<VECTOR*>& m)
+                                                          NamedData<VECTOR*>& m)
     {
       block_info = b;
-      residuals = m;      
+      residuals = m;
     }
 
     template <class VECTOR>
@@ -622,7 +622,7 @@ namespace MeshWorker
           constraints->distribute_local_to_global(local, dof, global);
     }
 
-    
+
     template <class VECTOR>
     template <class DOFINFO>
     inline void
@@ -630,10 +630,10 @@ namespace MeshWorker
       const DOFINFO& info)
     {
       for (unsigned int i=0;i<residuals.size();++i)
-	assemble(*residuals(i), info.vector(i), info.indices);
+        assemble(*residuals(i), info.vector(i), info.indices);
     }
 
-    
+
     template <class VECTOR>
     template <class DOFINFO>
     inline void
@@ -642,24 +642,24 @@ namespace MeshWorker
       const DOFINFO& info2)
     {
       for (unsigned int i=0;i<residuals.size();++i)
-	{
-	  assemble(*residuals(i), info1.vector(i), info1.indices);
-	  assemble(*residuals(i), info2.vector(i), info2.indices);
-	}
+        {
+          assemble(*residuals(i), info1.vector(i), info1.indices);
+          assemble(*residuals(i), info2.vector(i), info2.indices);
+        }
     }
 
 
 //----------------------------------------------------------------------//
-    
+
     template <class MATRIX, typename number>
     inline
     MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::MatrixLocalBlocksToGlobalBlocks(
       double threshold)
-		    :
-		    threshold(threshold)
+                    :
+                    threshold(threshold)
     {}
-    
-    
+
+
     template <class MATRIX, typename number>
     inline void
     MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(
@@ -679,9 +679,9 @@ namespace MeshWorker
     {
       constraints = &c;
     }
-    
 
-    
+
+
     template <class MATRIX ,typename number>
     template <class DOFINFO>
     inline void
@@ -734,13 +734,13 @@ namespace MeshWorker
         std::vector<unsigned int> sliced_col_indices (bi.block_size(block_col));
         for(unsigned int i=0; i<sliced_col_indices.size(); ++i)
           sliced_col_indices[i] = dof2[bi.block_start(block_col)+i];
-        
+
         constraints->distribute_local_to_global(local,
             sliced_row_indices, sliced_col_indices, global);
       }
     }
 
-    
+
     template <class MATRIX, typename number>
     template <class DOFINFO>
     inline void
@@ -748,17 +748,17 @@ namespace MeshWorker
       const DOFINFO& info)
     {
       for (unsigned int i=0;i<matrices->size();++i)
-	{
-					   // Row and column index of
-					   // the block we are dealing with
-	  const unsigned int row = matrices->block(i).row;
-	  const unsigned int col = matrices->block(i).column;
+        {
+                                           // Row and column index of
+                                           // the block we are dealing with
+          const unsigned int row = matrices->block(i).row;
+          const unsigned int col = matrices->block(i).column;
 
-	  assemble(matrices->block(i), info.matrix(i,false).matrix, row, col, info.indices, info.indices);
-	}
+          assemble(matrices->block(i), info.matrix(i,false).matrix, row, col, info.indices, info.indices);
+        }
     }
 
-    
+
     template <class MATRIX, typename number>
     template <class DOFINFO>
     inline void
@@ -767,31 +767,31 @@ namespace MeshWorker
       const DOFINFO& info2)
     {
       for (unsigned int i=0;i<matrices->size();++i)
-	{
-					   // Row and column index of
-					   // the block we are dealing with
-	  const unsigned int row = matrices->block(i).row;
-	  const unsigned int col = matrices->block(i).column;
+        {
+                                           // Row and column index of
+                                           // the block we are dealing with
+          const unsigned int row = matrices->block(i).row;
+          const unsigned int col = matrices->block(i).column;
 
-	  assemble(matrices->block(i), info1.matrix(i,false).matrix, row, col, info1.indices, info1.indices);
-	  assemble(matrices->block(i), info1.matrix(i,true).matrix, row, col, info1.indices, info2.indices);
-	  assemble(matrices->block(i), info2.matrix(i,false).matrix, row, col, info2.indices, info2.indices);
-	  assemble(matrices->block(i), info2.matrix(i,true).matrix, row, col, info2.indices, info1.indices);
-	}
+          assemble(matrices->block(i), info1.matrix(i,false).matrix, row, col, info1.indices, info1.indices);
+          assemble(matrices->block(i), info1.matrix(i,true).matrix, row, col, info1.indices, info2.indices);
+          assemble(matrices->block(i), info2.matrix(i,false).matrix, row, col, info2.indices, info2.indices);
+          assemble(matrices->block(i), info2.matrix(i,true).matrix, row, col, info2.indices, info1.indices);
+        }
     }
 
 
 // ----------------------------------------------------------------------//
-    
+
     template <class MATRIX, typename number>
     inline
     MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::MGMatrixLocalBlocksToGlobalBlocks(
       double threshold)
-		    :
-		    threshold(threshold)
+                    :
+                    threshold(threshold)
     {}
-    
-    
+
+
     template <class MATRIX, typename number>
     inline void
     MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(
@@ -811,7 +811,7 @@ namespace MeshWorker
     {
       mg_constrained_dofs = &mg_c;
     }
-    
+
 
     template <class MATRIX ,typename number>
     template <class DOFINFO>
@@ -834,7 +834,7 @@ namespace MeshWorker
       flux_up = up;
       flux_down = down;
     }
-    
+
 
     template <class MATRIX, typename number>
     inline void
@@ -846,7 +846,7 @@ namespace MeshWorker
       interface_out = out;
     }
 
-    
+
     template <class MATRIX, typename number>
     inline void
     MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble(
@@ -861,30 +861,30 @@ namespace MeshWorker
       bool transpose)
     {
       for (unsigned int j=0;j<local.n_rows();++j)
-	for (unsigned int k=0;k<local.n_cols();++k)
-	  if (std::fabs(local(j,k)) >= threshold)
-	    {
-					       // The coordinates of
-					       // the current entry in
-					       // DoFHandler
-					       // numbering, which
-					       // differs from the
-					       // block-wise local
-					       // numbering we use in
-					       // our local matrices
-	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+        for (unsigned int k=0;k<local.n_cols();++k)
+          if (std::fabs(local(j,k)) >= threshold)
+            {
+                                               // The coordinates of
+                                               // the current entry in
+                                               // DoFHandler
+                                               // numbering, which
+                                               // differs from the
+                                               // block-wise local
+                                               // numbering we use in
+                                               // our local matrices
+              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
 
-					       // The global dof
-					       // indices to assemble
-					       // in. Since we may
-					       // have face matrices
-					       // coupling two
-					       // different cells, we
-					       // provide two sets of
-					       // dof indices.
-	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+                                               // The global dof
+                                               // indices to assemble
+                                               // in. Since we may
+                                               // have face matrices
+                                               // coupling two
+                                               // different cells, we
+                                               // provide two sets of
+                                               // dof indices.
+              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
 
               if(mg_constrained_dofs == 0)
               {
@@ -922,7 +922,7 @@ namespace MeshWorker
                   }
                 }
               }
-	    }
+            }
     }
 
 
@@ -939,30 +939,30 @@ namespace MeshWorker
       unsigned int level2)
     {
       for (unsigned int j=0;j<local.n_rows();++j)
-	for (unsigned int k=0;k<local.n_cols();++k)
-	  if (std::fabs(local(j,k)) >= threshold)
-	    {
-					       // The coordinates of
-					       // the current entry in
-					       // DoFHandler
-					       // numbering, which
-					       // differs from the
-					       // block-wise local
-					       // numbering we use in
-					       // our local matrices
-	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+        for (unsigned int k=0;k<local.n_cols();++k)
+          if (std::fabs(local(j,k)) >= threshold)
+            {
+                                               // The coordinates of
+                                               // the current entry in
+                                               // DoFHandler
+                                               // numbering, which
+                                               // differs from the
+                                               // block-wise local
+                                               // numbering we use in
+                                               // our local matrices
+              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
 
-					       // The global dof
-					       // indices to assemble
-					       // in. Since we may
-					       // have face matrices
-					       // coupling two
-					       // different cells, we
-					       // provide two sets of
-					       // dof indices.
-	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+                                               // The global dof
+                                               // indices to assemble
+                                               // in. Since we may
+                                               // have face matrices
+                                               // coupling two
+                                               // different cells, we
+                                               // provide two sets of
+                                               // dof indices.
+              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
 
               if(mg_constrained_dofs == 0)
                 global.add(jglobal, kglobal, local(j,k));
@@ -992,30 +992,30 @@ namespace MeshWorker
       unsigned int level2)
     {
       for (unsigned int j=0;j<local.n_rows();++j)
-	for (unsigned int k=0;k<local.n_cols();++k)
-	  if (std::fabs(local(j,k)) >= threshold)
-	    {
-					       // The coordinates of
-					       // the current entry in
-					       // DoFHandler
-					       // numbering, which
-					       // differs from the
-					       // block-wise local
-					       // numbering we use in
-					       // our local matrices
-	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+        for (unsigned int k=0;k<local.n_cols();++k)
+          if (std::fabs(local(j,k)) >= threshold)
+            {
+                                               // The coordinates of
+                                               // the current entry in
+                                               // DoFHandler
+                                               // numbering, which
+                                               // differs from the
+                                               // block-wise local
+                                               // numbering we use in
+                                               // our local matrices
+              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
 
-					       // The global dof
-					       // indices to assemble
-					       // in. Since we may
-					       // have face matrices
-					       // coupling two
-					       // different cells, we
-					       // provide two sets of
-					       // dof indices.
-	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+                                               // The global dof
+                                               // indices to assemble
+                                               // in. Since we may
+                                               // have face matrices
+                                               // coupling two
+                                               // different cells, we
+                                               // provide two sets of
+                                               // dof indices.
+              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
 
               if(mg_constrained_dofs == 0)
                 global.add(jglobal, kglobal, local(j,k));
@@ -1045,30 +1045,30 @@ namespace MeshWorker
       unsigned int level2)
     {
       for (unsigned int j=0;j<local.n_rows();++j)
-	for (unsigned int k=0;k<local.n_cols();++k)
-	  if (std::fabs(local(k,j)) >= threshold)
-	    {
-					       // The coordinates of
-					       // the current entry in
-					       // DoFHandler
-					       // numbering, which
-					       // differs from the
-					       // block-wise local
-					       // numbering we use in
-					       // our local matrices
-	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+        for (unsigned int k=0;k<local.n_cols();++k)
+          if (std::fabs(local(k,j)) >= threshold)
+            {
+                                               // The coordinates of
+                                               // the current entry in
+                                               // DoFHandler
+                                               // numbering, which
+                                               // differs from the
+                                               // block-wise local
+                                               // numbering we use in
+                                               // our local matrices
+              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
 
-					       // The global dof
-					       // indices to assemble
-					       // in. Since we may
-					       // have face matrices
-					       // coupling two
-					       // different cells, we
-					       // provide two sets of
-					       // dof indices.
-	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+                                               // The global dof
+                                               // indices to assemble
+                                               // in. Since we may
+                                               // have face matrices
+                                               // coupling two
+                                               // different cells, we
+                                               // provide two sets of
+                                               // dof indices.
+              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
 
               if(mg_constrained_dofs == 0)
                 global.add(jglobal, kglobal, local(k,j));
@@ -1101,30 +1101,30 @@ namespace MeshWorker
 //      AssertDimension(local.m(), dof2.size());
 
       for (unsigned int j=0;j<local.n_rows();++j)
-	for (unsigned int k=0;k<local.n_cols();++k)
-	  if (std::fabs(local(j,k)) >= threshold)
-	    {
-					       // The coordinates of
-					       // the current entry in
-					       // DoFHandler
-					       // numbering, which
-					       // differs from the
-					       // block-wise local
-					       // numbering we use in
-					       // our local matrices
-	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+        for (unsigned int k=0;k<local.n_cols();++k)
+          if (std::fabs(local(j,k)) >= threshold)
+            {
+                                               // The coordinates of
+                                               // the current entry in
+                                               // DoFHandler
+                                               // numbering, which
+                                               // differs from the
+                                               // block-wise local
+                                               // numbering we use in
+                                               // our local matrices
+              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
 
-					       // The global dof
-					       // indices to assemble
-					       // in. Since we may
-					       // have face matrices
-					       // coupling two
-					       // different cells, we
-					       // provide two sets of
-					       // dof indices.
-	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+                                               // The global dof
+                                               // indices to assemble
+                                               // in. Since we may
+                                               // have face matrices
+                                               // coupling two
+                                               // different cells, we
+                                               // provide two sets of
+                                               // dof indices.
+              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
 
               if(mg_constrained_dofs == 0)
                 global.add(jglobal, kglobal, local(j,k));
@@ -1166,30 +1166,30 @@ namespace MeshWorker
 //      AssertDimension(local.m(), dof2.size());
 
       for (unsigned int j=0;j<local.n_rows();++j)
-	for (unsigned int k=0;k<local.n_cols();++k)
-	  if (std::fabs(local(k,j)) >= threshold)
-	    {
-					       // The coordinates of
-					       // the current entry in
-					       // DoFHandler
-					       // numbering, which
-					       // differs from the
-					       // block-wise local
-					       // numbering we use in
-					       // our local matrices
-	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+        for (unsigned int k=0;k<local.n_cols();++k)
+          if (std::fabs(local(k,j)) >= threshold)
+            {
+                                               // The coordinates of
+                                               // the current entry in
+                                               // DoFHandler
+                                               // numbering, which
+                                               // differs from the
+                                               // block-wise local
+                                               // numbering we use in
+                                               // our local matrices
+              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
 
-					       // The global dof
-					       // indices to assemble
-					       // in. Since we may
-					       // have face matrices
-					       // coupling two
-					       // different cells, we
-					       // provide two sets of
-					       // dof indices.
-	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+                                               // The global dof
+                                               // indices to assemble
+                                               // in. Since we may
+                                               // have face matrices
+                                               // coupling two
+                                               // different cells, we
+                                               // provide two sets of
+                                               // dof indices.
+              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
 
               if(mg_constrained_dofs == 0)
                 global.add(jglobal, kglobal, local(k,j));
@@ -1215,41 +1215,41 @@ namespace MeshWorker
             }
     }
 
-    
+
     template <class MATRIX, typename number>
     template <class DOFINFO>
     inline void
     MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble(const DOFINFO& info)
     {
       const unsigned int level = info.cell->level();
-      
-      for (unsigned int i=0;i<matrices->size();++i)
-	{
-					   // Row and column index of
-					   // the block we are dealing with
-	  const unsigned int row = matrices->block(i)[level].row;
-	  const unsigned int col = matrices->block(i)[level].column;
 
-	  assemble(matrices->block(i)[level].matrix, info.matrix(i,false).matrix, row, col,
-		   info.indices, info.indices, level, level);
+      for (unsigned int i=0;i<matrices->size();++i)
+        {
+                                           // Row and column index of
+                                           // the block we are dealing with
+          const unsigned int row = matrices->block(i)[level].row;
+          const unsigned int col = matrices->block(i)[level].column;
+
+          assemble(matrices->block(i)[level].matrix, info.matrix(i,false).matrix, row, col,
+                   info.indices, info.indices, level, level);
           if(mg_constrained_dofs != 0)
           {
             if(interface_in != 0)
-            assemble_in(interface_in->block(i)[level], info.matrix(i,false).matrix, row, col, 
+            assemble_in(interface_in->block(i)[level], info.matrix(i,false).matrix, row, col,
                 info.indices, info.indices, level, level);
             if(interface_out != 0)
-            assemble_in(interface_out->block(i)[level], info.matrix(i,false).matrix, row, col, 
+            assemble_in(interface_out->block(i)[level], info.matrix(i,false).matrix, row, col,
                 info.indices, info.indices, level, level);
 
-            assemble_in(matrices->block_in(i)[level], info.matrix(i,false).matrix, row, col, 
+            assemble_in(matrices->block_in(i)[level], info.matrix(i,false).matrix, row, col,
                 info.indices, info.indices, level, level);
             assemble_out(matrices->block_out(i)[level], info.matrix(i,false).matrix, row, col,
                 info.indices, info.indices, level, level);
           }
-	}
+        }
     }
 
-    
+
     template <class MATRIX, typename number>
     template <class DOFINFO>
     inline void
@@ -1259,58 +1259,58 @@ namespace MeshWorker
     {
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
-      
-      for (unsigned int i=0;i<matrices->size();++i)
-	{
-	  MGLevelObject<MatrixBlock<MATRIX> >& o = matrices->block(i);
-	  
-					   // Row and column index of
-					   // the block we are dealing with
-	  const unsigned int row = o[level1].row;
-	  const unsigned int col = o[level1].column;
 
-	  if (level1 == level2)
-	    {
+      for (unsigned int i=0;i<matrices->size();++i)
+        {
+          MGLevelObject<MatrixBlock<MATRIX> >& o = matrices->block(i);
+
+                                           // Row and column index of
+                                           // the block we are dealing with
+          const unsigned int row = o[level1].row;
+          const unsigned int col = o[level1].column;
+
+          if (level1 == level2)
+            {
               if(mg_constrained_dofs == 0)
               {
-	      assemble(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
-		       info1.indices, info1.indices, level1, level1);
-	      assemble(o[level1].matrix, info1.matrix(i,true).matrix, row, col,
-		       info1.indices, info2.indices, level1, level2);
-	      assemble(o[level1].matrix, info2.matrix(i,false).matrix, row, col,
-		       info2.indices, info2.indices, level2, level2);
-	      assemble(o[level1].matrix, info2.matrix(i,true).matrix, row, col,
-		       info2.indices, info1.indices, level2, level1);
+              assemble(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
+                       info1.indices, info1.indices, level1, level1);
+              assemble(o[level1].matrix, info1.matrix(i,true).matrix, row, col,
+                       info1.indices, info2.indices, level1, level2);
+              assemble(o[level1].matrix, info2.matrix(i,false).matrix, row, col,
+                       info2.indices, info2.indices, level2, level2);
+              assemble(o[level1].matrix, info2.matrix(i,true).matrix, row, col,
+                       info2.indices, info1.indices, level2, level1);
               }
               else
               {
-	      assemble_fluxes(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
-		       info1.indices, info1.indices, level1, level1);
-	      assemble_fluxes(o[level1].matrix, info1.matrix(i,true).matrix, row, col,
-		       info1.indices, info2.indices, level1, level2);
-	      assemble_fluxes(o[level1].matrix, info2.matrix(i,false).matrix, row, col,
-		       info2.indices, info2.indices, level2, level2);
-	      assemble_fluxes(o[level1].matrix, info2.matrix(i,true).matrix, row, col,
-		       info2.indices, info1.indices, level2, level1);
+              assemble_fluxes(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
+                       info1.indices, info1.indices, level1, level1);
+              assemble_fluxes(o[level1].matrix, info1.matrix(i,true).matrix, row, col,
+                       info1.indices, info2.indices, level1, level2);
+              assemble_fluxes(o[level1].matrix, info2.matrix(i,false).matrix, row, col,
+                       info2.indices, info2.indices, level2, level2);
+              assemble_fluxes(o[level1].matrix, info2.matrix(i,true).matrix, row, col,
+                       info2.indices, info1.indices, level2, level1);
               }
-	    }
-	  else
-	    {
-	      Assert(level1 > level2, ExcNotImplemented());
-	      if (flux_up->size() != 0)
-		{
-						   // Do not add M22,
-						   // which is done by
-						   // the coarser cell
-		  assemble_fluxes(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
-			   info1.indices, info1.indices, level1, level1);	      
-		  assemble_up(flux_up->block(i)[level1].matrix, info1.matrix(i,true).matrix, row, col,
-			   info1.indices, info2.indices, level1, level2);
-		  assemble_down(flux_down->block(i)[level1].matrix, info2.matrix(i,true).matrix, row, col,
-			   info2.indices, info1.indices, level2, level1);
-		}
-	    }
-	}
+            }
+          else
+            {
+              Assert(level1 > level2, ExcNotImplemented());
+              if (flux_up->size() != 0)
+                {
+                                                   // Do not add M22,
+                                                   // which is done by
+                                                   // the coarser cell
+                  assemble_fluxes(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
+                           info1.indices, info1.indices, level1, level1);
+                  assemble_up(flux_up->block(i)[level1].matrix, info1.matrix(i,true).matrix, row, col,
+                           info1.indices, info2.indices, level1, level2);
+                  assemble_down(flux_down->block(i)[level1].matrix, info2.matrix(i,true).matrix, row, col,
+                           info2.indices, info1.indices, level2, level1);
+                }
+            }
+        }
     }
   }
 }

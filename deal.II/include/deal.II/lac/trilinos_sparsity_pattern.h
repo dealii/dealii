@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,171 +62,171 @@ namespace TrilinosWrappers
     {
       private:
                                        /**
-					* Accessor class for iterators
-					*/
+                                        * Accessor class for iterators
+                                        */
         class Accessor
         {
           public:
                                        /**
-					* Constructor. Since we use
-					* accessors only for read
-					* access, a const matrix
-					* pointer is sufficient.
-					*/
+                                        * Constructor. Since we use
+                                        * accessors only for read
+                                        * access, a const matrix
+                                        * pointer is sufficient.
+                                        */
             Accessor (const SparsityPattern *sparsity_pattern,
                       const unsigned int     row,
                       const unsigned int     index);
 
                                        /**
-					* Row number of the element
-					* represented by this object.
-					*/
+                                        * Row number of the element
+                                        * represented by this object.
+                                        */
             unsigned int row() const;
 
                                        /**
-					* Index in row of the element
-					* represented by this object.
-					*/
+                                        * Index in row of the element
+                                        * represented by this object.
+                                        */
             unsigned int index() const;
 
                                        /**
-					* Column number of the element
-					* represented by this object.
-					*/
+                                        * Column number of the element
+                                        * represented by this object.
+                                        */
             unsigned int column() const;
 
                                        /**
-					* Exception
-					*/
+                                        * Exception
+                                        */
             DeclException0 (ExcBeyondEndOfSparsityPattern);
 
-	                               /**
-					* Exception
-					*/
+                                       /**
+                                        * Exception
+                                        */
             DeclException3 (ExcAccessToNonlocalRow,
                             int, int, int,
                             << "You tried to access row " << arg1
                             << " of a distributed sparsity pattern, "
-			    << " but only rows " << arg2 << " through " << arg3
+                            << " but only rows " << arg2 << " through " << arg3
                             << " are stored locally and can be accessed.");
 
           private:
                                        /**
-					* The matrix accessed.
-					*/
+                                        * The matrix accessed.
+                                        */
             mutable SparsityPattern *sparsity_pattern;
 
                                        /**
-					* Current row number.
-					*/
+                                        * Current row number.
+                                        */
             unsigned int a_row;
 
                                        /**
-					* Current index in row.
-					*/
+                                        * Current index in row.
+                                        */
             unsigned int a_index;
 
                                        /**
-					* Cache where we store the
-					* column indices of the
-					* present row. This is
-					* necessary, since Trilinos
-					* makes access to the elements
-					* of its matrices rather hard,
-					* and it is much more
-					* efficient to copy all column
-					* entries of a row once when
-					* we enter it than repeatedly
-					* asking Trilinos for
-					* individual ones. This also
-					* makes some sense since it is
-					* likely that we will access
-					* them sequentially anyway.
-					*
-					* In order to make copying of
-					* iterators/accessor of
-					* acceptable performance, we
-					* keep a shared pointer to
-					* these entries so that more
-					* than one accessor can access
-					* this data if necessary.
-					*/
+                                        * Cache where we store the
+                                        * column indices of the
+                                        * present row. This is
+                                        * necessary, since Trilinos
+                                        * makes access to the elements
+                                        * of its matrices rather hard,
+                                        * and it is much more
+                                        * efficient to copy all column
+                                        * entries of a row once when
+                                        * we enter it than repeatedly
+                                        * asking Trilinos for
+                                        * individual ones. This also
+                                        * makes some sense since it is
+                                        * likely that we will access
+                                        * them sequentially anyway.
+                                        *
+                                        * In order to make copying of
+                                        * iterators/accessor of
+                                        * acceptable performance, we
+                                        * keep a shared pointer to
+                                        * these entries so that more
+                                        * than one accessor can access
+                                        * this data if necessary.
+                                        */
             std_cxx1x::shared_ptr<const std::vector<unsigned int> > colnum_cache;
 
-	                               /**
-					* Discard the old row caches
-					* (they may still be used by
-					* other accessors) and
-					* generate new ones for the
-					* row pointed to presently by
-					* this accessor.
-					*/
+                                       /**
+                                        * Discard the old row caches
+                                        * (they may still be used by
+                                        * other accessors) and
+                                        * generate new ones for the
+                                        * row pointed to presently by
+                                        * this accessor.
+                                        */
             void visit_present_row ();
 
                                        /**
-					* Make enclosing class a
-					* friend.
-					*/
+                                        * Make enclosing class a
+                                        * friend.
+                                        */
             friend class const_iterator;
         };
 
       public:
 
                                        /**
-					* Constructor. Create an
-					* iterator into the matrix @p
-					* matrix for the given row and
-					* the index within it.
-					*/
+                                        * Constructor. Create an
+                                        * iterator into the matrix @p
+                                        * matrix for the given row and
+                                        * the index within it.
+                                        */
         const_iterator (const SparsityPattern *sparsity_pattern,
                         const unsigned int     row,
                         const unsigned int     index);
 
                                        /**
-					* Prefix increment.
-					*/
+                                        * Prefix increment.
+                                        */
         const_iterator& operator++ ();
 
                                        /**
-					* Postfix increment.
-					*/
+                                        * Postfix increment.
+                                        */
         const_iterator operator++ (int);
 
                                        /**
-					* Dereferencing operator.
-					*/
+                                        * Dereferencing operator.
+                                        */
         const Accessor& operator* () const;
 
                                        /**
-					* Dereferencing operator.
-					*/
+                                        * Dereferencing operator.
+                                        */
         const Accessor* operator-> () const;
 
                                        /**
-					* Comparison. True, if both
-					* iterators point to the same
-					* matrix position.
-					*/
+                                        * Comparison. True, if both
+                                        * iterators point to the same
+                                        * matrix position.
+                                        */
         bool operator == (const const_iterator&) const;
 
                                        /**
-					* Inverse of <tt>==</tt>.
-					*/
+                                        * Inverse of <tt>==</tt>.
+                                        */
         bool operator != (const const_iterator&) const;
 
                                        /**
-					* Comparison operator. Result
-					* is true if either the first
-					* row number is smaller or if
-					* the row numbers are equal
-					* and the first index is
-					* smaller.
-					*/
+                                        * Comparison operator. Result
+                                        * is true if either the first
+                                        * row number is smaller or if
+                                        * the row numbers are equal
+                                        * and the first index is
+                                        * smaller.
+                                        */
         bool operator < (const const_iterator&) const;
 
-	                               /**
+                                       /**
                                         * Exception
-					*/
+                                        */
         DeclException2 (ExcInvalidIndexWithinRow,
                         int, int,
                         << "Attempt to access element " << arg2
@@ -237,10 +237,10 @@ namespace TrilinosWrappers
                                        /**
                                         * Store an object of the
                                         * accessor class.
-					*/
+                                        */
         Accessor accessor;
 
-	friend class TrilinosWrappers::SparsityPattern;
+        friend class TrilinosWrappers::SparsityPattern;
     };
 
   }
@@ -288,35 +288,35 @@ namespace TrilinosWrappers
       SparsityPattern ();
 
                                        /**
-					* Generate a sparsity pattern that is
-					* completely stored locally, having
-					* $m$ rows and $n$ columns. The
-					* resulting matrix will be completely
-					* stored locally, too.
-					*
-					* It is possible to specify the
-					* number of columns entries per row
-					* using the optional @p
-					* n_entries_per_row
-					* argument. However, this value does
-					* not need to be accurate or even
-					* given at all, since one does
-					* usually not have this kind of
-					* information before building the
-					* sparsity pattern (the usual case
-					* when the function
-					* DoFTools::make_sparsity_pattern()
-					* is called). The entries are
-					* allocated dynamically in a similar
-					* manner as for the deal.II
-					* CompressedSparsityPattern
-					* classes. However, a good estimate
-					* will reduce the setup time of the
-					* sparsity pattern.
-					*/
+                                        * Generate a sparsity pattern that is
+                                        * completely stored locally, having
+                                        * $m$ rows and $n$ columns. The
+                                        * resulting matrix will be completely
+                                        * stored locally, too.
+                                        *
+                                        * It is possible to specify the
+                                        * number of columns entries per row
+                                        * using the optional @p
+                                        * n_entries_per_row
+                                        * argument. However, this value does
+                                        * not need to be accurate or even
+                                        * given at all, since one does
+                                        * usually not have this kind of
+                                        * information before building the
+                                        * sparsity pattern (the usual case
+                                        * when the function
+                                        * DoFTools::make_sparsity_pattern()
+                                        * is called). The entries are
+                                        * allocated dynamically in a similar
+                                        * manner as for the deal.II
+                                        * CompressedSparsityPattern
+                                        * classes. However, a good estimate
+                                        * will reduce the setup time of the
+                                        * sparsity pattern.
+                                        */
       SparsityPattern (const unsigned int  m,
-		       const unsigned int  n,
-		       const unsigned int  n_entries_per_row = 0);
+                       const unsigned int  n,
+                       const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Generate a sparsity pattern that is
@@ -324,16 +324,16 @@ namespace TrilinosWrappers
                                         * $m$ rows and $n$ columns. The
                                         * resulting matrix will be completely
                                         * stored locally, too.
-					*
-					* The vector
-					* <tt>n_entries_per_row</tt>
-					* specifies the number of entries in
-					* each row (an information usually
-					* not available, though).
+                                        *
+                                        * The vector
+                                        * <tt>n_entries_per_row</tt>
+                                        * specifies the number of entries in
+                                        * each row (an information usually
+                                        * not available, though).
                                         */
       SparsityPattern (const unsigned int               m,
-		       const unsigned int               n,
-		       const std::vector<unsigned int> &n_entries_per_row);
+                       const unsigned int               n,
+                       const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * Copy constructor. Sets the calling
@@ -355,23 +355,23 @@ namespace TrilinosWrappers
                                         * having $m$ rows and $n$
                                         * columns. The resulting matrix will
                                         * be completely stored locally.
-					*
-					* The number of columns entries per
-					* row is specified as the maximum
-					* number of entries argument.  This
-					* does not need to be an accurate
-					* number since the entries are
-					* allocated dynamically in a similar
-					* manner as for the deal.II
-					* CompressedSparsityPattern classes,
-					* but a good estimate will reduce
-					* the setup time of the sparsity
-					* pattern.
+                                        *
+                                        * The number of columns entries per
+                                        * row is specified as the maximum
+                                        * number of entries argument.  This
+                                        * does not need to be an accurate
+                                        * number since the entries are
+                                        * allocated dynamically in a similar
+                                        * manner as for the deal.II
+                                        * CompressedSparsityPattern classes,
+                                        * but a good estimate will reduce
+                                        * the setup time of the sparsity
+                                        * pattern.
                                         */
       void
       reinit (const unsigned int  m,
-	      const unsigned int  n,
-	      const unsigned int  n_entries_per_row = 0);
+              const unsigned int  n,
+              const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Initialize a sparsity pattern that
@@ -379,16 +379,16 @@ namespace TrilinosWrappers
                                         * having $m$ rows and $n$ columns. The
                                         * resulting matrix will be
                                         * completely stored locally.
-					*
-					* The vector
-					* <tt>n_entries_per_row</tt>
-					* specifies the number of entries in
-					* each row.
+                                        *
+                                        * The vector
+                                        * <tt>n_entries_per_row</tt>
+                                        * specifies the number of entries in
+                                        * each row.
                                         */
       void
       reinit (const unsigned int               m,
-	      const unsigned int               n,
-	      const std::vector<unsigned int> &n_entries_per_row);
+              const unsigned int               n,
+              const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * Copy function. Sets the calling
@@ -409,28 +409,28 @@ namespace TrilinosWrappers
       void
       copy_from (const SparsityType &nontrilinos_sparsity_pattern);
 
-				       /**
-					* Copy operator. This operation is
-					* only allowed for empty objects, to
-					* avoid potentially very costly
-					* operations automatically
-					* synthesized by the compiler. Use
-					* copy_from() instead if you know
-					* that you really want to copy a
-					* sparsity pattern with non-trivial
-					* content.
-					*/
+                                       /**
+                                        * Copy operator. This operation is
+                                        * only allowed for empty objects, to
+                                        * avoid potentially very costly
+                                        * operations automatically
+                                        * synthesized by the compiler. Use
+                                        * copy_from() instead if you know
+                                        * that you really want to copy a
+                                        * sparsity pattern with non-trivial
+                                        * content.
+                                        */
       SparsityPattern & operator = (const SparsityPattern &input_sparsity_pattern);
 
                                        /**
                                         * Release all memory and return to a
                                         * state just like after having
                                         * called the default constructor.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       void clear ();
 
@@ -460,51 +460,51 @@ namespace TrilinosWrappers
 
                                        /**
                                         * Constructor for a square sparsity
-				        * pattern using an Epetra_map for
-				        * the description of the %parallel
-				        * partitioning. Moreover, the number
-				        * of nonzero entries in the rows of
-				        * the sparsity pattern can be
-				        * specified. Note that this number
-				        * does not need to be exact, and it
-				        * is allowed that the actual
-				        * sparsity structure has more
-				        * nonzero entries than specified in
-				        * the constructor (the usual case
-				        * when the function
-				        * DoFTools::make_sparsity_pattern()
-				        * is called). However it is still
-				        * advantageous to provide good
-				        * estimates here since a good value
-				        * will avoid repeated allocation of
-				        * memory, which considerably
-				        * increases the performance when
-				        * creating the sparsity pattern.
+                                        * pattern using an Epetra_map for
+                                        * the description of the %parallel
+                                        * partitioning. Moreover, the number
+                                        * of nonzero entries in the rows of
+                                        * the sparsity pattern can be
+                                        * specified. Note that this number
+                                        * does not need to be exact, and it
+                                        * is allowed that the actual
+                                        * sparsity structure has more
+                                        * nonzero entries than specified in
+                                        * the constructor (the usual case
+                                        * when the function
+                                        * DoFTools::make_sparsity_pattern()
+                                        * is called). However it is still
+                                        * advantageous to provide good
+                                        * estimates here since a good value
+                                        * will avoid repeated allocation of
+                                        * memory, which considerably
+                                        * increases the performance when
+                                        * creating the sparsity pattern.
                                         */
       SparsityPattern (const Epetra_Map   &parallel_partitioning,
-		       const unsigned int  n_entries_per_row = 0);
+                       const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Same as before, but now use the
-				        * exact number of nonzeros in each m
-				        * row. Since we know the number of
-				        * elements in the sparsity pattern
-				        * exactly in this case, we can
-				        * already allocate the right amount
-				        * of memory, which makes the
-				        * creation process by the respective
-				        * SparsityPattern::reinit call
-				        * considerably faster. However, this
-				        * is a rather unusual situation,
-				        * since knowing the number of
-				        * entries in each row is usually
-				        * connected to knowing the indices
-				        * of nonzero entries, which the
-				        * sparsity pattern is designed to
-				        * describe.
+                                        * exact number of nonzeros in each m
+                                        * row. Since we know the number of
+                                        * elements in the sparsity pattern
+                                        * exactly in this case, we can
+                                        * already allocate the right amount
+                                        * of memory, which makes the
+                                        * creation process by the respective
+                                        * SparsityPattern::reinit call
+                                        * considerably faster. However, this
+                                        * is a rather unusual situation,
+                                        * since knowing the number of
+                                        * entries in each row is usually
+                                        * connected to knowing the indices
+                                        * of nonzero entries, which the
+                                        * sparsity pattern is designed to
+                                        * describe.
                                         */
       SparsityPattern (const Epetra_Map                &parallel_partitioning,
-		       const std::vector<unsigned int> &n_entries_per_row);
+                       const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * This constructor is similar to the
@@ -529,89 +529,89 @@ namespace TrilinosWrappers
                                         * when performing matrix-vector
                                         * products with vectors based on the
                                         * same column map.
-					*
-					* The number of columns entries per
-					* row is specified as the maximum
-					* number of entries argument.
+                                        *
+                                        * The number of columns entries per
+                                        * row is specified as the maximum
+                                        * number of entries argument.
                                         */
       SparsityPattern (const Epetra_Map   &row_parallel_partitioning,
-		       const Epetra_Map   &col_parallel_partitioning,
-		       const unsigned int  n_entries_per_row = 0);
+                       const Epetra_Map   &col_parallel_partitioning,
+                       const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * This constructor is similar to the
-				        * one above, but it now takes two
-				        * different Epetra maps for rows and
-				        * columns. This interface is meant to
-				        * be used for generating rectangular
-				        * matrices, where one map specifies
-				        * the %parallel distribution of rows
-				        * and the second one specifies the
-				        * distribution of degrees of freedom
-				        * associated with matrix columns. This
-				        * second map is however not used for
-				        * the distribution of the columns
-				        * themselves &ndash; rather, all
-				        * column elements of a row are stored
-				        * on the same processor. The vector
-				        * <tt>n_entries_per_row</tt> specifies
-				        * the number of entries in each row of
-				        * the newly generated matrix.
+                                        * one above, but it now takes two
+                                        * different Epetra maps for rows and
+                                        * columns. This interface is meant to
+                                        * be used for generating rectangular
+                                        * matrices, where one map specifies
+                                        * the %parallel distribution of rows
+                                        * and the second one specifies the
+                                        * distribution of degrees of freedom
+                                        * associated with matrix columns. This
+                                        * second map is however not used for
+                                        * the distribution of the columns
+                                        * themselves &ndash; rather, all
+                                        * column elements of a row are stored
+                                        * on the same processor. The vector
+                                        * <tt>n_entries_per_row</tt> specifies
+                                        * the number of entries in each row of
+                                        * the newly generated matrix.
                                         */
       SparsityPattern (const Epetra_Map                &row_parallel_partitioning,
-		       const Epetra_Map                &col_parallel_partitioning,
-		       const std::vector<unsigned int> &n_entries_per_row);
+                       const Epetra_Map                &col_parallel_partitioning,
+                       const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * Reinitialization function for
-				        * generating a square sparsity pattern
-				        * using an Epetra_Map for the
-				        * description of the %parallel
-				        * partitioning and the number of
-				        * nonzero entries in the rows of the
-				        * sparsity pattern. Note that this
-				        * number does not need to be exact,
-				        * and it is even allowed that the
-				        * actual sparsity structure has more
-				        * nonzero entries than specified in
-				        * the constructor. However it is still
-				        * advantageous to provide good
-				        * estimates here since this will
-				        * considerably increase the
-				        * performance when creating the
-				        * sparsity pattern.
-					*
-					* This function does not create any
-					* entries by itself, but provides
-					* the correct data structures that
-					* can be used by the respective
-					* add() function.
+                                        * generating a square sparsity pattern
+                                        * using an Epetra_Map for the
+                                        * description of the %parallel
+                                        * partitioning and the number of
+                                        * nonzero entries in the rows of the
+                                        * sparsity pattern. Note that this
+                                        * number does not need to be exact,
+                                        * and it is even allowed that the
+                                        * actual sparsity structure has more
+                                        * nonzero entries than specified in
+                                        * the constructor. However it is still
+                                        * advantageous to provide good
+                                        * estimates here since this will
+                                        * considerably increase the
+                                        * performance when creating the
+                                        * sparsity pattern.
+                                        *
+                                        * This function does not create any
+                                        * entries by itself, but provides
+                                        * the correct data structures that
+                                        * can be used by the respective
+                                        * add() function.
                                         */
       void
       reinit (const Epetra_Map   &parallel_partitioning,
-	      const unsigned int  n_entries_per_row = 0);
+              const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Same as before, but now use the
-				        * exact number of nonzeros in each m
-				        * row. Since we know the number of
-				        * elements in the sparsity pattern
-				        * exactly in this case, we can
-				        * already allocate the right amount
-				        * of memory, which makes process of
-				        * adding entries to the sparsity
-				        * pattern considerably
-				        * faster. However, this is a rather
-				        * unusual situation, since knowing
-				        * the number of entries in each row
-				        * is usually connected to knowing
-				        * the indices of nonzero entries,
-				        * which the sparsity pattern is
-				        * designed to describe.
+                                        * exact number of nonzeros in each m
+                                        * row. Since we know the number of
+                                        * elements in the sparsity pattern
+                                        * exactly in this case, we can
+                                        * already allocate the right amount
+                                        * of memory, which makes process of
+                                        * adding entries to the sparsity
+                                        * pattern considerably
+                                        * faster. However, this is a rather
+                                        * unusual situation, since knowing
+                                        * the number of entries in each row
+                                        * is usually connected to knowing
+                                        * the indices of nonzero entries,
+                                        * which the sparsity pattern is
+                                        * designed to describe.
                                         */
       void
       reinit (const Epetra_Map                &parallel_partitioning,
-	      const std::vector<unsigned int> &n_entries_per_row);
+              const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * This reinit function is similar to
@@ -636,43 +636,43 @@ namespace TrilinosWrappers
                                         * internal arragements when doing
                                         * matrix-vector products with
                                         * vectors based on that column map.
-					*
-					* The number of columns entries per
-					* row is specified by the argument
-					* <tt>n_entries_per_row</tt>.
+                                        *
+                                        * The number of columns entries per
+                                        * row is specified by the argument
+                                        * <tt>n_entries_per_row</tt>.
                                         */
       void
       reinit (const Epetra_Map   &row_parallel_partitioning,
-	      const Epetra_Map   &col_parallel_partitioning,
-	      const unsigned int  n_entries_per_row = 0);
+              const Epetra_Map   &col_parallel_partitioning,
+              const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * This reinit function is similar to
-				        * the one above, but it now takes
-				        * two different Epetra maps for rows
-				        * and columns. This interface is
-				        * meant to be used for generating
-				        * rectangular matrices, where one
-				        * map specifies the %parallel
-				        * distribution of rows and the
-				        * second one specifies the
-				        * distribution of degrees of freedom
-				        * associated with matrix
-				        * columns. This second map is
-				        * however not used for the
-				        * distribution of the columns
-				        * themselves &ndash; rather, all
-				        * column elements of a row are
-				        * stored on the same processor. The
-				        * vector <tt>n_entries_per_row</tt>
-				        * specifies the number of entries in
-				        * each row of the newly generated
-				        * matrix.
+                                        * the one above, but it now takes
+                                        * two different Epetra maps for rows
+                                        * and columns. This interface is
+                                        * meant to be used for generating
+                                        * rectangular matrices, where one
+                                        * map specifies the %parallel
+                                        * distribution of rows and the
+                                        * second one specifies the
+                                        * distribution of degrees of freedom
+                                        * associated with matrix
+                                        * columns. This second map is
+                                        * however not used for the
+                                        * distribution of the columns
+                                        * themselves &ndash; rather, all
+                                        * column elements of a row are
+                                        * stored on the same processor. The
+                                        * vector <tt>n_entries_per_row</tt>
+                                        * specifies the number of entries in
+                                        * each row of the newly generated
+                                        * matrix.
                                         */
       void
       reinit (const Epetra_Map                &row_parallel_partitioning,
-	      const Epetra_Map                &col_parallel_partitioning,
-	      const std::vector<unsigned int> &n_entries_per_row);
+              const Epetra_Map                &col_parallel_partitioning,
+              const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * Reinit function. Takes one of the
@@ -692,9 +692,9 @@ namespace TrilinosWrappers
       template<typename SparsityType>
       void
       reinit (const Epetra_Map   &row_parallel_partitioning,
-	      const Epetra_Map   &col_parallel_partitioning,
-	      const SparsityType &nontrilinos_sparsity_pattern,
-	      const bool          exchange_data = false);
+              const Epetra_Map   &col_parallel_partitioning,
+              const SparsityType &nontrilinos_sparsity_pattern,
+              const bool          exchange_data = false);
 
                                        /**
                                         * Reinit function. Takes one of the
@@ -714,8 +714,8 @@ namespace TrilinosWrappers
       template<typename SparsityType>
       void
       reinit (const Epetra_Map   &parallel_partitioning,
-	      const SparsityType &nontrilinos_sparsity_pattern,
-	      const bool          exchange_data = false);
+              const SparsityType &nontrilinos_sparsity_pattern,
+              const bool          exchange_data = false);
 //@}
 /**
  * @name Constructors and initialization using an IndexSet description
@@ -724,51 +724,51 @@ namespace TrilinosWrappers
 
                                        /**
                                         * Constructor for a square sparsity
-				        * pattern using an IndexSet and an
-				        * MPI communicator for the
-				        * description of the %parallel
-				        * partitioning. Moreover, the number
-				        * of nonzero entries in the rows of
-				        * the sparsity pattern can be
-				        * specified. Note that this number
-				        * does not need to be exact, and it
-				        * is even allowed that the actual
-				        * sparsity structure has more
-				        * nonzero entries than specified in
-				        * the constructor. However it is
-				        * still advantageous to provide good
-				        * estimates here since a good value
-				        * will avoid repeated allocation of
-				        * memory, which considerably
-				        * increases the performance when
-				        * creating the sparsity pattern.
+                                        * pattern using an IndexSet and an
+                                        * MPI communicator for the
+                                        * description of the %parallel
+                                        * partitioning. Moreover, the number
+                                        * of nonzero entries in the rows of
+                                        * the sparsity pattern can be
+                                        * specified. Note that this number
+                                        * does not need to be exact, and it
+                                        * is even allowed that the actual
+                                        * sparsity structure has more
+                                        * nonzero entries than specified in
+                                        * the constructor. However it is
+                                        * still advantageous to provide good
+                                        * estimates here since a good value
+                                        * will avoid repeated allocation of
+                                        * memory, which considerably
+                                        * increases the performance when
+                                        * creating the sparsity pattern.
                                         */
       SparsityPattern (const IndexSet     &parallel_partitioning,
-		       const MPI_Comm     &communicator = MPI_COMM_WORLD,
-		       const unsigned int  n_entries_per_row = 0);
+                       const MPI_Comm     &communicator = MPI_COMM_WORLD,
+                       const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Same as before, but now use the
-				        * exact number of nonzeros in each m
-				        * row. Since we know the number of
-				        * elements in the sparsity pattern
-				        * exactly in this case, we can
-				        * already allocate the right amount
-				        * of memory, which makes the
-				        * creation process by the respective
-				        * SparsityPattern::reinit call
-				        * considerably faster. However, this
-				        * is a rather unusual situation,
-				        * since knowing the number of
-				        * entries in each row is usually
-				        * connected to knowing the indices
-				        * of nonzero entries, which the
-				        * sparsity pattern is designed to
-				        * describe.
+                                        * exact number of nonzeros in each m
+                                        * row. Since we know the number of
+                                        * elements in the sparsity pattern
+                                        * exactly in this case, we can
+                                        * already allocate the right amount
+                                        * of memory, which makes the
+                                        * creation process by the respective
+                                        * SparsityPattern::reinit call
+                                        * considerably faster. However, this
+                                        * is a rather unusual situation,
+                                        * since knowing the number of
+                                        * entries in each row is usually
+                                        * connected to knowing the indices
+                                        * of nonzero entries, which the
+                                        * sparsity pattern is designed to
+                                        * describe.
                                         */
       SparsityPattern (const IndexSet                  &parallel_partitioning,
-		       const MPI_Comm                  &communicator,
-		       const std::vector<unsigned int> &n_entries_per_row);
+                       const MPI_Comm                  &communicator,
+                       const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * This constructor is similar to the
@@ -788,94 +788,94 @@ namespace TrilinosWrappers
                                         * for internal arragements when doing
                                         * matrix-vector products with vectors
                                         * based on that column map.
-					*
-					* The number of columns entries per
-					* row is specified as the maximum
-					* number of entries argument.
+                                        *
+                                        * The number of columns entries per
+                                        * row is specified as the maximum
+                                        * number of entries argument.
                                         */
       SparsityPattern (const IndexSet     &row_parallel_partitioning,
-		       const IndexSet     &col_parallel_partitioning,
-		       const MPI_Comm     &communicator = MPI_COMM_WORLD,
-		       const unsigned int  n_entries_per_row = 0);
+                       const IndexSet     &col_parallel_partitioning,
+                       const MPI_Comm     &communicator = MPI_COMM_WORLD,
+                       const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * This constructor is similar to the
-				        * one above, but it now takes two
-				        * different index sets for rows and
-				        * columns. This interface is meant to
-				        * be used for generating rectangular
-				        * matrices, where one map specifies
-				        * the %parallel distribution of rows
-				        * and the second one specifies the
-				        * distribution of degrees of freedom
-				        * associated with matrix columns. This
-				        * second map is however not used for
-				        * the distribution of the columns
-				        * themselves &ndash; rather, all
-				        * column elements of a row are stored
-				        * on the same processor. The vector
-				        * <tt>n_entries_per_row</tt> specifies
-				        * the number of entries in each row of
-				        * the newly generated matrix.
+                                        * one above, but it now takes two
+                                        * different index sets for rows and
+                                        * columns. This interface is meant to
+                                        * be used for generating rectangular
+                                        * matrices, where one map specifies
+                                        * the %parallel distribution of rows
+                                        * and the second one specifies the
+                                        * distribution of degrees of freedom
+                                        * associated with matrix columns. This
+                                        * second map is however not used for
+                                        * the distribution of the columns
+                                        * themselves &ndash; rather, all
+                                        * column elements of a row are stored
+                                        * on the same processor. The vector
+                                        * <tt>n_entries_per_row</tt> specifies
+                                        * the number of entries in each row of
+                                        * the newly generated matrix.
                                         */
       SparsityPattern (const IndexSet                  &row_parallel_partitioning,
-		       const IndexSet                  &col_parallel_partitioning,
-		       const MPI_Comm                  &communicator,
-		       const std::vector<unsigned int> &n_entries_per_row);
+                       const IndexSet                  &col_parallel_partitioning,
+                       const MPI_Comm                  &communicator,
+                       const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * Reinitialization function for
-				        * generating a square sparsity
-				        * pattern using an IndexSet and an
-				        * MPI communicator for the
-				        * description of the %parallel
-				        * partitioning and the number of
-				        * nonzero entries in the rows of the
-				        * sparsity pattern. Note that this
-				        * number does not need to be exact,
-				        * and it is even allowed that the
-				        * actual sparsity structure has more
-				        * nonzero entries than specified in
-				        * the constructor. However it is
-				        * still advantageous to provide good
-				        * estimates here since this will
-				        * considerably increase the
-				        * performance when creating the
-				        * sparsity pattern.
-					*
-					* This function does not create any
-					* entries by itself, but provides
-					* the correct data structures that
-					* can be used by the respective
-					* add() function.
+                                        * generating a square sparsity
+                                        * pattern using an IndexSet and an
+                                        * MPI communicator for the
+                                        * description of the %parallel
+                                        * partitioning and the number of
+                                        * nonzero entries in the rows of the
+                                        * sparsity pattern. Note that this
+                                        * number does not need to be exact,
+                                        * and it is even allowed that the
+                                        * actual sparsity structure has more
+                                        * nonzero entries than specified in
+                                        * the constructor. However it is
+                                        * still advantageous to provide good
+                                        * estimates here since this will
+                                        * considerably increase the
+                                        * performance when creating the
+                                        * sparsity pattern.
+                                        *
+                                        * This function does not create any
+                                        * entries by itself, but provides
+                                        * the correct data structures that
+                                        * can be used by the respective
+                                        * add() function.
                                         */
       void
       reinit (const IndexSet     &parallel_partitioning,
-	      const MPI_Comm     &communicator = MPI_COMM_WORLD,
-	      const unsigned int  n_entries_per_row = 0);
+              const MPI_Comm     &communicator = MPI_COMM_WORLD,
+              const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Same as before, but now use the
-				        * exact number of nonzeros in each m
-				        * row. Since we know the number of
-				        * elements in the sparsity pattern
-				        * exactly in this case, we can
-				        * already allocate the right amount
-				        * of memory, which makes process of
-				        * adding entries to the sparsity
-				        * pattern considerably
-				        * faster. However, this is a rather
-				        * unusual situation, since knowing
-				        * the number of entries in each row
-				        * is usually connected to knowing
-				        * the indices of nonzero entries,
-				        * which the sparsity pattern is
-				        * designed to describe.
+                                        * exact number of nonzeros in each m
+                                        * row. Since we know the number of
+                                        * elements in the sparsity pattern
+                                        * exactly in this case, we can
+                                        * already allocate the right amount
+                                        * of memory, which makes process of
+                                        * adding entries to the sparsity
+                                        * pattern considerably
+                                        * faster. However, this is a rather
+                                        * unusual situation, since knowing
+                                        * the number of entries in each row
+                                        * is usually connected to knowing
+                                        * the indices of nonzero entries,
+                                        * which the sparsity pattern is
+                                        * designed to describe.
                                         */
       void
       reinit (const IndexSet                  &parallel_partitioning,
-	      const MPI_Comm                  &communicator,
-	      const std::vector<unsigned int> &n_entries_per_row);
+              const MPI_Comm                  &communicator,
+              const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * This reinit function is similar to
@@ -901,53 +901,53 @@ namespace TrilinosWrappers
                                         * matrix-vector products with
                                         * vectors based on an EpetraMap
                                         * based on that IndexSet.
-					*
-					* The number of columns entries per
-					* row is specified by the argument
-					* <tt>n_entries_per_row</tt>.
+                                        *
+                                        * The number of columns entries per
+                                        * row is specified by the argument
+                                        * <tt>n_entries_per_row</tt>.
                                         */
       void
       reinit (const IndexSet     &row_parallel_partitioning,
-	      const IndexSet     &col_parallel_partitioning,
-	      const MPI_Comm     &communicator = MPI_COMM_WORLD,
-	      const unsigned int  n_entries_per_row = 0);
+              const IndexSet     &col_parallel_partitioning,
+              const MPI_Comm     &communicator = MPI_COMM_WORLD,
+              const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Same as before, but now using a
-				        * vector <tt>n_entries_per_row</tt>
-				        * for specifying the number of
-				        * entries in each row of the
-					* sparsity pattern.
+                                        * vector <tt>n_entries_per_row</tt>
+                                        * for specifying the number of
+                                        * entries in each row of the
+                                        * sparsity pattern.
                                         */
       void
       reinit (const IndexSet                  &row_parallel_partitioning,
-	      const IndexSet                  &col_parallel_partitioning,
-	      const MPI_Comm                  &communicator,
-	      const std::vector<unsigned int> &n_entries_per_row);
+              const IndexSet                  &col_parallel_partitioning,
+              const MPI_Comm                  &communicator,
+              const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
-					* Reinit function. Takes one of the
-					* deal.II sparsity patterns and the
-					* %parallel partitioning of the rows
-					* and columns specified by two index
-					* sets and a %parallel communicator
-					* for initializing the current
-					* Trilinos sparsity pattern. The
-					* optional argument @p exchange_data
-					* can be used for reinitialization
-					* with a sparsity pattern that is
-					* not fully constructed. This
-					* feature is only implemented for
-					* input sparsity patterns of type
-					* CompressedSimpleSparsityPattern.
-					*/
+                                        * Reinit function. Takes one of the
+                                        * deal.II sparsity patterns and the
+                                        * %parallel partitioning of the rows
+                                        * and columns specified by two index
+                                        * sets and a %parallel communicator
+                                        * for initializing the current
+                                        * Trilinos sparsity pattern. The
+                                        * optional argument @p exchange_data
+                                        * can be used for reinitialization
+                                        * with a sparsity pattern that is
+                                        * not fully constructed. This
+                                        * feature is only implemented for
+                                        * input sparsity patterns of type
+                                        * CompressedSimpleSparsityPattern.
+                                        */
       template<typename SparsityType>
       void
       reinit (const IndexSet     &row_parallel_partitioning,
-	      const IndexSet     &col_parallel_partitioning,
-	      const SparsityType &nontrilinos_sparsity_pattern,
-	      const MPI_Comm     &communicator = MPI_COMM_WORLD,
-	      const bool          exchange_data = false);
+              const IndexSet     &col_parallel_partitioning,
+              const SparsityType &nontrilinos_sparsity_pattern,
+              const MPI_Comm     &communicator = MPI_COMM_WORLD,
+              const bool          exchange_data = false);
 
                                        /**
                                         * Reinit function. Takes one of the
@@ -967,22 +967,22 @@ namespace TrilinosWrappers
       template<typename SparsityType>
       void
       reinit (const IndexSet     &parallel_partitioning,
-	      const SparsityType &nontrilinos_sparsity_pattern,
-	      const MPI_Comm     &communicator = MPI_COMM_WORLD,
-	      const bool          exchange_data = false);
+              const SparsityType &nontrilinos_sparsity_pattern,
+              const MPI_Comm     &communicator = MPI_COMM_WORLD,
+              const bool          exchange_data = false);
 //@}
 /**
  * @name Information on the sparsity pattern
  */
 //@{
 
-				       /**
-					* Returns the state of the sparsity
-					* pattern, i.e., whether compress()
-					* needs to be called after an
-					* operation requiring data
-					* exchange.
-					*/
+                                       /**
+                                        * Returns the state of the sparsity
+                                        * pattern, i.e., whether compress()
+                                        * needs to be called after an
+                                        * operation requiring data
+                                        * exchange.
+                                        */
       bool is_compressed () const;
 
                                        /**
@@ -1012,35 +1012,35 @@ namespace TrilinosWrappers
                                         * this number is the same as
                                         * n_rows(), but for parallel
                                         * matrices it may be smaller.
-					*
-					* To figure out which elements
-					* exactly are stored locally,
-					* use local_range().
+                                        *
+                                        * To figure out which elements
+                                        * exactly are stored locally,
+                                        * use local_range().
                                         */
       unsigned int local_size () const;
 
                                        /**
-					* Return a pair of indices
-					* indicating which rows of this
-					* sparsity pattern are stored
-					* locally. The first number is the
-					* index of the first row stored, the
-					* second the index of the one past
-					* the last one that is stored
-					* locally. If this is a sequential
-					* matrix, then the result will be
-					* the pair (0,n_rows()), otherwise
-					* it will be a pair (i,i+n), where
-					* <tt>n=local_size()</tt>.
-					*/
+                                        * Return a pair of indices
+                                        * indicating which rows of this
+                                        * sparsity pattern are stored
+                                        * locally. The first number is the
+                                        * index of the first row stored, the
+                                        * second the index of the one past
+                                        * the last one that is stored
+                                        * locally. If this is a sequential
+                                        * matrix, then the result will be
+                                        * the pair (0,n_rows()), otherwise
+                                        * it will be a pair (i,i+n), where
+                                        * <tt>n=local_size()</tt>.
+                                        */
       std::pair<unsigned int, unsigned int>
-	local_range () const;
+        local_range () const;
 
-				       /**
-					* Return whether @p index is
-					* in the local range or not,
-					* see also local_range().
-					*/
+                                       /**
+                                        * Return whether @p index is
+                                        * in the local range or not,
+                                        * see also local_range().
+                                        */
       bool in_local_range (const unsigned int index) const;
 
                                        /**
@@ -1056,15 +1056,15 @@ namespace TrilinosWrappers
       unsigned int row_length (const unsigned int row) const;
 
                                        /**
-					* Compute the bandwidth of the
-					* matrix represented by this
-					* structure. The bandwidth is the
-					* maximum of $|i-j|$ for which the
-					* index pair $(i,j)$ represents a
-					* nonzero entry of the
-					* matrix. Consequently, the maximum
-					* bandwidth a $n\times m$ matrix can
-					* have is $\max\{n-1,m-1\}$.
+                                        * Compute the bandwidth of the
+                                        * matrix represented by this
+                                        * structure. The bandwidth is the
+                                        * maximum of $|i-j|$ for which the
+                                        * index pair $(i,j)$ represents a
+                                        * nonzero entry of the
+                                        * matrix. Consequently, the maximum
+                                        * bandwidth a $n\times m$ matrix can
+                                        * have is $\max\{n-1,m-1\}$.
                                         */
       unsigned int bandwidth () const;
 
@@ -1083,14 +1083,14 @@ namespace TrilinosWrappers
                                         * non-zero) or not.
                                         */
       bool exists (const unsigned int i,
-		   const unsigned int j) const;
+                   const unsigned int j) const;
 
-				       /**
-					* Determine an estimate for the
-					* memory consumption (in bytes)
-					* of this object. Currently not
-					* implemented for this class.
-					*/
+                                       /**
+                                        * Determine an estimate for the
+                                        * memory consumption (in bytes)
+                                        * of this object. Currently not
+                                        * implemented for this class.
+                                        */
       std::size_t memory_consumption () const;
 
 //@}
@@ -1112,9 +1112,9 @@ namespace TrilinosWrappers
                                         */
       template <typename ForwardIterator>
       void add_entries (const unsigned int row,
-			ForwardIterator    begin,
-			ForwardIterator    end,
-			const bool         indices_are_sorted = false);
+                        ForwardIterator    begin,
+                        ForwardIterator    end,
+                        const bool         indices_are_sorted = false);
 //@}
 /**
  * @name Access of underlying Trilinos data
@@ -1173,11 +1173,11 @@ namespace TrilinosWrappers
                                         */
       const Epetra_Map & col_partitioner () const;
 
-				       /**
-					* Return a const reference to
-					* the communicator used for
-					* this object.
-					*/
+                                       /**
+                                        * Return a const reference to
+                                        * the communicator used for
+                                        * this object.
+                                        */
       const Epetra_Comm & trilinos_communicator () const;
 //@}
 /**
@@ -1235,61 +1235,61 @@ namespace TrilinosWrappers
 //@{
 
                                        /**
-					* Abstract Trilinos object
-					* that helps view in ASCII
-					* other Trilinos
-					* objects. Currently this
-					* function is not
-					* implemented.  TODO: Not
-					* implemented.
-					*/
+                                        * Abstract Trilinos object
+                                        * that helps view in ASCII
+                                        * other Trilinos
+                                        * objects. Currently this
+                                        * function is not
+                                        * implemented.  TODO: Not
+                                        * implemented.
+                                        */
       void write_ascii ();
 
-				       /**
-					* Print (the locally owned part of)
-					* the sparsity pattern to the given
-					* stream, using the format
-					* <tt>(line,col)</tt>. The optional
-					* flag outputs the sparsity pattern
-					* in Trilinos style, where even the
-					* according processor number is
-					* printed to the stream, as well as
-					* a summary before actually writing
-					* the entries.
-					*/
+                                       /**
+                                        * Print (the locally owned part of)
+                                        * the sparsity pattern to the given
+                                        * stream, using the format
+                                        * <tt>(line,col)</tt>. The optional
+                                        * flag outputs the sparsity pattern
+                                        * in Trilinos style, where even the
+                                        * according processor number is
+                                        * printed to the stream, as well as
+                                        * a summary before actually writing
+                                        * the entries.
+                                        */
       void print (std::ostream &out,
-		  const bool    write_extended_trilinos_info = false) const;
+                  const bool    write_extended_trilinos_info = false) const;
 
-				       /**
-					* Print the sparsity of the matrix
-					* in a format that <tt>gnuplot</tt>
-					* understands and which can be used
-					* to plot the sparsity pattern in a
-					* graphical way. The format consists
-					* of pairs <tt>i j</tt> of nonzero
-					* elements, each representing one
-					* entry of this matrix, one per line
-					* of the output file. Indices are
-					* counted from zero on, as
-					* usual. Since sparsity patterns are
-					* printed in the same way as
-					* matrices are displayed, we print
-					* the negative of the column index,
-					* which means that the
-					* <tt>(0,0)</tt> element is in the
-					* top left rather than in the bottom
-					* left corner.
-					*
-					* Print the sparsity pattern in
-					* gnuplot by setting the data style
-					* to dots or points and use the
-					* <tt>plot</tt> command.
-					*/
+                                       /**
+                                        * Print the sparsity of the matrix
+                                        * in a format that <tt>gnuplot</tt>
+                                        * understands and which can be used
+                                        * to plot the sparsity pattern in a
+                                        * graphical way. The format consists
+                                        * of pairs <tt>i j</tt> of nonzero
+                                        * elements, each representing one
+                                        * entry of this matrix, one per line
+                                        * of the output file. Indices are
+                                        * counted from zero on, as
+                                        * usual. Since sparsity patterns are
+                                        * printed in the same way as
+                                        * matrices are displayed, we print
+                                        * the negative of the column index,
+                                        * which means that the
+                                        * <tt>(0,0)</tt> element is in the
+                                        * top left rather than in the bottom
+                                        * left corner.
+                                        *
+                                        * Print the sparsity pattern in
+                                        * gnuplot by setting the data style
+                                        * to dots or points and use the
+                                        * <tt>plot</tt> command.
+                                        */
       void print_gnuplot (std::ostream &out) const;
 
 //@}
-    				     /** @addtogroup Exceptions
-				      * @{ */
+                                     /** @addtogroup Exceptions
+                                      * @{ */
                                        /**
                                         * Exception
                                         */
@@ -1298,13 +1298,13 @@ namespace TrilinosWrappers
                       << "An error with error number " << arg1
                       << " occured while calling a Trilinos function");
 
-				       /**
-					* Exception
-					*/
+                                       /**
+                                        * Exception
+                                        */
       DeclException2 (ExcInvalidIndex,
-		      int, int,
-		      << "The entry with index <" << arg1 << ',' << arg2
-		      << "> does not exist.");
+                      int, int,
+                      << "The entry with index <" << arg1 << ',' << arg2
+                      << "> does not exist.");
 
                                        /**
                                         * Exception
@@ -1315,39 +1315,39 @@ namespace TrilinosWrappers
                                         * Exception
                                         */
       DeclException4 (ExcAccessToNonLocalElement,
-		      int, int, int, int,
-		      << "You tried to access element (" << arg1
-		      << "/" << arg2 << ")"
-		      << " of a distributed matrix, but only rows "
-		      << arg3 << " through " << arg4
-		      << " are stored locally and can be accessed.");
+                      int, int, int, int,
+                      << "You tried to access element (" << arg1
+                      << "/" << arg2 << ")"
+                      << " of a distributed matrix, but only rows "
+                      << arg3 << " through " << arg4
+                      << " are stored locally and can be accessed.");
 
                                        /**
                                         * Exception
                                         */
       DeclException2 (ExcAccessToNonPresentElement,
-		      int, int,
-		      << "You tried to access element (" << arg1
-		      << "/" << arg2 << ")"
-		      << " of a sparse matrix, but it appears to not"
-		      << " exist in the Trilinos sparsity pattern.");
-				     //@}
+                      int, int,
+                      << "You tried to access element (" << arg1
+                      << "/" << arg2 << ")"
+                      << " of a sparse matrix, but it appears to not"
+                      << " exist in the Trilinos sparsity pattern.");
+                                     //@}
     private:
 
                                        /**
                                         * Pointer to the user-supplied
-				        * Epetra Trilinos mapping of
-				        * the matrix columns that
-				        * assigns parts of the matrix
-				        * to the individual processes.
-				        */
+                                        * Epetra Trilinos mapping of
+                                        * the matrix columns that
+                                        * assigns parts of the matrix
+                                        * to the individual processes.
+                                        */
       std_cxx1x::shared_ptr<Epetra_Map> column_space_map;
 
-				       /**
-					* A boolean variable to hold
-					* information on whether the
-					* vector is compressed or not.
-					*/
+                                       /**
+                                        * A boolean variable to hold
+                                        * information on whether the
+                                        * vector is compressed or not.
+                                        */
       bool compressed;
 
                                        /**
@@ -1433,14 +1433,14 @@ namespace TrilinosWrappers
     const_iterator::operator++ ()
     {
       Assert (accessor.a_row < accessor.sparsity_pattern->n_rows(),
-	      ExcIteratorPastEnd());
+              ExcIteratorPastEnd());
 
       ++accessor.a_index;
 
-				        // If at end of line: do one
-				        // step, then cycle until we
-				        // find a row with a nonzero
-				        // number of entries.
+                                        // If at end of line: do one
+                                        // step, then cycle until we
+                                        // find a row with a nonzero
+                                        // number of entries.
       if (accessor.a_index >= accessor.colnum_cache->size())
         {
           accessor.a_index = 0;
@@ -1608,7 +1608,7 @@ namespace TrilinosWrappers
   inline
   void
   SparsityPattern::add (const unsigned int i,
-			const unsigned int j)
+                        const unsigned int j)
   {
     add_entries (i, &j, &j+1);
   }
@@ -1619,9 +1619,9 @@ namespace TrilinosWrappers
   inline
   void
   SparsityPattern::add_entries (const unsigned int row,
-				ForwardIterator    begin,
-				ForwardIterator    end,
-				const bool         /*indices_are_sorted*/)
+                                ForwardIterator    begin,
+                                ForwardIterator    end,
+                                const bool         /*indices_are_sorted*/)
   {
     if (begin == end)
       return;
@@ -1631,7 +1631,7 @@ namespace TrilinosWrappers
     compressed = false;
 
     const int ierr = graph->InsertGlobalIndices (1, (int*)&row,
-						 n_cols, col_index_ptr);
+                                                 n_cols, col_index_ptr);
 
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
   }
@@ -1694,13 +1694,13 @@ namespace TrilinosWrappers
 
   inline
   SparsityPattern::SparsityPattern  (const IndexSet     &parallel_partitioning,
-				     const MPI_Comm     &communicator,
-				     const unsigned int  n_entries_per_row)
-		  :
-		  compressed (false)
+                                     const MPI_Comm     &communicator,
+                                     const unsigned int  n_entries_per_row)
+                  :
+                  compressed (false)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
-							      false);
+                                                              false);
     reinit (map, map, n_entries_per_row);
   }
 
@@ -1708,13 +1708,13 @@ namespace TrilinosWrappers
 
   inline
   SparsityPattern::SparsityPattern  (const IndexSet     &parallel_partitioning,
-				     const MPI_Comm     &communicator,
-				     const std::vector<unsigned int> &n_entries_per_row)
-		  :
-		  compressed (false)
+                                     const MPI_Comm     &communicator,
+                                     const std::vector<unsigned int> &n_entries_per_row)
+                  :
+                  compressed (false)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
-							      false);
+                                                              false);
     reinit (map, map, n_entries_per_row);
   }
 
@@ -1722,11 +1722,11 @@ namespace TrilinosWrappers
 
   inline
   SparsityPattern::SparsityPattern  (const IndexSet     &row_parallel_partitioning,
-				     const IndexSet     &col_parallel_partitioning,
-				     const MPI_Comm     &communicator,
-				     const unsigned int  n_entries_per_row)
-		  :
-		  compressed (false)
+                                     const IndexSet     &col_parallel_partitioning,
+                                     const MPI_Comm     &communicator,
+                                     const unsigned int  n_entries_per_row)
+                  :
+                  compressed (false)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -1740,11 +1740,11 @@ namespace TrilinosWrappers
   inline
   SparsityPattern::
   SparsityPattern  (const IndexSet     &row_parallel_partitioning,
-		    const IndexSet     &col_parallel_partitioning,
-		    const MPI_Comm     &communicator,
-		    const std::vector<unsigned int> &n_entries_per_row)
-		  :
-		  compressed (false)
+                    const IndexSet     &col_parallel_partitioning,
+                    const MPI_Comm     &communicator,
+                    const std::vector<unsigned int> &n_entries_per_row)
+                  :
+                  compressed (false)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -1758,11 +1758,11 @@ namespace TrilinosWrappers
   inline
   void
   SparsityPattern::reinit (const IndexSet     &parallel_partitioning,
-			   const MPI_Comm     &communicator,
-			   const unsigned int  n_entries_per_row)
+                           const MPI_Comm     &communicator,
+                           const unsigned int  n_entries_per_row)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
-							      false);
+                                                              false);
     reinit (map, map, n_entries_per_row);
   }
 
@@ -1770,11 +1770,11 @@ namespace TrilinosWrappers
 
   inline
   void SparsityPattern::reinit (const IndexSet     &parallel_partitioning,
-				const MPI_Comm     &communicator,
-				const std::vector<unsigned int> &n_entries_per_row)
+                                const MPI_Comm     &communicator,
+                                const std::vector<unsigned int> &n_entries_per_row)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
-							      false);
+                                                              false);
     reinit (map, map, n_entries_per_row);
   }
 
@@ -1782,9 +1782,9 @@ namespace TrilinosWrappers
 
   inline
   void SparsityPattern::reinit (const IndexSet     &row_parallel_partitioning,
-				const IndexSet     &col_parallel_partitioning,
-				const MPI_Comm     &communicator,
-				const unsigned int  n_entries_per_row)
+                                const IndexSet     &col_parallel_partitioning,
+                                const MPI_Comm     &communicator,
+                                const unsigned int  n_entries_per_row)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -1797,9 +1797,9 @@ namespace TrilinosWrappers
   inline
   void
   SparsityPattern::reinit (const IndexSet     &row_parallel_partitioning,
-			   const IndexSet     &col_parallel_partitioning,
-			   const MPI_Comm     &communicator,
-			   const std::vector<unsigned int> &n_entries_per_row)
+                           const IndexSet     &col_parallel_partitioning,
+                           const MPI_Comm     &communicator,
+                           const std::vector<unsigned int> &n_entries_per_row)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -1814,10 +1814,10 @@ namespace TrilinosWrappers
   inline
   void
   SparsityPattern::reinit (const IndexSet     &row_parallel_partitioning,
-			   const IndexSet     &col_parallel_partitioning,
-			   const SparsityType &nontrilinos_sparsity_pattern,
-			   const MPI_Comm     &communicator,
-			   const bool          exchange_data)
+                           const IndexSet     &col_parallel_partitioning,
+                           const SparsityType &nontrilinos_sparsity_pattern,
+                           const MPI_Comm     &communicator,
+                           const bool          exchange_data)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -1832,12 +1832,12 @@ namespace TrilinosWrappers
   inline
   void
   SparsityPattern::reinit (const IndexSet     &parallel_partitioning,
-			   const SparsityType &nontrilinos_sparsity_pattern,
-			   const MPI_Comm     &communicator,
-			   const bool          exchange_data)
+                           const SparsityType &nontrilinos_sparsity_pattern,
+                           const MPI_Comm     &communicator,
+                           const bool          exchange_data)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
-							      false);
+                                                              false);
     reinit (map, map, nontrilinos_sparsity_pattern, exchange_data);
   }
 

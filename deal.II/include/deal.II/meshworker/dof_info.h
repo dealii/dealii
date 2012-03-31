@@ -64,149 +64,149 @@ namespace MeshWorker
   class DoFInfo : public LocalResults<number>
   {
     public:
-				       /// The current cell
+                                       /// The current cell
       typename Triangulation<dim, spacedim>::cell_iterator cell;
 
-				       /// The current face
+                                       /// The current face
       typename Triangulation<dim, spacedim>::face_iterator face;
 
-				       /**
-					* The number of the current
-					* face on the current cell.
-					*
-					* This number is
-					* deal_II_numbers::invalid_unsigned_int
-					* if the info object was
-					* initialized with a cell.
-					*/
+                                       /**
+                                        * The number of the current
+                                        * face on the current cell.
+                                        *
+                                        * This number is
+                                        * deal_II_numbers::invalid_unsigned_int
+                                        * if the info object was
+                                        * initialized with a cell.
+                                        */
 
       unsigned int face_number;
-				       /**
-					* The number of the current
-					* subface on the current
-					* face
-					*
-					* This number is
-					* deal_II_numbers::invalid_unsigned_int
-					* if the info object was not
-					* initialized with a subface.
-					*/
+                                       /**
+                                        * The number of the current
+                                        * subface on the current
+                                        * face
+                                        *
+                                        * This number is
+                                        * deal_II_numbers::invalid_unsigned_int
+                                        * if the info object was not
+                                        * initialized with a subface.
+                                        */
       unsigned int sub_number;
 
-				       /*
-					* The DoF indices of the
-					* current cell
-					*/
+                                       /*
+                                        * The DoF indices of the
+                                        * current cell
+                                        */
       std::vector<unsigned int> indices;
 
-				       /**
-					* The DoF indices on the
-					* current cell, organized by
-					* local blocks
-					*/
+                                       /**
+                                        * The DoF indices on the
+                                        * current cell, organized by
+                                        * local blocks
+                                        */
       std::vector<std::vector<unsigned int> > indices_by_block;
-      
-				       /**
-					* Constructor setting the
-					* #block_info pointer.
-					*/
+
+                                       /**
+                                        * Constructor setting the
+                                        * #block_info pointer.
+                                        */
       DoFInfo(const BlockInfo& block_info);
 
-				       /**
-					* Constructor
-					* leaving the #block_info
-					* pointer empty, but setting
-					* the #aux_local_indices.
-					*/
+                                       /**
+                                        * Constructor
+                                        * leaving the #block_info
+                                        * pointer empty, but setting
+                                        * the #aux_local_indices.
+                                        */
       template <class DH>
       DoFInfo (const DH& dof_handler);
 
-				       /**
-					* Set the current cell and
-					* fill #indices.
-					*/
+                                       /**
+                                        * Set the current cell and
+                                        * fill #indices.
+                                        */
       template <class DHCellIterator>
       void reinit(const DHCellIterator& c);
 
-				       /**
-					* Set the current face and
-					* fill #indices if the #cell
-					* changed.
-					*/
+                                       /**
+                                        * Set the current face and
+                                        * fill #indices if the #cell
+                                        * changed.
+                                        */
       template <class DHCellIterator, class DHFaceIterator>
       void reinit(const DHCellIterator& c,
-		  const DHFaceIterator& f,
-		  const unsigned int n);
+                  const DHFaceIterator& f,
+                  const unsigned int n);
 
-				       /**
-					* Set the current subface
-					* and fill #indices if the
-					* #cell changed.
-					*/
+                                       /**
+                                        * Set the current subface
+                                        * and fill #indices if the
+                                        * #cell changed.
+                                        */
       template <class DHCellIterator, class DHFaceIterator>
       void reinit(const DHCellIterator& c,
-		  const DHFaceIterator& f,
-		  const unsigned int n,
-		  const unsigned int s);
+                  const DHFaceIterator& f,
+                  const unsigned int n,
+                  const unsigned int s);
 
-				       /**
-					* Switch to a new face of the
-					* same cell. Does not change
-					* #indices and does not reset
-					* data in LocalResults.
-					*/
+                                       /**
+                                        * Switch to a new face of the
+                                        * same cell. Does not change
+                                        * #indices and does not reset
+                                        * data in LocalResults.
+                                        */
       template <class DHFaceIterator>
       void set_face (const DHFaceIterator& f,
-		     const unsigned int n);
-				       /**
-					* Switch to a new subface of the
-					* same cell. Does not change
-					* #indices and does not reset
-					* data in LocalResults.
-					*/
+                     const unsigned int n);
+                                       /**
+                                        * Switch to a new subface of the
+                                        * same cell. Does not change
+                                        * #indices and does not reset
+                                        * data in LocalResults.
+                                        */
       template <class DHFaceIterator>
       void set_subface (const DHFaceIterator& f,
-			const unsigned int n,
-			const unsigned int s);
+                        const unsigned int n,
+                        const unsigned int s);
 
       const BlockIndices& local_indices() const;
 
 
-				       /// The block structure of the system
+                                       /// The block structure of the system
       SmartPointer<const BlockInfo,DoFInfo<dim,spacedim> > block_info;
 
       bool level_cell;
     private:
-				       /**
-					* Standard constructor, not
-					* setting any block
-					* indices. Use of this
-					* constructor is not
-					* recommended, but it is
-					* needed for the arrays in
-					* DoFInfoBox.
-					*/
+                                       /**
+                                        * Standard constructor, not
+                                        * setting any block
+                                        * indices. Use of this
+                                        * constructor is not
+                                        * recommended, but it is
+                                        * needed for the arrays in
+                                        * DoFInfoBox.
+                                        */
       DoFInfo ();
-      
-				       /// Set up local block indices
+
+                                       /// Set up local block indices
       void set_block_indices ();
-      				       /// Fill index vector with active indices
+                                       /// Fill index vector with active indices
       void get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c);
 
-				       /// Fill index vector with level indices
+                                       /// Fill index vector with level indices
       void get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator& c);
 
-				       /// Auxiliary vector
+                                       /// Auxiliary vector
       std::vector<unsigned int> indices_org;
 
-				       /**
-					* An auxiliary local
-					* BlockIndices object created
-					* if #block_info is not set.
-					* It contains just a single
-					* block of the size of
-					* degrees of freedom per cell.
-					*/
+                                       /**
+                                        * An auxiliary local
+                                        * BlockIndices object created
+                                        * if #block_info is not set.
+                                        * It contains just a single
+                                        * block of the size of
+                                        * degrees of freedom per cell.
+                                        */
       BlockIndices aux_local_indices;
 
       friend class DoFInfoBox<dim, DoFInfo<dim, spacedim, number> >;
@@ -228,66 +228,66 @@ namespace MeshWorker
   class DoFInfoBox
   {
     public:
-				       /**
-					* Constructor copying the seed
-					* into all other objects.
-					*/
+                                       /**
+                                        * Constructor copying the seed
+                                        * into all other objects.
+                                        */
       DoFInfoBox(const DOFINFO& seed);
 
-				       /**
-					* Copy constructor, taking
-					* #cell and using it as a seed
-					* in the other constructor.
-					*/
+                                       /**
+                                        * Copy constructor, taking
+                                        * #cell and using it as a seed
+                                        * in the other constructor.
+                                        */
       DoFInfoBox(const DoFInfoBox<dim, DOFINFO>&);
 
-				       /**
-					* Reset all the availability flags.
-					*/
+                                       /**
+                                        * Reset all the availability flags.
+                                        */
       void reset();
 
-				       /**
-					* After all info objects have
-					* been filled appropriately,
-					* use the ASSEMBLER object
-					* to assemble them into the
-					* global data. See
-					* MeshWorker::Assembler for
-					* available classes.
-					*/
+                                       /**
+                                        * After all info objects have
+                                        * been filled appropriately,
+                                        * use the ASSEMBLER object
+                                        * to assemble them into the
+                                        * global data. See
+                                        * MeshWorker::Assembler for
+                                        * available classes.
+                                        */
       template <class ASSEMBLER>
       void assemble(ASSEMBLER& ass) const;
 
-				       /**
-					* The memory used by this object.
-					*/
+                                       /**
+                                        * The memory used by this object.
+                                        */
       std::size_t memory_consumption () const;
-      
 
-				       /**
-					* The data for the cell.
-					*/
+
+                                       /**
+                                        * The data for the cell.
+                                        */
       DOFINFO cell;
-				       /**
-					* The data for the faces from inside.
-					*/
+                                       /**
+                                        * The data for the faces from inside.
+                                        */
       DOFINFO interior[GeometryInfo<dim>::faces_per_cell];
-				       /**
-					* The data for the faces from outside.
-					*/
+                                       /**
+                                        * The data for the faces from outside.
+                                        */
       DOFINFO exterior[GeometryInfo<dim>::faces_per_cell];
 
-				       /**
-					* A set of flags, indicating
-					* whether data on an interior
-					* face is available.
-					*/
+                                       /**
+                                        * A set of flags, indicating
+                                        * whether data on an interior
+                                        * face is available.
+                                        */
       bool interior_face_available[GeometryInfo<dim>::faces_per_cell];
-				       /**
-					* A set of flags, indicating
-					* whether data on an exterior
-					* face is available.
-					*/
+                                       /**
+                                        * A set of flags, indicating
+                                        * whether data on an exterior
+                                        * face is available.
+                                        */
       bool exterior_face_available[GeometryInfo<dim>::faces_per_cell];
   };
 
@@ -330,8 +330,8 @@ namespace MeshWorker
     face_number = n;
     sub_number = deal_II_numbers::invalid_unsigned_int;
   }
-  
-  
+
+
   template<int dim, int spacedim, typename number>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
@@ -341,11 +341,11 @@ namespace MeshWorker
     unsigned int n)
   {
     if ((cell.state() != IteratorState::valid)
-	||  cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
+        ||  cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
       get_indices(c);
     cell = static_cast<typename Triangulation<dim>::cell_iterator> (c);
     set_face(f,n);
-    
+
     if (block_info)
       LocalResults<number>::reinit(block_info->local());
     else
@@ -365,8 +365,8 @@ namespace MeshWorker
     face_number = n;
     sub_number = s;
   }
-  
-  
+
+
   template<int dim, int spacedim, typename number>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
@@ -377,11 +377,11 @@ namespace MeshWorker
     unsigned int s)
   {
     if (cell.state() != IteratorState::valid
-	|| cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
+        || cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
       get_indices(c);
     cell = static_cast<typename Triangulation<dim>::cell_iterator> (c);
     set_subface(f,n,s);
-    
+
     if (block_info)
       LocalResults<number>::reinit(block_info->local());
     else
@@ -403,15 +403,15 @@ namespace MeshWorker
   template <int dim, class DOFINFO>
   inline
   DoFInfoBox<dim, DOFINFO>::DoFInfoBox(const DOFINFO& seed)
-		  :
-		  cell(seed)
+                  :
+                  cell(seed)
   {
     for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
       {
-	exterior[i] = seed;
-	interior[i] = seed;
-	interior_face_available[i] = false;
-	exterior_face_available[i] = false;
+        exterior[i] = seed;
+        interior[i] = seed;
+        interior_face_available[i] = false;
+        exterior_face_available[i] = false;
       }
   }
 
@@ -419,15 +419,15 @@ namespace MeshWorker
   template <int dim, class DOFINFO>
   inline
   DoFInfoBox<dim, DOFINFO>::DoFInfoBox(const DoFInfoBox<dim, DOFINFO>& other)
-		  :
-		  cell(other.cell)
+                  :
+                  cell(other.cell)
   {
     for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
       {
-	exterior[i] = other.exterior[i];
-	interior[i] = other.interior[i];
-	interior_face_available[i] = false;
-	exterior_face_available[i] = false;
+        exterior[i] = other.exterior[i];
+        interior[i] = other.interior[i];
+        interior_face_available[i] = false;
+        exterior_face_available[i] = false;
       }
   }
 
@@ -438,8 +438,8 @@ namespace MeshWorker
   {
     for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
       {
-    	interior_face_available[i] = false;
-	exterior_face_available[i] = false;
+        interior_face_available[i] = false;
+        exterior_face_available[i] = false;
       }
   }
 
@@ -452,17 +452,17 @@ namespace MeshWorker
     assembler.assemble(cell);
     for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
       {
-					 // Only do something if data available
-	if (interior_face_available[i])
-	  {
-					     // If both data
-					     // available, it is an
-					     // interior face
-	    if (exterior_face_available[i])
-	      assembler.assemble(interior[i], exterior[i]);
-	    else
-	      assembler.assemble(interior[i]);
-	  }
+                                         // Only do something if data available
+        if (interior_face_available[i])
+          {
+                                             // If both data
+                                             // available, it is an
+                                             // interior face
+            if (exterior_face_available[i])
+              assembler.assemble(interior[i], exterior[i]);
+            else
+              assembler.assemble(interior[i]);
+          }
       }
   }
 }

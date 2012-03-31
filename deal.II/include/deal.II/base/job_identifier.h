@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,62 +23,62 @@ DEAL_II_NAMESPACE_OPEN
  * identifier. There exists a library object <tt>dealjobid</tt> of this
  * class. This object can be accessed by all output functions to
  * provide an id for the current job.
- * 
+ *
  * @ingroup utilities
  */
 class JobIdentifier
 {
   public:
-				     /**
-				      * Constructor. Set program
-				      * identifier to value of
-				      * <tt>program_id</tt> concatenated
-				      * with the present time.
-				      */
+                                     /**
+                                      * Constructor. Set program
+                                      * identifier to value of
+                                      * <tt>program_id</tt> concatenated
+                                      * with the present time.
+                                      */
     JobIdentifier();
 
-				     /**
-				      * This function returns an
-				      * identifier for the running
-				      * program. Currently, the
-				      * library provides a function
-				      * returning "JobID".
-				      *
-				      * The user may define a
-				      * replacement of this function
-				      * in his source code and avoid
-				      * linking the library
-				      * version. Unfortunately, this
-				      * mechanism does not work with
-				      * shared libraries.
-				      */
+                                     /**
+                                      * This function returns an
+                                      * identifier for the running
+                                      * program. Currently, the
+                                      * library provides a function
+                                      * returning "JobID".
+                                      *
+                                      * The user may define a
+                                      * replacement of this function
+                                      * in his source code and avoid
+                                      * linking the library
+                                      * version. Unfortunately, this
+                                      * mechanism does not work with
+                                      * shared libraries.
+                                      */
     static const char* program_id();
 
-				     /**
-				      * Obtain the base name of the
-				      * file currently being
-				      * compiled. That is, if the file
-				      * is <tt>mypath/file.cc</tt>
-				      * return just
-				      * <tt>file</tt>. Typically, this
-				      * can be called from a program
-				      * with the argument
-				      * <tt>__FILE__</tt> and is used
-				      * in the deal.II test suite.
-				      */
+                                     /**
+                                      * Obtain the base name of the
+                                      * file currently being
+                                      * compiled. That is, if the file
+                                      * is <tt>mypath/file.cc</tt>
+                                      * return just
+                                      * <tt>file</tt>. Typically, this
+                                      * can be called from a program
+                                      * with the argument
+                                      * <tt>__FILE__</tt> and is used
+                                      * in the deal.II test suite.
+                                      */
     static std::string base_name(const char* filename);
-    
-				     /**
-				      * Return the value of <tt>id</tt>.
-				      */
+
+                                     /**
+                                      * Return the value of <tt>id</tt>.
+                                      */
     const std::string operator () () const;
-    
+
   private:
-				     /**
-				      * String holding the identifier
-				      * of the presently running
-				      * program.
-				      */
+                                     /**
+                                      * String holding the identifier
+                                      * of the presently running
+                                      * program.
+                                      */
     std::string id;
 };
 

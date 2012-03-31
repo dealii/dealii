@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,10 +43,10 @@ namespace internal
     class Iterators<1,spacedim>
     {
       public:
-	typedef dealii::MGDoFCellAccessor<1,spacedim> CellAccessor;
-	typedef dealii::MGDoFAccessor<0,1,spacedim> FaceAccessor;
+        typedef dealii::MGDoFCellAccessor<1,spacedim> CellAccessor;
+        typedef dealii::MGDoFAccessor<0,1,spacedim> FaceAccessor;
 
-	typedef TriaRawIterator   <CellAccessor> raw_line_iterator;
+        typedef TriaRawIterator   <CellAccessor> raw_line_iterator;
         typedef TriaIterator      <CellAccessor> line_iterator;
         typedef TriaActiveIterator<CellAccessor> active_line_iterator;
 
@@ -77,8 +77,8 @@ namespace internal
     class Iterators<2,spacedim>
     {
       public:
-	typedef dealii::MGDoFCellAccessor<2,spacedim> CellAccessor;
-	typedef dealii::MGDoFAccessor<1,2,spacedim> FaceAccessor;
+        typedef dealii::MGDoFCellAccessor<2,spacedim> CellAccessor;
+        typedef dealii::MGDoFAccessor<1,2,spacedim> FaceAccessor;
 
         typedef TriaRawIterator   <FaceAccessor> raw_line_iterator;
         typedef TriaIterator      <FaceAccessor> line_iterator;
@@ -111,8 +111,8 @@ namespace internal
     class Iterators<3,spacedim>
     {
       public:
-	typedef dealii::MGDoFCellAccessor<3,spacedim> CellAccessor;
-	typedef dealii::MGDoFAccessor<2,3,spacedim> FaceAccessor;
+        typedef dealii::MGDoFCellAccessor<3,spacedim> CellAccessor;
+        typedef dealii::MGDoFAccessor<2,3,spacedim> FaceAccessor;
 
         typedef TriaRawIterator   <dealii::MGDoFAccessor<1,3,spacedim> >    raw_line_iterator;
         typedef TriaIterator      <dealii::MGDoFAccessor<1,3,spacedim> >       line_iterator;

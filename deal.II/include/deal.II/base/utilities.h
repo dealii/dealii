@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,16 +49,16 @@ namespace Utilities
                                     * Convert a number @p i to a string, with
                                     * as many digits as given to fill with
                                     * leading zeros.
-				    *
-				    * If the second parameter is left at its
-				    * default value, the number is not padded
-				    * with leading zeros. The result is then
-				    * the same as of the standard C function
-				    * <code>itoa()</code> had been called.
+                                    *
+                                    * If the second parameter is left at its
+                                    * default value, the number is not padded
+                                    * with leading zeros. The result is then
+                                    * the same as of the standard C function
+                                    * <code>itoa()</code> had been called.
                                     */
   std::string
   int_to_string (const unsigned int i,
-		 const unsigned int digits = numbers::invalid_unsigned_int);
+                 const unsigned int digits = numbers::invalid_unsigned_int);
 
                                    /**
                                     * Determine how many digits are needed to
@@ -135,31 +135,31 @@ namespace Utilities
                          const unsigned int width,
                          const char delimiter = ' ');
 
-				   /**
-				    * Return true if the given pattern
-				    * string appears in the first
-				    * position of the string.
-				    */
+                                   /**
+                                    * Return true if the given pattern
+                                    * string appears in the first
+                                    * position of the string.
+                                    */
   bool
   match_at_string_start (const std::string &name,
-			 const std::string &pattern);
+                         const std::string &pattern);
 
-				   /**
-				    * Read a (signed) integer starting
-				    * at the position in @p name
-				    * indicated by the second
-				    * argument, and retun this integer
-				    * as a pair together with how many
-				    * characters it takes up in the
-				    * string.
-				    *
-				    * If no integer can be read at the
-				    * indicated position, return
-				    * (-1,numbers::invalid_unsigned_int)
-				    */
+                                   /**
+                                    * Read a (signed) integer starting
+                                    * at the position in @p name
+                                    * indicated by the second
+                                    * argument, and retun this integer
+                                    * as a pair together with how many
+                                    * characters it takes up in the
+                                    * string.
+                                    *
+                                    * If no integer can be read at the
+                                    * indicated position, return
+                                    * (-1,numbers::invalid_unsigned_int)
+                                    */
   std::pair<int, unsigned int>
   get_integer_at_position (const std::string &name,
-			   const unsigned int position);
+                           const unsigned int position);
 
                                    /**
                                     * Generate a random number from a
@@ -169,105 +169,105 @@ namespace Utilities
                                     */
   double
   generate_normal_random_number (const double a,
-				 const double sigma);
+                                 const double sigma);
 
 
-				   /**
-				    * Calculate a fixed power, provided as a
-				    * template argument, of a number.
-				    *
-				    * This function provides an efficient way
-				    * to calculate things like
-				    * <code>t^N</code> where <code>N</code> is
-				    * a known number at compile time.
-				    *
-				    * Use this function as in
-				    * <code>fixed_power@<dim@> (n)</code>.
-				    */
+                                   /**
+                                    * Calculate a fixed power, provided as a
+                                    * template argument, of a number.
+                                    *
+                                    * This function provides an efficient way
+                                    * to calculate things like
+                                    * <code>t^N</code> where <code>N</code> is
+                                    * a known number at compile time.
+                                    *
+                                    * Use this function as in
+                                    * <code>fixed_power@<dim@> (n)</code>.
+                                    */
   template <int N, typename T>
   T
   fixed_power (const T t);
 
-				   /**
-				    * Optimized replacement for
-				    * <tt>std::lower_bound</tt> for
-				    * searching within the range of
-				    * column indices. Slashes
-				    * execution time by
-				    * approximately one half for the
-				    * present application, partly
-				    * because because the
-				    * binary search is replaced by a
-				    * linear search for small loop
-				    * lengths.
-				    *
-				    * Another reason for this function is
-				    * rather obscure:
-				    * when using the GCC libstdc++
-				    * function std::lower_bound,
-				    * complexity is O(log(N)) as
-				    * required. However, when using the
-				    * debug version of the GCC libstdc++
-				    * as we do when running the testsuite,
-				    * then std::lower_bound tests whether
-				    * the sequence is in fact partitioned
-				    * with respect to the pivot 'value'
-				    * (i.e. in essence that the sequence
-				    * is sorted as required for binary
-				    * search to work). However, verifying
-				    * this means that the complexity of
-				    * std::lower_bound jumps to O(N); we
-				    * call this function O(N) times below,
-				    * making the overall complexity
-				    * O(N**2). The consequence is that a
-				    * few tests with big meshes completely
-				    * run off the wall time limit for
-				    * tests and fail with the libstdc++
-				    * debug mode
-				    *
-				    * This function simply makes the
-				    * assumption that the sequence is
-				    * sorted, and we simply don't do the
-				    * additional check.
-				    */
+                                   /**
+                                    * Optimized replacement for
+                                    * <tt>std::lower_bound</tt> for
+                                    * searching within the range of
+                                    * column indices. Slashes
+                                    * execution time by
+                                    * approximately one half for the
+                                    * present application, partly
+                                    * because because the
+                                    * binary search is replaced by a
+                                    * linear search for small loop
+                                    * lengths.
+                                    *
+                                    * Another reason for this function is
+                                    * rather obscure:
+                                    * when using the GCC libstdc++
+                                    * function std::lower_bound,
+                                    * complexity is O(log(N)) as
+                                    * required. However, when using the
+                                    * debug version of the GCC libstdc++
+                                    * as we do when running the testsuite,
+                                    * then std::lower_bound tests whether
+                                    * the sequence is in fact partitioned
+                                    * with respect to the pivot 'value'
+                                    * (i.e. in essence that the sequence
+                                    * is sorted as required for binary
+                                    * search to work). However, verifying
+                                    * this means that the complexity of
+                                    * std::lower_bound jumps to O(N); we
+                                    * call this function O(N) times below,
+                                    * making the overall complexity
+                                    * O(N**2). The consequence is that a
+                                    * few tests with big meshes completely
+                                    * run off the wall time limit for
+                                    * tests and fail with the libstdc++
+                                    * debug mode
+                                    *
+                                    * This function simply makes the
+                                    * assumption that the sequence is
+                                    * sorted, and we simply don't do the
+                                    * additional check.
+                                    */
   template<typename Iterator, typename T>
   Iterator
   lower_bound (Iterator  first,
-	       Iterator  last,
-	       const T  &val);
+               Iterator  last,
+               const T  &val);
 
 
-				   /**
-				    * The same function as above, but taking
-				    * an argument that is used to compare
-				    * individual elements of the sequence of
-				    * objects pointed to by the iterators.
-				    */
+                                   /**
+                                    * The same function as above, but taking
+                                    * an argument that is used to compare
+                                    * individual elements of the sequence of
+                                    * objects pointed to by the iterators.
+                                    */
   template<typename Iterator, typename T, typename Comp>
   Iterator
   lower_bound (Iterator   first,
-	       Iterator   last,
-	       const T   &val,
-	       const Comp comp);
+               Iterator   last,
+               const T   &val,
+               const Comp comp);
 
-				   /**
-				    * Given a permutation vector (i.e. a
-				    * vector $p_0\ldots p_{N-1}$ where each
-				    * $p_i\in [0,N)$ and $p_i\neq p_j$ for
-				    * $i\neq j$), produce the reverse
-				    * permutation $q_i=N-1-p_i$.
-				    */
+                                   /**
+                                    * Given a permutation vector (i.e. a
+                                    * vector $p_0\ldots p_{N-1}$ where each
+                                    * $p_i\in [0,N)$ and $p_i\neq p_j$ for
+                                    * $i\neq j$), produce the reverse
+                                    * permutation $q_i=N-1-p_i$.
+                                    */
   std::vector<unsigned int>
   reverse_permutation (const std::vector<unsigned int> &permutation);
 
-				   /**
-				    * Given a permutation vector (i.e. a
-				    * vector $p_0\ldots p_{N-1}$ where each
-				    * $p_i\in [0,N)$ and $p_i\neq p_j$ for
-				    * $i\neq j$), produce the inverse
-				    * permutation $q_0\ldots q_{N-1}$ so that
-				    * $q_{p_i}=p_{q_i}=i$.
-				    */
+                                   /**
+                                    * Given a permutation vector (i.e. a
+                                    * vector $p_0\ldots p_{N-1}$ where each
+                                    * $p_i\in [0,N)$ and $p_i\neq p_j$ for
+                                    * $i\neq j$), produce the inverse
+                                    * permutation $q_0\ldots q_{N-1}$ so that
+                                    * $q_{p_i}=p_{q_i}=i$.
+                                    */
   std::vector<unsigned int>
   invert_permutation (const std::vector<unsigned int> &permutation);
 
@@ -292,27 +292,27 @@ namespace Utilities
                                       */
     double get_cpu_load ();
 
-				     /**
-				      * Structure that hold information about
-				      * memory usage in kB. Used by
-				      * get_memory_stats(). See man 5 proc
-				      * entry /status for details.
-				      */
+                                     /**
+                                      * Structure that hold information about
+                                      * memory usage in kB. Used by
+                                      * get_memory_stats(). See man 5 proc
+                                      * entry /status for details.
+                                      */
     struct MemoryStats
     {
-	unsigned long int VmPeak; /** peak virtual memory size in kB */
-	unsigned long int VmSize; /** current virtual memory size in kB */
-	unsigned long int VmHWM; /** peak resident memory size in kB */
-	unsigned long int VmRSS; /** current resident memory size in kB */
+        unsigned long int VmPeak; /** peak virtual memory size in kB */
+        unsigned long int VmSize; /** current virtual memory size in kB */
+        unsigned long int VmHWM; /** peak resident memory size in kB */
+        unsigned long int VmRSS; /** current resident memory size in kB */
     };
 
 
-				     /**
-				      * Fills the @param stats structure with
-				      * information about the memory
-				      * consumption of this process. This is
-				      * only implemented on Linux.
-				      */
+                                     /**
+                                      * Fills the @param stats structure with
+                                      * information about the memory
+                                      * consumption of this process. This is
+                                      * only implemented on Linux.
+                                      */
     void get_memory_stats (MemoryStats & stats);
 
 
@@ -328,107 +328,107 @@ namespace Utilities
                                       */
     std::string get_time ();
 
-				     /**
-				      * Return whether (i) deal.II has
-				      * been compiled to support MPI
-				      * (for example by compiling with
-				      * <code>CXX=mpiCC</code>) and if
-				      * so whether (ii)
-				      * <code>MPI_Init()</code> has
-				      * been called (for example using
-				      * the
-				      * Utilities::System::MPI_InitFinalize
-				      * class). In other words, the
-				      * result indicates whether the
-				      * current job is running under
-				      * MPI.
-				      *
-				      * @note The function does not
-				      * take into account whether an
-				      * MPI job actually runs on more
-				      * than one processor or is, in
-				      * fact, a single-node job that
-				      * happens to run under MPI.
-				      */
+                                     /**
+                                      * Return whether (i) deal.II has
+                                      * been compiled to support MPI
+                                      * (for example by compiling with
+                                      * <code>CXX=mpiCC</code>) and if
+                                      * so whether (ii)
+                                      * <code>MPI_Init()</code> has
+                                      * been called (for example using
+                                      * the
+                                      * Utilities::System::MPI_InitFinalize
+                                      * class). In other words, the
+                                      * result indicates whether the
+                                      * current job is running under
+                                      * MPI.
+                                      *
+                                      * @note The function does not
+                                      * take into account whether an
+                                      * MPI job actually runs on more
+                                      * than one processor or is, in
+                                      * fact, a single-node job that
+                                      * happens to run under MPI.
+                                      */
     bool job_supports_mpi ();
 
-				     /**
-				      * Alias for job_supports_mpi().
-				      *
-				      * @deprecated
-				      */
+                                     /**
+                                      * Alias for job_supports_mpi().
+                                      *
+                                      * @deprecated
+                                      */
     bool program_uses_mpi ();
 
-				     /**
-				      * @name Functions that work
-				      * in parallel via MPI. The
-				      * functions following here
-				      * are all deprecated and have
-				      * been moved to namespace
-				      * Utilities::MPI.
-				      */
-				     /** @{ */
+                                     /**
+                                      * @name Functions that work
+                                      * in parallel via MPI. The
+                                      * functions following here
+                                      * are all deprecated and have
+                                      * been moved to namespace
+                                      * Utilities::MPI.
+                                      */
+                                     /** @{ */
 
-				     /**
-				      * This function is an alias for
-				      * Utilities::MPI::n_mpi_processes.
-				      *
-				      * @deprecated
-				      */
+                                     /**
+                                      * This function is an alias for
+                                      * Utilities::MPI::n_mpi_processes.
+                                      *
+                                      * @deprecated
+                                      */
     unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator);
 
-				     /**
-				      * This function is an alias for
-				      * Utilities::MPI::this_mpi_process.
-				      *
-				      * @deprecated
-				      */
+                                     /**
+                                      * This function is an alias for
+                                      * Utilities::MPI::this_mpi_process.
+                                      *
+                                      * @deprecated
+                                      */
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
 
 
-				     /**
-				      * This function is an alias for
-				      * Utilities::MPI::compute_point_to_point_communication_pattern.
-				      *
-				      * @deprecated
-				      */
+                                     /**
+                                      * This function is an alias for
+                                      * Utilities::MPI::compute_point_to_point_communication_pattern.
+                                      *
+                                      * @deprecated
+                                      */
     using
     Utilities::MPI::compute_point_to_point_communication_pattern;
 
 
-				     /**
-				      * This function is an alias for
-				      * Utilities::MPI::duplicate_communicator.
-				      *
-				      * @deprecated
-				      */
+                                     /**
+                                      * This function is an alias for
+                                      * Utilities::MPI::duplicate_communicator.
+                                      *
+                                      * @deprecated
+                                      */
     using Utilities::MPI::duplicate_communicator;
 
-				     /**
-				      * An alias for Utilities::MPI::MinMaxAvg.
-				      *
-				      * @deprecated
-				      */
+                                     /**
+                                      * An alias for Utilities::MPI::MinMaxAvg.
+                                      *
+                                      * @deprecated
+                                      */
     using Utilities::MPI::MinMaxAvg;
 
-				     /**
-				      * An alias for Utilities::MPI::min_max_avg.
-				      *
-				      * @deprecated
-				      */
+                                     /**
+                                      * An alias for Utilities::MPI::min_max_avg.
+                                      *
+                                      * @deprecated
+                                      */
     void
     calculate_collective_mpi_min_max_avg (const MPI_Comm &mpi_communicator,
-					  const double my_value,
-					  MinMaxAvg & result);
+                                          const double my_value,
+                                          MinMaxAvg & result);
 
-				     /**
-				      * An alias for Utilities::MPI::MPI_InitFinalize.
-				      *
-				      * @deprecated
-				      */
+                                     /**
+                                      * An alias for Utilities::MPI::MPI_InitFinalize.
+                                      *
+                                      * @deprecated
+                                      */
     using Utilities::MPI::MPI_InitFinalize;
 
-				     /** @} */
+                                     /** @} */
   }
 
 
@@ -440,175 +440,175 @@ namespace Utilities
    */
   namespace Trilinos
   {
-				     /**
-				      * Returns a Trilinos Epetra_Comm
-				      * object needed for creation of
-				      * Epetra_Maps.
-				      *
-				      * If deal.II has been configured to use
-				      * a compiler that does not support MPI
-				      * then the resulting communicator will
-				      * be a serial one. Otherwise, the
-				      * communicator will correspond to
-				      * MPI_COMM_WORLD, i.e. a communicator
-				      * that encompasses all processes within
-				      * this MPI universe.
-				      */
+                                     /**
+                                      * Returns a Trilinos Epetra_Comm
+                                      * object needed for creation of
+                                      * Epetra_Maps.
+                                      *
+                                      * If deal.II has been configured to use
+                                      * a compiler that does not support MPI
+                                      * then the resulting communicator will
+                                      * be a serial one. Otherwise, the
+                                      * communicator will correspond to
+                                      * MPI_COMM_WORLD, i.e. a communicator
+                                      * that encompasses all processes within
+                                      * this MPI universe.
+                                      */
     const Epetra_Comm& comm_world();
 
-				     /**
-				      * Returns a Trilinos Epetra_Comm
-				      * object needed for creation of
-				      * Epetra_Maps.
-				      *
-				      * If deal.II has been configured to use
-				      * a compiler that does not support MPI
-				      * then the resulting communicator will
-				      * be a serial one. Otherwise, the
-				      * communicator will correspond to
-				      * MPI_COMM_SELF, i.e. a communicator
-				      * that comprises only this one
-				      * processor.
-				      */
+                                     /**
+                                      * Returns a Trilinos Epetra_Comm
+                                      * object needed for creation of
+                                      * Epetra_Maps.
+                                      *
+                                      * If deal.II has been configured to use
+                                      * a compiler that does not support MPI
+                                      * then the resulting communicator will
+                                      * be a serial one. Otherwise, the
+                                      * communicator will correspond to
+                                      * MPI_COMM_SELF, i.e. a communicator
+                                      * that comprises only this one
+                                      * processor.
+                                      */
     const Epetra_Comm& comm_self();
 
-				     /**
-				      * Given a communicator, duplicate it. If
-				      * the given communicator is serial, that
-				      * means to just return a copy of
-				      * itself. On the other hand, if it is
-				      * %parallel, we duplicate the underlying
-				      * MPI_Comm object: we create a separate
-				      * MPI communicator that contains the
-				      * same processors and in the same order
-				      * but has a separate identifier distinct
-				      * from the given communicator. The
-				      * function returns a pointer to a new
-				      * object of a class derived from
-				      * Epetra_Comm. The caller of this
-				      * function needs to assume ownership of
-				      * this function. The returned object
-				      * should be destroyed using the
-				      * destroy_communicator() function.
-				      *
-				      * This facility is used to separate
-				      * streams of communication. For example,
-				      * a program could simply use
-				      * MPI_Comm_World for everything. But it
-				      * is easy to come up with scenarios
-				      * where sometimes not all processors
-				      * participate in a communication that is
-				      * intended to be global -- for example
-				      * if we assemble a matrix on a coarse
-				      * mesh with fewer cells than there are
-				      * processors, some processors may not
-				      * sync their matrices with the rest
-				      * because they haven't written into it
-				      * because they own no cells. That's
-				      * clearly a bug. However, if these
-				      * processors just continue their work,
-				      * and the next %parallel operation
-				      * happens to be a sync on a different
-				      * matrix, then the sync could succeed --
-				      * by accident, since different
-				      * processors are talking about different
-				      * matrices.
-				      *
-				      * This kind of situation can be avoided
-				      * if we use different communicators for
-				      * different matrices which reduces the
-				      * likelihood that communications meant
-				      * to be separate aren't recognized as
-				      * such just because they happen on the
-				      * same communicator. In addition, it is
-				      * conceivable that some MPI operations
-				      * can be parallelized using multiple
-				      * threads because their communicators
-				      * identifies the communication in
-				      * question, not their relative timing as
-				      * is the case in a sequential program
-				      * that just uses a single communicator.
-				      */
+                                     /**
+                                      * Given a communicator, duplicate it. If
+                                      * the given communicator is serial, that
+                                      * means to just return a copy of
+                                      * itself. On the other hand, if it is
+                                      * %parallel, we duplicate the underlying
+                                      * MPI_Comm object: we create a separate
+                                      * MPI communicator that contains the
+                                      * same processors and in the same order
+                                      * but has a separate identifier distinct
+                                      * from the given communicator. The
+                                      * function returns a pointer to a new
+                                      * object of a class derived from
+                                      * Epetra_Comm. The caller of this
+                                      * function needs to assume ownership of
+                                      * this function. The returned object
+                                      * should be destroyed using the
+                                      * destroy_communicator() function.
+                                      *
+                                      * This facility is used to separate
+                                      * streams of communication. For example,
+                                      * a program could simply use
+                                      * MPI_Comm_World for everything. But it
+                                      * is easy to come up with scenarios
+                                      * where sometimes not all processors
+                                      * participate in a communication that is
+                                      * intended to be global -- for example
+                                      * if we assemble a matrix on a coarse
+                                      * mesh with fewer cells than there are
+                                      * processors, some processors may not
+                                      * sync their matrices with the rest
+                                      * because they haven't written into it
+                                      * because they own no cells. That's
+                                      * clearly a bug. However, if these
+                                      * processors just continue their work,
+                                      * and the next %parallel operation
+                                      * happens to be a sync on a different
+                                      * matrix, then the sync could succeed --
+                                      * by accident, since different
+                                      * processors are talking about different
+                                      * matrices.
+                                      *
+                                      * This kind of situation can be avoided
+                                      * if we use different communicators for
+                                      * different matrices which reduces the
+                                      * likelihood that communications meant
+                                      * to be separate aren't recognized as
+                                      * such just because they happen on the
+                                      * same communicator. In addition, it is
+                                      * conceivable that some MPI operations
+                                      * can be parallelized using multiple
+                                      * threads because their communicators
+                                      * identifies the communication in
+                                      * question, not their relative timing as
+                                      * is the case in a sequential program
+                                      * that just uses a single communicator.
+                                      */
     Epetra_Comm *
     duplicate_communicator (const Epetra_Comm &communicator);
 
-				     /**
-				      * Given an Epetra communicator that was
-				      * created by the
-				      * duplicate_communicator() function,
-				      * destroy the underlying MPI
-				      * communicator object and reset the
-				      * Epetra_Comm object to a the result of
-				      * comm_self().
-				      *
-				      * It is necessary to call this function
-				      * at the time when the result of
-				      * duplicate_communicator() is no longer
-				      * needed. The reason is that in that
-				      * function, we first create a new
-				      * MPI_Comm object and then create an
-				      * Epetra_Comm around it. While we can
-				      * take care of destroying the latter, it
-				      * doesn't destroy the communicator since
-				      * it can only assume that it may also be
-				      * still used by other objects in the
-				      * program. Consequently, we have to take
-				      * care of destroying it ourselves,
-				      * explicitly.
-				      *
-				      * This function does exactly
-				      * that. Because this has to happen while
-				      * the Epetra_Comm object is still
-				      * around, it first resets the latter and
-				      * then destroys the communicator object.
-				      *
-				      * @note If you call this function on an
-				      * Epetra_Comm object that is not created
-				      * by duplicate_communicator(), you are
-				      * likely doing something quite
-				      * wrong. Don't do this.
-				      */
+                                     /**
+                                      * Given an Epetra communicator that was
+                                      * created by the
+                                      * duplicate_communicator() function,
+                                      * destroy the underlying MPI
+                                      * communicator object and reset the
+                                      * Epetra_Comm object to a the result of
+                                      * comm_self().
+                                      *
+                                      * It is necessary to call this function
+                                      * at the time when the result of
+                                      * duplicate_communicator() is no longer
+                                      * needed. The reason is that in that
+                                      * function, we first create a new
+                                      * MPI_Comm object and then create an
+                                      * Epetra_Comm around it. While we can
+                                      * take care of destroying the latter, it
+                                      * doesn't destroy the communicator since
+                                      * it can only assume that it may also be
+                                      * still used by other objects in the
+                                      * program. Consequently, we have to take
+                                      * care of destroying it ourselves,
+                                      * explicitly.
+                                      *
+                                      * This function does exactly
+                                      * that. Because this has to happen while
+                                      * the Epetra_Comm object is still
+                                      * around, it first resets the latter and
+                                      * then destroys the communicator object.
+                                      *
+                                      * @note If you call this function on an
+                                      * Epetra_Comm object that is not created
+                                      * by duplicate_communicator(), you are
+                                      * likely doing something quite
+                                      * wrong. Don't do this.
+                                      */
     void
     destroy_communicator (Epetra_Comm &communicator);
 
-				     /**
-				      * Return the number of MPI processes
-				      * there exist in the given communicator
-				      * object. If this is a sequential job,
-				      * it returns 1.
-				      */
+                                     /**
+                                      * Return the number of MPI processes
+                                      * there exist in the given communicator
+                                      * object. If this is a sequential job,
+                                      * it returns 1.
+                                      */
     unsigned int get_n_mpi_processes (const Epetra_Comm &mpi_communicator);
 
-				     /**
-				      * Return the number of the present MPI
-				      * process in the space of processes
-				      * described by the given
-				      * communicator. This will be a unique
-				      * value for each process between zero
-				      * and (less than) the number of all
-				      * processes (given by
-				      * get_n_mpi_processes()).
-				      */
+                                     /**
+                                      * Return the number of the present MPI
+                                      * process in the space of processes
+                                      * described by the given
+                                      * communicator. This will be a unique
+                                      * value for each process between zero
+                                      * and (less than) the number of all
+                                      * processes (given by
+                                      * get_n_mpi_processes()).
+                                      */
     unsigned int get_this_mpi_process (const Epetra_Comm &mpi_communicator);
 
-				     /**
-				      * Given a Trilinos Epetra map, create a
-				      * new map that has the same subdivision
-				      * of elements to processors but uses the
-				      * given communicator object instead of
-				      * the one stored in the first
-				      * argument. In essence, this means that
-				      * we create a map that communicates
-				      * among the same processors in the same
-				      * way, but using a separate channel.
-				      *
-				      * This function is typically used with a
-				      * communicator that has been obtained by
-				      * the duplicate_communicator() function.
-				      */
+                                     /**
+                                      * Given a Trilinos Epetra map, create a
+                                      * new map that has the same subdivision
+                                      * of elements to processors but uses the
+                                      * given communicator object instead of
+                                      * the one stored in the first
+                                      * argument. In essence, this means that
+                                      * we create a map that communicates
+                                      * among the same processors in the same
+                                      * way, but using a separate channel.
+                                      *
+                                      * This function is typically used with a
+                                      * communicator that has been obtained by
+                                      * the duplicate_communicator() function.
+                                      */
     Epetra_Map
     duplicate_map (const Epetra_BlockMap  &map,
-		   const Epetra_Comm &comm);
+                   const Epetra_Comm &comm);
   }
 
 #endif
@@ -628,20 +628,20 @@ namespace Utilities
     switch (N)
       {
         case 0:
-	      return 1;
-	case 1:
-	      return n;
-	case 2:
-	      return n*n;
-	case 3:
-	      return n*n*n;
-	case 4:
-	      return n*n*n*n;
-	default:
-	      T result = 1;
-	      for (int d=0;d<N;++d)
-		result *= n;
-	      return result;
+              return 1;
+        case 1:
+              return n;
+        case 2:
+              return n*n;
+        case 3:
+              return n*n*n;
+        case 4:
+              return n*n*n*n;
+        default:
+              T result = 1;
+              for (int d=0;d<N;++d)
+                result *= n;
+              return result;
       }
   }
 
@@ -651,11 +651,11 @@ namespace Utilities
   inline
   Iterator
   lower_bound (Iterator  first,
-	       Iterator  last,
-	       const T  &val)
+               Iterator  last,
+               const T  &val)
   {
     return Utilities::lower_bound (first, last, val,
-				   std::less<T>());
+                                   std::less<T>());
   }
 
 
@@ -664,9 +664,9 @@ namespace Utilities
   inline
   Iterator
   lower_bound (Iterator    first,
-	       Iterator    last,
-	       const T    &val,
-	       const Comp  comp)
+               Iterator    last,
+               const T    &val,
+               const Comp  comp)
   {
     unsigned int len = last-first;
 
@@ -675,74 +675,74 @@ namespace Utilities
 
     while (true)
       {
-					 // if length equals 8 or less,
-					 // then do a rolled out
-					 // search. use a switch without
-					 // breaks for that and roll-out
-					 // the loop somehow
-	if (len < 8)
-	  {
-	    switch (len)
-	      {
-		case 7:
-		      if (!comp(*first, val))
-			return first;
-		      ++first;
-		case 6:
-		      if (!comp(*first, val))
-			return first;
-		      ++first;
-		case 5:
-		      if (!comp(*first, val))
-			return first;
-		      ++first;
-		case 4:
-		      if (!comp(*first, val))
-			return first;
-		      ++first;
-		case 3:
-		      if (!comp(*first, val))
-			return first;
-		      ++first;
-		case 2:
-		      if (!comp(*first, val))
-			return first;
-		      ++first;
-		case 1:
-		      if (!comp(*first, val))
-			return first;
-		      return first+1;
-		default:
-						       // indices seem
-						       // to not be
-						       // sorted
-						       // correctly!? or
-						       // did len
-						       // become==0
-						       // somehow? that
-						       // shouln't have
-						       // happened
-		      Assert (false, ExcInternalError());
-	      }
-	  }
+                                         // if length equals 8 or less,
+                                         // then do a rolled out
+                                         // search. use a switch without
+                                         // breaks for that and roll-out
+                                         // the loop somehow
+        if (len < 8)
+          {
+            switch (len)
+              {
+                case 7:
+                      if (!comp(*first, val))
+                        return first;
+                      ++first;
+                case 6:
+                      if (!comp(*first, val))
+                        return first;
+                      ++first;
+                case 5:
+                      if (!comp(*first, val))
+                        return first;
+                      ++first;
+                case 4:
+                      if (!comp(*first, val))
+                        return first;
+                      ++first;
+                case 3:
+                      if (!comp(*first, val))
+                        return first;
+                      ++first;
+                case 2:
+                      if (!comp(*first, val))
+                        return first;
+                      ++first;
+                case 1:
+                      if (!comp(*first, val))
+                        return first;
+                      return first+1;
+                default:
+                                                       // indices seem
+                                                       // to not be
+                                                       // sorted
+                                                       // correctly!? or
+                                                       // did len
+                                                       // become==0
+                                                       // somehow? that
+                                                       // shouln't have
+                                                       // happened
+                      Assert (false, ExcInternalError());
+              }
+          }
 
 
 
-	const unsigned int half   = len >> 1;
-	const Iterator     middle = first + half;
+        const unsigned int half   = len >> 1;
+        const Iterator     middle = first + half;
 
-					 // if the value is larger than
-					 // that pointed to by the
-					 // middle pointer, then the
-					 // insertion point must be
-					 // right of it
-	if (comp(*middle, val))
-	  {
-	    first = middle + 1;
-	    len  -= half + 1;
-	  }
-	else
-	  len = half;
+                                         // if the value is larger than
+                                         // that pointed to by the
+                                         // middle pointer, then the
+                                         // insertion point must be
+                                         // right of it
+        if (comp(*middle, val))
+          {
+            first = middle + 1;
+            len  -= half + 1;
+          }
+        else
+          len = half;
       }
   }
 }

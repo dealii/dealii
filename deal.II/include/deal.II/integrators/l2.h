@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,18 +57,18 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_components = fe.get_fe().n_components();
-      
+
       for (unsigned k=0;k<fe.n_quadrature_points;++k)
-	{
-	  const double dx = fe.JxW(k) * factor;
-	  
-	  for (unsigned i=0;i<n_dofs;++i)
-	    for (unsigned j=0;j<n_dofs;++j)
-	      for (unsigned int d=0;d<n_components;++d)
-		M(i,j) += dx
-			  * fe.shape_value_component(j,k,d)
-			  * fe.shape_value_component(i,k,d);
-	}
+        {
+          const double dx = fe.JxW(k) * factor;
+
+          for (unsigned i=0;i<n_dofs;++i)
+            for (unsigned j=0;j<n_dofs;++j)
+              for (unsigned int d=0;d<n_components;++d)
+                M(i,j) += dx
+                          * fe.shape_value_component(j,k,d)
+                          * fe.shape_value_component(i,k,d);
+        }
     }
 
 /**
@@ -89,10 +89,10 @@ namespace LocalIntegrators
       AssertDimension(result.size(), n_dofs);
       AssertDimension(fe.get_fe().n_components(), 1);
       AssertDimension(input.size(), fe.n_quadrature_points);
-      
+
       for (unsigned k=0;k<fe.n_quadrature_points;++k)
-	for (unsigned i=0;i<n_dofs;++i)
-	  result(i) += fe.JxW(k) * factor * input[k] * fe.shape_value(i,k);
+        for (unsigned i=0;i<n_dofs;++i)
+          result(i) += fe.JxW(k) * factor * input[k] * fe.shape_value(i,k);
     }
 
 /**
@@ -118,14 +118,14 @@ namespace LocalIntegrators
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int fe_components = fe.get_fe().n_components();
       const unsigned int n_components = input.size();
-	
+
       AssertDimension(result.size(), n_dofs);
       AssertDimension(input.size(), fe_components);
-	
+
       for (unsigned k=0;k<fe.n_quadrature_points;++k)
-	for (unsigned i=0;i<n_dofs;++i)
-	  for (unsigned int d=0;d<n_components;++d)
-	    result(i) += fe.JxW(k) * factor * fe.shape_value_component(i,k,d) * input[d][k];
+        for (unsigned i=0;i<n_dofs;++i)
+          for (unsigned int d=0;d<n_components;++d)
+            result(i) += fe.JxW(k) * factor * fe.shape_value_component(i,k,d) * input[d][k];
     }
 
 /**
@@ -159,7 +159,7 @@ namespace LocalIntegrators
       const unsigned int n1_dofs = fe1.dofs_per_cell;
       const unsigned int n2_dofs = fe2.dofs_per_cell;
       const unsigned int n_components = fe1.get_fe().n_components();
-      
+
       Assert(n1_dofs == n2_dofs, ExcNotImplemented());
       AssertDimension(n_components, fe2.get_fe().n_components());
       AssertDimension(M11.m(), n1_dofs);
@@ -170,26 +170,26 @@ namespace LocalIntegrators
       AssertDimension(M12.n(), n2_dofs);
       AssertDimension(M21.n(), n1_dofs);
       AssertDimension(M22.n(), n2_dofs);
-      
+
       for (unsigned k=0;k<fe1.n_quadrature_points;++k)
-	{
-	  const double dx = fe1.JxW(k);
-	  
-	  for (unsigned i=0;i<n1_dofs;++i)
-	    for (unsigned j=0;j<n1_dofs;++j)
-	      for (unsigned int d=0;d<n_components;++d)
-		{
-		  const double u1 = factor1*fe1.shape_value_component(j,k,d);
-		  const double u2 =-factor2*fe2.shape_value_component(j,k,d);
-		  const double v1 = factor1*fe1.shape_value_component(i,k,d);
-		  const double v2 =-factor2*fe2.shape_value_component(i,k,d);		  
-		  
-		  M11(i,j) += dx * u1*v1;
-		  M12(i,j) += dx * u2*v1;
-		  M21(i,j) += dx * u1*v2;
-		  M22(i,j) += dx * u2*v2;
-		}
-	}
+        {
+          const double dx = fe1.JxW(k);
+
+          for (unsigned i=0;i<n1_dofs;++i)
+            for (unsigned j=0;j<n1_dofs;++j)
+              for (unsigned int d=0;d<n_components;++d)
+                {
+                  const double u1 = factor1*fe1.shape_value_component(j,k,d);
+                  const double u2 =-factor2*fe2.shape_value_component(j,k,d);
+                  const double v1 = factor1*fe1.shape_value_component(i,k,d);
+                  const double v2 =-factor2*fe2.shape_value_component(i,k,d);
+
+                  M11(i,j) += dx * u1*v1;
+                  M12(i,j) += dx * u2*v1;
+                  M21(i,j) += dx * u1*v2;
+                  M22(i,j) += dx * u2*v2;
+                }
+        }
     }
   }
 }

@@ -1,7 +1,7 @@
 //----------------------------  hp_fe_values.h  ---------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -64,8 +64,8 @@ namespace internal
                                           * indicated by the parameters
                                           * to the constructor.
                                           */
-	FEValuesBase (const dealii::hp::MappingCollection<dim,FEValues::space_dimension> &mapping_collection,
-		      const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
+        FEValuesBase (const dealii::hp::MappingCollection<dim,FEValues::space_dimension> &mapping_collection,
+                      const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
                       const dealii::hp::QCollection<q_dim>     &q_collection,
                       const UpdateFlags             update_flags);
                                          /**
@@ -77,17 +77,17 @@ namespace internal
                                           * object for the mapping
                                           * object.
                                           */
-	FEValuesBase (const dealii::hp::FECollection<dim,FEValues::space_dimension> &fe_collection,
+        FEValuesBase (const dealii::hp::FECollection<dim,FEValues::space_dimension> &fe_collection,
                       const dealii::hp::QCollection<q_dim> &q_collection,
                       const UpdateFlags         update_flags);
 
-					 /**
-					  * Get a reference to the
-					  * collection of finite
-					  * element objects used here.
-					  */
-	const dealii::hp::FECollection<dim,FEValues::space_dimension> &
-	get_fe_collection () const;
+                                         /**
+                                          * Get a reference to the
+                                          * collection of finite
+                                          * element objects used here.
+                                          */
+        const dealii::hp::FECollection<dim,FEValues::space_dimension> &
+        get_fe_collection () const;
 
                                          /**
                                           * Return a reference to the @p
@@ -129,64 +129,64 @@ namespace internal
                                           * elements to be used.
                                           */
         const SmartPointer<const dealii::hp::FECollection<dim,FEValues::space_dimension>,
-			   FEValuesBase<dim,q_dim,FEValues> > fe_collection;
+                           FEValuesBase<dim,q_dim,FEValues> > fe_collection;
 
-				     /**
-				      * A pointer to the
-				      * collection of mappings to
-				      * be used.
-				      */
+                                     /**
+                                      * A pointer to the
+                                      * collection of mappings to
+                                      * be used.
+                                      */
     const SmartPointer<const dealii::hp::MappingCollection<dim, FEValues::space_dimension>,
-		       FEValuesBase<dim,q_dim,FEValues> > mapping_collection;
+                       FEValuesBase<dim,q_dim,FEValues> > mapping_collection;
 
-				   /**
-				    * Copy of the quadrature
-				    * collection object
-				    * provided to the
-				    * constructor.
-				    */
+                                   /**
+                                    * Copy of the quadrature
+                                    * collection object
+                                    * provided to the
+                                    * constructor.
+                                    */
   const dealii::hp::QCollection<q_dim> q_collection;
 
   private:
-				   /**
-				    * A table in which we store
-				    * pointers to fe_values
-				    * objects for different
-				    * finite element, mapping,
-				    * and quadrature objects
-				    * from our collection. The
-				    * first index indicates the
-				    * index of the finite
-				    * element within the
-				    * fe_collection, the second
-				    * the index of the mapping
-				    * within the mapping
-				    * collection, and the last
-				    * one the index of the
-				    * quadrature formula within
-				    * the q_collection.
-				    *
-				    * Initially, all entries
-				    * have zero pointers, and we
-				    * will allocate them lazily
-				    * as needed in
-				    * select_fe_values().
-				    */
+                                   /**
+                                    * A table in which we store
+                                    * pointers to fe_values
+                                    * objects for different
+                                    * finite element, mapping,
+                                    * and quadrature objects
+                                    * from our collection. The
+                                    * first index indicates the
+                                    * index of the finite
+                                    * element within the
+                                    * fe_collection, the second
+                                    * the index of the mapping
+                                    * within the mapping
+                                    * collection, and the last
+                                    * one the index of the
+                                    * quadrature formula within
+                                    * the q_collection.
+                                    *
+                                    * Initially, all entries
+                                    * have zero pointers, and we
+                                    * will allocate them lazily
+                                    * as needed in
+                                    * select_fe_values().
+                                    */
   Table<3,std_cxx1x::shared_ptr<FEValues> > fe_values_table;
 
-				   /**
-				    * Set of indices pointing at
-				    * the fe_values object
-				    * selected last time the
-				    * select_fe_value() function
-				    * was called.
-				    */
+                                   /**
+                                    * Set of indices pointing at
+                                    * the fe_values object
+                                    * selected last time the
+                                    * select_fe_value() function
+                                    * was called.
+                                    */
   TableIndices<3> present_fe_values_index;
 
-				   /**
-				    * Values of the update flags as
-				    * given to the constructor.
-				    */
+                                   /**
+                                    * Values of the update flags as
+                                    * given to the constructor.
+                                    */
   const UpdateFlags update_flags;
 };
 
@@ -274,7 +274,7 @@ namespace hp
                                         * function.
                                         */
       FEValues (const dealii::hp::MappingCollection<dim,spacedim> &mapping_collection,
-		const dealii::hp::FECollection<dim,spacedim>  &fe_collection,
+                const dealii::hp::FECollection<dim,spacedim>  &fe_collection,
                 const dealii::hp::QCollection<dim>       &q_collection,
                 const UpdateFlags             update_flags);
 

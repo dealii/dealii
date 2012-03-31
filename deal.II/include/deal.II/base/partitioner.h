@@ -61,312 +61,312 @@ namespace Utilities
   class Partitioner
   {
   public:
-				/**
-				 * Empty Constructor.
-				 */
+                                /**
+                                 * Empty Constructor.
+                                 */
     Partitioner ();
 
-				/**
-				 * Constructor with size argument. Creates an
-				 * MPI_COMM_SELF structure where there is no
-				 * real parallel layout.
-				 */
+                                /**
+                                 * Constructor with size argument. Creates an
+                                 * MPI_COMM_SELF structure where there is no
+                                 * real parallel layout.
+                                 */
     Partitioner (const unsigned int size);
 
-				/**
-				 * Constructor with index set arguments. This
-				 *  constructor creates a distributed layout
-				 *  based on a given communicators, an
-				 *  IndexSet describing the locally owned
-				 *  range and another one for describing ghost
-				 *  indices that are owned by other
-				 *  processors, but we need to have read or
-				 *  write access to.
-				 */
+                                /**
+                                 * Constructor with index set arguments. This
+                                 *  constructor creates a distributed layout
+                                 *  based on a given communicators, an
+                                 *  IndexSet describing the locally owned
+                                 *  range and another one for describing ghost
+                                 *  indices that are owned by other
+                                 *  processors, but we need to have read or
+                                 *  write access to.
+                                 */
     Partitioner (const IndexSet &locally_owned_indices,
-		 const IndexSet &ghost_indices_in,
-		 const MPI_Comm  communicator_in);
+                 const IndexSet &ghost_indices_in,
+                 const MPI_Comm  communicator_in);
 
-				/**
-				 * Constructor with one index set argument. This
-				 * constructor creates a distributed layout
-				 * based on a given communicator, and an IndexSet
-				 * describing the locally owned range. It
-				 * allows to set the ghost indices at a later
-				 * time. Apart from this, it is similar to the
-				 * other constructor with two index sets.
-				 */
+                                /**
+                                 * Constructor with one index set argument. This
+                                 * constructor creates a distributed layout
+                                 * based on a given communicator, and an IndexSet
+                                 * describing the locally owned range. It
+                                 * allows to set the ghost indices at a later
+                                 * time. Apart from this, it is similar to the
+                                 * other constructor with two index sets.
+                                 */
     Partitioner (const IndexSet &locally_owned_indices,
-		 const MPI_Comm  communicator_in);
+                 const MPI_Comm  communicator_in);
 
-				/**
-				 * Sets the locally owned indices. Used in the
-				 * constructor.
-				 */
+                                /**
+                                 * Sets the locally owned indices. Used in the
+                                 * constructor.
+                                 */
     void set_owned_indices (const IndexSet &locally_owned_indices);
 
-				/**
-				 * Allows to set the ghost indices after the
-				 * constructor has been called.
-				 */
+                                /**
+                                 * Allows to set the ghost indices after the
+                                 * constructor has been called.
+                                 */
     void set_ghost_indices (const IndexSet &ghost_indices);
 
-				/**
-				 * Returns the global size.
-				 */
+                                /**
+                                 * Returns the global size.
+                                 */
     types::global_dof_index size() const;
 
-				/**
-				 * Returns the local size, i.e.
-				 * local_range().second minus
-				 * local_range().first.
-				 */
+                                /**
+                                 * Returns the local size, i.e.
+                                 * local_range().second minus
+                                 * local_range().first.
+                                 */
     unsigned int local_size() const;
 
-				/**
-				 * Returns an IndexSet representation of the
-				 * local range. This class only supports
-				 * contiguous local ranges, so the IndexSet
-				 * actually only consists of one single range
-				 * of data, and is equivalent to the result of
-				 * local_range().
-				 */
+                                /**
+                                 * Returns an IndexSet representation of the
+                                 * local range. This class only supports
+                                 * contiguous local ranges, so the IndexSet
+                                 * actually only consists of one single range
+                                 * of data, and is equivalent to the result of
+                                 * local_range().
+                                 */
     const IndexSet & locally_owned_range() const;
 
-				/**
-				 * Returns the local range. The returned pair
-				 * consists of the index of the first element
-				 * and the index of the element one past the
-				 * last locally owned one.
-				 */
+                                /**
+                                 * Returns the local range. The returned pair
+                                 * consists of the index of the first element
+                                 * and the index of the element one past the
+                                 * last locally owned one.
+                                 */
     std::pair<types::global_dof_index,types::global_dof_index>
     local_range() const;
 
-				/**
-				 * Returns true if the given global index is
-				 * in the local range of this processor.
-				 */
+                                /**
+                                 * Returns true if the given global index is
+                                 * in the local range of this processor.
+                                 */
     bool in_local_range (const types::global_dof_index global_index) const;
 
-				/**
-				 * Returns the local index corresponding to
-				 * the given global index. If the given global
-				 * index is neither locally owned nor a ghost,
-				 * an exception is thrown.
-				 *
-				 * Note that the local index for locally owned
-				 * indices is between 0 and local_size()-1,
-				 * and the local index for ghosts is between
-				 * local_size() and
-				 * local_size()+n_ghost_indices()-1.
-				 */
+                                /**
+                                 * Returns the local index corresponding to
+                                 * the given global index. If the given global
+                                 * index is neither locally owned nor a ghost,
+                                 * an exception is thrown.
+                                 *
+                                 * Note that the local index for locally owned
+                                 * indices is between 0 and local_size()-1,
+                                 * and the local index for ghosts is between
+                                 * local_size() and
+                                 * local_size()+n_ghost_indices()-1.
+                                 */
     unsigned int
     global_to_local (const types::global_dof_index global_index) const;
 
-				/**
-				 * Returns the global index corresponding to
-				 * the given local index.
-				 *
-				 * Note that the local index for locally owned
-				 * indices is between 0 and local_size()-1,
-				 * and the local index for ghosts is between
-				 * local_size() and
-				 * local_size()+n_ghost_indices()-1.
-				 */
+                                /**
+                                 * Returns the global index corresponding to
+                                 * the given local index.
+                                 *
+                                 * Note that the local index for locally owned
+                                 * indices is between 0 and local_size()-1,
+                                 * and the local index for ghosts is between
+                                 * local_size() and
+                                 * local_size()+n_ghost_indices()-1.
+                                 */
     types::global_dof_index
     local_to_global (const unsigned int local_index) const;
 
-				/**
-				 * Returns whether the given global index is a
-				 * ghost index on the present
-				 * processor. Returns false for indices that
-				 * are owned locally and for indices not
-				 * present at all.
-				 */
+                                /**
+                                 * Returns whether the given global index is a
+                                 * ghost index on the present
+                                 * processor. Returns false for indices that
+                                 * are owned locally and for indices not
+                                 * present at all.
+                                 */
     bool is_ghost_entry (const types::global_dof_index global_index) const;
 
-				/**
-				 * Returns an IndexSet representation of all
-				 * ghost indices.
-				 */
+                                /**
+                                 * Returns an IndexSet representation of all
+                                 * ghost indices.
+                                 */
     const IndexSet& ghost_indices() const;
 
-				/**
-				 * Returns the number of ghost indices. Same
-				 * as ghost_indices().n_elements(), but cached
-				 * for simpler access.
-				 */
+                                /**
+                                 * Returns the number of ghost indices. Same
+                                 * as ghost_indices().n_elements(), but cached
+                                 * for simpler access.
+                                 */
     unsigned int n_ghost_indices() const;
 
-				/**
-				 * Returns a list of processors (first entry)
-				 * and the number of degrees of freedom for
-				 * the individual processor on the ghost
-				 * elements present (second entry).
-				 */
+                                /**
+                                 * Returns a list of processors (first entry)
+                                 * and the number of degrees of freedom for
+                                 * the individual processor on the ghost
+                                 * elements present (second entry).
+                                 */
     const std::vector<std::pair<unsigned int,unsigned int> >&
     ghost_targets() const;
 
-				/**
-				 * The set of (local) indices that we are
-				 * importing during compress(), i.e., others'
-				 * ghosts that belong to the local
-				 * range. Similar structure as in an IndexSet,
-				 * but tailored to be iterated over, and some
-				 * indices may be duplicates.
-				 */
+                                /**
+                                 * The set of (local) indices that we are
+                                 * importing during compress(), i.e., others'
+                                 * ghosts that belong to the local
+                                 * range. Similar structure as in an IndexSet,
+                                 * but tailored to be iterated over, and some
+                                 * indices may be duplicates.
+                                 */
     const std::vector<std::pair<unsigned int, unsigned int> >&
     import_indices() const;
 
-				/**
-				 * Number of import indices, i.e., indices
-				 * that are ghosts on other processors and we
-				 * will receive data from.
-				 */
+                                /**
+                                 * Number of import indices, i.e., indices
+                                 * that are ghosts on other processors and we
+                                 * will receive data from.
+                                 */
     unsigned int n_import_indices() const;
 
-				/**
-				 * Returns a list of processors (first entry)
-				 * and the number of degrees of freedom for
-				 * all the processors that data is obtained
-				 * from (second entry), i.e., locally owned
-				 * indices that are ghosts on other
-				 * processors.
-				 */
+                                /**
+                                 * Returns a list of processors (first entry)
+                                 * and the number of degrees of freedom for
+                                 * all the processors that data is obtained
+                                 * from (second entry), i.e., locally owned
+                                 * indices that are ghosts on other
+                                 * processors.
+                                 */
     const std::vector<std::pair<unsigned int,unsigned int> >&
     import_targets() const;
 
-				/**
-				 * Checks whether the given
-				 * partitioner is compatible with the
-				 * partitioner used for this
-				 * vector. Two partitioners are
-				 * compatible if the have the same
-				 * local size and the same ghost
-				 * indices. They do not necessarily
-				 * need to be the same data
-				 * field. This is a local operation
-				 * only, i.e., if only some
-				 * processors decide that the
-				 * partitioning is not compatible,
-				 * only these processors will return
-				 * @p false, whereas the other
-				 * processors will return @p true.
-				 */
+                                /**
+                                 * Checks whether the given
+                                 * partitioner is compatible with the
+                                 * partitioner used for this
+                                 * vector. Two partitioners are
+                                 * compatible if the have the same
+                                 * local size and the same ghost
+                                 * indices. They do not necessarily
+                                 * need to be the same data
+                                 * field. This is a local operation
+                                 * only, i.e., if only some
+                                 * processors decide that the
+                                 * partitioning is not compatible,
+                                 * only these processors will return
+                                 * @p false, whereas the other
+                                 * processors will return @p true.
+                                 */
     bool is_compatible (const Partitioner &part) const;
 
-				/**
-				 * Returns the MPI ID of the calling
-				 * processor. Cached to have simple access.
-				 */
+                                /**
+                                 * Returns the MPI ID of the calling
+                                 * processor. Cached to have simple access.
+                                 */
     unsigned int this_mpi_process () const;
 
-				/**
-				 * Returns the total number of MPI processor
-				 * participating in the given
-				 * partitioner. Cached to have simple access.
-				 */
+                                /**
+                                 * Returns the total number of MPI processor
+                                 * participating in the given
+                                 * partitioner. Cached to have simple access.
+                                 */
     unsigned int n_mpi_processes () const;
 
-				/**
-				 * Returns the MPI communicator underlying the
-				 * partitioner object.
-				 */
+                                /**
+                                 * Returns the MPI communicator underlying the
+                                 * partitioner object.
+                                 */
     MPI_Comm get_communicator() const;
 
-				/**
-				 * Computes the memory consumption of this
-				 * structure.
-				 */
+                                /**
+                                 * Computes the memory consumption of this
+                                 * structure.
+                                 */
     std::size_t memory_consumption() const;
 
                                        /**
-					* Exception
-					*/
+                                        * Exception
+                                        */
     DeclException2 (ExcIndexNotPresent,
-		    unsigned int, unsigned int,
-		    << "Global index " << arg1
-		    << " neither owned nor ghost on proc " << arg2);
+                    unsigned int, unsigned int,
+                    << "Global index " << arg1
+                    << " neither owned nor ghost on proc " << arg2);
 
-  private:			/**
-				 * The global size of the vector over all
-				 * processors
-				 */
+  private:                      /**
+                                 * The global size of the vector over all
+                                 * processors
+                                 */
     const types::global_dof_index global_size;
 
-				/**
-				 * The range of the vector that is stored
-				 * locally.
-				 */
+                                /**
+                                 * The range of the vector that is stored
+                                 * locally.
+                                 */
     IndexSet locally_owned_range_data;
 
-				/**
-				 * The range of the vector that is stored
-				 * locally. Extracted from locally_owned_range
-				 * for performance reasons.
-				 */
+                                /**
+                                 * The range of the vector that is stored
+                                 * locally. Extracted from locally_owned_range
+                                 * for performance reasons.
+                                 */
     std::pair<types::global_dof_index,types::global_dof_index> local_range_data;
 
-				/**
-				 * The set of indices to which we need to have
-				 * read access but that are not locally owned
-				 */
+                                /**
+                                 * The set of indices to which we need to have
+                                 * read access but that are not locally owned
+                                 */
     IndexSet ghost_indices_data;
 
-				/**
-				 * Caches the number of ghost indices. It
-				 * would be expensive to use @p
-				 * ghost_indices.n_elements() to compute this.
-				 */
+                                /**
+                                 * Caches the number of ghost indices. It
+                                 * would be expensive to use @p
+                                 * ghost_indices.n_elements() to compute this.
+                                 */
     unsigned int n_ghost_indices_data;
 
-				/**
-				 * Contains information which processors my
-				 * ghost indices belong to and how many those
-				 * indices are
-				 */
+                                /**
+                                 * Contains information which processors my
+                                 * ghost indices belong to and how many those
+                                 * indices are
+                                 */
     std::vector<std::pair<unsigned int,unsigned int> > ghost_targets_data;
 
-				/**
-				 * The set of (local) indices that we are
-				 * importing during compress(), i.e., others'
-				 * ghosts that belong to the local
-				 * range. Similar structure as in an IndexSet,
-				 * but tailored to be iterated over, and some
-				 * indices may be duplicates.
-				 */
+                                /**
+                                 * The set of (local) indices that we are
+                                 * importing during compress(), i.e., others'
+                                 * ghosts that belong to the local
+                                 * range. Similar structure as in an IndexSet,
+                                 * but tailored to be iterated over, and some
+                                 * indices may be duplicates.
+                                 */
     std::vector<std::pair<unsigned int, unsigned int> > import_indices_data;
 
-				/**
-				 * Caches the number of ghost indices. It
-				 * would be expensive to compute it by
-				 * iterating over the import indices and
-				 * accumulate them.
-				 */
+                                /**
+                                 * Caches the number of ghost indices. It
+                                 * would be expensive to compute it by
+                                 * iterating over the import indices and
+                                 * accumulate them.
+                                 */
     unsigned int n_import_indices_data;
 
-				/**
-				 * The set of processors and length of data
-				 * field which send us their ghost data
-				 */
+                                /**
+                                 * The set of processors and length of data
+                                 * field which send us their ghost data
+                                 */
     std::vector<std::pair<unsigned int,unsigned int> > import_targets_data;
 
-				/**
-				 * The ID of the current processor in the MPI
-				 * network
-				 */
+                                /**
+                                 * The ID of the current processor in the MPI
+                                 * network
+                                 */
     unsigned int my_pid;
 
-				/**
-				 * The total number of processors active in
-				 * the problem
-				 */
+                                /**
+                                 * The total number of processors active in
+                                 * the problem
+                                 */
     unsigned int n_procs;
 
-				/**
-				 * The MPI communicator involved in the
-				 * problem
-				 */
+                                /**
+                                 * The MPI communicator involved in the
+                                 * problem
+                                 */
     const MPI_Comm communicator;
   };
 
@@ -415,7 +415,7 @@ namespace Utilities
     Partitioner::in_local_range (const types::global_dof_index global_index) const
     {
       return (local_range_data.first <= global_index &&
-	      global_index < local_range_data.second);
+              global_index < local_range_data.second);
     }
 
 
@@ -424,12 +424,12 @@ namespace Utilities
     bool
     Partitioner::is_ghost_entry (const types::global_dof_index global_index) const
     {
-				// if the index is in the global range, it is
-				// trivially not a ghost
+                                // if the index is in the global range, it is
+                                // trivially not a ghost
       if (in_local_range(global_index) == true)
-	return false;
+        return false;
       else
-	return ghost_indices().is_element(global_index);
+        return ghost_indices().is_element(global_index);
     }
 
 
@@ -439,19 +439,19 @@ namespace Utilities
     Partitioner::global_to_local (const types::global_dof_index global_index) const
     {
       Assert(in_local_range(global_index) || is_ghost_entry (global_index),
-	     ExcIndexNotPresent(global_index, my_pid));
+             ExcIndexNotPresent(global_index, my_pid));
       if (in_local_range(global_index))
-	return global_index - local_range_data.first;
+        return global_index - local_range_data.first;
       else if (is_ghost_entry (global_index))
-	return (local_size() +
-		ghost_indices_data.index_within_set (global_index));
+        return (local_size() +
+                ghost_indices_data.index_within_set (global_index));
       else
-				// should only end up here in
-				// optimized mode, when we use this
-				// large number to trigger a segfault
-				// when using this method for array
-				// access
-	return numbers::invalid_unsigned_int;
+                                // should only end up here in
+                                // optimized mode, when we use this
+                                // large number to trigger a segfault
+                                // when using this method for array
+                                // access
+        return numbers::invalid_unsigned_int;
     }
 
 
@@ -462,9 +462,9 @@ namespace Utilities
     {
       AssertIndexRange (local_index, local_size() + n_ghost_indices_data);
       if (local_index < local_size())
-	return local_range_data.first + local_index;
+        return local_range_data.first + local_index;
       else
-	return ghost_indices_data.nth_index_in_set (local_index-local_size());
+        return ghost_indices_data.nth_index_in_set (local_index-local_size());
     }
 
 
@@ -525,14 +525,14 @@ namespace Utilities
     bool
     Partitioner::is_compatible (const Partitioner &part) const
     {
-				// is the partitioner points to the same
-				// memory location as the calling processor
+                                // is the partitioner points to the same
+                                // memory location as the calling processor
       if (&part == this)
-	return true;
+        return true;
       else
-	return (global_size == part.global_size &&
-		local_range_data == part.local_range_data &&
-		ghost_indices_data == part.ghost_indices_data);
+        return (global_size == part.global_size &&
+                local_range_data == part.local_range_data &&
+                ghost_indices_data == part.ghost_indices_data);
     }
 
 
@@ -540,11 +540,11 @@ namespace Utilities
     unsigned int
     Partitioner::this_mpi_process() const
     {
-				// return the id from the variable stored in
-				// this class instead of
-				// Utilities::MPI::this_mpi_process() in order
-				// to make this query also work when MPI is
-				// not initialized.
+                                // return the id from the variable stored in
+                                // this class instead of
+                                // Utilities::MPI::this_mpi_process() in order
+                                // to make this query also work when MPI is
+                                // not initialized.
       return my_pid;
     }
 
@@ -554,11 +554,11 @@ namespace Utilities
     unsigned int
     Partitioner::n_mpi_processes() const
     {
-				// return the number of MPI processes from the
-				// variable stored in this class instead of
-				// Utilities::MPI::n_mpi_processes() in order
-				// to make this query also work when MPI is
-				// not initialized.
+                                // return the number of MPI processes from the
+                                // variable stored in this class instead of
+                                // Utilities::MPI::n_mpi_processes() in order
+                                // to make this query also work when MPI is
+                                // not initialized.
       return n_procs;
     }
 

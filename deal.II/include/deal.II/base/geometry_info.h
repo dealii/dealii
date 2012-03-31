@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,45 +37,45 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 struct RefinementPossibilities
 {
-				     /**
-				      * Possible values for refinement
-				      * cases in the current
-				      * dimension.
-				      *
-				      * Note the construction of the
-				      * values: the lowest bit
-				      * describes a cut of the x-axis,
-				      * the second to lowest bit
-				      * corresponds to a cut of the
-				      * y-axis and the third to lowest
-				      * bit corresponds to a cut of
-				      * the z-axis. Thus, the
-				      * following relations hold
-				      * (among others):
-				      *
-				      * @code
-				      * cut_xy  == cut_x  | cut_y
-				      * cut_xyz == cut_xy | cut_xz
-				      * cut_x   == cut_xy & cut_xz
-				      * @endcode
-				      *
-				      * Only those cuts that are
-				      * reasonable in a given space
-				      * dimension are offered, of
-				      * course.
-				      *
-				      * In addition, the tag
-				      * <code>isotropic_refinement</code>
-				      * denotes isotropic refinement
-				      * in the space dimension
-				      * selected by the template
-				      * argument of this class.
-				      */
+                                     /**
+                                      * Possible values for refinement
+                                      * cases in the current
+                                      * dimension.
+                                      *
+                                      * Note the construction of the
+                                      * values: the lowest bit
+                                      * describes a cut of the x-axis,
+                                      * the second to lowest bit
+                                      * corresponds to a cut of the
+                                      * y-axis and the third to lowest
+                                      * bit corresponds to a cut of
+                                      * the z-axis. Thus, the
+                                      * following relations hold
+                                      * (among others):
+                                      *
+                                      * @code
+                                      * cut_xy  == cut_x  | cut_y
+                                      * cut_xyz == cut_xy | cut_xz
+                                      * cut_x   == cut_xy & cut_xz
+                                      * @endcode
+                                      *
+                                      * Only those cuts that are
+                                      * reasonable in a given space
+                                      * dimension are offered, of
+                                      * course.
+                                      *
+                                      * In addition, the tag
+                                      * <code>isotropic_refinement</code>
+                                      * denotes isotropic refinement
+                                      * in the space dimension
+                                      * selected by the template
+                                      * argument of this class.
+                                      */
     enum Possibilities
     {
-	  no_refinement= 0,
+          no_refinement= 0,
 
-	  isotropic_refinement = static_cast<unsigned char>(-1)
+          isotropic_refinement = static_cast<unsigned char>(-1)
     };
 };
 
@@ -94,46 +94,46 @@ struct RefinementPossibilities
 template <>
 struct RefinementPossibilities<1>
 {
-				     /**
-				      * Possible values for refinement
-				      * cases in the current
-				      * dimension.
-				      *
-				      * Note the construction of the
-				      * values: the lowest bit
-				      * describes a cut of the x-axis,
-				      * the second to lowest bit
-				      * corresponds to a cut of the
-				      * y-axis and the third to lowest
-				      * bit corresponds to a cut of
-				      * the z-axis. Thus, the
-				      * following relations hold
-				      * (among others):
-				      *
-				      * @code
-				      * cut_xy  == cut_x  | cut_y
-				      * cut_xyz == cut_xy | cut_xz
-				      * cut_x   == cut_xy & cut_xz
-				      * @endcode
-				      *
-				      * Only those cuts that are
-				      * reasonable in a given space
-				      * dimension are offered, of
-				      * course.
-				      *
-				      * In addition, the tag
-				      * <code>isotropic_refinement</code>
-				      * denotes isotropic refinement
-				      * in the space dimension
-				      * selected by the template
-				      * argument of this class.
-				      */
+                                     /**
+                                      * Possible values for refinement
+                                      * cases in the current
+                                      * dimension.
+                                      *
+                                      * Note the construction of the
+                                      * values: the lowest bit
+                                      * describes a cut of the x-axis,
+                                      * the second to lowest bit
+                                      * corresponds to a cut of the
+                                      * y-axis and the third to lowest
+                                      * bit corresponds to a cut of
+                                      * the z-axis. Thus, the
+                                      * following relations hold
+                                      * (among others):
+                                      *
+                                      * @code
+                                      * cut_xy  == cut_x  | cut_y
+                                      * cut_xyz == cut_xy | cut_xz
+                                      * cut_x   == cut_xy & cut_xz
+                                      * @endcode
+                                      *
+                                      * Only those cuts that are
+                                      * reasonable in a given space
+                                      * dimension are offered, of
+                                      * course.
+                                      *
+                                      * In addition, the tag
+                                      * <code>isotropic_refinement</code>
+                                      * denotes isotropic refinement
+                                      * in the space dimension
+                                      * selected by the template
+                                      * argument of this class.
+                                      */
     enum Possibilities
     {
-	  no_refinement= 0,
-	  cut_x        = 1,
+          no_refinement= 0,
+          cut_x        = 1,
 
-	  isotropic_refinement = cut_x
+          isotropic_refinement = cut_x
     };
 };
 
@@ -153,48 +153,48 @@ struct RefinementPossibilities<1>
 template <>
 struct RefinementPossibilities<2>
 {
-				     /**
-				      * Possible values for refinement
-				      * cases in the current
-				      * dimension.
-				      *
-				      * Note the construction of the
-				      * values: the lowest bit
-				      * describes a cut of the x-axis,
-				      * the second to lowest bit
-				      * corresponds to a cut of the
-				      * y-axis and the third to lowest
-				      * bit corresponds to a cut of
-				      * the z-axis. Thus, the
-				      * following relations hold
-				      * (among others):
-				      *
-				      * @code
-				      * cut_xy  == cut_x  | cut_y
-				      * cut_xyz == cut_xy | cut_xz
-				      * cut_x   == cut_xy & cut_xz
-				      * @endcode
-				      *
-				      * Only those cuts that are
-				      * reasonable in a given space
-				      * dimension are offered, of
-				      * course.
-				      *
-				      * In addition, the tag
-				      * <code>isotropic_refinement</code>
-				      * denotes isotropic refinement
-				      * in the space dimension
-				      * selected by the template
-				      * argument of this class.
-				      */
+                                     /**
+                                      * Possible values for refinement
+                                      * cases in the current
+                                      * dimension.
+                                      *
+                                      * Note the construction of the
+                                      * values: the lowest bit
+                                      * describes a cut of the x-axis,
+                                      * the second to lowest bit
+                                      * corresponds to a cut of the
+                                      * y-axis and the third to lowest
+                                      * bit corresponds to a cut of
+                                      * the z-axis. Thus, the
+                                      * following relations hold
+                                      * (among others):
+                                      *
+                                      * @code
+                                      * cut_xy  == cut_x  | cut_y
+                                      * cut_xyz == cut_xy | cut_xz
+                                      * cut_x   == cut_xy & cut_xz
+                                      * @endcode
+                                      *
+                                      * Only those cuts that are
+                                      * reasonable in a given space
+                                      * dimension are offered, of
+                                      * course.
+                                      *
+                                      * In addition, the tag
+                                      * <code>isotropic_refinement</code>
+                                      * denotes isotropic refinement
+                                      * in the space dimension
+                                      * selected by the template
+                                      * argument of this class.
+                                      */
     enum Possibilities
     {
-	  no_refinement= 0,
-	  cut_x        = 1,
-	  cut_y        = 2,
-	  cut_xy       = cut_x | cut_y,
+          no_refinement= 0,
+          cut_x        = 1,
+          cut_y        = 2,
+          cut_xy       = cut_x | cut_y,
 
-	  isotropic_refinement = cut_xy
+          isotropic_refinement = cut_xy
     };
 };
 
@@ -215,52 +215,52 @@ struct RefinementPossibilities<2>
 template <>
 struct RefinementPossibilities<3>
 {
-				     /**
-				      * Possible values for refinement
-				      * cases in the current
-				      * dimension.
-				      *
-				      * Note the construction of the
-				      * values: the lowest bit
-				      * describes a cut of the x-axis,
-				      * the second to lowest bit
-				      * corresponds to a cut of the
-				      * y-axis and the third to lowest
-				      * bit corresponds to a cut of
-				      * the z-axis. Thus, the
-				      * following relations hold
-				      * (among others):
-				      *
-				      * @code
-				      * cut_xy  == cut_x  | cut_y
-				      * cut_xyz == cut_xy | cut_xz
-				      * cut_x   == cut_xy & cut_xz
-				      * @endcode
-				      *
-				      * Only those cuts that are
-				      * reasonable in a given space
-				      * dimension are offered, of
-				      * course.
-				      *
-				      * In addition, the tag
-				      * <code>isotropic_refinement</code>
-				      * denotes isotropic refinement
-				      * in the space dimension
-				      * selected by the template
-				      * argument of this class.
-				      */
+                                     /**
+                                      * Possible values for refinement
+                                      * cases in the current
+                                      * dimension.
+                                      *
+                                      * Note the construction of the
+                                      * values: the lowest bit
+                                      * describes a cut of the x-axis,
+                                      * the second to lowest bit
+                                      * corresponds to a cut of the
+                                      * y-axis and the third to lowest
+                                      * bit corresponds to a cut of
+                                      * the z-axis. Thus, the
+                                      * following relations hold
+                                      * (among others):
+                                      *
+                                      * @code
+                                      * cut_xy  == cut_x  | cut_y
+                                      * cut_xyz == cut_xy | cut_xz
+                                      * cut_x   == cut_xy & cut_xz
+                                      * @endcode
+                                      *
+                                      * Only those cuts that are
+                                      * reasonable in a given space
+                                      * dimension are offered, of
+                                      * course.
+                                      *
+                                      * In addition, the tag
+                                      * <code>isotropic_refinement</code>
+                                      * denotes isotropic refinement
+                                      * in the space dimension
+                                      * selected by the template
+                                      * argument of this class.
+                                      */
     enum Possibilities
     {
-	  no_refinement= 0,
-	  cut_x        = 1,
-	  cut_y        = 2,
-	  cut_xy       = cut_x | cut_y,
-	  cut_z        = 4,
-	  cut_xz       = cut_x | cut_z,
-	  cut_yz       = cut_y | cut_z,
-	  cut_xyz      = cut_x | cut_y | cut_z,
+          no_refinement= 0,
+          cut_x        = 1,
+          cut_y        = 2,
+          cut_xy       = cut_x | cut_y,
+          cut_z        = 4,
+          cut_xz       = cut_x | cut_z,
+          cut_yz       = cut_y | cut_z,
+          cut_xyz      = cut_x | cut_y | cut_z,
 
-	  isotropic_refinement = cut_xyz
+          isotropic_refinement = cut_xyz
     };
 };
 
@@ -280,110 +280,110 @@ template <int dim>
 class RefinementCase : public RefinementPossibilities<dim>
 {
   public:
-				     /**
-				      * Default constructor. Initialize the
-				      * refinement case with no_refinement.
-				      */
+                                     /**
+                                      * Default constructor. Initialize the
+                                      * refinement case with no_refinement.
+                                      */
     RefinementCase ();
 
-				     /**
-				      * Constructor. Take and store a
-				      * value indicating a particular
-				      * refinement from the list of
-				      * possible refinements specified
-				      * in the base class.
-				      */
+                                     /**
+                                      * Constructor. Take and store a
+                                      * value indicating a particular
+                                      * refinement from the list of
+                                      * possible refinements specified
+                                      * in the base class.
+                                      */
    RefinementCase (const typename RefinementPossibilities<dim>::Possibilities refinement_case);
 
-				     /**
-				      * Constructor. Take and store a
-				      * value indicating a particular
-				      * refinement as a bit field. To
-				      * avoid implicit conversions to
-				      * and from integral values, this
-				      * constructor is marked as
-				      * explicit.
-				      */
+                                     /**
+                                      * Constructor. Take and store a
+                                      * value indicating a particular
+                                      * refinement as a bit field. To
+                                      * avoid implicit conversions to
+                                      * and from integral values, this
+                                      * constructor is marked as
+                                      * explicit.
+                                      */
    explicit RefinementCase (const unsigned char refinement_case);
 
-				     /**
-				      * Return the numeric value
-				      * stored by this class. While
-				      * the presence of this operator
-				      * might seem dangerous, it is
-				      * useful in cases where one
-				      * would like to have code like
-				      * <tt>switch
-				      * (refinement_flag)... case
-				      * RefinementCase<dim>::cut_x:
-				      * ... </tt>, which can be
-				      * written as <code>switch
-				      * (static_cast@<unsigned
-				      * char@>(refinement_flag)</code>. Another
-				      * application is to use an
-				      * object of the current type as
-				      * an index into an array;
-				      * however, this use is
-				      * deprecated as it assumes a
-				      * certain mapping from the
-				      * symbolic flags defined in the
-				      * RefinementPossibilities base
-				      * class to actual numerical
-				      * values (the array indices).
-				      */
+                                     /**
+                                      * Return the numeric value
+                                      * stored by this class. While
+                                      * the presence of this operator
+                                      * might seem dangerous, it is
+                                      * useful in cases where one
+                                      * would like to have code like
+                                      * <tt>switch
+                                      * (refinement_flag)... case
+                                      * RefinementCase<dim>::cut_x:
+                                      * ... </tt>, which can be
+                                      * written as <code>switch
+                                      * (static_cast@<unsigned
+                                      * char@>(refinement_flag)</code>. Another
+                                      * application is to use an
+                                      * object of the current type as
+                                      * an index into an array;
+                                      * however, this use is
+                                      * deprecated as it assumes a
+                                      * certain mapping from the
+                                      * symbolic flags defined in the
+                                      * RefinementPossibilities base
+                                      * class to actual numerical
+                                      * values (the array indices).
+                                      */
     operator unsigned char () const;
 
-				     /**
-				      * Return the union of the
-				      * refinement flags represented
-				      * by the current object and the
-				      * one given as argument.
-				      */
+                                     /**
+                                      * Return the union of the
+                                      * refinement flags represented
+                                      * by the current object and the
+                                      * one given as argument.
+                                      */
     RefinementCase operator | (const RefinementCase &r) const;
 
-				     /**
-				      * Return the intersection of the
-				      * refinement flags represented
-				      * by the current object and the
-				      * one given as argument.
-				      */
+                                     /**
+                                      * Return the intersection of the
+                                      * refinement flags represented
+                                      * by the current object and the
+                                      * one given as argument.
+                                      */
     RefinementCase operator & (const RefinementCase &r) const;
 
-				     /**
-				      * Return the negation of the
-				      * refinement flags represented
-				      * by the current object. For
-				      * example, in 2d, if the current
-				      * object holds the flag
-				      * <code>cut_x</code>, then the
-				      * returned value will be
-				      * <code>cut_y</code>; if the
-				      * current value is
-				      * <code>isotropic_refinement</code>
-				      * then the result will be
-				      * <code>no_refinement</code>;
-				      * etc.
-				      */
+                                     /**
+                                      * Return the negation of the
+                                      * refinement flags represented
+                                      * by the current object. For
+                                      * example, in 2d, if the current
+                                      * object holds the flag
+                                      * <code>cut_x</code>, then the
+                                      * returned value will be
+                                      * <code>cut_y</code>; if the
+                                      * current value is
+                                      * <code>isotropic_refinement</code>
+                                      * then the result will be
+                                      * <code>no_refinement</code>;
+                                      * etc.
+                                      */
     RefinementCase operator ~ () const;
 
 
-				     /**
-				      * Return the flag that
-				      * corresponds to cutting a cell
-				      * along the axis given as
-				      * argument. For example, if
-				      * <code>i=0</code> then the
-				      * returned value is
-				      * <tt>RefinementPossibilities<dim>::cut_x</tt>.
-				      */
+                                     /**
+                                      * Return the flag that
+                                      * corresponds to cutting a cell
+                                      * along the axis given as
+                                      * argument. For example, if
+                                      * <code>i=0</code> then the
+                                      * returned value is
+                                      * <tt>RefinementPossibilities<dim>::cut_x</tt>.
+                                      */
     static
     RefinementCase cut_axis (const unsigned int i);
 
-				     /**
-				      * Return the amount of memory
-				      * occupied by an object of this
-				      * type.
-				      */
+                                     /**
+                                      * Return the amount of memory
+                                      * occupied by an object of this
+                                      * type.
+                                      */
     static std::size_t memory_consumption ();
 
     /**
@@ -392,23 +392,23 @@ class RefinementCase : public RefinementPossibilities<dim>
      */
     template <class Archive>
     void serialize(Archive & ar,
-		   const unsigned int version);
+                   const unsigned int version);
 
-				     /**
-				      * Exception.
-				      */
+                                     /**
+                                      * Exception.
+                                      */
     DeclException1 (ExcInvalidRefinementCase,
-		    int,
-		    << "The refinement flags given (" << arg1 << ") contain set bits that do not "
-		    << "make sense for the space dimension of the object to which they are applied.");
+                    int,
+                    << "The refinement flags given (" << arg1 << ") contain set bits that do not "
+                    << "make sense for the space dimension of the object to which they are applied.");
 
   private:
-				     /**
-				      * Store the refinement case as a
-				      * bit field with as many bits as
-				      * are necessary in any given
-				      * dimension.
-				      */
+                                     /**
+                                      * Store the refinement case as a
+                                      * bit field with as many bits as
+                                      * are necessary in any given
+                                      * dimension.
+                                      */
     unsigned char value : (dim > 0 ? dim : 1);
 };
 
@@ -441,16 +441,16 @@ namespace internal
   template <int dim>
   struct SubfacePossibilities
   {
-				       /**
-					* Possible cases of faces
-					* being subdivided into
-					* subface.
-					*/
+                                       /**
+                                        * Possible cases of faces
+                                        * being subdivided into
+                                        * subface.
+                                        */
       enum Possibilities
       {
-	    case_none = 0,
+            case_none = 0,
 
-	    case_isotropic = static_cast<unsigned char>(-1)
+            case_isotropic = static_cast<unsigned char>(-1)
       };
   };
 
@@ -468,18 +468,18 @@ namespace internal
   template <>
   struct SubfacePossibilities<0>
   {
-				       /**
-					* Possible cases of faces
-					* being subdivided into
-					* subface.
-					*
-					* Dummy implementation.
-					*/
+                                       /**
+                                        * Possible cases of faces
+                                        * being subdivided into
+                                        * subface.
+                                        *
+                                        * Dummy implementation.
+                                        */
       enum Possibilities
       {
-	    case_none = 0,
+            case_none = 0,
 
-	    case_isotropic = case_none
+            case_isotropic = case_none
       };
   };
 
@@ -499,20 +499,20 @@ namespace internal
   template <>
   struct SubfacePossibilities<1>
   {
-				       /**
-					* Possible cases of faces
-					* being subdivided into
-					* subface.
-					*
-					* In 1d there are no faces,
-					* thus no subface
-					* possibilities.
-					*/
+                                       /**
+                                        * Possible cases of faces
+                                        * being subdivided into
+                                        * subface.
+                                        *
+                                        * In 1d there are no faces,
+                                        * thus no subface
+                                        * possibilities.
+                                        */
       enum Possibilities
       {
-	    case_none = 0,
+            case_none = 0,
 
-	    case_isotropic = case_none
+            case_isotropic = case_none
       };
   };
 
@@ -533,24 +533,24 @@ namespace internal
   template <>
   struct SubfacePossibilities<2>
   {
-				       /**
-					* Possible cases of faces
-					* being subdivided into
-					* subface.
-					*
-					* In 2d there are following
-					* possibilities: a face (line)
-					* being refined *
-					* (<code>case_x</code>) or not
-					* refined
-					* (<code>case_no</code>).
-				       */
+                                       /**
+                                        * Possible cases of faces
+                                        * being subdivided into
+                                        * subface.
+                                        *
+                                        * In 2d there are following
+                                        * possibilities: a face (line)
+                                        * being refined *
+                                        * (<code>case_x</code>) or not
+                                        * refined
+                                        * (<code>case_no</code>).
+                                       */
       enum Possibilities
       {
-	    case_none = 0,
-	    case_x    = 1,
+            case_none = 0,
+            case_x    = 1,
 
-	    case_isotropic = case_x
+            case_isotropic = case_x
       };
   };
 
@@ -654,30 +654,30 @@ namespace internal
   template <>
   struct SubfacePossibilities<3>
   {
-				       /**
-					* Possible cases of faces
-					* being subdivided into
-					* subface.
-					*
-					* See documentation to the
-					* SubfacePossibilities<3> for
-					* more details on the subface
-					* possibilities.
-					*/
+                                       /**
+                                        * Possible cases of faces
+                                        * being subdivided into
+                                        * subface.
+                                        *
+                                        * See documentation to the
+                                        * SubfacePossibilities<3> for
+                                        * more details on the subface
+                                        * possibilities.
+                                        */
       enum Possibilities
       {
-	    case_none  = 0,
-	    case_x     = 1,
-	    case_x1y   = 2,
-	    case_x2y   = 3,
-	    case_x1y2y = 4,
-	    case_y     = 5,
-	    case_y1x   = 6,
-	    case_y2x   = 7,
-	    case_y1x2x = 8,
-	    case_xy    = 9,
+            case_none  = 0,
+            case_x     = 1,
+            case_x1y   = 2,
+            case_x2y   = 3,
+            case_x1y2y = 4,
+            case_y     = 5,
+            case_y1x   = 6,
+            case_y2x   = 7,
+            case_y1x2x = 8,
+            case_xy    = 9,
 
-	    case_isotropic = case_xy
+            case_isotropic = case_xy
       };
   };
 
@@ -696,65 +696,65 @@ namespace internal
   class SubfaceCase : public SubfacePossibilities<dim>
   {
     public:
-				       /**
-					* Constructor. Take and store
-					* a value indicating a
-					* particular subface
-					* possibility in the list of
-					* possible situations
-					* specified in the base class.
-					*/
+                                       /**
+                                        * Constructor. Take and store
+                                        * a value indicating a
+                                        * particular subface
+                                        * possibility in the list of
+                                        * possible situations
+                                        * specified in the base class.
+                                        */
       SubfaceCase (const typename SubfacePossibilities<dim>::Possibilities subface_possibility);
 
-				       /**
-					* Return the numeric value
-					* stored by this class. While
-					* the presence of this operator
-					* might seem dangerous, it is
-					* useful in cases where one
-					* would like to have code like
-					* <code>switch
-					* (subface_case)... case
-					* SubfaceCase@<dim@>::case_x:
-					* ... </code>, which can be
-					* written as <code>switch
-					* (static_cast@<unsigned
-					* char@>(subface_case)</code>. Another
-					* application is to use an
-					* object of the current type as
-					* an index into an array;
-					* however, this use is
-					* deprecated as it assumes a
-					* certain mapping from the
-					* symbolic flags defined in the
-					* SubfacePossibilities
-					* base class to actual numerical
-					* values (the array indices).
-					*/
+                                       /**
+                                        * Return the numeric value
+                                        * stored by this class. While
+                                        * the presence of this operator
+                                        * might seem dangerous, it is
+                                        * useful in cases where one
+                                        * would like to have code like
+                                        * <code>switch
+                                        * (subface_case)... case
+                                        * SubfaceCase@<dim@>::case_x:
+                                        * ... </code>, which can be
+                                        * written as <code>switch
+                                        * (static_cast@<unsigned
+                                        * char@>(subface_case)</code>. Another
+                                        * application is to use an
+                                        * object of the current type as
+                                        * an index into an array;
+                                        * however, this use is
+                                        * deprecated as it assumes a
+                                        * certain mapping from the
+                                        * symbolic flags defined in the
+                                        * SubfacePossibilities
+                                        * base class to actual numerical
+                                        * values (the array indices).
+                                        */
       operator unsigned char () const;
 
-				       /**
-					* Return the amount of memory
-					* occupied by an object of this
-					* type.
-					*/
+                                       /**
+                                        * Return the amount of memory
+                                        * occupied by an object of this
+                                        * type.
+                                        */
       static std::size_t memory_consumption ();
 
-				       /**
-					* Exception.
-					*/
+                                       /**
+                                        * Exception.
+                                        */
       DeclException1 (ExcInvalidSubfaceCase,
-		      int,
-		      << "The subface case given (" << arg1 << ") does not make sense "
-		      << "for the space dimension of the object to which they are applied.");
+                      int,
+                      << "The subface case given (" << arg1 << ") does not make sense "
+                      << "for the space dimension of the object to which they are applied.");
 
     private:
-				       /**
-					* Store the refinement case as a
-					* bit field with as many bits as
-					* are necessary in any given
-					* dimension.
-					*/
+                                       /**
+                                        * Store the refinement case as a
+                                        * bit field with as many bits as
+                                        * are necessary in any given
+                                        * dimension.
+                                        */
       unsigned char value : (dim == 3 ? 4 : 1);
   };
 
@@ -796,17 +796,17 @@ struct GeometryInfo<0>
                                       * a cell, i.e. the number of
                                       * children of an isotropically
                                       * refined cell.
-				      *
-				      * If a cell is refined
-				      * anisotropically, the actual
-				      * number of children may be less
-				      * than the value given here.
+                                      *
+                                      * If a cell is refined
+                                      * anisotropically, the actual
+                                      * number of children may be less
+                                      * than the value given here.
                                       */
     static const unsigned int max_children_per_cell = 1;
 
-				     /**
-				      * Number of faces a cell has.
-				      */
+                                     /**
+                                      * Number of faces a cell has.
+                                      */
     static const unsigned int faces_per_cell    = 0;
 
                                      /**
@@ -814,65 +814,65 @@ struct GeometryInfo<0>
                                       * a refined face, i.e. the
                                       * number of children of an
                                       * isotropically refined face.
-				      *
-				      * If a cell is refined
-				      * anisotropically, the actual
-				      * number of children may be less
-				      * than the value given here.
+                                      *
+                                      * If a cell is refined
+                                      * anisotropically, the actual
+                                      * number of children may be less
+                                      * than the value given here.
                                       */
     static const unsigned int max_children_per_face = 0;
 
-				     /**
-				      * Return the number of children
-				      * of a cell (or face) refined
-				      * with <tt>ref_case</tt>. Since
-				      * we are concerned here with
-				      * points, the number of children
-				      * is equal to one.
-				      */
+                                     /**
+                                      * Return the number of children
+                                      * of a cell (or face) refined
+                                      * with <tt>ref_case</tt>. Since
+                                      * we are concerned here with
+                                      * points, the number of children
+                                      * is equal to one.
+                                      */
     static unsigned int n_children(const RefinementCase<0> &refinement_case);
 
-				     /**
-				      * Number of vertices a cell has.
-				      */
+                                     /**
+                                      * Number of vertices a cell has.
+                                      */
     static const unsigned int vertices_per_cell = 1;
 
-				     /**
-				      * Number of vertices each face has.
-				      * Since this is not useful in one
-				      * dimension, we provide a useless
-				      * number (in the hope that a compiler
-				      * may warn when it sees constructs like
-				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
-				      * at least if @p i is an <tt>unsigned int</tt>.
-				      */
+                                     /**
+                                      * Number of vertices each face has.
+                                      * Since this is not useful in one
+                                      * dimension, we provide a useless
+                                      * number (in the hope that a compiler
+                                      * may warn when it sees constructs like
+                                      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
+                                      * at least if @p i is an <tt>unsigned int</tt>.
+                                      */
     static const unsigned int vertices_per_face = 0;
 
-				     /**
-				      * Number of lines each face has.
-				      */
+                                     /**
+                                      * Number of lines each face has.
+                                      */
     static const unsigned int lines_per_face    = 0;
 
-				     /**
-				      * Number of quads on each face.
-				      */
+                                     /**
+                                      * Number of quads on each face.
+                                      */
     static const unsigned int quads_per_face    = 0;
 
-				     /**
-				      * Number of lines of a cell.
-				      */
+                                     /**
+                                      * Number of lines of a cell.
+                                      */
     static const unsigned int lines_per_cell    = 0;
 
-				     /**
-				      * Number of quadrilaterals of a
-				      * cell.
-				      */
+                                     /**
+                                      * Number of quadrilaterals of a
+                                      * cell.
+                                      */
     static const unsigned int quads_per_cell    = 0;
 
-				     /**
-				      * Number of hexahedra of a
-				      * cell.
-				      */
+                                     /**
+                                      * Number of hexahedra of a
+                                      * cell.
+                                      */
     static const unsigned int hexes_per_cell    = 0;
 };
 
@@ -1420,17 +1420,17 @@ struct GeometryInfo
                                       * a refined cell, i.e. the
                                       * number of children of an
                                       * isotropically refined cell.
-				      *
-				      * If a cell is refined
-				      * anisotropically, the actual
-				      * number of children may be less
-				      * than the value given here.
+                                      *
+                                      * If a cell is refined
+                                      * anisotropically, the actual
+                                      * number of children may be less
+                                      * than the value given here.
                                       */
     static const unsigned int max_children_per_cell = 1 << dim;
 
-				     /**
-				      * Number of faces of a cell.
-				      */
+                                     /**
+                                      * Number of faces of a cell.
+                                      */
     static const unsigned int faces_per_cell = 2 * dim;
 
                                      /**
@@ -1438,126 +1438,126 @@ struct GeometryInfo
                                       * a refined face, i.e. the
                                       * number of children of an
                                       * isotropically refined face.
-				      *
-				      * If a cell is refined
-				      * anisotropically, the actual
-				      * number of children may be less
-				      * than the value given here.
+                                      *
+                                      * If a cell is refined
+                                      * anisotropically, the actual
+                                      * number of children may be less
+                                      * than the value given here.
                                       */
     static const unsigned int max_children_per_face = GeometryInfo<dim-1>::max_children_per_cell;
 
-				     /**
-				      * Number of vertices of a cell.
-				      */
+                                     /**
+                                      * Number of vertices of a cell.
+                                      */
     static const unsigned int vertices_per_cell = 1 << dim;
 
-				     /**
-				      * Number of vertices on each
-				      * face.
-				      */
+                                     /**
+                                      * Number of vertices on each
+                                      * face.
+                                      */
     static const unsigned int vertices_per_face = GeometryInfo<dim-1>::vertices_per_cell;
 
-				     /**
-				      * Number of lines on each face.
-				      */
+                                     /**
+                                      * Number of lines on each face.
+                                      */
     static const unsigned int lines_per_face
     = GeometryInfo<dim-1>::lines_per_cell;
 
-				     /**
-				      * Number of quads on each face.
-				      */
+                                     /**
+                                      * Number of quads on each face.
+                                      */
     static const unsigned int quads_per_face
     = GeometryInfo<dim-1>::quads_per_cell;
 
-				     /**
-				      * Number of lines of a cell.
-				      *
-				      * The formula to compute this makes use
-				      * of the fact that when going from one
-				      * dimension to the next, the object of
-				      * the lower dimension is copied once
-				      * (thus twice the old number of lines)
-				      * and then a new line is inserted
-				      * between each vertex of the old object
-				      * and the corresponding one in the copy.
-				      */
+                                     /**
+                                      * Number of lines of a cell.
+                                      *
+                                      * The formula to compute this makes use
+                                      * of the fact that when going from one
+                                      * dimension to the next, the object of
+                                      * the lower dimension is copied once
+                                      * (thus twice the old number of lines)
+                                      * and then a new line is inserted
+                                      * between each vertex of the old object
+                                      * and the corresponding one in the copy.
+                                      */
     static const unsigned int lines_per_cell
     = (2*GeometryInfo<dim-1>::lines_per_cell +
        GeometryInfo<dim-1>::vertices_per_cell);
 
-				     /**
-				      * Number of quadrilaterals of a
-				      * cell.
-				      *
-				      * This number is computed recursively
-				      * just as the previous one, with the
-				      * exception that new quads result from
-				      * connecting an original line and its
-				      * copy.
-				      */
+                                     /**
+                                      * Number of quadrilaterals of a
+                                      * cell.
+                                      *
+                                      * This number is computed recursively
+                                      * just as the previous one, with the
+                                      * exception that new quads result from
+                                      * connecting an original line and its
+                                      * copy.
+                                      */
     static const unsigned int quads_per_cell
     = (2*GeometryInfo<dim-1>::quads_per_cell +
        GeometryInfo<dim-1>::lines_per_cell);
 
-				     /**
-				      * Number of hexahedra of a
-				      * cell.
-				      */
+                                     /**
+                                      * Number of hexahedra of a
+                                      * cell.
+                                      */
     static const unsigned int hexes_per_cell
     = (2*GeometryInfo<dim-1>::hexes_per_cell +
        GeometryInfo<dim-1>::quads_per_cell);
 
-				     /**
-				      * Rearrange vertices for UCD
-				      * output.  For a cell being
-				      * written in UCD format, each
-				      * entry in this field contains
-				      * the number of a vertex in
-				      * <tt>deal.II</tt> that corresponds
-				      * to the UCD numbering at this
-				      * location.
-				      *
-				      * Typical example: write a cell
-				      * and arrange the vertices, such
-				      * that UCD understands them.
-				      *
-				      * @code
-				      * for (i=0; i< n_vertices; ++i)
-				      *   out << cell->vertex(ucd_to_deal[i]);
-				      * @endcode
-				      *
-				      * As the vertex numbering in
-				      * deal.II versions <= 5.1
-				      * happened to coincide with the
-				      * UCD numbering, this field can
-				      * also be used like a
-				      * old_to_lexicographic mapping.
-				      */
+                                     /**
+                                      * Rearrange vertices for UCD
+                                      * output.  For a cell being
+                                      * written in UCD format, each
+                                      * entry in this field contains
+                                      * the number of a vertex in
+                                      * <tt>deal.II</tt> that corresponds
+                                      * to the UCD numbering at this
+                                      * location.
+                                      *
+                                      * Typical example: write a cell
+                                      * and arrange the vertices, such
+                                      * that UCD understands them.
+                                      *
+                                      * @code
+                                      * for (i=0; i< n_vertices; ++i)
+                                      *   out << cell->vertex(ucd_to_deal[i]);
+                                      * @endcode
+                                      *
+                                      * As the vertex numbering in
+                                      * deal.II versions <= 5.1
+                                      * happened to coincide with the
+                                      * UCD numbering, this field can
+                                      * also be used like a
+                                      * old_to_lexicographic mapping.
+                                      */
     static const unsigned int ucd_to_deal[vertices_per_cell];
 
-				     /**
-				      * Rearrange vertices for OpenDX
-				      * output.  For a cell being
-				      * written in OpenDX format, each
-				      * entry in this field contains
-				      * the number of a vertex in
-				      * <tt>deal.II</tt> that corresponds
-				      * to the DX numbering at this
-				      * location.
-				      *
-				      * Typical example: write a cell
-				      * and arrange the vertices, such
-				      * that OpenDX understands them.
-				      *
-				      * @code
-				      * for (i=0; i< n_vertices; ++i)
-				      *   out << cell->vertex(dx_to_deal[i]);
-				      * @endcode
-				      */
+                                     /**
+                                      * Rearrange vertices for OpenDX
+                                      * output.  For a cell being
+                                      * written in OpenDX format, each
+                                      * entry in this field contains
+                                      * the number of a vertex in
+                                      * <tt>deal.II</tt> that corresponds
+                                      * to the DX numbering at this
+                                      * location.
+                                      *
+                                      * Typical example: write a cell
+                                      * and arrange the vertices, such
+                                      * that OpenDX understands them.
+                                      *
+                                      * @code
+                                      * for (i=0; i< n_vertices; ++i)
+                                      *   out << cell->vertex(dx_to_deal[i]);
+                                      * @endcode
+                                      */
     static const unsigned int dx_to_deal[vertices_per_cell];
 
                                      /**
-				      * This field stores for each vertex
+                                      * This field stores for each vertex
                                       * to which faces it belongs. In any
                                       * given dimension, the number of
                                       * faces is equal to the dimension.
@@ -1568,69 +1568,69 @@ struct GeometryInfo
                                       */
     static const unsigned int vertex_to_face[vertices_per_cell][dim];
 
-				     /**
-				      * Return the number of children
-				      * of a cell (or face) refined
-				      * with <tt>ref_case</tt>.
-				      */
+                                     /**
+                                      * Return the number of children
+                                      * of a cell (or face) refined
+                                      * with <tt>ref_case</tt>.
+                                      */
     static
     unsigned int
     n_children(const RefinementCase<dim> &refinement_case);
 
-				     /**
-				      * Return the number of subfaces
-				      * of a face refined according to
-				      * internal::SubfaceCase
-				      * @p face_ref_case.
-				      */
+                                     /**
+                                      * Return the number of subfaces
+                                      * of a face refined according to
+                                      * internal::SubfaceCase
+                                      * @p face_ref_case.
+                                      */
     static
     unsigned int
     n_subfaces(const internal::SubfaceCase<dim> &subface_case);
 
-				     /**
-				      * Given a face on the reference
-				      * element with a
-				      * <code>internal::SubfaceCase@<dim@></code>
-				      * @p face_refinement_case this
-				      * function returns the ratio
-				      * between the area of the @p
-				      * subface_no th subface and the
-				      * area(=1) of the face.
-				      *
-				      * E.g. for
-				      * <code>internal::SubfaceCase@<3@>::cut_xy</code>
-				      * the ratio is 1/4 for each of
-				      * the subfaces.
-				      */
+                                     /**
+                                      * Given a face on the reference
+                                      * element with a
+                                      * <code>internal::SubfaceCase@<dim@></code>
+                                      * @p face_refinement_case this
+                                      * function returns the ratio
+                                      * between the area of the @p
+                                      * subface_no th subface and the
+                                      * area(=1) of the face.
+                                      *
+                                      * E.g. for
+                                      * <code>internal::SubfaceCase@<3@>::cut_xy</code>
+                                      * the ratio is 1/4 for each of
+                                      * the subfaces.
+                                      */
     static
     double
     subface_ratio(const internal::SubfaceCase<dim> &subface_case,
-		  const unsigned int subface_no);
+                  const unsigned int subface_no);
 
-				     /**
-				      * Given a cell refined with the
-				      * <code>RefinementCase</code>
-				      * @p cell_refinement_case
-				      * return the
-				      * <code>SubfaceCase</code> of
-				      * the @p face_no th face.
-				      */
+                                     /**
+                                      * Given a cell refined with the
+                                      * <code>RefinementCase</code>
+                                      * @p cell_refinement_case
+                                      * return the
+                                      * <code>SubfaceCase</code> of
+                                      * the @p face_no th face.
+                                      */
     static
     RefinementCase<dim-1>
     face_refinement_case (const RefinementCase<dim> &cell_refinement_case,
-			  const unsigned int face_no,
-			  const bool face_orientation = true,
-			  const bool face_flip        = false,
-			  const bool face_rotation    = false);
+                          const unsigned int face_no,
+                          const bool face_orientation = true,
+                          const bool face_flip        = false,
+                          const bool face_rotation    = false);
 
-				     /**
-				      * Given the SubfaceCase @p
-				      * face_refinement_case of the @p
-				      * face_no th face, return the
-				      * smallest RefinementCase of the
-				      * cell, which corresponds to
-				      * that refinement of the face.
-				      */
+                                     /**
+                                      * Given the SubfaceCase @p
+                                      * face_refinement_case of the @p
+                                      * face_no th face, return the
+                                      * smallest RefinementCase of the
+                                      * cell, which corresponds to
+                                      * that refinement of the face.
+                                      */
     static
     RefinementCase<dim>
     min_cell_refinement_case_for_face_refinement
@@ -1640,385 +1640,385 @@ struct GeometryInfo
      const bool face_flip        = false,
      const bool face_rotation    = false);
 
-				     /**
-				      * Given a cell refined with the
-				      * RefinementCase @p
-				      * cell_refinement_case return
-				      * the RefinementCase of the @p
-				      * line_no th face.
-				      */
+                                     /**
+                                      * Given a cell refined with the
+                                      * RefinementCase @p
+                                      * cell_refinement_case return
+                                      * the RefinementCase of the @p
+                                      * line_no th face.
+                                      */
     static
     RefinementCase<1>
     line_refinement_case(const RefinementCase<dim> &cell_refinement_case,
-			 const unsigned int line_no);
+                         const unsigned int line_no);
 
-				     /**
-				      * Return the minimal / smallest
-				      * RefinementCase of the cell, which
-				      * ensures refinement of line
-				      * @p line_no.
-				      */
+                                     /**
+                                      * Return the minimal / smallest
+                                      * RefinementCase of the cell, which
+                                      * ensures refinement of line
+                                      * @p line_no.
+                                      */
     static
     RefinementCase<dim>
     min_cell_refinement_case_for_line_refinement(const unsigned int line_no);
 
                                      /**
-				      * This field stores which child
-				      * cells are adjacent to a
-				      * certain face of the mother
-				      * cell.
-				      *
-				      * For example, in 2D the layout of
-				      * a cell is as follows:
-				      * @verbatim
-				      * .      3
-				      * .   2-->--3
-				      * .   |     |
-				      * . 0 ^     ^ 1
-				      * .   |     |
-				      * .   0-->--1
-				      * .      2
-				      * @endverbatim
-				      * Vertices and faces are indicated
-				      * with their numbers, faces also with
-				      * their directions.
-				      *
-				      * Now, when refined, the layout is
-				      * like this:
-				      * @verbatim
-				      * *--*--*
-				      * | 2|3 |
-				      * *--*--*
-				      * | 0|1 |
-				      * *--*--*
-				      * @endverbatim
-				      *
-				      * Thus, the child cells on face
-				      * 0 are (ordered in the
-				      * direction of the face) 0 and
-				      * 2, on face 3 they are 2 and 3,
-				      * etc.
-				      *
-				      * For three spatial dimensions, the exact
-				      * order of the children is laid down in
-				      * the general documentation of this
-				      * class.
-				      *
-				      * Through the <tt>face_orientation</tt>,
-				      * <tt>face_flip</tt> and
-				      * <tt>face_rotation</tt> arguments this
-				      * function handles faces oriented in the
-				      * standard and non-standard orientation.
-				      * <tt>face_orientation</tt> defaults to
-				      * <tt>true</tt>, <tt>face_flip</tt> and
-				      * <tt>face_rotation</tt> default to
-				      * <tt>false</tt> (standard orientation)
-				      * and has no effect in 2d. The concept of
-				      * face orientations is explained in this
-				      * @ref GlossFaceOrientation "glossary"
-				      * entry.
-				      *
-				      * In the case of anisotropically refined
-				      * cells and faces, the @p RefinementCase of
-				      * the face, <tt>face_ref_case</tt>,
-				      * might have an influence on
-				      * which child is behind which given
-				      * subface, thus this is an additional
-				      * argument, defaulting to isotropic
-				      * refinement of the face.
-				      */
+                                      * This field stores which child
+                                      * cells are adjacent to a
+                                      * certain face of the mother
+                                      * cell.
+                                      *
+                                      * For example, in 2D the layout of
+                                      * a cell is as follows:
+                                      * @verbatim
+                                      * .      3
+                                      * .   2-->--3
+                                      * .   |     |
+                                      * . 0 ^     ^ 1
+                                      * .   |     |
+                                      * .   0-->--1
+                                      * .      2
+                                      * @endverbatim
+                                      * Vertices and faces are indicated
+                                      * with their numbers, faces also with
+                                      * their directions.
+                                      *
+                                      * Now, when refined, the layout is
+                                      * like this:
+                                      * @verbatim
+                                      * *--*--*
+                                      * | 2|3 |
+                                      * *--*--*
+                                      * | 0|1 |
+                                      * *--*--*
+                                      * @endverbatim
+                                      *
+                                      * Thus, the child cells on face
+                                      * 0 are (ordered in the
+                                      * direction of the face) 0 and
+                                      * 2, on face 3 they are 2 and 3,
+                                      * etc.
+                                      *
+                                      * For three spatial dimensions, the exact
+                                      * order of the children is laid down in
+                                      * the general documentation of this
+                                      * class.
+                                      *
+                                      * Through the <tt>face_orientation</tt>,
+                                      * <tt>face_flip</tt> and
+                                      * <tt>face_rotation</tt> arguments this
+                                      * function handles faces oriented in the
+                                      * standard and non-standard orientation.
+                                      * <tt>face_orientation</tt> defaults to
+                                      * <tt>true</tt>, <tt>face_flip</tt> and
+                                      * <tt>face_rotation</tt> default to
+                                      * <tt>false</tt> (standard orientation)
+                                      * and has no effect in 2d. The concept of
+                                      * face orientations is explained in this
+                                      * @ref GlossFaceOrientation "glossary"
+                                      * entry.
+                                      *
+                                      * In the case of anisotropically refined
+                                      * cells and faces, the @p RefinementCase of
+                                      * the face, <tt>face_ref_case</tt>,
+                                      * might have an influence on
+                                      * which child is behind which given
+                                      * subface, thus this is an additional
+                                      * argument, defaulting to isotropic
+                                      * refinement of the face.
+                                      */
     static
     unsigned int
     child_cell_on_face (const RefinementCase<dim> &ref_case,
-			const unsigned int face,
-			const unsigned int subface,
-			const bool face_orientation = true,
-			const bool face_flip        = false,
-			const bool face_rotation    = false,
-			const RefinementCase<dim-1> &face_refinement_case
-			= RefinementCase<dim-1>::isotropic_refinement);
+                        const unsigned int face,
+                        const unsigned int subface,
+                        const bool face_orientation = true,
+                        const bool face_flip        = false,
+                        const bool face_rotation    = false,
+                        const RefinementCase<dim-1> &face_refinement_case
+                        = RefinementCase<dim-1>::isotropic_refinement);
 
-				     /**
-				      * Map line vertex number to cell
-				      * vertex number, i.e. give the
-				      * cell vertex number of the
-				      * <tt>vertex</tt>th vertex of
-				      * line <tt>line</tt>, e.g.
-				      * <tt>GeometryInfo<2>::line_to_cell_vertices(3,0)=2</tt>.
-				      *
-				      * The order of the lines, as well as
-				      * their direction (which in turn
-				      * determines which is the first and
-				      * which the second vertex on a line) is
-				      * the canonical one in deal.II, as
-				      * described in the general documentation
-				      * of this class.
-				      *
-				      * For <tt>dim=2</tt> this call
-				      * is simply passed down to the
-				      * face_to_cell_vertices()
-				      * function.
-				      */
+                                     /**
+                                      * Map line vertex number to cell
+                                      * vertex number, i.e. give the
+                                      * cell vertex number of the
+                                      * <tt>vertex</tt>th vertex of
+                                      * line <tt>line</tt>, e.g.
+                                      * <tt>GeometryInfo<2>::line_to_cell_vertices(3,0)=2</tt>.
+                                      *
+                                      * The order of the lines, as well as
+                                      * their direction (which in turn
+                                      * determines which is the first and
+                                      * which the second vertex on a line) is
+                                      * the canonical one in deal.II, as
+                                      * described in the general documentation
+                                      * of this class.
+                                      *
+                                      * For <tt>dim=2</tt> this call
+                                      * is simply passed down to the
+                                      * face_to_cell_vertices()
+                                      * function.
+                                      */
     static
     unsigned int
     line_to_cell_vertices (const unsigned int line,
-			   const unsigned int vertex);
+                           const unsigned int vertex);
 
-				     /**
-				      * Map face vertex number to cell
-				      * vertex number, i.e. give the
-				      * cell vertex number of the
-				      * <tt>vertex</tt>th vertex of
-				      * face <tt>face</tt>, e.g.
-				      * <tt>GeometryInfo<2>::face_to_cell_vertices(3,0)=2</tt>,
-				      * see the image under point N4
-				      * in the 2d section of this
-				      * class's documentation.
-				      *
-				      * Through the <tt>face_orientation</tt>,
-				      * <tt>face_flip</tt> and
-				      * <tt>face_rotation</tt> arguments this
-				      * function handles faces oriented in the
-				      * standard and non-standard orientation.
-				      * <tt>face_orientation</tt> defaults to
-				      * <tt>true</tt>, <tt>face_flip</tt> and
-				      * <tt>face_rotation</tt> default to
-				      * <tt>false</tt> (standard orientation)
-				      * and has no effect in 2d.
-				      *
-				      * As the children of a cell are
-				      * ordered according to the
-				      * vertices of the cell, this
-				      * call is passed down to the
-				      * child_cell_on_face() function.
-				      * Hence this function is simply
-				      * a wrapper of
-				      * child_cell_on_face() giving it
-				      * a suggestive name.
-				      */
+                                     /**
+                                      * Map face vertex number to cell
+                                      * vertex number, i.e. give the
+                                      * cell vertex number of the
+                                      * <tt>vertex</tt>th vertex of
+                                      * face <tt>face</tt>, e.g.
+                                      * <tt>GeometryInfo<2>::face_to_cell_vertices(3,0)=2</tt>,
+                                      * see the image under point N4
+                                      * in the 2d section of this
+                                      * class's documentation.
+                                      *
+                                      * Through the <tt>face_orientation</tt>,
+                                      * <tt>face_flip</tt> and
+                                      * <tt>face_rotation</tt> arguments this
+                                      * function handles faces oriented in the
+                                      * standard and non-standard orientation.
+                                      * <tt>face_orientation</tt> defaults to
+                                      * <tt>true</tt>, <tt>face_flip</tt> and
+                                      * <tt>face_rotation</tt> default to
+                                      * <tt>false</tt> (standard orientation)
+                                      * and has no effect in 2d.
+                                      *
+                                      * As the children of a cell are
+                                      * ordered according to the
+                                      * vertices of the cell, this
+                                      * call is passed down to the
+                                      * child_cell_on_face() function.
+                                      * Hence this function is simply
+                                      * a wrapper of
+                                      * child_cell_on_face() giving it
+                                      * a suggestive name.
+                                      */
     static
     unsigned int
     face_to_cell_vertices (const unsigned int face,
-			   const unsigned int vertex,
-			   const bool face_orientation = true,
-			   const bool face_flip        = false,
-			   const bool face_rotation    = false);
+                           const unsigned int vertex,
+                           const bool face_orientation = true,
+                           const bool face_flip        = false,
+                           const bool face_rotation    = false);
 
-				     /**
-				      * Map face line number to cell
-				      * line number, i.e. give the
-				      * cell line number of the
-				      * <tt>line</tt>th line of face
-				      * <tt>face</tt>, e.g.
-				      * <tt>GeometryInfo<3>::face_to_cell_lines(5,0)=4</tt>.
-				      *
-				      * Through the <tt>face_orientation</tt>,
-				      * <tt>face_flip</tt> and
-				      * <tt>face_rotation</tt> arguments this
-				      * function handles faces oriented in the
-				      * standard and non-standard orientation.
-				      * <tt>face_orientation</tt> defaults to
-				      * <tt>true</tt>, <tt>face_flip</tt> and
-				      * <tt>face_rotation</tt> default to
-				      * <tt>false</tt> (standard orientation)
-				      * and has no effect in 2d.
-				      */
+                                     /**
+                                      * Map face line number to cell
+                                      * line number, i.e. give the
+                                      * cell line number of the
+                                      * <tt>line</tt>th line of face
+                                      * <tt>face</tt>, e.g.
+                                      * <tt>GeometryInfo<3>::face_to_cell_lines(5,0)=4</tt>.
+                                      *
+                                      * Through the <tt>face_orientation</tt>,
+                                      * <tt>face_flip</tt> and
+                                      * <tt>face_rotation</tt> arguments this
+                                      * function handles faces oriented in the
+                                      * standard and non-standard orientation.
+                                      * <tt>face_orientation</tt> defaults to
+                                      * <tt>true</tt>, <tt>face_flip</tt> and
+                                      * <tt>face_rotation</tt> default to
+                                      * <tt>false</tt> (standard orientation)
+                                      * and has no effect in 2d.
+                                      */
     static
     unsigned int
     face_to_cell_lines (const unsigned int face,
-			const unsigned int line,
-			const bool face_orientation = true,
-			const bool face_flip        = false,
-			const bool face_rotation    = false);
+                        const unsigned int line,
+                        const bool face_orientation = true,
+                        const bool face_flip        = false,
+                        const bool face_rotation    = false);
 
-				     /**
-				      * Map the vertex index @p vertex of a face
-				      * in standard orientation to one of a face
-				      * with arbitrary @p face_orientation, @p
-				      * face_flip and @p face_rotation. The
-				      * values of these three flags default to
-				      * <tt>true</tt>, <tt>false</tt> and
-				      * <tt>false</tt>, respectively. this
-				      * combination describes a face in standard
-				      * orientation.
-				      *
-				      * This function is only implemented in 3D.
-				      */
+                                     /**
+                                      * Map the vertex index @p vertex of a face
+                                      * in standard orientation to one of a face
+                                      * with arbitrary @p face_orientation, @p
+                                      * face_flip and @p face_rotation. The
+                                      * values of these three flags default to
+                                      * <tt>true</tt>, <tt>false</tt> and
+                                      * <tt>false</tt>, respectively. this
+                                      * combination describes a face in standard
+                                      * orientation.
+                                      *
+                                      * This function is only implemented in 3D.
+                                      */
     static
     unsigned int
     standard_to_real_face_vertex (const unsigned int vertex,
-				  const bool face_orientation = true,
-				  const bool face_flip        = false,
-				  const bool face_rotation    = false);
+                                  const bool face_orientation = true,
+                                  const bool face_flip        = false,
+                                  const bool face_rotation    = false);
 
-				     /**
-				      * Map the vertex index @p vertex of a face
-				      * with arbitrary @p face_orientation, @p
-				      * face_flip and @p face_rotation to a face
-				      * in standard orientation. The values of
-				      * these three flags default to
-				      * <tt>true</tt>, <tt>false</tt> and
-				      * <tt>false</tt>, respectively. this
-				      * combination describes a face in standard
-				      * orientation.
-				      *
-				      * This function is only implemented in 3D.
-				      */
+                                     /**
+                                      * Map the vertex index @p vertex of a face
+                                      * with arbitrary @p face_orientation, @p
+                                      * face_flip and @p face_rotation to a face
+                                      * in standard orientation. The values of
+                                      * these three flags default to
+                                      * <tt>true</tt>, <tt>false</tt> and
+                                      * <tt>false</tt>, respectively. this
+                                      * combination describes a face in standard
+                                      * orientation.
+                                      *
+                                      * This function is only implemented in 3D.
+                                      */
     static
     unsigned int
     real_to_standard_face_vertex (const unsigned int vertex,
-				  const bool face_orientation = true,
-				  const bool face_flip        = false,
-				  const bool face_rotation    = false);
+                                  const bool face_orientation = true,
+                                  const bool face_flip        = false,
+                                  const bool face_rotation    = false);
 
-				     /**
-				      * Map the line index @p line of a face
-				      * in standard orientation to one of a face
-				      * with arbitrary @p face_orientation, @p
-				      * face_flip and @p face_rotation. The
-				      * values of these three flags default to
-				      * <tt>true</tt>, <tt>false</tt> and
-				      * <tt>false</tt>, respectively. this
-				      * combination describes a face in standard
-				      * orientation.
-				      *
-				      * This function is only implemented in 3D.
-				      */
+                                     /**
+                                      * Map the line index @p line of a face
+                                      * in standard orientation to one of a face
+                                      * with arbitrary @p face_orientation, @p
+                                      * face_flip and @p face_rotation. The
+                                      * values of these three flags default to
+                                      * <tt>true</tt>, <tt>false</tt> and
+                                      * <tt>false</tt>, respectively. this
+                                      * combination describes a face in standard
+                                      * orientation.
+                                      *
+                                      * This function is only implemented in 3D.
+                                      */
     static
     unsigned int
     standard_to_real_face_line (const unsigned int line,
-				const bool face_orientation = true,
-				const bool face_flip        = false,
-				const bool face_rotation    = false);
+                                const bool face_orientation = true,
+                                const bool face_flip        = false,
+                                const bool face_rotation    = false);
 
-				     /**
-				      * Map the line index @p line of a face
-				      * with arbitrary @p face_orientation, @p
-				      * face_flip and @p face_rotation to a face
-				      * in standard orientation. The values of
-				      * these three flags default to
-				      * <tt>true</tt>, <tt>false</tt> and
-				      * <tt>false</tt>, respectively. this
-				      * combination describes a face in standard
-				      * orientation.
-				      *
-				      * This function is only implemented in 3D.
-				      */
+                                     /**
+                                      * Map the line index @p line of a face
+                                      * with arbitrary @p face_orientation, @p
+                                      * face_flip and @p face_rotation to a face
+                                      * in standard orientation. The values of
+                                      * these three flags default to
+                                      * <tt>true</tt>, <tt>false</tt> and
+                                      * <tt>false</tt>, respectively. this
+                                      * combination describes a face in standard
+                                      * orientation.
+                                      *
+                                      * This function is only implemented in 3D.
+                                      */
     static
     unsigned int
     real_to_standard_face_line (const unsigned int line,
-				const bool face_orientation = true,
-				const bool face_flip        = false,
-				const bool face_rotation    = false);
+                                const bool face_orientation = true,
+                                const bool face_flip        = false,
+                                const bool face_rotation    = false);
 
-				     /**
-				      * Return the position of the @p ith
-				      * vertex on the unit cell. The order of
-				      * vertices is the canonical one in
-				      * deal.II, as described in the general
-				      * documentation of this class.
-				      */
+                                     /**
+                                      * Return the position of the @p ith
+                                      * vertex on the unit cell. The order of
+                                      * vertices is the canonical one in
+                                      * deal.II, as described in the general
+                                      * documentation of this class.
+                                      */
     static
     Point<dim>
     unit_cell_vertex (const unsigned int vertex);
 
-				     /**
-				      * Given a point @p p in unit
-				      * coordinates, return the number
-				      * of the child cell in which it
-				      * would lie in. If the point
-				      * lies on the interface of two
-				      * children, return any one of
-				      * their indices. The result is
-				      * always less than
-				      * GeometryInfo<dimension>::max_children_per_cell.
-				      *
-				      * The order of child cells is described
-				      * the general documentation of this
-				      * class.
-				      */
+                                     /**
+                                      * Given a point @p p in unit
+                                      * coordinates, return the number
+                                      * of the child cell in which it
+                                      * would lie in. If the point
+                                      * lies on the interface of two
+                                      * children, return any one of
+                                      * their indices. The result is
+                                      * always less than
+                                      * GeometryInfo<dimension>::max_children_per_cell.
+                                      *
+                                      * The order of child cells is described
+                                      * the general documentation of this
+                                      * class.
+                                      */
     static
     unsigned int
     child_cell_from_point (const Point<dim> &p);
 
-				     /**
-				      * Given coordinates @p p on the
-				      * unit cell, return the values
-				      * of the coordinates of this
-				      * point in the coordinate system
-				      * of the given child. Neither
-				      * original nor returned
-				      * coordinates need actually be
-				      * inside the cell, we simply
-				      * perform a scale-and-shift
-				      * operation with a shift that
-				      * depends on the number of the
-				      * child.
-				      */
+                                     /**
+                                      * Given coordinates @p p on the
+                                      * unit cell, return the values
+                                      * of the coordinates of this
+                                      * point in the coordinate system
+                                      * of the given child. Neither
+                                      * original nor returned
+                                      * coordinates need actually be
+                                      * inside the cell, we simply
+                                      * perform a scale-and-shift
+                                      * operation with a shift that
+                                      * depends on the number of the
+                                      * child.
+                                      */
     static
     Point<dim>
     cell_to_child_coordinates (const Point<dim>          &p,
-			       const unsigned int         child_index,
-			       const RefinementCase<dim>  refine_case
-			       = RefinementCase<dim>::isotropic_refinement);
+                               const unsigned int         child_index,
+                               const RefinementCase<dim>  refine_case
+                               = RefinementCase<dim>::isotropic_refinement);
 
-				     /**
-				      * The reverse function to the
-				      * one above: take a point in the
-				      * coordinate system of the
-				      * child, and transform it to the
-				      * coordinate system of the
-				      * mother cell.
-				      */
+                                     /**
+                                      * The reverse function to the
+                                      * one above: take a point in the
+                                      * coordinate system of the
+                                      * child, and transform it to the
+                                      * coordinate system of the
+                                      * mother cell.
+                                      */
     static
     Point<dim>
     child_to_cell_coordinates (const Point<dim>          &p,
-			       const unsigned int         child_index,
-			       const RefinementCase<dim>  refine_case
-			       = RefinementCase<dim>::isotropic_refinement);
+                               const unsigned int         child_index,
+                               const RefinementCase<dim>  refine_case
+                               = RefinementCase<dim>::isotropic_refinement);
 
-				     /**
-				      * Return true if the given point
-				      * is inside the unit cell of the
-				      * present space dimension.
-				      */
+                                     /**
+                                      * Return true if the given point
+                                      * is inside the unit cell of the
+                                      * present space dimension.
+                                      */
     static
     bool
     is_inside_unit_cell (const Point<dim> &p);
 
-				     /**
-				      * Return true if the given point
-				      * is inside the unit cell of the
-				      * present space dimension. This
-				      * * function accepts an
-				      * additional * parameter which
-				      * specifies how * much the point
-				      * position may * actually be
-				      * outside the true * unit
-				      * cell. This is useful because
-				      * in practice we may often not
-				      * be able to compute the
-				      * coordinates of a point in
-				      * reference coordinates exactly,
-				      * but only up to numerical
-				      * roundoff.
-				      *
-				      * The tolerance parameter may be
-				      * less than zero, indicating
-				      * that the point should be
-				      * safely inside the cell.
-				      */
+                                     /**
+                                      * Return true if the given point
+                                      * is inside the unit cell of the
+                                      * present space dimension. This
+                                      * * function accepts an
+                                      * additional * parameter which
+                                      * specifies how * much the point
+                                      * position may * actually be
+                                      * outside the true * unit
+                                      * cell. This is useful because
+                                      * in practice we may often not
+                                      * be able to compute the
+                                      * coordinates of a point in
+                                      * reference coordinates exactly,
+                                      * but only up to numerical
+                                      * roundoff.
+                                      *
+                                      * The tolerance parameter may be
+                                      * less than zero, indicating
+                                      * that the point should be
+                                      * safely inside the cell.
+                                      */
     static
     bool
     is_inside_unit_cell (const Point<dim> &p,
-			 const double eps);
+                         const double eps);
 
-				     /**
-				      * Projects a given point onto the
+                                     /**
+                                      * Projects a given point onto the
                                       * unit cell, i.e. each coordinate
                                       * outside [0..1] is modified
                                       * to lie within that interval.
-				      */
+                                      */
     static
     Point<dim>
     project_to_unit_cell (const Point<dim> &p);
@@ -2035,122 +2035,122 @@ struct GeometryInfo
     double
     distance_to_unit_cell (const Point<dim> &p);
 
-				     /**
-				      * Compute the value of the $i$-th
-				      * $d$-linear (i.e. (bi-,tri-)linear)
-				      * shape function at location $\xi$.
-				      */
+                                     /**
+                                      * Compute the value of the $i$-th
+                                      * $d$-linear (i.e. (bi-,tri-)linear)
+                                      * shape function at location $\xi$.
+                                      */
     static
     double
     d_linear_shape_function (const Point<dim> &xi,
-			     const unsigned int i);
+                             const unsigned int i);
 
-				     /**
-				      * Compute the gradient of the $i$-th
-				      * $d$-linear (i.e. (bi-,tri-)linear)
-				      * shape function at location $\xi$.
-				      */
+                                     /**
+                                      * Compute the gradient of the $i$-th
+                                      * $d$-linear (i.e. (bi-,tri-)linear)
+                                      * shape function at location $\xi$.
+                                      */
     static
     Tensor<1,dim>
     d_linear_shape_function_gradient (const Point<dim> &xi,
-				      const unsigned int i);
+                                      const unsigned int i);
 
-				     /**
-				      * For a (bi-, tri-)linear
-				      * mapping from the reference
-				      * cell, face, or edge to the
-				      * object specified by the given
-				      * vertices, compute the
-				      * alternating form of the
-				      * transformed unit vectors
-				      * vertices. For an object of
-				      * dimensionality @p dim, there
-				      * are @p dim vectors with @p
-				      * spacedim components each, and
-				      * the alternating form is a
-				      * tensor of rank spacedim-dim
-				      * that corresponds to the wedge
-				      * product of the @p dim unit
-				      * vectors, and it corresponds to
-				      * the volume and normal vectors
-				      * of the mapping from reference
-				      * element to the element
-				      * described by the vertices.
-				      *
-				      * For example, if dim==spacedim==2, then
-				      * the alternating form is a scalar
-				      * (because spacedim-dim=0) and its value
-				      * equals $\mathbf v_1\wedge \mathbf
-				      * v_2=\mathbf v_1^\perp \cdot\mathbf
-				      * v_2$, where $\mathbf v_1^\perp$ is a
-				      * vector that is rotated to the right by
-				      * 90 degrees from $\mathbf v_1$. If
-				      * dim==spacedim==3, then the result is
-				      * again a scalar with value $\mathbf
-				      * v_1\wedge \mathbf v_2 \wedge \mathbf
-				      * v_3 = (\mathbf v_1\times \mathbf
-				      * v_2)\cdot \mathbf v_3$, where $\mathbf
-				      * v_1, \mathbf v_2, \mathbf v_3$ are the
-				      * images of the unit vectors at a vertex
-				      * of the unit dim-dimensional cell under
-				      * transformation to the dim-dimensional
-				      * cell in spacedim-dimensional space. In
-				      * both cases, i.e. for dim==2 or 3, the
-				      * result happens to equal the
-				      * determinant of the Jacobian of the
-				      * mapping from reference cell to cell in
-				      * real space. Note that it is the actual
-				      * determinant, not its absolute value as
-				      * often used in transforming integrals
-				      * from one coordinate system to
-				      * another. In particular, if the object
-				      * specified by the vertices is a
-				      * parallelogram (i.e. a linear
-				      * transformation of the reference cell)
-				      * then the computed values are the same
-				      * at all vertices and equal the (signed)
-				      * area of the cell; similarly, for
-				      * parallel-epipeds, it is the volume of
-				      * the cell.
-				      *
-				      * Likewise, if we have dim==spacedim-1
-				      * (e.g. we have a quad in 3d space, or a
-				      * line in 2d), then the alternating
-				      * product denotes the normal vector
-				      * (i.e. a rank-1 tensor, since
-				      * spacedim-dim=1) to the object at each
-				      * vertex, where the normal vector's
-				      * magnitude denotes the area element of
-				      * the transformation from the reference
-				      * object to the object given by the
-				      * vertices. In particular, if again the
-				      * mapping from reference object to the
-				      * object under consideration here is
-				      * linear (not bi- or trilinear), then
-				      * the returned vectors are all
-				      * %parallel, perpendicular to the mapped
-				      * object described by the vertices, and
-				      * have a magnitude equal to the
-				      * area/volume of the mapped object. If
-				      * dim=1, spacedim=2, then the returned
-				      * value is $\mathbf v_1^\perp$, where
-				      * $\mathbf v_1$ is the image of the sole
-				      * unit vector of a line mapped to the
-				      * line in 2d given by the vertices; if
-				      * dim=2, spacedim=3, then the returned
-				      * values are $\mathbf v_1 \wedge \mathbf
-				      * v_2=\mathbf v_1 \times \mathbf v_2$
-				      * where $\mathbf v_1,\mathbf v_2$ are
-				      * the two three-dimensional vectors that
-				      * are tangential to the quad mapped into
-				      * three-dimensional space.
-				      *
-				      * This function is used in order to
-				      * determine how distorted a cell is (see
-				      * the entry on
-				      * @ref GlossDistorted "distorted cells"
-				      * in the glossary).
-				      */
+                                     /**
+                                      * For a (bi-, tri-)linear
+                                      * mapping from the reference
+                                      * cell, face, or edge to the
+                                      * object specified by the given
+                                      * vertices, compute the
+                                      * alternating form of the
+                                      * transformed unit vectors
+                                      * vertices. For an object of
+                                      * dimensionality @p dim, there
+                                      * are @p dim vectors with @p
+                                      * spacedim components each, and
+                                      * the alternating form is a
+                                      * tensor of rank spacedim-dim
+                                      * that corresponds to the wedge
+                                      * product of the @p dim unit
+                                      * vectors, and it corresponds to
+                                      * the volume and normal vectors
+                                      * of the mapping from reference
+                                      * element to the element
+                                      * described by the vertices.
+                                      *
+                                      * For example, if dim==spacedim==2, then
+                                      * the alternating form is a scalar
+                                      * (because spacedim-dim=0) and its value
+                                      * equals $\mathbf v_1\wedge \mathbf
+                                      * v_2=\mathbf v_1^\perp \cdot\mathbf
+                                      * v_2$, where $\mathbf v_1^\perp$ is a
+                                      * vector that is rotated to the right by
+                                      * 90 degrees from $\mathbf v_1$. If
+                                      * dim==spacedim==3, then the result is
+                                      * again a scalar with value $\mathbf
+                                      * v_1\wedge \mathbf v_2 \wedge \mathbf
+                                      * v_3 = (\mathbf v_1\times \mathbf
+                                      * v_2)\cdot \mathbf v_3$, where $\mathbf
+                                      * v_1, \mathbf v_2, \mathbf v_3$ are the
+                                      * images of the unit vectors at a vertex
+                                      * of the unit dim-dimensional cell under
+                                      * transformation to the dim-dimensional
+                                      * cell in spacedim-dimensional space. In
+                                      * both cases, i.e. for dim==2 or 3, the
+                                      * result happens to equal the
+                                      * determinant of the Jacobian of the
+                                      * mapping from reference cell to cell in
+                                      * real space. Note that it is the actual
+                                      * determinant, not its absolute value as
+                                      * often used in transforming integrals
+                                      * from one coordinate system to
+                                      * another. In particular, if the object
+                                      * specified by the vertices is a
+                                      * parallelogram (i.e. a linear
+                                      * transformation of the reference cell)
+                                      * then the computed values are the same
+                                      * at all vertices and equal the (signed)
+                                      * area of the cell; similarly, for
+                                      * parallel-epipeds, it is the volume of
+                                      * the cell.
+                                      *
+                                      * Likewise, if we have dim==spacedim-1
+                                      * (e.g. we have a quad in 3d space, or a
+                                      * line in 2d), then the alternating
+                                      * product denotes the normal vector
+                                      * (i.e. a rank-1 tensor, since
+                                      * spacedim-dim=1) to the object at each
+                                      * vertex, where the normal vector's
+                                      * magnitude denotes the area element of
+                                      * the transformation from the reference
+                                      * object to the object given by the
+                                      * vertices. In particular, if again the
+                                      * mapping from reference object to the
+                                      * object under consideration here is
+                                      * linear (not bi- or trilinear), then
+                                      * the returned vectors are all
+                                      * %parallel, perpendicular to the mapped
+                                      * object described by the vertices, and
+                                      * have a magnitude equal to the
+                                      * area/volume of the mapped object. If
+                                      * dim=1, spacedim=2, then the returned
+                                      * value is $\mathbf v_1^\perp$, where
+                                      * $\mathbf v_1$ is the image of the sole
+                                      * unit vector of a line mapped to the
+                                      * line in 2d given by the vertices; if
+                                      * dim=2, spacedim=3, then the returned
+                                      * values are $\mathbf v_1 \wedge \mathbf
+                                      * v_2=\mathbf v_1 \times \mathbf v_2$
+                                      * where $\mathbf v_1,\mathbf v_2$ are
+                                      * the two three-dimensional vectors that
+                                      * are tangential to the quad mapped into
+                                      * three-dimensional space.
+                                      *
+                                      * This function is used in order to
+                                      * determine how distorted a cell is (see
+                                      * the entry on
+                                      * @ref GlossDistorted "distorted cells"
+                                      * in the glossary).
+                                      */
     template <int spacedim>
     static
     void
@@ -2165,74 +2165,74 @@ struct GeometryInfo
       ;
 
                                      /**
-				      * For each face of the reference
-				      * cell, this field stores the
-				      * coordinate direction in which
-				      * its normal vector points. In
-				      * <tt>dim</tt> dimension these
-				      * are the <tt>2*dim</tt> first
-				      * entries of
-				      * <tt>{0,0,1,1,2,2,3,3}</tt>.
-				      *
-				      * Note that this is only the
-				      * coordinate number. The actual
-				      * direction of the normal vector
-				      * is obtained by multiplying the
-				      * unit vector in this direction
-				      * with #unit_normal_orientation.
-				      */
+                                      * For each face of the reference
+                                      * cell, this field stores the
+                                      * coordinate direction in which
+                                      * its normal vector points. In
+                                      * <tt>dim</tt> dimension these
+                                      * are the <tt>2*dim</tt> first
+                                      * entries of
+                                      * <tt>{0,0,1,1,2,2,3,3}</tt>.
+                                      *
+                                      * Note that this is only the
+                                      * coordinate number. The actual
+                                      * direction of the normal vector
+                                      * is obtained by multiplying the
+                                      * unit vector in this direction
+                                      * with #unit_normal_orientation.
+                                      */
     static const unsigned int unit_normal_direction[faces_per_cell];
 
-				     /**
-				      * Orientation of the unit normal
-				      * vector of a face of the
-				      * reference cell. In
-				      * <tt>dim</tt> dimension these
-				      * are the <tt>2*dim</tt> first
-				      * entries of
-				      * <tt>{-1,1,-1,1,-1,1,-1,1}</tt>.
-				      *
-				      * Each value is either
-				      * <tt>1</tt> or <tt>-1</tt>,
-				      * corresponding to a normal
-				      * vector pointing in the
-				      * positive or negative
-				      * coordinate direction,
-				      * respectively.
-				      *
-				      * Note that this is only the
-				      * <em>standard orientation</em>
-				      * of faces. At least in 3d,
-				      * actual faces of cells in a
-				      * triangulation can also have
-				      * the opposite orientation,
-				      * depending on a flag that one
-				      * can query from the cell it
-				      * belongs to. For more
-				      * information, see the
-				      * @ref GlossFaceOrientation "glossary"
-				      * entry on
-				      * face orientation.
-				      */
+                                     /**
+                                      * Orientation of the unit normal
+                                      * vector of a face of the
+                                      * reference cell. In
+                                      * <tt>dim</tt> dimension these
+                                      * are the <tt>2*dim</tt> first
+                                      * entries of
+                                      * <tt>{-1,1,-1,1,-1,1,-1,1}</tt>.
+                                      *
+                                      * Each value is either
+                                      * <tt>1</tt> or <tt>-1</tt>,
+                                      * corresponding to a normal
+                                      * vector pointing in the
+                                      * positive or negative
+                                      * coordinate direction,
+                                      * respectively.
+                                      *
+                                      * Note that this is only the
+                                      * <em>standard orientation</em>
+                                      * of faces. At least in 3d,
+                                      * actual faces of cells in a
+                                      * triangulation can also have
+                                      * the opposite orientation,
+                                      * depending on a flag that one
+                                      * can query from the cell it
+                                      * belongs to. For more
+                                      * information, see the
+                                      * @ref GlossFaceOrientation "glossary"
+                                      * entry on
+                                      * face orientation.
+                                      */
     static const int unit_normal_orientation[faces_per_cell];
 
-				     /**
-				      * List of numbers which denotes which
-				      * face is opposite to a given face. Its
-				      * entries are the first <tt>2*dim</tt>
-				      * entries of
-				      * <tt>{ 1, 0, 3, 2, 5, 4, 7, 6}</tt>.
-				      */
+                                     /**
+                                      * List of numbers which denotes which
+                                      * face is opposite to a given face. Its
+                                      * entries are the first <tt>2*dim</tt>
+                                      * entries of
+                                      * <tt>{ 1, 0, 3, 2, 5, 4, 7, 6}</tt>.
+                                      */
     static const unsigned int opposite_face[faces_per_cell];
 
 
                                      /**
-				      * Exception
-				      */
+                                      * Exception
+                                      */
     DeclException1 (ExcInvalidCoordinate,
-		    double,
-		    << "The coordinates must satisfy 0 <= x_i <= 1, "
-		    << "but here we have x_i=" << arg1);
+                    double,
+                    << "The coordinates must satisfy 0 <= x_i <= 1, "
+                    << "but here we have x_i=" << arg1);
 
                                      /**
                                       * Exception
@@ -2285,17 +2285,17 @@ template <>
 Tensor<1,1>
 GeometryInfo<1>::
 d_linear_shape_function_gradient (const Point<1> &xi,
-				  const unsigned int i);
+                                  const unsigned int i);
 template <>
 Tensor<1,2>
 GeometryInfo<2>::
 d_linear_shape_function_gradient (const Point<2> &xi,
-				  const unsigned int i);
+                                  const unsigned int i);
 template <>
 Tensor<1,3>
 GeometryInfo<3>::
 d_linear_shape_function_gradient (const Point<3> &xi,
-				  const unsigned int i);
+                                  const unsigned int i);
 
 
 
@@ -2308,8 +2308,8 @@ namespace internal
   template <int dim>
   inline
   SubfaceCase<dim>::SubfaceCase (const typename SubfacePossibilities<dim>::Possibilities subface_possibility)
-		  :
-		  value (subface_possibility)
+                  :
+                  value (subface_possibility)
   {}
 
 
@@ -2379,8 +2379,8 @@ RefinementCase<3>::cut_axis (const unsigned int i)
 template <int dim>
 inline
 RefinementCase<dim>::RefinementCase ()
-		:
-		value (RefinementPossibilities<dim>::no_refinement)
+                :
+                value (RefinementPossibilities<dim>::no_refinement)
 {}
 
 
@@ -2389,16 +2389,16 @@ template <int dim>
 inline
 RefinementCase<dim>::
 RefinementCase (const typename RefinementPossibilities<dim>::Possibilities refinement_case)
-		:
-		value (refinement_case)
+                :
+                value (refinement_case)
 {
-				   // check that only those bits of
-				   // the given argument are set that
-				   // make sense for a given space
-				   // dimension
+                                   // check that only those bits of
+                                   // the given argument are set that
+                                   // make sense for a given space
+                                   // dimension
   Assert ((refinement_case & RefinementPossibilities<dim>::isotropic_refinement) ==
-	  refinement_case,
-	  ExcInvalidRefinementCase (refinement_case));
+          refinement_case,
+          ExcInvalidRefinementCase (refinement_case));
 }
 
 
@@ -2406,16 +2406,16 @@ RefinementCase (const typename RefinementPossibilities<dim>::Possibilities refin
 template <int dim>
 inline
 RefinementCase<dim>::RefinementCase (const unsigned char refinement_case)
-		:
-		value (refinement_case)
+                :
+                value (refinement_case)
 {
-				   // check that only those bits of
-				   // the given argument are set that
-				   // make sense for a given space
-				   // dimension
+                                   // check that only those bits of
+                                   // the given argument are set that
+                                   // make sense for a given space
+                                   // dimension
   Assert ((refinement_case & RefinementPossibilities<dim>::isotropic_refinement) ==
-	  refinement_case,
-	  ExcInvalidRefinementCase (refinement_case));
+          refinement_case,
+          ExcInvalidRefinementCase (refinement_case));
 }
 
 
@@ -2455,7 +2455,7 @@ RefinementCase<dim>
 RefinementCase<dim>::operator ~ () const
 {
   return RefinementCase<dim>(static_cast<unsigned char> (
-			       (~value) & RefinementPossibilities<dim>::isotropic_refinement));
+                               (~value) & RefinementPossibilities<dim>::isotropic_refinement));
 }
 
 
@@ -2474,7 +2474,7 @@ RefinementCase<dim>::memory_consumption ()
 template <int dim>
 template <class Archive>
 void RefinementCase<dim>::serialize (Archive &ar,
-				     const unsigned int)
+                                     const unsigned int)
 {
   // serialization can't deal with bitfields, so copy from/to a full sized
   // unsigned char
@@ -2492,7 +2492,7 @@ Point<1>
 GeometryInfo<1>::unit_cell_vertex (const unsigned int vertex)
 {
   Assert (vertex < vertices_per_cell,
-	  ExcIndexRange (vertex, 0, vertices_per_cell));
+          ExcIndexRange (vertex, 0, vertices_per_cell));
 
   return Point<1>(static_cast<double>(vertex));
 }
@@ -2505,7 +2505,7 @@ Point<2>
 GeometryInfo<2>::unit_cell_vertex (const unsigned int vertex)
 {
   Assert (vertex < vertices_per_cell,
-	  ExcIndexRange (vertex, 0, vertices_per_cell));
+          ExcIndexRange (vertex, 0, vertices_per_cell));
 
   return Point<2>(vertex%2, vertex/2);
 }
@@ -2518,7 +2518,7 @@ Point<3>
 GeometryInfo<3>::unit_cell_vertex (const unsigned int vertex)
 {
   Assert (vertex < vertices_per_cell,
-	  ExcIndexRange (vertex, 0, vertices_per_cell));
+          ExcIndexRange (vertex, 0, vertices_per_cell));
 
   return Point<3>(vertex%2, vertex/2%2, vertex/4);
 }
@@ -2558,8 +2558,8 @@ GeometryInfo<2>::child_cell_from_point (const Point<2> &p)
   Assert ((p[1] >= 0) && (p[1] <= 1), ExcInvalidCoordinate(p[1]));
 
   return (p[0] <= 0.5 ?
-	  (p[1] <= 0.5 ? 0 : 2) :
-	  (p[1] <= 0.5 ? 1 : 3));
+          (p[1] <= 0.5 ? 0 : 2) :
+          (p[1] <= 0.5 ? 1 : 3));
 }
 
 
@@ -2574,12 +2574,12 @@ GeometryInfo<3>::child_cell_from_point (const Point<3> &p)
   Assert ((p[2] >= 0) && (p[2] <= 1), ExcInvalidCoordinate(p[2]));
 
   return (p[0] <= 0.5 ?
-	  (p[1] <= 0.5 ?
-	   (p[2] <= 0.5 ? 0 : 4) :
-	   (p[2] <= 0.5 ? 2 : 6)) :
-	  (p[1] <= 0.5 ?
-	   (p[2] <= 0.5 ? 1 : 5) :
-	   (p[2] <= 0.5 ? 3 : 7)));
+          (p[1] <= 0.5 ?
+           (p[2] <= 0.5 ? 0 : 4) :
+           (p[2] <= 0.5 ? 2 : 6)) :
+          (p[1] <= 0.5 ?
+           (p[2] <= 0.5 ? 1 : 5) :
+           (p[2] <= 0.5 ? 3 : 7)));
 }
 
 
@@ -2599,14 +2599,14 @@ template <>
 inline
 Point<1>
 GeometryInfo<1>::cell_to_child_coordinates (const Point<1>         &p,
-					    const unsigned int      child_index,
-					    const RefinementCase<1> refine_case)
+                                            const unsigned int      child_index,
+                                            const RefinementCase<1> refine_case)
 
 {
   Assert (child_index < 2,
-	  ExcIndexRange (child_index, 0, 2));
+          ExcIndexRange (child_index, 0, 2));
   Assert (refine_case==RefinementCase<1>::cut_x,
-	  ExcInternalError());
+          ExcInternalError());
 
   return p*2.0-unit_cell_vertex(child_index);
 }
@@ -2617,32 +2617,32 @@ template <>
 inline
 Point<2>
 GeometryInfo<2>::cell_to_child_coordinates (const Point<2>         &p,
-					    const unsigned int      child_index,
-					    const RefinementCase<2> refine_case)
+                                            const unsigned int      child_index,
+                                            const RefinementCase<2> refine_case)
 
 {
   Assert (child_index < GeometryInfo<2>::n_children(refine_case),
-	  ExcIndexRange (child_index, 0, GeometryInfo<2>::n_children(refine_case)));
+          ExcIndexRange (child_index, 0, GeometryInfo<2>::n_children(refine_case)));
 
   Point<2> point=p;
   switch (refine_case)
     {
       case RefinementCase<2>::cut_x:
-	    point[0]*=2.0;
-	    if (child_index==1)
-	      point[0]-=1.0;
-	    break;
+            point[0]*=2.0;
+            if (child_index==1)
+              point[0]-=1.0;
+            break;
       case RefinementCase<2>::cut_y:
-	    point[1]*=2.0;
-	    if (child_index==1)
-	      point[1]-=1.0;
-	    break;
+            point[1]*=2.0;
+            if (child_index==1)
+              point[1]-=1.0;
+            break;
       case RefinementCase<2>::cut_xy:
-	    point*=2.0;
-	    point-=unit_cell_vertex(child_index);
-	    break;
+            point*=2.0;
+            point-=unit_cell_vertex(child_index);
+            break;
       default:
-	    Assert(false, ExcInternalError());
+            Assert(false, ExcInternalError());
     }
 
   return point;
@@ -2654,70 +2654,70 @@ template <>
 inline
 Point<3>
 GeometryInfo<3>::cell_to_child_coordinates (const Point<3>         &p,
-					    const unsigned int      child_index,
-					    const RefinementCase<3> refine_case)
+                                            const unsigned int      child_index,
+                                            const RefinementCase<3> refine_case)
 
 {
   Assert (child_index < GeometryInfo<3>::n_children(refine_case),
-	  ExcIndexRange (child_index, 0, GeometryInfo<3>::n_children(refine_case)));
+          ExcIndexRange (child_index, 0, GeometryInfo<3>::n_children(refine_case)));
 
   Point<3> point=p;
-				   // there might be a cleverer way to do
-				   // this, but since this function is called
-				   // in very few places for initialization
-				   // purposes only, I don't care at the
-				   // moment
+                                   // there might be a cleverer way to do
+                                   // this, but since this function is called
+                                   // in very few places for initialization
+                                   // purposes only, I don't care at the
+                                   // moment
   switch (refine_case)
     {
       case RefinementCase<3>::cut_x:
-	    point[0]*=2.0;
-	    if (child_index==1)
-	      point[0]-=1.0;
-	    break;
+            point[0]*=2.0;
+            if (child_index==1)
+              point[0]-=1.0;
+            break;
       case RefinementCase<3>::cut_y:
-	    point[1]*=2.0;
-	    if (child_index==1)
-	      point[1]-=1.0;
-	    break;
+            point[1]*=2.0;
+            if (child_index==1)
+              point[1]-=1.0;
+            break;
       case RefinementCase<3>::cut_z:
-	    point[2]*=2.0;
-	    if (child_index==1)
-	      point[2]-=1.0;
-	    break;
+            point[2]*=2.0;
+            if (child_index==1)
+              point[2]-=1.0;
+            break;
       case RefinementCase<3>::cut_xy:
-	    point[0]*=2.0;
-	    point[1]*=2.0;
-	    if (child_index%2==1)
-	      point[0]-=1.0;
-	    if (child_index/2==1)
-	      point[1]-=1.0;
-	    break;
+            point[0]*=2.0;
+            point[1]*=2.0;
+            if (child_index%2==1)
+              point[0]-=1.0;
+            if (child_index/2==1)
+              point[1]-=1.0;
+            break;
       case RefinementCase<3>::cut_xz:
-					     // careful, this is slightly
-					     // different from xy and yz due to
-					     // differnt internal numbering of
-					     // children!
-	    point[0]*=2.0;
-	    point[2]*=2.0;
-	    if (child_index/2==1)
-	      point[0]-=1.0;
-	    if (child_index%2==1)
-	      point[2]-=1.0;
-	    break;
+                                             // careful, this is slightly
+                                             // different from xy and yz due to
+                                             // differnt internal numbering of
+                                             // children!
+            point[0]*=2.0;
+            point[2]*=2.0;
+            if (child_index/2==1)
+              point[0]-=1.0;
+            if (child_index%2==1)
+              point[2]-=1.0;
+            break;
       case RefinementCase<3>::cut_yz:
-	    point[1]*=2.0;
-	    point[2]*=2.0;
-	    if (child_index%2==1)
-	      point[1]-=1.0;
-	    if (child_index/2==1)
-	      point[2]-=1.0;
-	    break;
+            point[1]*=2.0;
+            point[2]*=2.0;
+            if (child_index%2==1)
+              point[1]-=1.0;
+            if (child_index/2==1)
+              point[2]-=1.0;
+            break;
       case RefinementCase<3>::cut_xyz:
-	    point*=2.0;
-	    point-=unit_cell_vertex(child_index);
-	    break;
+            point*=2.0;
+            point-=unit_cell_vertex(child_index);
+            break;
       default:
-	    Assert(false, ExcInternalError());
+            Assert(false, ExcInternalError());
     }
 
   return point;
@@ -2729,8 +2729,8 @@ template <int dim>
 inline
 Point<dim>
 GeometryInfo<dim>::cell_to_child_coordinates (const Point<dim>         &/*p*/,
-					      const unsigned int        /*child_index*/,
-					      const RefinementCase<dim> /*refine_case*/)
+                                              const unsigned int        /*child_index*/,
+                                              const RefinementCase<dim> /*refine_case*/)
 
 {
   AssertThrow (false, ExcNotImplemented());
@@ -2743,14 +2743,14 @@ template <>
 inline
 Point<1>
 GeometryInfo<1>::child_to_cell_coordinates (const Point<1>         &p,
-					    const unsigned int      child_index,
-					    const RefinementCase<1> refine_case)
+                                            const unsigned int      child_index,
+                                            const RefinementCase<1> refine_case)
 
 {
   Assert (child_index < 2,
-	  ExcIndexRange (child_index, 0, 2));
+          ExcIndexRange (child_index, 0, 2));
   Assert (refine_case==RefinementCase<1>::cut_x,
-	  ExcInternalError());
+          ExcInternalError());
 
   return (p+unit_cell_vertex(child_index))*0.5;
 }
@@ -2761,70 +2761,70 @@ template <>
 inline
 Point<3>
 GeometryInfo<3>::child_to_cell_coordinates (const Point<3>         &p,
-					    const unsigned int      child_index,
-					    const RefinementCase<3> refine_case)
+                                            const unsigned int      child_index,
+                                            const RefinementCase<3> refine_case)
 
 {
   Assert (child_index < GeometryInfo<3>::n_children(refine_case),
-	  ExcIndexRange (child_index, 0, GeometryInfo<3>::n_children(refine_case)));
+          ExcIndexRange (child_index, 0, GeometryInfo<3>::n_children(refine_case)));
 
   Point<3> point=p;
-				   // there might be a cleverer way to do
-				   // this, but since this function is called
-				   // in very few places for initialization
-				   // purposes only, I don't care at the
-				   // moment
+                                   // there might be a cleverer way to do
+                                   // this, but since this function is called
+                                   // in very few places for initialization
+                                   // purposes only, I don't care at the
+                                   // moment
   switch (refine_case)
     {
       case RefinementCase<3>::cut_x:
-	    if (child_index==1)
-	      point[0]+=1.0;
-	    point[0]*=0.5;
-	    break;
+            if (child_index==1)
+              point[0]+=1.0;
+            point[0]*=0.5;
+            break;
       case RefinementCase<3>::cut_y:
-	    if (child_index==1)
-	      point[1]+=1.0;
-	    point[1]*=0.5;
-	    break;
+            if (child_index==1)
+              point[1]+=1.0;
+            point[1]*=0.5;
+            break;
       case RefinementCase<3>::cut_z:
-	    if (child_index==1)
-	      point[2]+=1.0;
-	    point[2]*=0.5;
-	    break;
+            if (child_index==1)
+              point[2]+=1.0;
+            point[2]*=0.5;
+            break;
       case RefinementCase<3>::cut_xy:
-	    if (child_index%2==1)
-	      point[0]+=1.0;
-	    if (child_index/2==1)
-	      point[1]+=1.0;
-	    point[0]*=0.5;
-	    point[1]*=0.5;
-	    break;
+            if (child_index%2==1)
+              point[0]+=1.0;
+            if (child_index/2==1)
+              point[1]+=1.0;
+            point[0]*=0.5;
+            point[1]*=0.5;
+            break;
       case RefinementCase<3>::cut_xz:
-					     // careful, this is slightly
-					     // different from xy and yz due to
-					     // differnt internal numbering of
-					     // children!
-	    if (child_index/2==1)
-	      point[0]+=1.0;
-	    if (child_index%2==1)
-	      point[2]+=1.0;
-	    point[0]*=0.5;
-	    point[2]*=0.5;
-	    break;
+                                             // careful, this is slightly
+                                             // different from xy and yz due to
+                                             // differnt internal numbering of
+                                             // children!
+            if (child_index/2==1)
+              point[0]+=1.0;
+            if (child_index%2==1)
+              point[2]+=1.0;
+            point[0]*=0.5;
+            point[2]*=0.5;
+            break;
       case RefinementCase<3>::cut_yz:
-	    if (child_index%2==1)
-	      point[1]+=1.0;
-	    if (child_index/2==1)
-	      point[2]+=1.0;
-	    point[1]*=0.5;
-	    point[2]*=0.5;
-	    break;
+            if (child_index%2==1)
+              point[1]+=1.0;
+            if (child_index/2==1)
+              point[2]+=1.0;
+            point[1]*=0.5;
+            point[2]*=0.5;
+            break;
       case RefinementCase<3>::cut_xyz:
-	    point+=unit_cell_vertex(child_index);
-	    point*=0.5;
-	    break;
+            point+=unit_cell_vertex(child_index);
+            point*=0.5;
+            break;
       default:
-	    Assert(false, ExcInternalError());
+            Assert(false, ExcInternalError());
     }
 
   return point;
@@ -2836,31 +2836,31 @@ template <>
 inline
 Point<2>
 GeometryInfo<2>::child_to_cell_coordinates (const Point<2>         &p,
-					    const unsigned int      child_index,
-					    const RefinementCase<2> refine_case)
+                                            const unsigned int      child_index,
+                                            const RefinementCase<2> refine_case)
 {
   Assert (child_index < GeometryInfo<2>::n_children(refine_case),
-	  ExcIndexRange (child_index, 0, GeometryInfo<2>::n_children(refine_case)));
+          ExcIndexRange (child_index, 0, GeometryInfo<2>::n_children(refine_case)));
 
   Point<2> point=p;
   switch (refine_case)
     {
       case RefinementCase<2>::cut_x:
-	    if (child_index==1)
-	      point[0]+=1.0;
-	    point[0]*=0.5;
-	    break;
+            if (child_index==1)
+              point[0]+=1.0;
+            point[0]*=0.5;
+            break;
       case RefinementCase<2>::cut_y:
-	    if (child_index==1)
-	      point[1]+=1.0;
-	    point[1]*=0.5;
-	    break;
+            if (child_index==1)
+              point[1]+=1.0;
+            point[1]*=0.5;
+            break;
       case RefinementCase<2>::cut_xy:
-	    point+=unit_cell_vertex(child_index);
-	    point*=0.5;
-	    break;
+            point+=unit_cell_vertex(child_index);
+            point*=0.5;
+            break;
       default:
-	    Assert(false, ExcInternalError());
+            Assert(false, ExcInternalError());
     }
 
   return point;
@@ -2872,8 +2872,8 @@ template <int dim>
 inline
 Point<dim>
 GeometryInfo<dim>::child_to_cell_coordinates (const Point<dim>         &/*p*/,
-					      const unsigned int        /*child_index*/,
-					      const RefinementCase<dim> /*refine_case*/)
+                                              const unsigned int        /*child_index*/,
+                                              const RefinementCase<dim> /*refine_case*/)
 {
   AssertThrow (false, ExcNotImplemented());
   return Point<dim>();
@@ -2897,7 +2897,7 @@ bool
 GeometryInfo<2>::is_inside_unit_cell (const Point<2> &p)
 {
   return (p[0] >= 0.) && (p[0] <= 1.) &&
-	 (p[1] >= 0.) && (p[1] <= 1.);
+         (p[1] >= 0.) && (p[1] <= 1.);
 }
 
 
@@ -2908,15 +2908,15 @@ bool
 GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p)
 {
   return (p[0] >= 0.) && (p[0] <= 1.) &&
-	 (p[1] >= 0.) && (p[1] <= 1.) &&
-	 (p[2] >= 0.) && (p[2] <= 1.);
+         (p[1] >= 0.) && (p[1] <= 1.) &&
+         (p[2] >= 0.) && (p[2] <= 1.);
 }
 
 template <>
 inline
 bool
 GeometryInfo<1>::is_inside_unit_cell (const Point<1> &p,
-				      const double eps)
+                                      const double eps)
 {
   return (p[0] >= -eps) && (p[0] <= 1.+eps);
 }
@@ -2927,11 +2927,11 @@ template <>
 inline
 bool
 GeometryInfo<2>::is_inside_unit_cell (const Point<2> &p,
-				      const double eps)
+                                      const double eps)
 {
   const double l = -eps, u = 1+eps;
   return (p[0] >= l) && (p[0] <= u) &&
-	 (p[1] >= l) && (p[1] <= u);
+         (p[1] >= l) && (p[1] <= u);
 }
 
 
@@ -2940,12 +2940,12 @@ template <>
 inline
 bool
 GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p,
-				      const double eps)
+                                      const double eps)
 {
   const double l = -eps, u = 1.0+eps;
   return (p[0] >= l) && (p[0] <= u) &&
-	 (p[1] >= l) && (p[1] <= u) &&
-	 (p[2] >= l) && (p[2] <= u);
+         (p[1] >= l) && (p[1] <= u) &&
+         (p[2] >= l) && (p[2] <= u);
 }
 
 

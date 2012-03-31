@@ -2,7 +2,7 @@
 //    $Id$
 //    Author: Toby D. Young, Polish Academy of Sciences, 2009
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,7 +44,7 @@ namespace SLEPcWrappers
     public:
 
                                    /**
-                                    * Constructor. 
+                                    * Constructor.
                                     */
       TransformationBase ();
 
@@ -54,8 +54,8 @@ namespace SLEPcWrappers
       virtual ~TransformationBase ();
 
                                    /**
-				    * Record the EPS object that is associated
-				    * to the spectral transformation
+                                    * Record the EPS object that is associated
+                                    * to the spectral transformation
                                     */
       void set_context (EPS &eps);
 
@@ -82,15 +82,15 @@ namespace SLEPcWrappers
       {
 
                                    /**
-                           	    * Destructor.
-                              	    */
-	~TransformationData ();
+                                    * Destructor.
+                                    */
+        ~TransformationData ();
 
                                    /**
                                     * Objects for Eigenvalue Problem
                                     * Solver.
                                     */
-	ST st;
+        ST st;
       };
 
       std_cxx1x::shared_ptr<TransformationData> transformation_data;
@@ -119,12 +119,12 @@ namespace SLEPcWrappers
                                     * Constructor. By default, set the
                                     * shift parameter to zero.
                                     */
-	AdditionalData (const double shift_parameter = 0);
+        AdditionalData (const double shift_parameter = 0);
 
                                    /**
                                     * Shift parameter.
                                     */
-	const double shift_parameter;
+        const double shift_parameter;
       };
 
 
@@ -174,12 +174,12 @@ namespace SLEPcWrappers
                                     * Constructor. By default, set the
                                     * shift parameter to zero.
                                     */
-	AdditionalData (const double shift_parameter = 0);
+        AdditionalData (const double shift_parameter = 0);
 
                                    /**
                                     * Shift parameter.
                                     */
-	const double shift_parameter;
+        const double shift_parameter;
       };
 
 
@@ -228,12 +228,12 @@ namespace SLEPcWrappers
                                     * Constructor. By default, set the
                                     * shift parameter to zero.
                                     */
-	AdditionalData (const double shift_parameter = 0);
+        AdditionalData (const double shift_parameter = 0);
 
                                    /**
                                     * Shift parameter.
                                     */
-	const double shift_parameter;
+        const double shift_parameter;
       };
 
 
@@ -281,14 +281,14 @@ namespace SLEPcWrappers
                                     * Constructor. Requires two shift
                                     * parameters
                                     */
-	AdditionalData (const double shift_parameter     = 0,
-			const double antishift_parameter = 0);
+        AdditionalData (const double shift_parameter     = 0,
+                        const double antishift_parameter = 0);
 
                                    /**
                                     * Shift and antishift parameter.
                                     */
-	const double shift_parameter;
-	const double antishift_parameter;
+        const double shift_parameter;
+        const double antishift_parameter;
       };
 
 
@@ -296,7 +296,7 @@ namespace SLEPcWrappers
                                     * Constructor.
                                     */
       TransformationCayley (const double shift,
-			    const double antishift);
+                            const double antishift);
 
     protected:
 

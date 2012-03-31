@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,14 +29,14 @@ namespace PETScWrappers
 {
                                    // forward declaration
   class BlockVector;
-  
+
   namespace MPI
   {
 
 /*! @addtogroup PETScWrappers
  *@{
  */
-    
+
 /**
  * An implementation of block vectors based on the parallel vector class
  * implemented in PETScWrappers. While the base class provides for most of the
@@ -62,7 +62,7 @@ namespace PETScWrappers
                                           * access to its own typedefs.
                                           */
         typedef BlockVectorBase<Vector> BaseClass;
-    
+
                                          /**
                                           * Typedef the type of the underlying
                                           * vector.
@@ -87,7 +87,7 @@ namespace PETScWrappers
                                           * empty vector without any blocks.
                                           */
         BlockVector ();
-        
+
                                          /**
                                           *  Constructor. Generate a block
                                           *  vector with @p n_blocks blocks,
@@ -101,7 +101,7 @@ namespace PETScWrappers
                               const MPI_Comm     &communicator,
                               const unsigned int  block_size,
                               const unsigned int  local_size);
-    
+
                                          /**
                                           * Copy-Constructor. Set all the
                                           * properties of the parallel vector
@@ -125,7 +125,7 @@ namespace PETScWrappers
         BlockVector (const std::vector<unsigned int> &block_sizes,
                      const MPI_Comm                  &communicator,
                      const std::vector<unsigned int> &local_elements);
-    
+
                                          /**
                                           * Destructor. Clears memory
                                           */
@@ -146,35 +146,35 @@ namespace PETScWrappers
         operator= (const BlockVector &V);
 
                                          /**
-					  * Copy the given sequential
-					  * (non-distributed) block vector
-					  * into the present parallel block
-					  * vector. It is assumed that they
-					  * have the same size, and this
-					  * operation does not change the
-					  * partitioning of the parallel
-					  * vectors by which its elements are
-					  * distributed across several MPI
-					  * processes. What this operation
-					  * therefore does is to copy that
-					  * chunk of the given vector @p v
-					  * that corresponds to elements of
-					  * the target vector that are stored
-					  * locally, and copies them, for each
-					  * of the individual blocks of this
-					  * object. Elements that are not
-					  * stored locally are not touched.
-					  *
-					  * This being a parallel vector, you
-					  * must make sure that @em all
-					  * processes call this function at
-					  * the same time. It is not possible
-					  * to change the local part of a
-					  * parallel vector on only one
-					  * process, independent of what other
-					  * processes do, with this function.
-					  */
-	BlockVector &
+                                          * Copy the given sequential
+                                          * (non-distributed) block vector
+                                          * into the present parallel block
+                                          * vector. It is assumed that they
+                                          * have the same size, and this
+                                          * operation does not change the
+                                          * partitioning of the parallel
+                                          * vectors by which its elements are
+                                          * distributed across several MPI
+                                          * processes. What this operation
+                                          * therefore does is to copy that
+                                          * chunk of the given vector @p v
+                                          * that corresponds to elements of
+                                          * the target vector that are stored
+                                          * locally, and copies them, for each
+                                          * of the individual blocks of this
+                                          * object. Elements that are not
+                                          * stored locally are not touched.
+                                          *
+                                          * This being a parallel vector, you
+                                          * must make sure that @em all
+                                          * processes call this function at
+                                          * the same time. It is not possible
+                                          * to change the local part of a
+                                          * parallel vector on only one
+                                          * process, independent of what other
+                                          * processes do, with this function.
+                                          */
+        BlockVector &
         operator = (const PETScWrappers::BlockVector &v);
 
                                          /**
@@ -195,7 +195,7 @@ namespace PETScWrappers
                      const unsigned int  block_size,
                      const unsigned int  local_size,
                      const bool fast = false);
-  
+
                                          /**
                                           * Reinitialize the BlockVector such
                                           * that it contains
@@ -230,12 +230,12 @@ namespace PETScWrappers
                                           * yield unpredictable results
                                           * since they may be routed to
                                           * the wrong block.
-                                          */ 
+                                          */
         void reinit (const std::vector<unsigned int> &block_sizes,
                      const MPI_Comm                  &communicator,
                      const std::vector<unsigned int> &local_sizes,
                      const bool                       fast=false);
-    
+
                                          /**
                                           * Change the dimension to that
                                           * of the vector <tt>V</tt>. The same
@@ -271,7 +271,7 @@ namespace PETScWrappers
                                           * this vector.
                                           */
         const MPI_Comm & get_mpi_communicator () const;
-        
+
                                          /**
                                           * Swap the contents of this
                                           * vector and the other vector
@@ -302,16 +302,16 @@ namespace PETScWrappers
                                           * <tt>u.swap(v)</tt>, again in analogy
                                           * to standard functions.
                                           */
-        void swap (BlockVector &v);    
+        void swap (BlockVector &v);
 
-					 /**
-					  * Print to a stream.
-					  */
-	void print (std::ostream       &out,
-		    const unsigned int  precision = 3,
-		    const bool          scientific = true,
-		    const bool          across = true) const;
-    
+                                         /**
+                                          * Print to a stream.
+                                          */
+        void print (std::ostream       &out,
+                    const unsigned int  precision = 3,
+                    const bool          scientific = true,
+                    const bool          across = true) const;
+
                                          /**
                                           * Exception
                                           */
@@ -330,8 +330,8 @@ namespace PETScWrappers
     inline
     BlockVector::BlockVector ()
     {}
-    
-    
+
+
 
     inline
     BlockVector::BlockVector (const unsigned int  n_blocks,
@@ -360,7 +360,7 @@ namespace PETScWrappers
     {
       this->components.resize (v.n_blocks());
       this->block_indices = v.block_indices;
-    
+
       for (unsigned int i=0; i<this->n_blocks(); ++i)
         this->components[i] = v.components[i];
     }
@@ -391,7 +391,7 @@ namespace PETScWrappers
     BlockVector::~BlockVector ()
     {}
 
-  
+
     inline
     void
     BlockVector::reinit (const unsigned int  n_blocks,
@@ -406,7 +406,7 @@ namespace PETScWrappers
              fast);
     }
 
-  
+
 
     inline
     void
@@ -418,7 +418,7 @@ namespace PETScWrappers
       this->block_indices.reinit (block_sizes);
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
-  
+
       for (unsigned int i=0; i<this->n_blocks(); ++i)
         this->components[i].reinit(communicator, block_sizes[i],
                              local_sizes[i], fast);
@@ -433,7 +433,7 @@ namespace PETScWrappers
       this->block_indices = v.get_block_indices();
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
-  
+
       for (unsigned int i=0;i<this->n_blocks();++i)
         block(i).reinit(v.block(i), fast);
     }
@@ -446,8 +446,8 @@ namespace PETScWrappers
     {
       return block(0).get_mpi_communicator();
     }
-    
-  
+
+
 
     inline
     void
@@ -455,7 +455,7 @@ namespace PETScWrappers
     {
       Assert (this->n_blocks() == v.n_blocks(),
               ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
-  
+
       for (unsigned int i=0; i<this->n_blocks(); ++i)
         this->components[i].swap (v.components[i]);
       ::dealii::swap (this->block_indices, v.block_indices);
@@ -464,22 +464,22 @@ namespace PETScWrappers
 
 
     inline
-    void 
+    void
     BlockVector::print (std::ostream       &out,
-			const unsigned int  precision,
-			const bool          scientific,
-			const bool          across) const
+                        const unsigned int  precision,
+                        const bool          scientific,
+                        const bool          across) const
     {
       for (unsigned int i=0;i<this->n_blocks();++i)
-	{
-	  if (across)
-	    out << 'C' << i << ':';
-	  else
-	    out << "Component " << i << std::endl;
-	  this->components[i].print(out, precision, scientific, across);
-	}
+        {
+          if (across)
+            out << 'C' << i << ':';
+          else
+            out << "Component " << i << std::endl;
+          this->components[i].print(out, precision, scientific, across);
+        }
     }
-    
+
 
 
 /**
@@ -496,9 +496,9 @@ namespace PETScWrappers
     {
       u.swap (v);
     }
-    
+
   }
-  
+
 }
 
 DEAL_II_NAMESPACE_CLOSE

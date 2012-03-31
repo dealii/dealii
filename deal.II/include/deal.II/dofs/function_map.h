@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -39,15 +39,15 @@ template <int spacedim> class Function;
 template<int dim>
 struct FunctionMap
 {
-				     /**
-				      * Declare the type as discussed
-				      * above. Since we can't name it
-				      * FunctionMap (as that would
-				      * ambiguate a possible
-				      * constructor of this class),
-				      * name it in the fashion of the
-				      * STL local typedefs.
-				      */
+                                     /**
+                                      * Declare the type as discussed
+                                      * above. Since we can't name it
+                                      * FunctionMap (as that would
+                                      * ambiguate a possible
+                                      * constructor of this class),
+                                      * name it in the fashion of the
+                                      * STL local typedefs.
+                                      */
     typedef std::map<types::boundary_id_t, const Function<dim>*> type;
 };
 

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -180,28 +180,28 @@ namespace TrilinosWrappers
 
                                        /**
                                         * Resize the matrix, by using an
-				        * array of Epetra maps to determine
-				        * the %parallel distribution of the
-				        * individual matrices. This function
-				        * assumes that a quadratic block
-				        * matrix is generated.
+                                        * array of Epetra maps to determine
+                                        * the %parallel distribution of the
+                                        * individual matrices. This function
+                                        * assumes that a quadratic block
+                                        * matrix is generated.
                                         */
       template <typename BlockSparsityType>
       void reinit (const std::vector<Epetra_Map> &input_maps,
-		   const BlockSparsityType       &block_sparsity_pattern);
+                   const BlockSparsityType       &block_sparsity_pattern);
 
                                        /**
                                         * Resize the matrix, by using an
-				        * array of index sets to determine
-				        * the %parallel distribution of the
-				        * individual matrices. This function
-				        * assumes that a quadratic block
-				        * matrix is generated.
+                                        * array of index sets to determine
+                                        * the %parallel distribution of the
+                                        * individual matrices. This function
+                                        * assumes that a quadratic block
+                                        * matrix is generated.
                                         */
       template <typename BlockSparsityType>
       void reinit (const std::vector<IndexSet> &input_maps,
-		   const BlockSparsityType     &block_sparsity_pattern,
-		   const MPI_Comm              &communicator = MPI_COMM_WORLD);
+                   const BlockSparsityType     &block_sparsity_pattern,
+                   const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
                                        /**
                                         * Resize the matrix and initialize it
@@ -215,64 +215,64 @@ namespace TrilinosWrappers
 
                                        /**
                                         * This function initializes the
-				        * Trilinos matrix using the deal.II
-				        * sparse matrix and the entries stored
-				        * therein. It uses a threshold
-				        * to copy only elements whose
-				        * modulus is larger than the
-				        * threshold (so zeros in the
-				        * deal.II matrix can be filtered
-				        * away).
+                                        * Trilinos matrix using the deal.II
+                                        * sparse matrix and the entries stored
+                                        * therein. It uses a threshold
+                                        * to copy only elements whose
+                                        * modulus is larger than the
+                                        * threshold (so zeros in the
+                                        * deal.II matrix can be filtered
+                                        * away).
                                         */
       void reinit (const std::vector<Epetra_Map>             &input_maps,
-		   const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
-		   const double                               drop_tolerance=1e-13);
+                   const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
+                   const double                               drop_tolerance=1e-13);
 
                                        /**
                                         * This function initializes
-				        * the Trilinos matrix using
-				        * the deal.II sparse matrix
-				        * and the entries stored
-				        * therein. It uses a threshold
-				        * to copy only elements whose
-				        * modulus is larger than the
-				        * threshold (so zeros in the
-				        * deal.II matrix can be
-				        * filtered away). Since no
-				        * Epetra_Map is given, all the
-				        * elements will be locally
-				        * stored.
+                                        * the Trilinos matrix using
+                                        * the deal.II sparse matrix
+                                        * and the entries stored
+                                        * therein. It uses a threshold
+                                        * to copy only elements whose
+                                        * modulus is larger than the
+                                        * threshold (so zeros in the
+                                        * deal.II matrix can be
+                                        * filtered away). Since no
+                                        * Epetra_Map is given, all the
+                                        * elements will be locally
+                                        * stored.
                                         */
       void reinit (const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
-		   const double                               drop_tolerance=1e-13);
+                   const double                               drop_tolerance=1e-13);
 
-				       /**
-					* This function calls the compress()
-				        * command of all matrices after
-				        * the assembly is
-				        * completed. Note that all MPI
-				        * processes need to call this
-				        * command (whereas the individual
-				        * assembly routines will most probably
-				        * only be called on each processor
-				        * individually) before any
-				        * can complete it.
-				        */
+                                       /**
+                                        * This function calls the compress()
+                                        * command of all matrices after
+                                        * the assembly is
+                                        * completed. Note that all MPI
+                                        * processes need to call this
+                                        * command (whereas the individual
+                                        * assembly routines will most probably
+                                        * only be called on each processor
+                                        * individually) before any
+                                        * can complete it.
+                                        */
       void compress ();
 
-				       /**
-					* Returns the state of the
-					* matrix, i.e., whether
-					* compress() needs to be called
-					* after an operation requiring
-					* data exchange. Does only
-					* return non-true values when
-					* used in <tt>debug</tt> mode,
-					* since it is quite expensive to
-					* keep track of all operations
-					* that lead to the need for
-					* compress().
-					*/
+                                       /**
+                                        * Returns the state of the
+                                        * matrix, i.e., whether
+                                        * compress() needs to be called
+                                        * after an operation requiring
+                                        * data exchange. Does only
+                                        * return non-true values when
+                                        * used in <tt>debug</tt> mode,
+                                        * since it is quite expensive to
+                                        * keep track of all operations
+                                        * that lead to the need for
+                                        * compress().
+                                        */
       bool is_compressed () const;
 
                                        /**
@@ -323,7 +323,7 @@ namespace TrilinosWrappers
                                         * processor).
                                         */
       void vmult (BlockVector       &dst,
-		  const BlockVector &src) const;
+                  const BlockVector &src) const;
 
                                        /**
                                         * Matrix-vector
@@ -346,7 +346,7 @@ namespace TrilinosWrappers
                                         * processor).
                                         */
       void vmult (BlockVector  &dst,
-		  const Vector &src) const;
+                  const Vector &src) const;
 
                                        /**
                                         * Matrix-vector
@@ -356,7 +356,7 @@ namespace TrilinosWrappers
                                         * only one block row.
                                         */
       void vmult (MPI::Vector            &dst,
-		  const MPI::BlockVector &src) const;
+                  const MPI::BlockVector &src) const;
 
                                        /**
                                         * Matrix-vector
@@ -369,7 +369,7 @@ namespace TrilinosWrappers
                                         * processor).
                                         */
       void vmult (Vector            &dst,
-		  const BlockVector &src) const;
+                  const BlockVector &src) const;
 
                                        /**
                                         * Matrix-vector
@@ -475,21 +475,21 @@ namespace TrilinosWrappers
                                         * Source <i>x</i> and
                                         * destination <i>dst</i> must
                                         * not be the same vector.
-					*
-					* Note that both vectors have
-					* to be distributed vectors
-					* generated using the same Map
-					* as was used for the matrix
-					* in case you work on a
-					* distributed memory
-					* architecture, using the
-					* interface in the
-					* TrilinosWrappers::MPI::BlockVector
-					* class.
+                                        *
+                                        * Note that both vectors have
+                                        * to be distributed vectors
+                                        * generated using the same Map
+                                        * as was used for the matrix
+                                        * in case you work on a
+                                        * distributed memory
+                                        * architecture, using the
+                                        * interface in the
+                                        * TrilinosWrappers::MPI::BlockVector
+                                        * class.
                                         */
       TrilinosScalar residual (MPI::BlockVector       &dst,
-			       const MPI::BlockVector &x,
-			       const MPI::BlockVector &b) const;
+                               const MPI::BlockVector &x,
+                               const MPI::BlockVector &b) const;
 
                                        /**
                                         * Compute the residual of an
@@ -504,26 +504,26 @@ namespace TrilinosWrappers
                                         * Source <i>x</i> and
                                         * destination <i>dst</i> must
                                         * not be the same vector.
-					*
-					* Note that both vectors have
-					* to be distributed vectors
-					* generated using the same Map
-					* as was used for the matrix
-					* in case you work on a
-					* distributed memory
-					* architecture, using the
-					* interface in the
-					* TrilinosWrappers::BlockVector
-					* class. Since the block
-					* matrix is in general
-					* distributed among processes,
-					* this function only works
-					* when running the program on
-					* one processor.
+                                        *
+                                        * Note that both vectors have
+                                        * to be distributed vectors
+                                        * generated using the same Map
+                                        * as was used for the matrix
+                                        * in case you work on a
+                                        * distributed memory
+                                        * architecture, using the
+                                        * interface in the
+                                        * TrilinosWrappers::BlockVector
+                                        * class. Since the block
+                                        * matrix is in general
+                                        * distributed among processes,
+                                        * this function only works
+                                        * when running the program on
+                                        * one processor.
                                         */
       TrilinosScalar residual (BlockVector       &dst,
-			       const BlockVector &x,
-			       const BlockVector &b) const;
+                               const BlockVector &x,
+                               const BlockVector &b) const;
 
                                        /**
                                         * Compute the residual of an
@@ -539,8 +539,8 @@ namespace TrilinosWrappers
                                         * only has one block row.
                                         */
       TrilinosScalar residual (MPI::BlockVector       &dst,
-			       const MPI::Vector      &x,
-			       const MPI::BlockVector &b) const;
+                               const MPI::Vector      &x,
+                               const MPI::BlockVector &b) const;
 
                                        /**
                                         * Compute the residual of an
@@ -556,8 +556,8 @@ namespace TrilinosWrappers
                                         * only has one block row.
                                         */
       TrilinosScalar residual (BlockVector       &dst,
-			       const Vector      &x,
-			       const BlockVector &b) const;
+                               const Vector      &x,
+                               const BlockVector &b) const;
 
                                        /**
                                         * Compute the residual of an
@@ -573,8 +573,8 @@ namespace TrilinosWrappers
                                         * only has one block column.
                                         */
       TrilinosScalar residual (MPI::Vector            &dst,
-			       const MPI::BlockVector &x,
-			       const MPI::Vector      &b) const;
+                               const MPI::BlockVector &x,
+                               const MPI::Vector      &b) const;
 
                                        /**
                                         * Compute the residual of an
@@ -590,8 +590,8 @@ namespace TrilinosWrappers
                                         * only has one block column.
                                         */
       TrilinosScalar residual (Vector            &dst,
-			       const BlockVector &x,
-			       const Vector      &b) const;
+                               const BlockVector &x,
+                               const Vector      &b) const;
 
                                        /**
                                         * Compute the residual of an
@@ -607,8 +607,8 @@ namespace TrilinosWrappers
                                         * only has one block.
                                         */
       TrilinosScalar residual (VectorBase       &dst,
-			       const VectorBase &x,
-			       const VectorBase &b) const;
+                               const VectorBase &x,
+                               const VectorBase &b) const;
 
                                        /**
                                         * Make the clear() function in the
@@ -617,9 +617,9 @@ namespace TrilinosWrappers
                                         */
       using BlockMatrixBase<SparseMatrix>::clear;
 
-				       /** @addtogroup Exceptions
-					* @{
-					*/
+                                       /** @addtogroup Exceptions
+                                        * @{
+                                        */
 
                                        /**
                                         * Exception
@@ -629,14 +629,14 @@ namespace TrilinosWrappers
                       << "The blocks [" << arg1 << ',' << arg2 << "] and ["
                       << arg3 << ',' << arg4 << "] have differing row numbers.");
 
-				       /**
+                                       /**
                                         * Exception
                                         */
       DeclException4 (ExcIncompatibleColNumbers,
                       int, int, int, int,
                       << "The blocks [" << arg1 << ',' << arg2 << "] and ["
                       << arg3 << ',' << arg4 << "] have differing column numbers.");
-				       ///@}
+                                       ///@}
   };
 
 
@@ -655,7 +655,7 @@ namespace TrilinosWrappers
 
     for (unsigned int r=0; r<this->n_block_rows(); ++r)
       for (unsigned int c=0; c<this->n_block_cols(); ++c)
-	this->block(r,c) = d;
+        this->block(r,c) = d;
 
     return *this;
   }
@@ -669,11 +669,11 @@ namespace TrilinosWrappers
     bool compressed = true;
     for (unsigned int row=0; row<n_block_rows(); ++row)
       for (unsigned int col=0; col<n_block_cols(); ++col)
-	if (block(row, col).is_compressed() == false)
-	  {
-	    compressed = false;
-	    break;
-	  }
+        if (block(row, col).is_compressed() == false)
+          {
+            compressed = false;
+            break;
+          }
 
     return compressed;
   }
@@ -683,7 +683,7 @@ namespace TrilinosWrappers
   inline
   void
   BlockSparseMatrix::vmult (MPI::BlockVector       &dst,
-			    const MPI::BlockVector &src) const
+                            const MPI::BlockVector &src) const
   {
     BaseClass::vmult_block_block (dst, src);
   }
@@ -703,7 +703,7 @@ namespace TrilinosWrappers
   inline
   void
   BlockSparseMatrix::vmult (MPI::BlockVector  &dst,
-			    const MPI::Vector &src) const
+                            const MPI::Vector &src) const
   {
     BaseClass::vmult_block_nonblock (dst, src);
   }
@@ -743,7 +743,7 @@ namespace TrilinosWrappers
   inline
   void
   BlockSparseMatrix::vmult (VectorBase       &dst,
-			    const VectorBase &src) const
+                            const VectorBase &src) const
   {
     BaseClass::vmult_nonblock_nonblock (dst, src);
   }
@@ -753,7 +753,7 @@ namespace TrilinosWrappers
   inline
   void
   BlockSparseMatrix::Tvmult (MPI::BlockVector       &dst,
-			     const MPI::BlockVector &src) const
+                             const MPI::BlockVector &src) const
   {
     BaseClass::Tvmult_block_block (dst, src);
   }
@@ -763,7 +763,7 @@ namespace TrilinosWrappers
   inline
   void
   BlockSparseMatrix::Tvmult (BlockVector       &dst,
-			     const BlockVector &src) const
+                             const BlockVector &src) const
   {
     BaseClass::Tvmult_block_block (dst, src);
   }
@@ -773,7 +773,7 @@ namespace TrilinosWrappers
   inline
   void
   BlockSparseMatrix::Tvmult (MPI::BlockVector  &dst,
-			     const MPI::Vector &src) const
+                             const MPI::Vector &src) const
   {
     BaseClass::Tvmult_block_nonblock (dst, src);
   }
@@ -783,7 +783,7 @@ namespace TrilinosWrappers
   inline
   void
   BlockSparseMatrix::Tvmult (BlockVector  &dst,
-			     const Vector &src) const
+                             const Vector &src) const
   {
     BaseClass::Tvmult_block_nonblock (dst, src);
   }
@@ -793,7 +793,7 @@ namespace TrilinosWrappers
   inline
   void
   BlockSparseMatrix::Tvmult (MPI::Vector            &dst,
-			     const MPI::BlockVector &src) const
+                             const MPI::BlockVector &src) const
   {
     BaseClass::Tvmult_nonblock_block (dst, src);
   }
@@ -803,7 +803,7 @@ namespace TrilinosWrappers
   inline
   void
   BlockSparseMatrix::Tvmult (Vector            &dst,
-			     const BlockVector &src) const
+                             const BlockVector &src) const
   {
     BaseClass::Tvmult_nonblock_block (dst, src);
   }
@@ -813,7 +813,7 @@ namespace TrilinosWrappers
   inline
   void
   BlockSparseMatrix::Tvmult (VectorBase       &dst,
-			     const VectorBase &src) const
+                             const VectorBase &src) const
   {
     BaseClass::Tvmult_nonblock_nonblock (dst, src);
   }

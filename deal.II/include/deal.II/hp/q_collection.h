@@ -1,7 +1,7 @@
 //----------------------------  q_collection.h  ----------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,9 +31,9 @@ namespace hp
  *
  * It implements the concepts stated in the @ref hpcollection module described
  * in the doxygen documentation.
- * 
+ *
  * @ingroup hp hpcollection
- * 
+ *
  * @author Oliver Kayser-Herold, 2005
  */
   template <int dim>
@@ -110,7 +110,7 @@ namespace hp
                                         * in this object.
                                         */
       unsigned int size () const;
-    
+
                                        /**
                                         * Return the maximum number of
                                         * quadrature points over all
@@ -125,7 +125,7 @@ namespace hp
                                         * collection.
                                         */
       unsigned int max_n_quadrature_points () const;
-      
+
                                        /**
                                         * Determine an estimate for the
                                         * memory consumption (in bytes)
@@ -137,7 +137,7 @@ namespace hp
                                         * Exception
                                         */
       DeclException0 (ExcNoQuadrature);
-    
+
     private:
                                        /**
                                         * The real container, which stores
@@ -154,7 +154,7 @@ namespace hp
   template <int dim>
   inline
   unsigned int
-  QCollection<dim>::size () const 
+  QCollection<dim>::size () const
   {
     return quadratures.size();
   }
@@ -164,16 +164,16 @@ namespace hp
   template <int dim>
   inline
   unsigned int
-  QCollection<dim>::max_n_quadrature_points () const 
+  QCollection<dim>::max_n_quadrature_points () const
   {
     Assert (quadratures.size() > 0,
             ExcMessage ("You can't call this function for an empty collection"));
-    
+
     unsigned int m = 0;
     for (unsigned int i=0; i<quadratures.size(); ++i)
       if (quadratures[i]->size() > m)
         m = quadratures[i]->size();
-    
+
     return m;
   }
 
@@ -185,7 +185,7 @@ namespace hp
   QCollection<dim>::operator[] (const unsigned int index) const
   {
     Assert (index < quadratures.size (),
-	    ExcIndexRange (index, 0, quadratures.size ()));
+            ExcIndexRange (index, 0, quadratures.size ()));
     return *quadratures[index];
   }
 
@@ -206,7 +206,7 @@ namespace hp
       .push_back (std_cxx1x::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(quadrature)));
   }
 
-  
+
 
   template <int dim>
   inline
@@ -236,7 +236,7 @@ namespace hp
   QCollection<dim>::memory_consumption () const
   {
     return (sizeof(*this) +
-	    MemoryConsumption::memory_consumption (quadratures));
+            MemoryConsumption::memory_consumption (quadratures));
   }
 
 
@@ -248,7 +248,7 @@ namespace hp
     quadratures
       .push_back (std_cxx1x::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(new_quadrature)));
   }
-  
+
 } // namespace hp
 
 

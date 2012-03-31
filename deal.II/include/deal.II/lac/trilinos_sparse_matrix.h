@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,7 +43,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-				 // forward declarations
+                                 // forward declarations
 template <typename MatrixType> class BlockMatrixBase;
 
 template <typename number> class SparseMatrix;
@@ -76,52 +76,52 @@ namespace TrilinosWrappers
     {
       private:
                                        /**
-					* Accessor class for iterators
-					*/
+                                        * Accessor class for iterators
+                                        */
         class Accessor
         {
           public:
                                        /**
-					* Constructor. Since we use
-					* accessors only for read
-					* access, a const matrix
-					* pointer is sufficient.
-					*/
+                                        * Constructor. Since we use
+                                        * accessors only for read
+                                        * access, a const matrix
+                                        * pointer is sufficient.
+                                        */
             Accessor (const SparseMatrix *matrix,
                       const unsigned int  row,
                       const unsigned int  index);
 
                                        /**
-					* Row number of the element
-					* represented by this object.
-					*/
+                                        * Row number of the element
+                                        * represented by this object.
+                                        */
             unsigned int row() const;
 
                                        /**
-					* Index in row of the element
-					* represented by this object.
-					*/
+                                        * Index in row of the element
+                                        * represented by this object.
+                                        */
             unsigned int index() const;
 
                                        /**
-					* Column number of the element
-					* represented by this object.
-					*/
+                                        * Column number of the element
+                                        * represented by this object.
+                                        */
             unsigned int column() const;
 
-	                               /**
-					* Value of this matrix entry.
-					*/
+                                       /**
+                                        * Value of this matrix entry.
+                                        */
             TrilinosScalar value() const;
 
                                        /**
-					* Exception
-					*/
+                                        * Exception
+                                        */
             DeclException0 (ExcBeyondEndOfMatrix);
 
-	                               /**
-					* Exception
-					*/
+                                       /**
+                                        * Exception
+                                        */
             DeclException3 (ExcAccessToNonlocalRow,
                             int, int, int,
                             << "You tried to access row " << arg1
@@ -131,127 +131,127 @@ namespace TrilinosWrappers
 
           private:
                                        /**
-					* The matrix accessed.
-					*/
+                                        * The matrix accessed.
+                                        */
             mutable SparseMatrix *matrix;
 
                                        /**
-					* Current row number.
-					*/
+                                        * Current row number.
+                                        */
             unsigned int a_row;
 
                                        /**
-					* Current index in row.
-					*/
+                                        * Current index in row.
+                                        */
             unsigned int a_index;
 
                                        /**
-					* Cache where we store the
-					* column indices of the
-					* present row. This is
-					* necessary, since Trilinos
-					* makes access to the elements
-					* of its matrices rather hard,
-					* and it is much more
-					* efficient to copy all column
-					* entries of a row once when
-					* we enter it than repeatedly
-					* asking Trilinos for
-					* individual ones. This also
-					* makes some sense since it is
-					* likely that we will access
-					* them sequentially anyway.
-					*
-					* In order to make copying of
-					* iterators/accessor of
-					* acceptable performance, we
-					* keep a shared pointer to
-					* these entries so that more
-					* than one accessor can access
-					* this data if necessary.
-					*/
+                                        * Cache where we store the
+                                        * column indices of the
+                                        * present row. This is
+                                        * necessary, since Trilinos
+                                        * makes access to the elements
+                                        * of its matrices rather hard,
+                                        * and it is much more
+                                        * efficient to copy all column
+                                        * entries of a row once when
+                                        * we enter it than repeatedly
+                                        * asking Trilinos for
+                                        * individual ones. This also
+                                        * makes some sense since it is
+                                        * likely that we will access
+                                        * them sequentially anyway.
+                                        *
+                                        * In order to make copying of
+                                        * iterators/accessor of
+                                        * acceptable performance, we
+                                        * keep a shared pointer to
+                                        * these entries so that more
+                                        * than one accessor can access
+                                        * this data if necessary.
+                                        */
             std_cxx1x::shared_ptr<std::vector<unsigned int> > colnum_cache;
 
                                        /**
-					* Similar cache for the values
-					* of this row.
-					*/
+                                        * Similar cache for the values
+                                        * of this row.
+                                        */
             std_cxx1x::shared_ptr<std::vector<TrilinosScalar> > value_cache;
 
-	                               /**
-					* Discard the old row caches
-					* (they may still be used by
-					* other accessors) and
-					* generate new ones for the
-					* row pointed to presently by
-					* this accessor.
-					*/
+                                       /**
+                                        * Discard the old row caches
+                                        * (they may still be used by
+                                        * other accessors) and
+                                        * generate new ones for the
+                                        * row pointed to presently by
+                                        * this accessor.
+                                        */
             void visit_present_row ();
 
                                        /**
-					* Make enclosing class a
-					* friend.
-					*/
+                                        * Make enclosing class a
+                                        * friend.
+                                        */
             friend class const_iterator;
         };
 
       public:
 
                                        /**
-					* Constructor. Create an
-					* iterator into the matrix @p
-					* matrix for the given row and
-					* the index within it.
-					*/
+                                        * Constructor. Create an
+                                        * iterator into the matrix @p
+                                        * matrix for the given row and
+                                        * the index within it.
+                                        */
         const_iterator (const SparseMatrix *matrix,
                         const unsigned int  row,
                         const unsigned int  index);
 
                                        /**
-					* Prefix increment.
-					*/
+                                        * Prefix increment.
+                                        */
         const_iterator& operator++ ();
 
                                        /**
-					* Postfix increment.
-					*/
+                                        * Postfix increment.
+                                        */
         const_iterator operator++ (int);
 
                                        /**
-					* Dereferencing operator.
-					*/
+                                        * Dereferencing operator.
+                                        */
         const Accessor& operator* () const;
 
                                        /**
-					* Dereferencing operator.
-					*/
+                                        * Dereferencing operator.
+                                        */
         const Accessor* operator-> () const;
 
                                        /**
-					* Comparison. True, if both
-					* iterators point to the same
-					* matrix position.
-					*/
+                                        * Comparison. True, if both
+                                        * iterators point to the same
+                                        * matrix position.
+                                        */
         bool operator == (const const_iterator&) const;
 
                                        /**
-					* Inverse of <tt>==</tt>.
-					*/
+                                        * Inverse of <tt>==</tt>.
+                                        */
         bool operator != (const const_iterator&) const;
 
                                        /**
-					* Comparison operator. Result
-					* is true if either the first
-					* row number is smaller or if
-					* the row numbers are equal
-					* and the first index is
-					* smaller.
-					*/
+                                        * Comparison operator. Result
+                                        * is true if either the first
+                                        * row number is smaller or if
+                                        * the row numbers are equal
+                                        * and the first index is
+                                        * smaller.
+                                        */
         bool operator < (const const_iterator&) const;
 
-	                               /**
+                                       /**
                                         * Exception
-					*/
+                                        */
         DeclException2 (ExcInvalidIndexWithinRow,
                         int, int,
                         << "Attempt to access element " << arg2
@@ -262,7 +262,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Store an object of the
                                         * accessor class.
-					*/
+                                        */
         Accessor accessor;
     };
 
@@ -320,7 +320,7 @@ namespace TrilinosWrappers
                                         * It is safe to elide additions
                                         * of zeros to individual
                                         * elements of this matrix.
-					*/
+                                        */
           static const bool zero_addition_can_be_elided = true;
       };
 
@@ -351,28 +351,28 @@ namespace TrilinosWrappers
                                         * Generate a matrix that is completely
                                         * stored locally, having #m rows and
                                         * #n columns.
-					*
-					* The number of columns entries per
-					* row is specified as the maximum
-					* number of entries argument.
+                                        *
+                                        * The number of columns entries per
+                                        * row is specified as the maximum
+                                        * number of entries argument.
                                         */
       SparseMatrix (const unsigned int  m,
-		    const unsigned int  n,
-		    const unsigned int  n_max_entries_per_row);
+                    const unsigned int  n,
+                    const unsigned int  n_max_entries_per_row);
 
                                        /**
                                         * Generate a matrix that is completely
                                         * stored locally, having #m rows and
                                         * #n columns.
-					*
-					* The vector
-					* <tt>n_entries_per_row</tt>
-					* specifies the number of entries in
-					* each row.
+                                        *
+                                        * The vector
+                                        * <tt>n_entries_per_row</tt>
+                                        * specifies the number of entries in
+                                        * each row.
                                         */
       SparseMatrix (const unsigned int               m,
-		    const unsigned int               n,
-		    const std::vector<unsigned int> &n_entries_per_row);
+                    const unsigned int               n,
+                    const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * Generate a matrix from a Trilinos
@@ -398,97 +398,97 @@ namespace TrilinosWrappers
 
                                        /**
                                         * This function initializes the
-				        * Trilinos matrix with a deal.II
-				        * sparsity pattern, i.e. it makes
-				        * the Trilinos Epetra matrix know
-				        * the position of nonzero entries
-				        * according to the sparsity
-				        * pattern. This function is meant
-				        * for use in serial programs, where
-				        * there is no need to specify how
-				        * the matrix is going to be
-				        * distributed among different
-				        * processors. This function works in
-				        * %parallel, too, but it is
-				        * recommended to manually specify
-				        * the %parallel partioning of the
-				        * matrix using an Epetra_Map. When
-				        * run in %parallel, it is currently
-				        * necessary that each processor
-				        * holds the sparsity_pattern
-				        * structure because each processor
-				        * sets its rows.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        * Trilinos matrix with a deal.II
+                                        * sparsity pattern, i.e. it makes
+                                        * the Trilinos Epetra matrix know
+                                        * the position of nonzero entries
+                                        * according to the sparsity
+                                        * pattern. This function is meant
+                                        * for use in serial programs, where
+                                        * there is no need to specify how
+                                        * the matrix is going to be
+                                        * distributed among different
+                                        * processors. This function works in
+                                        * %parallel, too, but it is
+                                        * recommended to manually specify
+                                        * the %parallel partioning of the
+                                        * matrix using an Epetra_Map. When
+                                        * run in %parallel, it is currently
+                                        * necessary that each processor
+                                        * holds the sparsity_pattern
+                                        * structure because each processor
+                                        * sets its rows.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       template<typename SparsityType>
       void reinit (const SparsityType &sparsity_pattern);
 
-				       /**
-				        * This function reinitializes the
-				        * Trilinos sparse matrix from a
-				        * (possibly distributed) Trilinos
-				        * sparsity pattern.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
-				        */
+                                       /**
+                                        * This function reinitializes the
+                                        * Trilinos sparse matrix from a
+                                        * (possibly distributed) Trilinos
+                                        * sparsity pattern.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
+                                        */
       void reinit (const SparsityPattern &sparsity_pattern);
 
-				       /**
-				        * This function copies the content
-				        * in <tt>sparse_matrix</tt> to the
-				        * calling matrix.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
-				        */
+                                       /**
+                                        * This function copies the content
+                                        * in <tt>sparse_matrix</tt> to the
+                                        * calling matrix.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
+                                        */
       void reinit (const SparseMatrix &sparse_matrix);
 
-				       /**
+                                       /**
                                         * This function initializes the
-				        * Trilinos matrix using the deal.II
-				        * sparse matrix and the entries
-				        * stored therein. It uses a
-				        * threshold to copy only elements
-				        * with modulus larger than the
-				        * threshold (so zeros in the deal.II
-				        * matrix can be filtered away).
-					*
-					* The optional parameter
-					* <tt>copy_values</tt> decides
-					* whether only the sparsity
-					* structure of the input matrix
-					* should be used or the matrix
-					* entries should be copied, too.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        * Trilinos matrix using the deal.II
+                                        * sparse matrix and the entries
+                                        * stored therein. It uses a
+                                        * threshold to copy only elements
+                                        * with modulus larger than the
+                                        * threshold (so zeros in the deal.II
+                                        * matrix can be filtered away).
+                                        *
+                                        * The optional parameter
+                                        * <tt>copy_values</tt> decides
+                                        * whether only the sparsity
+                                        * structure of the input matrix
+                                        * should be used or the matrix
+                                        * entries should be copied, too.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       template <typename number>
       void reinit (const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-		   const double                          drop_tolerance=1e-13,
-		   const bool                            copy_values=true,
-		   const ::dealii::SparsityPattern      *use_this_sparsity=0);
+                   const double                          drop_tolerance=1e-13,
+                   const bool                            copy_values=true,
+                   const ::dealii::SparsityPattern      *use_this_sparsity=0);
 
                                        /**
-					* This reinit function takes as
-					* input a Trilinos Epetra_CrsMatrix
-					* and copies its sparsity
-					* pattern. If so requested, even the
-					* content (values) will be copied.
-					*/
+                                        * This reinit function takes as
+                                        * input a Trilinos Epetra_CrsMatrix
+                                        * and copies its sparsity
+                                        * pattern. If so requested, even the
+                                        * content (values) will be copied.
+                                        */
       void reinit (const Epetra_CrsMatrix &input_matrix,
-		   const bool              copy_values = true);
+                   const bool              copy_values = true);
 //@}
 /**
  * @name Constructors and initialization using an Epetra_Map description
@@ -496,46 +496,46 @@ namespace TrilinosWrappers
 //@{
                                        /**
                                         * Constructor using an Epetra_Map to
-				        * describe the %parallel
-				        * partitioning. The parameter @p
-				        * n_max_entries_per_row sets the
-				        * number of nonzero entries in each
-				        * row that will be allocated. Note
-				        * that this number does not need to
-				        * be exact, and it is even allowed
-				        * that the actual matrix structure
-				        * has more nonzero entries than
-				        * specified in the
-				        * constructor. However it is still
-				        * advantageous to provide good
-				        * estimates here since this will
-				        * considerably increase the
-				        * performance of the matrix
-				        * setup. However, there is no effect
-				        * in the performance of
-				        * matrix-vector products, since
-				        * Trilinos reorganizes the matrix
-				        * memory prior to use (in the
-				        * compress() step).
+                                        * describe the %parallel
+                                        * partitioning. The parameter @p
+                                        * n_max_entries_per_row sets the
+                                        * number of nonzero entries in each
+                                        * row that will be allocated. Note
+                                        * that this number does not need to
+                                        * be exact, and it is even allowed
+                                        * that the actual matrix structure
+                                        * has more nonzero entries than
+                                        * specified in the
+                                        * constructor. However it is still
+                                        * advantageous to provide good
+                                        * estimates here since this will
+                                        * considerably increase the
+                                        * performance of the matrix
+                                        * setup. However, there is no effect
+                                        * in the performance of
+                                        * matrix-vector products, since
+                                        * Trilinos reorganizes the matrix
+                                        * memory prior to use (in the
+                                        * compress() step).
                                         */
       SparseMatrix (const Epetra_Map   &parallel_partitioning,
-		    const unsigned int  n_max_entries_per_row = 0);
+                    const unsigned int  n_max_entries_per_row = 0);
 
                                        /**
                                         * Same as before, but now set a
-				        * value of nonzeros for each matrix
-				        * row. Since we know the number of
-				        * elements in the matrix exactly in
-				        * this case, we can already allocate
-				        * the right amount of memory, which
-				        * makes the creation process
-				        * including the insertion of nonzero
-				        * elements by the respective
-				        * SparseMatrix::reinit call
-				        * considerably faster.
+                                        * value of nonzeros for each matrix
+                                        * row. Since we know the number of
+                                        * elements in the matrix exactly in
+                                        * this case, we can already allocate
+                                        * the right amount of memory, which
+                                        * makes the creation process
+                                        * including the insertion of nonzero
+                                        * elements by the respective
+                                        * SparseMatrix::reinit call
+                                        * considerably faster.
                                         */
       SparseMatrix (const Epetra_Map                &parallel_partitioning,
-		    const std::vector<unsigned int> &n_entries_per_row);
+                    const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * This constructor is similar to the
@@ -560,99 +560,99 @@ namespace TrilinosWrappers
                                         * for internal arragements when
                                         * doing matrix-vector products with
                                         * vectors based on that column map.
-					*
-					* The integer input @p
-					* n_max_entries_per_row defines the
-					* number of columns entries per row
-					* that will be allocated.
+                                        *
+                                        * The integer input @p
+                                        * n_max_entries_per_row defines the
+                                        * number of columns entries per row
+                                        * that will be allocated.
                                         */
       SparseMatrix (const Epetra_Map   &row_parallel_partitioning,
-		    const Epetra_Map   &col_parallel_partitioning,
-		    const unsigned int  n_max_entries_per_row = 0);
+                    const Epetra_Map   &col_parallel_partitioning,
+                    const unsigned int  n_max_entries_per_row = 0);
 
                                        /**
                                         * This constructor is similar to the
-				        * one above, but it now takes two
-				        * different Epetra maps for rows and
-				        * columns. This interface is meant
-				        * to be used for generating
-				        * rectangular matrices, where one
-				        * map specifies the %parallel
-				        * distribution of degrees of freedom
-				        * associated with matrix rows and
-				        * the second one specifies the
-				        * %parallel distribution the dofs
-				        * associated with columns in the
-				        * matrix. The second map also
-				        * provides information for the
-				        * internal arrangement in matrix
-				        * vector products (i.e., the
-				        * distribution of vector this matrix
-				        * is to be multiplied with), but is
-				        * not used for the distribution of
-				        * the columns &ndash; rather, all
-				        * column elements of a row are
-				        * stored on the same processor in
-				        * any case. The vector
-				        * <tt>n_entries_per_row</tt>
-				        * specifies the number of entries in
-				        * each row of the newly generated
-				        * matrix.
+                                        * one above, but it now takes two
+                                        * different Epetra maps for rows and
+                                        * columns. This interface is meant
+                                        * to be used for generating
+                                        * rectangular matrices, where one
+                                        * map specifies the %parallel
+                                        * distribution of degrees of freedom
+                                        * associated with matrix rows and
+                                        * the second one specifies the
+                                        * %parallel distribution the dofs
+                                        * associated with columns in the
+                                        * matrix. The second map also
+                                        * provides information for the
+                                        * internal arrangement in matrix
+                                        * vector products (i.e., the
+                                        * distribution of vector this matrix
+                                        * is to be multiplied with), but is
+                                        * not used for the distribution of
+                                        * the columns &ndash; rather, all
+                                        * column elements of a row are
+                                        * stored on the same processor in
+                                        * any case. The vector
+                                        * <tt>n_entries_per_row</tt>
+                                        * specifies the number of entries in
+                                        * each row of the newly generated
+                                        * matrix.
                                         */
       SparseMatrix (const Epetra_Map                &row_parallel_partitioning,
-		    const Epetra_Map                &col_parallel_partitioning,
-		    const std::vector<unsigned int> &n_entries_per_row);
+                    const Epetra_Map                &col_parallel_partitioning,
+                    const std::vector<unsigned int> &n_entries_per_row);
 
-				       /**
+                                       /**
                                         * This function is initializes the
-				        * Trilinos Epetra matrix according to
-				        * the specified sparsity_pattern, and
-				        * also reassigns the matrix rows to
-				        * different processes according to a
-				        * user-supplied Epetra map. In
-				        * programs following the style of the
-				        * tutorial programs, this function
-				        * (and the respective call for a
-				        * rectangular matrix) are the natural
-				        * way to initialize the matrix size,
-				        * its distribution among the MPI
-				        * processes (if run in %parallel) as
-				        * well as the locatoin of non-zero
-				        * elements. Trilinos stores the
-				        * sparsity pattern internally, so it
-				        * won't be needed any more after this
-				        * call, in contrast to the deal.II own
-				        * object. The optional argument @p
-				        * exchange_data can be used for
-				        * reinitialization with a sparsity
-				        * pattern that is not fully
-				        * constructed. This feature is only
-				        * implemented for input sparsity
-				        * patterns of type
-				        * CompressedSimpleSparsityPattern. If
-				        * the flag is not set, each processor
-				        * just sets the elements in the
-				        * sparsity pattern that belong to its
-				        * rows.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        * Trilinos Epetra matrix according to
+                                        * the specified sparsity_pattern, and
+                                        * also reassigns the matrix rows to
+                                        * different processes according to a
+                                        * user-supplied Epetra map. In
+                                        * programs following the style of the
+                                        * tutorial programs, this function
+                                        * (and the respective call for a
+                                        * rectangular matrix) are the natural
+                                        * way to initialize the matrix size,
+                                        * its distribution among the MPI
+                                        * processes (if run in %parallel) as
+                                        * well as the locatoin of non-zero
+                                        * elements. Trilinos stores the
+                                        * sparsity pattern internally, so it
+                                        * won't be needed any more after this
+                                        * call, in contrast to the deal.II own
+                                        * object. The optional argument @p
+                                        * exchange_data can be used for
+                                        * reinitialization with a sparsity
+                                        * pattern that is not fully
+                                        * constructed. This feature is only
+                                        * implemented for input sparsity
+                                        * patterns of type
+                                        * CompressedSimpleSparsityPattern. If
+                                        * the flag is not set, each processor
+                                        * just sets the elements in the
+                                        * sparsity pattern that belong to its
+                                        * rows.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       template<typename SparsityType>
       void reinit (const Epetra_Map    &parallel_partitioning,
-		   const SparsityType  &sparsity_pattern,
-		   const bool          exchange_data = false);
+                   const SparsityType  &sparsity_pattern,
+                   const bool          exchange_data = false);
 
-				       /**
+                                       /**
                                         * This function is similar to the
-				        * other initialization function
-				        * above, but now also reassigns the
-				        * matrix rows and columns according
-				        * to two user-supplied Epetra maps.
-				        * To be used for rectangular
-				        * matrices. The optional argument @p
+                                        * other initialization function
+                                        * above, but now also reassigns the
+                                        * matrix rows and columns according
+                                        * to two user-supplied Epetra maps.
+                                        * To be used for rectangular
+                                        * matrices. The optional argument @p
                                         * exchange_data can be used for
                                         * reinitialization with a sparsity
                                         * pattern that is not fully
@@ -660,81 +660,81 @@ namespace TrilinosWrappers
                                         * implemented for input sparsity
                                         * patterns of type
                                         * CompressedSimpleSparsityPattern.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       template<typename SparsityType>
       void reinit (const Epetra_Map    &row_parallel_partitioning,
-		   const Epetra_Map    &col_parallel_partitioning,
-		   const SparsityType  &sparsity_pattern,
-		   const bool          exchange_data = false);
+                   const Epetra_Map    &col_parallel_partitioning,
+                   const SparsityType  &sparsity_pattern,
+                   const bool          exchange_data = false);
 
-				       /**
+                                       /**
                                         * This function initializes the
-				        * Trilinos matrix using the deal.II
-				        * sparse matrix and the entries
-				        * stored therein. It uses a
-				        * threshold to copy only elements
-				        * with modulus larger than the
-				        * threshold (so zeros in the deal.II
-				        * matrix can be filtered away). In
-				        * contrast to the other reinit
-				        * function with deal.II sparse
-				        * matrix argument, this function
-				        * takes a %parallel partitioning
-				        * specified by the user instead of
-				        * internally generating it.
-					*
-					* The optional parameter
-					* <tt>copy_values</tt> decides
-					* whether only the sparsity
-					* structure of the input matrix
-					* should be used or the matrix
-					* entries should be copied, too.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        * Trilinos matrix using the deal.II
+                                        * sparse matrix and the entries
+                                        * stored therein. It uses a
+                                        * threshold to copy only elements
+                                        * with modulus larger than the
+                                        * threshold (so zeros in the deal.II
+                                        * matrix can be filtered away). In
+                                        * contrast to the other reinit
+                                        * function with deal.II sparse
+                                        * matrix argument, this function
+                                        * takes a %parallel partitioning
+                                        * specified by the user instead of
+                                        * internally generating it.
+                                        *
+                                        * The optional parameter
+                                        * <tt>copy_values</tt> decides
+                                        * whether only the sparsity
+                                        * structure of the input matrix
+                                        * should be used or the matrix
+                                        * entries should be copied, too.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       template <typename number>
       void reinit (const Epetra_Map                     &parallel_partitioning,
-		   const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-		   const double                          drop_tolerance=1e-13,
-		   const bool                            copy_values=true,
-		   const ::dealii::SparsityPattern      *use_this_sparsity=0);
+                   const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+                   const double                          drop_tolerance=1e-13,
+                   const bool                            copy_values=true,
+                   const ::dealii::SparsityPattern      *use_this_sparsity=0);
 
- 				       /**
+                                       /**
                                         * This function is similar to the
-				        * other initialization function with
-				        * deal.II sparse matrix input above,
-				        * but now takes Epetra maps for both
-				        * the rows and the columns of the
-				        * matrix. Chosen for rectangular
-				        * matrices.
-					*
-					* The optional parameter
-					* <tt>copy_values</tt> decides
-					* whether only the sparsity
-					* structure of the input matrix
-					* should be used or the matrix
-					* entries should be copied, too.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        * other initialization function with
+                                        * deal.II sparse matrix input above,
+                                        * but now takes Epetra maps for both
+                                        * the rows and the columns of the
+                                        * matrix. Chosen for rectangular
+                                        * matrices.
+                                        *
+                                        * The optional parameter
+                                        * <tt>copy_values</tt> decides
+                                        * whether only the sparsity
+                                        * structure of the input matrix
+                                        * should be used or the matrix
+                                        * entries should be copied, too.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       template <typename number>
       void reinit (const Epetra_Map                      &row_parallel_partitioning,
-		   const Epetra_Map                      &col_parallel_partitioning,
-		   const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
-		   const double                           drop_tolerance=1e-13,
-		   const bool                             copy_values=true,
-		   const ::dealii::SparsityPattern      *use_this_sparsity=0);
+                   const Epetra_Map                      &col_parallel_partitioning,
+                   const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
+                   const double                           drop_tolerance=1e-13,
+                   const bool                             copy_values=true,
+                   const ::dealii::SparsityPattern      *use_this_sparsity=0);
 //@}
 /**
  * @name Constructors and initialization using an IndexSet description
@@ -742,254 +742,254 @@ namespace TrilinosWrappers
 //@{
                                        /**
                                         * Constructor using an IndexSet and
-				        * an MPI communicator to describe
-				        * the %parallel partitioning. The
-				        * parameter @p n_max_entries_per_row
-				        * sets the number of nonzero entries
-				        * in each row that will be
-				        * allocated. Note that this number
-				        * does not need to be exact, and it
-				        * is even allowed that the actual
-				        * matrix structure has more nonzero
-				        * entries than specified in the
-				        * constructor. However it is still
-				        * advantageous to provide good
-				        * estimates here since this will
-				        * considerably increase the
-				        * performance of the matrix
-				        * setup. However, there is no effect
-				        * in the performance of
-				        * matrix-vector products, since
-				        * Trilinos reorganizes the matrix
-				        * memory prior to use (in the
-				        * compress() step).
+                                        * an MPI communicator to describe
+                                        * the %parallel partitioning. The
+                                        * parameter @p n_max_entries_per_row
+                                        * sets the number of nonzero entries
+                                        * in each row that will be
+                                        * allocated. Note that this number
+                                        * does not need to be exact, and it
+                                        * is even allowed that the actual
+                                        * matrix structure has more nonzero
+                                        * entries than specified in the
+                                        * constructor. However it is still
+                                        * advantageous to provide good
+                                        * estimates here since this will
+                                        * considerably increase the
+                                        * performance of the matrix
+                                        * setup. However, there is no effect
+                                        * in the performance of
+                                        * matrix-vector products, since
+                                        * Trilinos reorganizes the matrix
+                                        * memory prior to use (in the
+                                        * compress() step).
                                         */
       SparseMatrix (const IndexSet     &parallel_partitioning,
-		    const MPI_Comm     &communicator = MPI_COMM_WORLD,
-		    const unsigned int  n_max_entries_per_row = 0);
+                    const MPI_Comm     &communicator = MPI_COMM_WORLD,
+                    const unsigned int  n_max_entries_per_row = 0);
 
                                        /**
                                         * Same as before, but now set the
-				        * number of nonzeros in each matrix
-				        * row separately. Since we know the
-				        * number of elements in the matrix
-				        * exactly in this case, we can
-				        * already allocate the right amount
-				        * of memory, which makes the
-				        * creation process including the
-				        * insertion of nonzero elements by
-				        * the respective
-				        * SparseMatrix::reinit call
-				        * considerably faster.
+                                        * number of nonzeros in each matrix
+                                        * row separately. Since we know the
+                                        * number of elements in the matrix
+                                        * exactly in this case, we can
+                                        * already allocate the right amount
+                                        * of memory, which makes the
+                                        * creation process including the
+                                        * insertion of nonzero elements by
+                                        * the respective
+                                        * SparseMatrix::reinit call
+                                        * considerably faster.
                                         */
       SparseMatrix (const IndexSet                  &parallel_partitioning,
-		    const MPI_Comm                  &communicator,
-		    const std::vector<unsigned int> &n_entries_per_row);
-
-				       /**
-					* This constructor is similar to the
-					* one above, but it now takes two
-					* different IndexSet partitions for
-					* row and columns. This interface is
-					* meant to be used for generating
-					* rectangular matrices, where the
-					* first index set describes the
-					* %parallel partitioning of the
-					* degrees of freedom associated with
-					* the matrix rows and the second one
-					* the partitioning of the matrix
-					* columns. The second index set
-					* specifies the partitioning of the
-					* vectors this matrix is to be
-					* multiplied with, not the
-					* distribution of the elements that
-					* actually appear in the matrix.
-					*
-					* The parameter @p
-					* n_max_entries_per_row defines how
-					* much memory will be allocated for
-					* each row. This number does not
-					* need to be accurate, as the
-					* structure is reorganized in the
-					* compress() call.
-                                        */
-      SparseMatrix (const IndexSet     &row_parallel_partitioning,
-		    const IndexSet     &col_parallel_partitioning,
-		    const MPI_Comm     &communicator = MPI_COMM_WORLD,
-		    const unsigned int  n_max_entries_per_row = 0);
+                    const MPI_Comm                  &communicator,
+                    const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * This constructor is similar to the
-				        * one above, but it now takes two
-				        * different Epetra maps for rows and
-				        * columns. This interface is meant
-				        * to be used for generating
-				        * rectangular matrices, where one
-				        * map specifies the %parallel
-				        * distribution of degrees of freedom
-				        * associated with matrix rows and
-				        * the second one specifies the
-				        * %parallel distribution the dofs
-				        * associated with columns in the
-				        * matrix. The second map also
-				        * provides information for the
-				        * internal arrangement in matrix
-				        * vector products (i.e., the
-				        * distribution of vector this matrix
-				        * is to be multiplied with), but is
-				        * not used for the distribution of
-				        * the columns &ndash; rather, all
-				        * column elements of a row are
-				        * stored on the same processor in
-				        * any case. The vector
-				        * <tt>n_entries_per_row</tt>
-				        * specifies the number of entries in
-				        * each row of the newly generated
-				        * matrix.
+                                        * one above, but it now takes two
+                                        * different IndexSet partitions for
+                                        * row and columns. This interface is
+                                        * meant to be used for generating
+                                        * rectangular matrices, where the
+                                        * first index set describes the
+                                        * %parallel partitioning of the
+                                        * degrees of freedom associated with
+                                        * the matrix rows and the second one
+                                        * the partitioning of the matrix
+                                        * columns. The second index set
+                                        * specifies the partitioning of the
+                                        * vectors this matrix is to be
+                                        * multiplied with, not the
+                                        * distribution of the elements that
+                                        * actually appear in the matrix.
+                                        *
+                                        * The parameter @p
+                                        * n_max_entries_per_row defines how
+                                        * much memory will be allocated for
+                                        * each row. This number does not
+                                        * need to be accurate, as the
+                                        * structure is reorganized in the
+                                        * compress() call.
+                                        */
+      SparseMatrix (const IndexSet     &row_parallel_partitioning,
+                    const IndexSet     &col_parallel_partitioning,
+                    const MPI_Comm     &communicator = MPI_COMM_WORLD,
+                    const unsigned int  n_max_entries_per_row = 0);
+
+                                       /**
+                                        * This constructor is similar to the
+                                        * one above, but it now takes two
+                                        * different Epetra maps for rows and
+                                        * columns. This interface is meant
+                                        * to be used for generating
+                                        * rectangular matrices, where one
+                                        * map specifies the %parallel
+                                        * distribution of degrees of freedom
+                                        * associated with matrix rows and
+                                        * the second one specifies the
+                                        * %parallel distribution the dofs
+                                        * associated with columns in the
+                                        * matrix. The second map also
+                                        * provides information for the
+                                        * internal arrangement in matrix
+                                        * vector products (i.e., the
+                                        * distribution of vector this matrix
+                                        * is to be multiplied with), but is
+                                        * not used for the distribution of
+                                        * the columns &ndash; rather, all
+                                        * column elements of a row are
+                                        * stored on the same processor in
+                                        * any case. The vector
+                                        * <tt>n_entries_per_row</tt>
+                                        * specifies the number of entries in
+                                        * each row of the newly generated
+                                        * matrix.
                                         */
       SparseMatrix (const IndexSet                  &row_parallel_partitioning,
-		    const IndexSet                  &col_parallel_partitioning,
-		    const MPI_Comm                  &communicator,
-		    const std::vector<unsigned int> &n_entries_per_row);
+                    const IndexSet                  &col_parallel_partitioning,
+                    const MPI_Comm                  &communicator,
+                    const std::vector<unsigned int> &n_entries_per_row);
 
-				       /**
+                                       /**
                                         * This function is initializes the
-				        * Trilinos Epetra matrix according
-				        * to the specified sparsity_pattern,
-				        * and also reassigns the matrix rows
-				        * to different processes according
-				        * to a user-supplied index set and
-				        * %parallel communicator. In
-				        * programs following the style of
-				        * the tutorial programs, this
-				        * function (and the respective call
-				        * for a rectangular matrix) are the
-				        * natural way to initialize the
-				        * matrix size, its distribution
-				        * among the MPI processes (if run in
-				        * %parallel) as well as the locatoin
-				        * of non-zero elements. Trilinos
-				        * stores the sparsity pattern
-				        * internally, so it won't be needed
-				        * any more after this call, in
-				        * contrast to the deal.II own
-				        * object. The optional argument @p
-				        * exchange_data can be used for
-				        * reinitialization with a sparsity
-				        * pattern that is not fully
-				        * constructed. This feature is only
-				        * implemented for input sparsity
-				        * patterns of type
-				        * CompressedSimpleSparsityPattern. If
-				        * the flag is not set, each
-				        * processor just sets the elements
-				        * in the sparsity pattern that
-				        * belong to its rows.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        * Trilinos Epetra matrix according
+                                        * to the specified sparsity_pattern,
+                                        * and also reassigns the matrix rows
+                                        * to different processes according
+                                        * to a user-supplied index set and
+                                        * %parallel communicator. In
+                                        * programs following the style of
+                                        * the tutorial programs, this
+                                        * function (and the respective call
+                                        * for a rectangular matrix) are the
+                                        * natural way to initialize the
+                                        * matrix size, its distribution
+                                        * among the MPI processes (if run in
+                                        * %parallel) as well as the locatoin
+                                        * of non-zero elements. Trilinos
+                                        * stores the sparsity pattern
+                                        * internally, so it won't be needed
+                                        * any more after this call, in
+                                        * contrast to the deal.II own
+                                        * object. The optional argument @p
+                                        * exchange_data can be used for
+                                        * reinitialization with a sparsity
+                                        * pattern that is not fully
+                                        * constructed. This feature is only
+                                        * implemented for input sparsity
+                                        * patterns of type
+                                        * CompressedSimpleSparsityPattern. If
+                                        * the flag is not set, each
+                                        * processor just sets the elements
+                                        * in the sparsity pattern that
+                                        * belong to its rows.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       template<typename SparsityType>
       void reinit (const IndexSet      &parallel_partitioning,
-		   const SparsityType  &sparsity_pattern,
-		   const MPI_Comm      &communicator = MPI_COMM_WORLD,
-		   const bool           exchange_data = false);
+                   const SparsityType  &sparsity_pattern,
+                   const MPI_Comm      &communicator = MPI_COMM_WORLD,
+                   const bool           exchange_data = false);
 
-				       /**
+                                       /**
                                         * This function is similar to the
-				        * other initialization function
-				        * above, but now also reassigns the
-				        * matrix rows and columns according
-				        * to two user-supplied index sets.
-				        * To be used for rectangular
-				        * matrices. The optional argument @p
-				        * exchange_data can be used for
-				        * reinitialization with a sparsity
-				        * pattern that is not fully
-				        * constructed. This feature is only
-				        * implemented for input sparsity
-				        * patterns of type
-				        * CompressedSimpleSparsityPattern.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        * other initialization function
+                                        * above, but now also reassigns the
+                                        * matrix rows and columns according
+                                        * to two user-supplied index sets.
+                                        * To be used for rectangular
+                                        * matrices. The optional argument @p
+                                        * exchange_data can be used for
+                                        * reinitialization with a sparsity
+                                        * pattern that is not fully
+                                        * constructed. This feature is only
+                                        * implemented for input sparsity
+                                        * patterns of type
+                                        * CompressedSimpleSparsityPattern.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       template<typename SparsityType>
       void reinit (const IndexSet      &row_parallel_partitioning,
-		   const IndexSet      &col_parallel_partitioning,
-		   const SparsityType  &sparsity_pattern,
-		   const MPI_Comm      &communicator = MPI_COMM_WORLD,
-		   const bool           exchange_data = false);
+                   const IndexSet      &col_parallel_partitioning,
+                   const SparsityType  &sparsity_pattern,
+                   const MPI_Comm      &communicator = MPI_COMM_WORLD,
+                   const bool           exchange_data = false);
 
-				       /**
+                                       /**
                                         * This function initializes the
-				        * Trilinos matrix using the deal.II
-				        * sparse matrix and the entries
-				        * stored therein. It uses a
-				        * threshold to copy only elements
-				        * with modulus larger than the
-				        * threshold (so zeros in the deal.II
-				        * matrix can be filtered away). In
-				        * contrast to the other reinit
-				        * function with deal.II sparse
-				        * matrix argument, this function
-				        * takes a %parallel partitioning
-				        * specified by the user instead of
-				        * internally generating it.
-					*
-					* The optional parameter
-					* <tt>copy_values</tt> decides
-					* whether only the sparsity
-					* structure of the input matrix
-					* should be used or the matrix
-					* entries should be copied, too.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        * Trilinos matrix using the deal.II
+                                        * sparse matrix and the entries
+                                        * stored therein. It uses a
+                                        * threshold to copy only elements
+                                        * with modulus larger than the
+                                        * threshold (so zeros in the deal.II
+                                        * matrix can be filtered away). In
+                                        * contrast to the other reinit
+                                        * function with deal.II sparse
+                                        * matrix argument, this function
+                                        * takes a %parallel partitioning
+                                        * specified by the user instead of
+                                        * internally generating it.
+                                        *
+                                        * The optional parameter
+                                        * <tt>copy_values</tt> decides
+                                        * whether only the sparsity
+                                        * structure of the input matrix
+                                        * should be used or the matrix
+                                        * entries should be copied, too.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       template <typename number>
       void reinit (const IndexSet                       &parallel_partitioning,
-		   const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-		   const MPI_Comm                       &communicator = MPI_COMM_WORLD,
-		   const double                          drop_tolerance=1e-13,
-		   const bool                            copy_values=true,
-		   const ::dealii::SparsityPattern      *use_this_sparsity=0);
+                   const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+                   const MPI_Comm                       &communicator = MPI_COMM_WORLD,
+                   const double                          drop_tolerance=1e-13,
+                   const bool                            copy_values=true,
+                   const ::dealii::SparsityPattern      *use_this_sparsity=0);
 
- 				       /**
+                                       /**
                                         * This function is similar to the
-				        * other initialization function with
-				        * deal.II sparse matrix input above,
-				        * but now takes index sets for both
-				        * the rows and the columns of the
-				        * matrix. Chosen for rectangular
-				        * matrices.
-					*
-					* The optional parameter
-					* <tt>copy_values</tt> decides
-					* whether only the sparsity
-					* structure of the input matrix
-					* should be used or the matrix
-					* entries should be copied, too.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        * other initialization function with
+                                        * deal.II sparse matrix input above,
+                                        * but now takes index sets for both
+                                        * the rows and the columns of the
+                                        * matrix. Chosen for rectangular
+                                        * matrices.
+                                        *
+                                        * The optional parameter
+                                        * <tt>copy_values</tt> decides
+                                        * whether only the sparsity
+                                        * structure of the input matrix
+                                        * should be used or the matrix
+                                        * entries should be copied, too.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       template <typename number>
       void reinit (const IndexSet                        &row_parallel_partitioning,
-		   const IndexSet                        &col_parallel_partitioning,
-		   const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
-		   const MPI_Comm                        &communicator = MPI_COMM_WORLD,
-		   const double                           drop_tolerance=1e-13,
-		   const bool                             copy_values=true,
-		   const ::dealii::SparsityPattern      *use_this_sparsity=0);
+                   const IndexSet                        &col_parallel_partitioning,
+                   const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
+                   const MPI_Comm                        &communicator = MPI_COMM_WORLD,
+                   const double                           drop_tolerance=1e-13,
+                   const bool                             copy_values=true,
+                   const ::dealii::SparsityPattern      *use_this_sparsity=0);
 //@}
 /**
  * @name Information on the matrix
@@ -1017,37 +1017,37 @@ namespace TrilinosWrappers
                                         * number is the same as m(),
                                         * but for %parallel matrices it
                                         * may be smaller.
-					*
-					* To figure out which elements
-					* exactly are stored locally,
-					* use local_range().
+                                        *
+                                        * To figure out which elements
+                                        * exactly are stored locally,
+                                        * use local_range().
                                         */
       unsigned int local_size () const;
 
                                        /**
-					* Return a pair of indices
-					* indicating which rows of
-					* this matrix are stored
-					* locally. The first number is
-					* the index of the first row
-					* stored, the second the index
-					* of the one past the last one
-					* that is stored locally. If
-					* this is a sequential matrix,
-					* then the result will be the
-					* pair (0,m()), otherwise it
-					* will be a pair (i,i+n),
-					* where
-					* <tt>n=local_size()</tt>.
-					*/
+                                        * Return a pair of indices
+                                        * indicating which rows of
+                                        * this matrix are stored
+                                        * locally. The first number is
+                                        * the index of the first row
+                                        * stored, the second the index
+                                        * of the one past the last one
+                                        * that is stored locally. If
+                                        * this is a sequential matrix,
+                                        * then the result will be the
+                                        * pair (0,m()), otherwise it
+                                        * will be a pair (i,i+n),
+                                        * where
+                                        * <tt>n=local_size()</tt>.
+                                        */
       std::pair<unsigned int, unsigned int>
-	local_range () const;
+        local_range () const;
 
-				       /**
-					* Return whether @p index is
-					* in the local range or not,
-					* see also local_range().
-					*/
+                                       /**
+                                        * Return whether @p index is
+                                        * in the local range or not,
+                                        * see also local_range().
+                                        */
       bool in_local_range (const unsigned int index) const;
 
                                        /**
@@ -1062,25 +1062,25 @@ namespace TrilinosWrappers
                                         */
       unsigned int row_length (const unsigned int row) const;
 
-				       /**
-					* Returns the state of the matrix,
-					* i.e., whether compress() needs to
-					* be called after an operation
-					* requiring data exchange. A call to
-					* compress() is also needed when the
-					* method set() has been called (even
-					* when working in serial).
-					*/
+                                       /**
+                                        * Returns the state of the matrix,
+                                        * i.e., whether compress() needs to
+                                        * be called after an operation
+                                        * requiring data exchange. A call to
+                                        * compress() is also needed when the
+                                        * method set() has been called (even
+                                        * when working in serial).
+                                        */
       bool is_compressed () const;
 
-				       /**
-					* Determine an estimate for the memory
-					* consumption (in bytes) of this
-					* object. Note that only the memory
-					* reserved on the current processor is
-					* returned in case this is called in
-					* an MPI-based program.
-					*/
+                                       /**
+                                        * Determine an estimate for the memory
+                                        * consumption (in bytes) of this
+                                        * object. Note that only the memory
+                                        * reserved on the current processor is
+                                        * returned in case this is called in
+                                        * an MPI-based program.
+                                        */
       std::size_t memory_consumption () const;
 
 //@}
@@ -1106,51 +1106,51 @@ namespace TrilinosWrappers
                                         * previously used.
                                         */
       SparseMatrix &
-	operator = (const double d);
+        operator = (const double d);
 
                                        /**
                                         * Release all memory and return to a
                                         * state just like after having
                                         * called the default constructor.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+                                        *
+                                        * This is a collective operation
+                                        * that needs to be called on all
+                                        * processors in order to avoid a
+                                        * dead lock.
                                         */
       void clear ();
 
                                        /**
-					* This command does two things:
-					* <ul>
-					* <li> If the matrix was initialized
-					* without a sparsity pattern,
-					* elements have been added manually
-					* using the set() command. When this
-					* process is completed, a call to
-					* compress() reorganizes the
-					* internal data structures (aparsity
-					* pattern) so that a fast access to
-					* data is possible in matrix-vector
-					* products.
-					* <li> If the matrix structure has
-					* already been fixed (either by
-					* initialization with a sparsity
-					* pattern or by calling compress()
-					* during the setup phase), this
-					* command does the %parallel
-					* exchange of data. This is
-					* necessary when we perform assembly
-					* on more than one (MPI) process,
-					* because then some non-local row
-					* data will accumulate on nodes that
-					* belong to the current's processor
-					* element, but are actually held by
-					* another. This command is usually
-					* called after all elements have
-					* been traversed.
-					* </ul>
-					*
+                                        * This command does two things:
+                                        * <ul>
+                                        * <li> If the matrix was initialized
+                                        * without a sparsity pattern,
+                                        * elements have been added manually
+                                        * using the set() command. When this
+                                        * process is completed, a call to
+                                        * compress() reorganizes the
+                                        * internal data structures (aparsity
+                                        * pattern) so that a fast access to
+                                        * data is possible in matrix-vector
+                                        * products.
+                                        * <li> If the matrix structure has
+                                        * already been fixed (either by
+                                        * initialization with a sparsity
+                                        * pattern or by calling compress()
+                                        * during the setup phase), this
+                                        * command does the %parallel
+                                        * exchange of data. This is
+                                        * necessary when we perform assembly
+                                        * on more than one (MPI) process,
+                                        * because then some non-local row
+                                        * data will accumulate on nodes that
+                                        * belong to the current's processor
+                                        * element, but are actually held by
+                                        * another. This command is usually
+                                        * called after all elements have
+                                        * been traversed.
+                                        * </ul>
+                                        *
                                         * In both cases, this function
                                         * compresses the data structures and
                                         * allows the resulting matrix to be
@@ -1159,38 +1159,38 @@ namespace TrilinosWrappers
                                         * collective operation, i.e., it
                                         * needs to be run on all processors
                                         * when used in %parallel.
-					*
-					* See @ref GlossCompress "Compressing distributed objects"
-					* for more information.
+                                        *
+                                        * See @ref GlossCompress "Compressing distributed objects"
+                                        * for more information.
                                         */
       void compress ();
 
                                        /**
                                         * Set the element (<i>i,j</i>)
                                         * to @p value.
-					*
-					* This function is able to insert new
-					* elements into the matrix as long as
-					* compress() has not been called, so
-					* the sparsity pattern will be
-					* extended. When compress() is called
-					* for the first time, then this is no
-					* longer possible and an insertion of
-					* elements at positions which have not
-					* been initialized will throw an
-					* exception. Note that in case
-					* elements need to be inserted, it is
-					* mandatory that elements are inserted
-					* only once. Otherwise, the elements
-					* will actually be added in the end
-					* (since it is not possible to
-					* efficiently find values to the same
-					* entry before compress() has been
-					* called). In the case that an element
-					* is set more than once, initialize
-					* the matrix with a sparsity pattern
-					* first.
-					*/
+                                        *
+                                        * This function is able to insert new
+                                        * elements into the matrix as long as
+                                        * compress() has not been called, so
+                                        * the sparsity pattern will be
+                                        * extended. When compress() is called
+                                        * for the first time, then this is no
+                                        * longer possible and an insertion of
+                                        * elements at positions which have not
+                                        * been initialized will throw an
+                                        * exception. Note that in case
+                                        * elements need to be inserted, it is
+                                        * mandatory that elements are inserted
+                                        * only once. Otherwise, the elements
+                                        * will actually be added in the end
+                                        * (since it is not possible to
+                                        * efficiently find values to the same
+                                        * entry before compress() has been
+                                        * called). In the case that an element
+                                        * is set more than once, initialize
+                                        * the matrix with a sparsity pattern
+                                        * first.
+                                        */
       void set (const unsigned int i,
                 const unsigned int j,
                 const TrilinosScalar value);
@@ -1210,30 +1210,30 @@ namespace TrilinosWrappers
                                         * quadratic sparse matrix and a
                                         * quadratic full_matrix, the usual
                                         * situation in FE calculations.
-					*
-					* This function is able to insert
-					* new elements into the matrix as
-					* long as compress() has not been
-					* called, so the sparsity pattern
-					* will be extended. When compress()
-					* is called for the first time, then
-					* this is no longer possible and an
-					* insertion of elements at positions
-					* which have not been initialized
-					* will throw an exception.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be inserted anyway
-					* or they should be filtered
-					* away. The default value is
-					* <tt>false</tt>, i.e., even zero
-					* values are inserted/replaced.
-					*/
+                                        *
+                                        * This function is able to insert
+                                        * new elements into the matrix as
+                                        * long as compress() has not been
+                                        * called, so the sparsity pattern
+                                        * will be extended. When compress()
+                                        * is called for the first time, then
+                                        * this is no longer possible and an
+                                        * insertion of elements at positions
+                                        * which have not been initialized
+                                        * will throw an exception.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be inserted anyway
+                                        * or they should be filtered
+                                        * away. The default value is
+                                        * <tt>false</tt>, i.e., even zero
+                                        * values are inserted/replaced.
+                                        */
       void set (const std::vector<unsigned int>  &indices,
-		const FullMatrix<TrilinosScalar> &full_matrix,
-		const bool                        elide_zero_values = false);
+                const FullMatrix<TrilinosScalar> &full_matrix,
+                const bool                        elide_zero_values = false);
 
                                        /**
                                         * Same function as before, but now
@@ -1241,11 +1241,11 @@ namespace TrilinosWrappers
                                         * rectangular full_matrices and
                                         * different local-to-global indexing
                                         * on rows and columns, respectively.
-					*/
+                                        */
       void set (const std::vector<unsigned int>  &row_indices,
-		const std::vector<unsigned int>  &col_indices,
-		const FullMatrix<TrilinosScalar> &full_matrix,
-		const bool                        elide_zero_values = false);
+                const std::vector<unsigned int>  &col_indices,
+                const FullMatrix<TrilinosScalar> &full_matrix,
+                const bool                        elide_zero_values = false);
 
                                        /**
                                         * Set several elements in the
@@ -1253,31 +1253,31 @@ namespace TrilinosWrappers
                                         * column indices as given by
                                         * <tt>col_indices</tt> to the
                                         * respective value.
-					*
-					* This function is able to insert
-					* new elements into the matrix as
-					* long as compress() has not been
-					* called, so the sparsity pattern
-					* will be extended. When compress()
-					* is called for the first time, then
-					* this is no longer possible and an
-					* insertion of elements at positions
-					* which have not been initialized
-					* will throw an exception.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be inserted anyway
-					* or they should be filtered
-					* away. The default value is
-					* <tt>false</tt>, i.e., even zero
-					* values are inserted/replaced.
-					*/
+                                        *
+                                        * This function is able to insert
+                                        * new elements into the matrix as
+                                        * long as compress() has not been
+                                        * called, so the sparsity pattern
+                                        * will be extended. When compress()
+                                        * is called for the first time, then
+                                        * this is no longer possible and an
+                                        * insertion of elements at positions
+                                        * which have not been initialized
+                                        * will throw an exception.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be inserted anyway
+                                        * or they should be filtered
+                                        * away. The default value is
+                                        * <tt>false</tt>, i.e., even zero
+                                        * values are inserted/replaced.
+                                        */
       void set (const unsigned int                row,
-		const std::vector<unsigned int>   &col_indices,
-		const std::vector<TrilinosScalar> &values,
-		const bool                         elide_zero_values = false);
+                const std::vector<unsigned int>   &col_indices,
+                const std::vector<TrilinosScalar> &values,
+                const bool                         elide_zero_values = false);
 
                                        /**
                                         * Set several elements to values
@@ -1285,47 +1285,47 @@ namespace TrilinosWrappers
                                         * given row in columns given by
                                         * col_indices into the sparse
                                         * matrix.
-					*
-					* This function is able to insert
-					* new elements into the matrix as
-					* long as compress() has not been
-					* called, so the sparsity pattern
-					* will be extended. When compress()
-					* is called for the first time, then
-					* this is no longer possible and an
-					* insertion of elements at positions
-					* which have not been initialized
-					* will throw an exception.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be inserted anyway
-					* or they should be filtered
-					* away. The default value is
-					* <tt>false</tt>, i.e., even zero
-					* values are inserted/replaced.
-					*/
+                                        *
+                                        * This function is able to insert
+                                        * new elements into the matrix as
+                                        * long as compress() has not been
+                                        * called, so the sparsity pattern
+                                        * will be extended. When compress()
+                                        * is called for the first time, then
+                                        * this is no longer possible and an
+                                        * insertion of elements at positions
+                                        * which have not been initialized
+                                        * will throw an exception.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be inserted anyway
+                                        * or they should be filtered
+                                        * away. The default value is
+                                        * <tt>false</tt>, i.e., even zero
+                                        * values are inserted/replaced.
+                                        */
       void set (const unsigned int    row,
-		const unsigned int    n_cols,
-		const unsigned int   *col_indices,
-		const TrilinosScalar *values,
-		const bool            elide_zero_values = false);
+                const unsigned int    n_cols,
+                const unsigned int   *col_indices,
+                const TrilinosScalar *values,
+                const bool            elide_zero_values = false);
 
                                        /**
                                         * Add @p value to the element
                                         * (<i>i,j</i>).
-					*
-					* Just as the respective call in
-					* deal.II SparseMatrix<Number>
-					* class (but in contrast to the
-					* situation for PETSc based
-					* matrices), this function
-					* throws an exception if an
-					* entry does not exist in the
-					* sparsity pattern. Moreover, if
-					* <tt>value</tt> is not a finite
-					* number an exception is thrown.
+                                        *
+                                        * Just as the respective call in
+                                        * deal.II SparseMatrix<Number>
+                                        * class (but in contrast to the
+                                        * situation for PETSc based
+                                        * matrices), this function
+                                        * throws an exception if an
+                                        * entry does not exist in the
+                                        * sparsity pattern. Moreover, if
+                                        * <tt>value</tt> is not a finite
+                                        * number an exception is thrown.
                                         */
       void add (const unsigned int i,
                 const unsigned int j,
@@ -1347,29 +1347,29 @@ namespace TrilinosWrappers
                                         * quadratic sparse matrix and a
                                         * quadratic full_matrix, the usual
                                         * situation in FE calculations.
-					*
-					* Just as the respective call in
-					* deal.II SparseMatrix<Number>
-					* class (but in contrast to the
-					* situation for PETSc based
-					* matrices), this function
-					* throws an exception if an
-					* entry does not exist in the
-					* sparsity pattern.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be added anyway or
-					* these should be filtered away and
-					* only non-zero data is added. The
-					* default value is <tt>true</tt>,
-					* i.e., zero values won't be added
-					* into the matrix.
-					*/
+                                        *
+                                        * Just as the respective call in
+                                        * deal.II SparseMatrix<Number>
+                                        * class (but in contrast to the
+                                        * situation for PETSc based
+                                        * matrices), this function
+                                        * throws an exception if an
+                                        * entry does not exist in the
+                                        * sparsity pattern.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be added anyway or
+                                        * these should be filtered away and
+                                        * only non-zero data is added. The
+                                        * default value is <tt>true</tt>,
+                                        * i.e., zero values won't be added
+                                        * into the matrix.
+                                        */
       void add (const std::vector<unsigned int>  &indices,
-		const FullMatrix<TrilinosScalar> &full_matrix,
-		const bool                        elide_zero_values = true);
+                const FullMatrix<TrilinosScalar> &full_matrix,
+                const bool                        elide_zero_values = true);
 
                                        /**
                                         * Same function as before, but now
@@ -1377,11 +1377,11 @@ namespace TrilinosWrappers
                                         * rectangular full_matrices and
                                         * different local-to-global indexing
                                         * on rows and columns, respectively.
-					*/
+                                        */
       void add (const std::vector<unsigned int>  &row_indices,
-		const std::vector<unsigned int>  &col_indices,
-		const FullMatrix<TrilinosScalar> &full_matrix,
-		const bool                        elide_zero_values = true);
+                const std::vector<unsigned int>  &col_indices,
+                const FullMatrix<TrilinosScalar> &full_matrix,
+                const bool                        elide_zero_values = true);
 
                                        /**
                                         * Set several elements in the
@@ -1389,30 +1389,30 @@ namespace TrilinosWrappers
                                         * column indices as given by
                                         * <tt>col_indices</tt> to the
                                         * respective value.
-					*
-					* Just as the respective call in
-					* deal.II SparseMatrix<Number>
-					* class (but in contrast to the
-					* situation for PETSc based
-					* matrices), this function
-					* throws an exception if an
-					* entry does not exist in the
-					* sparsity pattern.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be added anyway or
-					* these should be filtered away and
-					* only non-zero data is added. The
-					* default value is <tt>true</tt>,
-					* i.e., zero values won't be added
-					* into the matrix.
-					*/
+                                        *
+                                        * Just as the respective call in
+                                        * deal.II SparseMatrix<Number>
+                                        * class (but in contrast to the
+                                        * situation for PETSc based
+                                        * matrices), this function
+                                        * throws an exception if an
+                                        * entry does not exist in the
+                                        * sparsity pattern.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be added anyway or
+                                        * these should be filtered away and
+                                        * only non-zero data is added. The
+                                        * default value is <tt>true</tt>,
+                                        * i.e., zero values won't be added
+                                        * into the matrix.
+                                        */
       void add (const unsigned int                row,
-		const std::vector<unsigned int>   &col_indices,
-		const std::vector<TrilinosScalar> &values,
-		const bool                         elide_zero_values = true);
+                const std::vector<unsigned int>   &col_indices,
+                const std::vector<TrilinosScalar> &values,
+                const bool                         elide_zero_values = true);
 
                                        /**
                                         * Add an array of values given by
@@ -1420,31 +1420,31 @@ namespace TrilinosWrappers
                                         * global matrix row at columns
                                         * specified by col_indices in the
                                         * sparse matrix.
-					*
-					* Just as the respective call in
-					* deal.II SparseMatrix<Number> class
-					* (but in contrast to the situation
-					* for PETSc based matrices), this
-					* function throws an exception if an
-					* entry does not exist in the
-					* sparsity pattern.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be added anyway or
-					* these should be filtered away and
-					* only non-zero data is added. The
-					* default value is <tt>true</tt>,
-					* i.e., zero values won't be added
-					* into the matrix.
-					*/
+                                        *
+                                        * Just as the respective call in
+                                        * deal.II SparseMatrix<Number> class
+                                        * (but in contrast to the situation
+                                        * for PETSc based matrices), this
+                                        * function throws an exception if an
+                                        * entry does not exist in the
+                                        * sparsity pattern.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be added anyway or
+                                        * these should be filtered away and
+                                        * only non-zero data is added. The
+                                        * default value is <tt>true</tt>,
+                                        * i.e., zero values won't be added
+                                        * into the matrix.
+                                        */
       void add (const unsigned int    row,
-		const unsigned int    n_cols,
-		const unsigned int   *col_indices,
-		const TrilinosScalar *values,
-		const bool            elide_zero_values = true,
-		const bool            col_indices_are_sorted = false);
+                const unsigned int    n_cols,
+                const unsigned int   *col_indices,
+                const TrilinosScalar *values,
+                const bool            elide_zero_values = true,
+                const bool            col_indices_are_sorted = false);
 
                                        /**
                                         * Multiply the entire matrix
@@ -1458,26 +1458,26 @@ namespace TrilinosWrappers
                                         */
       SparseMatrix & operator /= (const TrilinosScalar factor);
 
-				       /**
-					* Copy the given (Trilinos) matrix
-					* (sparsity pattern and entries).
-					*/
+                                       /**
+                                        * Copy the given (Trilinos) matrix
+                                        * (sparsity pattern and entries).
+                                        */
       void copy_from (const SparseMatrix &source);
 
-				       /**
-					* Add <tt>matrix</tt> scaled by
-					* <tt>factor</tt> to this matrix,
-					* i.e. the matrix
-					* <tt>factor*matrix</tt> is added to
-					* <tt>this</tt>. If the sparsity
-					* pattern of the calling matrix does
-					* not contain all the elements in
-					* the sparsity pattern of the input
-					* matrix, this function will throw
-					* an exception.
-					*/
+                                       /**
+                                        * Add <tt>matrix</tt> scaled by
+                                        * <tt>factor</tt> to this matrix,
+                                        * i.e. the matrix
+                                        * <tt>factor*matrix</tt> is added to
+                                        * <tt>this</tt>. If the sparsity
+                                        * pattern of the calling matrix does
+                                        * not contain all the elements in
+                                        * the sparsity pattern of the input
+                                        * matrix, this function will throw
+                                        * an exception.
+                                        */
       void add (const TrilinosScalar  factor,
-		const SparseMatrix   &matrix);
+                const SparseMatrix   &matrix);
 
                                        /**
                                         * Remove all elements from
@@ -1541,9 +1541,9 @@ namespace TrilinosWrappers
                        const TrilinosScalar             new_diag_value = 0);
 
                                        /**
-					* Make an in-place transpose
-					* of a matrix.
-					*/
+                                        * Make an in-place transpose
+                                        * of a matrix.
+                                        */
       void transpose ();
 
 //@}
@@ -1572,7 +1572,7 @@ namespace TrilinosWrappers
                                         * process.
                                         */
       TrilinosScalar operator () (const unsigned int i,
-				  const unsigned int j) const;
+                                  const unsigned int j) const;
 
                                        /**
                                         * Return the value of the
@@ -1591,28 +1591,28 @@ namespace TrilinosWrappers
                                         * want to be sure the entry
                                         * exists, you should use
                                         * operator() instead.
-					*
-					* The lack of error checking
-					* in this function can also
-					* yield surprising results if
-					* you have a parallel
-					* matrix. In that case, just
-					* because you get a zero
-					* result from this function
-					* does not mean that either
-					* the entry does not exist in
-					* the sparsity pattern or that
-					* it does but has a value of
-					* zero. Rather, it could also
-					* be that it simply isn't
-					* stored on the current
-					* processor; in that case, it
-					* may be stored on a different
-					* processor, and possibly so
-					* with a nonzero value.
+                                        *
+                                        * The lack of error checking
+                                        * in this function can also
+                                        * yield surprising results if
+                                        * you have a parallel
+                                        * matrix. In that case, just
+                                        * because you get a zero
+                                        * result from this function
+                                        * does not mean that either
+                                        * the entry does not exist in
+                                        * the sparsity pattern or that
+                                        * it does but has a value of
+                                        * zero. Rather, it could also
+                                        * be that it simply isn't
+                                        * stored on the current
+                                        * processor; in that case, it
+                                        * may be stored on a different
+                                        * processor, and possibly so
+                                        * with a nonzero value.
                                         */
       TrilinosScalar el (const unsigned int i,
-			 const unsigned int j) const;
+                         const unsigned int j) const;
 
                                        /**
                                         * Return the main diagonal
@@ -1620,10 +1620,10 @@ namespace TrilinosWrappers
                                         * row. This function throws an
                                         * error if the matrix is not
                                         * quadratic and it also throws
-					* an error if <i>(i,i)</i> is not
-					* element of the local matrix.
-					* See also the comment in
-					* trilinos_sparse_matrix.cc.
+                                        * an error if <i>(i,i)</i> is not
+                                        * element of the local matrix.
+                                        * See also the comment in
+                                        * trilinos_sparse_matrix.cc.
                                         */
       TrilinosScalar diag_element (const unsigned int i) const;
 
@@ -1640,26 +1640,26 @@ namespace TrilinosWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
-					*
-					* Note that both vectors have to
-					* be distributed vectors
-					* generated using the same Map
-					* as was used for the matrix in
-					* case you work on a distributed
-					* memory architecture, using the
-					* interface in the
-					* TrilinosWrappers::VectorBase
-					* class (or one of the two
-					* derived classes Vector and
-					* MPI::Vector).
-					*
-					* In case of a localized Vector,
-					* this function will only work
-					* when running on one processor,
-					* since the matrix object is
-					* inherently
-					* distributed. Otherwise, and
-					* exception will be thrown.
+                                        *
+                                        * Note that both vectors have to
+                                        * be distributed vectors
+                                        * generated using the same Map
+                                        * as was used for the matrix in
+                                        * case you work on a distributed
+                                        * memory architecture, using the
+                                        * interface in the
+                                        * TrilinosWrappers::VectorBase
+                                        * class (or one of the two
+                                        * derived classes Vector and
+                                        * MPI::Vector).
+                                        *
+                                        * In case of a localized Vector,
+                                        * this function will only work
+                                        * when running on one processor,
+                                        * since the matrix object is
+                                        * inherently
+                                        * distributed. Otherwise, and
+                                        * exception will be thrown.
                                         */
       void vmult (VectorBase       &dst,
                   const VectorBase &src) const;
@@ -1683,29 +1683,29 @@ namespace TrilinosWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
-					*
-					* Note that both vectors have to
-					* be distributed vectors
-					* generated using the same Map
-					* as was used for the matrix in
-					* case you work on a distributed
-					* memory architecture, using the
-					* interface in the
-					* TrilinosWrappers::VectorBase
-					* class (or one of the two
-					* derived classes Vector and
-					* MPI::Vector).
-					*
-					* In case of a localized Vector,
-					* this function will only work
-					* when running on one processor,
-					* since the matrix object is
-					* inherently
-					* distributed. Otherwise, and
-					* exception will be thrown.
+                                        *
+                                        * Note that both vectors have to
+                                        * be distributed vectors
+                                        * generated using the same Map
+                                        * as was used for the matrix in
+                                        * case you work on a distributed
+                                        * memory architecture, using the
+                                        * interface in the
+                                        * TrilinosWrappers::VectorBase
+                                        * class (or one of the two
+                                        * derived classes Vector and
+                                        * MPI::Vector).
+                                        *
+                                        * In case of a localized Vector,
+                                        * this function will only work
+                                        * when running on one processor,
+                                        * since the matrix object is
+                                        * inherently
+                                        * distributed. Otherwise, and
+                                        * exception will be thrown.
                                         */
       void Tvmult (VectorBase       &dst,
-		   const VectorBase &src) const;
+                   const VectorBase &src) const;
 
                                        /**
                                         * Same as before, but working with
@@ -1713,7 +1713,7 @@ namespace TrilinosWrappers
                                         * class.
                                         */
       void Tvmult (parallel::distributed::Vector<TrilinosScalar>       &dst,
-		   const parallel::distributed::Vector<TrilinosScalar> &src) const;
+                   const parallel::distributed::Vector<TrilinosScalar> &src) const;
 
                                        /**
                                         * Adding Matrix-vector
@@ -1724,26 +1724,26 @@ namespace TrilinosWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
-					*
-					* Note that both vectors have to
-					* be distributed vectors
-					* generated using the same Map
-					* as was used for the matrix in
-					* case you work on a distributed
-					* memory architecture, using the
-					* interface in the
-					* TrilinosWrappers::VectorBase
-					* class (or one of the two
-					* derived classes Vector and
-					* MPI::Vector).
-					*
-					* In case of a localized Vector,
-					* this function will only work
-					* when running on one processor,
-					* since the matrix object is
-					* inherently
-					* distributed. Otherwise, and
-					* exception will be thrown.
+                                        *
+                                        * Note that both vectors have to
+                                        * be distributed vectors
+                                        * generated using the same Map
+                                        * as was used for the matrix in
+                                        * case you work on a distributed
+                                        * memory architecture, using the
+                                        * interface in the
+                                        * TrilinosWrappers::VectorBase
+                                        * class (or one of the two
+                                        * derived classes Vector and
+                                        * MPI::Vector).
+                                        *
+                                        * In case of a localized Vector,
+                                        * this function will only work
+                                        * when running on one processor,
+                                        * since the matrix object is
+                                        * inherently
+                                        * distributed. Otherwise, and
+                                        * exception will be thrown.
                                         */
       void vmult_add (VectorBase       &dst,
                       const VectorBase &src) const;
@@ -1760,26 +1760,26 @@ namespace TrilinosWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
-					*
-					* Note that both vectors have to
-					* be distributed vectors
-					* generated using the same Map
-					* as was used for the matrix in
-					* case you work on a distributed
-					* memory architecture, using the
-					* interface in the
-					* TrilinosWrappers::VectorBase
-					* class (or one of the two
-					* derived classes Vector and
-					* MPI::Vector).
-					*
-					* In case of a localized Vector,
-					* this function will only work
-					* when running on one processor,
-					* since the matrix object is
-					* inherently
-					* distributed. Otherwise, and
-					* exception will be thrown.
+                                        *
+                                        * Note that both vectors have to
+                                        * be distributed vectors
+                                        * generated using the same Map
+                                        * as was used for the matrix in
+                                        * case you work on a distributed
+                                        * memory architecture, using the
+                                        * interface in the
+                                        * TrilinosWrappers::VectorBase
+                                        * class (or one of the two
+                                        * derived classes Vector and
+                                        * MPI::Vector).
+                                        *
+                                        * In case of a localized Vector,
+                                        * this function will only work
+                                        * when running on one processor,
+                                        * since the matrix object is
+                                        * inherently
+                                        * distributed. Otherwise, and
+                                        * exception will be thrown.
                                         */
       void Tvmult_add (VectorBase       &dst,
                        const VectorBase &src) const;
@@ -1812,26 +1812,26 @@ namespace TrilinosWrappers
                                         * class) since Trilinos doesn't
                                         * support this operation and
                                         * needs a temporary vector.
-					*
-					* Note that both vectors have to
-					* be distributed vectors
-					* generated using the same Map
-					* as was used for the matrix in
-					* case you work on a distributed
-					* memory architecture, using the
-					* interface in the
-					* TrilinosWrappers::VectorBase
-					* class (or one of the two
-					* derived classes Vector and
-					* MPI::Vector).
-					*
-					* In case of a localized Vector,
-					* this function will only work
-					* when running on one processor,
-					* since the matrix object is
-					* inherently
-					* distributed. Otherwise, and
-					* exception will be thrown.
+                                        *
+                                        * Note that both vectors have to
+                                        * be distributed vectors
+                                        * generated using the same Map
+                                        * as was used for the matrix in
+                                        * case you work on a distributed
+                                        * memory architecture, using the
+                                        * interface in the
+                                        * TrilinosWrappers::VectorBase
+                                        * class (or one of the two
+                                        * derived classes Vector and
+                                        * MPI::Vector).
+                                        *
+                                        * In case of a localized Vector,
+                                        * this function will only work
+                                        * when running on one processor,
+                                        * since the matrix object is
+                                        * inherently
+                                        * distributed. Otherwise, and
+                                        * exception will be thrown.
                                         */
       TrilinosScalar matrix_norm_square (const VectorBase &v) const;
 
@@ -1849,29 +1849,29 @@ namespace TrilinosWrappers
                                         * Trilinos doesn't support
                                         * this operation and needs a
                                         * temporary vector.
-					*
-					* Note that both vectors have to
-					* be distributed vectors
-					* generated using the same Map
-					* as was used for the matrix in
-					* case you work on a distributed
-					* memory architecture, using the
-					* interface in the
-					* TrilinosWrappers::VectorBase
-					* class (or one of the two
-					* derived classes Vector and
-					* MPI::Vector).
-					*
-					* In case of a localized Vector,
-					* this function will only work
-					* when running on one processor,
-					* since the matrix object is
-					* inherently
-					* distributed. Otherwise, and
-					* exception will be thrown.
+                                        *
+                                        * Note that both vectors have to
+                                        * be distributed vectors
+                                        * generated using the same Map
+                                        * as was used for the matrix in
+                                        * case you work on a distributed
+                                        * memory architecture, using the
+                                        * interface in the
+                                        * TrilinosWrappers::VectorBase
+                                        * class (or one of the two
+                                        * derived classes Vector and
+                                        * MPI::Vector).
+                                        *
+                                        * In case of a localized Vector,
+                                        * this function will only work
+                                        * when running on one processor,
+                                        * since the matrix object is
+                                        * inherently
+                                        * distributed. Otherwise, and
+                                        * exception will be thrown.
                                         */
       TrilinosScalar matrix_scalar_product (const VectorBase &u,
-					    const VectorBase &v) const;
+                                            const VectorBase &v) const;
 
                                        /**
                                         * Compute the residual of an
@@ -1886,89 +1886,89 @@ namespace TrilinosWrappers
                                         * Source <i>x</i> and
                                         * destination <i>dst</i> must
                                         * not be the same vector.
-					*
-					* Note that both vectors have to
-					* be distributed vectors
-					* generated using the same Map
-					* as was used for the matrix in
-					* case you work on a distributed
-					* memory architecture, using the
-					* interface in the
-					* TrilinosWrappers::VectorBase
-					* class (or one of the two
-					* derived classes Vector and
-					* MPI::Vector).
-					*
-					* In case of a localized Vector,
-					* this function will only work
-					* when running on one processor,
-					* since the matrix object is
-					* inherently
-					* distributed. Otherwise, and
-					* exception will be thrown.
+                                        *
+                                        * Note that both vectors have to
+                                        * be distributed vectors
+                                        * generated using the same Map
+                                        * as was used for the matrix in
+                                        * case you work on a distributed
+                                        * memory architecture, using the
+                                        * interface in the
+                                        * TrilinosWrappers::VectorBase
+                                        * class (or one of the two
+                                        * derived classes Vector and
+                                        * MPI::Vector).
+                                        *
+                                        * In case of a localized Vector,
+                                        * this function will only work
+                                        * when running on one processor,
+                                        * since the matrix object is
+                                        * inherently
+                                        * distributed. Otherwise, and
+                                        * exception will be thrown.
                                         */
       TrilinosScalar residual (VectorBase       &dst,
-			       const VectorBase &x,
-			       const VectorBase &b) const;
+                               const VectorBase &x,
+                               const VectorBase &b) const;
 
-				     /**
-				      * Perform the matrix-matrix
-				      * multiplication <tt>C = A * B</tt>,
-				      * or, if an optional vector argument
-				      * is given, <tt>C = A * diag(V) *
-				      * B</tt>, where <tt>diag(V)</tt>
-				      * defines a diagonal matrix with the
-				      * vector entries.
-				      *
-				      * This function assumes that the
-				      * calling matrix <tt>A</tt> and
-				      * <tt>B</tt> have compatible
-				      * sizes. The size of <tt>C</tt> will
-				      * be set within this function.
-				      *
-				      * The content as well as the sparsity
-				      * pattern of the matrix C will be
-				      * changed by this function, so make
-				      * sure that the sparsity pattern is
-				      * not used somewhere else in your
-				      * program. This is an expensive
-				      * operation, so think twice before you
-				      * use this function.
-				      */
+                                     /**
+                                      * Perform the matrix-matrix
+                                      * multiplication <tt>C = A * B</tt>,
+                                      * or, if an optional vector argument
+                                      * is given, <tt>C = A * diag(V) *
+                                      * B</tt>, where <tt>diag(V)</tt>
+                                      * defines a diagonal matrix with the
+                                      * vector entries.
+                                      *
+                                      * This function assumes that the
+                                      * calling matrix <tt>A</tt> and
+                                      * <tt>B</tt> have compatible
+                                      * sizes. The size of <tt>C</tt> will
+                                      * be set within this function.
+                                      *
+                                      * The content as well as the sparsity
+                                      * pattern of the matrix C will be
+                                      * changed by this function, so make
+                                      * sure that the sparsity pattern is
+                                      * not used somewhere else in your
+                                      * program. This is an expensive
+                                      * operation, so think twice before you
+                                      * use this function.
+                                      */
     void mmult (SparseMatrix       &C,
-		const SparseMatrix &B,
-		const VectorBase   &V = VectorBase()) const;
+                const SparseMatrix &B,
+                const VectorBase   &V = VectorBase()) const;
 
 
-				     /**
-				      * Perform the matrix-matrix
-				      * multiplication with the transpose of
-				      * <tt>this</tt>, i.e., <tt>C =
-				      * A<sup>T</sup> * B</tt>, or, if an
-				      * optional vector argument is given,
-				      * <tt>C = A<sup>T</sup> * diag(V) *
-				      * B</tt>, where <tt>diag(V)</tt>
-				      * defines a diagonal matrix with the
-				      * vector entries.
-				      *
-				      * This function assumes that the
-				      * calling matrix <tt>A</tt> and
-				      * <tt>B</tt> have compatible
-				      * sizes. The size of <tt>C</tt> will
-				      * be set within this function.
-				      *
-				      * The content as well as the sparsity
-				      * pattern of the matrix C will be
-				      * changed by this function, so make
-				      * sure that the sparsity pattern is
-				      * not used somewhere else in your
-				      * program. This is an expensive
-				      * operation, so think twice before you
-				      * use this function.
-				      */
+                                     /**
+                                      * Perform the matrix-matrix
+                                      * multiplication with the transpose of
+                                      * <tt>this</tt>, i.e., <tt>C =
+                                      * A<sup>T</sup> * B</tt>, or, if an
+                                      * optional vector argument is given,
+                                      * <tt>C = A<sup>T</sup> * diag(V) *
+                                      * B</tt>, where <tt>diag(V)</tt>
+                                      * defines a diagonal matrix with the
+                                      * vector entries.
+                                      *
+                                      * This function assumes that the
+                                      * calling matrix <tt>A</tt> and
+                                      * <tt>B</tt> have compatible
+                                      * sizes. The size of <tt>C</tt> will
+                                      * be set within this function.
+                                      *
+                                      * The content as well as the sparsity
+                                      * pattern of the matrix C will be
+                                      * changed by this function, so make
+                                      * sure that the sparsity pattern is
+                                      * not used somewhere else in your
+                                      * program. This is an expensive
+                                      * operation, so think twice before you
+                                      * use this function.
+                                      */
     void Tmmult (SparseMatrix       &C,
-		 const SparseMatrix &B,
-		 const VectorBase   &V = VectorBase()) const;
+                 const SparseMatrix &B,
+                 const VectorBase   &V = VectorBase()) const;
 
 //@}
 /**
@@ -1981,9 +1981,9 @@ namespace TrilinosWrappers
                                         * <i>l</i><sub>1</sub>-norm of
                                         * the matrix, that is
                                         * $|M|_1=
-					* \max_{\mathrm{all\ columns\ } j}
-					* \sum_{\mathrm{all\ rows\ } i}
-					* |M_{ij}|$, (max. sum
+                                        * \max_{\mathrm{all\ columns\ } j}
+                                        * \sum_{\mathrm{all\ rows\ } i}
+                                        * |M_{ij}|$, (max. sum
                                         * of columns).  This is the
                                         * natural matrix norm that is
                                         * compatible to the l1-norm for
@@ -2139,37 +2139,37 @@ namespace TrilinosWrappers
 //@{
 
                                        /**
-					* Abstract Trilinos object
-					* that helps view in ASCII
-					* other Trilinos
-					* objects. Currently this
-					* function is not
-					* implemented.  TODO: Not
-					* implemented.
-					*/
+                                        * Abstract Trilinos object
+                                        * that helps view in ASCII
+                                        * other Trilinos
+                                        * objects. Currently this
+                                        * function is not
+                                        * implemented.  TODO: Not
+                                        * implemented.
+                                        */
       void write_ascii ();
 
-				       /**
-					* Print the matrix to the given
-					* stream, using the format
-					* <tt>(line,col) value</tt>, i.e. one
-					* nonzero entry of the matrix per
-					* line. The optional flag outputs the
-					* sparsity pattern in Trilinos style,
-					* where the data is sorted according
-					* to the processor number when printed
-					* to the stream, as well as a summary
-					* of the matrix like the global size.
-					*/
+                                       /**
+                                        * Print the matrix to the given
+                                        * stream, using the format
+                                        * <tt>(line,col) value</tt>, i.e. one
+                                        * nonzero entry of the matrix per
+                                        * line. The optional flag outputs the
+                                        * sparsity pattern in Trilinos style,
+                                        * where the data is sorted according
+                                        * to the processor number when printed
+                                        * to the stream, as well as a summary
+                                        * of the matrix like the global size.
+                                        */
       void print (std::ostream &out,
-		  const bool    write_extended_trilinos_info = false) const;
+                  const bool    write_extended_trilinos_info = false) const;
 
 //@}
 /** @addtogroup Exceptions
  *
  */
 //@{
-				       /**
+                                       /**
                                         * Exception
                                         */
       DeclException1 (ExcTrilinosError,
@@ -2177,13 +2177,13 @@ namespace TrilinosWrappers
                       << "An error with error number " << arg1
                       << " occured while calling a Trilinos function");
 
-				       /**
-					* Exception
-					*/
+                                       /**
+                                        * Exception
+                                        */
       DeclException2 (ExcInvalidIndex,
-		      int, int,
-		      << "The entry with index <" << arg1 << ',' << arg2
-		      << "> does not exist.");
+                      int, int,
+                      << "The entry with index <" << arg1 << ',' << arg2
+                      << "> does not exist.");
 
                                        /**
                                         * Exception
@@ -2199,22 +2199,22 @@ namespace TrilinosWrappers
                                         * Exception
                                         */
       DeclException4 (ExcAccessToNonLocalElement,
-		      int, int, int, int,
-		      << "You tried to access element (" << arg1
-		      << "/" << arg2 << ")"
-		      << " of a distributed matrix, but only rows "
-		      << arg3 << " through " << arg4
-		      << " are stored locally and can be accessed.");
+                      int, int, int, int,
+                      << "You tried to access element (" << arg1
+                      << "/" << arg2 << ")"
+                      << " of a distributed matrix, but only rows "
+                      << arg3 << " through " << arg4
+                      << " are stored locally and can be accessed.");
 
                                        /**
                                         * Exception
                                         */
       DeclException2 (ExcAccessToNonPresentElement,
-		      int, int,
-		      << "You tried to access element (" << arg1
-		      << "/" << arg2 << ")"
-		      << " of a sparse matrix, but it appears to not"
-		      << " exist in the Trilinos sparsity pattern.");
+                      int, int,
+                      << "You tried to access element (" << arg1
+                      << "/" << arg2 << ")"
+                      << " of a sparse matrix, but it appears to not"
+                      << " exist in the Trilinos sparsity pattern.");
 //@}
 
 
@@ -2245,7 +2245,7 @@ namespace TrilinosWrappers
                                       */
       void prepare_add();
 
-				      /**
+                                      /**
                                       * Same as prepare_add() but
                                       * prepare the matrix for setting
                                       * elements if the representation
@@ -2260,11 +2260,11 @@ namespace TrilinosWrappers
 
                                        /**
                                         * Pointer to the user-supplied
-				        * Epetra Trilinos mapping of
-				        * the matrix columns that
-				        * assigns parts of the matrix
-				        * to the individual processes.
-				        */
+                                        * Epetra Trilinos mapping of
+                                        * the matrix columns that
+                                        * assigns parts of the matrix
+                                        * to the individual processes.
+                                        */
       std_cxx1x::shared_ptr<Epetra_Map> column_space_map;
 
                                        /**
@@ -2302,45 +2302,45 @@ namespace TrilinosWrappers
                                         */
       Epetra_CombineMode last_action;
 
-				       /**
-					* A boolean variable to hold
-					* information on whether the
-					* vector is compressed or not.
-					*/
+                                       /**
+                                        * A boolean variable to hold
+                                        * information on whether the
+                                        * vector is compressed or not.
+                                        */
       bool compressed;
 
-				       /**
-					* An internal Trilinos vector that
-					* is used for accelerating vmult_add
-					* functions (in order not to need to
-					* recreate temporary vectors every
-					* time that function is called).
-					*/
+                                       /**
+                                        * An internal Trilinos vector that
+                                        * is used for accelerating vmult_add
+                                        * functions (in order not to need to
+                                        * recreate temporary vectors every
+                                        * time that function is called).
+                                        */
       mutable VectorBase temp_vector;
 
-				       /**
-					* An internal array of integer
-					* values that is used to store the
-					* column indices when
-					* adding/inserting local data into
-					* the (large) sparse matrix.
-					*/
+                                       /**
+                                        * An internal array of integer
+                                        * values that is used to store the
+                                        * column indices when
+                                        * adding/inserting local data into
+                                        * the (large) sparse matrix.
+                                        */
       std::vector<unsigned int> column_indices;
 
-				       /**
-					* An internal array of double values
-					* that is used to store the column
-					* indices when adding/inserting
-					* local data into the (large) sparse
-					* matrix.
-					*/
+                                       /**
+                                        * An internal array of double values
+                                        * that is used to store the column
+                                        * indices when adding/inserting
+                                        * local data into the (large) sparse
+                                        * matrix.
+                                        */
       std::vector<TrilinosScalar> column_values;
 
-				       /**
-				        *  To allow calling protected
-				        *  prepare_add() and
-				        *  prepare_set().
-				        */
+                                       /**
+                                        *  To allow calling protected
+                                        *  prepare_add() and
+                                        *  prepare_set().
+                                        */
       friend class BlockMatrixBase<SparseMatrix>;
   };
 
@@ -2427,10 +2427,10 @@ namespace TrilinosWrappers
 
       ++accessor.a_index;
 
-				        // If at end of line: do one
-				        // step, then cycle until we
-				        // find a row with a nonzero
-				        // number of entries.
+                                        // If at end of line: do one
+                                        // step, then cycle until we
+                                        // find a row with a nonzero
+                                        // number of entries.
       if (accessor.a_index >= accessor.colnum_cache->size())
         {
           accessor.a_index = 0;
@@ -2590,10 +2590,10 @@ namespace TrilinosWrappers
   void
   SparseMatrix::compress ()
   {
-				  // flush buffers
+                                  // flush buffers
     int ierr;
     ierr = matrix->GlobalAssemble (*column_space_map, matrix->RowMap(),
-				   true);
+                                   true);
 
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -2622,18 +2622,18 @@ namespace TrilinosWrappers
 
 
 
-				        // Inline the set() and add()
-				        // functions, since they will be
+                                        // Inline the set() and add()
+                                        // functions, since they will be
                                         // called frequently, and the
-				        // compiler can optimize away
-				        // some unnecessary loops when
-					// the sizes are given at
-				        // compile time.
+                                        // compiler can optimize away
+                                        // some unnecessary loops when
+                                        // the sizes are given at
+                                        // compile time.
   inline
   void
   SparseMatrix::set (const unsigned int   i,
-		     const unsigned int   j,
-		     const TrilinosScalar value)
+                     const unsigned int   j,
+                     const TrilinosScalar value)
   {
 
     Assert (numbers::is_finite(value), ExcNumberNotFinite());
@@ -2646,16 +2646,16 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::set (const std::vector<unsigned int>  &indices,
-		     const FullMatrix<TrilinosScalar> &values,
-		     const bool                        elide_zero_values)
+                     const FullMatrix<TrilinosScalar> &values,
+                     const bool                        elide_zero_values)
   {
     Assert (indices.size() == values.m(),
-	    ExcDimensionMismatch(indices.size(), values.m()));
+            ExcDimensionMismatch(indices.size(), values.m()));
     Assert (values.m() == values.n(), ExcNotQuadratic());
 
     for (unsigned int i=0; i<indices.size(); ++i)
       set (indices[i], indices.size(), &indices[0], &values(i,0),
-	   elide_zero_values);
+           elide_zero_values);
   }
 
 
@@ -2663,18 +2663,18 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::set (const std::vector<unsigned int>  &row_indices,
-		     const std::vector<unsigned int>  &col_indices,
-		     const FullMatrix<TrilinosScalar> &values,
-		     const bool                        elide_zero_values)
+                     const std::vector<unsigned int>  &col_indices,
+                     const FullMatrix<TrilinosScalar> &values,
+                     const bool                        elide_zero_values)
   {
     Assert (row_indices.size() == values.m(),
-	    ExcDimensionMismatch(row_indices.size(), values.m()));
+            ExcDimensionMismatch(row_indices.size(), values.m()));
     Assert (col_indices.size() == values.n(),
-	    ExcDimensionMismatch(col_indices.size(), values.n()));
+            ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (unsigned int i=0; i<row_indices.size(); ++i)
       set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
-	   elide_zero_values);
+           elide_zero_values);
   }
 
 
@@ -2682,15 +2682,15 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::set (const unsigned int                 row,
-		     const std::vector<unsigned int>   &col_indices,
-		     const std::vector<TrilinosScalar> &values,
-		     const bool                         elide_zero_values)
+                     const std::vector<unsigned int>   &col_indices,
+                     const std::vector<TrilinosScalar> &values,
+                     const bool                         elide_zero_values)
   {
     Assert (col_indices.size() == values.size(),
-	    ExcDimensionMismatch(col_indices.size(), values.size()));
+            ExcDimensionMismatch(col_indices.size(), values.size()));
 
     set (row, col_indices.size(), &col_indices[0], &values[0],
-	 elide_zero_values);
+         elide_zero_values);
   }
 
 
@@ -2698,18 +2698,18 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::set (const unsigned int    row,
-		     const unsigned int    n_cols,
-		     const unsigned int   *col_indices,
-		     const TrilinosScalar *values,
-		     const bool            elide_zero_values)
+                     const unsigned int    n_cols,
+                     const unsigned int   *col_indices,
+                     const TrilinosScalar *values,
+                     const bool            elide_zero_values)
   {
     int ierr;
     if (last_action == Add)
       {
-	ierr = matrix->GlobalAssemble (*column_space_map, matrix->RowMap(),
-				       true);
+        ierr = matrix->GlobalAssemble (*column_space_map, matrix->RowMap(),
+                                       true);
 
-	Assert (ierr == 0, ExcTrilinosError(ierr));
+        Assert (ierr == 0, ExcTrilinosError(ierr));
       }
 
     last_action = Insert;
@@ -2718,108 +2718,108 @@ namespace TrilinosWrappers
     TrilinosScalar const* col_value_ptr;
     int n_columns;
 
-				   // If we don't elide zeros, the pointers
-				   // are already available...
+                                   // If we don't elide zeros, the pointers
+                                   // are already available...
     if (elide_zero_values == false)
       {
-	col_index_ptr = (int*)col_indices;
-	col_value_ptr = values;
-	n_columns = n_cols;
+        col_index_ptr = (int*)col_indices;
+        col_value_ptr = values;
+        n_columns = n_cols;
       }
     else
       {
-				   // Otherwise, extract nonzero values in
-				   // each row and get the respective
-				   // indices.
-	if (column_indices.size() < n_cols)
-	  {
-	    column_indices.resize(n_cols);
-	    column_values.resize(n_cols);
-	  }
+                                   // Otherwise, extract nonzero values in
+                                   // each row and get the respective
+                                   // indices.
+        if (column_indices.size() < n_cols)
+          {
+            column_indices.resize(n_cols);
+            column_values.resize(n_cols);
+          }
 
-	n_columns = 0;
-	for (unsigned int j=0; j<n_cols; ++j)
-	  {
-	    const double value = values[j];
-	    Assert (numbers::is_finite(value), ExcNumberNotFinite());
-	    if (value != 0)
-	      {
-		column_indices[n_columns] = col_indices[j];
-		column_values[n_columns] = value;
-		n_columns++;
-	      }
-	  }
+        n_columns = 0;
+        for (unsigned int j=0; j<n_cols; ++j)
+          {
+            const double value = values[j];
+            Assert (numbers::is_finite(value), ExcNumberNotFinite());
+            if (value != 0)
+              {
+                column_indices[n_columns] = col_indices[j];
+                column_values[n_columns] = value;
+                n_columns++;
+              }
+          }
 
-	Assert(n_columns <= (int)n_cols, ExcInternalError());
+        Assert(n_columns <= (int)n_cols, ExcInternalError());
 
-	col_index_ptr = (int*)&column_indices[0];
-	col_value_ptr = &column_values[0];
+        col_index_ptr = (int*)&column_indices[0];
+        col_value_ptr = &column_values[0];
       }
 
 
-				   // If the calling matrix owns the row to
-				   // which we want to insert values, we
-				   // can directly call the Epetra_CrsMatrix
-				   // input function, which is much faster
-				   // than the Epetra_FECrsMatrix
+                                   // If the calling matrix owns the row to
+                                   // which we want to insert values, we
+                                   // can directly call the Epetra_CrsMatrix
+                                   // input function, which is much faster
+                                   // than the Epetra_FECrsMatrix
                                    // function. We distinguish between two
-				   // cases: the first one is when the matrix
-				   // is not filled (i.e., it is possible to
-				   // add new elements to the sparsity pattern),
-				   // and the second one is when the pattern is
-				   // already fixed. In the former case, we
-				   // add the possibility to insert new values,
-				   // and in the second we just replace
-				   // data.
+                                   // cases: the first one is when the matrix
+                                   // is not filled (i.e., it is possible to
+                                   // add new elements to the sparsity pattern),
+                                   // and the second one is when the pattern is
+                                   // already fixed. In the former case, we
+                                   // add the possibility to insert new values,
+                                   // and in the second we just replace
+                                   // data.
     if (row_partitioner().MyGID(row) == true)
       {
-	if (matrix->Filled() == false)
-	  {
-	    ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(row, n_columns,
-					    const_cast<double*>(col_value_ptr),
-								col_index_ptr);
+        if (matrix->Filled() == false)
+          {
+            ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(row, n_columns,
+                                            const_cast<double*>(col_value_ptr),
+                                                                col_index_ptr);
 
-				        // When inserting elements, we do
-				        // not want to create exceptions in
-				        // the case when inserting non-local
-					// data (since that's what we want
-				        // to do right now).
-	    if (ierr > 0)
-	      ierr = 0;
-	  }
-	else
-	  ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues(row, n_columns,
-					   const_cast<double*>(col_value_ptr),
-							       col_index_ptr);
+                                        // When inserting elements, we do
+                                        // not want to create exceptions in
+                                        // the case when inserting non-local
+                                        // data (since that's what we want
+                                        // to do right now).
+            if (ierr > 0)
+              ierr = 0;
+          }
+        else
+          ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues(row, n_columns,
+                                           const_cast<double*>(col_value_ptr),
+                                                               col_index_ptr);
       }
     else
       {
-				   // When we're at off-processor data, we
-				   // have to stick with the standard
-				   // Insert/ReplaceGlobalValues
-				   // function. Nevertheless, the way we
-				   // call it is the fastest one (any other
-				   // will lead to repeated allocation and
-				   // deallocation of memory in order to
-				   // call the function we already use,
-				   // which is very unefficient if writing
-				   // one element at a time).
-	compressed = false;
+                                   // When we're at off-processor data, we
+                                   // have to stick with the standard
+                                   // Insert/ReplaceGlobalValues
+                                   // function. Nevertheless, the way we
+                                   // call it is the fastest one (any other
+                                   // will lead to repeated allocation and
+                                   // deallocation of memory in order to
+                                   // call the function we already use,
+                                   // which is very unefficient if writing
+                                   // one element at a time).
+        compressed = false;
 
-	if (matrix->Filled() == false)
-	  {
-	    ierr = matrix->InsertGlobalValues (1, (int*)&row,
-					       n_columns, col_index_ptr,
-					       &col_value_ptr,
-					       Epetra_FECrsMatrix::ROW_MAJOR);
-	    if (ierr > 0)
-	      ierr = 0;
-	  }
-	else
-	  ierr = matrix->ReplaceGlobalValues (1, (int*)&row,
-					      n_columns, col_index_ptr,
-					      &col_value_ptr,
-					      Epetra_FECrsMatrix::ROW_MAJOR);
+        if (matrix->Filled() == false)
+          {
+            ierr = matrix->InsertGlobalValues (1, (int*)&row,
+                                               n_columns, col_index_ptr,
+                                               &col_value_ptr,
+                                               Epetra_FECrsMatrix::ROW_MAJOR);
+            if (ierr > 0)
+              ierr = 0;
+          }
+        else
+          ierr = matrix->ReplaceGlobalValues (1, (int*)&row,
+                                              n_columns, col_index_ptr,
+                                              &col_value_ptr,
+                                              Epetra_FECrsMatrix::ROW_MAJOR);
       }
 
     Assert (ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
@@ -2831,35 +2831,35 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::add (const unsigned int   i,
-		     const unsigned int   j,
-		     const TrilinosScalar value)
+                     const unsigned int   j,
+                     const TrilinosScalar value)
   {
     Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
     if (value == 0)
       {
-				  // we have to do checkings on Insert/Add
-				  // in any case
-				  // to be consistent with the MPI
-				  // communication model (see the comments
-				  // in the documentation of
-				  // TrilinosWrappers::Vector), but we can
-				  // save some work if the addend is
-				  // zero. However, these actions are done
-				  // in case we pass on to the other
-				  // function.
-	if (last_action == Insert)
-	  {
-	    int ierr;
-	    ierr = matrix->GlobalAssemble(*column_space_map,
-					  row_partitioner(), false);
+                                  // we have to do checkings on Insert/Add
+                                  // in any case
+                                  // to be consistent with the MPI
+                                  // communication model (see the comments
+                                  // in the documentation of
+                                  // TrilinosWrappers::Vector), but we can
+                                  // save some work if the addend is
+                                  // zero. However, these actions are done
+                                  // in case we pass on to the other
+                                  // function.
+        if (last_action == Insert)
+          {
+            int ierr;
+            ierr = matrix->GlobalAssemble(*column_space_map,
+                                          row_partitioner(), false);
 
-	    Assert (ierr == 0, ExcTrilinosError(ierr));
-	  }
+            Assert (ierr == 0, ExcTrilinosError(ierr));
+          }
 
-	last_action = Add;
+        last_action = Add;
 
-	return;
+        return;
       }
     else
       add (i, 1, &j, &value, false);
@@ -2870,16 +2870,16 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::add (const std::vector<unsigned int>  &indices,
-		     const FullMatrix<TrilinosScalar> &values,
-		     const bool                        elide_zero_values)
+                     const FullMatrix<TrilinosScalar> &values,
+                     const bool                        elide_zero_values)
   {
     Assert (indices.size() == values.m(),
-	    ExcDimensionMismatch(indices.size(), values.m()));
+            ExcDimensionMismatch(indices.size(), values.m()));
     Assert (values.m() == values.n(), ExcNotQuadratic());
 
     for (unsigned int i=0; i<indices.size(); ++i)
       add (indices[i], indices.size(), &indices[0], &values(i,0),
-	   elide_zero_values);
+           elide_zero_values);
   }
 
 
@@ -2887,18 +2887,18 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::add (const std::vector<unsigned int>  &row_indices,
-		     const std::vector<unsigned int>  &col_indices,
-		     const FullMatrix<TrilinosScalar> &values,
-		     const bool                        elide_zero_values)
+                     const std::vector<unsigned int>  &col_indices,
+                     const FullMatrix<TrilinosScalar> &values,
+                     const bool                        elide_zero_values)
   {
     Assert (row_indices.size() == values.m(),
-	    ExcDimensionMismatch(row_indices.size(), values.m()));
+            ExcDimensionMismatch(row_indices.size(), values.m()));
     Assert (col_indices.size() == values.n(),
-	    ExcDimensionMismatch(col_indices.size(), values.n()));
+            ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (unsigned int i=0; i<row_indices.size(); ++i)
       add (row_indices[i], col_indices.size(), &col_indices[0],
-	   &values(i,0), elide_zero_values);
+           &values(i,0), elide_zero_values);
   }
 
 
@@ -2906,15 +2906,15 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::add (const unsigned int                 row,
-		     const std::vector<unsigned int>   &col_indices,
-		     const std::vector<TrilinosScalar> &values,
-		     const bool                         elide_zero_values)
+                     const std::vector<unsigned int>   &col_indices,
+                     const std::vector<TrilinosScalar> &values,
+                     const bool                         elide_zero_values)
   {
     Assert (col_indices.size() == values.size(),
-	    ExcDimensionMismatch(col_indices.size(), values.size()));
+            ExcDimensionMismatch(col_indices.size(), values.size()));
 
     add (row, col_indices.size(), &col_indices[0], &values[0],
-	 elide_zero_values);
+         elide_zero_values);
   }
 
 
@@ -2922,21 +2922,21 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::add (const unsigned int    row,
-		     const unsigned int    n_cols,
-		     const unsigned int   *col_indices,
-		     const TrilinosScalar *values,
-		     const bool            elide_zero_values,
-		     const bool            /*col_indices_are_sorted*/)
+                     const unsigned int    n_cols,
+                     const unsigned int   *col_indices,
+                     const TrilinosScalar *values,
+                     const bool            elide_zero_values,
+                     const bool            /*col_indices_are_sorted*/)
   {
     int ierr;
     if (last_action == Insert)
       {
-	// TODO: this could lead to a dead lock when only one processor
-	// calls GlobalAssemble.
-	ierr = matrix->GlobalAssemble(*column_space_map,
-				      row_partitioner(), false);
+        // TODO: this could lead to a dead lock when only one processor
+        // calls GlobalAssemble.
+        ierr = matrix->GlobalAssemble(*column_space_map,
+                                      row_partitioner(), false);
 
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
 
     last_action = Add;
@@ -2945,95 +2945,95 @@ namespace TrilinosWrappers
     TrilinosScalar const* col_value_ptr;
     int n_columns;
 
-				   // If we don't elide zeros, the pointers
-				   // are already available...
+                                   // If we don't elide zeros, the pointers
+                                   // are already available...
     if (elide_zero_values == false)
       {
-	col_index_ptr = (int*)col_indices;
-	col_value_ptr = values;
-	n_columns = n_cols;
+        col_index_ptr = (int*)col_indices;
+        col_value_ptr = values;
+        n_columns = n_cols;
       }
     else
       {
-				   // Otherwise, extract nonzero values in
-				   // each row and the corresponding index.
-	if (column_indices.size() < n_cols)
-	  {
-	    column_indices.resize(n_cols);
-	    column_values.resize(n_cols);
-	  }
+                                   // Otherwise, extract nonzero values in
+                                   // each row and the corresponding index.
+        if (column_indices.size() < n_cols)
+          {
+            column_indices.resize(n_cols);
+            column_values.resize(n_cols);
+          }
 
-	n_columns = 0;
-	for (unsigned int j=0; j<n_cols; ++j)
-	  {
-	    const double value = values[j];
-	    Assert (numbers::is_finite(value), ExcNumberNotFinite());
-	    if (value != 0)
-	      {
-		column_indices[n_columns] = col_indices[j];
-		column_values[n_columns] = value;
-		n_columns++;
-	      }
-	  }
+        n_columns = 0;
+        for (unsigned int j=0; j<n_cols; ++j)
+          {
+            const double value = values[j];
+            Assert (numbers::is_finite(value), ExcNumberNotFinite());
+            if (value != 0)
+              {
+                column_indices[n_columns] = col_indices[j];
+                column_values[n_columns] = value;
+                n_columns++;
+              }
+          }
 
-	Assert(n_columns <= (int)n_cols, ExcInternalError());
+        Assert(n_columns <= (int)n_cols, ExcInternalError());
 
-	col_index_ptr = (int*)&column_indices[0];
-	col_value_ptr = &column_values[0];
+        col_index_ptr = (int*)&column_indices[0];
+        col_value_ptr = &column_values[0];
       }
 
-				   // If the calling matrix owns the row to
-				   // which we want to add values, we
-				   // can directly call the Epetra_CrsMatrix
-				   // input function, which is much faster
-				   // than the Epetra_FECrsMatrix function.
+                                   // If the calling matrix owns the row to
+                                   // which we want to add values, we
+                                   // can directly call the Epetra_CrsMatrix
+                                   // input function, which is much faster
+                                   // than the Epetra_FECrsMatrix function.
     if (row_partitioner().MyGID(row) == true)
       {
-	ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_columns,
-					 const_cast<double*>(col_value_ptr),
-							     col_index_ptr);
+        ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_columns,
+                                         const_cast<double*>(col_value_ptr),
+                                                             col_index_ptr);
       }
     else
       {
-				   // When we're at off-processor data, we
-				   // have to stick with the standard
-				   // SumIntoGlobalValues
-				   // function. Nevertheless, the way we
-				   // call it is the fastest one (any other
-				   // will lead to repeated allocation and
-				   // deallocation of memory in order to
-				   // call the function we already use,
-				   // which is very unefficient if writing
-				   // one element at a time).
-	compressed = false;
+                                   // When we're at off-processor data, we
+                                   // have to stick with the standard
+                                   // SumIntoGlobalValues
+                                   // function. Nevertheless, the way we
+                                   // call it is the fastest one (any other
+                                   // will lead to repeated allocation and
+                                   // deallocation of memory in order to
+                                   // call the function we already use,
+                                   // which is very unefficient if writing
+                                   // one element at a time).
+        compressed = false;
 
-	ierr = matrix->SumIntoGlobalValues (1, (int*)&row, n_columns,
-					    col_index_ptr,
-					    &col_value_ptr,
-					    Epetra_FECrsMatrix::ROW_MAJOR);
+        ierr = matrix->SumIntoGlobalValues (1, (int*)&row, n_columns,
+                                            col_index_ptr,
+                                            &col_value_ptr,
+                                            Epetra_FECrsMatrix::ROW_MAJOR);
       }
 
 #ifdef DEBUG
     if (ierr > 0)
       {
-	std::cout << "------------------------------------------"
-		  << std::endl;
-	std::cout << "Got error " << ierr << " in row " << row
-		  << " of proc " << row_partitioner().Comm().MyPID()
-		  << " when trying to add the columns:" << std::endl;
-	for (int i=0; i<n_columns; ++i)
-	  std::cout << col_index_ptr[i] << " ";
-	std::cout << std::endl << std::endl;
-	std::cout << "Matrix row has the following indices:" << std::endl;
-	int n_indices, *indices;
-	trilinos_sparsity_pattern().ExtractMyRowView(row_partitioner().LID(row),
-						     n_indices,
-						     indices);
-	for (int i=0; i<n_indices; ++i)
-	  std::cout << indices[i] << " ";
-	std::cout << endl << std::endl;
-	Assert (ierr <= 0,
-		ExcAccessToNonPresentElement(row, col_index_ptr[0]));
+        std::cout << "------------------------------------------"
+                  << std::endl;
+        std::cout << "Got error " << ierr << " in row " << row
+                  << " of proc " << row_partitioner().Comm().MyPID()
+                  << " when trying to add the columns:" << std::endl;
+        for (int i=0; i<n_columns; ++i)
+          std::cout << col_index_ptr[i] << " ";
+        std::cout << std::endl << std::endl;
+        std::cout << "Matrix row has the following indices:" << std::endl;
+        int n_indices, *indices;
+        trilinos_sparsity_pattern().ExtractMyRowView(row_partitioner().LID(row),
+                                                     n_indices,
+                                                     indices);
+        for (int i=0; i<n_indices; ++i)
+          std::cout << indices[i] << " ";
+        std::cout << endl << std::endl;
+        Assert (ierr <= 0,
+                ExcAccessToNonPresentElement(row, col_index_ptr[0]));
       }
 #endif
     Assert (ierr >= 0, ExcTrilinosError(ierr));
@@ -3041,9 +3041,9 @@ namespace TrilinosWrappers
 
 
 
-				   // inline "simple" functions that are
-				   // called frequently and do only involve
-				   // a call to some Trilinos function.
+                                   // inline "simple" functions that are
+                                   // called frequently and do only involve
+                                   // a call to some Trilinos function.
   inline
   unsigned int
   SparseMatrix::m () const
@@ -3096,9 +3096,9 @@ namespace TrilinosWrappers
   template <typename SparsityType>
   inline
   void SparseMatrix::reinit (const IndexSet      &parallel_partitioning,
-			     const SparsityType  &sparsity_pattern,
-			     const MPI_Comm      &communicator,
-			     const bool           exchange_data)
+                             const SparsityType  &sparsity_pattern,
+                             const MPI_Comm      &communicator,
+                             const bool           exchange_data)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, false);
     reinit (map, map, sparsity_pattern, exchange_data);
@@ -3109,10 +3109,10 @@ namespace TrilinosWrappers
   template <typename SparsityType>
   inline
   void SparseMatrix::reinit (const IndexSet      &row_parallel_partitioning,
-			     const IndexSet      &col_parallel_partitioning,
-			     const SparsityType  &sparsity_pattern,
-			     const MPI_Comm      &communicator,
-			     const bool           exchange_data)
+                             const IndexSet      &col_parallel_partitioning,
+                             const SparsityType  &sparsity_pattern,
+                             const MPI_Comm      &communicator,
+                             const bool           exchange_data)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -3126,15 +3126,15 @@ namespace TrilinosWrappers
   template <typename number>
   inline
   void SparseMatrix::reinit (const IndexSet      &parallel_partitioning,
-			     const ::dealii::SparseMatrix<number> &sparse_matrix,
-			     const MPI_Comm      &communicator,
-			     const double         drop_tolerance,
-			     const bool           copy_values,
-			     const ::dealii::SparsityPattern *use_this_sparsity)
+                             const ::dealii::SparseMatrix<number> &sparse_matrix,
+                             const MPI_Comm      &communicator,
+                             const double         drop_tolerance,
+                             const bool           copy_values,
+                             const ::dealii::SparsityPattern *use_this_sparsity)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, false);
     reinit (map, map, sparse_matrix, drop_tolerance, copy_values,
-	    use_this_sparsity);
+            use_this_sparsity);
   }
 
 
@@ -3142,19 +3142,19 @@ namespace TrilinosWrappers
   template <typename number>
   inline
   void SparseMatrix::reinit (const IndexSet      &row_parallel_partitioning,
-			     const IndexSet      &col_parallel_partitioning,
-			     const ::dealii::SparseMatrix<number> &sparse_matrix,
-			     const MPI_Comm      &communicator,
-			     const double         drop_tolerance,
-			     const bool           copy_values,
-			     const ::dealii::SparsityPattern *use_this_sparsity)
+                             const IndexSet      &col_parallel_partitioning,
+                             const ::dealii::SparseMatrix<number> &sparse_matrix,
+                             const MPI_Comm      &communicator,
+                             const double         drop_tolerance,
+                             const bool           copy_values,
+                             const ::dealii::SparsityPattern *use_this_sparsity)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
     Epetra_Map col_map =
       col_parallel_partitioning.make_trilinos_map (communicator, false);
     reinit (row_map, col_map, sparse_matrix, drop_tolerance, copy_values,
-	    use_this_sparsity);
+            use_this_sparsity);
   }
 
 
@@ -3220,18 +3220,18 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::vmult (VectorBase       &dst,
-		       const VectorBase &src) const
+                       const VectorBase &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
 
     Assert (src.vector_partitioner().SameAs(matrix->DomainMap()) == true,
-	    ExcMessage ("Column map of matrix does not fit with vector map!"));
+            ExcMessage ("Column map of matrix does not fit with vector map!"));
     Assert (dst.vector_partitioner().SameAs(matrix->RangeMap()) == true,
-	    ExcMessage ("Row map of matrix does not fit with vector map!"));
+            ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     const int ierr = matrix->Multiply (false, src.trilinos_vector(),
-				       dst.trilinos_vector());
+                                       dst.trilinos_vector());
     Assert (ierr == 0, ExcTrilinosError(ierr));
   }
 
@@ -3240,7 +3240,7 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::vmult (parallel::distributed::Vector<TrilinosScalar>       &dst,
-		       const parallel::distributed::Vector<TrilinosScalar> &src) const
+                       const parallel::distributed::Vector<TrilinosScalar> &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
@@ -3250,7 +3250,7 @@ namespace TrilinosWrappers
 
     Epetra_Vector tril_dst (View, matrix->RangeMap(), dst.begin());
     Epetra_Vector tril_src (View, matrix->DomainMap(),
-			    const_cast<double*>(src.begin()));
+                            const_cast<double*>(src.begin()));
 
     const int ierr = matrix->Multiply (false, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));
@@ -3261,18 +3261,18 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::Tvmult (VectorBase       &dst,
-			const VectorBase &src) const
+                        const VectorBase &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
 
     Assert (src.vector_partitioner().SameAs(matrix->RangeMap()) == true,
-	    ExcMessage ("Column map of matrix does not fit with vector map!"));
+            ExcMessage ("Column map of matrix does not fit with vector map!"));
     Assert (dst.vector_partitioner().SameAs(matrix->DomainMap()) == true,
-	    ExcMessage ("Row map of matrix does not fit with vector map!"));
+            ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     const int ierr = matrix->Multiply (true, src.trilinos_vector(),
-				       dst.trilinos_vector());
+                                       dst.trilinos_vector());
     Assert (ierr == 0, ExcTrilinosError(ierr));
   }
 
@@ -3281,7 +3281,7 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::Tvmult (parallel::distributed::Vector<TrilinosScalar>      &dst,
-			const parallel::distributed::Vector<TrilinosScalar>&src) const
+                        const parallel::distributed::Vector<TrilinosScalar>&src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
@@ -3291,7 +3291,7 @@ namespace TrilinosWrappers
 
     Epetra_Vector tril_dst (View, matrix->DomainMap(), dst.begin());
     Epetra_Vector tril_src (View, matrix->RangeMap(),
-			    const_cast<double*>(src.begin()));
+                            const_cast<double*>(src.begin()));
 
     const int ierr = matrix->Multiply (true, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));
@@ -3302,15 +3302,15 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::vmult_add (VectorBase       &dst,
-			   const VectorBase &src) const
+                           const VectorBase &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-				   // Choose to reinit the vector with fast
-				   // argument set, which does not overwrite
-				   // the content -- this is what we need
-				   // since we're going to overwrite that
-				   // anyway in the vmult operation.
+                                   // Choose to reinit the vector with fast
+                                   // argument set, which does not overwrite
+                                   // the content -- this is what we need
+                                   // since we're going to overwrite that
+                                   // anyway in the vmult operation.
     temp_vector.reinit(dst, true);
 
     vmult (temp_vector, src);
@@ -3322,7 +3322,7 @@ namespace TrilinosWrappers
   inline
   void
   SparseMatrix::Tvmult_add (VectorBase       &dst,
-			    const VectorBase &src) const
+                            const VectorBase &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
@@ -3339,7 +3339,7 @@ namespace TrilinosWrappers
   SparseMatrix::matrix_norm_square (const VectorBase &v) const
   {
     Assert (row_partitioner().SameAs(domain_partitioner()),
-	    ExcNotQuadratic());
+            ExcNotQuadratic());
 
     temp_vector.reinit(v);
 
@@ -3352,10 +3352,10 @@ namespace TrilinosWrappers
   inline
   TrilinosScalar
   SparseMatrix::matrix_scalar_product (const VectorBase &u,
-				       const VectorBase &v) const
+                                       const VectorBase &v) const
   {
     Assert (row_partitioner().SameAs(domain_partitioner()),
-	    ExcNotQuadratic());
+            ExcNotQuadratic());
 
     temp_vector.reinit(v);
 
@@ -3368,8 +3368,8 @@ namespace TrilinosWrappers
   inline
   TrilinosScalar
   SparseMatrix::residual (VectorBase       &dst,
-			  const VectorBase &x,
-			  const VectorBase &b) const
+                          const VectorBase &x,
+                          const VectorBase &b) const
   {
     vmult (dst, x);
     dst -= b;

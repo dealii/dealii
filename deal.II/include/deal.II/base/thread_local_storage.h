@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2011 by the deal.II authors
+//    Copyright (C) 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,36 +32,36 @@ namespace Threads
   template <typename T>
   /**
    * @brief A class that provides a separate storage location on each thread that accesses the object.
-   * 
+   *
    * This class offers ways so that every thread that accesses it has its
    * own copy of an object of type T. In essence, accessing this object
    * can never result in race conditions in multithreaded programs since
    * no other thread than the current one can ever access it.
-   * 
+   *
    * The class builds on the Threading Building Blocks's tbb::enumerable_thread_specific
    * class but wraps it in such a way that this class can also be used when deal.II
    * is configured not to use threads at all -- in that case, this class simply
    * stores a single copy of an object of type T.
-   * 
+   *
    * <h3>Construction and destruction</h3>
-   * 
+   *
    * Objects of this class can either be default constructed or by providing an
    * "exemplar", i.e. an object of type T so that everytime we need to create
    * a T on a thread that doesn't already have such an object, it is copied from
    * the exemplar.
-   * 
+   *
    * Upon destruction of objects of this class, all T objects that correspond
    * to threads that have accessed this object are destroyed. Note that this may be
    * before the time when a thread is terminated.
-   * 
+   *
    * <h3>Access</h3>
-   * 
+   *
    * The T object stored by this object can be accessed using the get() function. It
    * provides a reference to a unique object when accessed from different threads.
    * Objects of type T are created lazily, i.e. they are only created whenever a
    * thread actually calls get().
    **/
-  class ThreadLocalStorage 
+  class ThreadLocalStorage
   {
   public:
     /**
@@ -69,7 +69,7 @@ namespace Threads
      * using its default constructor.
      **/
     ThreadLocalStorage ();
-    
+
     /**
      * A kind of copy constructor. Initialize each thread local object
      * by copying the given object.
@@ -85,7 +85,7 @@ namespace Threads
     /**
      * Return a reference to the data stored by this object for the current
      * thread this function is called on.
-     * 
+     *
      * Note that there is no member function get() that is const and
      * returns a const reference as one would expect. The reason is that
      * if such a member function were called on a thread for which no
@@ -97,7 +97,7 @@ namespace Threads
      * allow such access.
      */
     T & get ();
-    
+
     /**
      * Conversion operator that simply converts the thread-local object
      * to the data type that it stores. This function is equivalent to
@@ -105,7 +105,7 @@ namespace Threads
      * TLS object look more like the object it is storing.
      */
     operator T & ();
-    
+
     /**
      * Copy the given argument into the storage space used to represent
      * the current thread. Calling this function as <code>tls_data = object</code>
@@ -113,9 +113,9 @@ namespace Threads
      * intent of this operator is to make the ThreadLocalStorage object
      * look more like the object it represents on the current thread.
      *
-     * @param t The object to be copied into the storage space used 
+     * @param t The object to be copied into the storage space used
      * for the current thread.
-     * 
+     *
      * @return The current object, after the changes have been made
      **/
     ThreadLocalStorage<T> & operator = (const T &t);
@@ -125,17 +125,17 @@ namespace Threads
     /**
      * The data element we store. If we support threads, then this
      * object will be of a type that provides a separate object
-     * for each thread. Otherwise, it is simply a single object 
+     * for each thread. Otherwise, it is simply a single object
      * of type T.
      **/
     tbb::enumerable_thread_specific<T> data;
 #else
     T data;
-#endif    
+#endif
   };
-  
+
 // ----------------- inline and template functions ----------------------------
-  
+
   template <typename T>
   inline
   ThreadLocalStorage<T>::ThreadLocalStorage()
@@ -167,7 +167,7 @@ namespace Threads
     return data.local();
 #else
     return data;
-#endif        
+#endif
   }
 
 
@@ -178,7 +178,7 @@ namespace Threads
   {
     return get();
   }
-  
+
 
   template <typename T>
   inline

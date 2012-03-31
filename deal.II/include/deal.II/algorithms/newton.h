@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -64,136 +64,136 @@ namespace Algorithms
   class Newton : public Operator<VECTOR>
   {
     public:
-				       /**
-					* Constructor, receiving the
-					* applications computing the
-					* residual and solving the
-					* linear problem, respectively.
-					*/
+                                       /**
+                                        * Constructor, receiving the
+                                        * applications computing the
+                                        * residual and solving the
+                                        * linear problem, respectively.
+                                        */
       Newton (Operator<VECTOR>& residual, Operator<VECTOR>& inverse_derivative);
-      
-				       /**
-					* Declare the parameters
-					* applicable to Newton's method.
-					*/
+
+                                       /**
+                                        * Declare the parameters
+                                        * applicable to Newton's method.
+                                        */
       void declare_parameters (ParameterHandler& param);
-      
-				       /**
-					* Read the parameters.
-					*/
+
+                                       /**
+                                        * Read the parameters.
+                                        */
       void initialize (ParameterHandler& param);
 
-				       /**
-					* Initialize the pointer 
+                                       /**
+                                        * Initialize the pointer
                                         * data_out for debugging.
-					*/
+                                        */
       void initialize (OutputOperator<VECTOR>& output);
-      
-      				       /**
-					* The actual Newton
-					* iteration. The initial value
-					* is in <tt>out(0)</tt>, which
-					* also contains the result
-					* after convergence. Values in
-					* <tt>in</tt> are not used by
-					* Newton, but will be handed
-					* down to the objects
-					* #residual and #inverse_derivative.
-					*/
+
+                                       /**
+                                        * The actual Newton
+                                        * iteration. The initial value
+                                        * is in <tt>out(0)</tt>, which
+                                        * also contains the result
+                                        * after convergence. Values in
+                                        * <tt>in</tt> are not used by
+                                        * Newton, but will be handed
+                                        * down to the objects
+                                        * #residual and #inverse_derivative.
+                                        */
       virtual void operator() (NamedData<VECTOR*>& out, const NamedData<VECTOR*>& in);
-      
+
       virtual void notify(const Event&);
 
-				       /**
-					* Set the maximal residual
-					* reduction allowed without
-					* triggering assembling in the
-					* next step. Return the
-					* previous value.
-					*/
+                                       /**
+                                        * Set the maximal residual
+                                        * reduction allowed without
+                                        * triggering assembling in the
+                                        * next step. Return the
+                                        * previous value.
+                                        */
       double threshold(double new_value);
 
-				       /**
-					* Control object for the
-					* Newton iteration.
-					*/
+                                       /**
+                                        * Control object for the
+                                        * Newton iteration.
+                                        */
       ReductionControl control;
     private:
-				       /**
-					* The operator computing the residual.
-					*/
+                                       /**
+                                        * The operator computing the residual.
+                                        */
       SmartPointer<Operator<VECTOR>, Newton<VECTOR> > residual;
 
-				       /**
-					* The operator applying the
-					* inverse derivative to the residual.
-					*/
+                                       /**
+                                        * The operator applying the
+                                        * inverse derivative to the residual.
+                                        */
       SmartPointer<Operator<VECTOR>, Newton<VECTOR> > inverse_derivative;
 
-				       /**
-					* The operator handling the output 
+                                       /**
+                                        * The operator handling the output
                                         * in case the debug_vectors is true.
                                         * Call the initialize function first.
-					*/
+                                        */
       SmartPointer<OutputOperator<VECTOR>, Newton<VECTOR> > data_out;
-      
-				       /**
-					* This flag is set by the
-					* function assemble(),
-					* indicating that the matrix
-					* must be assembled anew upon
-					* start.
-					*/
+
+                                       /**
+                                        * This flag is set by the
+                                        * function assemble(),
+                                        * indicating that the matrix
+                                        * must be assembled anew upon
+                                        * start.
+                                        */
       bool assemble_now;
 
-				       /**
-					* A flag used to decide how
-					* many stepsize iteration
-					* should be made. Default is
-					* the original value of 21.
-					*
-					* Enter zero here to turn of
-					* stepsize control.
-					*
-					* @note Controlled by
-					* <tt>Stepsize iterations</tt> in
-					* parameter file
-					*/
+                                       /**
+                                        * A flag used to decide how
+                                        * many stepsize iteration
+                                        * should be made. Default is
+                                        * the original value of 21.
+                                        *
+                                        * Enter zero here to turn of
+                                        * stepsize control.
+                                        *
+                                        * @note Controlled by
+                                        * <tt>Stepsize iterations</tt> in
+                                        * parameter file
+                                        */
       unsigned int n_stepsize_iterations;
-      
-				       /**
-					* Threshold for re-assembling matrix.
-					*
-					* If the quotient of two
-					* consecutive residuals is
-					* smaller than this threshold,
-					* the system matrix is not
-					* assembled in this step.
-					*
-					* @note This parameter should be
-					* adjusted to the residual gain
-					* of the inner solver.
-					*
-					* The default values is zero,
-					* resulting in reassembling in
-					* every Newton step.
-					*/
+
+                                       /**
+                                        * Threshold for re-assembling matrix.
+                                        *
+                                        * If the quotient of two
+                                        * consecutive residuals is
+                                        * smaller than this threshold,
+                                        * the system matrix is not
+                                        * assembled in this step.
+                                        *
+                                        * @note This parameter should be
+                                        * adjusted to the residual gain
+                                        * of the inner solver.
+                                        *
+                                        * The default values is zero,
+                                        * resulting in reassembling in
+                                        * every Newton step.
+                                        */
       double assemble_threshold;
 
     public:
-				       /**
-					* Print residual, update and
-					* updated solution after each
-					* step into file
-					* <tt>Newton_NNN</tt>?
-					*/
+                                       /**
+                                        * Print residual, update and
+                                        * updated solution after each
+                                        * step into file
+                                        * <tt>Newton_NNN</tt>?
+                                        */
       bool debug_vectors;
-				       /**
-					* Write debug output to
-					* #deallog; the higher the
-					* number, the more output.
-					*/
-      unsigned int debug;	
+                                       /**
+                                        * Write debug output to
+                                        * #deallog; the higher the
+                                        * number, the more output.
+                                        */
+      unsigned int debug;
   };
 }
 

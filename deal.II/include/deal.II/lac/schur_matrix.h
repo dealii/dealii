@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -205,7 +205,7 @@ class SchurMatrix : public Subscriptor
                                       * Optional signature of the @p u-vector.
                                       */
     std::vector<unsigned int> signature;
-  
+
                                      /**
                                       * Switch for debugging information.
                                       */
@@ -218,13 +218,13 @@ class SchurMatrix : public Subscriptor
 template <class MA_inverse, class MB, class MDt, class MC>
 SchurMatrix<MA_inverse, MB, MDt, MC>
 ::SchurMatrix(const MA_inverse& Ainv,
-	      const MB& B,
-	      const MDt& Dt,
-	      const MC& C,
-	      VectorMemory<BlockVector<double> >& mem,
-	      const std::vector<unsigned int>& signature)
-		: Ainv(&Ainv), B(&B), Dt(&Dt), C(&C),
-		  mem(mem),
+              const MB& B,
+              const MDt& Dt,
+              const MC& C,
+              VectorMemory<BlockVector<double> >& mem,
+              const std::vector<unsigned int>& signature)
+                : Ainv(&Ainv), B(&B), Dt(&Dt), C(&C),
+                  mem(mem),
                   signature(signature),
                   debug(0)
 {
@@ -243,12 +243,12 @@ SchurMatrix<MA_inverse, MB, MDt, MC>
 template <class MA_inverse, class MB, class MDt, class MC>
 void SchurMatrix<MA_inverse, MB, MDt, MC>
 ::vmult(BlockVector<double>& dst,
-	const BlockVector<double>& src) const
+        const BlockVector<double>& src) const
 {
   deallog.push("Schur");
   if (debug > 0)
     deallog << "src:" << src.l2_norm() << std::endl;
-  
+
   C->vmult(dst, src);
   if (debug > 0)
     deallog << "C:" << dst.l2_norm() << std::endl;
@@ -281,8 +281,8 @@ void SchurMatrix<MA_inverse, MB, MDt, MC>
 template <class MA_inverse, class MB, class MDt, class MC>
 double SchurMatrix<MA_inverse, MB, MDt, MC>
 ::residual(BlockVector<double>& dst,
-	   const BlockVector<double>& src,
-	   const BlockVector<double>& rhs) const
+           const BlockVector<double>& src,
+           const BlockVector<double>& rhs) const
 {
   vmult(dst, src);
   dst.scale(-1.);
@@ -294,13 +294,13 @@ double SchurMatrix<MA_inverse, MB, MDt, MC>
 template <class MA_inverse, class MB, class MDt, class MC>
 void SchurMatrix<MA_inverse, MB, MDt, MC>
 ::prepare_rhs(BlockVector<double>& dst,
-	      const BlockVector<double>& src) const
+              const BlockVector<double>& src) const
 {
   Assert (src.n_blocks() == B->n_block_cols(),
-	  ExcDimensionMismatch(src.n_blocks(), B->n_block_cols()));
+          ExcDimensionMismatch(src.n_blocks(), B->n_block_cols()));
   Assert (dst.n_blocks() == B->n_block_rows(),
-	  ExcDimensionMismatch(dst.n_blocks(), B->n_block_rows()));
-  
+          ExcDimensionMismatch(dst.n_blocks(), B->n_block_rows()));
+
   deallog.push("Schur-prepare");
   if (debug > 0)
     deallog << "src:" << src.l2_norm() << std::endl;
@@ -323,16 +323,16 @@ void SchurMatrix<MA_inverse, MB, MDt, MC>
 template <class MA_inverse, class MB, class MDt, class MC>
 void SchurMatrix<MA_inverse, MB, MDt, MC>
 ::postprocess(BlockVector<double>& dst,
-	      const BlockVector<double>& src,
-	      const BlockVector<double>& rhs) const
+              const BlockVector<double>& src,
+              const BlockVector<double>& rhs) const
 {
   Assert (dst.n_blocks() == B->n_block_cols(),
-	  ExcDimensionMismatch(dst.n_blocks(), B->n_block_cols()));
+          ExcDimensionMismatch(dst.n_blocks(), B->n_block_cols()));
   Assert (rhs.n_blocks() == B->n_block_cols(),
-	  ExcDimensionMismatch(rhs.n_blocks(), B->n_block_cols()));
+          ExcDimensionMismatch(rhs.n_blocks(), B->n_block_cols()));
   Assert (src.n_blocks() == B->n_block_rows(),
-	  ExcDimensionMismatch(src.n_blocks(), B->n_block_rows()));
-  
+          ExcDimensionMismatch(src.n_blocks(), B->n_block_rows()));
+
   deallog.push("Schur-post");
   if (debug > 0)
     deallog << "src:" << src.l2_norm() << std::endl;

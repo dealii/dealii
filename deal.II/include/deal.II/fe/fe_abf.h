@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -97,253 +97,253 @@ template <int dim>
 class FE_ABF : public FE_PolyTensor<PolynomialsABF<dim>, dim>
 {
   public:
-				     /**
-				      * Constructor for the ABF
-				      * element of degree @p p.
-				      */
+                                     /**
+                                      * Constructor for the ABF
+                                      * element of degree @p p.
+                                      */
     FE_ABF (const unsigned int p);
-    
-				     /**
-				      * Return a string that uniquely
-				      * identifies a finite
-				      * element. This class returns
-				      * <tt>FE_ABF<dim>(degree)</tt>, with
-				      * @p dim and @p degree
-				      * replaced by appropriate
-				      * values.
-				      */
+
+                                     /**
+                                      * Return a string that uniquely
+                                      * identifies a finite
+                                      * element. This class returns
+                                      * <tt>FE_ABF<dim>(degree)</tt>, with
+                                      * @p dim and @p degree
+                                      * replaced by appropriate
+                                      * values.
+                                      */
     virtual std::string get_name () const;
-    
-				     /**
-				      * Check whether a shape function
-				      * may be non-zero on a face.
-				      *
-				      * Right now, this is only
-				      * implemented for RT0 in
-				      * 1D. Otherwise, returns always
-				      * @p true.
-				      */
+
+                                     /**
+                                      * Check whether a shape function
+                                      * may be non-zero on a face.
+                                      *
+                                      * Right now, this is only
+                                      * implemented for RT0 in
+                                      * 1D. Otherwise, returns always
+                                      * @p true.
+                                      */
     virtual bool has_support_on_face (const unsigned int shape_index,
-				      const unsigned int face_index) const;
-    
+                                      const unsigned int face_index) const;
+
     virtual void interpolate(std::vector<double>&                local_dofs,
-			     const std::vector<double>& values) const;
+                             const std::vector<double>& values) const;
     virtual void interpolate(std::vector<double>&                local_dofs,
-			     const std::vector<Vector<double> >& values,
-			     unsigned int offset = 0) const;
+                             const std::vector<Vector<double> >& values,
+                             unsigned int offset = 0) const;
     virtual void interpolate(
       std::vector<double>& local_dofs,
       const VectorSlice<const std::vector<std::vector<double> > >& values) const;
     virtual std::size_t memory_consumption () const;
     virtual FiniteElement<dim> * clone() const;
-    
+
   private:
-				     /**
-				      * The order of the
-				      * ABF element. The
-				      * lowest order elements are
-				      * usually referred to as RT0,
-				      * even though their shape
-				      * functions are piecewise
-				      * quadratics.
-				      */  
+                                     /**
+                                      * The order of the
+                                      * ABF element. The
+                                      * lowest order elements are
+                                      * usually referred to as RT0,
+                                      * even though their shape
+                                      * functions are piecewise
+                                      * quadratics.
+                                      */
     const unsigned int rt_order;
 
-    				     /**
-				      * Only for internal use. Its
-				      * full name is
-				      * @p get_dofs_per_object_vector
-				      * function and it creates the
-				      * @p dofs_per_object vector that is
-				      * needed within the constructor to
-				      * be passed to the constructor of
-				      * @p FiniteElementData.
-				      */
+                                     /**
+                                      * Only for internal use. Its
+                                      * full name is
+                                      * @p get_dofs_per_object_vector
+                                      * function and it creates the
+                                      * @p dofs_per_object vector that is
+                                      * needed within the constructor to
+                                      * be passed to the constructor of
+                                      * @p FiniteElementData.
+                                      */
     static std::vector<unsigned int>
     get_dpo_vector (const unsigned int degree);
 
-				     /**
-				      * Initialize the @p
-				      * generalized_support_points
-				      * field of the FiniteElement
-				      * class and fill the tables with
-				      * interpolation weights
-				      * (#boundary_weights and
-				      * #interior_weights). Called
-				      * from the constructor.
-				      */
+                                     /**
+                                      * Initialize the @p
+                                      * generalized_support_points
+                                      * field of the FiniteElement
+                                      * class and fill the tables with
+                                      * interpolation weights
+                                      * (#boundary_weights and
+                                      * #interior_weights). Called
+                                      * from the constructor.
+                                      */
     void initialize_support_points (const unsigned int rt_degree);
 
-				     /**
-				      * Initialize the interpolation
-				      * from functions on refined mesh
-				      * cells onto the father
-				      * cell. According to the
-				      * philosophy of the
-				      * Raviart-Thomas element, this
-				      * restriction operator preserves
-				      * the divergence of a function
-				      * weakly.
-				      */
+                                     /**
+                                      * Initialize the interpolation
+                                      * from functions on refined mesh
+                                      * cells onto the father
+                                      * cell. According to the
+                                      * philosophy of the
+                                      * Raviart-Thomas element, this
+                                      * restriction operator preserves
+                                      * the divergence of a function
+                                      * weakly.
+                                      */
     void initialize_restriction ();
-    
-				     /**
-				      * Given a set of flags indicating
-				      * what quantities are requested
-				      * from a @p FEValues object,
-				      * return which of these can be
-				      * precomputed once and for
-				      * all. Often, the values of
-				      * shape function at quadrature
-				      * points can be precomputed, for
-				      * example, in which case the
-				      * return value of this function
-				      * would be the logical and of
-				      * the input @p flags and
-				      * @p update_values.
-				      *
-				      * For the present kind of finite
-				      * element, this is exactly the
-				      * case.
-				      */
+
+                                     /**
+                                      * Given a set of flags indicating
+                                      * what quantities are requested
+                                      * from a @p FEValues object,
+                                      * return which of these can be
+                                      * precomputed once and for
+                                      * all. Often, the values of
+                                      * shape function at quadrature
+                                      * points can be precomputed, for
+                                      * example, in which case the
+                                      * return value of this function
+                                      * would be the logical and of
+                                      * the input @p flags and
+                                      * @p update_values.
+                                      *
+                                      * For the present kind of finite
+                                      * element, this is exactly the
+                                      * case.
+                                      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const;
-  
-				     /**
-				      * This is the opposite to the
-				      * above function: given a set of
-				      * flags indicating what we want
-				      * to know, return which of these
-				      * need to be computed each time
-				      * we visit a new cell.
-				      *
-				      * If for the computation of one
-				      * quantity something else is
-				      * also required (for example, we
-				      * often need the covariant
-				      * transformation when gradients
-				      * need to be computed), include
-				      * this in the result as well.
-				      */
+
+                                     /**
+                                      * This is the opposite to the
+                                      * above function: given a set of
+                                      * flags indicating what we want
+                                      * to know, return which of these
+                                      * need to be computed each time
+                                      * we visit a new cell.
+                                      *
+                                      * If for the computation of one
+                                      * quantity something else is
+                                      * also required (for example, we
+                                      * often need the covariant
+                                      * transformation when gradients
+                                      * need to be computed), include
+                                      * this in the result as well.
+                                      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
-    
-				     /**
-				      * Fields of cell-independent data.
-				      *
-				      * For information about the
-				      * general purpose of this class,
-				      * see the documentation of the
-				      * base class.
-				      */
+
+                                     /**
+                                      * Fields of cell-independent data.
+                                      *
+                                      * For information about the
+                                      * general purpose of this class,
+                                      * see the documentation of the
+                                      * base class.
+                                      */
     class InternalData : public FiniteElement<dim>::InternalDataBase
     {
       public:
-					 /**
-					  * Array with shape function
-					  * values in quadrature
-					  * points. There is one row
-					  * for each shape function,
-					  * containing values for each
-					  * quadrature point. Since
-					  * the shape functions are
-					  * vector-valued (with as
-					  * many components as there
-					  * are space dimensions), the
-					  * value is a tensor.
-					  *
-					  * In this array, we store
-					  * the values of the shape
-					  * function in the quadrature
-					  * points on the unit
-					  * cell. The transformation
-					  * to the real space cell is
-					  * then simply done by
-					  * multiplication with the
-					  * Jacobian of the mapping.
-					  */
-	std::vector<std::vector<Tensor<1,dim> > > shape_values;
+                                         /**
+                                          * Array with shape function
+                                          * values in quadrature
+                                          * points. There is one row
+                                          * for each shape function,
+                                          * containing values for each
+                                          * quadrature point. Since
+                                          * the shape functions are
+                                          * vector-valued (with as
+                                          * many components as there
+                                          * are space dimensions), the
+                                          * value is a tensor.
+                                          *
+                                          * In this array, we store
+                                          * the values of the shape
+                                          * function in the quadrature
+                                          * points on the unit
+                                          * cell. The transformation
+                                          * to the real space cell is
+                                          * then simply done by
+                                          * multiplication with the
+                                          * Jacobian of the mapping.
+                                          */
+        std::vector<std::vector<Tensor<1,dim> > > shape_values;
 
-					 /**
-					  * Array with shape function
-					  * gradients in quadrature
-					  * points. There is one
-					  * row for each shape
-					  * function, containing
-					  * values for each quadrature
-					  * point.
-					  *
-					  * We store the gradients in
-					  * the quadrature points on
-					  * the unit cell. We then
-					  * only have to apply the
-					  * transformation (which is a
-					  * matrix-vector
-					  * multiplication) when
-					  * visiting an actual cell.
-					  */
-	std::vector<std::vector<Tensor<2,dim> > > shape_gradients;
+                                         /**
+                                          * Array with shape function
+                                          * gradients in quadrature
+                                          * points. There is one
+                                          * row for each shape
+                                          * function, containing
+                                          * values for each quadrature
+                                          * point.
+                                          *
+                                          * We store the gradients in
+                                          * the quadrature points on
+                                          * the unit cell. We then
+                                          * only have to apply the
+                                          * transformation (which is a
+                                          * matrix-vector
+                                          * multiplication) when
+                                          * visiting an actual cell.
+                                          */
+        std::vector<std::vector<Tensor<2,dim> > > shape_gradients;
     };
 
-				     /**
-				      * These are the factors
-				      * multiplied to a function in
-				      * the
-				      * #generalized_face_support_points
-				      * when computing the
-				      * integration. They are
-				      * organized such that there is
-				      * one row for each generalized
-				      * face support point and one
-				      * column for each degree of
-				      * freedom on the face.
-				      */
+                                     /**
+                                      * These are the factors
+                                      * multiplied to a function in
+                                      * the
+                                      * #generalized_face_support_points
+                                      * when computing the
+                                      * integration. They are
+                                      * organized such that there is
+                                      * one row for each generalized
+                                      * face support point and one
+                                      * column for each degree of
+                                      * freedom on the face.
+                                      */
     Table<2, double> boundary_weights;
-				     /**
-				      * Precomputed factors for
-				      * interpolation of interior
-				      * degrees of freedom. The
-				      * rationale for this Table is
-				      * the same as for
-				      * #boundary_weights. Only, this
-				      * table has a third coordinate
-				      * for the space direction of the
-				      * component evaluated.
-				      */
+                                     /**
+                                      * Precomputed factors for
+                                      * interpolation of interior
+                                      * degrees of freedom. The
+                                      * rationale for this Table is
+                                      * the same as for
+                                      * #boundary_weights. Only, this
+                                      * table has a third coordinate
+                                      * for the space direction of the
+                                      * component evaluated.
+                                      */
     Table<3, double> interior_weights;
-    
 
 
-				     /**
-				      * These are the factors
-				      * multiplied to a function in
-				      * the
-				      * #generalized_face_support_points
-				      * when computing the
-				      * integration. They are
-				      * organized such that there is
-				      * one row for each generalized
-				      * face support point and one
-				      * column for each degree of
-				      * freedom on the face.
-				      */
+
+                                     /**
+                                      * These are the factors
+                                      * multiplied to a function in
+                                      * the
+                                      * #generalized_face_support_points
+                                      * when computing the
+                                      * integration. They are
+                                      * organized such that there is
+                                      * one row for each generalized
+                                      * face support point and one
+                                      * column for each degree of
+                                      * freedom on the face.
+                                      */
     Table<2, double> boundary_weights_abf;
-				     /**
-				      * Precomputed factors for
-				      * interpolation of interior
-				      * degrees of freedom. The
-				      * rationale for this Table is
-				      * the same as for
-				      * #boundary_weights. Only, this
-				      * table has a third coordinate
-				      * for the space direction of the
-				      * component evaluated.
-				      */
+                                     /**
+                                      * Precomputed factors for
+                                      * interpolation of interior
+                                      * degrees of freedom. The
+                                      * rationale for this Table is
+                                      * the same as for
+                                      * #boundary_weights. Only, this
+                                      * table has a third coordinate
+                                      * for the space direction of the
+                                      * component evaluated.
+                                      */
     Table<3, double> interior_weights_abf;
 
 
-				     /**
-				      * Allow access from other
-				      * dimensions.
-				      */
+                                     /**
+                                      * Allow access from other
+                                      * dimensions.
+                                      */
     template <int dim1> friend class FE_ABF;
 };
 

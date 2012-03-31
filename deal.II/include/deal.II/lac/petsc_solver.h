@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -138,23 +138,23 @@ namespace PETScWrappers
              const PreconditionerBase &preconditioner);
 
 
-				       /**
-					* Resets the contained preconditioner
-					* and solver object. See class
-					* description for more details.
-					*/
+                                       /**
+                                        * Resets the contained preconditioner
+                                        * and solver object. See class
+                                        * description for more details.
+                                        */
       virtual void reset();
-					
-      
+
+
                                       /**
-                                        * Sets a prefix name for the solver 
+                                        * Sets a prefix name for the solver
                                         * object. Useful when customizing the
                                         * PETSc KSP object with command-line
                                         * options.
                                         */
       void set_prefix(const std::string &prefix);
-					
-      
+
+
                                        /**
                                         * Access to object that controls
                                         * convergence.
@@ -202,9 +202,9 @@ namespace PETScWrappers
                                         * Solver prefix name to qualify options
                                         * specific to the PETSc KSP object in the
                                         * current context.
-                                        * Note: A hyphen (-) must NOT be given 
-                                        * at the beginning of the prefix name. 
-                                        * The first character of all runtime 
+                                        * Note: A hyphen (-) must NOT be given
+                                        * at the beginning of the prefix name.
+                                        * The first character of all runtime
                                         * options is AUTOMATICALLY the hyphen.
                                         */
       std::string prefix_name;
@@ -602,7 +602,7 @@ namespace PETScWrappers
                                             * iterations.
                                             */
           AdditionalData (const unsigned int restart_parameter = 30,
-			  const bool right_preconditioning = false);
+                          const bool right_preconditioning = false);
 
                                            /**
                                             * Maximum number of
@@ -610,11 +610,11 @@ namespace PETScWrappers
                                             */
           unsigned int restart_parameter;
 
-					   /**
-					    * Flag for right
-					    * preconditioning.
-					    */
-	  bool right_preconditioning;
+                                           /**
+                                            * Flag for right
+                                            * preconditioning.
+                                            */
+          bool right_preconditioning;
       };
 
                                        /**
@@ -1129,8 +1129,8 @@ namespace PETScWrappers
                                         * SolverBase class.
                                         */
       SolverPreOnly (SolverControl        &cn,
-		     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-		     const AdditionalData &data = AdditionalData());
+                     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+                     const AdditionalData &data = AdditionalData());
 
     protected:
                                        /**

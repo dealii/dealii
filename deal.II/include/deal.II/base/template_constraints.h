@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2008, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,7 +26,7 @@ template <bool, typename> struct constraint_and_return_value;
  * to the second template argument. It is used in order to construct
  * constraints on template arguments in template (and member template)
  * functions. The negative specialization is missing.
- * 
+ *
  * Here's how the trick works, called SFINAE (substitution failure is
  * not an error): The C++ standard prescribes that a template function
  * is only considered in a call, if all parts of its signature can be
@@ -42,9 +42,9 @@ template <bool, typename> struct constraint_and_return_value;
  * parameter T must be identified with the type "int". However,
  * the return type T::type does not exist. The trick now is
  * that this is not considered an error: this template is simply
- * not considered, the compiler keeps on looking for another 
+ * not considered, the compiler keeps on looking for another
  * possible function foo.
- * 
+ *
  * The idea is then to make the return type un-instantiatable if
  * certain constraints on the template types are not satisfied:
  * @verbatim
@@ -75,7 +75,7 @@ template <bool, typename> struct constraint_and_return_value;
  * the return type is just the second type in the template.
  *
  * @author Wolfgang Bangerth, 2003
- */ 
+ */
 template <typename T> struct constraint_and_return_value<true,T>
 {
     typedef T type;
@@ -177,7 +177,7 @@ struct identity
  *
  * @author Wolfgang Bangerth, 2004
  */
-struct PointerComparison 
+struct PointerComparison
 {
                                      /**
                                       * Comparison function for pointers of
@@ -197,7 +197,7 @@ struct PointerComparison
                                       * same, so we always return @p false.
                                       */
     template <typename T, typename U>
-    static bool equal (const T*, const U*);    
+    static bool equal (const T*, const U*);
 };
 
 
@@ -263,7 +263,7 @@ namespace internal
  * @author Wolfgang Bangerth, 2006
  */
   template <int N>
-  struct int2type 
+  struct int2type
   {};
 
 

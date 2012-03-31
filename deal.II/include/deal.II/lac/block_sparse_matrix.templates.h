@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,8 +38,8 @@ BlockSparseMatrix (const BlockSparsityPattern &sparsity)
 template <typename number>
 BlockSparseMatrix<number>::~BlockSparseMatrix ()
 {
-  				   // delete previous content of
-				   // the subobjects array
+                                   // delete previous content of
+                                   // the subobjects array
   clear ();
   sparsity_pattern = 0;
 }
@@ -49,7 +49,7 @@ BlockSparseMatrix<number>::~BlockSparseMatrix ()
 template <typename number>
 BlockSparseMatrix<number> &
 BlockSparseMatrix<number>::
-operator = (const BlockSparseMatrix<number> &m) 
+operator = (const BlockSparseMatrix<number> &m)
 {
   Assert (this->row_block_indices == m.row_block_indices,
           ExcBlockDimensionMismatch());
@@ -57,9 +57,9 @@ operator = (const BlockSparseMatrix<number> &m)
           ExcBlockDimensionMismatch());
 
                                    // this operator does not do
-				   // anything except than checking
-				   // whether the base objects want to
-				   // do something
+                                   // anything except than checking
+                                   // whether the base objects want to
+                                   // do something
   for (unsigned int r=0; r<this->n_block_rows(); ++r)
     for (unsigned int c=0; c<this->n_block_cols(); ++c)
       this->block(r,c) = m.block(r,c);
@@ -71,7 +71,7 @@ operator = (const BlockSparseMatrix<number> &m)
 
 template <typename number>
 void
-BlockSparseMatrix<number>::clear () 
+BlockSparseMatrix<number>::clear ()
 {
   BlockMatrixBase<SparseMatrix<number> >::clear();
   sparsity_pattern = 0;
@@ -84,28 +84,28 @@ void
 BlockSparseMatrix<number>::
 reinit (const BlockSparsityPattern &sparsity)
 {
-				   // first delete previous content of
-				   // the subobjects array and delete
-				   // the table completely
+                                   // first delete previous content of
+                                   // the subobjects array and delete
+                                   // the table completely
   clear ();
 
-				   // then associate new sparsity
-				   // pattern and resize
+                                   // then associate new sparsity
+                                   // pattern and resize
   sparsity_pattern = &sparsity;
-  
+
   this->row_block_indices    = sparsity.row_indices;
   this->column_block_indices = sparsity.column_indices;
 
   this->sub_objects.reinit (sparsity.n_block_rows(),
                             sparsity.n_block_cols());
 
-				   // and reinitialize the blocks
+                                   // and reinitialize the blocks
   for (unsigned int r=0; r<this->n_block_rows(); ++r)
     for (unsigned int c=0; c<this->n_block_cols(); ++c)
       {
         BlockType *p = new SparseMatrix<number>();
         p->reinit (sparsity.block(r,c));
-	this->sub_objects[r][c] = p;
+        this->sub_objects[r][c] = p;
       }
 }
 
@@ -118,7 +118,7 @@ BlockSparseMatrix<number>::empty () const
   for (unsigned int r=0; r<this->n_block_rows(); ++r)
     for (unsigned int c=0; c<this->n_block_cols(); ++c)
       if (this->block(r,c).empty () == false)
-	return false;
+        return false;
 
   return true;
 }
@@ -168,7 +168,7 @@ BlockSparseMatrix<number>::get_sparsity_pattern () const
 
 
 template <typename number>
-void 
+void
 BlockSparseMatrix<number>::
 print_formatted (std::ostream       &out,
                  const unsigned int  precision,

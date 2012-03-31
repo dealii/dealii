@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -239,357 +239,357 @@ class TriaRawIterator :
 #endif
 {
   public:
-				     /**
-				      * Declare the type of the Accessor for
-				      * use in the outside world. This way other
-				      * functions can use the Accessor's type
-				      * without knowledge of how the exact
-				      * implementation actually is.
-				      */
+                                     /**
+                                      * Declare the type of the Accessor for
+                                      * use in the outside world. This way other
+                                      * functions can use the Accessor's type
+                                      * without knowledge of how the exact
+                                      * implementation actually is.
+                                      */
     typedef Accessor AccessorType;
 
-				     /**
-				      *  Empty constructor. Such an object
-				      *  is not usable!
-				      */
+                                     /**
+                                      *  Empty constructor. Such an object
+                                      *  is not usable!
+                                      */
     TriaRawIterator ();
 
-				     /**
-				      *  Copy constructor.
-				      */
+                                     /**
+                                      *  Copy constructor.
+                                      */
     TriaRawIterator (const TriaRawIterator &);
 
-				     /**
-				      * Construct an iterator from the given
-				      * accessor; the given accessor needs not
-				      * be of the same type as the accessor of
-				      * this class is, but it needs to be
-				      * convertible.
-				      *
-				      * Through this constructor, it is also
-				      * possible to construct objects for
-				      * derived iterators:
-				      * @verbatim
-				      * DoFCellAccessor dof_accessor;
-				      * Triangulation::active_cell_iterator cell
-				      *   = accessor;
-				      * @endverbatim
-				      */
+                                     /**
+                                      * Construct an iterator from the given
+                                      * accessor; the given accessor needs not
+                                      * be of the same type as the accessor of
+                                      * this class is, but it needs to be
+                                      * convertible.
+                                      *
+                                      * Through this constructor, it is also
+                                      * possible to construct objects for
+                                      * derived iterators:
+                                      * @verbatim
+                                      * DoFCellAccessor dof_accessor;
+                                      * Triangulation::active_cell_iterator cell
+                                      *   = accessor;
+                                      * @endverbatim
+                                      */
     TriaRawIterator (const Accessor &a);
 
-				     /**
-				      * Constructor. Assumes that the
-				      * other accessor type is
-				      * convertible to the current
-				      * one.
-				      */
+                                     /**
+                                      * Constructor. Assumes that the
+                                      * other accessor type is
+                                      * convertible to the current
+                                      * one.
+                                      */
     template <typename OtherAccessor>
     TriaRawIterator (const OtherAccessor &a);
 
-				     /**
-				      *  Proper constructor, initialized
-				      *  with the triangulation, the
-				      *  level and index of the object
-				      *  pointed to. The last parameter is
-				      *  of a type declared by the accessor
-				      *  class.
-				      */
+                                     /**
+                                      *  Proper constructor, initialized
+                                      *  with the triangulation, the
+                                      *  level and index of the object
+                                      *  pointed to. The last parameter is
+                                      *  of a type declared by the accessor
+                                      *  class.
+                                      */
     TriaRawIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
-		     const int level,
-		     const int index,
-		     const typename AccessorType::AccessorData *local_data = 0);
+                     const int level,
+                     const int index,
+                     const typename AccessorType::AccessorData *local_data = 0);
 
-				     /**
-				      * This is a conversion operator
-				      * (constructor) which takes another
-				      * iterator type and copies the data;
-				      * this conversion works, if there is
-				      * a conversion path from the
-				      * @p OtherAccessor class to the @p Accessor
-				      * class of this object. One such path
-				      * would be derived class to base class,
-				      * which for example may be used to get
-				      * a Triangulation::raw_cell_iterator from
-				      * a DoFHandler::raw_cell_iterator, since
-				      * the DoFAccessor class is derived from
-				      * the TriaAccessorBase class.
-				      */
+                                     /**
+                                      * This is a conversion operator
+                                      * (constructor) which takes another
+                                      * iterator type and copies the data;
+                                      * this conversion works, if there is
+                                      * a conversion path from the
+                                      * @p OtherAccessor class to the @p Accessor
+                                      * class of this object. One such path
+                                      * would be derived class to base class,
+                                      * which for example may be used to get
+                                      * a Triangulation::raw_cell_iterator from
+                                      * a DoFHandler::raw_cell_iterator, since
+                                      * the DoFAccessor class is derived from
+                                      * the TriaAccessorBase class.
+                                      */
     template <typename OtherAccessor>
     TriaRawIterator (const TriaRawIterator<OtherAccessor> &i);
 
-				     /**
-				      * Conversion constructor. Same
-				      * as above with the difference
-				      * that it converts from
-				      * TriaIterator classes (not
-				      * TriaRawIterator).
-				      */
+                                     /**
+                                      * Conversion constructor. Same
+                                      * as above with the difference
+                                      * that it converts from
+                                      * TriaIterator classes (not
+                                      * TriaRawIterator).
+                                      */
     template <typename OtherAccessor>
     TriaRawIterator (const TriaIterator<OtherAccessor> &i);
 
-				     /**
-				      * Conversion constructor. Same
-				      * as above with the difference
-				      * that it converts from
-				      * TriaActiveIterator classes
-				      * (not TriaRawIterator).
-				      */
+                                     /**
+                                      * Conversion constructor. Same
+                                      * as above with the difference
+                                      * that it converts from
+                                      * TriaActiveIterator classes
+                                      * (not TriaRawIterator).
+                                      */
     template <typename OtherAccessor>
     TriaRawIterator (const TriaActiveIterator<OtherAccessor> &i);
 
-				     /**
-				      *  @name Dereferencing
-				      */
-				     /*@{*/
-				     /**
-				      *  Dereferencing operator, returns a
-				      *  reference to an accessor.
-				      *  Usage is thus like <tt>(*i).index ();</tt>
-				      *
-				      *  This function has to be specialized
-				      *  explicitly for the different
-				      *  @p Pointees, to allow an
-				      *  <tt>iterator<1,TriangulationLevel<1>::LinesData></tt>
-				      *  to point to <tt>tria->lines.cells[index]</tt> while
-				      *  for one dimension higher it has
-				      *  to point to <tt>tria->quads.cells[index]</tt>.
-				      *
-				      *  You must not dereference invalid or
-				      *  past the end iterators.
-				      */
+                                     /**
+                                      *  @name Dereferencing
+                                      */
+                                     /*@{*/
+                                     /**
+                                      *  Dereferencing operator, returns a
+                                      *  reference to an accessor.
+                                      *  Usage is thus like <tt>(*i).index ();</tt>
+                                      *
+                                      *  This function has to be specialized
+                                      *  explicitly for the different
+                                      *  @p Pointees, to allow an
+                                      *  <tt>iterator<1,TriangulationLevel<1>::LinesData></tt>
+                                      *  to point to <tt>tria->lines.cells[index]</tt> while
+                                      *  for one dimension higher it has
+                                      *  to point to <tt>tria->quads.cells[index]</tt>.
+                                      *
+                                      *  You must not dereference invalid or
+                                      *  past the end iterators.
+                                      */
     const Accessor & operator * () const;
 
-				     /**
-				      *  Dereferencing operator, non-@p const
-				      *  version.
-				      */
+                                     /**
+                                      *  Dereferencing operator, non-@p const
+                                      *  version.
+                                      */
     Accessor & operator * ();
 
-				     /**
-				      *  Dereferencing operator, returns a
-				      *  reference of the cell pointed to.
-				      *  Usage is thus like <tt>i->index ();</tt>
-				      *
-				      *  There is a @p const and a non-@p const
-				      *  version.
-				      */
+                                     /**
+                                      *  Dereferencing operator, returns a
+                                      *  reference of the cell pointed to.
+                                      *  Usage is thus like <tt>i->index ();</tt>
+                                      *
+                                      *  There is a @p const and a non-@p const
+                                      *  version.
+                                      */
     const Accessor * operator -> () const;
 
-				     /**
-				      *  Dereferencing operator, non-@p const
-				      *  version.
-				      */
+                                     /**
+                                      *  Dereferencing operator, non-@p const
+                                      *  version.
+                                      */
     Accessor * operator -> ();
-				     /*@}*/
+                                     /*@}*/
 
-				     /**
-				      *  Assignment operator.
-				      */
+                                     /**
+                                      *  Assignment operator.
+                                      */
     TriaRawIterator & operator = (const TriaRawIterator &);
 
-				     /**
-				      *  Assignment operator.
-				      */
+                                     /**
+                                      *  Assignment operator.
+                                      */
 //    template <class OtherAccessor>
 //    TriaRawIterator & operator = (const TriaRawIterator<OtherAccessor>&);
 
-				     /**
-				      *  Assignment operator.
-				      */
+                                     /**
+                                      *  Assignment operator.
+                                      */
 //    template <class OtherAccessor>
 //    TriaRawIterator & operator = (const TriaIterator<OtherAccessor>&);
 
-				     /**
-				      *  Assignment operator.
-				      */
+                                     /**
+                                      *  Assignment operator.
+                                      */
 //    template <class OtherAccessor>
 //    TriaRawIterator & operator = (const TriaActiveIterator<OtherAccessor>&);
 
-				     /**
-				      *  Compare for equality.
-				      */
+                                     /**
+                                      *  Compare for equality.
+                                      */
     bool operator == (const TriaRawIterator &) const;
 
-				     /**
-				      *  Compare for inequality.
-				      */
+                                     /**
+                                      *  Compare for inequality.
+                                      */
     bool operator != (const TriaRawIterator &) const;
 
-				     /**
-				      * Offer a weak ordering of iterators,
-				      * which is needed to make @p maps with
-				      * iterators being keys. An iterator
-				      * pointing to an element @p a is
-				      * less than another iterator pointing
-				      * to an element @p b if
-				      * level(a)<level(b) or
-				      * (level(a)==level(b) and index(a)<index(b)).
-				      *
-				      * Comparing iterators of which one or
-				      * both are invalid is an error. The
-				      * past-the-end iterator is always
-				      * ordered last. Two past-the-end
-				      * iterators rank the same, thus false
-				      * is returned in that case.
-				      */
+                                     /**
+                                      * Offer a weak ordering of iterators,
+                                      * which is needed to make @p maps with
+                                      * iterators being keys. An iterator
+                                      * pointing to an element @p a is
+                                      * less than another iterator pointing
+                                      * to an element @p b if
+                                      * level(a)<level(b) or
+                                      * (level(a)==level(b) and index(a)<index(b)).
+                                      *
+                                      * Comparing iterators of which one or
+                                      * both are invalid is an error. The
+                                      * past-the-end iterator is always
+                                      * ordered last. Two past-the-end
+                                      * iterators rank the same, thus false
+                                      * is returned in that case.
+                                      */
     bool operator < (const TriaRawIterator &) const;
 
-				     /**@name Advancement of iterators*/
-				     /*@{*/
-				     /**
-				      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
-				      *  operator advances the iterator to
-				      *  the next element and returns
-				      *  a reference to <tt>*this</tt>.
-				      *
-				      *  The next element is next on this
-				      *  level if there are more. If the
-				      *  present element is the last on
-				      *  this level, the first on the
-				      *  next level is accessed. This is only
-				      *  valid for iterators pointing to cells,
-				      *  faces have no level.
-				      */
+                                     /**@name Advancement of iterators*/
+                                     /*@{*/
+                                     /**
+                                      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
+                                      *  operator advances the iterator to
+                                      *  the next element and returns
+                                      *  a reference to <tt>*this</tt>.
+                                      *
+                                      *  The next element is next on this
+                                      *  level if there are more. If the
+                                      *  present element is the last on
+                                      *  this level, the first on the
+                                      *  next level is accessed. This is only
+                                      *  valid for iterators pointing to cells,
+                                      *  faces have no level.
+                                      */
     TriaRawIterator & operator ++ ();
 
-				     /**
-				      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
-				      *  operator advances the iterator to
-				      *  the next element, but
-				      *  returns an iterator to the element
-				      *  priviously pointed to. Since this
-				      *  involves a temporary and a copy
-				      *  operation and since an
-				      *  @p iterator is quite a large
-				      *  object for a pointer, use the
-				      *  prefix operator <tt>++i</tt> whenever
-				      *  possible, especially in the head
-				      *  of for loops
-				      *  (<tt>for (; i!=end; ++i)</tt>) since there
-				      *  you normally never need the
-				      *  returned value.
-				      */
+                                     /**
+                                      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
+                                      *  operator advances the iterator to
+                                      *  the next element, but
+                                      *  returns an iterator to the element
+                                      *  priviously pointed to. Since this
+                                      *  involves a temporary and a copy
+                                      *  operation and since an
+                                      *  @p iterator is quite a large
+                                      *  object for a pointer, use the
+                                      *  prefix operator <tt>++i</tt> whenever
+                                      *  possible, especially in the head
+                                      *  of for loops
+                                      *  (<tt>for (; i!=end; ++i)</tt>) since there
+                                      *  you normally never need the
+                                      *  returned value.
+                                      */
     TriaRawIterator operator ++ (int);
 
-    				     /**
-				      *  Prefix @p -- operator: @p --i. This
-				      *  operator advances the iterator to
-				      *  the previous element and returns
-				      *  a reference to <tt>*this</tt>.
-				      *
-				      *  The previous element is previous on
-				      *  this level if <tt>index>0</tt>. If the
-				      *  present element is the first on
-				      *  this level, the last on the
-				      *  previous level is accessed. This is only
-				      *  valid for iterators pointing to cells,
-				      *  faces have no level.
-				      */
+                                     /**
+                                      *  Prefix @p -- operator: @p --i. This
+                                      *  operator advances the iterator to
+                                      *  the previous element and returns
+                                      *  a reference to <tt>*this</tt>.
+                                      *
+                                      *  The previous element is previous on
+                                      *  this level if <tt>index>0</tt>. If the
+                                      *  present element is the first on
+                                      *  this level, the last on the
+                                      *  previous level is accessed. This is only
+                                      *  valid for iterators pointing to cells,
+                                      *  faces have no level.
+                                      */
     TriaRawIterator & operator -- ();
 
-				     /**
-				      *  Postfix @p -- operator: @p i--. This
-				      *  operator advances the iterator to
-				      *  the previous element, but
-				      *  returns an iterator to the element
-				      *  priviously pointed to. Since this
-				      *  involves a temporary and a copy
-				      *  operation and since an
-				      *  @p iterator is quite a large
-				      *  object for a pointer, use the
-				      *  prefix operator @p --i whenever
-				      *  possible, especially in the head
-				      *  of for loops
-				      *  (<tt>for (; i!=end; --i)</tt>) since there
-				      *  you normally never need the
-				      *  returned value.
-				      */
+                                     /**
+                                      *  Postfix @p -- operator: @p i--. This
+                                      *  operator advances the iterator to
+                                      *  the previous element, but
+                                      *  returns an iterator to the element
+                                      *  priviously pointed to. Since this
+                                      *  involves a temporary and a copy
+                                      *  operation and since an
+                                      *  @p iterator is quite a large
+                                      *  object for a pointer, use the
+                                      *  prefix operator @p --i whenever
+                                      *  possible, especially in the head
+                                      *  of for loops
+                                      *  (<tt>for (; i!=end; --i)</tt>) since there
+                                      *  you normally never need the
+                                      *  returned value.
+                                      */
     TriaRawIterator operator -- (int);
-				     /*@}*/
+                                     /*@}*/
 
-				     /**
-				      *  Return the state of the iterator.
-				      */
+                                     /**
+                                      *  Return the state of the iterator.
+                                      */
     IteratorState::IteratorStates state () const;
 
-				     /**
-				      * Print the iterator to @p out. The
-				      * format is like <tt>level.index</tt>.
-				      */
+                                     /**
+                                      * Print the iterator to @p out. The
+                                      * format is like <tt>level.index</tt>.
+                                      */
     void print (std::ostream &out) const;
 
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object.
+                                      */
     std::size_t memory_consumption () const;
 
 
-				     /**@name Exceptions*/
-				     /*@{*/
-				     /**
-				      *  Exception for TriaObjects with
-				      *  level, i.e. cells.
-				      */
+                                     /**@name Exceptions*/
+                                     /*@{*/
+                                     /**
+                                      *  Exception for TriaObjects with
+                                      *  level, i.e. cells.
+                                      */
     DeclException1 (ExcDereferenceInvalidCell,
-		    Accessor,
-		    << "You tried to dereference a cell iterator for which this "
-		    << "is not possible. More information on this iterator: "
-		    << "level=" << arg1.level()
-		    << ", index=" << arg1.index()
-		    << ", state="
-		    << (arg1.state() == IteratorState::valid ? "valid" :
-			(arg1.state() == IteratorState::past_the_end ?
-			 "past_the_end" : "invalid")));
+                    Accessor,
+                    << "You tried to dereference a cell iterator for which this "
+                    << "is not possible. More information on this iterator: "
+                    << "level=" << arg1.level()
+                    << ", index=" << arg1.index()
+                    << ", state="
+                    << (arg1.state() == IteratorState::valid ? "valid" :
+                        (arg1.state() == IteratorState::past_the_end ?
+                         "past_the_end" : "invalid")));
 
-				     /**
-				      *  Exception for
-				      *  lower-dimensional TriaObjects
-				      *  without level, i.e. objects
-				      *  faces are constructed with.
-				      */
+                                     /**
+                                      *  Exception for
+                                      *  lower-dimensional TriaObjects
+                                      *  without level, i.e. objects
+                                      *  faces are constructed with.
+                                      */
     DeclException1 (ExcDereferenceInvalidObject,
-		    Accessor,
-		    << "You tried to dereference an iterator for which this "
-		    << "is not possible. More information on this iterator: "
-		    << "index=" << arg1.index()
-		    << ", state="
-		    << (arg1.state() == IteratorState::valid ? "valid" :
-			(arg1.state() == IteratorState::past_the_end ?
-			 "past_the_end" : "invalid")));
+                    Accessor,
+                    << "You tried to dereference an iterator for which this "
+                    << "is not possible. More information on this iterator: "
+                    << "index=" << arg1.index()
+                    << ", state="
+                    << (arg1.state() == IteratorState::valid ? "valid" :
+                        (arg1.state() == IteratorState::past_the_end ?
+                         "past_the_end" : "invalid")));
 
-				     /**
-				      *  Exception
-				      */
+                                     /**
+                                      *  Exception
+                                      */
     DeclException0 (ExcAdvanceInvalidObject);
-				     /**
-				      * Exception
-				      */
+                                     /**
+                                      * Exception
+                                      */
     DeclException0 (ExcInvalidComparison);
 
-				     /*@}*/
+                                     /*@}*/
   protected:
-				     /**
-				      * Object holding the real data.
-				      */
+                                     /**
+                                      * Object holding the real data.
+                                      */
     Accessor accessor;
 
 
-				     /**
-				      * Make all other iterator class templates
-				      * friends of this class. This is
-				      * necessary for the implementation of
-				      * conversion constructors.
-				      *
-				      * In fact, we would not need them to
-				      * be friends if they were for different
-				      * dimensions, but the compiler dislikes
-				      * giving a fixed dimension and variable
-				      * accessor since then it says that would
-				      * be a artial specialization.
-				      */
+                                     /**
+                                      * Make all other iterator class templates
+                                      * friends of this class. This is
+                                      * necessary for the implementation of
+                                      * conversion constructors.
+                                      *
+                                      * In fact, we would not need them to
+                                      * be friends if they were for different
+                                      * dimensions, but the compiler dislikes
+                                      * giving a fixed dimension and variable
+                                      * accessor since then it says that would
+                                      * be a artial specialization.
+                                      */
     template <typename SomeAccessor> friend class TriaRawIterator;
     template <typename SomeAccessor> friend class TriaIterator;
     template <typename SomeAccessor> friend class TriaActiveIterator;
@@ -607,166 +607,166 @@ template <typename Accessor>
 class TriaIterator : public TriaRawIterator<Accessor>
 {
   public:
-				     /**
-				      *  Empty constructor. Such an object
-				      *  is not usable!
-				      */
+                                     /**
+                                      *  Empty constructor. Such an object
+                                      *  is not usable!
+                                      */
     TriaIterator ();
 
-				     /**
-				      *  Copy constructor.
-				      */
+                                     /**
+                                      *  Copy constructor.
+                                      */
     TriaIterator (const TriaIterator<Accessor> &);
 
-    				     /**
-				      *  Cross copy constructor from
-				      *  iterators pointing also to
-				      *  non-active objects.
-				      *
-				      *  If the object pointed to is not
-				      *  past-the-end and is not
-				      *  used, the debug version raises
-				      *  an error!
-				      */
+                                     /**
+                                      *  Cross copy constructor from
+                                      *  iterators pointing also to
+                                      *  non-active objects.
+                                      *
+                                      *  If the object pointed to is not
+                                      *  past-the-end and is not
+                                      *  used, the debug version raises
+                                      *  an error!
+                                      */
     TriaIterator (const TriaRawIterator<Accessor> &);
 
-				     /**
-				      *  Proper constructor, initialized
-				      *  with the triangulation, the
-				      *  level and index of the object
-				      *  pointed to. The last parameter is
-				      *  of a type declared by the accessor
-				      *  class.
-				      *
-				      *  If the object pointed to is not
-				      *  past-the-end and is not
-				      *  used, the debug version raises
-				      *  an error!
-				      */
+                                     /**
+                                      *  Proper constructor, initialized
+                                      *  with the triangulation, the
+                                      *  level and index of the object
+                                      *  pointed to. The last parameter is
+                                      *  of a type declared by the accessor
+                                      *  class.
+                                      *
+                                      *  If the object pointed to is not
+                                      *  past-the-end and is not
+                                      *  used, the debug version raises
+                                      *  an error!
+                                      */
     TriaIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
-		  const int                 level,
-		  const int                 index,
-		  const typename Accessor::AccessorData *local_data = 0);
+                  const int                 level,
+                  const int                 index,
+                  const typename Accessor::AccessorData *local_data = 0);
 
-				     /**
-				      * This is a conversion operator
-				      * (constructor) which takes another
-				      * iterator type and copies the data;
-				      * this conversion works, if there is
-				      * a conversion path from the
-				      * @p OtherAccessor class to the @p Accessor
-				      * class of this object. One such path
-				      * would be derived class to base class,
-				      * which for example may be used to get
-				      * a Triangulation::cell_iterator from
-				      * a DoFHandler::cell_iterator, since
-				      * the DoFAccessor class is derived from
-				      * the TriaAccessorBase class.
-				      */
+                                     /**
+                                      * This is a conversion operator
+                                      * (constructor) which takes another
+                                      * iterator type and copies the data;
+                                      * this conversion works, if there is
+                                      * a conversion path from the
+                                      * @p OtherAccessor class to the @p Accessor
+                                      * class of this object. One such path
+                                      * would be derived class to base class,
+                                      * which for example may be used to get
+                                      * a Triangulation::cell_iterator from
+                                      * a DoFHandler::cell_iterator, since
+                                      * the DoFAccessor class is derived from
+                                      * the TriaAccessorBase class.
+                                      */
     template <typename OtherAccessor>
     TriaIterator (const TriaIterator<OtherAccessor> &i);
 
-				     /**
-				      * Similar conversion operator to the above
-				      * one, but does a check whether the
-				      * iterator points to a used element,
-				      * which is necessary for raw iterators.
-				      */
+                                     /**
+                                      * Similar conversion operator to the above
+                                      * one, but does a check whether the
+                                      * iterator points to a used element,
+                                      * which is necessary for raw iterators.
+                                      */
     template <typename OtherAccessor>
     TriaIterator (const TriaRawIterator<OtherAccessor> &i);
 
-				     /**
-				      * Similar conversion operator to
-				      * the above one, but for
-				      * conversion from active
-				      * iterators.
-				      */
+                                     /**
+                                      * Similar conversion operator to
+                                      * the above one, but for
+                                      * conversion from active
+                                      * iterators.
+                                      */
     template <typename OtherAccessor>
     TriaIterator (const TriaActiveIterator<OtherAccessor> &i);
 
-    				     /**
-				      *  Assignment operator.
-				      */
+                                     /**
+                                      *  Assignment operator.
+                                      */
     TriaIterator<Accessor> &
     operator = (const TriaIterator<Accessor>&);
 
-    				     /**
-				      *  Cross assignment operator. This
-				      *  assignment is only valid if the
-				      *  given iterator points to a used
-				      *  element.
-				      */
+                                     /**
+                                      *  Cross assignment operator. This
+                                      *  assignment is only valid if the
+                                      *  given iterator points to a used
+                                      *  element.
+                                      */
     TriaIterator<Accessor> &
     operator = (const TriaRawIterator<Accessor>&);
 
-    				     /**
-				      *  Assignment
-				      *  operator. Requires, that
-				      *  Accessor can be copied from
-				      *  OtherAccessor.
-				      */
+                                     /**
+                                      *  Assignment
+                                      *  operator. Requires, that
+                                      *  Accessor can be copied from
+                                      *  OtherAccessor.
+                                      */
     template <class OtherAccessor>
     TriaIterator<Accessor> &
     operator = (const TriaIterator<OtherAccessor>&);
 
-    				     /**
-				      *  Cross assignment operator. This
-				      *  assignment is only valid if the
-				      *  given iterator points to a used
-				      *  element. Requires, that
-				      *  Accessor can be copied from
-				      *  OtherAccessor.
-				      */
+                                     /**
+                                      *  Cross assignment operator. This
+                                      *  assignment is only valid if the
+                                      *  given iterator points to a used
+                                      *  element. Requires, that
+                                      *  Accessor can be copied from
+                                      *  OtherAccessor.
+                                      */
    template <class OtherAccessor>
    TriaIterator<Accessor> &
    operator = (const TriaRawIterator<OtherAccessor>&);
 
-				     /**@name Advancement of iterators*/
-				     /*@{*/
-				     /**
-				      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
-				      *  operator advances the iterator to
-				      *  the next used element and returns
-				      *  a reference to <tt>*this</tt>.
-				      */
+                                     /**@name Advancement of iterators*/
+                                     /*@{*/
+                                     /**
+                                      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
+                                      *  operator advances the iterator to
+                                      *  the next used element and returns
+                                      *  a reference to <tt>*this</tt>.
+                                      */
     TriaIterator<Accessor> & operator ++ ();
 
-				     /**
-				      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
-				      *  operator advances the iterator to
-				      *  the next used element, but
-				      *  returns an iterator to the element
-				      *  previously pointed to. Since this
-				      *  involves a temporary and a copy
-				      *  operation and since an
-				      *  @p active_iterator is quite a large
-				      *  object for a pointer, use the
-				      *  prefix operator <tt>++i</tt> whenever
-				      *  possible, especially in the head
-				      *  of for loops
-				      *  (<tt>for (; i!=end; ++i)</tt>) since there
-				      *  you normally never need the
-				      *  returned value.
-				      */
+                                     /**
+                                      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
+                                      *  operator advances the iterator to
+                                      *  the next used element, but
+                                      *  returns an iterator to the element
+                                      *  previously pointed to. Since this
+                                      *  involves a temporary and a copy
+                                      *  operation and since an
+                                      *  @p active_iterator is quite a large
+                                      *  object for a pointer, use the
+                                      *  prefix operator <tt>++i</tt> whenever
+                                      *  possible, especially in the head
+                                      *  of for loops
+                                      *  (<tt>for (; i!=end; ++i)</tt>) since there
+                                      *  you normally never need the
+                                      *  returned value.
+                                      */
     TriaIterator<Accessor> operator ++ (int);
 
-    				     /**
-				      *  Prefix @p -- operator: @p --i. This
-				      *  operator advances the iterator to
-				      *  the previous used element and returns
-				      *  a reference to <tt>*this</tt>.
-				      */
+                                     /**
+                                      *  Prefix @p -- operator: @p --i. This
+                                      *  operator advances the iterator to
+                                      *  the previous used element and returns
+                                      *  a reference to <tt>*this</tt>.
+                                      */
     TriaIterator<Accessor> & operator -- ();
 
-				     /**
-				      *  Postfix @p -- operator: @p i--.
-				      */
+                                     /**
+                                      *  Postfix @p -- operator: @p i--.
+                                      */
     TriaIterator<Accessor> operator -- (int);
-				     /*@}*/
+                                     /*@}*/
 
-				     /**
-				      *  Exception
-				      */
+                                     /**
+                                      *  Exception
+                                      */
     DeclException0 (ExcAssignmentOfUnusedObject);
 };
 
@@ -784,193 +784,193 @@ template <typename Accessor>
 class TriaActiveIterator : public TriaIterator<Accessor>
 {
   public:
-				     /**
-				      *  Empty constructor. Such an object
-				      *  is not usable!
-				      */
+                                     /**
+                                      *  Empty constructor. Such an object
+                                      *  is not usable!
+                                      */
     TriaActiveIterator ();
 
-				     /**
-				      *  Copy constructor.
-				      */
+                                     /**
+                                      *  Copy constructor.
+                                      */
     TriaActiveIterator (const TriaActiveIterator<Accessor> &);
 
-    				     /**
-				      *  Cross copy constructor from
-				      *  iterators pointing also to
-				      *  non-active objects.
-				      *
-				      *  If the object pointed to is not
-				      *  past-the-end and is not
-				      *  active, the debug version raises
-				      *  an error!
-				      */
+                                     /**
+                                      *  Cross copy constructor from
+                                      *  iterators pointing also to
+                                      *  non-active objects.
+                                      *
+                                      *  If the object pointed to is not
+                                      *  past-the-end and is not
+                                      *  active, the debug version raises
+                                      *  an error!
+                                      */
     TriaActiveIterator (const TriaRawIterator<Accessor> &);
 
-				     /**
-				      *  Cross copy constructor from
-				      *  iterators pointing also to
-				      *  non-active objects.
-				      *
-				      *  If the object pointed to is not
-				      *  past-the-end and is not
-				      *  active, the debug version raises
-				      *  an error!
-				      */
+                                     /**
+                                      *  Cross copy constructor from
+                                      *  iterators pointing also to
+                                      *  non-active objects.
+                                      *
+                                      *  If the object pointed to is not
+                                      *  past-the-end and is not
+                                      *  active, the debug version raises
+                                      *  an error!
+                                      */
     TriaActiveIterator (const TriaIterator<Accessor> &);
 
-				     /**
-				      *  Proper constructor, initialized
-				      *  with the triangulation, the
-				      *  level and index of the object
-				      *  pointed to. The last parameter is
-				      *  of a type declared by the accessor
-				      *  class.
-				      *
-				      *  If the object pointed to is not
-				      *  past-the-end and is not
-				      *  active, the debug version raises
-				      *  an error!
-				      */
+                                     /**
+                                      *  Proper constructor, initialized
+                                      *  with the triangulation, the
+                                      *  level and index of the object
+                                      *  pointed to. The last parameter is
+                                      *  of a type declared by the accessor
+                                      *  class.
+                                      *
+                                      *  If the object pointed to is not
+                                      *  past-the-end and is not
+                                      *  active, the debug version raises
+                                      *  an error!
+                                      */
     TriaActiveIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
-			const int level,
-			const int index,
-			const typename Accessor::AccessorData *local_data = 0);
+                        const int level,
+                        const int index,
+                        const typename Accessor::AccessorData *local_data = 0);
 
-				     /**
-				      * This is a conversion operator
-				      * (constructor) which takes another
-				      * iterator type and copies the data;
-				      * this conversion works, if there is
-				      * a conversion path from the
-				      * @p OtherAccessor class to the @p Accessor
-				      * class of this object. One such path
-				      * would be derived class to base class,
-				      * which for example may be used to get
-				      * a Triangulation::active_cell_iterator from
-				      * a DoFHandler::active_cell_iterator, since
-				      * the DoFAccessor class is derived from
-				      * the TriaAccessorBase class.
-				      */
+                                     /**
+                                      * This is a conversion operator
+                                      * (constructor) which takes another
+                                      * iterator type and copies the data;
+                                      * this conversion works, if there is
+                                      * a conversion path from the
+                                      * @p OtherAccessor class to the @p Accessor
+                                      * class of this object. One such path
+                                      * would be derived class to base class,
+                                      * which for example may be used to get
+                                      * a Triangulation::active_cell_iterator from
+                                      * a DoFHandler::active_cell_iterator, since
+                                      * the DoFAccessor class is derived from
+                                      * the TriaAccessorBase class.
+                                      */
     template <typename OtherAccessor>
     TriaActiveIterator (const TriaActiveIterator<OtherAccessor> &i);
 
-				     /**
-				      * Similar conversion operator to the above
-				      * one, but does a check whether the
-				      * iterator points to a used element,
-				      * and is active, which is necessary for
-				      * raw iterators. Since usual iterators
-				      * are also raw iterators, this constructor
-				      * works also for parameters of type
-				      * <tt>TriaIterator<OtherAccessor></tt>.
-				      */
+                                     /**
+                                      * Similar conversion operator to the above
+                                      * one, but does a check whether the
+                                      * iterator points to a used element,
+                                      * and is active, which is necessary for
+                                      * raw iterators. Since usual iterators
+                                      * are also raw iterators, this constructor
+                                      * works also for parameters of type
+                                      * <tt>TriaIterator<OtherAccessor></tt>.
+                                      */
     template <typename OtherAccessor>
     TriaActiveIterator (const TriaRawIterator<OtherAccessor> &i);
 
-    				     /**
-				      *  Assignment operator.
-				      */
+                                     /**
+                                      *  Assignment operator.
+                                      */
     TriaActiveIterator<Accessor> &
     operator = (const TriaActiveIterator<Accessor> &);
 
-    				     /**
-				      *  Cross assignment operator. This
-				      *  assignment is only valid if the
-				      *  given iterator points to an active
-				      *  element.
-				      */
+                                     /**
+                                      *  Cross assignment operator. This
+                                      *  assignment is only valid if the
+                                      *  given iterator points to an active
+                                      *  element.
+                                      */
     TriaActiveIterator<Accessor> &
     operator = (const TriaIterator<Accessor> &);
 
-    				     /**
-				      *  Cross assignment operator. This
-				      *  assignment is only valid if the
-				      *  given iterator points to an active
-				      *  element or past the end.
-				      */
+                                     /**
+                                      *  Cross assignment operator. This
+                                      *  assignment is only valid if the
+                                      *  given iterator points to an active
+                                      *  element or past the end.
+                                      */
     TriaActiveIterator<Accessor> &
     operator = (const TriaRawIterator<Accessor> &);
 
-    				     /**
-				      *  Assignment operator. Requires, that
-				      *  Accessor can be copied from
-				      *  OtherAccessor.
-				      */
+                                     /**
+                                      *  Assignment operator. Requires, that
+                                      *  Accessor can be copied from
+                                      *  OtherAccessor.
+                                      */
     template <class OtherAccessor>
     TriaActiveIterator<Accessor> &
     operator = (const TriaActiveIterator<OtherAccessor> &);
 
-    				     /**
-				      *  Cross assignment operator. This
-				      *  assignment is only valid if the
-				      *  given iterator points to an active
-				      *  element or past the end. Requires, that
-				      *  Accessor can be copied from
-				      *  OtherAccessor.
-				      */
+                                     /**
+                                      *  Cross assignment operator. This
+                                      *  assignment is only valid if the
+                                      *  given iterator points to an active
+                                      *  element or past the end. Requires, that
+                                      *  Accessor can be copied from
+                                      *  OtherAccessor.
+                                      */
    template <class OtherAccessor>
    TriaActiveIterator<Accessor> &
    operator = (const TriaRawIterator<OtherAccessor> &);
 
-				     /**
-				      *  Cross assignment operator. This
-				      *  assignment is only valid if the
-				      *  given iterator points to an active
-				      *  element. Requires, that
-				      *  Accessor can be copied from
-				      *  OtherAccessor.
-				      */
+                                     /**
+                                      *  Cross assignment operator. This
+                                      *  assignment is only valid if the
+                                      *  given iterator points to an active
+                                      *  element. Requires, that
+                                      *  Accessor can be copied from
+                                      *  OtherAccessor.
+                                      */
    template <class OtherAccessor>
    TriaActiveIterator<Accessor> &
    operator = (const TriaIterator<OtherAccessor> &);
 
-				     /**
-				      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
-				      *  operator advances the iterator to
-				      *  the next active element and returns
-				      *  a reference to <tt>*this</tt>.
-				      */
+                                     /**
+                                      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
+                                      *  operator advances the iterator to
+                                      *  the next active element and returns
+                                      *  a reference to <tt>*this</tt>.
+                                      */
     TriaActiveIterator<Accessor> & operator ++ ();
 
-				     /**@name Advancement of iterators*/
-				     /*@{*/
-				     /**
-				      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
-				      *  operator advances the iterator to
-				      *  the next active element, but
-				      *  returns an iterator to the element
-				      *  previously pointed to. Since this
-				      *  involves a temporary and a copy
-				      *  operation and since an
-				      *  @p active_iterator is quite a large
-				      *  object for a pointer, use the
-				      *  prefix operator <tt>++i</tt> whenever
-				      *  possible, especially in the head
-				      *  of for loops
-				      *  (<tt>for (; i!=end; ++i)</tt>) since there
-				      *  you normally never need the
-				      *  returned value.
-				      */
+                                     /**@name Advancement of iterators*/
+                                     /*@{*/
+                                     /**
+                                      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
+                                      *  operator advances the iterator to
+                                      *  the next active element, but
+                                      *  returns an iterator to the element
+                                      *  previously pointed to. Since this
+                                      *  involves a temporary and a copy
+                                      *  operation and since an
+                                      *  @p active_iterator is quite a large
+                                      *  object for a pointer, use the
+                                      *  prefix operator <tt>++i</tt> whenever
+                                      *  possible, especially in the head
+                                      *  of for loops
+                                      *  (<tt>for (; i!=end; ++i)</tt>) since there
+                                      *  you normally never need the
+                                      *  returned value.
+                                      */
     TriaActiveIterator<Accessor> operator ++ (int);
 
-    				     /**
-				      *  Prefix @p -- operator: @p --i. This
-				      *  operator advances the iterator to
-				      *  the previous active element and
-				      *  returns a reference to <tt>*this</tt>.
-				      */
+                                     /**
+                                      *  Prefix @p -- operator: @p --i. This
+                                      *  operator advances the iterator to
+                                      *  the previous active element and
+                                      *  returns a reference to <tt>*this</tt>.
+                                      */
     TriaActiveIterator<Accessor> & operator -- ();
 
-				     /**
-				      *  Postfix @p -- operator: @p i--.
-				      */
+                                     /**
+                                      *  Postfix @p -- operator: @p i--.
+                                      */
     TriaActiveIterator<Accessor> operator -- (int);
-				     /*@}*/
+                                     /*@}*/
 
-				     /**
-				      *  Exception
-				      */
+                                     /**
+                                      *  Exception
+                                      */
     DeclException0 (ExcAssignmentOfInactiveObject);
 };
 
@@ -982,8 +982,8 @@ template <typename Accessor>
 inline
 TriaRawIterator<Accessor>::
 TriaRawIterator (const Accessor &a)
-		:
-		accessor (a)
+                :
+                accessor (a)
 {}
 
 
@@ -993,8 +993,8 @@ template <typename OtherAccessor>
 inline
 TriaRawIterator<Accessor>::
 TriaRawIterator (const OtherAccessor &a)
-		:
-		accessor (a)
+                :
+                accessor (a)
 {}
 
 
@@ -1004,8 +1004,8 @@ template <typename OtherAccessor>
 inline
 TriaRawIterator<Accessor>::
 TriaRawIterator (const TriaRawIterator<OtherAccessor> &i)
-		:
-		accessor (i.accessor)
+                :
+                accessor (i.accessor)
 {}
 
 
@@ -1015,8 +1015,8 @@ template <typename OtherAccessor>
 inline
 TriaRawIterator<Accessor>::
 TriaRawIterator (const TriaIterator<OtherAccessor> &i)
-		:
-		accessor (i.accessor)
+                :
+                accessor (i.accessor)
 {}
 
 
@@ -1026,8 +1026,8 @@ template <typename OtherAccessor>
 inline
 TriaRawIterator<Accessor>::
 TriaRawIterator (const TriaActiveIterator<OtherAccessor> &i)
-		:
-		accessor (i.accessor)
+                :
+                accessor (i.accessor)
 {}
 
 
@@ -1038,11 +1038,11 @@ const Accessor &
 TriaRawIterator<Accessor>::operator * () const
 {
   Assert (Accessor::structure_dimension!=Accessor::dimension ||
-	  state() == IteratorState::valid,
-	  ExcDereferenceInvalidCell(accessor));
+          state() == IteratorState::valid,
+          ExcDereferenceInvalidCell(accessor));
   Assert (Accessor::structure_dimension==Accessor::dimension ||
-	  state() == IteratorState::valid,
-	  ExcDereferenceInvalidObject(accessor));
+          state() == IteratorState::valid,
+          ExcDereferenceInvalidObject(accessor));
 
   return accessor;
 }
@@ -1055,11 +1055,11 @@ Accessor &
 TriaRawIterator<Accessor>::operator * ()
 {
   Assert (Accessor::structure_dimension!=Accessor::dimension ||
-	  state() == IteratorState::valid,
-	  ExcDereferenceInvalidCell(accessor));
+          state() == IteratorState::valid,
+          ExcDereferenceInvalidCell(accessor));
   Assert (Accessor::structure_dimension==Accessor::dimension ||
-	  state() == IteratorState::valid,
-	  ExcDereferenceInvalidObject(accessor));
+          state() == IteratorState::valid,
+          ExcDereferenceInvalidObject(accessor));
 
   return accessor;
 }
@@ -1102,36 +1102,36 @@ bool
 TriaRawIterator<Accessor>::operator < (const TriaRawIterator &i) const
 {
   Assert (Accessor::structure_dimension!=Accessor::dimension ||
-	  state() != IteratorState::invalid,
-	  ExcDereferenceInvalidCell(accessor));
+          state() != IteratorState::invalid,
+          ExcDereferenceInvalidCell(accessor));
   Assert (Accessor::structure_dimension==Accessor::dimension ||
-	  state() != IteratorState::invalid,
-	  ExcDereferenceInvalidObject(accessor));
+          state() != IteratorState::invalid,
+          ExcDereferenceInvalidObject(accessor));
 
   Assert (Accessor::structure_dimension!=Accessor::dimension ||
-	  i.state() != IteratorState::invalid,
-	  ExcDereferenceInvalidCell(i.accessor));
+          i.state() != IteratorState::invalid,
+          ExcDereferenceInvalidCell(i.accessor));
   Assert (Accessor::structure_dimension==Accessor::dimension ||
-	  i.state() != IteratorState::invalid,
-	  ExcDereferenceInvalidObject(i.accessor));
+          i.state() != IteratorState::invalid,
+          ExcDereferenceInvalidObject(i.accessor));
 
   Assert (&accessor.get_triangulation() == &i.accessor.get_triangulation(),
-	  ExcInvalidComparison());
+          ExcInvalidComparison());
 
   if (Accessor::structure_dimension==Accessor::dimension)
     return ((((accessor.level() < i.accessor.level()) ||
-	      ((accessor.level() == i.accessor.level()) &&
-	       (accessor.index() < i.accessor.index()))        ) &&
-	     (state()==IteratorState::valid)                     &&
-	     (i.state()==IteratorState::valid)                 ) ||
-	    ((state()==IteratorState::valid) &&
-	     (i.state()==IteratorState::past_the_end)));
+              ((accessor.level() == i.accessor.level()) &&
+               (accessor.index() < i.accessor.index()))        ) &&
+             (state()==IteratorState::valid)                     &&
+             (i.state()==IteratorState::valid)                 ) ||
+            ((state()==IteratorState::valid) &&
+             (i.state()==IteratorState::past_the_end)));
   else
     return ((((accessor.index() < i.accessor.index())          ) &&
-	     (state()==IteratorState::valid)                     &&
-	     (i.state()==IteratorState::valid)                 ) ||
-	    ((state()==IteratorState::valid) &&
-	     (i.state()==IteratorState::past_the_end)));
+             (state()==IteratorState::valid)                     &&
+             (i.state()==IteratorState::valid)                 ) ||
+            ((state()==IteratorState::valid) &&
+             (i.state()==IteratorState::past_the_end)));
 }
 
 
@@ -1188,8 +1188,8 @@ template <typename Accessor>
 template <typename OtherAccessor>
 inline
 TriaIterator<Accessor>::TriaIterator (const TriaIterator<OtherAccessor> &i)
-		:
-		TriaRawIterator<Accessor> (i.accessor)
+                :
+                TriaRawIterator<Accessor> (i.accessor)
 {}
 
 
@@ -1198,8 +1198,8 @@ template <typename Accessor>
 template <typename OtherAccessor>
 inline
 TriaIterator<Accessor>::TriaIterator (const TriaActiveIterator<OtherAccessor> &i)
-		:
-		TriaRawIterator<Accessor> (i.accessor)
+                :
+                TriaRawIterator<Accessor> (i.accessor)
 {}
 
 
@@ -1208,19 +1208,19 @@ template <typename Accessor>
 template <typename OtherAccessor>
 inline
 TriaIterator<Accessor>::TriaIterator (const TriaRawIterator<OtherAccessor> &i)
-		:
-		TriaRawIterator<Accessor> (i.accessor)
+                :
+                TriaRawIterator<Accessor> (i.accessor)
 {
 #ifdef DEBUG
-				   // do this like this, because:
-				   // if we write
-				   // "Assert (IteratorState::past_the_end || used)"
-				   // used() is called anyway, even if
-				   // state==IteratorState::past_the_end, and will then
-				   // throw the exception!
+                                   // do this like this, because:
+                                   // if we write
+                                   // "Assert (IteratorState::past_the_end || used)"
+                                   // used() is called anyway, even if
+                                   // state==IteratorState::past_the_end, and will then
+                                   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
     Assert (this->accessor.used(),
-	    ExcAssignmentOfUnusedObject());
+            ExcAssignmentOfUnusedObject());
 #endif
 }
 
@@ -1230,8 +1230,8 @@ template <typename Accessor>
 template <typename OtherAccessor>
 inline
 TriaActiveIterator<Accessor>::TriaActiveIterator (const TriaActiveIterator<OtherAccessor> &i)
-		:
-		TriaIterator<Accessor> (i.accessor)
+                :
+                TriaIterator<Accessor> (i.accessor)
 {}
 
 
@@ -1240,19 +1240,19 @@ template <typename Accessor>
 template <typename OtherAccessor>
 inline
 TriaActiveIterator<Accessor>::TriaActiveIterator (const TriaRawIterator<OtherAccessor> &i)
-		:
-		TriaIterator<Accessor> (i)
+                :
+                TriaIterator<Accessor> (i)
 {
 #ifdef DEBUG
-				   // do this like this, because:
-				   // if we write
-				   // "Assert (IteratorState::past_the_end || !has_children())"
-				   // has_children() is called anyway, even if
-				   // state==IteratorState::past_the_end, and will then
-				   // throw the exception!
+                                   // do this like this, because:
+                                   // if we write
+                                   // "Assert (IteratorState::past_the_end || !has_children())"
+                                   // has_children() is called anyway, even if
+                                   // state==IteratorState::past_the_end, and will then
+                                   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
     Assert (this->accessor.has_children()==false,
-	    ExcAssignmentOfInactiveObject());
+            ExcAssignmentOfInactiveObject());
 #endif
 }
 
@@ -1269,7 +1269,7 @@ TriaActiveIterator<Accessor>::TriaActiveIterator (const TriaRawIterator<OtherAcc
 template <typename Accessor>
 inline
 std::ostream & operator << (std::ostream                        &out,
-			    const TriaRawIterator<Accessor> &i)
+                            const TriaRawIterator<Accessor> &i)
 {
   i.print(out);
   return out;
@@ -1288,7 +1288,7 @@ std::ostream & operator << (std::ostream                        &out,
 template <typename Accessor>
 inline
 std::ostream & operator << (std::ostream                     &out,
-			    const TriaIterator<Accessor> &i)
+                            const TriaIterator<Accessor> &i)
 {
   i.print(out);
   return out;
@@ -1307,7 +1307,7 @@ std::ostream & operator << (std::ostream                     &out,
 template <typename Accessor>
 inline
 std::ostream & operator << (std::ostream                           &out,
-			    const TriaActiveIterator<Accessor> &i)
+                            const TriaActiveIterator<Accessor> &i)
 {
   i.print(out);
   return out;

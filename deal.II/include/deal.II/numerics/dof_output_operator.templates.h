@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by Guido Kanschat
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012 by Guido Kanschat
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <class VECTOR, int dim, int spacedim>
-  OutputOperator<VECTOR>& 
+  OutputOperator<VECTOR>&
   DoFOutputOperator<VECTOR, dim, spacedim>::operator<<(
       const NamedData<VECTOR*>& vectors)
   {

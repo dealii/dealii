@@ -1,7 +1,7 @@
 //----------------------------  fe_collection.h  ---------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,7 +20,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace hp
 {
-  
+
 /**
  * This class acts as a collection of finite element objects used in the
  * hp::DoFHandler. It is thus to a hp::DoFHandler what a
@@ -37,9 +37,9 @@ namespace hp
  *
  * This class has not yet been implemented for the use in the codimension
  * one case (<tt>spacedim != dim </tt>).
- * 
+ *
  * @ingroup hp hpcollection
- * 
+ *
  * @author Wolfgang Bangerth, 2003
  */
   template <int dim, int spacedim=dim>
@@ -169,37 +169,37 @@ namespace hp
 
 
                                        /**
-					* Return whether all elements
-					* in this collection
-					* implement the hanging node
-					* constraints in the new way,
-					* which has to be used to make
-					* elements "hp compatible".
-					* If this is not the case,
-					* the function returns false,
-					* which implies, that at least
-					* one element in the FECollection
-					* does not support the new face
-					* interface constraints.
-					* On the other hand, if this
-					* method does return
-					* true, this does not imply
-					* that the hp method will work!
-					*
-					* This behaviour is related to
-					* the fact, that FiniteElement
-					* classes, which provide the
-					* new style hanging node constraints
-					* might still not provide
-					* them for all possible cases.
-					* If FE_Q and FE_RaviartThomas
-					* elements are included in the
-					* FECollection and both properly implement
-					* the get_face_interpolation_matrix
-					* method, this method will return
-					* true. But the get_face_interpolation_matrix
-					* might still fail to find an interpolation
-					* matrix between these two elements.
+                                        * Return whether all elements
+                                        * in this collection
+                                        * implement the hanging node
+                                        * constraints in the new way,
+                                        * which has to be used to make
+                                        * elements "hp compatible".
+                                        * If this is not the case,
+                                        * the function returns false,
+                                        * which implies, that at least
+                                        * one element in the FECollection
+                                        * does not support the new face
+                                        * interface constraints.
+                                        * On the other hand, if this
+                                        * method does return
+                                        * true, this does not imply
+                                        * that the hp method will work!
+                                        *
+                                        * This behaviour is related to
+                                        * the fact, that FiniteElement
+                                        * classes, which provide the
+                                        * new style hanging node constraints
+                                        * might still not provide
+                                        * them for all possible cases.
+                                        * If FE_Q and FE_RaviartThomas
+                                        * elements are included in the
+                                        * FECollection and both properly implement
+                                        * the get_face_interpolation_matrix
+                                        * method, this method will return
+                                        * true. But the get_face_interpolation_matrix
+                                        * might still fail to find an interpolation
+                                        * matrix between these two elements.
                                         */
       bool hp_constraints_are_implemented () const;
 
@@ -207,8 +207,8 @@ namespace hp
                                        /**
                                         * Exception
                                         */
-      DeclException0 (ExcNoFiniteElements);    
-    
+      DeclException0 (ExcNoFiniteElements);
+
     private:
                                        /**
                                         * Array of pointers to the finite
@@ -224,7 +224,7 @@ namespace hp
   template <int dim, int spacedim>
   inline
   unsigned int
-  FECollection<dim,spacedim>::size () const 
+  FECollection<dim,spacedim>::size () const
   {
     return finite_elements.size();
   }
@@ -243,7 +243,7 @@ namespace hp
   template <int dim, int spacedim>
   inline
   const FiniteElement<dim,spacedim> &
-  FECollection<dim,spacedim>::operator[] (const unsigned int index) const 
+  FECollection<dim,spacedim>::operator[] (const unsigned int index) const
   {
     Assert (index < finite_elements.size(),
             ExcIndexRange (index, 0, finite_elements.size()));
@@ -254,10 +254,10 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_vertex () const 
+  FECollection<dim,spacedim>::max_dofs_per_vertex () const
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
-  
+
     unsigned int max = 0;
     for (unsigned int i=0; i<finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_vertex > max)
@@ -270,10 +270,10 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_line () const 
+  FECollection<dim,spacedim>::max_dofs_per_line () const
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
-  
+
     unsigned int max = 0;
     for (unsigned int i=0; i<finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_line > max)
@@ -286,10 +286,10 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_quad () const 
+  FECollection<dim,spacedim>::max_dofs_per_quad () const
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
-  
+
     unsigned int max = 0;
     for (unsigned int i=0; i<finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_quad > max)
@@ -302,10 +302,10 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_hex () const 
+  FECollection<dim,spacedim>::max_dofs_per_hex () const
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
-  
+
     unsigned int max = 0;
     for (unsigned int i=0; i<finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_hex > max)
@@ -318,10 +318,10 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_face () const 
+  FECollection<dim,spacedim>::max_dofs_per_face () const
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
-  
+
     unsigned int max = 0;
     for (unsigned int i=0; i<finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_face > max)
@@ -334,10 +334,10 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_cell () const 
+  FECollection<dim,spacedim>::max_dofs_per_cell () const
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
-  
+
     unsigned int max = 0;
     for (unsigned int i=0; i<finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_cell > max)
@@ -345,25 +345,25 @@ namespace hp
 
     return max;
   }
-  
+
 
   template <int dim, int spacedim>
   bool
-  FECollection<dim,spacedim>::hp_constraints_are_implemented () const 
+  FECollection<dim,spacedim>::hp_constraints_are_implemented () const
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
-  
+
     bool hp_constraints = true;
     for (unsigned int i=0; i<finite_elements.size(); ++i)
       hp_constraints = hp_constraints &&
-		       finite_elements[i]->hp_constraints_are_implemented();
-    
+                       finite_elements[i]->hp_constraints_are_implemented();
+
     return hp_constraints;
   }
-  
+
 
 } // namespace hp
 
 DEAL_II_NAMESPACE_CLOSE
-  
+
 #endif

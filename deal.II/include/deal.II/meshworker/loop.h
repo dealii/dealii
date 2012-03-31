@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -99,8 +99,8 @@ namespace MeshWorker
     const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)>& cell_worker,
     const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)>& boundary_worker,
     const std_cxx1x::function<void (DOFINFO&, DOFINFO&,
-				    typename INFOBOX::CellInfo&,
-				    typename INFOBOX::CellInfo&)>& face_worker,
+                                    typename INFOBOX::CellInfo&,
+                                    typename INFOBOX::CellInfo&)>& face_worker,
     const bool cells_first,
     const bool unique_faces_only)
   {
@@ -155,7 +155,7 @@ namespace MeshWorker
           // only occur if
           // both cells are
           // active.
-          if (cell->neighbor_is_coarser(face_no)) 
+          if (cell->neighbor_is_coarser(face_no))
           {
             Assert(!cell->has_children(), ExcInternalError());
             Assert(!neighbor->has_children(), ExcInternalError());
@@ -240,43 +240,43 @@ namespace MeshWorker
  */
   template<int dim, int spacedim, class DOFINFO, class INFOBOX, class ASSEMBLER, class ITERATOR>
   void loop(ITERATOR begin,
-	    typename identity<ITERATOR>::type end,
-	    DOFINFO& dinfo,
-	    INFOBOX& info,
-	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)>& cell_worker,
-	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)>& boundary_worker,
-	    const std_cxx1x::function<void (DOFINFO&, DOFINFO&,
-					    typename INFOBOX::CellInfo&,
-					    typename INFOBOX::CellInfo&)>& face_worker,
-	    ASSEMBLER& assembler,
-	    bool cells_first = true)
+            typename identity<ITERATOR>::type end,
+            DOFINFO& dinfo,
+            INFOBOX& info,
+            const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)>& cell_worker,
+            const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)>& boundary_worker,
+            const std_cxx1x::function<void (DOFINFO&, DOFINFO&,
+                                            typename INFOBOX::CellInfo&,
+                                            typename INFOBOX::CellInfo&)>& face_worker,
+            ASSEMBLER& assembler,
+            bool cells_first = true)
   {
     DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
 
     assembler.initialize_info(dof_info.cell, false);
     for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
       {
-	assembler.initialize_info(dof_info.interior[i], true);
-	assembler.initialize_info(dof_info.exterior[i], true);
+        assembler.initialize_info(dof_info.interior[i], true);
+        assembler.initialize_info(dof_info.exterior[i], true);
       }
 
-				     // Loop over all cells
+                                     // Loop over all cells
 #ifdef DEAL_II_MESHWORKER_PARALLEL
     WorkStream::run(begin, end,
- 		    std_cxx1x::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>, 
-				    std_cxx1x::_1, std_cxx1x::_3, std_cxx1x::_2,
-				    cell_worker, boundary_worker, face_worker, cells_first, true),
- 		    std_cxx1x::bind(&internal::assemble<dim,DOFINFO,ASSEMBLER>, std_cxx1x::_1, &assembler),
- 		    info, dof_info);
+                    std_cxx1x::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>,
+                                    std_cxx1x::_1, std_cxx1x::_3, std_cxx1x::_2,
+                                    cell_worker, boundary_worker, face_worker, cells_first, true),
+                    std_cxx1x::bind(&internal::assemble<dim,DOFINFO,ASSEMBLER>, std_cxx1x::_1, &assembler),
+                    info, dof_info);
 #else
     for (ITERATOR cell = begin; cell != end; ++cell)
       {
-	cell_action<INFOBOX,DOFINFO,dim,spacedim>(cell, dof_info,
-						  info, cell_worker,
-						  boundary_worker, face_worker,
-						  cells_first,
-						  true);
-	dof_info.assemble(assembler);
+        cell_action<INFOBOX,DOFINFO,dim,spacedim>(cell, dof_info,
+                                                  info, cell_worker,
+                                                  boundary_worker, face_worker,
+                                                  cells_first,
+                                                  true);
+        dof_info.assemble(assembler);
       }
 #endif
   }
@@ -289,16 +289,16 @@ namespace MeshWorker
  */
   template<int dim, int spacedim, class ITERATOR, class ASSEMBLER>
   void integration_loop(ITERATOR begin,
-			typename identity<ITERATOR>::type end,
-			DoFInfo<dim, spacedim>& dof_info,
-			IntegrationInfoBox<dim, spacedim>& box,
-			const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &cell_worker,
-			const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &boundary_worker,
-			const std_cxx1x::function<void (DoFInfo<dim>&, DoFInfo<dim>&,
-							IntegrationInfo<dim, spacedim>&,
-							IntegrationInfo<dim, spacedim>&)> &face_worker,
-			ASSEMBLER &assembler,
-			bool cells_first = true)
+                        typename identity<ITERATOR>::type end,
+                        DoFInfo<dim, spacedim>& dof_info,
+                        IntegrationInfoBox<dim, spacedim>& box,
+                        const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &cell_worker,
+                        const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &boundary_worker,
+                        const std_cxx1x::function<void (DoFInfo<dim>&, DoFInfo<dim>&,
+                                                        IntegrationInfo<dim, spacedim>&,
+                                                        IntegrationInfo<dim, spacedim>&)> &face_worker,
+                        ASSEMBLER &assembler,
+                        bool cells_first = true)
   {
     loop<dim, spacedim>
       (begin, end,

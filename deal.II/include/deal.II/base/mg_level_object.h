@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,89 +38,89 @@ template<class Object>
 class MGLevelObject : public Subscriptor
 {
   public:
-				     /**
-				      * Constructor allowing to
-				      * initialize the number of
-				      * levels. By default, the object
-				      * is created empty.
-				      */
+                                     /**
+                                      * Constructor allowing to
+                                      * initialize the number of
+                                      * levels. By default, the object
+                                      * is created empty.
+                                      */
     MGLevelObject (const unsigned int minlevel = 0,
-		   const unsigned int maxlevel = 0);
-    
-				     /**
-				      * Access object on level @p level.
-				      */
+                   const unsigned int maxlevel = 0);
+
+                                     /**
+                                      * Access object on level @p level.
+                                      */
     Object & operator[] (const unsigned int level);
-    
-				     /**
-				      * Access object on level
-				      * @p level. Constant version.
-				      */
+
+                                     /**
+                                      * Access object on level
+                                      * @p level. Constant version.
+                                      */
     const Object & operator[] (const unsigned int level) const;
 
-				     /**
-				      * Delete all previous contents
-				      * of this object and reset its
-				      * size according to the values
-				      * of @p new_minlevel and
-				      * @p new_maxlevel.
-				      */
+                                     /**
+                                      * Delete all previous contents
+                                      * of this object and reset its
+                                      * size according to the values
+                                      * of @p new_minlevel and
+                                      * @p new_maxlevel.
+                                      */
     void resize (const unsigned int new_minlevel,
-		 const unsigned int new_maxlevel);
+                 const unsigned int new_maxlevel);
 
-				     /**
-				      * Call <tt>operator = (s)</tt>
-				      * on all objects stored by this
-				      * object.  This is particularly
-				      * useful for
-				      * e.g. <tt>Object==Vector@<T@></tt>
-				      */
+                                     /**
+                                      * Call <tt>operator = (s)</tt>
+                                      * on all objects stored by this
+                                      * object.  This is particularly
+                                      * useful for
+                                      * e.g. <tt>Object==Vector@<T@></tt>
+                                      */
     MGLevelObject<Object> & operator = (const double d);
-    
-				     /**
-				      * Call @p clear on all objects
-				      * stored by this object. This
-				      * function is only implemented
-				      * for some @p Object classes,
-				      * e.g. the PreconditionBlockSOR
-				      * and similar classes.
-				      */
+
+                                     /**
+                                      * Call @p clear on all objects
+                                      * stored by this object. This
+                                      * function is only implemented
+                                      * for some @p Object classes,
+                                      * e.g. the PreconditionBlockSOR
+                                      * and similar classes.
+                                      */
     void clear();
 
-				     /**
-				      * Coarsest level for multigrid.
-				      */
+                                     /**
+                                      * Coarsest level for multigrid.
+                                      */
     unsigned int min_level () const;
-    
-				     /**
-				      * Finest level for multigrid.
-				      */
+
+                                     /**
+                                      * Finest level for multigrid.
+                                      */
     unsigned int max_level () const;
-    
-				     /**
-				      * @deprecated Replaced by min_level()
-				      */
+
+                                     /**
+                                      * @deprecated Replaced by min_level()
+                                      */
     unsigned int get_minlevel () const;
-    
-				     /**
-				      * @deprecated Replaced by max_level()
-				      */
+
+                                     /**
+                                      * @deprecated Replaced by max_level()
+                                      */
     unsigned int get_maxlevel () const;
-    
-				     /**
-				      * Memory used by this object.
-				      */
+
+                                     /**
+                                      * Memory used by this object.
+                                      */
     std::size_t memory_consumption () const;
-    
+
   private:
-				     /**
-				      * Level of first component.
-				      */
+                                     /**
+                                      * Level of first component.
+                                      */
     unsigned int minlevel;
 
-				     /**
-				      * Array of the objects to be held.
-				      */
+                                     /**
+                                      * Array of the objects to be held.
+                                      */
     std::vector<std_cxx1x::shared_ptr<Object> > objects;
 };
 
@@ -130,9 +130,9 @@ class MGLevelObject : public Subscriptor
 
 template<class Object>
 MGLevelObject<Object>::MGLevelObject(const unsigned int min,
-				     const unsigned int max)
-		:
-		minlevel(0)
+                                     const unsigned int max)
+                :
+                minlevel(0)
 {
   resize (min, max);
 }
@@ -143,7 +143,7 @@ Object &
 MGLevelObject<Object>::operator[] (const unsigned int i)
 {
   Assert((i>=minlevel) && (i<minlevel+objects.size()),
-	 ExcIndexRange (i, minlevel, minlevel+objects.size()));
+         ExcIndexRange (i, minlevel, minlevel+objects.size()));
   return *objects[i-minlevel];
 }
 
@@ -153,7 +153,7 @@ const Object &
 MGLevelObject<Object>::operator[] (const unsigned int i) const
 {
   Assert((i>=minlevel) && (i<minlevel+objects.size()),
-	 ExcIndexRange (i, minlevel, minlevel+objects.size()));
+         ExcIndexRange (i, minlevel, minlevel+objects.size()));
   return *objects[i-minlevel];
 }
 
@@ -161,18 +161,18 @@ MGLevelObject<Object>::operator[] (const unsigned int i) const
 template<class Object>
 void
 MGLevelObject<Object>::resize (const unsigned int new_minlevel,
-			       const unsigned int new_maxlevel)
+                               const unsigned int new_maxlevel)
 {
   Assert (new_minlevel <= new_maxlevel, ExcInternalError());
-				   // note that on clear(), the
-				   // shared_ptr class takes care of
-				   // deleting the object it points to
-				   // by itself
+                                   // note that on clear(), the
+                                   // shared_ptr class takes care of
+                                   // deleting the object it points to
+                                   // by itself
   objects.clear ();
 
   minlevel = new_minlevel;
   for (unsigned int i=0; i<new_maxlevel-new_minlevel+1; ++i)
-    objects.push_back(std_cxx1x::shared_ptr<Object> (new Object)); 
+    objects.push_back(std_cxx1x::shared_ptr<Object> (new Object));
 }
 
 
@@ -238,7 +238,7 @@ MGLevelObject<Object>::memory_consumption () const
   const Iter end = objects.end();
   for (Iter o=objects.begin(); o!=end; ++o)
     result += (*o)->memory_consumption();
-  
+
   return result;
 }
 

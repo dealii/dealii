@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,69 +38,69 @@ template<int dim>
 class QuadratureSelector : public Quadrature<dim>
 {
   public:
-				     /**
-				      * Constructor. Takes the name of
-				      * the quadrature rule (one of
-				      * "gauss", "milne", "weddle",
-				      * etc) and, if it iss "gauss",
-				      * the order of the quadrature
-				      * rule as argument.
-				      */
+                                     /**
+                                      * Constructor. Takes the name of
+                                      * the quadrature rule (one of
+                                      * "gauss", "milne", "weddle",
+                                      * etc) and, if it iss "gauss",
+                                      * the order of the quadrature
+                                      * rule as argument.
+                                      */
     QuadratureSelector (const std::string &s,
-			const unsigned int order=0);
+                        const unsigned int order=0);
 
-				     /**
-				      * This function returns all
-				      * possible names for quadratures
-				      * as a list separated by <tt>|</tt>,
-				      * so that you can use it for the
-				      * definition of parameter files
-				      * (see ParameterHandler for
-				      * details).
-				      */
+                                     /**
+                                      * This function returns all
+                                      * possible names for quadratures
+                                      * as a list separated by <tt>|</tt>,
+                                      * so that you can use it for the
+                                      * definition of parameter files
+                                      * (see ParameterHandler for
+                                      * details).
+                                      */
     static std::string get_quadrature_names();
 
-    				     /** @addtogroup Exceptions
-				      * @{ */
+                                     /** @addtogroup Exceptions
+                                      * @{ */
 
 
-				     /**
-				      * Exception
-				      */
+                                     /**
+                                      * Exception
+                                      */
     DeclException1 (ExcInvalidQGaussOrder,
-		    int,
-		    << "You tried to generate QGauss with an invalid order of "
-		    << arg1 << " (must be >= 2)");
-				     /**
-				      * Exception
-				      */
+                    int,
+                    << "You tried to generate QGauss with an invalid order of "
+                    << arg1 << " (must be >= 2)");
+                                     /**
+                                      * Exception
+                                      */
     DeclException2 (ExcInvalidOrder,
-		    std::string,
-		    unsigned int,
-		    << "You tried to generate a " << arg1
-		    << " object; no order is needed (" << arg2
-		    << " was given as parameter)");
-				     /**
-				      * Exception
-				      */
+                    std::string,
+                    unsigned int,
+                    << "You tried to generate a " << arg1
+                    << " object; no order is needed (" << arg2
+                    << " was given as parameter)");
+                                     /**
+                                      * Exception
+                                      */
     DeclException1 (ExcInvalidQuadrature,
-		    std::string,
-		    << arg1
-		    << " is not a valid quadrature name for a quadrature rule");
-				     //@}
+                    std::string,
+                    << arg1
+                    << " is not a valid quadrature name for a quadrature rule");
+                                     //@}
   private:
-				     /**
-				      * This static function creates a
-				      * quadrature object according to
-				      * the name given as a string,
-				      * and the appropriate order (if
-				      * the name is "gauss"). It is
-				      * called from the constructor.
-				      */
+                                     /**
+                                      * This static function creates a
+                                      * quadrature object according to
+                                      * the name given as a string,
+                                      * and the appropriate order (if
+                                      * the name is "gauss"). It is
+                                      * called from the constructor.
+                                      */
     static
     Quadrature<dim>
     create_quadrature (const std::string &s,
-		       const unsigned int order);
+                       const unsigned int order);
 };
 DEAL_II_NAMESPACE_CLOSE
 

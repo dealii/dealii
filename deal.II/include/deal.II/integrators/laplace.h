@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -58,16 +58,16 @@ namespace LocalIntegrators
       const unsigned int n_components = fe.get_fe().n_components();
 
       for (unsigned k=0;k<fe.n_quadrature_points;++k)
-	{
-	  const double dx = fe.JxW(k) * factor;
-	  for (unsigned i=0;i<n_dofs;++i)
-	    {
-	      for (unsigned j=0;j<n_dofs;++j)
-		for (unsigned int d=0;d<n_components;++d)
-		  M(i,j) += dx *
-			    (fe.shape_grad_component(j,k,d) * fe.shape_grad_component(i,k,d));
-	    }
-	}
+        {
+          const double dx = fe.JxW(k) * factor;
+          for (unsigned i=0;i<n_dofs;++i)
+            {
+              for (unsigned j=0;j<n_dofs;++j)
+                for (unsigned int d=0;d<n_components;++d)
+                  M(i,j) += dx *
+                            (fe.shape_grad_component(j,k,d) * fe.shape_grad_component(i,k,d));
+            }
+        }
     }
 /**
  * Weak boundary condition of Nitsche type for the Laplacian, namely on the face <i>F</i> the matrix
@@ -96,17 +96,17 @@ namespace LocalIntegrators
       Assert (M.n() == n_dofs, ExcDimensionMismatch(M.n(), n_dofs));
 
       for (unsigned k=0;k<fe.n_quadrature_points;++k)
-	{
-	  const double dx = fe.JxW(k) * factor;
-	  const Point<dim>& n = fe.normal_vector(k);
-	  for (unsigned i=0;i<n_dofs;++i)
-	    for (unsigned j=0;j<n_dofs;++j)
-	      for (unsigned int d=0;d<n_comp;++d)
-		M(i,j) += dx *
-			  (2. * fe.shape_value_component(i,k,d) * penalty * fe.shape_value_component(j,k,d)
-			   - (n * fe.shape_grad_component(i,k,d)) * fe.shape_value_component(j,k,d)
-			   - (n * fe.shape_grad_component(j,k,d)) * fe.shape_value_component(i,k,d));
-	}
+        {
+          const double dx = fe.JxW(k) * factor;
+          const Point<dim>& n = fe.normal_vector(k);
+          for (unsigned i=0;i<n_dofs;++i)
+            for (unsigned j=0;j<n_dofs;++j)
+              for (unsigned int d=0;d<n_comp;++d)
+                M(i,j) += dx *
+                          (2. * fe.shape_value_component(i,k,d) * penalty * fe.shape_value_component(j,k,d)
+                           - (n * fe.shape_grad_component(i,k,d)) * fe.shape_value_component(j,k,d)
+                           - (n * fe.shape_grad_component(j,k,d)) * fe.shape_value_component(i,k,d));
+        }
     }
 
 /**
@@ -129,37 +129,37 @@ namespace LocalIntegrators
  */
       template <int dim>
       void nitsche_residual (
-	Vector<double>& result,
-	const FEValuesBase<dim>& fe,
-	const VectorSlice<const std::vector<std::vector<double> > >& input,
-	const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > >& Dinput,
-	const VectorSlice<const std::vector<std::vector<double> > >& data,
-	double penalty,
-	double factor = 1.)
+        Vector<double>& result,
+        const FEValuesBase<dim>& fe,
+        const VectorSlice<const std::vector<std::vector<double> > >& input,
+        const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > >& Dinput,
+        const VectorSlice<const std::vector<std::vector<double> > >& data,
+        double penalty,
+        double factor = 1.)
       {
-	const unsigned int n_dofs = fe.dofs_per_cell;
+        const unsigned int n_dofs = fe.dofs_per_cell;
 
-	const unsigned int n_comp = fe.get_fe().n_components();
-	AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
-	AssertVectorVectorDimension(Dinput, n_comp, fe.n_quadrature_points);
-	AssertVectorVectorDimension(data, n_comp, fe.n_quadrature_points);
+        const unsigned int n_comp = fe.get_fe().n_components();
+        AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
+        AssertVectorVectorDimension(Dinput, n_comp, fe.n_quadrature_points);
+        AssertVectorVectorDimension(data, n_comp, fe.n_quadrature_points);
 
-	for (unsigned k=0;k<fe.n_quadrature_points;++k)
-	  {
-	    const double dx = factor * fe.JxW(k);
-	    const Point<dim>& n = fe.normal_vector(k);
-	    for (unsigned i=0;i<n_dofs;++i)
-	      for (unsigned int d=0;d<n_comp;++d)
-		{
-		  const double dnv = fe.shape_grad_component(i,k,d) * n;
-		  const double dnu = Dinput[d][k] * n;
-		  const double v= fe.shape_value_component(i,k,d);
-		  const double u= input[d][k];
-		  const double g= data[d][k];
+        for (unsigned k=0;k<fe.n_quadrature_points;++k)
+          {
+            const double dx = factor * fe.JxW(k);
+            const Point<dim>& n = fe.normal_vector(k);
+            for (unsigned i=0;i<n_dofs;++i)
+              for (unsigned int d=0;d<n_comp;++d)
+                {
+                  const double dnv = fe.shape_grad_component(i,k,d) * n;
+                  const double dnu = Dinput[d][k] * n;
+                  const double v= fe.shape_value_component(i,k,d);
+                  const double u= input[d][k];
+                  const double g= data[d][k];
 
-		  result(i) += dx*(2.*penalty*(u-g)*v - dnv*(u-g) - dnu*v);
-		}
-	  }
+                  result(i) += dx*(2.*penalty*(u-g)*v - dnv*(u-g) - dnu*v);
+                }
+          }
       }
 
 /**
@@ -177,34 +177,34 @@ namespace LocalIntegrators
  */
       template <int dim>
       void nitsche_residual (
-	Vector<double>& result,
-	const FEValuesBase<dim>& fe,
-	const std::vector<double>& input,
-	const std::vector<Tensor<1,dim> >& Dinput,
-	const std::vector<double>& data,
-	double penalty,
-	double factor = 1.)
+        Vector<double>& result,
+        const FEValuesBase<dim>& fe,
+        const std::vector<double>& input,
+        const std::vector<Tensor<1,dim> >& Dinput,
+        const std::vector<double>& data,
+        double penalty,
+        double factor = 1.)
       {
-	const unsigned int n_dofs = fe.dofs_per_cell;
-	AssertDimension(input.size(), fe.n_quadrature_points);
-	AssertDimension(Dinput.size(), fe.n_quadrature_points);
-	AssertDimension(data.size(), fe.n_quadrature_points);
+        const unsigned int n_dofs = fe.dofs_per_cell;
+        AssertDimension(input.size(), fe.n_quadrature_points);
+        AssertDimension(Dinput.size(), fe.n_quadrature_points);
+        AssertDimension(data.size(), fe.n_quadrature_points);
 
-	for (unsigned k=0;k<fe.n_quadrature_points;++k)
-	  {
-	    const double dx = factor * fe.JxW(k);
-	    const Point<dim>& n = fe.normal_vector(k);
-	    for (unsigned i=0;i<n_dofs;++i)
-	      {
-		const double dnv = fe.shape_grad(i,k) * n;
-		const double dnu = Dinput[k] * n;
-		const double v= fe.shape_value(i,k);
-		const double u= input[k];
-		const double g= data[k];
+        for (unsigned k=0;k<fe.n_quadrature_points;++k)
+          {
+            const double dx = factor * fe.JxW(k);
+            const Point<dim>& n = fe.normal_vector(k);
+            for (unsigned i=0;i<n_dofs;++i)
+              {
+                const double dnv = fe.shape_grad(i,k) * n;
+                const double dnu = Dinput[k] * n;
+                const double v= fe.shape_value(i,k);
+                const double u= input[k];
+                const double g= data[k];
 
-		result(i) += dx*(2.*penalty*(u-g)*v - dnv*(u-g) - dnu*v);
-	      }
-	  }
+                result(i) += dx*(2.*penalty*(u-g)*v - dnv*(u-g) - dnu*v);
+              }
+          }
       }
 
 /**
@@ -253,49 +253,49 @@ namespace LocalIntegrators
       const double nue = (factor2 < 0) ? factor1 : factor2;
 
       for (unsigned k=0;k<fe1.n_quadrature_points;++k)
-	{
-	  const double dx = fe1.JxW(k);
-	  const Point<dim>& n = fe1.normal_vector(k);
-	  for (unsigned i=0;i<n_dofs;++i)
-	    {
-	      for (unsigned j=0;j<n_dofs;++j)
-		{
-		  if (fe1.get_fe().n_components() == 1)
-		    {
-		      const double vi = fe1.shape_value(i,k);
-		      const double dnvi = n * fe1.shape_grad(i,k);
-		      const double ve = fe2.shape_value(i,k);
-		      const double dnve = n * fe2.shape_grad(i,k);
-		      const double ui = fe1.shape_value(j,k);
-		      const double dnui = n * fe1.shape_grad(j,k);
-		      const double ue = fe2.shape_value(j,k);
-		      const double dnue = n * fe2.shape_grad(j,k);
+        {
+          const double dx = fe1.JxW(k);
+          const Point<dim>& n = fe1.normal_vector(k);
+          for (unsigned i=0;i<n_dofs;++i)
+            {
+              for (unsigned j=0;j<n_dofs;++j)
+                {
+                  if (fe1.get_fe().n_components() == 1)
+                    {
+                      const double vi = fe1.shape_value(i,k);
+                      const double dnvi = n * fe1.shape_grad(i,k);
+                      const double ve = fe2.shape_value(i,k);
+                      const double dnve = n * fe2.shape_grad(i,k);
+                      const double ui = fe1.shape_value(j,k);
+                      const double dnui = n * fe1.shape_grad(j,k);
+                      const double ue = fe2.shape_value(j,k);
+                      const double dnue = n * fe2.shape_grad(j,k);
 
-		      M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
-		      M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
-		      M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
-		      M22(i,j) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+penalty*ue*ve);
-		    }
-		  else
-		    for (unsigned int d=0;d<dim;++d)
-		      {
-			const double vi = fe1.shape_value_component(i,k,d);
-			const double dnvi = n * fe1.shape_grad_component(i,k,d);
-			const double ve = fe2.shape_value_component(i,k,d);
-			const double dnve = n * fe2.shape_grad_component(i,k,d);
-			const double ui = fe1.shape_value_component(j,k,d);
-			const double dnui = n * fe1.shape_grad_component(j,k,d);
-			const double ue = fe2.shape_value_component(j,k,d);
-			const double dnue = n * fe2.shape_grad_component(j,k,d);
+                      M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
+                      M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
+                      M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
+                      M22(i,j) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+penalty*ue*ve);
+                    }
+                  else
+                    for (unsigned int d=0;d<dim;++d)
+                      {
+                        const double vi = fe1.shape_value_component(i,k,d);
+                        const double dnvi = n * fe1.shape_grad_component(i,k,d);
+                        const double ve = fe2.shape_value_component(i,k,d);
+                        const double dnve = n * fe2.shape_grad_component(i,k,d);
+                        const double ui = fe1.shape_value_component(j,k,d);
+                        const double dnui = n * fe1.shape_grad_component(j,k,d);
+                        const double ue = fe2.shape_value_component(j,k,d);
+                        const double dnue = n * fe2.shape_grad_component(j,k,d);
 
-			M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
-			M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
-			M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
-			M22(i,j) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+penalty*ue*ve);
-		      }
-		}
-	    }
-	}
+                        M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
+                        M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
+                        M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
+                        M22(i,j) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+penalty*ue*ve);
+                      }
+                }
+            }
+        }
     }
 
 /**
@@ -323,15 +323,15 @@ namespace LocalIntegrators
       const unsigned int normal2 = GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number];
       const unsigned int deg1sq = (deg1 == 0) ? 1 : deg1 * (deg1+1);
       const unsigned int deg2sq = (deg2 == 0) ? 1 : deg2 * (deg2+1);
-      
+
       double penalty1 = deg1sq / dinfo1.cell->extent_in_direction(normal1);
       double penalty2 = deg2sq / dinfo2.cell->extent_in_direction(normal2);
       if (dinfo1.cell->has_children() ^ dinfo2.cell->has_children())
-	{
-	  Assert (dinfo1.face == dinfo2.face, ExcInternalError());
-	  Assert (dinfo1.face->has_children(), ExcInternalError());
-	  penalty1 *= 2;
-	}
+        {
+          Assert (dinfo1.face == dinfo2.face, ExcInternalError());
+          Assert (dinfo1.face->has_children(), ExcInternalError());
+          penalty1 *= 2;
+        }
       const double penalty = 0.5*(penalty1 + penalty2);
       return penalty;
     }

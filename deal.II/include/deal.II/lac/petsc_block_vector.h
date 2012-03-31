@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,7 +51,7 @@ namespace PETScWrappers
                                         * access to its own typedefs.
                                         */
       typedef BlockVectorBase<Vector> BaseClass;
-    
+
                                        /**
                                         * Typedef the type of the underlying
                                         * vector.
@@ -92,7 +92,7 @@ namespace PETScWrappers
                                         */
       explicit BlockVector (const unsigned int num_blocks = 0,
                             const unsigned int block_size = 0);
-    
+
                                        /**
                                         * Copy-Constructor. Dimension set to
                                         * that of V, all components are copied
@@ -104,7 +104,7 @@ namespace PETScWrappers
                                         * Copy-constructor: copy the values
                                         * from a PETSc wrapper parallel block
                                         * vector class.
-                                        * 
+                                        *
                                         *
                                         * Note that due to the communication
                                         * model of MPI, @em all processes have
@@ -147,7 +147,7 @@ namespace PETScWrappers
       BlockVector (const std::vector<unsigned int> &n,
                    const InputIterator              first,
                    const InputIterator              end);
-    
+
                                        /**
                                         * Destructor. Clears memory
                                         */
@@ -194,7 +194,7 @@ namespace PETScWrappers
       void reinit (const unsigned int num_blocks,
                    const unsigned int block_size,
                    const bool fast = false);
-  
+
                                        /**
                                         * Reinitialize the BlockVector such
                                         * that it contains
@@ -226,10 +226,10 @@ namespace PETScWrappers
                                         * yield unpredictable results
                                         * since they may be routed to
                                         * the wrong block.
-                                        */ 
+                                        */
       void reinit (const std::vector<unsigned int> &N,
                    const bool                       fast=false);
-    
+
                                        /**
                                         * Change the dimension to that
                                         * of the vector <tt>V</tt>. The same
@@ -258,7 +258,7 @@ namespace PETScWrappers
                                         */
       void reinit (const BlockVector &V,
                    const bool         fast=false);
-    
+
                                        /**
                                         * Swap the contents of this
                                         * vector and the other vector
@@ -289,24 +289,24 @@ namespace PETScWrappers
                                         * <tt>u.swap(v)</tt>, again in analogy
                                         * to standard functions.
                                         */
-      void swap (BlockVector &v);    
+      void swap (BlockVector &v);
 
-				     /**
-				      * Print to a stream.
-				      */
+                                     /**
+                                      * Print to a stream.
+                                      */
       void print (std::ostream       &out,
-		  const unsigned int  precision = 3,
-		  const bool          scientific = true,
-		  const bool          across = true) const;
+                  const unsigned int  precision = 3,
+                  const bool          scientific = true,
+                  const bool          across = true) const;
 
-				       /** @addtogroup Exceptions
-					* @{ */
+                                       /** @addtogroup Exceptions
+                                        * @{ */
 
                                        /**
                                         * Exception
                                         */
       DeclException0 (ExcIteratorRangeDoesNotMatchVectorSize);
-				       ///@}
+                                       ///@}
   };
 
 /*@}*/
@@ -338,7 +338,7 @@ namespace PETScWrappers
   {
     this->components.resize (v.n_blocks());
     block_indices = v.block_indices;
-  
+
     for (unsigned int i=0; i<this->n_blocks(); ++i)
       this->components[i] = v.components[i];
   }
@@ -352,12 +352,12 @@ namespace PETScWrappers
   {
     this->components.resize (v.get_block_indices().size());
     block_indices = v.get_block_indices();
-  
+
     for (unsigned int i=0; i<this->n_blocks(); ++i)
       this->components[i] = v.block(i);
   }
 
-  
+
 
   template <typename InputIterator>
   BlockVector::BlockVector (const std::vector<unsigned int> &n,
@@ -374,8 +374,8 @@ namespace PETScWrappers
         InputIterator end = start;
         std::advance (end, static_cast<signed int>(n[b]));
 
-	for (unsigned int i=0; i<n[b]; ++i, ++start)
-	  this->block(b)(i) = *start;
+        for (unsigned int i=0; i<n[b]; ++i, ++start)
+          this->block(b)(i) = *start;
       }
     Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
   }
@@ -416,7 +416,7 @@ namespace PETScWrappers
   BlockVector::~BlockVector ()
   {}
 
-  
+
   inline
   void
   BlockVector::reinit (const unsigned int n_bl,
@@ -427,7 +427,7 @@ namespace PETScWrappers
     reinit(n, fast);
   }
 
-  
+
 
   inline
   void
@@ -437,7 +437,7 @@ namespace PETScWrappers
     block_indices.reinit (n);
     if (this->components.size() != this->n_blocks())
       this->components.resize(this->n_blocks());
-  
+
     for (unsigned int i=0; i<this->n_blocks(); ++i)
       this->components[i].reinit(n[i], fast);
   }
@@ -451,12 +451,12 @@ namespace PETScWrappers
     block_indices = v.get_block_indices();
     if (this->components.size() != this->n_blocks())
       this->components.resize(this->n_blocks());
-  
+
     for (unsigned int i=0;i<this->n_blocks();++i)
       block(i).reinit(v.block(i), fast);
   }
 
-  
+
 
   inline
   void
@@ -464,7 +464,7 @@ namespace PETScWrappers
   {
     Assert (this->n_blocks() == v.n_blocks(),
             ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
-  
+
     for (unsigned int i=0; i<this->n_blocks(); ++i)
       this->components[i].swap (v.components[i]);
     ::dealii::swap (this->block_indices, v.block_indices);
@@ -473,24 +473,24 @@ namespace PETScWrappers
 
 
   inline
-  void 
+  void
   BlockVector::print (std::ostream       &out,
-		      const unsigned int  precision,
-		      const bool          scientific,
-		      const bool          across) const
+                      const unsigned int  precision,
+                      const bool          scientific,
+                      const bool          across) const
   {
     for (unsigned int i=0;i<this->n_blocks();++i)
       {
-	if (across)
-	  out << 'C' << i << ':';
-	else
-	  out << "Component " << i << std::endl;
-	this->components[i].print(out, precision, scientific, across);
+        if (across)
+          out << 'C' << i << ':';
+        else
+          out << "Component " << i << std::endl;
+        this->components[i].print(out, precision, scientific, across);
       }
   }
 
 
-  
+
 
 /**
  * Global function which overloads the default implementation
@@ -506,7 +506,7 @@ namespace PETScWrappers
   {
     u.swap (v);
   }
-  
+
 }
 
 

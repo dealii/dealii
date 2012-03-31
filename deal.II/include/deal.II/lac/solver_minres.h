@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -58,96 +58,96 @@ template <class VECTOR = Vector<double> >
 class SolverMinRes : public Solver<VECTOR>
 {
   public:
-    				     /**
-				      * Standardized data struct to
-				      * pipe additional data to the
-				      * solver. This solver does not
-				      * need additional data yet.
-				      */
+                                     /**
+                                      * Standardized data struct to
+                                      * pipe additional data to the
+                                      * solver. This solver does not
+                                      * need additional data yet.
+                                      */
     struct AdditionalData
     {
     };
 
-				     /**
-				      * Constructor.
-				      */
+                                     /**
+                                      * Constructor.
+                                      */
     SolverMinRes (SolverControl &cn,
-		  VectorMemory<VECTOR> &mem,
-		  const AdditionalData &data=AdditionalData());
+                  VectorMemory<VECTOR> &mem,
+                  const AdditionalData &data=AdditionalData());
 
-				     /**
-				      * Constructor. Use an object of
-				      * type GrowingVectorMemory as
-				      * a default to allocate memory.
-				      */
+                                     /**
+                                      * Constructor. Use an object of
+                                      * type GrowingVectorMemory as
+                                      * a default to allocate memory.
+                                      */
     SolverMinRes (SolverControl        &cn,
-		  const AdditionalData &data=AdditionalData());
+                  const AdditionalData &data=AdditionalData());
 
-				     /**
-				      * Virtual destructor.
-				      */
+                                     /**
+                                      * Virtual destructor.
+                                      */
     virtual ~SolverMinRes ();
-    
-				     /**
-				      * Solve the linear system $Ax=b$
-				      * for x.
-				      */
+
+                                     /**
+                                      * Solve the linear system $Ax=b$
+                                      * for x.
+                                      */
     template<class MATRIX, class PRECONDITIONER>
     void
     solve (const MATRIX         &A,
-	   VECTOR               &x,
-	   const VECTOR         &b,
-	   const PRECONDITIONER &precondition);
+           VECTOR               &x,
+           const VECTOR         &b,
+           const PRECONDITIONER &precondition);
 
-    				     /** @addtogroup Exceptions
-				      * @{ */
+                                     /** @addtogroup Exceptions
+                                      * @{ */
 
-				     /**
-				      * Exception
-				      */
+                                     /**
+                                      * Exception
+                                      */
     DeclException0 (ExcPreconditionerNotDefinite);
-				     //@}
+                                     //@}
 
   protected:
-				     /**
-				      * Implementation of the computation of
-				      * the norm of the residual.
-				      */
+                                     /**
+                                      * Implementation of the computation of
+                                      * the norm of the residual.
+                                      */
     virtual double criterion();
-				     /**
-				      * Interface for derived class.
-				      * This function gets the current
-				      * iteration vector, the residual
-				      * and the update vector in each
-				      * step. It can be used for a
-				      * graphical output of the
-				      * convergence history.
-				      */
+                                     /**
+                                      * Interface for derived class.
+                                      * This function gets the current
+                                      * iteration vector, the residual
+                                      * and the update vector in each
+                                      * step. It can be used for a
+                                      * graphical output of the
+                                      * convergence history.
+                                      */
     virtual void print_vectors(const unsigned int step,
-			       const VECTOR& x,
-			       const VECTOR& r,
-			       const VECTOR& d) const;
+                               const VECTOR& x,
+                               const VECTOR& r,
+                               const VECTOR& d) const;
 
-				     /**
-				      * Temporary vectors, allocated through
-				      * the @p VectorMemory object at the start
-				      * of the actual solution process and
-				      * deallocated at the end.
-				      */
+                                     /**
+                                      * Temporary vectors, allocated through
+                                      * the @p VectorMemory object at the start
+                                      * of the actual solution process and
+                                      * deallocated at the end.
+                                      */
     VECTOR *Vu0, *Vu1, *Vu2;
-    VECTOR *Vm0, *Vm1, *Vm2;   
+    VECTOR *Vm0, *Vm1, *Vm2;
     VECTOR *Vv;
-    
-				     /**
-				      * Within the iteration loop, the
-				      * square of the residual vector is
-				      * stored in this variable. The
-				      * function @p criterion uses this
-				      * variable to compute the convergence
-				      * value, which in this class is the
-				      * norm of the residual vector and thus
-				      * the square root of the @p res2 value.
-				      */
+
+                                     /**
+                                      * Within the iteration loop, the
+                                      * square of the residual vector is
+                                      * stored in this variable. The
+                                      * function @p criterion uses this
+                                      * variable to compute the convergence
+                                      * value, which in this class is the
+                                      * norm of the residual vector and thus
+                                      * the square root of the @p res2 value.
+                                      */
     double res2;
 };
 
@@ -158,19 +158,19 @@ class SolverMinRes : public Solver<VECTOR>
 
 template<class VECTOR>
 SolverMinRes<VECTOR>::SolverMinRes (SolverControl &cn,
-				    VectorMemory<VECTOR> &mem,
-				    const AdditionalData &)
-		:
-		Solver<VECTOR>(cn,mem)
+                                    VectorMemory<VECTOR> &mem,
+                                    const AdditionalData &)
+                :
+                Solver<VECTOR>(cn,mem)
 {}
 
 
 
 template<class VECTOR>
 SolverMinRes<VECTOR>::SolverMinRes (SolverControl &cn,
-				    const AdditionalData &)
-		:
-		Solver<VECTOR>(cn)
+                                    const AdditionalData &)
+                :
+                Solver<VECTOR>(cn)
 {}
 
 
@@ -191,9 +191,9 @@ SolverMinRes<VECTOR>::criterion()
 template<class VECTOR>
 void
 SolverMinRes<VECTOR>::print_vectors(const unsigned int,
-				    const VECTOR&,
-				    const VECTOR&,
-				    const VECTOR&) const
+                                    const VECTOR&,
+                                    const VECTOR&,
+                                    const VECTOR&) const
 {}
 
 
@@ -202,15 +202,15 @@ template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 void
 SolverMinRes<VECTOR>::solve (const MATRIX         &A,
-			     VECTOR               &x,
-			     const VECTOR         &b,
-			     const PRECONDITIONER &precondition)
+                             VECTOR               &x,
+                             const VECTOR         &b,
+                             const PRECONDITIONER &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
   deallog.push("minres");
 
-				   // Memory allocation
+                                   // Memory allocation
   Vu0  = this->memory.alloc();
   Vu1  = this->memory.alloc();
   Vu2  = this->memory.alloc();
@@ -218,14 +218,14 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   Vm0  = this->memory.alloc();
   Vm1  = this->memory.alloc();
   Vm2  = this->memory.alloc();
-				   // define some aliases for simpler access
+                                   // define some aliases for simpler access
   typedef VECTOR *vecptr;
   vecptr u[3] = {Vu0, Vu1, Vu2};
   vecptr m[3] = {Vm0, Vm1, Vm2};
   VECTOR &v   = *Vv;
-				   // resize the vectors, but do not set
-				   // the values since they'd be overwritten
-				   // soon anyway.
+                                   // resize the vectors, but do not set
+                                   // the values since they'd be overwritten
+                                   // soon anyway.
   u[0]->reinit(b,true);
   u[1]->reinit(b,true);
   u[2]->reinit(b,true);
@@ -234,10 +234,10 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   m[2]->reinit(b,true);
   v.reinit(b,true);
 
-				   // some values needed
+                                   // some values needed
   double delta[3] = { 0, 0, 0 };
   double f[2] = { 0, 0 };
-  double e[2] = { 0, 0 }; 
+  double e[2] = { 0, 0 };
 
   double r_l2 = 0;
   double r0   = 0;
@@ -246,45 +246,45 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   double gamma = 0;
   double s = 0;
   double d_ = 0;
-  double d = 0;  
+  double d = 0;
 
-				   // The iteration step.
+                                   // The iteration step.
   unsigned int j = 1;
-  
 
-				   // Start of the solution process
+
+                                   // Start of the solution process
   A.vmult(*m[0],x);
   *u[1] = b;
   *u[1] -= *m[0];
-				   // Precondition is applied.
-				   // The preconditioner has to be
-				   // positiv definite and symmetric
+                                   // Precondition is applied.
+                                   // The preconditioner has to be
+                                   // positiv definite and symmetric
 
-				   // M v = u[1]
+                                   // M v = u[1]
   precondition.vmult (v,*u[1]);
-  
+
   delta[1] = v * (*u[1]);
-				   // Preconditioner positive
+                                   // Preconditioner positive
   Assert (delta[1]>=0, ExcPreconditionerNotDefinite());
-  
+
   r0 = std::sqrt(delta[1]);
   r_l2 = r0;
-  
-  
+
+
   u[0]->reinit(b);
   delta[0] = 1.;
   m[0]->reinit(b);
   m[1]->reinit(b);
   m[2]->reinit(b);
-				   
+
   conv = this->control().check(0,r_l2);
-  
+
   while (conv==SolverControl::iterate)
-    {      
+    {
       if (delta[1]!=0)
-	v *= 1./std::sqrt(delta[1]);
+        v *= 1./std::sqrt(delta[1]);
       else
-	v.reinit(b);
+        v.reinit(b);
 
       A.vmult(*u[2],v);
       u[2]->add (-std::sqrt(delta[1]/delta[0]), *u[0]);
@@ -292,95 +292,95 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
       gamma = *u[2] * v;
       u[2]->add (-gamma / std::sqrt(delta[1]), *u[1]);
       *m[0] = v;
-      
-				       // precondition: solve M v = u[2]
-				       // Preconditioner has to be positiv
-				       // definite and symmetric.
+
+                                       // precondition: solve M v = u[2]
+                                       // Preconditioner has to be positiv
+                                       // definite and symmetric.
       precondition.vmult(v,*u[2]);
- 
+
       delta[2] = v * (*u[2]);
 
       Assert (delta[2]>=0, ExcPreconditionerNotDefinite());
 
       if (j==1)
-	{
-	  d_ = gamma;
-	  e[1] = std::sqrt(delta[2]);
-	}
+        {
+          d_ = gamma;
+          e[1] = std::sqrt(delta[2]);
+        }
       if (j>1)
-	{
-	  d_ = s * e[0] - c * gamma;
-	  e[0] = c * e[0] + s * gamma;
-	  f[1] = s * std::sqrt(delta[2]);
-	  e[1] = -c * std::sqrt(delta[2]);
-	}
+        {
+          d_ = s * e[0] - c * gamma;
+          e[0] = c * e[0] + s * gamma;
+          f[1] = s * std::sqrt(delta[2]);
+          e[1] = -c * std::sqrt(delta[2]);
+        }
 
       d = std::sqrt (d_*d_ + delta[2]);
-      
+
       if (j>1) tau *= s / c;
       c = d_ / d;
       tau *= c;
-      
+
       s = std::sqrt(delta[2]) / d;
 
       if (j==1)
-	tau = r0 * c;
+        tau = r0 * c;
 
       m[0]->add (-e[0], *m[1]);
       if (j>1)
-	m[0]->add (-f[0], *m[2]);
+        m[0]->add (-f[0], *m[2]);
       *m[0] *= 1./d;
       x.add (tau, *m[0]);
       r_l2 *= std::fabs(s);
 
       conv = this->control().check(j,r_l2);
-      
-				       // next iteration step
+
+                                       // next iteration step
       ++j;
-				       // All vectors have to be shifted
-				       // one iteration step.
-				       // This should be changed one time.
-				       //
-				       // the previous code was like this:
-				       //   m[2] = m[1];
-				       //   m[1] = m[0];
-				       // but it can be made more efficient,
-				       // since the value of m[0] is no more
-				       // needed in the next iteration
+                                       // All vectors have to be shifted
+                                       // one iteration step.
+                                       // This should be changed one time.
+                                       //
+                                       // the previous code was like this:
+                                       //   m[2] = m[1];
+                                       //   m[1] = m[0];
+                                       // but it can be made more efficient,
+                                       // since the value of m[0] is no more
+                                       // needed in the next iteration
       swap (*m[2], *m[1]);
       swap (*m[1], *m[0]);
-      
-				       // likewise, but reverse direction:
-				       //   u[0] = u[1];
-				       //   u[1] = u[2];
+
+                                       // likewise, but reverse direction:
+                                       //   u[0] = u[1];
+                                       //   u[1] = u[2];
       swap (*u[0], *u[1]);
       swap (*u[1], *u[2]);
 
-				       // these are scalars, so need
-				       // to bother
+                                       // these are scalars, so need
+                                       // to bother
       f[0] = f[1];
       e[0] = e[1];
       delta[0] = delta[1];
       delta[1] = delta[2];
     }
 
-				   // Deallocation of Memory
+                                   // Deallocation of Memory
   this->memory.free(Vu0);
   this->memory.free(Vu1);
   this->memory.free(Vu2);
-  this->memory.free(Vv); 
+  this->memory.free(Vv);
   this->memory.free(Vm0);
   this->memory.free(Vm1);
   this->memory.free(Vm2);
-				   // Output
+                                   // Output
   deallog.pop ();
-  
-				   // in case of failure: throw
-				   // exception
+
+                                   // in case of failure: throw
+                                   // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
-					this->control().last_value());
-				   // otherwise exit as normal
+                                        this->control().last_value());
+                                   // otherwise exit as normal
 }
 
 #endif // DOXYGEN

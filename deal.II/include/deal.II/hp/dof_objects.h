@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2008 by the deal.II authors
+//    Copyright (C) 2006, 2008, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,9 +33,9 @@ namespace internal
  * internal::DoFHandler::DoFObjects classes (see there for more
  * information, in particular on the layout of the class hierarchy,
  * and the use of file names).
- * 
+ *
  * <h4>Offset computations</h4>
- * 
+ *
  * For hp methods, not all cells may use the same finite element, and
  * it is consequently more complicated to determine where the DoF
  * indices for a given line, quad, or hex are stored. As described in
@@ -48,7 +48,7 @@ namespace internal
  * using this simple multiplication, the dofs array has an associated
  * array dof_offsets. The data corresponding to a
  * line then starts at index <code>line_dof_offsets[line_index]</code>
- * within the <code>line_dofs</code> array. 
+ * within the <code>line_dofs</code> array.
  *
  *
  * <h4>Multiple data sets per object</h4>
@@ -56,7 +56,7 @@ namespace internal
  * If an object corresponds to a cell, the global dof indices of this
  * cell are stored at the location indicated above in sequential
  * order.
- * 
+ *
  * However, if two adjacent cells use different finite elements, then
  * the face that they share needs to store DoF indices for both
  * involved finite elements. While faces therefore have to have at
@@ -86,8 +86,8 @@ namespace internal
  * list and pick out or set a DoF index given the finite element index
  * and its location within the set of DoFs corresponding to this
  * finite element.
- * 
- * 
+ *
+ *
  * @ingroup hp
  * @author Tobias Leicht, 2006
  */
@@ -135,15 +135,15 @@ namespace internal
                                           * the internal::hp::DoFLevel
                                           * class template for more
                                           * information.
-					  */
+                                          */
         template <int dimm, int spacedim>
         void
         set_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-		       const unsigned int               obj_index,
-		       const unsigned int               fe_index,
-		       const unsigned int               local_index,
-		       const unsigned int               global_index,
-		       const unsigned int               obj_level);
+                       const unsigned int               obj_index,
+                       const unsigned int               fe_index,
+                       const unsigned int               local_index,
+                       const unsigned int               global_index,
+                       const unsigned int               obj_level);
 
                                          /**
                                           * Return the global index of
@@ -167,14 +167,14 @@ namespace internal
                                           * the internal::hp::DoFLevel
                                           * class template for more
                                           * information.
-					  */
+                                          */
         template <int dimm, int spacedim>
         unsigned int
         get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-		       const unsigned int               obj_index,
-		       const unsigned int               fe_index,
-		       const unsigned int               local_index,
-		       const unsigned int               obj_level) const;
+                       const unsigned int               obj_index,
+                       const unsigned int               fe_index,
+                       const unsigned int               local_index,
+                       const unsigned int               obj_level) const;
 
                                          /**
                                           * Return the number of
@@ -192,29 +192,29 @@ namespace internal
                                           * value may be one or any
                                           * other value larger than
                                           * that.
-					  *
-					  * If the object is not part
-					  * of an active cell, then no
-					  * degrees of freedom have
-					  * been distributed and zero
-					  * is returned.
+                                          *
+                                          * If the object is not part
+                                          * of an active cell, then no
+                                          * degrees of freedom have
+                                          * been distributed and zero
+                                          * is returned.
                                           */
         template <int dimm, int spacedim>
         unsigned int
         n_active_fe_indices (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                              const unsigned int               obj_index) const;
 
-					 /**
-					  * Return the fe_index of the
-					  * n-th active finite element
-					  * on this object.
-					  */
+                                         /**
+                                          * Return the fe_index of the
+                                          * n-th active finite element
+                                          * on this object.
+                                          */
         template <int dimm, int spacedim>
         unsigned int
         nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-			     const unsigned int               obj_level,
+                             const unsigned int               obj_level,
                              const unsigned int               obj_index,
-			     const unsigned int               n) const;
+                             const unsigned int               n) const;
 
                                          /**
                                           * Check whether a given
@@ -227,7 +227,7 @@ namespace internal
         fe_index_is_active (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                             const unsigned int               obj_index,
                             const unsigned int               fe_index,
-			    const unsigned int               obj_level) const;
+                            const unsigned int               obj_level) const;
 
                                          /**
                                           * Determine an estimate for the
@@ -427,8 +427,8 @@ namespace internal
                                        // object for which DoFs have
                                        // been allocated at all
       if (dof_offsets[obj_index] == numbers::invalid_unsigned_int)
-	return 0;
-      
+        return 0;
+
                                        // if we are on a cell, then the
                                        // only set of indices we store
                                        // is the one for the cell,
@@ -502,7 +502,7 @@ namespace internal
                                            // is only a single
                                            // fe_index
           Assert (n == 0, ExcIndexRange (n, 0, 1));
-      
+
           return dof_handler.levels[obj_level]->active_fe_indices[obj_index];
         }
       else
@@ -510,7 +510,7 @@ namespace internal
           Assert (n < n_active_fe_indices(dof_handler, obj_index),
                   ExcIndexRange (n, 0,
                                  n_active_fe_indices(dof_handler, obj_index)));
-      
+
                                            // we are in higher space
                                            // dimensions, so there may
                                            // be multiple finite
@@ -536,10 +536,10 @@ namespace internal
 
               Assert (fe_index < dof_handler.get_fe().size(),
                       ExcInternalError());
-	  
+
               if (counter == n)
                 return fe_index;
-	  
+
               ++counter;
               pointer += dof_handler.get_fe()[fe_index]
                          .template n_dofs_per_object<dim>() + 1;
@@ -622,7 +622,7 @@ namespace internal
             }
         }
     }
-    
+
   }
 }
 

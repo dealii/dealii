@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by Guido Kanschat
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012 by Guido Kanschat
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,15 +20,15 @@ namespace Algorithms
   Operator<VECTOR>::~Operator()
   {}
 
-  
-  
+
+
   template <class VECTOR>
   void Operator<VECTOR>::notify(const Event& e)
   {
     notifications += e;
   }
-  
-  
+
+
   template <class VECTOR>
   void
   Operator<VECTOR>::clear_events ()
@@ -40,7 +40,7 @@ namespace Algorithms
   template <class VECTOR>
   OutputOperator<VECTOR>::~OutputOperator()
   {}
-  
+
   template <class VECTOR>
   OutputOperator<VECTOR>::OutputOperator()
   :
@@ -52,7 +52,7 @@ namespace Algorithms
   {
     os =&stream;
   }
-  
+
   template <class VECTOR>
   OutputOperator<VECTOR>&
   OutputOperator<VECTOR>::operator<< (const NamedData<VECTOR*>& vectors)
@@ -69,8 +69,8 @@ namespace Algorithms
     {
       (*os) << ' ' << step;
       for (unsigned int i=0;i<vectors.size();++i)
-	for (unsigned int j=0;j<vectors(i)->size();++j)
-	  (*os) << ' ' << (*vectors(i))(j);
+        for (unsigned int j=0;j<vectors(i)->size();++j)
+          (*os) << ' ' << (*vectors(i))(j);
       (*os) << std::endl;
     }
     return *this;

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by Guido Kanschat
+//    Copyright (C) 2010, 2012 by Guido Kanschat
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -48,149 +48,149 @@ namespace Algorithms
   class TimestepControl : public Subscriptor
   {
     public:
-				       /**
-					* The time stepping
-					* strategies. These are
-					* controlled by the value of
-					* tolerance() and start_step().
-					*/
+                                       /**
+                                        * The time stepping
+                                        * strategies. These are
+                                        * controlled by the value of
+                                        * tolerance() and start_step().
+                                        */
       enum Strategy
       {
-					     /**
-					      * Choose a uniform time
-					      * step size. The step size
-					      * is determined by
-					      * start_step(),
-					      * tolerance() is ignored.
-					      */
-	    uniform,
-					     /**
-					      * Start with the time step
-					      * size given by
-					      * start_step() and double it
-					      * in every
-					      * step. tolerance() is
-					      * ignored.
-					      *
-					      * This strategy is
-					      * intended for
-					      * pseudo-timestepping
-					      * schemes computing a
-					      * stationary limit.
-					      */
-	    doubling
+                                             /**
+                                              * Choose a uniform time
+                                              * step size. The step size
+                                              * is determined by
+                                              * start_step(),
+                                              * tolerance() is ignored.
+                                              */
+            uniform,
+                                             /**
+                                              * Start with the time step
+                                              * size given by
+                                              * start_step() and double it
+                                              * in every
+                                              * step. tolerance() is
+                                              * ignored.
+                                              *
+                                              * This strategy is
+                                              * intended for
+                                              * pseudo-timestepping
+                                              * schemes computing a
+                                              * stationary limit.
+                                              */
+            doubling
       };
 
-				       /**
-					* Constructor setting default
-					* values
-					*/
+                                       /**
+                                        * Constructor setting default
+                                        * values
+                                        */
       TimestepControl (double start = 0.,
-		       double final = 1.,
-		       double tolerance = 1.e-2,
-		       double start_step = 1.e-2,
-		       double print_step = -1.,
-		       double max_step = 1.);
+                       double final = 1.,
+                       double tolerance = 1.e-2,
+                       double start_step = 1.e-2,
+                       double print_step = -1.,
+                       double max_step = 1.);
 
-				       /**
-					* Declare the control
-					* parameters for parameter
-					* handler.
-					*/
+                                       /**
+                                        * Declare the control
+                                        * parameters for parameter
+                                        * handler.
+                                        */
       static void declare_parameters (ParameterHandler& param);
-				       /**
-					* Read the control parameters
-					* from a parameter handler.
-					*/
+                                       /**
+                                        * Read the control parameters
+                                        * from a parameter handler.
+                                        */
       void parse_parameters (ParameterHandler& param);
 
-				       /**
-					* The left end of the time interval.
-					*/
+                                       /**
+                                        * The left end of the time interval.
+                                        */
       double start () const;
-				       /**
-					* The right end of the time
-					* interval. The control
-					* mechanism ensures that the
-					* final time step ends at this
-					* point.
-					*/
+                                       /**
+                                        * The right end of the time
+                                        * interval. The control
+                                        * mechanism ensures that the
+                                        * final time step ends at this
+                                        * point.
+                                        */
       double final () const;
-				       /**
-					* The tolerance value
-					* controlling the time steps.
-					*/
+                                       /**
+                                        * The tolerance value
+                                        * controlling the time steps.
+                                        */
       double tolerance () const;
-				       /**
-					* The size of the current time
-					* step.
-					*/
+                                       /**
+                                        * The size of the current time
+                                        * step.
+                                        */
       double step () const;
-      
-				       /**
-					* The current time.
-					*/
+
+                                       /**
+                                        * The current time.
+                                        */
       double now () const;
 
-				       /**
-					* Compute the size of the next
-					* step size and return true if
-					* it differs from the current
-					* step size. Advance the
-					* current time by the new step
-					* size.
-					*/
+                                       /**
+                                        * Compute the size of the next
+                                        * step size and return true if
+                                        * it differs from the current
+                                        * step size. Advance the
+                                        * current time by the new step
+                                        * size.
+                                        */
       bool advance ();
 
-				       /**
-					* Set start value.
-					*/
+                                       /**
+                                        * Set start value.
+                                        */
       void start (double);
-				       /**
-					* Set final time value.
-					*/
+                                       /**
+                                        * Set final time value.
+                                        */
       void final (double);
-				       /**
-					* Set tolerance
-					*/
+                                       /**
+                                        * Set tolerance
+                                        */
       void tolerance (double);
-				       /**
-					* Set strategy.
-					*/
+                                       /**
+                                        * Set strategy.
+                                        */
       void strategy (Strategy);
-    
-				       /**
-					* Set size of the first
-					* step. This may be overwritten
-					* by the time stepping strategy.
-					*/
+
+                                       /**
+                                        * Set size of the first
+                                        * step. This may be overwritten
+                                        * by the time stepping strategy.
+                                        */
       void start_step (double);
-    
-				       /**
-					* Set size of the maximum
-					* step size.
-					*/
+
+                                       /**
+                                        * Set size of the maximum
+                                        * step size.
+                                        */
       void max_step (double);
 
-				       /**
-					* Set now() equal to
-					* start(). Initialize step() and
-					* print() to their initial
-					* values.
-					*/
+                                       /**
+                                        * Set now() equal to
+                                        * start(). Initialize step() and
+                                        * print() to their initial
+                                        * values.
+                                        */
       void restart ();
-				       /**
-					* Return true if this timestep
-					* should be written to disk.
-					*/
+                                       /**
+                                        * Return true if this timestep
+                                        * should be written to disk.
+                                        */
       bool print ();
-				       /**
-					* Set the output name template.
-					*/
+                                       /**
+                                        * Set the output name template.
+                                        */
       void file_name_format (const char*);
       const char* file_name_format ();
     private:
-    
+
       double start_val;
       double final_val;
       double tolerance_val;
@@ -198,18 +198,18 @@ namespace Algorithms
       double start_step_val;
       double max_step_val;
       double min_step_val;
-				       /**
-					* The size of the current time
-					* step. This may differ from
-					* #step_val, if we aimed at #final_val.
-					*/
+                                       /**
+                                        * The size of the current time
+                                        * step. This may differ from
+                                        * #step_val, if we aimed at #final_val.
+                                        */
       double current_step_val;
       double step_val;
-    
+
       double now_val;
       double print_step;
       double next_print_val;
-    
+
       char format[30];
   };
 

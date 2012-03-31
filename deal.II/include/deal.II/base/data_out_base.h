@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -218,1192 +218,1192 @@ class ParameterHandler;
 class DataOutBase
 {
   public:
-				     /**
-				      * Data structure describing a patch of
-				      * data in <tt>dim</tt> space
-				      * dimensions.
-				      *
-				      * A patch consists of the following data:
-				      * <ul>
-				      * <li>the corner #vertices,
-				      * <li> the number
-				      * #n_subdivisions of the number
-				      * of cells the Patch has in each
-				      * space direction,
-				      * <li> the #data attached to
-				      * each vertex, in the usual
-				      * lexicographic ordering,
-				      * <li> Information on #neighbors.
-				      * </ul>
-				      *
-				      * See the general
-				      * documentation of the
-				      * <tt>DataOutBase</tt> class for more
-				      * information on its contents and
-				      * purposes.  In the case of two
-				      * dimensions, the next picture ist an
-				      * example of <tt>n_subdivision</tt> = 4
-				      * because the number of (sub)cells
-				      * within each patch is equal to
-				      * <tt>2^dim</tt>.
-				      *
-				      * @ingroup output
-				      *
-				      * @author Wolfgang Bangerth, Guido Kanschat
-				      */
+                                     /**
+                                      * Data structure describing a patch of
+                                      * data in <tt>dim</tt> space
+                                      * dimensions.
+                                      *
+                                      * A patch consists of the following data:
+                                      * <ul>
+                                      * <li>the corner #vertices,
+                                      * <li> the number
+                                      * #n_subdivisions of the number
+                                      * of cells the Patch has in each
+                                      * space direction,
+                                      * <li> the #data attached to
+                                      * each vertex, in the usual
+                                      * lexicographic ordering,
+                                      * <li> Information on #neighbors.
+                                      * </ul>
+                                      *
+                                      * See the general
+                                      * documentation of the
+                                      * <tt>DataOutBase</tt> class for more
+                                      * information on its contents and
+                                      * purposes.  In the case of two
+                                      * dimensions, the next picture ist an
+                                      * example of <tt>n_subdivision</tt> = 4
+                                      * because the number of (sub)cells
+                                      * within each patch is equal to
+                                      * <tt>2^dim</tt>.
+                                      *
+                                      * @ingroup output
+                                      *
+                                      * @author Wolfgang Bangerth, Guido Kanschat
+                                      */
     template <int dim, int spacedim=dim>
     struct Patch
     {
-					 /**
-					  * Make the <tt>spacedim</tt> template
-					  * parameter available.
-					  */
-	static const unsigned int space_dim=spacedim;
+                                         /**
+                                          * Make the <tt>spacedim</tt> template
+                                          * parameter available.
+                                          */
+        static const unsigned int space_dim=spacedim;
 
-					 /**
-					  * Corner points of a patch.
-					  * Inner points are computed by
-					  * a multilinear transform of
-					  * the unit cell to the cell
-					  * specified by these corner
-					  * points. The order of points
-					  * is the same as for cells
-					  * in the triangulation.
-					  */
-	Point<spacedim> vertices[GeometryInfo<dim>::vertices_per_cell];
+                                         /**
+                                          * Corner points of a patch.
+                                          * Inner points are computed by
+                                          * a multilinear transform of
+                                          * the unit cell to the cell
+                                          * specified by these corner
+                                          * points. The order of points
+                                          * is the same as for cells
+                                          * in the triangulation.
+                                          */
+        Point<spacedim> vertices[GeometryInfo<dim>::vertices_per_cell];
 
-					 /**
-					  * Numbers of neighbors of a patch.
-					  * OpenDX format requires
-					  * neighbor information for
-					  * advanced output. Here the
-					  * neighborship relationship
-					  * of patches is
-					  * stored. During output,
-					  * this must be transformed
-					  * into neighborship of
-					  * sub-grid cells.
-					  */
-	unsigned int neighbors[GeometryInfo<dim>::faces_per_cell];
+                                         /**
+                                          * Numbers of neighbors of a patch.
+                                          * OpenDX format requires
+                                          * neighbor information for
+                                          * advanced output. Here the
+                                          * neighborship relationship
+                                          * of patches is
+                                          * stored. During output,
+                                          * this must be transformed
+                                          * into neighborship of
+                                          * sub-grid cells.
+                                          */
+        unsigned int neighbors[GeometryInfo<dim>::faces_per_cell];
 
-					 /**
-					  * Number of this
-					  * patch. Since we are not
-					  * sure patches are handled
-					  * in the same order, always,
-					  * we better store this.
-					  */
-	unsigned int patch_index;
+                                         /**
+                                          * Number of this
+                                          * patch. Since we are not
+                                          * sure patches are handled
+                                          * in the same order, always,
+                                          * we better store this.
+                                          */
+        unsigned int patch_index;
 
-					 /**
-					  * Number of subdivisions with
-					  * which this patch is to be
-					  * written. <tt>1</tt> means no
-					  * subdivision, <tt>2</tt> means
-					  * bisection, <tt>3</tt> trisection,
-					  * etc.
-					  */
-	unsigned int n_subdivisions;
+                                         /**
+                                          * Number of subdivisions with
+                                          * which this patch is to be
+                                          * written. <tt>1</tt> means no
+                                          * subdivision, <tt>2</tt> means
+                                          * bisection, <tt>3</tt> trisection,
+                                          * etc.
+                                          */
+        unsigned int n_subdivisions;
 
-					 /**
-					  * Data vectors. The format is
-					  * as follows:
-					  * <tt>data(i,.)</tt> denotes the data
-					  * belonging to the <tt>i</tt>th data
-					  * vector. <tt>data.n()</tt>
-					  * therefore equals the number
-					  * of output points; this
-					  * number is <tt>(subdivisions+1)^{dim</tt>}.
-					  * <tt>data.m()</tt> equals the number of
-					  * data vectors.
-					  *
-					  * Within each column,
-					  * <tt>data(.,j)</tt> are the
-					  * data values at the output
-					  * point <tt>j</tt>, where
-					  * <tt>j</tt> denotes the
-					  * usual lexicographic
-					  * ordering in deal.II. This
-					  * is also the order of
-					  * points as provided by the
-					  * <tt>QIterated</tt> class
-					  * when used with the
-					  * <tt>QTrapez</tt> class as
-					  * subquadrature.
-					  *
-					  * Since the number of data vectors
-					  * is usually the same for all
-					  * patches to be printed,
-					  * <tt>data.size()</tt> should yield
-					  * the same value for all patches
-					  * provided. The exception are
-					  * patches for which
-					  * points_are_available are set,
-					  * where the actual coordinates of
-					  * the point are appended to the
-					  * 'data' field, see the
-					  * documentation of the
-					  * points_are_available flag.
-					  */
-	Table<2,float> data;
+                                         /**
+                                          * Data vectors. The format is
+                                          * as follows:
+                                          * <tt>data(i,.)</tt> denotes the data
+                                          * belonging to the <tt>i</tt>th data
+                                          * vector. <tt>data.n()</tt>
+                                          * therefore equals the number
+                                          * of output points; this
+                                          * number is <tt>(subdivisions+1)^{dim</tt>}.
+                                          * <tt>data.m()</tt> equals the number of
+                                          * data vectors.
+                                          *
+                                          * Within each column,
+                                          * <tt>data(.,j)</tt> are the
+                                          * data values at the output
+                                          * point <tt>j</tt>, where
+                                          * <tt>j</tt> denotes the
+                                          * usual lexicographic
+                                          * ordering in deal.II. This
+                                          * is also the order of
+                                          * points as provided by the
+                                          * <tt>QIterated</tt> class
+                                          * when used with the
+                                          * <tt>QTrapez</tt> class as
+                                          * subquadrature.
+                                          *
+                                          * Since the number of data vectors
+                                          * is usually the same for all
+                                          * patches to be printed,
+                                          * <tt>data.size()</tt> should yield
+                                          * the same value for all patches
+                                          * provided. The exception are
+                                          * patches for which
+                                          * points_are_available are set,
+                                          * where the actual coordinates of
+                                          * the point are appended to the
+                                          * 'data' field, see the
+                                          * documentation of the
+                                          * points_are_available flag.
+                                          */
+        Table<2,float> data;
 
-					 /**
-					  * Bool flag indicating, whether the
-					  * coordinates of the inner patch
-					  * points are appended to the @p data
-					  * table (@ true) or not (@ false),
-					  * where the second is the standard and
-					  * can be found for all cells in the
-					  * interior of a domain.
-					  *
-					  * On the boundary of a domain, patch
-					  * points are evaluated using a
-					  * Mapping and therefore have to be
-					  * stored inside the patch, as the
-					  * Mapping and the corresponding
-					  * boundary information are no longer
-					  * available later on when we
-					  * actually write the patch out to an
-					  * output stream.
-					  */
-	bool points_are_available;
+                                         /**
+                                          * Bool flag indicating, whether the
+                                          * coordinates of the inner patch
+                                          * points are appended to the @p data
+                                          * table (@ true) or not (@ false),
+                                          * where the second is the standard and
+                                          * can be found for all cells in the
+                                          * interior of a domain.
+                                          *
+                                          * On the boundary of a domain, patch
+                                          * points are evaluated using a
+                                          * Mapping and therefore have to be
+                                          * stored inside the patch, as the
+                                          * Mapping and the corresponding
+                                          * boundary information are no longer
+                                          * available later on when we
+                                          * actually write the patch out to an
+                                          * output stream.
+                                          */
+        bool points_are_available;
 
-					 /**
-					  * Default constructor. Sets
-					  * <tt>n_subdivisions</tt> to one.
-					  */
-	Patch ();
+                                         /**
+                                          * Default constructor. Sets
+                                          * <tt>n_subdivisions</tt> to one.
+                                          */
+        Patch ();
 
-					 /**
-					  * Compare the present patch
-					  * for equality with another
-					  * one. This is used in a few
-					  * of the automated tests in
-					  * our testsuite.
-					  */
-	bool operator == (const Patch &patch) const;
+                                         /**
+                                          * Compare the present patch
+                                          * for equality with another
+                                          * one. This is used in a few
+                                          * of the automated tests in
+                                          * our testsuite.
+                                          */
+        bool operator == (const Patch &patch) const;
 
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object. Since sometimes
-					  * the size of objects can
-					  * not be determined exactly
-					  * (for example: what is the
-					  * memory consumption of an
-					  * STL <tt>std::map</tt> type with a
-					  * certain number of
-					  * elements?), this is only
-					  * an estimate. however often
-					  * quite close to the true
-					  * value.
-					  */
-	std::size_t memory_consumption () const;
+                                         /**
+                                          * Determine an estimate for
+                                          * the memory consumption (in
+                                          * bytes) of this
+                                          * object. Since sometimes
+                                          * the size of objects can
+                                          * not be determined exactly
+                                          * (for example: what is the
+                                          * memory consumption of an
+                                          * STL <tt>std::map</tt> type with a
+                                          * certain number of
+                                          * elements?), this is only
+                                          * an estimate. however often
+                                          * quite close to the true
+                                          * value.
+                                          */
+        std::size_t memory_consumption () const;
 
-					 /**
-					  * Value to be used if this
-					  * patch has no neighbor on
-					  * one side.
-					  */
-	static const unsigned int no_neighbor = numbers::invalid_unsigned_int;
-					 /** @addtogroup Exceptions
-					  * @{ */
+                                         /**
+                                          * Value to be used if this
+                                          * patch has no neighbor on
+                                          * one side.
+                                          */
+        static const unsigned int no_neighbor = numbers::invalid_unsigned_int;
+                                         /** @addtogroup Exceptions
+                                          * @{ */
 
-					 /**
-					  * Exception
-					  */
-	DeclException2 (ExcInvalidCombinationOfDimensions,
-			int, int,
-			<< "It is not possible to have a structural dimension of " << arg1
-			<< " to be larger than the space dimension of the surrounding"
-			<< " space " << arg2);
-					 //@}
+                                         /**
+                                          * Exception
+                                          */
+        DeclException2 (ExcInvalidCombinationOfDimensions,
+                        int, int,
+                        << "It is not possible to have a structural dimension of " << arg1
+                        << " to be larger than the space dimension of the surrounding"
+                        << " space " << arg2);
+                                         //@}
     };
 
-    				     /**
-				      * Flags controlling the details of
-				      * output in OpenDX format.
-				      *
-				      * @ingroup output
-				      */
+                                     /**
+                                      * Flags controlling the details of
+                                      * output in OpenDX format.
+                                      *
+                                      * @ingroup output
+                                      */
     struct DXFlags
     {
-					 /**
-					  * Write neighbor
-					  * information. This
-					  * information is necessary
-					  * for instance, if OpenDX is
-					  * supposed to compute
-					  * integral curves
-					  * (streamlines). If it is
-					  * not present, streamlines
-					  * end at cell boundaries.
-					  */
-	bool write_neighbors;
-					 /**
-					  * Write integer values of
-					  * the Triangulation in
-					  * binary format.
-					  */
-	bool int_binary;
-					 /**
-					  * Write coordinate vectors in
-					  * binary format.
-					  */
-	bool coordinates_binary;
+                                         /**
+                                          * Write neighbor
+                                          * information. This
+                                          * information is necessary
+                                          * for instance, if OpenDX is
+                                          * supposed to compute
+                                          * integral curves
+                                          * (streamlines). If it is
+                                          * not present, streamlines
+                                          * end at cell boundaries.
+                                          */
+        bool write_neighbors;
+                                         /**
+                                          * Write integer values of
+                                          * the Triangulation in
+                                          * binary format.
+                                          */
+        bool int_binary;
+                                         /**
+                                          * Write coordinate vectors in
+                                          * binary format.
+                                          */
+        bool coordinates_binary;
 
-					 /**
-					  * Write data vectors in
-					  * binary format.
-					  */
-	bool data_binary;
+                                         /**
+                                          * Write data vectors in
+                                          * binary format.
+                                          */
+        bool data_binary;
 
-					 /**
-					  * Write binary coordinate
-					  * vectors as double (64 bit)
-					  * numbers instead of float (32 bit).
-					  */
-	bool data_double;
+                                         /**
+                                          * Write binary coordinate
+                                          * vectors as double (64 bit)
+                                          * numbers instead of float (32 bit).
+                                          */
+        bool data_double;
 
-					 /**
-					  * Constructor.
-					  */
-	DXFlags (const bool write_neighbors = false,
-		 const bool int_binary = false,
-		 const bool coordinates_binary = false,
-		 const bool data_binary = false);
+                                         /**
+                                          * Constructor.
+                                          */
+        DXFlags (const bool write_neighbors = false,
+                 const bool int_binary = false,
+                 const bool coordinates_binary = false,
+                 const bool data_binary = false);
 
-					 /**
-					  * Declare all flags with name
-					  * and type as offered by this
-					  * class, for use in input files.
-					  */
-	static void declare_parameters (ParameterHandler &prm);
+                                         /**
+                                          * Declare all flags with name
+                                          * and type as offered by this
+                                          * class, for use in input files.
+                                          */
+        static void declare_parameters (ParameterHandler &prm);
 
-					 /**
-					  * Read the parameters declared in
-					  * <tt>declare_parameters</tt> and set the
-					  * flags for this output format
-					  * accordingly.
-					  *
-					  * The flags thus obtained overwrite
-					  * all previous contents of this object.
-					  */
-	void parse_parameters (const ParameterHandler &prm);
+                                         /**
+                                          * Read the parameters declared in
+                                          * <tt>declare_parameters</tt> and set the
+                                          * flags for this output format
+                                          * accordingly.
+                                          *
+                                          * The flags thus obtained overwrite
+                                          * all previous contents of this object.
+                                          */
+        void parse_parameters (const ParameterHandler &prm);
 
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object.
-					  */
-	std::size_t memory_consumption () const;
+                                         /**
+                                          * Determine an estimate for
+                                          * the memory consumption (in
+                                          * bytes) of this
+                                          * object.
+                                          */
+        std::size_t memory_consumption () const;
     };
 
-				     /**
-				      * Flags controlling the details
-				      * of output in UCD format for
-				      * AVS.
-				      *
-				      * @ingroup output
-				      */
+                                     /**
+                                      * Flags controlling the details
+                                      * of output in UCD format for
+                                      * AVS.
+                                      *
+                                      * @ingroup output
+                                      */
     struct UcdFlags
     {
-					 /**
-					  * Write a comment at the
-					  * beginning of the file
-					  * stating the date of
-					  * creation and some other
-					  * data.  While this is
-					  * supported by the UCD
-					  * format and
-					  * AVS, some other
-					  * programs get confused by
-					  * this, so the default is to
-					  * not write a
-					  * preamble. However, a
-					  * preamble can be written
-					  * using this flag.
-					  *
-					  * Default: <code>false</code>.
-					  */
-	bool write_preamble;
+                                         /**
+                                          * Write a comment at the
+                                          * beginning of the file
+                                          * stating the date of
+                                          * creation and some other
+                                          * data.  While this is
+                                          * supported by the UCD
+                                          * format and
+                                          * AVS, some other
+                                          * programs get confused by
+                                          * this, so the default is to
+                                          * not write a
+                                          * preamble. However, a
+                                          * preamble can be written
+                                          * using this flag.
+                                          *
+                                          * Default: <code>false</code>.
+                                          */
+        bool write_preamble;
 
-					 /**
-					  * Constructor.
-					  */
-	UcdFlags (const bool write_preamble = false);
+                                         /**
+                                          * Constructor.
+                                          */
+        UcdFlags (const bool write_preamble = false);
 
-					 /**
-					  * Declare all flags with name
-					  * and type as offered by this
-					  * class, for use in input files.
-					  */
-	static void declare_parameters (ParameterHandler &prm);
+                                         /**
+                                          * Declare all flags with name
+                                          * and type as offered by this
+                                          * class, for use in input files.
+                                          */
+        static void declare_parameters (ParameterHandler &prm);
 
-					 /**
-					  * Read the parameters declared in
-					  * <tt>declare_parameters</tt> and set the
-					  * flags for this output format
-					  * accordingly.
-					  *
-					  * The flags thus obtained overwrite
-					  * all previous contents of this object.
-					  */
-	void parse_parameters (const ParameterHandler &prm);
+                                         /**
+                                          * Read the parameters declared in
+                                          * <tt>declare_parameters</tt> and set the
+                                          * flags for this output format
+                                          * accordingly.
+                                          *
+                                          * The flags thus obtained overwrite
+                                          * all previous contents of this object.
+                                          */
+        void parse_parameters (const ParameterHandler &prm);
 
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object. Since sometimes
-					  * the size of objects can
-					  * not be determined exactly
-					  * (for example: what is the
-					  * memory consumption of an
-					  * STL <tt>std::map</tt> type with a
-					  * certain number of
-					  * elements?), this is only
-					  * an estimate. however often
-					  * quite close to the true
-					  * value.
-					  */
-	std::size_t memory_consumption () const;
+                                         /**
+                                          * Determine an estimate for
+                                          * the memory consumption (in
+                                          * bytes) of this
+                                          * object. Since sometimes
+                                          * the size of objects can
+                                          * not be determined exactly
+                                          * (for example: what is the
+                                          * memory consumption of an
+                                          * STL <tt>std::map</tt> type with a
+                                          * certain number of
+                                          * elements?), this is only
+                                          * an estimate. however often
+                                          * quite close to the true
+                                          * value.
+                                          */
+        std::size_t memory_consumption () const;
     };
 
-				     /**
-				      * Flags controlling the details of
-				      * output in Gnuplot format. At
-				      * present no flags are implemented.
-				      *
-				      * @ingroup output
-				      */
+                                     /**
+                                      * Flags controlling the details of
+                                      * output in Gnuplot format. At
+                                      * present no flags are implemented.
+                                      *
+                                      * @ingroup output
+                                      */
     struct GnuplotFlags
     {
       private:
-					 /**
-					  * Dummy entry to suppress compiler
-					  * warnings when copying an empty
-					  * structure. Remove this member
-					  * when adding the first flag to
-					  * this structure (and remove the
-					  * <tt>private</tt> as well).
-					  */
-	int dummy;
+                                         /**
+                                          * Dummy entry to suppress compiler
+                                          * warnings when copying an empty
+                                          * structure. Remove this member
+                                          * when adding the first flag to
+                                          * this structure (and remove the
+                                          * <tt>private</tt> as well).
+                                          */
+        int dummy;
 
       public:
-					 /**
-					  * Constructor.
-					  */
-	GnuplotFlags ();
+                                         /**
+                                          * Constructor.
+                                          */
+        GnuplotFlags ();
 
-					 /**
-					  * Declare all flags with name
-					  * and type as offered by this
-					  * class, for use in input files.
-					  */
-	static void declare_parameters (ParameterHandler &prm);
+                                         /**
+                                          * Declare all flags with name
+                                          * and type as offered by this
+                                          * class, for use in input files.
+                                          */
+        static void declare_parameters (ParameterHandler &prm);
 
-					 /**
-					  * Read the parameters declared in
-					  * <tt>declare_parameters</tt> and set the
-					  * flags for this output format
-					  * accordingly.
-					  *
-					  * The flags thus obtained overwrite
-					  * all previous contents of this object.
-					  */
-	void parse_parameters (const ParameterHandler &prm) const;
+                                         /**
+                                          * Read the parameters declared in
+                                          * <tt>declare_parameters</tt> and set the
+                                          * flags for this output format
+                                          * accordingly.
+                                          *
+                                          * The flags thus obtained overwrite
+                                          * all previous contents of this object.
+                                          */
+        void parse_parameters (const ParameterHandler &prm) const;
 
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object. Since sometimes
-					  * the size of objects can
-					  * not be determined exactly
-					  * (for example: what is the
-					  * memory consumption of an
-					  * STL <tt>std::map</tt> type with a
-					  * certain number of
-					  * elements?), this is only
-					  * an estimate. however often
-					  * quite close to the true
-					  * value.
-					  */
-	std::size_t memory_consumption () const;
+                                         /**
+                                          * Determine an estimate for
+                                          * the memory consumption (in
+                                          * bytes) of this
+                                          * object. Since sometimes
+                                          * the size of objects can
+                                          * not be determined exactly
+                                          * (for example: what is the
+                                          * memory consumption of an
+                                          * STL <tt>std::map</tt> type with a
+                                          * certain number of
+                                          * elements?), this is only
+                                          * an estimate. however often
+                                          * quite close to the true
+                                          * value.
+                                          */
+        std::size_t memory_consumption () const;
     };
 
-    				     /**
-				      * Flags controlling the details
-				      * of output in Povray
-				      * format. Several flags are
-				      * implemented, see their
-				      * respective documentation.
-				      *
-				      * @ingroup output
-				      */
+                                     /**
+                                      * Flags controlling the details
+                                      * of output in Povray
+                                      * format. Several flags are
+                                      * implemented, see their
+                                      * respective documentation.
+                                      *
+                                      * @ingroup output
+                                      */
     struct PovrayFlags
     {
-					 /**
-					  * Normal vector interpolation,
-					  * if set to true
-					  *
-					  * default = false
-					  */
-	bool smooth;
+                                         /**
+                                          * Normal vector interpolation,
+                                          * if set to true
+                                          *
+                                          * default = false
+                                          */
+        bool smooth;
 
-					 /**
-					  * Use bicubic patches (b-splines)
-					  * instead of triangles.
-					  *
-					  * default = false
-					  */
-	bool bicubic_patch;
+                                         /**
+                                          * Use bicubic patches (b-splines)
+                                          * instead of triangles.
+                                          *
+                                          * default = false
+                                          */
+        bool bicubic_patch;
 
-					 /**
-					  * include external "data.inc"
-					  * with camera, light and
-					  * texture definition for the
-					  * scene.
-					  *
-					  * default = false
-					  */
-	bool external_data;
+                                         /**
+                                          * include external "data.inc"
+                                          * with camera, light and
+                                          * texture definition for the
+                                          * scene.
+                                          *
+                                          * default = false
+                                          */
+        bool external_data;
 
-					 /**
-					  * Constructor.
-					  */
-	PovrayFlags (const bool smooth = false,
-		     const bool bicubic_patch = false,
-		     const bool external_data = false);
+                                         /**
+                                          * Constructor.
+                                          */
+        PovrayFlags (const bool smooth = false,
+                     const bool bicubic_patch = false,
+                     const bool external_data = false);
 
-					 /**
-					  * Declare all flags with name
-					  * and type as offered by this
-					  * class, for use in input files.
-					  */
-	static void declare_parameters (ParameterHandler &prm);
+                                         /**
+                                          * Declare all flags with name
+                                          * and type as offered by this
+                                          * class, for use in input files.
+                                          */
+        static void declare_parameters (ParameterHandler &prm);
 
-					 /**
-					  * Read the parameters declared in
-					  * <tt>declare_parameters</tt> and set the
-					  * flags for this output format
-					  * accordingly.
-					  *
-					  * The flags thus obtained overwrite
-					  * all previous contents of this object.
-					  */
-	void parse_parameters (const ParameterHandler &prm);
+                                         /**
+                                          * Read the parameters declared in
+                                          * <tt>declare_parameters</tt> and set the
+                                          * flags for this output format
+                                          * accordingly.
+                                          *
+                                          * The flags thus obtained overwrite
+                                          * all previous contents of this object.
+                                          */
+        void parse_parameters (const ParameterHandler &prm);
 
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object. Since sometimes
-					  * the size of objects can
-					  * not be determined exactly
-					  * (for example: what is the
-					  * memory consumption of an
-					  * STL <tt>std::map</tt> type with a
-					  * certain number of
-					  * elements?), this is only
-					  * an estimate. however often
-					  * quite close to the true
-					  * value.
-					  */
-	std::size_t memory_consumption () const;
+                                         /**
+                                          * Determine an estimate for
+                                          * the memory consumption (in
+                                          * bytes) of this
+                                          * object. Since sometimes
+                                          * the size of objects can
+                                          * not be determined exactly
+                                          * (for example: what is the
+                                          * memory consumption of an
+                                          * STL <tt>std::map</tt> type with a
+                                          * certain number of
+                                          * elements?), this is only
+                                          * an estimate. however often
+                                          * quite close to the true
+                                          * value.
+                                          */
+        std::size_t memory_consumption () const;
     };
 
 
-				     /**
-				      * Flags controlling the details of
-				      * output in encapsulated postscript
-				      * format.
-				      *
-				      * @ingroup output
-				      */
+                                     /**
+                                      * Flags controlling the details of
+                                      * output in encapsulated postscript
+                                      * format.
+                                      *
+                                      * @ingroup output
+                                      */
     struct EpsFlags
     {
-					 /**
-					  * This denotes the number of the
-					  * data vector which shall be used
-					  * for generating the height
-					  * information. By default, the
-					  * first data vector is taken,
-					  * i.e. <tt>height_vector==0</tt>, if
-					  * there is any data vector. If there
-					  * is no data vector, no height
-					  * information is generated.
-					  */
-	unsigned int height_vector;
+                                         /**
+                                          * This denotes the number of the
+                                          * data vector which shall be used
+                                          * for generating the height
+                                          * information. By default, the
+                                          * first data vector is taken,
+                                          * i.e. <tt>height_vector==0</tt>, if
+                                          * there is any data vector. If there
+                                          * is no data vector, no height
+                                          * information is generated.
+                                          */
+        unsigned int height_vector;
 
-					 /**
-					  * Number of the vector which is
-					  * to be taken to colorize cells.
-					  * The same applies as for
-					  * <tt>height_vector</tt>.
-					  */
-	unsigned int color_vector;
+                                         /**
+                                          * Number of the vector which is
+                                          * to be taken to colorize cells.
+                                          * The same applies as for
+                                          * <tt>height_vector</tt>.
+                                          */
+        unsigned int color_vector;
 
-					 /**
-					  * Enum denoting the possibilities
-					  * whether the scaling should be done
-					  * such that the given <tt>size</tt> equals
-					  * the width or the height of
-					  * the resulting picture.
-					  */
-	enum SizeType {
-					       /// Scale to given width
-	      width,
-					       /// Scale to given height
-	      height
-	};
+                                         /**
+                                          * Enum denoting the possibilities
+                                          * whether the scaling should be done
+                                          * such that the given <tt>size</tt> equals
+                                          * the width or the height of
+                                          * the resulting picture.
+                                          */
+        enum SizeType {
+                                               /// Scale to given width
+              width,
+                                               /// Scale to given height
+              height
+        };
 
-					 /**
-					  * See above. Default is <tt>width</tt>.
-					  */
-	SizeType size_type;
+                                         /**
+                                          * See above. Default is <tt>width</tt>.
+                                          */
+        SizeType size_type;
 
-					 /**
-					  * Width or height of the output
-					  * as given in postscript units
-					  * This usually is given by the
-					  * strange unit 1/72 inch. Whether
-					  * this is height or width is
-					  * specified by the flag
-					  * <tt>size_type</tt>.
-					  *
-					  * Default is 300, which represents
-					  * a size of roughly 10 cm.
-					  */
-	unsigned int size;
+                                         /**
+                                          * Width or height of the output
+                                          * as given in postscript units
+                                          * This usually is given by the
+                                          * strange unit 1/72 inch. Whether
+                                          * this is height or width is
+                                          * specified by the flag
+                                          * <tt>size_type</tt>.
+                                          *
+                                          * Default is 300, which represents
+                                          * a size of roughly 10 cm.
+                                          */
+        unsigned int size;
 
-					 /**
-					  * Width of a line in postscript
-					  * units. Default is 0.5.
-					  */
-	double line_width;
+                                         /**
+                                          * Width of a line in postscript
+                                          * units. Default is 0.5.
+                                          */
+        double line_width;
 
-					 /**
-					  * Angle of the line origin-viewer
-					  * against the z-axis in degrees.
-					  *
-					  * Default is the Gnuplot-default
-					  * of 60.
-					  */
-	double azimut_angle;
+                                         /**
+                                          * Angle of the line origin-viewer
+                                          * against the z-axis in degrees.
+                                          *
+                                          * Default is the Gnuplot-default
+                                          * of 60.
+                                          */
+        double azimut_angle;
 
-					 /**
-					  * Angle by which the viewers
-					  * position projected onto the
-					  * x-y-plane is rotated around
-					  * the z-axis, in positive sense
-					  * when viewed from above. The
-					  * unit are degrees, and zero
-					  * equals a position above or below
-					  * the negative y-axis.
-					  *
-					  * Default is the
-					  * Gnuplot-default of 30.
-					  * An exemple of a
-					  * Gnuplot-default of 0 is
-					  * the following:
-					  *
-					  * @verbatim
-					  *
-					  *          3________7
-					  *          /       /|
-					  *         /       / |
-					  *       2/______6/  |
-					  *       |   |   |   |
-					  * O-->  |   0___|___4
-					  *       |  /    |  /
-					  *       | /     | /
-					  *      1|/______5/
-					  *
-					  * @endverbatim
-					  */
-	double turn_angle;
+                                         /**
+                                          * Angle by which the viewers
+                                          * position projected onto the
+                                          * x-y-plane is rotated around
+                                          * the z-axis, in positive sense
+                                          * when viewed from above. The
+                                          * unit are degrees, and zero
+                                          * equals a position above or below
+                                          * the negative y-axis.
+                                          *
+                                          * Default is the
+                                          * Gnuplot-default of 30.
+                                          * An exemple of a
+                                          * Gnuplot-default of 0 is
+                                          * the following:
+                                          *
+                                          * @verbatim
+                                          *
+                                          *          3________7
+                                          *          /       /|
+                                          *         /       / |
+                                          *       2/______6/  |
+                                          *       |   |   |   |
+                                          * O-->  |   0___|___4
+                                          *       |  /    |  /
+                                          *       | /     | /
+                                          *      1|/______5/
+                                          *
+                                          * @endverbatim
+                                          */
+        double turn_angle;
 
-					 /**
-					  * Factor by which the z-axis is to
-					  * be stretched as compared to the
-					  * x- and y-axes. This is to compensate
-					  * for the different sizes that
-					  * coordinate and solution values may
-					  * have and to prevent that the plot
-					  * looks to much out-of-place (no
-					  * elevation at all if solution values
-					  * are much smaller than coordinate
-					  * values, or the common "extremely
-					  * mountainous area" in the opposite
-					  * case.
-					  *
-					  * Default is <tt>1.0</tt>.
-					  */
-	double z_scaling;
+                                         /**
+                                          * Factor by which the z-axis is to
+                                          * be stretched as compared to the
+                                          * x- and y-axes. This is to compensate
+                                          * for the different sizes that
+                                          * coordinate and solution values may
+                                          * have and to prevent that the plot
+                                          * looks to much out-of-place (no
+                                          * elevation at all if solution values
+                                          * are much smaller than coordinate
+                                          * values, or the common "extremely
+                                          * mountainous area" in the opposite
+                                          * case.
+                                          *
+                                          * Default is <tt>1.0</tt>.
+                                          */
+        double z_scaling;
 
-					 /**
-					  * Flag the determines whether the
-					  * lines bounding the cells (or the
-					  * parts of each patch) are to be
-					  * plotted.
-					  *
-					  * Default: <tt>true</tt>.
-					  */
-	bool   draw_mesh;
+                                         /**
+                                          * Flag the determines whether the
+                                          * lines bounding the cells (or the
+                                          * parts of each patch) are to be
+                                          * plotted.
+                                          *
+                                          * Default: <tt>true</tt>.
+                                          */
+        bool   draw_mesh;
 
-					 /**
-					  * Flag whether to fill the regions
-					  * between the lines bounding the cells
-					  * or not. If not, no hidden line removal
-					  * is performed, which in this crude
-					  * implementation is done through
-					  * writing the cells in a back-to-front
-					  * order, thereby hiding the cells in
-					  * the background by cells in the
-					  * foreground.
-					  *
-					  * If this flag is <tt>false</tt> and <tt>draw_mesh</tt>
-					  * is <tt>false</tt> as well, nothing will be
-					  * printed.
-					  *
-					  * If this flag is <tt>true</tt>, then the cells
-					  * will be drawn either colored by one
-					  * of the data sets (if <tt>shade_cells</tt> is
-					  * <tt>true</tt>), or pure white (if
-					  * <tt>shade_cells</tt> is false or if there are
-					  * no data sets).
-					  *
-					  * Default is <tt>true</tt>.
-					  */
-	bool   draw_cells;
+                                         /**
+                                          * Flag whether to fill the regions
+                                          * between the lines bounding the cells
+                                          * or not. If not, no hidden line removal
+                                          * is performed, which in this crude
+                                          * implementation is done through
+                                          * writing the cells in a back-to-front
+                                          * order, thereby hiding the cells in
+                                          * the background by cells in the
+                                          * foreground.
+                                          *
+                                          * If this flag is <tt>false</tt> and <tt>draw_mesh</tt>
+                                          * is <tt>false</tt> as well, nothing will be
+                                          * printed.
+                                          *
+                                          * If this flag is <tt>true</tt>, then the cells
+                                          * will be drawn either colored by one
+                                          * of the data sets (if <tt>shade_cells</tt> is
+                                          * <tt>true</tt>), or pure white (if
+                                          * <tt>shade_cells</tt> is false or if there are
+                                          * no data sets).
+                                          *
+                                          * Default is <tt>true</tt>.
+                                          */
+        bool   draw_cells;
 
-					 /**
-					  * Flag to determine whether the cells
-					  * shall be colorized by the data
-					  * set denoted by <tt>color_vector</tt>, or
-					  * simply be painted in white. This
-					  * flag only makes sense if
-					  * <tt>draw_cells==true</tt>. Colorization is
-					  * done through the <tt>color_function</tt>.
-					  *
-					  * Default is <tt>true</tt>.
-					  */
-	bool   shade_cells;
+                                         /**
+                                          * Flag to determine whether the cells
+                                          * shall be colorized by the data
+                                          * set denoted by <tt>color_vector</tt>, or
+                                          * simply be painted in white. This
+                                          * flag only makes sense if
+                                          * <tt>draw_cells==true</tt>. Colorization is
+                                          * done through the <tt>color_function</tt>.
+                                          *
+                                          * Default is <tt>true</tt>.
+                                          */
+        bool   shade_cells;
 
-					 /**
-					  * Structure keeping the three color
-					  * values in the RGB system.
-					  */
-	struct RgbValues
-	{
-	    float red;
-	    float green;
-	    float blue;
+                                         /**
+                                          * Structure keeping the three color
+                                          * values in the RGB system.
+                                          */
+        struct RgbValues
+        {
+            float red;
+            float green;
+            float blue;
 
-					     /**
-					      * Return <tt>true</tt> if the
-					      * color represented by
-					      * the three color values
-					      * is a grey scale,
-					      * i.e. all components
-					      * are equal.
-					      */
-	    bool is_grey () const;
-	};
+                                             /**
+                                              * Return <tt>true</tt> if the
+                                              * color represented by
+                                              * the three color values
+                                              * is a grey scale,
+                                              * i.e. all components
+                                              * are equal.
+                                              */
+            bool is_grey () const;
+        };
 
-					 /**
-					  * Definition of a function pointer
-					  * type taking a value and returning
-					  * a triple of color values in RGB
-					  * values.
-					  *
-					  * Besides the actual value by which
-					  * the color is to be computed, min
-					  * and max values of the data to
-					  * be colorized are given as well.
-					  */
-	typedef RgbValues (*ColorFunction) (const double value,
-					    const double min_value,
-					    const double max_value);
+                                         /**
+                                          * Definition of a function pointer
+                                          * type taking a value and returning
+                                          * a triple of color values in RGB
+                                          * values.
+                                          *
+                                          * Besides the actual value by which
+                                          * the color is to be computed, min
+                                          * and max values of the data to
+                                          * be colorized are given as well.
+                                          */
+        typedef RgbValues (*ColorFunction) (const double value,
+                                            const double min_value,
+                                            const double max_value);
 
-					 /**
-					  * This is a pointer to the function
-					  * which is used to colorize the cells.
-					  * By default, it points to the
-					  * static function <tt>default_color_function</tt>
-					  * which is a member of this class.
-					  */
-	ColorFunction color_function;
+                                         /**
+                                          * This is a pointer to the function
+                                          * which is used to colorize the cells.
+                                          * By default, it points to the
+                                          * static function <tt>default_color_function</tt>
+                                          * which is a member of this class.
+                                          */
+        ColorFunction color_function;
 
 
-					 /**
-					  * Default colorization function. This
-					  * one does what one usually wants:
-					  * It shifts colors from black (lowest
-					  * value) through blue, green and red
-					  * to white (highest value). For the
-					  * exact defition of the color scale
-					  * refer to the implementation.
-					  *
-					  * This function was originally written
-					  * by Stefan Nauber.
-					  */
-	static RgbValues
+                                         /**
+                                          * Default colorization function. This
+                                          * one does what one usually wants:
+                                          * It shifts colors from black (lowest
+                                          * value) through blue, green and red
+                                          * to white (highest value). For the
+                                          * exact defition of the color scale
+                                          * refer to the implementation.
+                                          *
+                                          * This function was originally written
+                                          * by Stefan Nauber.
+                                          */
+        static RgbValues
         default_color_function (const double value,
                                 const double min_value,
                                 const double max_value);
 
-					 /**
-					  * This is an alternative color
-					  * function producing a grey scale
-					  * between black (lowest values)
-					  * and white (highest values). You
-					  * may use it by setting the
-					  * <tt>color_function</tt> variable to the
-					  * address of this function.
-					  */
-	static RgbValues
+                                         /**
+                                          * This is an alternative color
+                                          * function producing a grey scale
+                                          * between black (lowest values)
+                                          * and white (highest values). You
+                                          * may use it by setting the
+                                          * <tt>color_function</tt> variable to the
+                                          * address of this function.
+                                          */
+        static RgbValues
         grey_scale_color_function (const double value,
                                    const double min_value,
                                    const double max_value);
 
-					 /**
-					  * This is one more
-					  * alternative color function
-					  * producing a grey scale
-					  * between white (lowest
-					  * values) and black (highest
-					  * values), i.e. the scale is
-					  * reversed to the previous
-					  * one. You may use it by
-					  * setting the
-					  * <tt>color_function</tt>
-					  * variable to the address of
-					  * this function.
-					  */
-	static RgbValues
+                                         /**
+                                          * This is one more
+                                          * alternative color function
+                                          * producing a grey scale
+                                          * between white (lowest
+                                          * values) and black (highest
+                                          * values), i.e. the scale is
+                                          * reversed to the previous
+                                          * one. You may use it by
+                                          * setting the
+                                          * <tt>color_function</tt>
+                                          * variable to the address of
+                                          * this function.
+                                          */
+        static RgbValues
         reverse_grey_scale_color_function (const double value,
                                            const double min_value,
                                            const double max_value);
 
-					 /**
-					  * Constructor.
-					  */
-	EpsFlags (const unsigned int  height_vector = 0,
-		  const unsigned int  color_vector  = 0,
-		  const SizeType      size_type     = width,
-		  const unsigned int  size          = 300,
-		  const double        line_width    = 0.5,
-		  const double        azimut_angle  = 60,
-		  const double        turn_angle    = 30,
-		  const double        z_scaling     = 1.0,
-		  const bool          draw_mesh     = true,
-		  const bool          draw_cells    = true,
-		  const bool          shade_cells   = true,
-		  const ColorFunction color_function= &default_color_function);
+                                         /**
+                                          * Constructor.
+                                          */
+        EpsFlags (const unsigned int  height_vector = 0,
+                  const unsigned int  color_vector  = 0,
+                  const SizeType      size_type     = width,
+                  const unsigned int  size          = 300,
+                  const double        line_width    = 0.5,
+                  const double        azimut_angle  = 60,
+                  const double        turn_angle    = 30,
+                  const double        z_scaling     = 1.0,
+                  const bool          draw_mesh     = true,
+                  const bool          draw_cells    = true,
+                  const bool          shade_cells   = true,
+                  const ColorFunction color_function= &default_color_function);
 
-					 /**
-					  * Declare all flags with name
-					  * and type as offered by this
-					  * class, for use in input files.
-					  *
-					  * For coloring, only the color
-					  * functions declared in this
-					  * class are offered.
-					  */
-	static void declare_parameters (ParameterHandler &prm);
+                                         /**
+                                          * Declare all flags with name
+                                          * and type as offered by this
+                                          * class, for use in input files.
+                                          *
+                                          * For coloring, only the color
+                                          * functions declared in this
+                                          * class are offered.
+                                          */
+        static void declare_parameters (ParameterHandler &prm);
 
-					 /**
-					  * Read the parameters declared in
-					  * <tt>declare_parameters</tt> and set the
-					  * flags for this output format
-					  * accordingly.
-					  *
-					  * The flags thus obtained overwrite
-					  * all previous contents of this object.
-					  */
-	void parse_parameters (const ParameterHandler &prm);
+                                         /**
+                                          * Read the parameters declared in
+                                          * <tt>declare_parameters</tt> and set the
+                                          * flags for this output format
+                                          * accordingly.
+                                          *
+                                          * The flags thus obtained overwrite
+                                          * all previous contents of this object.
+                                          */
+        void parse_parameters (const ParameterHandler &prm);
 
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object. Since sometimes
-					  * the size of objects can
-					  * not be determined exactly
-					  * (for example: what is the
-					  * memory consumption of an
-					  * STL <tt>std::map</tt> type with a
-					  * certain number of
-					  * elements?), this is only
-					  * an estimate. however often
-					  * quite close to the true
-					  * value.
-					  */
-	std::size_t memory_consumption () const;
+                                         /**
+                                          * Determine an estimate for
+                                          * the memory consumption (in
+                                          * bytes) of this
+                                          * object. Since sometimes
+                                          * the size of objects can
+                                          * not be determined exactly
+                                          * (for example: what is the
+                                          * memory consumption of an
+                                          * STL <tt>std::map</tt> type with a
+                                          * certain number of
+                                          * elements?), this is only
+                                          * an estimate. however often
+                                          * quite close to the true
+                                          * value.
+                                          */
+        std::size_t memory_consumption () const;
     };
 
-    				     /**
-				      * Flags controlling the details
-				      * of output in GMV
-				      * format. At present no flags
-				      * are implemented.
-				      *
-				      * @ingroup output
-				      */
+                                     /**
+                                      * Flags controlling the details
+                                      * of output in GMV
+                                      * format. At present no flags
+                                      * are implemented.
+                                      *
+                                      * @ingroup output
+                                      */
     struct GmvFlags
     {
       private:
-					 /**
-					  * Dummy entry to suppress compiler
-					  * warnings when copying an empty
-					  * structure. Remove this member
-					  * when adding the first flag to
-					  * this structure (and remove the
-					  * <tt>private</tt> as well).
-					  */
-	int dummy;
+                                         /**
+                                          * Dummy entry to suppress compiler
+                                          * warnings when copying an empty
+                                          * structure. Remove this member
+                                          * when adding the first flag to
+                                          * this structure (and remove the
+                                          * <tt>private</tt> as well).
+                                          */
+        int dummy;
 
       public:
-					 /**
-					  * Default constructor.
-					  */
-	GmvFlags ();
+                                         /**
+                                          * Default constructor.
+                                          */
+        GmvFlags ();
 
-					 /**
-					  * Declare all flags with name
-					  * and type as offered by this
-					  * class, for use in input files.
-					  */
-	static void declare_parameters (ParameterHandler &prm);
+                                         /**
+                                          * Declare all flags with name
+                                          * and type as offered by this
+                                          * class, for use in input files.
+                                          */
+        static void declare_parameters (ParameterHandler &prm);
 
-					 /**
-					  * Read the parameters declared in
-					  * <tt>declare_parameters</tt> and set the
-					  * flags for this output format
-					  * accordingly.
-					  *
-					  * The flags thus obtained overwrite
-					  * all previous contents of this object.
-					  */
-	void parse_parameters (const ParameterHandler &prm) const;
+                                         /**
+                                          * Read the parameters declared in
+                                          * <tt>declare_parameters</tt> and set the
+                                          * flags for this output format
+                                          * accordingly.
+                                          *
+                                          * The flags thus obtained overwrite
+                                          * all previous contents of this object.
+                                          */
+        void parse_parameters (const ParameterHandler &prm) const;
 
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object. Since sometimes
-					  * the size of objects can
-					  * not be determined exactly
-					  * (for example: what is the
-					  * memory consumption of an
-					  * STL <tt>std::map</tt> type with a
-					  * certain number of
-					  * elements?), this is only
-					  * an estimate. however often
-					  * quite close to the true
-					  * value.
-					  */
-	std::size_t memory_consumption () const;
+                                         /**
+                                          * Determine an estimate for
+                                          * the memory consumption (in
+                                          * bytes) of this
+                                          * object. Since sometimes
+                                          * the size of objects can
+                                          * not be determined exactly
+                                          * (for example: what is the
+                                          * memory consumption of an
+                                          * STL <tt>std::map</tt> type with a
+                                          * certain number of
+                                          * elements?), this is only
+                                          * an estimate. however often
+                                          * quite close to the true
+                                          * value.
+                                          */
+        std::size_t memory_consumption () const;
     };
 
-    				     /**
-				      * Flags controlling the details
-				      * of output in
-				      * Tecplot format.
-				      *
-				      * @ingroup output
-				      */
+                                     /**
+                                      * Flags controlling the details
+                                      * of output in
+                                      * Tecplot format.
+                                      *
+                                      * @ingroup output
+                                      */
     struct TecplotFlags
     {
 
       public:
 
-					 /**
-					  * This variable is needed to hold the
-					  * output file name when using the
-					  * Tecplot API to write binary files.
-					  * If the user doesn't set the file
-					  * name with this variable only
-					  * ASCII Tecplot output will be
-					  * produced.
-					  */
+                                         /**
+                                          * This variable is needed to hold the
+                                          * output file name when using the
+                                          * Tecplot API to write binary files.
+                                          * If the user doesn't set the file
+                                          * name with this variable only
+                                          * ASCII Tecplot output will be
+                                          * produced.
+                                          */
         const char* tecplot_binary_file_name;
 
-					 /**
-					  * Tecplot allows to assign
-					  * names to zones. This
-					  * variable stores this name.
-					  */
-	const char* zone_name;
+                                         /**
+                                          * Tecplot allows to assign
+                                          * names to zones. This
+                                          * variable stores this name.
+                                          */
+        const char* zone_name;
 
-	                                 /**
-	                                  * Constructor
-	                                  **/
-	TecplotFlags (const char* tecplot_binary_file_name = NULL,
-		      const char* zone_name = NULL);
+                                         /**
+                                          * Constructor
+                                          **/
+        TecplotFlags (const char* tecplot_binary_file_name = NULL,
+                      const char* zone_name = NULL);
 
-					 /**
-					  * Declare all flags with name
-					  * and type as offered by this
-					  * class, for use in input files.
-					  */
-	static void declare_parameters (ParameterHandler &prm);
+                                         /**
+                                          * Declare all flags with name
+                                          * and type as offered by this
+                                          * class, for use in input files.
+                                          */
+        static void declare_parameters (ParameterHandler &prm);
 
-					 /**
-					  * Read the parameters declared in
-					  * <tt>declare_parameters</tt> and set the
-					  * flags for this output format
-					  * accordingly.
-					  *
-					  * The flags thus obtained overwrite
-					  * all previous contents of this object.
-					  */
-	void parse_parameters (const ParameterHandler &prm) const;
+                                         /**
+                                          * Read the parameters declared in
+                                          * <tt>declare_parameters</tt> and set the
+                                          * flags for this output format
+                                          * accordingly.
+                                          *
+                                          * The flags thus obtained overwrite
+                                          * all previous contents of this object.
+                                          */
+        void parse_parameters (const ParameterHandler &prm) const;
 
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object. Since sometimes
-					  * the size of objects can
-					  * not be determined exactly
-					  * (for example: what is the
-					  * memory consumption of an
-					  * STL <tt>std::map</tt> type with a
-					  * certain number of
-					  * elements?), this is only
-					  * an estimate. however often
-					  * quite close to the true
-					  * value.
-					  */
-	std::size_t memory_consumption () const;
+                                         /**
+                                          * Determine an estimate for
+                                          * the memory consumption (in
+                                          * bytes) of this
+                                          * object. Since sometimes
+                                          * the size of objects can
+                                          * not be determined exactly
+                                          * (for example: what is the
+                                          * memory consumption of an
+                                          * STL <tt>std::map</tt> type with a
+                                          * certain number of
+                                          * elements?), this is only
+                                          * an estimate. however often
+                                          * quite close to the true
+                                          * value.
+                                          */
+        std::size_t memory_consumption () const;
     };
 
-    				     /**
-				      * Flags controlling the details
-				      * of output in VTK
-				      * format. At present no flags
-				      * are implemented.
-				      *
-				      * @ingroup output
-				      */
+                                     /**
+                                      * Flags controlling the details
+                                      * of output in VTK
+                                      * format. At present no flags
+                                      * are implemented.
+                                      *
+                                      * @ingroup output
+                                      */
     struct VtkFlags
     {
       private:
-					 /**
-					  * Dummy entry to suppress compiler
-					  * warnings when copying an empty
-					  * structure. Remove this member
-					  * when adding the first flag to
-					  * this structure (and remove the
-					  * <tt>private</tt> as well).
-					  */
-	int dummy;
+                                         /**
+                                          * Dummy entry to suppress compiler
+                                          * warnings when copying an empty
+                                          * structure. Remove this member
+                                          * when adding the first flag to
+                                          * this structure (and remove the
+                                          * <tt>private</tt> as well).
+                                          */
+        int dummy;
 
       public:
-					 /**
-					  * Default constructor.
-					  */
-	VtkFlags ();
+                                         /**
+                                          * Default constructor.
+                                          */
+        VtkFlags ();
 
-					 /**
-					  * Declare all flags with name
-					  * and type as offered by this
-					  * class, for use in input files.
-					  */
-	static void declare_parameters (ParameterHandler &prm);
+                                         /**
+                                          * Declare all flags with name
+                                          * and type as offered by this
+                                          * class, for use in input files.
+                                          */
+        static void declare_parameters (ParameterHandler &prm);
 
-					 /**
-					  * Read the parameters declared in
-					  * <tt>declare_parameters</tt> and set the
-					  * flags for this output format
-					  * accordingly.
-					  *
-					  * The flags thus obtained overwrite
-					  * all previous contents of this object.
-					  */
-	void parse_parameters (const ParameterHandler &prm) const;
+                                         /**
+                                          * Read the parameters declared in
+                                          * <tt>declare_parameters</tt> and set the
+                                          * flags for this output format
+                                          * accordingly.
+                                          *
+                                          * The flags thus obtained overwrite
+                                          * all previous contents of this object.
+                                          */
+        void parse_parameters (const ParameterHandler &prm) const;
 
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object. Since sometimes
-					  * the size of objects can
-					  * not be determined exactly
-					  * (for example: what is the
-					  * memory consumption of an
-					  * STL <tt>std::map</tt> type with a
-					  * certain number of
-					  * elements?), this is only
-					  * an estimate. however often
-					  * quite close to the true
-					  * value.
-					  */
-	std::size_t memory_consumption () const;
+                                         /**
+                                          * Determine an estimate for
+                                          * the memory consumption (in
+                                          * bytes) of this
+                                          * object. Since sometimes
+                                          * the size of objects can
+                                          * not be determined exactly
+                                          * (for example: what is the
+                                          * memory consumption of an
+                                          * STL <tt>std::map</tt> type with a
+                                          * certain number of
+                                          * elements?), this is only
+                                          * an estimate. however often
+                                          * quite close to the true
+                                          * value.
+                                          */
+        std::size_t memory_consumption () const;
     };
-    				     /**
-				      * Flags controlling the details
-				      * of output in deal.II
-				      * intermediate format. At
-				      * present no flags are
-				      * implemented.
-				      *
-				      * @ingroup output
-				      */
+                                     /**
+                                      * Flags controlling the details
+                                      * of output in deal.II
+                                      * intermediate format. At
+                                      * present no flags are
+                                      * implemented.
+                                      *
+                                      * @ingroup output
+                                      */
     struct Deal_II_IntermediateFlags
     {
-					 /**
-					  * An indicator of the
-					  * currect file format
-					  * version used to write
-					  * intermediate format. We do
-					  * not attempt to be backward
-					  * compatible, so this number
-					  * is used only to verify
-					  * that the format we are
-					  * writing is what the
-					  * current readers and
-					  * writers understand.
-					  */
+                                         /**
+                                          * An indicator of the
+                                          * currect file format
+                                          * version used to write
+                                          * intermediate format. We do
+                                          * not attempt to be backward
+                                          * compatible, so this number
+                                          * is used only to verify
+                                          * that the format we are
+                                          * writing is what the
+                                          * current readers and
+                                          * writers understand.
+                                          */
         static const unsigned int format_version = 3;
       private:
-					 /**
-					  * Dummy entry to suppress compiler
-					  * warnings when copying an empty
-					  * structure. Remove this member
-					  * when adding the first flag to
-					  * this structure (and remove the
-					  * <tt>private</tt> as well).
-					  */
-	int dummy;
+                                         /**
+                                          * Dummy entry to suppress compiler
+                                          * warnings when copying an empty
+                                          * structure. Remove this member
+                                          * when adding the first flag to
+                                          * this structure (and remove the
+                                          * <tt>private</tt> as well).
+                                          */
+        int dummy;
 
       public:
-					 /**
-					  * Constructor.
-					  */
-	Deal_II_IntermediateFlags ();
+                                         /**
+                                          * Constructor.
+                                          */
+        Deal_II_IntermediateFlags ();
 
-					 /**
-					  * Declare all flags with name
-					  * and type as offered by this
-					  * class, for use in input files.
-					  */
-	static void declare_parameters (ParameterHandler &prm);
+                                         /**
+                                          * Declare all flags with name
+                                          * and type as offered by this
+                                          * class, for use in input files.
+                                          */
+        static void declare_parameters (ParameterHandler &prm);
 
-					 /**
-					  * Read the parameters declared in
-					  * <tt>declare_parameters</tt> and set the
-					  * flags for this output format
-					  * accordingly.
-					  *
-					  * The flags thus obtained overwrite
-					  * all previous contents of this object.
-					  */
-	void parse_parameters (const ParameterHandler &prm) const;
+                                         /**
+                                          * Read the parameters declared in
+                                          * <tt>declare_parameters</tt> and set the
+                                          * flags for this output format
+                                          * accordingly.
+                                          *
+                                          * The flags thus obtained overwrite
+                                          * all previous contents of this object.
+                                          */
+        void parse_parameters (const ParameterHandler &prm) const;
 
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object. Since sometimes
-					  * the size of objects can
-					  * not be determined exactly
-					  * (for example: what is the
-					  * memory consumption of an
-					  * STL <tt>std::map</tt> type with a
-					  * certain number of
-					  * elements?), this is only
-					  * an estimate. however often
-					  * quite close to the true
-					  * value.
-					  */
-	std::size_t memory_consumption () const;
+                                         /**
+                                          * Determine an estimate for
+                                          * the memory consumption (in
+                                          * bytes) of this
+                                          * object. Since sometimes
+                                          * the size of objects can
+                                          * not be determined exactly
+                                          * (for example: what is the
+                                          * memory consumption of an
+                                          * STL <tt>std::map</tt> type with a
+                                          * certain number of
+                                          * elements?), this is only
+                                          * an estimate. however often
+                                          * quite close to the true
+                                          * value.
+                                          */
+        std::size_t memory_consumption () const;
     };
 
-				     /**
-				      * Provide a data type specifying
-				      * the presently supported output
-				      * formats.
-				      */
+                                     /**
+                                      * Provide a data type specifying
+                                      * the presently supported output
+                                      * formats.
+                                      */
     enum OutputFormat
     {
-					   /**
-					    * Use the format already
-					    * stored in the object.
-					    */
-	  default_format,
-					   /**
-					    * Do not write any output.
-					    */
-	  none,
-					   /**
-					    * Output for OpenDX.
-					    */
-	  dx,
-					   /**
-					    * Output in the UCD format
-					    * for AVS.
-					    */
-	  ucd,
-					   /**
-					    * Output for the
-					    * Gnuplot tool.
-					    */
-	  gnuplot,
-					   /**
-					    * Output for the
-					    * Povray
-					    * raytracer.
-					    */
-	  povray,
-					   /**
-					    * Output in encapsulated
-					    * PostScript.
-					    */
-	  eps,
-					   /**
-					    * Output for GMV.
-					    */
-	  gmv,
-					   /**
-					    * Output for
-					    * Tecplot in text
-					    * format.
-					    */
+                                           /**
+                                            * Use the format already
+                                            * stored in the object.
+                                            */
+          default_format,
+                                           /**
+                                            * Do not write any output.
+                                            */
+          none,
+                                           /**
+                                            * Output for OpenDX.
+                                            */
+          dx,
+                                           /**
+                                            * Output in the UCD format
+                                            * for AVS.
+                                            */
+          ucd,
+                                           /**
+                                            * Output for the
+                                            * Gnuplot tool.
+                                            */
+          gnuplot,
+                                           /**
+                                            * Output for the
+                                            * Povray
+                                            * raytracer.
+                                            */
+          povray,
+                                           /**
+                                            * Output in encapsulated
+                                            * PostScript.
+                                            */
+          eps,
+                                           /**
+                                            * Output for GMV.
+                                            */
+          gmv,
+                                           /**
+                                            * Output for
+                                            * Tecplot in text
+                                            * format.
+                                            */
 
-	  tecplot,
-					   /**
-					    * Output for
-					    * Tecplot in
-					    * binary format. Faster
-					    * and smaller than text
-					    * format.
-					    */
-	  tecplot_binary,
+          tecplot,
+                                           /**
+                                            * Output for
+                                            * Tecplot in
+                                            * binary format. Faster
+                                            * and smaller than text
+                                            * format.
+                                            */
+          tecplot_binary,
 
-					   /**
-					    * Output in
-					    * VTK format.
-					    */
-	  vtk,
+                                           /**
+                                            * Output in
+                                            * VTK format.
+                                            */
+          vtk,
 
-					   /**
-					    * Output in
-					    * VTK format.
-					    */
-	  vtu,
+                                           /**
+                                            * Output in
+                                            * VTK format.
+                                            */
+          vtu,
 
-					   /**
-					    * Output in deal.II
-					    * intermediate format.
-					    */
-	  deal_II_intermediate
+                                           /**
+                                            * Output in deal.II
+                                            * intermediate format.
+                                            */
+          deal_II_intermediate
     };
 
 
@@ -1417,10 +1417,10 @@ class DataOutBase
  */
     template <int dim, int spacedim>
     static void write_dx (const std::vector<Patch<dim,spacedim> > &patches,
-			  const std::vector<std::string>          &data_names,
-			  const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-			  const DXFlags                           &flags,
-			  std::ostream                            &out);
+                          const std::vector<std::string>          &data_names,
+                          const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                          const DXFlags                           &flags,
+                          std::ostream                            &out);
 
 /**
  * Write the given list of patches to the output stream in eps format.
@@ -1469,10 +1469,10 @@ class DataOutBase
  */
     template <int dim, int spacedim>
     static void write_eps (const std::vector<Patch<dim,spacedim> > &patches,
-			   const std::vector<std::string>          &data_names,
-			   const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-			   const EpsFlags                          &flags,
-			   std::ostream                            &out);
+                           const std::vector<std::string>          &data_names,
+                           const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                           const EpsFlags                          &flags,
+                           std::ostream                            &out);
 
 /**
  * Write the given list of patches to the output stream in
@@ -1486,10 +1486,10 @@ class DataOutBase
  */
     template <int dim, int spacedim>
     static void write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
-			   const std::vector<std::string>          &data_names,
-			   const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-			   const GmvFlags                          &flags,
-			   std::ostream                            &out);
+                           const std::vector<std::string>          &data_names,
+                           const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                           const GmvFlags                          &flags,
+                           std::ostream                            &out);
 
 /**
  * Write the given list of patches to the output stream in gnuplot
@@ -1553,10 +1553,10 @@ class DataOutBase
  */
     template <int dim, int spacedim>
     static void write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
-			       const std::vector<std::string>          &data_names,
-			       const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-			       const GnuplotFlags                      &flags,
-			       std::ostream                            &out);
+                               const std::vector<std::string>          &data_names,
+                               const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                               const GnuplotFlags                      &flags,
+                               std::ostream                            &out);
 
 /**
  * Write the given list of patches to the output stream for the
@@ -1607,10 +1607,10 @@ class DataOutBase
  */
     template <int dim, int spacedim>
     static void write_povray (const std::vector<Patch<dim,spacedim> > &patches,
-			      const std::vector<std::string>          &data_names,
-			      const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-			      const PovrayFlags                       &flags,
-			      std::ostream                            &out);
+                              const std::vector<std::string>          &data_names,
+                              const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                              const PovrayFlags                       &flags,
+                              std::ostream                            &out);
 
 /**
  * Write the given list of patches to the output stream in
@@ -1621,10 +1621,10 @@ class DataOutBase
  */
     template <int dim, int spacedim>
     static void write_tecplot (const std::vector<Patch<dim,spacedim> > &patches,
-			       const std::vector<std::string>          &data_names,
-			       const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-			       const TecplotFlags                      &flags,
-			       std::ostream                            &out);
+                               const std::vector<std::string>          &data_names,
+                               const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                               const TecplotFlags                      &flags,
+                               std::ostream                            &out);
 
 /**
  * Write the given list of patches to the output stream in
@@ -1672,10 +1672,10 @@ class DataOutBase
  */
     template <int dim, int spacedim>
     static void write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
-			   const std::vector<std::string>          &data_names,
-			   const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-			   const UcdFlags                          &flags,
-			   std::ostream                            &out);
+                           const std::vector<std::string>          &data_names,
+                           const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                           const UcdFlags                          &flags,
+                           std::ostream                            &out);
 
 /**
  * Write the given list of patches to the output stream in VTK
@@ -1691,10 +1691,10 @@ class DataOutBase
  */
     template <int dim, int spacedim>
     static void write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
-			   const std::vector<std::string>          &data_names,
-			   const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-			   const VtkFlags                          &flags,
-			   std::ostream                            &out);
+                           const std::vector<std::string>          &data_names,
+                           const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                           const VtkFlags                          &flags,
+                           std::ostream                            &out);
 
 
 /**
@@ -1720,10 +1720,10 @@ class DataOutBase
  */
     template <int dim, int spacedim>
     static void write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
-			   const std::vector<std::string>          &data_names,
-			   const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-			   const VtkFlags                          &flags,
-			   std::ostream                            &out);
+                           const std::vector<std::string>          &data_names,
+                           const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                           const VtkFlags                          &flags,
+                           std::ostream                            &out);
 
 /**
  * This writes the header for the xml based vtu file format. This
@@ -1825,206 +1825,206 @@ class DataOutBase
     std::pair<unsigned int, unsigned int>
     determine_intermediate_format_dimensions (std::istream &input);
 
-				     /**
-				      * Return the <tt>OutputFormat</tt>
-				      * value corresponding to the
-				      * given string. If the string
-				      * does not match any known
-				      * format, an exception is
-				      * thrown.
-				      *
-				      * Since this function does not
-				      * need data from this object, it
-				      * is static and can thus be
-				      * called without creating an
-				      * object of this class. Its main
-				      * purpose is to allow a program
-				      * to use any implemented output
-				      * format without the need to
-				      * extend the program's parser
-				      * each time a new format is
-				      * implemented.
-				      *
-				      * To get a list of presently
-				      * available format names,
-				      * e.g. to give it to the
-				      * ParameterHandler class,
-				      * use the function
-				      * get_output_format_names().
-				      */
+                                     /**
+                                      * Return the <tt>OutputFormat</tt>
+                                      * value corresponding to the
+                                      * given string. If the string
+                                      * does not match any known
+                                      * format, an exception is
+                                      * thrown.
+                                      *
+                                      * Since this function does not
+                                      * need data from this object, it
+                                      * is static and can thus be
+                                      * called without creating an
+                                      * object of this class. Its main
+                                      * purpose is to allow a program
+                                      * to use any implemented output
+                                      * format without the need to
+                                      * extend the program's parser
+                                      * each time a new format is
+                                      * implemented.
+                                      *
+                                      * To get a list of presently
+                                      * available format names,
+                                      * e.g. to give it to the
+                                      * ParameterHandler class,
+                                      * use the function
+                                      * get_output_format_names().
+                                      */
     static OutputFormat parse_output_format (const std::string &format_name);
 
-				     /**
-				      * Return a list of implemented
-				      * output formats. The different
-				      * names are separated by
-				      * vertical bar signs (<tt>`|'</tt>)
-				      * as used by the
-				      * ParameterHandler classes.
-				      */
+                                     /**
+                                      * Return a list of implemented
+                                      * output formats. The different
+                                      * names are separated by
+                                      * vertical bar signs (<tt>`|'</tt>)
+                                      * as used by the
+                                      * ParameterHandler classes.
+                                      */
     static std::string get_output_format_names ();
 
-				     /**
-				      * Provide a function which tells us which
-				      * suffix a file with a given output format
-				      * usually has. At present the following
-				      * formats are defined:
-				      * <ul>
-				      * <li> <tt>dx</tt>: <tt>.dx</tt>
-				      * <li> <tt>ucd</tt>: <tt>.inp</tt>
-				      * <li> <tt>gnuplot</tt>: <tt>.gnuplot</tt>
-				      * <li> <tt>povray</tt>: <tt>.pov</tt>
-				      * <li> <tt>eps</tt>: <tt>.eps</tt>
-				      * <li> <tt>gmv</tt>: <tt>.gmv</tt>
-				      * <li> <tt>tecplot</tt>: <tt>.dat</tt>
-				      * <li> <tt>tecplot_binary</tt>: <tt>.plt</tt>
-				      * <li> <tt>vtk</tt>: <tt>.vtk</tt>
-				      * <li> <tt>vtu</tt>: <tt>.vtu</tt>
-				      * <li> <tt>deal_II_intermediate</tt>: <tt>.d2</tt>.
-				      * </ul>
-				      */
+                                     /**
+                                      * Provide a function which tells us which
+                                      * suffix a file with a given output format
+                                      * usually has. At present the following
+                                      * formats are defined:
+                                      * <ul>
+                                      * <li> <tt>dx</tt>: <tt>.dx</tt>
+                                      * <li> <tt>ucd</tt>: <tt>.inp</tt>
+                                      * <li> <tt>gnuplot</tt>: <tt>.gnuplot</tt>
+                                      * <li> <tt>povray</tt>: <tt>.pov</tt>
+                                      * <li> <tt>eps</tt>: <tt>.eps</tt>
+                                      * <li> <tt>gmv</tt>: <tt>.gmv</tt>
+                                      * <li> <tt>tecplot</tt>: <tt>.dat</tt>
+                                      * <li> <tt>tecplot_binary</tt>: <tt>.plt</tt>
+                                      * <li> <tt>vtk</tt>: <tt>.vtk</tt>
+                                      * <li> <tt>vtu</tt>: <tt>.vtu</tt>
+                                      * <li> <tt>deal_II_intermediate</tt>: <tt>.d2</tt>.
+                                      * </ul>
+                                      */
     static std::string default_suffix (const OutputFormat output_format);
 
-				     /**
-				      * Determine an estimate for
-				      * the memory consumption (in
-				      * bytes) of this
-				      * object. Since sometimes
-				      * the size of objects can
-				      * not be determined exactly
-				      * (for example: what is the
-				      * memory consumption of an
-				      * STL <tt>std::map</tt> type with a
-				      * certain number of
-				      * elements?), this is only
-				      * an estimate. however often
-				      * quite close to the true
-				      * value.
-				      */
+                                     /**
+                                      * Determine an estimate for
+                                      * the memory consumption (in
+                                      * bytes) of this
+                                      * object. Since sometimes
+                                      * the size of objects can
+                                      * not be determined exactly
+                                      * (for example: what is the
+                                      * memory consumption of an
+                                      * STL <tt>std::map</tt> type with a
+                                      * certain number of
+                                      * elements?), this is only
+                                      * an estimate. however often
+                                      * quite close to the true
+                                      * value.
+                                      */
     static std::size_t memory_consumption ();
 
-				     /** @addtogroup Exceptions
-				      * @{ */
+                                     /** @addtogroup Exceptions
+                                      * @{ */
 
-				     /**
-				      * Exception
-				      */
+                                     /**
+                                      * Exception
+                                      */
     DeclException2 (ExcInvalidDatasetSize,
-		    int, int,
-		    << "The number of points in this data set is " << arg1
-		    << ", but we expected " << arg2 << " in each space direction.");
-				     /**
-				      * An output function did not
-				      * receive any patches for
-				      * writing.
-				      */
+                    int, int,
+                    << "The number of points in this data set is " << arg1
+                    << ", but we expected " << arg2 << " in each space direction.");
+                                     /**
+                                      * An output function did not
+                                      * receive any patches for
+                                      * writing.
+                                      */
     DeclException0 (ExcNoPatches);
-				     /**
-				       * Exception
-				       */
+                                     /**
+                                       * Exception
+                                       */
     DeclException0 (ExcTecplotAPIError);
- 				      /**
-				       * Exception
-				       */
+                                      /**
+                                       * Exception
+                                       */
     DeclException1 (ExcErrorOpeningTecplotFile,
-		    char*,
-		    << "There was an error opening Tecplot file " << arg1
-		    << " for output");
+                    char*,
+                    << "There was an error opening Tecplot file " << arg1
+                    << " for output");
 
-				     //@}
+                                     //@}
   private:
-				     /**
-				      * Write the coordinates of nodes
-				      * in the desired format.
-				      */
+                                     /**
+                                      * Write the coordinates of nodes
+                                      * in the desired format.
+                                      */
     template <int dim, int spacedim, typename STREAM>
     static void write_nodes (const std::vector<Patch<dim,spacedim> >& patches,
-			     STREAM& out);
+                             STREAM& out);
 
-				     /**
-				      * Write the node numbers of a
-				      * cell in the desired format.
-				      */
+                                     /**
+                                      * Write the node numbers of a
+                                      * cell in the desired format.
+                                      */
     template <int dim, int spacedim, typename STREAM>
     static void write_cells (const std::vector<Patch<dim,spacedim> >& patches,
-			     STREAM& out);
+                             STREAM& out);
 
-				     /**
-				      * Write data in the desired
-				      * format.
-				      */
+                                     /**
+                                      * Write data in the desired
+                                      * format.
+                                      */
     template <int dim, int spacedim, class STREAM>
     static void write_data (const std::vector<Patch<dim,spacedim> >& patches,
-			    const unsigned int n_data_sets,
-			    const bool double_precision,
-			    STREAM& out);
+                            const unsigned int n_data_sets,
+                            const bool double_precision,
+                            STREAM& out);
 
-				     /**
-				      * Class holding the data of one
-				      * cell of a patch in two space
-				      * dimensions for output. It is
-				      * the projection of a cell in
-				      * three-dimensional space (two
-				      * coordinates, one height value)
-				      * to the direction of sight.
-				      */
+                                     /**
+                                      * Class holding the data of one
+                                      * cell of a patch in two space
+                                      * dimensions for output. It is
+                                      * the projection of a cell in
+                                      * three-dimensional space (two
+                                      * coordinates, one height value)
+                                      * to the direction of sight.
+                                      */
     class EpsCell2d
     {
       public:
 
-					 /**
-					  * Vector of vertices of this cell.
-					  */
-	Point<2> vertices[4];
+                                         /**
+                                          * Vector of vertices of this cell.
+                                          */
+        Point<2> vertices[4];
 
-					 /**
-					  * Data value from which the actual
-					  * colors will be computed by
-					  * the colorization function stated
-					  * in the <tt>EpsFlags</tt> class.
-					  */
-	float color_value;
+                                         /**
+                                          * Data value from which the actual
+                                          * colors will be computed by
+                                          * the colorization function stated
+                                          * in the <tt>EpsFlags</tt> class.
+                                          */
+        float color_value;
 
-					 /**
-					  * Depth into the picture, which
-					  * is defined as the distance from
-					  * an observer at an the origin in
-					  * direction of the line of sight.
-					  */
-	float depth;
+                                         /**
+                                          * Depth into the picture, which
+                                          * is defined as the distance from
+                                          * an observer at an the origin in
+                                          * direction of the line of sight.
+                                          */
+        float depth;
 
-					 /**
-					  * Comparison operator for
-					  * sorting.
-					  */
-	bool operator < (const EpsCell2d &) const;
+                                         /**
+                                          * Comparison operator for
+                                          * sorting.
+                                          */
+        bool operator < (const EpsCell2d &) const;
     };
 
 
-				     /**
-				      * This is a helper function for
-				      * the <tt>write_gmv</tt>
-				      * function. There, the data in
-				      * the patches needs to be copied
-				      * around as output is one
-				      * variable globally at a time,
-				      * rather than all data on each
-				      * vertex at a time. This copying
-				      * around can be done detached
-				      * from the main thread, and is
-				      * thus moved into this separate
-				      * function.
-				      *
-				      * Note that because of the
-				      * similarity of the formats,
-				      * this function is also used by
-				      * the Vtk and Tecplot output
-				      * functions.
-				      */
+                                     /**
+                                      * This is a helper function for
+                                      * the <tt>write_gmv</tt>
+                                      * function. There, the data in
+                                      * the patches needs to be copied
+                                      * around as output is one
+                                      * variable globally at a time,
+                                      * rather than all data on each
+                                      * vertex at a time. This copying
+                                      * around can be done detached
+                                      * from the main thread, and is
+                                      * thus moved into this separate
+                                      * function.
+                                      *
+                                      * Note that because of the
+                                      * similarity of the formats,
+                                      * this function is also used by
+                                      * the Vtk and Tecplot output
+                                      * functions.
+                                      */
     template <int dim, int spacedim>
     static void
     write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
-				    Table<2,double>                         &data_vectors);
+                                    Table<2,double>                         &data_vectors);
 
 
 
@@ -2176,9 +2176,9 @@ class DataOutInterface : private DataOutBase
     using DataOutBase::get_output_format_names;
     using DataOutBase::determine_intermediate_format_dimensions;
 
-				     /**
-				      * Constructor.
-				      */
+                                     /**
+                                      * Constructor.
+                                      */
     DataOutInterface ();
 
                                      /**
@@ -2188,525 +2188,525 @@ class DataOutInterface : private DataOutBase
                                       */
     virtual ~DataOutInterface ();
 
-				     /**
-				      * Obtain data through get_patches()
-				      * and write it to <tt>out</tt>
-				      * in OpenDX format. See
-				      * DataOutBase::write_dx.
-				      */
+                                     /**
+                                      * Obtain data through get_patches()
+                                      * and write it to <tt>out</tt>
+                                      * in OpenDX format. See
+                                      * DataOutBase::write_dx.
+                                      */
     void write_dx (std::ostream &out) const;
 
-				     /**
-				      * Obtain data through get_patches()
-				      * and write it to <tt>out</tt>
-				      * in EPS format. See
-				      * DataOutBase::write_eps.
-				      */
+                                     /**
+                                      * Obtain data through get_patches()
+                                      * and write it to <tt>out</tt>
+                                      * in EPS format. See
+                                      * DataOutBase::write_eps.
+                                      */
     void write_eps (std::ostream &out) const;
 
-    				     /**
-				      * Obtain data through get_patches()
-				      * and write it to <tt>out</tt>
-				      * in GMV format. See
-				      * DataOutBase::write_gmv.
-				      */
+                                     /**
+                                      * Obtain data through get_patches()
+                                      * and write it to <tt>out</tt>
+                                      * in GMV format. See
+                                      * DataOutBase::write_gmv.
+                                      */
     void write_gmv (std::ostream &out) const;
 
-				     /**
-				      * Obtain data through get_patches()
-				      * and write it to <tt>out</tt>
-				      * in GNUPLOT format. See
-				      * DataOutBase::write_gnuplot.
-				      */
+                                     /**
+                                      * Obtain data through get_patches()
+                                      * and write it to <tt>out</tt>
+                                      * in GNUPLOT format. See
+                                      * DataOutBase::write_gnuplot.
+                                      */
     void write_gnuplot (std::ostream &out) const;
 
-    				     /**
-				      * Obtain data through get_patches()
-				      * and write it to <tt>out</tt>
-				      * in POVRAY format. See
-				      * DataOutBase::write_povray.
-				      */
+                                     /**
+                                      * Obtain data through get_patches()
+                                      * and write it to <tt>out</tt>
+                                      * in POVRAY format. See
+                                      * DataOutBase::write_povray.
+                                      */
     void write_povray (std::ostream &out) const;
 
-    				     /**
-				      * Obtain data through get_patches()
-				      * and write it to <tt>out</tt>
-				      * in Tecplot format. See
-				      * DataOutBase::write_tecplot.
-				      */
+                                     /**
+                                      * Obtain data through get_patches()
+                                      * and write it to <tt>out</tt>
+                                      * in Tecplot format. See
+                                      * DataOutBase::write_tecplot.
+                                      */
     void write_tecplot (std::ostream &out) const;
 
-    				     /**
-				      * Obtain data through
-				      * get_patches() and write it in
-				      * the Tecplot binary output
-				      * format. Note that the name of
-				      * the output file must be
-				      * specified through the
-				      * TecplotFlags interface.
-				      */
+                                     /**
+                                      * Obtain data through
+                                      * get_patches() and write it in
+                                      * the Tecplot binary output
+                                      * format. Note that the name of
+                                      * the output file must be
+                                      * specified through the
+                                      * TecplotFlags interface.
+                                      */
     void write_tecplot_binary (std::ostream &out) const;
 
-				     /**
-				      * Obtain data through
-				      * get_patches() and write it to
-				      * <tt>out</tt> in UCD format for
-				      * AVS. See
-				      * DataOutBase::write_ucd.
-				      */
+                                     /**
+                                      * Obtain data through
+                                      * get_patches() and write it to
+                                      * <tt>out</tt> in UCD format for
+                                      * AVS. See
+                                      * DataOutBase::write_ucd.
+                                      */
     void write_ucd (std::ostream &out) const;
 
-    				     /**
-				      * Obtain data through get_patches()
-				      * and write it to <tt>out</tt>
-				      * in Vtk format. See
-				      * DataOutBase::write_vtk.
-				      */
+                                     /**
+                                      * Obtain data through get_patches()
+                                      * and write it to <tt>out</tt>
+                                      * in Vtk format. See
+                                      * DataOutBase::write_vtk.
+                                      */
     void write_vtk (std::ostream &out) const;
 
-				     /**
-				      * Obtain data through get_patches()
-				      * and write it to <tt>out</tt>
-				      * in Vtu (VTK's XML) format. See
-				      * DataOutBase::write_vtu.
-				      *
-				      * Some visualization programs,
-				      * such as ParaView, can read
-				      * several separate VTU files to
-				      * parallelize visualization. In
-				      * that case, you need a
-				      * <code>.pvtu</code> file that
-				      * describes which VTU files form
-				      * a group. The
-				      * DataOutInterface::write_pvtu_record()
-				      * function can generate such a
-				      * master record. Likewise,
-				      * DataOutInterface::write_visit_record()
-				      * does the same for VisIt.
-				      */
+                                     /**
+                                      * Obtain data through get_patches()
+                                      * and write it to <tt>out</tt>
+                                      * in Vtu (VTK's XML) format. See
+                                      * DataOutBase::write_vtu.
+                                      *
+                                      * Some visualization programs,
+                                      * such as ParaView, can read
+                                      * several separate VTU files to
+                                      * parallelize visualization. In
+                                      * that case, you need a
+                                      * <code>.pvtu</code> file that
+                                      * describes which VTU files form
+                                      * a group. The
+                                      * DataOutInterface::write_pvtu_record()
+                                      * function can generate such a
+                                      * master record. Likewise,
+                                      * DataOutInterface::write_visit_record()
+                                      * does the same for VisIt.
+                                      */
     void write_vtu (std::ostream &out) const;
 
                                      /**
                                       * Collective MPI call to write the
-				      * solution from all participating nodes
-				      * (those in the given communicator) to a
-				      * single compressed .vtu file on a
-				      * shared file system.  The communicator
-				      * can be a sub communicator of the one
-				      * used by the computation.  This routine
-				      * uses MPI I/O to achieve high
-				      * performance on parallel filesystems.
-				      * Also see
-				      * DataOutInterface::write_vtu().
+                                      * solution from all participating nodes
+                                      * (those in the given communicator) to a
+                                      * single compressed .vtu file on a
+                                      * shared file system.  The communicator
+                                      * can be a sub communicator of the one
+                                      * used by the computation.  This routine
+                                      * uses MPI I/O to achieve high
+                                      * performance on parallel filesystems.
+                                      * Also see
+                                      * DataOutInterface::write_vtu().
                                       */
     void write_vtu_in_parallel (const char* filename, MPI_Comm comm) const;
 
-				     /**
-				      * Some visualization programs, such as
-				      * ParaView, can read several separate
-				      * VTU files to parallelize
-				      * visualization. In that case, you need
-				      * a <code>.pvtu</code> file that
-				      * describes which VTU files (written,
-				      * for example, through the write_vtu()
-				      * function) form a group. The current
-				      * function can generate such a master
-				      * record.
-				      *
-				      * The file so written contains a list of
-				      * (scalar or vector) fields whose values
-				      * are described by the individual files
-				      * that comprise the set of parallel VTU
-				      * files along with the names of these
-				      * files. This function gets the names
-				      * and types of fields through the
-				      * get_patches() function of this class
-				      * like all the other write_xxx()
-				      * functions. The second argument to this
-				      * function specifies the names of the
-				      * files that form the parallel set.
-				      *
-				      * @note See DataOutBase::write_vtu for
-				      * writing each piece. Also note that
-				      * only one parallel process needs to
-				      * call the current function, listing the
-				      * names of the files written by all
-				      * parallel processes.
-				      *
-				      * @note The use of this function is
-				      * explained in step-40.
-				      *
-				      * @note At the time of writing,
-				      * the other big VTK-based
-				      * visualization program, VisIt,
-				      * can not read <code>pvtu</code>
-				      * records. However, it can read
-				      * visit records as written by
-				      * the write_visit_record()
-				      * function.
-				      */
+                                     /**
+                                      * Some visualization programs, such as
+                                      * ParaView, can read several separate
+                                      * VTU files to parallelize
+                                      * visualization. In that case, you need
+                                      * a <code>.pvtu</code> file that
+                                      * describes which VTU files (written,
+                                      * for example, through the write_vtu()
+                                      * function) form a group. The current
+                                      * function can generate such a master
+                                      * record.
+                                      *
+                                      * The file so written contains a list of
+                                      * (scalar or vector) fields whose values
+                                      * are described by the individual files
+                                      * that comprise the set of parallel VTU
+                                      * files along with the names of these
+                                      * files. This function gets the names
+                                      * and types of fields through the
+                                      * get_patches() function of this class
+                                      * like all the other write_xxx()
+                                      * functions. The second argument to this
+                                      * function specifies the names of the
+                                      * files that form the parallel set.
+                                      *
+                                      * @note See DataOutBase::write_vtu for
+                                      * writing each piece. Also note that
+                                      * only one parallel process needs to
+                                      * call the current function, listing the
+                                      * names of the files written by all
+                                      * parallel processes.
+                                      *
+                                      * @note The use of this function is
+                                      * explained in step-40.
+                                      *
+                                      * @note At the time of writing,
+                                      * the other big VTK-based
+                                      * visualization program, VisIt,
+                                      * can not read <code>pvtu</code>
+                                      * records. However, it can read
+                                      * visit records as written by
+                                      * the write_visit_record()
+                                      * function.
+                                      */
     void write_pvtu_record (std::ostream &out,
-			    const std::vector<std::string> &piece_names) const;
+                            const std::vector<std::string> &piece_names) const;
 
-				     /**
-				      * This function is the exact
-				      * equivalent of the
-				      * write_pvtu_record() function
-				      * but for the VisIt
-				      * visualization program. See
-				      * there for the purpose of this
-				      * function.
-				      *
-				      * This function is documented
-				      * in the "Creating a master file
-				      * for parallel" section (section 5.7)
-				      * of the "Getting data into VisIt"
-				      * report that can be found here:
-				      * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
-				      */
+                                     /**
+                                      * This function is the exact
+                                      * equivalent of the
+                                      * write_pvtu_record() function
+                                      * but for the VisIt
+                                      * visualization program. See
+                                      * there for the purpose of this
+                                      * function.
+                                      *
+                                      * This function is documented
+                                      * in the "Creating a master file
+                                      * for parallel" section (section 5.7)
+                                      * of the "Getting data into VisIt"
+                                      * report that can be found here:
+                                      * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+                                      */
     void write_visit_record (std::ostream &out,
-			     const std::vector<std::string> &piece_names) const;
+                             const std::vector<std::string> &piece_names) const;
 
-    				     /**
-				      * Obtain data through get_patches()
-				      * and write it to <tt>out</tt>
-				      * in deal.II intermediate
-				      * format. See
-				      * DataOutBase::write_deal_II_intermediate.
-				      *
-				      * Note that the intermediate
-				      * format is what its name
-				      * suggests: a direct
-				      * representation of internal
-				      * data. It isn't standardized
-				      * and will change whenever we
-				      * change our internal
-				      * representation. You can only
-				      * expect to process files
-				      * written in this format using
-				      * the same version of deal.II
-				      * that was used for writing.
-				      */
+                                     /**
+                                      * Obtain data through get_patches()
+                                      * and write it to <tt>out</tt>
+                                      * in deal.II intermediate
+                                      * format. See
+                                      * DataOutBase::write_deal_II_intermediate.
+                                      *
+                                      * Note that the intermediate
+                                      * format is what its name
+                                      * suggests: a direct
+                                      * representation of internal
+                                      * data. It isn't standardized
+                                      * and will change whenever we
+                                      * change our internal
+                                      * representation. You can only
+                                      * expect to process files
+                                      * written in this format using
+                                      * the same version of deal.II
+                                      * that was used for writing.
+                                      */
     void write_deal_II_intermediate (std::ostream &out) const;
 
-				     /**
-				      * Write data and grid to <tt>out</tt>
-				      * according to the given data
-				      * format. This function simply
-				      * calls the appropriate
-				      * <tt>write_*</tt> function. If no
-				      * output format is requested,
-				      * the <tt>default_format</tt> is
-				      * written.
-				      *
-				      * An error occurs if no format
-				      * is provided and the default
-				      * format is <tt>default_format</tt>.
-				      */
+                                     /**
+                                      * Write data and grid to <tt>out</tt>
+                                      * according to the given data
+                                      * format. This function simply
+                                      * calls the appropriate
+                                      * <tt>write_*</tt> function. If no
+                                      * output format is requested,
+                                      * the <tt>default_format</tt> is
+                                      * written.
+                                      *
+                                      * An error occurs if no format
+                                      * is provided and the default
+                                      * format is <tt>default_format</tt>.
+                                      */
     void write (std::ostream       &out,
-		const OutputFormat  output_format = default_format) const;
+                const OutputFormat  output_format = default_format) const;
 
-				     /**
-				      * Set the default format. The
-				      * value set here is used
-				      * anytime, output for format
-				      * <tt>default_format</tt> is
-				      * requested.
-				      */
+                                     /**
+                                      * Set the default format. The
+                                      * value set here is used
+                                      * anytime, output for format
+                                      * <tt>default_format</tt> is
+                                      * requested.
+                                      */
     void set_default_format (const OutputFormat default_format);
 
-				     /**
-				      * Set the flags to be used for
-				      * output in OpenDX format.
-				      */
+                                     /**
+                                      * Set the flags to be used for
+                                      * output in OpenDX format.
+                                      */
     void set_flags (const DXFlags &dx_flags);
 
-				     /**
-				      * Set the flags to be used for
-				      * output in UCD format.
-				      */
+                                     /**
+                                      * Set the flags to be used for
+                                      * output in UCD format.
+                                      */
     void set_flags (const UcdFlags &ucd_flags);
 
-    				     /**
-				      * Set the flags to be used for
-				      * output in GNUPLOT format.
-				      */
+                                     /**
+                                      * Set the flags to be used for
+                                      * output in GNUPLOT format.
+                                      */
     void set_flags (const GnuplotFlags &gnuplot_flags);
 
-    				     /**
-				      * Set the flags to be used for
-				      * output in POVRAY format.
-				      */
+                                     /**
+                                      * Set the flags to be used for
+                                      * output in POVRAY format.
+                                      */
     void set_flags (const PovrayFlags &povray_flags);
 
-    				     /**
-				      * Set the flags to be used for
-				      * output in EPS output.
-				      */
+                                     /**
+                                      * Set the flags to be used for
+                                      * output in EPS output.
+                                      */
     void set_flags (const EpsFlags &eps_flags);
 
-    				     /**
-				      * Set the flags to be used for
-				      * output in GMV format.
-				      */
+                                     /**
+                                      * Set the flags to be used for
+                                      * output in GMV format.
+                                      */
     void set_flags (const GmvFlags &gmv_flags);
 
-    				     /**
-				      * Set the flags to be used for
-				      * output in Tecplot format.
-				      */
+                                     /**
+                                      * Set the flags to be used for
+                                      * output in Tecplot format.
+                                      */
     void set_flags (const TecplotFlags &tecplot_flags);
 
-    				     /**
-				      * Set the flags to be used for
-				      * output in VTK format.
-				      */
+                                     /**
+                                      * Set the flags to be used for
+                                      * output in VTK format.
+                                      */
     void set_flags (const VtkFlags &vtk_flags);
 
-    				     /**
-				      * Set the flags to be used for output in
-				      * deal.II intermediate format.
-				      */
+                                     /**
+                                      * Set the flags to be used for output in
+                                      * deal.II intermediate format.
+                                      */
     void set_flags (const Deal_II_IntermediateFlags &deal_II_intermediate_flags);
 
-				     /**
-				      * A function that returns the same
-				      * string as the respective function in
-				      * the base class does; the only
-				      * exception being that if the parameter
-				      * is omitted, then the value for the
-				      * present default format is returned,
-				      * i.e. the correct suffix for the format
-				      * that was set through
-				      * set_default_format() or
-				      * parse_parameters() before calling this
-				      * function.
-				      */
+                                     /**
+                                      * A function that returns the same
+                                      * string as the respective function in
+                                      * the base class does; the only
+                                      * exception being that if the parameter
+                                      * is omitted, then the value for the
+                                      * present default format is returned,
+                                      * i.e. the correct suffix for the format
+                                      * that was set through
+                                      * set_default_format() or
+                                      * parse_parameters() before calling this
+                                      * function.
+                                      */
     std::string
     default_suffix (const OutputFormat output_format = default_format) const;
 
-				     /**
-				      * Declare parameters for all
-				      * output formats by declaring
-				      * subsections within the
-				      * parameter file for each output
-				      * format and call the respective
-				      * <tt>declare_parameters</tt>
-				      * functions of the flag classes
-				      * for each output format.
-				      *
-				      * Some of the declared
-				      * subsections may not contain
-				      * entries, if the respective
-				      * format does not export any
-				      * flags.
-				      *
-				      * Note that the top-level
-				      * parameters denoting the number
-				      * of subdivisions per patch and
-				      * the output format are not
-				      * declared, since they are only
-				      * passed to virtual functions
-				      * and are not stored inside
-				      * objects of this type. You have
-				      * to declare them yourself.
-				      */
+                                     /**
+                                      * Declare parameters for all
+                                      * output formats by declaring
+                                      * subsections within the
+                                      * parameter file for each output
+                                      * format and call the respective
+                                      * <tt>declare_parameters</tt>
+                                      * functions of the flag classes
+                                      * for each output format.
+                                      *
+                                      * Some of the declared
+                                      * subsections may not contain
+                                      * entries, if the respective
+                                      * format does not export any
+                                      * flags.
+                                      *
+                                      * Note that the top-level
+                                      * parameters denoting the number
+                                      * of subdivisions per patch and
+                                      * the output format are not
+                                      * declared, since they are only
+                                      * passed to virtual functions
+                                      * and are not stored inside
+                                      * objects of this type. You have
+                                      * to declare them yourself.
+                                      */
     static void declare_parameters (ParameterHandler &prm);
 
-				     /**
-				      * Read the parameters declared
-				      * in <tt>declare_parameters</tt> and
-				      * set the flags for the output
-				      * formats accordingly.
-				      *
-				      * The flags thus obtained
-				      * overwrite all previous
-				      * contents of the flag objects
-				      * as default-constructed or set
-				      * by the set_flags() function.
-				      */
+                                     /**
+                                      * Read the parameters declared
+                                      * in <tt>declare_parameters</tt> and
+                                      * set the flags for the output
+                                      * formats accordingly.
+                                      *
+                                      * The flags thus obtained
+                                      * overwrite all previous
+                                      * contents of the flag objects
+                                      * as default-constructed or set
+                                      * by the set_flags() function.
+                                      */
     void parse_parameters (ParameterHandler &prm);
 
-				     /**
-				      * Determine an estimate for
-				      * the memory consumption (in
-				      * bytes) of this
-				      * object. Since sometimes
-				      * the size of objects can
-				      * not be determined exactly
-				      * (for example: what is the
-				      * memory consumption of an
-				      * STL <tt>std::map</tt> type with a
-				      * certain number of
-				      * elements?), this is only
-				      * an estimate. however often
-				      * quite close to the true
-				      * value.
-				      */
+                                     /**
+                                      * Determine an estimate for
+                                      * the memory consumption (in
+                                      * bytes) of this
+                                      * object. Since sometimes
+                                      * the size of objects can
+                                      * not be determined exactly
+                                      * (for example: what is the
+                                      * memory consumption of an
+                                      * STL <tt>std::map</tt> type with a
+                                      * certain number of
+                                      * elements?), this is only
+                                      * an estimate. however often
+                                      * quite close to the true
+                                      * value.
+                                      */
     std::size_t memory_consumption () const;
 
   protected:
-				     /**
-				      * This is the abstract function
-				      * through which derived classes
-				      * propagate preprocessed data in
-				      * the form of Patch
-				      * structures (declared in the
-				      * base class DataOutBase) to
-				      * the actual output
-				      * function. You need to overload
-				      * this function to allow the
-				      * output functions to know what
-				      * they shall print.
-				      */
+                                     /**
+                                      * This is the abstract function
+                                      * through which derived classes
+                                      * propagate preprocessed data in
+                                      * the form of Patch
+                                      * structures (declared in the
+                                      * base class DataOutBase) to
+                                      * the actual output
+                                      * function. You need to overload
+                                      * this function to allow the
+                                      * output functions to know what
+                                      * they shall print.
+                                      */
     virtual
     const std::vector<typename DataOutBase::Patch<dim,spacedim> > &
     get_patches () const = 0;
 
-				     /**
-				      * Abstract virtual function
-				      * through which the names of
-				      * data sets are obtained by the
-				      * output functions of the base
-				      * class.
-				      */
+                                     /**
+                                      * Abstract virtual function
+                                      * through which the names of
+                                      * data sets are obtained by the
+                                      * output functions of the base
+                                      * class.
+                                      */
     virtual
     std::vector<std::string>
     get_dataset_names () const = 0;
 
-				     /**
-				      * This functions returns
-				      * information about how the
-				      * individual components of
-				      * output files that consist of
-				      * more than one data set are to
-				      * be interpreted.
-				      *
-				      * It returns a list of index
-				      * pairs and corresponding name
-				      * indicating which components of
-				      * the output are to be
-				      * considered vector-valued
-				      * rather than just a collection
-				      * of scalar data. The index
-				      * pairs are inclusive; for
-				      * example, if we have a Stokes
-				      * problem in 2d with components
-				      * (u,v,p), then the
-				      * corresponding vector data
-				      * range should be (0,1), and the
-				      * returned list would consist of
-				      * only a single element with a
-				      * tuple such as (0,1,"velocity").
-				      *
-				      * Since some of the derived
-				      * classes do not know about
-				      * vector data, this function has
-				      * a default implementation that
-				      * simply returns an empty
-				      * string, meaning that all data
-				      * is to be considered a
-				      * collection of scalar fields.
-				      */
+                                     /**
+                                      * This functions returns
+                                      * information about how the
+                                      * individual components of
+                                      * output files that consist of
+                                      * more than one data set are to
+                                      * be interpreted.
+                                      *
+                                      * It returns a list of index
+                                      * pairs and corresponding name
+                                      * indicating which components of
+                                      * the output are to be
+                                      * considered vector-valued
+                                      * rather than just a collection
+                                      * of scalar data. The index
+                                      * pairs are inclusive; for
+                                      * example, if we have a Stokes
+                                      * problem in 2d with components
+                                      * (u,v,p), then the
+                                      * corresponding vector data
+                                      * range should be (0,1), and the
+                                      * returned list would consist of
+                                      * only a single element with a
+                                      * tuple such as (0,1,"velocity").
+                                      *
+                                      * Since some of the derived
+                                      * classes do not know about
+                                      * vector data, this function has
+                                      * a default implementation that
+                                      * simply returns an empty
+                                      * string, meaning that all data
+                                      * is to be considered a
+                                      * collection of scalar fields.
+                                      */
     virtual
     std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     get_vector_data_ranges () const;
 
-				     /**
-				      * The default number of
-				      * subdivisions for patches. This
-				      * is filled by parse_parameters()
-				      * and should be obeyed by
-				      * build_patches() in derived
-				      * classes.
-				      */
+                                     /**
+                                      * The default number of
+                                      * subdivisions for patches. This
+                                      * is filled by parse_parameters()
+                                      * and should be obeyed by
+                                      * build_patches() in derived
+                                      * classes.
+                                      */
     unsigned int default_subdivisions;
 
   private:
-				     /**
-				      * Standard output format.  Use
-				      * this format, if output format
-				      * default_format is
-				      * requested. It can be changed
-				      * by the <tt>set_format</tt> function
-				      * or in a parameter file.
-				      */
+                                     /**
+                                      * Standard output format.  Use
+                                      * this format, if output format
+                                      * default_format is
+                                      * requested. It can be changed
+                                      * by the <tt>set_format</tt> function
+                                      * or in a parameter file.
+                                      */
     OutputFormat default_fmt;
 
-				     /**
-				      * Flags to be used upon output
-				      * of OpenDX data. Can be changed by
-				      * using the <tt>set_flags</tt>
-				      * function.
-				      */
+                                     /**
+                                      * Flags to be used upon output
+                                      * of OpenDX data. Can be changed by
+                                      * using the <tt>set_flags</tt>
+                                      * function.
+                                      */
     DXFlags     dx_flags;
 
-				     /**
-				      * Flags to be used upon output
-				      * of UCD data. Can be changed by
-				      * using the <tt>set_flags</tt>
-				      * function.
-				      */
+                                     /**
+                                      * Flags to be used upon output
+                                      * of UCD data. Can be changed by
+                                      * using the <tt>set_flags</tt>
+                                      * function.
+                                      */
     UcdFlags     ucd_flags;
 
-				     /**
-				      * Flags to be used upon output
-				      * of GNUPLOT data. Can be
-				      * changed by using the
-				      * <tt>set_flags</tt> function.
-				      */
+                                     /**
+                                      * Flags to be used upon output
+                                      * of GNUPLOT data. Can be
+                                      * changed by using the
+                                      * <tt>set_flags</tt> function.
+                                      */
     GnuplotFlags gnuplot_flags;
 
-    				     /**
-				      * Flags to be used upon output
-				      * of POVRAY data. Can be changed
-				      * by using the <tt>set_flags</tt>
-				      * function.
-				      */
+                                     /**
+                                      * Flags to be used upon output
+                                      * of POVRAY data. Can be changed
+                                      * by using the <tt>set_flags</tt>
+                                      * function.
+                                      */
     PovrayFlags povray_flags;
 
-				     /**
-				      * Flags to be used upon output
-				      * of EPS data in one space
-				      * dimension. Can be changed by
-				      * using the <tt>set_flags</tt>
-				      * function.
-				      */
+                                     /**
+                                      * Flags to be used upon output
+                                      * of EPS data in one space
+                                      * dimension. Can be changed by
+                                      * using the <tt>set_flags</tt>
+                                      * function.
+                                      */
     EpsFlags     eps_flags;
 
-				     /**
-				      * Flags to be used upon output
-				      * of gmv data in one space
-				      * dimension. Can be changed by
-				      * using the <tt>set_flags</tt>
-				      * function.
-				      */
+                                     /**
+                                      * Flags to be used upon output
+                                      * of gmv data in one space
+                                      * dimension. Can be changed by
+                                      * using the <tt>set_flags</tt>
+                                      * function.
+                                      */
     GmvFlags     gmv_flags;
 
-				     /**
-				      * Flags to be used upon output
-				      * of Tecplot data in one space
-				      * dimension. Can be changed by
-				      * using the <tt>set_flags</tt>
-				      * function.
-				      */
+                                     /**
+                                      * Flags to be used upon output
+                                      * of Tecplot data in one space
+                                      * dimension. Can be changed by
+                                      * using the <tt>set_flags</tt>
+                                      * function.
+                                      */
     TecplotFlags tecplot_flags;
 
-				     /**
-				      * Flags to be used upon output
-				      * of vtk data in one space
-				      * dimension. Can be changed by
-				      * using the <tt>set_flags</tt>
-				      * function.
-				      */
+                                     /**
+                                      * Flags to be used upon output
+                                      * of vtk data in one space
+                                      * dimension. Can be changed by
+                                      * using the <tt>set_flags</tt>
+                                      * function.
+                                      */
     VtkFlags     vtk_flags;
 
-				     /**
-				      * Flags to be used upon output of
-				      * deal.II intermediate data in one space
-				      * dimension. Can be changed by using the
-				      * <tt>set_flags</tt> function.
-				      */
+                                     /**
+                                      * Flags to be used upon output of
+                                      * deal.II intermediate data in one space
+                                      * dimension. Can be changed by using the
+                                      * <tt>set_flags</tt> function.
+                                      */
     Deal_II_IntermediateFlags     deal_II_intermediate_flags;
 };
 
@@ -2766,14 +2766,14 @@ template <int dim, int spacedim=dim>
 class DataOutReader : public DataOutInterface<dim,spacedim>
 {
   public:
-				     /**
-				      * Read a sequence of patches as
-				      * written previously by
-				      * <tt>DataOutBase::write_deal_II_intermediate</tt>
-				      * and store them in the present
-				      * object. This overwrites any
-				      * previous content.
-				      */
+                                     /**
+                                      * Read a sequence of patches as
+                                      * written previously by
+                                      * <tt>DataOutBase::write_deal_II_intermediate</tt>
+                                      * and store them in the present
+                                      * object. This overwrites any
+                                      * previous content.
+                                      */
     void read (std::istream &in);
 
                                      /**
@@ -2813,14 +2813,14 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
                                       * patches, the previous state is
                                       * overwritten, and the merged-in
                                       * patches are lost.
-				      *
+                                      *
                                       * This function will fail if
                                       * either this or the other
                                       * object did not yet set up any
                                       * patches.
-				      *
-				      * The use of this function is
-				      * demonstrated in step-19.
+                                      *
+                                      * The use of this function is
+                                      * demonstrated in step-19.
                                       */
     void merge (const DataOutReader<dim,spacedim> &other);
 
@@ -2836,102 +2836,102 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
                                       * Exception
                                       */
     DeclException0 (ExcIncompatiblePatchLists);
-				     /**
-				      * Exception
-				      */
+                                     /**
+                                      * Exception
+                                      */
     DeclException4 (ExcIncompatibleDimensions,
-		    int, int, int, int,
-		    << "Either the dimensions <" << arg1 << "> and <"
-		    << arg2 << "> or the space dimensions <"
-		    << arg3 << "> and <" << arg4
-		    << "> do not match!");
+                    int, int, int, int,
+                    << "Either the dimensions <" << arg1 << "> and <"
+                    << arg2 << "> or the space dimensions <"
+                    << arg3 << "> and <" << arg4
+                    << "> do not match!");
 
   protected:
-				     /**
-				      * This is the function
-				      * through which this class
-				      * propagates preprocessed data in
-				      * the form of Patch
-				      * structures (declared in the
-				      * base class DataOutBase) to
-				      * the actual output
-				      * function.
-				      *
-				      * It returns the patches as read
-				      * the last time a stream was
-				      * given to the read() function.
-				      */
+                                     /**
+                                      * This is the function
+                                      * through which this class
+                                      * propagates preprocessed data in
+                                      * the form of Patch
+                                      * structures (declared in the
+                                      * base class DataOutBase) to
+                                      * the actual output
+                                      * function.
+                                      *
+                                      * It returns the patches as read
+                                      * the last time a stream was
+                                      * given to the read() function.
+                                      */
     virtual const std::vector<typename dealii::DataOutBase::Patch<dim,spacedim> > &
     get_patches () const;
 
-				     /**
-				      * Abstract virtual function
-				      * through which the names of
-				      * data sets are obtained by the
-				      * output functions of the base
-				      * class.
-				      *
-				      * Return the names of the
-				      * variables as read the last
-				      * time we read a file.
-				      */
+                                     /**
+                                      * Abstract virtual function
+                                      * through which the names of
+                                      * data sets are obtained by the
+                                      * output functions of the base
+                                      * class.
+                                      *
+                                      * Return the names of the
+                                      * variables as read the last
+                                      * time we read a file.
+                                      */
     virtual std::vector<std::string> get_dataset_names () const;
 
-				     /**
-				      * This functions returns
-				      * information about how the
-				      * individual components of
-				      * output files that consist of
-				      * more than one data set are to
-				      * be interpreted.
-				      *
-				      * It returns a list of index
-				      * pairs and corresponding name
-				      * indicating which components of
-				      * the output are to be
-				      * considered vector-valued
-				      * rather than just a collection
-				      * of scalar data. The index
-				      * pairs are inclusive; for
-				      * example, if we have a Stokes
-				      * problem in 2d with components
-				      * (u,v,p), then the
-				      * corresponding vector data
-				      * range should be (0,1), and the
-				      * returned list would consist of
-				      * only a single element with a
-				      * tuple such as (0,1,"velocity").
-				      *
-				      * Since some of the derived
-				      * classes do not know about
-				      * vector data, this function has
-				      * a default implementation that
-				      * simply returns an empty
-				      * string, meaning that all data
-				      * is to be considered a
-				      * collection of scalar fields.
-				      */
+                                     /**
+                                      * This functions returns
+                                      * information about how the
+                                      * individual components of
+                                      * output files that consist of
+                                      * more than one data set are to
+                                      * be interpreted.
+                                      *
+                                      * It returns a list of index
+                                      * pairs and corresponding name
+                                      * indicating which components of
+                                      * the output are to be
+                                      * considered vector-valued
+                                      * rather than just a collection
+                                      * of scalar data. The index
+                                      * pairs are inclusive; for
+                                      * example, if we have a Stokes
+                                      * problem in 2d with components
+                                      * (u,v,p), then the
+                                      * corresponding vector data
+                                      * range should be (0,1), and the
+                                      * returned list would consist of
+                                      * only a single element with a
+                                      * tuple such as (0,1,"velocity").
+                                      *
+                                      * Since some of the derived
+                                      * classes do not know about
+                                      * vector data, this function has
+                                      * a default implementation that
+                                      * simply returns an empty
+                                      * string, meaning that all data
+                                      * is to be considered a
+                                      * collection of scalar fields.
+                                      */
     virtual
     std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     get_vector_data_ranges () const;
 
   private:
-				     /**
-				      * Arrays holding the set of
-				      * patches as well as the names
-				      * of output variables, all of
-				      * which we read from an input
-				      * stream.
-				      */
+                                     /**
+                                      * Arrays holding the set of
+                                      * patches as well as the names
+                                      * of output variables, all of
+                                      * which we read from an input
+                                      * stream.
+                                      */
     std::vector<typename dealii::DataOutBase::Patch<dim,spacedim> > patches;
     std::vector<std::string> dataset_names;
 
-				     /**
-				      * Information about whether
-				      * certain components of the
-				      * output field are to be
-				      * considered vectors.
-				      */
+                                     /**
+                                      * Information about whether
+                                      * certain components of the
+                                      * output field are to be
+                                      * considered vectors.
+                                      */
     std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     vector_data_ranges;
 };
@@ -2963,7 +2963,7 @@ DataOutBase::EpsFlags::RgbValues::is_grey () const
 template <int dim, int spacedim>
 std::ostream &
 operator << (std::ostream                           &out,
-	     const DataOutBase::Patch<dim,spacedim> &patch);
+             const DataOutBase::Patch<dim,spacedim> &patch);
 
 
 
@@ -2978,7 +2978,7 @@ operator << (std::ostream                           &out,
 template <int dim, int spacedim>
 std::istream &
 operator >> (std::istream                     &in,
-	     DataOutBase::Patch<dim,spacedim> &patch);
+             DataOutBase::Patch<dim,spacedim> &patch);
 
 
 

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,12 +24,12 @@ RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData (
   const double relaxation,
   const bool invert_diagonal,
   const bool same_diagonal)
-		:
-		relaxation(relaxation),
-		invert_diagonal(invert_diagonal),
-		same_diagonal(same_diagonal),
-		inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
-		threshold(0.)
+                :
+                relaxation(relaxation),
+                invert_diagonal(invert_diagonal),
+                same_diagonal(same_diagonal),
+                inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
+                threshold(0.)
 {}
 
 
@@ -40,12 +40,12 @@ RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData (
   const double relaxation,
   const bool invert_diagonal,
   const bool same_diagonal)
-		:
-		relaxation(relaxation),
-		invert_diagonal(invert_diagonal),
-		same_diagonal(same_diagonal),
-		inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
-		threshold(0.)
+                :
+                relaxation(relaxation),
+                invert_diagonal(invert_diagonal),
+                same_diagonal(same_diagonal),
+                inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
+                threshold(0.)
 {
   bl.create_sparsity_pattern(block_list, 0);
 }
@@ -59,16 +59,16 @@ RelaxationBlock<MATRIX,inverse_type>::initialize (
   const AdditionalData& parameters)
 {
   Assert (parameters.invert_diagonal, ExcNotImplemented());
-  
+
   clear();
 //  Assert (M.m() == M.n(), ExcNotQuadratic());
   A = &M;
   additional_data = &parameters;
   this->inversion = parameters.inversion;
-  
+
   this->reinit(additional_data->block_list.n_rows(), 0, additional_data->same_diagonal,
-	       additional_data->inversion);
-  
+               additional_data->inversion);
+
   if (additional_data->invert_diagonal)
     invert_diagblocks();
 }
@@ -99,54 +99,54 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
   else
     {
       for (unsigned int block=0;block<additional_data->block_list.n_rows();++block)
-	{
-	  const unsigned int bs = additional_data->block_list.row_length(block);
-	  M_cell.reinit(bs, bs);
+        {
+          const unsigned int bs = additional_data->block_list.row_length(block);
+          M_cell.reinit(bs, bs);
 
-					   // Copy rows for this block
-					   // into the matrix for the
-					   // diagonal block
-	  SparsityPattern::row_iterator row
-	    = additional_data->block_list.row_begin(block);
-	  for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
-	    {
+                                           // Copy rows for this block
+                                           // into the matrix for the
+                                           // diagonal block
+          SparsityPattern::row_iterator row
+            = additional_data->block_list.row_begin(block);
+          for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
+            {
 //TODO:[GK] Optimize here
-	      for (typename MATRIX::const_iterator entry = M.begin(*row);
-		   entry != M.end(*row); ++entry)
-		{
-		  const unsigned int column = entry->column();
-		  const unsigned int col_cell = additional_data->block_list.row_position(block, column);
-		  if (col_cell != numbers::invalid_unsigned_int)
-		    M_cell(row_cell, col_cell) = entry->value();
-		}
-	    }
-					   // Now M_cell contains the
-					   // diagonal block. Now
-					   // store it and its
-					   // inverse, if so requested.
-	  if (this->store_diagonals())
-	    {
-	      this->diagonal(block).reinit(bs, bs);
-	      this->diagonal(block) = M_cell;
-	    }
-	  switch(this->inversion)
-	    {
-	      case PreconditionBlockBase<inverse_type>::gauss_jordan:
-		    this->inverse(block).reinit(bs, bs);
-		    this->inverse(block).invert(M_cell);
-		    break;
-	      case PreconditionBlockBase<inverse_type>::householder:
-		    this->inverse_householder(block).initialize(M_cell);
-		    break;
-	      case PreconditionBlockBase<inverse_type>::svd:
-		    this->inverse_svd(block).reinit(bs, bs);
-		    this->inverse_svd(block) = M_cell;
-		    this->inverse_svd(block).compute_inverse_svd(additional_data->threshold);
-		    break;
-	      default:
-		    Assert(false, ExcNotImplemented());
-	    }
-	}
+              for (typename MATRIX::const_iterator entry = M.begin(*row);
+                   entry != M.end(*row); ++entry)
+                {
+                  const unsigned int column = entry->column();
+                  const unsigned int col_cell = additional_data->block_list.row_position(block, column);
+                  if (col_cell != numbers::invalid_unsigned_int)
+                    M_cell(row_cell, col_cell) = entry->value();
+                }
+            }
+                                           // Now M_cell contains the
+                                           // diagonal block. Now
+                                           // store it and its
+                                           // inverse, if so requested.
+          if (this->store_diagonals())
+            {
+              this->diagonal(block).reinit(bs, bs);
+              this->diagonal(block) = M_cell;
+            }
+          switch(this->inversion)
+            {
+              case PreconditionBlockBase<inverse_type>::gauss_jordan:
+                    this->inverse(block).reinit(bs, bs);
+                    this->inverse(block).invert(M_cell);
+                    break;
+              case PreconditionBlockBase<inverse_type>::householder:
+                    this->inverse_householder(block).initialize(M_cell);
+                    break;
+              case PreconditionBlockBase<inverse_type>::svd:
+                    this->inverse_svd(block).reinit(bs, bs);
+                    this->inverse_svd(block) = M_cell;
+                    this->inverse_svd(block).compute_inverse_svd(additional_data->threshold);
+                    break;
+              default:
+                    Assert(false, ExcNotImplemented());
+            }
+        }
     }
   this->inverses_computed(true);
 }
@@ -163,50 +163,50 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
   const bool backward) const
 {
   Assert (additional_data->invert_diagonal, ExcNotImplemented());
-  
+
   const MATRIX &M=*this->A;
   Vector<number2> b_cell, x_cell;
 
   const bool permutation_empty = additional_data->order.size() == 0;
   const unsigned int n_permutations = (permutation_empty)
-				      ? 1U : additional_data->order.size();
+                                      ? 1U : additional_data->order.size();
   const unsigned int n_blocks = additional_data->block_list.n_rows();
 
   if (!permutation_empty)
     for (unsigned int i=0;i<additional_data->order.size();++i)
       AssertDimension(additional_data->order[i].size(), this->size());
-  
+
   for (unsigned int perm=0; perm<n_permutations;++perm)
     {
       for (unsigned int bi=0;bi<n_blocks;++bi)
-	{
-	  const unsigned int raw_block = backward ? (n_blocks - bi - 1) : bi;
-	  const unsigned int block = permutation_empty
-				     ? raw_block
-				     : (backward
-					? (additional_data->order[n_permutations-1-perm][raw_block])
-					: (additional_data->order[perm][raw_block]));
+        {
+          const unsigned int raw_block = backward ? (n_blocks - bi - 1) : bi;
+          const unsigned int block = permutation_empty
+                                     ? raw_block
+                                     : (backward
+                                        ? (additional_data->order[n_permutations-1-perm][raw_block])
+                                        : (additional_data->order[perm][raw_block]));
 
-	  const unsigned int bs = additional_data->block_list.row_length(block);
-	  
-	  b_cell.reinit(bs);
-	  x_cell.reinit(bs);
-					   // Collect off-diagonal parts
-	  SparsityPattern::row_iterator row = additional_data->block_list.row_begin(block);
-	  for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
-	    {
-	      b_cell(row_cell) = src(*row);
-	      for (typename MATRIX::const_iterator entry = M.begin(*row);
-		   entry != M.end(*row); ++entry)
-		b_cell(row_cell) -= entry->value() * prev(entry->column());
-	    }
-					   // Apply inverse diagonal
-	  this->inverse_vmult(block, x_cell, b_cell);
-					   // Store in result vector
-	  row=additional_data->block_list.row_begin(block);
-	  for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
-	    dst(*row) = prev(*row) + additional_data->relaxation * x_cell(row_cell);
-	}
+          const unsigned int bs = additional_data->block_list.row_length(block);
+
+          b_cell.reinit(bs);
+          x_cell.reinit(bs);
+                                           // Collect off-diagonal parts
+          SparsityPattern::row_iterator row = additional_data->block_list.row_begin(block);
+          for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
+            {
+              b_cell(row_cell) = src(*row);
+              for (typename MATRIX::const_iterator entry = M.begin(*row);
+                   entry != M.end(*row); ++entry)
+                b_cell(row_cell) -= entry->value() * prev(entry->column());
+            }
+                                           // Apply inverse diagonal
+          this->inverse_vmult(block, x_cell, b_cell);
+                                           // Store in result vector
+          row=additional_data->block_list.row_begin(block);
+          for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
+            dst(*row) = prev(*row) + additional_data->relaxation * x_cell(row_cell);
+        }
     }
 }
 

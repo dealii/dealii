@@ -1,7 +1,7 @@
 //----------------------------  solver_gmres.h  ---------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,82 +33,82 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-				   /**
-				    * A namespace for a helper class
-				    * to the GMRES solver.
-				    */
+                                   /**
+                                    * A namespace for a helper class
+                                    * to the GMRES solver.
+                                    */
   namespace SolverGMRES
   {
-				     /**
-				      * Class to hold temporary
-				      * vectors.  This class
-				      * automatically allocates a new
-				      * vector, once it is needed.
-				      *
-				      * A future version should also
-				      * be able to shift through
-				      * vectors automatically,
-				      * avoiding restart.
-				      */
+                                     /**
+                                      * Class to hold temporary
+                                      * vectors.  This class
+                                      * automatically allocates a new
+                                      * vector, once it is needed.
+                                      *
+                                      * A future version should also
+                                      * be able to shift through
+                                      * vectors automatically,
+                                      * avoiding restart.
+                                      */
 
     template <class VECTOR>
     class TmpVectors
     {
       public:
-					 /**
-					  * Constructor. Prepares an
-					  * array of @p VECTOR of
-					  * length @p max_size.
-					  */
-	TmpVectors(const unsigned int    max_size,
-		   VectorMemory<VECTOR> &vmem);
+                                         /**
+                                          * Constructor. Prepares an
+                                          * array of @p VECTOR of
+                                          * length @p max_size.
+                                          */
+        TmpVectors(const unsigned int    max_size,
+                   VectorMemory<VECTOR> &vmem);
 
                                          /**
-					  * Delete all allocated vectors.
-					  */
-	~TmpVectors();
+                                          * Delete all allocated vectors.
+                                          */
+        ~TmpVectors();
 
-					 /**
-					  * Get vector number
-					  * @p i. If this vector was
-					  * unused before, an error
-					  * occurs.
-					  */
-	VECTOR& operator[] (const unsigned int i) const;
+                                         /**
+                                          * Get vector number
+                                          * @p i. If this vector was
+                                          * unused before, an error
+                                          * occurs.
+                                          */
+        VECTOR& operator[] (const unsigned int i) const;
 
-					 /**
-					  * Get vector number
-					  * @p i. Allocate it if
-					  * necessary.
-					  *
-					  * If a vector must be
-					  * allocated, @p temp is
-					  * used to reinit it to the
-					  * proper dimensions.
-					  */
-	VECTOR& operator() (const unsigned int i,
-			    const VECTOR      &temp);
+                                         /**
+                                          * Get vector number
+                                          * @p i. Allocate it if
+                                          * necessary.
+                                          *
+                                          * If a vector must be
+                                          * allocated, @p temp is
+                                          * used to reinit it to the
+                                          * proper dimensions.
+                                          */
+        VECTOR& operator() (const unsigned int i,
+                            const VECTOR      &temp);
 
       private:
-					 /**
-					  * Pool were vectors are
-					  * obtained from.
-					  */
-	VectorMemory<VECTOR> &mem;
+                                         /**
+                                          * Pool were vectors are
+                                          * obtained from.
+                                          */
+        VectorMemory<VECTOR> &mem;
 
-					 /**
-					  * Field for storing the
-					  * vectors.
-					  */
-	std::vector<VECTOR*> data;
+                                         /**
+                                          * Field for storing the
+                                          * vectors.
+                                          */
+        std::vector<VECTOR*> data;
 
-					 /**
-					  * Offset of the first
-					  * vector. This is for later
-					  * when vector rotation will
-					  * be implemented.
-					  */
-	unsigned int offset;
+                                         /**
+                                          * Offset of the first
+                                          * vector. This is for later
+                                          * when vector rotation will
+                                          * be implemented.
+                                          */
+        unsigned int offset;
     };
   }
 }
@@ -168,126 +168,126 @@ template <class VECTOR = Vector<double> >
 class SolverGMRES : public Solver<VECTOR>
 {
   public:
-    				     /**
-				      * Standardized data struct to
-				      * pipe additional data to the
-				      * solver.
-				      */
+                                     /**
+                                      * Standardized data struct to
+                                      * pipe additional data to the
+                                      * solver.
+                                      */
     struct AdditionalData
     {
-					 /**
-					  * Constructor. By default, set the
-					  * number of temporary vectors to 30,
-					  * i.e. do a restart every
-					  * 28 iterations. Also
-					  * set preconditioning from left and
-					  * the residual of the stopping
-					  * criterion to the default residual.
-					  */
-	AdditionalData (const unsigned int max_n_tmp_vectors = 30,
+                                         /**
+                                          * Constructor. By default, set the
+                                          * number of temporary vectors to 30,
+                                          * i.e. do a restart every
+                                          * 28 iterations. Also
+                                          * set preconditioning from left and
+                                          * the residual of the stopping
+                                          * criterion to the default residual.
+                                          */
+        AdditionalData (const unsigned int max_n_tmp_vectors = 30,
                         const bool right_preconditioning = false,
                         const bool use_default_residual = true);
 
-					 /**
-					  * Maximum number of
-					  * temporary vectors. This
-					  * parameter controls the
-					  * size of the Arnoldi basis,
-					  * which for historical
-					  * reasons is
-					  * #max_n_tmp_vectors-2.
-					  */
-	unsigned int    max_n_tmp_vectors;
+                                         /**
+                                          * Maximum number of
+                                          * temporary vectors. This
+                                          * parameter controls the
+                                          * size of the Arnoldi basis,
+                                          * which for historical
+                                          * reasons is
+                                          * #max_n_tmp_vectors-2.
+                                          */
+        unsigned int    max_n_tmp_vectors;
 
-					 /**
-					  * Flag for right
-					  * preconditioning.
-					  *
-					  * @note Change between left
-					  * and right preconditioning
-					  * will also change the way
-					  * residuals are
-					  * evaluated. See the
-					  * corresponding section in
-					  * the SolverGMRES.
-					  */
-	bool right_preconditioning;
+                                         /**
+                                          * Flag for right
+                                          * preconditioning.
+                                          *
+                                          * @note Change between left
+                                          * and right preconditioning
+                                          * will also change the way
+                                          * residuals are
+                                          * evaluated. See the
+                                          * corresponding section in
+                                          * the SolverGMRES.
+                                          */
+        bool right_preconditioning;
 
-					 /**
-					  * Flag for the default
-					  * residual that is used to
-					  * measure convergence.
-					  */
-	bool use_default_residual;
+                                         /**
+                                          * Flag for the default
+                                          * residual that is used to
+                                          * measure convergence.
+                                          */
+        bool use_default_residual;
     };
 
-				     /**
-				      * Constructor.
-				      */
+                                     /**
+                                      * Constructor.
+                                      */
     SolverGMRES (SolverControl        &cn,
-		 VectorMemory<VECTOR> &mem,
-		 const AdditionalData &data=AdditionalData());
+                 VectorMemory<VECTOR> &mem,
+                 const AdditionalData &data=AdditionalData());
 
-				     /**
-				      * Constructor. Use an object of
-				      * type GrowingVectorMemory as
-				      * a default to allocate memory.
-				      */
+                                     /**
+                                      * Constructor. Use an object of
+                                      * type GrowingVectorMemory as
+                                      * a default to allocate memory.
+                                      */
     SolverGMRES (SolverControl        &cn,
-		 const AdditionalData &data=AdditionalData());
+                 const AdditionalData &data=AdditionalData());
 
-				     /**
-				      * Solve the linear system $Ax=b$
-				      * for x.
-				      */
+                                     /**
+                                      * Solve the linear system $Ax=b$
+                                      * for x.
+                                      */
     template<class MATRIX, class PRECONDITIONER>
     void
     solve (const MATRIX         &A,
-	   VECTOR               &x,
-	   const VECTOR         &b,
-	   const PRECONDITIONER &precondition);
+           VECTOR               &x,
+           const VECTOR         &b,
+           const PRECONDITIONER &precondition);
 
     DeclException1 (ExcTooFewTmpVectors,
-		    int,
-		    << "The number of temporary vectors you gave ("
-		    << arg1 << ") is too small. It should be at least 10 for "
-		    << "any results, and much more for reasonable ones.");
+                    int,
+                    << "The number of temporary vectors you gave ("
+                    << arg1 << ") is too small. It should be at least 10 for "
+                    << "any results, and much more for reasonable ones.");
 
   protected:
-				     /**
-				      * Includes the maximum number of
-				      * tmp vectors.
-				      */
+                                     /**
+                                      * Includes the maximum number of
+                                      * tmp vectors.
+                                      */
     AdditionalData additional_data;
 
-				     /**
-				      * Implementation of the computation of
-				      * the norm of the residual.
-				      */
+                                     /**
+                                      * Implementation of the computation of
+                                      * the norm of the residual.
+                                      */
     virtual double criterion();
 
-				     /**
-				      * Transformation of an upper
-				      * Hessenberg matrix into
-				      * tridiagonal structure by givens
-				      * rotation of the last column
-				      */
+                                     /**
+                                      * Transformation of an upper
+                                      * Hessenberg matrix into
+                                      * tridiagonal structure by givens
+                                      * rotation of the last column
+                                      */
     void givens_rotation (Vector<double> &h,  Vector<double> &b,
-			  Vector<double> &ci, Vector<double> &si,
-			  int col) const;
-				     /**
-				      * Projected system matrix
-				      */
+                          Vector<double> &ci, Vector<double> &si,
+                          int col) const;
+                                     /**
+                                      * Projected system matrix
+                                      */
     FullMatrix<double> H;
-				     /**
-				      * Auxiliary matrix for inverting @p H
-				      */
+                                     /**
+                                      * Auxiliary matrix for inverting @p H
+                                      */
     FullMatrix<double> H1;
 
   private:
-    				     /**
-				      * No copy constructor.
-				      */
+                                     /**
+                                      * No copy constructor.
+                                      */
     SolverGMRES (const SolverGMRES<VECTOR>&);
 };
 
@@ -314,74 +314,74 @@ template <class VECTOR = Vector<double> >
 class SolverFGMRES : public Solver<VECTOR>
 {
   public:
-    				     /**
-				      * Standardized data struct to
-				      * pipe additional data to the
-				      * solver.
-				      */
+                                     /**
+                                      * Standardized data struct to
+                                      * pipe additional data to the
+                                      * solver.
+                                      */
     struct AdditionalData
     {
-					 /**
-					  * Constructor. By default,
-					  * set the number of
-					  * temporary vectors to 30,
-					  * preconditioning from left
-					  * and the residual of the
-					  * stopping criterion to the
-					  * default residual
-					  * (cf. class documentation).
-					  */
-	AdditionalData(const unsigned int max_basis_size = 30,
-		       const bool /*use_default_residual*/ = true)
-			:
-			max_basis_size(max_basis_size)
-	  {}
+                                         /**
+                                          * Constructor. By default,
+                                          * set the number of
+                                          * temporary vectors to 30,
+                                          * preconditioning from left
+                                          * and the residual of the
+                                          * stopping criterion to the
+                                          * default residual
+                                          * (cf. class documentation).
+                                          */
+        AdditionalData(const unsigned int max_basis_size = 30,
+                       const bool /*use_default_residual*/ = true)
+                        :
+                        max_basis_size(max_basis_size)
+          {}
 
-					 /**
-					  * Maximum number of
-					  * tmp vectors.
-					  */
-	unsigned int    max_basis_size;
+                                         /**
+                                          * Maximum number of
+                                          * tmp vectors.
+                                          */
+        unsigned int    max_basis_size;
     };
 
-				     /**
-				      * Constructor.
-				      */
+                                     /**
+                                      * Constructor.
+                                      */
     SolverFGMRES (SolverControl        &cn,
-		  VectorMemory<VECTOR> &mem,
-		  const AdditionalData &data=AdditionalData());
+                  VectorMemory<VECTOR> &mem,
+                  const AdditionalData &data=AdditionalData());
 
-				     /**
-				      * Constructor. Use an object of
-				      * type GrowingVectorMemory as
-				      * a default to allocate memory.
-				      */
+                                     /**
+                                      * Constructor. Use an object of
+                                      * type GrowingVectorMemory as
+                                      * a default to allocate memory.
+                                      */
     SolverFGMRES (SolverControl        &cn,
-		  const AdditionalData &data=AdditionalData());
+                  const AdditionalData &data=AdditionalData());
 
-				     /**
-				      * Solve the linear system $Ax=b$
-				      * for x.
-				      */
+                                     /**
+                                      * Solve the linear system $Ax=b$
+                                      * for x.
+                                      */
     template<class MATRIX, class PRECONDITIONER>
     void
     solve (const MATRIX         &A,
-	   VECTOR               &x,
-	   const VECTOR         &b,
-	   const PRECONDITIONER &precondition);
+           VECTOR               &x,
+           const VECTOR         &b,
+           const PRECONDITIONER &precondition);
 
   private:
                                      /**
-				      * Additional flags.
-				      */
+                                      * Additional flags.
+                                      */
     AdditionalData additional_data;
-				     /**
-				      * Projected system matrix
-				      */
+                                     /**
+                                      * Projected system matrix
+                                      */
     FullMatrix<double> H;
-				     /**
-				      * Auxiliary matrix for inverting @p H
-				      */
+                                     /**
+                                      * Auxiliary matrix for inverting @p H
+                                      */
     FullMatrix<double> H1;
 };
 
@@ -398,11 +398,11 @@ namespace internal
     inline
     TmpVectors<VECTOR>::
     TmpVectors (const unsigned int    max_size,
-		VectorMemory<VECTOR> &vmem)
-		    :
-		    mem(vmem),
-		    data (max_size, 0),
-		    offset(0)
+                VectorMemory<VECTOR> &vmem)
+                    :
+                    mem(vmem),
+                    data (max_size, 0),
+                    offset(0)
     {}
 
 
@@ -411,9 +411,9 @@ namespace internal
     TmpVectors<VECTOR>::~TmpVectors ()
     {
       for (typename std::vector<VECTOR*>::iterator v = data.begin();
-	   v != data.end(); ++v)
-	if (*v != 0)
-	  mem.free(*v);
+           v != data.end(); ++v)
+        if (*v != 0)
+          mem.free(*v);
     }
 
 
@@ -422,7 +422,7 @@ namespace internal
     TmpVectors<VECTOR>::operator[] (const unsigned int i) const
     {
       Assert (i+offset<data.size(),
-	      ExcIndexRange(i, -offset, data.size()-offset));
+              ExcIndexRange(i, -offset, data.size()-offset));
 
       Assert (data[i-offset] != 0, ExcNotInitialized());
       return *data[i-offset];
@@ -432,15 +432,15 @@ namespace internal
     template <class VECTOR>
     inline VECTOR&
     TmpVectors<VECTOR>::operator() (const unsigned int i,
-				    const VECTOR      &temp)
+                                    const VECTOR      &temp)
     {
       Assert (i+offset<data.size(),
-	      ExcIndexRange(i,-offset, data.size()-offset));
+              ExcIndexRange(i,-offset, data.size()-offset));
       if (data[i-offset] == 0)
-	{
-	  data[i-offset] = mem.alloc();
-	  data[i-offset]->reinit(temp);
-	}
+        {
+          data[i-offset] = mem.alloc();
+          data[i-offset]->reinit(temp);
+        }
       return *data[i-offset];
     }
   }
@@ -465,9 +465,9 @@ template <class VECTOR>
 SolverGMRES<VECTOR>::SolverGMRES (SolverControl        &cn,
                                   VectorMemory<VECTOR> &mem,
                                   const AdditionalData &data)
-		:
-		Solver<VECTOR> (cn,mem),
-		additional_data(data)
+                :
+                Solver<VECTOR> (cn,mem),
+                additional_data(data)
 {}
 
 
@@ -475,8 +475,8 @@ SolverGMRES<VECTOR>::SolverGMRES (SolverControl        &cn,
 template <class VECTOR>
 SolverGMRES<VECTOR>::SolverGMRES (SolverControl        &cn,
                                   const AdditionalData &data) :
-		Solver<VECTOR> (cn),
-		additional_data(data)
+                Solver<VECTOR> (cn),
+                additional_data(data)
 {}
 
 
@@ -485,10 +485,10 @@ template <class VECTOR>
 inline
 void
 SolverGMRES<VECTOR>::givens_rotation (Vector<double> &h,
-				      Vector<double> &b,
-				      Vector<double> &ci,
-				      Vector<double> &si,
-				      int     col) const
+                                      Vector<double> &b,
+                                      Vector<double> &ci,
+                                      Vector<double> &si,
+                                      int     col) const
 {
   for (int i=0 ; i<col ; i++)
     {
@@ -513,16 +513,16 @@ template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 void
 SolverGMRES<VECTOR>::solve (const MATRIX         &A,
-			    VECTOR               &x,
-			    const VECTOR         &b,
-			    const PRECONDITIONER &precondition)
+                            VECTOR               &x,
+                            const VECTOR         &b,
+                            const PRECONDITIONER &precondition)
 {
-				   // this code was written a very
-				   // long time ago by people not
-				   // associated with deal.II. we
-				   // don't make any guarantees to its
-				   // optimality or that it even works
-				   // as expected...
+                                   // this code was written a very
+                                   // long time ago by people not
+                                   // associated with deal.II. we
+                                   // don't make any guarantees to its
+                                   // optimality or that it even works
+                                   // as expected...
 
 //TODO:[?] Check, why there are two different start residuals.
 //TODO:[GK] Make sure the parameter in the constructor means maximum basis size
@@ -530,21 +530,21 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
   deallog.push("GMRES");
   const unsigned int n_tmp_vectors = additional_data.max_n_tmp_vectors;
 
-				   // Generate an object where basis
-				   // vectors are stored.
+                                   // Generate an object where basis
+                                   // vectors are stored.
   internal::SolverGMRES::TmpVectors<VECTOR> tmp_vectors (n_tmp_vectors, this->memory);
 
-				   // number of the present iteration; this
-				   // number is not reset to zero upon a
-				   // restart
+                                   // number of the present iteration; this
+                                   // number is not reset to zero upon a
+                                   // restart
   unsigned int accumulated_iterations = 0;
 
-				   // matrix used for the orthogonalization
-				   // process later
+                                   // matrix used for the orthogonalization
+                                   // process later
   H.reinit(n_tmp_vectors, n_tmp_vectors-1);
 
-				   // some additional vectors, also used
-				   // in the orthogonalization
+                                   // some additional vectors, also used
+                                   // in the orthogonalization
   dealii::Vector<double>
     gamma(n_tmp_vectors),
     ci   (n_tmp_vectors-1),
@@ -556,26 +556,26 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
   SolverControl::State iteration_state = SolverControl::iterate;
 
-				   // switch to determine whether we want a
-				   // left or a right preconditioner. at
-				   // present, left is default, but both
-				   // ways are implemented
+                                   // switch to determine whether we want a
+                                   // left or a right preconditioner. at
+                                   // present, left is default, but both
+                                   // ways are implemented
   const bool left_precondition = !additional_data.right_preconditioning;
-				   // Per default the left
-				   // preconditioned GMRes uses the
-				   // preconditioned residual and the
-				   // right preconditioned GMRes uses
-				   // the unpreconditioned residual as
-				   // stopping criterion.
+                                   // Per default the left
+                                   // preconditioned GMRes uses the
+                                   // preconditioned residual and the
+                                   // right preconditioned GMRes uses
+                                   // the unpreconditioned residual as
+                                   // stopping criterion.
   const bool use_default_residual = additional_data.use_default_residual;
 
-				   // define two aliases
+                                   // define two aliases
   VECTOR &v = tmp_vectors(0, x);
   VECTOR &p = tmp_vectors(n_tmp_vectors-1, x);
 
-				   // Following vectors are needed
-				   // when not the default residuals
-				   // are used as stopping criterion
+                                   // Following vectors are needed
+                                   // when not the default residuals
+                                   // are used as stopping criterion
   VECTOR *r=0;
   VECTOR *x_=0;
   dealii::Vector<double> *gamma_=0;
@@ -590,214 +590,214 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
     }
 
                                    ///////////////////////////////////
-				   // outer iteration: loop until we
-				   // either reach convergence or the
-				   // maximum number of iterations is
-				   // exceeded. each cycle of this
-				   // loop amounts to one restart
+                                   // outer iteration: loop until we
+                                   // either reach convergence or the
+                                   // maximum number of iterations is
+                                   // exceeded. each cycle of this
+                                   // loop amounts to one restart
   do
     {
-				       // reset this vector to the
-				       // right size
+                                       // reset this vector to the
+                                       // right size
       h.reinit (n_tmp_vectors-1);
 
       if (left_precondition)
-	{
-	  A.vmult(p,x);
-	  p.sadd(-1.,1.,b);
-	  precondition.vmult(v,p);
-	}
+        {
+          A.vmult(p,x);
+          p.sadd(-1.,1.,b);
+          precondition.vmult(v,p);
+        }
       else
-	{
-	  A.vmult(v,x);
-	  v.sadd(-1.,1.,b);
-	};
+        {
+          A.vmult(v,x);
+          v.sadd(-1.,1.,b);
+        };
 
       double rho = v.l2_norm();
 
-				       // check the residual here as
-				       // well since it may be that we
-				       // got the exact (or an almost
-				       // exact) solution vector at
-				       // the outset. if we wouldn't
-				       // check here, the next scaling
-				       // operation would produce
-				       // garbage
+                                       // check the residual here as
+                                       // well since it may be that we
+                                       // got the exact (or an almost
+                                       // exact) solution vector at
+                                       // the outset. if we wouldn't
+                                       // check here, the next scaling
+                                       // operation would produce
+                                       // garbage
       if (use_default_residual)
-	{
-	  iteration_state = this->control().check (
-	    accumulated_iterations, rho);
+        {
+          iteration_state = this->control().check (
+            accumulated_iterations, rho);
 
-	  if (iteration_state != SolverControl::iterate)
-	    break;
-	}
+          if (iteration_state != SolverControl::iterate)
+            break;
+        }
       else
-	{
-	  deallog << "default_res=" << rho << std::endl;
+        {
+          deallog << "default_res=" << rho << std::endl;
 
-	  if (left_precondition)
-	    {
-	      A.vmult(*r,x);
-	      r->sadd(-1.,1.,b);
-	    }
-	  else
-	    precondition.vmult(*r,v);
+          if (left_precondition)
+            {
+              A.vmult(*r,x);
+              r->sadd(-1.,1.,b);
+            }
+          else
+            precondition.vmult(*r,v);
 
-	  double res = r->l2_norm();
-	  iteration_state = this->control().check (
-	    accumulated_iterations, res);
+          double res = r->l2_norm();
+          iteration_state = this->control().check (
+            accumulated_iterations, res);
 
-	  if (iteration_state != SolverControl::iterate)
-	    {
-	      this->memory.free(r);
-	      this->memory.free(x_);
+          if (iteration_state != SolverControl::iterate)
+            {
+              this->memory.free(r);
+              this->memory.free(x_);
 
-	      delete gamma_;
-	      break;
-	    }
-	}
+              delete gamma_;
+              break;
+            }
+        }
 
       gamma(0) = rho;
 
       v *= 1./rho;
 
-				       // inner iteration doing at
-				       // most as many steps as there
-				       // are temporary vectors. the
-				       // number of steps actually
-				       // been done is propagated
-				       // outside through the @p dim
-				       // variable
+                                       // inner iteration doing at
+                                       // most as many steps as there
+                                       // are temporary vectors. the
+                                       // number of steps actually
+                                       // been done is propagated
+                                       // outside through the @p dim
+                                       // variable
       for (unsigned int inner_iteration=0;
-	   ((inner_iteration < n_tmp_vectors-2)
-	    &&
-	    (iteration_state==SolverControl::iterate));
-	   ++inner_iteration)
-	{
-	  ++accumulated_iterations;
-	  // yet another alias
-	  VECTOR& vv = tmp_vectors(inner_iteration+1, x);
+           ((inner_iteration < n_tmp_vectors-2)
+            &&
+            (iteration_state==SolverControl::iterate));
+           ++inner_iteration)
+        {
+          ++accumulated_iterations;
+          // yet another alias
+          VECTOR& vv = tmp_vectors(inner_iteration+1, x);
 
-	  if (left_precondition)
-	    {
-	      A.vmult(p, tmp_vectors[inner_iteration]);
-	      precondition.vmult(vv,p);
-	    } else {
-	      precondition.vmult(p, tmp_vectors[inner_iteration]);
-	      A.vmult(vv,p);
-	    };
+          if (left_precondition)
+            {
+              A.vmult(p, tmp_vectors[inner_iteration]);
+              precondition.vmult(vv,p);
+            } else {
+              precondition.vmult(p, tmp_vectors[inner_iteration]);
+              A.vmult(vv,p);
+            };
 
-	  dim = inner_iteration+1;
+          dim = inner_iteration+1;
 
-					   /* Orthogonalization */
-	  for (unsigned int i=0 ; i<dim ; ++i)
-	    {
-	      h(i) = vv * tmp_vectors[i];
-	      vv.add(-h(i), tmp_vectors[i]);
-	    };
+                                           /* Orthogonalization */
+          for (unsigned int i=0 ; i<dim ; ++i)
+            {
+              h(i) = vv * tmp_vectors[i];
+              vv.add(-h(i), tmp_vectors[i]);
+            };
 
-	  				   /* Re-orthogonalization */
-	  for (unsigned int i=0 ; i<dim ; ++i)
-	    {
-	      double htmp = vv * tmp_vectors[i];
-	      h(i) += htmp;
-	      vv.add(-htmp, tmp_vectors[i]);
-	    }
+                                           /* Re-orthogonalization */
+          for (unsigned int i=0 ; i<dim ; ++i)
+            {
+              double htmp = vv * tmp_vectors[i];
+              h(i) += htmp;
+              vv.add(-htmp, tmp_vectors[i]);
+            }
 
-	  const double s = vv.l2_norm();
-	  h(inner_iteration+1) = s;
+          const double s = vv.l2_norm();
+          h(inner_iteration+1) = s;
 //TODO: s=0 is a lucky breakdown. Handle this somehow decently
 
-	  vv *= 1./s;
+          vv *= 1./s;
 
-					   /*  Transformation into
-					       triagonal structure  */
-	  givens_rotation(h,gamma,ci,si,inner_iteration);
+                                           /*  Transformation into
+                                               triagonal structure  */
+          givens_rotation(h,gamma,ci,si,inner_iteration);
 
-					   /*  append vector on matrix  */
-	  for (unsigned int i=0; i<dim; ++i)
-	    H(i,inner_iteration) = h(i);
+                                           /*  append vector on matrix  */
+          for (unsigned int i=0; i<dim; ++i)
+            H(i,inner_iteration) = h(i);
 
-					   /*  default residual  */
-	  rho = std::fabs(gamma(dim));
+                                           /*  default residual  */
+          rho = std::fabs(gamma(dim));
 
-	  if (use_default_residual)
-	    iteration_state = this->control().check (
-	      accumulated_iterations, rho);
-  	  else
-  	    {
-	      deallog << "default_res=" << rho << std::endl;
+          if (use_default_residual)
+            iteration_state = this->control().check (
+              accumulated_iterations, rho);
+          else
+            {
+              deallog << "default_res=" << rho << std::endl;
 
-	      dealii::Vector<double> h_(dim);
-	      *x_=x;
-	      *gamma_=gamma;
-	      H1.reinit(dim+1,dim);
+              dealii::Vector<double> h_(dim);
+              *x_=x;
+              *gamma_=gamma;
+              H1.reinit(dim+1,dim);
 
-	      for (unsigned int i=0; i<dim+1; ++i)
-		for (unsigned int j=0; j<dim; ++j)
-		  H1(i,j) = H(i,j);
+              for (unsigned int i=0; i<dim+1; ++i)
+                for (unsigned int j=0; j<dim; ++j)
+                  H1(i,j) = H(i,j);
 
-	      H1.backward(h_,*gamma_);
+              H1.backward(h_,*gamma_);
 
-	      if (left_precondition)
-		for (unsigned int i=0 ; i<dim; ++i)
-		  x_->add(h_(i), tmp_vectors[i]);
-	      else
-		{
-		  p = 0.;
-		  for (unsigned int i=0; i<dim; ++i)
-		    p.add(h_(i), tmp_vectors[i]);
-		  precondition.vmult(*r,p);
-		  x_->add(1.,*r);
-		};
-	      A.vmult(*r,*x_);
-	      r->sadd(-1.,1.,b);
-					       // Now *r contains the
-					       // unpreconditioned
-					       // residual!!
-	      if (left_precondition)
-		{
-		  const double res=r->l2_norm();
+              if (left_precondition)
+                for (unsigned int i=0 ; i<dim; ++i)
+                  x_->add(h_(i), tmp_vectors[i]);
+              else
+                {
+                  p = 0.;
+                  for (unsigned int i=0; i<dim; ++i)
+                    p.add(h_(i), tmp_vectors[i]);
+                  precondition.vmult(*r,p);
+                  x_->add(1.,*r);
+                };
+              A.vmult(*r,*x_);
+              r->sadd(-1.,1.,b);
+                                               // Now *r contains the
+                                               // unpreconditioned
+                                               // residual!!
+              if (left_precondition)
+                {
+                  const double res=r->l2_norm();
 
-		  iteration_state = this->control().check (
-		    accumulated_iterations, res);
-		}
-	      else
-		{
-		  precondition.vmult(*x_, *r);
-		  const double preconditioned_res=x_->l2_norm();
+                  iteration_state = this->control().check (
+                    accumulated_iterations, res);
+                }
+              else
+                {
+                  precondition.vmult(*x_, *r);
+                  const double preconditioned_res=x_->l2_norm();
 
-		  iteration_state = this->control().check (
-		    accumulated_iterations, preconditioned_res);
-		}
-  	    }
-	};
-				       // end of inner iteration. now
-				       // calculate the solution from
-				       // the temporary vectors
+                  iteration_state = this->control().check (
+                    accumulated_iterations, preconditioned_res);
+                }
+            }
+        };
+                                       // end of inner iteration. now
+                                       // calculate the solution from
+                                       // the temporary vectors
       h.reinit(dim);
       H1.reinit(dim+1,dim);
 
       for (unsigned int i=0; i<dim+1; ++i)
-	for (unsigned int j=0; j<dim; ++j)
-	  H1(i,j) = H(i,j);
+        for (unsigned int j=0; j<dim; ++j)
+          H1(i,j) = H(i,j);
 
       H1.backward(h,gamma);
 
       if (left_precondition)
-	for (unsigned int i=0 ; i<dim; ++i)
-	  x.add(h(i), tmp_vectors[i]);
+        for (unsigned int i=0 ; i<dim; ++i)
+          x.add(h(i), tmp_vectors[i]);
       else
-	{
-	  p = 0.;
-	  for (unsigned int i=0; i<dim; ++i)
-	    p.add(h(i), tmp_vectors[i]);
-	  precondition.vmult(v,p);
-	  x.add(1.,v);
-	};
-				       // end of outer iteration. restart if
-				       // no convergence and the number of
-				       // iterations is not exceeded
+        {
+          p = 0.;
+          for (unsigned int i=0; i<dim; ++i)
+            p.add(h(i), tmp_vectors[i]);
+          precondition.vmult(v,p);
+          x.add(1.,v);
+        };
+                                       // end of outer iteration. restart if
+                                       // no convergence and the number of
+                                       // iterations is not exceeded
     }
   while (iteration_state == SolverControl::iterate);
 
@@ -810,12 +810,12 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
     }
 
   deallog.pop();
-				   // in case of failure: throw
-				   // exception
+                                   // in case of failure: throw
+                                   // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
-					this->control().last_value());
-				   // otherwise exit as normal
+                                        this->control().last_value());
+                                   // otherwise exit as normal
 }
 
 
@@ -824,9 +824,9 @@ template<class VECTOR>
 double
 SolverGMRES<VECTOR>::criterion ()
 {
-				   // dummy implementation. this function is
-				   // not needed for the present implementation
-				   // of gmres
+                                   // dummy implementation. this function is
+                                   // not needed for the present implementation
+                                   // of gmres
   Assert (false, ExcInternalError());
   return 0;
 }
@@ -836,21 +836,21 @@ SolverGMRES<VECTOR>::criterion ()
 
 template <class VECTOR>
 SolverFGMRES<VECTOR>::SolverFGMRES (SolverControl        &cn,
-				    VectorMemory<VECTOR> &mem,
-				    const AdditionalData &data)
-		:
-		Solver<VECTOR> (cn, mem),
-		additional_data(data)
+                                    VectorMemory<VECTOR> &mem,
+                                    const AdditionalData &data)
+                :
+                Solver<VECTOR> (cn, mem),
+                additional_data(data)
 {}
 
 
 
 template <class VECTOR>
 SolverFGMRES<VECTOR>::SolverFGMRES (SolverControl        &cn,
-				    const AdditionalData &data)
-		:
-		Solver<VECTOR> (cn),
-		additional_data(data)
+                                    const AdditionalData &data)
+                :
+                Solver<VECTOR> (cn),
+                additional_data(data)
 {}
 
 
@@ -870,21 +870,21 @@ SolverFGMRES<VECTOR>::solve (
 
   const unsigned int basis_size = additional_data.max_basis_size;
 
-				   // Generate an object where basis
-				   // vectors are stored.
+                                   // Generate an object where basis
+                                   // vectors are stored.
   typename internal::SolverGMRES::TmpVectors<VECTOR> v (basis_size, this->memory);
   typename internal::SolverGMRES::TmpVectors<VECTOR> z (basis_size, this->memory);
 
-				   // number of the present iteration; this
-				   // number is not reset to zero upon a
-				   // restart
+                                   // number of the present iteration; this
+                                   // number is not reset to zero upon a
+                                   // restart
   unsigned int accumulated_iterations = 0;
 
-				   // matrix used for the orthogonalization
-				   // process later
+                                   // matrix used for the orthogonalization
+                                   // process later
   H.reinit(basis_size+1, basis_size);
 
-				   // Vectors for projected system
+                                   // Vectors for projected system
   Vector<double> projected_rhs;
   Vector<double> y;
 
@@ -899,57 +899,57 @@ SolverFGMRES<VECTOR>::solve (
 
       double beta = aux->l2_norm();
       if (this->control().check(accumulated_iterations,beta)
-	  == SolverControl::success)
-	break;
+          == SolverControl::success)
+        break;
 
       H.reinit(basis_size+1, basis_size);
       double a = beta;
 
       for (unsigned int j=0;j<basis_size;++j)
-	{
-	  v(j,x).equ(1./a, *aux);
+        {
+          v(j,x).equ(1./a, *aux);
 
-	  precondition.vmult(z(j,x), v[j]);
-	  A.vmult(*aux, z[j]);
+          precondition.vmult(z(j,x), v[j]);
+          A.vmult(*aux, z[j]);
 
-					   // Gram-Schmidt
-	  for (unsigned int i=0;i<=j;++i)
-	    {
-	      H(i,j) = *aux * v[i];
-	      aux->add(-H(i,j), v[i]);
-	    }
-	  H(j+1,j) = a = aux->l2_norm();
+                                           // Gram-Schmidt
+          for (unsigned int i=0;i<=j;++i)
+            {
+              H(i,j) = *aux * v[i];
+              aux->add(-H(i,j), v[i]);
+            }
+          H(j+1,j) = a = aux->l2_norm();
 
-					   // Compute projected solution
+                                           // Compute projected solution
 
-	  if (j>0)
-	    {
-	      H1.reinit(j+1,j);
-	      projected_rhs.reinit(j+1);
-	      y.reinit(j);
-	      projected_rhs(0) = beta;
-	      H1.fill(H);
-	      Householder<double> house(H1);
-	      double res = house.least_squares(y, projected_rhs);
-	      iteration_state = this->control().check(++accumulated_iterations, res);
-	      if (iteration_state != SolverControl::iterate)
-		break;
-	    }
-	}
-				       // Update solution vector
+          if (j>0)
+            {
+              H1.reinit(j+1,j);
+              projected_rhs.reinit(j+1);
+              y.reinit(j);
+              projected_rhs(0) = beta;
+              H1.fill(H);
+              Householder<double> house(H1);
+              double res = house.least_squares(y, projected_rhs);
+              iteration_state = this->control().check(++accumulated_iterations, res);
+              if (iteration_state != SolverControl::iterate)
+                break;
+            }
+        }
+                                       // Update solution vector
       for (unsigned int j=0;j<y.size();++j)
-	x.add(y(j), z[j]);
+        x.add(y(j), z[j]);
 
     } while (iteration_state == SolverControl::iterate);
 
   this->memory.free(aux);
 
   deallog.pop();
-				   // in case of failure: throw
-				   // exception
+                                   // in case of failure: throw
+                                   // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
-					this->control().last_value());
+                                        this->control().last_value());
 }
 
 #endif // DOXYGEN

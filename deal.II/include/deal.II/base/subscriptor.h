@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,205 +52,205 @@ DEAL_II_NAMESPACE_OPEN
 class Subscriptor
 {
   public:
-				     /**
-				      * Constructor setting the counter to zero.
-				      */
+                                     /**
+                                      * Constructor setting the counter to zero.
+                                      */
     Subscriptor();
 
-				     /**
-				      * Copy-constructor.
-				      *
-				      * The counter of the copy is zero,
-				      * since references point to the
-				      * original object.
-				      */
+                                     /**
+                                      * Copy-constructor.
+                                      *
+                                      * The counter of the copy is zero,
+                                      * since references point to the
+                                      * original object.
+                                      */
     Subscriptor(const Subscriptor&);
 
-				     /**
-				      * Destructor, asserting that the counter
-				      * is zero.
-				      */
+                                     /**
+                                      * Destructor, asserting that the counter
+                                      * is zero.
+                                      */
     virtual ~Subscriptor();
 
-				     /**
-				      * Assignment operator.
-				      *
-				      * This has to be handled with
-				      * care, too, because the counter
-				      * has to remain the same. It therefore
-				      * does nothing more than returning
-				      * <tt>*this</tt>.
-				      */
+                                     /**
+                                      * Assignment operator.
+                                      *
+                                      * This has to be handled with
+                                      * care, too, because the counter
+                                      * has to remain the same. It therefore
+                                      * does nothing more than returning
+                                      * <tt>*this</tt>.
+                                      */
     Subscriptor& operator = (const Subscriptor&);
 
-				     /**
-				      * Subscribes a user of the
-				      * object. The subscriber may be
-				      * identified by text supplied as
-				      * <tt>identifier</tt>.
-				      */
+                                     /**
+                                      * Subscribes a user of the
+                                      * object. The subscriber may be
+                                      * identified by text supplied as
+                                      * <tt>identifier</tt>.
+                                      */
     void subscribe (const char* identifier = 0) const;
 
-				     /**
-				      * Unsubscribes a user from the
-				      * object.
-				      *
-				      * @note The <tt>identifier</tt>
-				      * must be the <b>same
-				      * pointer</b> as the one
-				      * supplied to subscribe(), not
-				      * just the same text.
-				      */
+                                     /**
+                                      * Unsubscribes a user from the
+                                      * object.
+                                      *
+                                      * @note The <tt>identifier</tt>
+                                      * must be the <b>same
+                                      * pointer</b> as the one
+                                      * supplied to subscribe(), not
+                                      * just the same text.
+                                      */
     void unsubscribe (const char* identifier = 0) const;
 
-				     /**
-				      * Return the present number of
-				      * subscriptions to this object.
-				      * This allows to use this class
-				      * for reference counted lifetime
-				      * determination where the last one
-				      * to unsubscribe also deletes the
-				      * object.
-				      */
+                                     /**
+                                      * Return the present number of
+                                      * subscriptions to this object.
+                                      * This allows to use this class
+                                      * for reference counted lifetime
+                                      * determination where the last one
+                                      * to unsubscribe also deletes the
+                                      * object.
+                                      */
     unsigned int n_subscriptions () const;
 
-				     /**
-				      * List the subscribers to #deallog.
-				      */
+                                     /**
+                                      * List the subscribers to #deallog.
+                                      */
     void list_subscribers () const;
 
-    				     /** @addtogroup Exceptions
-				      * @{ */
+                                     /** @addtogroup Exceptions
+                                      * @{ */
 
-				     /**
-				      * Exception:
-				      * Object may not be deleted, since
-				      * it is used.
-				      */
+                                     /**
+                                      * Exception:
+                                      * Object may not be deleted, since
+                                      * it is used.
+                                      */
     DeclException3(ExcInUse,
-		   int, char*, std::string &,
-		   << "Object of class " << arg2
-		   << " is still used by " << arg1 << " other objects."
-		   << arg3);
+                   int, char*, std::string &,
+                   << "Object of class " << arg2
+                   << " is still used by " << arg1 << " other objects."
+                   << arg3);
 
-				     /**
-				      * A subscriber with the
-				      * identification string given to
-				      * Subscriptor::unsubscribe() did
-				      * not subscribe to the object.
-				      */
+                                     /**
+                                      * A subscriber with the
+                                      * identification string given to
+                                      * Subscriptor::unsubscribe() did
+                                      * not subscribe to the object.
+                                      */
     DeclException2(ExcNoSubscriber, char*, char*,
-		   << "No subscriber with identifier \"" << arg2
-		   << "\" did subscribe to this object of class " << arg1);
-				     //@}
+                   << "No subscriber with identifier \"" << arg2
+                   << "\" did subscribe to this object of class " << arg1);
+                                     //@}
 
-				     /**
-				      * Read or write the data of this
-				      * object to or from a stream for
-				      * the purpose of serialization.
-				      *
-				      * This function does not
-				      * actually serialize any of the
-				      * member variables of this
-				      * class. The reason is that what
-				      * this class stores is only who
-				      * subscribes to this object, but
-				      * who does so at the time of
-				      * storing the contents of this
-				      * object does not necessarily
-				      * have anything to do with who
-				      * subscribes to the object when
-				      * it is restored. Consequently,
-				      * we do not want to overwrite
-				      * the subscribers at the time of
-				      * restoring, and then there is
-				      * no reason to write the
-				      * subscribers out in the first
-				      * place.
-				      */
+                                     /**
+                                      * Read or write the data of this
+                                      * object to or from a stream for
+                                      * the purpose of serialization.
+                                      *
+                                      * This function does not
+                                      * actually serialize any of the
+                                      * member variables of this
+                                      * class. The reason is that what
+                                      * this class stores is only who
+                                      * subscribes to this object, but
+                                      * who does so at the time of
+                                      * storing the contents of this
+                                      * object does not necessarily
+                                      * have anything to do with who
+                                      * subscribes to the object when
+                                      * it is restored. Consequently,
+                                      * we do not want to overwrite
+                                      * the subscribers at the time of
+                                      * restoring, and then there is
+                                      * no reason to write the
+                                      * subscribers out in the first
+                                      * place.
+                                      */
     template <class Archive>
     void serialize(Archive & ar, const unsigned int version);
 
   private:
-				     /**
-				      * Register a subscriber for
-				      * debugging purposes. Called by
-				      * subscribe() in debug mode.
-				      */
+                                     /**
+                                      * Register a subscriber for
+                                      * debugging purposes. Called by
+                                      * subscribe() in debug mode.
+                                      */
     void do_subscribe(const char* id) const;
 
-				     /**
-				      * Deregister a subscriber for
-				      * debugging purposes. Called by
-				      * unsubscribe() in debug mode.
-				      */
+                                     /**
+                                      * Deregister a subscriber for
+                                      * debugging purposes. Called by
+                                      * unsubscribe() in debug mode.
+                                      */
     void do_unsubscribe(const char* id) const;
 
-				     /**
-				      * The data type used in
-				      * #counter_map.
-				      */
+                                     /**
+                                      * The data type used in
+                                      * #counter_map.
+                                      */
     typedef std::map<const char*, unsigned int>::value_type
     map_value_type;
 
-				     /**
-				      * The iterator type used in
-				      * #counter_map.
-				      */
+                                     /**
+                                      * The iterator type used in
+                                      * #counter_map.
+                                      */
     typedef std::map<const char*, unsigned int>::iterator
     map_iterator;
 
-    				     /**
-				      * Store the number of objects
-				      * which subscribed to this
-				      * object. Initialally, this
-				      * number is zero, and upon
-				      * destruction it shall be zero
-				      * again (i.e. all objects which
-				      * subscribed should have
-				      * unsubscribed again).
-				      *
-				      * The creator (and owner) of an
-				      * object is counted in the map
-				      * below if HE manages to supply
-				      * identification.
-				      *
-				      * We use the <tt>mutable</tt> keyword
-				      * in order to allow subscription
-				      * to constant objects also.
-				      *
-				      * In multithreaded mode, this
-				      * counter may be modified by
-				      * different threads. We thus
-				      * have to mark it
-				      * <tt>volatile</tt>. However, this is
-				      * counter-productive in non-MT
-				      * mode since it may pessimize
-				      * code. So use the macro
-				      * defined above to selectively
-				      * add volatility.
-				      */
+                                     /**
+                                      * Store the number of objects
+                                      * which subscribed to this
+                                      * object. Initialally, this
+                                      * number is zero, and upon
+                                      * destruction it shall be zero
+                                      * again (i.e. all objects which
+                                      * subscribed should have
+                                      * unsubscribed again).
+                                      *
+                                      * The creator (and owner) of an
+                                      * object is counted in the map
+                                      * below if HE manages to supply
+                                      * identification.
+                                      *
+                                      * We use the <tt>mutable</tt> keyword
+                                      * in order to allow subscription
+                                      * to constant objects also.
+                                      *
+                                      * In multithreaded mode, this
+                                      * counter may be modified by
+                                      * different threads. We thus
+                                      * have to mark it
+                                      * <tt>volatile</tt>. However, this is
+                                      * counter-productive in non-MT
+                                      * mode since it may pessimize
+                                      * code. So use the macro
+                                      * defined above to selectively
+                                      * add volatility.
+                                      */
     mutable DEAL_VOLATILE unsigned int counter;
 
-				     /**
-				      * In this map, we count
-				      * subscriptions for each
-				      * different identification string
-				      * supplied to subscribe().
-				      */
+                                     /**
+                                      * In this map, we count
+                                      * subscriptions for each
+                                      * different identification string
+                                      * supplied to subscribe().
+                                      */
     mutable std::map<const char*, unsigned int> counter_map;
 
-				     /**
-				      * Pointer to the typeinfo object
-				      * of this object, from which we
-				      * can later deduce the class
-				      * name. Since this information
-				      * on the derived class is
-				      * neither available in the
-				      * destructor, nor in the
-				      * constructor, we obtain it in
-				      * between and store it here.
-				      */
+                                     /**
+                                      * Pointer to the typeinfo object
+                                      * of this object, from which we
+                                      * can later deduce the class
+                                      * name. Since this information
+                                      * on the derived class is
+                                      * neither available in the
+                                      * destructor, nor in the
+                                      * constructor, we obtain it in
+                                      * between and store it here.
+                                      */
     mutable const std::type_info * object_info;
 };
 
@@ -260,10 +260,10 @@ template <class Archive>
 inline
 void
 Subscriptor::serialize(Archive &,
-		       const unsigned int)
+                       const unsigned int)
 {
-				   // do nothing, as explained in the
-				   // documentation of this function
+                                   // do nothing, as explained in the
+                                   // documentation of this function
 }
 
 // If we are in optimized mode, the subscription checking is turned

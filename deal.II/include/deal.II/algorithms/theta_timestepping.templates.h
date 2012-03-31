@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by Guido Kanschat
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012 by Guido Kanschat
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,7 @@ namespace Algorithms
 {
   template <class VECTOR>
   ThetaTimestepping<VECTOR>::ThetaTimestepping (Operator<VECTOR>& e, Operator<VECTOR>& i)
-		  : vtheta(0.5), adaptive(false), op_explicit(&e), op_implicit(&i)
+                  : vtheta(0.5), adaptive(false), op_explicit(&e), op_implicit(&i)
   {}
 
 
@@ -71,9 +71,9 @@ namespace Algorithms
 
     d_explicit.time = control.now();
 
-				     // The data used to compute the
-				     // vector associated with the old
-				     // timestep
+                                     // The data used to compute the
+                                     // vector associated with the old
+                                     // timestep
     VECTOR* p = out(0);
     NamedData<VECTOR*> src1;
     src1.add(p, "Previous iterate");
@@ -85,8 +85,8 @@ namespace Algorithms
     p = aux;
     NamedData<VECTOR*> out1;
     out1.add(p, "Result");
-				     // The data provided to the inner
-				     // solver
+                                     // The data provided to the inner
+                                     // solver
     src2.add(p, "Previous time");
     src2.merge(in);
 
@@ -95,29 +95,29 @@ namespace Algorithms
 
     for (unsigned int count = 1; d_explicit.time < control.final(); ++count)
       {
-	const bool step_change = control.advance();
-	d_implicit.time = control.now();
-	d_explicit.step = (1.-vtheta)*control.step();
-	d_implicit.step = vtheta*control.step();
-	deallog << "Time step:" << d_implicit.time << std::endl;
+        const bool step_change = control.advance();
+        d_implicit.time = control.now();
+        d_explicit.step = (1.-vtheta)*control.step();
+        d_implicit.step = vtheta*control.step();
+        deallog << "Time step:" << d_implicit.time << std::endl;
 
-	op_explicit->notify(Events::new_time);
-	op_implicit->notify(Events::new_time);
-	if (step_change)
-	  {
-	    op_explicit->notify(Events::new_timestep_size);
-	    op_implicit->notify(Events::new_timestep_size);
-	  }
+        op_explicit->notify(Events::new_time);
+        op_implicit->notify(Events::new_time);
+        if (step_change)
+          {
+            op_explicit->notify(Events::new_timestep_size);
+            op_implicit->notify(Events::new_timestep_size);
+          }
 
-					 // Compute
-					 // (I + (1-theta)dt A) u
-	(*op_explicit)(out1, src1);
-	(*op_implicit)(out, src2);
+                                         // Compute
+                                         // (I + (1-theta)dt A) u
+        (*op_explicit)(out1, src1);
+        (*op_implicit)(out, src2);
 
-	if (output != 0 && control.print())
-	  (*output) << count << out;
+        if (output != 0 && control.print())
+          (*output) << count << out;
 
-	d_explicit.time = control.now();
+        d_explicit.time = control.now();
       }
     deallog.pop();
   }

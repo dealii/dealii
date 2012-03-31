@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,8 +30,8 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace Functions
 {
-  
-  
+
+
 /**
  * The distance to the origin squared.
  *
@@ -47,30 +47,30 @@ namespace Functions
   {
     public:
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;      
+                            const unsigned int  component = 0) const;
       virtual void vector_value (const Point<dim>   &p,
-				 Vector<double>     &values) const;
+                                 Vector<double>     &values) const;
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
+                                      const unsigned int  component = 0) const;
       virtual void vector_gradient (const Point<dim>   &p,
-				    std::vector<Tensor<1,dim> >    &gradient) const;
+                                    std::vector<Tensor<1,dim> >    &gradient) const;
       virtual void gradient_list (const std::vector<Point<dim> > &points,
-				  std::vector<Tensor<1,dim> >    &gradients,
-				  const unsigned int              component = 0) const;
+                                  std::vector<Tensor<1,dim> >    &gradients,
+                                  const unsigned int              component = 0) const;
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
+                                const unsigned int  component = 0) const;
       virtual void laplacian_list (const std::vector<Point<dim> > &points,
-				   std::vector<double>            &values,
-				   const unsigned int              component = 0) const;
+                                   std::vector<double>            &values,
+                                   const unsigned int              component = 0) const;
   };
-  
-  
-  
+
+
+
 /**
- * The function <tt>xy</tt> in 2d and 3d, not implemented in 1d. 
+ * The function <tt>xy</tt> in 2d and 3d, not implemented in 1d.
  * This function serves as an example for
  * a vanishing Laplacian.
  *
@@ -82,41 +82,41 @@ namespace Functions
   {
     public:
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
+                            const unsigned int  component = 0) const;
+
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
-      
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
+
       virtual void vector_value_list (const std::vector<Point<dim> >& points,
-				      std::vector<Vector<double> >& values) const;
-      
+                                      std::vector<Vector<double> >& values) const;
+
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int       component = 0) const;
-      
+                                      const unsigned int       component = 0) const;
+
       virtual void gradient_list (const std::vector<Point<dim> > &points,
-				  std::vector<Tensor<1,dim> >    &gradients,
-				  const unsigned int              component = 0) const;
-      
+                                  std::vector<Tensor<1,dim> >    &gradients,
+                                  const unsigned int              component = 0) const;
+
       virtual void vector_gradient_list (const std::vector<Point<dim> > &,
-					 std::vector<std::vector<Tensor<1,dim> > >&) const;
-      
-				       /**
-					* Laplacian of the function at one point.
-					*/
+                                         std::vector<std::vector<Tensor<1,dim> > >&) const;
+
+                                       /**
+                                        * Laplacian of the function at one point.
+                                        */
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
-      
-				       /**
-					* Laplacian of the function at multiple points.
-					*/
+                                const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Laplacian of the function at multiple points.
+                                        */
       virtual void laplacian_list (const std::vector<Point<dim> > &points,
-				   std::vector<double>            &values,
-				   const unsigned int              component = 0) const;
+                                   std::vector<double>            &values,
+                                   const unsigned int              component = 0) const;
   };
-  
-  
-  
+
+
+
 /**
  * d-quadratic pillow on the unit hypercube.
  *
@@ -136,57 +136,57 @@ namespace Functions
   class PillowFunction : public Function<dim>
   {
     public:
-				       /**
-					* Constructor. Provide a
-					* constant that will be added to
-					* each function value.
-					*/
+                                       /**
+                                        * Constructor. Provide a
+                                        * constant that will be added to
+                                        * each function value.
+                                        */
       PillowFunction (const double offset=0.);
-      
-				       /**
-					* The value at a single point.
-					*/
+
+                                       /**
+                                        * The value at a single point.
+                                        */
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Values at multiple points.
-					*/
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Values at multiple points.
+                                        */
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
-      
-				       /**
-					* Gradient at a single point.
-					*/
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
+
+                                       /**
+                                        * Gradient at a single point.
+                                        */
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
-      
-				       /**
-					* Gradients at multiple points.
-					*/
+                                      const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Gradients at multiple points.
+                                        */
       virtual void gradient_list (const std::vector<Point<dim> > &points,
-				  std::vector<Tensor<1,dim> >    &gradients,
-				  const unsigned int              component = 0) const;
-      
-				       /**
-					* Laplacian at a single point.
-					*/
+                                  std::vector<Tensor<1,dim> >    &gradients,
+                                  const unsigned int              component = 0) const;
+
+                                       /**
+                                        * Laplacian at a single point.
+                                        */
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
-      
-				       /**
-					* Laplacian at multiple points.
-					*/
+                                const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Laplacian at multiple points.
+                                        */
       virtual void laplacian_list (const std::vector<Point<dim> > &points,
-				   std::vector<double>            &values,
-				   const unsigned int              component = 0) const;
+                                   std::vector<double>            &values,
+                                   const unsigned int              component = 0) const;
     private:
       const double offset;
   };
-  
-  
-  
+
+
+
 /**
  * Cosine-shaped pillow function.
  * This is another function with zero boundary values on $[-1,1]^d$. In the interior
@@ -199,57 +199,57 @@ namespace Functions
   class CosineFunction : public Function<dim>
   {
     public:
-				       /**
-					* Constructor which allows to
-					* optionally generate a vector
-					* valued cosine function with
-					* the same value in each
-					* component.
-					*/
+                                       /**
+                                        * Constructor which allows to
+                                        * optionally generate a vector
+                                        * valued cosine function with
+                                        * the same value in each
+                                        * component.
+                                        */
       CosineFunction (const unsigned int n_components = 1);
-      
+
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
+                            const unsigned int  component = 0) const;
+
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
-      
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
+
       virtual void vector_value_list (const std::vector<Point<dim> >& points,
-				      std::vector<Vector<double> >& values) const;
-      
+                                      std::vector<Vector<double> >& values) const;
+
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
-      
+                                      const unsigned int  component = 0) const;
+
       virtual void gradient_list (const std::vector<Point<dim> > &points,
-				  std::vector<Tensor<1,dim> >    &gradients,
-				  const unsigned int              component = 0) const;
-      
+                                  std::vector<Tensor<1,dim> >    &gradients,
+                                  const unsigned int              component = 0) const;
+
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
-      
+                                const unsigned int  component = 0) const;
+
       virtual void laplacian_list (const std::vector<Point<dim> > &points,
-				   std::vector<double>            &values,
-				   const unsigned int              component = 0) const;
-      
-				       /**
-					* Second derivatives at a
-					* single point.
-					*/
+                                   std::vector<double>            &values,
+                                   const unsigned int              component = 0) const;
+
+                                       /**
+                                        * Second derivatives at a
+                                        * single point.
+                                        */
       virtual Tensor<2,dim> hessian (const Point<dim>   &p,
-				     const unsigned int  component = 0) const;
-      
-				       /**
-					* Second derivatives at
-					* multiple points.
-					*/
+                                     const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Second derivatives at
+                                        * multiple points.
+                                        */
       virtual void hessian_list (const std::vector<Point<dim> > &points,
-				 std::vector<Tensor<2,dim> >    &hessians,
-				 const unsigned int              component = 0) const;
+                                 std::vector<Tensor<2,dim> >    &hessians,
+                                 const unsigned int              component = 0) const;
   };
-  
-  
-  
+
+
+
 /**
  * Gradient of the cosine-shaped pillow function.
  *
@@ -266,39 +266,39 @@ namespace Functions
   class CosineGradFunction : public Function<dim>
   {
     public:
-				       /**
-					* Constructor, creating a
-					* function with @p dim components.
-					*/
+                                       /**
+                                        * Constructor, creating a
+                                        * function with @p dim components.
+                                        */
       CosineGradFunction ();
-      
+
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component) const;      
+                            const unsigned int  component) const;
       virtual void vector_value (const Point<dim>   &p,
-				 Vector<double>     &values) const;
+                                 Vector<double>     &values) const;
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component) const;
-      
+                               std::vector<double>            &values,
+                               const unsigned int              component) const;
+
       virtual void vector_value_list (const std::vector<Point<dim> >& points,
-				      std::vector<Vector<double> >& values) const;
-      
+                                      std::vector<Vector<double> >& values) const;
+
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component) const;
-      
+                                      const unsigned int  component) const;
+
       virtual void gradient_list (const std::vector<Point<dim> > &points,
-				  std::vector<Tensor<1,dim> >    &gradients,
-				  const unsigned int              component) const;
-      
+                                  std::vector<Tensor<1,dim> >    &gradients,
+                                  const unsigned int              component) const;
+
       virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
-					 std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
+                                         std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
 
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component) const;
+                                const unsigned int  component) const;
   };
-  
-  
-  
+
+
+
 /**
  * Product of exponential functions in each coordinate direction.
  *
@@ -309,48 +309,48 @@ namespace Functions
   class ExpFunction : public Function<dim>
   {
     public:
-				       /**
-					* The value at a single point.
-					*/
+                                       /**
+                                        * The value at a single point.
+                                        */
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Values at multiple points.
-					*/
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Values at multiple points.
+                                        */
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
-      
-				       /**
-					* Gradient at a single point.
-					*/
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
+
+                                       /**
+                                        * Gradient at a single point.
+                                        */
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
-      
-				       /**
-					* Gradients at multiple points.
-					*/
+                                      const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Gradients at multiple points.
+                                        */
       virtual void gradient_list (const std::vector<Point<dim> > &points,
-				  std::vector<Tensor<1,dim> >    &gradients,
-				  const unsigned int              component = 0) const;
-      
-				       /**
-					* Laplacian at a single point.
-					*/
+                                  std::vector<Tensor<1,dim> >    &gradients,
+                                  const unsigned int              component = 0) const;
+
+                                       /**
+                                        * Laplacian at a single point.
+                                        */
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
-      
-				       /**
-					* Laplacian at multiple points.
-					*/
+                                const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Laplacian at multiple points.
+                                        */
       virtual void laplacian_list (const std::vector<Point<dim> > &points,
-				   std::vector<double>            &values,
-				   const unsigned int              component = 0) const;
+                                   std::vector<double>            &values,
+                                   const unsigned int              component = 0) const;
   };
-  
-  
-  
+
+
+
 /**
  * Harmonic singularity on the L-shaped domain in 2D.
  *
@@ -362,35 +362,35 @@ namespace Functions
   {
     public:
       virtual double value (const Point<2>   &p,
-			    const unsigned int  component = 0) const;
-      
+                            const unsigned int  component = 0) const;
+
       virtual void value_list (const std::vector<Point<2> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
 
       virtual void vector_value_list (const std::vector<Point<2> >& points,
-				      std::vector<Vector<double> >& values) const;
-      
+                                      std::vector<Vector<double> >& values) const;
+
       virtual Tensor<1,2> gradient (const Point<2>     &p,
-				    const unsigned int  component = 0) const;
-      
+                                    const unsigned int  component = 0) const;
+
       virtual void gradient_list (const std::vector<Point<2> > &points,
-				  std::vector<Tensor<1,2> >    &gradients,
-				  const unsigned int            component = 0) const;
-      
+                                  std::vector<Tensor<1,2> >    &gradients,
+                                  const unsigned int            component = 0) const;
+
       virtual void vector_gradient_list (const std::vector<Point<2> > &,
-					 std::vector<std::vector<Tensor<1,2> > >&) const;
-      
+                                         std::vector<std::vector<Tensor<1,2> > >&) const;
+
       virtual double laplacian (const Point<2>   &p,
-				const unsigned int  component = 0) const;
-      
+                                const unsigned int  component = 0) const;
+
       virtual void laplacian_list (const std::vector<Point<2> > &points,
-				   std::vector<double>          &values,
-				   const unsigned int            component = 0) const;
+                                   std::vector<double>          &values,
+                                   const unsigned int            component = 0) const;
   };
-  
-  
-  
+
+
+
 /**
  * Gradient of the harmonic singularity on the L-shaped domain in 2D.
  *
@@ -403,41 +403,41 @@ namespace Functions
   class LSingularityGradFunction : public Function<2>
   {
     public:
-				       /**
-					* Default constructor setting
-					* the dimension to 2.
-					*/
+                                       /**
+                                        * Default constructor setting
+                                        * the dimension to 2.
+                                        */
       LSingularityGradFunction ();
       virtual double value (const Point<2>   &p,
-			    const unsigned int  component) const;
-      
+                            const unsigned int  component) const;
+
       virtual void value_list (const std::vector<Point<2> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component) const;
+                               std::vector<double>            &values,
+                               const unsigned int              component) const;
 
       virtual void vector_value_list (const std::vector<Point<2> >& points,
-				      std::vector<Vector<double> >& values) const;
-      
+                                      std::vector<Vector<double> >& values) const;
+
       virtual Tensor<1,2> gradient (const Point<2>     &p,
-				    const unsigned int  component) const;
-      
+                                    const unsigned int  component) const;
+
       virtual void gradient_list (const std::vector<Point<2> > &points,
-				  std::vector<Tensor<1,2> >    &gradients,
-				  const unsigned int            component) const;
-      
+                                  std::vector<Tensor<1,2> >    &gradients,
+                                  const unsigned int            component) const;
+
       virtual void vector_gradient_list (const std::vector<Point<2> > &,
-					 std::vector<std::vector<Tensor<1,2> > >&) const;
-      
+                                         std::vector<std::vector<Tensor<1,2> > >&) const;
+
       virtual double laplacian (const Point<2>   &p,
-				const unsigned int  component) const;
-      
+                                const unsigned int  component) const;
+
       virtual void laplacian_list (const std::vector<Point<2> > &points,
-				   std::vector<double>          &values,
-				   const unsigned int            component) const;
+                                   std::vector<double>          &values,
+                                   const unsigned int            component) const;
   };
-  
-  
-  
+
+
+
 /**
  * Singularity on the slit domain in 2D and 3D.
  *
@@ -449,34 +449,34 @@ namespace Functions
   {
     public:
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
+                            const unsigned int  component = 0) const;
+
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
-      
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
+
       virtual void vector_value_list (const std::vector<Point<dim> >& points,
-				      std::vector<Vector<double> >& values) const;
-      
+                                      std::vector<Vector<double> >& values) const;
+
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				    const unsigned int  component = 0) const;
-      
+                                    const unsigned int  component = 0) const;
+
       virtual void gradient_list (const std::vector<Point<dim> > &points,
-				  std::vector<Tensor<1,dim> >    &gradients,
-				  const unsigned int            component = 0) const;
-      
+                                  std::vector<Tensor<1,dim> >    &gradients,
+                                  const unsigned int            component = 0) const;
+
       virtual void vector_gradient_list (const std::vector<Point<dim> > &,
-					 std::vector<std::vector<Tensor<1,dim> > >&) const;
-      
+                                         std::vector<std::vector<Tensor<1,dim> > >&) const;
+
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
-      
+                                const unsigned int  component = 0) const;
+
       virtual void laplacian_list (const std::vector<Point<dim> > &points,
-				   std::vector<double>          &values,
-				   const unsigned int            component = 0) const;
+                                   std::vector<double>          &values,
+                                   const unsigned int            component = 0) const;
   };
-  
-  
+
+
 /**
  * Singularity on the slit domain with one Neumann boundary in 2D.
  *
@@ -487,35 +487,35 @@ namespace Functions
   {
     public:
       virtual double value (const Point<2>   &p,
-			    const unsigned int  component = 0) const;
-      
+                            const unsigned int  component = 0) const;
+
       virtual void value_list (const std::vector<Point<2> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
-      
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
+
       virtual void vector_value_list (const std::vector<Point<2> >& points,
-				      std::vector<Vector<double> >& values) const;
-      
+                                      std::vector<Vector<double> >& values) const;
+
       virtual Tensor<1,2> gradient (const Point<2>   &p,
-				    const unsigned int  component = 0) const;
-      
+                                    const unsigned int  component = 0) const;
+
       virtual void gradient_list (const std::vector<Point<2> > &points,
-				  std::vector<Tensor<1,2> >    &gradients,
-				  const unsigned int            component = 0) const;
-      
+                                  std::vector<Tensor<1,2> >    &gradients,
+                                  const unsigned int            component = 0) const;
+
       virtual void vector_gradient_list (const std::vector<Point<2> > &,
-					 std::vector<std::vector<Tensor<1,2> > >&) const;
-      
+                                         std::vector<std::vector<Tensor<1,2> > >&) const;
+
       virtual double laplacian (const Point<2>   &p,
-				const unsigned int  component = 0) const;
-      
+                                const unsigned int  component = 0) const;
+
       virtual void laplacian_list (const std::vector<Point<2> > &points,
-				   std::vector<double>          &values,
-				   const unsigned int            component = 0) const;
+                                   std::vector<double>          &values,
+                                   const unsigned int            component = 0) const;
   };
 
-  
-  
+
+
 /**
  * A jump in x-direction transported into some direction.
  *
@@ -535,102 +535,102 @@ namespace Functions
   class JumpFunction : public Function<dim>
   {
     public:
-				       /**
-					* Constructor. Provide the
-					* advection direction here and
-					* the steepness of the slope.
-					*/
+                                       /**
+                                        * Constructor. Provide the
+                                        * advection direction here and
+                                        * the steepness of the slope.
+                                        */
       JumpFunction (const Point<dim> &direction,
-		    const double      steepness);
-      
-				       /**
-					* Function value at one point.
-					*/
+                    const double      steepness);
+
+                                       /**
+                                        * Function value at one point.
+                                        */
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Function values at multiple
-					* points.
-					*/
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Function values at multiple
+                                        * points.
+                                        */
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
-      
-				       /**
-					* Gradient at one point.
-					*/
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
+
+                                       /**
+                                        * Gradient at one point.
+                                        */
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
-      
-				       /**
-					  Gradients at multiple points.
-				       */
+                                      const unsigned int  component = 0) const;
+
+                                       /**
+                                          Gradients at multiple points.
+                                       */
       virtual void gradient_list (const std::vector<Point<dim> > &points,
-				  std::vector<Tensor<1,dim> >    &gradients,
-				  const unsigned int              component = 0) const;
-      
-				       /**
-					* Laplacian of the function at one point.
-					*/
+                                  std::vector<Tensor<1,dim> >    &gradients,
+                                  const unsigned int              component = 0) const;
+
+                                       /**
+                                        * Laplacian of the function at one point.
+                                        */
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
-      
-				       /**
-					* Laplacian of the function at multiple points.
-					*/
+                                const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Laplacian of the function at multiple points.
+                                        */
       virtual void laplacian_list (const std::vector<Point<dim> > &points,
-				   std::vector<double>            &values,
-				   const unsigned int              component = 0) const;
-      
-				       /**
-					* Determine an estimate for
-					* the memory consumption (in
-					* bytes) of this
-					* object. Since sometimes
-					* the size of objects can
-					* not be determined exactly
-					* (for example: what is the
-					* memory consumption of an
-					* STL <tt>std::map</tt> type with a
-					* certain number of
-					* elements?), this is only
-					* an estimate. however often
-					* quite close to the true
-					* value.
-					*/
+                                   std::vector<double>            &values,
+                                   const unsigned int              component = 0) const;
+
+                                       /**
+                                        * Determine an estimate for
+                                        * the memory consumption (in
+                                        * bytes) of this
+                                        * object. Since sometimes
+                                        * the size of objects can
+                                        * not be determined exactly
+                                        * (for example: what is the
+                                        * memory consumption of an
+                                        * STL <tt>std::map</tt> type with a
+                                        * certain number of
+                                        * elements?), this is only
+                                        * an estimate. however often
+                                        * quite close to the true
+                                        * value.
+                                        */
       std::size_t memory_consumption () const;
-      
+
     protected:
-				       /**
-					* Advection vector.
-					*/
+                                       /**
+                                        * Advection vector.
+                                        */
       const Point<dim> direction;
-      
-				       /**
-					* Steepness (maximal derivative)
-					* of the slope.
-					*/
+
+                                       /**
+                                        * Steepness (maximal derivative)
+                                        * of the slope.
+                                        */
       const double steepness;
-      
-				       /**
-					* Advection angle.
-					*/
+
+                                       /**
+                                        * Advection angle.
+                                        */
       double angle;
-      
-				       /**
-					* Sine of <tt>angle</tt>.
-					*/
+
+                                       /**
+                                        * Sine of <tt>angle</tt>.
+                                        */
       double sine;
-      
-				       /**
-					* Cosine of <tt>angle</tt>.
-					*/
+
+                                       /**
+                                        * Cosine of <tt>angle</tt>.
+                                        */
       double cosine;
   };
-  
-  
-  
+
+
+
 /**
  * Given a wavenumber vector generate a cosine function. The
  * wavenumber coefficient is given as a $d$-dimensional point $k$
@@ -644,53 +644,53 @@ namespace Functions
  * @author Wolfgang Bangerth, 2001
  */
   template <int dim>
-  class FourierCosineFunction : public Function<dim> 
+  class FourierCosineFunction : public Function<dim>
   {
     public:
-				       /**
-					* Constructor. Take the Fourier
-					* coefficients in each space
-					* direction as argument.
-					*/
+                                       /**
+                                        * Constructor. Take the Fourier
+                                        * coefficients in each space
+                                        * direction as argument.
+                                        */
       FourierCosineFunction (const Point<dim> &fourier_coefficients);
-      
-				       /**
-					* Return the value of the
-					* function at the given
-					* point. Unless there is only
-					* one component (i.e. the
-					* function is scalar), you
-					* should state the component you
-					* want to have evaluated; it
-					* defaults to zero, i.e. the
-					* first component.
-					*/
+
+                                       /**
+                                        * Return the value of the
+                                        * function at the given
+                                        * point. Unless there is only
+                                        * one component (i.e. the
+                                        * function is scalar), you
+                                        * should state the component you
+                                        * want to have evaluated; it
+                                        * defaults to zero, i.e. the
+                                        * first component.
+                                        */
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Return the gradient of the
-					* specified component of the
-					* function at the given point.
-					*/
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Return the gradient of the
+                                        * specified component of the
+                                        * function at the given point.
+                                        */
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
-      
-				       /**
-					* Compute the Laplacian of a
-					* given component at point <tt>p</tt>.
-					*/
+                                      const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Compute the Laplacian of a
+                                        * given component at point <tt>p</tt>.
+                                        */
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
+                                const unsigned int  component = 0) const;
     private:
-				       /**
-					* Stored Fourier coefficients.
-					*/
+                                       /**
+                                        * Stored Fourier coefficients.
+                                        */
       const Point<dim> fourier_coefficients;
   };
-  
-  
-  
+
+
+
 /**
  * Given a wavenumber vector generate a sine function. The
  * wavenumber coefficient is given as a $d$-dimensional point $k$
@@ -704,51 +704,51 @@ namespace Functions
  * @author Wolfgang Bangerth, 2001
  */
   template <int dim>
-  class FourierSineFunction : public Function<dim> 
+  class FourierSineFunction : public Function<dim>
   {
     public:
-				       /**
-					* Constructor. Take the Fourier
-					* coefficients in each space
-					* direction as argument.
-					*/
+                                       /**
+                                        * Constructor. Take the Fourier
+                                        * coefficients in each space
+                                        * direction as argument.
+                                        */
       FourierSineFunction (const Point<dim> &fourier_coefficients);
-      
-				       /**
-					* Return the value of the
-					* function at the given
-					* point. Unless there is only
-					* one component (i.e. the
-					* function is scalar), you
-					* should state the component you
-					* want to have evaluated; it
-					* defaults to zero, i.e. the
-					* first component.
-					*/
+
+                                       /**
+                                        * Return the value of the
+                                        * function at the given
+                                        * point. Unless there is only
+                                        * one component (i.e. the
+                                        * function is scalar), you
+                                        * should state the component you
+                                        * want to have evaluated; it
+                                        * defaults to zero, i.e. the
+                                        * first component.
+                                        */
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Return the gradient of the
-					* specified component of the
-					* function at the given point.
-					*/
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Return the gradient of the
+                                        * specified component of the
+                                        * function at the given point.
+                                        */
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
-      
-				       /**
-					* Compute the Laplacian of a
-					* given component at point <tt>p</tt>.
-					*/
+                                      const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Compute the Laplacian of a
+                                        * given component at point <tt>p</tt>.
+                                        */
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
+                                const unsigned int  component = 0) const;
     private:
-				       /**
-					* Stored Fourier coefficients.
-					*/
+                                       /**
+                                        * Stored Fourier coefficients.
+                                        */
       const Point<dim> fourier_coefficients;
   };
-  
+
 
 /**
  * Given a sequence of wavenumber vectors and weights generate a sum
@@ -761,50 +761,50 @@ namespace Functions
  * @author Wolfgang Bangerth, 2001
  */
   template <int dim>
-  class FourierSineSum : public Function<dim> 
+  class FourierSineSum : public Function<dim>
   {
     public:
-				       /**
-					* Constructor. Take the Fourier
-					* coefficients in each space
-					* direction as argument.
-					*/
+                                       /**
+                                        * Constructor. Take the Fourier
+                                        * coefficients in each space
+                                        * direction as argument.
+                                        */
       FourierSineSum (const std::vector<Point<dim> > &fourier_coefficients,
-		      const std::vector<double>      &weights);
-      
-				       /**
-					* Return the value of the
-					* function at the given
-					* point. Unless there is only
-					* one component (i.e. the
-					* function is scalar), you
-					* should state the component you
-					* want to have evaluated; it
-					* defaults to zero, i.e. the
-					* first component.
-					*/
+                      const std::vector<double>      &weights);
+
+                                       /**
+                                        * Return the value of the
+                                        * function at the given
+                                        * point. Unless there is only
+                                        * one component (i.e. the
+                                        * function is scalar), you
+                                        * should state the component you
+                                        * want to have evaluated; it
+                                        * defaults to zero, i.e. the
+                                        * first component.
+                                        */
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Return the gradient of the
-					* specified component of the
-					* function at the given point.
-					*/
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Return the gradient of the
+                                        * specified component of the
+                                        * function at the given point.
+                                        */
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
-      
-				       /**
-					* Compute the Laplacian of a
-					* given component at point <tt>p</tt>.
-					*/
+                                      const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Compute the Laplacian of a
+                                        * given component at point <tt>p</tt>.
+                                        */
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
+                                const unsigned int  component = 0) const;
     private:
-				       /**
-					* Stored Fourier coefficients
-					* and weights.
-					*/
+                                       /**
+                                        * Stored Fourier coefficients
+                                        * and weights.
+                                        */
       const std::vector<Point<dim> > fourier_coefficients;
       const std::vector<double>      weights;
   };
@@ -822,51 +822,51 @@ namespace Functions
  * @author Wolfgang Bangerth, 2001
  */
   template <int dim>
-  class FourierCosineSum : public Function<dim> 
+  class FourierCosineSum : public Function<dim>
   {
     public:
-				       /**
-					* Constructor. Take the Fourier
-					* coefficients in each space
-					* direction as argument.
-					*/
+                                       /**
+                                        * Constructor. Take the Fourier
+                                        * coefficients in each space
+                                        * direction as argument.
+                                        */
       FourierCosineSum (const std::vector<Point<dim> > &fourier_coefficients,
-			const std::vector<double>      &weights);
-      
-				       /**
-					* Return the value of the
-					* function at the given
-					* point. Unless there is only
-					* one component (i.e. the
-					* function is scalar), you
-					* should state the component you
-					* want to have evaluated; it
-					* defaults to zero, i.e. the
-					* first component.
-					*/
+                        const std::vector<double>      &weights);
+
+                                       /**
+                                        * Return the value of the
+                                        * function at the given
+                                        * point. Unless there is only
+                                        * one component (i.e. the
+                                        * function is scalar), you
+                                        * should state the component you
+                                        * want to have evaluated; it
+                                        * defaults to zero, i.e. the
+                                        * first component.
+                                        */
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Return the gradient of the
-					* specified component of the
-					* function at the given point.
-					*/
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Return the gradient of the
+                                        * specified component of the
+                                        * function at the given point.
+                                        */
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
-      
-				       /**
-					* Compute the Laplacian of a
-					* given component at point <tt>p</tt>.
-					*/
+                                      const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Compute the Laplacian of a
+                                        * given component at point <tt>p</tt>.
+                                        */
       virtual double laplacian (const Point<dim>   &p,
-				const unsigned int  component = 0) const;
+                                const unsigned int  component = 0) const;
 
     private:
-				       /**
-					* Stored Fourier coefficients
-					* and weights.
-					*/
+                                       /**
+                                        * Stored Fourier coefficients
+                                        * and weights.
+                                        */
       const std::vector<Point<dim> > fourier_coefficients;
       const std::vector<double>      weights;
   };
@@ -885,63 +885,63 @@ namespace Functions
   class CutOffFunctionBase : public Function<dim>
   {
     public:
-				       /**
-					* Value used in the
-					* constructor of this and
-					* derived classes to denote
-					* that no component is
-					* selected.
-					*/
+                                       /**
+                                        * Value used in the
+                                        * constructor of this and
+                                        * derived classes to denote
+                                        * that no component is
+                                        * selected.
+                                        */
       static const unsigned int no_component = numbers::invalid_unsigned_int;
 
-  				       /**
-					* Constructor. Arguments are the
-					* center of the ball and its
-					* radius.
-					*
-					* If an argument <tt>select</tt> is
-					* given and not -1, the
-					* cut-off function will be
-					* non-zero for this component
-					* only.
-					*/
+                                       /**
+                                        * Constructor. Arguments are the
+                                        * center of the ball and its
+                                        * radius.
+                                        *
+                                        * If an argument <tt>select</tt> is
+                                        * given and not -1, the
+                                        * cut-off function will be
+                                        * non-zero for this component
+                                        * only.
+                                        */
       CutOffFunctionBase (const double radius = 1.,
-			  const Point<dim> = Point<dim>(),
-			  const unsigned int n_components = 1,
-			  const unsigned int select = CutOffFunctionBase<dim>::no_component);
-      
-				       /**
-					* Move the center of the ball
-					* to new point <tt>p</tt>.
-					*/
+                          const Point<dim> = Point<dim>(),
+                          const unsigned int n_components = 1,
+                          const unsigned int select = CutOffFunctionBase<dim>::no_component);
+
+                                       /**
+                                        * Move the center of the ball
+                                        * to new point <tt>p</tt>.
+                                        */
       void new_center (const Point<dim>& p);
-      
-				       /**
-					* Set the radius of the ball to <tt>r</tt>.
-					*/
+
+                                       /**
+                                        * Set the radius of the ball to <tt>r</tt>.
+                                        */
       void new_radius (const double r);
 
     protected:
-      				       /**
-					* Center of the integration ball.
-					*/
+                                       /**
+                                        * Center of the integration ball.
+                                        */
       Point<dim> center;
 
-				       /**
-					* Radius of the ball.
-					*/
+                                       /**
+                                        * Radius of the ball.
+                                        */
       double radius;
 
-				       /**
-					* Component selected. If
-					* <tt>no_component</tt>, the function is
-					* the same in all components.
-					*/
+                                       /**
+                                        * Component selected. If
+                                        * <tt>no_component</tt>, the function is
+                                        * the same in all components.
+                                        */
       const unsigned int selected;
   };
-  
-  
-  
+
+
+
 /**
  * Cut-off function in L-infinity for an arbitrary ball.  This
  * function is the characteristic function of a ball around <tt>center</tt>
@@ -959,43 +959,43 @@ namespace Functions
   class CutOffFunctionLinfty : public CutOffFunctionBase<dim>
   {
     public:
-				       /**
-					* Constructor. Arguments are the
-					* center of the ball and its
-					* radius.
-					*
-					* If an argument <tt>select</tt> is
-					* given and not -1, the
-					* cut-off function will be
-					* non-zero for this component
-					* only.
-					*/
+                                       /**
+                                        * Constructor. Arguments are the
+                                        * center of the ball and its
+                                        * radius.
+                                        *
+                                        * If an argument <tt>select</tt> is
+                                        * given and not -1, the
+                                        * cut-off function will be
+                                        * non-zero for this component
+                                        * only.
+                                        */
       CutOffFunctionLinfty (const double radius = 1.,
-			    const Point<dim> = Point<dim>(),
-			    const unsigned int n_components = 1,
-			    const unsigned int select = CutOffFunctionBase<dim>::no_component);
-    
-				       /**
-					* Function value at one point.
-					*/
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Function values at multiple points.
-					*/
-      virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
+                            const Point<dim> = Point<dim>(),
+                            const unsigned int n_components = 1,
+                            const unsigned int select = CutOffFunctionBase<dim>::no_component);
 
-				       /**
-					* Function values at multiple points.
-					*/
+                                       /**
+                                        * Function value at one point.
+                                        */
+      virtual double value (const Point<dim>   &p,
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Function values at multiple points.
+                                        */
+      virtual void value_list (const std::vector<Point<dim> > &points,
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
+
+                                       /**
+                                        * Function values at multiple points.
+                                        */
       virtual void vector_value_list (const std::vector<Point<dim> > &points,
-				      std::vector<Vector<double> >           &values) const;
+                                      std::vector<Vector<double> >           &values) const;
   };
-  
-  
+
+
 /**
  * Cut-off function for an arbitrary ball. This function is a cone
  * with support in a ball of certain <tt>radius</tt> around <tt>center</tt>. The
@@ -1009,43 +1009,43 @@ namespace Functions
   class CutOffFunctionW1 : public CutOffFunctionBase<dim>
   {
     public:
-				       /**
-					* Constructor. Arguments are the
-					* center of the ball and its
-					* radius.
-					* radius.
-					*
-					* If an argument <tt>select</tt> is
-					* given, the cut-off function
-					* will be non-zero for this
-					* component only.
-					*/
+                                       /**
+                                        * Constructor. Arguments are the
+                                        * center of the ball and its
+                                        * radius.
+                                        * radius.
+                                        *
+                                        * If an argument <tt>select</tt> is
+                                        * given, the cut-off function
+                                        * will be non-zero for this
+                                        * component only.
+                                        */
       CutOffFunctionW1 (const double radius = 1.,
-			const Point<dim> = Point<dim>(),
-			const unsigned int n_components = 1,
-			const unsigned int select = CutOffFunctionBase<dim>::no_component);
-    
-				       /**
-					* Function value at one point.
-					*/
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Function values at multiple points.
-					*/
-      virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
+                        const Point<dim> = Point<dim>(),
+                        const unsigned int n_components = 1,
+                        const unsigned int select = CutOffFunctionBase<dim>::no_component);
 
-				       /**
-					* Function values at multiple points.
-					*/
+                                       /**
+                                        * Function value at one point.
+                                        */
+      virtual double value (const Point<dim>   &p,
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Function values at multiple points.
+                                        */
+      virtual void value_list (const std::vector<Point<dim> > &points,
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
+
+                                       /**
+                                        * Function values at multiple points.
+                                        */
       virtual void vector_value_list (const std::vector<Point<dim> > &points,
-				      std::vector<Vector<double> >           &values) const;
+                                      std::vector<Vector<double> >           &values) const;
   };
-  
-  
+
+
 /**
  * Cut-off function for an arbitrary ball. This is the traditional
  * cut-off function in C-infinity for a ball of certain <tt>radius</tt>
@@ -1060,46 +1060,46 @@ namespace Functions
   class CutOffFunctionCinfty : public CutOffFunctionBase<dim>
   {
     public:
-				       /**
-					* Constructor. Arguments are the
-					* center of the ball and its
-					* radius.
-					* radius.
-					*
-					* If an argument <tt>select</tt> is
-					* given, the cut-off function
-					* will be non-zero for this
-					* component only.
-					*/
+                                       /**
+                                        * Constructor. Arguments are the
+                                        * center of the ball and its
+                                        * radius.
+                                        * radius.
+                                        *
+                                        * If an argument <tt>select</tt> is
+                                        * given, the cut-off function
+                                        * will be non-zero for this
+                                        * component only.
+                                        */
       CutOffFunctionCinfty (const double radius = 1.,
-			    const Point<dim> = Point<dim>(),
-			    const unsigned int n_components = 1,
-			    const unsigned int select = CutOffFunctionBase<dim>::no_component);
-    
-				       /**
-					* Function value at one point.
-					*/
+                            const Point<dim> = Point<dim>(),
+                            const unsigned int n_components = 1,
+                            const unsigned int select = CutOffFunctionBase<dim>::no_component);
+
+                                       /**
+                                        * Function value at one point.
+                                        */
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Function values at multiple points.
-					*/
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Function values at multiple points.
+                                        */
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
 
-				       /**
-					* Function values at multiple points.
-					*/
+                                       /**
+                                        * Function values at multiple points.
+                                        */
       virtual void vector_value_list (const std::vector<Point<dim> > &points,
-				      std::vector<Vector<double> >           &values) const;
+                                      std::vector<Vector<double> >           &values) const;
 
-				       /**
-					* Function gradient at one point.
-					*/
+                                       /**
+                                        * Function gradient at one point.
+                                        */
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
+                                      const unsigned int  component = 0) const;
   };
 
 
@@ -1120,56 +1120,56 @@ namespace Functions
   class Monomial : public Function<dim>
   {
     public:
-				       /**
-					* Constructor. The first argument is
-					* explained in the general description
-					* of the class. The second argument
-					* denotes the number of vector
-					* components this object shall
-					* represent. All vector components
-					* will have the same value.
-					*/
+                                       /**
+                                        * Constructor. The first argument is
+                                        * explained in the general description
+                                        * of the class. The second argument
+                                        * denotes the number of vector
+                                        * components this object shall
+                                        * represent. All vector components
+                                        * will have the same value.
+                                        */
       Monomial (const Tensor<1,dim> &exponents,
-		const unsigned int n_components = 1);
-    
-				       /**
-					* Function value at one point.
-					*/
+                const unsigned int n_components = 1);
+
+                                       /**
+                                        * Function value at one point.
+                                        */
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Return all components of a
-					* vector-valued function at a
-					* given point.
-					*
-					* <tt>values</tt> shall have the right
-					* size beforehand,
-					* i.e. #n_components.
-					*/
+                            const unsigned int  component = 0) const;
+
+                                       /**
+                                        * Return all components of a
+                                        * vector-valued function at a
+                                        * given point.
+                                        *
+                                        * <tt>values</tt> shall have the right
+                                        * size beforehand,
+                                        * i.e. #n_components.
+                                        */
       virtual void vector_value (const Point<dim>   &p,
-				 Vector<double>     &values) const;
+                                 Vector<double>     &values) const;
 
-				       /**
-					* Function values at multiple points.
-					*/
+                                       /**
+                                        * Function values at multiple points.
+                                        */
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
 
-				       /**
-					* Function gradient at one point.
-					*/
+                                       /**
+                                        * Function gradient at one point.
+                                        */
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
+                                      const unsigned int  component = 0) const;
 
     private:
-				       /**
-					* The set of exponents.
-					*/
+                                       /**
+                                        * The set of exponents.
+                                        */
       const Tensor<1,dim> exponents;
   };
-  
+
 }
 DEAL_II_NAMESPACE_CLOSE
 

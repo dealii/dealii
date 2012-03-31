@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,12 +26,12 @@ template <int, int> class MGDoFHandler;
 
 
 namespace internal
-{  
+{
   namespace DoFHandler
   {
-    
 
-/**    
+
+/**
  *
  * <h4>DoFLevel@<0@></h4>
  *
@@ -100,17 +100,17 @@ namespace internal
     class DoFLevel<0>
     {
       public:
-					 /**
-					  * Cache for the DoF indices
-					  * on cells. The size of this
-					  * array equals the number of
-					  * cells on a given level
-					  * times
-					  * selected_fe.dofs_per_cell.
-					  */
-	std::vector<unsigned int> cell_dof_indices_cache;
+                                         /**
+                                          * Cache for the DoF indices
+                                          * on cells. The size of this
+                                          * array equals the number of
+                                          * cells on a given level
+                                          * times
+                                          * selected_fe.dofs_per_cell.
+                                          */
+        std::vector<unsigned int> cell_dof_indices_cache;
 
-        
+
                                          /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
@@ -118,15 +118,15 @@ namespace internal
                                           */
         std::size_t memory_consumption () const;
 
-	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
     };
-    
+
 /**
  * Store the indices of the degrees of freedom which are located on
  * lines. See the general template DoFLevel for more information.
@@ -139,24 +139,24 @@ namespace internal
       public:
                                          /**
                                           * The object containing dof-indices
-					  * and related access-functions
-					  */
-	DoFObjects<1> lines;
+                                          * and related access-functions
+                                          */
+        DoFObjects<1> lines;
 
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
 
-      	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
     };
 
 
@@ -172,24 +172,24 @@ namespace internal
       public:
                                          /**
                                           * The object containing dof-indices
-					  * and related access-functions
-					  */
-	internal::DoFHandler::DoFObjects<2> quads;
+                                          * and related access-functions
+                                          */
+        internal::DoFHandler::DoFObjects<2> quads;
 
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
-	
-	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);
+
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
     };
 
 
@@ -205,62 +205,62 @@ namespace internal
       public:
                                          /**
                                           * The object containing dof-indices
-					  * and related access-functions
-					  */
-	internal::DoFHandler::DoFObjects<3> hexes;
-	
-					 /**
+                                          * and related access-functions
+                                          */
+        internal::DoFHandler::DoFObjects<3> hexes;
+
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
-    
-	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);      
+
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
     };
 
-    
-    
+
+
     template <class Archive>
     void DoFLevel<0>::serialize (Archive &ar,
-				 const unsigned int)
+                                 const unsigned int)
     {
       ar & cell_dof_indices_cache;
     }
-    
 
-    
+
+
     template <class Archive>
     void DoFLevel<1>::serialize (Archive &ar,
-				 const unsigned int version)
+                                 const unsigned int version)
     {
       this->DoFLevel<0>::serialize (ar, version);
       ar & lines;
-    }    
+    }
 
-    
+
     template <class Archive>
     void DoFLevel<2>::serialize (Archive &ar,
-				 const unsigned int version)
+                                 const unsigned int version)
     {
       this->DoFLevel<0>::serialize (ar, version);
       ar & quads;
     }
 
-    
+
     template <class Archive>
     void DoFLevel<3>::serialize (Archive &ar,
-				 const unsigned int version)
+                                 const unsigned int version)
     {
       this->DoFLevel<0>::serialize (ar, version);
       ar & hexes;
-    }    
+    }
   }
 }
 
