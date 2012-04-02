@@ -426,7 +426,7 @@ namespace EquationData
 	// return_value = 0.032 + data->dicke - input_copy->mikro_height (p(0) + shift_walze_x, p(1) + shift_walze_y, p(2));
 
 	// Ball with radius R
-	double R = 0.2;
+	double R = 0.5;
 	if (std::pow ((p(0)-1.0/2.0), 2) + std::pow ((p(1)-1.0/2.0), 2) < R*R)
 	  return_value = 1.0 + R - 0.001 - sqrt (R*R  - std::pow ((p(0)-1.0/2.0), 2)
 						 - std::pow ((p(1)-1.0/2.0), 2));
@@ -464,7 +464,7 @@ Step4<dim>::Step4 ()
   pcout (std::cout,
 	 (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
   sigma_0 (400),
-  gamma (2000),
+  gamma (1.e-2),
   e_modul (2.e5),
   nu (0.3)
 {
@@ -493,7 +493,7 @@ void Step4<dim>::make_grid ()
            /  9    /|
           /______ / |
         8|       | 8|
-         |   7   | /
+         |   8   | /
          |_______|/
              6
    */
@@ -504,11 +504,10 @@ void Step4<dim>::make_grid ()
 	if (cell->face (face)->center ()[2] == p2(2))
 	  cell->face (face)->set_boundary_indicator (9);
 	if (cell->face (face)->center ()[0] == p1(0) ||
-	    cell->face (face)->center ()[0] == p2(0))
-	  cell->face (face)->set_boundary_indicator (8);
-	if (cell->face (face)->center ()[1] == p1(1) ||
+	    cell->face (face)->center ()[0] == p2(0) ||
+	    cell->face (face)->center ()[1] == p1(1) ||
 	    cell->face (face)->center ()[1] == p2(1))
-	  cell->face (face)->set_boundary_indicator (7);
+	  cell->face (face)->set_boundary_indicator (8);
 	if (cell->face (face)->center ()[2] == p1(2))
 	  cell->face (face)->set_boundary_indicator (6);
       }  
@@ -531,20 +530,6 @@ void Step4<dim>::make_grid ()
          {
 	   if (cell->face (face)->at_boundary()
 	       && cell->face (face)->boundary_indicator () == 9)
-	     // Verfeinerung fuer Dortmund
-	//      if(// Einschraenkung in x-Richtung linker Rand
-	// 	cell->face (face)->vertex (0)[0] <= 0.7 &&//p2(0)*0.5+0.4 - 0.4*hlp_refinement &&
-	// 	// Einschraenkung in x-Richtung rechter Rand
-	// 	cell->face (face)->vertex (1)[0] >= 0.3 &&//p2(0)*0.5-0.3 + 0.2*hlp_refinement && 
-	// 	// Einschraenkung in y-Richtung oberer Rand
-	// cell->face (face)->vertex (0)[1] <= 0.875 &&//p2(1)-0.6 + 0.4*hlp_refinement)
-	// 	// Einschraenkung in y-Richtung unterer Rand
-	// 	cell->face (face)->vertex (2)[1] >= 0.125)
-	//        {
-	// 	 cell->set_refine_flag ();
-	// 	 break;
-	//        }
-	   // Verfeinerung TKSE
 	     {
 	       cell->set_refine_flag ();
 	       break;
@@ -555,8 +540,6 @@ void Step4<dim>::make_grid ()
 	       break;
 	     }
         };
-
-      // Markierte Zellen werden verfeinert
       triangulation.execute_coarsening_and_refinement ();
     };
 }
@@ -763,16 +746,10 @@ void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u)
 		
 		// the residual part F(v) of the rhs
 		Tensor<1,dim> rhs_values;
-		rhs_values = 0;//right_hand_side_values[q_point](0);
-		//rhs_values[1] = 0;//right_hand_side_values[q_point](1);
+		rhs_values = 0;
 		cell_rhs(i) += (fe_values[displacement].value (i, q_point) *
 				rhs_values *
 				fe_values.JxW (q_point));
-		
-		// 	      if (i == 7)
-		// 	      	std::cout<< i << ". " << stress_tensor//->get_strain(fe_values, i, q_point)
-		// 	                 << ", " << stress_strain_tensor_linearized
-		// 	      		 <<std::endl;
 	      }
 	  }
 	
@@ -789,10 +766,7 @@ void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u)
 		for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
 		  {
 		    Tensor<1,dim> rhs_values;
-		    rhs_values[0] = right_hand_side_values_face[q_point](0);
-		    rhs_values[1] = right_hand_side_values_face[q_point](1);
-		    rhs_values[2] = right_hand_side_values_face[q_point](2);
-		    
+		    rhs_values = 0;		    
 		    for (unsigned int i=0; i<dofs_per_cell; ++i)
 		      cell_rhs(i) += (fe_values_face[displacement].value (i, q_point) *
 				      rhs_values *
@@ -809,19 +783,6 @@ void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u)
   
   system_matrix_newton.compress ();
   system_rhs_newton.compress ();
-
-  // for (unsigned int i=0; i<solution.size (); ++i)
-  // {
-  //   for (unsigned int j=0; j<solution.size (); ++j)
-  //     if (system_matrix_newton (j,i))
-  // if (constraints.is_inhomogeneously_constrained (i))
-  //     {
-  // 	std::cout<< ", " <<  system_matrix_newton (j,i);
-  // 	std::cout<< i << ". " << constraints.get_inhomogeneity (i)
-  // 		 << ", " << system_rhs_newton (i)
-  // 		 <<std::endl;
-  // }
-  // }
 }
 
 template <int dim>
@@ -897,12 +858,11 @@ void Step4<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
 				plast_lin_hard->get_strain(fe_values, i, q_point) *
 				fe_values.JxW (q_point));
 		
-		/*	    Tensor<1,dim> rhs_values;
-			    rhs_values[0] = right_hand_side_values[q_point](0);
-			    rhs_values[1] = right_hand_side_values[q_point](1);
-			    cell_rhs(i) += ((fe_values[displacement].value (i, q_point) *
-			    rhs_values) *
-	      		    fe_values.JxW (q_point));*/	   
+		Tensor<1,dim> rhs_values;
+		rhs_values = 0;
+		cell_rhs(i) += ((fe_values[displacement].value (i, q_point) *
+				 rhs_values) *
+				fe_values.JxW (q_point));	   
 	      };
 	  };
 	
@@ -919,10 +879,7 @@ void Step4<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
 		for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
 		  {
 		    Tensor<1,dim> rhs_values;
-		    rhs_values[0] = right_hand_side_values_face[q_point](0);
-		    rhs_values[1] = right_hand_side_values_face[q_point](1);
-		    rhs_values[2] = right_hand_side_values_face[q_point](2);
-		    
+		    rhs_values = 0;		    
 		    for (unsigned int i=0; i<dofs_per_cell; ++i)
 		      cell_rhs(i) += (fe_values_face[displacement].value (i, q_point) *
 				      rhs_values *
@@ -935,9 +892,7 @@ void Step4<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
 	constraints_dirichlet_hanging_nodes.distribute_local_to_global (cell_rhs,
 									local_dof_indices,
 									system_rhs_newton);
-	// for (unsigned int i=0; i<dofs_per_cell; ++i)
-	//   system_rhs_newton(local_dof_indices[i]) += cell_rhs(i);
-	
+
 	sigma_eff_vector(cell_number) /= n_q_points;
 	cell_number += 1;
       };
@@ -974,6 +929,7 @@ void Step4<dim>::projection_active_set ()
   constraints.reinit(locally_relevant_dofs);
   active_set.clear ();
   const double c = 100.0*e_modul;
+
   for (; cell!=endc; ++cell)
     if (cell->is_locally_owned())
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -994,16 +950,7 @@ void Step4<dim>::projection_active_set ()
 	      
 	      double obstacle_value = obstacle.value (point, 2);
 	      double solution_index_z = solution (index_z);
-	      double gap = obstacle_value - point (2); 
-	      
-	      // std::cout<< point << ", "
-	      //      << "Error: " << lambda (index_z) +
-	      //   diag_mass_matrix_vector (index_z)*c*(solution_index_z - gap)
-	      //      << ", " << lambda (index_z)
-	      //      << ", " << diag_mass_matrix_vector (index_z)
-	      //      << ", " << obstacle_value
-	      //      << ", " << solution_index_z
-	      //      <<std::endl;
+	      double gap = obstacle_value - point (2);
 	      
 	      if (lambda (index_z) +
 		  c*diag_mass_matrix_vector_relevant (index_z)*(solution_index_z - gap) > 0)
@@ -1015,21 +962,15 @@ void Step4<dim>::projection_active_set ()
 		  
 		  if (locally_owned_dofs.is_element (index_z))
 		    active_set.add_index (index_z);
-		  
-		  // std::cout<< point[0] << " "
-		  // 	       << -lambda (index_z) << " "
-		  // 	       << diag_mass_matrix_vector (index_z) << " "
-		  // 	       << 1.0/pow (2.0,n_refinements + n_refinements_local)
-		  // 	       <<std::endl;
-		  // locally_relevant_dofs.print(cout);
-		  std::cout<< index_z << ", "
-			   << "Error: " << lambda (index_z) +
-		    diag_mass_matrix_vector_relevant (index_z)*c*(solution_index_z - gap)
-			   << ", " << lambda (index_z)
-			   << ", " << diag_mass_matrix_vector_relevant (index_z)
-			   << ", " << obstacle_value
-			   << ", " << solution_index_z
-			   <<std::endl;
+
+		  // std::cout<< index_z << ", "
+		  // 	   << "Error: " << lambda (index_z) +
+		  //   diag_mass_matrix_vector_relevant (index_z)*c*(solution_index_z - gap)
+		  // 	   << ", " << lambda (index_z)
+		  // 	   << ", " << diag_mass_matrix_vector_relevant (index_z)
+		  // 	   << ", " << obstacle_value
+		  // 	   << ", " << solution_index_z
+		  // 	   <<std::endl;
 		}
 	    }
   
@@ -1055,17 +996,16 @@ void Step4<dim>::dirichlet_constraints ()
            /  9    /|
           /______ / |
         8|       | 8|
-         |   7   | /
+         |   8   | /
          |_______|/
              6
    */
 
-  // constraints_dirichlet_hanging_nodes.clear ();
   constraints_dirichlet_hanging_nodes.reinit (locally_relevant_dofs);
   constraints_dirichlet_hanging_nodes.merge (constraints_hanging_nodes);
 
   std::vector<bool> component_mask (dim, true);
-  component_mask[0] = false;
+  component_mask[0] = true;
   component_mask[1] = true;
   component_mask[2] = true;
   VectorTools::interpolate_boundary_values (dof_handler,
@@ -1074,23 +1014,14 @@ void Step4<dim>::dirichlet_constraints ()
 					    constraints_dirichlet_hanging_nodes,
 					    component_mask);
   
-  component_mask[0] = false;
-  component_mask[1] = true;
-  component_mask[2] = false;
-  VectorTools::interpolate_boundary_values (dof_handler,
-  					    7,
-  					    EquationData::BoundaryValues<dim>(),
-  					    constraints_dirichlet_hanging_nodes,
-  					    component_mask);
-
   component_mask[0] = true;
-  component_mask[1] = false;
+  component_mask[1] = true;
   component_mask[2] = false;
   VectorTools::interpolate_boundary_values (dof_handler,
   					    8,
   					    EquationData::BoundaryValues<dim>(),
   					    constraints_dirichlet_hanging_nodes,
-  				            component_mask);
+  					    component_mask);
   constraints_dirichlet_hanging_nodes.close ();
 }
 
@@ -1102,20 +1033,13 @@ void Step4<dim>::solve ()
   TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
   distributed_solution = solution;
 
-  //  constraints_hanging_nodes.set_zero (distributed_solution);
-  const unsigned int
-    start = (distributed_solution.local_range().first),
-    end   = (distributed_solution.local_range().second);
-  for (unsigned int i=start; i<end; ++i)
-    if (constraints_hanging_nodes.is_constrained (i))
-      distributed_solution(i) = 0;
+  constraints_hanging_nodes.set_zero (distributed_solution);
   
   // Solving iterative
   SolverCG<TrilinosWrappers::MPI::Vector>
     solver (reduction_control, mpi_communicator);
 
   preconditioner_u.initialize (system_matrix_newton, additional_data);
-  //  preconditioner_u.reinit ();
 
   solver.solve (system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
   pcout << "Initial error: " << reduction_control.initial_value() <<std::endl;
@@ -1140,12 +1064,6 @@ void Step4<dim>::solve_newton ()
   TrilinosWrappers::MPI::Vector  tmp_vector (system_rhs_newton);
   clock_t                        start, end;
 
-  char* name = new char[30];
-  sprintf (name,"Error-FPV.dat");
-  FILE* fp = fopen(name,"w");
-  delete[] name;
-  fclose(fp);
-
   std::vector<std::vector<bool> > constant_modes;
   std::vector<bool>  components (dim,true);
   components[dim] = false;
@@ -1158,10 +1076,7 @@ void Step4<dim>::solve_newton ()
   additional_data.output_details = false;
   additional_data.smoother_sweeps = 2;
   additional_data.aggregation_threshold = 1e-2;
-  //additional_data.constant_modes;
 
-  // std::cout<< "Update Active Set in Dim = " << dim <<std::endl;	
-  // projection_active_set ();
   IndexSet                            active_set_old (active_set);
   Vector<double>                      sigma_eff_vector;
   sigma_eff_vector.reinit (triangulation.n_active_cells());
@@ -1170,103 +1085,85 @@ void Step4<dim>::solve_newton ()
   for (; j<=100;j++)
     {
       pcout<< " " <<std::endl;
-      pcout<< j << ". Iteration of active set." <<std::endl;
-      pcout<< "Update Active Set in Dim = " << dim <<std::endl;
+      pcout<< j << ". Iteration of the inexact Newton-method." <<std::endl;
+      pcout<< "Update of active set" <<std::endl;
       projection_active_set ();
 
-      // std::ofstream fp("Constraints");
-      // constraints.print (fp);
-
-      for (unsigned int k=0; k<=0; k++)
+      pcout<< "Assembling ... " <<std::endl;
+      start = clock();
+      system_matrix_newton = 0;
+      system_rhs_newton = 0;
+      assemble_nl_system (solution);  //compute Newton-Matrix
+      end = clock();
+      run_time[1] += (double)(end-start)/CLOCKS_PER_SEC;
+      
+      number_assemble_system += 1;
+      
+      start = clock();
+      solve ();
+      end = clock();
+      run_time[2] += (double)(end-start)/CLOCKS_PER_SEC;
+      
+      TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
+      distributed_solution = solution;
+      
+      int damped = 0;
+      tmp_vector = old_solution;
+      double a = 0;
+      for (unsigned int i=0; (i<10)&&(!damped); i++)
 	{
-	  pcout<< " " <<std::endl;
-	  pcout<< "Assembling ... " <<std::endl;
-	  start = clock();
-      	  system_matrix_newton = 0;
-      	  system_rhs_newton = 0;
-      	  assemble_nl_system (solution);  //compute Newton-Matrix
-	  end = clock();
-	  run_time[1] += (double)(end-start)/CLOCKS_PER_SEC;
-
-      	  number_assemble_system += 1;
-
-	  start = clock();
-      	  solve ();
-	  end = clock();
-	  run_time[2] += (double)(end-start)/CLOCKS_PER_SEC;
-
-	  TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
-	  distributed_solution = solution;
-
-	  int damped = 0;
-	  tmp_vector = old_solution;
-	  double a = 0;
-	  for (unsigned int i=0; (i<10)&&(!damped); i++)
-	    {
-	      a=pow(0.5,i);
-	      old_solution = tmp_vector;
-	      old_solution.sadd(1-a,a, distributed_solution);
-	      
-	      start = clock();
-	      system_rhs_newton = 0;
-	      sigma_eff_vector = 0;
-	      solution = old_solution;
-	      residual_nl_system (solution, sigma_eff_vector);
-	      res = system_rhs_newton;
-	      
-	      // constraints_dirichlet_hanging_nodes.condense (res);
-	      const unsigned int
-	      	start_res     = (res.local_range().first),
-	      	end_res       = (res.local_range().second);
-	      for (unsigned int n=start_res; n<end_res; ++n)
-	      	if (constraints.is_inhomogeneously_constrained (n))
-	      	  {
-	      	    // pcout<< i << ". " << constraints.get_inhomogeneity (n)
-	      	    // 	 << ". " << res (n)
-		    // 	 << ", start = " << start_res
-		    // 	 << ", end = " << end_res
-	      	    // 	 <<std::endl;
-	      	    res(n) = 0;
-		  }
-
-	      resid = res.l2_norm ();
-	      pcout<< "Resid Newton: " << resid <<std::endl;
-	      
-	      if (resid<resid_old)
-		{
-		  pcout<< "--------------- alpha = " << a <<std::endl;
-		  damped=1;
-		}
-	      end = clock();
-	      run_time[3] = (double)(end-start)/CLOCKS_PER_SEC;
-	    }
+	  a=pow(0.5,i);
+	  old_solution = tmp_vector;
+	  old_solution.sadd(1-a,a, distributed_solution);
 	  
-	  char* name = new char[30];
-	  sprintf (name,"Error-FPV.dat");
-	  FILE* fp2 = fopen(name,"a");
+	  start = clock();
+	  system_rhs_newton = 0;
+	  sigma_eff_vector = 0;
+	  solution = old_solution;
+	  residual_nl_system (solution, sigma_eff_vector);
+	  res = system_rhs_newton;
+
+	  const unsigned int
+	    start_res     = (res.local_range().first),
+	    end_res       = (res.local_range().second);
+	  for (unsigned int n=start_res; n<end_res; ++n)
+	    if (constraints.is_inhomogeneously_constrained (n))
+	      {
+		// pcout<< i << ". " << constraints.get_inhomogeneity (n)
+		// 	 << ". " << res (n)
+		// 	 << ", start = " << start_res
+		// 	 << ", end = " << end_res
+		// 	 <<std::endl;
+		res(n) = 0;
+	      }
 	  
-	  fprintf (fp2,"%d %le %le \n",k, a, resid);
-	  fclose(fp2);
-
-	  pcout<< "-------" << k << ". SQP-Iteration, error -> " << resid <<std::endl;
-
-	  if (resid<1e-8)
+	  resid = res.l2_norm ();
+	  pcout<< "Residual: " << resid <<std::endl;
+	  
+	  if (resid<resid_old)
 	    {
-	      pcout<< "Newton-Verfahren gestoppt bei resid = " << resid <<std::endl;
-	      pcout<< "Number of Assembling systems = " << number_assemble_system <<std::endl;
-	      break;
+	      pcout<< "Newton-damping parameter alpha = " << a <<std::endl;
+	      damped=1;
 	    }
-	  resid_old=resid;
-	} // End of sqp-loop
+	  end = clock();
+	  run_time[3] = (double)(end-start)/CLOCKS_PER_SEC;
+	}
+      
+      if (resid<1e-8)
+	{
+	  pcout<< "Inexact Newton-method stopped with residual = " << resid <<std::endl;
+	  pcout<< "Number of Assembling systems = " << number_assemble_system <<std::endl;
+	  break;
+	}
+      resid_old=resid;
 
-      // output_results (res, "Residual");
       resid_vector = system_rhs_newton;
-
+      
       if (active_set == active_set_old && resid < 1e-10)
 	break;
       active_set_old = active_set;
     } // End of active-set-loop
-
+  
   start = clock();
   pcout<< "Creating output." <<std::endl;
   std::ostringstream filename_solution;
