@@ -30,7 +30,7 @@ D = ../../
 # shall be deleted when calling `make clean'. Object and backup files,
 # executables and the like are removed anyway. Here, we give a list of
 # files in the various output formats that deal.II supports.
-clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
+clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *vtu *visit *ucd *.d2
 
 
 
@@ -45,23 +45,25 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
 # settings
 include $D/common/Make.global_options
 
-################################################################ 
-# This example program will only work if UMFPACK is installed. If this
+################################################################
+# This example program will only work if Trilinos is installed. If this
 # is not the case, then simply redefine the main targets to do nothing
-
-
-ifneq ($(USE_CONTRIB_UMFPACK),yes)
+ifneq ($(USE_CONTRIB_TRILINOS)$(USE_CONTRIB_P4EST),yesyes)
 default run clean:
 	@echo
-	@echo "===========================================================" 
-	@echo "=   This program cannot be compiled without UMFPACK. Make ="
-	@echo "=   sure you have UMFPACK installed and detected during   ="
-	@echo "=   configuration of deal.II                              ="
+	@echo "==========================================================="
+	@echo "=   This program can only be run with the following       ="
+	@echo "=   configuration:                                        ="
+	@echo "=   - with Trilinos                                       ="
+	@echo "=   - with P4EST                                          ="
+	@echo "=   At least one of these conditions is not satisfied.    ="
 	@echo "==========================================================="
 	@echo
-endif
+else
 #
 ################################################################
+
+
 
 
 # Since the whole project consists of only one file, we need not
@@ -108,6 +110,7 @@ run: $(target)$(EXEEXT)
 	@./$(target)$(EXEEXT)
 
 
+
 # As a last rule to the `make' program, we define what to do when
 # cleaning up a directory. This usually involves deleting object files
 # and other automatically created files such as the executable itself,
@@ -128,6 +131,7 @@ clean:
 ./%.$(OBJEXT) :
 	@echo "==============optimized===== $(<F)  ->  $@"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
+
 
 
 # The following statement tells make that the rules `run' and `clean'
@@ -160,3 +164,4 @@ Makefile.dep: $(target).cc Makefile \
 include Makefile.dep
 
 
+endif  # USE_CONTRIB_TRILINOS
