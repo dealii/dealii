@@ -4,7 +4,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyrightG and license information. Please refer     */
@@ -1200,9 +1200,18 @@ void Step4<dim>::output_results (const std::string& title) const
 
   data_out.attach_dof_handler (dof_handler);
 
-  data_out.add_data_vector (solution, "Displacement");
-  data_out.add_data_vector (lambda, "Residual");
-  data_out.add_data_vector (active_set, "ActiveSet");
+  const std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    data_component_interpretation
+    (dim, DataComponentInterpretation::component_is_part_of_vector);
+  data_out.add_data_vector (solution, std::vector<std::string>(dim, "Displacement"),
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
+  data_out.add_data_vector (lambda, std::vector<std::string>(dim, "Residual"),
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
+  data_out.add_data_vector (active_set, std::vector<std::string>(dim, "ActiveSet"),
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
 
   Vector<float> subdomain (triangulation.n_active_cells());
   for (unsigned int i=0; i<subdomain.size(); ++i)
