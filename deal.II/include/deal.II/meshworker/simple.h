@@ -926,27 +926,36 @@ namespace MeshWorker
                 G.add(i1[j], i2[k], M(j,k));
         }
       else
-        {
-          for (unsigned int j=0; j<i1.size(); ++j)
-            for (unsigned int k=0; k<i2.size(); ++k)
-              if (std::fabs(M(j,k)) >= threshold)
-                if (!mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
-                    !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
-                  {
-                    if (mg_constrained_dofs->set_boundary_values())
-                      {
-                        if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
-                             !mg_constrained_dofs->is_boundary_index(level, i2[k]))
-                            ||
-                            (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
-                             mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
-                             i1[j] == i2[k]))
-                          G.add(i1[j], i2[k], M(j,k));
-                      }
-                    else
-                      G.add(i1[j], i2[k], M(j,k));
-                  }
-        }
+	{
+	  for (unsigned int j=0; j<i1.size(); ++j)
+	    for (unsigned int k=0; k<i2.size(); ++k)
+	      if (std::fabs(M(j,k)) >= threshold)
+		if (!mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+		    !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+		  {
+		    if (mg_constrained_dofs->set_boundary_values())
+		      {
+							 // At the
+							 // boundary,
+							 // only enter
+							 // the term
+							 // on the
+							 // diagonal,
+							 // but not
+							 // the
+							 // coupling terms
+			if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+			     !mg_constrained_dofs->is_boundary_index(level, i2[k]))
+			    ||
+			    (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+			     mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
+			     i1[j] == i2[k]))
+			  G.add(i1[j], i2[k], M(j,k));
+		      }
+		    else
+		      G.add(i1[j], i2[k], M(j,k));
+		  }
+	}
     }
 
 

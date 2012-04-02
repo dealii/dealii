@@ -253,51 +253,33 @@ namespace LocalIntegrators
       const double nue = (factor2 < 0) ? factor1 : factor2;
 
       for (unsigned k=0;k<fe1.n_quadrature_points;++k)
-        {
-          const double dx = fe1.JxW(k);
-          const Point<dim>& n = fe1.normal_vector(k);
-          for (unsigned i=0;i<n_dofs;++i)
-            {
-              for (unsigned j=0;j<n_dofs;++j)
-                {
-                  if (fe1.get_fe().n_components() == 1)
-                    {
-                      const double vi = fe1.shape_value(i,k);
-                      const double dnvi = n * fe1.shape_grad(i,k);
-                      const double ve = fe2.shape_value(i,k);
-                      const double dnve = n * fe2.shape_grad(i,k);
-                      const double ui = fe1.shape_value(j,k);
-                      const double dnui = n * fe1.shape_grad(j,k);
-                      const double ue = fe2.shape_value(j,k);
-                      const double dnue = n * fe2.shape_grad(j,k);
-
-                      M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
-                      M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
-                      M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
-                      M22(i,j) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+penalty*ue*ve);
-                    }
-                  else
-                    for (unsigned int d=0;d<dim;++d)
-                      {
-                        const double vi = fe1.shape_value_component(i,k,d);
-                        const double dnvi = n * fe1.shape_grad_component(i,k,d);
-                        const double ve = fe2.shape_value_component(i,k,d);
-                        const double dnve = n * fe2.shape_grad_component(i,k,d);
-                        const double ui = fe1.shape_value_component(j,k,d);
-                        const double dnui = n * fe1.shape_grad_component(j,k,d);
-                        const double ue = fe2.shape_value_component(j,k,d);
-                        const double dnue = n * fe2.shape_grad_component(j,k,d);
-
-                        M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
-                        M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
-                        M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
-                        M22(i,j) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+penalty*ue*ve);
-                      }
-                }
-            }
-        }
+	{
+	  const double dx = fe1.JxW(k);
+	  const Point<dim>& n = fe1.normal_vector(k);
+	  for (unsigned int d=0;d<fe1.get_fe().n_components();++d)
+	    {
+	      for (unsigned i=0;i<n_dofs;++i)
+		{
+		  for (unsigned j=0;j<n_dofs;++j)
+		    {
+		      const double vi = fe1.shape_value_component(i,k,d);
+		      const double dnvi = n * fe1.shape_grad_component(i,k,d);
+		      const double ve = fe2.shape_value_component(i,k,d);
+		      const double dnve = n * fe2.shape_grad_component(i,k,d);
+		      const double ui = fe1.shape_value_component(j,k,d);
+		      const double dnui = n * fe1.shape_grad_component(j,k,d);
+		      const double ue = fe2.shape_value_component(j,k,d);
+		      const double dnue = n * fe2.shape_grad_component(j,k,d);
+		      M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
+		      M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
+		      M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
+		      M22(i,j) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+penalty*ue*ve);
+		    }
+		}
+	    }
+	}
     }
-
+    
 /**
  * Auxiliary function computing the penalty parameter for interior
  * penalty methods on rectangles.
