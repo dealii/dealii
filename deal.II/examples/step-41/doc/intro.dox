@@ -19,7 +19,8 @@ reaching its equilibrium position if gravity was the only existing force? In
 the current example program, we will consider that under the membrane is a
 stair step obstacle against which gravity pushes the membrane.
 
-This problem is typically called the "obstacle problem", and it results in a
+This problem is typically called the "obstacle problem" (see also <a
+href="http://en.wikipedia.org/wiki/Obstacle_problem">this wikipedia article</a>), and it results in a
 variational inequality, rather than a variational equation when put into the
 weak form. We will below derive it from the classical formulation, but before we
 go on to discuss the mathematics let us show how the solution of the problem we
