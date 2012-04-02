@@ -82,12 +82,12 @@ using namespace dealii;
 template <int dim> class ConstitutiveLaw;
 
 template <int dim>
-class Step4 
+class Step4
 {
 public:
   Step4 ();
   void run ();
-  
+
 private:
   void make_grid ();
   void setup_system();
@@ -104,48 +104,48 @@ private:
   void output_results (TrilinosWrappers::MPI::Vector vector, const std::string& title) const;
   void output_results (Vector<double> vector, const std::string& title) const;
 
-  MPI_Comm             mpi_communicator;  
+  MPI_Comm             mpi_communicator;
 
   parallel::distributed::Triangulation<dim>   triangulation;
 
   FESystem<dim>        fe;
   DoFHandler<dim>      dof_handler;
-  
+
   IndexSet             locally_owned_dofs;
   IndexSet             locally_relevant_dofs;
-  
+
   int                  n_refinements;
   int                  n_refinements_local;
   unsigned int         number_iterations;
   std::vector<double>  run_time;
-  
+
   ConstraintMatrix     constraints;
   ConstraintMatrix     constraints_hanging_nodes;
   ConstraintMatrix     constraints_dirichlet_hanging_nodes;
-  
+
   TrilinosWrappers::SparseMatrix system_matrix_newton;
   TrilinosWrappers::SparseMatrix mass_matrix;
-  
+
   TrilinosWrappers::MPI::Vector       solution;
   TrilinosWrappers::MPI::Vector       old_solution;
   TrilinosWrappers::MPI::Vector       system_rhs_newton;
   TrilinosWrappers::MPI::Vector       resid_vector;
   TrilinosWrappers::MPI::Vector       diag_mass_matrix_vector;
-  IndexSet                            active_set;  
+  IndexSet                            active_set;
 
   ConditionalOStream pcout;
-  
+
   TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
   TrilinosWrappers::PreconditionAMG preconditioner_u;
   TrilinosWrappers::PreconditionAMG preconditioner_t;
-  
+
   std::auto_ptr<ConstitutiveLaw<dim> > plast_lin_hard;
-  
+
   double sigma_0;    // Yield stress
   double gamma;      // Parameter for the linear isotropic hardening
   double e_modul;    // E-Modul
   double nu;         // Poisson ratio
-  
+
   std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>  Mp_preconditioner;
 };
 
@@ -166,8 +166,8 @@ public:
 					  SymmetricTensor<2,dim>  &strain_tensor);
   inline SymmetricTensor<2,dim> get_strain (const FEValues<dim> &fe_values,
 					    const unsigned int  shape_func,
-					    const unsigned int  q_point) const; 
-  
+					    const unsigned int  q_point) const;
+
 private:
   SymmetricTensor<4,dim>  stress_strain_tensor_mu;
   SymmetricTensor<4,dim>  stress_strain_tensor_kappa;
@@ -207,7 +207,7 @@ SymmetricTensor<2,dim> ConstitutiveLaw<dim>::get_strain (const FEValues<dim> &fe
   SymmetricTensor<2,dim> tmp;
 
   tmp = fe_values[displacement].symmetric_gradient (shape_func,q_point);
-  
+
   return tmp;
 }
 
@@ -226,13 +226,13 @@ void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim>  &stre
     stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
     double tmp = E/((1+nu)*(1-2*nu));
     double stress_tensor_33 = 0.0;//tmp*(strain_tensor[0][0] + strain_tensor[1][1])*nu;
-    
+
     SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
-    
+
     double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
     deviator_stress_tensor_norm = std::sqrt (deviator_stress_tensor_norm*deviator_stress_tensor_norm +
 				  stress_tensor_33*stress_tensor_33);
-    
+
     yield = 0;
     stress_strain_tensor = stress_strain_tensor_mu;
     double beta = 1.0;
@@ -245,7 +245,7 @@ void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim>  &stre
     }
     else
       elast_points += 1;
-    
+
 //     std::cout<< beta <<std::endl;
     stress_strain_tensor += stress_strain_tensor_kappa;
 
@@ -265,24 +265,24 @@ void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,
     stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
     double tmp = E/((1+nu)*(1-2*nu));
     double stress_tensor_33 = 0.0;//tmp*(strain_tensor[0][0] + strain_tensor[1][1])*nu;
-    
+
     stress_strain_tensor = stress_strain_tensor_mu;
     stress_strain_tensor_linearized = stress_strain_tensor_mu;
-    
+
     SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
-    
+
     double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
     deviator_stress_tensor_norm = std::sqrt (deviator_stress_tensor_norm*deviator_stress_tensor_norm + stress_tensor_33*stress_tensor_33);
     double beta = 1.0;
     if (deviator_stress_tensor_norm >= sigma_0)
-    { 
+    {
       beta = (sigma_0 + gamma)/deviator_stress_tensor_norm;
       stress_strain_tensor *= beta;
       stress_strain_tensor_linearized *= beta;
       deviator_stress_tensor /= deviator_stress_tensor_norm;
-      stress_strain_tensor_linearized -= beta*2*mu*outer_product(deviator_stress_tensor, deviator_stress_tensor);  
+      stress_strain_tensor_linearized -= beta*2*mu*outer_product(deviator_stress_tensor, deviator_stress_tensor);
     }
-      
+
     stress_strain_tensor += stress_strain_tensor_kappa;
     stress_strain_tensor_linearized += stress_strain_tensor_kappa;
   }
@@ -291,21 +291,21 @@ void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,
 namespace EquationData
 {
   template <int dim>
-  class RightHandSide : public Function<dim> 
+  class RightHandSide : public Function<dim>
   {
   public:
     RightHandSide () : Function<dim>(dim) {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     virtual void vector_value (const Point<dim> &p,
 			       Vector<double>   &values) const;
   };
 
   template <int dim>
   double RightHandSide<dim>::value (const Point<dim> &p,
-				    const unsigned int component) const 
+				    const unsigned int component) const
   {
     double return_value = 0.0;
 
@@ -320,10 +320,10 @@ namespace EquationData
       return_value = 0.0;
     // for (unsigned int i=0; i<dim; ++i)
     //   return_value += 4*std::pow(p(i), 4);
-    
+
     return return_value;
   }
-  
+
   template <int dim>
   void RightHandSide<dim>::vector_value (const Point<dim> &p,
 					 Vector<double>   &values) const
@@ -334,21 +334,21 @@ namespace EquationData
 
 
   template <int dim>
-  class BoundaryValues : public Function<dim> 
+  class BoundaryValues : public Function<dim>
   {
   public:
     BoundaryValues () : Function<dim>(dim) {};
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     virtual void vector_value (const Point<dim> &p,
 			       Vector<double>   &values) const;
   };
-  
+
   template <int dim>
   double BoundaryValues<dim>::value (const Point<dim> &p,
-				     const unsigned int component) const 
+				     const unsigned int component) const
   {
     double return_value = 0;
 
@@ -364,15 +364,15 @@ namespace EquationData
 
   template <int dim>
   void BoundaryValues<dim>::vector_value (const Point<dim> &p,
-					   Vector<double>   &values) const 
+					   Vector<double>   &values) const
   {
     for (unsigned int c=0; c<this->n_components; ++c)
       values(c) = BoundaryValues<dim>::value (p, c);
   }
 
-  
+
   template <int dim>
-  class Obstacle : public Function<dim> 
+  class Obstacle : public Function<dim>
   {
   public:
     Obstacle () : Function<dim>(dim) {};
@@ -386,7 +386,7 @@ namespace EquationData
 
   template <int dim>
   double Obstacle<dim>::value (const Point<dim> &p,
-			       const unsigned int component) const 
+			       const unsigned int component) const
   {
     double R = 0.03;
     double return_value = 0.0;
@@ -434,16 +434,16 @@ namespace EquationData
 	  return_value = 1e+5;
       }
     return return_value;
-    
+
     // return 1e+10;//0.98;
   }
-  
+
   template <int dim>
   void Obstacle<dim>::vector_value (const Point<dim> &p,
-			            Vector<double> &values) const 
+			            Vector<double> &values) const
   {
     for (unsigned int c=0; c<this->n_components; ++c)
-      values(c) = Obstacle<dim>::value (p, c);  
+      values(c) = Obstacle<dim>::value (p, c);
   }
 }
 
@@ -453,7 +453,7 @@ namespace EquationData
                                  // Next for the implementation of the class
                                  // template that makes use of the functions
                                  // above. As before, we will write everything
-              
+
 template <int dim>
 Step4<dim>::Step4 ()
   :
@@ -483,11 +483,11 @@ void Step4<dim>::make_grid ()
   Point<dim> p1 (0,0,0);
   Point<dim> p2 (1.0, 1.0, 1.0);
   GridGenerator::subdivided_hyper_rectangle (triangulation, repet, p1, p2);
-  
+
   Triangulation<3>::active_cell_iterator
     cell = triangulation.begin_active(),
     endc = triangulation.end();
-    
+
   /* boundary_indicators:
             _______
            /  9    /|
@@ -510,9 +510,9 @@ void Step4<dim>::make_grid ()
 	  cell->face (face)->set_boundary_indicator (8);
 	if (cell->face (face)->center ()[2] == p1(2))
 	  cell->face (face)->set_boundary_indicator (6);
-      }  
- 
-  n_refinements = 2;
+      }
+
+  n_refinements = 3;
   n_refinements_local = 3;
   triangulation.refine_global (n_refinements);
 
@@ -520,7 +520,7 @@ void Step4<dim>::make_grid ()
   for (int step=0; step<n_refinements_local; ++step)
     {
       cell = triangulation.begin_active();  // Iterator ueber alle Zellen
-     
+
       double hlp_refinement = 0;
       hlp_refinement = pow((double)(step)/(n_refinements_local),4.0);
       pcout<< "Verfeinerungsfaktor: " << hlp_refinement <<std::endl;
@@ -564,7 +564,7 @@ void Step4<dim>::setup_system ()
     DoFTools::make_hanging_node_constraints (dof_handler,
 					     constraints_hanging_nodes);
     constraints_hanging_nodes.close ();
-    
+
     pcout << "Number of active cells: "
 	       << triangulation.n_active_cells()
 	       << std::endl
@@ -574,7 +574,7 @@ void Step4<dim>::setup_system ()
 	       << "Number of degrees of freedom: "
 	       << dof_handler.n_dofs ()
 	       << std::endl;
-    
+
     dirichlet_constraints ();
   }
 
@@ -595,12 +595,12 @@ void Step4<dim>::setup_system ()
 
     DoFTools::make_sparsity_pattern (dof_handler, sp, constraints_dirichlet_hanging_nodes, false,
 				     Utilities::MPI::this_mpi_process(mpi_communicator));
-    
+
     sp.compress();
-    
+
     system_matrix_newton.reinit (sp);
-    
-    mass_matrix.reinit (sp); 
+
+    mass_matrix.reinit (sp);
   }
 
   assemble_mass_matrix ();
@@ -613,11 +613,11 @@ void Step4<dim>::setup_system ()
 }
 
 template <int dim>
-void Step4<dim>::assemble_mass_matrix () 
-{  
+void Step4<dim>::assemble_mass_matrix ()
+{
   QTrapez<dim-1>  face_quadrature_formula;
 
-  FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula, 
+  FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula,
 			              update_values   | update_quadrature_points | update_JxW_values);
 
   const unsigned int   dofs_per_cell      = fe.dofs_per_cell;
@@ -633,7 +633,7 @@ void Step4<dim>::assemble_mass_matrix ()
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
- 
+
   for (; cell!=endc; ++cell)
     if (cell->is_locally_owned())
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -642,15 +642,15 @@ void Step4<dim>::assemble_mass_matrix ()
 	  {
 	    fe_values_face.reinit (cell, face);
 	    cell_matrix = 0;
-	    
+
 	    for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
 		cell_matrix(i,i) += (fe_values_face[displacement].value (i, q_point) *
 				     fe_values_face[displacement].value (i, q_point) *
 				     fe_values_face.JxW (q_point));
-	    
+
 	    cell->get_dof_indices (local_dof_indices);
-	    
+
 	    constraints_dirichlet_hanging_nodes.distribute_local_to_global (cell_matrix,
 									    local_dof_indices,
 									    mass_matrix);
@@ -660,18 +660,18 @@ void Step4<dim>::assemble_mass_matrix ()
 }
 
 template <int dim>
-void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u) 
+void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u)
 {
   QGauss<dim>  quadrature_formula(2);
   QGauss<dim-1>  face_quadrature_formula(2);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   UpdateFlags(update_values    |
 				       update_gradients |
 				       update_q_points  |
 				       update_JxW_values));
 
-  FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula, 
+  FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula,
 				    update_values   | update_quadrature_points |
 				    update_JxW_values);
 
@@ -685,7 +685,7 @@ void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u)
   std::vector<Vector<double> > right_hand_side_values_face (n_face_q_points,
 							    Vector<double>(dim));
 
-  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);  
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
@@ -703,47 +703,47 @@ void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u)
 	fe_values.reinit (cell);
 	cell_matrix = 0;
 	cell_rhs = 0;
-	
+
 	right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
 					   right_hand_side_values);
-	
+
 	std::vector<SymmetricTensor<2,dim> > strain_tensor (n_q_points);
 	fe_values[displacement].get_function_symmetric_gradients (u, strain_tensor);
-	
+
 	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	  {	
+	  {
 	    SymmetricTensor<4,dim> stress_strain_tensor_linearized;
 	    SymmetricTensor<4,dim> stress_strain_tensor;
 	    SymmetricTensor<2,dim> stress_tensor;
-	    
+
 	    plast_lin_hard->linearized_plast_linear_hardening (stress_strain_tensor_linearized,
 							       stress_strain_tensor,
 							       strain_tensor[q_point]);
-	    
+
 	    //   	if (q_point == 0)
 	    //  	std::cout<< stress_strain_tensor_linearized <<std::endl;
 	    //  	std::cout<< stress_strain_tensor <<std::endl;
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      {
 		stress_tensor = stress_strain_tensor_linearized * plast_lin_hard->get_strain(fe_values, i, q_point);
-		
+
 		for (unsigned int j=0; j<dofs_per_cell; ++j)
 		  {
 		    cell_matrix(i,j) += (stress_tensor *
 					 plast_lin_hard->get_strain(fe_values, j, q_point) *
 					 fe_values.JxW (q_point));
 		  }
-		
+
 		// the linearized part a(v^i;v^i,v) of the rhs
 		cell_rhs(i) += (stress_tensor *
 				strain_tensor[q_point] *
 				fe_values.JxW (q_point));
-		
+
 		// the residual part a(v^i;v) of the rhs
 		cell_rhs(i) -= (strain_tensor[q_point] * stress_strain_tensor *
 				plast_lin_hard->get_strain(fe_values, i, q_point) *
 				fe_values.JxW (q_point));
-		
+
 		// the residual part F(v) of the rhs
 		Tensor<1,dim> rhs_values;
 		rhs_values = 0;
@@ -752,21 +752,21 @@ void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u)
 				fe_values.JxW (q_point));
 	      }
 	  }
-	
+
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  {
 	    if (cell->face (face)->at_boundary()
 		&& cell->face (face)->boundary_indicator () == 9)
 	      {
 		fe_values_face.reinit (cell, face);
-		
+
 		right_hand_side.vector_value_list (fe_values_face.get_quadrature_points(),
 						   right_hand_side_values_face);
-		
+
 		for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
 		  {
 		    Tensor<1,dim> rhs_values;
-		    rhs_values = 0;		    
+		    rhs_values = 0;
 		    for (unsigned int i=0; i<dofs_per_cell; ++i)
 		      cell_rhs(i) += (fe_values_face[displacement].value (i, q_point) *
 				      rhs_values *
@@ -774,13 +774,13 @@ void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u)
 		  }
 	      }
 	  }
-	
+
 	cell->get_dof_indices (local_dof_indices);
 	constraints.distribute_local_to_global (cell_matrix, cell_rhs,
 						local_dof_indices,
 						system_matrix_newton, system_rhs_newton, true);
       };
-  
+
   system_matrix_newton.compress ();
   system_rhs_newton.compress ();
 }
@@ -792,13 +792,13 @@ void Step4<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
   QGauss<dim>  quadrature_formula(2);
   QGauss<dim-1> face_quadrature_formula(2);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   UpdateFlags(update_values    |
 				       update_gradients |
 				       update_q_points  |
 				       update_JxW_values));
 
-  FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula, 
+  FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula,
 				    update_values   | update_quadrature_points |
 				    update_JxW_values);
 
@@ -808,10 +808,10 @@ void Step4<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
 
   const EquationData::RightHandSide<dim> right_hand_side;
   std::vector<Vector<double> > right_hand_side_values (n_q_points,
-                                                       Vector<double>(dim));  
+                                                       Vector<double>(dim));
   std::vector<Vector<double> > right_hand_side_values_face (n_face_q_points,
 							    Vector<double>(dim));
-  
+
   Vector<double>       cell_rhs (dofs_per_cell);
   Vector<double>       cell_sigma_eff (dofs_per_cell);
 
@@ -832,24 +832,24 @@ void Step4<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
       {
 	fe_values.reinit (cell);
 	cell_rhs = 0;
-	
+
 	right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
 					   right_hand_side_values);
-	
+
 	std::vector<SymmetricTensor<2,dim> > strain_tensor (n_q_points);
 	fe_values[displacement].get_function_symmetric_gradients (u, strain_tensor);
-	
+
 	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	  {
 	    SymmetricTensor<4,dim> stress_strain_tensor;
 	    SymmetricTensor<2,dim> stress_tensor;
-	    
+
 	    plast_lin_hard->plast_linear_hardening (stress_strain_tensor, strain_tensor[q_point],
 						    elast_points, plast_points, sigma_eff, yield);
-	    
+
 	    // sigma_eff_vector (cell_number) += sigma_eff;
 	    sigma_eff_vector (cell_number) += yield;
-	    
+
 	    /*	if (q_point == 0)
 		std::cout<< stress_strain_tensor <<std::endl;*/
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -857,29 +857,29 @@ void Step4<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
 		cell_rhs(i) -= (strain_tensor[q_point] * stress_strain_tensor * //(stress_tensor) *
 				plast_lin_hard->get_strain(fe_values, i, q_point) *
 				fe_values.JxW (q_point));
-		
+
 		Tensor<1,dim> rhs_values;
 		rhs_values = 0;
 		cell_rhs(i) += ((fe_values[displacement].value (i, q_point) *
 				 rhs_values) *
-				fe_values.JxW (q_point));	   
+				fe_values.JxW (q_point));
 	      };
 	  };
-	
+
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  {
 	    if (cell->face (face)->at_boundary()
 		&& cell->face (face)->boundary_indicator () == 9)
 	      {
 		fe_values_face.reinit (cell, face);
-		
+
 		right_hand_side.vector_value_list (fe_values_face.get_quadrature_points(),
 						   right_hand_side_values_face);
-		
+
 		for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
 		  {
 		    Tensor<1,dim> rhs_values;
-		    rhs_values = 0;		    
+		    rhs_values = 0;
 		    for (unsigned int i=0; i<dofs_per_cell; ++i)
 		      cell_rhs(i) += (fe_values_face[displacement].value (i, q_point) *
 				      rhs_values *
@@ -887,7 +887,7 @@ void Step4<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
 		  }
 	      }
 	  }
-	
+
 	cell->get_dof_indices (local_dof_indices);
 	constraints_dirichlet_hanging_nodes.distribute_local_to_global (cell_rhs,
 									local_dof_indices,
@@ -918,7 +918,7 @@ void Step4<dim>::projection_active_set ()
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
-  
+
   TrilinosWrappers::MPI::Vector         distributed_solution (system_rhs_newton);
   distributed_solution = solution;
   TrilinosWrappers::MPI::Vector         lambda (solution);
@@ -937,30 +937,30 @@ void Step4<dim>::projection_active_set ()
 	  for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
 	    {
 	      unsigned int index_z = cell->face (face)->vertex_dof_index (v,2);
-	      
+
 	      if (vertex_touched[cell->face (face)->vertex_index(v)] == false)
 		vertex_touched[cell->face (face)->vertex_index(v)] = true;
-	      else 
+	      else
 		continue;
-	      
+
 	      // the local row where
 	      Point<dim> point (cell->face (face)->vertex (v)[0],/* + solution (index_x),*/
 				cell->face (face)->vertex (v)[1],
 				cell->face (face)->vertex (v)[2]);
-	      
+
 	      double obstacle_value = obstacle.value (point, 2);
 	      double solution_index_z = solution (index_z);
 	      double gap = obstacle_value - point (2);
-	      
+
 	      if (lambda (index_z) +
 		  c*diag_mass_matrix_vector_relevant (index_z)*(solution_index_z - gap) > 0)
 		{
 		  constraints.add_line (index_z);
 		  constraints.set_inhomogeneity (index_z, gap);
-		  
-		  distributed_solution (index_z) = gap;		    
-		  
-		  if (locally_owned_dofs.is_element (index_z))
+
+		  distributed_solution (index_z) = gap;
+
+		  if (locally_relevant_dofs.is_element (index_z))
 		    active_set.add_index (index_z);
 
 		  // std::cout<< index_z << ", "
@@ -973,7 +973,7 @@ void Step4<dim>::projection_active_set ()
 		  // 	   <<std::endl;
 		}
 	    }
-  
+
   distributed_solution.compress(Insert);
 
   unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set.n_elements (), mpi_communicator);
@@ -982,7 +982,7 @@ void Step4<dim>::projection_active_set ()
   solution = distributed_solution;
 
   constraints.close ();
-  
+
   const ConstraintMatrix::MergeConflictBehavior
     merge_conflict_behavior = ConstraintMatrix::left_object_wins;
   constraints.merge (constraints_dirichlet_hanging_nodes, merge_conflict_behavior);
@@ -1013,7 +1013,7 @@ void Step4<dim>::dirichlet_constraints ()
 					    EquationData::BoundaryValues<dim>(),
 					    constraints_dirichlet_hanging_nodes,
 					    component_mask);
-  
+
   component_mask[0] = true;
   component_mask[1] = true;
   component_mask[2] = false;
@@ -1026,7 +1026,7 @@ void Step4<dim>::dirichlet_constraints ()
 }
 
 template <int dim>
-void Step4<dim>::solve () 
+void Step4<dim>::solve ()
 {
   ReductionControl                 reduction_control (10000, 1e-15, 1e-4);
 
@@ -1034,7 +1034,7 @@ void Step4<dim>::solve ()
   distributed_solution = solution;
 
   constraints_hanging_nodes.set_zero (distributed_solution);
-  
+
   // Solving iterative
   SolverCG<TrilinosWrappers::MPI::Vector>
     solver (reduction_control, mpi_communicator);
@@ -1096,17 +1096,17 @@ void Step4<dim>::solve_newton ()
       assemble_nl_system (solution);  //compute Newton-Matrix
       end = clock();
       run_time[1] += (double)(end-start)/CLOCKS_PER_SEC;
-      
+
       number_assemble_system += 1;
-      
+
       start = clock();
       solve ();
       end = clock();
       run_time[2] += (double)(end-start)/CLOCKS_PER_SEC;
-      
+
       TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
       distributed_solution = solution;
-      
+
       int damped = 0;
       tmp_vector = old_solution;
       double a = 0;
@@ -1115,7 +1115,7 @@ void Step4<dim>::solve_newton ()
 	  a=pow(0.5,i);
 	  old_solution = tmp_vector;
 	  old_solution.sadd(1-a,a, distributed_solution);
-	  
+
 	  start = clock();
 	  system_rhs_newton = 0;
 	  sigma_eff_vector = 0;
@@ -1136,10 +1136,10 @@ void Step4<dim>::solve_newton ()
 		// 	 <<std::endl;
 		res(n) = 0;
 	      }
-	  
+
 	  resid = res.l2_norm ();
 	  pcout<< "Residual: " << resid <<std::endl;
-	  
+
 	  if (resid<resid_old)
 	    {
 	      pcout<< "Newton-damping parameter alpha = " << a <<std::endl;
@@ -1148,7 +1148,7 @@ void Step4<dim>::solve_newton ()
 	  end = clock();
 	  run_time[3] = (double)(end-start)/CLOCKS_PER_SEC;
 	}
-      
+
       if (resid<1e-8)
 	{
 	  pcout<< "Inexact Newton-method stopped with residual = " << resid <<std::endl;
@@ -1158,12 +1158,12 @@ void Step4<dim>::solve_newton ()
       resid_old=resid;
 
       resid_vector = system_rhs_newton;
-      
+
       if (active_set == active_set_old && resid < 1e-10)
 	break;
       active_set_old = active_set;
     } // End of active-set-loop
-  
+
   start = clock();
   pcout<< "Creating output." <<std::endl;
   std::ostringstream filename_solution;
@@ -1193,24 +1193,24 @@ void Step4<dim>::output_results (const std::string& title) const
   lambda = resid_vector;
 
   DataOut<dim> data_out;
-  
+
   data_out.attach_dof_handler (dof_handler);
-  
+
   data_out.add_data_vector (solution, "Displacement");
   data_out.add_data_vector (lambda, "Residual");
   data_out.add_data_vector (active_set, "ActiveSet");
-  
+
   Vector<float> subdomain (triangulation.n_active_cells());
   for (unsigned int i=0; i<subdomain.size(); ++i)
     subdomain(i) = triangulation.locally_owned_subdomain();
   data_out.add_data_vector (subdomain, "subdomain");
 
   data_out.build_patches ();
-  
+
   const std::string filename = (title + "-" +
   				Utilities::int_to_string
   				(triangulation.locally_owned_subdomain(), 4));
-  
+
   std::ofstream output_vtu ((filename + ".vtu").c_str ());
   data_out.write_vtu (output_vtu);
 
@@ -1223,11 +1223,11 @@ void Step4<dim>::output_results (const std::string& title) const
   	filenames.push_back ("solution-" +
   			     Utilities::int_to_string (i, 4) +
   			     ".vtu");
-      
+
       std::ofstream master_output ((filename + ".pvtu").c_str());
       data_out.write_pvtu_record (master_output, filenames);
     }
-  
+
   TrilinosWrappers::MPI::Vector  tmp (solution);
   tmp *= -1;
   move_mesh (tmp);
@@ -1250,7 +1250,7 @@ void Step4<dim>::move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displ
 	  if (vertex_touched[cell->vertex_index(v)] == false)
 	    {
 	      vertex_touched[cell->vertex_index(v)] = true;
-	      
+
 	      Point<dim> vertex_displacement;
 	      for (unsigned int d=0; d<dim; ++d)
 		{
@@ -1258,10 +1258,10 @@ void Step4<dim>::move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displ
 		    vertex_displacement[d]
 		      = _complete_displacement(cell->vertex_dof_index(v,d));
 		}
-	      
+
 	      cell->vertex(v) += vertex_displacement;
 	    }
-	}	  
+	}
 }
 
 template <int dim>
@@ -1298,7 +1298,7 @@ void Step4<dim>::output_results (Vector<double> vector, const std::string& title
 }
 
 template <int dim>
-void Step4<dim>::run () 
+void Step4<dim>::run ()
 {
   pcout << "Solving problem in " << dim << " space dimensions." << std::endl;
 
@@ -1392,7 +1392,7 @@ void Step4<dim>::run ()
                                  // written. By changing it you can get more
                                  // information about the innards of the
                                  // library.
-int main (int argc, char *argv[]) 
+int main (int argc, char *argv[])
 {
   deallog.depth_console (0);
 
@@ -1408,6 +1408,6 @@ int main (int argc, char *argv[])
 
   end = clock();
   cout<< "%%%%%% Rechenzeit overall = " << (double)(end-start)/CLOCKS_PER_SEC <<std::endl;
-  
+
   return 0;
 }
