@@ -928,6 +928,8 @@ void Step4<dim>::projection_active_set ()
 
   constraints.reinit(locally_relevant_dofs);
   active_set.clear ();
+  IndexSet     active_set_locally_owned;
+  active_set_locally_owned.set_size (locally_owned_dofs.size ());
   const double c = 100.0*e_modul;
 
   for (; cell!=endc; ++cell)
@@ -963,6 +965,9 @@ void Step4<dim>::projection_active_set ()
 		  if (locally_relevant_dofs.is_element (index_z))
 		    active_set.add_index (index_z);
 
+		  if (locally_owned_dofs.is_element (index_z))
+		    active_set_locally_owned.add_index (index_z);
+
 		  // std::cout<< index_z << ", "
 		  // 	   << "Error: " << lambda (index_z) +
 		  //   diag_mass_matrix_vector_relevant (index_z)*c*(solution_index_z - gap)
@@ -976,11 +981,8 @@ void Step4<dim>::projection_active_set ()
 
   distributed_solution.compress(Insert);
 
-//TODO: since the active sets on different processors also store "ghost" elements,
-// i.e. constraints for DoFs that are locally_relevant but not locally_owned,
-// the following sum doesn't make much sense. We need to count the
-// *unique* elements
-  unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set.n_elements (), mpi_communicator);
+  unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set_locally_owned.n_elements (),
+							     mpi_communicator);
   pcout << "Number of Contact-Constaints: " << sum_contact_constraints <<std::endl;
 
   solution = distributed_solution;
