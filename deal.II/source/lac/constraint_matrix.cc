@@ -2259,7 +2259,6 @@ ConstraintMatrix::memory_consumption () const
                                                                const VectorType &uncondensed_vector, \
                                                                SparseMatrix<double> &condensed, \
                                                                VectorType       &condensed_vector) const; \
-  template void ConstraintMatrix::set_zero<VectorType >(VectorType &vec) const;\
   template void ConstraintMatrix:: \
     distribute_local_to_global<VectorType > (const Vector<double>            &, \
                                              const std::vector<unsigned int> &, \
