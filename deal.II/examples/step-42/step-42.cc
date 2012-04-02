@@ -976,6 +976,10 @@ void Step4<dim>::projection_active_set ()
 
   distributed_solution.compress(Insert);
 
+//TODO: since the active sets on different processors also store "ghost" elements,
+// i.e. constraints for DoFs that are locally_relevant but not locally_owned,
+// the following sum doesn't make much sense. We need to count the
+// *unique* elements
   unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set.n_elements (), mpi_communicator);
   pcout << "Number of Contact-Constaints: " << sum_contact_constraints <<std::endl;
 
