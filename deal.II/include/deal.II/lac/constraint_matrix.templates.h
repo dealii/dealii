@@ -22,6 +22,8 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/parallel_block_vector.h>
 
 #include <iomanip>
 
@@ -698,16 +700,103 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 
 
 
+// number of functions to select the right implementation for set_zero().
+namespace internal
+{
+  namespace ConstraintMatrix
+  {
+    namespace
+      {
+	// TODO: in general we should iterate over the constraints and not over all DoFs
+	// for performance reasons
+	template<class VEC>
+	  void set_zero_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, unsigned int shift = 0)
+	  { 
+	    Assert(!vec.has_ghost_elements(), ExcInternalError());//ExcGhostsPresent());
+
+	    const unsigned int
+	      start = vec.local_range().first,
+	      end   = vec.local_range().second;
+	    for (unsigned int i=start; i<end; ++i)
+	      if (cm.is_constrained (shift + i))
+		vec(i) = 0;
+	  }
+  
+	template<class VEC>
+	  void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<false>)
+	  {
+	    set_zero_parallel(cm, vec, 0);
+	  }
+  
+	// in parallel for BlockVectors
+	template<class VEC>
+	  void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<true>)
+	  {
+	    unsigned int start_shift = 0;
+	    for (unsigned int j=0; j<vec.n_blocks(); ++j)
+	      {
+		set_zero_parallel(cm, vec.block(j), start_shift);
+		start_shift += vec.block(j).size();
+	      }
+	  }
+  
+	template<class VEC>
+	  void set_zero_serial(const dealii::ConstraintMatrix &cm, VEC &vec)
+	  {
+	    // TODO would be faster:
+	    /* std::vector<dealii::ConstraintMatrix::ConstraintLine>::const_iterator constraint_line = cm.lines.begin();
+	       for (; constraint_line!=cm.lines.end(); ++constraint_line)
+	       vec(constraint_line->line) = 0.;*/
+	    for (unsigned int i=0; i<vec.size(); ++i)
+	      if (cm.is_constrained (i))
+		vec(i) = 0;
+	  }
+
+	template<class VEC>
+	  void set_zero_all(const dealii::ConstraintMatrix &cm, VEC &vec)
+	  {
+	    set_zero_in_parallel<VEC>(cm, vec, internal::bool2type<IsBlockVector<VEC>::value>());
+	  }
+
+
+	template<class T>
+	  void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::Vector<T> &vec)
+	  {
+	    set_zero_serial(cm, vec);
+	  }
+
+	template<class T>
+	  void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::BlockVector<T> &vec)
+	  {
+	    set_zero_serial(cm, vec);
+	  }
+
+
+	template<class T>
+	  void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::parallel::distributed::Vector<T> &vec)
+	  {
+	    // should use the general template above, but requires that
+	    // some member functions are added to parallel::distributed::Vector
+	    Assert (false, ExcNotImplemented());
+	  }
+
+	template<class T>
+	  void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::parallel::distributed::BlockVector<T> &vec)
+	  {
+	    Assert (false, ExcNotImplemented());
+	  }
+      }
+  }
+}
+	
+
 template <class VectorType>
 void
 ConstraintMatrix::set_zero (VectorType &vec) const
 {
-  Assert (sorted == true, ExcMatrixNotClosed());
-
-  std::vector<ConstraintLine>::const_iterator constraint_line = lines.begin();
-  for (; constraint_line!=lines.end(); ++constraint_line)
-    vec(constraint_line->line) = 0.;
+  internal::ConstraintMatrix::set_zero_all(*this, vec);
 }
+
 
 
 
