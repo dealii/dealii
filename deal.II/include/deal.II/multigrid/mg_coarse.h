@@ -111,21 +111,14 @@ class MGCoarseGridLACIteration :  public MGCoarseGridBase<VECTOR>
 
 
 
-//TODO: Improve QR-factorization to make this more efficient.
-
 /**
- * Coarse grid solver by QR factorization
+ * Coarse grid solver by QR factorization implemented in the class Householder.
  *
- * This is a direct solver for possibly indefinite coarse grid
- * problems, using the @p least_squares function of the class
- * FullMatrix.
+ * Upon initialization, the QR decomposition of the matrix is
+ * computed. then, the operator() uses Householder::least_squares() to
+ * compute the action of the inverse.
  *
- * Since the currently implemented Householder algorithm transforms
- * the right hand side immediately, the transformation has to be
- * computed for each coarse grid solution. Therefore, this coarse grid
- * solver may be inefficient for larger coarse grid systems.
- *
- * @author Guido Kanschat, 2003
+ * @author Guido Kanschat, 2003, 2012
  */
 template<typename number = double, class VECTOR = Vector<number> >
 class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
