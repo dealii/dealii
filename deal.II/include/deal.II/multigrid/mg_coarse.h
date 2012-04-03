@@ -169,7 +169,7 @@ class MGCoarseGridSVD : public MGCoarseGridBase<VECTOR>
                                       * matrix. This resets the
                                       * dimensions to the 
                                       */
-    void initialize (const FullMatrix<number>& A, const double threshold = 1.e-12);
+    void initialize (const FullMatrix<number>& A, const double threshold = 0);
     
     void operator() (const unsigned int   level,
                      VECTOR       &dst,
