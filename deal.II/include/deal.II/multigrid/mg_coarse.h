@@ -134,16 +134,7 @@ class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
                                       * Initialize for a new matrix.
                                       */
     void initialize (const FullMatrix<number>& A);
-
-                                     /**
-                                      * Release matrix pointer.
-                                      */
-    void clear ();
-
-                                     /**
-                                      * Solution operator, defined in
-                                      * the base class.
-                                      */
+    
     void operator() (const unsigned int   level,
                      VECTOR       &dst,
                      const VECTOR &src) const;
@@ -153,6 +144,48 @@ class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
                                       * Matrix for QR-factorization.
                                       */
     Householder<number> householder;
+};
+
+/**
+ * Coarse grid solver using singular value decomposition of LAPACK matrices.
+ *
+ * Upon initialization, the singular value decomposition of the matrix is
+ * computed. then, the operator() uses 
+ *
+ * @author Guido Kanschat, 2003, 2012
+ */
+template<typename number = double, class VECTOR = Vector<number> >
+class MGCoarseGridSVD : public MGCoarseGridBase<VECTOR>
+{
+  public:
+                                     /**
+                                      * Constructor leaving an
+                                      * uninitialized object.
+                                      */
+    MGCoarseGridSVD ();
+    
+                                     /**
+                                      * Initialize for a new
+                                      * matrix. This resets the
+                                      * dimensions to the 
+                                      */
+    void initialize (const FullMatrix<number>& A, const double threshold = 1.e-12);
+    
+    void operator() (const unsigned int   level,
+                     VECTOR       &dst,
+                     const VECTOR &src) const;
+    
+				     /**
+				      * Write the singular values to #deallog.
+				      */
+    void log () const;
+    
+  private:
+    
+                                     /**
+                                      * Matrix for singular value decomposition.
+                                      */
+    LAPACKFullMatrix<number> matrix;
 };
 
 /*@}*/
@@ -274,13 +307,6 @@ MGCoarseGridHouseholder<number, VECTOR>::initialize(
 
 template<typename number, class VECTOR>
 void
-MGCoarseGridHouseholder<number, VECTOR>::clear()
-{}
-
-
-
-template<typename number, class VECTOR>
-void
 MGCoarseGridHouseholder<number, VECTOR>::operator() (
   const unsigned int,
   VECTOR       &dst,
@@ -288,6 +314,50 @@ MGCoarseGridHouseholder<number, VECTOR>::operator() (
 {
   householder.least_squares(dst, src);
 }
+
+//---------------------------------------------------------------------------
+
+template<typename number, class VECTOR>
+inline
+MGCoarseGridSVD<number, VECTOR>::MGCoarseGridSVD()
+{}
+
+
+
+template<typename number, class VECTOR>
+void
+MGCoarseGridSVD<number, VECTOR>::initialize(
+  const FullMatrix<number>& A,
+  double threshold)
+{
+  matrix.reinit(A.n_rows(), A.n_cols());
+  matrix = A;
+  matrix.compute_inverse_svd(threshold);
+}
+
+
+template<typename number, class VECTOR>
+void
+MGCoarseGridSVD<number, VECTOR>::operator() (
+  const unsigned int,
+  VECTOR       &dst,
+  const VECTOR &src) const
+{
+  matrix.vmult(dst, src);
+}
+
+
+template<typename number, class VECTOR>
+void
+MGCoarseGridSVD<number, VECTOR>::log() const
+{
+  const unsigned int n = std::min(matrix.n_rows(), matrix.n_cols());
+  
+  for (unsigned int i=0;i<n;++i)
+    deallog << ' ' << matrix.singular_value(i);
+  deallog << std::endl;
+}
+
 
 #endif // DOXYGEN
 
