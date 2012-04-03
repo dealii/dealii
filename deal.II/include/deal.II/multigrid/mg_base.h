@@ -107,8 +107,7 @@ class MGCoarseGridBase : public Subscriptor
     virtual ~MGCoarseGridBase ();
 
                                      /**
-                                      * Solver method implemented by
-                                      * derived classes.
+                                      * Solution operator.
                                       */
     virtual void operator() (const unsigned int   level,
                              VECTOR       &dst,
