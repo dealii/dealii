@@ -228,11 +228,22 @@ class PreconditionBlockBase
                                       */
     const FullMatrix<number>& diagonal (unsigned int i) const;
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
+				     /**
+				      * Print some statistics about
+				      * the inverses to #deallog. Output depends
+				      * on #Inversion. It is richest
+				      * for svd, where we obtain
+				      * statistics on extremal
+				      * singular values and condition
+				      * numbers.
+				      */
+    void log_statistics () const;
+    
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
     std::size_t memory_consumption () const;
 
                                      /**
@@ -657,6 +668,53 @@ inline bool
 PreconditionBlockBase<number>::inverses_ready() const
 {
   return var_inverses_ready;
+}
+
+
+template <typename number>
+inline void
+PreconditionBlockBase<number>::log_statistics () const
+{
+  deallog << "PreconditionBlockBase: " << size() << " blocks; ";
+
+  if (inversion == svd)
+    {
+      unsigned int kermin = 100000000, kermax = 0;
+      double sigmin = 1.e300, sigmax= -1.e300;
+      double kappamin = 1.e300, kappamax= -1.e300;
+      
+      for (unsigned int b=0;b<size();++b)
+	{
+	  const LAPACKFullMatrix<number>& matrix = inverse_svd(b);
+	  unsigned int k=1;
+	  while (k <= matrix.n_cols() && matrix.singular_value(matrix.n_cols()-k) == 0)
+	    ++k;
+	  const double s0 = matrix.singular_value(0);
+	  const double sm = matrix.singular_value(matrix.n_cols()-k);
+	  const double co = sm/s0;
+	  
+	  if (kermin > k) kermin = k-1;
+	  if (kermax < k) kermax = k-1;
+	  if (s0 < sigmin) sigmin = s0;
+	  if (sm > sigmax) sigmax = sm;
+	  if (co < kappamin) kappamin = co;
+	  if (co > kappamax) kappamax = co;	    
+	}
+      deallog << "dim ker [" << kermin << ':' << kermax
+	      << "] sigma [" << sigmin << ':' << sigmax
+	      << "] kappa [" << kappamin << ':' << kappamax << ']' << std::endl;
+      
+    }
+  else if (inversion == householder)
+    {
+    }
+  else if (inversion == gauss_jordan)
+    {
+    }
+  else
+    {
+      Assert(false, ExcNotImplemented());
+    }
 }
 
 

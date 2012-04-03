@@ -342,7 +342,8 @@ class RelaxationBlockJacobi : public virtual Subscriptor,
                                       * Make function of base class public again.
                                       */
     using RelaxationBlock<MATRIX, inverse_type>::inverse_svd;
-                                     /**
+    using PreconditionBlockBase<inverse_type>::log_statistics;
+                                    /**
                                       * Perform one step of the Jacobi
                                       * iteration.
                                       */
@@ -424,6 +425,7 @@ class RelaxationBlockSOR : public virtual Subscriptor,
                                       * Make function of base class public again.
                                       */
     using RelaxationBlock<MATRIX, inverse_type>::inverse_svd;
+    using PreconditionBlockBase<inverse_type>::log_statistics;
                                      /**
                                       * Perform one step of the SOR
                                       * iteration.
@@ -503,6 +505,7 @@ class RelaxationBlockSSOR : public virtual Subscriptor,
                                       * Make function of base class public again.
                                       */
     using RelaxationBlock<MATRIX, inverse_type>::inverse_svd;
+    using PreconditionBlockBase<inverse_type>::log_statistics;
                                      /**
                                       * Perform one step of the SOR
                                       * iteration.

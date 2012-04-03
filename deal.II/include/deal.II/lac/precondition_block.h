@@ -613,6 +613,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
     using PreconditionBlockBase<inverse_type>::inverse;
     using PreconditionBlockBase<inverse_type>::inverse_householder;
     using PreconditionBlockBase<inverse_type>::inverse_svd;
+    using PreconditionBlockBase<inverse_type>::log_statistics;
                                      /**
                                       * @deprecated Use size() instead
                                       */
@@ -784,6 +785,7 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     using PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
     using PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
     using PreconditionBlock<MATRIX, inverse_type>::set_permutation;
+    using PreconditionBlockBase<inverse_type>::log_statistics;
 
                                      /**
                                       * Execute block SOR
@@ -973,6 +975,7 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
     using PreconditionBlockBase<inverse_type>::inverse;
     using PreconditionBlockBase<inverse_type>::inverse_householder;
     using PreconditionBlockBase<inverse_type>::inverse_svd;
+    using PreconditionBlockBase<inverse_type>::log_statistics;
     using PreconditionBlockSOR<MATRIX,inverse_type>::set_permutation;
     using PreconditionBlockSOR<MATRIX, inverse_type>::empty;
     using PreconditionBlockSOR<MATRIX, inverse_type>::el;
