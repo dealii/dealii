@@ -105,6 +105,7 @@ while(<>)
 	$args0 = $args;
 	$args0 =~ s/\*[^,]*,/\*,/g;
 	$args0 =~ s/\*[^,]*$/\*/g;
+	
 	# First, do the general template None of these functions is
 	# implemented, but they allow us to link for instance with
 	# long double lapack support
@@ -117,7 +118,8 @@ while(<>)
 	}
 	$typet =~ s/double/number1/g;
 
-	$templates .= "\n\n//--------------------------------------------------------------------------------//\ntemplate<typename number1";
+	$templates .= "\n\n/// Template wrapper for LAPACK functions d$name and s$name\n";
+	$templates .= "template<typename number1";
 	for (my $i=2;$i<$numbers;++$i)
 	{
 	    $templates .= ", typename number$i";
