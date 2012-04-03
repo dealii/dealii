@@ -102,7 +102,10 @@ class LAPACKFullMatrix : public TransposeTable<number>
 
                                      /**
                                       * Assignment operator for a
-                                      * regular FullMatrix.
+                                      * regular FullMatrix. Note that
+                                      * since LAPACK expects matrices
+                                      * in transposed order, this
+                                      * transposition is included here.
                                       */
     template <typename number2>
     LAPACKFullMatrix<number> &
@@ -120,7 +123,9 @@ class LAPACKFullMatrix : public TransposeTable<number>
 
                                      /**
                                       * Assignment from different
-                                      * matrix classes. This
+                                      * matrix classes, performing the
+                                      * usual conversion to the
+                                      * transposed format expected by LAPACK. This
                                       * assignment operator uses
                                       * iterators of the class
                                       * MATRIX. Therefore, sparse
@@ -164,6 +169,29 @@ class LAPACKFullMatrix : public TransposeTable<number>
                                      /**
                                       * Matrix-vector-multiplication.
                                       *
+				      * Depending on previous
+				      * transformations recorded in #state, the
+				      * result of this function is one
+				      * of
+				      *
+				      * <ul>
+				      * <li> If #state is LAPACKSupport::matrix or
+				      * LAPACKSupport::inverse_matrix,
+				      * this will be a regular matrix
+				      * vector product using LAPACK
+				      * gemv().
+				      * <li> If #state is
+				      * LAPACKSupport::svd or
+				      * LAPACKSupport::inverse_svd,
+				      * this function first multiplies
+				      * with the right transformation
+				      * matrix, then with the diagonal
+				      * matrix of singular values or
+				      * their reciprocal values, and
+				      * finally with the left
+				      * trandformation matrix.
+				      * </ul>
+				      *
                                       * The optional parameter
                                       * <tt>adding</tt> determines, whether the
                                       * result is stored in <tt>w</tt> or added
@@ -175,7 +203,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
                                       * if (!adding)
                                       *  <i>w = A*v</i>
                                       *
-                                      * Source and destination must
+                                      * @note Source and destination must
                                       * not be the same vector.
                                       *
                                       * @note This template only
@@ -190,14 +218,9 @@ class LAPACKFullMatrix : public TransposeTable<number>
                                       * Adding Matrix-vector-multiplication.
                                       *  <i>w += A*v</i>
                                       *
-                                      * Source and destination must
-                                      * not be the same vector.
-                                      *
-                                      * @note This template only
-                                      * exists for compile-time
-                                      * compatibility with
-                                      * FullMatrix. Implementation is
-                                      * only available for <tt>VECTOR=Vector&lt;number&gt;</tt>
+				      * See the documentation of
+				      * vmult() for details on the
+				      * implementation.
                                       */
     template <class VECTOR>
     void vmult_add (VECTOR& w, const VECTOR& v) const;
@@ -217,15 +240,9 @@ class LAPACKFullMatrix : public TransposeTable<number>
                                       * if (!adding)
                                       *  <i>w = A<sup>T</sup>*v</i>
                                       *
-                                      *
-                                      * Source and destination must
-                                      * not be the same vector.
-                                      *
-                                      * @note This template only
-                                      * exists for compile-time
-                                      * compatibility with
-                                      * FullMatrix. Implementation is
-                                      * only available for <tt>VECTOR=Vector&lt;number&gt;</tt>
+				      * See the documentation of
+				      * vmult() for details on the
+				      * implementation.
                                       */
     template <class VECTOR>
     void Tvmult (VECTOR& w, const VECTOR& v,
@@ -236,14 +253,9 @@ class LAPACKFullMatrix : public TransposeTable<number>
                                       * matrix-vector-multiplication.
                                       *  <i>w += A<sup>T</sup>*v</i>
                                       *
-                                      * Source and destination must
-                                      * not be the same vector.
-                                      *
-                                      * @note This template only
-                                      * exists for compile-time
-                                      * compatibility with
-                                      * FullMatrix. Implementation is
-                                      * only available for <tt>VECTOR=Vector&lt;number&gt;</tt>
+				      * See the documentation of
+				      * vmult() for details on the
+				      * implementation.
                                       */
     template <class VECTOR>
     void Tvmult_add (VECTOR& w, const VECTOR& v) const;
