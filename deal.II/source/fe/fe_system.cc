@@ -386,47 +386,15 @@ template <int dim, int spacedim>
 FiniteElement<dim,spacedim>*
 FESystem<dim,spacedim>::clone() const
 {
-  switch (this->n_base_elements())
+  std::vector< const FiniteElement<dim,spacedim>* >  fes;
+  std::vector<unsigned int> multiplicities;
+
+  for (unsigned int i=0; i<this->n_base_elements(); i++)
     {
-    case 1:
-      return new FESystem(base_element(0),
-                          this->element_multiplicity(0));
-    case 2:
-      return new FESystem(base_element(0),
-                          this->element_multiplicity(0),
-                          base_element(1),
-                          this->element_multiplicity(1));
-    case 3:
-      return new FESystem(base_element(0),
-                          this->element_multiplicity(0),
-                          base_element(1),
-                          this->element_multiplicity(1),
-                          base_element(2),
-                          this->element_multiplicity(2));
-    case 4:
-      return new FESystem(base_element(0),
-                          this->element_multiplicity(0),
-                          base_element(1),
-                          this->element_multiplicity(1),
-                          base_element(2),
-                          this->element_multiplicity(2),
-                          base_element(3),
-                          this->element_multiplicity(3));
-    case 5:
-      return new FESystem(base_element(0),
-                          this->element_multiplicity(0),
-                          base_element(1),
-                          this->element_multiplicity(1),
-                          base_element(2),
-                          this->element_multiplicity(2),
-                          base_element(3),
-                          this->element_multiplicity(3),
-                          base_element(4),
-                          this->element_multiplicity(4));
-      default:
-                          Assert(false, ExcNotImplemented());
+      fes.push_back( & base_element(i) );
+      multiplicities.push_back(this->element_multiplicity(i) );
     }
-  return 0;
+  return new FESystem<dim>(fes, multiplicities);
 }
 
 
