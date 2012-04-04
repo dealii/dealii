@@ -394,7 +394,7 @@ FESystem<dim,spacedim>::clone() const
       fes.push_back( & base_element(i) );
       multiplicities.push_back(this->element_multiplicity(i) );
     }
-  return new FESystem<dim>(fes, multiplicities);
+  return new FESystem<dim,spacedim>(fes, multiplicities);
 }
 
 
