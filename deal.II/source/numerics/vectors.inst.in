@@ -645,6 +645,33 @@ for (deal_II_dimension : DIMENSIONS)
      const ConstraintMatrix                             &,
      Vector<double>                                     &);
 
+  template
+    void interpolate_boundary_values
+    (const Mapping<deal_II_dimension>    &,
+     const DoFHandler<deal_II_dimension> &,
+     const types::boundary_id_t,
+     const Function<deal_II_dimension>   &,
+     ConstraintMatrix                    &,
+     const std::vector<bool>             &);
+
+  template
+    void interpolate_boundary_values
+    (const Mapping<deal_II_dimension>        &,
+     const hp::DoFHandler<deal_II_dimension> &,
+     const types::boundary_id_t,
+     const Function<deal_II_dimension>       &,
+     ConstraintMatrix                        &,
+     const std::vector<bool>                 &);
+
+  template
+    void interpolate_boundary_values
+    (const Mapping<deal_II_dimension>      &,
+     const MGDoFHandler<deal_II_dimension> &,
+     const types::boundary_id_t,
+     const Function<deal_II_dimension>     &,
+     ConstraintMatrix                      &,
+     const std::vector<bool>               &);
+
   \}
 }
 
