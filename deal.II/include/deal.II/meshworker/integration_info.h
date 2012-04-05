@@ -404,6 +404,20 @@ namespace MeshWorker
                                         * @name FEValues setup
                                         */
                                        /* @{ */
+
+				       /**
+					* Call this function after
+					* initialize() in order to
+					* guess the update flags
+					* needed.
+					*
+					* In most cases, this sets all
+					* the update flags required
+					* for computations. If more
+					* are needed, call one of the
+					* functions below to add more
+					* update flags.
+					*/
       void initialize_update_flags();
 
                                        /**
