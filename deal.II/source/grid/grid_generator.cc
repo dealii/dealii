@@ -2929,7 +2929,6 @@ void GridGenerator::quarter_hyper_shell (Triangulation<3> & tria,
       const double c = a*std::sqrt(3.0)/2e0;
       const double d = b*std::sqrt(3.0)/2e0;
       const double e = outer_radius/2e0;
-      const double f = outer_radius*std::sqrt(3.0)/2e0;
       const double h = inner_radius/2e0;
 
       std::vector<Point<3> > vertices;
