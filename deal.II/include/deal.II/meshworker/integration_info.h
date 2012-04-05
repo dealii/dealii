@@ -406,19 +406,26 @@ namespace MeshWorker
                                        /* @{ */
 
 				       /**
-					* Call this function after
+					* Call this function before
 					* initialize() in order to
 					* guess the update flags
-					* needed.
+					* needed, based on the data
+					* selected.
 					*
-					* In most cases, this sets all
-					* the update flags required
-					* for computations. If more
-					* are needed, call one of the
-					* functions below to add more
-					* update flags.
+					* When computing face fluxes,
+					* we normally can use the
+					* geometry (integration
+					* weights and normal vectors)
+					* from the original cell and
+					* thus can avoid updating
+					* these values on the
+					* neighboring cell. Set
+					* <tt>neighbor_geometry</tt>
+					* to true in order to
+					* initialize these values as
+					* well.
 					*/
-      void initialize_update_flags();
+      void initialize_update_flags(bool neighbor_geometry = false);
 
                                        /**
                                         * Add FEValues UpdateFlags for

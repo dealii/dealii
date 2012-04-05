@@ -149,12 +149,14 @@ namespace MeshWorker
 
   template<int dim, int sdim>
   void
-  IntegrationInfoBox<dim,sdim>::initialize_update_flags ()
+  IntegrationInfoBox<dim,sdim>::initialize_update_flags (bool neighbor_geometry)
   {
     cell_flags |= update_JxW_values;
     boundary_flags |= UpdateFlags(update_JxW_values | update_normal_vectors);
     face_flags |= boundary_flags;
-    neighbor_flags |= update_default;
+    neighbor_flags |= neighbor_geometry
+		      ? boundary_flags
+		      : update_default;
 
     if (cell_selector.has_values() != 0) cell_flags |= update_values;
     if (cell_selector.has_gradients() != 0) cell_flags |= update_gradients;
