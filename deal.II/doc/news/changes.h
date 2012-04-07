@@ -48,6 +48,12 @@ used for boundary indicators.
 
 <ol>
 <li>
+Changed: The version of BOOST we ship with deal.II has been upgraded
+to 1.49.0.
+<br>
+(Martin Kronbichler, 2012/04/07)
+
+<li>
 New: We have added a brief section to the step-12 tutorial programs that
 compares the DG solution computed there with one that one would obtain by
 using a continuous finite element.

@@ -32,11 +32,11 @@
 #      define UINTMAX_C(x) x ## ULL
 #    endif
 
-#    include "../contrib/boost-1.46.1/libs/thread/src/pthread/once.cpp"
-#    include "../contrib/boost-1.46.1/libs/thread/src/pthread/thread.cpp"
+#    include "../contrib/boost-1.49.0/libs/thread/src/pthread/once.cpp"
+#    include "../contrib/boost-1.49.0/libs/thread/src/pthread/thread.cpp"
 #  else
-#    include "../contrib/boost-1.46.1/libs/thread/src/win32/once.cpp"
-#    include "../contrib/boost-1.46.1/libs/thread/src/win32/thread.cpp"
+#    include "../contrib/boost-1.49.0/libs/thread/src/win32/once.cpp"
+#    include "../contrib/boost-1.49.0/libs/thread/src/win32/thread.cpp"
 #  endif
 
 #endif
