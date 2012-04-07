@@ -33,7 +33,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <fstream>
-
+#include <numeric>
 
 
 void test ()
