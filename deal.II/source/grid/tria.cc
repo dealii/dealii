@@ -5808,7 +5808,7 @@ namespace internal
                                                                  // now we have to copy
                                                                  // all information of the
                                                                  // two quads
-                                const int switch_1_lines[4]=
+                                const unsigned int switch_1_lines[4]=
                                   {switch_1->line_index(0),
                                    switch_1->line_index(1),
                                    switch_1->line_index(2),
@@ -6173,7 +6173,7 @@ namespace internal
                           {{1,0},   // child 0, line_orientation=false and true
                            {0,1}};  // child 1, line_orientation=false and true
 
-                        const unsigned int line_indices[12]
+                        const int line_indices[12]
                           = { quad->line(0)->child(index[0][quad->line_orientation(0)])->index(),
                               quad->line(0)->child(index[1][quad->line_orientation(0)])->index(),
                               quad->line(1)->child(index[0][quad->line_orientation(1)])->index(),
@@ -6500,7 +6500,7 @@ namespace internal
                         *lines=0;
                       const unsigned int *line_indices=0;
                       const bool *line_orientation=0;
-                      const unsigned int *quad_indices=0;
+                      const int *quad_indices=0;
 
                                                        // little helper table, indicating,
                                                        // whether the child with index 0
@@ -6710,7 +6710,7 @@ namespace internal
                                                              // take care of the
                                                              // orientation of
                                                              // faces.
-                            const unsigned int quad_indices_x[11]
+                            const int quad_indices_x[11]
                               = {
                                   new_quads[0]->index(),     //0
 
@@ -6922,7 +6922,7 @@ namespace internal
                                                              // take care of the
                                                              // orientation of
                                                              // faces.
-                            const unsigned int quad_indices_y[11]
+                            const int quad_indices_y[11]
                               = {
                                   new_quads[0]->index(),     //0
 
@@ -7137,7 +7137,7 @@ namespace internal
                                                              // take care of the
                                                              // orientation of
                                                              // faces.
-                            const unsigned int quad_indices_z[11]
+                            const int quad_indices_z[11]
                               = {
                                   new_quads[0]->index(),     //0
 
@@ -7472,7 +7472,7 @@ namespace internal
                                                              // take care of the
                                                              // orientation of
                                                              // faces.
-                            const unsigned int quad_indices_xy[20]
+                            const int quad_indices_xy[20]
                               = {
                                   new_quads[0]->index(),     //0
                                   new_quads[1]->index(),
@@ -7833,7 +7833,7 @@ namespace internal
                                                              // take care of the
                                                              // orientation of
                                                              // faces.
-                            const unsigned int quad_indices_xz[20]
+                            const int quad_indices_xz[20]
                               = {
                                   new_quads[0]->index(),     //0
                                   new_quads[1]->index(),
@@ -8201,7 +8201,7 @@ namespace internal
                                                              // take care of the
                                                              // orientation of
                                                              // faces.
-                            const unsigned int quad_indices_yz[20]
+                            const int quad_indices_yz[20]
                               = {
                                   new_quads[0]->index(),     //0
                                   new_quads[1]->index(),
@@ -8734,7 +8734,7 @@ namespace internal
                                                              // take care of the
                                                              // orientation of
                                                              // faces.
-                            const unsigned int quad_indices_xyz[36]
+                            const int quad_indices_xyz[36]
                               = {
                                   new_quads[0]->index(),     //0
                                   new_quads[1]->index(),
