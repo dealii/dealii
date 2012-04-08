@@ -408,8 +408,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
-    CXXFLAGSO="$CXXFLAGSO -O2 -funroll-loops -funroll-all-loops -fstrict-aliasing -Wuninitialized -felide-constructors -ftemplate-depth-128"
-    CXXFLAGSG="$CXXFLAGSG -DDEBUG -Wall -W -Wpointer-arith -Wwrite-strings -Wsynth -Wsign-compare -Wswitch -ftemplate-depth-128"
+    CXXFLAGSO="$CXXFLAGSO -O2 -funroll-loops -funroll-all-loops -fstrict-aliasing -Wuninitialized -felide-constructors"
+    CXXFLAGSG="$CXXFLAGSG -DDEBUG -Wall -W -Wpointer-arith -Wwrite-strings -Wsynth -Wsign-compare -Wswitch"
 
     dnl gcc 4.4 has an interesting problem in that it doesn't
     dnl care for one of BOOST signals2's header files and produces
