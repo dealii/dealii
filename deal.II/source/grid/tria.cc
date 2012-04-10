@@ -9537,6 +9537,8 @@ Triangulation<dim, spacedim>::get_boundary_indicators () const
     }
   else
     {
+//TODO: if boundary_id_t is a real integer type, this might become
+//a humongously large array...
       std::vector<bool> bi_exists(types::internal_face_boundary_id, false);
       active_cell_iterator cell=begin_active();
       for (; cell!=end(); ++cell)
