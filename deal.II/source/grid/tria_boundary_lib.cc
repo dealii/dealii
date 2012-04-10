@@ -1141,6 +1141,7 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
                                            // inner part of the shell. proceed
                                            // as in the base class
           HyperShellBoundary<dim>::get_intermediate_points_on_line (line, points);
+	break;
       }
 
                                              // in 3d, a line is a straight
@@ -1150,28 +1151,29 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
                                              // inner or outer sphere
       case 3:
       {
-
-            if (((line->vertex(0)(0) == this->center(0))
-                 &&
-                 (line->vertex(1)(0) == this->center(0)))
-                &&
-                !(((std::fabs (line->vertex(0).distance (this->center)
-                               - inner_radius) < 1e-12 * outer_radius)
-                   &&
-                   (std::fabs (line->vertex(1).distance (this->center)
-                               - inner_radius) < 1e-12 * outer_radius))
-                  ||
-                  ((std::fabs (line->vertex(0).distance (this->center)
-                               - outer_radius) < 1e-12 * outer_radius)
-                   &&
-                   (std::fabs (line->vertex(1).distance (this->center)
-                               - outer_radius) < 1e-12 * outer_radius))))
+	if (((line->vertex(0)(0) == this->center(0))
+	     &&
+	     (line->vertex(1)(0) == this->center(0)))
+	    &&
+	    !(((std::fabs (line->vertex(0).distance (this->center)
+			   - inner_radius) < 1e-12 * outer_radius)
+	       &&
+	       (std::fabs (line->vertex(1).distance (this->center)
+			   - inner_radius) < 1e-12 * outer_radius))
+	      ||
+	      ((std::fabs (line->vertex(0).distance (this->center)
+			   - outer_radius) < 1e-12 * outer_radius)
+	       &&
+	       (std::fabs (line->vertex(1).distance (this->center)
+			   - outer_radius) < 1e-12 * outer_radius))))
           StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
         else
                                            // otherwise we are on the outer or
                                            // inner part of the shell. proceed
                                            // as in the base class
           HyperShellBoundary<dim>::get_intermediate_points_on_line (line, points);
+
+	break;
       }
 
       default:
