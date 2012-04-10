@@ -1954,7 +1954,7 @@ namespace GridTools
                     }
 
                   c_data.vertices[j] = map_vert_index[v_index];
-                  c_data.material_id = face->boundary_indicator();
+                  c_data.material_id = static_cast<types::material_id_t>(face->boundary_indicator());
                 }
 
               cells.push_back(c_data);
