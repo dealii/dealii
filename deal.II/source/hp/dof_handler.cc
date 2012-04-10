@@ -2819,7 +2819,7 @@ template <>
   }
 
   template <>
-  unsigned int DoFHandler<1,3>::n_boundary_dofs (const std::set<unsigned char> &) const
+  unsigned int DoFHandler<1,3>::n_boundary_dofs (const std::set<types::boundary_id_t> &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
