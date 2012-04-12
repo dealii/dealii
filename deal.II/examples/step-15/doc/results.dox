@@ -1,117 +1,107 @@
 <h1>Results</h1>
 
 
-If run, the program generates output like this:
-
-
+The output of the program looks as follows:
 @code
-Realization 0:
-   Energy: 0.00377302
-   Energy: 0.00106138
-   Energy: 0.000514363
-   Energy: 0.000382105
-   Energy: 0.000339017
-   Energy: 0.000327948
-   Energy: 0.000320299
-   Energy: 0.000318016
-   Energy: 0.000316735
-   Energy: 0.000316536
-   Energy: 0.000316463
-   Energy: 0.000316285
-   Energy: 0.000316227
-   Energy: 0.000316221
-   Energy: 0.00031622
-
-Realization 1:
-   Energy: 0.00279316
-   Energy: 0.000896516
-   Energy: 0.000504609
-   Energy: 0.000392703
-   Energy: 0.000317725
-   Energy: 0.000291881
-   Energy: 0.000288243
-   Energy: 0.000283541
-   Energy: 0.000282406
-   Energy: 0.000281842
-   Energy: 0.000281752
-   Energy: 0.000281743
-   Energy: 0.000281743
-
+residual:17.1036
+residual:0.0493566
+residual:0.0437197
+residual:0.0388877
+residual:0.0346918
+mesh-refinement:1
+residual:0.0479423
+residual:0.0427299
+residual:0.0381861
+residual:0.03418
+residual:0.0306245
+mesh-refinement:2
 ....
+residual:0.00354605
+residual:0.00318818
+residual:0.00286721
+residual:0.00257911
+residual:0.00232034
+mesh-refinement:7
+residual:0.00211166
+residual:0.00189985
+residual:0.00170948
+residual:0.00153832
+residual:0.00138438
+mesh-refinement:8
+residual:0.00143114
+residual:0.00128729
+residual:0.00115805
+residual:0.00104189
+residual:0.000937454
+mesh-refinement:9
 
-Realization 9:
-   Energy: 0.0103729
-   Energy: 0.0082121
-   Energy: 0.00733742
-   Energy: 0.00728154
-   Energy: 0.00725198
-   Energy: 0.00724302
-   Energy: 0.00724019
-   Energy: 0.00723837
-   Energy: 0.00723783
-   Energy: 0.00723772
-   Energy: 0.00690564
-   Energy: 0.00690562
 @endcode
 
 
-The lowest energy yet seen is in this run (you only get this by increasing the
-number of runs):
-
-@code
-Realization 18:
-   Energy: 0.00200645
-   Energy: 0.000638519
-   Energy: 0.00022749
-   Energy: 9.18962e-05
-   Energy: 5.42442e-05
-   Energy: 3.94415e-05
-   Energy: 3.42307e-05
-   Energy: 3.30727e-05
-   Energy: 3.19998e-05
-   Energy: 3.18104e-05
-   Energy: 2.97091e-05
-   Energy: 3.5011e-05
-@endcode
-
-
-Apparently something went wrong in the last step (the energy increased, which
-it shouldn't - but then this is a strongly nonlinear problem), which is also
-why the program aborted after this iteration. Apart from this, the iterations
-shown above demonstrate that our program indeed is able to reduce the energy
-in the solution in each iteration, as should be.
 
 
 
-Since the program did not really deliver the goal we had originally intended
-for (the computation of the minimal energy of finite element spaces), the
-graphical output is also not very exciting. Here are plots of five of the
-first 10 solutions:
 
-
-@image html step-15.solution-1.png
+The final solution, as written by the program at the end of the
+<code>%run()</code> function, looks as follows:
 
 
 
-And here are the first 100 solutions, where each node in each solution is
-represented as a dot. As can be seen, all the solutions cluster somewhat
-around the $x^{1/3}$ curve, here shown in turquoise:
-
-
-@image html step-15.solution-2.png
+@image html step-6.solution.png
 
 
 
-Note that this behavior is mostly independent of the choice of starting data
-(which we have chosen to be close to this curve), which a posteriori justfies
-our choice. Some of the curves actually show a linear behavior of the solution
-close to the origin; this is particularly obvious when the curves are viewed
-in a log-log plot (not shown here, but rather left as an exercise to the
-reader).
+In each cycle, the program furthermore writes the grid in EPS
+format. These are shown in the following:
 
 
 
-Given the almost complete absence of interesting results of this program, we
-hope that at least its source code provided some information with respect to
-programming with deal.II
+<TABLE WIDTH="100%">
+<tr>
+<td>
+  @image html step-6.grid-0.png
+</td>
+<td>
+  @image html step-6.grid-1.png
+</td>
+</tr>
 
+<tr>
+<td>
+  @image html step-6.grid-2.png
+</td>
+<td>
+  @image html step-6.grid-3.png
+</td>
+</tr>
+
+<tr>
+<td>
+  @image html step-6.grid-4.png
+</td>
+<td>
+  @image html step-6.grid-5.png
+</td>
+</tr>
+
+<tr>
+<td>
+  @image html step-6.grid-6.png
+</td>
+<td>
+  @image html step-6.grid-7.png
+</td>
+</tr>
+</table>
+
+
+
+It is clearly visible that the region where the solution has a kink,
+i.e. the circle at radial distance 0.5 from the center, is
+refined most. Furthermore, the central region where the solution is
+very smooth and almost flat, is almost not refined at all, but this
+results from the fact that we did not take into account that the
+coefficient is large there. The region outside is refined rather
+randomly, since the second derivative is constant there and refinement
+is therefore mostly based on the size of the cells and their deviation
+from the optimal square.
