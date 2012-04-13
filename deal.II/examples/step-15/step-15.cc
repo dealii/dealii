@@ -492,6 +492,19 @@ void Step15<dim>::run ()
 	while(first_step || (res>1e-3))
 	{
 
+				// In the first step, we compute the solution on the two times globally 
+				// refined mesh. After that the mesh will be refined 
+				// adaptively, in order to not get too many cells. The refinement 
+				// is the first thing done every time we restart the process in the while-loop.
+		if(!first_step)
+		{
+			refine_grid();
+
+			std::cout<<"********mesh-refinement:"<<refinement+1<<" ********"<<std::endl;
+			refinement++;
+		}
+
+
 				// First thing to do after refining the mesh, is to setup the vectors,
 				// matrices, etc., which is done in the <code>setup_system</code>
 				// function.
@@ -542,29 +555,7 @@ void Step15<dim>::run ()
 		std::ofstream output (filename.c_str());
 		data_out.write_vtk (output);
 
-				// last thing to do is to refine the mesh:
-
-		refine_grid();
-
-		std::cout<<"********mesh-refinement:"<<refinement+1<<" ********"<<std::endl;
-		refinement++;
-
 	}
-
-				// After the residual is less than $10^{-3}$, the final-solution
-				// is written in a vtk-file:
-
-  DataOutBase::EpsFlags vtk_flags;
-
-  DataOut<dim> data_out;
-  data_out.set_flags (vtk_flags);
-
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (present_solution, "solution");
-  data_out.build_patches (6);
-
-  std::ofstream output ("final-solution.vtk");
-  data_out.write_vtk (output);
 }
 
 								// @ sect4{The main function}
@@ -608,3 +599,4 @@ int main ()
     }
   return 0;
 }
+

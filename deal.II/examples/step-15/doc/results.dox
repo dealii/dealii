@@ -42,7 +42,7 @@ mesh-refinement:9
 
 
 
-The final solution, as written by the program at the end of the
+The last solution, as written by the program at the end of the
 <code>%run()</code> function, looks as follows:
 
 
@@ -51,8 +51,10 @@ The final solution, as written by the program at the end of the
 
 
 
-In each cycle, the program furthermore writes the grid in EPS
-format. These are shown in the following:
+After each refinement, the solution after the fifth Newton-
+iteration is shown in the following pictures. On the left 
+the solution is visualized, on the right side the solution
+with the mesh is shown:
 
 
 
@@ -94,14 +96,16 @@ format. These are shown in the following:
 </tr>
 </table>
 
+It is clearly visible, that the solution minimizes the surface
+after each refinement. The solution converges to a picture one 
+would imagine a soapbubble inside a wire, which is bended like
+the boundary. Also it is visible, how the boundary 
+is smoothed out after each refinement. On the coarse mesh,
+the boundary doesn't look like a sine, whereas it does the
+finer the mesh gets.
 
+The mesh is mostly refined near the boundary, where the solution
+increases or decreases strongly, whereas it is coarsened on 
+the inside of the domain, where nothing interesting happens,
+because there isn't much change in the solution. 
 
-It is clearly visible that the region where the solution has a kink,
-i.e. the circle at radial distance 0.5 from the center, is
-refined most. Furthermore, the central region where the solution is
-very smooth and almost flat, is almost not refined at all, but this
-results from the fact that we did not take into account that the
-coefficient is large there. The region outside is refined rather
-randomly, since the second derivative is constant there and refinement
-is therefore mostly based on the size of the cells and their deviation
-from the optimal square.
