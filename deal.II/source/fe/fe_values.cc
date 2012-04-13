@@ -1790,6 +1790,10 @@ FEValuesBase<dim,spacedim>::FEValuesBase (const unsigned int n_q_points,
                 fe_data(0, typeid(*this).name()),
                 fe_values_views_cache (*this)
 {
+  Assert (n_q_points > 0,
+          ExcMessage ("There is nothing useful you can do with an FEValues "
+                      "object when using a quadrature formula with zero "
+                      "quadrature points!"));
   this->update_flags = flags;
 }
 
