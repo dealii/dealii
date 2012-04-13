@@ -19,6 +19,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -607,25 +608,13 @@ void Step15<dim>::run ()
 
 		Assert (refinement < 100, ExcNotImplemented());
 
-		DataOutBase::EpsFlags vtk_flags;
-
 		DataOut<dim> data_out;
-		data_out.set_flags (vtk_flags);
 
 		data_out.attach_dof_handler (dof_handler);
 		data_out.add_data_vector (newton_update, "update");
 		data_out.add_data_vector (present_solution, "solution");
-		data_out.build_patches (6);
-		std::string filename = "solution-";
-		if(refinement<10)
-		{
-		  filename += ('0' + refinement);
-		}
-		else{
-		  filename += ('0' + refinement/10);
-		  filename += ('0' + refinement%10);
-		}
-		filename += ".vtk";
+		data_out.build_patches ();
+		const std::string filename = "solution-" + Utilities::int_to_string (refinement, 2) + ".vtk";
 		std::ofstream output (filename.c_str());
 		data_out.write_vtk (output);
 
