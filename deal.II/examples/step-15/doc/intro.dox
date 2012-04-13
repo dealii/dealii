@@ -1,25 +1,22 @@
-/**
- @page mse Minimal surface equation
-
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Foreword</h3>
 
 This programm deals with an example of a non-linear elliptic pde, the minimal
-surface equation. You can imagine the solution as a soap bubble inside a 
-closed wire, where the wire isn't smooth, but curved. The soap bubble will 
+surface equation. You can imagine the solution as a soap bubble inside a
+closed wire, where the wire isn't just a planar loop, but in in fact curved. The soap bubble will
 take a shape with minimal surface. The solution of the minimal surface equation
-describes this shape with the wire as a boundary condition. 
+describes this shape with the wire as a boundary condition.
 
-Because the equation is non-linear, we can't solve it directly, but have to use 
+Because the equation is non-linear, we can't solve it directly, but have to use
 the newton-method to compute the solution iterativly.
 
 
 
 <h3>Classical formulation</h3>
 
-In a classical sense, the problem posseses following form:
+In a classical sense, the problem posseses the following form:
 
 @par
   @f[
@@ -29,10 +26,10 @@ In a classical sense, the problem posseses following form:
   @f[
     u=g \qquad\qquad on ~ \partial \Omega
   @f]
-  
+
 In this example, we choose the unitball as our domain $\Omega$.
 
-As described above, we have to formulate the Newton-method for this problem 
+As described above, we have to formulate the Newton-method for this problem
 with a damping parameter $\lambda$ to have a better global convergence behaviour:
 
 @par
@@ -42,13 +39,13 @@ with a damping parameter $\lambda$ to have a better global convergence behaviour
   @f[
     u^{n+1}=u^{n}+\delta u^{n}
   @f]
-  
+
 with:
 
   @f[
     F(u):= -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right)
   @f]
-  
+
 and $F'(u,\delta u)$ the derivative of F in direction of $\delta u$:
 
 @f[
@@ -60,26 +57,26 @@ So we have to solve a linear elliptic pde in every Newton-step, with $\delta u$ 
 the solution of:
 
   @f[
-  - \nabla \cdot \left( \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla 
-  \delta u^{n} \right) + 
-  \nabla \cdot \left( \frac{\nabla u^{n} \cdot 
-  \nabla \delta u^{n}}{(1+|\nabla u^{n}|^{2})^{\frac{3}{2}}} \nabla u^{n} 
-  \right)  = 
+  - \nabla \cdot \left( \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla
+  \delta u^{n} \right) +
+  \nabla \cdot \left( \frac{\nabla u^{n} \cdot
+  \nabla \delta u^{n}}{(1+|\nabla u^{n}|^{2})^{\frac{3}{2}}} \nabla u^{n}
+  \right)  =
   -\left( - \nabla \cdot \left( \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}
   \nabla u^{n} \right) \right)
   @f]
 
 In order to solve the minimal surface equation, we have to solve this equation in every
-Newton step. To solve this, we have to take a look at the boundary condition of this 
-problem. Assuming that $u^{n}$ already has the right boundary values, the Newton update 
+Newton step. To solve this, we have to take a look at the boundary condition of this
+problem. Assuming that $u^{n}$ already has the right boundary values, the Newton update
 $\delta u^{n}$ should have zero boundary conditions, in order to have the right boundary
 condition after adding both.
-In the first Newton step, we are starting with the solution $u^{0}\equiv 0$, the Newton 
-update still has to deliever the right boundary condition to the solution $u^{1}$. 
+In the first Newton step, we are starting with the solution $u^{0}\equiv 0$, the Newton
+update still has to deliever the right boundary condition to the solution $u^{1}$.
 
 @par
 
-Summing up, we have to solve the pde above with the boundary condition $\delta u^{0}=g$ 
+Summing up, we have to solve the pde above with the boundary condition $\delta u^{0}=g$
 in the first step and with $\delta u^{n}=0$ in all the other steps.
 
 
@@ -89,14 +86,14 @@ Starting with the strong formulation above, we get the weak formulation by multi
 both sides of the pde with a testfunction $\varphi$ and integrating by parts on both sides:
 
   @f[
-  \left( \nabla \varphi , \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla 
-  \delta u^{n} \right)-\left(\nabla \varphi ,\frac{\nabla u^{n} \cdot \nabla 
-  \delta u^{n}}{(1+|\nabla u^{n}|^{2})^{\frac{3}{2}}}\nabla u^{n}  \right) 
+  \left( \nabla \varphi , \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla
+  \delta u^{n} \right)-\left(\nabla \varphi ,\frac{\nabla u^{n} \cdot \nabla
+  \delta u^{n}}{(1+|\nabla u^{n}|^{2})^{\frac{3}{2}}}\nabla u^{n}  \right)
   = -\left(\nabla \varphi , \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}} \nabla u^{n}
    \right)
   @f]
-  
-Where the solution $\delta u^{n}$ is a function in the infinte space $H^{1}(\Omega)$. 
+
+Where the solution $\delta u^{n}$ is a function in the infinte space $H^{1}(\Omega)$.
 Reducing this space to a finite space with basis $\left\{ \varphi_{0},\dots ,
 \varphi_{N-1}\right\}$, we can write the solution:
 
@@ -108,10 +105,10 @@ Using the basis functions as testfunctions and defining $a_{n}:=\frac{1}
 {\sqrt{1+|\nabla u^{n}|^{2}}}$, we can rewrite the weak formualtion:
 
 @f[
-  \sum_{j=0}^{N-1}\left[ \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) - 
-  \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla 
-  \varphi_{j} \right) \right] \cdot U_{j}=\left( \nabla \varphi_{i} , a_{n} 
-  \nabla u^{n}\right) \qquad \forall i=0,\dots ,N-1 
+  \sum_{j=0}^{N-1}\left[ \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
+  \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla
+  \varphi_{j} \right) \right] \cdot U_{j}=\left( \nabla \varphi_{i} , a_{n}
+  \nabla u^{n}\right) \qquad \forall i=0,\dots ,N-1
 @f]
 
 where the solution $\delta u^{n}$ is given by the coefficents $\delta U^{n}_{j}$.
@@ -124,8 +121,8 @@ This linear equation system can be rewritten as:
 where the entries of the matrix $A^{n}$ are given by:
 
 @f[
-  A^{n}_{ij}:= \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) - 
-  \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla 
+  A^{n}_{ij}:= \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
+  \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla
   \varphi_{j} \right)
 @f]
 
@@ -135,19 +132,19 @@ and the right hand side $b^{n}$ is given by:
   b^{n}_{i}:=\left( \nabla \varphi_{i} , a_{n} \nabla u^{n}\right)
 @f]
 
-The matrix A is symmetric, but it is indefinite. So we have to take a better look 
-at the solver we choose for this linear system. The CG-method needs 
+The matrix A is symmetric, but it is indefinite. So we have to take a better look
+at the solver we choose for this linear system. The CG-method needs
 positive-definiteness of the matrix A, which is not given, so it can't be used.
 Using the symmetry of the matrix we can choose the minimal residual method as a
 solver, which needs symmetry but no definiteness.
 
 <h3>Summary</h3>
 
-Starting with the function $u^{0}\equiv 0$, the first Newton update is computed by 
+Starting with the function $u^{0}\equiv 0$, the first Newton update is computed by
 solving the system $A^{0}U^{0}=b^{0}$ with boundary condition $\delta u^{0}=g$ on
- $\partial \Omega$. The new approximation of the solution is given by 
- $u^{1}=u^{0}+\delta u^{0}$. The next updates are given as solution of 
- the linear system $A^{n}U^{n}=b^{n}$ with boundary condition $\delta u^{n}=0$ on 
+ $\partial \Omega$. The new approximation of the solution is given by
+ $u^{1}=u^{0}+\delta u^{0}$. The next updates are given as solution of
+ the linear system $A^{n}U^{n}=b^{n}$ with boundary condition $\delta u^{n}=0$ on
  $\partial \Omega$ and the new approximation given by $u^{n+1}=u^{n}+\delta u^{n}$.
 
 
