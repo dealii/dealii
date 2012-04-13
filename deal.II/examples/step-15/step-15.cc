@@ -88,6 +88,9 @@ class Step15
     void assemble_system ();
     void solve ();
     void refine_grid ();
+    void set_boundary_values ();
+    double compute_residual (const double alpha) const;
+    double determine_step_length() const;
 
     Triangulation<dim>   triangulation;
 
@@ -105,7 +108,6 @@ class Step15
 
 
 
-    double 				 res;
     unsigned int         refinement;
 
     			// As described in the Introduction, the first Newton iteration
@@ -231,7 +233,7 @@ void Step15<dim>::assemble_system ()
   system_rhs = 0;
 
   FEValues<dim> fe_values (fe, quadrature_formula,
-			   update_values    |  update_gradients |
+			   update_gradients |
 			   update_quadrature_points  |  update_JxW_values);
 
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
@@ -285,8 +287,7 @@ void Step15<dim>::assemble_system ()
 							* fe_values.JxW(q_point));
 				}
 
-				cell_rhs(i) -=0.1 *
-						(fe_values.shape_grad(i, q_point) * coeff
+				cell_rhs(i) -= (fe_values.shape_grad(i, q_point) * coeff
 								* gradients[q_point] * fe_values.JxW(q_point));
 			}
 		}
@@ -306,35 +307,93 @@ void Step15<dim>::assemble_system ()
   hanging_node_constraints.condense (system_rhs);
   std::map<unsigned int,double> boundary_values;
 
-    			// As described above, there is a different boundary condition
-  	  	  	  	// in the first Newton step than in the later ones. This is
-  	  	  	  	// implemented with the help of the bool first_step, which
-  	  	  	  	// will later be false for all times. Starting with the zero-
-  	  	  	  	// function in the first step, we have to set the boundary
-  	  	  	    // condition $\delta u^{0}=g$ on $\partial \Omega $:
 
-  if(first_step)
-  {
-	VectorTools::interpolate_boundary_values (dof_handler,
-					      0,
-				          BoundaryValues<dim>(),
-						  boundary_values);
-  }
-  	  	  	    // In later steps, the Newton update has to have homogeneous
-  	  	  	    // boundary conditions, in order for the solution to have the
-  	  	  	    // right ones.
-
-  else{
     VectorTools::interpolate_boundary_values (dof_handler,
 	  				      0,
 	  				      ZeroFunction<dim>(),
 	  				      boundary_values);
-  }
 
   MatrixTools::apply_boundary_values (boundary_values,
 				      system_matrix,
 				      newton_update,
 				      system_rhs);
+}
+
+
+template <int dim>
+double Step15<dim>::compute_residual (const double alpha) const
+{
+  const QGauss<dim>  quadrature_formula(3);
+
+  Vector<double> residual (dof_handler.n_dofs());
+
+  Vector<double> linearization_point (dof_handler.n_dofs());
+  linearization_point = present_solution;
+  linearization_point.add (alpha, newton_update);
+
+  FEValues<dim> fe_values (fe, quadrature_formula,
+                           update_gradients |
+                           update_quadrature_points  |  update_JxW_values);
+
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.size();
+
+  Vector<double>       cell_rhs (dofs_per_cell);
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      cell_rhs = 0;
+
+      fe_values.reinit (cell);
+
+
+      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point) {
+
+                  // To setup up the linear system, the gradient of the old solution
+                  // in the quadrature points is needed. For this purpose there is
+                  // is a function, which will write these gradients in a vector,
+                  // where every component of the vector is a vector itself:
+
+                        std::vector<Tensor<1, dim> > gradients(n_q_points);
+                        fe_values.get_function_gradients(linearization_point, gradients);
+
+                          // Having the gradients of the old solution in the quadrature
+                          // points, we are able to compute the coefficients $a_{n}$
+                          // in these points.
+
+                        const double coeff = 1/sqrt(1 + gradients[q_point] * gradients[q_point]);
+
+                          // The assembly of the system then is the same as always, except
+                          // of the damping parameter of the Newton method, which we set on
+                          // 0.1 in this case.
+
+                        for (unsigned int i = 0; i < dofs_per_cell; ++i) {
+                                cell_rhs(i) -= (fe_values.shape_grad(i, q_point) * coeff
+                                                                * gradients[q_point] * fe_values.JxW(q_point));
+                        }
+                }
+
+      cell->get_dof_indices (local_dof_indices);
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+          residual(local_dof_indices[i]) += cell_rhs(i);
+    }
+  hanging_node_constraints.condense (residual);
+
+  std::map<unsigned int,double> boundary_values;
+  VectorTools::interpolate_boundary_values (dof_handler,
+                                              0,
+                                              ZeroFunction<dim>(),
+                                              boundary_values);
+  for (std::map<unsigned int,double>::const_iterator p = boundary_values.begin();
+      p != boundary_values.end(); ++p)
+    residual(p->first) = 0;
+
+  return residual.l2_norm();
 }
 
 								// @sect4{Step15::solve}
@@ -346,8 +405,7 @@ void Step15<dim>::assemble_system ()
 template <int dim>
 void Step15<dim>::solve ()
 {
-  res=system_rhs.l2_norm();
-  SolverControl           solver_control (1000, res*1e-6);
+  SolverControl           solver_control (1000, system_rhs.l2_norm()*1e-6);
   SolverMinRes<>              solver (solver_control);
 
   PreconditionSSOR<> preconditioner;
@@ -359,10 +417,17 @@ void Step15<dim>::solve ()
   hanging_node_constraints.distribute (newton_update);
 
   	  	  	  	  // In this step, the old solution is updated to the new one:
-
-  present_solution += newton_update;
+  const double alpha = determine_step_length();
+  std::cout << "  step length alpha=" << alpha << std::endl;
+  present_solution.add (alpha, newton_update);
 }
 
+
+template <int dim>
+double Step15<dim>::determine_step_length() const
+{
+  return 0.1;
+}
 								// @sect4{Step15::refine_grid}
 
 				// The first part of this function is the same as in step 6.
@@ -429,21 +494,7 @@ void Step15<dim>::refine_grid ()
   solution_transfer.interpolate(present_solution,tmp);
   present_solution=tmp;
 
-  	  	  	  	// Having refined the mesh, there might be new nodal points on
-  	  	  	  	// the boundary. These have just interpolated values, but
-  	  	  	  	// not the right boundary values. This is fixed up, by
-  	  	  	  	// setting all boundary nodals explicit to the right value:
-
-  std::map<unsigned int, double> boundary_values2;
-  VectorTools::interpolate_boundary_values(dof_handler,
-		  	  	  	  	  	  	  	  	    0,
-		  	  	  	  	  	  	  	  	    BoundaryValues<dim>(),
-		  	  	  	  	  	  	  	  	    boundary_values2);
-  for (std::map<unsigned int, double>::const_iterator
-		  p = boundary_values2.begin();
-		  p != boundary_values2.end();
-		  ++p)
-	  present_solution(p->first) = p->second;
+  set_boundary_values ();
 
   	  	  	  	// On the new mesh, there are different hanging nodes, which shall
   	  	  	  	// be enlisted in a matrix like before. To ensure there are no
@@ -461,6 +512,22 @@ void Step15<dim>::refine_grid ()
   hanging_node_constraints.distribute(present_solution);
 }
 
+
+template <int dim>
+void Step15<dim>::set_boundary_values ()
+{
+    // Having refined the mesh, there might be new nodal points on
+    // the boundary. These have just interpolated values, but
+    // not the right boundary values. This is fixed up, by
+    // setting all boundary nodals explicit to the right value:
+
+    std::map<unsigned int, double> boundary_values2;
+    VectorTools::interpolate_boundary_values(dof_handler, 0,
+        BoundaryValues<dim>(), boundary_values2);
+    for (std::map<unsigned int, double>::const_iterator p =
+        boundary_values2.begin(); p != boundary_values2.end(); ++p)
+      present_solution(p->first) = p->second;
+}
 								// @sect4{Step15::run}
 
 				// In the run function, the first grid is build. Also in this
@@ -489,7 +556,8 @@ void Step15<dim>::run ()
 				// iteration scheme. Later the Newton method will continue until the
 				// residual is less than $10^{-3}$.
 
-	while(first_step || (res>1e-3))
+	double previous_res = 0;
+	while(first_step || (previous_res>1e-3))
 	{
 
 				// In the first step, we compute the solution on the two times globally 
@@ -511,9 +579,13 @@ void Step15<dim>::run ()
 
 		setup_system();
 
+		if (first_step)
+		  set_boundary_values ();
+
 				// On every mesh there are done five Newton steps, in order to get a
 				// better solution, before the mesh gets too fine and the computations
 				// take more time.
+                std::cout<<"initial residual:"<<compute_residual(0)<<std::endl;
 
 		for(unsigned int i=0; i<5;++i)
 		{
@@ -522,9 +594,11 @@ void Step15<dim>::run ()
 				// have to be computed.
 
 			assemble_system ();
+                        previous_res = system_rhs.l2_norm();
+
 			solve ();
 			first_step=false;
-			std::cout<<"residual:"<<res<<std::endl;
+			std::cout<<"residual:"<<compute_residual(0)<<std::endl;
 		}
 
 			    // The fifth solution, as well as the Newton update,
