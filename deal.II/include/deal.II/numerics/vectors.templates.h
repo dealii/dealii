@@ -2625,7 +2625,7 @@ namespace VectorTools
 
       std::vector<Point<dim> > tangentials (fe_values.n_quadrature_points);
       std::vector<Vector<double> > values (fe_values.n_quadrature_points,
-                                           Vector<double> (dim));
+                                           Vector<double> (cell->get_fe ().n_components ()));
 
                                        // Get boundary function values
                                        // at quadrature points.
@@ -2648,6 +2648,7 @@ namespace VectorTools
             { 0, 0, 2, 2 },
             { 1, 1, 0, 0 },
             { 1, 1, 0, 0 } };
+      const FEValuesExtractors::Vector vec (first_vector_component);
 
                                        // The interpolation for the
                                        // lowest order edge shape
@@ -2679,115 +2680,24 @@ namespace VectorTools
           tangentials[q_point]
             /= std::sqrt (tangentials[q_point].square ());
 
-                                           // Compute the mean value.
-          dof_values[line * superdegree]
-            += (fe_values.JxW (q_point)
-                * (values[q_point] (0) * tangentials[q_point] (0)
-                   + values[q_point] (1) * tangentials[q_point] (1)
-                   + values[q_point] (2) * tangentials[q_point] (2))
-                / (jacobians[q_point][0][edge_coordinate_direction[face][line]]
-                   * jacobians[q_point][0][edge_coordinate_direction[face][line]]
-                   + jacobians[q_point][1][edge_coordinate_direction[face][line]]
-                   * jacobians[q_point][1][edge_coordinate_direction[face][line]]
-                   + jacobians[q_point][2][edge_coordinate_direction[face][line]]
-                   * jacobians[q_point][2][edge_coordinate_direction[face][line]]));
-        }
-
-                                       // If there are also higher
-                                       // order shape functions we
-                                       // have still some work left.
-      if (degree > 0)
-        {
-          const FEValuesExtractors::Vector vec (first_vector_component);
-          FullMatrix<double> assembling_matrix (degree, fe_values.n_quadrature_points);
-          Vector<double> assembling_vector (fe_values.n_quadrature_points);
-
-                                           // We set up a linear system
-                                           // of equations to get the
-                                           // values for the remaining
-                                           // degrees of freedom
-                                           // associated with the edge.
-          for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
-               ++q_point)
-            {
-                                               // The right hand side of
-                                               // the corresponding
-                                               // problem is the
-                                               // tangential components of
-                                               // the residual of the
-                                               // boundary function and
-                                               // the interpolated part
-                                               // above.
-              const Tensor<1, dim> tmp
-                =
-                std::sqrt (fe_values.JxW (q_point)
-                           / (jacobians[q_point][0][edge_coordinate_direction[face][line]]
-                              * jacobians[q_point][0][edge_coordinate_direction[face][line]]
-                              +
-                              jacobians[q_point][1][edge_coordinate_direction[face][line]]
-                              * jacobians[q_point][1][edge_coordinate_direction[face][line]]
-                              +
-                              jacobians[q_point][2][edge_coordinate_direction[face][line]]
-                              * jacobians[q_point][2][edge_coordinate_direction[face][line]]))
-                * tangentials[q_point];
-
-              const Tensor<1, dim> shape_value
-                = fe_values[vec].value (cell->get_fe ()
-                                        .face_to_cell_index (line * superdegree, face),
-                                        q_point);
-                                               // In the weak form the
-                                               // right hand side function
-                                               // is multiplicated by the
-                                               // higher order shape
-                                               // functions.
-              assembling_vector (q_point)
-                = ((values[q_point] (0)
-                    -
-                    dof_values[line * superdegree] * shape_value[0]) * tmp[0]
-                   +
-                   (values[q_point] (1)
-                    -
-                    dof_values[line * superdegree] * shape_value[1]) * tmp[1]
-                   +
-                   (values[q_point] (2)
-                    -
-                    dof_values[line * superdegree] * shape_value[2]) * tmp[2]);
-
-              for (unsigned int i = 0; i < degree; ++i)
-                assembling_matrix (i, q_point)
-                  = fe_values[vec].value (cell->get_fe ()
-                                          .face_to_cell_index (i + line * superdegree + 1,
-                                                               face),
-                                          q_point) * tmp;
-            }
-
-          FullMatrix<double> cell_matrix (degree, degree);
-
-                                           // Create the system matrix
-                                           // by multiplying the
-                                           // assembling matrix with its
-                                           // transposed.
-          assembling_matrix.mTmult (cell_matrix, assembling_matrix);
-
-          FullMatrix<double> cell_matrix_inv (degree, degree);
-                                           // Compute its inverse.
-          cell_matrix_inv.invert (cell_matrix);
-
-          Vector<double> cell_rhs (degree);
-
-                                           // Create the system right
-                                           // hand side vector by
-                                           // multiplying the assembling
-                                           // matrix with the assembling
-                                           // vector.
-          assembling_matrix.vmult (cell_rhs, assembling_vector);
-
-          Vector<double> solution (degree);
-
-          cell_matrix_inv.vmult (solution, cell_rhs);
-                                           // Store the computed values.
-          for (unsigned int i = 0; i < degree; ++i)
-            dof_values[i + line * superdegree + 1] = solution (i);
+                                           // Compute the degrees of
+                                           // freedom.
+          for (unsigned int i = 0; i <= degree; ++i)
+            dof_values[i + line * superdegree]
+              += (fe_values.JxW (q_point)
+                  * (values[q_point] (first_vector_component) * tangentials[q_point] (0)
+                     + values[q_point] (first_vector_component + 1) * tangentials[q_point] (1)
+                     + values[q_point] (first_vector_component + 2) * tangentials[q_point] (2))
+                  * (fe_values[vec].value (cell->get_fe ().face_to_cell_index (i + line * superdegree,
+                                                                               face),
+                                           q_point)
+                     * tangentials[q_point])
+                  / std::sqrt (jacobians[q_point][0][edge_coordinate_direction[face][line]]
+                               * jacobians[q_point][0][edge_coordinate_direction[face][line]]
+                               + jacobians[q_point][1][edge_coordinate_direction[face][line]]
+                               * jacobians[q_point][1][edge_coordinate_direction[face][line]]
+                               + jacobians[q_point][2][edge_coordinate_direction[face][line]]
+                               * jacobians[q_point][2][edge_coordinate_direction[face][line]]));
         }
     }
 
@@ -2831,7 +2741,7 @@ namespace VectorTools
         jacobians = fe_values.get_jacobians ();
 
       std::vector<Vector<double> >
-        values (fe_values.n_quadrature_points, Vector<double> (dim));
+        values (fe_values.n_quadrature_points, Vector<double> (cell->get_fe ().n_components ()));
 
       switch (dim)
         {
@@ -2856,6 +2766,7 @@ namespace VectorTools
             const unsigned int
               face_coordinate_direction[GeometryInfo<dim>::faces_per_cell]
               = { 1, 1, 0, 0 };
+            const FEValuesExtractors::Vector vec (first_vector_component);
 
                                              // The interpolation for
                                              // the lowest order face
@@ -2891,123 +2802,23 @@ namespace VectorTools
                                                    shifted_reference_point_2));
                 tangentials[q_point]
                   /= std::sqrt (tangentials[q_point].square ());
-                                                 // Compute the mean
-                                                 // value.
-                dof_values[0]
-                  += fe_values.JxW (q_point)
-                  * (values[q_point] (0)
-                     * tangentials[q_point] (0)
-                     + values[q_point] (1) * tangentials[q_point] (1))
-                  / (jacobians[q_point][0][face_coordinate_direction[face]]
-                     * jacobians[q_point][0][face_coordinate_direction[face]]
-                     + jacobians[q_point][1][face_coordinate_direction[face]]
-                     * jacobians[q_point][1][face_coordinate_direction[face]]);
+                                                 // Compute the degrees
+                                                 // of freedom.
+                for (unsigned int i = 0; i <= degree; ++i)
+                  dof_values[i]
+                    += fe_values.JxW (q_point)
+                    * (values[q_point] (first_vector_component)
+                       * tangentials[q_point] (0)
+                       + values[q_point] (first_vector_component + 1)
+                       * tangentials[q_point] (1))
+                    * (fe_values[vec].value (cell->get_fe ().face_to_cell_index (i, face),
+                                             q_point) * tangentials[q_point])
+                    / std::sqrt (jacobians[q_point][0][face_coordinate_direction[face]]
+                                 * jacobians[q_point][0][face_coordinate_direction[face]]
+                                 + jacobians[q_point][1][face_coordinate_direction[face]]
+                                 * jacobians[q_point][1][face_coordinate_direction[face]]);
               }
-
-                                             // If there are also
-                                             // higher order shape
-                                             // functions we have
-                                             // still some work left.
-            if (degree > 0)
-              {
-                const FEValuesExtractors::Vector vec (first_vector_component);
-                FullMatrix<double> assembling_matrix (degree,
-                                                      fe_values.n_quadrature_points);
-                Vector<double> assembling_vector (fe_values.n_quadrature_points);
-
-                                                 // We set up a
-                                                 // linear system
-                                                 // of equations to
-                                                 // get the values
-                                                 // for the
-                                                 // remaining degrees
-                                                 // of freedom
-                                                 // associated with
-                                                 // the face.
-                for (unsigned int q_point = 0;
-                     q_point < fe_values.n_quadrature_points; ++q_point)
-                  {
-                                                     // The right
-                                                     // hand side of
-                                                     // the corresponding
-                                                     // problem is
-                                                     // the tangential
-                                                     // components of
-                                                     // the residual
-                                                     // of the boundary
-                                                     // function and
-                                                     // the interpolated
-                                                     // part above.
-                    const Tensor<1, dim> tmp
-                      = std::sqrt (fe_values.JxW (q_point)
-                                   / std::sqrt (jacobians[q_point][0][face_coordinate_direction[face]]
-                                                * jacobians[q_point][0][face_coordinate_direction[face]]
-                                                + jacobians[q_point][1][face_coordinate_direction[face]]
-                                                * jacobians[q_point][1][face_coordinate_direction[face]]))
-                      * tangentials[q_point];
-
-                    const Tensor<1, dim> shape_value
-                      = fe_values[vec].value (cell->get_fe ()
-                                              .face_to_cell_index (0, face),
-                                              q_point);
-
-                    assembling_vector (q_point) = (values[q_point] (0)
-                                                   -
-                                                   dof_values[0] * shape_value[0]) * tmp[0]
-                                                  +
-                                                  (values[q_point] (1)
-                                                   -
-                                                   dof_values[1] * shape_value[1]) * tmp[1];
-
-                                                     // In the weak
-                                                     // form the
-                                                     // right hand
-                                                     // side function
-                                                     // is multiplicated
-                                                     // by the higher
-                                                     // order shape
-                                                     // functions.
-                    for (unsigned int i = 0; i < degree; ++i)
-                      assembling_matrix (i, q_point)
-                        = fe_values[vec].value (cell->get_fe ()
-                                                .face_to_cell_index (i + 1, face),
-                                                q_point) * tmp;
-                  }
-
-                FullMatrix<double> cell_matrix (degree, degree);
-
-                                                 // Create the system
-                                                 // matrix by multiplying
-                                                 // the assembling
-                                                 // matrix with its
-                                                 // transposed.
-                assembling_matrix.mTmult (cell_matrix, assembling_matrix);
-
-                FullMatrix<double> cell_matrix_inv (degree, degree);
-                                                 // Compute its inverse.
-                cell_matrix_inv.invert (cell_matrix);
-
-                Vector<double> cell_rhs (degree);
-
-                                                 // Create the system
-                                                 // right hand side
-                                                 // vector by
-                                                 // multiplying the
-                                                 // assembling matrix
-                                                 // with the assembling
-                                                 // vector.
-                assembling_matrix.vmult (cell_rhs, assembling_vector);
-
-                Vector<double> solution (degree);
-
-                cell_matrix_inv.vmult (solution, cell_rhs);
-
-                                                 // Store the computed
-                                                 // values.
-                for (unsigned int i = 0; i < degree; ++i)
-                  dof_values[i + 1] = solution (i);
-              }
-
+            
             break;
           }
 
@@ -3080,7 +2891,7 @@ namespace VectorTools
                 Tensor<1, dim> tmp;
 
                 for (unsigned int d = 0; d < dim; ++d)
-                  tmp[d] = values[q_point] (d);
+                  tmp[d] = values[q_point] (first_vector_component + d);
 
                 for (unsigned int i = 0; i < 2; ++i)
                   for (unsigned int j = 0; j <= degree; ++j)
@@ -3180,7 +2991,7 @@ namespace VectorTools
                 Tensor<1, dim> tmp;
 
                 for (unsigned int d = 0; d < dim; ++d)
-                  tmp[d] = values[q_point] (d);
+                  tmp[d] = values[q_point] (first_vector_component + d);
 
                 for (unsigned int i = 0; i < 2; ++i)
                   for (unsigned int j = 0; j <= degree; ++j)
@@ -3267,30 +3078,16 @@ namespace VectorTools
                                      // interpolated on each edge.  This
                                      // gives the values for the degrees
                                      // of freedom corresponding to the
-                                     // lowest order edge shape
-                                     // functions. Then the interpolated
-                                     // part of the function is
-                                     // subtracted and we project the
-                                     // tangential component of the
-                                     // residual onto the space of the
-                                     // remaining (higher order) edge
-                                     // shape functions. This is done by
-                                     // building a linear system of
-                                     // equations of dimension
-                                     // <tt>degree</tt>. The solution
-                                     // gives us the values for the
-                                     // degrees of freedom corresponding
-                                     // to the remaining edge shape
-                                     // functions. Now we are done for
-                                     // 2D, but in 3D we possibly have
-                                     // also degrees of freedom, which
+                                     // edge shape functions. Now we are
+                                     // done for 2D, but in 3D we possibly
+                                     // have also degrees of freedom, which
                                      // are located in the interior of
                                      // the faces. Therefore we compute
                                      // the residual of the function
                                      // describing the boundary values
                                      // and the interpolated part, which
-                                     // we have computed in the last two
-                                     // steps. On the faces there are
+                                     // we have computed in the last
+                                     // step. On the faces there are
                                      // two kinds of shape functions,
                                      // the horizontal and the vertical
                                      // ones. Thus we have to solve two
@@ -3337,13 +3134,18 @@ namespace VectorTools
                     if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
                       return;
 
-                                                     // this is only
+                                                     // This is only
                                                      // implemented, if the
                                                      // FE is a Nedelec
-                                                     // element
-                    typedef FiniteElement<dim> FEL;
-                    AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != 0,
-                                 typename FEL::ExcInterpolationNotImplemented ());
+                                                     // element. If the FE
+                                                     // is a FESystem, we
+                                                     // cannot check this.
+                    if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) != 0) {
+                      typedef FiniteElement<dim> FEL;
+                      AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != 0,
+                      
+                                   typename FEL::ExcInterpolationNotImplemented ());
+                    }
 
                     for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                       dof_values[dof] = 0.0;
