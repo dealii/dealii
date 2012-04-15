@@ -11,7 +11,7 @@ The results agree with those in the literature.
 The lower-order formulation typically overestimates the displacement for low levels of refinement, 
 while the higher-order interpolation scheme underestimates it, but be a lesser degree.
 This benchmark, and a series of others not shown here, give us confidence that the code is working
-as it should
+as it should.
 
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
@@ -207,18 +207,19 @@ near-incompressible block under compression.
 The command-line output indicates that the volumetric change under extreme compression resulted in 
 less than 0.01% volume change for a Poisson's ratio of 0.4999.
 
-In terms of run-time, the $Q_2-DGPM_1-DGPM_1$ formulation tends to be a bit more computationally expensive 
-than the $Q_1-DGPM_0-DGPM_0$ for a similar number of degree-of-freedom 
+In terms of run-time, the $Q_2-DGPM_1-DGPM_1$ formulation tends to be more computationally expensive 
+than the $Q_1-DGPM_0-DGPM_0$ for a similar number of degrees-of-freedom 
 (produced by adding an extra grid refinement level for the lower-order interpolation). 
-This is shown in the graph below for a batch of tests run serially on a single 4-core (8-thread) machine.
+This is shown in the graph below for a batch of tests run consecutively on a single 4-core (8-thread) machine.
 The increase in computational time for the higher-order method is likely due to 
 the increased band-width required for the higher-order elements. 
 As previously mentioned, the use of a better solver and precondtioner may mitigate the 
 expense of using a higher-order formulation. 
-It was observed that using the multithreaded Jacobi preconditioner does reduce the 
-computational runtime by up to 25% in comparison to the single-thread SSOR preconditioner. 
-However, it is the author's experience that the Jacobi method of preconditioning may not
- be suitable for some finite-strain problems involving alternative constitutive models.
+It was observed that for the given problem using the multithreaded Jacobi preconditioner can reduce the 
+computational runtime by up to 72% (for the worst case being a higher-order formulation with a large number
+of degrees-of-freedom) in comparison to the single-thread SSOR preconditioner. 
+However, it is the author's experience that the Jacobi method of preconditioning may not be suitable for 
+some finite-strain problems involving alternative constitutive models.
 
 
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
@@ -266,7 +267,6 @@ There are a number of obvious extensions for this work:
   convergence. It may also be necessary to use a load limiting method,
   such as the Riks method, to solve unstable problems involving
   geometric instability such as buckling and snap-through.
-
 - Many physical problems involve contact. It is possible to include
   the effect of frictional or frictionless contact between objects
   into this program. This would involve the addition of an extra term
@@ -275,6 +275,5 @@ There are a number of obvious extensions for this work:
   (detection and stress calculations) itself. An alternative to
   additional penalty terms in the free-energy functional would be to
   use active set methods such as the one used in step-41.
-
 - Finally, adaptive mesh refinement, as demonstrated in step-18, could
   provide additional solution accuracy.
