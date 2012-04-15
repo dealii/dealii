@@ -77,6 +77,10 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
       (const dealii::VEC&, std::vector<dealii::SymmetricTensor<2,deal_II_space_dimension> >&) const;
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
+      ::get_function_curls<dealii::VEC>
+      (const dealii::VEC&, std::vector<curl_type>&) const;
+    template
+      void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
       ::get_function_divergences<dealii::VEC>
       (const dealii::VEC&, std::vector<double>&) const;
     template
