@@ -291,7 +291,16 @@ class FullMatrix : public Table<2,number>
                                       * @endverbatim
                                       */
     explicit FullMatrix (const IdentityMatrix &id);
+    /**
+     * @}
+     */
 
+    /**
+     * @name Copying into and out of other matrices
+     */
+    /**
+     * @{
+     */
 
                                      /**
                                       * Assignment operator.
@@ -343,6 +352,7 @@ class FullMatrix : public Table<2,number>
     FullMatrix<number> &
     operator = (const LAPACKFullMatrix<number2>&);
 
+
                                      /**
                                       * Assignment from different
                                       * matrix classes. This
@@ -365,7 +375,53 @@ class FullMatrix : public Table<2,number>
     template <class MATRIX>
     void copy_transposed (const MATRIX&);
 
-                                     /**
+    /**
+     * Fill matrix with elements
+     * extracted from a tensor,
+     * taking rows included between
+     * <tt>r_i</tt> and <tt>r_j</tt>
+     * and columns between
+     * <tt>c_i</tt> and
+     * <tt>c_j</tt>. The resulting
+     * matrix is then inserted in the
+     * destination matrix at position
+     * <tt>(dst_r, dst_c)</tt> Checks
+     * on the indices are made.
+     */
+    template <int dim>
+    void
+    copy_from (Tensor<2,dim> &T,
+        const unsigned int src_r_i=0,
+        const unsigned int src_r_j=dim-1,
+        const unsigned int src_c_i=0,
+        const unsigned int src_c_j=dim-1,
+        const unsigned int dst_r=0,
+        const unsigned int dst_c=0);
+
+    /**
+     * Insert a submatrix (also
+     * rectangular) into a tensor,
+     * putting its upper left element
+     * at the specified position
+     * <tt>(dst_r, dst_c)</tt> and
+     * the other elements
+     * consequently. Default values
+     * are chosen so that no
+     * parameter needs to be specified
+     * if the size of the tensor and
+     * that of the matrix coincide.
+     */
+    template <int dim>
+    void
+    copy_to(Tensor<2,dim> &T,
+        const unsigned int src_r_i=0,
+        const unsigned int src_r_j=dim-1,
+        const unsigned int src_c_i=0,
+        const unsigned int src_c_j=dim-1,
+        const unsigned int dst_r=0,
+        const unsigned int dst_c=0) const;
+
+ /**
                                       * Fill rectangular block.
                                       *
                                       * A rectangular block of the
@@ -421,9 +477,15 @@ class FullMatrix : public Table<2,number>
                            const std::vector<unsigned int> &p_rows,
                            const std::vector<unsigned int> &p_cols);
 
-//@}
-///@name Non-modifying operators
-//@{
+    /**
+     * @}
+     */
+    /**
+     * @name Non-modifying operators
+     */
+    /**
+     * @{
+     */
 
                                      /**
                                       * Comparison operator. Be
@@ -994,53 +1056,6 @@ class FullMatrix : public Table<2,number>
                                       */
     template <typename number2>
     void right_invert (const FullMatrix<number2> &M);
-
-                                     /**
-                                      * Fill matrix with elements
-                                      * extracted from a tensor,
-                                      * taking rows included between
-                                      * <tt>r_i</tt> and <tt>r_j</tt>
-                                      * and columns between
-                                      * <tt>c_i</tt> and
-                                      * <tt>c_j</tt>. The resulting
-                                      * matrix is then inserted in the
-                                      * destination matrix at position
-                                      * <tt>(dst_r, dst_c)</tt> Checks
-                                      * on the indices are made.
-                                      */
-    template <int dim>
-    void
-    copy_from (Tensor<2,dim> &T,
-               const unsigned int src_r_i=0,
-               const unsigned int src_r_j=dim-1,
-               const unsigned int src_c_i=0,
-               const unsigned int src_c_j=dim-1,
-               const unsigned int dst_r=0,
-               const unsigned int dst_c=0);
-
-                                     /**
-                                      * Insert a submatrix (also
-                                      * rectangular) into a tensor,
-                                      * putting its upper left element
-                                      * at the specified position
-                                      * <tt>(dst_r, dst_c)</tt> and
-                                      * the other elements
-                                      * consequently. Default values
-                                      * are chosen so that no
-                                      * parameter needs to be specified
-                                      * if the size of the tensor and
-                                      * that of the matrix coincide.
-                                      */
-    template <int dim>
-    void
-    copy_to(Tensor<2,dim> &T,
-            const unsigned int src_r_i=0,
-            const unsigned int src_r_j=dim-1,
-            const unsigned int src_c_i=0,
-            const unsigned int src_c_j=dim-1,
-            const unsigned int dst_r=0,
-            const unsigned int dst_c=0) const;
-
 
 //@}
 ///@name Multiplications
