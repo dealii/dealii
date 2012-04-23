@@ -390,13 +390,13 @@ class FullMatrix : public Table<2,number>
      */
     template <int dim>
     void
-    copy_from (Tensor<2,dim> &T,
-        const unsigned int src_r_i=0,
-        const unsigned int src_r_j=dim-1,
-        const unsigned int src_c_i=0,
-        const unsigned int src_c_j=dim-1,
-        const unsigned int dst_r=0,
-        const unsigned int dst_c=0);
+    copy_from (const Tensor<2,dim> &T,
+               const unsigned int src_r_i=0,
+               const unsigned int src_r_j=dim-1,
+               const unsigned int src_c_i=0,
+               const unsigned int src_c_j=dim-1,
+               const unsigned int dst_r=0,
+               const unsigned int dst_c=0);
 
     /**
      * Insert a submatrix (also
@@ -414,12 +414,12 @@ class FullMatrix : public Table<2,number>
     template <int dim>
     void
     copy_to(Tensor<2,dim> &T,
-        const unsigned int src_r_i=0,
-        const unsigned int src_r_j=dim-1,
-        const unsigned int src_c_i=0,
-        const unsigned int src_c_j=dim-1,
-        const unsigned int dst_r=0,
-        const unsigned int dst_c=0) const;
+            const unsigned int src_r_i=0,
+            const unsigned int src_r_j=dim-1,
+            const unsigned int src_c_i=0,
+            const unsigned int src_c_j=dim-1,
+            const unsigned int dst_r=0,
+            const unsigned int dst_c=0) const;
 
  /**
                                       * Fill rectangular block.
