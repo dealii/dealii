@@ -1039,7 +1039,7 @@ class FullMatrix : public Table<2,number>
             const unsigned int src_c_i=0,
             const unsigned int src_c_j=dim-1,
             const unsigned int dst_r=0,
-            const unsigned int dst_c=0);
+            const unsigned int dst_c=0) const;
 
 
 //@}

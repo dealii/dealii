@@ -1647,7 +1647,7 @@ FullMatrix<number>::copy_to (Tensor<2,dim> &T,
                              const unsigned int src_c_i,
                              const unsigned int src_c_j,
                              const unsigned int dst_r,
-                             const unsigned int dst_c)
+                             const unsigned int dst_c) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   Assert(dim-dst_r>src_r_j-src_r_i,
