@@ -1612,7 +1612,7 @@ FullMatrix<number>::right_invert (const FullMatrix<number2> &A)
 template <typename number>
 template <int dim>
 void
-FullMatrix<number>::copy_from (Tensor<2,dim> &T,
+FullMatrix<number>::copy_from (const Tensor<2,dim> &T,
                                const unsigned int src_r_i,
                                const unsigned int src_r_j,
                                const unsigned int src_c_i,
@@ -1633,7 +1633,7 @@ FullMatrix<number>::copy_from (Tensor<2,dim> &T,
 
   for (unsigned int i=0; i<src_r_j-src_r_i+1; i++)
     for (unsigned int j=0; j<src_c_j-src_c_i+1; j++)
-      (*this)(i+dst_r,j+dst_c)=number(T[i+src_r_i][j+src_c_i]);
+      (*this)(i+dst_r,j+dst_c) = number(T[i+src_r_i][j+src_c_i]);
 
 }
 
