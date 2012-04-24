@@ -410,41 +410,41 @@ namespace Step44
 // @sect3{Some standard tensors}
 // Now we define some frequently used
 // second and fourth-order tensors:
-    template <int dim>
-    class StandardTensors
-    {
-      public:
+  template <int dim>
+  class StandardTensors
+  {
+    public:
 
-                                         // $\mathbf{I}$
-        static const SymmetricTensor<2, dim> I;
-                                         // $\mathbf{I} \otimes \mathbf{I}$
-        static const SymmetricTensor<4, dim> IxI;
-                                         // $\mathcal{S}$, note that as we only use
-                                         // this fourth-order unit tensor to operate
-                                         // on symmetric second-order tensors.
-                                         // To maintain notation consistent with Holzapfel (2001)
-                                         // we name the tensor $\mathcal{I}$
-        static const SymmetricTensor<4, dim> II;
-                                         // Fourth-order deviatoric tensor such that
-                                         // $\textrm{dev} \{ \bullet \} = \{ \bullet \} - [1/\textrm{dim}][ \{ \bullet\} :\mathbf{I}]\mathbf{I}$
-        static const SymmetricTensor<4, dim> dev_P;
-    };
+				       // $\mathbf{I}$
+      static const SymmetricTensor<2, dim> I;
+				       // $\mathbf{I} \otimes \mathbf{I}$
+      static const SymmetricTensor<4, dim> IxI;
+				       // $\mathcal{S}$, note that as we only use
+				       // this fourth-order unit tensor to operate
+				       // on symmetric second-order tensors.
+				       // To maintain notation consistent with Holzapfel (2001)
+				       // we name the tensor $\mathcal{I}$
+      static const SymmetricTensor<4, dim> II;
+				       // Fourth-order deviatoric tensor such that
+				       // $\textrm{dev} \{ \bullet \} = \{ \bullet \} - [1/\textrm{dim}][ \{ \bullet\} :\mathbf{I}]\mathbf{I}$
+      static const SymmetricTensor<4, dim> dev_P;
+  };
 
-    template <int dim>
-    const SymmetricTensor<2, dim>
-    StandardTensors<dim>::I = unit_symmetric_tensor<dim>();
+  template <int dim>
+  const SymmetricTensor<2, dim>
+  StandardTensors<dim>::I = unit_symmetric_tensor<dim>();
 
-    template <int dim>
-    const SymmetricTensor<4, dim>
-    StandardTensors<dim>::IxI = outer_product(I, I);
+  template <int dim>
+  const SymmetricTensor<4, dim>
+  StandardTensors<dim>::IxI = outer_product(I, I);
 
-    template <int dim>
-    const SymmetricTensor<4, dim>
-    StandardTensors<dim>::II = identity_tensor<dim>();
+  template <int dim>
+  const SymmetricTensor<4, dim>
+  StandardTensors<dim>::II = identity_tensor<dim>();
 
-    template <int dim>
-    const SymmetricTensor<4, dim>
-    StandardTensors<dim>::dev_P = deviator_tensor<dim>();
+  template <int dim>
+  const SymmetricTensor<4, dim>
+  StandardTensors<dim>::dev_P = deviator_tensor<dim>();
 
 // @sect3{Time class}
 // A simple class to store time data. Its
@@ -547,8 +547,8 @@ namespace Step44
                                        // We update the material model with
                                        // various deformation dependent data
                                        // based on $F$ and the pressure $\widetilde{p}$
-                                   // and dilatation $\widetilde{J}$,
-                                   // and at the end of the
+				       // and dilatation $\widetilde{J}$,
+				       // and at the end of the
                                        // function include a physical check for
                                        // internal consistency:
       void update_material_data(const Tensor<2, dim> & F,
@@ -632,7 +632,7 @@ namespace Step44
     protected:
                                        // Define constitutive model paramaters
                                        // $\kappa$ (bulk modulus)
-                                   // and the neo-Hookean model
+				       // and the neo-Hookean model
                                        // parameter $c_1$:
       const double kappa;
       const double c_1;
@@ -748,13 +748,13 @@ namespace Step44
                                        // The first function is used to create
                                        // a material object and to initialize
                                        // all tensors correctly:
-                                   // The second one updates the stored
-                                   // values and stresses based on the
-                       // current deformation measure
-                       // $\textrm{Grad}\mathbf{u}_{\textrm{n}}$,
-                       // pressure $\widetilde{p}$ and
-                       // dilation $\widetilde{J}$ field
-                       // values.
+				       // The second one updates the stored
+				       // values and stresses based on the
+				       // current deformation measure
+				       // $\textrm{Grad}\mathbf{u}_{\textrm{n}}$,
+				       // pressure $\widetilde{p}$ and
+				       // dilation $\widetilde{J}$ field
+				       // values.
       void setup_lqp (const Parameters::AllParameters & parameters)
         {
           material = new Material_Compressible_Neo_Hook_Three_Field<dim>(parameters.mu,
@@ -845,7 +845,7 @@ namespace Step44
           return material->get_p_tilde();
         }
 
-     const SymmetricTensor<2, dim>& get_tau() const
+      const SymmetricTensor<2, dim>& get_tau() const
         {
           return tau;
         }
@@ -1169,7 +1169,7 @@ namespace Step44
       get_error_dilation();
 
                                        // Print information to screen
-                                   // in a pleasing way...
+				       // in a pleasing way...
       static
       void
       print_conv_header();
@@ -1724,22 +1724,22 @@ namespace Step44
 
                                        // The global system matrix initially has the following structure
                                        // @f{align*}
-                                                // \underbrace{\begin{bmatrix}
-                                                // \mathbf{\mathsf{K}}_{uu}     &       \mathbf{\mathsf{K}}_{u\widetilde{p}}    & \mathbf{0} \\
-                                                //      \mathbf{\mathsf{K}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}} \\
-                                                //      \mathbf{0}      &       \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
-                                                //      \end{bmatrix}}_{\mathbf{\mathsf{K}}(\mathbf{\Xi}_{\textrm{i}})}
-                                                //      \underbrace{\begin{bmatrix}
-                                                //                      d \mathbf{\mathsf{u}} \\
-                                                //          d \widetilde{\mathbf{\mathsf{p}}} \\
-                                                //          d \widetilde{\mathbf{\mathsf{J}}}
-                                                //      \end{bmatrix}}_{d \mathbf{\Xi}}
-                                                // =
-                                                // \underbrace{\begin{bmatrix}
-                                                // \mathbf{\mathsf{F}}_{u}(\mathbf{u}_{\textrm{i}}) \\
-                                                //  \mathbf{\mathsf{F}}_{\widetilde{p}}(\widetilde{p}_{\textrm{i}}) \\
-                                                //  \mathbf{\mathsf{F}}_{\widetilde{J}}(\widetilde{J}_{\textrm{i}})
-                                                //\end{bmatrix}}_{ \mathbf{\mathsf{F}}(\mathbf{\Xi}_{\textrm{i}}) } \, .
+				       // \underbrace{\begin{bmatrix}
+				       // \mathbf{\mathsf{K}}_{uu}     &       \mathbf{\mathsf{K}}_{u\widetilde{p}}    & \mathbf{0} \\
+				       //      \mathbf{\mathsf{K}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}} \\
+				       //      \mathbf{0}      &       \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+				       //      \end{bmatrix}}_{\mathbf{\mathsf{K}}(\mathbf{\Xi}_{\textrm{i}})}
+				       //      \underbrace{\begin{bmatrix}
+				       //                      d \mathbf{\mathsf{u}} \\
+				       //          d \widetilde{\mathbf{\mathsf{p}}} \\
+				       //          d \widetilde{\mathbf{\mathsf{J}}}
+				       //      \end{bmatrix}}_{d \mathbf{\Xi}}
+				       // =
+				       // \underbrace{\begin{bmatrix}
+				       // \mathbf{\mathsf{F}}_{u}(\mathbf{u}_{\textrm{i}}) \\
+				       //  \mathbf{\mathsf{F}}_{\widetilde{p}}(\widetilde{p}_{\textrm{i}}) \\
+				       //  \mathbf{\mathsf{F}}_{\widetilde{J}}(\widetilde{J}_{\textrm{i}})
+				       //\end{bmatrix}}_{ \mathbf{\mathsf{F}}(\mathbf{\Xi}_{\textrm{i}}) } \, .
                                        // @f}
                                        // We optimise the sparsity pattern to reflect this structure
                                        // and prevent unnecessary data creation for the right-diagonal
@@ -2331,12 +2331,12 @@ namespace Step44
                                      // copying the values to the upper half.
                                      // So we only assemble half of the
                                      // $\mathsf{\mathbf{k}}_{uu}$,
-                                 // $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{p}} = \mathbf{0}$,
-                                 // $\mathsf{\mathbf{k}}_{\widetilde{J} \widetilde{J}}$
+				     // $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{p}} = \mathbf{0}$,
+				     // $\mathsf{\mathbf{k}}_{\widetilde{J} \widetilde{J}}$
                                      // blocks, while the whole $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$,
                                      // $\mathsf{\mathbf{k}}_{\mathbf{u} \widetilde{J}} = \mathbf{0}$,
-                                 // $\mathsf{\mathbf{k}}_{\mathbf{u} \widetilde{p}}$
-                                 // blocks are built.
+				     // $\mathsf{\mathbf{k}}_{\mathbf{u} \widetilde{p}}$
+				     // blocks are built.
                                      //
                                      // In doing so, we first extract some
                                      // configuration dependent variables from
@@ -2561,8 +2561,8 @@ namespace Step44
                                                // is defined using the first
                                                // Piola-Kirchhoff stress is
                                                // simply
-                                           // $\mathbf{t} = \mathbf{P}\mathbf{N}
-                                           // = [p_0 \mathbf{I}] \mathbf{N} = p_0 \mathbf{N}$
+					       // $\mathbf{t} = \mathbf{P}\mathbf{N}
+					       // = [p_0 \mathbf{I}] \mathbf{N} = p_0 \mathbf{N}$
                                                // We use the
                                                // time variable to linearly
                                                // ramp up the pressure load.
@@ -2805,86 +2805,86 @@ namespace Step44
 
                                      // In the first step of this function, we solve for the incremental displacement $d\mathbf{u}$.
                                      // To this end, we perform static condensation to make
-                                 //    $\mathbf{\mathsf{K}}_{\textrm{con}}
-                                 //    = \bigl[ \mathbf{\mathsf{K}}_{uu} + \overline{\overline{\mathbf{\mathsf{K}}}}~ \bigr]$
-                                 // and put
+				     //    $\mathbf{\mathsf{K}}_{\textrm{con}}
+				     //    = \bigl[ \mathbf{\mathsf{K}}_{uu} + \overline{\overline{\mathbf{\mathsf{K}}}}~ \bigr]$
+				     // and put
                                      // $\mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}$
-                                 // in the original $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$ block.
+				     // in the original $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$ block.
                                      // That is, we make $\mathbf{\mathsf{K}}_{\textrm{store}}$.
     {
       assemble_sc();
 
-                                                //              $
-                                                //      \mathsf{\mathbf{A}}_{\widetilde{J}}
-                                                //      =
-                                                //              \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
-                                                //              \mathsf{\mathbf{F}}_{\widetilde{p}}
-                                                //              $
+				       //              $
+				       //      \mathsf{\mathbf{A}}_{\widetilde{J}}
+				       //      =
+				       //              \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+				       //              \mathsf{\mathbf{F}}_{\widetilde{p}}
+				       //              $
       tangent_matrix.block(p_dof, J_dof).vmult(A.block(J_dof),
                                                system_rhs.block(p_dof));
-                                                //      $
-                                                //      \mathsf{\mathbf{B}}_{\widetilde{J}}
-                                                //      =
-                                                //      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
-                                                //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
-                                                //      \mathsf{\mathbf{F}}_{\widetilde{p}}
-                                                //      $
+				       //      $
+				       //      \mathsf{\mathbf{B}}_{\widetilde{J}}
+				       //      =
+				       //      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
+				       //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+				       //      \mathsf{\mathbf{F}}_{\widetilde{p}}
+				       //      $
       tangent_matrix.block(J_dof, J_dof).vmult(B.block(J_dof),
                                                A.block(J_dof));
-                                                //      $
-                                                //      \mathsf{\mathbf{A}}_{\widetilde{J}}
-                                                //      =
-                                                //      \mathsf{\mathbf{F}}_{\widetilde{J}}
-                                                //      -
-                                                //      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
-                                                //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
-                                                //      \mathsf{\mathbf{F}}_{\widetilde{p}}
-                                                //      $
+				       //      $
+				       //      \mathsf{\mathbf{A}}_{\widetilde{J}}
+				       //      =
+				       //      \mathsf{\mathbf{F}}_{\widetilde{J}}
+				       //      -
+				       //      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
+				       //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+				       //      \mathsf{\mathbf{F}}_{\widetilde{p}}
+				       //      $
       A.block(J_dof).equ(1.0, system_rhs.block(J_dof), -1.0, B.block(J_dof));
-                                                //      $
-                                                //      \mathsf{\mathbf{A}}_{\widetilde{J}}
-                                                //      =
-                                                //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{J} \widetilde{p}}
-                                                //      [
-                                                //      \mathsf{\mathbf{F}}_{\widetilde{J}}
-                                                //      -
-                                                //      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
-                                                //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
-                                                //      \mathsf{\mathbf{F}}_{\widetilde{p}}
-                                                //      ]
-                                                //      $
+				       //      $
+				       //      \mathsf{\mathbf{A}}_{\widetilde{J}}
+				       //      =
+				       //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{J} \widetilde{p}}
+				       //      [
+				       //      \mathsf{\mathbf{F}}_{\widetilde{J}}
+				       //      -
+				       //      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
+				       //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+				       //      \mathsf{\mathbf{F}}_{\widetilde{p}}
+				       //      ]
+				       //      $
       tangent_matrix.block(p_dof, J_dof).Tvmult(A.block(p_dof),
                                                 A.block(J_dof));
-                                                //      $
-                                                //      \mathsf{\mathbf{A}}_{\mathbf{u}}
-                                                //      =
-                                                //      \mathsf{\mathbf{K}}_{\mathbf{u} \widetilde{p}}
-                                                //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{J} \widetilde{p}}
-                                                //      [
-                                                //      \mathsf{\mathbf{F}}_{\widetilde{J}}
-                                                //      -
-                                                //      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
-                                                //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
-                                                //      \mathsf{\mathbf{F}}_{\widetilde{p}}
-                                                //      ]
-                                                //      $
+				       //      $
+				       //      \mathsf{\mathbf{A}}_{\mathbf{u}}
+				       //      =
+				       //      \mathsf{\mathbf{K}}_{\mathbf{u} \widetilde{p}}
+				       //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{J} \widetilde{p}}
+				       //      [
+				       //      \mathsf{\mathbf{F}}_{\widetilde{J}}
+				       //      -
+				       //      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
+				       //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+				       //      \mathsf{\mathbf{F}}_{\widetilde{p}}
+				       //      ]
+				       //      $
       tangent_matrix.block(u_dof, p_dof).vmult(A.block(u_dof),
                                                A.block(p_dof));
-                                                //      $
-                                                //      \mathsf{\mathbf{F}}_{\text{con}}
-                                                //      =
-                                                //      \mathsf{\mathbf{F}}_{\mathbf{u}}
-                                                //      -
-                                                //      \mathsf{\mathbf{K}}_{\mathbf{u} \widetilde{p}}
-                                                //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{J} \widetilde{p}}
-                                                //      [
-                                                //      \mathsf{\mathbf{F}}_{\widetilde{J}}
-                                                //      -
-                                                //      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
-                                                //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
-                                                //      \mathsf{\mathbf{K}}_{\widetilde{p}}
-                                                //      ]
-                                                //      $
+				       //      $
+				       //      \mathsf{\mathbf{F}}_{\text{con}}
+				       //      =
+				       //      \mathsf{\mathbf{F}}_{\mathbf{u}}
+				       //      -
+				       //      \mathsf{\mathbf{K}}_{\mathbf{u} \widetilde{p}}
+				       //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{J} \widetilde{p}}
+				       //      [
+				       //      \mathsf{\mathbf{F}}_{\widetilde{J}}
+				       //      -
+				       //      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
+				       //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+				       //      \mathsf{\mathbf{K}}_{\widetilde{p}}
+				       //      ]
+				       //      $
       system_rhs.block(u_dof) -= A.block(u_dof);
 
       timer.enter_subsection("Linear solver");
@@ -2953,99 +2953,99 @@ namespace Step44
                                      // problem is to post-process to get the
                                      // dilatation solution from the
                                      // substitution:
-                                         //    $
-                                         //     d \widetilde{\mathbf{\mathsf{J}}}
-                                         //      = \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1} \bigl[
-                                         //       \mathbf{\mathsf{F}}_{\widetilde{p}}
-                                         //     - \mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
-                                         //      \bigr]
-                                         //    $
+				     //    $
+				     //     d \widetilde{\mathbf{\mathsf{J}}}
+				     //      = \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1} \bigl[
+				     //       \mathbf{\mathsf{F}}_{\widetilde{p}}
+				     //     - \mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+				     //      \bigr]
+				     //    $
     {
-                                        //      $
-                                        //      \mathbf{\mathsf{A}}_{\widetilde{p}}
-                                        //      =
-                                        //      \mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
-                                        //      $
+				       //      $
+				       //      \mathbf{\mathsf{A}}_{\widetilde{p}}
+				       //      =
+				       //      \mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+				       //      $
       tangent_matrix.block(p_dof, u_dof).vmult(A.block(p_dof),
                                                newton_update.block(u_dof));
-                                        //      $
-                                        //      \mathbf{\mathsf{A}}_{\widetilde{p}}
-                                        //      =
-                                        //      -\mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
-                                        //      $
+				       //      $
+				       //      \mathbf{\mathsf{A}}_{\widetilde{p}}
+				       //      =
+				       //      -\mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+				       //      $
       A.block(p_dof) *= -1.0;
-                                        //      $
-                                        //      \mathbf{\mathsf{A}}_{\widetilde{p}}
-                                        //      =
-                                        //      \mathbf{\mathsf{F}}_{\widetilde{p}}
-                                        //      -\mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
-                                        //      $
+				       //      $
+				       //      \mathbf{\mathsf{A}}_{\widetilde{p}}
+				       //      =
+				       //      \mathbf{\mathsf{F}}_{\widetilde{p}}
+				       //      -\mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+				       //      $
       A.block(p_dof) += system_rhs.block(p_dof);
-                                        //      $
-                                        //      d\mathbf{\mathsf{\widetilde{J}}}
-                                        //      =
-                                        //      \mathbf{\mathsf{K}}^{-1}_{\widetilde{p}\widetilde{J}}
-                                        //      [
-                                        //      \mathbf{\mathsf{F}}_{\widetilde{p}}
-                                        //      -\mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
-                                        //      ]
-                                        //      $
+				       //      $
+				       //      d\mathbf{\mathsf{\widetilde{J}}}
+				       //      =
+				       //      \mathbf{\mathsf{K}}^{-1}_{\widetilde{p}\widetilde{J}}
+				       //      [
+				       //      \mathbf{\mathsf{F}}_{\widetilde{p}}
+				       //      -\mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+				       //      ]
+				       //      $
       tangent_matrix.block(p_dof, J_dof).vmult(newton_update.block(J_dof),
                                                A.block(p_dof));
     }
 
-    // we insure here that any Dirichlet constraints
-    // are distributed on the updated solution:
+				     // we insure here that any Dirichlet constraints
+				     // are distributed on the updated solution:
     constraints.distribute(newton_update);
 
                                      // Finally we solve for the pressure
                                      // update with the substitution:
-                                        //    $
-                                        //    d \widetilde{\mathbf{\mathsf{p}}}
-                                        //     =
-                                        //    \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
-                                        //    \bigl[
-                                        //     \mathbf{\mathsf{F}}_{\widetilde{J}}
-                                        //      - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
-                                        //    d \widetilde{\mathbf{\mathsf{J}}}
-                                        //    \bigr]
-                                        //    $
+				     //    $
+				     //    d \widetilde{\mathbf{\mathsf{p}}}
+				     //     =
+				     //    \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
+				     //    \bigl[
+				     //     \mathbf{\mathsf{F}}_{\widetilde{J}}
+				     //      - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+				     //    d \widetilde{\mathbf{\mathsf{J}}}
+				     //    \bigr]
+				     //    $
     {
-                                                //      $
-                                                //      \mathsf{\mathbf{A}}_{\widetilde{J}}
-                                                //       =
-                                                //      \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
-                                                //      d \widetilde{\mathbf{\mathsf{J}}}
-                                                //      $
+				       //      $
+				       //      \mathsf{\mathbf{A}}_{\widetilde{J}}
+				       //       =
+				       //      \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+				       //      d \widetilde{\mathbf{\mathsf{J}}}
+				       //      $
       tangent_matrix.block(J_dof, J_dof).vmult(A.block(J_dof),
                                                newton_update.block(J_dof));
-                                                //      $
-                                                //      \mathsf{\mathbf{A}}_{\widetilde{J}}
-                                                //       =
-                                                //      -\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
-                                                //      d \widetilde{\mathbf{\mathsf{J}}}
-                                                //      $
+				       //      $
+				       //      \mathsf{\mathbf{A}}_{\widetilde{J}}
+				       //       =
+				       //      -\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+				       //      d \widetilde{\mathbf{\mathsf{J}}}
+				       //      $
       A.block(J_dof) *= -1.0;
-                                                //      $
-                                                //      \mathsf{\mathbf{A}}_{\widetilde{J}}
-                                                //       =
-                                                //      \mathsf{\mathbf{F}}_{\widetilde{J}}
-                                                //      -
-                                                //      \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
-                                                //      d \widetilde{\mathbf{\mathsf{J}}}
-                                                //      $
+				       //      $
+				       //      \mathsf{\mathbf{A}}_{\widetilde{J}}
+				       //       =
+				       //      \mathsf{\mathbf{F}}_{\widetilde{J}}
+				       //      -
+				       //      \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+				       //      d \widetilde{\mathbf{\mathsf{J}}}
+				       //      $
       A.block(J_dof) += system_rhs.block(J_dof);
-                                        // and finally....
-                                                //    $
-                                                //    d \widetilde{\mathbf{\mathsf{p}}}
-                                                //     =
-                                                //    \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
-                                                //    \bigl[
-                                                //     \mathbf{\mathsf{F}}_{\widetilde{J}}
-                                                //      - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
-                                                //    d \widetilde{\mathbf{\mathsf{J}}}
-                                                //    \bigr]
-                                                //    $
+				       // and finally....
+				       //    $
+				       //    d \widetilde{\mathbf{\mathsf{p}}}
+				       //     =
+				       //    \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
+				       //    \bigl[
+				       //     \mathbf{\mathsf{F}}_{\widetilde{J}}
+				       //      - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+				       //    d \widetilde{\mathbf{\mathsf{J}}}
+				       //    \bigr]
+				       //    $
       tangent_matrix.block(p_dof, J_dof).Tvmult(newton_update.block(p_dof),
                                                 A.block(J_dof));
     }
@@ -3067,7 +3067,7 @@ namespace Step44
 // dilatation variables are discontinuous, the static condensation (SC)
 // operation can be done on a per-cell basis and we can produce the inverse of
 // the block-diagonal $ \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}$
- // block by inverting the local blocks. We can again
+				   // block by inverting the local blocks. We can again
 // use TBB to do this since each operation will be independent of one another.
 //
 // Using the TBB via the WorkStream class, we assemble the contributions to form
@@ -3134,58 +3134,58 @@ namespace Step44
                                      // coupling of the local contributions at the
                                      // global level. This is not the case with the u dof.
                                      // In other words,
-                                 // $\mathsf{\mathbf{k}}_{\widetilde{J} \widetilde{p}}$,
-                                 // $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{p}}$
-                                 // and
-                                 // $\mathsf{\mathbf{k}}_{\widetilde{J} \widetilde{p}}$,
-                                 // when extracted
+				     // $\mathsf{\mathbf{k}}_{\widetilde{J} \widetilde{p}}$,
+				     // $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{p}}$
+				     // and
+				     // $\mathsf{\mathbf{k}}_{\widetilde{J} \widetilde{p}}$,
+				     // when extracted
                                      // from the global stiffness matrix are the element
                                      // contributions.
-                                 // This is not the case for
-                                 // $\mathsf{\mathbf{k}}_{\mathbf{u} \mathbf{u}}$
-                                 //
-                                 // Note: a lower-case symbol is used to denote
-                                 // element stiffness matrices.
+				     // This is not the case for
+				     // $\mathsf{\mathbf{k}}_{\mathbf{u} \mathbf{u}}$
+				     //
+				     // Note: a lower-case symbol is used to denote
+				     // element stiffness matrices.
 
                                      // Currently the matrix corresponding to
                                      // the dof associated with the current element
                                      // (denoted somewhat loosely as $\mathsf{\mathbf{k}}$)
-                                 // is of the form:
-                                // @f{align*}
-                                        //    \begin{bmatrix}
-                                        //                      \mathbf{\mathsf{k}}_{uu}        &       \mathbf{\mathsf{k}}_{u\widetilde{p}}    & \mathbf{0} \\
-                                        //                      \mathbf{\mathsf{k}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}} \\
-                                        //                      \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
-                                        //    \end{bmatrix}
-                                // @f}
+				     // is of the form:
+				     // @f{align*}
+				     //    \begin{bmatrix}
+				     //                      \mathbf{\mathsf{k}}_{uu}        &       \mathbf{\mathsf{k}}_{u\widetilde{p}}    & \mathbf{0} \\
+				     //                      \mathbf{\mathsf{k}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}} \\
+				     //                      \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
+				     //    \end{bmatrix}
+				     // @f}
                                      //
                                      // We now need to modify it such that it appear as
-                                // @f{align*}
-                                        //    \begin{bmatrix}
-                                        //                      \mathbf{\mathsf{k}}_{\textrm{con}}      &       \mathbf{\mathsf{k}}_{u\widetilde{p}}    & \mathbf{0} \\
-                                        //                      \mathbf{\mathsf{k}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}^{-1} \\
-                                        //                      \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
-                                        //    \end{bmatrix}
-                                // @f}
+				     // @f{align*}
+				     //    \begin{bmatrix}
+				     //                      \mathbf{\mathsf{k}}_{\textrm{con}}      &       \mathbf{\mathsf{k}}_{u\widetilde{p}}    & \mathbf{0} \\
+				     //                      \mathbf{\mathsf{k}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}^{-1} \\
+				     //                      \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
+				     //    \end{bmatrix}
+				     // @f}
                                      // with $\mathbf{\mathsf{k}}_{\textrm{con}} = \bigl[ \mathbf{\mathsf{k}}_{uu} +\overline{\overline{\mathbf{\mathsf{k}}}}~ \bigr]$
                                      // where
                                      // $               \overline{\overline{\mathbf{\mathsf{k}}}} :=
-                                 // \mathbf{\mathsf{k}}_{u\widetilde{p}} \overline{\mathbf{\mathsf{k}}} \mathbf{\mathsf{k}}_{\widetilde{p}u}
-                                // $
+				     // \mathbf{\mathsf{k}}_{u\widetilde{p}} \overline{\mathbf{\mathsf{k}}} \mathbf{\mathsf{k}}_{\widetilde{p}u}
+				     // $
                                      // and
-                                // $
-                                        //    \overline{\mathbf{\mathsf{k}}} =
-                                        //     \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
-                                        //    \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
-                                // $.
+				     // $
+				     //    \overline{\mathbf{\mathsf{k}}} =
+				     //     \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
+				     //    \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
+				     // $.
                                      //
                                      // At this point, we need to take note of
                                      // the fact that global data already exists
                                      // in the $\mathsf{\mathbf{K}}_{uu}$,
-                                 // $\mathsf{\mathbf{K}}_{\widetilde{p} \widetilde{J}}$
-                                 // and
-                                 //  $\mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{p}}$
-                                 // sub-blocks.  So
+				     // $\mathsf{\mathbf{K}}_{\widetilde{p} \widetilde{J}}$
+				     // and
+				     //  $\mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{p}}$
+				     // sub-blocks.  So
                                      // if we are to modify them, we must
                                      // account for the data that is already
                                      // there (i.e. simply add to it or remove
@@ -3212,37 +3212,37 @@ namespace Step44
                                      // static-condensation $\overline{\overline{\mathbf{\mathsf{k}}}}$.
                                      //
                                      // - $\mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}$:
-                                 //                      Similarly, $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$ exists in
+				     //                      Similarly, $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$ exists in
                                      //          the subblock. Since the copy
                                      //          operation is a += operation, we
                                      //          need to subtract the existing
                                      //          $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$
-                                 //                      submatrix in addition to
+				     //                      submatrix in addition to
                                      //          "adding" that which we wish to
                                      //          replace it with.
                                      //
                                      // - $\mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{p}}$:
-                                 //              Since the global matrix
+				     //              Since the global matrix
                                      //          is symmetric, this block is the
                                      //          same as the one above and we
                                      //          can simply use
-                                 //              $\mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}$
+				     //              $\mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}$
                                      //          as a substitute for this one.
                                      //
                                      // We first extract element data from the
                                      // system matrix. So first we get the
                                      // entire subblock for the cell, then
                                      // extract $\mathsf{\mathbf{k}}$
-                                 // for the dofs associated with
+				     // for the dofs associated with
                                      // the current element
     data.k_orig.extract_submatrix_from(tangent_matrix,
                                        data.local_dof_indices,
                                        data.local_dof_indices);
                                      // and next the local matrices for
-                                 // $\mathsf{\mathbf{k}}_{ \widetilde{p} \mathbf{u}}$
-                                 // $\mathsf{\mathbf{k}}_{ \widetilde{p} \widetilde{J}}$
-                                 // and
-                                 // $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{J}}$:
+				     // $\mathsf{\mathbf{k}}_{ \widetilde{p} \mathbf{u}}$
+				     // $\mathsf{\mathbf{k}}_{ \widetilde{p} \widetilde{J}}$
+				     // and
+				     // $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{J}}$:
     data.k_pu.extract_submatrix_from(data.k_orig,
                                      element_indices_p,
                                      element_indices_u);
@@ -3254,8 +3254,8 @@ namespace Step44
                                      element_indices_J);
 
                                      // To get the inverse of
-                                 // $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$,
-                                 // we invert it
+				     // $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$,
+				     // we invert it
                                      // directly.  This operation is relatively
                                      // inexpensive since $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$
                                      // since block-diagonal.
@@ -3263,50 +3263,50 @@ namespace Step44
 
                                      // Now we can make condensation terms to
                                      // add to the $\mathsf{\mathbf{k}}_{\mathbf{u} \mathbf{u}}$
-                                 // block and put them in
+				     // block and put them in
                                      // the cell local matrix
-                                        //    $
-                                        //    \mathsf{\mathbf{A}}
-                                        //    =
-                                        //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
-                                        //    \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
-                                        //    $:
-        data.k_pJ_inv.mmult(data.A, data.k_pu);
-                                        //      $
-                                        //      \mathsf{\mathbf{B}}
-                                        //      =
-                                        //      \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{J}}
-                                        //      \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
-                                        //      \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
-                                        //      $
+				     //    $
+				     //    \mathsf{\mathbf{A}}
+				     //    =
+				     //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
+				     //    \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
+				     //    $:
+    data.k_pJ_inv.mmult(data.A, data.k_pu);
+				     //      $
+				     //      \mathsf{\mathbf{B}}
+				     //      =
+				     //      \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{J}}
+				     //      \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
+				     //      \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
+				     //      $
     data.k_JJ.mmult(data.B, data.A);
-                                        //    $
-                                        //    \mathsf{\mathbf{C}}
-                                        //    =
-                                        //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{p}}
-                                        //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{J}}
-                                        //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
-                                        //    \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
-                                        //    $
+				     //    $
+				     //    \mathsf{\mathbf{C}}
+				     //    =
+				     //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{p}}
+				     //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{J}}
+				     //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
+				     //    \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
+				     //    $
     data.k_pJ_inv.Tmmult(data.C, data.B);
-                                        //    $
-                                        //    \overline{\overline{\mathsf{\mathbf{k}}}}
-                                        //    =
-                                        //    \mathsf{\mathbf{k}}_{\mathbf{u} \widetilde{p}}
-                                        //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{p}}
-                                        //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{J}}
-                                        //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
-                                        //    \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
-                                        //    $
+				     //    $
+				     //    \overline{\overline{\mathsf{\mathbf{k}}}}
+				     //    =
+				     //    \mathsf{\mathbf{k}}_{\mathbf{u} \widetilde{p}}
+				     //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{p}}
+				     //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{J}}
+				     //    \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
+				     //    \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
+				     //    $
     data.k_pu.Tmmult(data.k_bbar, data.C);
     data.k_bbar.scatter_matrix_to(element_indices_u,
                                   element_indices_u,
                                   data.cell_matrix);
 
                                      // Next we place
-                                 // $\mathsf{\mathbf{k}}^{-1}_{ \widetilde{p} \widetilde{J}}$
-                                 // in the
-                                 // $\mathsf{\mathbf{k}}_{ \widetilde{p} \widetilde{J}}$
+				     // $\mathsf{\mathbf{k}}^{-1}_{ \widetilde{p} \widetilde{J}}$
+				     // in the
+				     // $\mathsf{\mathbf{k}}_{ \widetilde{p} \widetilde{J}}$
                                      // block for post-processing.  Note again
                                      // that we need to remove the
                                      // contribution that already exists there.
