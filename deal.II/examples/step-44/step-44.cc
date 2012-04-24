@@ -407,15 +407,8 @@ namespace Step44
     }
   }
 
-// @sect3{General tools}
-// We need to perform some specific operations that are not defined
-// in the deal.II library yet.
-// We place these common operations
-// in a separate namespace for convenience.
-// We also include some widely used operators.
-  namespace AdditionalTools
-  {
-    // Now we define some frequently used
+// @sect3{Some standard tensors}
+// Now we define some frequently used
 // second and fourth-order tensors:
     template <int dim>
     class StandardTensors
@@ -432,7 +425,7 @@ namespace Step44
                                          // To maintain notation consistent with Holzapfel (2001)
                                          // we name the tensor $\mathcal{I}$
         static const SymmetricTensor<4, dim> II;
-                                         // Fourth-order deviatoric such that
+                                         // Fourth-order deviatoric tensor such that
                                          // $\textrm{dev} \{ \bullet \} = \{ \bullet \} - [1/\textrm{dim}][ \{ \bullet\} :\mathbf{I}]\mathbf{I}$
         static const SymmetricTensor<4, dim> dev_P;
     };
@@ -452,7 +445,6 @@ namespace Step44
     template <int dim>
     const SymmetricTensor<4, dim>
     StandardTensors<dim>::dev_P = deviator_tensor<dim>();
-  }
 
 // @sect3{Time class}
 // A simple class to store time data. Its
@@ -544,7 +536,7 @@ namespace Step44
                       det_F(1.0),
                       p_tilde(0.0),
                       J_tilde(1.0),
-                      b_bar(AdditionalTools::StandardTensors<dim>::I)
+                      b_bar(StandardTensors<dim>::I)
         {
           Assert(kappa > 0, ExcInternalError());
         }
@@ -661,7 +653,7 @@ namespace Step44
                                        // $\boldsymbol{\tau}_{\textrm{vol}}$:
       SymmetricTensor<2, dim> get_tau_vol() const
         {
-          return p_tilde * det_F * AdditionalTools::StandardTensors<dim>::I;
+          return p_tilde * det_F * StandardTensors<dim>::I;
         }
 
                                        // Next, determine the isochoric
@@ -670,7 +662,7 @@ namespace Step44
                                        // \mathcal{P}:\overline{\boldsymbol{\tau}}$:
       SymmetricTensor<2, dim> get_tau_iso() const
         {
-          return AdditionalTools::StandardTensors<dim>::dev_P * get_tau_bar();
+          return StandardTensors<dim>::dev_P * get_tau_bar();
         }
 
                                        // Then, determine the fictitious
@@ -688,8 +680,8 @@ namespace Step44
         {
 
           return p_tilde * det_F
-            * ( AdditionalTools::StandardTensors<dim>::IxI
-                - (2.0 * AdditionalTools::StandardTensors<dim>::II) );
+            * ( StandardTensors<dim>::IxI
+                - (2.0 * StandardTensors<dim>::II) );
         }
 
                                        // Calculate the isochoric part of the
@@ -701,17 +693,17 @@ namespace Step44
           const SymmetricTensor<2, dim> tau_iso = get_tau_iso();
           const SymmetricTensor<4, dim> tau_iso_x_I
             = outer_product(tau_iso,
-                            AdditionalTools::StandardTensors<dim>::I);
+                            StandardTensors<dim>::I);
           const SymmetricTensor<4, dim> I_x_tau_iso
-            = outer_product(AdditionalTools::StandardTensors<dim>::I,
+            = outer_product(StandardTensors<dim>::I,
                             tau_iso);
           const SymmetricTensor<4, dim> c_bar = get_c_bar();
 
           return (2.0 / 3.0) * trace(tau_bar)
-            * AdditionalTools::StandardTensors<dim>::dev_P
+            * StandardTensors<dim>::dev_P
             - (2.0 / 3.0) * (tau_iso_x_I + I_x_tau_iso)
-            + AdditionalTools::StandardTensors<dim>::dev_P * c_bar
-            * AdditionalTools::StandardTensors<dim>::dev_P;
+            + StandardTensors<dim>::dev_P * c_bar
+            * StandardTensors<dim>::dev_P;
         }
 
                                        // Calculate the fictitious elasticity
@@ -740,7 +732,7 @@ namespace Step44
       PointHistory()
                       :
                       material(NULL),
-                      F_inv(AdditionalTools::StandardTensors<dim>::I),
+                      F_inv(StandardTensors<dim>::I),
                       tau(SymmetricTensor<2, dim>()),
                       d2Psi_vol_dJ2(0.0),
                       dPsi_vol_dJ(0.0),
@@ -804,7 +796,7 @@ namespace Step44
                           const double J_tilde)
         {
           const Tensor<2, dim> F
-            = (Tensor<2, dim>(AdditionalTools::StandardTensors<dim>::I) +
+            = (Tensor<2, dim>(StandardTensors<dim>::I) +
                Grad_u_n);
           material->update_material_data(F, p_tilde, J_tilde);
 
@@ -2306,7 +2298,7 @@ namespace Step44
     PointHistory<dim> *lqph =
       reinterpret_cast<PointHistory<dim>*>(cell->user_pointer());
 
-    static const SymmetricTensor<2, dim> I = AdditionalTools::StandardTensors<dim>::I;
+    static const SymmetricTensor<2, dim> I = StandardTensors<dim>::I;
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       {
         const Tensor<2, dim> F_inv = lqph[q_point].get_F_inv();
@@ -2396,7 +2388,7 @@ namespace Step44
                   {
                     data.cell_matrix(i, j) += N[i] * det_F
                                               * (symm_grad_Nx[j]
-                                                 * AdditionalTools::StandardTensors<dim>::I)
+                                                 * StandardTensors<dim>::I)
                                               * JxW;
                   }
                                                  // and lastly the $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{p}}$
