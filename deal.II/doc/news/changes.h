@@ -165,6 +165,11 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The FullMatrix::extract_submatrix_from, FullMatrix::scatter_matrix_to,
+FullMatrix::set functions are new.
+<br>
+(Andrew McBride, Jean Paul Pelteret, Wolfgang Bangerth, 2012/04/24)
+
 <li> Fixed:
 The method FEValues<dim>::inverse_jacobian() previously returned the transpose of the
 inverse Jacobians instead of just the inverse Jacobian as documented. This is now fixed.

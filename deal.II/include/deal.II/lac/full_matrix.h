@@ -421,7 +421,42 @@ class FullMatrix : public Table<2,number>
             const unsigned int dst_r=0,
             const unsigned int dst_c=0) const;
 
- /**
+    /**
+     * Copy a subset of the rows and columns of another matrix into the
+     * current object.
+     *
+     * @param matrix The matrix from which a subset is to be taken from.
+     * @param row_index_set The set of rows of @p matrix from which to extract.
+     * @param column_index_set The set of columns of @p matrix from which to extract.
+     * @precondition The number of elements in @p row_index_set and
+     *               @p column_index_set shall be equal to the number of
+     *               rows and columns in the current object. In other words,
+     *               the current object is not resized for this operation.
+     */
+    template <typename MatrixType>
+    void extract_submatrix_from (const MatrixType &matrix,
+                                 const std::vector<unsigned int> &row_index_set,
+                                 const std::vector<unsigned int> &column_index_set);
+
+    /**
+     * Copy the elements of the current matrix object into a specified
+     * set of rows and columns of another matrix. This thus a scatter operation.
+     *
+     * @param row_index_set The rows of @matrix into which to write.
+     * @param column_index_set The columns of @matrix into which to write.
+     * @param matrix The matrix within which certain elements are to be replaced.
+     * @precondition The number of elements in @p row_index_set and
+     *               @p column_index_set shall be equal to the number of
+     *               rows and columns in the current object. In other words,
+     *               the current object is not resized for this operation.
+     */
+    template <typename MatrixType>
+    void
+    scatter_matrix_to (const std::vector<unsigned int> &row_index_set,
+                       const std::vector<unsigned int> &column_index_set,
+                       MatrixType &matrix) const;
+
+                                     /**
                                       * Fill rectangular block.
                                       *
                                       * A rectangular block of the
@@ -477,6 +512,19 @@ class FullMatrix : public Table<2,number>
                            const std::vector<unsigned int> &p_rows,
                            const std::vector<unsigned int> &p_cols);
 
+    /**
+     * Set a particular entry of the matrix to a value. Thus, calling
+     * <code>A.set(1,2,3.141);</code> is entirely equivalent to the operation
+     * <code>A(1,2) = 3.141;</code>. This function exists for compatibility
+     * with the various sparse matrix objects.
+     *
+     * @param i The row index of the element to be set.
+     * @param j The columns index of the element to be set.
+     * @param value The value to be written into the element.
+     */
+    void set (const unsigned int i,
+              const unsigned int j,
+              const number value);
     /**
      * @}
      */
@@ -1453,6 +1501,7 @@ FullMatrix<number>::copy_from (const MATRIX& M)
 }
 
 
+
 template <typename number>
 template <class MATRIX>
 void
@@ -1464,6 +1513,62 @@ FullMatrix<number>::copy_transposed (const MATRIX& M)
        entry != end; ++entry)
     this->el(entry->column(), entry->row()) = entry->value();
 }
+
+
+
+template <typename number>
+template <typename MatrixType>
+inline
+void
+FullMatrix<number>::extract_submatrix_from (const MatrixType &matrix,
+                                            const std::vector<unsigned int> &row_index_set,
+                                            const std::vector<unsigned int> &column_index_set)
+{
+  AssertDimension(row_index_set.size(), this->n_rows());
+  AssertDimension(column_index_set.size(), this->n_cols());
+
+  const unsigned int n_rows_submatrix = row_index_set.size();
+  const unsigned int n_cols_submatrix = column_index_set.size();
+
+  for (unsigned int sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
+    for (unsigned int sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
+      (*this)(sub_row, sub_col) = matrix.el(row_index_set[sub_row], column_index_set[sub_col]);
+}
+
+
+
+template <typename number>
+template <typename MatrixType>
+inline
+void
+FullMatrix<number>::scatter_matrix_to (const std::vector<unsigned int> &row_index_set,
+                                            const std::vector<unsigned int> &column_index_set,
+                                            MatrixType &matrix) const
+{
+  AssertDimension(row_index_set.size(), this->n_rows());
+  AssertDimension(column_index_set.size(), this->n_cols());
+
+  const unsigned int n_rows_submatrix = row_index_set.size();
+  const unsigned int n_cols_submatrix = column_index_set.size();
+
+  for (unsigned int sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
+    for (unsigned int sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
+      matrix.set(row_index_set[sub_row],
+                 column_index_set[sub_col],
+                 (*this)(sub_row, sub_col));
+}
+
+
+template <typename number>
+inline
+void
+FullMatrix<number>::set (const unsigned int i,
+                         const unsigned int j,
+                         const number value)
+{
+  (*this)(i,j) = value;
+}
+
 
 
 template <typename number>
