@@ -415,117 +415,7 @@ namespace Step44
 // We also include some widely used operators.
   namespace AdditionalTools
   {
-
-// The  extract_submatrix function
-// takes specific entries from a matrix,
-// and copies them to a  sub_matrix.
-// The copied entries are defined by the
-// first two parameters which hold the
-// row and columns to be extracted.
-// The  matrix is automatically resized
-// to size $ r \times c $. At the beginning we
-// check the size of the input vectors
-    template <typename MatrixType>
-    void extract_submatrix (const std::vector<unsigned int> &row_index_set,
-                            const std::vector<unsigned int> &column_index_set,
-                            const MatrixType &matrix,
-                            FullMatrix<double> &sub_matrix)
-    {
-
-      const unsigned int n_rows_submatrix = row_index_set.size();
-      const unsigned int n_cols_submatrix = column_index_set.size();
-      Assert(n_rows_submatrix > 0, ExcInternalError());
-      Assert(n_cols_submatrix > 0, ExcInternalError());
-
-      sub_matrix.reinit(n_rows_submatrix, n_cols_submatrix);
-
-      for (unsigned int sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
-        {
-          const unsigned int row = row_index_set[sub_row];
-          Assert(row<=matrix.m(), ExcInternalError());
-
-          for (unsigned int sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
-            {
-              const unsigned int col = column_index_set[sub_col];
-              Assert(col<=matrix.n(), ExcInternalError());
-
-              sub_matrix(sub_row, sub_col) = matrix(row, col);
-            }
-        }
-    }
-
-// As above, but to extract entries from
-// a <code> BlockSparseMatrix </code>.
-    template <>
-    void
-    extract_submatrix<dealii::BlockSparseMatrix<double> >
-    (const std::vector<unsigned int> &row_index_set,
-     const std::vector<unsigned int> &column_index_set,
-     const dealii::BlockSparseMatrix<double> &matrix,
-     FullMatrix<double> &sub_matrix)
-    {
-
-      const unsigned int n_rows_submatrix = row_index_set.size();
-      const unsigned int n_cols_submatrix = column_index_set.size();
-
-      Assert(n_rows_submatrix > 0, ExcInternalError());
-      Assert(n_cols_submatrix > 0, ExcInternalError());
-
-      sub_matrix.reinit(n_rows_submatrix, n_cols_submatrix);
-
-      for (unsigned int sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
-        {
-          const unsigned int row = row_index_set[sub_row];
-          Assert(row<=matrix.m(), ExcInternalError());
-
-          for (unsigned int sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
-            {
-              const unsigned int col = column_index_set[sub_col];
-              Assert(col<=matrix.n(), ExcInternalError());
-              if (matrix.get_sparsity_pattern().exists(row, col) == false)
-                continue;
-
-              sub_matrix(sub_row, sub_col) = matrix(row, col);
-            }
-        }
-    }
-
-// The replace_submatrix function takes
-// specific entries from a  sub_matrix,
-// and copies them into a  matrix.
-// The copied entries are defined by the
-// first two parameters which hold the
-// row and column entries to be replaced.
-// The matrix expected to be of the correct size.
-    template <typename MatrixType>
-    void
-    replace_submatrix(const std::vector<unsigned int> &row_index_set,
-                      const std::vector<unsigned int> &column_index_set,
-                      const MatrixType &sub_matrix,
-                      FullMatrix<double> &matrix)
-    {
-      const unsigned int n_rows_submatrix = row_index_set.size();
-      Assert(n_rows_submatrix<=sub_matrix.m(), ExcInternalError());
-      const unsigned int n_cols_submatrix = column_index_set.size();
-      Assert(n_cols_submatrix<=sub_matrix.n(), ExcInternalError());
-
-      for (unsigned int sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
-        {
-          const unsigned int row = row_index_set[sub_row];
-          Assert(row<=matrix.m(), ExcInternalError());
-
-          for (unsigned int sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
-            {
-              const unsigned int col = column_index_set[sub_col];
-              Assert(col<=matrix.n(), ExcInternalError());
-
-              matrix(row, col) = sub_matrix(sub_row, sub_col);
-
-            }
-        }
-    }
-
-// Now we define some frequently used
+    // Now we define some frequently used
 // second and fourth-order tensors:
     template <int dim>
     class StandardTensors
@@ -3353,27 +3243,23 @@ namespace Step44
                                      // extract $\mathsf{\mathbf{k}}$
                                  // for the dofs associated with
                                      // the current element
-    AdditionalTools::extract_submatrix(data.local_dof_indices,
+    data.k_orig.extract_submatrix_from(tangent_matrix,
                                        data.local_dof_indices,
-                                       tangent_matrix,
-                                       data.k_orig);
+                                       data.local_dof_indices);
                                      // and next the local matrices for
                                  // $\mathsf{\mathbf{k}}_{ \widetilde{p} \mathbf{u}}$
                                  // $\mathsf{\mathbf{k}}_{ \widetilde{p} \widetilde{J}}$
                                  // and
                                  // $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{J}}$:
-    AdditionalTools::extract_submatrix(element_indices_p,
-                                       element_indices_u,
-                                       data.k_orig,
-                                       data.k_pu);
-    AdditionalTools::extract_submatrix(element_indices_p,
-                                       element_indices_J,
-                                       data.k_orig,
-                                       data.k_pJ);
-    AdditionalTools::extract_submatrix(element_indices_J,
-                                       element_indices_J,
-                                       data.k_orig,
-                                       data.k_JJ);
+    data.k_pu.extract_submatrix_from(data.k_orig,
+                                     element_indices_p,
+                                     element_indices_u);
+    data.k_pJ.extract_submatrix_from(data.k_orig,
+                                     element_indices_p,
+                                     element_indices_J);
+    data.k_JJ.extract_submatrix_from(data.k_orig,
+                                     element_indices_J,
+                                     element_indices_J);
 
                                      // To get the inverse of
                                  // $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$,
@@ -3421,10 +3307,9 @@ namespace Step44
                                         //    \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
                                         //    $
     data.k_pu.Tmmult(data.k_bbar, data.C);
-    AdditionalTools::replace_submatrix(element_indices_u,
-                                       element_indices_u,
-                                       data.k_bbar,
-                                       data.cell_matrix);
+    data.k_bbar.scatter_matrix_to(element_indices_u,
+                                  element_indices_u,
+                                  data.cell_matrix);
 
                                      // Next we place
                                  // $\mathsf{\mathbf{k}}^{-1}_{ \widetilde{p} \widetilde{J}}$
@@ -3434,10 +3319,9 @@ namespace Step44
                                      // that we need to remove the
                                      // contribution that already exists there.
     data.k_pJ_inv.add(-1.0, data.k_pJ);
-    AdditionalTools::replace_submatrix(element_indices_p,
-                                       element_indices_J,
-                                       data.k_pJ_inv,
-                                       data.cell_matrix);
+    data.k_pJ_inv.scatter_matrix_to(element_indices_p,
+                                    element_indices_J,
+                                    data.cell_matrix);
   }
 
 // @sect4{Solid::output_results}
