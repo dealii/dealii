@@ -460,8 +460,9 @@ namespace Step44
                       timestep(0),
                       time_current(0.0),
                       time_end(time_end),
-                      delta_t(delta_t) {
-      }
+                      delta_t(delta_t)
+      {}
+
       virtual ~Time()
         {}
 
@@ -1725,20 +1726,20 @@ namespace Step44
                                        // The global system matrix initially has the following structure
                                        // @f{align*}
 				       // \underbrace{\begin{bmatrix}
-				       // \mathbf{\mathsf{K}}_{uu}     &       \mathbf{\mathsf{K}}_{u\widetilde{p}}    & \mathbf{0} \\
-				       //      \mathbf{\mathsf{K}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}} \\
-				       //      \mathbf{0}      &       \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
-				       //      \end{bmatrix}}_{\mathbf{\mathsf{K}}(\mathbf{\Xi}_{\textrm{i}})}
+				       //   \mathbf{\mathsf{K}}_{uu}  & \mathbf{\mathsf{K}}_{u\widetilde{p}} & \mathbf{0}
+				       //   \\ \mathbf{\mathsf{K}}_{\widetilde{p}u} & \mathbf{0} & \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}
+				       //   \\ \mathbf{0} & \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}} & \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+				       // \end{bmatrix}}_{\mathbf{\mathsf{K}}(\mathbf{\Xi}_{\textrm{i}})}
 				       //      \underbrace{\begin{bmatrix}
-				       //                      d \mathbf{\mathsf{u}} \\
-				       //          d \widetilde{\mathbf{\mathsf{p}}} \\
-				       //          d \widetilde{\mathbf{\mathsf{J}}}
+				       //          d \mathbf{\mathsf{u}}
+				       //      \\  d \widetilde{\mathbf{\mathsf{p}}}
+				       //      \\  d \widetilde{\mathbf{\mathsf{J}}}
 				       //      \end{bmatrix}}_{d \mathbf{\Xi}}
 				       // =
 				       // \underbrace{\begin{bmatrix}
-				       // \mathbf{\mathsf{F}}_{u}(\mathbf{u}_{\textrm{i}}) \\
-				       //  \mathbf{\mathsf{F}}_{\widetilde{p}}(\widetilde{p}_{\textrm{i}}) \\
-				       //  \mathbf{\mathsf{F}}_{\widetilde{J}}(\widetilde{J}_{\textrm{i}})
+				       //  \mathbf{\mathsf{F}}_{u}(\mathbf{u}_{\textrm{i}})
+				       //  \\ \mathbf{\mathsf{F}}_{\widetilde{p}}(\widetilde{p}_{\textrm{i}})
+				       //  \\ \mathbf{\mathsf{F}}_{\widetilde{J}}(\widetilde{J}_{\textrm{i}})
 				       //\end{bmatrix}}_{ \mathbf{\mathsf{F}}(\mathbf{\Xi}_{\textrm{i}}) } \, .
                                        // @f}
                                        // We optimise the sparsity pattern to reflect this structure
@@ -2754,23 +2755,23 @@ namespace Step44
 //  \mathbf{\mathsf{K}}_{\textrm{store}}
 //:=
 //  \begin{bmatrix}
-//              \mathbf{\mathsf{K}}_{\textrm{con}}      &       \mathbf{\mathsf{K}}_{u\widetilde{p}}    & \mathbf{0} \\
-//              \mathbf{\mathsf{K}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1} \\
-//              \mathbf{0}      &       \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
-//      \end{bmatrix} \, .
+//      \mathbf{\mathsf{K}}_{\textrm{con}}      &       \mathbf{\mathsf{K}}_{u\widetilde{p}}    & \mathbf{0}
+//  \\  \mathbf{\mathsf{K}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
+//  \\  \mathbf{0}      &       \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+//  \end{bmatrix} \, .
 // @f}
 // and
 //  @f{align*}
 //              d \widetilde{\mathbf{\mathsf{p}}}
 //              & = \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \bigl[
 //                       \mathbf{\mathsf{F}}_{\widetilde{J}}
-//                       - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}} d \widetilde{\mathbf{\mathsf{J}}} \bigr] \\
-//              d \widetilde{\mathbf{\mathsf{J}}}
+//                       - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}} d \widetilde{\mathbf{\mathsf{J}}} \bigr]
+//              \\ d \widetilde{\mathbf{\mathsf{J}}}
 //              & = \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1} \bigl[
 //                      \mathbf{\mathsf{F}}_{\widetilde{p}}
 //                      - \mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
-//                      \bigr] \\
-//               \Rightarrow d \widetilde{\mathbf{\mathsf{p}}}
+//                      \bigr]
+//               \\ \Rightarrow d \widetilde{\mathbf{\mathsf{p}}}
 //              &=  \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{F}}_{\widetilde{J}}
 //              - \underbrace{\bigl[\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
 //              \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1}\bigr]}_{\overline{\mathbf{\mathsf{K}}}}\bigl[ \mathbf{\mathsf{F}}_{\widetilde{p}}
@@ -3153,18 +3154,18 @@ namespace Step44
 				     // is of the form:
 				     // @f{align*}
 				     //    \begin{bmatrix}
-				     //                      \mathbf{\mathsf{k}}_{uu}        &       \mathbf{\mathsf{k}}_{u\widetilde{p}}    & \mathbf{0} \\
-				     //                      \mathbf{\mathsf{k}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}} \\
-				     //                      \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
+				     //       \mathbf{\mathsf{k}}_{uu}  &  \mathbf{\mathsf{k}}_{u\widetilde{p}}    & \mathbf{0}
+				     //    \\ \mathbf{\mathsf{k}}_{\widetilde{p}u} & \mathbf{0}  &  \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}
+				     //    \\ \mathbf{0}  &  \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}  & \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
 				     //    \end{bmatrix}
 				     // @f}
                                      //
                                      // We now need to modify it such that it appear as
 				     // @f{align*}
 				     //    \begin{bmatrix}
-				     //                      \mathbf{\mathsf{k}}_{\textrm{con}}      &       \mathbf{\mathsf{k}}_{u\widetilde{p}}    & \mathbf{0} \\
-				     //                      \mathbf{\mathsf{k}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}^{-1} \\
-				     //                      \mathbf{0}      &       \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}                & \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
+				     //       \mathbf{\mathsf{k}}_{\textrm{con}}   & \mathbf{\mathsf{k}}_{u\widetilde{p}}    & \mathbf{0}
+				     //    \\ \mathbf{\mathsf{k}}_{\widetilde{p}u} & \mathbf{0} & \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
+				     //    \\ \mathbf{0} & \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}} & \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
 				     //    \end{bmatrix}
 				     // @f}
                                      // with $\mathbf{\mathsf{k}}_{\textrm{con}} = \bigl[ \mathbf{\mathsf{k}}_{uu} +\overline{\overline{\mathbf{\mathsf{k}}}}~ \bigr]$
