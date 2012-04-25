@@ -1641,13 +1641,21 @@ namespace VectorTools
                                           "elements"));
                 }
 
-              typename DH::face_iterator face = cell->face(face_no);
-
-                                               // cast the face iterator to a DoFHandler
-                                               // iterator so that we can access the boundary
-                                               // indicators
+              const typename DH::face_iterator face = cell->face(face_no);
               const types::boundary_id_t boundary_component = face->boundary_indicator();
-              if (function_map.find(boundary_component) != function_map.end())
+
+					       // see if this face is
+					       // part of the
+					       // boundaries for which
+					       // we are supposed to
+					       // do something, and
+					       // also see if the
+					       // finite element in
+					       // use here has DoFs on
+					       // the face at all
+              if ((function_map.find(boundary_component) != function_map.end())
+		  &&
+		  (cell->get_fe().dofs_per_face > 0))
                 {
                                                    // face is of the right component
                   x_fe_values.reinit(cell, face_no);
@@ -2818,7 +2826,7 @@ namespace VectorTools
                                  + jacobians[q_point][1][face_coordinate_direction[face]]
                                  * jacobians[q_point][1][face_coordinate_direction[face]]);
               }
-            
+
             break;
           }
 
@@ -3143,7 +3151,7 @@ namespace VectorTools
                     if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) != 0) {
                       typedef FiniteElement<dim> FEL;
                       AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != 0,
-                      
+
                                    typename FEL::ExcInterpolationNotImplemented ());
                     }
 
