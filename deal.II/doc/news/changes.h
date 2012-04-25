@@ -48,6 +48,16 @@ used for boundary indicators.
 
 <ol>
 <li>
+New: step-44 demonstrates one approach to modelling large
+deformations of nearly-incompressible elastic solids. The
+elastic response is governed by a non-linear, hyperelastic
+free-energy function. The geometrical response is also
+nonlinear, i.e., the program considers finite deformations.
+<br>
+(Andrew McBride and Jean-Paul Pelteret, 2012/04/25)
+
+
+<li>
 Changed: The version of BOOST we ship with deal.II has been upgraded
 to 1.49.0.
 <br>
