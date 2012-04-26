@@ -428,10 +428,10 @@ class FullMatrix : public Table<2,number>
      * @param matrix The matrix from which a subset is to be taken from.
      * @param row_index_set The set of rows of @p matrix from which to extract.
      * @param column_index_set The set of columns of @p matrix from which to extract.
-     * @precondition The number of elements in @p row_index_set and
-     *               @p column_index_set shall be equal to the number of
-     *               rows and columns in the current object. In other words,
-     *               the current object is not resized for this operation.
+     * @pre The number of elements in @p row_index_set and
+     *      @p column_index_set shall be equal to the number of
+     *      rows and columns in the current object. In other words,
+     *      the current object is not resized for this operation.
      */
     template <typename MatrixType>
     void extract_submatrix_from (const MatrixType &matrix,
@@ -445,10 +445,10 @@ class FullMatrix : public Table<2,number>
      * @param row_index_set The rows of @matrix into which to write.
      * @param column_index_set The columns of @matrix into which to write.
      * @param matrix The matrix within which certain elements are to be replaced.
-     * @precondition The number of elements in @p row_index_set and
-     *               @p column_index_set shall be equal to the number of
-     *               rows and columns in the current object. In other words,
-     *               the current object is not resized for this operation.
+     * @pre The number of elements in @p row_index_set and
+     *      @p column_index_set shall be equal to the number of
+     *      rows and columns in the current object. In other words,
+     *      the current object is not resized for this operation.
      */
     template <typename MatrixType>
     void
