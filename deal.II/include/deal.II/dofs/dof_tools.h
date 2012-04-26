@@ -1069,73 +1069,124 @@ namespace DoFTools
                       std::vector<bool>       &selected_dofs,
                       const bool               blocks = false);
 
-                                   /**
-                                    * Extract all degrees of freedom
-                                    * which are at the boundary and
-                                    * belong to specified components
-                                    * of the solution. The function
-                                    * returns its results in the
-                                    * last non-default-valued
-                                    * parameter which contains
-                                    * @p true if a degree of
-                                    * freedom is at the boundary and
-                                    * belongs to one of the selected
-                                    * components, and @p false
-                                    * otherwise.
-                                    *
-                                    * By specifying the
-                                    * @p boundary_indicator
-                                    * variable, you can select which
-                                    * boundary indicators the faces
-                                    * have to have on which the
-                                    * degrees of freedom are located
-                                    * that shall be extracted. If it
-                                    * is an empty list, then all
-                                    * boundary indicators are
-                                    * accepted.
-                                    *
-                                    * The size of @p component_select
-                                    * shall equal the number of
-                                    * components in the finite
-                                    * element used by @p dof. The
-                                    * size of @p selected_dofs shall
-                                    * equal
-                                    * <tt>dof_handler.n_dofs()</tt>. Previous
-                                    * contents of this array or
-                                    * overwritten.
-                                    *
-                                    * Using the usual convention, if
-                                    * a shape function is non-zero
-                                    * in more than one component
-                                    * (i.e. it is non-primitive),
-                                    * then the element in the
-                                    * component mask is used that
-                                    * corresponds to the first
-                                    * non-zero components. Elements
-                                    * in the mask corresponding to
-                                    * later components are ignored.
-                                    *
-                                    * @note This function will not work
-                                    * for DoFHandler objects that are
-                                    * built on a
-                                    * parallel::distributed::Triangulation
-                                    * object. The reasons is that the
-                                    * output argument @p selected_dofs
-                                    * has to have a length equal to <i>all</i>
-                                    * global degrees of freedom.
-                                    * Consequently, this does not scale
-                                    * to very large problems. If you
-                                    * need the functionality of this
-                                    * function for parallel triangulations,
-                                    * then you need to use the other
-                                    * DoFTools::extract_boundary_dofs
-                                    * function.
-                                    */
+  /**
+   * Extract all degrees of freedom
+   * which are at the boundary and
+   * belong to specified components
+   * of the solution. The function
+   * returns its results in the
+   * last non-default-valued
+   * parameter which contains
+   * @p true if a degree of
+   * freedom is at the boundary and
+   * belongs to one of the selected
+   * components, and @p false
+   * otherwise.
+   *
+   * By specifying the
+   * @p boundary_indicator
+   * variable, you can select which
+   * boundary indicators the faces
+   * have to have on which the
+   * degrees of freedom are located
+   * that shall be extracted. If it
+   * is an empty list, then all
+   * boundary indicators are
+   * accepted.
+   *
+   * The size of @p component_select
+   * shall equal the number of
+   * components in the finite
+   * element used by @p dof. The
+   * size of @p selected_dofs shall
+   * equal
+   * <tt>dof_handler.n_dofs()</tt>. Previous
+   * contents of this array or
+   * overwritten.
+   *
+   * Using the usual convention, if
+   * a shape function is non-zero
+   * in more than one component
+   * (i.e. it is non-primitive),
+   * then the element in the
+   * component mask is used that
+   * corresponds to the first
+   * non-zero components. Elements
+   * in the mask corresponding to
+   * later components are ignored.
+   *
+   * @note This function will not work
+   * for DoFHandler objects that are
+   * built on a
+   * parallel::distributed::Triangulation
+   * object. The reasons is that the
+   * output argument @p selected_dofs
+   * has to have a length equal to <i>all</i>
+   * global degrees of freedom.
+   * Consequently, this does not scale
+   * to very large problems. If you
+   * need the functionality of this
+   * function for parallel triangulations,
+   * then you need to use the other
+   * DoFTools::extract_boundary_dofs
+   * function.
+   *
+   * @param dof_handler The object that describes which degrees of freedom
+   *          live on which cell
+   * @param component_select A mask denoting the vector components of the
+   *          finite element that should be considered.
+   * @param selected_dofs The IndexSet object that is returned and that
+   *          will contain the indices of degrees of freedom that are
+   *          located on the boundary (and correspond to the selected
+   *          vector components and boundary indicators, depending on
+   *          the values of the @p component_select and @p boundary_indicators
+   *          arguments).
+   * @param boundary_indicators If empty, this function extracts the
+   *          indices of the degrees of freedom for all parts of the boundary.
+   *          If it is a non-empty list, then the function only considers
+   *          boundary faces with the boundary indicators listed in this
+   *          argument.
+   */
   template <class DH>
   void
   extract_boundary_dofs (const DH                   &dof_handler,
                          const std::vector<bool>    &component_select,
                          std::vector<bool>          &selected_dofs,
+                         const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
+
+  /**
+   * This function does the same as the previous one but it
+   * returns its result as an IndexSet rather than a std::vector@<bool@>.
+   * Thus, it can also be called for DoFHandler objects that are
+   * defined on parallel::distributed::Triangulation objects.
+   *
+   * @note If the DoFHandler object is indeed defined on a
+   * parallel::distributed::Triangulation, then the @p selected_dofs
+   * index set will contain only those degrees of freedom on the
+   * boundary that belong to the locally relevant set (see
+   * @ref GlossLocallyRelevantDof "locally relevant DoFs").
+   *
+   * @param dof_handler The object that describes which degrees of freedom
+   *          live on which cell
+   * @param component_select A mask denoting the vector components of the
+   *          finite element that should be considered.
+   * @param selected_dofs The IndexSet object that is returned and that
+   *          will contain the indices of degrees of freedom that are
+   *          located on the boundary (and correspond to the selected
+   *          vector components and boundary indicators, depending on
+   *          the values of the @p component_select and @p boundary_indicators
+   *          arguments).
+   * @param boundary_indicators If empty, this function extracts the
+   *          indices of the degrees of freedom for all parts of the boundary.
+   *          If it is a non-empty list, then the function only considers
+   *          boundary faces with the boundary indicators listed in this
+   *          argument.
+   */
+  template <class DH>
+  void
+  extract_boundary_dofs (const DH                   &dof_handler,
+                         const std::vector<bool>    &component_select,
+                         IndexSet                    &selected_dofs,
                          const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
 
                                    /**

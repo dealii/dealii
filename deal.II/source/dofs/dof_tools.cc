@@ -3752,9 +3752,6 @@ namespace DoFTools
                          std::vector<bool>             &selected_dofs,
                          const std::set<types::boundary_id_t> &boundary_indicators)
   {
-    AssertDimension (component_select.size(), n_components(dof_handler));
-    Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
-            ExcInvalidBoundaryIndicator());
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
              (&dof_handler.get_tria())
              ==
@@ -3762,7 +3759,34 @@ namespace DoFTools
             ExcMessage ("This function can not be used with distributed triangulations."
                         "See the documentation for more information."));
 
+    IndexSet indices;
+    extract_boundary_dofs (dof_handler, component_select,
+                           indices, boundary_indicators);
+
+    // clear and reset array by default values
+    selected_dofs.clear ();
+    selected_dofs.resize (dof_handler.n_dofs(), false);
+
+    // then convert the values computed above to the binary vector
+    indices.fill_binary_vector(selected_dofs);
+  }
+
+
+  template <class DH>
+  void
+  extract_boundary_dofs (const DH                      &dof_handler,
+                         const std::vector<bool>       &component_select,
+                         IndexSet             &selected_dofs,
+                         const std::set<types::boundary_id_t> &boundary_indicators)
+  {
+    AssertDimension (component_select.size(), n_components(dof_handler));
+    Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
+            ExcInvalidBoundaryIndicator());
     const unsigned int dim=DH::dimension;
+
+    // first reset output argument
+    selected_dofs.clear ();
+    selected_dofs.set_size(dof_handler.n_dofs());
 
                                      // let's see whether we have to
                                      // check for certain boundary
@@ -3777,10 +3801,6 @@ namespace DoFTools
       = (component_select != std::vector<bool>(component_select.size(),
                                                true));
 
-                                     // clear and reset array by default
-                                     // values
-    selected_dofs.clear ();
-    selected_dofs.resize (dof_handler.n_dofs(), false);
     std::vector<unsigned int> face_dof_indices;
     face_dof_indices.reserve (max_dofs_per_face(dof_handler));
 
@@ -3799,79 +3819,83 @@ namespace DoFTools
                                      // sooner or later
     for (typename DH::active_cell_iterator cell=dof_handler.begin_active();
          cell!=dof_handler.end(); ++cell)
-      for (unsigned int face=0;
-           face<GeometryInfo<DH::dimension>::faces_per_cell; ++face)
-        if (cell->at_boundary(face))
-          if (! check_boundary_indicator ||
-              (boundary_indicators.find (cell->face(face)->boundary_indicator())
-               != boundary_indicators.end()))
-            {
-              const FiniteElement<DH::dimension, DH::space_dimension> &fe = cell->get_fe();
+      // only work on cells that are either locally owned or at
+      // least ghost cells
+      if (cell->is_artificial() == false)
+        for (unsigned int face=0;
+            face<GeometryInfo<DH::dimension>::faces_per_cell; ++face)
+          if (cell->at_boundary(face))
+            if (! check_boundary_indicator ||
+                (boundary_indicators.find (cell->face(face)->boundary_indicator())
+                    != boundary_indicators.end()))
+              {
+                const FiniteElement<DH::dimension, DH::space_dimension> &fe = cell->get_fe();
 
-              const unsigned int dofs_per_face = fe.dofs_per_face;
-              face_dof_indices.resize (dofs_per_face);
-              cell->face(face)->get_dof_indices (face_dof_indices,
-                                                 cell->active_fe_index());
+                const unsigned int dofs_per_face = fe.dofs_per_face;
+                face_dof_indices.resize (dofs_per_face);
+                cell->face(face)->get_dof_indices (face_dof_indices,
+                                                   cell->active_fe_index());
 
-              for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-                if (!check_vector_component)
-                  selected_dofs[face_dof_indices[i]] = true;
-                else
-                                                   // check for
-                                                   // component is
-                                                   // required. somewhat
-                                                   // tricky as usual
-                                                   // for the case that
-                                                   // the shape function
-                                                   // is non-primitive,
-                                                   // but use usual
-                                                   // convention (see
-                                                   // docs)
-                  {
-                                                     // first get at the
-                                                     // cell-global
-                                                     // number of a face
-                                                     // dof, to ask the
-                                                     // fe certain
-                                                     // questions
-                    const unsigned int cell_index
+                for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+                  if (!check_vector_component)
+                    selected_dofs.add_index (face_dof_indices[i]);
+                  else
+                    // check for
+                    // component is
+                    // required. somewhat
+                    // tricky as usual
+                    // for the case that
+                    // the shape function
+                    // is non-primitive,
+                    // but use usual
+                    // convention (see
+                    // docs)
+                    {
+                      // first get at the
+                      // cell-global
+                      // number of a face
+                      // dof, to ask the
+                      // fe certain
+                      // questions
+                      const unsigned int cell_index
                       = (dim == 1 ?
-                         i
-                         :
-                         (dim == 2 ?
-                          (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
+                          i
                           :
-                          (dim == 3 ?
-                           (i<4*fe.dofs_per_vertex ?
-                            i
-                            :
-                            (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
-                             i+4*fe.dofs_per_vertex
-                             :
-                             i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
-                           :
-                           numbers::invalid_unsigned_int)));
-                    if (fe.is_primitive (cell_index))
-                      selected_dofs[face_dof_indices[i]]
-                        = (component_select[fe.face_system_to_component_index(i).first]
-                           == true);
-                    else // not primitive
-                      {
-                        const unsigned int first_nonzero_comp
+                          (dim == 2 ?
+                              (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
+                              :
+                              (dim == 3 ?
+                                  (i<4*fe.dofs_per_vertex ?
+                                      i
+                                      :
+                                      (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
+                                          i+4*fe.dofs_per_vertex
+                                          :
+                                          i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                                          :
+                                          numbers::invalid_unsigned_int)));
+                      if (fe.is_primitive (cell_index))
+                        {
+                          if (component_select[fe.face_system_to_component_index(i).first]
+                                               == true)
+                            selected_dofs.add_index (face_dof_indices[i]);
+                        }
+                      else // not primitive
+                        {
+                          const unsigned int first_nonzero_comp
                           = (std::find (fe.get_nonzero_components(cell_index).begin(),
                                         fe.get_nonzero_components(cell_index).end(),
                                         true)
-                             -
-                             fe.get_nonzero_components(cell_index).begin());
-                        Assert (first_nonzero_comp < fe.n_components(),
-                                ExcInternalError());
+                          -
+                          fe.get_nonzero_components(cell_index).begin());
+                          Assert (first_nonzero_comp < fe.n_components(),
+                                  ExcInternalError());
 
-                        selected_dofs[face_dof_indices[i]]
-                          = (component_select[first_nonzero_comp]
-                             == true);
-                      }
-                  }
-            }
+                          if (component_select[first_nonzero_comp] == true)
+                            selected_dofs.add_index (face_dof_indices[i]);
+                        }
+                    }
+              }
   }
 
 

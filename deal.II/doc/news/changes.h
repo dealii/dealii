@@ -175,6 +175,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now a second DoFTools::extract_boundary_dofs
+function that also works for parallel::distributed::Triangulation
+triangulations.
+<br>
+(Wolfgang Bangerth, 2012/04/26)
+
 <li> New: The FullMatrix::extract_submatrix_from, FullMatrix::scatter_matrix_to,
 FullMatrix::set functions are new.
 <br>
