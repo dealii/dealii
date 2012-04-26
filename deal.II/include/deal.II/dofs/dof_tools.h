@@ -1114,6 +1114,22 @@ namespace DoFTools
                                     * non-zero components. Elements
                                     * in the mask corresponding to
                                     * later components are ignored.
+                                    *
+                                    * @note This function will not work
+                                    * for DoFHandler objects that are
+                                    * built on a
+                                    * parallel::distributed::Triangulation
+                                    * object. The reasons is that the
+                                    * output argument @p selected_dofs
+                                    * has to have a length equal to <i>all</i>
+                                    * global degrees of freedom.
+                                    * Consequently, this does not scale
+                                    * to very large problems. If you
+                                    * need the functionality of this
+                                    * function for parallel triangulations,
+                                    * then you need to use the other
+                                    * DoFTools::extract_boundary_dofs
+                                    * function.
                                     */
   template <class DH>
   void

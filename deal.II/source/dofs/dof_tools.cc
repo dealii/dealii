@@ -3752,9 +3752,16 @@ namespace DoFTools
                          std::vector<bool>             &selected_dofs,
                          const std::set<types::boundary_id_t> &boundary_indicators)
   {
-    AssertDimension (component_select.size(),n_components(dof_handler));
+    AssertDimension (component_select.size(), n_components(dof_handler));
     Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
+             (&dof_handler.get_tria())
+             ==
+             0),
+            ExcMessage ("This function can not be used with distributed triangulations."
+                        "See the documentation for more information."));
+
     const unsigned int dim=DH::dimension;
 
                                      // let's see whether we have to
