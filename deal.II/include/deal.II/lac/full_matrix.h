@@ -442,8 +442,8 @@ class FullMatrix : public Table<2,number>
      * Copy the elements of the current matrix object into a specified
      * set of rows and columns of another matrix. This thus a scatter operation.
      *
-     * @param row_index_set The rows of @matrix into which to write.
-     * @param column_index_set The columns of @matrix into which to write.
+     * @param row_index_set The rows of @p matrix into which to write.
+     * @param column_index_set The columns of @p matrix into which to write.
      * @param matrix The matrix within which certain elements are to be replaced.
      * @pre The number of elements in @p row_index_set and
      *      @p column_index_set shall be equal to the number of
