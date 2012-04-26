@@ -146,6 +146,3 @@ solving the system $A^{0}U^{0}=b^{0}$ with boundary condition $\delta u^{0}=g$ o
  $u^{1}=u^{0}+\delta u^{0}$. The next updates are given as solution of
  the linear system $A^{n}U^{n}=b^{n}$ with boundary condition $\delta u^{n}=0$ on
  $\partial \Omega$ and the new approximation given by $u^{n+1}=u^{n}+\delta u^{n}$.
-
-
-*/
