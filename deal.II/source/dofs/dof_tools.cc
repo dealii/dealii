@@ -5743,14 +5743,12 @@ namespace DoFTools
   {
     namespace
     {
-      template<class DH>
-      void  map_dofs_to_support_points_internal(
-          const hp::MappingCollection<DH::dimension, DH::space_dimension> & mapping,
-          const DH  &dof_handler,
-          std::vector<Point<DH::space_dimension> >  &support_points)
+      template <class DH>
+      void
+      map_dofs_to_support_points(const hp::MappingCollection<DH::dimension, DH::space_dimension> & mapping,
+                                 const DH  &dof_handler,
+                                 std::map<unsigned int,Point<DH::space_dimension> >  &support_points)
       {
-          AssertDimension(support_points.size(), dof_handler.n_dofs());
-
           const unsigned int dim = DH::dimension;
           const unsigned int spacedim = DH::space_dimension;
 
@@ -5762,7 +5760,7 @@ namespace DoFTools
               // check whether every fe in the collection
               // has support points
               Assert(fe_collection[fe_index].has_support_points(),
-                  typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
+                     typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
               q_coll_dummy.push_back(
                   Quadrature<dim> (
                       fe_collection[fe_index].get_unit_support_points()));
@@ -5781,25 +5779,49 @@ namespace DoFTools
           // rule have been set to invalid values
           // by the used constructor.
           hp::FEValues<dim, spacedim> hp_fe_values(mapping, fe_collection,
-              q_coll_dummy, update_quadrature_points);
+                                                   q_coll_dummy, update_quadrature_points);
           typename DH::active_cell_iterator cell =
               dof_handler.begin_active(), endc = dof_handler.end();
 
           std::vector<unsigned int> local_dof_indices;
           for (; cell != endc; ++cell)
-            {
-              hp_fe_values.reinit(cell);
-              const FEValues<dim, spacedim> &fe_values = hp_fe_values.get_present_fe_values();
+            // only work on locally relevant cells
+            if (cell->is_artificial() == false)
+              {
+                hp_fe_values.reinit(cell);
+                const FEValues<dim, spacedim> &fe_values = hp_fe_values.get_present_fe_values();
 
-              local_dof_indices.resize(cell->get_fe().dofs_per_cell);
-              cell->get_dof_indices(local_dof_indices);
+                local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+                cell->get_dof_indices(local_dof_indices);
 
-              const std::vector<Point<spacedim> > & points =
-                  fe_values.get_quadrature_points();
-              for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
-                support_points[local_dof_indices[i]] = points[i];
-            };
+                const std::vector<Point<spacedim> > & points =
+                    fe_values.get_quadrature_points();
+                for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
+                  // insert the values into the map
+                  support_points[local_dof_indices[i]] = points[i];
+              }
       }
+
+
+      template <class DH>
+      void
+      map_dofs_to_support_points(const hp::MappingCollection<DH::dimension, DH::space_dimension> & mapping,
+                                 const DH  &dof_handler,
+                                 std::vector<Point<DH::space_dimension> >  &support_points)
+        {
+          // get the data in the form of the map as above
+          std::map<unsigned int,Point<DH::space_dimension> >  x_support_points;
+          map_dofs_to_support_points(mapping, dof_handler, x_support_points);
+
+          // now convert from the map to the linear vector. make sure every
+          // entry really appeared in the map
+          for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+            {
+              Assert (x_support_points.find(i) != x_support_points.end(),
+                      ExcInternalError());
+              support_points[i] = x_support_points[i];
+            }
+        }
     }
   }
 
@@ -5810,32 +5832,76 @@ namespace DoFTools
       std::vector<Point<spacedim> > &support_points)
   {
     AssertDimension(support_points.size(), dof_handler.n_dofs());
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+             (&dof_handler.get_tria())
+             ==
+             0),
+            ExcMessage ("This function can not be used with distributed triangulations."
+                        "See the documentation for more information."));
 
     //Let the internal function do all the work,
     //just make sure that it gets a MappingCollection
     const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
-    internal::map_dofs_to_support_points_internal(
-        mapping_collection,
-        dof_handler, support_points);
+    internal::map_dofs_to_support_points (mapping_collection,
+                                          dof_handler,
+                                          support_points);
   }
 
 
   template<int dim, int spacedim>
   void
-  map_dofs_to_support_points(
-      const hp::MappingCollection<dim, spacedim> &mapping,
-      const hp::DoFHandler<dim, spacedim> &dof_handler,
-      std::vector<Point<spacedim> > &support_points)
+  map_dofs_to_support_points(const hp::MappingCollection<dim, spacedim> &mapping,
+                             const hp::DoFHandler<dim, spacedim> &dof_handler,
+                             std::vector<Point<spacedim> > &support_points)
   {
     AssertDimension(support_points.size(), dof_handler.n_dofs());
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+             (&dof_handler.get_tria())
+             ==
+             0),
+            ExcMessage ("This function can not be used with distributed triangulations."
+                        "See the documentation for more information."));
 
     //Let the internal function do all the work,
     //just make sure that it gets a MappingCollection
-    internal::map_dofs_to_support_points_internal(
-        mapping,
-        dof_handler,
-        support_points);
+    internal::map_dofs_to_support_points (mapping,
+                                          dof_handler,
+                                          support_points);
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping,
+                              const DoFHandler<dim,spacedim>    &dof_handler,
+                              std::map<unsigned int, Point<spacedim> > &support_points)
+  {
+    support_points.clear();
+
+    //Let the internal function do all the work,
+    //just make sure that it gets a MappingCollection
+    const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
+
+    internal::map_dofs_to_support_points (mapping_collection,
+                                          dof_handler,
+                                          support_points);
+  }
+
+
+  template<int dim, int spacedim>
+  void
+  map_dofs_to_support_points(const hp::MappingCollection<dim, spacedim> &mapping,
+                             const hp::DoFHandler<dim, spacedim> &dof_handler,
+                             std::map<unsigned int, Point<spacedim> > &support_points)
+  {
+    support_points.clear();
+
+    //Let the internal function do all the work,
+    //just make sure that it gets a MappingCollection
+    internal::map_dofs_to_support_points (mapping,
+                                          dof_handler,
+                                          support_points);
   }
 
 

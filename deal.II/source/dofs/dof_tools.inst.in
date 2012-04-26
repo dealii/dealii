@@ -812,6 +812,22 @@ DoFTools::map_dofs_to_support_points<deal_II_dimension>
  const hp::DoFHandler<deal_II_dimension>&,
  std::vector<Point<deal_II_dimension> >&);
 
+
+template
+void
+DoFTools::map_dofs_to_support_points<deal_II_dimension>
+(const Mapping<deal_II_dimension,deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ std::map<unsigned int, Point<deal_II_dimension> >&);
+
+
+template
+void
+DoFTools::map_dofs_to_support_points<deal_II_dimension>
+(const hp::MappingCollection<deal_II_dimension,deal_II_dimension>&,
+ const hp::DoFHandler<deal_II_dimension>&,
+ std::map<unsigned int, Point<deal_II_dimension> >&);
+
 #if deal_II_dimension < 3
 
 template
@@ -827,6 +843,21 @@ DoFTools::map_dofs_to_support_points<deal_II_dimension,deal_II_dimension+1>
 (const hp::MappingCollection<deal_II_dimension,deal_II_dimension+1>&,
  const hp::DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
  std::vector<Point<deal_II_dimension+1> >&);
+
+template
+void
+DoFTools::map_dofs_to_support_points<deal_II_dimension,deal_II_dimension+1>
+(const Mapping<deal_II_dimension,deal_II_dimension+1>&,
+ const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+ std::map<unsigned int, Point<deal_II_dimension+1> >&);
+
+template
+void
+DoFTools::map_dofs_to_support_points<deal_II_dimension,deal_II_dimension+1>
+(const hp::MappingCollection<deal_II_dimension,deal_II_dimension+1>&,
+ const hp::DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+ std::map<unsigned int, Point<deal_II_dimension+1> >&);
+
 
 template
 void

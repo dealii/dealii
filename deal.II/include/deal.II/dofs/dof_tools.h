@@ -2251,9 +2251,19 @@ namespace DoFTools
                                     * or the like. Otherwise, an
                                     * exception is thrown.
                                     *
-                                    * The given array must have a
+                                    * @pre The given array must have a
                                     * length of as many elements as
                                     * there are degrees of freedom.
+                                    *
+                                    * @note The precondition to this function
+                                    * that the output argument needs to have
+                                    * size equal to the total number of degrees
+                                    * of freedom makes this function
+                                    * unsuitable for the case that the given
+                                    * DoFHandler object derives from a
+                                    * parallel::distributed::Triangulation object.
+                                    * Consequently, this function will produce an
+                                    * error if called with such a DoFHandler.
                                     */
   template <int dim, int spacedim>
   void
@@ -2262,14 +2272,54 @@ namespace DoFTools
                               std::vector<Point<spacedim> >     &support_points);
 
             /**
-             * Same as above for the hp case.
+             * Same as the previous function but for the hp case.
              */
-
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points (const dealii::hp::MappingCollection<dim,spacedim>   &mapping,
         const hp::DoFHandler<dim,spacedim>    &dof_handler,
         std::vector<Point<spacedim> > &support_points);
+
+  /**
+   * This function is a version of the above map_dofs_to_support_points
+   * function that doesn't simply return a vector of support_points with one
+   * entry for each global degree of freedom, but instead a map that
+   * maps from the DoFs index to its location. The point of this
+   * function is that it is also usable in cases where the DoFHandler
+   * is based on a parallel::distributed::Triangulation object. In such cases,
+   * each processor will not be able to determine the support point location
+   * of all DoFs, and worse no processor may be able to hold a vector that
+   * would contain the locations of all DoFs even if they were known. As
+   * a consequence, this function constructs a map from those DoFs for which
+   * we can know the locations (namely, those DoFs that are
+   * locally relevant (see @ref GlossLocallyRelevantDof "locally relevant DoFs")
+   * to their locations.
+   *
+   * For non-distributed triangulations, the map returned as @p support_points
+   * is of course dense, i.e., every DoF is to be found in it.
+   *
+   * @param mapping The mapping from the reference cell to the real cell on
+   *        which DoFs are defined.
+   * @param dof_handler The object that describes which DoF indices live on
+   *        which cell of the triangulation.
+   * @param support_points A map that for every locally relevant DoF index
+   *        contains the corresponding location in real space coordinates.
+   *        Previous content of this object is deleted in this function.
+   */
+  template <int dim, int spacedim>
+  void
+  map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping,
+                              const DoFHandler<dim,spacedim>    &dof_handler,
+                              std::map<unsigned int, Point<spacedim> >     &support_points);
+
+            /**
+             * Same as the previous function but for the hp case.
+             */
+  template <int dim, int spacedim>
+  void
+  map_dofs_to_support_points (const dealii::hp::MappingCollection<dim,spacedim>   &mapping,
+                              const hp::DoFHandler<dim,spacedim>    &dof_handler,
+                              std::map<unsigned int, Point<spacedim> > &support_points);
 
                                    /**
                                     * This is the opposite function
