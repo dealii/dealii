@@ -175,6 +175,11 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The GridIn::read_unv function can now read meshes generated
+by the Salome framework, see http://www.salome-platform.org/ .
+<br>
+(Valentin Zingan, 2012/04/27)
+
 <li> New: There is now a second DoFTools::map_dofs_to_support_points
 function that also works for parallel::distributed::Triangulation
 triangulations.

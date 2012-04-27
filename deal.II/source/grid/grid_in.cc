@@ -46,6 +46,234 @@ void GridIn<dim, spacedim>::attach_triangulation (Triangulation<dim, spacedim> &
 }
 
 
+
+// ---          ---
+// --- read_unv ---
+// ---          ---
+
+template<int dim, int spacedim>
+void GridIn<dim, spacedim>::read_unv(std::istream &in)
+{
+  Assert(tria != 0, ExcNoTriangulationSelected());
+  Assert((dim == 2)||(dim == 3), ExcNotImplemented());
+
+  AssertThrow(in, ExcIO());
+  skip_comment_lines(in, '#'); // skip comments (if any) at beginning of file
+
+  int tmp;
+
+  AssertThrow(in, ExcIO());
+  in >> tmp;
+  AssertThrow(in, ExcIO());
+  in >> tmp;
+
+  AssertThrow(tmp == 2411, ExcUnknownSectionType(tmp)); // section 2411 describes vertices http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2411.htm/
+
+  std::vector< Point<spacedim> > vertices; // vector of vertex coordinates
+  std::map<int, int> vertex_indices; // # vert in unv (key) ---> # vert in deal.II (value)
+
+  int no_vertex = 0; // deal.II
+
+  while(tmp != -1) // we do until reach end of 2411
+    {
+      int no; // unv
+      int dummy;
+      double x[3];
+
+      AssertThrow(in, ExcIO());
+      in >> no;
+
+      tmp = no;
+      if(tmp == -1)
+        break;
+
+      in >> dummy >> dummy >> dummy;
+
+      AssertThrow(in, ExcIO());
+      in >> x[0] >> x[1] >> x[2];
+
+      vertices.push_back(Point<spacedim>());
+
+      for(unsigned int d = 0; d < spacedim; d++)
+        vertices.back()(d) = x[d];
+
+      vertex_indices[no] = no_vertex;
+
+      no_vertex++;
+    }
+
+  AssertThrow(in, ExcIO());
+  in >> tmp;
+  AssertThrow(in, ExcIO());
+  in >> tmp;
+
+  AssertThrow(tmp == 2412, ExcUnknownSectionType(tmp)); // section 2412 describes elements http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2412.htm/
+
+  std::vector< CellData<dim> > cells; // vector of cells
+  SubCellData subcelldata;
+
+  std::map<int, int> cell_indices; // # cell in unv (key) ---> # cell in deal.II (value)
+  std::map<int, int> line_indices; // # line in unv (key) ---> # line in deal.II (value)
+  std::map<int, int> quad_indices; // # quad in unv (key) ---> # quad in deal.II (value)
+
+  int no_cell = 0; // deal.II
+  int no_line = 0; // deal.II
+  int no_quad = 0; // deal.II
+
+  while(tmp != -1) // we do until reach end of 2412
+    {
+      int no; // unv
+      int type;
+      int dummy;
+
+      AssertThrow(in, ExcIO());
+      in >> no;
+
+      tmp = no;
+      if(tmp == -1)
+        break;
+
+      in >> type >> dummy >> dummy >> dummy >> dummy;
+
+      AssertThrow((type == 11)||(type == 44)||(type == 115), ExcUnknownElementType(type));
+
+      if( ((type == 44)&&(dim == 2)) || ((type == 115)&&(dim == 3)) ) // cell
+        {
+          cells.push_back(CellData<dim>());
+
+          AssertThrow(in, ExcIO());
+          for(unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+            in >> cells.back().vertices[v];
+
+          cells.back().material_id = 0;
+
+          for(unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+            cells.back().vertices[v] = vertex_indices[cells.back().vertices[v]];
+
+          cell_indices[no] = no_cell;
+
+          no_cell++;
+        }
+      else if( ((type == 11)&&(dim == 2)) || ((type == 11)&&(dim == 3)) ) // boundary line
+        {
+          AssertThrow(in, ExcIO());
+          in >> dummy >> dummy >> dummy;
+
+          subcelldata.boundary_lines.push_back(CellData<1>());
+
+          AssertThrow(in, ExcIO());
+          for(unsigned int v = 0; v < 2; v++)
+            in >> subcelldata.boundary_lines.back().vertices[v];
+
+          subcelldata.boundary_lines.back().material_id = 0;
+
+          for(unsigned int v = 0; v < 2; v++)
+            subcelldata.boundary_lines.back().vertices[v] = vertex_indices[subcelldata.boundary_lines.back().vertices[v]];
+
+          line_indices[no] = no_line;
+
+          no_line++;
+        }
+      else if( (type == 44) && (dim == 3) ) // boundary quad
+        {
+          subcelldata.boundary_quads.push_back(CellData<2>());
+
+          AssertThrow(in, ExcIO());
+          for(unsigned int v = 0; v < 4; v++)
+            in >> subcelldata.boundary_quads.back().vertices[v];
+
+          subcelldata.boundary_quads.back().material_id = 0;
+
+          for(unsigned int v = 0; v < 4; v++)
+            subcelldata.boundary_quads.back().vertices[v] = vertex_indices[subcelldata.boundary_quads.back().vertices[v]];
+
+          quad_indices[no] = no_quad;
+
+          no_quad++;
+        }
+    }
+
+// note that so far all materials and bcs are explicitly set to 0
+// if we do not need more info on materials and bcs - this is end of file
+// if we do - section 2467 comes
+
+  in >> tmp; // tmp can be either -1 or end-of-file
+
+  if( !in.eof() )
+    {
+      AssertThrow(in, ExcIO());
+      in >> tmp;
+
+      AssertThrow(tmp == 2467, ExcUnknownSectionType(tmp)); // section 2467 describes (materials - first and bcs - second) or (bcs - first and materials - second) - sequence depends on which group is created first
+                                       // http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2467.htm/
+
+      while(tmp != -1) // we do until reach end of 2467
+        {
+          int n_entities; // number of entities in group
+          int id;         // id is either material or bc
+          int no;         // unv
+          int dummy;
+
+          AssertThrow(in, ExcIO());
+          in >> dummy;
+
+          tmp = dummy;
+          if(tmp == -1)
+            break;
+
+          in >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> n_entities;
+
+          AssertThrow(in, ExcIO());
+          in >> id;
+
+          int n_lines = (n_entities%2 == 0)?(n_entities/2):((n_entities+1)/2);
+
+          for(int no_line = 0; no_line < n_lines; no_line++)
+            {
+              int n_fragments;
+
+              if(no_line == n_lines-1)
+                n_fragments = (n_entities%2 == 0)?(2):(1);
+              else
+                n_fragments = 2;
+
+              for(int no_fragment = 0; no_fragment < n_fragments; no_fragment++)
+                {
+                  AssertThrow(in, ExcIO());
+                  in >> dummy >> no >> dummy >> dummy;
+
+                  if( cell_indices.count(no) > 0 ) // cell - material
+                    cells[cell_indices[no]].material_id = id;
+
+                  if( line_indices.count(no) > 0 ) // boundary line - bc
+                    subcelldata.boundary_lines[line_indices[no]].material_id = id;
+
+                  if( quad_indices.count(no) > 0 ) // boundary quad - bc
+                    subcelldata.boundary_quads[quad_indices[no]].material_id = id;
+                }
+            }
+        }
+    }
+
+  Assert(subcelldata.check_consistency(dim), ExcInternalError());
+
+  GridTools::delete_unused_vertices(vertices,
+                                    cells,
+                                    subcelldata);
+
+  if(dim == spacedim)
+    GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
+                                                                     cells);
+
+  GridReordering<dim, spacedim>::reorder_cells(cells);
+
+  tria->create_triangulation_compatibility(vertices,
+                                           cells,
+                                           subcelldata);
+}
+
+
+
 template <int dim, int spacedim>
 void GridIn<dim, spacedim>::read_ucd (std::istream &in)
 {
@@ -2111,6 +2339,10 @@ void GridIn<dim, spacedim>::read (std::istream& in,
         read_msh (in);
         return;
 
+      case unv:
+        read_unv (in);
+        return;
+
       case ucd:
         read_ucd (in);
         return;
@@ -2147,6 +2379,8 @@ GridIn<dim, spacedim>::default_suffix (const Format format)
         return ".dbmesh";
       case msh:
         return ".msh";
+      case unv:
+        return ".unv";
       case ucd:
         return ".inp";
       case xda:
@@ -2172,6 +2406,9 @@ GridIn<dim, spacedim>::parse_format (const std::string &format_name)
 
   if (format_name == "msh")
     return msh;
+
+  if (format_name == "unv")
+    return unv;
 
   if (format_name == "inp")
     return ucd;
@@ -2216,7 +2453,7 @@ GridIn<dim, spacedim>::parse_format (const std::string &format_name)
 template <int dim, int spacedim>
 std::string GridIn<dim, spacedim>::get_format_names ()
 {
-  return "dbmesh|msh|ucd|xda|netcdf|tecplot";
+  return "dbmesh|msh|unv|ucd|xda|netcdf|tecplot";
 }
 
 
