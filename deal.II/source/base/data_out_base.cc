@@ -2153,7 +2153,8 @@ parse_output_format (const std::string &format_name)
     return deal_II_intermediate;
 
   AssertThrow (false,
-               ExcMessage ("The given file format name is not recognized."));
+               ExcMessage ("The given file format name is not recognized: <"
+                           + format_name + ">"));
 
                                    // return something invalid
   return OutputFormat(-1);
