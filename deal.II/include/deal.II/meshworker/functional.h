@@ -111,15 +111,15 @@ namespace MeshWorker
                                          /**
                                           * The initialization
                                           * function, specifying the
-                                          * #results vectors and
+                                          * @p results vectors and
                                           * whether face data should
                                           * be collected separately.
                                           *
-                                          * #results should contain
+                                          * @p results should contain
                                           * two block vectors named
                                           * "cells" and "faces" (the
                                           * latter only if
-                                          * #separate_faces is
+                                          * @p separate_faces is
                                           * true). In each of the two,
                                           * each block should have
                                           * equal size and be large
@@ -179,7 +179,7 @@ namespace MeshWorker
 
                                          /**
                                           * The value of the ith entry
-                                          * in #results.
+                                          * in @p results.
                                           */
         number operator() (unsigned int i) const;
       private:

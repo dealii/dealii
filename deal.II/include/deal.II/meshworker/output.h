@@ -69,7 +69,7 @@ namespace MeshWorker
                                           * which data is written. If
                                           * no stream is selected with
                                           * this function, data goes
-                                          * to #deallog.
+                                          * to @p deallog.
                                           */
         void initialize_stream (std::ostream& stream);
 
@@ -109,7 +109,7 @@ namespace MeshWorker
                                           * Write the object T either
                                           * to the stream #os, if initialize_stream
                                           * has been called, or to
-                                          * #deallog if no pointer has
+                                          * @p deallog if no pointer has
                                           * been set.
                                           */
         template<typename T>
@@ -119,7 +119,7 @@ namespace MeshWorker
                                           * Write an end-of-line marker either
                                           * to the stream #os, if initialize_stream
                                           * has been called, or to
-                                          * #deallog if no pointer has
+                                          * @p deallog if no pointer has
                                           * been set.
                                           */
         void write_endl () const;

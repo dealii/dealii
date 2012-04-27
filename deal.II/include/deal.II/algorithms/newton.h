@@ -190,7 +190,7 @@ namespace Algorithms
       bool debug_vectors;
                                        /**
                                         * Write debug output to
-                                        * #deallog; the higher the
+                                        * @p deallog; the higher the
                                         * number, the more output.
                                         */
       unsigned int debug;

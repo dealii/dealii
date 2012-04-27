@@ -230,7 +230,7 @@ class PreconditionBlockBase
 
 				     /**
 				      * Print some statistics about
-				      * the inverses to #deallog. Output depends
+				      * the inverses to @p deallog. Output depends
 				      * on #Inversion. It is richest
 				      * for svd, where we obtain
 				      * statistics on extremal
@@ -238,7 +238,7 @@ class PreconditionBlockBase
 				      * numbers.
 				      */
     void log_statistics () const;
-    
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -682,7 +682,7 @@ PreconditionBlockBase<number>::log_statistics () const
       unsigned int kermin = 100000000, kermax = 0;
       double sigmin = 1.e300, sigmax= -1.e300;
       double kappamin = 1.e300, kappamax= -1.e300;
-      
+
       for (unsigned int b=0;b<size();++b)
 	{
 	  const LAPACKFullMatrix<number>& matrix = inverse_svd(b);
@@ -692,18 +692,18 @@ PreconditionBlockBase<number>::log_statistics () const
 	  const double s0 = matrix.singular_value(0);
 	  const double sm = matrix.singular_value(matrix.n_cols()-k);
 	  const double co = sm/s0;
-	  
+
 	  if (kermin > k) kermin = k-1;
 	  if (kermax < k) kermax = k-1;
 	  if (s0 < sigmin) sigmin = s0;
 	  if (sm > sigmax) sigmax = sm;
 	  if (co < kappamin) kappamin = co;
-	  if (co > kappamax) kappamax = co;	    
+	  if (co > kappamax) kappamax = co;
 	}
       deallog << "dim ker [" << kermin << ':' << kermax
 	      << "] sigma [" << sigmin << ':' << sigmax
 	      << "] kappa [" << kappamin << ':' << kappamax << ']' << std::endl;
-      
+
     }
   else if (inversion == householder)
     {

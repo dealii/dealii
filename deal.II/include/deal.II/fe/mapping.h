@@ -143,7 +143,7 @@ enum MappingType
  * reference cell, nothing needs to be done for them. For a function
  * defined on the computational domain, the quadrature points need to
  * be mapped, which is done in fill_fe_values() if
- * #update_quadrature_points is set in the update flags. The mapped
+ * @p update_quadrature_points is set in the update flags. The mapped
  * quadrature points are then accessed through FEValuesBase::quadrature_point().
  *
  * @todo Add a function <tt>transform_quadrature_points</tt> for this.
@@ -159,7 +159,7 @@ enum MappingType
  *
  * The transformed quadrature weights $\left|\text{det}J(\mathbf{\hat
  * x})\right|$ are accessed through FEValuesBase::JxW() and
- * computed in fill_fe_values(), if #update_JxW_values is set in the
+ * computed in fill_fe_values(), if @p update_JxW_values is set in the
  * update flags.
  *
  * @todo Add a function <tt>transform_quadrature_weights</tt> for
@@ -430,12 +430,12 @@ class Mapping : public Subscriptor
  *
  * @note Normally, this function is called by a finite element,
  * filling FEValues objects. For this finite element, there should be
- * an alias MappingType like #mapping_bdm, #mapping_nedelec, etc. This
+ * an alias MappingType like @p mapping_bdm, @p mapping_nedelec, etc. This
  * alias should be preferred to using the types below.
  *
  * The mapping types currently implemented by derived classes are:
  * <ul>
- * <li> #mapping_contravariant: maps a vector field on the reference cell
+ * <li> @p mapping_contravariant: maps a vector field on the reference cell
  * is to the physical cell through the Jacobian:
  * @f[
  * \mathbf u(\mathbf x) = J(\mathbf{\hat x})\mathbf{\hat u}(\mathbf{\hat x}).
@@ -444,7 +444,7 @@ class Mapping : public Subscriptor
  * transformation. Mathematically, it is the push forward of a
  * vector field.
  *
- * <li> #mapping_covariant: maps a field of one-forms on the reference cell
+ * <li> @p mapping_covariant: maps a field of one-forms on the reference cell
  * to a field of one-forms on the physical cell.
  * (theoretically this would refer to a DerivativeForm<1, dim, 1> but it
  * canonically identified with a Tensor<1,dim>).
@@ -460,7 +460,7 @@ class Mapping : public Subscriptor
  * @f]
  * Gradients of scalar differentiable functions are transformed this way.
  *
- * <li> #mapping_piola: A field of <i>n-1</i>-forms on the reference cell is also
+ * <li> @p mapping_piola: A field of <i>n-1</i>-forms on the reference cell is also
  * represented by a vector field, but again transforms differently,
  * namely by the Piola transform
  * @f[
@@ -488,7 +488,7 @@ class Mapping : public Subscriptor
 
    The mapping types currently implemented by derived classes are:
    <ul>
-   <li> #mapping_covariant: maps a field of forms on the reference cell
+   <li> @p mapping_covariant: maps a field of forms on the reference cell
    to a field of forms on the physical cell.
    Mathematically, it is the pull back of the differential form
    @f[
@@ -527,7 +527,7 @@ class Mapping : public Subscriptor
    The mapping types currently implemented by derived classes are:
    <ul>
 
-   <li> #mapping_contravariant_gradient, it
+   <li> @p mapping_contravariant_gradient, it
    assumes $\mathbf u(\mathbf x) = J \mathbf{\hat u}$ so that
    @f[
    \mathbf T(\mathbf x) =
@@ -535,7 +535,7 @@ class Mapping : public Subscriptor
    J^{-1}(\mathbf{\hat x}).
    @f]
 
-   <li> #mapping_covariant_gradient, it
+   <li> @p mapping_covariant_gradient, it
    assumes $\mathbf u(\mathbf x) = J^{-T} \mathbf{\hat u}$ so that
    @f[
    \mathbf T(\mathbf x) =
@@ -543,7 +543,7 @@ class Mapping : public Subscriptor
    J^{-1}(\mathbf{\hat x}).
    @f]
 
-   <li> #mapping_piola_gradient, it
+   <li> @p mapping_piola_gradient, it
    assumes $\mathbf u(\mathbf x) = \frac{1}{\text{det}J(\mathbf x)}
    J(\mathbf x) \mathbf{\hat u}(\mathbf x)$
    so that
@@ -555,8 +555,8 @@ class Mapping : public Subscriptor
    @f]
    </ul>
 
-   @todo The formulas for #mapping_covariant_gradient,
-   #mapping_contravariant_gradient and #mapping_piola_gradient
+   @todo The formulas for @p mapping_covariant_gradient,
+   @p mapping_contravariant_gradient and @p mapping_piola_gradient
    are only true as stated for linear mappings,
    if the mapping is bilinear for example then there is a missing
    term associated with the derivative of of J.

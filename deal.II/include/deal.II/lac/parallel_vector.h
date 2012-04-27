@@ -41,7 +41,7 @@ namespace parallel
 
                                      /**
                                       * Implementation of a parallel vector class. The design of this class is
-                                      * similar to the standard dealii::Vector<Number> class in deal.II, with the
+                                      * similar to the standard ::dealii::Vector class in deal.II, with the
                                       * exception that storage is distributed with MPI.
                                       *
                                       * The vector is designed for the following scheme of parallel partitioning:
@@ -919,7 +919,7 @@ namespace parallel
 
                                          /**
                                           * Provide this class with all functionality
-                                          * of ::dealii::Vector<Number> by creating a
+                                          * of ::dealii::Vector by creating a
                                           * VectorView object.
                                           */
         VectorView<Number> vector_view;

@@ -50,7 +50,7 @@ namespace MeshWorker
  * the vector has been changed from zero-length, then local dof
  * indices stored in this object will automatically be renumbered to
  * reflect local block structure. This means, the first entries in
- * #indices will refer to the first block of the system, then comes
+ * @p indices will refer to the first block of the system, then comes
  * the second block and so on.
  *
  * The BlockInfo object is stored as a pointer. Therefore, if the
@@ -123,14 +123,14 @@ namespace MeshWorker
 
                                        /**
                                         * Set the current cell and
-                                        * fill #indices.
+                                        * fill @p indices.
                                         */
       template <class DHCellIterator>
       void reinit(const DHCellIterator& c);
 
                                        /**
                                         * Set the current face and
-                                        * fill #indices if the #cell
+                                        * fill @p indices if the #cell
                                         * changed.
                                         */
       template <class DHCellIterator, class DHFaceIterator>
@@ -140,7 +140,7 @@ namespace MeshWorker
 
                                        /**
                                         * Set the current subface
-                                        * and fill #indices if the
+                                        * and fill @p indices if the
                                         * #cell changed.
                                         */
       template <class DHCellIterator, class DHFaceIterator>
@@ -152,7 +152,7 @@ namespace MeshWorker
                                        /**
                                         * Switch to a new face of the
                                         * same cell. Does not change
-                                        * #indices and does not reset
+                                        * @p indices and does not reset
                                         * data in LocalResults.
                                         */
       template <class DHFaceIterator>
@@ -161,7 +161,7 @@ namespace MeshWorker
                                        /**
                                         * Switch to a new subface of the
                                         * same cell. Does not change
-                                        * #indices and does not reset
+                                        * @p indices and does not reset
                                         * data in LocalResults.
                                         */
       template <class DHFaceIterator>

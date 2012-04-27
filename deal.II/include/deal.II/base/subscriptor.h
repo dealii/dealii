@@ -115,7 +115,7 @@ class Subscriptor
     unsigned int n_subscriptions () const;
 
                                      /**
-                                      * List the subscribers to #deallog.
+                                      * List the subscribers to @p deallog.
                                       */
     void list_subscribers () const;
 

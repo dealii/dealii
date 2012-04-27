@@ -147,8 +147,8 @@ namespace Functions
 
 /**
  * Laminar pipe flow in two and three dimensions. The channel
- * stretches along the <i>x</i>-axis and has radius #radius. The
- * #Reynolds number is used to scale the pressure properly for a
+ * stretches along the <i>x</i>-axis and has radius @p radius. The
+ * @p Reynolds number is used to scale the pressure properly for a
  * Navier-Stokes problem.
  *
  * @ingroup functions

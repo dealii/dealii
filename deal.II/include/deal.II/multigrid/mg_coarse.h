@@ -134,7 +134,7 @@ class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
                                       * Initialize for a new matrix.
                                       */
     void initialize (const FullMatrix<number>& A);
-    
+
     void operator() (const unsigned int   level,
                      VECTOR       &dst,
                      const VECTOR &src) const;
@@ -150,7 +150,7 @@ class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
  * Coarse grid solver using singular value decomposition of LAPACK matrices.
  *
  * Upon initialization, the singular value decomposition of the matrix is
- * computed. then, the operator() uses 
+ * computed. then, the operator() uses
  *
  * @author Guido Kanschat, 2003, 2012
  */
@@ -163,25 +163,25 @@ class MGCoarseGridSVD : public MGCoarseGridBase<VECTOR>
                                       * uninitialized object.
                                       */
     MGCoarseGridSVD ();
-    
+
                                      /**
                                       * Initialize for a new
                                       * matrix. This resets the
-                                      * dimensions to the 
+                                      * dimensions to the
                                       */
     void initialize (const FullMatrix<number>& A, const double threshold = 0);
-    
+
     void operator() (const unsigned int   level,
                      VECTOR       &dst,
                      const VECTOR &src) const;
-    
+
 				     /**
-				      * Write the singular values to #deallog.
+				      * Write the singular values to @p deallog.
 				      */
     void log () const;
-    
+
   private:
-    
+
                                      /**
                                       * Matrix for singular value decomposition.
                                       */
@@ -352,7 +352,7 @@ void
 MGCoarseGridSVD<number, VECTOR>::log() const
 {
   const unsigned int n = std::min(matrix.n_rows(), matrix.n_cols());
-  
+
   for (unsigned int i=0;i<n;++i)
     deallog << ' ' << matrix.singular_value(i);
   deallog << std::endl;

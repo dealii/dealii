@@ -103,12 +103,13 @@ namespace Algorithms
                                         * Empty virtual destructor.
                                         */
       virtual ~OutputOperator();
+
       /**
-       * Set the stream #os to
+       * Set the stream @p os to
        * which data is written. If
        * no stream is selected with
        * this function, data goes
-       * to #deallog.
+       * to @p deallog.
        */
       void initialize_stream(std::ostream& stream);
                                        /**

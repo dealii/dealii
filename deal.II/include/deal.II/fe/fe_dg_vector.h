@@ -114,7 +114,7 @@ class FE_DGVector
                                       * generalized_support_points
                                       * field of the FiniteElement
                                       * class and fill the tables with
-                                      * #interior_weights. Called
+                                      * @p interior_weights. Called
                                       * from the constructor.
                                       */
     void initialize_support_points (const unsigned int degree);

@@ -99,9 +99,9 @@ class MGSmoother : public MGSmootherBase<VECTOR>
     void set_transpose (const bool);
 
                                      /**
-                                      * Set #debug to a nonzero value
+                                      * Set @p debug to a nonzero value
                                       * to get debug information
-                                      * logged to #deallog. Increase
+                                      * logged to @p deallog. Increase
                                       * to get more information
                                       */
     void set_debug (const unsigned int level);
@@ -151,7 +151,7 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 
                                      /**
                                       * Output debugging information
-                                      * to #deallog if this is
+                                      * to @p deallog if this is
                                       * nonzero.
                                       */
     unsigned int debug;

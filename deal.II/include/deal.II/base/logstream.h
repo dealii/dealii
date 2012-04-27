@@ -95,7 +95,7 @@ class LogStream : public Subscriptor
                                       * a block, create one of these
                                       * objects, and it will appear as
                                       * a prefix in LogStream output
-                                      * like #deallog. At the end of
+                                      * like @p deallog. At the end of
                                       * the block, the prefix will
                                       * automatically be removed, when
                                       * this object is destroyed.
@@ -105,7 +105,7 @@ class LogStream : public Subscriptor
       public:
                                          /**
                                           * Set a new prefix for
-                                          * #deallog, which will be
+                                          * @p deallog, which will be
                                           * removed when the variable
                                           * is destroyed .
                                           */
