@@ -699,6 +699,10 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 }
 
 
+//TODO: I'm sure the followng could be made more elegant by using a bit of
+//introspection using static member variables of the various vector
+//classes to dispatch between the different functions, rather than using
+//knowledge of the individual types
 
 // number of functions to select the right implementation for set_zero().
 namespace internal
@@ -711,7 +715,7 @@ namespace internal
 	// for performance reasons
 	template<class VEC>
 	  void set_zero_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, unsigned int shift = 0)
-	  { 
+	  {
 	    Assert(!vec.has_ghost_elements(), ExcInternalError());//ExcGhostsPresent());
 
 	    const unsigned int
@@ -721,13 +725,13 @@ namespace internal
 	      if (cm.is_constrained (shift + i))
 		vec(i) = 0;
 	  }
-  
+
 	template<class VEC>
 	  void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<false>)
 	  {
 	    set_zero_parallel(cm, vec, 0);
 	  }
-  
+
 	// in parallel for BlockVectors
 	template<class VEC>
 	  void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<true>)
@@ -739,7 +743,7 @@ namespace internal
 		start_shift += vec.block(j).size();
 	      }
 	  }
-  
+
 	template<class VEC>
 	  void set_zero_serial(const dealii::ConstraintMatrix &cm, VEC &vec)
 	  {
@@ -773,7 +777,7 @@ namespace internal
 
 
 	template<class T>
-	  void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::parallel::distributed::Vector<T> &vec)
+	  void set_zero_all(const dealii::ConstraintMatrix &, dealii::parallel::distributed::Vector<T> &)
 	  {
 	    // should use the general template above, but requires that
 	    // some member functions are added to parallel::distributed::Vector
@@ -781,14 +785,14 @@ namespace internal
 	  }
 
 	template<class T>
-	  void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::parallel::distributed::BlockVector<T> &vec)
+	  void set_zero_all(const dealii::ConstraintMatrix &, dealii::parallel::distributed::BlockVector<T> &)
 	  {
 	    Assert (false, ExcNotImplemented());
 	  }
       }
   }
 }
-	
+
 
 template <class VectorType>
 void
