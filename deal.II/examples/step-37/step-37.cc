@@ -1056,7 +1056,7 @@ void LaplaceOperator<dim,number>::transform (number* result) const
                   transformation[5] * result[2];
     }
   else
-    ExcNotImplemented();
+    AssertThrow(false, ExcNotImplemented());
 }
 
                                  // The final function in this group
@@ -1099,7 +1099,7 @@ LaplaceOperator<dim,number>::operator=(const Tensor<2,dim> &tensor)
               ExcInternalError());
     }
   else
-    ExcNotImplemented();
+    AssertThrow(false, ExcNotImplemented());
   return *this;
 }
 
