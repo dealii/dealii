@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -359,7 +359,7 @@
                      const InputIterator1 &end_in_1,
                      const InputIterator2 &begin_in_2,
                      const OutputIterator &begin_out,
-		     FunctionObject       &function)
+                     FunctionObject       &function)
      {
        InputIterator1 in_1 = begin_in_1;
        InputIterator2 in_2 = begin_in_2;
@@ -390,9 +390,9 @@
  * @code
      parallel::transform (x.begin(), x.end(),
                           y.begin(),
-		 	  z.begin(),
-			  (boost::lambda::_1 + boost::lambda::_2),
-			  1000);
+                          z.begin(),
+                          (boost::lambda::_1 + boost::lambda::_2),
+                          1000);
  * @endcode
  *
  * In this example, we used the <a
@@ -446,13 +446,13 @@
       Vector::iterator dst_ptr = dst.begin();
 
       for (unsigned int row=0; row<n_rows; ++row, ++dst_ptr)
-	{
-	  double s = 0.;
-	  const double *const val_end_of_row = &values[rowstart[row+1]];
-	  while (val_ptr != val_end_of_row)
-	    s += *val_ptr++ * src(*colnum_ptr++);
-	  *dst_ptr = s;
-	}
+        {
+          double s = 0.;
+          const double *const val_end_of_row = &values[rowstart[row+1]];
+          while (val_ptr != val_end_of_row)
+            s += *val_ptr++ * src(*colnum_ptr++);
+          *dst_ptr = s;
+        }
     }
  * @endcode
  * Inside the for loop, we compute the dot product of a single row of the
@@ -468,7 +468,7 @@
  * @code
     void SparseMatrix::vmult (const Vector     &src,
                               Vector           &dst,
-			      Vector::iterator &dst_row) const
+                              Vector::iterator &dst_row) const
     {
       const unsigned int  row = (dst_row - dst.begin());
 
@@ -478,7 +478,7 @@
       double s = 0.;
       const double *const val_end_of_row = &values[rowstart[row+1]];
       while (val_ptr != val_end_of_row)
-	s += *val_ptr++ * src(*colnum_ptr++);
+        s += *val_ptr++ * src(*colnum_ptr++);
       *dst_row = s;
     }
 
@@ -487,11 +487,11 @@
     {
       parallel::transform (dst.begin(), dst.end(),
                            std_cxx1x::bind (&SparseMatrix::vmult_one_row,
-			                this,
-					std_cxx1x::cref(src),
-					std_cxx1x::ref(dst),
-					std_cxx1x::_1),
-			   200);
+                                        this,
+                                        std_cxx1x::cref(src),
+                                        std_cxx1x::ref(dst),
+                                        std_cxx1x::_1),
+                           200);
     }
  * @endcode
  * Note how we use <a
@@ -520,34 +520,34 @@
  * @code
     void
     SparseMatrix::vmult_on_subrange (const unsigned int  begin_row,
-			             const unsigned int  end_row,
-			             const Vector     &src,
-			             Vector           &dst)
+                                     const unsigned int  end_row,
+                                     const Vector     &src,
+                                     Vector           &dst)
     {
       const double       *val_ptr    = &values[rowstart[begin_row]];
       const unsigned int *colnum_ptr = &colnums[rowstart[begin_row]];
       Vector::iterator dst_ptr = dst.begin() + begin_row;
 
       for (unsigned int row=begin_row; row<end_row; ++row, ++dst_ptr)
-	{
-	  double s = 0.;
-	  const double *const val_end_of_row = &values[rowstart[row+1]];
-	  while (val_ptr != val_end_of_row)
-	    s += *val_ptr++ * src(*colnum_ptr++);
-	  *dst_ptr = s;
-	}
+        {
+          double s = 0.;
+          const double *const val_end_of_row = &values[rowstart[row+1]];
+          while (val_ptr != val_end_of_row)
+            s += *val_ptr++ * src(*colnum_ptr++);
+          *dst_ptr = s;
+        }
     }
 
     void SparseMatrix::vmult (const Vector &src,
                               Vector       &dst) const
     {
        parallel::apply_to_subranges (0, n_rows(),
-				     std_cxx1x::bind (vmult_on_subrange,
-						  this,
-						  std_cxx1x::_1, std_cxx1x::_2,
-						  std_cxx1x::cref(src),
-						  std_cxx1x::ref(dst)),
-				     200);
+                                     std_cxx1x::bind (vmult_on_subrange,
+                                                  this,
+                                                  std_cxx1x::_1, std_cxx1x::_2,
+                                                  std_cxx1x::cref(src),
+                                                  std_cxx1x::ref(dst)),
+                                     200);
     }
  * @endcode
  * Here, we call the <code>vmult_on_subrange</code> function on sub-ranges
@@ -568,13 +568,13 @@
       double norm_sqr = 0;
 
       for (unsigned int row=0; row<n_rows; ++row, ++dst_ptr)
-	{
-	  double s = 0.;
-	  const double *const val_end_of_row = &values[rowstart[row+1]];
-	  while (val_ptr != val_end_of_row)
-	    s += *val_ptr++ * x(*colnum_ptr++);
-	  norm_sqr += x(row) * s;
-	}
+        {
+          double s = 0.;
+          const double *const val_end_of_row = &values[rowstart[row+1]];
+          while (val_ptr != val_end_of_row)
+            s += *val_ptr++ * x(*colnum_ptr++);
+          norm_sqr += x(row) * s;
+        }
 
       return std::sqrt (norm_sqr);
     }
@@ -591,8 +591,8 @@
  * @code
     double
     SparseMatrix::mat_norm_sqr_on_subrange (const unsigned int  begin_row,
-			                    const unsigned int  end_row,
-			                    const Vector     &x)
+                                            const unsigned int  end_row,
+                                            const Vector     &x)
     {
       const double       *val_ptr    = &values[rowstart[begin_row]];
       const unsigned int *colnum_ptr = &colnums[rowstart[begin_row]];
@@ -601,13 +601,13 @@
       double norm_sqr = 0;
 
       for (unsigned int row=begin_row; row<end_row; ++row, ++dst_ptr)
-	{
-	  double s = 0.;
-	  const double *const val_end_of_row = &values[rowstart[row+1]];
-	  while (val_ptr != val_end_of_row)
-	    s += *val_ptr++ * x(*colnum_ptr++);
-	  norm_sqr += x(row) * s;
-	}
+        {
+          double s = 0.;
+          const double *const val_end_of_row = &values[rowstart[row+1]];
+          while (val_ptr != val_end_of_row)
+            s += *val_ptr++ * x(*colnum_ptr++);
+          norm_sqr += x(row) * s;
+        }
 
       return norm_sqr;
     }
@@ -616,12 +616,12 @@
     {
       return
         std::sqrt
-	(parallel::accumulate_from_subranges (0, n_rows(),
-				              std_cxx1x::bind (mat_norm_sqr_on_subrange,
-						           this,
-						           std_cxx1x::_1, std_cxx1x::_2,
-						           std_cxx1x::cref(x)),
-				              200));
+        (parallel::accumulate_from_subranges (0, n_rows(),
+                                              std_cxx1x::bind (mat_norm_sqr_on_subrange,
+                                                           this,
+                                                           std_cxx1x::_1, std_cxx1x::_2,
+                                                           std_cxx1x::cref(x)),
+                                              200));
     }
  * @endcode
  *
@@ -653,10 +653,10 @@
      Threads::TaskGroup<void> task_group;
      for (typename DoFHandler<dim>::active_cell_iterator
             cell = dof_handler.begin_active();
-	  cell != dof_handler.end(); ++cell)
+          cell != dof_handler.end(); ++cell)
        task_group += Threads::new_task (&MyClass<dim>::assemble_on_one_cell,
                                         *this,
-					cell);
+                                        cell);
      task_group.join_all ();
    }
  * @endcode
@@ -688,9 +688,9 @@
    void MyClass<dim>::assemble_system ()
    {
      WorkStream::run (dof_handler.begin_active(),
-	              dof_handler.end(),
-		      *this,
-		      &MyClass<dim>::assemble_on_one_cell);
+                      dof_handler.end(),
+                      *this,
+                      &MyClass<dim>::assemble_on_one_cell);
    }
  * @endcode
  *
@@ -711,7 +711,7 @@
      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
        for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
          for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
-	   cell_matrix(i,j) += ...;
+           cell_matrix(i,j) += ...;
      ...same for cell_rhs...
 
      // now copy results into global system
@@ -720,7 +720,7 @@
      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
        for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
          system_matrix.add (dof_indices[i], dof_indices[j],
-	                    cell_matrix(i,j));
+                            cell_matrix(i,j));
      ...same for rhs...
    }
  * @endcode
@@ -740,7 +740,7 @@
      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
        for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
          system_matrix.add (dof_indices[i], dof_indices[j],
-	                    cell_matrix(i,j));
+                            cell_matrix(i,j));
      ...same for rhs...
      mutex.release ();
    }
@@ -760,7 +760,7 @@
      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
        for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
          system_matrix.add (dof_indices[i], dof_indices[j],
-	                    cell_matrix(i,j));
+                            cell_matrix(i,j));
      ...same for rhs...
    }
  * @endcode
@@ -831,7 +831,7 @@
      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
        for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
          for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
-	   data.cell_matrix(i,j) += ...;
+           data.cell_matrix(i,j) += ...;
      ...same for cell_rhs...
 
      cell->get_dof_indices (data.dof_indices);
@@ -843,7 +843,7 @@
      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
        for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
          system_matrix.add (data.dof_indices[i], data.dof_indices[j],
-	                    data.cell_matrix(i,j));
+                            data.cell_matrix(i,j));
      ...same for rhs...
    }
 
@@ -854,11 +854,11 @@
      ...initialize members of per_task_data to the correct sizes...
 
      WorkStream::run (dof_handler.begin_active(),
-	              dof_handler.end(),
-		      *this,
-		      &MyClass<dim>::assemble_on_one_cell,
-		      &MyClass<dim>::copy_local_to_global,
-		      per_task_data);
+                      dof_handler.end(),
+                      *this,
+                      &MyClass<dim>::assemble_on_one_cell,
+                      &MyClass<dim>::copy_local_to_global,
+                      per_task_data);
    }
  * @endcode
  *
@@ -900,10 +900,10 @@
      std::vector<unsigned int> dof_indices;
 
      PerTaskData (const FiniteElement<dim> &fe)
-		:
-		cell_matrix (fe.dofs_per_cell, fe.dofs_per_cell),
-		cell_rhs (fe.dofs_per_cell),
-		dof_indices (fe.dofs_per_cell)
+                :
+                cell_matrix (fe.dofs_per_cell, fe.dofs_per_cell),
+                cell_rhs (fe.dofs_per_cell),
+                dof_indices (fe.dofs_per_cell)
        {}
    }
 
@@ -913,15 +913,15 @@
      ScratchData (const FiniteElement<dim> &fe,
                   const Quadrature<dim>    &quadrature,
                   const UpdateFlags         update_flags)
-		:
-		fe_values (fe, quadrature, update_flags)
+                :
+                fe_values (fe, quadrature, update_flags)
        {}
-     
+
      ScratchData (const ScratchData &scratch)
-		:
-		fe_values (scratch.fe_values.get_fe(), 
-		           scratch.fe_values.get_quadrature(), 
-		           scratch.fe_values.get_update_flags())
+                :
+                fe_values (scratch.fe_values.get_fe(),
+                           scratch.fe_values.get_quadrature(),
+                           scratch.fe_values.get_update_flags())
        {}
    }
  * @endcode
@@ -930,19 +930,19 @@
    template <int dim>
    void MyClass<dim>::assemble_on_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                             ScratchData &scratch,
-					    PerTaskData &data)
+                                            PerTaskData &data)
    {
      scratch.fe_values.reinit (cell);
      ...
    }
  * @endcode
- *   Just as for the <code>PerTaskData</code> structure, we will create a 
+ *   Just as for the <code>PerTaskData</code> structure, we will create a
  *   sample <code>ScratchData</code> object and pass it to the work stream
- *   object, which will replicate it as many times as necessary. For this 
- *   to work <code>ScratchData</code> structures need to copyable. Since FEValues 
- *   objects are rather complex and cannot be copied implicitly, we provided 
- *   our own copy constructor for the <code>ScratchData</code> structure. 
- * 
+ *   object, which will replicate it as many times as necessary. For this
+ *   to work <code>ScratchData</code> structures need to copyable. Since FEValues
+ *   objects are rather complex and cannot be copied implicitly, we provided
+ *   our own copy constructor for the <code>ScratchData</code> structure.
+ *
  *   The same approach, putting things into the <code>ScratchData</code>
  *   data structure, should be used for everything that is expensive to
  *   construct. This holds, in particular, for everything that needs to
@@ -953,7 +953,7 @@
    template <int dim>
    void MyClass<dim>::assemble_on_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                             ScratchData &scratch,
-					    PerTaskData &data)
+                                            PerTaskData &data)
    {
      std::vector<double> rhs_values (fe_values.n_quadrature_points);
      rhs_function.value_list (data.fe_values.get_quadrature_points,
@@ -970,24 +970,24 @@
      ScratchData (const FiniteElement<dim> &fe,
                   const Quadrature<dim>    &quadrature,
                   const UpdateFlags         update_flags)
-		:
-		rhs_values (quadrature.size()),
-		fe_values (fe, quadrature, update_flags)
+                :
+                rhs_values (quadrature.size()),
+                fe_values (fe, quadrature, update_flags)
        {}
-       
+
       ScratchData (const ScratchData &scratch)
-		:
-		rhs_values (scratch.rhs_values),
-		fe_values (scratch.fe_values.get_fe(), 
-		           scratch.fe_values.get_quadrature(), 
-		           scratch.fe_values.get_update_flags())
+                :
+                rhs_values (scratch.rhs_values),
+                fe_values (scratch.fe_values.get_fe(),
+                           scratch.fe_values.get_quadrature(),
+                           scratch.fe_values.get_update_flags())
        {}
    }
 
    template <int dim>
    void MyClass<dim>::assemble_on_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                             ScratchData &scratch,
-					    PerTaskData &data)
+                                            PerTaskData &data)
    {
      rhs_function.value_list (scratch.fe_values.get_quadrature_points,
                               scratch.rhs_values)
@@ -1007,18 +1007,18 @@
  * identical:
  * @code
      WorkStream::run (dof_handler.begin_active(),
-	              dof_handler.end(),
-		      *this,
-		      &MyClass<dim>::assemble_on_one_cell,
-		      &MyClass<dim>::copy_local_to_global,
-		      per_task_data);
+                      dof_handler.end(),
+                      *this,
+                      &MyClass<dim>::assemble_on_one_cell,
+                      &MyClass<dim>::copy_local_to_global,
+                      per_task_data);
      // ...is the same as:
      WorkStream::run (dof_handler.begin_active(),
-	              dof_handler.end(),
-		      std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell, *this,
-		                  std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
-		      std_cxx1x::bind(&MyClass<dim>::copy_local_to_global, *this, std_cxx1x::_1),
-		      per_task_data);
+                      dof_handler.end(),
+                      std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell, *this,
+                                  std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
+                      std_cxx1x::bind(&MyClass<dim>::copy_local_to_global, *this, std_cxx1x::_1),
+                      per_task_data);
  * @endcode
  * Note how <code>std_cxx1x::bind</code> produces a function object that takes three
  * arguments by binding the member function to the <code>*this</code>
@@ -1040,7 +1040,7 @@
                                        const typename DoFHandler<dim>::active_cell_iterator &cell,
                                        ScratchData &scratch,
                                        PerTaskData &data,
-				       const double current_time)
+                                       const double current_time)
    { ... }
  * @endcode
  * Because WorkStream expects to be able to call the worker function with
@@ -1049,17 +1049,17 @@
  * to it:
  * @code
      WorkStream::run (dof_handler.begin_active(),
-	              dof_handler.end(),
-		      std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell,
-		                  *this,
-				  current_solution,
-				  std_cxx1x::_1,
-				  std_cxx1x::_2,
- 				  std_cxx1x::_3,
-				  previous_time+time_step),
-		      std_cxx1x::bind(&MyClass<dim>::copy_local_to_global,
-		                  *this, std_cxx1x::_1),
-		      per_task_data);
+                      dof_handler.end(),
+                      std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell,
+                                  *this,
+                                  current_solution,
+                                  std_cxx1x::_1,
+                                  std_cxx1x::_2,
+                                  std_cxx1x::_3,
+                                  previous_time+time_step),
+                      std_cxx1x::bind(&MyClass<dim>::copy_local_to_global,
+                                  *this, std_cxx1x::_1),
+                      per_task_data);
  * @endcode
  * Here, we bind the object, the linearization point argument, and the
  * current time argument to the function before we hand it off to
@@ -1146,10 +1146,10 @@
 
      Vector<float> error_per_cell (triangulation.n_active_cells());
      KellyErrorEstimator<dim>::estimate (dof_handler,
-				        QGauss<dim-1>(3),
-				        typename FunctionMap<dim>::type(),
-				        solution,
-				        estimated_error_per_cell);
+                                        QGauss<dim-1>(3),
+                                        typename FunctionMap<dim>::type(),
+                                        solution,
+                                        estimated_error_per_cell);
      thread.join ();
  * @endcode
  *

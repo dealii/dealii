@@ -541,14 +541,14 @@
  * The full reference for the paper is as follows:
  * @code
 @Article{BBHK11,
-  author = 	 {Wolfgang Bangerth and Carsten Burstedde and Timo Heister
+  author =       {Wolfgang Bangerth and Carsten Burstedde and Timo Heister
                   and Martin Kronbichler},
-  title = 	 {Algorithms and data structures for massively parallel generic
+  title =        {Algorithms and data structures for massively parallel generic
   adaptive finite element codes},
-  journal = 	 {ACM Trans. Math. Softw.},
-  year = 	 2011,
-  volume = 	 38,
-  pages = 	 {14/1--28}}
+  journal =      {ACM Trans. Math. Softw.},
+  year =         2011,
+  volume =       38,
+  pages =        {14/1--28}}
  * @endcode
  * It is also available as
  * <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
@@ -652,14 +652,14 @@
  * The full reference for this paper is as follows:
  * @code
 Article{BK07,
-  author = 	 {Wolfgang Bangerth and Oliver Kayser-Herold},
-  title = 	 {Data Structures and Requirements for hp Finite Element
+  author =       {Wolfgang Bangerth and Oliver Kayser-Herold},
+  title =        {Data Structures and Requirements for hp Finite Element
                   Software},
-  journal = 	 {ACM Trans. Math. Softw.},
-  year = 	 2009,
-  volume = 	 36,
-  number = 	 1,
-  pages = 	 {4/1--4/31}
+  journal =      {ACM Trans. Math. Softw.},
+  year =         2009,
+  volume =       36,
+  number =       1,
+  pages =        {4/1--4/31}
 }
  * @endcode
  * It is available as Technical Report ISC-07-04-MATH from the
@@ -761,10 +761,10 @@ Article{BK07,
  * The full reference for this paper is as follows:
  * @code
 Article{JK10,
-  author = 	 {B. Janssen and G. Kanschat},
-  title = 	 {Adaptive multilevel methods with local smoothing},
-  journal = 	 {submitted},
-  year = 	 2010
+  author =       {B. Janssen and G. Kanschat},
+  title =        {Adaptive multilevel methods with local smoothing},
+  journal =      {submitted},
+  year =         2010
 }
  * @endcode
  * It is available as Technical Report IAMCS-2009-131 from the

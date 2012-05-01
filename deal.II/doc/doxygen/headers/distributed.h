@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -347,17 +347,17 @@
 
 namespace parallel
 {
-				   /**
-				    * A namespace for class and
-				    * functions that support %parallel
-				    * computing on %distributed memory
-				    * machines. See the @ref
-				    * distributed module for an
-				    * overview of the facilities this
-				    * namespace offers.
-				    *
-				    * @ingroup distributed
-				    */
+                                   /**
+                                    * A namespace for class and
+                                    * functions that support %parallel
+                                    * computing on %distributed memory
+                                    * machines. See the @ref
+                                    * distributed module for an
+                                    * overview of the facilities this
+                                    * namespace offers.
+                                    *
+                                    * @ingroup distributed
+                                    */
   namespace distributed
   {
   }
