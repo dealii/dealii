@@ -565,9 +565,8 @@ namespace Patterns
       std::istringstream is(description);
       is.ignore(strlen(description_init) + strlen(" list of <"));
 
-      std::auto_ptr<char> new_description (new char[is.str().size() + 1]);
-      is.getline(&(*new_description), is.str().size(), '>');
-      std::string str(&(*new_description));
+      std::string str;
+      std::getline(is, str, '>');
 
       std::auto_ptr<PatternBase> base_pattern (pattern_factory(str));
 
