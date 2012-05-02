@@ -145,7 +145,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
             break;
 
       default:
-            ExcNotImplemented();
+	    Assert(false, ExcNotImplemented());
     }
 
   Assert(columns.count(rate_key), ExcInternalError());
