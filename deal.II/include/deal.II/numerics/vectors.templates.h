@@ -3148,7 +3148,7 @@ namespace VectorTools
                                                      // element. If the FE
                                                      // is a FESystem, we
                                                      // cannot check this.
-                    if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) != 0) {
+                    if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0) {
                       typedef FiniteElement<dim> FEL;
                       AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != 0,
 
