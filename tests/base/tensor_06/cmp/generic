@@ -1,0 +1,7 @@
+
+DEAL::dim = 1: -10.0
+DEAL::dim = 2: -22.0
+DEAL::dim = 3: -28.0
+DEAL::dim = 4: -20.0
+DEAL::dim = 7: 168.
+DEAL::OK

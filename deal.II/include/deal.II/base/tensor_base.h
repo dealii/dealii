@@ -1125,7 +1125,7 @@ Tensor<1,dim,Number>::operator * (const Tensor<1,dim,Number> &p) const
               values[2] * p.values[2]);
       break;
     default:
-      Number q = values[0] * values[0];
+      Number q = values[0] * p.values[0];
       for (unsigned int i=1; i<dim; ++i)
         q += values[i] * p.values[i];
       return q;
