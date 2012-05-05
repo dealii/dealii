@@ -1495,7 +1495,8 @@ namespace parallel
     {
                                        // if we call Vector::operator=0, we want to
                                        // zero out all the entries plus ghosts.
-      vector_view.dealii::template Vector<Number>::operator= (s);
+      if (partitioner->local_size() > 0)
+        vector_view.dealii::template Vector<Number>::operator= (s);
       if (s==Number())
         zero_out_ghosts();
 
@@ -1878,23 +1879,6 @@ namespace parallel
                                        // for parallel implementation
       if(local_size()>0)
         vector_view.ratio (a.vector_view, b.vector_view);
-    }
-
-
-
-    template <typename Number>
-    inline
-    void
-    Vector<Number>::swap (Vector<Number> &v)
-    {
-      std::swap (allocated_size,         v.allocated_size);
-      std::swap (val,                    v.val);
-      std::swap (import_data,            v.import_data);
-      std::swap (vector_view,            v.vector_view);
-#ifdef DEAL_II_COMPILER_SUPPROTS_MPI
-      std::swap (compress_requests,      v.compress_requests);
-      std::swap (update_ghost_values_requests, v.update_ghost_values_requests);
-#endif
     }
 
 

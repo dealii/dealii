@@ -898,6 +898,30 @@ class SymmetricTensor
     Number &
     operator [] (const TableIndices<rank> &indices);
 
+				     /**
+				      * Access to an element according
+				      * to unrolled index. The
+				      * function
+				      * <tt>s.access_raw_entry(i)</tt>
+				      * does the same as
+				      * <tt>s[s.unrolled_to_component_indices(i)]</tt>,
+				      * but more efficiently.
+				      */
+    Number
+    access_raw_entry (const unsigned int unrolled_index) const;
+
+				     /**
+				      * Access to an element according
+				      * to unrolled index. The
+				      * function
+				      * <tt>s.access_raw_entry(i)</tt>
+				      * does the same as
+				      * <tt>s[s.unrolled_to_component_indices(i)]</tt>,
+				      * but more efficiently.
+				      */
+    Number &
+    access_raw_entry (const unsigned int unrolled_index);
+
                                      /**
                                       * Return the Frobenius-norm of a tensor,
                                       * i.e. the square root of the sum of
@@ -1569,7 +1593,7 @@ namespace internal
         }
       }
 
-    static Number dummy_but_referenceable = 0;
+    static Number dummy_but_referenceable = Number();
     return dummy_but_referenceable;
   }
 
@@ -1906,6 +1930,28 @@ Number &
 SymmetricTensor<rank,dim,Number>::operator [] (const TableIndices<rank> &indices)
 {
   return data[component_to_unrolled_index(indices)];
+}
+
+
+
+template <int rank, int dim, typename Number>
+inline
+Number
+SymmetricTensor<rank,dim,Number>::access_raw_entry (const unsigned int index) const
+{
+  AssertIndexRange (index, data.dimension);
+  return data[index];
+}
+
+
+
+template <int rank, int dim, typename Number>
+inline
+Number &
+SymmetricTensor<rank,dim,Number>::access_raw_entry (const unsigned int index)
+{
+  AssertIndexRange (index, data.dimension);
+  return data[index];
 }
 
 

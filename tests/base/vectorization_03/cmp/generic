@@ -1,0 +1,10 @@
+
+DEAL::Constructor: [][]
+DEAL::Assignment: [2 1 42 0 ][2 1 42 0 ]
+DEAL::Assignment vector: [2 1 42 0 ][2 1 42 0 ]
+DEAL::Data consistency after assignment: [2 1 42 0 ][2 1 42 0 ]
+DEAL::Insertion: [2 1 42 0 ][2 1 42 0 ][2 41 42 0 100 ]
+DEAL::Shrinking: [2 1 42 0 ]
+DEAL::Reserve: [2 1 42 0 ]
+DEAL::Resize: [2 1 42 0 ][][][][][][][][][]
+DEAL::Clear: 

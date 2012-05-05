@@ -1216,6 +1216,16 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
        [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
 
+  AC_MSG_CHECKING(for std::type_traits)
+  AC_TRY_COMPILE(
+       [#include <type_traits>],
+       [ const bool m0 = std::is_trivial<double>::value;
+         const bool m1 = std::is_standard_layout<double>::value;
+         const bool m2 = std::is_pod<double>::value; ],
+       [ AC_MSG_RESULT(yes) ],
+       [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
+       )
+
   CXXFLAGS="${OLD_CXXFLAGS}"
 
   dnl If the above classes and operations are all defined then we can
@@ -1999,12 +2009,12 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
         AC_MSG_RESULT(x86 derivate ($withcpu))
 	case "$GXX_VERSION" in
 	  gcc*)
-	      dnl Tune for this processor, but only in optimized mode
-              dnl (to prevent the effects of possible compiler bugs to affect
-              dnl both debug as well as optimized versions)
+	      dnl Tune for this processor
+	      CXXFLAGSG="$CXXFLAGSG -march=$withcpu"
 	      CXXFLAGSO="$CXXFLAGSO -march=$withcpu"
 
 	      dnl Also set the mode for f77 compiler
+	      F77FLAGSG="$F77FLAGSG -march=$withcpu"
 	      F77FLAGSO="$F77FLAGSO -march=$withcpu"
           ;;
         esac
@@ -2014,18 +2024,19 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
         AC_MSG_RESULT(native processor variant)
 	case "$GXX_VERSION" in
 	  gcc*)
-	      dnl Tune for this processor, but only in optimized mode
-              dnl (to prevent the effects of possible compiler bugs to affect
-              dnl both debug as well as optimized versions)
+	      dnl Tune for this processor
+	      CXXFLAGSG="$CXXFLAGSG -march=native"
 	      CXXFLAGSO="$CXXFLAGSO -march=native"
 
 	      dnl Also set the mode for f77 compiler
+	      F77FLAGSG="$F77FLAGSG -march=native"
 	      F77FLAGSO="$F77FLAGSO -march=native"
               ;;
 
           intel_icc*)
               dnl Same, but for the icc compiler
               CXXFLAGSO="$CXXFLAGSO -xhost"
+              CXXFLAGSG="$CXXFLAGSG -xhost"
               ;;
         esac
         ;;
@@ -2034,6 +2045,155 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
         AC_MSG_RESULT(none given or not recognized)
 	;;
   esac
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Check whether the compiler allows for vectorization and that
+dnl vectorization actually works. For this test, we use compiler
+dnl intrinsics similar to what is used in the deal.II library and
+dnl check whether the arithmetic operations are correctly performed
+dnl on examples where all numbers are exactly represented as
+dnl floating point numbers.
+dnl
+dnl Usage: DEAL_II_COMPILER_VECTORIZATION_LEVEL
+dnl 0 means no vectorization, 1 support for SSE2, 2 support for AVX
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_DETECT_VECTORIZATION_LEVEL, dnl
+[
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  dnl SSE2 check in debug mode
+  AC_MSG_CHECKING(whether CPU supports SSE2)
+  AC_TRY_RUN(
+    [
+#include <emmintrin.h>
+#include <mm_malloc.h>
+	int main()
+	{
+        __m128d a, b;
+	const unsigned int vector_bytes = sizeof(__m128d);
+	const int n_vectors = vector_bytes/sizeof(double);
+	__m128d * data =
+	  reinterpret_cast<__m128d*>(_mm_malloc (2*vector_bytes, vector_bytes));
+	double * ptr = reinterpret_cast<double*>(&a);
+	ptr[0] = (volatile double)(1.0);
+	for (int i=1; i<n_vectors; ++i)
+	  ptr[i] = 0.0;
+	b = _mm_set1_pd ((volatile double)(2.25));
+	data[0] = _mm_add_pd (a, b);
+	data[1] = _mm_mul_pd (b, data[0]);
+	ptr = reinterpret_cast<double*>(&data[1]);
+	unsigned int return_value = 0;
+	if (ptr[0] != 7.3125)
+	  return_value = 1;
+	for (int i=1; i<n_vectors; ++i)
+	  if (ptr[i] != 5.0625)
+	    return_value = 1;
+	_mm_free (data);
+	return return_value;
+	}
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      dnl AVX check in debug mode
+      AC_MSG_CHECKING(whether CPU supports AVX)
+      AC_TRY_RUN(
+      [
+#include <immintrin.h>
+#include <mm_malloc.h>
+	int main()
+	{
+        __m256d a, b;
+	const unsigned int vector_bytes = sizeof(__m256d);
+	const int n_vectors = vector_bytes/sizeof(double);
+	__m256d * data =
+	  reinterpret_cast<__m256d*>(_mm_malloc (2*vector_bytes, vector_bytes));
+	double * ptr = reinterpret_cast<double*>(&a);
+	ptr[0] = (volatile double)(1.0);
+	for (int i=1; i<n_vectors; ++i)
+	  ptr[i] = 0.0;
+	b = _mm256_set1_pd ((volatile double)(2.25));
+	data[0] = _mm256_add_pd (a, b);
+	data[1] = _mm256_mul_pd (b, data[0]);
+	ptr = reinterpret_cast<double*>(&data[1]);
+	unsigned int return_value = 0;
+	if (ptr[0] != 7.3125)
+	  return_value = 1;
+	for (int i=1; i<n_vectors; ++i)
+	  if (ptr[i] != 5.0625)
+	    return_value = 1;
+	_mm_free (data);
+	}
+      ],
+      [
+	AC_MSG_RESULT(yes)
+        AC_DEFINE(DEAL_II_COMPILER_VECTORIZATION_LEVEL, 2,
+                  [Equal to 0 in the generic case,
+		   equal to 1 if CPU compiled for supports SSE2,
+		   equal to 2 if CPU compiled for supports AVX])
+      ],
+      [
+        AC_MSG_RESULT(no)
+        AC_DEFINE(DEAL_II_COMPILER_VECTORIZATION_LEVEL, 1,
+                  [Equal to 0 in the generic case,
+		   equal to 1 if CPU compiled for supports SSE2,
+		   equal to 2 if CPU compiled for supports AVX])
+      ])
+    ],
+    [
+        AC_DEFINE(DEAL_II_COMPILER_VECTORIZATION_LEVEL, 0,
+                  [Equal to 0 in the generic case,
+		   equal to 1 if CPU compiled for supports SSE2,
+		   equal to 2 if CPU compiled for supports AVX])
+        AC_MSG_RESULT(no)
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Check whether the compiler allows to use arithmetic operations
+dnl +-*/ on vectorized data types or whether we need to use
+dnl _mm_add_pd for addition and so on. +-*/ is preferred because
+dnl it allows the compiler to choose other optimizations like
+dnl fused multiply add, whereas _mm_add_pd explicitly enforces the
+dnl assembler command.
+dnl
+dnl Usage: DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_VECTOR_ARITHMETICS, dnl
+
+[
+  AC_MSG_CHECKING(whether compiler supports vector arithmetics)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <emmintrin.h>
+    ],
+    [
+        __m128d a, b;
+        a = _mm_set_sd (1.0);
+	b = _mm_set1_pd (2.1);
+	__m128d c = a + b;
+	__m128d d = b - c;
+	__m128d e = c * a + d;
+	__m128d f = e/a;
+	(void)f;
+    ],
+    [
+	AC_MSG_RESULT(yes)
+        AC_DEFINE(DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS, 1,
+                  [Defined if the compiler can use arithmetic operations on
+		  vectorized data types])
+    ],
+    [
+        AC_MSG_RESULT(no)
+    ])
 ])
 
 
@@ -4954,106 +5114,6 @@ AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Check whether the compiler allows to use arithmetic operations
-dnl +-*/ on vectorized data types or whether we need to use
-dnl _mm_add_pd for addition and so on. +-*/ is preferred because
-dnl it allows the compiler to choose other optimizations like
-dnl fused multiply add, whereas _mm_add_pd explicitly enforces the
-dnl assembler command.
-dnl
-dnl Usage: DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_VECTOR_ARITHMETICS, dnl
-
-[
-  AC_MSG_CHECKING(whether compiler supports vector arithmetics)
-  AC_LANG(C++)
-  CXXFLAGS="$CXXFLAGSG"
-  AC_TRY_COMPILE(
-    [
-#include <emmintrin.h>
-    ],
-    [
-        __m128d a, b;
-        a = _mm_set_sd (1.0);
-	b = _mm_set1_pd (2.1);
-	__m128d c = a + b;
-	__m128d d = b - c;
-	__m128d e = c * a + d;
-	__m128d f = e/a;
-	(void)f;
-    ],
-    [
-	AC_MSG_RESULT(yes)
-        AC_DEFINE(DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS, 1,
-                  [Defined if the compiler can use arithmetic operations on
-		  vectorized data types])
-    ],
-    [
-        AC_MSG_RESULT(no)
-    ])
-])
-
-
-
-dnl -------------------------------------------------------------
-dnl Check for existence of a strong inline function. This can be used
-dnl to force a compiler to inline some functions also at low optimization
-dnl levels. We use it in vectorized data types, where we want inlining
-dnl also for debug code. If we cannot find a good inlining routine, we
-dnl just use 'inline'.
-dnl
-dnl Usage: DEAL_II_ALWAYS_INLINE
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_ALWAYS_INLINE, dnl
-
-[
-  if test "$GXX" = "yes" ; then
-     dnl force inline for gcc compiler
-     TEMP_ALWAYS_INLINE='__inline __attribute__((__always_inline__))'
-  else
-    case "$GXX_VERSION" in
-      clang*)
-        dnl force inline for clang compiler
-	TEMP_ALWAYS_INLINE='__inline __attribute__((__always_inline__))'
-	;;
-
-      *)
-	dnl for all other compilers, try with __forceinline
-	TEMP_ALWAYS_INLINE=__forceinline
-	;;
-    esac
-  fi
-  AC_MSG_CHECKING(for forced inlining)
-  AC_LANG(C++)
-  CXXFLAGS="$CXXFLAGSG"
-  AC_TRY_COMPILE(
-    [
-        $TEMP_ALWAYS_INLINE
-	void f() {};
-    ],
-    [
-	f();
-    ],
-    [
-	AC_MSG_RESULT(yes)
-        AC_DEFINE_UNQUOTED(DEAL_II_ALWAYS_INLINE, $TEMP_ALWAYS_INLINE,
-                  [Forces the compiler to always inline functions, also in
-		   debug mode])
-    ],
-    [
-        AC_MSG_RESULT(no)
-	AC_DEFINE(DEAL_II_ALWAYS_INLINE, inline,
-                  [Forces the compiler to always inline functions, also in
-		   debug mode])
-    ])
-])
-
-
-
-dnl -------------------------------------------------------------
 dnl
 dnl Usage: DEAL_II_CHECK_MIN_VECTOR_CAPACITY
 dnl -------------------------------------------------------------
@@ -7425,6 +7485,7 @@ AC_DEFUN(DEAL_II_WITH_LAPACK, dnl
         AC_DEFINE([HAVE_LIBLAPACK], [1],
                   [Defined if deal.II was configured with LAPACK support])
         AC_SUBST(DEAL_II_USE_LAPACK, "yes")
+	USE_CONTRIB_LAPACK='yes'
       ],
       [AC_MSG_ERROR([LAPACK library $lapack not found])]
     )
@@ -7531,6 +7592,7 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
                    ],,$F77LIBS)
       AC_SUBST(DEAL_II_USE_BLAS, "yes")
       AC_SUBST(NEEDS_F77LIBS, "yes")
+      USE_CONTRIB_BLAS='yes'
     else
       DEAL_II_CHECK_BLAS_FRAMEWORK
       if test "x$framework_works" != "xyes"; then
@@ -7544,6 +7606,7 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
 
         AC_SUBST(DEAL_II_USE_BLAS, "yes")
         AC_SUBST(NEEDS_F77LIBS, "yes")
+	USE_CONTRIB_BLAS='yes'
       fi
     fi
   fi

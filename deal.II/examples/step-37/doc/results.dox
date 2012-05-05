@@ -3,309 +3,236 @@
 <h3>Program output</h3>
 
 Since this example solves the same problem as step-5 (except for
-a different coefficient), we refer to the graphical output there. Here, we
-evaluate some aspects of the multigrid solver.
+a different coefficient), there is little to say about the
+solution. We show a picture anyway, illustrating the size of the
+solution through both isocontours and volume rendering:
 
+@image html "step-37.solution.png"
+
+Of more interest is to evaluate some aspects of the multigrid solver.
 When we run this program in 2D for quadratic ($Q_2$) elements, we get the
 following output:
 @code
 Cycle 0
-Number of degrees of freedom: 337
-System matrix memory consumption: 0.02573 MiB.
-Multigrid objects memory consumption: 0.05083 MiB.
-Convergence in 10 CG iterations.
+Number of degrees of freedom: 81
+System matrix memory consumption:     0.008982 MB.
+Multigrid objects memory consumption: 0.02617 MB.
+Total setup time               (wall) 0.001811s
+Time solve (5 iterations)  (CPU/wall) 0s/0.0002651s
 
 Cycle 1
-Number of degrees of freedom: 1313
-System matrix memory consumption: 0.09257 MiB.
-Multigrid objects memory consumption: 0.1794 MiB.
-Convergence in 10 CG iterations.
+Number of degrees of freedom: 289
+System matrix memory consumption:     0.01817 MB.
+Multigrid objects memory consumption: 0.05779 MB.
+Total setup time               (wall) 0.001223s
+Time solve (5 iterations)  (CPU/wall) 0s/0.000926s
 
 Cycle 2
-Number of degrees of freedom: 5185
-System matrix memory consumption: 0.3553 MiB.
-Multigrid objects memory consumption: 0.6779 MiB.
-Convergence in 10 CG iterations.
+Number of degrees of freedom: 1089
+System matrix memory consumption:     0.05286 MB.
+Multigrid objects memory consumption: 0.1581 MB.
+Total setup time               (wall) 0.003045s
+Time solve (6 iterations)  (CPU/wall) 0.012s/0.003393s
 
 Cycle 3
-Number of degrees of freedom: 20609
-System matrix memory consumption: 1.397 MiB.
-Multigrid objects memory consumption: 2.645 MiB.
-Convergence in 10 CG iterations.
+Number of degrees of freedom: 4225
+System matrix memory consumption:     0.1957 MB.
+Multigrid objects memory consumption: 0.5228 MB.
+Total setup time               (wall) 0.008561s
+Time solve (6 iterations)  (CPU/wall) 0.02s/0.01133s
 
 Cycle 4
-Number of degrees of freedom: 82177
-System matrix memory consumption: 5.546 MiB.
-Multigrid objects memory consumption: 10.46 MiB.
-Convergence in 10 CG iterations.
+Number of degrees of freedom: 16641
+System matrix memory consumption:     0.7343 MB.
+Multigrid objects memory consumption: 1.925 MB.
+Total setup time               (wall) 0.02938s
+Time solve (6 iterations)  (CPU/wall) 0.068s/0.03312s
 
 Cycle 5
-Number of degrees of freedom: 328193
-System matrix memory consumption: 22.11 MiB.
-Multigrid objects memory consumption: 41.65 MiB.
-Convergence in 10 CG iterations.
+Number of degrees of freedom: 66049
+System matrix memory consumption:     2.856 MB.
+Multigrid objects memory consumption: 7.435 MB.
+Total setup time               (wall) 0.1128s
+Time solve (6 iterations)  (CPU/wall) 0.228s/0.09577s
+
+Cycle 6
+Number of degrees of freedom: 263169
+System matrix memory consumption:     11.28 MB.
+Multigrid objects memory consumption: 29.3 MB.
+Total setup time               (wall) 0.4553s
+Time solve (6 iterations)  (CPU/wall) 1.272s/0.3955s
 @endcode
 
 As in step-16, we see that the number of CG iterations remains constant with
 increasing number of degrees of freedom. We can also see that the various
 objects we have to store for the multigrid method on the individual levels of
-our mesh together make up about twice as much as the matrix on the finest
-level.
+our mesh together make up more than twice as much as the matrix on the finest
+level. For the present example, about half the memory consumption of the
+multigrid objects are the level transfer matrices, and the other half is
+consumed by the matrix-free objects (and there, mainly the indices and the
+variable coefficient).
 
-Not much changes if we run the
-program in three spatial dimensions, with the exception that the multilevel
-objects now take up comparatively less space (because in 3d, each level has
-only one eighth the number of cells of the next finer one, whereas in 2d this
-factor if one quarter):
+Not much changes if we run the program in three spatial dimensions, with the
+exception that the multilevel objects now take up some more memory (because
+the level transfer matrices are denser) and the computing times are somewhat
+larger:
 
 @code
 Cycle 0
-Number of degrees of freedom: 517
-System matrix memory consumption: 0.1001 MiB.
-Multigrid objects memory consumption: 0.1463 MiB.
-Convergence in 9 CG iterations.
+Number of degrees of freedom: 125
+System matrix memory consumption:     0.01093 MB.
+Multigrid objects memory consumption: 0.03094 MB.
+Total setup time               (wall) 0.002481s
+Time solve (5 iterations)  (CPU/wall) 0s/0.000334s
 
 Cycle 1
-Number of degrees of freedom: 3817
-System matrix memory consumption: 0.6613 MiB.
-Multigrid objects memory consumption: 0.8896 MiB.
-Convergence in 10 CG iterations.
+Number of degrees of freedom: 729
+System matrix memory consumption:     0.04105 MB.
+Multigrid objects memory consumption: 0.1274 MB.
+Total setup time               (wall) 0.004471s
+Time solve (5 iterations)  (CPU/wall) 0.004s/0.001979s
 
 Cycle 2
-Number of degrees of freedom: 29521
-System matrix memory consumption: 5.1 MiB.
-Multigrid objects memory consumption: 6.653 MiB.
-Convergence in 10 CG iterations.
+Number of degrees of freedom: 4913
+System matrix memory consumption:     0.2821 MB.
+Multigrid objects memory consumption: 0.8048 MB.
+Total setup time               (wall) 0.01651s
+Time solve (4 iterations)  (CPU/wall) 0.036s/0.01295s
 
 Cycle 3
-Number of degrees of freedom: 232609
-System matrix memory consumption: 40.4 MiB.
-Multigrid objects memory consumption: 52.24 MiB.
-Convergence in 11 CG iterations.
+Number of degrees of freedom: 35937
+System matrix memory consumption:     1.948 MB.
+Multigrid objects memory consumption: 5.734 MB.
+Total setup time               (wall) 0.1072s
+Time solve (5 iterations)  (CPU/wall) 0.16s/0.0709s
 
 Cycle 4
-Number of degrees of freedom: 1847617
-System matrix memory consumption: 322 MiB.
-Multigrid objects memory consumption: 415.1 MiB.
-Convergence in 11 CG iterations.
+Number of degrees of freedom: 274625
+System matrix memory consumption:     14.49 MB.
+Multigrid objects memory consumption: 44.41 MB.
+Total setup time               (wall) 0.8173s
+Time solve (5 iterations)  (CPU/wall) 1.52s/0.5093s
+
+Cycle 5
+Number of degrees of freedom: 2146689
+System matrix memory consumption:     115.9 MB.
+Multigrid objects memory consumption: 342.6 MB.
+Total setup time               (wall) 6.387s
+Time solve (5 iterations)  (CPU/wall) 12.45s/3.767s
 @endcode
 
 
 <h3>Comparison with a sparse matrix</h3>
 
-In order to understand the capabilities of this class, we compare the memory
-consumption and execution (wallclock) time for assembly and 50 matrix-vector
-products (MV) on a <b>3D problem with one million unknowns</b> the classical
-sparse matrix implementation (SpM) and the MatrixFree implementation shown
-here (M-F). Both matrices are based on @p double %numbers. The program is run
-on a 2.8 GHz Opteron processor with the <a href="http://www.amd.com/acml">ACML
-BLAS</a>. We present results running on one core core and four cores,
-respectively. Moreover, we measure the time it takes to construct the
-individual matrices and filling them with data (@p setup and @p assemble
-functions). The sparse matrix is initialized using a
-CompressedSimpleSparsityPattern for calling the
-DoFTools::make_sparsity_pattern function, and then copied to a SparsityPattern
-object. The boundary nodes are eliminated using the ConstraintMatrix class, so
-that only elements that are actually nonzero are stored in the matrix.
+In order to understand the capabilities of the matrix-free implementation, we
+compare the performance on the 3d example above with a SparseMatrix
+implementation and we measure the computation times for both initialization of
+the problem (distribute DoFs, setup and assemble matrices, setup multigrid
+structures) and the actual solution for the matrix-free variant and the
+variant based on sparse matrices. We base the preconditioner on float
+numbers and the actual matrix and vectors on double numbers, as shown
+above. Tests are run on an Intel Core i7-2620M notebook processor (two cores
+and <a href="http://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX</a>
+support, i.e., four operations on doubles can be done with one CPU
+instruction, which is heavily used in FEEvaluation) and optimized mode. The
+example makes use of multithreading, so both cores are actually used.
 
 <table align="center" border="1">
   <tr>
     <th>&nbsp;</th>
-    <th colspan="2">Memory consumption</th>
-    <th colspan="2">Time assembly</th>
-    <th colspan="2">Time 50 MV, 1 CPU</th>
-    <th colspan="2">Time 50 MV, 4 CPUs</th>
+    <th colspan="2">Sparse matrix</th>
+    <th colspan="2">Matrix-free implementation</th>
   </tr>
   <tr>
-    <th align="center">element order</th>
-    <th align="center">SpM</th>
-    <th align="center">M-F</th>
-    <th align="center">SpM</th>
-    <th align="center">M-F</th>
-    <th align="center">SpM</th>
-    <th align="center">M-F</th>
-    <th align="center">SpM</th>
-    <th align="center">M-F</th>
+    <th>n_dofs</th>
+    <th>Setup + assemble</th>
+    <th>&nbsp;Solve&nbsp;</th>
+    <th>Setup + assemble</th>
+    <th>&nbsp;Solve&nbsp;</th>
   </tr>
   <tr>
-    <td align="center">1</td>
-    <td align="center">299 MiB</td>
-    <td align="center">394 MiB</td>
-    <td align="center">8.09 s</td>
-    <td align="center">3.43 s</td>
-    <td align="center">5.50 s</td>
-    <td align="center">22.4 s</td>
-    <td align="center">4.30 s</td>
-    <td align="center">11.0 s</td>
+    <td align="right">125</td>
+    <td align="center">0.0048s</td>
+    <td align="center">0.00075s</td>
+    <td align="center">0.0025s</td>
+    <td align="center">0.00033s</td>
   </tr>
   <tr>
-    <td align="center">2</td>
-    <td align="center">698 MiB</td>
-    <td align="center">177 MiB</td>
-    <td align="center">12.43 s</td>
-    <td align="center">1.32 s</td>
-    <td align="center">12.0 s</td>
-    <td align="center">18.6 s</td>
-    <td align="center">9.10 s</td>
-    <td align="center">6.31 s</td>
+    <td align="right">729</td>
+    <td align="center">0.014s</td>
+    <td align="center">0.0022s</td>
+    <td align="center">0.0026s</td>
+    <td align="center">0.0018s</td>
   </tr>
   <tr>
-    <td align="center">3</td>
-    <td align="center">1295 MiB</td>
-    <td align="center">124 MiB</td>
-    <td align="center">41.1 s</td>
-    <td align="center">1.31 s</td>
-    <td align="center">21.2 s</td>
-    <td align="center">23.7 s</td>
-    <td align="center">16.0 s</td>
-    <td align="center">7.43 s</td>
+    <td align="right">4,913</td>
+    <td align="center">0.10s</td>
+    <td align="center">0.012s</td>
+    <td align="center">0.017s</td>
+    <td align="center">0.013s</td>
   </tr>
   <tr>
-    <td align="center">4</td>
-    <td align="center">2282 MiB</td>
-    <td align="center">107 MiB</td>
-    <td align="center">117 s</td>
-    <td align="center">1.97 s</td>
-    <td align="center">40.8 s</td>
-    <td align="center">36.3 s</td>
-    <td align="center">19.7 s</td>
-    <td align="center">10.9 s</td>
+    <td align="right">35,937</td>
+    <td align="center">0.80s</td>
+    <td align="center">0.14s</td>
+    <td align="center">0.11s</td>
+    <td align="center">0.071s</td>
   </tr>
   <tr>
-    <td align="center">5</td>
-    <td align="center">3597 MiB</td>
-    <td align="center">96.4 MiB</td>
-    <td align="center">510 s</td>
-    <td align="center">5.52 s</td>
-    <td align="center">75.7 s</td>
-    <td align="center">53.9 s</td>
-    <td align="center">29.3 s</td>
-    <td align="center">15.7 s</td>
+    <td align="right">274,625</td>
+    <td align="center">5.93s</td>
+    <td align="center">1.05s</td>
+    <td align="center">0.82s</td>
+    <td align="center">0.51s</td>
   </tr>
   <tr>
-    <td align="center">6</td>
-    <td align="center">5679 MiB</td>
-    <td align="center">96.3 MiB</td>
-    <td align="center">2389 s</td>
-    <td align="center">26.1 s</td>
-    <td align="center">135 s</td>
-    <td align="center">79.1 s</td>
-    <td align="center">45.8 s</td>
-    <td align="center">24.3 s</td>
+    <td align="right">2,146,689</td>
+    <td align="center">46.7s</td>
+    <td align="center">8.44s</td>
+    <td align="center">6.39s</td>
+    <td align="center">3.77s</td>
   </tr>
 </table>
 
-There are a few interesting things with the %numbers in this table. 
+The table clearly shows that the matrix-free implementation is twice as fast
+for the solver, and more than six times as fast when it comes to
+initialization costs. As the problem size is made a factor 8 larger, we note
+that the times usually go up by a factor eight, too (as the solver iterations
+are constant at 5). There are two deviations. The first is in the sparse
+matrix between 5k and 36k degrees of freedom, where the time increases by a
+factor 12. This is the threshold when the cache in the processor can no longer
+hold all data necessary for the matrix-vector products and all matrix elements
+must be fetched from main memory. The second deviation is the times for the
+matrix-free solve which increase by less than a factor 8. This is because of
+more parallelism from more cells, exploited by the (involved) dynamic tasks
+scheduling approach CellFEOperator. Note that about 30% of the time in the
+matrix-free solver is spent on restriction and prolongation, which use sparse
+matrices. So the speedup could be even better if all parts where done
+efficiently.
 
-Firstly, we see the disappointing fact that for <b>linear elements</b> the
-MatrixFree class does actually consume more memory than a SparseMatrix with
-its SparsityPattern, despite the efforts made in this program. As mentioned
-earlier, this is mostly because the Transformation data is stored for every
-quadrature point. For each quadrature point, the transformation consists of
-six doubles, and there are about eight times as many quadrature points as
-there are degrees of freedom. In first approximation, this means that the
-matrix consumes 384 (= @p sizeof(double) * 6 * 8) bytes for each degree of
-freedom. On the other hand, the sparse matrix has a bandwidth of 27 or less,
-so each dof gives rise to at most 324 (= 27 * 12) bytes. A more clever
-implementation would try to compress the Jacobian transformation data, by
-exploiting similarities between the mappings within the cells, as well as from
-one cell to the next. This could dramatically reduce the memory requirements,
-and hence, increase the speed for lower-order implementations.
+Of course, this picture does not necessarily translate to all cases, as there
+are problems where knowledge of matrix entries enables much better solvers (as
+happens when the coefficient is varying more strongly than in the above
+example). Moreover, it also depends on the computer system. The present system
+has good memory performance, so sparse matrices perform comparably
+well. Nonetheless, the matrix-free implementation gives a nice speedup already
+for the <i>Q</i><sub>2</sub> elements used in this example. This becomes
+particularly apparent for time-dependent or nonlinear problems where sparse
+matrices would need to be reassembled over and over again, which becomes much
+easier with this class. And of course, thanks to the better complexity of the
+products, the method gains increasingly larger advantages when the order of the
+elements increases (the matrix-free implementation has costs
+4<i>d</i><sup>2</sup><i>p</i> per degree of freedom, compared to
+2<i>p<sup>d</sup></i> for the sparse matrix, so it will win anyway for order 4
+and higher in 3d).
 
-Secondly, we observe that the memory requirements for a SparseMatrix grow
-quickly as the order of the elements increases. This is because there are
-increasingly many entries in each row, which exist due to more degrees of
-freedom that couple to each other. The matrix-free implementation does not
-suffer from this drawback. Here, the memory consumption decreases instead,
-since there are less DoFs that are shared among elements, which decreases the
-relative amount of quadrature points. Regarding the execution speed, we see
-that the matrix-free variant gets more competitive with higher order, and it
-does scale better when run on multiple processors (3.5 speedup with four
-processors compared to the serial case, compared to 2-2.5 speedup for the
-SparseMatrix). The advantage in %parallel scaling was expected, because the
-matrix-free variant is less memory-bound for higher order implementations, so
-that the additional computing power from many cores can better be exploited.
+<h3>Possibilities for extensions</h3>
 
-A third thing, which is unrelated to this tutorial program, is the fact that
-standard matrix assembly gets really slow for high order elements. The %numbers
-shown here are based on the usual routines that many other tutorial programs
-make use of. A closer analysis of this shows that the cell data does not fit
-into cache anymore. One could circumvent this problem by writing the assembly
-as a matrix-matrix product, and using (cache-aware) BLAS implementations.
-
-For completeness, here comes a similar table for a <b>2D problem with 5.7
-million unknowns</b>. Since the excess in work for the matrix-free
-implementation is less compared to 3D, the implementation is more competitive
-for lower-order elements.
-
-<table align="center" border="1">
-  <tr>
-    <th>&nbsp;</th>
-    <th colspan="2">Memory consumption</th>
-    <th colspan="2">Time assembly</th>
-    <th colspan="2">Time 50 MV, 4 CPUs</th>
-  </tr>
-  <tr>
-    <th align="center">element order</th>
-    <th align="center">SpM</th>
-    <th align="center">M-F</th>
-    <th align="center">SpM</th>
-    <th align="center">M-F</th>
-    <th align="center">SpM</th>
-    <th align="center">M-F</th>
-  </tr>
-  <tr>
-    <td align="center">1</td>
-    <td align="center">659 MiB</td>
-    <td align="center">661 MiB</td>
-    <td align="center">18.8 s</td>
-    <td align="center">6.45 s</td>
-    <td align="center">11.0 s</td>
-    <td align="center">28.8 s</td>
-  </tr>
-  <tr>
-    <td align="center">2</td>
-    <td align="center">1119 MiB</td>
-    <td align="center">391 MiB</td>
-    <td align="center">15.6 s</td>
-    <td align="center">2.46 s</td>
-    <td align="center">17.1 s</td>
-    <td align="center">16.2 s</td>
-  </tr>
-  <tr>
-    <td align="center">3</td>
-    <td align="center">1711 MiB</td>
-    <td align="center">318 MiB</td>
-    <td align="center">17.4 s</td>
-    <td align="center">1.82 s</td>
-    <td align="center">23.1 s</td>
-    <td align="center">13.7 s</td>
-  </tr>
-  <tr>
-    <td align="center">4</td>
-    <td align="center">2434 MiB</td>
-    <td align="center">285 MiB</td>
-    <td align="center">24.2 s</td>
-    <td align="center">1.34 s</td>
-    <td align="center">31.1 s</td>
-    <td align="center">14.6 s</td>
-  </tr>
-  <tr>
-    <td align="center">5</td>
-    <td align="center">3289 MiB</td>
-    <td align="center">266 MiB</td>
-    <td align="center">35.9 s</td>
-    <td align="center">1.26 s</td>
-    <td align="center">29.6 s</td>
-    <td align="center">16.7 s</td>
-  </tr>
-  <tr>
-    <td align="center">6</td>
-    <td align="center">4274 MiB</td>
-    <td align="center">254 MiB</td>
-    <td align="center">58.0 s</td>
-    <td align="center">1.12 s</td>
-    <td align="center">35.9 s</td>
-    <td align="center">19.4 s</td>
-  </tr>
-</table>
+Above, we have shown figures for second-order finite elements. Our
+implementation gains more compared to sparse matrices if higher order elements
+are used. However, FE_Q elements with equidistant nodes are badly conditioned
+if the order increases. In this case, the smoother and the multigrid solver
+break down. Node clustering close to the element boundaries resolves this
+problem (and the multigrid solver converges in 5 or 6 iterations also for very
+high order). Elements with this properties are the Gauss-Lobatto FE_Q
+elements, which are presented in step-48.

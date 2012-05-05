@@ -343,7 +343,7 @@ inline
 Number
 Point<dim,Number>::square () const
 {
-  Number q=0;
+  Number q = Number();
   for (unsigned int i=0; i<dim; ++i)
     q += this->values[i] * this->values[i];
   return q;

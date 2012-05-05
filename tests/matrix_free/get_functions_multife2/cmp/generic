@@ -1,0 +1,78 @@
+
+DEAL:2d::Testing FE_DGQ<2>(0), FE_Q<2>(1), and FE_Q<2>(1)
+DEAL:2d::Error function values FE 0: 0
+DEAL:2d::Error function gradients FE 0: 0
+DEAL:2d::Error function Laplacians FE 0: 0
+DEAL:2d::Error function values FE 1: 0
+DEAL:2d::Error function gradients FE 1: 0
+DEAL:2d::Error function Laplacians FE 1: 0
+DEAL:2d::Error function values FE 2: 0
+DEAL:2d::Error function gradients FE 2: 0
+DEAL:2d::Error function Laplacians FE 2: 0
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(0), FE_Q<2>(2), and FE_Q<2>(2)
+DEAL:2d::Error function values FE 0: 0
+DEAL:2d::Error function gradients FE 0: 0
+DEAL:2d::Error function Laplacians FE 0: 0
+DEAL:2d::Error function values FE 1: 0
+DEAL:2d::Error function gradients FE 1: 0
+DEAL:2d::Error function Laplacians FE 1: 0
+DEAL:2d::Error function values FE 2: 0
+DEAL:2d::Error function gradients FE 2: 0
+DEAL:2d::Error function Laplacians FE 2: 0
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(0), FE_Q<2>(3), and FE_Q<2>(3)
+DEAL:2d::Error function values FE 0: 0
+DEAL:2d::Error function gradients FE 0: 0
+DEAL:2d::Error function Laplacians FE 0: 0
+DEAL:2d::Error function values FE 1: 0
+DEAL:2d::Error function gradients FE 1: 0
+DEAL:2d::Error function Laplacians FE 1: 0
+DEAL:2d::Error function values FE 2: 0
+DEAL:2d::Error function gradients FE 2: 0
+DEAL:2d::Error function Laplacians FE 2: 0
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(0), FE_Q<2>(4), and FE_Q<2>(4)
+DEAL:2d::Error function values FE 0: 0
+DEAL:2d::Error function gradients FE 0: 0
+DEAL:2d::Error function Laplacians FE 0: 0
+DEAL:2d::Error function values FE 1: 0
+DEAL:2d::Error function gradients FE 1: 0
+DEAL:2d::Error function Laplacians FE 1: 0
+DEAL:2d::Error function values FE 2: 0
+DEAL:2d::Error function gradients FE 2: 0
+DEAL:2d::Error function Laplacians FE 2: 0
+DEAL:2d::
+DEAL:3d::Testing FE_DGQ<3>(0), FE_Q<3>(1), and FE_Q<3>(1)
+DEAL:3d::Error function values FE 0: 0
+DEAL:3d::Error function gradients FE 0: 0
+DEAL:3d::Error function Laplacians FE 0: 0
+DEAL:3d::Error function values FE 1: 0
+DEAL:3d::Error function gradients FE 1: 0
+DEAL:3d::Error function Laplacians FE 1: 0
+DEAL:3d::Error function values FE 2: 0
+DEAL:3d::Error function gradients FE 2: 0
+DEAL:3d::Error function Laplacians FE 2: 0
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(0), FE_Q<3>(2), and FE_Q<3>(2)
+DEAL:3d::Error function values FE 0: 0
+DEAL:3d::Error function gradients FE 0: 0
+DEAL:3d::Error function Laplacians FE 0: 0
+DEAL:3d::Error function values FE 1: 0
+DEAL:3d::Error function gradients FE 1: 0
+DEAL:3d::Error function Laplacians FE 1: 0
+DEAL:3d::Error function values FE 2: 0
+DEAL:3d::Error function gradients FE 2: 0
+DEAL:3d::Error function Laplacians FE 2: 0
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(0), FE_Q<3>(3), and FE_Q<3>(3)
+DEAL:3d::Error function values FE 0: 0
+DEAL:3d::Error function gradients FE 0: 0
+DEAL:3d::Error function Laplacians FE 0: 0
+DEAL:3d::Error function values FE 1: 0
+DEAL:3d::Error function gradients FE 1: 0
+DEAL:3d::Error function Laplacians FE 1: 0
+DEAL:3d::Error function values FE 2: 0
+DEAL:3d::Error function gradients FE 2: 0
+DEAL:3d::Error function Laplacians FE 2: 0
+DEAL:3d::

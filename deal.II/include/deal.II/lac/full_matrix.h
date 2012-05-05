@@ -926,6 +926,30 @@ class FullMatrix : public Table<2,number>
                                       */
     void add(const unsigned int row, const unsigned int column, const number value);
 
+                                       /**
+                                        * Add an array of values given by
+                                        * <tt>values</tt> in the given global
+                                        * matrix row at columns specified by
+                                        * col_indices in the full matrix. This
+                                        * function is present for
+                                        * compatibility with the various
+                                        * sparse matrices in deal.II. In
+                                        * particular, the two boolean fields
+                                        * @p elide_zero_values and @p
+                                        * col_indices_are_sorted do not impact
+                                        * the performance of this routine, as
+                                        * opposed to the sparse matrix case
+                                        * and are indeed ignored in the
+                                        * implementation.
+                                        */
+    template <typename number2>
+    void add (const unsigned int  row,
+              const unsigned int  n_cols,
+              const unsigned int *col_indices,
+              const number2      *values,
+              const bool          elide_zero_values = true,
+              const bool          col_indices_are_sorted = false);
+
                                      /**
                                       * <i>A(i,1...n) +=
                                       * s*A(j,1...n)</i>.  Simple
@@ -1773,6 +1797,27 @@ FullMatrix<number>::add (const unsigned int r, const unsigned int c, const numbe
   AssertIndexRange(c, this->n());
 
   this->operator()(r,c) += v;
+}
+
+
+
+template <typename number>
+template <typename number2>
+inline
+void
+FullMatrix<number>::add (const unsigned int  row,
+                         const unsigned int  n_cols,
+                         const unsigned int *col_indices,
+                         const number2      *values,
+                         const bool,
+                         const bool)
+{
+  AssertIndexRange(row, this->m());
+  for (unsigned int col=0; col<n_cols; ++col)
+    {
+      AssertIndexRange(col_indices[col], this->n());
+      this->operator()(row,col_indices[col]) += values[col];
+    }
 }
 
 

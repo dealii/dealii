@@ -2330,6 +2330,8 @@ distribute_local_to_global<MatrixType,Vector<double> > (const FullMatrix<double>
 
 MATRIX_FUNCTIONS(SparseMatrix<double>);
 MATRIX_FUNCTIONS(SparseMatrix<float>);
+MATRIX_FUNCTIONS(FullMatrix<double>);
+MATRIX_FUNCTIONS(FullMatrix<float>);
 MATRIX_VECTOR_FUNCTIONS(SparseMatrix<float>, Vector<float>);
 
 BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<double>);

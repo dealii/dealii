@@ -1555,8 +1555,7 @@ template <typename Number>
 inline
 Number determinant (const Tensor<2,2,Number> &t)
 {
-  return ((t[0][0] * t[1][1]) -
-          (t[1][0] * t[0][1]));
+  return ((t[0][0] * t[1][1]) - (t[1][0] * t[0][1]));
 }
 
 
@@ -1570,18 +1569,20 @@ template <typename Number>
 inline
 Number determinant (const Tensor<2,3,Number> &t)
 {
-                                   // get this using Maple:
-                                   // with(linalg);
-                                   // a := matrix(3,3);
-                                   // x := det(a);
-                                   // readlib(C);
-                                   // C(x, optimized);
-  return ( t[0][0]*t[1][1]*t[2][2]
-           -t[0][0]*t[1][2]*t[2][1]
-           -t[1][0]*t[0][1]*t[2][2]
-           +t[1][0]*t[0][2]*t[2][1]
-           +t[2][0]*t[0][1]*t[1][2]
-           -t[2][0]*t[0][2]*t[1][1] );
+                                // use exactly the same expression with the
+                                // same order of operations as for the inverse
+                                // to let the compiler use common
+                                // subexpression elimination when using
+                                // determinant and inverse in nearby code
+  const Number t4 = t[0][0]*t[1][1],
+               t6 = t[0][0]*t[1][2],
+               t8 = t[0][1]*t[1][0],
+               t00 = t[0][2]*t[1][0],
+               t01 = t[0][1]*t[2][0],
+               t04 = t[0][2]*t[2][0],
+               det = (t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
+                      t00*t[2][1]+t01*t[1][2]-t04*t[1][1]);
+  return det;
 }
 
 
@@ -1608,7 +1609,7 @@ Number determinant (const Tensor<2,dim,Number> &t)
 
   for (unsigned int k=0; k<dim; ++k)
     {
-      Tensor<2,dim-1> minor;
+      Tensor<2,dim-1,Number> minor;
       for (unsigned int i=0; i<dim-1; ++i)
         for (unsigned int j=0; j<dim-1; ++j)
           minor[i][j] = t[i][j<k ? j : j+1];
@@ -1667,7 +1668,8 @@ invert (const Tensor<2,dim,Number> &t)
                                              // this is Maple output,
                                              // thus a bit unstructured
       {
-        const Number t4 = 1.0/(t[0][0]*t[1][1]-t[0][1]*t[1][0]);
+        const Number det = t[0][0]*t[1][1]-t[1][0]*t[0][1];
+        const Number t4 = 1.0/det;
         return_tensor[0][0] = t[1][1]*t4;
         return_tensor[0][1] = -t[0][1]*t4;
         return_tensor[1][0] = -t[1][0]*t4;
@@ -1683,8 +1685,9 @@ invert (const Tensor<2,dim,Number> &t)
                     t00 = t[0][2]*t[1][0],
                     t01 = t[0][1]*t[2][0],
                     t04 = t[0][2]*t[2][0],
-                    t07 = 1.0/(t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
-                               t00*t[2][1]+t01*t[1][2]-t04*t[1][1]);
+                    det = (t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
+                           t00*t[2][1]+t01*t[1][2]-t04*t[1][1]),
+                    t07 = 1.0/det;
         return_tensor[0][0] = (t[1][1]*t[2][2]-t[1][2]*t[2][1])*t07;
         return_tensor[0][1] = (t[0][2]*t[2][1]-t[0][1]*t[2][2])*t07;
         return_tensor[0][2] = (t[0][1]*t[1][2]-t[0][2]*t[1][1])*t07;
@@ -1701,7 +1704,6 @@ invert (const Tensor<2,dim,Number> &t)
                                         // if desired, take over the
                                         // inversion of a 4x4 tensor
                                         // from the FullMatrix
-
       default:
             AssertThrow (false, ExcNotImplemented());
     }

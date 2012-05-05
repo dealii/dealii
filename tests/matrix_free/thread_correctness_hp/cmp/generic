@@ -1,0 +1,25 @@
+
+DEAL:2d:double::Parallel option partition/partition
+DEAL:2d:double::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double::
+DEAL:2d:float::Parallel option partition/partition
+DEAL:2d:float::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float::
+DEAL:2d:double::Parallel option partition/color
+DEAL:2d:double::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double::
+DEAL:2d:float::Parallel option partition/color
+DEAL:2d:float::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float::
+DEAL:3d:double::Parallel option partition/partition
+DEAL:3d:double::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double::
+DEAL:3d:float::Parallel option partition/partition
+DEAL:3d:float::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float::
+DEAL:3d:double::Parallel option partition/color
+DEAL:3d:double::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double::
+DEAL:3d:float::Parallel option partition/color
+DEAL:3d:float::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float::

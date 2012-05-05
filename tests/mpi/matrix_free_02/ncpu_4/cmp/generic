@@ -1,0 +1,33 @@
+
+DEAL:0:2d::Testing FE_Q<2>(1)
+DEAL:0:2d::Parallel option: partition partition
+DEAL:0:2d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:2d::Parallel option: partition color
+DEAL:0:2d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:2d::Parallel option: color
+DEAL:0:2d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:2d::
+DEAL:0:2d::Testing FE_Q<2>(2)
+DEAL:0:2d::Parallel option: partition partition
+DEAL:0:2d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:2d::Parallel option: partition color
+DEAL:0:2d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:2d::Parallel option: color
+DEAL:0:2d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:2d::
+DEAL:0:3d::Testing FE_Q<3>(1)
+DEAL:0:3d::Parallel option: partition partition
+DEAL:0:3d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:3d::Parallel option: partition color
+DEAL:0:3d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:3d::Parallel option: color
+DEAL:0:3d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:3d::
+DEAL:0:3d::Testing FE_Q<3>(2)
+DEAL:0:3d::Parallel option: partition partition
+DEAL:0:3d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:3d::Parallel option: partition color
+DEAL:0:3d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:3d::Parallel option: color
+DEAL:0:3d::Norm of difference: 0 0 0 0 0 0 0 0 0 0
+DEAL:0:3d::

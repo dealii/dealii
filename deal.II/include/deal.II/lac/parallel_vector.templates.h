@@ -465,6 +465,39 @@ namespace parallel
 
 
     template <typename Number>
+    void
+    Vector<Number>::swap (Vector<Number> &v)
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                                // introduce a Barrier over all MPI processes
+                                // to make sure that the compress request are
+                                // no longer used before changing the owner
+      if (v.partitioner->n_mpi_processes() > 1)
+        MPI_Barrier (v.partitioner->get_communicator());
+      if (partitioner->n_mpi_processes() > 1 &&
+          v.partitioner->n_mpi_processes() !=
+          partitioner->n_mpi_processes())
+        MPI_Barrier (partitioner->get_communicator());
+
+      std::swap (compress_requests, v.compress_requests);
+      std::swap (update_ghost_values_requests, v.update_ghost_values_requests);
+#endif
+
+      std::swap (partitioner,    v.partitioner);
+      std::swap (allocated_size, v.allocated_size);
+      std::swap (val,            v.val);
+      std::swap (import_data,    v.import_data);
+
+                                // vector view cannot be swapped so reset it
+                                // manually (without touching the vector
+                                // elements)
+      vector_view.reinit (partitioner->local_size(), val);
+      v.vector_view.reinit (v.partitioner->local_size(), v.val);
+    }
+
+
+
+    template <typename Number>
     std::size_t
     Vector<Number>::memory_consumption () const
     {

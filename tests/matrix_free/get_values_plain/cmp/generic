@@ -1,0 +1,19 @@
+
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Error read_dof_values vs read_dof_values_plain: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(2)
+DEAL:2d::Error read_dof_values vs read_dof_values_plain: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(3)
+DEAL:2d::Error read_dof_values vs read_dof_values_plain: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(4)
+DEAL:2d::Error read_dof_values vs read_dof_values_plain: 0
+DEAL:2d::
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Error read_dof_values vs read_dof_values_plain: 0
+DEAL:3d::
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Error read_dof_values vs read_dof_values_plain: 0
+DEAL:3d::

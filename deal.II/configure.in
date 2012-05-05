@@ -245,8 +245,6 @@ DEAL_II_HAVE_BUILTIN_EXPECT
 DEAL_II_HAVE_VERBOSE_TERMINATE
 DEAL_II_HAVE_GLIBC_STACKTRACE
 DEAL_II_HAVE_DEMANGLER
-DEAL_II_CHECK_VECTOR_ARITHMETICS
-DEAL_II_CHECK_ALWAYS_INLINE
 DEAL_II_CHECK_MIN_VECTOR_CAPACITY
 DEAL_II_CHECK_ABORT
 DEAL_II_CHECK_GETRUSAGE
@@ -590,6 +588,8 @@ AC_ARG_WITH(blas,
 			  is given, use -lblas. Default is to use -lblas only
                           if required by other libraries.],
   DEAL_II_WITH_BLAS($withval))
+AC_SUBST(USE_CONTRIB_BLAS)
+AC_SUBST(USE_CONTRIB_LAPACK)
 
 DEAL_II_CONFIGURE_HSL
 AC_SUBST(USE_CONTRIB_HSL)
@@ -696,9 +696,14 @@ AC_MSG_RESULT(---------------- checking compiler flags --------------------)
 dnl Possibly add some flags if optimizations are requested
 DEAL_II_CHECK_CPU_OPTIMIZATIONS
 
-dnl Last check: test whether CXXFLAGS and F77FLAGS are ok
+dnl Test whether CXXFLAGS and F77FLAGS are ok
 DEAL_II_CHECK_CXXFLAGS_CONSISTENCY
 DEAL_II_CHECK_F77FLAGS_CONSISTENCY
+
+dnl Last check: check whether the compiler and host system allows for
+dnl vectorization
+DEAL_II_DETECT_VECTORIZATION_LEVEL
+DEAL_II_CHECK_VECTOR_ARITHMETICS
 
 dnl -------------------------------------------------------------
 dnl                       Third party programs

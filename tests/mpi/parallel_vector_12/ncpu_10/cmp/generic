@@ -1,0 +1,8 @@
+
+DEAL:0::numproc=10
+DEAL:0::Initial set and ghost update OK
+DEAL:0::First swap OK
+DEAL:0::Ghost values after first swap OK
+DEAL:0::Ghost values after re-set OK
+DEAL:0::Second swap OK
+DEAL:0::Ghost values after second swap OK
