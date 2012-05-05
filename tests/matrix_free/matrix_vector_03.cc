@@ -47,8 +47,8 @@ void test ()
       cell = tria.begin_active ();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
-	if (counter % (7-i) == 0)
-	  cell->set_refine_flag();
+        if (counter % (7-i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
@@ -58,7 +58,7 @@ void test ()
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values (dof, 0, ZeroFunction<dim>(),
-					    constraints);
+                                            constraints);
   constraints.close();
 
   do_test<dim, fe_degree, double> (dof, constraints);

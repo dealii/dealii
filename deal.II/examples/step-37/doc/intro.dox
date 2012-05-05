@@ -4,9 +4,13 @@
 This program was contributed by Katharina Kormann and Martin
 Kronbichler.
 
-The algorithm for the matrix-vector product is built upon the preprint &quot;A generic interface for parallel cell-based finite element operator application&quot; by Martin Kronbichler and Katharina Kormann, Uppsala
-University, October 2011, and the paper &quot;Parallel finite element operator application: Graph partitioning and coloring&quot; by Katharina Kormann and Martin Kronbichler in: Proceedings of the 7th IEEE International Conference on e-Science, 2011.
-</i>
+The algorithm for the matrix-vector product is built upon the article <a
+href="http://dx.doi.org/10.1016/j.compfluid.2012.04.012">A generic interface
+for parallel cell-based finite element operator application</a> by Martin
+Kronbichler and Katharina Kormann, Computers and Fluids, 2012, and the paper
+&quot;Parallel finite element operator application: Graph partitioning and
+coloring&quot; by Katharina Kormann and Martin Kronbichler in: Proceedings of
+the 7th IEEE International Conference on e-Science, 2011.  </i>
 
 
 <a name="Intro"></a>
@@ -342,6 +346,13 @@ reduces the complexity for computing this product from $p^4$ to $2 p^3$, where
 <i>p</i>-1 is the degree of the finite element (i.e., equivalently,
 <i>p</i> is the number of shape functions in each coordinate
 direction), or $p^{2d}$ to $d p^{d+1}$ in general.
+
+Implementing a matrix-free and cell-based finite element operator requires a
+somewhat different design compared to the usual matrix assembly codes shown in
+previous tutorial programs. The data structures for doing this are the
+MatrixFree class that collects all data and issues a (parallel) loop over all
+cells and the FEEvaluation class that evaluates finite element basis functions
+by making use of the tensor product structure.
 
 
 The implementation of the matrix-free matrix-vector product shown in this

@@ -45,21 +45,21 @@ void sub_test()
   DoFHandler<dim> dof (tria);
   deallog << "Testing " << fe.get_name() << std::endl;
 
-				// run test for several different meshes
+                                // run test for several different meshes
   for (unsigned int i=0; i<8-2*dim; ++i)
     {
       cell = tria.begin_active ();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
-	if (counter % (9-i) == 0)
-	  cell->set_refine_flag();
+        if (counter % (9-i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
 
       dof.distribute_dofs(fe);
       ConstraintMatrix constraints;
       DoFTools::make_hanging_node_constraints(dof, constraints);
       VectorTools::interpolate_boundary_values (dof, 0, ZeroFunction<dim>(),
-						constraints);
+                                                constraints);
       constraints.close();
 
       //std::cout << "Number of cells: " << dof.get_tria().n_active_cells() << std::endl;
@@ -68,26 +68,26 @@ void sub_test()
 
       MatrixFree<dim,number> mf_data;
       {
-	const QGauss<1> quad (fe_degree+1);
-	mf_data.reinit (dof, constraints, quad,
-			typename MatrixFree<dim,number>::AdditionalData(MPI_COMM_SELF,MatrixFree<dim,number>::AdditionalData::none));
+        const QGauss<1> quad (fe_degree+1);
+        mf_data.reinit (dof, constraints, quad,
+                        typename MatrixFree<dim,number>::AdditionalData(MPI_COMM_SELF,MatrixFree<dim,number>::AdditionalData::none));
       }
 
-      MatrixFreeTest<dim,fe_degree+1,number> mf_ref (mf_data);
+      MatrixFreeTest<dim,fe_degree,number> mf_ref (mf_data);
 
       Vector<number> in_dist (dof.n_dofs());
       Vector<number> out_ref (in_dist), out_copy (in_dist);
-     MatrixFree<dim,number> mf_copy;
+      MatrixFree<dim,number> mf_copy;
       mf_copy.copy_from (mf_data);
-      MatrixFreeTest<dim,fe_degree+1,number> copied (mf_copy);
+      MatrixFreeTest<dim,fe_degree,number> copied (mf_copy);
 
       for (unsigned int i=0; i<dof.n_dofs(); ++i)
-	{
-	  if(constraints.is_constrained(i))
-	    continue;
-	  const double entry = rand()/(double)RAND_MAX;
-	  in_dist(i) = entry;
-	}
+        {
+          if(constraints.is_constrained(i))
+            continue;
+          const double entry = rand()/(double)RAND_MAX;
+          in_dist(i) = entry;
+        }
 
       mf_ref.vmult (out_ref, in_dist);
       copied.vmult (out_copy, in_dist);
@@ -95,7 +95,7 @@ void sub_test()
       out_copy -= out_ref;
       double diff_norm = out_copy.linfty_norm();
       deallog << "Error in copied MF: " << diff_norm 
-	      << std::endl;
+              << std::endl;
     }
   deallog << std::endl;
 }

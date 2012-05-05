@@ -898,27 +898,27 @@ class SymmetricTensor
     Number &
     operator [] (const TableIndices<rank> &indices);
 
-				     /**
-				      * Access to an element according
-				      * to unrolled index. The
-				      * function
-				      * <tt>s.access_raw_entry(i)</tt>
-				      * does the same as
-				      * <tt>s[s.unrolled_to_component_indices(i)]</tt>,
-				      * but more efficiently.
-				      */
+                                     /**
+                                      * Access to an element according
+                                      * to unrolled index. The
+                                      * function
+                                      * <tt>s.access_raw_entry(i)</tt>
+                                      * does the same as
+                                      * <tt>s[s.unrolled_to_component_indices(i)]</tt>,
+                                      * but more efficiently.
+                                      */
     Number
     access_raw_entry (const unsigned int unrolled_index) const;
 
-				     /**
-				      * Access to an element according
-				      * to unrolled index. The
-				      * function
-				      * <tt>s.access_raw_entry(i)</tt>
-				      * does the same as
-				      * <tt>s[s.unrolled_to_component_indices(i)]</tt>,
-				      * but more efficiently.
-				      */
+                                     /**
+                                      * Access to an element according
+                                      * to unrolled index. The
+                                      * function
+                                      * <tt>s.access_raw_entry(i)</tt>
+                                      * does the same as
+                                      * <tt>s[s.unrolled_to_component_indices(i)]</tt>,
+                                      * but more efficiently.
+                                      */
     Number &
     access_raw_entry (const unsigned int unrolled_index);
 

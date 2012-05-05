@@ -32,7 +32,7 @@
 std::ofstream logfile("integrate_functions/output");
 
 
-template <int dim, int n_dofs_1d, typename Number>
+template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
  public:
@@ -43,17 +43,17 @@ class MatrixFreeTest
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data   (data_in),
     fe_val (data.get_dof_handler().get_fe(),
-	    Quadrature<dim>(data.get_quad(0)),
-	    update_values | update_gradients | update_JxW_values)
+            Quadrature<dim>(data.get_quad(0)),
+            update_values | update_gradients | update_JxW_values)
   {};
 
   void operator () (const MatrixFree<dim,Number> &data,
-		    VectorType       &dst,
-		    const VectorType &src,
-		    const std::pair<unsigned int,unsigned int> &cell_range) const;
+                    VectorType       &dst,
+                    const VectorType &src,
+                    const std::pair<unsigned int,unsigned int> &cell_range) const;
 
   void test_functions (Vector<Number> &dst,
-		       Vector<Number> &dst_deal) const
+                       Vector<Number> &dst_deal) const
   {
     dst = 0;
     dst_deal = 0;
@@ -61,8 +61,8 @@ class MatrixFreeTest
     dst_data[0] = &dst;
     dst_data[1] = &dst_deal;
     VectorType src_dummy;
-    data.cell_loop (&MatrixFreeTest<dim,n_dofs_1d,Number>::operator(), this,
-		    dst_data, src_dummy);
+    data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number>::operator(), this,
+                    dst_data, src_dummy);
   };
 
 private:
@@ -73,14 +73,14 @@ private:
 
 
 
-template <int dim, int n_dofs_1d, typename Number>
-void MatrixFreeTest<dim,n_dofs_1d,Number>::
+template <int dim, int fe_degree, typename Number>
+void MatrixFreeTest<dim,fe_degree,Number>::
 operator () (const MatrixFree<dim,Number> &data,
-	     std::vector<Vector<Number>*> &dst,
-	     const std::vector<Vector<Number>*> &,
-	     const std::pair<unsigned int,unsigned int> &cell_range) const
+             std::vector<Vector<Number>*> &dst,
+             const std::vector<Vector<Number>*> &,
+             const std::pair<unsigned int,unsigned int> &cell_range) const
 {
-  FEEvaluation<dim,n_dofs_1d,n_dofs_1d,1,Number> fe_eval (data);
+  FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
   const unsigned int n_q_points = fe_eval.n_q_points;
   const unsigned int dofs_per_cell = fe_eval.dofs_per_cell;
   AlignedVector<vector_t> values (n_q_points);
@@ -89,43 +89,43 @@ operator () (const MatrixFree<dim,Number> &data,
   for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
     {
       fe_eval.reinit(cell);
-				// compare values with the ones the FEValues
-				// gives us. Those are seen as reference
+                                // compare values with the ones the FEValues
+                                // gives us. Those are seen as reference
       for (unsigned int j=0; j<data.n_components_filled(cell); ++j)
-	{
-				// generate random numbers at quadrature
-				// points and test them with basis functions
-				// and their gradients
-	  for (unsigned int q=0; q<n_q_points; ++q)
-	    {
-	      values[q][j] = rand()/(double)RAND_MAX;
-	      for (unsigned int d=0; d<dim; ++d)
-		gradients[q*dim+d][j] = -1. + 2. * (rand()/(double)RAND_MAX);
-	    }
-	  fe_val.reinit (data.get_cell_iterator(cell,j));
-	  data.get_cell_iterator(cell,j)->get_dof_indices(dof_indices);
+        {
+                                // generate random numbers at quadrature
+                                // points and test them with basis functions
+                                // and their gradients
+          for (unsigned int q=0; q<n_q_points; ++q)
+            {
+              values[q][j] = rand()/(double)RAND_MAX;
+              for (unsigned int d=0; d<dim; ++d)
+                gradients[q*dim+d][j] = -1. + 2. * (rand()/(double)RAND_MAX);
+            }
+          fe_val.reinit (data.get_cell_iterator(cell,j));
+          data.get_cell_iterator(cell,j)->get_dof_indices(dof_indices);
 
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    {
-	      double sum = 0.;
-	      for (unsigned int q=0; q<n_q_points; ++q)
-		{
-		  sum += values[q][j] * fe_val.shape_value(i,q) * fe_val.JxW(q);
-		  for (unsigned int d=0; d<dim; ++d)
-		    sum += (gradients[q*dim+d][j] * fe_val.shape_grad(i,q)[d] *
-			    fe_val.JxW(q));
-		}
-	      (*dst[1])(dof_indices[i]) += sum;
-	    }
-	}
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            {
+              double sum = 0.;
+              for (unsigned int q=0; q<n_q_points; ++q)
+                {
+                  sum += values[q][j] * fe_val.shape_value(i,q) * fe_val.JxW(q);
+                  for (unsigned int d=0; d<dim; ++d)
+                    sum += (gradients[q*dim+d][j] * fe_val.shape_grad(i,q)[d] *
+                            fe_val.JxW(q));
+                }
+              (*dst[1])(dof_indices[i]) += sum;
+            }
+        }
       for (unsigned int q=0; q<n_q_points; ++q)
-	{
-	  fe_eval.submit_value (values[q], q);
-	  Tensor<1,dim,vector_t> submit (false);
-	  for (unsigned int d=0; d<dim; ++d)
-	    submit[d] = gradients[q*dim+d];
-	  fe_eval.submit_gradient (submit, q);
-	}
+        {
+          fe_eval.submit_value (values[q], q);
+          Tensor<1,dim,vector_t> submit (false);
+          for (unsigned int d=0; d<dim; ++d)
+            submit[d] = gradients[q*dim+d];
+          fe_eval.submit_gradient (submit, q);
+        }
       fe_eval.integrate (true,true);
       fe_eval.distribute_local_to_global (*dst[0]);
     }
@@ -164,8 +164,8 @@ void test ()
       cell = tria.begin_active ();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
-	if (counter % (7-i) == 0)
-	  cell->set_refine_flag();
+        if (counter % (7-i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
@@ -184,10 +184,10 @@ void test ()
   {
     const QGauss<1> quad (fe_degree+1);
     mf_data.reinit (dof, constraints, quad,
-		    typename MatrixFree<dim,number>::AdditionalData(MPI_COMM_SELF,MatrixFree<dim,number>::AdditionalData::none));
+                    typename MatrixFree<dim,number>::AdditionalData(MPI_COMM_SELF,MatrixFree<dim,number>::AdditionalData::none));
   }
 
-  MatrixFreeTest<dim,fe_degree+1,number> mf (mf_data);
+  MatrixFreeTest<dim,fe_degree,number> mf (mf_data);
   Vector<number> solution (dof.n_dofs());
   Vector<number> solution_dist (dof.n_dofs());
 

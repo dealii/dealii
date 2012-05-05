@@ -438,4 +438,64 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
     this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
+
+
+namespace internal
+{
+  template <class POLY>
+  inline
+  std::vector<unsigned int>
+  get_poly_space_numbering (const POLY&)
+  {
+    Assert (false, ExcNotImplemented());
+    return std::vector<unsigned int>();
+  }
+
+  template <class POLY>
+  inline
+  std::vector<unsigned int>
+  get_poly_space_numbering_inverse (const POLY&)
+  {
+    Assert (false, ExcNotImplemented());
+    return std::vector<unsigned int>();
+  }
+
+  template <int dim>
+  inline
+  std::vector<unsigned int>
+  get_poly_space_numbering (const TensorProductPolynomials<dim> &poly)
+  {
+    return poly.get_numbering();
+  }
+
+  template <int dim>
+  inline
+  std::vector<unsigned int>
+  get_poly_space_numbering_inverse (const TensorProductPolynomials<dim> &poly)
+  {
+    return poly.get_numbering_inverse();
+  }
+}
+
+
+
+template <class POLY, int dim, int spacedim>
+std::vector<unsigned int>
+FE_Poly<POLY,dim,spacedim>::get_poly_space_numbering () const
+{
+  return internal::get_poly_space_numbering (poly_space);
+}
+
+
+
+
+template <class POLY, int dim, int spacedim>
+std::vector<unsigned int>
+FE_Poly<POLY,dim,spacedim>::get_poly_space_numbering_inverse () const
+{
+  return internal::get_poly_space_numbering_inverse (poly_space);
+}
+
+
+
 DEAL_II_NAMESPACE_CLOSE

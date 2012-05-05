@@ -23,8 +23,7 @@ namespace internal
 {
 namespace MatrixFreeFunctions
 {
-  namespace internal
-  {
+
                                      /**
                                       * A struct that takes entries describing
                                       * a constraint and puts them into a
@@ -53,7 +52,8 @@ namespace MatrixFreeFunctions
       unsigned short
       insert_entries (const std::vector<std::pair<unsigned int,double> > &entries);
 
-      CompressedMatrix<Number> constraint_pool;
+      std::vector<Number> constraint_pool_data;
+      std::vector<unsigned int> constraint_pool_row_index;
       std::vector<std::pair<unsigned int, unsigned int> >  pool_locations;
       std::vector<std::pair<Number,unsigned int> > constraint_entries;
       std::vector<unsigned int> constraint_indices;
@@ -67,7 +67,7 @@ namespace MatrixFreeFunctions
       :
       hashes (1.)
     {
-      constraint_pool.row_index.push_back (0);
+      constraint_pool_row_index.push_back (0);
     }
 
     template <typename Number>
@@ -112,7 +112,7 @@ namespace MatrixFreeFunctions
 
                                 // If constraint has to be added, which will
                                 // be its no.
-      test.second = constraint_pool.row_index.size()-1;
+      test.second = constraint_pool_row_index.size()-1;
 
                                 // Hash value larger than all the ones
                                 // before. We need to add it.
@@ -127,7 +127,8 @@ namespace MatrixFreeFunctions
           while(is_same == true)
             {
               if(one_constraint.size()!=
-                 (constraint_pool.row_length(pos->second)))
+                 (constraint_pool_row_index[pos->second+1]-
+                  constraint_pool_row_index[pos->second]))
                                 // The constraints have different length, and
                                 // hence different.
                 is_same = false;
@@ -135,8 +136,8 @@ namespace MatrixFreeFunctions
                 for (unsigned int q=0; q<one_constraint.size(); ++q)
                                 // check whether or not all weights are the
                                 // same.
-                  if (std::fabs(constraint_pool.data[constraint_pool.
-                                                     row_index[pos->second]+q]-
+                  if (std::fabs(constraint_pool_data[constraint_pool_row_index
+                                                     [pos->second]+q]-
                                 one_constraint[q])>hashes.scaling)
                     {
                       is_same = false;
@@ -172,9 +173,10 @@ namespace MatrixFreeFunctions
 
                                 // Remember hash value and location of
                                 // constraint.
-          constraint_pool.data.insert_back(one_constraint.begin(),
-                                           one_constraint.end());
-          constraint_pool.complete_last_row();
+          constraint_pool_data.insert (constraint_pool_data.end(),
+                                       one_constraint.begin(),
+                                       one_constraint.end());
+          constraint_pool_row_index.push_back (constraint_pool_data.size());
 
                                 // Add the location of constraint in pool.
           insert_position = test.second;
@@ -188,7 +190,6 @@ namespace MatrixFreeFunctions
              ExcInternalError());
       return static_cast<unsigned short>(insert_position);
     }
-  } // end of namespace internal
 
 
 
@@ -240,7 +241,7 @@ namespace MatrixFreeFunctions
                              const std::vector<unsigned int> &lexicographic_inv,
                              const ConstraintMatrix          &constraints,
                              const unsigned int               cell_number,
-                             internal::ConstraintValues<double> &constraint_values,
+                             ConstraintValues<double> &constraint_values,
                              bool                            &cell_at_boundary)
   {
     Assert (vector_partitioner.get() !=0, ExcInternalError());
@@ -397,7 +398,8 @@ namespace MatrixFreeFunctions
       for (unsigned int j=0; j<row_length_indicators(cell_number); ++j)
         {
           n_dofs += blb[j].first;
-          n_dofs += constraint_values.constraint_pool.row_length(blb[j].second);
+          n_dofs += constraint_values.constraint_pool_row_index[blb[j].second+1]
+            - constraint_values.constraint_pool_row_index[blb[j].second];
         }
       n_dofs += constraint_iterator.first;
       AssertDimension(n_dofs, row_length_indices(cell_number));
@@ -512,6 +514,7 @@ namespace MatrixFreeFunctions
 
     std::vector<unsigned int> new_ghosts;
     ghost_dofs.swap(new_ghosts);
+
                                 // set the ghost indices now. need to cast
                                 // away constness here, but that is uncritical
                                 // since we reset the Partitioner in the same
@@ -524,23 +527,162 @@ namespace MatrixFreeFunctions
 
 
   void
+  DoFInfo::compute_renumber_serial (const std::vector<unsigned int> &boundary_cells,
+                                    const SizeInfo                  &size_info,
+                                    std::vector<unsigned int>       &renumbering)
+  {
+    std::vector<unsigned int> reverse_numbering (size_info.n_active_cells,
+                                                 numbers::invalid_unsigned_int);
+    const unsigned int n_boundary_cells = boundary_cells.size();
+    for (unsigned int j=0; j<n_boundary_cells; ++j)
+      reverse_numbering[boundary_cells[j]] = 
+        j + size_info.vectorization_length*size_info.boundary_cells_start;
+    unsigned int counter = 0;
+    unsigned int j = 0;
+    while (counter < size_info.n_active_cells &&
+           counter < size_info.vectorization_length * size_info.boundary_cells_start)
+      {
+        if (reverse_numbering[j] == numbers::invalid_unsigned_int)
+          reverse_numbering[j] = counter++;
+        j++;
+      }
+    counter = std::min (size_info.vectorization_length*
+                        size_info.boundary_cells_start+n_boundary_cells,
+                        size_info.n_active_cells);
+    if (counter < size_info.n_active_cells)
+      {
+        for ( ; j<size_info.n_active_cells; ++j)
+          if (reverse_numbering[j] == numbers::invalid_unsigned_int)
+            reverse_numbering[j] = counter++;
+      }
+    AssertDimension (counter, size_info.n_active_cells);
+    renumbering = Utilities::invert_permutation (reverse_numbering);
+  }
+
+
+
+  void
+  DoFInfo::compute_renumber_hp_serial (SizeInfo                  &size_info,
+                                       std::vector<unsigned int> &renumbering,
+                                       std::vector<unsigned int> &irregular_cells)
+  {
+    const unsigned int n_active_cells = size_info.n_active_cells;
+    const unsigned int vectorization_length = size_info.vectorization_length;
+    irregular_cells.resize (0);
+    irregular_cells.resize (size_info.n_macro_cells+3*max_fe_index);
+    std::vector<std::vector<unsigned int> > renumbering_fe_index;
+    renumbering_fe_index.resize(max_fe_index);
+    unsigned int counter,n_macro_cells_before = 0;
+    const unsigned int
+      start_bound = std::min (size_info.n_active_cells,
+                              size_info.boundary_cells_start*vectorization_length),
+      end_bound   = std::min (size_info.n_active_cells,
+                              size_info.boundary_cells_end*vectorization_length);
+    for(counter=0; counter<start_bound; counter++)
+      {
+        renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
+          push_back(renumbering[counter]);
+      }
+    counter = 0;
+    for (unsigned int j=0;j<max_fe_index;j++)
+      {
+        for(unsigned int jj=0;jj<renumbering_fe_index[j].size();jj++)
+          renumbering[counter++] = renumbering_fe_index[j][jj];
+        irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
+                        n_macro_cells_before] =
+          renumbering_fe_index[j].size()%vectorization_length;
+        n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
+          vectorization_length;
+        renumbering_fe_index[j].resize(0);
+      }
+    unsigned int new_boundary_start = n_macro_cells_before;
+    for(counter = start_bound; counter < end_bound; counter++)
+      {
+        renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
+          push_back(renumbering[counter]);
+      }
+    counter = start_bound;
+    for (unsigned int j=0;j<max_fe_index;j++)
+      {
+        for(unsigned int jj=0;jj<renumbering_fe_index[j].size();jj++)
+          renumbering[counter++] = renumbering_fe_index[j][jj];
+        irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
+                        n_macro_cells_before] =
+          renumbering_fe_index[j].size()%vectorization_length;
+        n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
+          vectorization_length;
+        renumbering_fe_index[j].resize(0);
+      }
+    unsigned int new_boundary_end = n_macro_cells_before;
+    for(counter=end_bound; counter<n_active_cells; counter++)
+      {
+        renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
+          push_back(renumbering[counter]);
+      }
+    counter = end_bound;
+    for (unsigned int j=0;j<max_fe_index;j++)
+      {
+        for(unsigned int jj=0;jj<renumbering_fe_index[j].size();jj++)
+          renumbering[counter++] = renumbering_fe_index[j][jj];
+        irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
+                        n_macro_cells_before] =
+          renumbering_fe_index[j].size()%vectorization_length;
+        n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
+          vectorization_length;
+      }
+    AssertIndexRange (n_macro_cells_before,
+                      size_info.n_macro_cells + 3*max_fe_index+1);
+    irregular_cells.resize (n_macro_cells_before);
+    size_info.n_macro_cells = n_macro_cells_before;
+    size_info.boundary_cells_start = new_boundary_start;
+    size_info.boundary_cells_end = new_boundary_end;
+  }
+
+
+
+  void
+  DoFInfo::compute_renumber_parallel (const std::vector<unsigned int> &boundary_cells,
+                                      SizeInfo                        &size_info,
+                                      std::vector<unsigned int>       &renumbering)
+  {
+    std::vector<unsigned int> reverse_numbering (size_info.n_active_cells,
+                                                 numbers::invalid_unsigned_int);
+    const unsigned int n_boundary_cells = boundary_cells.size();
+    for (unsigned int j=0; j<n_boundary_cells; ++j)
+      reverse_numbering[boundary_cells[j]] = j;
+    unsigned int counter = n_boundary_cells;
+    for (unsigned int j=0; j<size_info.n_active_cells; ++j)
+      if (reverse_numbering[j] == numbers::invalid_unsigned_int)
+        reverse_numbering[j] = counter++;
+
+    size_info.boundary_cells_end   = (size_info.boundary_cells_end -
+                                      size_info.boundary_cells_start);
+    size_info.boundary_cells_start = 0;
+    
+    AssertDimension (counter, size_info.n_active_cells);
+    renumbering = Utilities::invert_permutation (reverse_numbering);
+  }
+
+
+
+  void
   DoFInfo::reorder_cells (const SizeInfo                  &size_info,
                           const std::vector<unsigned int> &renumbering,
                           const std::vector<unsigned int> &constraint_pool_row_index,
                           const std::vector<unsigned int> &irregular_cells,
-                          const unsigned int               n_vectors)
+                          const unsigned int               vectorization_length)
   {
                         // first reorder the active fe index.
     if (cell_active_fe_index.size() > 0)
       {
         std::vector<unsigned int> new_active_fe_index;
         new_active_fe_index.reserve (size_info.n_macro_cells);
-        std::vector<unsigned int> fe_indices(n_vectors);
+        std::vector<unsigned int> fe_indices(vectorization_length);
         unsigned int position_cell = 0;
         for (unsigned int cell=0; cell<size_info.n_macro_cells; ++cell)
           {
             const unsigned int n_comp = (irregular_cells[cell] > 0 ?
-                                         irregular_cells[cell] : n_vectors);
+                                         irregular_cells[cell] : vectorization_length);
             for (unsigned int j=0; j<n_comp; ++j)
               fe_indices[j]=cell_active_fe_index[renumbering[position_cell+j]];
 
@@ -579,23 +721,23 @@ namespace MatrixFreeFunctions
                                 // first dof index 0 for all vectors, then dof
                                 // index 1 for all vectors, and so on. This
                                 // involves some extra resorting.
-    std::vector<const unsigned int*> glob_indices (n_vectors);
-    std::vector<const unsigned int*> plain_glob_indices (n_vectors);
+    std::vector<const unsigned int*> glob_indices (vectorization_length);
+    std::vector<const unsigned int*> plain_glob_indices (vectorization_length);
     std::vector<const std::pair<unsigned short,unsigned short>*>
-      constr_ind(n_vectors), constr_end(n_vectors);
-    std::vector<unsigned int> index(n_vectors);
+      constr_ind(vectorization_length), constr_end(vectorization_length);
+    std::vector<unsigned int> index(vectorization_length);
     for (unsigned int i=0; i<size_info.n_macro_cells; ++i)
       {
         const unsigned int dofs_mcell =
           dofs_per_cell[cell_active_fe_index.size() == 0 ? 0 :
-                        cell_active_fe_index[i]] * n_vectors;
+                        cell_active_fe_index[i]] * vectorization_length;
         new_row_starts[i] =
           std_cxx1x::tuple<unsigned int,unsigned int,unsigned int>
           (new_dof_indices.size(), new_constraint_indicator.size(),
            irregular_cells[i]);
 
         const unsigned int n_comp = (irregular_cells[i]>0 ?
-                                     irregular_cells[i] : n_vectors);
+                                     irregular_cells[i] : vectorization_length);
 
         for (unsigned int j=0; j<n_comp; ++j)
           {
@@ -625,7 +767,7 @@ namespace MatrixFreeFunctions
 
         unsigned int m_ind_local = 0, m_index = 0;
         while (m_ind_local < dofs_mcell)
-          for (unsigned int j=0; j<n_vectors; ++j)
+          for (unsigned int j=0; j<vectorization_length; ++j)
             {
                                 // last cell: nothing to do
               if (j >= n_comp)
@@ -759,9 +901,10 @@ namespace MatrixFreeFunctions
 
                                 // if there are too few degrees of freedom per
                                 // cell, need to increase the block size
+        const unsigned int minimum_parallel_grain_size = 500;
         if (dofs_per_cell[0] * task_info.block_size <
-            internal::minimum_parallel_grain_size)
-          task_info.block_size = (internal::minimum_parallel_grain_size /
+            minimum_parallel_grain_size)
+          task_info.block_size = (minimum_parallel_grain_size /
                                   dofs_per_cell[0] + 1);
       }
     if (task_info.block_size > size_info.n_macro_cells)
@@ -780,8 +923,8 @@ namespace MatrixFreeFunctions
     if (size_info.n_macro_cells == 0)
       return;
 
-    const std::size_t n_vectors = size_info.n_vectors;
-    Assert (n_vectors > 0, ExcInternalError());
+    const std::size_t vectorization_length = size_info.vectorization_length;
+    Assert (vectorization_length > 0, ExcInternalError());
 
     guess_block_size (size_info, task_info);
 
@@ -816,7 +959,7 @@ namespace MatrixFreeFunctions
       std::vector<std::vector<unsigned int> > renumbering_fe_index;
       renumbering_fe_index.resize(max_fe_index);
       unsigned int counter,n_macro_cells_before = 0;
-      for(counter=0;counter<start_nonboundary*n_vectors;
+      for(counter=0;counter<start_nonboundary*vectorization_length;
           counter++)
         {
           renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
@@ -827,31 +970,31 @@ namespace MatrixFreeFunctions
         {
           for(unsigned int jj=0;jj<renumbering_fe_index[j].size();jj++)
             renumbering[counter++] = renumbering_fe_index[j][jj];
-          irregular_cells[renumbering_fe_index[j].size()/n_vectors+
+          irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
                           n_macro_cells_before] =
-            renumbering_fe_index[j].size()%n_vectors;
-          n_macro_cells_before += (renumbering_fe_index[j].size()+n_vectors-1)/
-            n_vectors;
+            renumbering_fe_index[j].size()%vectorization_length;
+          n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
+            vectorization_length;
           renumbering_fe_index[j].resize(0);
         }
 
       unsigned int new_boundary_end = n_macro_cells_before;
-      for(counter=start_nonboundary*n_vectors;
+      for(counter=start_nonboundary*vectorization_length;
           counter<size_info.n_active_cells; counter++)
         {
           renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
             push_back(renumbering[counter]);
         }
-      counter = start_nonboundary * n_vectors;
+      counter = start_nonboundary * vectorization_length;
       for (unsigned int j=0;j<max_fe_index;j++)
         {
           for(unsigned int jj=0;jj<renumbering_fe_index[j].size();jj++)
             renumbering[counter++] = renumbering_fe_index[j][jj];
-          irregular_cells[renumbering_fe_index[j].size()/n_vectors+
+          irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
                           n_macro_cells_before] =
-            renumbering_fe_index[j].size()%n_vectors;
-          n_macro_cells_before += (renumbering_fe_index[j].size()+n_vectors-1)/
-            n_vectors;
+            renumbering_fe_index[j].size()%vectorization_length;
+          n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
+            vectorization_length;
         }
       AssertIndexRange (n_macro_cells_before,
                         size_info.n_macro_cells + 2*max_fe_index+1);
@@ -903,6 +1046,9 @@ namespace MatrixFreeFunctions
                                          size_info.n_macro_cells);
     std::vector<bool> color_finder;
 
+                                // this performs a classical breath-first
+                                // search in the connectivity graph of the
+                                // cell chunks
     while(work)
       {
                                 // put all cells up to begin_inner_cells into
@@ -972,11 +1118,11 @@ namespace MatrixFreeFunctions
 
 
                                   // Color the cells within each partition
-    task_info.partition_color_blocks.row_index.resize(partition+1);
+    task_info.partition_color_blocks_row_index.resize(partition+1);
     unsigned int color_counter = 0, index_counter = 0;
     for(unsigned int part=0; part<partition; part++)
       {
-        task_info.partition_color_blocks.row_index[part] = index_counter;
+        task_info.partition_color_blocks_row_index[part] = index_counter;
         unsigned int max_color = 0;
         for (unsigned int k=partition_blocks[part]; k<partition_blocks[part+1];
              k++)
@@ -1015,7 +1161,7 @@ namespace MatrixFreeFunctions
                                 // the number the larger the partition)
         for(unsigned int color=0; color<=max_color; color++)
           {
-            task_info.partition_color_blocks.data.push_back(color_counter);
+            task_info.partition_color_blocks_data.push_back(color_counter);
             index_counter++;
             for (unsigned int k=partition_blocks[part];
                  k<partition_blocks[part+1]; k++)
@@ -1028,8 +1174,8 @@ namespace MatrixFreeFunctions
               }
           }
       }
-    task_info.partition_color_blocks.data.push_back(task_info.n_blocks);
-    task_info.partition_color_blocks.row_index[partition] = index_counter;
+    task_info.partition_color_blocks_data.push_back(task_info.n_blocks);
+    task_info.partition_color_blocks_row_index[partition] = index_counter;
     AssertDimension (color_counter, task_info.n_blocks);
 
     partition_list = renumbering;
@@ -1061,7 +1207,7 @@ namespace MatrixFreeFunctions
             ++mcell)
           {
             unsigned int n_comp = (irregular_cells[mcell]>0)
-              ?irregular_cells[mcell]:size_info.n_vectors;
+              ?irregular_cells[mcell]:size_info.vectorization_length;
             block_start[block+1] += n_comp;
             ++counter;
           }
@@ -1101,7 +1247,7 @@ namespace MatrixFreeFunctions
     task_info.odds  = (partition)>>1;
     task_info.n_blocked_workers = task_info.odds-
       (task_info.odds+task_info.evens+1)%2;
-    task_info.n_workers = task_info.partition_color_blocks.data.size()-1-
+    task_info.n_workers = task_info.partition_color_blocks_data.size()-1-
       task_info.n_blocked_workers;
   }
 
@@ -1118,8 +1264,8 @@ namespace MatrixFreeFunctions
     if (size_info.n_macro_cells == 0)
       return;
 
-    const std::size_t n_vectors = size_info.n_vectors;
-    Assert (n_vectors > 0, ExcInternalError());
+    const std::size_t vectorization_length = size_info.vectorization_length;
+    Assert (vectorization_length > 0, ExcInternalError());
 
     guess_block_size (size_info, task_info);
 
@@ -1130,7 +1276,7 @@ namespace MatrixFreeFunctions
     task_info.block_size_last = size_info.n_macro_cells-
       (task_info.block_size*(task_info.n_blocks-1));
     task_info.position_short_block = task_info.n_blocks-1;
-    unsigned int cluster_size = task_info.block_size*n_vectors;
+    unsigned int cluster_size = task_info.block_size*vectorization_length;
 
     // create the connectivity graph without
     // internal blocking
@@ -1138,37 +1284,43 @@ namespace MatrixFreeFunctions
     make_connectivity_graph (size_info, task_info, renumbering,irregular_cells,
                              false, connectivity);
 
-    // Create cell-block  partitioning.
+                                // Create cell-block  partitioning.
 
-    // For each block of cells, this variable
-    // saves to which partitions the block
-    // belongs. Initialize all to n_macro_cells to
-    // mark them as not yet assigned a partition.
+                                // For each block of cells, this variable
+                                // saves to which partitions the block
+                                // belongs. Initialize all to n_macro_cells to
+                                // mark them as not yet assigned a partition.
     std::vector<unsigned int> cell_partition (size_info.n_active_cells,
                                               size_info.n_active_cells);
     std::vector<unsigned int> neighbor_list;
     std::vector<unsigned int> neighbor_neighbor_list;
 
-    // In element j of this variable, one puts the
-    // old number of the block that should be the
-    // jth block in the new numeration.
+                                // In element j of this variable, one puts the
+                                // old number of the block that should be the
+                                // jth block in the new numeration.
     std::vector<unsigned int> partition_list(size_info.n_active_cells,0);
     std::vector<unsigned int> partition_partition_list(size_info.n_active_cells,0);
 
-    // This vector points to the start of each
-    // partition.
+                                // This vector points to the start of each
+                                // partition.
     std::vector<unsigned int> partition_size(2,0);
 
     unsigned int partition = 0,start_up=0,counter=0;
-    unsigned int start_nonboundary = n_vectors * size_info.boundary_cells_end;
+    unsigned int start_nonboundary = vectorization_length * size_info.boundary_cells_end;
     if (start_nonboundary > size_info.n_active_cells)
       start_nonboundary = size_info.n_active_cells;
     bool work = true;
     unsigned int remainder = cluster_size;
+
+                                // this performs a classical breath-first
+                                // search in the connectivity graph of the
+                                // cells under the restriction that the size
+                                // of the partitions should be a multiple of
+                                // the given block size
     while (work)
       {
-        // put the cells with neighbors on remote MPI
-        // processes up front
+                                // put the cells with neighbors on remote MPI
+                                // processes up front
         if(start_nonboundary>0)
           {
             for(unsigned int cell=0; cell<start_nonboundary; ++cell)
@@ -1185,7 +1337,7 @@ namespace MatrixFreeFunctions
 
             // adjust end of boundary cells to the
             // remainder
-            size_info.boundary_cells_end += (remainder+n_vectors-1)/n_vectors;
+            size_info.boundary_cells_end += (remainder+vectorization_length-1)/vectorization_length;
           }
         else
           {
@@ -1333,8 +1485,8 @@ namespace MatrixFreeFunctions
       // mark them as not yet assigned a partition.
       std::vector<unsigned int> cell_partition_l2(size_info.n_active_cells,
                                                   size_info.n_active_cells);
-      task_info.partition_color_blocks.row_index.resize(partition+1,0);
-      task_info.partition_color_blocks.data.resize(1,0);
+      task_info.partition_color_blocks_row_index.resize(partition+1,0);
+      task_info.partition_color_blocks_data.resize(1,0);
 
       start_up = 0;
       counter = 0;
@@ -1428,19 +1580,19 @@ namespace MatrixFreeFunctions
                         for (unsigned int j=0; j<max_fe_index; j++)
                           {
                             remaining_per_macro_cell[j] =
-                              renumbering_fe_index[j].size()%n_vectors;
+                              renumbering_fe_index[j].size()%vectorization_length;
                             if(remaining_per_macro_cell[j] != 0)
                               filled = false;
                             missing_macros += ((renumbering_fe_index[j].size()+
-                                                n_vectors-1)/n_vectors);
+                                                vectorization_length-1)/vectorization_length);
                           }
                       }
                     else
                       {
                         remaining_per_macro_cell.resize(1);
                         remaining_per_macro_cell[0] = partition_counter%
-                          n_vectors;
-                        missing_macros = partition_counter/n_vectors;
+                          vectorization_length;
+                        missing_macros = partition_counter/vectorization_length;
                         if(remaining_per_macro_cell[0] != 0)
                           {
                             filled = false;
@@ -1509,7 +1661,7 @@ namespace MatrixFreeFunctions
                                       missing_macros--;
                                     remaining_per_macro_cell[this_index]++;
                                     if (remaining_per_macro_cell[this_index]
-                                        == n_vectors)
+                                        == vectorization_length)
                                       {
                                         remaining_per_macro_cell[this_index] = 0;
                                       }
@@ -1540,43 +1692,43 @@ namespace MatrixFreeFunctions
                                   size(); jj++)
                               renumbering[cell++] =
                                 renumbering_fe_index[j][jj];
-                            if(renumbering_fe_index[j].size()%n_vectors != 0)
+                            if(renumbering_fe_index[j].size()%vectorization_length != 0)
                               irregular_cells[renumbering_fe_index[j].size()/
-                                              n_vectors+
+                                              vectorization_length+
                                               n_macro_cells_before] =
-                                renumbering_fe_index[j].size()%n_vectors;
+                                renumbering_fe_index[j].size()%vectorization_length;
                             n_macro_cells_before += (renumbering_fe_index[j].
-                                                     size()+n_vectors-1)/
-                              n_vectors;
+                                                     size()+vectorization_length-1)/
+                              vectorization_length;
                             renumbering_fe_index[j].resize(0);
                           }
                       }
                     else
                       {
-                        n_macro_cells_before += partition_counter/n_vectors;
-                        if(partition_counter%n_vectors != 0)
+                        n_macro_cells_before += partition_counter/vectorization_length;
+                        if(partition_counter%vectorization_length != 0)
                           {
                             irregular_cells[n_macro_cells_before] =
-                              partition_counter%n_vectors;
+                              partition_counter%vectorization_length;
                             n_macro_cells_before++;
                           }
                       }
                   }
-                  task_info.partition_color_blocks.data.
+                  task_info.partition_color_blocks_data.
                     push_back(n_macro_cells_before);
                   partition_l2++;
                 }
               neighbor_list = neighbor_neighbor_list;
               neighbor_neighbor_list.resize(0);
             }
-          task_info.partition_color_blocks.row_index[part+1] =
-            task_info.partition_color_blocks.row_index[part] + partition_l2;
+          task_info.partition_color_blocks_row_index[part+1] =
+            task_info.partition_color_blocks_row_index[part] + partition_l2;
         }
     }
 
     if(size_info.boundary_cells_end>0)
-      size_info.boundary_cells_end = task_info.partition_color_blocks.
-        data[task_info.partition_color_blocks.row_index[1]];
+      size_info.boundary_cells_end = task_info.partition_color_blocks_data
+        [task_info.partition_color_blocks_row_index[1]];
 
     if (hp_bool == false)
       renumbering.swap(partition_partition_list);
@@ -1596,11 +1748,11 @@ namespace MatrixFreeFunctions
     for(unsigned int part=0;part<partition;part++)
       {
         task_info.partition_evens[part] =
-          (task_info.partition_color_blocks.row_index[part+1]-
-           task_info.partition_color_blocks.row_index[part]+1)/2;
+          (task_info.partition_color_blocks_row_index[part+1]-
+           task_info.partition_color_blocks_row_index[part]+1)/2;
         task_info.partition_odds[part] =
-          (task_info.partition_color_blocks.row_index[part+1]-
-           task_info.partition_color_blocks.row_index[part])/2;
+          (task_info.partition_color_blocks_row_index[part+1]-
+           task_info.partition_color_blocks_row_index[part])/2;
         task_info.partition_n_blocked_workers[part] =
           task_info.partition_odds[part]-(task_info.partition_odds[part]+
                                           task_info.partition_evens[part]+1)%2;
@@ -1762,7 +1914,7 @@ namespace MatrixFreeFunctions
                 ++mcell)
               {
                 unsigned int n_comp = (irregular_cells[mcell]>0)
-                  ?irregular_cells[mcell]:size_info.n_vectors;
+                  ?irregular_cells[mcell]:size_info.vectorization_length;
                 for (unsigned int cell = cell_start; cell < cell_start+n_comp;
                      ++cell)
                   {
@@ -1801,7 +1953,7 @@ namespace MatrixFreeFunctions
                 ++mcell)
               {
                 unsigned int n_comp = (irregular_cells[mcell]>0)
-                  ?irregular_cells[mcell]:size_info.n_vectors;
+                  ?irregular_cells[mcell]:size_info.vectorization_length;
                 for (unsigned int cell = cell_start; cell < cell_start+n_comp;
                      ++cell)
                   {
@@ -1949,26 +2101,31 @@ namespace MatrixFreeFunctions
                                      const SizeInfo &size_info) const
   {
     out << "       Memory row starts indices:    ";
-    size_info.print_mem (out, (row_starts.capacity()*
-                               sizeof(std_cxx1x::tuple<unsigned int,
-                                      unsigned int, unsigned int>)));
+    size_info.print_memory_statistics
+      (out, (row_starts.capacity()*sizeof(std_cxx1x::tuple<unsigned int,
+                                          unsigned int, unsigned int>)));
     out << "       Memory dof indices:           ";
-    size_info.print_mem (out, MemoryConsumption::memory_consumption (dof_indices));
+    size_info.print_memory_statistics 
+      (out, MemoryConsumption::memory_consumption (dof_indices));
     out << "       Memory constraint indicators: ";
-    size_info.print_mem (out, MemoryConsumption::memory_consumption (constraint_indicator));
+    size_info.print_memory_statistics
+      (out, MemoryConsumption::memory_consumption (constraint_indicator));
     out << "       Memory plain indices:         ";
-    size_info.print_mem (out, MemoryConsumption::memory_consumption (row_starts_plain_indices)+
-                         MemoryConsumption::memory_consumption (plain_dof_indices));
+    size_info.print_memory_statistics 
+      (out, MemoryConsumption::memory_consumption (row_starts_plain_indices)+
+       MemoryConsumption::memory_consumption (plain_dof_indices));
     out << "       Memory vector partitioner:    ";
-    size_info.print_mem (out, MemoryConsumption::memory_consumption (*vector_partitioner));
+    size_info.print_memory_statistics
+      (out, MemoryConsumption::memory_consumption (*vector_partitioner));
   }
 
 
 
   template <typename Number>
   void
-  DoFInfo::print (const CompressedMatrix<Number> &constraint_pool,
-                  std::ostream                   &out) const
+  DoFInfo::print (const std::vector<Number>       &constraint_pool_data,
+                  const std::vector<unsigned int> &constraint_pool_row_index,
+                  std::ostream                    &out) const
   {
     const unsigned int n_rows = row_starts.size() - 1;
     for (unsigned int row=0 ; row<n_rows ; ++row)
@@ -1990,14 +2147,14 @@ namespace MatrixFreeFunctions
               }
 
             out << "[ ";
-            for(unsigned int k=constraint_pool.row_index[con_it->second];
-                k<constraint_pool.row_index[con_it->second+1];
+            for(unsigned int k=constraint_pool_row_index[con_it->second];
+                k<constraint_pool_row_index[con_it->second+1];
                 k++,index++)
               {
                 Assert (glob_indices+index != end_row, ExcInternalError());
                 out << glob_indices[index] << "/"
-                    << constraint_pool.data[k];
-                if (k<constraint_pool.row_index[con_it->second+1]-1)
+                    << constraint_pool_data[k];
+                if (k<constraint_pool_row_index[con_it->second+1]-1)
                   out << " ";
               }
             out << "] ";

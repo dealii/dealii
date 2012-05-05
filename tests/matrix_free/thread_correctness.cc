@@ -45,22 +45,22 @@ void sub_test()
   DoFHandler<dim> dof (tria);
   deallog << "Testing " << fe.get_name() << std::endl;
 
-				// run test for several different meshes
+                                // run test for several different meshes
   for (unsigned int i=0; i<8-2*dim; ++i)
     {
       cell = tria.begin_active ();
       endc = tria.end();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
-	if (counter % (9-i) == 0)
-	  cell->set_refine_flag();
+        if (counter % (9-i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
 
       dof.distribute_dofs(fe);
       ConstraintMatrix constraints;
       DoFTools::make_hanging_node_constraints(dof, constraints);
       VectorTools::interpolate_boundary_values (dof, 0, ZeroFunction<dim>(),
-						constraints);
+                                                constraints);
       constraints.close();
 
       //std::cout << "Number of cells: " << dof.get_tria().n_active_cells() << std::endl;
@@ -69,60 +69,60 @@ void sub_test()
 
       MatrixFree<dim,number> mf_data, mf_data_color, mf_data_partition;
       {
-	const QGauss<1> quad (fe_degree+1);
-	mf_data.reinit (dof, constraints, quad,
-			typename MatrixFree<dim,number>::AdditionalData(MPI_COMM_SELF,MatrixFree<dim,number>::AdditionalData::none));
+        const QGauss<1> quad (fe_degree+1);
+        mf_data.reinit (dof, constraints, quad,
+                        typename MatrixFree<dim,number>::AdditionalData(MPI_COMM_SELF,MatrixFree<dim,number>::AdditionalData::none));
 
-				// choose block size of 3 which introduces
-				// some irregularity to the blocks (stress the
-				// non-overlapping computation harder)
-	mf_data_color.reinit (dof, constraints, quad,
-			      typename MatrixFree<dim,number>::AdditionalData
-			      (MPI_COMM_SELF,
-			       MatrixFree<dim,number>::AdditionalData::partition_color,
-			       3));
-	mf_data_partition.reinit (dof, constraints, quad,
-				  typename MatrixFree<dim,number>::AdditionalData
-				  (MPI_COMM_SELF,
-				   MatrixFree<dim,number>::AdditionalData::partition_partition,
-				   3));
+                                // choose block size of 3 which introduces
+                                // some irregularity to the blocks (stress the
+                                // non-overlapping computation harder)
+        mf_data_color.reinit (dof, constraints, quad,
+                              typename MatrixFree<dim,number>::AdditionalData
+                              (MPI_COMM_SELF,
+                               MatrixFree<dim,number>::AdditionalData::partition_color,
+                               3));
+        mf_data_partition.reinit (dof, constraints, quad,
+                                  typename MatrixFree<dim,number>::AdditionalData
+                                  (MPI_COMM_SELF,
+                                   MatrixFree<dim,number>::AdditionalData::partition_partition,
+                                   3));
       }
 
-      MatrixFreeTest<dim,fe_degree+1,number> mf_ref (mf_data);
-      MatrixFreeTest<dim,fe_degree+1,number> mf_color (mf_data_color);
-      MatrixFreeTest<dim,fe_degree+1,number> mf_partition (mf_data_partition);
+      MatrixFreeTest<dim,fe_degree,number> mf_ref (mf_data);
+      MatrixFreeTest<dim,fe_degree,number> mf_color (mf_data_color);
+      MatrixFreeTest<dim,fe_degree,number> mf_partition (mf_data_partition);
       Vector<number> in_dist (dof.n_dofs());
       Vector<number> out_dist (in_dist), out_color (in_dist),
-	out_partition(in_dist);
+        out_partition(in_dist);
 
       for (unsigned int i=0; i<dof.n_dofs(); ++i)
-	{
-	  if(constraints.is_constrained(i))
-	    continue;
-	  const double entry = rand()/(double)RAND_MAX;
-	  in_dist(i) = entry;
-	}
+        {
+          if(constraints.is_constrained(i))
+            continue;
+          const double entry = rand()/(double)RAND_MAX;
+          in_dist(i) = entry;
+        }
 
       mf_ref.vmult (out_dist, in_dist);
 
-				// make 10 sweeps in order to get in some
-				// variation to the threaded program
+                                // make 10 sweeps in order to get in some
+                                // variation to the threaded program
       for (unsigned int sweep = 0; sweep < 10; ++sweep)
-	{
-	  mf_color.vmult (out_color, in_dist);
-	  mf_partition.vmult (out_partition, in_dist);
+        {
+          mf_color.vmult (out_color, in_dist);
+          mf_partition.vmult (out_partition, in_dist);
       
-	  out_color -= out_dist;
-	  double diff_norm = out_color.linfty_norm();
-	  deallog << "Sweep " << sweep 
-		  << ", error in partition/color:     " << diff_norm 
-		  << std::endl;
-	  out_partition -= out_dist;
-	  diff_norm = out_partition.linfty_norm();
-	  deallog << "Sweep " << sweep 
-		  << ", error in partition/partition: " << diff_norm 
-		  << std::endl;
-	}
+          out_color -= out_dist;
+          double diff_norm = out_color.linfty_norm();
+          deallog << "Sweep " << sweep 
+                  << ", error in partition/color:     " << diff_norm 
+                  << std::endl;
+          out_partition -= out_dist;
+          diff_norm = out_partition.linfty_norm();
+          deallog << "Sweep " << sweep 
+                  << ", error in partition/partition: " << diff_norm 
+                  << std::endl;
+        }
       deallog << std::endl;
     }
   deallog << std::endl;

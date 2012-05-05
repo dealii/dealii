@@ -53,8 +53,8 @@ void test ()
       cell = tria.begin_active ();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
-	if (counter % (7-i) == 0)
-	  cell->set_refine_flag();
+        if (counter % (7-i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
@@ -62,17 +62,17 @@ void test ()
   DoFHandler<dim> dof (tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
-				// there should not be any hanging nodes or
-				// boundary conditions for FE_DGQ as there are
-				// only interior DoFs on the elements, but try
-				// anyway
+                                // there should not be any hanging nodes or
+                                // boundary conditions for FE_DGQ as there are
+                                // only interior DoFs on the elements, but try
+                                // anyway
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values (dof, 0, ZeroFunction<dim>(),
-					    constraints);
+                                            constraints);
   constraints.close();
 
   do_test<dim, fe_degree, double> (dof, constraints);
 
-				// test with coloring only as well
+                                // test with coloring only as well
   do_test<dim, fe_degree, double> (dof, constraints, 2);
 }

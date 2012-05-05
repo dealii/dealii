@@ -26,7 +26,7 @@ template void ConstraintMatrix::distribute<V1 >(V1 &) const;
 EOT
     ;
 
-my $vector_functions_also_parallel = <<EOT
+my $vector_functions_also_parallel = <<'EOT'
 
 template void ConstraintMatrix::set_zero<V1 >(V1&) const;
 
@@ -56,6 +56,7 @@ EOT
 ######################################################################
 
 multisubst($vector_functions, ['V1'], \@sequential_vectors);
+multisubst($vector_functions, ['V1'], \@deal_parallel_vectors);
 multisubst($vector_functions_also_parallel, ['V1'], \@sequential_vectors);
 multisubst($vector_functions_also_parallel, ['V1'], \@parallel_vectors);
 multisubst($scalar_functions, ['S1'], \@real_scalars);

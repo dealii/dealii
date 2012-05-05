@@ -30,7 +30,7 @@ void test ()
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
 
-				   // each processor owns 2 indices and all
+                                   // each processor owns 2 indices and all
                                    // are ghosting element 1 (the second)
   IndexSet local_owned(numproc*2);
   local_owned.add_range(myid*2,myid*2+2);
@@ -48,10 +48,10 @@ void test ()
   v.compress();
   v.update_ghost_values();
 
-				// check that the value of the ghost is 1.0
+                                // check that the value of the ghost is 1.0
   Assert (v(1) == 1., ExcInternalError());
 
-				// copy vector
+                                // copy vector
   w  = v;
   v *= 2.0;
 

@@ -18,7 +18,7 @@
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_tools.h>
 
-#include <deal.II/matrix_free/fe_evaluation_data.h>
+#include <deal.II/matrix_free/shape_info.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -28,59 +28,11 @@ namespace internal
 {
 namespace MatrixFreeFunctions
 {
-  namespace internal
-  {
 
-  // ----------------- FE_PolyAccess -----------------------------------
-
-                                // in order to read out the 1D info from a
-                                // finite element and use the tensor product
-                                // structure easily, we need to be able to
-                                // access the numbering in the polynomial
-                                // space of the finite element. that
-                                // information is not public, but we can get
-                                // access to that information by creating a
-                                // new dummy class that is based on
-                                // FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
-    template <int dim, int spacedim>
-    class FE_PolyAccess : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
-    {
-    public:
-      FE_PolyAccess (const FE_Poly<TensorProductPolynomials<dim>,dim,spacedim> &fe)
-        :
-        FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>(fe)
-      {}
-
-      virtual std::string get_name() const 
-      {
-        Assert (false, ExcNotImplemented());
-        return 0;
-      }
-      virtual FiniteElement<dim,spacedim> * clone() const
-      {
-        Assert (false, ExcNotImplemented());
-        return 0;
-      }
-
-      const std::vector<unsigned int> get_numbering () const
-      {
-        return this->poly_space.get_numbering();
-      }
-
-      const std::vector<unsigned int> get_numbering_inverse () const
-      {
-        return this->poly_space.get_numbering_inverse();
-      }
-    };
-
-  } // end of namespace internal
-
-
-
-  // ----------------- actual FEEvaluationData functions --------------------
+  // ----------------- actual ShapeInfo functions --------------------
 
   template <typename Number>
-  FEEvaluationData<Number>::FEEvaluationData ()
+  ShapeInfo<Number>::ShapeInfo ()
     :
     n_q_points (0),
     dofs_per_cell (0)
@@ -91,7 +43,7 @@ namespace MatrixFreeFunctions
   template <typename Number>
   template <int dim>
   void
-  FEEvaluationData<Number>::reinit (const Quadrature<1> &quad,
+  ShapeInfo<Number>::reinit (const Quadrature<1> &quad,
                                     const FiniteElement<dim> &fe_dim)
   {
     Assert (fe_dim.n_components() == 1,
@@ -115,7 +67,7 @@ namespace MatrixFreeFunctions
 
   template <typename Number>
   void
-  FEEvaluationData<Number>::do_initialize (const Quadrature<1>    &quad,
+  ShapeInfo<Number>::do_initialize (const Quadrature<1>    &quad,
                                            const FiniteElement<1> &fe,
                                            const unsigned int dim)
   {
@@ -129,12 +81,10 @@ namespace MatrixFreeFunctions
                                 // lexicographic ordering necessary to apply
                                 // tensor products efficiently)
     {
-      const FE_Poly<TensorProductPolynomials<1>,1,1> *cast_fe =
+      const FE_Poly<TensorProductPolynomials<1>,1,1> *fe_poly =
         dynamic_cast<const FE_Poly<TensorProductPolynomials<1>,1,1>*>(&fe);
-      Assert (cast_fe != 0, ExcNotImplemented());
-      const internal::FE_PolyAccess<1,1> & fe_acc =
-        static_cast< const internal::FE_PolyAccess<1,1> &>(*cast_fe);
-      lexicographic = fe_acc.get_numbering();
+      Assert (fe_poly != 0, ExcNotImplemented());
+      lexicographic = fe_poly->get_poly_space_numbering();
     }
 
     n_q_points      = 1;
@@ -171,9 +121,10 @@ namespace MatrixFreeFunctions
         const unsigned int my_i = lexicographic[i];
         for (unsigned int q=0; q<n_q_points_1d; ++q)
           {
-                                // fill both vectors with n_vectors copies for
-                                // the shape information and non-vectorized
-                                // fields
+                                // fill both vectors with
+                                // VectorizedArray<Number>::n_array_elements
+                                // copies for the shape information and
+                                // non-vectorized fields
             const Point<1> q_point = quad.get_points()[q];
             shape_values_number[my_i*n_q_points_1d+q]   = fe.shape_value(i,q_point);
             shape_gradient_number[my_i*n_q_points_1d+q] = fe.shape_grad (i,q_point)[0];
@@ -239,7 +190,7 @@ namespace MatrixFreeFunctions
 
   template <typename Number>
   std::size_t
-  FEEvaluationData<Number>::memory_consumption () const
+  ShapeInfo<Number>::memory_consumption () const
   {
     std::size_t memory = sizeof(*this);
     memory += MemoryConsumption::memory_consumption(shape_values);
@@ -256,7 +207,7 @@ namespace MatrixFreeFunctions
     return memory;
   }
 
-  // end of functions for FEEvaluationData
+  // end of functions for ShapeInfo
 
 } // end of namespace MatrixFreeFunctions
 } // end of namespace internal

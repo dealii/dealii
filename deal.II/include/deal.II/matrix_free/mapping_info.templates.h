@@ -48,8 +48,8 @@ namespace MatrixFreeFunctions
     second_derivatives_initialized = false;
     mapping_data_gen.clear();
     cell_type.clear();
-    cartesian.clear();
-    linear.clear();
+    cartesian_data.clear();
+    affine_data.clear();
   }
 
 
@@ -140,8 +140,10 @@ namespace MatrixFreeFunctions
     clear();
     const unsigned int n_quads = quad.size();
     const unsigned int n_cells = cells.size();
-    Assert (n_cells%n_vectors == 0, ExcInternalError());
-    const unsigned int n_macro_cells = n_cells/n_vectors;
+    const unsigned int vectorization_length =
+      VectorizedArray<Number>::n_array_elements;
+    Assert (n_cells%vectorization_length == 0, ExcInternalError());
+    const unsigned int n_macro_cells = n_cells/vectorization_length;
     mapping_data_gen.resize (n_quads);
     cell_type.resize (n_macro_cells);
 
@@ -175,8 +177,8 @@ namespace MatrixFreeFunctions
     const double jacobian_size = internal::get_jacobian_size(tria);
 
                                 // objects that hold the data for up to
-                                // n_vectors cells while we fill them up. Only
-                                // after all n_vectors cells have been
+                                // vectorization_length cells while we fill them up. Only
+                                // after all vectorization_length cells have been
                                 // processed, we can insert the data into the
                                 // data structures of this class
     CellData data (jacobian_size);
@@ -235,17 +237,18 @@ namespace MatrixFreeFunctions
         if (cells.size() == 0)
           continue;
 
-        tensor3  jac_grad, grad_jac_inv;
-        tensor1  tmp;
+        Tensor<3,dim,VectorizedArray<Number> > jac_grad, grad_jac_inv;
+        Tensor<1,dim,VectorizedArray<Number> > tmp;
 
                                 // encodes the cell types of the current
                                 // cell. Since several cells must be
                                 // considered together, this variable holds
                                 // the individual info of the last chunk of
                                 // cells
-        unsigned int cell_t [n_vectors], cell_t_prev [n_vectors];
-        for (unsigned int j=0; j<n_vectors; ++j)
-          cell_t_prev[j] = numbers::invalid_unsigned_int;
+        CellType cell_t [vectorization_length], 
+          cell_t_prev [vectorization_length];
+        for (unsigned int j=0; j<vectorization_length; ++j)
+          cell_t_prev[j] = undefined;
 
                                 // fe_values object that is used to compute
                                 // the mapping data. for the hp case there
@@ -288,13 +291,13 @@ namespace MatrixFreeFunctions
                                 // similarities between mapping data from one
                                 // cell to the next.
         std::vector<std::pair<unsigned int, int> > hash_collection;
-        internal::HashValue hash_value (jacobian_size);
+        HashValue hash_value (jacobian_size);
 
                                 // loop over all cells
         for (unsigned int cell=0; cell<n_macro_cells; ++cell)
           {
                                 // GENERAL OUTLINE: First generate the data in
-                                // format "number" for n_vectors cells, and
+                                // format "number" for vectorization_length cells, and
                                 // then find the most general type of cell for
                                 // appropriate vectorized formats. then fill
                                 // this data in
@@ -315,15 +318,15 @@ namespace MatrixFreeFunctions
                                 // similarity due to some cells further ahead)
             if (cell > 0 && active_fe_index.size() > 0 &&
                 active_fe_index[cell] != active_fe_index[cell-1])
-              cell_t_prev[n_vectors-1] = numbers::invalid_unsigned_int;
-            evaluate_on_cell (tria, &cells[cell*n_vectors],
+              cell_t_prev[vectorization_length-1] = undefined;
+            evaluate_on_cell (tria, &cells[cell*vectorization_length],
                               cell, my_q, cell_t_prev, cell_t, fe_val, data);
 
                                 // now reorder the data into vectorized
                                 // types. if we are here for the first time,
                                 // we need to find out whether the Jacobian
                                 // allows for some simplification (Cartesian,
-                                // linear) taking n_vectors cell together and
+                                // affine) taking vectorization_length cell together and
                                 // we have to insert that data into the
                                 // respective fields. Also, we have to
                                 // compress different cell indicators into one
@@ -333,8 +336,8 @@ namespace MatrixFreeFunctions
               {
                                 // find the most general cell type (most
                                 // general type is 2 (general cell))
-                unsigned int most_general_type = 0;
-                for (unsigned int j=0; j<n_vectors; ++j)
+                CellType most_general_type = cartesian;
+                for (unsigned int j=0; j<vectorization_length; ++j)
                   if (cell_t[j] > most_general_type)
                     most_general_type = cell_t[j];
                 AssertIndexRange (most_general_type, 3);
@@ -344,12 +347,13 @@ namespace MatrixFreeFunctions
                                 // Jacobian determinant
                 unsigned int insert_position = numbers::invalid_unsigned_int;
                 typedef std::vector<std::pair<unsigned int,int> >::iterator iter;
-                if (most_general_type == 0)
+                if (most_general_type == cartesian)
                   {
-                    std::pair<tensor1,vector_t> new_entry;
+                    std::pair<Tensor<1,dim,VectorizedArray<Number> >,
+                              VectorizedArray<Number> > new_entry;
                     for (unsigned int d=0; d<dim; ++d)
                       new_entry.first[d] = data.const_jac[d][d];
-                    insert_position = cartesian.size();
+                    insert_position = cartesian_data.size();
 
                                 // check whether everything is the same as on
                                 // another cell before. find an insertion point
@@ -372,9 +376,9 @@ namespace MatrixFreeFunctions
                         pos->first == hash)
                       {
                         for (unsigned int d=0; d<dim; ++d)
-                          for (unsigned int j=0; j<n_vectors; ++j)
+                          for (unsigned int j=0; j<vectorization_length; ++j)
                             if (std::fabs(data.const_jac[d][d][j]-
-                                          cartesian[-pos->second].first[d][j])>
+                                          cartesian_data[-pos->second].first[d][j])>
                                 hash_value.scaling)
                               duplicate = false;
                       }
@@ -385,7 +389,7 @@ namespace MatrixFreeFunctions
                     if (duplicate == false)
                       {
                         hash_collection.insert (pos, insertion);
-                        cartesian.push_back (new_entry);
+                        cartesian_data.push_back (new_entry);
                       }
                                 // else, remember the position
                     else
@@ -394,9 +398,9 @@ namespace MatrixFreeFunctions
 
                                 // Constant Jacobian case. same strategy as
                                 // before, but with other data fields
-                else if (most_general_type == 1)
+                else if (most_general_type == affine)
                   {
-                    insert_position = linear.size();
+                    insert_position = affine_data.size();
 
                                 // check whether everything is the same as on
                                 // the previous cell
@@ -415,9 +419,10 @@ namespace MatrixFreeFunctions
                       {
                         for (unsigned int d=0; d<dim; ++d)
                           for (unsigned int e=0; e<dim; ++e)
-                            for (unsigned int j=0; j<n_vectors; ++j)
+                            for (unsigned int j=0; j<vectorization_length; ++j)
                               if (std::fabs(data.const_jac[d][e][j]-
-                                            linear[-pos->second].first[d][e][j])>
+                                            affine_data[-pos->second].first[d]
+                                            [e][j])>
                                   hash_value.scaling)
                                 duplicate = false;
                       }
@@ -427,8 +432,11 @@ namespace MatrixFreeFunctions
                     if (duplicate == false)
                       {
                         hash_collection.insert (pos, insertion);
-                        linear.push_back (std::pair<tensor2,vector_t>(data.const_jac,
-                                                                      make_vectorized_array (Number(0.))));
+                        affine_data.push_back 
+                          (std::pair<Tensor<2,dim,VectorizedArray<Number> >,
+                           VectorizedArray<Number> >(data.const_jac,
+                                                     make_vectorized_array 
+                                                     (Number(0.))));
                       }
                     else
                       insert_position = -pos->second;
@@ -443,7 +451,7 @@ namespace MatrixFreeFunctions
                                 // here involves at most one reallocation.
                 else
                   {
-                    Assert (most_general_type == 2, ExcInternalError());
+                    Assert (most_general_type == general, ExcInternalError());
                     insert_position = current_data.rowstart_jacobians.size();
                     if (current_data.rowstart_jacobians.size() == 0)
                       {
@@ -462,7 +470,7 @@ namespace MatrixFreeFunctions
                   }
 
                 cell_type[cell] = ((insert_position << n_cell_type_bits) +
-                                   most_general_type);
+                                   (unsigned int)most_general_type);
 
               } // end if (my_q == 0)
 
@@ -470,7 +478,7 @@ namespace MatrixFreeFunctions
                                 // quadrature points and collect the
                                 // data. done for all different quadrature
                                 // formulas, so do it outside the above loop.
-            if (get_cell_type(cell) == 2)
+            if (get_cell_type(cell) == general)
               {
                 const unsigned int previous_size =
                   current_data.jacobians.size();
@@ -489,10 +497,10 @@ namespace MatrixFreeFunctions
                   }
                 for (unsigned int q=0; q<n_q_points; ++q)
                   {
-                    tensor2  &jac = data.general_jac[q];
-                    tensor3  &jacobian_grad = data.general_jac_grad[q];
-                    for (unsigned int j=0; j<n_vectors; ++j)
-                      if (cell_t[j] < 2)
+                    Tensor<2,dim,VectorizedArray<Number> > &jac = data.general_jac[q];
+                    Tensor<3,dim,VectorizedArray<Number> > &jacobian_grad = data.general_jac_grad[q];
+                    for (unsigned int j=0; j<vectorization_length; ++j)
+                      if (cell_t[j] == cartesian || cell_t[j] == affine)
                         {
                           for (unsigned int d=0; d<dim; ++d)
                             for (unsigned int e=0; e<dim; ++e)
@@ -503,9 +511,9 @@ namespace MatrixFreeFunctions
                               }
                         }
 
-                    const vector_t det = determinant (jac);
+                    const VectorizedArray<Number> det = determinant (jac);
                     current_data.jacobians.push_back (transpose(invert(jac)));
-                    const tensor2 &inv_jac = current_data.jacobians.back();
+                    const Tensor<2,dim,VectorizedArray<Number> > &inv_jac = current_data.jacobians.back();
 
                                 // TODO: deal.II does not use abs on
                                 // determinants. Is there an assumption
@@ -553,7 +561,7 @@ namespace MatrixFreeFunctions
                             {
                               for (unsigned int f=0; f<dim; ++f)
                                 {
-                                  tmp[f] = vector_t();
+                                  tmp[f] = VectorizedArray<Number>();
                                   for (unsigned int g=0; g<dim; ++g)
                                     tmp[f] -= jac_grad[d][f][g] * inv_jac[g][e];
                                 }
@@ -569,16 +577,16 @@ namespace MatrixFreeFunctions
                             }
 
                         {
-                          vector_t grad_diag[dim][dim];
+                          VectorizedArray<Number> grad_diag[dim][dim];
                           for (unsigned int d=0; d<dim; ++d)
                             for (unsigned int e=0; e<dim; ++e)
                               grad_diag[d][e] = grad_jac_inv[d][d][e];
                           current_data.jacobians_grad_diag.push_back
-                            (Tensor<2,dim,vector_t>(grad_diag));
+                            (Tensor<2,dim,VectorizedArray<Number> >(grad_diag));
                         }
 
                                 // sets upper-diagonal part of Jacobian
-                        tensorUT grad_upper;
+                        Tensor<1,(dim>1?dim*(dim-1)/2:1),Tensor<1,dim,VectorizedArray<Number> > > grad_upper;
                         for (unsigned int d=0, count=0; d<dim; ++d)
                           for (unsigned int e=d+1; e<dim; ++e, ++count)
                             for (unsigned int f=0; f<dim; ++f)
@@ -607,9 +615,9 @@ namespace MatrixFreeFunctions
                   current_data.quadrature_points.size();
                 current_data.rowstart_q_points[cell] = old_size;
 
-                tensor1 quad_point;
+                Tensor<1,dim,VectorizedArray<Number> > quad_point;
 
-                if (get_cell_type(cell) == 0)
+                if (get_cell_type(cell) == cartesian)
                   {
                     current_data.quadrature_points.resize (old_size+
                                                            n_q_points_1d[fe_index]);
@@ -633,25 +641,26 @@ namespace MatrixFreeFunctions
         current_data.rowstart_q_points[n_macro_cells] =
           current_data.quadrature_points.size();
 
-                                // finally, need to invert and transpose the
-                                // Jacobians in the cartesian and linear
+                                // finally, need to invert and
+                                // transpose the Jacobians in the
+                                // cartesian_data and affine_data
                                 // fields and compute the JxW value.
         if (my_q == 0)
           {
-            for (unsigned int i=0; i<cartesian.size(); ++i)
+            for (unsigned int i=0; i<cartesian_data.size(); ++i)
               {
-                vector_t det = cartesian[i].first[0];
+                VectorizedArray<Number> det = cartesian_data[i].first[0];
                 for (unsigned int d=1; d<dim; ++d)
-                  det *= cartesian[i].first[d];
+                  det *= cartesian_data[i].first[d];
                 for (unsigned int d=0; d<dim; ++d)
-                  cartesian[i].first[d] = 1./cartesian[i].first[d];
-                cartesian[i].second = std::abs(det);
+                  cartesian_data[i].first[d] = 1./cartesian_data[i].first[d];
+                cartesian_data[i].second = std::abs(det);
               }
-            for (unsigned int i=0; i<linear.size(); ++i)
+            for (unsigned int i=0; i<affine_data.size(); ++i)
               {
-                vector_t det = determinant(linear[i].first);
-                linear[i].first = transpose(invert(linear[i].first));
-                linear[i].second = std::abs(det);
+                VectorizedArray<Number> det = determinant(affine_data[i].first);
+                affine_data[i].first = transpose(invert(affine_data[i].first));
+                affine_data[i].second = std::abs(det);
               }
           }
       }
@@ -665,11 +674,13 @@ namespace MatrixFreeFunctions
                                              const std::pair<unsigned int,unsigned int> *cells,
                                              const unsigned int  cell,
                                              const unsigned int  my_q,
-                                             unsigned int (&cell_t_prev)[n_vectors],
-                                             unsigned int (&cell_t)[n_vectors],
+                                             CellType (&cell_t_prev)[VectorizedArray<Number>::n_array_elements],
+                                             CellType (&cell_t)[VectorizedArray<Number>::n_array_elements],
                                              FEValues<dim,dim> &fe_val,
                                              CellData          &data) const
   {
+    const unsigned int vectorization_length =
+      VectorizedArray<Number>::n_array_elements;
     const unsigned int n_q_points = fe_val.n_quadrature_points;
     const UpdateFlags update_flags = fe_val.get_update_flags();
 
@@ -678,12 +689,12 @@ namespace MatrixFreeFunctions
                                 // not have that field here)
     const double zero_tolerance_double = data.jac_size *
       std::numeric_limits<double>::epsilon() * 1024.;
-    for (unsigned int j=0; j<n_vectors; ++j)
+    for (unsigned int j=0; j<vectorization_length; ++j)
       {
         typename dealii::Triangulation<dim>::cell_iterator
           cell_it (&tria, cells[j].first, cells[j].second);
         fe_val.reinit(cell_it);
-        cell_t[j] = numbers::invalid_unsigned_int;
+        cell_t[j] = undefined;
 
                                 // extract quadrature points and store them
                                 // temporarily. if we have Cartesian cells, we
@@ -700,7 +711,8 @@ namespace MatrixFreeFunctions
                                 // and we already have determined that this
                                 // cell is either Cartesian or with constant
                                 // Jacobian, we have nothing more to do.
-        if (my_q > 0 && get_cell_type(cell) < 2)
+        if (my_q > 0 && (get_cell_type(cell) == cartesian 
+                         || get_cell_type(cell) == affine) )
           continue;
 
                                 // first round: if the transformation is
@@ -713,7 +725,7 @@ namespace MatrixFreeFunctions
             if (j==0)
               {
                 Assert (cell>0, ExcInternalError());
-                cell_t[j] = cell_t_prev[n_vectors-1];
+                cell_t[j] = cell_t_prev[vectorization_length-1];
               }
             else
               cell_t[j] = cell_t[j-1];
@@ -726,7 +738,7 @@ namespace MatrixFreeFunctions
                                 // check whether the Jacobian is constant on
                                 // this cell the first time we come around
                                 // here
-            if (cell_t[j] == numbers::invalid_unsigned_int)
+            if (cell_t[j] == undefined)
               {
                 bool jacobian_constant = true;
                 for (unsigned int q=1; q<n_q_points; ++q)
@@ -788,15 +800,15 @@ namespace MatrixFreeFunctions
                   }
                                 // set cell type
                 if (cell_cartesian == true)
-                  cell_t[j] = 0;
+                  cell_t[j] = cartesian;
                 else if (jacobian_constant == true)
-                  cell_t[j] = 1;
+                  cell_t[j] = affine;
                 else
-                  cell_t[j] = 2;
+                  cell_t[j] = general;
               }
 
                                 // Cartesian cell
-            if (cell_t[j] == 0)
+            if (cell_t[j] == cartesian)
               {
                                 // set Jacobian into diagonal and clear
                                 // off-diagonal part
@@ -812,8 +824,8 @@ namespace MatrixFreeFunctions
                 continue;
               }
 
-                                // cell with linear mapping
-            else if (cell_t[j] == 1)
+                                // cell with affine mapping
+            else if (cell_t[j] == affine)
               {
                                 // compress out very small values
                 for (unsigned int d=0; d<dim; ++d)
@@ -860,13 +872,33 @@ namespace MatrixFreeFunctions
                       data.general_jac_grad[q][d][e][f][j] = jacobian_grad[d][e][f];
               }
           }
-      } // end loop over all entries in vectorization (n_vectors cells)
+      } // end loop over all entries in vectorization (vectorization_length cells)
 
                                 // set information for next cell
-    for (unsigned int j=0; j<n_vectors; ++j)
+    for (unsigned int j=0; j<vectorization_length; ++j)
       cell_t_prev[j] = cell_t[j];
   }
 
+
+  template <int dim, typename Number>
+  MappingInfo<dim,Number>::CellData::CellData (const double jac_size_in)
+    :
+    jac_size (jac_size_in)
+  {}
+
+
+
+  template <int dim, typename Number>
+  void
+  MappingInfo<dim,Number>::CellData::resize (const unsigned int size)
+  {
+    if (general_jac.size() != size)
+      {
+        quadrature_points.resize(size);
+        general_jac.resize(size);
+        general_jac_grad.resize(size);
+      }
+  }
 
 
 
@@ -896,8 +928,8 @@ namespace MatrixFreeFunctions
   {
     std::size_t
       memory= MemoryConsumption::memory_consumption (mapping_data_gen);
-    memory += MemoryConsumption::memory_consumption (linear);
-    memory += MemoryConsumption::memory_consumption (cartesian);
+    memory += MemoryConsumption::memory_consumption (affine_data);
+    memory += MemoryConsumption::memory_consumption (cartesian_data);
     memory += MemoryConsumption::memory_consumption (cell_type);
     memory += sizeof (this);
     return memory;
@@ -911,8 +943,9 @@ namespace MatrixFreeFunctions
   (STREAM         &out,
    const SizeInfo &size_info) const
   {
-                                // print_mem involves global communication, so
-                                // we can disable the check here only if no
+                                // print_memory_statistics involves
+                                // global communication, so we can
+                                // disable the check here only if no
                                 // processor has any such data
 #if DEAL_II_COMPILER_SUPPORTS_MPI
     unsigned int general_size_glob = 0, general_size_loc = jacobians.size();
@@ -924,15 +957,13 @@ namespace MatrixFreeFunctions
     if (general_size_glob > 0)
       {
         out << "      Memory Jacobian data:          ";
-        size_info.print_mem (out,
-                             MemoryConsumption::memory_consumption (jacobians)
-                             +
-                             MemoryConsumption::memory_consumption (JxW_values));
+        size_info.print_memory_statistics 
+          (out, MemoryConsumption::memory_consumption (jacobians) +
+           MemoryConsumption::memory_consumption (JxW_values));
         out << "      Memory second derivative data: ";
-        size_info.print_mem (out,
-                             MemoryConsumption::memory_consumption (jacobians_grad_diag)
-                             +
-                             MemoryConsumption::memory_consumption (jacobians_grad_upper));
+        size_info.print_memory_statistics
+          (out,MemoryConsumption::memory_consumption (jacobians_grad_diag) +
+           MemoryConsumption::memory_consumption (jacobians_grad_upper));
       }
 
 #if DEAL_II_COMPILER_SUPPORTS_MPI
@@ -945,10 +976,9 @@ namespace MatrixFreeFunctions
     if (quad_size_glob > 0)
       {
         out << "      Memory quadrature points:      ";
-        size_info.print_mem (out,
-                             MemoryConsumption::memory_consumption (rowstart_q_points)
-                             +
-                             MemoryConsumption::memory_consumption (quadrature_points));
+        size_info.print_memory_statistics 
+          (out, MemoryConsumption::memory_consumption (rowstart_q_points) +
+           MemoryConsumption::memory_consumption (quadrature_points));
       }
   }
 
@@ -960,10 +990,12 @@ namespace MatrixFreeFunctions
                                                          const SizeInfo &size_info) const
   {
     out << "    Cell types:                      ";
-    size_info.print_mem (out, MemoryConsumption::memory_consumption (cell_type));
+    size_info.print_memory_statistics 
+      (out, MemoryConsumption::memory_consumption (cell_type));
     out << "    Memory transformations compr:    ";
-    size_info.print_mem (out, MemoryConsumption::memory_consumption (linear) +
-                         MemoryConsumption::memory_consumption (cartesian));
+    size_info.print_memory_statistics 
+      (out, MemoryConsumption::memory_consumption (affine_data) +
+       MemoryConsumption::memory_consumption (cartesian_data));
     for (unsigned int j=0; j<mapping_data_gen.size(); ++j)
       {
         out << "    Data component " << j << std::endl;

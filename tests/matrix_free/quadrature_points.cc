@@ -64,29 +64,29 @@ void test ()
 
   double error_points = 0, abs_points = 0;
   const unsigned int n_cells = mf_data.get_size_info().n_macro_cells;
-  FEEvaluation<dim,fe_degree+1> fe_eval (mf_data);
+  FEEvaluation<dim,fe_degree> fe_eval (mf_data);
   FEValues<dim> fe_values (mapping, fe, mf_data.get_quad(),
-			   update_quadrature_points);
+                           update_quadrature_points);
 
   typedef VectorizedArray<double> vector_t;
   for (unsigned int cell=0; cell<n_cells; ++cell)
     {
       fe_eval.reinit(cell);
       for (unsigned int j=0; j<mf_data.n_components_filled(cell); ++j)
-	{
-	  fe_values.reinit (mf_data.get_cell_iterator(cell,j));
-	  for (unsigned int q=0; q<fe_eval.n_q_points; ++q)
-	    {
-	      abs_points += fe_values.quadrature_point(q).norm();
-	      for (unsigned int d=0; d<dim; ++d)
-		error_points += std::fabs(fe_values.quadrature_point(q)[d]-
-					  fe_eval.quadrature_point(q)[d][j]);
-	    }
-	}
+        {
+          fe_values.reinit (mf_data.get_cell_iterator(cell,j));
+          for (unsigned int q=0; q<fe_eval.n_q_points; ++q)
+            {
+              abs_points += fe_values.quadrature_point(q).norm();
+              for (unsigned int d=0; d<dim; ++d)
+                error_points += std::fabs(fe_values.quadrature_point(q)[d]-
+                                          fe_eval.quadrature_point(q)[d][j]);
+            }
+        }
     }
 
   deallog << "Norm of difference: " << error_points/abs_points
-	  << std::endl << std::endl;
+          << std::endl << std::endl;
 }
 
 

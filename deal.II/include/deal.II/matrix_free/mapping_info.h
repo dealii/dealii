@@ -41,15 +41,6 @@ namespace MatrixFreeFunctions
   template <int dim, typename Number>
   struct MappingInfo
   {
-    typedef VectorizedArray<Number>               vector_t;
-    typedef Point<dim,vector_t>                             point;
-    typedef Tensor<1,dim,vector_t>                          tensor1;
-    typedef Tensor<2,dim,vector_t>                          tensor2;
-    typedef Tensor<3,dim,vector_t>                          tensor3;
-    typedef Tensor<1,(dim>1?dim*(dim-1)/2:1),Tensor<1,dim,vector_t> > tensorUT;
-    static const std::size_t n_vectors
-      = VectorizedArray<Number>::n_array_elements;
-
                                 /**
                                  * Determines how many bits of an unsigned int
                                  * are used to distinguish the cell types
@@ -103,21 +94,13 @@ namespace MatrixFreeFunctions
                                  * Returns the type of a given cell as
                                  * detected during initialization.
                                  */
-    unsigned int get_cell_type (const unsigned int cell_chunk_no) const
-    {
-      AssertIndexRange (cell_chunk_no, cell_type.size());
-      return cell_type[cell_chunk_no] % n_cell_types;
-    };
+    CellType get_cell_type (const unsigned int cell_chunk_no) const;
 
                                 /**
                                  * Returns the type of a given cell as
                                  * detected during initialization.
                                  */
-    unsigned int get_cell_data_index (const unsigned int cell_chunk_no) const
-    {
-      AssertIndexRange (cell_chunk_no, cell_type.size());
-      return cell_type[cell_chunk_no] >> n_cell_type_bits;
-    };
+    unsigned int get_cell_data_index (const unsigned int cell_chunk_no) const;
 
                                 /**
                                  * Clears all data fields in this class.
@@ -170,7 +153,8 @@ namespace MatrixFreeFunctions
                                  * quadrature point, whereas the determinant
                                  * is the same on each quadrature point).
                                  */
-    AlignedVector<std::pair<tensor1,vector_t> > cartesian;
+    AlignedVector<std::pair<Tensor<1,dim,VectorizedArray<Number> >,
+                            VectorizedArray<Number> > > cartesian_data;
 
                                 /**
                                  * The first field stores the Jacobian for
@@ -190,7 +174,8 @@ namespace MatrixFreeFunctions
                                  * the determinant is the same on each
                                  * quadrature point).
                                  */
-    AlignedVector<std::pair<tensor2,vector_t> > linear;
+    AlignedVector<std::pair<Tensor<2,dim,VectorizedArray<Number> >,
+                            VectorizedArray<Number> > > affine_data;
 
                                 /**
                                  * Definition of a structure that stores data
@@ -216,14 +201,14 @@ namespace MatrixFreeFunctions
                                  * FEValues::inverse_jacobian) for general
                                  * cells.
                                  */
-      AlignedVector<tensor2> jacobians;
+      AlignedVector<Tensor<2,dim,VectorizedArray<Number> > > jacobians;
 
                                 /**
                                  * This field stores the Jacobian
                                  * determinant times the quadrature weights
                                  * (JxW in deal.II speak) for general cells.
                                  */
-      AlignedVector<vector_t> JxW_values;
+      AlignedVector<VectorizedArray<Number> > JxW_values;
 
                                 /**
                                  * Stores the diagonal part of the gradient of
@@ -237,7 +222,7 @@ namespace MatrixFreeFunctions
                                  * x_i \partial x_j, i\neq j$ because that is
                                  * only needed for computing a full Hessian.
                                  */
-      AlignedVector<tensor2>  jacobians_grad_diag;
+      AlignedVector<Tensor<2,dim,VectorizedArray<Number> > > jacobians_grad_diag;
 
                                 /**
                                  * Stores the off-diagonal part of the
@@ -251,7 +236,8 @@ namespace MatrixFreeFunctions
                                  * so on. The second index is the spatial
                                  * coordinate. Not filled currently.
                                  */
-      AlignedVector<tensorUT> jacobians_grad_upper;
+      AlignedVector<Tensor<1,(dim>1?dim*(dim-1)/2:1),
+                           Tensor<1,dim,VectorizedArray<Number> > > > jacobians_grad_upper;
 
                                 /**
                                  * Stores the row start for quadrature points
@@ -268,7 +254,7 @@ namespace MatrixFreeFunctions
                                  * coordinates for Cartesian cells (does not
                                  * need to store the full data on all points)
                                  */
-      AlignedVector<point>    quadrature_points;
+      AlignedVector<Point<dim,VectorizedArray<Number> > > quadrature_points;
 
                                 /**
                                  * The dim-dimensional quadrature formula
@@ -304,7 +290,7 @@ namespace MatrixFreeFunctions
                                  * The quadrature weights (vectorized data
                                  * format) on the unit cell.
                                  */
-      std::vector<AlignedVector<vector_t> > quadrature_weights;
+      std::vector<AlignedVector<VectorizedArray<Number> > > quadrature_weights;
 
                                 /**
                                  * This variable stores the number of
@@ -323,13 +309,7 @@ namespace MatrixFreeFunctions
                                  * given degree is actually present.
                                  */
       unsigned int
-      quad_index_from_n_q_points (const unsigned int n_q_points) const
-      {
-        for (unsigned int i=0; i<quad_index_conversion.size(); ++i)
-          if (n_q_points == quad_index_conversion[i])
-            return i;
-        return 0;
-      }
+      quad_index_from_n_q_points (const unsigned int n_q_points) const;
 
       
                                 /**
@@ -378,24 +358,14 @@ namespace MatrixFreeFunctions
                                  */
     struct CellData
     {
-      CellData (const double jac_size_in) :
-        jac_size (jac_size_in) {}
+      CellData (const double jac_size);
+      void resize (const unsigned int size);
 
-      void resize (const unsigned int size)
-      {
-        if (general_jac.size() != size)
-          {
-            quadrature_points.resize(size);
-            general_jac.resize(size);
-            general_jac_grad.resize(size);
-          }
-      }
-
-      AlignedVector<tensor1>  quadrature_points;
-      AlignedVector<tensor2>  general_jac;
-      AlignedVector<tensor3>  general_jac_grad;
-      tensor2                 const_jac;
-      const double            jac_size;
+      AlignedVector<Tensor<1,dim,VectorizedArray<Number> > >  quadrature_points;
+      AlignedVector<Tensor<2,dim,VectorizedArray<Number> > >  general_jac;
+      AlignedVector<Tensor<3,dim,VectorizedArray<Number> > >  general_jac_grad;
+      Tensor<2,dim,VectorizedArray<Number> > const_jac;
+      const double                           jac_size;
     };
 
                                 /**
@@ -406,11 +376,51 @@ namespace MatrixFreeFunctions
                           const std::pair<unsigned int,unsigned int> *cells,
                           const unsigned int  cell,
                           const unsigned int  my_q,
-                          unsigned int (&cell_t_prev)[n_vectors],
-                          unsigned int (&cell_t)[n_vectors],
+                          CellType (&cell_t_prev)[VectorizedArray<Number>::n_array_elements],
+                          CellType (&cell_t)[VectorizedArray<Number>::n_array_elements],
                           FEValues<dim,dim> &fe_values,
                           CellData          &cell_data) const;
   };
+
+
+
+  /* ------------------- inline functions ----------------------------- */
+
+  template <int dim, typename Number>
+  inline
+  unsigned int
+  MappingInfo<dim,Number>::MappingInfoDependent::
+  quad_index_from_n_q_points (const unsigned int n_q_points) const
+  {
+    for (unsigned int i=0; i<quad_index_conversion.size(); ++i)
+      if (n_q_points == quad_index_conversion[i])
+        return i;
+    return 0;
+  }
+
+
+
+  template <int dim, typename Number>
+  inline
+  CellType
+  MappingInfo<dim,Number>::get_cell_type (const unsigned int cell_no) const
+  {
+    AssertIndexRange (cell_no, cell_type.size());
+    CellType enum_cell_type = (CellType)(cell_type[cell_no] % n_cell_types);
+    Assert(enum_cell_type != undefined, ExcInternalError());
+    return enum_cell_type;
+  }
+
+
+
+  template <int dim, typename Number>
+  inline
+  unsigned int
+  MappingInfo<dim,Number>::get_cell_data_index (const unsigned int cell_no) const
+  {
+    AssertIndexRange (cell_no, cell_type.size());
+    return cell_type[cell_no] >> n_cell_type_bits;
+  }
 
 } // end of namespace MatrixFreeFunctions
 } // end of namespace internal

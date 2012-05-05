@@ -30,29 +30,29 @@
 #include <iostream>
 
 
-template <int dim, int n_dofs_1d, typename Number>
+template <int dim, int fe_degree, typename Number>
 void
 helmholtz_operator (const MatrixFree<dim,Number>  &data,
-		    parallel::distributed::Vector<Number>       &dst,
-		    const parallel::distributed::Vector<Number> &src,
-		    const std::pair<unsigned int,unsigned int>  &cell_range)
+                    parallel::distributed::Vector<Number>       &dst,
+                    const parallel::distributed::Vector<Number> &src,
+                    const std::pair<unsigned int,unsigned int>  &cell_range)
 {
-  FEEvaluation<dim,n_dofs_1d,n_dofs_1d,1,Number> fe_eval (data);
+  FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
   for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
     {
       fe_eval.reinit (cell);
 
-				// compare values with the ones the FEValues
-				// gives us. Those are seen as reference
+                                // compare values with the ones the FEValues
+                                // gives us. Those are seen as reference
       fe_eval.read_dof_values (src);
       fe_eval.evaluate (true, true, false);
       for (unsigned int q=0; q<n_q_points; ++q)
-	{
-	  fe_eval.submit_value (Number(10)*fe_eval.get_value(q),q);
-	  fe_eval.submit_gradient (fe_eval.get_gradient(q),q);
-	}
+        {
+          fe_eval.submit_value (Number(10)*fe_eval.get_value(q),q);
+          fe_eval.submit_gradient (fe_eval.get_gradient(q),q);
+        }
       fe_eval.integrate (true,true);
       fe_eval.distribute_local_to_global (dst);
     }
@@ -60,7 +60,7 @@ helmholtz_operator (const MatrixFree<dim,Number>  &data,
 
 
 
-template <int dim, int n_dofs_1d, typename Number>
+template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
  public:
@@ -72,14 +72,14 @@ class MatrixFreeTest
   {};
 
   void vmult (parallel::distributed::Vector<Number>       &dst,
-	      const parallel::distributed::Vector<Number> &src) const
+              const parallel::distributed::Vector<Number> &src) const
   {
     dst = 0;
     const std_cxx1x::function<void(const MatrixFree<dim,Number>  &,
-				   parallel::distributed::Vector<Number>&,
-				   const parallel::distributed::Vector<Number>&,
-				   const std::pair<unsigned int,unsigned int>&)>
-      wrap = helmholtz_operator<dim,n_dofs_1d,Number>;
+                                   parallel::distributed::Vector<Number>&,
+                                   const parallel::distributed::Vector<Number>&,
+                                   const std::pair<unsigned int,unsigned int>&)>
+      wrap = helmholtz_operator<dim,fe_degree,Number>;
     data.cell_loop (wrap, dst, src);
   };
 
@@ -106,7 +106,7 @@ void test ()
   for (; cell!=endc; ++cell)
     if (cell->is_locally_owned())
       if (cell->center().norm()<0.2)
-	cell->set_refine_flag();
+        cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   if (fe_degree < 2)
     tria.refine_global(2);
@@ -123,9 +123,9 @@ void test ()
       cell = tria.begin_active ();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
-	if (cell->is_locally_owned())
-	  if (counter % (7-i) == 0)
-	    cell->set_refine_flag();
+        if (cell->is_locally_owned())
+          if (counter % (7-i) == 0)
+            cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
@@ -159,7 +159,7 @@ void test ()
     mf_data.reinit (dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim,fe_degree+1,number> mf (mf_data);
+  MatrixFreeTest<dim,fe_degree,number> mf (mf_data);
   parallel::distributed::Vector<number> in, out, ref;
   mf_data.initialize_dof_vector (in);
   out.reinit (in);
@@ -168,9 +168,9 @@ void test ()
   for (unsigned int i=0; i<in.local_size(); ++i)
     {
       const unsigned int glob_index =
-	owned_set.nth_index_in_set (i);
+        owned_set.nth_index_in_set (i);
       if(constraints.is_constrained(glob_index))
-	continue;
+        continue;
       in.local_element(i) = (double)rand()/RAND_MAX;
     }
 
@@ -185,39 +185,39 @@ void test ()
       typename MatrixFree<dim,number>::AdditionalData data;
       data.mpi_communicator = MPI_COMM_WORLD;
       if (parallel_option == 0)
-	{
-	  data.tasks_parallel_scheme =
-	    MatrixFree<dim,number>::AdditionalData::partition_partition;
-	  deallog << "Parallel option: partition partition" << std::endl;
-	}
+        {
+          data.tasks_parallel_scheme =
+            MatrixFree<dim,number>::AdditionalData::partition_partition;
+          deallog << "Parallel option: partition partition" << std::endl;
+        }
       else if (parallel_option == 1)
-	{
-	  data.tasks_parallel_scheme =
-	    MatrixFree<dim,number>::AdditionalData::partition_color;
-	  deallog << "Parallel option: partition color" << std::endl;
-	}
+        {
+          data.tasks_parallel_scheme =
+            MatrixFree<dim,number>::AdditionalData::partition_color;
+          deallog << "Parallel option: partition color" << std::endl;
+        }
       else if (parallel_option == 2)
-	{
-	  data.tasks_parallel_scheme =
-	    MatrixFree<dim,number>::AdditionalData::color;
-	  deallog << "Parallel option: color" << std::endl;
-	}
+        {
+          data.tasks_parallel_scheme =
+            MatrixFree<dim,number>::AdditionalData::color;
+          deallog << "Parallel option: color" << std::endl;
+        }
 
       data.tasks_block_size = 3;
       mf_data.reinit (dof, constraints, quad, data);
-      MatrixFreeTest<dim, fe_degree+1, number> mf (mf_data);
+      MatrixFreeTest<dim, fe_degree, number> mf (mf_data);
       MPI_Barrier(MPI_COMM_WORLD);
       deallog << "Norm of difference:";
 
-				// run 10 times to make a possible error more
-				// likely to show up
+                                // run 10 times to make a possible error more
+                                // likely to show up
       for (unsigned int run=0; run<10; ++run)
-	{
-	  mf.vmult (out, in);
-	  out -= ref;
-	  const double diff_norm = out.linfty_norm();
-	  deallog << " " << diff_norm;
-	}
+        {
+          mf.vmult (out, in);
+          out -= ref;
+          const double diff_norm = out.linfty_norm();
+          deallog << " " << diff_norm;
+        }
       deallog << std::endl;
     }
   deallog << std::endl;

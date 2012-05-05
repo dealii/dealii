@@ -508,6 +508,12 @@ namespace parallel
    */
   struct ParallelForInteger
   {
+      /**
+       * Destructor. Made virtual to ensure that derived classes also
+       * have virtual destructors.
+       */
+      virtual ~ParallelForInteger ();
+
                                 /**
                                  * This function runs the for loop over the
                                  * given range <tt>[lower,upper)</tt>,
@@ -832,6 +838,11 @@ namespace parallel
   }
 
 #endif
+
+
+  inline
+  ParallelForInteger::~ParallelForInteger ()
+  {}
 
 
   inline

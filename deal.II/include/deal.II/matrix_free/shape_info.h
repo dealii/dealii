@@ -11,8 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
-#ifndef __deal2__matrix_free_fe_evaluation_data_h
-#define __deal2__matrix_free_fe_evaluation_data_h
+#ifndef __deal2__matrix_free_shape_info_h
+#define __deal2__matrix_free_shape_info_h
 
 
 #include <deal.II/base/exceptions.h>
@@ -38,15 +38,12 @@ namespace MatrixFreeFunctions
    * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
    */
   template <typename Number>
-  struct FEEvaluationData
+  struct ShapeInfo
   {
-    typedef VectorizedArray<Number> vector_t;
-    static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
-
                                 /**
                                  * Empty constructor. Does nothing.
                                  */
-    FEEvaluationData ();
+    ShapeInfo ();
 
                                 /**
                                  * Initializes the data fields. Takes a
@@ -90,7 +87,7 @@ namespace MatrixFreeFunctions
                                  * quadrature points are the index running
                                  * fastest.
                                  */
-    AlignedVector<vector_t> shape_values;
+    AlignedVector<VectorizedArray<Number> > shape_values;
 
                                 /**
                                  * Stores the shape gradients of the 1D finite
@@ -103,7 +100,7 @@ namespace MatrixFreeFunctions
                                  * quadrature points are the index running
                                  * fastest.
                                  */
-    AlignedVector<vector_t> shape_gradients;
+    AlignedVector<VectorizedArray<Number> > shape_gradients;
 
                                 /**
                                  * Stores the shape Hessians of the 1D finite
@@ -116,7 +113,7 @@ namespace MatrixFreeFunctions
                                  * quadrature points are the index running
                                  * fastest.
                                  */
-    AlignedVector<vector_t> shape_hessians;
+    AlignedVector<VectorizedArray<Number> > shape_hessians;
 
                                 /**
                                  * Stores the indices from cell DoFs to face

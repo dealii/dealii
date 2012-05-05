@@ -32,9 +32,9 @@ void test ()
 
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
-				// vector 0:
-				// global size: 20, local_size: 3 as long as
-				// less than 20
+                                // vector 0:
+                                // global size: 20, local_size: 3 as long as
+                                // less than 20
   const unsigned int local_size0 = 3;
   const unsigned int global_size0 = std::min(20U, local_size0 * numproc);
   const unsigned int my_start0 = std::min (local_size0 * myid, global_size0);
@@ -44,7 +44,7 @@ void test ()
   IndexSet local_owned0 (global_size0);
   if (my_end0 > my_start0)
     local_owned0.add_range(static_cast<unsigned int>(my_start0),
-			   static_cast<unsigned int>(my_end0));
+                           static_cast<unsigned int>(my_end0));
   IndexSet local_relevant0(global_size0);
   local_relevant0 = local_owned0;
   local_relevant0.add_index (2);
@@ -52,9 +52,9 @@ void test ()
     local_relevant0.add_index(8);
 
   parallel::distributed::Vector<double> v0(local_owned0, local_relevant0,
-					   MPI_COMM_WORLD);
+                                           MPI_COMM_WORLD);
 
-				// vector1: local size 4
+                                // vector1: local size 4
   const unsigned int local_size1 = 4;
   const unsigned int global_size1 = local_size1 * numproc;
   const int my_start1 = local_size1 * myid;
@@ -62,7 +62,7 @@ void test ()
 
   IndexSet local_owned1 (global_size1);
   local_owned1.add_range(static_cast<unsigned int>(my_start1),
-			 static_cast<unsigned int>(my_end1));
+                         static_cast<unsigned int>(my_end1));
   IndexSet local_relevant1(global_size1);
   local_relevant1 = local_owned1;
   local_relevant1.add_index (0);
@@ -74,17 +74,17 @@ void test ()
     }
 
   parallel::distributed::Vector<double> v1(local_owned1, local_relevant1,
-					   MPI_COMM_WORLD);
+                                           MPI_COMM_WORLD);
 
   v0 = 1;
   v1 = 2;
-				// check assignment in initial state
+                                // check assignment in initial state
   for (unsigned int i=0; i<v0.local_size(); ++i)
     Assert (v0.local_element(i) == 1., ExcNonEqual(v0.local_element(i),1.));
   for (unsigned int i=0; i<v1.local_size(); ++i)
     Assert (v1.local_element(i) == 2., ExcNonEqual(v1.local_element(i),2.));
 
-				// check ghost elements in initial state
+                                // check ghost elements in initial state
   v0.update_ghost_values();
   v1.update_ghost_values();
   Assert (v0(2) == 1., ExcNonEqual(v0(2),1.));
@@ -98,8 +98,9 @@ void test ()
       Assert (v1(10) == 2., ExcNonEqual(v1(10),2.));
     }
   if (myid==0) deallog << "Initial set and ghost update OK" << std::endl;
+  MPI_Barrier (MPI_COMM_WORLD);
 
-				// now swap v1 and v0
+                                // now swap v1 and v0
   v0.swap (v1);
   AssertDimension (v0.local_size(), local_size1);
   AssertDimension (v1.local_size(), actual_local_size0);
@@ -124,8 +125,8 @@ void test ()
     }
   if (myid==0) deallog << "Ghost values after first swap OK" << std::endl;
 
-				// now set the vectors to some different
-				// values and check the ghost values again
+                                // now set the vectors to some different
+                                // values and check the ghost values again
   v0 = 7.;
   v1 = 42.;
   v0.update_ghost_values();
@@ -142,7 +143,7 @@ void test ()
     }
   if (myid==0) deallog << "Ghost values after re-set OK" << std::endl;
 
-				// swap with an empty vector
+                                // swap with an empty vector
   parallel::distributed::Vector<double> v2;
   v2.swap (v0);
   AssertDimension (v0.size(), 0);

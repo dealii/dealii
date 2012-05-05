@@ -39,29 +39,29 @@ void test ();
 
 
 
-template <int dim, int n_dofs_1d, typename Number>
+template <int dim, int fe_degree, typename Number>
 void
 helmholtz_operator (const MatrixFree<dim,Number>  &data,
-		    Vector<Number>       &dst,
-		    const Vector<Number> &src,
-		    const std::pair<unsigned int,unsigned int> &cell_range)
+                    Vector<Number>       &dst,
+                    const Vector<Number> &src,
+                    const std::pair<unsigned int,unsigned int> &cell_range)
 {
-  FEEvaluation<dim,n_dofs_1d,n_dofs_1d,1,Number> fe_eval (data);
+  FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
   for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
     {
       fe_eval.reinit (cell);
 
-				// compare values with the ones the FEValues
-				// gives us. Those are seen as reference
+                                // compare values with the ones the FEValues
+                                // gives us. Those are seen as reference
       fe_eval.read_dof_values (src);
       fe_eval.template evaluate (true, true, false);
       for (unsigned int q=0; q<n_q_points; ++q)
-	{
-	  fe_eval.submit_value (Number(10)*fe_eval.get_value(q),q);
-	  fe_eval.submit_gradient (fe_eval.get_gradient(q),q);
-	}
+        {
+          fe_eval.submit_value (Number(10)*fe_eval.get_value(q),q);
+          fe_eval.submit_gradient (fe_eval.get_gradient(q),q);
+        }
       fe_eval.template integrate (true,true);
       fe_eval.distribute_local_to_global (dst);
     }
@@ -69,7 +69,7 @@ helmholtz_operator (const MatrixFree<dim,Number>  &data,
 
 
 
-template <int dim, int n_dofs_1d, typename Number>
+template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
  public:
@@ -81,14 +81,14 @@ class MatrixFreeTest
   {};
 
   void vmult (Vector<Number>       &dst,
-	      const Vector<Number> &src) const
+              const Vector<Number> &src) const
   {
     dst = 0;
     const std_cxx1x::function<void(const MatrixFree<dim,Number>  &,
-				   Vector<Number>       &,
-				   const Vector<Number> &,
-				   const std::pair<unsigned int,unsigned int>&)>
-      wrap = helmholtz_operator<dim,n_dofs_1d,Number>;
+                                   Vector<Number>       &,
+                                   const Vector<Number> &,
+                                   const std::pair<unsigned int,unsigned int>&)>
+      wrap = helmholtz_operator<dim,fe_degree,Number>;
     data.cell_loop (wrap, dst, src);
   };
 
@@ -102,8 +102,8 @@ private:
 
 template <int dim, int fe_degree, typename number>
 void do_test (const DoFHandler<dim> &dof,
-	      const ConstraintMatrix&constraints,
-	      const unsigned int     parallel_option = 0)
+              const ConstraintMatrix&constraints,
+              const unsigned int     parallel_option = 0)
 {
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -119,22 +119,22 @@ void do_test (const DoFHandler<dim> &dof,
     typename MatrixFree<dim,number>::AdditionalData data;
     if (parallel_option == 1)
       data.tasks_parallel_scheme =
-	MatrixFree<dim,number>::AdditionalData::partition_color;
+        MatrixFree<dim,number>::AdditionalData::partition_color;
     else if (parallel_option == 2)
       data.tasks_parallel_scheme =
-	MatrixFree<dim,number>::AdditionalData::color;
+        MatrixFree<dim,number>::AdditionalData::color;
     else
       {
-	Assert (parallel_option == 0, ExcInternalError());
-	data.tasks_parallel_scheme =
-	  MatrixFree<dim,number>::AdditionalData::partition_partition;
+        Assert (parallel_option == 0, ExcInternalError());
+        data.tasks_parallel_scheme =
+          MatrixFree<dim,number>::AdditionalData::partition_partition;
       }
     data.tasks_block_size = 7;
 
     mf_data.reinit (dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim,fe_degree+1,number> mf (mf_data);
+  MatrixFreeTest<dim,fe_degree,number> mf (mf_data);
   Vector<number> in (dof.n_dofs()), out (dof.n_dofs());
   Vector<number> in_dist (dof.n_dofs());
   Vector<number> out_dist (in_dist);
@@ -142,7 +142,7 @@ void do_test (const DoFHandler<dim> &dof,
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
       if(constraints.is_constrained(i))
-	continue;
+        continue;
       const double entry = rand()/(double)RAND_MAX;
       in(i) = entry;
       in_dist(i) = entry;
@@ -151,8 +151,8 @@ void do_test (const DoFHandler<dim> &dof,
   mf.vmult (out_dist, in_dist);
 
 
-				// assemble sparse matrix with (\nabla v,
-				// \nabla u) + (v, 10 * u)
+                                // assemble sparse matrix with (\nabla v,
+                                // \nabla u) + (v, 10 * u)
   SparsityPattern sparsity;
   {
     CompressedSimpleSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
@@ -164,8 +164,8 @@ void do_test (const DoFHandler<dim> &dof,
     QGauss<dim>  quadrature_formula(fe_degree+1);
 
     FEValues<dim> fe_values (dof.get_fe(), quadrature_formula,
-			     update_values    |  update_gradients |
-			     update_JxW_values);
+                             update_values    |  update_gradients |
+                             update_JxW_values);
 
     const unsigned int   dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
@@ -178,26 +178,26 @@ void do_test (const DoFHandler<dim> &dof,
       endc = dof.end();
     for (; cell!=endc; ++cell)
       {
-	cell_matrix = 0;
-	fe_values.reinit (cell);
+        cell_matrix = 0;
+        fe_values.reinit (cell);
 
-	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    {
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point) *
-				      fe_values.shape_grad(j,q_point)
-				      +
-				      10. *
-				      fe_values.shape_value(i,q_point) *
-				      fe_values.shape_value(j,q_point)) *
-				     fe_values.JxW(q_point));
-	    }
+        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            {
+              for (unsigned int j=0; j<dofs_per_cell; ++j)
+                cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point) *
+                                      fe_values.shape_grad(j,q_point)
+                                      +
+                                      10. *
+                                      fe_values.shape_value(i,q_point) *
+                                      fe_values.shape_value(j,q_point)) *
+                                     fe_values.JxW(q_point));
+            }
 
-	cell->get_dof_indices(local_dof_indices);
-	constraints.distribute_local_to_global (cell_matrix,
-						local_dof_indices,
-						sparse_matrix);
+        cell->get_dof_indices(local_dof_indices);
+        constraints.distribute_local_to_global (cell_matrix,
+                                                local_dof_indices,
+                                                sparse_matrix);
       }
   }
 

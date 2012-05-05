@@ -25,7 +25,7 @@ void test ()
   GridGenerator::hyper_ball (tria);
   static const HyperBallBoundary<dim> boundary;
   tria.set_boundary (0, boundary);
-				// refine first and last cell
+                                // refine first and last cell
   tria.begin(tria.n_levels()-1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();

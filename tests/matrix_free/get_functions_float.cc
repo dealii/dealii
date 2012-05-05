@@ -26,16 +26,16 @@ void test ()
   create_mesh (tria);
   tria.refine_global(4-dim);
 
-				// refine a few cells
+                                // refine a few cells
   for (unsigned int i=0; i<10-3*dim; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator
-	cell = tria.begin_active (),
-	endc = tria.end();
+        cell = tria.begin_active (),
+        endc = tria.end();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
-	if (counter % (7-i) == 0)
-	  cell->set_refine_flag();
+        if (counter % (7-i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
@@ -46,7 +46,7 @@ void test ()
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof, constraints);
   VectorTools::interpolate_boundary_values (dof, 1, ZeroFunction<dim>(),
-					    constraints);
+                                            constraints);
   constraints.close();
 
   do_test <dim, fe_degree, float> (dof, constraints);

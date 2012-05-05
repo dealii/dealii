@@ -30,7 +30,7 @@ void test ()
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
 
-				   // each processor owns 2 indices and all
+                                   // each processor owns 2 indices and all
                                    // are ghosting element 1 (the second)
   IndexSet local_owned(numproc*2);
   local_owned.add_range(myid*2,myid*2+2);
@@ -50,14 +50,14 @@ void test ()
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
 
-				// set ghost dof on remote processors,
-				// compress
+                                // set ghost dof on remote processors,
+                                // compress
   if (myid > 0)
     v(1) = 0;
 
   v.compress();
 
-				// check that nothing has changed
+                                // check that nothing has changed
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
 

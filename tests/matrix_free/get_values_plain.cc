@@ -34,7 +34,7 @@
 std::ofstream logfile("get_values_plain/output");
 
 
-template <int dim, int n_dofs_1d, int n_q_points_1d=n_dofs_1d, typename Number=double>
+template <int dim, int fe_degree, int n_q_points_1d=fe_degree+1, typename Number=double>
 class MatrixFreeTest
 {
  public:
@@ -44,33 +44,33 @@ class MatrixFreeTest
     data   (data_in)
   {};
 
-				// make function virtual to allow derived
-				// classes to define a different function
+                                // make function virtual to allow derived
+                                // classes to define a different function
   virtual void
   operator () (const MatrixFree<dim,Number> &data,
-	       Vector<Number> &,
-	       const Vector<Number> &src,
-	       const std::pair<unsigned int,unsigned int> &cell_range) const
+               Vector<Number> &,
+               const Vector<Number> &src,
+               const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     typedef VectorizedArray<Number> vector_t;
     const unsigned int n_vectors = sizeof(vector_t)/sizeof(Number);
-    FEEvaluation<dim,n_dofs_1d,n_q_points_1d,1,Number> fe_eval (data);
-    FEEvaluation<dim,n_dofs_1d,n_q_points_1d,1,Number> fe_eval_plain (data);
+    FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval (data);
+    FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval_plain (data);
     for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
       {
-	fe_eval.reinit (cell);
-	fe_eval.read_dof_values(src);
+        fe_eval.reinit (cell);
+        fe_eval.read_dof_values(src);
 
-	fe_eval_plain.reinit (cell);
-	fe_eval_plain.read_dof_values_plain(src);
+        fe_eval_plain.reinit (cell);
+        fe_eval_plain.read_dof_values_plain(src);
 
-	for (unsigned int i=0; i<fe_eval.dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<n_vectors; ++j)
-	    {
-	      error += std::fabs(fe_eval.get_dof_value(i)[j]-
-				 fe_eval_plain.get_dof_value(i)[j]);
-	      total += std::fabs(fe_eval.get_dof_value(i)[j]);
-	    }
+        for (unsigned int i=0; i<fe_eval.dofs_per_cell; ++i)
+          for (unsigned int j=0; j<n_vectors; ++j)
+            {
+              error += std::fabs(fe_eval.get_dof_value(i)[j]-
+                                 fe_eval_plain.get_dof_value(i)[j]);
+              total += std::fabs(fe_eval.get_dof_value(i)[j]);
+            }
       }
   }
 
@@ -81,12 +81,12 @@ class MatrixFreeTest
     error = 0;
     total = 0;
     Vector<Number> dst_dummy;
-    data.cell_loop (&MatrixFreeTest<dim,n_dofs_1d,n_q_points_1d,Number>::operator(),
-		    this, dst_dummy, src);
+    data.cell_loop (&MatrixFreeTest<dim,fe_degree,n_q_points_1d,Number>::operator(),
+                    this, dst_dummy, src);
 
     deallog.threshold_double(1e-10);
     deallog << "Error read_dof_values vs read_dof_values_plain: "
-	    << error/total << std::endl << std::endl;
+            << error/total << std::endl << std::endl;
   };
 
 protected:
@@ -98,21 +98,21 @@ protected:
 
 template <int dim, int fe_degree, typename number>
 void do_test (const DoFHandler<dim> &dof,
-	      const ConstraintMatrix&constraints)
+              const ConstraintMatrix&constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   //std::cout << "Number of cells: " << dof.get_tria().n_active_cells()
-  //	  << std::endl;
+  //          << std::endl;
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
   //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   Vector<number> solution (dof.n_dofs());
 
-				// create vector with random entries
+                                // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
       if(constraints.is_constrained(i))
-	continue;
+        continue;
       const double entry = rand()/(double)RAND_MAX;
       solution(i) = entry;
     }
@@ -127,7 +127,7 @@ void do_test (const DoFHandler<dim> &dof,
     mf_data.reinit (dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim,fe_degree+1,fe_degree+1,number> mf (mf_data);
+  MatrixFreeTest<dim,fe_degree,fe_degree+1,number> mf (mf_data);
   mf.test_functions(solution);
 }
 
@@ -140,16 +140,16 @@ void test ()
   tria.set_boundary (0, boundary);
   tria.set_boundary (1, boundary);
 
-				// refine a few cells
+                                // refine a few cells
   for (unsigned int i=0; i<11-3*dim; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator
-	cell = tria.begin_active (),
-	endc = tria.end();
+        cell = tria.begin_active (),
+        endc = tria.end();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
-	if (counter % (7-i) == 0)
-	  cell->set_refine_flag();
+        if (counter % (7-i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
@@ -160,7 +160,7 @@ void test ()
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values (dof, 1, ZeroFunction<dim>(),
-					    constraints);
+                                            constraints);
   constraints.close();
 
   do_test<dim, fe_degree, double> (dof, constraints);

@@ -53,54 +53,54 @@ class MatrixFreeTest
 
   void
   local_apply (const MatrixFree<dim,Number> &data,
-	       VectorType          &dst,
-	       const VectorType    &src,
-	       const std::pair<unsigned int,unsigned int> &cell_range) const
+               VectorType          &dst,
+               const VectorType    &src,
+               const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     typedef VectorizedArray<Number> vector_t;
-    FEEvaluation<dim,degree_p+2,degree_p+2,dim,Number> velocity (data, 0);
-    FEEvaluation<dim,degree_p+1,degree_p+2,1,  Number> pressure (data, 1);
+    FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number> velocity (data, 0);
+    FEEvaluation<dim,degree_p  ,degree_p+2,1,  Number> pressure (data, 1);
 
     for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
       {
-	velocity.reinit (cell);
-	velocity.read_dof_values (src, 0);
-	velocity.evaluate (false,true,false);
-	pressure.reinit (cell);
-	pressure.read_dof_values (src, dim);
-	pressure.evaluate (true,false,false);
+        velocity.reinit (cell);
+        velocity.read_dof_values (src, 0);
+        velocity.evaluate (false,true,false);
+        pressure.reinit (cell);
+        pressure.read_dof_values (src, dim);
+        pressure.evaluate (true,false,false);
 
-	for (unsigned int q=0; q<velocity.n_q_points; ++q)
-	  {
-	    SymmetricTensor<2,dim,vector_t> sym_grad_u =
-	      velocity.get_symmetric_gradient (q);
-	    vector_t pres = pressure.get_value(q);
-	    vector_t div = -velocity.get_divergence(q);
-	    pressure.submit_value   (div, q);
+        for (unsigned int q=0; q<velocity.n_q_points; ++q)
+          {
+            SymmetricTensor<2,dim,vector_t> sym_grad_u =
+              velocity.get_symmetric_gradient (q);
+            vector_t pres = pressure.get_value(q);
+            vector_t div = -velocity.get_divergence(q);
+            pressure.submit_value   (div, q);
 
-	                       // subtract p * I
-	    for (unsigned int d=0; d<dim; ++d)
-	      sym_grad_u[d][d] -= pres;
+                               // subtract p * I
+            for (unsigned int d=0; d<dim; ++d)
+              sym_grad_u[d][d] -= pres;
 
-	    velocity.submit_symmetric_gradient(sym_grad_u, q);
-	  }
+            velocity.submit_symmetric_gradient(sym_grad_u, q);
+          }
 
-	velocity.integrate (false,true);
-	velocity.distribute_local_to_global (dst, 0);
-	pressure.integrate (true,false);
-	pressure.distribute_local_to_global (dst, dim);
+        velocity.integrate (false,true);
+        velocity.distribute_local_to_global (dst, 0);
+        pressure.integrate (true,false);
+        pressure.distribute_local_to_global (dst, dim);
       }
   }
 
 
   void vmult (VectorType &dst,
-	      const VectorType &src) const
+              const VectorType &src) const
   {
     AssertDimension (dst.size(), dim+1);
     for (unsigned int d=0; d<dim+1; ++d)
       dst[d] = 0;
     data.cell_loop (&MatrixFreeTest<dim,degree_p,VectorType>::local_apply,
-		    this, dst, src);
+                    this, dst, src);
   };
 
 private:
@@ -118,16 +118,16 @@ void test ()
     subdivisions[0] = 4;
 
     const Point<dim> bottom_left = (dim == 2 ?
-				    Point<dim>(-2,-1) :
-				    Point<dim>(-2,0,-1));
+                                    Point<dim>(-2,-1) :
+                                    Point<dim>(-2,0,-1));
     const Point<dim> top_right   = (dim == 2 ?
-				    Point<dim>(2,0) :
-				    Point<dim>(2,1,0));
+                                    Point<dim>(2,0) :
+                                    Point<dim>(2,1,0));
 
     GridGenerator::subdivided_hyper_rectangle (triangulation,
-					       subdivisions,
-					       bottom_left,
-					       top_right);
+                                               subdivisions,
+                                               bottom_left,
+                                               top_right);
   }
   triangulation.refine_global (4-dim);
 
@@ -172,7 +172,7 @@ void test ()
 
     for (unsigned int d=0; d<dim+1; ++d)
       for (unsigned int e=0; e<dim+1; ++e)
-	csp.block(d,e).reinit (dofs_per_block[d], dofs_per_block[e]);
+        csp.block(d,e).reinit (dofs_per_block[d], dofs_per_block[e]);
 
     csp.collect_sizes();
 
@@ -201,14 +201,14 @@ void test ()
   vec1[dim].reinit (dofs_per_block[dim]);
   vec2[dim].reinit (vec1[dim]);
 
-				// this is from step-22
+                                // this is from step-22
   {
     QGauss<dim>   quadrature_formula(fe_degree+2);
 
     FEValues<dim> fe_values (fe, quadrature_formula,
-			     update_values    |
-			     update_JxW_values |
-			     update_gradients);
+                             update_values    |
+                             update_JxW_values |
+                             update_gradients);
 
     const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int   n_q_points      = quadrature_formula.size();
@@ -229,50 +229,50 @@ void test ()
       endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-	fe_values.reinit (cell);
-	local_matrix = 0;
+        fe_values.reinit (cell);
+        local_matrix = 0;
 
-	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-	    for (unsigned int k=0; k<dofs_per_cell; ++k)
-	      {
-		phi_grads_u[k] = fe_values[velocities].symmetric_gradient (k, q);
-		div_phi_u[k]   = fe_values[velocities].divergence (k, q);
-		phi_p[k]       = fe_values[pressure].value (k, q);
-	      }
+        for (unsigned int q=0; q<n_q_points; ++q)
+          {
+            for (unsigned int k=0; k<dofs_per_cell; ++k)
+              {
+                phi_grads_u[k] = fe_values[velocities].symmetric_gradient (k, q);
+                div_phi_u[k]   = fe_values[velocities].divergence (k, q);
+                phi_p[k]       = fe_values[pressure].value (k, q);
+              }
 
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      {
-		for (unsigned int j=0; j<=i; ++j)
-		  {
-		    local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
-					  - div_phi_u[i] * phi_p[j]
-					  - phi_p[i] * div_phi_u[j])
-		      * fe_values.JxW(q);
-		  }
-	      }
-	  }
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int j=i+1; j<dofs_per_cell; ++j)
-	    local_matrix(i,j) = local_matrix(j,i);
+            for (unsigned int i=0; i<dofs_per_cell; ++i)
+              {
+                for (unsigned int j=0; j<=i; ++j)
+                  {
+                    local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
+                                          - div_phi_u[i] * phi_p[j]
+                                          - phi_p[i] * div_phi_u[j])
+                      * fe_values.JxW(q);
+                  }
+              }
+          }
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int j=i+1; j<dofs_per_cell; ++j)
+            local_matrix(i,j) = local_matrix(j,i);
 
-	cell->get_dof_indices (local_dof_indices);
-	constraints.distribute_local_to_global (local_matrix,
-						local_dof_indices,
-						system_matrix);
+        cell->get_dof_indices (local_dof_indices);
+        constraints.distribute_local_to_global (local_matrix,
+                                                local_dof_indices,
+                                                system_matrix);
       }
   }
 
-				// first system_rhs with random numbers
+                                // first system_rhs with random numbers
   for (unsigned int i=0; i<dim+1; ++i)
     for (unsigned int j=0; j<system_rhs.block(i).size(); ++j)
       {
-	const double val = -1. + 2.*(double)rand()/double(RAND_MAX);
-	system_rhs.block(i)(j) = val;
-	vec1[i](j) = val;
+        const double val = -1. + 2.*(double)rand()/double(RAND_MAX);
+        system_rhs.block(i)(j) = val;
+        vec1[i](j) = val;
       }
 
-				// setup matrix-free structure
+                                // setup matrix-free structure
   {
     std::vector<const DoFHandler<dim>*> dofs;
     dofs.push_back(&dof_handler_u);
@@ -284,9 +284,9 @@ void test ()
     constraints.push_back (&dummy_constraints);
     QGauss<1> quad(fe_degree+2);
     mf_data.reinit (dofs, constraints, quad,
-		    typename MatrixFree<dim>::AdditionalData
-		    (MPI_COMM_WORLD,
-		     MatrixFree<dim>::AdditionalData::none));
+                    typename MatrixFree<dim>::AdditionalData
+                    (MPI_COMM_WORLD,
+                     MatrixFree<dim>::AdditionalData::none));
   }
 
   system_matrix.vmult (solution, system_rhs);
@@ -295,14 +295,14 @@ void test ()
   MatrixFreeTest<dim,fe_degree,VectorType> mf (mf_data);
   mf.vmult (vec2, vec1);
 
-				// Verification
+                                // Verification
   double error = 0.;
   for (unsigned int i=0; i<dim+1; ++i)
     for (unsigned int j=0; j<system_rhs.block(i).size(); ++j)
       error += std::fabs (solution.block(i)(j)-vec2[i](j));
   double relative = solution.block(0).l1_norm();
   deallog << "  Verification fe degree " << fe_degree  <<  ": "
-	  << error/relative << std::endl << std::endl;
+          << error/relative << std::endl << std::endl;
 }
 
 

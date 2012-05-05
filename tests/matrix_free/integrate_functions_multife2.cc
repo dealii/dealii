@@ -34,7 +34,7 @@
 std::ofstream logfile("integrate_functions_multife2/output");
 
 
-template <int dim, int n_dofs_1d, typename Number>
+template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
  public:
@@ -45,28 +45,28 @@ class MatrixFreeTest
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data   (data_in),
     fe_val0 (data.get_dof_handler(0).get_fe(),
-	     Quadrature<dim>(data.get_quad(0)),
-	     update_values | update_gradients | update_JxW_values),
+             Quadrature<dim>(data.get_quad(0)),
+             update_values | update_gradients | update_JxW_values),
     fe_val01 (data.get_dof_handler(0).get_fe(),
-	      Quadrature<dim>(data.get_quad(1)),
-	      update_values | update_gradients | update_JxW_values),
+              Quadrature<dim>(data.get_quad(1)),
+              update_values | update_gradients | update_JxW_values),
     fe_val1 (data.get_dof_handler(1).get_fe(),
-	     Quadrature<dim>(data.get_quad(1)),
-	     update_values | update_gradients | update_JxW_values)
+             Quadrature<dim>(data.get_quad(1)),
+             update_values | update_gradients | update_JxW_values)
   {};
 
   void operator () (const MatrixFree<dim,Number> &data,
-		    VectorType       &dst,
-		    const VectorType &src,
-		    const std::pair<unsigned int,unsigned int> &cell_range) const;
+                    VectorType       &dst,
+                    const VectorType &src,
+                    const std::pair<unsigned int,unsigned int> &cell_range) const;
 
   void test_functions (VectorType &dst) const
   {
     for (unsigned int comp=0; comp<dst.size(); ++comp)
       dst[comp] = 0;
     VectorType src_dummy;
-    data.cell_loop (&MatrixFreeTest<dim,n_dofs_1d,Number>::operator(), this,
-		    dst, src_dummy);
+    data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number>::operator(), this,
+                    dst, src_dummy);
   };
 
 private:
@@ -79,16 +79,16 @@ private:
 
 
 
-template <int dim, int n_dofs_1d, typename Number>
-void MatrixFreeTest<dim,n_dofs_1d,Number>::
+template <int dim, int fe_degree, typename Number>
+void MatrixFreeTest<dim,fe_degree,Number>::
 operator () (const MatrixFree<dim,Number> &data,
-	     std::vector<Vector<Number> > &dst,
-	     const std::vector<Vector<Number> > &,
-	     const std::pair<unsigned int,unsigned int> &cell_range) const
+             std::vector<Vector<Number> > &dst,
+             const std::vector<Vector<Number> > &,
+             const std::pair<unsigned int,unsigned int> &cell_range) const
 {
-  FEEvaluation<dim,1,1,1,Number> fe_eval0 (data, 0, 0);
-  FEEvaluation<dim,n_dofs_1d,n_dofs_1d,1,Number> fe_eval1 (data, 1, 1);
-  FEEvaluation<dim,1,n_dofs_1d,1,Number> fe_eval01 (data, 0, 1);
+  FEEvaluation<dim,0,1,1,Number> fe_eval0 (data, 0, 0);
+  FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval1 (data, 1, 1);
+  FEEvaluation<dim,0,fe_degree+1,1,Number> fe_eval01 (data, 0, 1);
   const unsigned int n_q_points0 = fe_eval0.n_q_points;
   const unsigned int n_q_points1 = fe_eval1.n_q_points;
   const unsigned int dofs_per_cell0 = fe_eval0.dofs_per_cell;
@@ -105,108 +105,108 @@ operator () (const MatrixFree<dim,Number> &data,
       fe_eval1.reinit(cell);
       fe_eval01.reinit(cell);
 
-				// compare values with the ones the FEValues
-				// gives us. Those are seen as reference
+                                // compare values with the ones the FEValues
+                                // gives us. Those are seen as reference
       for (unsigned int j=0; j<data.n_components_filled(cell); ++j)
-	{
-				// FE 0, Quad 0
-				// generate random numbers at quadrature
-				// points and test them with basis functions
-				// and their gradients
-	  for (unsigned int q=0; q<n_q_points0; ++q)
-	    {
-	      values0[q][j] = rand()/(double)RAND_MAX;
-	      for (unsigned int d=0; d<dim; ++d)
-		gradients0[q*dim+d][j] = -1. + 2. * (rand()/(double)RAND_MAX);
-	    }
-	  fe_val0.reinit (data.get_cell_iterator(cell,j,0));
-	  data.get_cell_iterator(cell,j,0)->get_dof_indices(dof_indices0);
+        {
+                                // FE 0, Quad 0
+                                // generate random numbers at quadrature
+                                // points and test them with basis functions
+                                // and their gradients
+          for (unsigned int q=0; q<n_q_points0; ++q)
+            {
+              values0[q][j] = rand()/(double)RAND_MAX;
+              for (unsigned int d=0; d<dim; ++d)
+                gradients0[q*dim+d][j] = -1. + 2. * (rand()/(double)RAND_MAX);
+            }
+          fe_val0.reinit (data.get_cell_iterator(cell,j,0));
+          data.get_cell_iterator(cell,j,0)->get_dof_indices(dof_indices0);
 
-	  for (unsigned int i=0; i<dofs_per_cell0; ++i)
-	    {
-	      double sum = 0.;
-	      for (unsigned int q=0; q<n_q_points0; ++q)
-		{
-		  sum += values0[q][j] * fe_val0.shape_value(i,q) * fe_val0.JxW(q);
-		  for (unsigned int d=0; d<dim; ++d)
-		    sum += (gradients0[q*dim+d][j] * fe_val0.shape_grad(i,q)[d] *
-			    fe_val0.JxW(q));
-		}
-	      dst[0+1](dof_indices0[i]) += sum;
-	    }
+          for (unsigned int i=0; i<dofs_per_cell0; ++i)
+            {
+              double sum = 0.;
+              for (unsigned int q=0; q<n_q_points0; ++q)
+                {
+                  sum += values0[q][j] * fe_val0.shape_value(i,q) * fe_val0.JxW(q);
+                  for (unsigned int d=0; d<dim; ++d)
+                    sum += (gradients0[q*dim+d][j] * fe_val0.shape_grad(i,q)[d] *
+                            fe_val0.JxW(q));
+                }
+              dst[0+1](dof_indices0[i]) += sum;
+            }
 
-				// FE 1, Quad 1
-	  fe_val1.reinit (data.get_cell_iterator(cell,j,1));
-	  data.get_cell_iterator(cell,j,1)->get_dof_indices(dof_indices1);
+                                // FE 1, Quad 1
+          fe_val1.reinit (data.get_cell_iterator(cell,j,1));
+          data.get_cell_iterator(cell,j,1)->get_dof_indices(dof_indices1);
 
-	  for (unsigned int q=0; q<n_q_points1; ++q)
-	    {
-	      values1[q][j] = rand()/(double)RAND_MAX;
-	      for (unsigned int d=0; d<dim; ++d)
-		gradients1[q*dim+d][j] = -1. + 2. * (rand()/(double)RAND_MAX);
-	    }
-	  for (unsigned int i=0; i<dofs_per_cell1; ++i)
-	    {
-	      double sum = 0.;
-	      for (unsigned int q=0; q<n_q_points1; ++q)
-		{
-		  sum += values1[q][j] * fe_val1.shape_value(i,q) * fe_val1.JxW(q);
-		  for (unsigned int d=0; d<dim; ++d)
-		    sum += (gradients1[q*dim+d][j] * fe_val1.shape_grad(i,q)[d] *
-			    fe_val1.JxW(q));
-		}
-	      dst[2+1](dof_indices1[i]) += sum;
-	    }
+          for (unsigned int q=0; q<n_q_points1; ++q)
+            {
+              values1[q][j] = rand()/(double)RAND_MAX;
+              for (unsigned int d=0; d<dim; ++d)
+                gradients1[q*dim+d][j] = -1. + 2. * (rand()/(double)RAND_MAX);
+            }
+          for (unsigned int i=0; i<dofs_per_cell1; ++i)
+            {
+              double sum = 0.;
+              for (unsigned int q=0; q<n_q_points1; ++q)
+                {
+                  sum += values1[q][j] * fe_val1.shape_value(i,q) * fe_val1.JxW(q);
+                  for (unsigned int d=0; d<dim; ++d)
+                    sum += (gradients1[q*dim+d][j] * fe_val1.shape_grad(i,q)[d] *
+                            fe_val1.JxW(q));
+                }
+              dst[2+1](dof_indices1[i]) += sum;
+            }
 
-				// FE 0, Quad 1
-	  fe_val01.reinit (data.get_cell_iterator(cell,j,0));
-	  for (unsigned int i=0; i<dofs_per_cell0; ++i)
-	    {
-	      double sum = 0.;
-	      for (unsigned int q=0; q<n_q_points1; ++q)
-		{
-		  sum += values1[q][j] * fe_val01.shape_value(i,q) * fe_val01.JxW(q);
-		  for (unsigned int d=0; d<dim; ++d)
-		    sum += (gradients1[q*dim+d][j] * fe_val01.shape_grad(i,q)[d] *
-			    fe_val01.JxW(q));
-		}
-	      dst[4+1](dof_indices0[i]) += sum;
-	    }
-	}
+                                // FE 0, Quad 1
+          fe_val01.reinit (data.get_cell_iterator(cell,j,0));
+          for (unsigned int i=0; i<dofs_per_cell0; ++i)
+            {
+              double sum = 0.;
+              for (unsigned int q=0; q<n_q_points1; ++q)
+                {
+                  sum += values1[q][j] * fe_val01.shape_value(i,q) * fe_val01.JxW(q);
+                  for (unsigned int d=0; d<dim; ++d)
+                    sum += (gradients1[q*dim+d][j] * fe_val01.shape_grad(i,q)[d] *
+                            fe_val01.JxW(q));
+                }
+              dst[4+1](dof_indices0[i]) += sum;
+            }
+        }
 
-				// FE 0, Quad 0
+                                // FE 0, Quad 0
       for (unsigned int q=0; q<n_q_points0; ++q)
-	{
-	  fe_eval0.submit_value (values0[q], q);
-	  Tensor<1,dim,vector_t> submit (false);
-	  for (unsigned int d=0; d<dim; ++d)
-	    submit[d] = gradients0[q*dim+d];
-	  fe_eval0.submit_gradient (submit, q);
-	}
+        {
+          fe_eval0.submit_value (values0[q], q);
+          Tensor<1,dim,vector_t> submit (false);
+          for (unsigned int d=0; d<dim; ++d)
+            submit[d] = gradients0[q*dim+d];
+          fe_eval0.submit_gradient (submit, q);
+        }
       fe_eval0.integrate (true,true);
       fe_eval0.distribute_local_to_global (dst[0]);
 
-				// FE 1, Quad 1
+                                // FE 1, Quad 1
       for (unsigned int q=0; q<n_q_points1; ++q)
-	{
-	  fe_eval1.submit_value (values1[q], q);
-	  Tensor<1,dim,vector_t> submit (false);
-	  for (unsigned int d=0; d<dim; ++d)
-	    submit[d] = gradients1[q*dim+d];
-	  fe_eval1.submit_gradient (submit, q);
-	}
+        {
+          fe_eval1.submit_value (values1[q], q);
+          Tensor<1,dim,vector_t> submit (false);
+          for (unsigned int d=0; d<dim; ++d)
+            submit[d] = gradients1[q*dim+d];
+          fe_eval1.submit_gradient (submit, q);
+        }
       fe_eval1.integrate (true,true);
       fe_eval1.distribute_local_to_global (dst[2]);
 
-				// FE 0, Quad 1
+                                // FE 0, Quad 1
       for (unsigned int q=0; q<n_q_points1; ++q)
-	{
-	  fe_eval01.submit_value (values1[q], q);
-	  Tensor<1,dim,vector_t> submit (false);
-	  for (unsigned int d=0; d<dim; ++d)
-	    submit[d] = gradients1[q*dim+d];
-	  fe_eval01.submit_gradient (submit, q);
-	}
+        {
+          fe_eval01.submit_value (values1[q], q);
+          Tensor<1,dim,vector_t> submit (false);
+          for (unsigned int d=0; d<dim; ++d)
+            submit[d] = gradients1[q*dim+d];
+          fe_eval01.submit_gradient (submit, q);
+        }
       fe_eval01.integrate (true,true);
       fe_eval01.distribute_local_to_global (dst[4]);
     }
@@ -217,8 +217,8 @@ operator () (const MatrixFree<dim,Number> &data,
 template <int dim, int fe_degree, typename number>
 void test ()
 {
-				// create hyper ball geometry and refine some
-				// cells
+                                // create hyper ball geometry and refine some
+                                // cells
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);
   static const HyperBallBoundary<dim> boundary;
@@ -246,8 +246,8 @@ void test ()
       cell = tria.begin_active ();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
-	if (counter % (7-i) == 0)
-	  cell->set_refine_flag();
+        if (counter % (7-i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
@@ -293,10 +293,10 @@ void test ()
     quad.push_back (QGauss<1>(1));
     quad.push_back (QGauss<1>(fe_degree+1));
     mf_data.reinit (dof, constraints, quad,
-		    typename MatrixFree<dim,number>::AdditionalData(MPI_COMM_SELF,MatrixFree<dim,number>::AdditionalData::none));
+                    typename MatrixFree<dim,number>::AdditionalData(MPI_COMM_SELF,MatrixFree<dim,number>::AdditionalData::none));
   }
 
-  MatrixFreeTest<dim,fe_degree+1,number> mf (mf_data);
+  MatrixFreeTest<dim,fe_degree,number> mf (mf_data);
   mf.test_functions(dst);
 
   constraints[0]->condense(dst[1]);

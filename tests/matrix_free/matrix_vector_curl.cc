@@ -55,36 +55,36 @@ class MatrixFreeTest
 
   void
   local_apply (const MatrixFree<dim,Number> &data,
-	       VectorType          &dst,
-	       const VectorType    &src,
-	       const std::pair<unsigned int,unsigned int> &cell_range) const
+               VectorType          &dst,
+               const VectorType    &src,
+               const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     typedef VectorizedArray<Number> vector_t;
-    FEEvaluation<dim,degree+1,degree+1,dim,Number> phi (data);
+    FEEvaluation<dim,degree,degree+1,dim,Number> phi (data);
     vector_t coeff = make_vectorized_array(global_coefficient);
 
     for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
       {
-	phi.reinit (cell);
-	phi.read_dof_values (src);
-	phi.evaluate (false,true,false);
+        phi.reinit (cell);
+        phi.read_dof_values (src);
+        phi.evaluate (false,true,false);
 
-	for (unsigned int q=0; q<phi.n_q_points; ++q)
-	  phi.submit_curl (coeff * phi.get_curl(q), q);
+        for (unsigned int q=0; q<phi.n_q_points; ++q)
+          phi.submit_curl (coeff * phi.get_curl(q), q);
 
-	phi.integrate (false,true);
-	phi.distribute_local_to_global (dst);
+        phi.integrate (false,true);
+        phi.distribute_local_to_global (dst);
       }
   }
 
   void vmult (VectorType &dst,
-	      const VectorType &src) const
+              const VectorType &src) const
   {
     AssertDimension (dst.size(), dim);
     for (unsigned int d=0; d<dim; ++d)
       dst[d] = 0;
     data.cell_loop (&MatrixFreeTest<dim,degree,VectorType>::local_apply,
-		    this, dst, src);
+                    this, dst, src);
   };
 
 private:
@@ -102,16 +102,16 @@ void test ()
   tria.set_boundary (0, boundary);
   tria.refine_global(4-dim);
 
-				// refine a few cells
+                                // refine a few cells
   for (unsigned int i=0; i<10-3*dim; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator
-	cell = tria.begin_active (),
-	endc = tria.end();
+        cell = tria.begin_active (),
+        endc = tria.end();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
-	if (counter % (7-i) == 0)
-	  cell->set_refine_flag();
+        if (counter % (7-i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
@@ -144,7 +144,7 @@ void test ()
     BlockCompressedSimpleSparsityPattern csp (dim,dim);
     for (unsigned int d=0; d<dim; ++d)
       for (unsigned int e=0; e<dim; ++e)
-	csp.block(d,e).reinit (dofs_per_block, dofs_per_block);
+        csp.block(d,e).reinit (dofs_per_block, dofs_per_block);
 
     csp.collect_sizes();
 
@@ -171,14 +171,14 @@ void test ()
       vec2[i].reinit (vec1[0]);
     }
 
-				// assemble curl-curl operator
+                                // assemble curl-curl operator
   {
     QGauss<dim>   quadrature_formula(fe_degree+1);
 
     FEValues<dim> fe_values (fe, quadrature_formula,
-			     update_values    |
-			     update_JxW_values |
-			     update_gradients);
+                             update_values    |
+                             update_JxW_values |
+                             update_gradients);
 
     const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int   n_q_points      = quadrature_formula.size();
@@ -197,63 +197,63 @@ void test ()
       endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-	fe_values.reinit (cell);
-	local_matrix = 0;
+        fe_values.reinit (cell);
+        local_matrix = 0;
 
-	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-	    for (unsigned int k=0; k<dofs_per_cell; ++k)
-	      {
-		const Tensor<2,dim> phi_grad = fe_values[sc].gradient(k,q);
-		if (dim == 2)
-		  phi_curl[k][0] = phi_grad[1][0] - phi_grad[0][1];
-		else
-		  {
-		    phi_curl[k][0] = phi_grad[2][1] - phi_grad[1][2];
-		    phi_curl[k][1] = phi_grad[0][2] - phi_grad[2][0];
-		    phi_curl[k][2] = phi_grad[1][0] - phi_grad[0][1];
-		  }
-	      }
+        for (unsigned int q=0; q<n_q_points; ++q)
+          {
+            for (unsigned int k=0; k<dofs_per_cell; ++k)
+              {
+                const Tensor<2,dim> phi_grad = fe_values[sc].gradient(k,q);
+                if (dim == 2)
+                  phi_curl[k][0] = phi_grad[1][0] - phi_grad[0][1];
+                else
+                  {
+                    phi_curl[k][0] = phi_grad[2][1] - phi_grad[1][2];
+                    phi_curl[k][1] = phi_grad[0][2] - phi_grad[2][0];
+                    phi_curl[k][2] = phi_grad[1][0] - phi_grad[0][1];
+                  }
+              }
 
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      {
-		for (unsigned int j=0; j<=i; ++j)
-		  {
-		    local_matrix(i,j) += (phi_curl[i] * phi_curl[j] *
-					  global_coefficient)
-		      * fe_values.JxW(q);
-		  }
-	      }
-	  }
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int j=i+1; j<dofs_per_cell; ++j)
-	    local_matrix(i,j) = local_matrix(j,i);
+            for (unsigned int i=0; i<dofs_per_cell; ++i)
+              {
+                for (unsigned int j=0; j<=i; ++j)
+                  {
+                    local_matrix(i,j) += (phi_curl[i] * phi_curl[j] *
+                                          global_coefficient)
+                      * fe_values.JxW(q);
+                  }
+              }
+          }
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int j=i+1; j<dofs_per_cell; ++j)
+            local_matrix(i,j) = local_matrix(j,i);
 
-	cell->get_dof_indices (local_dof_indices);
-	constraints.distribute_local_to_global (local_matrix,
-						local_dof_indices,
-						system_matrix);
+        cell->get_dof_indices (local_dof_indices);
+        constraints.distribute_local_to_global (local_matrix,
+                                                local_dof_indices,
+                                                system_matrix);
       }
   }
 
-				// first system_rhs with random numbers
+                                // first system_rhs with random numbers
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<system_rhs.block(i).size(); ++j)
       {
-	const double val = -1. + 2.*(double)rand()/double(RAND_MAX);
-	system_rhs.block(i)(j) = val;
+        const double val = -1. + 2.*(double)rand()/double(RAND_MAX);
+        system_rhs.block(i)(j) = val;
       }
   constraints.condense(system_rhs);
   for (unsigned int i=0; i<dim; ++i)
     vec1[i] = system_rhs.block(i);
 
-				// setup matrix-free structure
+                                // setup matrix-free structure
   {
     QGauss<1> quad(fe_degree+1);
     mf_data.reinit (dof_handler_sca, constraints, quad,
-		    typename MatrixFree<dim>::AdditionalData
-		    (MPI_COMM_WORLD,
-		     MatrixFree<dim>::AdditionalData::none));
+                    typename MatrixFree<dim>::AdditionalData
+                    (MPI_COMM_WORLD,
+                     MatrixFree<dim>::AdditionalData::none));
   }
 
   system_matrix.vmult (solution, system_rhs);
@@ -262,14 +262,14 @@ void test ()
   MatrixFreeTest<dim,fe_degree,VectorType> mf (mf_data);
   mf.vmult (vec2, vec1);
 
-				// Verification
+                                // Verification
   double error = 0.;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<system_rhs.block(i).size(); ++j)
       error += std::fabs (solution.block(i)(j)-vec2[i](j));
   double relative = solution.block(0).l1_norm();
   deallog << "  Verification fe degree " << fe_degree  <<  ": "
-	  << error/relative << std::endl << std::endl;
+          << error/relative << std::endl << std::endl;
 }
 
 

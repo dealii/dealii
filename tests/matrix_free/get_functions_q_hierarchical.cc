@@ -21,59 +21,59 @@ std::ofstream logfile("get_functions_q_hierarchical/output");
 #include "get_functions_common.h"
 
 
-template <int dim, int n_dofs_1d, typename Number>
-class MatrixFreeTestGen : public MatrixFreeTest<dim, n_dofs_1d, n_dofs_1d, Number>
+template <int dim, int fe_degree, typename Number>
+class MatrixFreeTestGen : public MatrixFreeTest<dim, fe_degree, fe_degree+1, Number>
 {
  public:
   typedef VectorizedArray<Number> vector_t;
   static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
 
   MatrixFreeTestGen(const MatrixFree<dim,Number> &data,
-		const Mapping<dim>               &mapping):
-    MatrixFreeTest<dim, n_dofs_1d, n_dofs_1d, Number>(data, mapping)
+                const Mapping<dim>               &mapping):
+    MatrixFreeTest<dim, fe_degree, fe_degree+1, Number>(data, mapping)
   {};
 
   void operator () (const MatrixFree<dim,Number> &data,
-		    Vector<Number>       &,
-		    const Vector<Number> &src,
-		    const std::pair<unsigned int,unsigned int> &cell_range) const
+                    Vector<Number>       &,
+                    const Vector<Number> &src,
+                    const std::pair<unsigned int,unsigned int> &cell_range) const
   {
-    FEEvaluationGeneral<dim,n_dofs_1d,n_dofs_1d,1,Number> fe_eval (data);
+    FEEvaluationGeneral<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
     for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
       {
-	fe_eval.reinit (cell);
-	std::vector<double> reference_values (fe_eval.n_q_points);
-	std::vector<Tensor<1,dim> > reference_grads (fe_eval.n_q_points);
-	std::vector<Tensor<2,dim> > reference_hess (fe_eval.n_q_points);
-	fe_eval.read_dof_values(src);
-	fe_eval.evaluate (true,true,true);
+        fe_eval.reinit (cell);
+        std::vector<double> reference_values (fe_eval.n_q_points);
+        std::vector<Tensor<1,dim> > reference_grads (fe_eval.n_q_points);
+        std::vector<Tensor<2,dim> > reference_hess (fe_eval.n_q_points);
+        fe_eval.read_dof_values(src);
+        fe_eval.evaluate (true,true,true);
 
-				// compare values with the ones the FEValues
-				// gives us. Those are seen as reference
-	for (unsigned int j=0; j<data.n_components_filled(cell); ++j)
-	  {
-	    this->fe_val.reinit (data.get_cell_iterator(cell,j));
-	    this->fe_val.get_function_values(src, reference_values);
-	    this->fe_val.get_function_gradients(src, reference_grads);
-	    this->fe_val.get_function_hessians(src, reference_hess);
+                                // compare values with the ones the FEValues
+                                // gives us. Those are seen as reference
+        for (unsigned int j=0; j<data.n_components_filled(cell); ++j)
+          {
+            this->fe_val.reinit (data.get_cell_iterator(cell,j));
+            this->fe_val.get_function_values(src, reference_values);
+            this->fe_val.get_function_gradients(src, reference_grads);
+            this->fe_val.get_function_hessians(src, reference_hess);
 
-	    for (int q=0; q<(int)fe_eval.n_q_points; q++)
-	      {
-		this->errors[0] += std::fabs(fe_eval.get_value(q)[j]-
-					     reference_values[q]);
-		for (unsigned int d=0; d<dim; ++d)
-		  {
-		  this->errors[1] += std::fabs(fe_eval.get_gradient(q)[d][j]-
-					       reference_grads[q][d]);
-		  }
-		this->errors[2] += std::fabs(fe_eval.get_laplacian(q)[j]-
-					     trace(reference_hess[q]));
-		this->total[0] += std::fabs(reference_values[q]);
-		for (unsigned int d=0; d<dim; ++d)
-		  this->total[1] += std::fabs(reference_grads[q][d]);
-		this->total[2] += std::fabs(fe_eval.get_laplacian(q)[j]);
-	      }
-	  }
+            for (int q=0; q<(int)fe_eval.n_q_points; q++)
+              {
+                this->errors[0] += std::fabs(fe_eval.get_value(q)[j]-
+                                             reference_values[q]);
+                for (unsigned int d=0; d<dim; ++d)
+                  {
+                  this->errors[1] += std::fabs(fe_eval.get_gradient(q)[d][j]-
+                                               reference_grads[q][d]);
+                  }
+                this->errors[2] += std::fabs(fe_eval.get_laplacian(q)[j]-
+                                             trace(reference_hess[q]));
+                this->total[0] += std::fabs(reference_values[q]);
+                for (unsigned int d=0; d<dim; ++d)
+                  this->total[1] += std::fabs(reference_grads[q][d]);
+                this->total[2] += std::fabs(fe_eval.get_laplacian(q)[j]);
+              }
+          }
       }
   }
 };
@@ -88,7 +88,7 @@ void test ()
   GridGenerator::hyper_ball (tria);
   static const HyperBallBoundary<dim> boundary;
   tria.set_boundary (0, boundary);
-				// refine first and last cell
+                                // refine first and last cell
   tria.begin(tria.n_levels()-1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
@@ -104,17 +104,17 @@ void test ()
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   //std::cout << "Number of cells: " << dof.get_tria().n_active_cells()
-  //	  << std::endl;
+  //          << std::endl;
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
   //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   Vector<number> solution (dof.n_dofs());
 
-				// create vector with random entries
+                                // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
       if(constraints.is_constrained(i))
-	continue;
+        continue;
       const double entry = rand()/(double)RAND_MAX;
       solution(i) = entry;
     }
@@ -122,14 +122,14 @@ void test ()
 
   MatrixFree<dim,number> mf_data;
   deallog << "Test with fe_degree " << fe_degree
-	  << std::endl;
+          << std::endl;
   const QGauss<1> quad (fe_degree+1);
   MappingQ<dim> mapping (4);
   typename MatrixFree<dim,number>::AdditionalData data;
   data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
   data.mapping_update_flags = update_gradients | update_second_derivatives;
   mf_data.reinit (mapping, dof, constraints, quad, data);
-  MatrixFreeTestGen<dim,fe_degree+1,number> mf (mf_data, mapping);
+  MatrixFreeTestGen<dim,fe_degree,number> mf (mf_data, mapping);
   mf.test_functions (solution);
 }
 

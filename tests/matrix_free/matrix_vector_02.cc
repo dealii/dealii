@@ -30,7 +30,7 @@ void test ()
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
   VectorTools::interpolate_boundary_values (dof, 0, ZeroFunction<dim>(),
-					    constraints);
+                                            constraints);
   constraints.close();
 
   do_test<dim, fe_degree, double> (dof, constraints);

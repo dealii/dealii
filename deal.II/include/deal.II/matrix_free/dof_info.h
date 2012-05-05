@@ -159,7 +159,7 @@ namespace MatrixFreeFunctions
                            const std::vector<unsigned int> &lexicographic_inv,
                            const ConstraintMatrix          &constraints,
                            const unsigned int               cell_number,
-                           internal::ConstraintValues<double>&constraint_values,
+                           ConstraintValues<double>&constraint_values,
                            bool                            &cell_at_boundary);
 
                                 /**
@@ -175,17 +175,54 @@ namespace MatrixFreeFunctions
     void assign_ghosts(const std::vector<unsigned int> &boundary_cells);
 
                                 /**
+                                 * Reorganizes cells for serial
+                                 * (non-thread-parallelized) such that
+                                 * boundary cells are places in the
+                                 * middle. This way, computations and
+                                 * communication can be overlapped. Should
+                                 * only be called by one DoFInfo object when
+                                 * used on a system of several DoFHandlers.
+                                 */
+    void compute_renumber_serial (const std::vector<unsigned int> &boundary_cells,
+                                  const SizeInfo                  &size_info,
+                                  std::vector<unsigned int>       &renumbering);
+
+                                /**
+                                 * Reorganizes cells in the hp case without
+                                 * parallelism such that all cells with the
+                                 * same FE index are placed
+                                 * consecutively. Should only be called by one
+                                 * DoFInfo object when used on a system of
+                                 * several DoFHandlers.
+                                 */
+    void compute_renumber_hp_serial (SizeInfo                  &size_info,
+                                     std::vector<unsigned int> &renumbering,
+                                     std::vector<unsigned int> &irregular_cells);
+
+                                /**
+                                 * Computes the initial renumbering of cells
+                                 * such that all cells with ghosts are put
+                                 * first. This is the first step before
+                                 * building the thread graph and used to
+                                 * overlap computations and communication.
+                                 */
+    void compute_renumber_parallel (const std::vector<unsigned int> &boundary_cells,
+                                    SizeInfo                        &size_info,
+                                    std::vector<unsigned int>       &renumbering);
+
+                                /**
                                  * This method reorders the way cells are gone
                                  * through based on a given renumbering of the
-                                 * cells. It also takes @p n_vectors cells
-                                 * together and interprets them as one cell
-                                 * only, as is needed for vectorization.
+                                 * cells. It also takes @p
+                                 * vectorization_length cells together and
+                                 * interprets them as one cell only, as is
+                                 * needed for vectorization.
                                  */
     void reorder_cells (const SizeInfo                  &size_info,
                         const std::vector<unsigned int> &renumbering,
                         const std::vector<unsigned int> &constraint_pool_row_index,
                         const std::vector<unsigned int> &irregular_cells,
-                        const unsigned int               n_vectors);
+                        const unsigned int               vectorization_length);
 
                                 /**
                                  * This helper function determines a block
@@ -292,12 +329,14 @@ namespace MatrixFreeFunctions
                                   const SizeInfo &size_info) const;
 
                                 /**
-                                 * Returns the memory consumption in bytes of
-                                 * this class.
+                                 * Prints a representation of the
+                                 * indices in the class to the given
+                                 * output stream.
                                  */
     template <typename Number>
-    void print (const CompressedMatrix<Number> &constraint_pool,
-                std::ostream                   &out) const;
+    void print (const std::vector<Number>       &constraint_pool_data,
+                const std::vector<unsigned int> &constraint_pool_row_index,
+                std::ostream                    &out) const;
 
                                 /**
                                  * Stores the rowstart indices of the
@@ -344,7 +383,7 @@ namespace MatrixFreeFunctions
                                  * reading from or writing to a vector. The
                                  * second number stores the index of the
                                  * constraint weights, stored in the variable
-                                 * constraint_pool.
+                                 * constraint_pool_data.
                                  */
     std::vector<std::pair<unsigned short,unsigned short> > constraint_indicator;
 

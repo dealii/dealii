@@ -29,7 +29,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/matrix_free/helper_functions.h>
-#include <deal.II/matrix_free/fe_evaluation_data.h>
+#include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/mapping_info.h>
 
@@ -56,6 +56,11 @@ DEAL_II_NAMESPACE_OPEN
  * matrix-vector products or residual computations on the same
  * mesh. The class is used in step-37 and step-48.
  *
+ * This class does not implement any operations involving finite element basis
+ * functions, i.e., regarding the operation performed on the cells. For these
+ * operations, the class FEEvaluation is designed to use the data collected in
+ * this class.
+ *
  * The stored data can be subdivided into three main components:
  *
  * - DoFInfo: It stores how local degrees of freedom relate to global degrees
@@ -66,7 +71,7 @@ DEAL_II_NAMESPACE_OPEN
  *   are necessary in order to build derivatives of finite element functions
  *   and find location of quadrature weights in physical space.
  *
- * - FEEvaluationData: It contains the shape functions of the finite element,
+ * - ShapeInfo: It contains the shape functions of the finite element,
  *   evaluated on the unit cell.
  *
  * Besides the initialization routines, this class implements only a
@@ -307,6 +312,10 @@ public:
     bool                initialize_mapping;
   };
 
+                                /**
+                                 * @name 1: Construction and initialization
+                                 */
+                                //@{
                                      /**
                                       * Default empty constructor. Does
                                       * nothing.
@@ -506,6 +515,12 @@ public:
                                  */
   void clear();
 
+                                //@}
+
+                                /**
+                                 * @name 2: Loop over cells
+                                 */
+                                //@{
                                 /**
                                  * This method runs the loop over all
                                  * cells (in parallel) and performs
@@ -579,81 +594,6 @@ public:
                   const InVector &src) const;
 
                                 /**
-                                 * Returns an approximation of the memory
-                                 * consumption of this class in bytes.
-                                 */
-  std::size_t memory_consumption() const;
-
-                                /**
-                                 * Prints a detailed summary of memory
-                                 * consumption in the different structures of
-                                 * this class to the given output stream.
-                                 */
-  template <typename STREAM>
-  void print_memory_consumption(STREAM &out) const;
-
-                                /**
-                                 * Prints a summary of this class to the given
-                                 * output stream. It is focused on the
-                                 * indices, and does not print all the data
-                                 * stored.
-                                 */
-  void print (std::ostream &out) const;
-
-                                /**
-                                 * Initialize function for a general
-                                 * vector. The length of the vector is equal
-                                 * to the total number of degrees in the
-                                 * DoFHandler. If the vector is of class
-                                 * parallel::distributed::Vector<Number>, the ghost
-                                 * entries are set accordingly. For
-                                 * vector-valued problems with several
-                                 * DoFHandlers underlying this class, the
-                                 * parameter @p vector_component defines which
-                                 * component is to be used.
-                                 */
-  template <typename VectorType>
-  void initialize_dof_vector(VectorType &vec,
-                             const unsigned int vector_component=0) const;
-
-                                /**
-                                 * Initialize function for a distributed
-                                 * vector. The length of the vector is equal
-                                 * to the total number of degrees in the
-                                 * DoFHandler. If the vector is of class
-                                 * parallel::distributed::Vector<Number>, the ghost
-                                 * entries are set accordingly. For
-                                 * vector-valued problems with several
-                                 * DoFHandlers underlying this class, the
-                                 * parameter @p vector_component defines which
-                                 * component is to be used.
-                                 */
-  template <typename Number2>
-  void initialize_dof_vector(parallel::distributed::Vector<Number2> &vec,
-                             const unsigned int vector_component=0) const;
-
-                                /**
-                                 * Returns the partitioner that represents the
-                                 * locally owned data and the ghost indices
-                                 * where access is needed to for the cell
-                                 * loop.
-                                 */
-  const std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner>&
-  get_vector_partitioner (const unsigned int vector_component=0) const;
-
-                                /**
-                                 * Returns a list of all degrees of freedom
-                                 * that are constrained. The list is returned
-                                 * in local index space for the locally owned
-                                 * range of the vector, not in global
-                                 * numbers. In addition, it only returns the
-                                 * indices for degrees of freedom that are
-                                 * owned locally, not for ghosts.
-                                 */
-  const std::vector<unsigned int> &
-  get_constrained_dofs (const unsigned int fe_component = 0) const;
-
-                                /**
                                  * In the hp adaptive case, a subrange of
                                  * cells as computed during the cell loop
                                  * might contain elements of different
@@ -681,6 +621,90 @@ public:
   create_cell_subrange_hp_by_index (const std::pair<unsigned int,unsigned int> &range,
                                     const unsigned int fe_index,
                                     const unsigned int vector_component = 0) const;
+
+                                //@}
+
+                                /**
+                                 * @name 3: Initialization of vectors
+                                 */
+                                //@{
+                                /**
+                                 * Initialize function for a general
+                                 * vector. The length of the vector is equal
+                                 * to the total number of degrees in the
+                                 * DoFHandler. If the vector is of class
+                                 * parallel::distributed::Vector@<Number@>, the ghost
+                                 * entries are set accordingly. For
+                                 * vector-valued problems with several
+                                 * DoFHandlers underlying this class, the
+                                 * parameter @p vector_component defines which
+                                 * component is to be used.
+                                 */
+  template <typename VectorType>
+  void initialize_dof_vector(VectorType &vec,
+                             const unsigned int vector_component=0) const;
+
+                                /**
+                                 * Initialize function for a distributed
+                                 * vector. The length of the vector is equal
+                                 * to the total number of degrees in the
+                                 * DoFHandler. If the vector is of class
+                                 * parallel::distributed::Vector@<Number@>, the ghost
+                                 * entries are set accordingly. For
+                                 * vector-valued problems with several
+                                 * DoFHandlers underlying this class, the
+                                 * parameter @p vector_component defines which
+                                 * component is to be used.
+                                 */
+  template <typename Number2>
+  void initialize_dof_vector(parallel::distributed::Vector<Number2> &vec,
+                             const unsigned int vector_component=0) const;
+
+                                /**
+                                 * Returns the partitioner that represents the
+                                 * locally owned data and the ghost indices
+                                 * where access is needed to for the cell
+                                 * loop. The partitioner is constructed from
+                                 * the locally owned dofs and ghost dofs given
+                                 * by the respective fields. If you want to
+                                 * have specific information about these
+                                 * objects, you can query them with the
+                                 * respective access functions. If you just
+                                 * want to initialize a (parallel) vector, you
+                                 * should usually prefer this data structure
+                                 * as the data exchange information can be
+                                 * reused from one vector to another.
+                                 */
+  const std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner>&
+  get_vector_partitioner (const unsigned int vector_component=0) const;
+
+                                /**
+                                 * Returns the set of cells that are
+                                 * oned by the processor.
+                                 */
+  const IndexSet &
+  get_locally_owned_set (const unsigned int fe_component = 0) const;
+
+                                /**
+                                 * Returns the set of ghost cells
+                                 * needed but not owned by the
+                                 * processor.
+                                 */
+  const IndexSet &
+  get_ghost_set (const unsigned int fe_component = 0) const;
+
+                                /**
+                                 * Returns a list of all degrees of freedom
+                                 * that are constrained. The list is returned
+                                 * in local index space for the locally owned
+                                 * range of the vector, not in global
+                                 * numbers. In addition, it only returns the
+                                 * indices for degrees of freedom that are
+                                 * owned locally, not for ghosts.
+                                 */
+  const std::vector<unsigned int> &
+  get_constrained_dofs (const unsigned int fe_component = 0) const;
+
                                 /**
                                  * Calls renumber_dofs function in dof
                                  * info which renumbers the the
@@ -690,19 +714,17 @@ public:
   void renumber_dofs (std::vector<unsigned int> &renumbering,
                       const unsigned int vector_component = 0);
 
+                                //@}
+
+                                /**
+                                 * @name 4: General information
+                                 */
+                                //@{
+                                /**
+                                 * Returns the number of different DoFHandlers
+                                 * specified at initialization.
+                                 */
   unsigned int n_components () const;
-
-                                /**
-                                 * Returns information on task graph.
-                                 */
-  const internal::MatrixFreeFunctions::TaskInfo &
-  get_task_info () const;
-
-                                /**
-                                 * Returns information on system size.
-                                 */
-  const internal::MatrixFreeFunctions::SizeInfo &
-  get_size_info () const;
 
                                 /**
                                  * Returns the number of cells this structure
@@ -718,45 +740,25 @@ public:
   unsigned int n_physical_cells () const;
 
                                 /**
-                                 * Returns the number of macro cells that this
-                                 * structure works on, i.e., the number of
-                                 * cell chunks that are worked on after the
-                                 * application of vectorization which in
-                                 * general works on several cells at once. The
-                                 * cell range in @p cell_loop runs from zero
-                                 * to n_macro_cells() (exclusive), so this is
-                                 * the appropriate size if you want to store
-                                 * arrays of data for all cells to be worked
-                                 * on. This number is approximately
-                                 * n_physical_cells()/VectorizedArray<Number>::n_array_elements
-                                 * (depending on how many cells are not filled
-                                 * up completely).
+                                 * Returns the number of macro cells
+                                 * that this structure works on, i.e.,
+                                 * the number of cell chunks that are
+                                 * worked on after the application of
+                                 * vectorization which in general
+                                 * works on several cells at once. The
+                                 * cell range in @p cell_loop runs
+                                 * from zero to n_macro_cells()
+                                 * (exclusive), so this is the
+                                 * appropriate size if you want to
+                                 * store arrays of data for all cells
+                                 * to be worked on. This number is
+                                 * approximately
+                                 * n_physical_cells()/VectorizedArray@<Number@>::n_array_elements
+                                 * (depending on how many cell chunks
+                                 * that do not get filled up
+                                 * completely).
                                  */
   unsigned int n_macro_cells () const;
-
-                                /*
-                                 * Returns geometry-dependent
-                                 * information on the cells.
-                                 */
-
-  const internal::MatrixFreeFunctions::MappingInfo<dim,Number> &
-  get_mapping_info () const;
-
-                                /**
-                                 * Returns information on indexation
-                                 * degrees of freedom.
-                                 */
-
-  const internal::MatrixFreeFunctions::DoFInfo &
-  get_dof_info (const unsigned int fe_component = 0) const;
-
-                                /*
-                                 * Returns the constraint pool holding
-                                 * all the constraints in the mesh.
-                                 */
-
-  const internal::MatrixFreeFunctions::CompressedMatrix<Number> &
-  get_constraint_pool () const;
 
                                 /**
                                  * In case this structure was built based on a
@@ -864,7 +866,7 @@ public:
                                  * mixed with deal.II access to cells,
                                  * care needs to be taken. This
                                  * function returns @p true if not all
-                                 * @p n_vectors cells for the given @p
+                                 * @p vectorization_length cells for the given @p
                                  * macro_cell are real cells. To find
                                  * out how many cells are actually
                                  * used, use the function @p
@@ -879,7 +881,7 @@ public:
                                  * vectorization data types correspond
                                  * to real cells in the mesh. For most
                                  * given @p macro_cells, this is just
-                                 * @p n_vectors many, but there might
+                                 * @p vectorization_length many, but there might
                                  * be one or a few meshes (where the
                                  * numbers do not add up) where there
                                  * are less such components filled,
@@ -926,31 +928,6 @@ public:
                        const unsigned int hp_active_fe_index = 0) const;
 
                                 /**
-                                 * Returns the set of cells that are
-                                 * oned by the processor.
-                                 */
-  const IndexSet &
-  get_locally_owned_set (const unsigned int fe_component = 0) const;
-
-                                /**
-                                 * Returns the set of ghost cells
-                                 * needed but not owned by the
-                                 * processor.
-                                 */
-  const IndexSet &
-  get_ghost_set (const unsigned int fe_component = 0) const;
-
-                                /**
-                                 * Returns the unit cell information
-                                 * for given hp index.
-                                 */
-  const internal::MatrixFreeFunctions::FEEvaluationData<Number> &
-  get_fe_evaluation (const unsigned int fe_component = 0,
-                     const unsigned int quad_index   = 0,
-                     const unsigned int hp_active_fe_index = 0,
-                     const unsigned int hp_active_quad_index = 0) const;
-
-                                /**
                                  * Returns the quadrature rule for
                                  * given hp index.
                                  */
@@ -972,13 +949,99 @@ public:
 
   bool mapping_initialized () const;
 
+                                /**
+                                 * Returns an approximation of the memory
+                                 * consumption of this class in bytes.
+                                 */
+  std::size_t memory_consumption() const;
+
+                                /**
+                                 * Prints a detailed summary of memory
+                                 * consumption in the different structures of
+                                 * this class to the given output stream.
+                                 */
+  template <typename STREAM>
+  void print_memory_consumption(STREAM &out) const;
+
+                                /**
+                                 * Prints a summary of this class to the given
+                                 * output stream. It is focused on the
+                                 * indices, and does not print all the data
+                                 * stored.
+                                 */
+  void print (std::ostream &out) const;
+
+                                //@}
+
+                                /**
+                                 * @name 5: Access of internal data structure (expert mode)
+                                 */
+                                //@{
+                                /**
+                                 * Returns information on task graph.
+                                 */
+  const internal::MatrixFreeFunctions::TaskInfo &
+  get_task_info () const;
+
+                                /**
+                                 * Returns information on system size.
+                                 */
+  const internal::MatrixFreeFunctions::SizeInfo &
+  get_size_info () const;
+
+                                /*
+                                 * Returns geometry-dependent
+                                 * information on the cells.
+                                 */
+  const internal::MatrixFreeFunctions::MappingInfo<dim,Number> &
+  get_mapping_info () const;
+
+                                /**
+                                 * Returns information on indexation
+                                 * degrees of freedom.
+                                 */
+  const internal::MatrixFreeFunctions::DoFInfo &
+  get_dof_info (const unsigned int fe_component = 0) const;
+
+                                /**
+                                 * Returns a pointer to the first
+                                 * number in the constraint pool data
+                                 * with index @p pool_index (to
+                                 * be used together with @p
+                                 * constraint_pool_end()).
+                                 */
+  const Number*
+  constraint_pool_begin (const unsigned int pool_index) const;
+
+                                /**
+                                 * Returns a pointer to one past the
+                                 * last number in the constraint pool
+                                 * data with index @p pool_index (to
+                                 * be used together with @p
+                                 * constraint_pool_begin()).
+                                 */
+  const Number*
+  constraint_pool_end (const unsigned int pool_index) const;
+
+                                /**
+                                 * Returns the unit cell information
+                                 * for given hp index.
+                                 */
+  const internal::MatrixFreeFunctions::ShapeInfo<Number> &
+  get_shape_info (const unsigned int fe_component = 0,
+                  const unsigned int quad_index   = 0,
+                  const unsigned int hp_active_fe_index = 0,
+                  const unsigned int hp_active_quad_index = 0) const;
+
+                                //@}
+
 private:
 
-                                         /**
-                                      * This is the actual reinit function
-                                      * that sets up the indices for the
-                                      * DoFHandler and MGDoFHandler case.
-                                      */
+                                /**
+                                 * This is the actual reinit function
+                                 * that sets up the indices for the
+                                 * DoFHandler and MGDoFHandler case.
+                                 */
   template <typename DoFHandler>
   void internal_reinit (const Mapping<dim>                &mapping,
                         const std::vector<const DoFHandler*> &dof_handler,
@@ -987,10 +1050,10 @@ private:
                         const std::vector<hp::QCollection<1> > &quad,
                         const AdditionalData               additional_data);
 
-                                         /**
-                                      * Same as before but for hp::DoFHandler
-                                      * instead of generic DoFHandler type.
-                                      */
+                                /**
+                                 * Same as before but for hp::DoFHandler
+                                 * instead of generic DoFHandler type.
+                                 */
   void internal_reinit (const Mapping<dim>               &mapping,
                         const std::vector<const hp::DoFHandler<dim>*> &dof_handler,
                         const std::vector<const ConstraintMatrix*> &constraint,
@@ -999,8 +1062,14 @@ private:
                         const AdditionalData              additional_data);
 
                                 /**
-                                 * Initializes the fields in DoFInfo together
-                                 * with @p constraint_pool.
+                                 * Initializes the fields in DoFInfo
+                                 * together with the constraint pool
+                                 * that holds all different weights in
+                                 * the constraints (not part of
+                                 * DoFInfo because several DoFInfo
+                                 * classes can have the same weights
+                                 * which consequently only need to be
+                                 * stored once).
                                  */
   void
   initialize_indices (const std::vector<const ConstraintMatrix*> &constraint,
@@ -1066,7 +1135,14 @@ private:
                                  * arguments on DoFInfo and keeps it a plain
                                  * field of indices only.
                                  */
-  internal::MatrixFreeFunctions::CompressedMatrix<Number> constraint_pool;
+  std::vector<Number> constraint_pool_data;
+
+                                /**
+                                 * Contains an indicator to the start
+                                 * of the ith index in the constraint
+                                 * pool data.
+                                 */
+  std::vector<unsigned int> constraint_pool_row_index;
 
                                 /**
                                  * Holds information on transformation of
@@ -1079,7 +1155,7 @@ private:
                                  * Contains shape value information on the
                                  * unit cell.
                                  */
-  Table<4,internal::MatrixFreeFunctions::FEEvaluationData<Number> > fe_evaluation_data;
+  Table<4,internal::MatrixFreeFunctions::ShapeInfo<Number> > shape_info;
 
                                 /**
                                  * Describes how the cells are gone
@@ -1248,10 +1324,22 @@ MatrixFree<dim,Number>::get_dof_info (unsigned int dof_index) const
 
 template <int dim, typename Number>
 inline
-const internal::MatrixFreeFunctions::CompressedMatrix<Number> &
-MatrixFree<dim,Number>::get_constraint_pool () const
+const Number*
+MatrixFree<dim,Number>::constraint_pool_begin (const unsigned int row) const
 {
-  return constraint_pool;
+  AssertIndexRange (row, constraint_pool_row_index.size()-1);
+  return &constraint_pool_data[0] + constraint_pool_row_index[row];
+}
+
+
+
+template <int dim, typename Number>
+inline
+const Number*
+MatrixFree<dim,Number>::constraint_pool_end (const unsigned int row) const
+{
+  AssertIndexRange (row, constraint_pool_row_index.size()-1);
+  return &constraint_pool_data[0] + constraint_pool_row_index[row+1];
 }
 
 
@@ -1383,11 +1471,11 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
                                               const unsigned int vector_number,
                                               const unsigned int dof_index) const
 {
-  const unsigned int n_vectors=VectorizedArray<Number>::n_array_elements;
+  const unsigned int vectorization_length=VectorizedArray<Number>::n_array_elements;
 #ifdef DEBUG
   AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
   AssertIndexRange (macro_cell_number, size_info.n_macro_cells);
-  AssertIndexRange (vector_number, n_vectors);
+  AssertIndexRange (vector_number, vectorization_length);
   const unsigned int irreg_filled =
     std_cxx1x::get<2>(dof_info[dof_index].row_starts[macro_cell_number]);
   if (irreg_filled > 0)
@@ -1417,7 +1505,7 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
     }
 
   std::pair<unsigned int,unsigned int> index =
-    cell_level_index[macro_cell_number*n_vectors+vector_number];
+    cell_level_index[macro_cell_number*vectorization_length+vector_number];
   return typename DoFHandler<dim>::active_cell_iterator
     (&dofh->get_tria(), index.first, index.second, dofh);
 }
@@ -1431,11 +1519,11 @@ MatrixFree<dim,Number>::get_mg_cell_iterator(const unsigned int macro_cell_numbe
                                                  const unsigned int vector_number,
                                                  const unsigned int dof_index) const
 {
-  const unsigned int n_vectors=VectorizedArray<Number>::n_array_elements;
+  const unsigned int vectorization_length=VectorizedArray<Number>::n_array_elements;
 #ifdef DEBUG
   AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
   AssertIndexRange (macro_cell_number, size_info.n_macro_cells);
-  AssertIndexRange (vector_number, n_vectors);
+  AssertIndexRange (vector_number, vectorization_length);
   const unsigned int irreg_filled =
     std_cxx1x::get<2>(dof_info[dof_index].row_starts[macro_cell_number]);
   if (irreg_filled > 0)
@@ -1447,7 +1535,7 @@ MatrixFree<dim,Number>::get_mg_cell_iterator(const unsigned int macro_cell_numbe
   const MGDoFHandler<dim> * dofh = dof_handlers.mg_dof_handler[dof_index];
 
   std::pair<unsigned int,unsigned int> index =
-    cell_level_index[macro_cell_number*n_vectors+vector_number];
+    cell_level_index[macro_cell_number*vectorization_length+vector_number];
   return typename MGDoFHandler<dim>::cell_iterator
     (&dofh->get_tria(), index.first, index.second, dofh);
 }
@@ -1461,11 +1549,11 @@ MatrixFree<dim,Number>::get_hp_cell_iterator(const unsigned int macro_cell_numbe
                                                  const unsigned int vector_number,
                                                  const unsigned int dof_index) const
 {
-  const unsigned int n_vectors=VectorizedArray<Number>::n_array_elements;
+  const unsigned int vectorization_length=VectorizedArray<Number>::n_array_elements;
 #ifdef DEBUG
   AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
   AssertIndexRange (macro_cell_number, size_info.n_macro_cells);
-  AssertIndexRange (vector_number, n_vectors);
+  AssertIndexRange (vector_number, vectorization_length);
   const unsigned int irreg_filled =
     std_cxx1x::get<2>(dof_info[dof_index].row_starts[macro_cell_number]);
   if (irreg_filled > 0)
@@ -1476,7 +1564,7 @@ MatrixFree<dim,Number>::get_hp_cell_iterator(const unsigned int macro_cell_numbe
           ExcNotImplemented());
   const hp::DoFHandler<dim> * dofh = dof_handlers.hp_dof_handler[dof_index];
   std::pair<unsigned int,unsigned int> index =
-    cell_level_index[macro_cell_number*n_vectors+vector_number];
+    cell_level_index[macro_cell_number*vectorization_length+vector_number];
   return typename hp::DoFHandler<dim>::cell_iterator
     (&dofh->get_tria(), index.first, index.second, dofh);
 }
@@ -1584,18 +1672,18 @@ MatrixFree<dim,Number>::get_ghost_set(const unsigned int dof_index) const
 
 template <int dim, typename Number>
 inline
-const internal::MatrixFreeFunctions::FEEvaluationData<Number> &
-MatrixFree<dim,Number>::get_fe_evaluation(const unsigned int index_fe,
-                                          const unsigned int index_quad,
-                                          const unsigned int active_fe_index,
-                                          const unsigned int active_quad_index) const
+const internal::MatrixFreeFunctions::ShapeInfo<Number> &
+MatrixFree<dim,Number>::get_shape_info (const unsigned int index_fe,
+                                        const unsigned int index_quad,
+                                        const unsigned int active_fe_index,
+                                        const unsigned int active_quad_index) const
 {
-  AssertIndexRange (index_fe, fe_evaluation_data.size(0));
-  AssertIndexRange (index_quad, fe_evaluation_data.size(1));
-  AssertIndexRange (active_fe_index, fe_evaluation_data.size(2));
-  AssertIndexRange (active_quad_index, fe_evaluation_data.size(3));
-  return fe_evaluation_data(index_fe, index_quad,
-                            active_fe_index, active_quad_index);
+  AssertIndexRange (index_fe, shape_info.size(0));
+  AssertIndexRange (index_quad, shape_info.size(1));
+  AssertIndexRange (active_fe_index, shape_info.size(2));
+  AssertIndexRange (active_quad_index, shape_info.size(3));
+  return shape_info(index_fe, index_quad,
+                    active_fe_index, active_quad_index);
 }
 
 
@@ -2008,8 +2096,8 @@ namespace internal
       tbb::task* execute ()
       {
         std::pair<unsigned int, unsigned int> cell_range
-          (task_info.partition_color_blocks.data[partition],
-           task_info.partition_color_blocks.data[partition+1]);
+          (task_info.partition_color_blocks_data[partition],
+           task_info.partition_color_blocks_data[partition+1]);
         worker(cell_range);
         if(blocked==true)
           dummy->spawn (*dummy);
@@ -2043,10 +2131,10 @@ namespace internal
         if(false)
           {
             std::pair<unsigned int, unsigned int> cell_range
-              (task_info.partition_color_blocks.data
-               [task_info.partition_color_blocks.row_index[partition]],
-               task_info.partition_color_blocks.data
-               [task_info.partition_color_blocks.row_index[partition+1]]);
+              (task_info.partition_color_blocks_data
+               [task_info.partition_color_blocks_row_index[partition]],
+               task_info.partition_color_blocks_data
+               [task_info.partition_color_blocks_row_index[partition+1]]);
             function(cell_range);
           }
         else
@@ -2066,9 +2154,8 @@ namespace internal
               {
                 worker[j] = new(root->allocate_child())
                   CellWork<Worker,false>(function,task_info.
-                                         partition_color_blocks.
-                                         row_index[partition]+
-                                         2*j,task_info);
+                                         partition_color_blocks_row_index
+                                         [partition] + 2*j, task_info);
                 if(j>0)
                   {
                     worker[j]->set_ref_count(2);
@@ -2082,9 +2169,8 @@ namespace internal
                   {
                     blocked_worker[j] = new(worker[j]->allocate_child())
                       CellWork<Worker,true>(function,task_info.
-                                            partition_color_blocks.
-                                            row_index[partition]+
-                                            2*j+1,task_info);
+                                            partition_color_blocks_row_index
+                                            [partition] + 2*j+1, task_info);
                   }
                 else
                   {
@@ -2093,9 +2179,8 @@ namespace internal
                         worker[evens] = new(worker[j]->allocate_child())
                           CellWork<Worker,false>(function,
                                                  task_info.
-                                                 partition_color_blocks.
-                                                 row_index[partition]+
-                                                 2*j+1,task_info);
+                                                 partition_color_blocks_row_index
+                                                 [partition]+2*j+1,task_info);
                         worker[j]->spawn(*worker[evens]);
                       }
                     else
@@ -2180,8 +2265,8 @@ namespace internal
       {};
       tbb::task* execute ()
       {
-        unsigned int lower = task_info.partition_color_blocks.data[partition],
-          upper = task_info.partition_color_blocks.data[partition+1];
+        unsigned int lower = task_info.partition_color_blocks_data[partition],
+          upper = task_info.partition_color_blocks_data[partition+1];
         parallel_for(tbb::blocked_range<unsigned int>(lower,upper,1),
                      CellWork<Worker> (worker,task_info));
         if(blocked==true)
@@ -2368,7 +2453,7 @@ MatrixFree<dim, Number>::cell_loop
               tbb::empty_task* root = new( tbb::task::allocate_root() ) tbb::empty_task;
               root->set_ref_count(evens+1);
               unsigned int n_blocked_workers = odds-(odds+evens+1)%2;
-              unsigned int n_workers = task_info.partition_color_blocks.data.size()-1-
+              unsigned int n_workers = task_info.partition_color_blocks_data.size()-1-
                 n_blocked_workers;
               std::vector<internal::color::PartitionWork<Worker,false>*> worker(n_workers);
               std::vector<internal::color::PartitionWork<Worker,true>*> blocked_worker(n_blocked_workers);
@@ -2379,7 +2464,7 @@ MatrixFree<dim, Number>::cell_loop
                 internal::MPIComCompress<OutVector>(dst);
               worker_compr->set_ref_count(1);
               for (unsigned int part=0;
-                   part<task_info.partition_color_blocks.row_index.size()-1;part++)
+                   part<task_info.partition_color_blocks_row_index.size()-1;part++)
                 {
                   spawn_index_new = worker_index;
                   if(part == 0)
@@ -2389,7 +2474,7 @@ MatrixFree<dim, Number>::cell_loop
                     worker[worker_index] = new(root->allocate_child())
                       internal::color::PartitionWork<Worker,false>(func,slice_index,task_info);
                   slice_index++;
-                  for(;slice_index<task_info.partition_color_blocks.row_index[part+1];
+                  for(;slice_index<task_info.partition_color_blocks_row_index[part+1];
                       slice_index++)
                     {
                       worker[worker_index]->set_ref_count(1);
@@ -2419,15 +2504,15 @@ MatrixFree<dim, Number>::cell_loop
                       worker_index++;
                     }
                   part += 1;
-                  if(part<task_info.partition_color_blocks.row_index.size()-1)
+                  if(part<task_info.partition_color_blocks_row_index.size()-1)
                     {
-                      if(part<task_info.partition_color_blocks.row_index.size()-2)
+                      if(part<task_info.partition_color_blocks_row_index.size()-2)
                         {
                           blocked_worker[part/2] = new(worker[worker_index-1]->allocate_child())
                             internal::color::PartitionWork<Worker,true>(func,slice_index,task_info);
                           slice_index++;
                           if(slice_index<
-                             task_info.partition_color_blocks.row_index[part+1])
+                             task_info.partition_color_blocks_row_index[part+1])
                             {
                               blocked_worker[part/2]->set_ref_count(1);
                               worker[worker_index] = new(blocked_worker[part/2]->allocate_child())
@@ -2440,11 +2525,11 @@ MatrixFree<dim, Number>::cell_loop
                               continue;
                             }
                         }
-                      for(;slice_index<task_info.partition_color_blocks.row_index[part+1];
+                      for(;slice_index<task_info.partition_color_blocks_row_index[part+1];
                           slice_index++)
                         {
                           if(slice_index>
-                             task_info.partition_color_blocks.row_index[part])
+                             task_info.partition_color_blocks_row_index[part])
                             {
                               worker[worker_index]->set_ref_count(1);
                               worker_index++;
@@ -2477,11 +2562,11 @@ MatrixFree<dim, Number>::cell_loop
               internal::update_ghost_values_finish(src);
 
               for (unsigned int color=0;
-                   color < task_info.partition_color_blocks.row_index[1];
+                   color < task_info.partition_color_blocks_row_index[1];
                    ++color)
                 {
-                  unsigned int lower = task_info.partition_color_blocks.data[color],
-                    upper = task_info.partition_color_blocks.data[color+1];
+                  unsigned int lower = task_info.partition_color_blocks_data[color],
+                    upper = task_info.partition_color_blocks_data[color+1];
                   parallel_for(tbb::blocked_range<unsigned int>(lower,upper,1),
                                internal::color::CellWork<Worker>
                                (func,task_info));

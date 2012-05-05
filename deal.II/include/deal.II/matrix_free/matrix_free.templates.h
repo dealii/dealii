@@ -22,7 +22,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/matrix_free/matrix_free.h>
-#include <deal.II/matrix_free/fe_evaluation_data.templates.h>
+#include <deal.II/matrix_free/shape_info.templates.h>
 #include <deal.II/matrix_free/mapping_info.templates.h>
 #include <deal.II/matrix_free/dof_info.templates.h>
 
@@ -54,9 +54,10 @@ copy_from (const MatrixFree<dim,Number> &v)
   clear ();
   dof_handlers = v.dof_handlers;
   dof_info = v.dof_info;
-  constraint_pool = v.constraint_pool;
+  constraint_pool_data = v.constraint_pool_data;
+  constraint_pool_row_index = v.constraint_pool_row_index;
   mapping_info = v.mapping_info;
-  fe_evaluation_data = v.fe_evaluation_data;
+  shape_info = v.shape_info;
   cell_level_index = v.cell_level_index;
   task_info = v.task_info;
   size_info = v.size_info;
@@ -156,7 +157,7 @@ internal_reinit(const Mapping<dim>                         &mapping,
 
                                 // set dof_indices together with
                                 // constraint_indicator and
-                                // constraint_pool. It also reorders the way
+                                // constraint_pool_data. It also reorders the way
                                 // cells are gone through (to separate cells
                                 // with overlap to other processors from
                                 // others without).
@@ -168,14 +169,14 @@ internal_reinit(const Mapping<dim>                         &mapping,
                                 // Hessians for quadrature points.
   const unsigned int n_fe   = dof_handler.size();
   const unsigned int n_quad = quad.size();
-  fe_evaluation_data.reinit (TableIndices<4>(n_fe, n_quad, 1, 1));
+  shape_info.reinit (TableIndices<4>(n_fe, n_quad, 1, 1));
   for (unsigned int no=0; no<n_fe; no++)
     {
       const FiniteElement<dim> &fe = dof_handler[no]->get_fe();
       for(unsigned int nq =0;nq<n_quad;nq++)
         {
           AssertDimension (quad[nq].size(), 1);
-          fe_evaluation_data(no,nq,0,0).reinit(quad[nq][0], fe.base_element(0));
+          shape_info(no,nq,0,0).reinit(quad[nq][0], fe.base_element(0));
         }
     }
 
@@ -254,7 +255,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
 
                                 // set dof_indices together with
                                 // constraint_indicator and
-                                // constraint_pool. It also reorders the way
+                                // constraint_pool_data. It also reorders the way
                                 // cells are gone through (to separate cells
                                 // with overlap to other processors from
                                 // others without).
@@ -273,17 +274,17 @@ internal_reinit(const Mapping<dim>                            &mapping,
   unsigned int n_quad_in_collection = 0;
   for (unsigned int q=0; q<n_quad; ++q)
     n_quad_in_collection = std::max (n_quad_in_collection, quad[q].size());
-  fe_evaluation_data.reinit (TableIndices<4>(n_components, n_quad,
-                                             n_fe_in_collection, 
-                                             n_quad_in_collection));
+  shape_info.reinit (TableIndices<4>(n_components, n_quad,
+                                     n_fe_in_collection,
+                                     n_quad_in_collection));
   for (unsigned int no=0; no<n_components; no++)
     for (unsigned int fe_no=0; fe_no<dof_handler[no]->get_fe().size(); ++fe_no)
       {
         const FiniteElement<dim> &fe = dof_handler[no]->get_fe()[fe_no];
         for(unsigned int nq =0; nq<n_quad; nq++)
           for (unsigned int q_no=0; q_no<quad[nq].size(); ++q_no)
-            fe_evaluation_data(no,nq,fe_no,q_no).reinit (quad[nq][q_no],
-                                                         fe.base_element(0));
+            shape_info(no,nq,fe_no,q_no).reinit (quad[nq][q_no],
+                                                 fe.base_element(0));
       }
 
                                 // Evaluates transformations from unit to real
@@ -472,7 +473,7 @@ void MatrixFree<dim,Number>::initialize_indices
   std::vector<std::vector<unsigned int> > ghost_dofs(n_fe);
   std::vector<std::vector<std::vector<unsigned int> > > lexicographic_inv(n_fe);
 
-  internal::MatrixFreeFunctions::internal::ConstraintValues<double> constraint_values;
+  internal::MatrixFreeFunctions::ConstraintValues<double> constraint_values;
   std::vector<unsigned int> constraint_indices;
 
   for(unsigned int no=0; no<n_fe; ++no)
@@ -511,68 +512,54 @@ void MatrixFree<dim,Number>::initialize_indices
                   ExcMessage ("MatrixFree only works for DoFHandler with one base element"));
           const unsigned int n_fe_components = fe.element_multiplicity (0);
 
-          // cache number of finite elements and
-          // dofs_per_cell
+                                // cache number of finite elements and
+                                // dofs_per_cell
           dof_info[no].dofs_per_cell.push_back (fe.dofs_per_cell);
           dof_info[no].dofs_per_face.push_back (fe.dofs_per_face);
           dof_info[no].n_components  = n_fe_components;
 
 
-          // get permutation that gives lexicographic
-          // renumbering of the cell dofs
-          // renumber (this is necessary for FE_Q, for
-          // example, since there the vertex DoFs come
-          // first, which is incompatible with the
-          // lexicographic ordering necessary to apply
-          // tensor products efficiently)
-          const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *cast_fe =
+                                // get permutation that gives lexicographic
+                                // renumbering of the cell dofs
+                                // renumber (this is necessary for FE_Q, for
+                                // example, since there the vertex DoFs come
+                                // first, which is incompatible with the
+                                // lexicographic ordering necessary to apply
+                                // tensor products efficiently)
+          const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *fe_poly =
             dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>
             (&fe.base_element(0));
-          // This class currently only works for
-          // elements derived from
-          // FE_Poly<TensorProductPolynomials<dim>,dim,dim>.
-          // For any other element, the dynamic cast
-          // above will fail and give cast_fe == 0.
-          Assert (cast_fe != 0, ExcNotImplemented());
 
-          // create a derived finite element that gives
-          // us access to the inverse numbering (which
-          // we need in order to get a lexicographic
-          // ordering of local degrees of freedom)
-          const internal::MatrixFreeFunctions::internal::FE_PolyAccess<dim,dim>&fe_acc =
-            static_cast<const internal::MatrixFreeFunctions::internal::
-            FE_PolyAccess<dim,dim> &>(*cast_fe);
+                                // This class currently only works for
+                                // elements derived from
+                                // FE_Poly<TensorProductPolynomials<dim>,dim,dim>.
+                                // For any other element, the dynamic cast
+                                // above will fail and give fe_poly == 0.
+          Assert (fe_poly != 0, ExcNotImplemented());
           if (n_fe_components == 1)
             {
-              lexicographic_inv[no][fe_index] = fe_acc.get_numbering_inverse();
+              lexicographic_inv[no][fe_index] =
+                fe_poly->get_poly_space_numbering_inverse();
               AssertDimension (lexicographic_inv[no][fe_index].size(),
                                dof_info[no].dofs_per_cell[fe_index]);
             }
           else
             {
-              // ok, we have more than one component
+                                // ok, we have more than one component
               Assert (n_fe_components > 1, ExcInternalError());
-              std::vector<unsigned int> scalar_lex=fe_acc.get_numbering();
+              std::vector<unsigned int> scalar_lex =
+                fe_poly->get_poly_space_numbering();
               AssertDimension (scalar_lex.size() * n_fe_components,
                                dof_info[no].dofs_per_cell[fe_index]);
-              lexicographic_inv[no][fe_index].resize (dof_info[no].dofs_per_cell[fe_index]);
               std::vector<unsigned int> lexicographic (dof_info[no].dofs_per_cell[fe_index]);
               for (unsigned int comp=0; comp<n_fe_components; ++comp)
                 for (unsigned int i=0; i<scalar_lex.size(); ++i)
                   lexicographic[fe.component_to_system_index(comp,i)]
                     = scalar_lex.size () * comp + scalar_lex[i];
 
-              // invert numbering
-              for (unsigned int i=0; i<lexicographic.size(); ++i)
-                lexicographic_inv[no][fe_index][lexicographic[i]] = i;
-
-#ifdef DEBUG
-              // check that we got a useful permutation
-              lexicographic = lexicographic_inv[no][fe_index];
-              std::sort(lexicographic.begin(), lexicographic.end());
-              for (unsigned int i=0; i<lexicographic.size(); ++i)
-                AssertDimension (lexicographic[i], i);
-#endif
+                                // invert numbering
+              lexicographic_inv[no][fe_index] =
+                Utilities::invert_permutation(lexicographic);
             }
           AssertDimension (lexicographic_inv[no][fe_index].size(),
                            dof_info[no].dofs_per_cell[fe_index]);
@@ -690,14 +677,298 @@ void MatrixFree<dim,Number>::initialize_indices
         boundary_cells.push_back(counter);
     }
 
-                                // try to make the number of boundary cells
-                                // divisible by the number of vectors in
-                                // vectorization
-  const unsigned int n_vectors = VectorizedArray<Number>::n_array_elements;
+  const unsigned int vectorization_length =
+    VectorizedArray<Number>::n_array_elements;
+  std::vector<unsigned int> irregular_cells;
+  size_info.make_layout (n_active_cells, vectorization_length, boundary_cells,
+                         irregular_cells);
+
+  for (unsigned int no=0; no<n_fe; ++no)
+    dof_info[no].assign_ghosts (boundary_cells);
+
+                                // reorganize the indices in order to overlap
+                                // communication in MPI with computations:
+                                // Place all cells with ghost indices into one
+                                // chunk. Also reorder cells so that we can
+                                // parallelize by threads
+  std::vector<unsigned int> renumbering;
+  if (task_info.use_multithreading == true)
+    {
+      dof_info[0].compute_renumber_parallel (boundary_cells, size_info,
+                                             renumbering);
+      if(task_info.use_partition_partition == true)
+        dof_info[0].make_thread_graph_partition_partition
+          (size_info, task_info, renumbering, irregular_cells,
+           dof_handlers.active_dof_handler == DoFHandlers::hp);
+      else
+        dof_info[0].make_thread_graph_partition_color
+          (size_info, task_info, renumbering, irregular_cells,
+           dof_handlers.active_dof_handler == DoFHandlers::hp);
+    }
+  else
+    {
+                                // In case, we have an hp-dofhandler, we have
+                                // to reorder the cell according to the
+                                // polynomial degree on the cell.
+      dof_info[0].compute_renumber_serial (boundary_cells, size_info,
+                                           renumbering);
+      if (dof_handlers.active_dof_handler == DoFHandlers::hp)
+        dof_info[0].compute_renumber_hp_serial (size_info, renumbering,
+                                                irregular_cells);
+    }
+
+                                // Finally perform the renumbering. We also
+                                // want to group several cells together to one
+                                // "macro-cell" for vectorization (where the
+                                // arithmetic operations will then be done
+                                // simultaneously).
+#ifdef DEBUG
   {
+    std::vector<unsigned int> sorted_renumbering (renumbering);
+    std::sort (sorted_renumbering.begin(), sorted_renumbering.end());
+    for (unsigned int i=0; i<sorted_renumbering.size(); ++i)
+      Assert (sorted_renumbering[i] == i, ExcInternalError());
+  }
+#endif
+  {
+    std::vector<std::pair<unsigned int,unsigned int> >
+      cell_level_index_old;
+    cell_level_index.swap (cell_level_index_old);
+    cell_level_index.reserve(size_info.n_macro_cells*vectorization_length);
+    unsigned int position_cell=0;
+    for (unsigned int i=0; i<size_info.n_macro_cells; ++i)
+      {
+        unsigned int n_comp = (irregular_cells[i]>0)?
+          irregular_cells[i] : vectorization_length;
+        for (unsigned int j=0; j<n_comp; ++j)
+          cell_level_index.push_back
+            (cell_level_index_old[renumbering[position_cell+j]]);
+
+                                // generate a cell and level index
+                                // also when we have not filled up
+                                // vectorization_length cells. This is needed for
+                                // MappingInfo when the transformation
+                                // data is initialized. We just set
+                                // the value to the last valid cell in
+                                // that case.
+        for (unsigned int j=n_comp; j<vectorization_length; ++j)
+          cell_level_index.push_back
+            (cell_level_index_old[renumbering[position_cell+n_comp-1]]);
+        position_cell += n_comp;
+      }
+    AssertDimension (position_cell, size_info.n_active_cells);
+    AssertDimension (cell_level_index.size(),size_info.n_macro_cells*vectorization_length);
+  }
+
+                                // set constraint pool and reorder the indices
+  constraint_pool_row_index =
+    constraint_values.constraint_pool_row_index;
+  constraint_pool_data.resize (constraint_values.constraint_pool_data.size());
+  std::copy (constraint_values.constraint_pool_data.begin(),
+             constraint_values.constraint_pool_data.end(),
+             constraint_pool_data.begin());
+  for (unsigned int no=0; no<n_fe; ++no)
+    {
+      dof_info[no].reorder_cells(size_info, renumbering,
+                                 constraint_pool_row_index,
+                                 irregular_cells, vectorization_length);
+    }
+
+  indices_are_initialized = true;
+}
+
+
+
+template <int dim, typename Number>
+void MatrixFree<dim,Number>::clear()
+{
+  dof_info.clear();
+  mapping_info.clear();
+  cell_level_index.clear();
+  size_info.clear();
+  task_info.clear();
+  indices_are_initialized = false;
+  mapping_is_initialized  = false;
+}
+
+
+
+template <int dim, typename Number>
+std::size_t MatrixFree<dim,Number>::memory_consumption () const
+{
+  std::size_t memory = MemoryConsumption::memory_consumption (dof_info);
+  memory += MemoryConsumption::memory_consumption (cell_level_index);
+  memory += MemoryConsumption::memory_consumption (shape_info);
+  memory += MemoryConsumption::memory_consumption (constraint_pool_data);
+  memory += MemoryConsumption::memory_consumption (constraint_pool_row_index);
+  memory += MemoryConsumption::memory_consumption (task_info);
+  memory += sizeof(this);
+  memory += mapping_info.memory_consumption();
+  return memory;
+}
+
+
+template <int dim, typename Number>
+template <typename STREAM>
+void MatrixFree<dim,Number>::print_memory_consumption (STREAM &out) const
+{
+  out << "  Memory cell FE operator total: --> ";
+  size_info.print_memory_statistics (out, memory_consumption());
+  out << "   Memory cell index:                ";
+  size_info.print_memory_statistics
+    (out, MemoryConsumption::memory_consumption (cell_level_index));
+  for (unsigned int j=0; j<dof_info.size(); ++ j)
+    {
+      out << "   Memory DoFInfo component "<< j << std::endl;
+      dof_info[j].print_memory_consumption(out, size_info);
+    }
+
+  out << "   Memory mapping info" << std::endl;
+  mapping_info.print_memory_consumption(out, size_info);
+
+  out << "   Memory unit cell shape data:      ";
+  size_info.print_memory_statistics
+    (out, MemoryConsumption::memory_consumption (shape_info));
+  if (task_info.use_multithreading == true)
+    {
+      out << "   Memory task partitioning info:    ";
+      size_info.print_memory_statistics
+        (out, MemoryConsumption::memory_consumption (task_info));
+    }
+}
+
+
+
+template <int dim, typename Number>
+void MatrixFree<dim,Number>::print (std::ostream &out) const
+{
+                                // print indices local to global
+  for (unsigned int no=0; no<dof_info.size(); ++no)
+    {
+      out << "\n-- Index data for component " << no << " --" << std::endl;
+      dof_info[no].print (constraint_pool_data, constraint_pool_row_index, out);
+      out << std::endl;
+    }
+}
+
+
+
+/*-------------------- Implementation of helper functions ------------------*/
+
+namespace internal
+{
+  namespace MatrixFreeFunctions
+  {
+
+  TaskInfo::TaskInfo ()
+  {
+    clear();
+  }
+
+
+
+  void TaskInfo::clear ()
+  {
+    block_size = 0;
+    n_blocks = 0;
+    block_size_last = 0;
+    position_short_block = 0;
+    use_multithreading = false;
+    use_partition_partition = false;
+    use_coloring_only = false;
+    partition_color_blocks_row_index.clear();
+    partition_color_blocks_data.clear();
+    evens = 0;
+    odds = 0;
+    n_blocked_workers = 0;
+    n_workers = 0;
+    partition_evens.clear();
+    partition_odds.clear();
+    partition_n_blocked_workers.clear();
+    partition_n_workers.clear();
+  }
+
+
+
+  std::size_t
+  TaskInfo::memory_consumption () const
+  {
+    return (MemoryConsumption::memory_consumption (partition_color_blocks_row_index) +
+            MemoryConsumption::memory_consumption (partition_color_blocks_data)+
+            MemoryConsumption::memory_consumption (partition_evens) +
+            MemoryConsumption::memory_consumption (partition_odds) +
+            MemoryConsumption::memory_consumption (partition_n_blocked_workers) +
+            MemoryConsumption::memory_consumption (partition_n_workers));
+  }
+
+
+
+  SizeInfo::SizeInfo ()
+  {
+    clear();
+  }
+
+
+
+  void SizeInfo::clear()
+  {
+    n_active_cells = 0;
+    n_macro_cells  = 0;
+    boundary_cells_start = 0;
+    boundary_cells_end   = 0;
+    vectorization_length = 0;
+    locally_owned_cells  = IndexSet();
+    ghost_cells = IndexSet();
+    communicator = MPI_COMM_SELF;
+    my_pid = 0;
+    n_procs = 0;
+  }
+
+
+
+  template <typename STREAM>
+  void SizeInfo::print_memory_statistics (STREAM     &out,
+                                          std::size_t data_length) const
+  {
+    Utilities::MPI::MinMaxAvg memory_c;
+    if (Utilities::System::job_supports_mpi() == true)
+      {
+        memory_c = Utilities::MPI::min_max_avg (1e-6*data_length,
+                                                communicator);
+      }
+    else
+      {
+        memory_c.sum = 1e-6*data_length;
+        memory_c.min = memory_c.sum;
+        memory_c.max = memory_c.sum;
+        memory_c.avg = memory_c.sum;
+        memory_c.min_index = 0;
+        memory_c.max_index = 0;
+      }
+    if (n_procs < 2)
+      out << memory_c.min;
+    else
+      out << memory_c.min << "/" << memory_c.avg << "/" << memory_c.max;
+    out << " MB" << std::endl;
+  }
+
+
+
+  inline
+  void SizeInfo::make_layout (const unsigned int n_active_cells_in,
+                              const unsigned int vectorization_length_in,
+                              std::vector<unsigned int> &boundary_cells,
+                              std::vector<unsigned int> &irregular_cells)
+  {
+    vectorization_length = vectorization_length_in;
+    n_active_cells = n_active_cells_in;
+
     unsigned int n_max_boundary_cells = boundary_cells.size();
     unsigned int n_boundary_cells = n_max_boundary_cells;
 
+                                // try to make the number of boundary cells
+                                // divisible by the number of vectors in
+                                // vectorization
     /*
                                 // try to balance the number of cells before
                                 // and after the boundary part on each
@@ -711,16 +982,7 @@ void MatrixFree<dim,Number>::initialize_indices
     */
 
     unsigned int fillup_needed =
-      (n_vectors - n_boundary_cells%n_vectors)%n_vectors;
-    /*
-    if (task_info.use_multithreading == true)
-      fillup_needed =
-        (n_vectors - n_boundary_cells%n_vectors)%n_vectors;
-    else
-      fillup_needed = (n_max_boundary_cells +
-                       (n_vectors - n_max_boundary_cells%n_vectors)%n_vectors -
-                             n_boundary_cells);
-    */
+      (vectorization_length - n_boundary_cells%vectorization_length)%vectorization_length;
     if (fillup_needed > 0 && n_boundary_cells < n_active_cells)
       {
                                 // fill additional cells into the list of
@@ -766,297 +1028,89 @@ void MatrixFree<dim,Number>::initialize_indices
 
         boundary_cells.swap(new_boundary_cells);
       }
-  }
 
                                 // set the number of cells
-  const unsigned int n_boundary_cells = boundary_cells.size();
-  std::sort (boundary_cells.begin(), boundary_cells.end());
-  std::vector<unsigned int> irregular_cells;
-  size_info.make_layout (n_active_cells, n_boundary_cells, n_vectors,
-                         irregular_cells);
+    std::sort (boundary_cells.begin(), boundary_cells.end());
+    n_boundary_cells = boundary_cells.size();
 
-  for (unsigned int no=0; no<n_fe; ++no)
-    dof_info[no].assign_ghosts (boundary_cells);
-
-                                // reorganize the indices: we want to put the
-                                // boundary cells at the beginning for
-                                // multithreading. So just renumber the cell
-                                // indices and put them at the beginning of
-                                // the list that determines the order of the
-                                // cells
-  std::vector<unsigned int> renumbering (n_active_cells,
-                                         numbers::invalid_unsigned_int);
-  {
-    std::vector<unsigned int> reverse_numbering (n_active_cells,
-                                                 numbers::invalid_unsigned_int);
-    unsigned int counter;
-    if (task_info.use_multithreading == true)
+                                // check that number of boundary cells
+                                // is divisible by
+                                // vectorization_length or that it
+                                // contains all cells
+    Assert (n_boundary_cells % vectorization_length == 0 ||
+            n_boundary_cells == n_active_cells, ExcInternalError());
+    n_macro_cells = (n_active_cells+vectorization_length-1)/vectorization_length;
+    irregular_cells.resize (n_macro_cells);
+    if (n_macro_cells*vectorization_length > n_active_cells)
       {
-        for (unsigned int j=0; j<n_boundary_cells; ++j)
-          reverse_numbering[boundary_cells[j]] = j;
-        counter = n_boundary_cells;
-        for (unsigned int j=0; j<n_active_cells; ++j)
-          if (reverse_numbering[j] == numbers::invalid_unsigned_int)
-            reverse_numbering[j] = counter++;
-
-        size_info.boundary_cells_end   = (size_info.boundary_cells_end -
-                                          size_info.boundary_cells_start);
-        size_info.boundary_cells_start = 0;
+        irregular_cells[n_macro_cells-1] =
+          vectorization_length - (n_macro_cells*vectorization_length - n_active_cells);
       }
-                                //  Otherwise, we put the boundary cells to
-                                //  the middle.
+    if (n_procs > 1)
+      {
+        const unsigned int n_macro_boundary_cells =
+          (n_boundary_cells+vectorization_length-1)/vectorization_length;
+        boundary_cells_start = (n_macro_cells-n_macro_boundary_cells)/2;
+        boundary_cells_end   = boundary_cells_start + n_macro_boundary_cells;
+      }
+    else
+      boundary_cells_start = boundary_cells_end = n_macro_cells;
+  }
+
+
+
+  HashValue::HashValue (const double element_size)
+    :
+    scaling (element_size * std::numeric_limits<double>::epsilon() *
+             1024.)
+  {}
+
+
+
+  unsigned int HashValue::operator ()(const std::vector<double> &vec)
+  {
+    std::vector<double> mod_vec(vec);
+    for (unsigned int i=0; i<mod_vec.size(); ++i)
+      mod_vec[i] -= fmod (mod_vec[i], scaling);
+    return static_cast<unsigned int>(boost::hash_range (mod_vec.begin(), mod_vec.end()));
+  }
+
+
+  template <int dim, typename number>
+  unsigned int HashValue::operator ()
+    (const Tensor<2,dim,VectorizedArray<number> > &input,
+     const bool     is_diagonal)
+  {
+    const unsigned int vectorization_length =
+      VectorizedArray<number>::n_array_elements;
+
+    if (is_diagonal)
+      {
+        number mod_tensor [dim][vectorization_length];
+        for (unsigned int i=0; i<dim; ++i)
+          for (unsigned int j=0; j<vectorization_length; ++j)
+            mod_tensor[i][j] = input[i][i][j] - fmod (input[i][i][j],
+                                                      number(scaling));
+        return static_cast<unsigned int>
+          (boost::hash_range(&mod_tensor[0][0],
+                             &mod_tensor[0][0]+dim*vectorization_length));
+      }
     else
       {
-        for (unsigned int j=0; j<n_boundary_cells; ++j)
-          reverse_numbering[boundary_cells[j]] = j+n_vectors*size_info.boundary_cells_start;
-        counter = 0;
-        unsigned int j = 0;
-        while (counter < n_active_cells &&
-               counter < n_vectors * size_info.boundary_cells_start)
-          {
-            if (reverse_numbering[j] == numbers::invalid_unsigned_int)
-              reverse_numbering[j] = counter++;
-            j++;
-          }
-        counter = std::min (n_vectors*size_info.boundary_cells_start+n_boundary_cells,
-                            n_active_cells);
-        if (counter < n_active_cells)
-          {
-            for ( ; j<n_active_cells; ++j)
-              if (reverse_numbering[j] == numbers::invalid_unsigned_int)
-                reverse_numbering[j] = counter++;
-          }
-      }
-    AssertDimension (counter, n_active_cells);
-    for (unsigned int j=0; j<n_active_cells; ++j)
-      {
-        AssertIndexRange (reverse_numbering[j], n_active_cells);
-        renumbering[reverse_numbering[j]] = j;
+        number mod_tensor [dim][dim][vectorization_length];
+        for (unsigned int i=0; i<dim; ++i)
+          for (unsigned int d=0; d<dim; ++d)
+            for (unsigned int j=0; j<vectorization_length; ++j)
+              mod_tensor[i][d][j] = input[i][d][j] - fmod (input[i][d][j],
+                                                           number(scaling));
+        return static_cast<unsigned int>(boost::hash_range
+                                         (&mod_tensor[0][0][0],
+                                          &mod_tensor[0][0][0]+
+                                          dim*dim*vectorization_length));
       }
   }
 
-                                // reorder cells so that we can parallelize by
-                                // threads
-  if (task_info.use_multithreading == true)
-    {
-      if(task_info.use_partition_partition == true)
-        dof_info[0].make_thread_graph_partition_partition
-          (size_info, task_info, renumbering, irregular_cells,
-           dof_handlers.active_dof_handler == DoFHandlers::hp);
-      else
-        dof_info[0].make_thread_graph_partition_color
-          (size_info, task_info, renumbering, irregular_cells,
-           dof_handlers.active_dof_handler == DoFHandlers::hp);
-    }
-  else
-    {
-                                // In case, we have an hp-dofhandler, we have
-                                // to reorder the cell according to the
-                                // polynomial degree on the cell.
-      if (dof_handlers.active_dof_handler == DoFHandlers::hp)
-      {
-        const unsigned int max_fe_index =
-          dof_info[0].max_fe_index;
-        irregular_cells.resize (0);
-        irregular_cells.resize (size_info.n_macro_cells+3*max_fe_index);
-        const std::vector<unsigned int> &cell_active_fe_index =
-          dof_info[0].cell_active_fe_index;
-        std::vector<std::vector<unsigned int> > renumbering_fe_index;
-      renumbering_fe_index.resize(max_fe_index);
-      unsigned int counter,n_macro_cells_before = 0;
-      const unsigned int
-        start_bound = std::min (size_info.n_active_cells,
-                                size_info.boundary_cells_start*n_vectors),
-        end_bound   = std::min (size_info.n_active_cells,
-                                size_info.boundary_cells_end*n_vectors);
-      for(counter=0; counter<start_bound; counter++)
-        {
-          renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
-            push_back(renumbering[counter]);
-        }
-      counter = 0;
-      for (unsigned int j=0;j<max_fe_index;j++)
-        {
-          for(unsigned int jj=0;jj<renumbering_fe_index[j].size();jj++)
-            renumbering[counter++] = renumbering_fe_index[j][jj];
-          irregular_cells[renumbering_fe_index[j].size()/n_vectors+
-                          n_macro_cells_before] =
-            renumbering_fe_index[j].size()%n_vectors;
-          n_macro_cells_before += (renumbering_fe_index[j].size()+n_vectors-1)/
-            n_vectors;
-          renumbering_fe_index[j].resize(0);
-        }
-      unsigned int new_boundary_start = n_macro_cells_before;
-      for(counter = start_bound; counter < end_bound; counter++)
-        {
-          renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
-            push_back(renumbering[counter]);
-        }
-      counter = start_bound;
-      for (unsigned int j=0;j<max_fe_index;j++)
-        {
-          for(unsigned int jj=0;jj<renumbering_fe_index[j].size();jj++)
-            renumbering[counter++] = renumbering_fe_index[j][jj];
-          irregular_cells[renumbering_fe_index[j].size()/n_vectors+
-                          n_macro_cells_before] =
-            renumbering_fe_index[j].size()%n_vectors;
-          n_macro_cells_before += (renumbering_fe_index[j].size()+n_vectors-1)/
-            n_vectors;
-          renumbering_fe_index[j].resize(0);
-        }
-      unsigned int new_boundary_end = n_macro_cells_before;
-      for(counter=end_bound; counter<n_active_cells; counter++)
-        {
-          renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
-            push_back(renumbering[counter]);
-        }
-      counter = end_bound;
-      for (unsigned int j=0;j<max_fe_index;j++)
-        {
-          for(unsigned int jj=0;jj<renumbering_fe_index[j].size();jj++)
-            renumbering[counter++] = renumbering_fe_index[j][jj];
-          irregular_cells[renumbering_fe_index[j].size()/n_vectors+
-                          n_macro_cells_before] =
-            renumbering_fe_index[j].size()%n_vectors;
-          n_macro_cells_before += (renumbering_fe_index[j].size()+n_vectors-1)/
-            n_vectors;
-        }
-      AssertIndexRange (n_macro_cells_before,
-                        size_info.n_macro_cells + 3*max_fe_index+1);
-      irregular_cells.resize (n_macro_cells_before);
-      size_info.n_macro_cells = n_macro_cells_before;
-      size_info.boundary_cells_start = new_boundary_start;
-      size_info.boundary_cells_end = new_boundary_end;
-      }
-    }
-                                // Finally perform the renumbering. We also
-                                // want to group several cells together to one
-                                // "macro-cell" for vectorization (where the
-                                // arithmetic operations will then be done
-                                // simultaneously).
-#ifdef DEBUG
-  {
-    std::vector<unsigned int> sorted_renumbering (renumbering);
-    std::sort (sorted_renumbering.begin(), sorted_renumbering.end());
-    for (unsigned int i=0; i<sorted_renumbering.size(); ++i)
-      Assert (sorted_renumbering[i] == i, ExcInternalError());
   }
-#endif
-  {
-    std::vector<std::pair<unsigned int,unsigned int> >
-      cell_level_index_old;
-    cell_level_index.swap (cell_level_index_old);
-    cell_level_index.reserve(size_info.n_macro_cells*n_vectors);
-    unsigned int position_cell=0;
-    for (unsigned int i=0; i<size_info.n_macro_cells; ++i)
-      {
-        unsigned int n_comp = (irregular_cells[i]>0)?
-          irregular_cells[i] : n_vectors;
-        for (unsigned int j=0; j<n_comp; ++j)
-          cell_level_index.push_back
-            (cell_level_index_old[renumbering[position_cell+j]]);
-
-                                // generate a cell and level index
-                                // also when we have not filled up
-                                // n_vectors cells. This is needed for
-                                // MappingInfo when the transformation
-                                // data is initialized. We just set
-                                // the value to the last valid cell in
-                                // that case.
-        for (unsigned int j=n_comp; j<n_vectors; ++j)
-          cell_level_index.push_back
-            (cell_level_index_old[renumbering[position_cell+n_comp-1]]);
-        position_cell += n_comp;
-      }
-    AssertDimension (position_cell, size_info.n_active_cells);
-    AssertDimension (cell_level_index.size(),size_info.n_macro_cells*n_vectors);
-  }
-
-                                // set constraint pool and reorder the indices
-  constraint_pool.row_index =
-    constraint_values.constraint_pool.row_index;
-  constraint_pool.data.resize (constraint_values.constraint_pool.data.size());
-  std::copy (constraint_values.constraint_pool.data.begin(),
-             constraint_values.constraint_pool.data.end(),
-             constraint_pool.data.begin());
-  for (unsigned int no=0; no<n_fe; ++no)
-    {
-      dof_info[no].reorder_cells(size_info, renumbering,
-                                 constraint_pool.row_index,
-                                 irregular_cells, n_vectors);
-    }
-
-  indices_are_initialized = true;
-}
-
-
-
-template <int dim, typename Number>
-void MatrixFree<dim,Number>::clear()
-{
-  dof_info.clear();
-  mapping_info.clear();
-  cell_level_index.clear();
-  size_info.clear();
-  task_info.clear();
-  indices_are_initialized = false;
-  mapping_is_initialized  = false;
-}
-
-
-
-template <int dim, typename Number>
-std::size_t MatrixFree<dim,Number>::memory_consumption () const
-{
-  std::size_t memory = MemoryConsumption::memory_consumption (dof_info);
-  memory += MemoryConsumption::memory_consumption (cell_level_index);
-  memory += MemoryConsumption::memory_consumption (fe_evaluation_data);
-  memory += MemoryConsumption::memory_consumption (constraint_pool);
-  memory += MemoryConsumption::memory_consumption (task_info);
-  memory += sizeof(this);
-  memory += mapping_info.memory_consumption();
-  return memory;
-}
-
-
-template <int dim, typename Number>
-template <typename STREAM>
-void MatrixFree<dim,Number>::print_memory_consumption (STREAM &out) const
-{
-  out << "  Memory cell FE operator total: --> ";
-  size_info.print_mem (out, memory_consumption());
-  out << "   Memory cell index:                ";
-  size_info.print_mem (out, MemoryConsumption::memory_consumption (cell_level_index));
-  for (unsigned int j=0; j<dof_info.size(); ++ j)
-    {
-      out << "   Memory DoFInfo component "<< j << std::endl;
-      dof_info[j].print_memory_consumption(out, size_info);
-    }
-
-  out << "   Memory mapping info" << std::endl;
-  mapping_info.print_memory_consumption(out, size_info);
-
-  out << "   Memory unit cell shape data:      ";
-  size_info.print_mem (out, MemoryConsumption::memory_consumption (fe_evaluation_data));
-  if (task_info.use_multithreading == true)
-    {
-      out << "   Memory task partitioning info:    ";
-      size_info.print_mem (out, MemoryConsumption::memory_consumption (task_info));
-    }
-}
-
-
-
-template <int dim, typename Number>
-void MatrixFree<dim,Number>::print (std::ostream &out) const
-{
-                                // print indices local to global
-  for (unsigned int no=0; no<dof_info.size(); ++no)
-    {
-      out << "\n-- Index data for component " << no << " --" << std::endl;
-      dof_info[no].print (constraint_pool, out);
-      out << std::endl;
-    }
 }
 
 

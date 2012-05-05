@@ -82,6 +82,22 @@ class FE_Poly : public FiniteElement<dim,spacedim>
     unsigned int get_degree () const;
 
                                      /**
+                                      * Return the numbering of the underlying
+                                      * polynomial space compared to
+                                      * lexicographic ordering of the basis
+                                      * functions. Returns
+                                      * POLY::get_numbering().
+                                      */
+    std::vector<unsigned int> get_poly_space_numbering() const;
+
+                                     /**
+                                      * Return the inverse numbering of the
+                                      * underlying polynomial space. Returns
+                                      * POLY::get_numbering_inverse().
+                                      */
+    std::vector<unsigned int> get_poly_space_numbering_inverse() const;
+
+                                     /**
                                       * Return the value of the
                                       * <tt>i</tt>th shape function at
                                       * the point <tt>p</tt>. See the

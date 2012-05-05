@@ -39,9 +39,9 @@ void test ()
     {
       global_size += set - i;
       if (i<myid)
-	my_start += set - i;
+        my_start += set - i;
     }
-				   // each processor owns some indices and all
+                                   // each processor owns some indices and all
                                    // are ghosting elements from three
                                    // processors (the second). some entries
                                    // are right around the border between two
@@ -51,16 +51,16 @@ void test ()
   IndexSet local_relevant(global_size);
   local_relevant = local_owned;
   unsigned int ghost_indices [10] = {1, 2, 13, set-2, set-1, set, set+1, 2*set,
-				     2*set+1, 2*set+3};
+                                     2*set+1, 2*set+3};
   local_relevant.add_indices (&ghost_indices[0], &ghost_indices[0]+10);
 
-				// v has ghosts, w has none. set some entries
-				// on w, copy into v and check if they are
-				// there
+                                // v has ghosts, w has none. set some entries
+                                // on w, copy into v and check if they are
+                                // there
   parallel::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
   parallel::distributed::Vector<double> w(local_owned, local_owned, MPI_COMM_WORLD);
 
-				// set a few of the local elements
+                                // set a few of the local elements
   for (unsigned i=0; i<local_size; ++i)
     w.local_element(i) = 2.0 * (i + my_start);
 
@@ -68,22 +68,22 @@ void test ()
   v.copy_from(w);
   v.update_ghost_values();
 
-				// check local values for correctness
+                                // check local values for correctness
   for (unsigned int i=0; i<local_size; ++i)
     Assert (v.local_element(i) == 2.0 * (i + my_start), ExcInternalError());
 
-				// check local values with two different
-				// access operators
+                                // check local values with two different
+                                // access operators
   for (unsigned int i=0; i<local_size; ++i)
     Assert (v.local_element(i) == v(local_owned.nth_index_in_set (i)), ExcInternalError());
   for (unsigned int i=0; i<local_size; ++i)
     Assert (v.local_element(i) == v(i+my_start), ExcInternalError());
   
-				// check non-local entries on all processors
+                                // check non-local entries on all processors
   for (unsigned int i=0; i<10; ++i)
     Assert (v(ghost_indices[i])== 2. * ghost_indices[i], ExcInternalError());
 
-				// compare direct access local_element with access ()
+                                // compare direct access local_element with access ()
   for (unsigned int i=0; i<10; ++i)
     if (ghost_indices[i] < my_start)
       Assert (v(ghost_indices[i])==v.local_element(local_size+i), ExcInternalError());
@@ -93,27 +93,27 @@ void test ()
       Assert (v(ghost_indices[i])==v.local_element(local_size+i-5), ExcInternalError());
 
 
-				// now the same again, but import ghosts
-				// through the call to copy_from
+                                // now the same again, but import ghosts
+                                // through the call to copy_from
   v.reinit (local_owned, local_relevant, MPI_COMM_WORLD);
   v.copy_from(w, true);
 
-				// check local values for correctness
+                                // check local values for correctness
   for (unsigned int i=0; i<local_size; ++i)
     Assert (v.local_element(i) == 2.0 * (i + my_start), ExcInternalError());
 
-				// check local values with two different
-				// access operators
+                                // check local values with two different
+                                // access operators
   for (unsigned int i=0; i<local_size; ++i)
     Assert (v.local_element(i) == v(local_owned.nth_index_in_set (i)), ExcInternalError());
   for (unsigned int i=0; i<local_size; ++i)
     Assert (v.local_element(i) == v(i+my_start), ExcInternalError());
   
-				// check non-local entries on all processors
+                                // check non-local entries on all processors
   for (unsigned int i=0; i<10; ++i)
     Assert (v(ghost_indices[i])== 2. * ghost_indices[i], ExcInternalError());
 
-				// compare direct access [] with access ()
+                                // compare direct access [] with access ()
   for (unsigned int i=0; i<10; ++i)
     if (ghost_indices[i] < my_start)
       Assert (v(ghost_indices[i])==v.local_element(local_size+i), ExcInternalError());
@@ -123,12 +123,12 @@ void test ()
       Assert (v(ghost_indices[i])==v.local_element(local_size+i-5), ExcInternalError());
 
 
-				// now do not call import_ghosts and check
-				// whether ghosts really are zero
+                                // now do not call import_ghosts and check
+                                // whether ghosts really are zero
   v.reinit (local_owned, local_relevant, MPI_COMM_WORLD);
   v.copy_from(w, false);
 
-  				// check non-local entries on all processors
+                                  // check non-local entries on all processors
   for (unsigned int i=0; i<10; ++i)
     if (local_owned.is_element (ghost_indices[i]) == false)
       Assert (v(ghost_indices[i]) == 0., ExcInternalError());

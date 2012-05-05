@@ -33,20 +33,20 @@ void test ()
 
   FE_Q<dim> fe (fe_degree);
 
-				// setup DoFs
+                                // setup DoFs
   MGDoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
   VectorTools::interpolate_boundary_values (dof,
-					    0,
-					    ZeroFunction<dim>(),
-					    constraints);
+                                            0,
+                                            ZeroFunction<dim>(),
+                                            constraints);
   constraints.close ();
 
   //std::cout << "Number of cells: " << dof.get_tria().n_active_cells() << std::endl;
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
-				// set up MatrixFree
+                                // set up MatrixFree
   QGauss<1> quad (fe_degree+1);
   MatrixFree<dim> mf_data;
   mf_data.reinit (dof, constraints, quad);
@@ -55,12 +55,12 @@ void test ()
   {
     CompressedSimpleSparsityPattern csp (dof.n_dofs(), dof.n_dofs());
     DoFTools::make_sparsity_pattern (static_cast<const DoFHandler<dim>&>(dof),
-				     csp, constraints, false);
+                                     csp, constraints, false);
     sparsity.copy_from (csp);
   }
   system_matrix.reinit (sparsity);
 
-				// setup MG levels
+                                // setup MG levels
   const unsigned int nlevels = tria.n_levels();
   typedef MatrixFree<dim> MatrixFreeTestType;
   MGLevelObject<MatrixFreeTestType>    mg_matrices;
@@ -94,14 +94,14 @@ void test ()
       mg_ref_matrices[level].reinit (mg_sparsities[level]);
     }
 
-				// assemble sparse matrix with (\nabla v,
-				// \nabla u) + (v, 10 * u) on the actual
-				// discretization and on all levels
+                                // assemble sparse matrix with (\nabla v,
+                                // \nabla u) + (v, 10 * u) on the actual
+                                // discretization and on all levels
   {
     QGauss<dim> quad (fe_degree+1);
     FEValues<dim> fe_values (fe, quad,
-			     update_values    |  update_gradients |
-			     update_JxW_values);
+                             update_values    |  update_gradients |
+                             update_JxW_values);
     const unsigned int n_quadrature_points = quad.size();
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
@@ -112,23 +112,23 @@ void test ()
       endc = dof.end();
     for (; cell!=endc; ++cell)
       {
-	cell_matrix = 0;
-	fe_values.reinit (cell);
+        cell_matrix = 0;
+        fe_values.reinit (cell);
 
-	for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    {
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point) *
-				      fe_values.shape_grad(j,q_point) +
-				      10. * fe_values.shape_value(i,q_point) *
-				      fe_values.shape_value(j,q_point)) *
-				     fe_values.JxW(q_point));
-	    }
-	cell->get_dof_indices (local_dof_indices);
-	constraints.distribute_local_to_global (cell_matrix,
-						local_dof_indices,
-						system_matrix);
+        for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            {
+              for (unsigned int j=0; j<dofs_per_cell; ++j)
+                cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point) *
+                                      fe_values.shape_grad(j,q_point) +
+                                      10. * fe_values.shape_value(i,q_point) *
+                                      fe_values.shape_value(j,q_point)) *
+                                     fe_values.JxW(q_point));
+            }
+        cell->get_dof_indices (local_dof_indices);
+        constraints.distribute_local_to_global (cell_matrix,
+                                                local_dof_indices,
+                                                system_matrix);
       }
 
     // now to the MG assembly
@@ -137,42 +137,42 @@ void test ()
       endcm = dof.end();
     for (; cellm!=endcm; ++cellm)
       {
-	cell_matrix = 0;
-	fe_values.reinit (cellm);
+        cell_matrix = 0;
+        fe_values.reinit (cellm);
 
-	for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    {
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point) *
-				      fe_values.shape_grad(j,q_point) +
-				      10. * fe_values.shape_value(i,q_point) *
-				      fe_values.shape_value(j,q_point)) *
-				     fe_values.JxW(q_point));
-	    }
-	cellm->get_mg_dof_indices (local_dof_indices);
-	mg_constraints[cellm->level()]
-	  .distribute_local_to_global (cell_matrix,
-				       local_dof_indices,
-				       mg_ref_matrices[cellm->level()]);
+        for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            {
+              for (unsigned int j=0; j<dofs_per_cell; ++j)
+                cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point) *
+                                      fe_values.shape_grad(j,q_point) +
+                                      10. * fe_values.shape_value(i,q_point) *
+                                      fe_values.shape_value(j,q_point)) *
+                                     fe_values.JxW(q_point));
+            }
+        cellm->get_mg_dof_indices (local_dof_indices);
+        mg_constraints[cellm->level()]
+          .distribute_local_to_global (cell_matrix,
+                                       local_dof_indices,
+                                       mg_ref_matrices[cellm->level()]);
       }
   }
 
-				// fill a right hand side vector with random
-				// numbers in unconstrained degrees of freedom
+                                // fill a right hand side vector with random
+                                // numbers in unconstrained degrees of freedom
   Vector<double> src (dof.n_dofs());
   Vector<double> result_spmv(src), result_mf (src);
 
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
       if (constraints.is_constrained(i) == false)
-	src(i) = (double)rand()/RAND_MAX;
+        src(i) = (double)rand()/RAND_MAX;
     }
 
-				// now perform matrix-vector product and check
-				// its correctness
+                                // now perform matrix-vector product and check
+                                // its correctness
   system_matrix.vmult (result_spmv, src);
-  MatrixFreeTest<dim,fe_degree+1,double> mf (mf_data);
+  MatrixFreeTest<dim,fe_degree,double> mf (mf_data);
   mf.vmult (result_mf, src);
 
   result_mf -= result_spmv;
@@ -185,21 +185,21 @@ void test ()
       Vector<double> result_spmv(src), result_mf (src);
 
       for (unsigned int i=0; i<dof.n_dofs(level); ++i)
-	{
-	  if (mg_constraints[level].is_constrained(i) == false)
-	    src(i) = (double)rand()/RAND_MAX;
-	}
+        {
+          if (mg_constraints[level].is_constrained(i) == false)
+            src(i) = (double)rand()/RAND_MAX;
+        }
 
-				// now perform matrix-vector product and check
-				// its correctness
+                                // now perform matrix-vector product and check
+                                // its correctness
       mg_ref_matrices[level].vmult (result_spmv, src);
-      MatrixFreeTest<dim,fe_degree+1,double> mf_lev (mg_matrices[level]);
+      MatrixFreeTest<dim,fe_degree,double> mf_lev (mg_matrices[level]);
       mf_lev.vmult (result_mf, src);
 
       result_mf -= result_spmv;
       const double diff_norm = result_mf.linfty_norm();
       deallog << "Norm of difference MG level " << level  
-	      << ": " << diff_norm << std::endl;
+              << ": " << diff_norm << std::endl;
     }
   deallog << std::endl;
 }

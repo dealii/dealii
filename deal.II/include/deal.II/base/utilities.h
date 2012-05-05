@@ -189,6 +189,35 @@ namespace Utilities
   fixed_power (const T t);
 
                                    /**
+                                    * Calculate a fixed power of an integer
+                                    * number by a template expression where
+                                    * both the number <code>a</code> and the
+                                    * power <code>N</code> are compile-time
+                                    * constants. This gives compile-time
+                                    * knowledge of the result of the power
+                                    * operation.
+                                    *
+                                    * Use this function as in
+                                    * <code>fixed_int_power@<a,N@>::value</code>.
+                                    */
+  template <int a, int N>
+  struct fixed_int_power
+  {
+    static const int value = a * fixed_int_power<a,N-1>::value;
+  };
+
+                                   /**
+                                    * Base case for the power operation with
+                                    * <code>N=0</code>, which gives the result
+                                    * 1.
+                                    */
+  template <int a>
+  struct fixed_int_power<a,0>
+  {
+    static const int value = 1;
+  };
+
+                                   /**
                                     * Optimized replacement for
                                     * <tt>std::lower_bound</tt> for
                                     * searching within the range of
