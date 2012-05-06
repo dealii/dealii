@@ -48,6 +48,32 @@ used for boundary indicators.
 
 <ol>
 <li>
+New: step-48 demonstrates the solution of a nonlinear wave equation
+with an explicit time stepping method. The usage of Gauss-Lobatto
+elements gives diagonal mass matrices, which obviates the solution of
+linear systems of equations. The nonlinear right hand side is
+evaluated with the matrix-free framework.
+<br>
+(Katharina Kormann and Martin Kronbichler, 2012/05/05)
+
+<li>
+New: step-37 shows how the matrix-free framework can be utilized to
+efficiently solve the Poisson equation without building global
+matrices. It combines fast operator evaluation with a multigrid solver
+based on polynomial Chebyshev smoother.
+<br>
+(Katharina Kormann and Martin Kronbichler, 2012/05/05)
+
+<li>
+New: A new matrix-free interface has been implemented. The framework
+is parallelized with MPI, TBB, and explicit vectorization instructions
+(new data type VectorizedArray). The class MatrixFree caches
+cell-based data in an efficient way. Common operations can be
+implemented using the FEEvaluation class.
+<br>
+(Katharina Kormann and Martin Kronbichler, 2012/05/05)
+
+<li>
 New: step-44 demonstrates one approach to modelling large
 deformations of nearly-incompressible elastic solids. The
 elastic response is governed by a non-linear, hyperelastic
@@ -55,7 +81,6 @@ free-energy function. The geometrical response is also
 nonlinear, i.e., the program considers finite deformations.
 <br>
 (Andrew McBride and Jean-Paul Pelteret, 2012/04/25)
-
 
 <li>
 Changed: The version of BOOST we ship with deal.II has been upgraded

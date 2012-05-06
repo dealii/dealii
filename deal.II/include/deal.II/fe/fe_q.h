@@ -231,16 +231,26 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 
                                      /**
                                       * Constructor for tensor product
-                                      * polynomials with support points @p
-                                      * points based on a one-dimensional
-                                      * quadrature formula. The degree of the
+                                      * polynomials with support
+                                      * points @p points based on a
+                                      * one-dimensional quadrature
+                                      * formula. The degree of the
                                       * finite element is
-                                      * <tt>points.size()-1</tt>.  Note that
-                                      * the first point has to be 0 and the
-                                      * last one 1.
+                                      * <tt>points.size()-1</tt>.
+                                      * Note that the first point has
+                                      * to be 0 and the last one 1. If
+                                      * <tt>FE_Q<dim>(QGaussLobatto<1>(fe_degree+1))</tt>
+                                      * is specified, so-called
+                                      * Gauss-Lobatto elements are
+                                      * obtained which can give a
+                                      * diagonal mass matrix if
+                                      * combined with Gauss-Lobatto
+                                      * quadrature on the same
+                                      * points. Their use is shown in
+                                      * step-48.
                                       */
-
     FE_Q (const Quadrature<1> &points);
+
                                      /**
                                       * Return a string that uniquely
                                       * identifies a finite
