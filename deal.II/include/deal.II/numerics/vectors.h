@@ -1716,6 +1716,63 @@ namespace VectorTools
 
                                    /**
                                     * Create a right hand side
+                                    * vector for a point source at point @p p
+                                    * for vector-valued finite elements.
+                                    * Prior content of the
+                                    * given @p rhs_vector vector is
+                                    * deleted.
+                                    *
+                                    * See the general documentation of this
+                                    * class for further information.
+                                    */
+  template <int dim, int spacedim>
+  void create_point_source_vector(const Mapping<dim,spacedim>    &mapping,
+                                  const DoFHandler<dim,spacedim> &dof,
+                                  const Point<spacedim>          &p,
+                                  const Point<dim>               &orientation,
+                                  Vector<double>                 &rhs_vector);
+
+                                   /**
+                                    * Calls the create_point_source_vector()
+                                    * function for vector-valued finite elements,
+                                    * see above, with
+                                    * <tt>mapping=MappingQ1@<dim@>()</tt>.
+                                    */
+  template <int dim, int spacedim>
+  void create_point_source_vector(const DoFHandler<dim,spacedim> &dof,
+                                  const Point<spacedim>          &p,
+                                  const Point<dim>               &orientation,
+                                  Vector<double>                 &rhs_vector);
+
+                                   /**
+                                    * Like the previous set of functions,
+                                    * but for hp objects.
+                                    */
+  template <int dim, int spacedim>
+  void create_point_source_vector(const hp::MappingCollection<dim,spacedim> &mapping,
+                                  const hp::DoFHandler<dim,spacedim>        &dof,
+                                  const Point<spacedim>                     &p,
+                                  const Point<dim>                          &orientation,
+                                  Vector<double>                            &rhs_vector);
+
+                                   /**
+                                    * Like the previous set of functions,
+                                    * but for hp objects. The function uses
+                                    * the default Q1 mapping object. Note
+                                    * that if your hp::DoFHandler uses any
+                                    * active fe index other than zero, then
+                                    * you need to call the function above
+                                    * that provides a mapping object for
+                                    * each active fe index.
+                                    */
+  template <int dim, int spacedim>
+  void create_point_source_vector(const hp::DoFHandler<dim,spacedim> &dof,
+                                  const Point<spacedim>              &p,
+                                  const Point<dim>                   &orientation,
+                                  Vector<double>                     &rhs_vector);
+
+                                   /**
+                                    * Create a right hand side
                                     * vector from boundary
                                     * forces. Prior content of the
                                     * given @p rhs_vector vector is
