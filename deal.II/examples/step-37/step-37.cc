@@ -1510,7 +1510,7 @@ namespace Step37
                                  // @sect3{The <code>main</code> function}
 
                                  // This is as in most other programs.
-int main (int argc, char** argv)
+int main ()
 {
   try
     {
