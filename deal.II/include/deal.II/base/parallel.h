@@ -854,7 +854,7 @@ namespace parallel
 #if DEAL_II_USE_MT == 0
                                      // make sure we don't get compiler
                                      // warnings about unused arguments
-    (void) grainsize;
+    (void) minimum_parallel_grain_size;
 
     apply_to_subrange (begin, end);
 #else
