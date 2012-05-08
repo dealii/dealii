@@ -1263,8 +1263,7 @@ class FullMatrix : public Table<2,number>
 
                                      /**
                                       * Add to the current matrix the
-                                      * triple product <b>B
-                                      * A<sup>-1</sup>
+                                      * triple product <b>B A
                                       * D</b>. Optionally, use the
                                       * transposes of the matrices
                                       * <b>B</b> and <b>D</b>. The
