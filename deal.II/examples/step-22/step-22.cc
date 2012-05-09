@@ -851,7 +851,7 @@ namespace Step22
                                      // not to <code>dofs_per_cell</code>,
                                      // but only up to <code>i</code>,
                                      // the index of the outer loop.
-    std::vector<SymmetricTensor<2,dim> > phi_grads_u (dofs_per_cell);
+    std::vector<SymmetricTensor<2,dim> > symgrad_phi_u (dofs_per_cell);
     std::vector<double>                  div_phi_u   (dofs_per_cell);
     std::vector<double>                  phi_p       (dofs_per_cell);
 
@@ -871,16 +871,16 @@ namespace Step22
           {
             for (unsigned int k=0; k<dofs_per_cell; ++k)
               {
-                phi_grads_u[k] = fe_values[velocities].symmetric_gradient (k, q);
-                div_phi_u[k]   = fe_values[velocities].divergence (k, q);
-                phi_p[k]       = fe_values[pressure].value (k, q);
+                symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient (k, q);
+                div_phi_u[k]     = fe_values[velocities].divergence (k, q);
+                phi_p[k]         = fe_values[pressure].value (k, q);
               }
 
             for (unsigned int i=0; i<dofs_per_cell; ++i)
               {
                 for (unsigned int j=0; j<=i; ++j)
                   {
-                    local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
+                    local_matrix(i,j) += (symgrad_phi_u[i] * symgrad_phi_u[j]
                                           - div_phi_u[i] * phi_p[j]
                                           - phi_p[i] * div_phi_u[j]
                                           + phi_p[i] * phi_p[j])

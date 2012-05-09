@@ -123,7 +123,7 @@ namespace Step46
       void assemble_interface_term (const FEFaceValuesBase<dim>          &elasticity_fe_face_values,
                                     const FEFaceValuesBase<dim>          &stokes_fe_face_values,
                                     std::vector<Tensor<1,dim> >          &elasticity_phi,
-                                    std::vector<SymmetricTensor<2,dim> > &stokes_phi_grads_u,
+                                    std::vector<SymmetricTensor<2,dim> > &stokes_symgrad_phi_u,
                                     std::vector<double>                  &stokes_phi_p,
                                     FullMatrix<double>                   &local_interface_matrix) const;
       void solve ();
@@ -622,12 +622,12 @@ namespace Step46
     const FEValuesExtractors::Scalar     pressure (dim);
     const FEValuesExtractors::Vector     displacements (dim+1);
 
-    std::vector<SymmetricTensor<2,dim> > stokes_phi_grads_u (stokes_dofs_per_cell);
-    std::vector<double>                  stokes_div_phi_u   (stokes_dofs_per_cell);
-    std::vector<double>                  stokes_phi_p       (stokes_dofs_per_cell);
+    std::vector<SymmetricTensor<2,dim> > stokes_symgrad_phi_u (stokes_dofs_per_cell);
+    std::vector<double>                  stokes_div_phi_u     (stokes_dofs_per_cell);
+    std::vector<double>                  stokes_phi_p         (stokes_dofs_per_cell);
 
-    std::vector<Tensor<2,dim> >          elasticity_phi_grad (elasticity_dofs_per_cell);
-    std::vector<double>                  elasticity_phi_div  (elasticity_dofs_per_cell);
+    std::vector<Tensor<2,dim> >          elasticity_grad_phi (elasticity_dofs_per_cell);
+    std::vector<double>                  elasticity_div_phi  (elasticity_dofs_per_cell);
     std::vector<Tensor<1,dim> >          elasticity_phi      (elasticity_dofs_per_cell);
 
                                      // Then comes the main loop over all cells
@@ -682,14 +682,14 @@ namespace Step46
               {
                 for (unsigned int k=0; k<dofs_per_cell; ++k)
                   {
-                    stokes_phi_grads_u[k] = fe_values[velocities].symmetric_gradient (k, q);
-                    stokes_div_phi_u[k]   = fe_values[velocities].divergence (k, q);
-                    stokes_phi_p[k]       = fe_values[pressure].value (k, q);
+                    stokes_symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient (k, q);
+                    stokes_div_phi_u[k]     = fe_values[velocities].divergence (k, q);
+                    stokes_phi_p[k]         = fe_values[pressure].value (k, q);
                   }
 
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
                   for (unsigned int j=0; j<dofs_per_cell; ++j)
-                    local_matrix(i,j) += (2 * viscosity * stokes_phi_grads_u[i] * stokes_phi_grads_u[j]
+                    local_matrix(i,j) += (2 * viscosity * stokes_symgrad_phi_u[i] * stokes_symgrad_phi_u[j]
                                           - stokes_div_phi_u[i] * stokes_phi_p[j]
                                           - stokes_phi_p[i] * stokes_div_phi_u[j])
                                          * fe_values.JxW(q);
@@ -705,8 +705,8 @@ namespace Step46
               {
                 for (unsigned int k=0; k<dofs_per_cell; ++k)
                   {
-                    elasticity_phi_grad[k] = fe_values[displacements].gradient (k, q);
-                    elasticity_phi_div[k]  = fe_values[displacements].divergence (k, q);
+                    elasticity_grad_phi[k] = fe_values[displacements].gradient (k, q);
+                    elasticity_div_phi[k]  = fe_values[displacements].divergence (k, q);
                   }
 
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -714,13 +714,13 @@ namespace Step46
                     {
                       local_matrix(i,j)
                         +=  (lambda *
-                             elasticity_phi_div[i] * elasticity_phi_div[j]
+                             elasticity_div_phi[i] * elasticity_div_phi[j]
                              +
                              mu *
-                             scalar_product(elasticity_phi_grad[i], elasticity_phi_grad[j])
+                             scalar_product(elasticity_grad_phi[i], elasticity_grad_phi[j])
                              +
                              mu *
-                             scalar_product(elasticity_phi_grad[i], transpose(elasticity_phi_grad[j]))
+                             scalar_product(elasticity_grad_phi[i], transpose(elasticity_grad_phi[j]))
                         )
                         *
                         fe_values.JxW(q);
@@ -827,7 +827,7 @@ namespace Step46
                                                   cell->neighbor_of_neighbor(f));
 
                     assemble_interface_term (elasticity_fe_face_values, stokes_fe_face_values,
-                                             elasticity_phi, stokes_phi_grads_u, stokes_phi_p,
+                                             elasticity_phi, stokes_symgrad_phi_u, stokes_phi_p,
                                              local_interface_matrix);
 
                     cell->neighbor(f)->get_dof_indices (neighbor_dof_indices);
@@ -872,7 +872,7 @@ namespace Step46
                           assemble_interface_term (elasticity_fe_subface_values,
                                                    stokes_fe_face_values,
                                                    elasticity_phi,
-                                                   stokes_phi_grads_u, stokes_phi_p,
+                                                   stokes_symgrad_phi_u, stokes_phi_p,
                                                    local_interface_matrix);
 
                           cell->neighbor_child_on_subface (f, subface)
@@ -904,7 +904,7 @@ namespace Step46
                     assemble_interface_term (elasticity_fe_face_values,
                                              stokes_fe_subface_values,
                                              elasticity_phi,
-                                             stokes_phi_grads_u, stokes_phi_p,
+                                             stokes_symgrad_phi_u, stokes_phi_p,
                                              local_interface_matrix);
 
                     cell->neighbor(f)->get_dof_indices (neighbor_dof_indices);
@@ -945,7 +945,7 @@ namespace Step46
   assemble_interface_term (const FEFaceValuesBase<dim>          &elasticity_fe_face_values,
                            const FEFaceValuesBase<dim>          &stokes_fe_face_values,
                            std::vector<Tensor<1,dim> >          &elasticity_phi,
-                           std::vector<SymmetricTensor<2,dim> > &stokes_phi_grads_u,
+                           std::vector<SymmetricTensor<2,dim> > &stokes_symgrad_phi_u,
                            std::vector<double>                  &stokes_phi_p,
                            FullMatrix<double>                   &local_interface_matrix) const
   {
@@ -965,14 +965,14 @@ namespace Step46
         const Tensor<1,dim> normal_vector = stokes_fe_face_values.normal_vector(q);
 
         for (unsigned int k=0; k<stokes_fe_face_values.dofs_per_cell; ++k)
-          stokes_phi_grads_u[k] = stokes_fe_face_values[velocities].symmetric_gradient (k, q);
+          stokes_symgrad_phi_u[k] = stokes_fe_face_values[velocities].symmetric_gradient (k, q);
         for (unsigned int k=0; k<elasticity_fe_face_values.dofs_per_cell; ++k)
           elasticity_phi[k] = elasticity_fe_face_values[displacements].value (k,q);
 
         for (unsigned int i=0; i<elasticity_fe_face_values.dofs_per_cell; ++i)
           for (unsigned int j=0; j<stokes_fe_face_values.dofs_per_cell; ++j)
             local_interface_matrix(i,j) += -((2 * viscosity *
-                                              (stokes_phi_grads_u[j] *
+                                              (stokes_symgrad_phi_u[j] *
                                                normal_vector)
                                               +
                                               stokes_phi_p[j] *

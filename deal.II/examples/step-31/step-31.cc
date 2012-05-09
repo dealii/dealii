@@ -1323,7 +1323,7 @@ namespace Step31
                                    // we create data structures for the cell
                                    // matrix and the relation between local and
                                    // global DoFs. The vectors
-                                   // <code>phi_grad_u</code> and
+                                   // <code>grad_phi_u</code> and
                                    // <code>phi_p</code> are going to hold the
                                    // values of the basis functions in order to
                                    // faster build up the local matrices, as was
@@ -1349,7 +1349,7 @@ namespace Step31
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-    std::vector<Tensor<2,dim> > phi_grad_u (dofs_per_cell);
+    std::vector<Tensor<2,dim> > grad_phi_u (dofs_per_cell);
     std::vector<double>         phi_p      (dofs_per_cell);
 
     const FEValuesExtractors::Vector velocities (0);
@@ -1387,14 +1387,14 @@ namespace Step31
           {
             for (unsigned int k=0; k<dofs_per_cell; ++k)
               {
-                phi_grad_u[k] = stokes_fe_values[velocities].gradient(k,q);
+                grad_phi_u[k] = stokes_fe_values[velocities].gradient(k,q);
                 phi_p[k]      = stokes_fe_values[pressure].value (k, q);
               }
 
             for (unsigned int i=0; i<dofs_per_cell; ++i)
               for (unsigned int j=0; j<dofs_per_cell; ++j)
                 local_matrix(i,j) += (EquationData::eta *
-                                      scalar_product (phi_grad_u[i], phi_grad_u[j])
+                                      scalar_product (grad_phi_u[i], grad_phi_u[j])
                                       +
                                       (1./EquationData::eta) *
                                       phi_p[i] * phi_p[j])
