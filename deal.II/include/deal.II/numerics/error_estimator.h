@@ -157,11 +157,22 @@ namespace hp
  *
  *  <li> No other boundary conditions are considered.
  *  </ul>
- *  The object describing the boundary conditions is obtained from the
- *  triangulation.
  *
- *  Thanks go to Franz-Theo Suttmeier for clarifications about boundary
- *  conditions.
+ *  In practice, if you have Robin boundary conditions or are too lazy to
+ *  accurately describe Neumann values, then this is rarely an issue: if you
+ *  don't say anything in the map about a particular part of the boundary then
+ *  the Kelly indicator will simply assume that the solution is correct on
+ *  that part of the boundary and not touch it. Of course, if you have a have
+ *  a Neumann or Robin boundary, that isn't quite true, there is going to be a
+ *  difference between the normal derivative of the numerical solution and the
+ *  Neumann values these normal derivatives should equal. So if we simply
+ *  ignore those parts of the boundary, we'll underestimate the error. In
+ *  practice, this rarely appears to be a problem -- you may not refine the
+ *  cell this time around but you'll probably refine it in the next refinement
+ *  step and everything is good again. After all, for all problems but the
+ *  Laplace equation, the Kelly indicator is only an indicator, not an
+ *  estimator, and so the values it computes are not exact error
+ *  representations anyway.
  *
  *
  *  <h3>Handling of hanging nodes</h3>
