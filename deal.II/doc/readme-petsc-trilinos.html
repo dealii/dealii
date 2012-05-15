@@ -5,7 +5,7 @@
   <title>The deal.II Readme on interfacing to PETSc and Trilinos</title>
   <link href="screen.css" rel="StyleSheet">
   <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-  <meta name="copyright" content="Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors">
   <meta name="date" content="$Date: 2008-10-14 05:36:48 -0500 (Tue, 14 Oct 2008) $">
   <meta name="svn_id" content="$Id: readme.html 17202 2008-10-14 10:36:48Z heister $">
   <meta name="keywords" content="deal.II">
@@ -54,7 +54,7 @@
       packages:
       </p>
 
-      <h5>PETSc</h5>
+      <h4>PETSc</h4>
 
       <p>
       PETSc usually requires you to set the
@@ -107,7 +107,26 @@
       target="_top">Frequently Asked Questions</a> page.
       </p>
 
-      <h5>Trilinos</h5>
+      <p><b>Note:</b> <acronym>deal.II</acronym> can be installed with both
+      PETSc and Trilinos (see below) and they do not usually get in their
+      respective ways. There are, however, occasions where this is not true
+      and this fundamentally comes from the fact that both of these packages
+      are built from subpackages that are developed by independent
+      groups. Unfortunately, some of these sub-packages can be configured to
+      be part of both PETSc and Trilinos, and if you try to
+      use <acronym>deal.II</acronym> with versions of PETSc and Trilinos
+      that <i>both</i> contain a particular sub-package, little good will come
+      of it in general. In particular, we have experienced this with the ML
+      package that can serve as an algebraic multigrid method to both PETSc
+      and Trilinos. If both of these packages are configured to use ML, then
+      difficult to understand error messages at compile or link time are
+      almost inevitable, and there is little the <acronym>deal.II</acronym>
+      build system can do to prevent this. Thus, <i>don't try to do such a
+      thing!</i>
+      </p>
+
+
+      <h4>Trilinos</h4>
 
       <p>
       As above, set the <code>TRILINOS_DIR</code>
@@ -126,7 +145,7 @@
       Trilinos sub-packages.
       </p>
 
-      <h6>Trilinos starting with version 10.0</h6>
+      <h5>Trilinos starting with version 10.0</h5>
 
       <p style="color: red">
       Note: Trilinos versions 10.6.x, 10.8.0, and 10.8.1 are not compatible with
@@ -194,7 +213,7 @@ make install
       </p>
 
       <p>
-	If the deal configuration complains about 
+	If the deal configuration complains about
 <code><pre>
 configure: error: *** Your Trilinos installation is not compatible with the C++ standard selected for this compiler. See the deal.II FAQ page for a solution. ***
 </pre></code>
