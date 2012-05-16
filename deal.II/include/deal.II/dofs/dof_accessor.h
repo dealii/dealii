@@ -478,6 +478,25 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
                                       * freedom, and fe_index has to
                                       * match the result of
                                       * active_fe_index().
+				      *
+				      * @note While the get_dof_indices()
+				      * function returns an array that
+				      * contains the indices of all degrees of
+				      * freedom that somehow live on this
+				      * object (i.e. on the vertices, edges or
+				      * interior of this object), the current
+				      * dof_index() function only considers
+				      * the DoFs that really belong to this
+				      * particular object's interior. In other
+				      * words, as an example, if the current
+				      * object refers to a quad (a cell in 2d,
+				      * a face in 3d) and the finite element
+				      * associated with it is a bilinear one,
+				      * then the get_dof_indices() will return
+				      * an array of size 4 while dof_index()
+				      * will produce an exception because no
+				      * degrees are defined in the interior of
+				      * the face.
                                       */
     unsigned int dof_index (const unsigned int i,
                             const unsigned int fe_index = DH::default_fe_index) const;
@@ -1123,6 +1142,25 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
                                       * freedom, and fe_index has to
                                       * match the result of
                                       * active_fe_index().
+				      *
+				      * @note While the get_dof_indices()
+				      * function returns an array that
+				      * contains the indices of all degrees of
+				      * freedom that somehow live on this
+				      * object (i.e. on the vertices, edges or
+				      * interior of this object), the current
+				      * dof_index() function only considers
+				      * the DoFs that really belong to this
+				      * particular object's interior. In other
+				      * words, as an example, if the current
+				      * object refers to a quad (a cell in 2d,
+				      * a face in 3d) and the finite element
+				      * associated with it is a bilinear one,
+				      * then the get_dof_indices() will return
+				      * an array of size 4 while dof_index()
+				      * will produce an exception because no
+				      * degrees are defined in the interior of
+				      * the face.
                                       */
     unsigned int dof_index (const unsigned int i,
                             const unsigned int fe_index = AccessorData::default_fe_index) const;
