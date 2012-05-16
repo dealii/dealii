@@ -142,11 +142,59 @@ and the right hand side $b^{n}$ is given by:
   b^{n}_{i}:=\left( \nabla \varphi_{i} , a_{n} \nabla u^{n}\right)
 @f]
 
-The matrix A is symmetric, but it is indefinite. So we have to take a better look
-at the solver we choose for this linear system. The CG-method needs
-positive-definiteness of the matrix A, which is not given, so it can't be used.
-Using the symmetry of the matrix we can choose the minimal residual method as a
-solver, which needs symmetry but no definiteness.
+
+<h3> Solver issues </h3>
+
+The matrix that corresponds to the Newton step above can be reformulated to
+show its structure a bit better. Rewriting it slightly, we get that it has the
+form
+@f[
+  A_{ij}
+  =
+  \left(
+    \nabla \varphi_i,
+    B
+    \nabla \varphi_j
+  \right)
+@f]
+where the matrix $B$ (of size $d \times d$ in $d$ space dimensions) is given
+by the following expression:
+@f[
+  B
+  =
+  a_n \left\{
+   \mathbf I
+   -
+   a_n^2 [\nabla u_n] \otimes [\nabla u_n]
+  \right\}
+  =
+  a_n \left\{
+   \mathbf I
+   -
+  \frac{\nabla u_n}{\sqrt{1+|\nabla u^{n}|^{2}}} \otimes
+  \frac{\nabla u_n}{\sqrt{1+|\nabla u^{n}|^{2}}}
+  \right\}.
+@f]
+From this expression, it is obvious that
+$B$ is symmetric, and so $A$ is symmetric as well.
+On the other hand, $B$ is also positive definite, which confers the same
+property onto $A$. This can be seen by noting that the vector $v_1 =
+\frac{\nabla u^n}{|\nabla u^n|}$ is an eigenvector of $B$ with eigenvalue
+$\lamba_1=1-\frac{1}{1+|\nabla u^n|^2} > 0$ while all vectors $v_2\ldots v_d$
+that are perpendicular to $v_1$ and each other are eigenvectors with
+eigenvalue $1$. Since all eigenvalues are positive, $B$ is positive definite
+and so is $A$. We can thus use the CG method for solving the Newton steps.
+
+It is worth noting, however, that the positive definiteness degenerates for
+problems where $\nabla u$ becomes large. In other words, if we simply multiply
+all boundary values by 2, then to first order $u$ and $\nabla u$ will also be
+multiplied by two, but as a consequence the smallest eigenvalue of $B$ will
+become smaller and the matrix will become more ill-conditioned. It is simple
+to verify with the current program that indeed multiplying the boundary values
+used in the current program by larger and larger values results in a problem
+that will ultimately no longer be solvable using the simple preconditioned CG
+method we use here.
+
 
 <h3>Summary</h3>
 
