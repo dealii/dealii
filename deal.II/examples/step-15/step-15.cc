@@ -25,6 +25,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
 
@@ -58,12 +59,6 @@
                                  // class transfers the solution to the new mesh.
 
 #include <deal.II/numerics/solution_transfer.h>
-
-                                 // In this tutorial, we can't use the CG-method as a solver, as
-                                 // described above, but we use the minimal residual method, which
-                                 // is included with this file.
-#include <deal.II/lac/solver_cg.h>
-//#include <deal.II/lac/solver_minres.h>
 
                                  // As in previous programs:
 namespace Step15
