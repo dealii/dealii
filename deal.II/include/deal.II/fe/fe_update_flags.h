@@ -293,6 +293,8 @@ STREAM& operator << (STREAM& s, UpdateFlags u)
   if (u & update_support_points)               s << "support_points|";
   if (u & update_support_jacobians)            s << "support_jacobians|";
   if (u & update_support_inverse_jacobians)    s << "support_inverse_jacobians|";
+
+//TODO: check that 'u' really only has the flags set that are handled above
   return s;
 }
 
