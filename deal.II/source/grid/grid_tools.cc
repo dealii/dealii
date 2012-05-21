@@ -1849,12 +1849,8 @@ namespace GridTools
       }
 
 
-
-
-    }
-  }
-
-
+    } /* namespace FixUpDistortedChildCells */
+  } /* namespace internal */
 
 
   template <int dim, int spacedim>
