@@ -624,11 +624,11 @@ namespace Step15
   }
 }
 
-				 // @ sect4{The main function}
+				 // @sect4{The main function}
 
-				 // Finally the main function, this follows the scheme of all other main
-				 // functions:
-
+				 // Finally the main function, this
+				 // follows the scheme of all other
+				 // main functions:
 int main ()
 {
   try
