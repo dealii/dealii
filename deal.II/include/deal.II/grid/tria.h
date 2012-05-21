@@ -3999,4 +3999,10 @@ template <> unsigned int Triangulation<1,3>::max_adjacent_cells () const;
 
 DEAL_II_NAMESPACE_CLOSE
 
+// Include tria_accessor.h here, so that it is possible for an end user to
+// use the iterators of Triangulation<dim> directly without the need to
+// include tria_accessor.h separately. (Otherwise the iterators are an
+// 'opaque' or 'incomplete' type.)
+#include <deal.II/grid/tria_accessor.h>
+
 #endif
