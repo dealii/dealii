@@ -38,74 +38,62 @@ mesh-refinement:9
 @endcode
 
 
-
-
-
-
-The last solution, as written by the program at the end of the
-<code>%run()</code> function, looks as follows:
-
-
-
-@image html step-6.solution.png
-
-
-
-After each refinement, the solution after the fifth Newton-
-iteration is shown in the following pictures. On the left 
-the solution is visualized, on the right side the solution
-with the mesh is shown:
-
+We can visualize the solution after each set of five Newton
+iterations, i.e., on each of the meshes on which we approximate the
+solution. This yields the following set of images:
 
 
 <TABLE WIDTH="100%">
 <tr>
 <td>
-  @image html step-6.grid-0.png
+  @image html step-15.solution-0.png
 </td>
 <td>
-  @image html step-6.grid-1.png
-</td>
-</tr>
-
-<tr>
-<td>
-  @image html step-6.grid-2.png
-</td>
-<td>
-  @image html step-6.grid-3.png
+  @image html step-15.solution-1.png
 </td>
 </tr>
 
 <tr>
 <td>
-  @image html step-6.grid-4.png
+  @image html step-15.solution-2.png
 </td>
 <td>
-  @image html step-6.grid-5.png
+  @image html step-15.solution-3.png
 </td>
 </tr>
 
 <tr>
 <td>
-  @image html step-6.grid-6.png
+  @image html step-15.solution-4.png
 </td>
 <td>
-  @image html step-6.grid-7.png
+  @image html step-15.solution-5.png
+</td>
+</tr>
+
+<tr>
+<td>
+  @image html step-15.solution-6.png
+</td>
+<td>
+  @image html step-15.solution-7.png
 </td>
 </tr>
 </table>
 
 It is clearly visible, that the solution minimizes the surface
-after each refinement. The solution converges to a picture one 
-would imagine a soapbubble inside a wire, which is bended like
-the boundary. Also it is visible, how the boundary 
+after each refinement. The solution converges to a picture one
+would imagine a soapbubble to be that is located inside a wire loop
+that is bent like
+the boundary. Also it is visible, how the boundary
 is smoothed out after each refinement. On the coarse mesh,
 the boundary doesn't look like a sine, whereas it does the
 finer the mesh gets.
 
 The mesh is mostly refined near the boundary, where the solution
-increases or decreases strongly, whereas it is coarsened on 
+increases or decreases strongly, whereas it is coarsened on
 the inside of the domain, where nothing interesting happens,
-because there isn't much change in the solution. 
+because there isn't much change in the solution. The final solution
+and mesh are shown here:
 
+@image html step-15.grid.png
