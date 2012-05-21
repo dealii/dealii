@@ -926,6 +926,189 @@ namespace DoFTools
                                  ConstraintMatrix &constraints);
                                    //@}
 
+
+                                   /**
+                                    * @name Periodic Boundary Conditions
+                                    * @{
+                                    */
+
+                                   /**
+                                    * Insert the (algebraic) constraints due
+                                    * to periodic boundary conditions into
+                                    * a ConstraintMatrix @p
+                                    * constraint_matrix.
+                                    *
+                                    * Given a pair of not necessarily
+                                    * active faces @p face_1 and @p face_2,
+                                    * this functions constrains all DoFs
+                                    * associated with the boundary
+                                    * described by @p face_1 to the
+                                    * respective DoFs of the boundary
+                                    * described by @p face_2. More
+                                    * precisely:
+                                    *
+                                    * If @p face_1 and @p face_2 are both
+                                    * active faces it adds the DoFs of
+                                    * @p face_1 to the list of constrained
+                                    * DoFs in @p constraint_matrix and adds
+                                    * lines to constrain them to the
+                                    * corresponding values of the DoFs on
+                                    * @p face_2.
+                                    * Otherwise it loops recursively over
+                                    * the children of @p face_1 and @p face_2.
+                                    *
+                                    * For this to work @p face_1 and @p face_2
+                                    * must have the same refinement
+                                    * history, i.e. either @p face_1 and
+                                    * @p face_2 must be active faces or
+                                    * must be isotropically refined and
+                                    * have the same number of child faces
+                                    * that recursively obey this rule.
+                                    * (The anisotropic case is not yet
+                                    * implemented.)
+                                    *
+                                    * This routine only constrains DoFs that
+                                    * are not already constrained.
+                                    * If this routine encounters a DoF that
+                                    * already is constrained (for instance
+                                    * by Dirichlet boundary conditions),
+                                    * the old setting of the constraint
+                                    * (dofs the entry is constrained to,
+                                    * inhomogeneities) is kept and nothing
+                                    * happens.
+                                    *
+                                    * Furthermore, no DoFs belonging to (or
+                                    * belonging to any descendant of) @p
+                                    * face_2 get constrained or get marked
+                                    * as being constrained.
+                                    *
+                                    * The flags in the last parameter,
+                                    * @p component_mask denote which
+                                    * components of the finite element space
+                                    * shall be constrained with periodic
+                                    * boundary conditions. If it is left as
+                                    * specified by the default value (i.e. an
+                                    * empty array), all components are
+                                    * constrainted. If it is different from
+                                    * the default value, it is assumed that
+                                    * the number of entries equals the number
+                                    * of components in the boundary functions
+                                    * and the finite element, and those
+                                    * components in the given boundary
+                                    * function will be used for which the
+                                    * respective flag was set in the component
+                                    * mask.
+                                    */
+  template<typename FaceIterator>
+  void
+  make_periodicity_constraints (const FaceIterator                          &face_1,
+                                const typename identity<FaceIterator>::type &face_2,
+                                dealii::ConstraintMatrix                    &constraint_matrix,
+                                const std::vector<bool>                     &component_mask = std::vector<bool>());
+
+
+                                   /**
+                                    * Insert the (algebraic) constraints due
+                                    * to periodic boundary conditions into
+                                    * a ConstraintMatrix @p
+                                    * constraint_matrix.
+                                    *
+                                    * This function serves as a high level
+                                    * interface for the
+                                    * make_periodicity_constraints function
+                                    * that takes face_iterator arguments.
+                                    *
+                                    * Given a @p direction,
+                                    * define a 'left' boundary as all
+                                    * boundary faces belonging to
+                                    * @p boundary_component with corresponding
+                                    * unit normal (of the @ref
+                                    * GlossReferenceCell "reference cell") in
+                                    * negative @p direction, i.e. all boundary
+                                    * faces with
+                                    * <tt>face(2*direction)->at_boundary()==true</tt>.
+                                    * Analogously, a 'right' boundary
+                                    * consisting of all faces of @p
+                                    * boundary_component with unit normal
+                                    * in positive @p direction,
+                                    * <tt>face(2*direction+1)->at_boundary()==true</tt>.
+                                    *
+                                    * This function tries to match
+                                    * all faces belonging to the 'left' and
+                                    * 'right' boundary with the help of an
+                                    * orthogonal equality relation:
+                                    * Two faces do match if their vertices
+                                    * can be transformed into each other by
+                                    * parallel translation in @p direction.
+                                    *
+                                    * If this matching is successfull it
+                                    * constrains all DoFs associated with the
+                                    * 'left' boundary to the respective DoFs
+                                    * of the 'right' boundary.
+                                    *
+                                    * This routine only constrains DoFs that
+                                    * are not already constrained.
+                                    * If this routine encounters a DoF that
+                                    * already is constrained (for instance
+                                    * by Dirichlet boundary conditions),
+                                    * the old setting of the constraint
+                                    * (dofs the entry is constrained to,
+                                    * inhomogeneities) is kept and nothing
+                                    * happens.
+                                    *
+                                    * Furthermore, no DoFs belonging to the
+                                    * 'right' boundary get constrained or get
+                                    * marked as being constrained.
+                                    *
+                                    * The flags in the last parameter,
+                                    * @p component_mask denote which
+                                    * components of the finite element space
+                                    * shall be constrained with periodic
+                                    * boundary conditions. If it is left as
+                                    * specified by the default value (i.e. an
+                                    * empty array), all components are
+                                    * constrainted. If it is different from
+                                    * the default value, it is assumed that
+                                    * the number of entries equals the number
+                                    * of components in the boundary functions
+                                    * and the finite element, and those
+                                    * components in the given boundary
+                                    * function will be used for which the
+                                    * respective flag was set in the component
+                                    * mask.
+                                    */
+  template<typename DH>
+  void
+  make_periodicity_constraints (const DH                   &dof_handler,
+                                const types::boundary_id_t boundary_component,
+                                const int                  direction,
+                                dealii::ConstraintMatrix   &constraint_matrix,
+                                const std::vector<bool>    &component_mask = std::vector<bool>());
+
+
+                                   /**
+                                    * Same as above but with an optional
+                                    * argument @p offset.
+                                    * The @p offset is a vector tangential to
+                                    * the faces that is added to the location
+                                    * of vertices of the 'left' boundary when
+                                    * attempting to match them to the
+                                    * corresponding vertices of the 'right'
+                                    * boundary. This can be used to implement
+                                    * conditions such as $u(0,y)=u(1,y+1)$.
+                                    */
+  template<typename DH>
+  void
+  make_periodicity_constraints (const DH                       &dof_handler,
+                                const types::boundary_id_t     boundary_component,
+                                const int                      direction,
+                                dealii::Tensor<1,DH::space_dimension>
+                                                               &offset,
+                                dealii::ConstraintMatrix       &constraint_matrix,
+                                const std::vector<bool>        &component_mask = std::vector<bool>());
+                                   //@}
+
+
                                    /**
                                     * Take a vector of values which live on
                                     * cells (e.g. an error per cell) and
