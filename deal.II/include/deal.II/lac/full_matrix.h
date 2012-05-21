@@ -960,8 +960,8 @@ class FullMatrix : public Table<2,number>
                   const unsigned int j);
 
                                      /**
-                                      * <i>A(i,1...n) += s*A(j,1...n)
-                                      * + t*A(k,1...n)</i>.  Multiple
+                                      * <i>A(i,1...n) += s*A(j,1...n) +
+                                      * t*A(k,1...n)</i>.  Multiple
                                       * addition of rows of this.
                                       */
     void add_row (const unsigned int i,
@@ -977,8 +977,8 @@ class FullMatrix : public Table<2,number>
                   const unsigned int j);
 
                                      /**
-                                      * <i>A(1...n,i) += s*A(1...n,j)
-                                      * + t*A(1...n,k)</i>.  Multiple
+                                      * <i>A(1...n,i) += s*A(1...n,j) +
+                                      * t*A(1...n,k)</i>.  Multiple
                                       * addition of columns of this.
                                       */
     void add_col (const unsigned int i,

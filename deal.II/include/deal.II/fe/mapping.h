@@ -467,9 +467,9 @@ class Mapping : public Subscriptor
  *  \mathbf u(\mathbf x) = \frac{1}{\text{det}J(\mathbf x)}
  * J(\mathbf x) \mathbf{\hat u}(\mathbf x).
  * @f]
- * @todo What is n in mapping_piola description?
  * </ul>
  *
+ * @todo What is n in mapping_piola description?
  */
     virtual
     void

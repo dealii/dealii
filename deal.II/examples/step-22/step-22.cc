@@ -898,8 +898,8 @@ namespace Step22
 
                                          // Note that in the above computation
                                          // of the local matrix contribution
-                                         // we added the term <code> phi_p[i]
-                                         // * phi_p[j] </code>, yielding a
+                                         // we added the term <code> phi_p[i] *
+                                         // phi_p[j] </code>, yielding a
                                          // pressure mass matrix in the
                                          // $(1,1)$ block of the matrix as
                                          // discussed in the

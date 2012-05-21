@@ -100,8 +100,8 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
 
                                      /**
                                       * Tranposed matrix-vector
-                                      * product <i>w = m2<sup>T</sup>
-                                      * * m1<sup>T</sup> * v</i>.
+                                      * product <i>w = m2<sup>T</sup> *
+                                      * m1<sup>T</sup> * v</i>.
                                       */
     virtual void Tvmult (VECTOR&       w,
                          const VECTOR& v) const;
@@ -270,8 +270,8 @@ class ProductSparseMatrix : public PointerMatrixBase<Vector<vector_number> >
 
                                      /**
                                       * Tranposed matrix-vector
-                                      * product <i>w = m2<sup>T</sup>
-                                      * * m1<sup>T</sup> * v</i>.
+                                      * product <i>w = m2<sup>T</sup> *
+                                      * m1<sup>T</sup> * v</i>.
                                       */
     virtual void Tvmult (VectorType&       w,
                          const VectorType& v) const;

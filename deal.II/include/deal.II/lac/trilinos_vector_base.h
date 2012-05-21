@@ -754,8 +754,8 @@ namespace TrilinosWrappers
 
                                        /**
                                         * Multiple addition of scaled
-                                        * vectors, i.e. <tt>*this = a*V
-                                        * + b*W</tt>.
+                                        * vectors, i.e. <tt>*this = a*V +
+                                        * b*W</tt>.
                                         */
       void add (const TrilinosScalar  a,
                 const VectorBase     &V,
