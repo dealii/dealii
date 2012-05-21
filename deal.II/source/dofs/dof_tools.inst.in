@@ -319,6 +319,8 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
 
 for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
 {
+
+#if deal_II_dimension != 1
   template
   void
   DoFTools::make_periodicity_constraints (const DH::face_iterator &,
@@ -342,6 +344,7 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
                                          dealii::Tensor<1,DH::space_dimension> &,
                                          dealii::ConstraintMatrix &,
                                          const std::vector<bool> &);
+#endif
 }
 
 
