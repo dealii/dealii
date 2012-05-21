@@ -180,7 +180,7 @@ $B$ is symmetric, and so $A$ is symmetric as well.
 On the other hand, $B$ is also positive definite, which confers the same
 property onto $A$. This can be seen by noting that the vector $v_1 =
 \frac{\nabla u^n}{|\nabla u^n|}$ is an eigenvector of $B$ with eigenvalue
-$\lamba_1=1-\frac{1}{1+|\nabla u^n|^2} > 0$ while all vectors $v_2\ldots v_d$
+$\lambda_1=1-\frac{1}{1+|\nabla u^n|^2} > 0$ while all vectors $v_2\ldots v_d$
 that are perpendicular to $v_1$ and each other are eigenvectors with
 eigenvalue $1$. Since all eigenvalues are positive, $B$ is positive definite
 and so is $A$. We can thus use the CG method for solving the Newton steps.
