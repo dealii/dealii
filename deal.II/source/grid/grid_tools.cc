@@ -2009,7 +2009,139 @@ namespace GridTools
     return surface_to_volume_mapping;
   }
 
-}
+                                   // Internally used in
+                                   // collect_periodic_cell_pairs.
+  template<typename CellIterator>
+  inline bool orthogonal_equality (const CellIterator &cell1,
+                                   const CellIterator &cell2,
+                                   const int          direction,
+                                   const dealii::Tensor<1,CellIterator::AccessorType::space_dimension>
+                                                      &offset)
+  {
+                                   // An orthogonal equality test for
+                                   // cells:
+                                   // Two cells are equal if the
+                                   // corresponding vertices of the
+                                   // boundary faces can be transformed
+                                   // into each other parallel to the
+                                   // given direction.
+                                   // It is assumed that
+                                   // cell1->face(2*direction) and
+                                   // cell2->face(2*direction+1) are the
+                                   // corresponding boundary faces.
+                                   // The optional argument offset will
+                                   // be added to each vertex of cell1
+
+    static const int dim = CellIterator::AccessorType::dimension;
+    static const int space_dim = CellIterator::AccessorType::space_dimension;
+    Assert(dim == space_dim,
+           ExcNotImplemented());
+                                   // ... otherwise we would need two
+                                   // directions: One for selecting the
+                                   // faces, thus living in dim,
+                                   // the other direction for selecting the
+                                   // direction for the orthogonal
+                                   // projection, thus living in
+                                   // space_dim.
+
+    for (int i = 0; i < space_dim; ++i) {
+                                   // Only compare
+                                   // coordinate-components != direction:
+      if (i == direction)
+        continue;
+
+      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
+        if (fabs (  cell1->face(2*direction)->vertex(v)(i)
+                  + offset[i]
+                  - cell2->face(2*direction+1)->vertex(v)(i))
+                    > 1.e-10)
+          return false;
+    }
+    return true;
+  }
+
+
+  template<typename CellIterator>
+  std::map<CellIterator, CellIterator>
+  collect_periodic_cell_pairs (const CellIterator                          &begin,
+                               const typename identity<CellIterator>::type &end,
+                               const types::boundary_id_t                  boundary_component,
+                               int                                         direction,
+                               const dealii::Tensor<1,CellIterator::AccessorType::space_dimension>
+                                 &offset = dealii::Tensor<1,CellIterator::AccessorType::space_dimension>())
+  {
+    static const int space_dim = CellIterator::AccessorType::space_dimension;
+    Assert (0<=direction && direction<space_dim,
+            ExcIndexRange (direction, 0, space_dim));
+
+    std::set<CellIterator> cells1;
+    std::set<CellIterator> cells2;
+
+                                   // collect boundary cells, i.e. cells
+                                   // with face(2*direction), resp.
+                                   // face(2*direction+1) being on the
+                                   // boundary and having the correct
+                                   // color:
+    CellIterator cell = begin;
+    for (; cell!= end; ++cell) {
+      if (cell->face(2*direction)->at_boundary() &&
+          cell->face(2*direction)->boundary_indicator() == boundary_component) {
+        cells1.insert(cell);
+      }
+      if (cell->face(2*direction+1)->at_boundary() &&
+          cell->face(2*direction+1)->boundary_indicator() == boundary_component) {
+        cells2.insert(cell);
+      }
+    }
+
+    Assert (cells1.size() == cells2.size(),
+            ExcMessage ("Unmatched cells on periodic boundaries"));
+
+    std::map<CellIterator, CellIterator> matched_cells;
+
+                                   // Match with a complexity of O(n^2).
+                                   // This could be improved...
+    typedef typename std::set<CellIterator>::const_iterator SetIterator;
+    for (SetIterator it1 = cells1.begin(); it1 != cells1.end(); ++it1) {
+      for (SetIterator it2 = cells2.begin(); it2 != cells2.end(); ++it2) {
+        if (orthogonal_equality(*it1, *it2, direction, offset)) {
+                                   // We have a match, so insert the
+                                   // matching pairs and remove the matched
+                                   // cell in cells2 to speed up the
+                                   // matching:
+          matched_cells[*it1] = *it2;
+          cells2.erase(it2);
+          break;
+        }
+      }
+    }
+
+    Assert (matched_cells.size() == cells1.size() &&
+            cells2.size() == 0,
+            ExcMessage ("Unmatched cells on periodic boundaries"));
+
+    return matched_cells;
+  }
+
+
+  template<typename DH>
+  std::map<typename DH::cell_iterator, typename DH::cell_iterator>
+  collect_periodic_cell_pairs (const DH                   &dof_handler,
+                               const types::boundary_id_t boundary_component,
+                               int                        direction,
+                               const dealii::Tensor<1,DH::space_dimension>
+                                 &offset = Tensor<1,DH::space_dimension>())
+  {
+    return collect_periodic_cell_pairs<typename DH::cell_iterator>
+                                      (dof_handler.begin_active(),
+                                       dof_handler.end(),
+                                       boundary_component,
+                                       direction,
+                                       offset);
+  }
+
+
+} /* namespace GridTools */
 
 
 // explicit instantiations

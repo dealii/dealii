@@ -901,6 +901,74 @@ namespace GridTools
                          const std::set<types::boundary_id_t> &boundary_ids
                          = std::set<types::boundary_id_t>());
 
+
+                                   /**
+                                    * This function loops over all cells
+                                    * from @p begin to @p end and collects a
+                                    * set of periodic cell pairs for
+                                    * @p direction:
+                                    *
+                                    * Given a @p direction,
+                                    * define a 'left' boundary as all
+                                    * boundary faces belonging to
+                                    * @p boundary_component with corresponding
+                                    * unit normal (of the @ref
+                                    * GlossReferenceCell "reference cell") in
+                                    * negative @p direction, i.e. all boundary
+                                    * faces with
+                                    * <tt>face(2*direction)->at_boundary()==true</tt>.
+                                    * Analogously, a 'right' boundary
+                                    * consisting of all faces of @p
+                                    * boundary_component with unit normal
+                                    * in positive @p direction,
+                                    * <tt>face(2*direction+1)->at_boundary()==true</tt>.
+                                    *
+                                    * This function tries to match
+                                    * all cells with faces belonging to the
+                                    * left' boundary with the cells with faces
+                                    * belonging to the 'right' boundary
+                                    * with the help of an
+                                    * orthogonal equality relation:
+                                    * Two cells do match if the vertices of
+                                    * the respective boundary faces
+                                    * can be transformed into each other by
+                                    * parallel translation in @p direction.
+                                    *
+                                    * The @p offset is a vector tangential to
+                                    * the faces that is added to the location
+                                    * of vertices of the 'left' boundary when
+                                    * attempting to match them to the
+                                    * corresponding vertices of the 'right'
+                                    * boundary. This can be used to implement
+                                    * conditions such as $u(0,y)=u(1,y+1)$.
+                                    */
+  template<typename CellIterator>
+  std::map<CellIterator, CellIterator>
+  collect_periodic_cell_pairs (const CellIterator                          &begin,
+                               const typename identity<CellIterator>::type &end,
+                               const types::boundary_id_t                  boundary_component,
+                               int                                         direction,
+                               const dealii::Tensor<1,CellIterator::AccessorType::space_dimension>
+                                 &offset = dealii::Tensor<1,CellIterator::AccessorType::space_dimension>());
+
+
+                                   /**
+                                    * Same as above but matches all active
+                                    * cells, i.e. this function calls the
+                                    * above function with
+                                    * @p dof_handler.begin_active() and
+                                    * @p dof_handler.end() as the first two
+                                    * arguments.
+                                    */
+  template<typename DH>
+  std::map<typename DH::cell_iterator, typename DH::cell_iterator>
+  collect_periodic_cell_pairs (const DH                   &dof_handler,
+                               const types::boundary_id_t boundary_component,
+                               int                        direction,
+                               const dealii::Tensor<1,DH::space_dimension>
+                                 &offset = Tensor<1,DH::space_dimension>());
+
+
                                  /**
                                   * Exception
                                   */
