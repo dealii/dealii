@@ -125,11 +125,11 @@ enum MappingType
  * $J(\mathbf{\hat x}) = \nabla\Phi(\mathbf{\hat x})$. For instance,
  * if dim=spacedim=2, we have
  * @f[
- * J(\mathbf{\hat x}) = \begin{matrix}
+ * J(\mathbf{\hat x}) = \left(\begin{matrix}
  * \frac{\partial x}{\partial \hat x} & \frac{\partial x}{\partial \hat y}
  * \\
  * \frac{\partial y}{\partial \hat x} & \frac{\partial y}{\partial \hat y}
- * \end{matrix}
+ * \end{matrix}\right)
  * @f]
  *
  * <h4>Mapping of functions</h4>
@@ -450,7 +450,7 @@ class Mapping : public Subscriptor
  * canonically identified with a Tensor<1,dim>).
  * Mathematically, it is the pull back of the differential form
  * @f[
- * \mathbf u(\mathbf x) = J*(J^{T} J)^{-1}(\mathbf{\hat x})\mathbf{\hat
+ * \mathbf u(\mathbf x) = J(J^{T} J)^{-1}(\mathbf{\hat x})\mathbf{\hat
  * u}(\mathbf{\hat x}).
  * @f]
  * In the case when dim=spacedim the previous formula reduces to
