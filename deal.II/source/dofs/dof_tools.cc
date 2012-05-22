@@ -3422,23 +3422,25 @@ namespace DoFTools
                                    // And apply the low level
                                    // make_periodicity_constraints function
                                    // to every matching pair:
-    for (auto it = matched_cells.begin(); it != matched_cells.end(); ++it) {
-      typedef typename DH::face_iterator FaceIterator;
-      FaceIterator face_1 = it->first->face(2*direction);
-      FaceIterator face_2 = it->second->face(2*direction+1);
+    for (typename std::map<CellIterator, CellIterator>::iterator it = matched_cells.begin();
+	 it != matched_cells.end(); ++it)
+      {
+	typedef typename DH::face_iterator FaceIterator;
+	FaceIterator face_1 = it->first->face(2*direction);
+	FaceIterator face_2 = it->second->face(2*direction+1);
 
-      Assert(face_1->at_boundary() && face_2->at_boundary(),
-             ExcInternalError());
+	Assert(face_1->at_boundary() && face_2->at_boundary(),
+	       ExcInternalError());
 
-      Assert (face_1->boundary_indicator() == boundary_component &&
-              face_2->boundary_indicator() == boundary_component,
-              ExcInternalError());
+	Assert (face_1->boundary_indicator() == boundary_component &&
+		face_2->boundary_indicator() == boundary_component,
+		ExcInternalError());
 
-      make_periodicity_constraints(face_1,
-                                   face_2,
-                                   constraint_matrix,
-                                   component_mask);
-    }
+	make_periodicity_constraints(face_1,
+				     face_2,
+				     constraint_matrix,
+				     component_mask);
+      }
   }
 
 
