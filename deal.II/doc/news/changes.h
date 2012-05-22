@@ -47,6 +47,13 @@ used for boundary indicators.
 
 
 <ol>
+
+<li> New: DoFTools::make_periodicity_constraints implemented which
+inserts algebraic constraints due to periodic boundary conditions
+into a ConstraintMatrix.
+<br>
+(Matthias Maier, 2012/05/22)
+
 <li>
 New: step-48 demonstrates the solution of a nonlinear wave equation
 with an explicit time stepping method. The usage of Gauss-Lobatto
