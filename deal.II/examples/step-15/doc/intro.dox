@@ -13,58 +13,60 @@ is by him.
 
 <h3>Foreword</h3>
 
-This programm deals with an example of a non-linear elliptic pde, the minimal
-surface equation. You can imagine the solution as a soap bubble inside a
-closed wire, where the wire isn't just a planar loop, but in in fact curved. The soap bubble will
-take a shape with minimal surface. The solution of the minimal surface equation
-describes this shape with the wire as a boundary condition.
+This program deals with an example of a non-linear elliptic partial
+differential equation, the minimal
+surface equation. You can imagine the solution of this equation to describe
+the surface spanned by a soap film that is enclosed by a
+closed wire loop. We imagine the wire to not just be a planar loop, but in
+fact curved. The surface tension of the soap film will then reduce the surface
+to have minimal surface. The solution of the minimal surface equation
+describes this shape with the wire's vertical displacement as a boundary
+condition. For simplicity, we will here assume that the surface can be written
+as a graph $u=u(x,y)$ although it is clear that it is not very hard to
+construct cases where the wire is bent in such a way that the surface can only
+locally be constructed as a graph but not globally.
 
-Because the equation is non-linear, we can't solve it directly, but have to use
-the newton-method to compute the solution iterativly.
+Because the equation is non-linear, we can't solve it directly. Rather, we
+have to use Newton's method to compute the solution iteratively.
 
 
 
 <h3>Classical formulation</h3>
 
-In a classical sense, the problem posseses the following form:
+In a classical sense, the problem is given in the following form:
 
-@par
-  @f[
-    -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right) = 0 \qquad
-    \qquad in ~ \Omega
-  @f]
-  @f[
-    u=g \qquad\qquad on ~ \partial \Omega
-  @f]
 
-In this example, we choose the unitball as our domain $\Omega$.
+  @f{align*}
+    -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right) &= 0 \qquad
+    \qquad &&\textrm{in} ~ \Omega
+    \\
+    u&=g \qquad\qquad &&\textrm{on} ~ \partial \Omega
+  @f}
 
-As described above, we have to formulate the Newton-method for this problem
-with a damping parameter $\lambda$ to have a better global convergence behaviour:
+$\Omega$ is the domain we get by projecting the wire's positions into $x-y$
+space. In this example, we choose $\Omega$ as the unit disk.
 
-@par
-  @f[
-    F'(u^{n},\delta u^{n})=- \lambda F(u^{n})
-  @f]
-  @f[
-    u^{n+1}=u^{n}+\delta u^{n}
-  @f]
-
-with:
-
+As described above, we solve this equation using Newton's method in which we
+compute the $n$th approximate solution from the $n-1$st one, and use
+a damping parameter $\lambda^n$ to get better global convergence behavior:
+  @f{align*}
+    F'(u^{n},\delta u^{n})&=- F(u^{n})
+    \\
+    u^{n+1}&=u^{n}+\lambda^n \delta u^{n}
+  @f}
+with
   @f[
     F(u):= -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right)
   @f]
-
 and $F'(u,\delta u)$ the derivative of F in direction of $\delta u$:
-
 @f[
   F'(u,\delta u)=\lim \limits_{\epsilon \rightarrow 0}{\frac{F(u+\epsilon \delta u)-
   F(u)}{\epsilon}}.
 @f]
 
-So we have to solve a linear elliptic pde in every Newton-step, with $\delta u$ as
-the solution of:
+Going through the motions to find out what $F'(u,\delta u)$ is, we find that
+we have to solve a linear elliptic PDE in every Newton step, with $\delta u^n$
+as the solution of:
 
   @f[
   - \nabla \cdot \left( \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla
@@ -76,39 +78,38 @@ the solution of:
   \nabla u^{n} \right) \right)
   @f]
 
-In order to solve the minimal surface equation, we have to solve this equation in every
-Newton step. To solve this, we have to take a look at the boundary condition of this
-problem. Assuming that $u^{n}$ already has the right boundary values, the Newton update
-$\delta u^{n}$ should have zero boundary conditions, in order to have the right boundary
-condition after adding both.
-In the first Newton step, we are starting with the solution $u^{0}\equiv 0$, the Newton
-update still has to deliever the right boundary condition to the solution $u^{1}$.
+In order to solve the minimal surface equation, we have to solve this equation
+repeatedly, once per Newton step. To solve this, we have to take a look at the
+boundary condition of this problem. Assuming that $u^{n}$ already has the
+right boundary values, the Newton update $\delta u^{n}$ should have zero
+boundary conditions, in order to have the right boundary condition after
+adding both.  In the first Newton step, we are starting with the solution
+$u^{0}\equiv 0$, the Newton update still has to deliever the right boundary
+condition to the solution $u^{1}$.
 
-@par
 
-Summing up, we have to solve the pde above with the boundary condition $\delta u^{0}=g$
-in the first step and with $\delta u^{n}=0$ in all the other steps.
+Summing up, we have to solve the PDE above with the boundary condition $\delta
+u^{0}=g$ in the first step and with $\delta u^{n}=0$ in all the following steps.
 
 
 <h3>Weak formulation of the problem</h3>
 
 Starting with the strong formulation above, we get the weak formulation by multiplying
-both sides of the pde with a testfunction $\varphi$ and integrating by parts on both sides:
-
+both sides of the PDE with a testfunction $\varphi$ and integrating by parts on both sides:
   @f[
   \left( \nabla \varphi , \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla
   \delta u^{n} \right)-\left(\nabla \varphi ,\frac{\nabla u^{n} \cdot \nabla
   \delta u^{n}}{(1+|\nabla u^{n}|^{2})^{\frac{3}{2}}}\nabla u^{n}  \right)
   = -\left(\nabla \varphi , \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}} \nabla u^{n}
-   \right)
+   \right).
   @f]
-
-Where the solution $\delta u^{n}$ is a function in the infinte space $H^{1}(\Omega)$.
-Reducing this space to a finite space with basis $\left\{ \varphi_{0},\dots ,
-\varphi_{N-1}\right\}$, we can write the solution:
+Here the solution $\delta u^{n}$ is a function in $H^{1}(\Omega)$, subject to
+the boundary conditions discussed above.
+Reducing this space to a finite dimensional space with basis $\left\{
+\varphi_{0},\dots , \varphi_{N-1}\right\}$, we can write the solution:
 
 @f[
-  \delta u^{n}=\sum_{j=0}^{N-1} \varphi_{j} \cdot U_{j}
+  \delta u^{n}=\sum_{j=0}^{N-1} U_{j} \varphi_{j}
 @f]
 
 Using the basis functions as testfunctions and defining $a_{n}:=\frac{1}
@@ -122,10 +123,10 @@ Using the basis functions as testfunctions and defining $a_{n}:=\frac{1}
 @f]
 
 where the solution $\delta u^{n}$ is given by the coefficents $\delta U^{n}_{j}$.
-This linear equation system can be rewritten as:
+This linear system of equations can be rewritten as:
 
 @f[
-  A^{n}U^{n}=b^{n}
+  A^{n}\; \delta U^{n}=b^{n}
 @f]
 
 where the entries of the matrix $A^{n}$ are given by:
@@ -199,8 +200,9 @@ method we use here.
 <h3>Summary</h3>
 
 Starting with the function $u^{0}\equiv 0$, the first Newton update is computed by
-solving the system $A^{0}U^{0}=b^{0}$ with boundary condition $\delta u^{0}=g$ on
+solving the system $A^{0}\;\delta U^{0}=b^{0}$ with boundary condition $\delta u^{0}=g$ on
  $\partial \Omega$. The new approximation of the solution is given by
- $u^{1}=u^{0}+\delta u^{0}$. The next updates are given as solution of
- the linear system $A^{n}U^{n}=b^{n}$ with boundary condition $\delta u^{n}=0$ on
- $\partial \Omega$ and the new approximation given by $u^{n+1}=u^{n}+\delta u^{n}$.
+ $u^{1}=u^{0}+\lambda^0 \delta u^{0}$. The next updates are given as solution of
+ the linear system $A^{n}\;\delta U^{n}=b^{n}$ with boundary condition $\delta u^{n}=0$ on
+ $\partial \Omega$ and the new approximation given by $u^{n+1}=u^{n}+\lambda^n
+ \delta u^{n}$.
