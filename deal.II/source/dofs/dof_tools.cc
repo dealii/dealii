@@ -3303,7 +3303,7 @@ namespace DoFTools
   make_periodicity_constraints (const FaceIterator                          &face_1,
                                 const typename identity<FaceIterator>::type &face_2,
                                 dealii::ConstraintMatrix                    &constraint_matrix,
-                                const std::vector<bool>                     &component_mask = std::vector<bool>())
+                                const std::vector<bool>                     &component_mask)
   {
     static const int dim = FaceIterator::AccessorType::dimension;
 
@@ -3381,7 +3381,7 @@ namespace DoFTools
                                 const types::boundary_id_t     boundary_component,
                                 const int                      direction,
                                 dealii::ConstraintMatrix       &constraint_matrix,
-                                const std::vector<bool>        &component_mask = std::vector<bool>())
+                                const std::vector<bool>        &component_mask)
   {
     Tensor<1,DH::space_dimension> dummy;
     make_periodicity_constraints (dof_handler,
@@ -3401,7 +3401,7 @@ namespace DoFTools
                                 dealii::Tensor<1,DH::space_dimension>
                                                                &offset,
                                 dealii::ConstraintMatrix       &constraint_matrix,
-                                const std::vector<bool>        &component_mask = std::vector<bool>())
+                                const std::vector<bool>        &component_mask)
   {
     static const int space_dim = DH::space_dimension;
     Assert (0<=direction && direction<space_dim,

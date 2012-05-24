@@ -2064,7 +2064,7 @@ namespace GridTools
                                const types::boundary_id_t                  boundary_component,
                                int                                         direction,
                                const dealii::Tensor<1,CellIterator::AccessorType::space_dimension>
-                                 &offset = dealii::Tensor<1,CellIterator::AccessorType::space_dimension>())
+                                 &offset)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
     Assert (0<=direction && direction<space_dim,
@@ -2126,7 +2126,7 @@ namespace GridTools
                                const types::boundary_id_t boundary_component,
                                int                        direction,
                                const dealii::Tensor<1,DH::space_dimension>
-                                 &offset = Tensor<1,DH::space_dimension>())
+                                 &offset)
   {
     return collect_periodic_cell_pairs<typename DH::cell_iterator>
                                       (dof_handler.begin_active(),

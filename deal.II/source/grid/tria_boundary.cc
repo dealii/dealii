@@ -731,7 +731,7 @@ template <>
 void
 StraightBoundary<3>::
 get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
-                         Boundary<3>::FaceVertexNormals &face_vertex_normals) const
+                         Boundary<3,3>::FaceVertexNormals &face_vertex_normals) const
 {
   const unsigned int vertices_per_face = GeometryInfo<3>::vertices_per_face;
 
