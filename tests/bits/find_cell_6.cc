@@ -14,17 +14,7 @@
 // find_active_cell_around_point() uses the closest vertex
 // to find the corresponding cell. This fail(ed) if it is
 // a hanging node for that cell.
-// this test documents this error:
-/*
-An error occurred in line <2552> of file </scratch/deal-trunk/deal.II/include/deal.II/grid/tria_accessor.templates.h> in function
-    void dealii::CellAccessor<dim, spacedim>::set_refine_flag(dealii::RefinementCase<dim>) const [with int dim = 2, int spacedim = 2]
-The violated condition was: 
-    this->used() && this->active()
-The name and call sequence of the exception was:
-    ExcRefineCellNotActive()
-Additional Information: 
-(none)
-*/
+// This test fortunately does not show this error (yet).
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -69,7 +59,7 @@ int main ()
       Triangulation<2> coarse_grid;
       GridGenerator::hyper_cube (coarse_grid);
       coarse_grid.refine_global (1);
-      coarse_grid.begin()->set_refine_flag();
+      coarse_grid.begin_active()->set_refine_flag();
       coarse_grid.execute_coarsening_and_refinement();
       check (coarse_grid);
     }
