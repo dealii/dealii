@@ -366,7 +366,7 @@ void Step4<dim>::setup_system ()
                                  // non-constant right hand side
                                  // function and non-zero boundary
                                  // values. Both are tasks that are
-                                 // readily achieved with a only a few
+                                 // readily achieved with only a few
                                  // new lines of code in the
                                  // assemblage of the matrix and right
                                  // hand side.

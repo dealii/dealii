@@ -533,7 +533,7 @@ void Step3::assemble_system ()
       fe_values.reinit (cell);
 
                                        // Next, reset the local cell's
-                                       // contributions contributions to
+                                       // contributions to
                                        // global matrix and global right hand
                                        // side to zero, before we fill them:
       cell_matrix = 0;

@@ -195,7 +195,7 @@ particular information you need; if anything can be re-used from the previous
 cell, then it will do so, and there is a lot of code in that class to make
 sure things are cached wherever this is advantageous.
 
-The final piece of the this introduction is to mention that after a linear
+The final piece of this introduction is to mention that after a linear
 system is obtained, it is solved using an iterative solver and then
 postprocessed: we create an output file using the DataOut class that can then
 be visualized using one of the common visualization programs.

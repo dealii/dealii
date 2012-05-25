@@ -183,7 +183,7 @@ void make_grid (Triangulation<2> &triangulation)
                                  // lingo: we <code>distribute degrees of
                                  // freedom</code>). Note that the DoFHandler
                                  // object will store a reference to this
-                                 // finite element object, so we need have to
+                                 // finite element object, so we have to
                                  // make sure its lifetime is at least as long
                                  // as that of the <code>DoFHandler</code>; one way to
                                  // make sure this is so is to make it static
