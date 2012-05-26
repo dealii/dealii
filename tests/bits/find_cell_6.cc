@@ -11,10 +11,18 @@
 //
 //----------------------------  find_cell_5.cc  ---------------------------
 
-// find_active_cell_around_point() uses the closest vertex
-// to find the corresponding cell. This fail(ed) if it is
-// a hanging node for that cell.
-// This test fortunately does not show this error (yet).
+// find_active_cell_around_point() stops working if some cells are refined.
+// this is most likely a rounding error, but it is frustrating.
+// check2 triggers the following error:
+/*
+An error occurred in line <838> of file </scratch/deal-trunk/deal.II/source/grid/grid_tools.cc> in function
+    std::pair<typename Container<dim, spacedim>::active_cell_iterator, dealii::Point<dim> > dealii::GridTools::find_active_cell_around_point(const dealii::Mapping<dim, spacedim>&, const Container<dim, spacedim>&, const dealii::Point<spacedim>&) [with int dim = 3, Container = dealii::Triangulation, int spacedim = 3, typename Container<dim, spacedim>::active_cell_iterator = dealii::TriaActiveIterator<dealii::CellAccessor<3, 3> >]
+The violated condition was: 
+    best_cell.first.state() == IteratorState::valid
+The name and call sequence of the exception was:
+    ExcPointNotFound<spacedim>(p)
+Additional Information: 
+The point <0.789000 0.313000 0.170000> could not be found inside any of the subcells of a coarse grid cell.*/
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -23,29 +31,75 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 
 #include <fstream>
 
 #include <deal.II/fe/mapping_q1.h>
 
-
-
-
-void check (Triangulation<2> &tria)
+bool inside(Triangulation<3> &tria, Point<3> &p)
 {
-  Point<2> p (0.25,0.6);
   
-  Triangulation<2>::active_cell_iterator cell
-    = GridTools::find_active_cell_around_point (tria, p);
+  for(typename Triangulation<3>::cell_iterator cell = tria.begin(0);
+      cell != tria.end(0); ++cell)
+    if( cell->point_inside (p) )
+      return true;
 
-  deallog << cell << std::endl;
-  for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-    deallog << "<" << cell->vertex(v) << "> ";
-  deallog << std::endl;
-
+  return false;
 }
 
+void check2 ()
+{
+  Triangulation<3> tria;
+  GridIn<3> gridIn;
+  gridIn.attach_triangulation (tria);
+  std::ifstream inputFile("find_cell_6/grid.inp");
+  gridIn.read_ucd (inputFile);
+
+  Point<3> p2(304.767,-57.0113,254.766);
+  deallog << inside(tria, p2) << std::endl;
+  GridTools::find_active_cell_around_point(tria, p2); //OK
+
+  int idx=0;
+  for (typename Triangulation<3>::active_cell_iterator  cell = tria.begin_active();  cell!=tria.end();  ++cell, ++idx)
+    {
+      if (idx==21)
+	cell->set_refine_flag();      
+    }
+  
+  tria.execute_coarsening_and_refinement ();
+  deallog << inside(tria, p2) << std::endl;
+  GridTools::find_active_cell_around_point(tria, p2); //triggers exception
+}
+
+void check1 ()
+{
+  Triangulation<3> tria;
+  GridGenerator::hyper_cube (tria);
+  tria.refine_global (3);
+
+  for (int i=0;i<5;++i)
+    {
+      for (int j=0;j<10000;++j)
+	{
+	  Point<3> p ((rand()%1000)/1000.0,(rand()%1000)/1000.0,(rand()%1000)/1000.0);
+	  if (!inside(tria, p))
+	    deallog << "NOT INSIDE" << std::endl;
+	  GridTools::find_active_cell_around_point(tria, p);
+	}
+
+      for(typename Triangulation<3>::active_cell_iterator cell = tria.begin_active();
+	  cell != tria.end(); ++cell)
+	for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
+	  {
+	    if (cell->face(f)->at_boundary() && (rand()%5)==1)
+	      cell->set_refine_flag();
+	  }
+
+      tria.execute_coarsening_and_refinement();
+    } 
+}
 
 int main () 
 {
@@ -56,12 +110,8 @@ int main ()
 
   try
     {
-      Triangulation<2> coarse_grid;
-      GridGenerator::hyper_cube (coarse_grid);
-      coarse_grid.refine_global (1);
-      coarse_grid.begin_active()->set_refine_flag();
-      coarse_grid.execute_coarsening_and_refinement();
-      check (coarse_grid);
+//      check1();
+      check2();
     }
   catch (const std::exception &exc)
     {
