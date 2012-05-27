@@ -113,9 +113,7 @@ namespace Functions
  *
  *  \ingroup functions
  *
- *  \author Luca Heltai, 2006
- *
- *  \todo Add hp functionality
+ *  \author Luca Heltai, 2006, Markus Buerg, 2012
  */
   template <int dim,
             typename DH=DoFHandler<dim>,

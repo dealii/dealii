@@ -13,6 +13,10 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/fe_values.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/hp/q_collection.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/fe_field_function.h>
 
@@ -72,7 +76,7 @@ namespace Functions
 
                                      // Now we can find out about the point
     Quadrature<dim> quad(qp);
-    FEValues<dim> fe_v(mapping, dh->get_fe(), quad,
+    FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_values);
     fe_v.reinit(cell);
     std::vector< Vector<double> > vvalues (1, values);
@@ -119,7 +123,7 @@ namespace Functions
 
                                      // Now we can find out about the point
     Quadrature<dim> quad(qp);
-    FEValues<dim> fe_v(mapping, dh->get_fe(), quad,
+    FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_gradients);
     fe_v.reinit(cell);
     std::vector< std::vector<Tensor<1,dim> > > vgrads
@@ -165,7 +169,7 @@ namespace Functions
 
     // Now we can find out about the point
     Quadrature<dim> quad(qp);
-    FEValues<dim> fe_v(mapping, dh->get_fe(), quad,
+    FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
         update_hessians);
     fe_v.reinit(cell);
     std::vector< Vector<double> > vvalues (1, values);
@@ -202,23 +206,28 @@ namespace Functions
     std::vector<std::vector<unsigned int> > maps;
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
-
+    hp::MappingCollection<dim> mapping_collection (mapping);
+    hp::FECollection<dim> fe_collection (dh->get_fe ());
+    hp::QCollection<dim> quadrature_collection;
+                                     // Create quadrature collection
+    for (unsigned int i=0; i<ncells; ++i) {
+                                         // Number of quadrature points on this cell
+      unsigned int nq = qpoints[i].size();
+                                         // Construct a quadrature formula
+      std::vector< double > ww(nq, 1./((double) nq));
+      
+      quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
+    }
+                                     // Get a function value object
+    hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
+                           update_values);
                                      // Now gather all the informations we need
     for (unsigned int i=0; i<ncells; ++i)
       {
-                                         // Number of quadrature points on this cell
-        unsigned int nq = qpoints[i].size();
-
-                                         // Construct a quadrature formula
-        std::vector< double > ww(nq, 1./((double) nq));
-        Quadrature<dim> quad(qpoints[i], ww);
-
-                                         // Get a function value object
-        FEValues<dim> fe_v(mapping, dh->get_fe(), quad,
-                           update_values);
-        fe_v.reinit(cells[i]);
+        fe_v.reinit(cells[i], i, 0);
+        const unsigned int nq = qpoints[i].size();
         std::vector< Vector<double> > vvalues (nq, Vector<double>(n_components));
-        fe_v.get_function_values(data_vector, vvalues);
+        fe_v.get_present_fe_values ().get_function_values(data_vector, vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
       }
@@ -256,24 +265,29 @@ namespace Functions
     std::vector<std::vector<unsigned int> > maps;
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
-
+    hp::MappingCollection<dim> mapping_collection (mapping);
+    hp::FECollection<dim> fe_collection (dh->get_fe ());
+    hp::QCollection<dim> quadrature_collection;
+                                     // Create quadrature collection
+    for (unsigned int i=0; i<ncells; ++i) {
+                                         // Number of quadrature points on this cell
+      unsigned int nq = qpoints[i].size();
+                                         // Construct a quadrature formula
+      std::vector< double > ww(nq, 1./((double) nq));
+      
+      quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
+    }
+                                     // Get a function value object
+    hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
+                           update_gradients);
                                      // Now gather all the informations we need
     for (unsigned int i=0; i<ncells; ++i)
       {
-                                         // Number of quadrature points on this cell
-        unsigned int nq = qpoints[i].size();
-
-                                         // Construct a quadrature formula
-        std::vector< double > ww(nq, 1./((double) nq));
-        Quadrature<dim> quad(qpoints[i], ww);
-
-                                         // Get a function value object
-        FEValues<dim> fe_v(mapping, dh->get_fe(), quad,
-                           update_gradients);
-        fe_v.reinit(cells[i]);
+        fe_v.reinit(cells[i], i, 0);
+        const unsigned int nq = qpoints[i].size();
         std::vector< std::vector<Tensor<1,dim> > >
           vgrads (nq, std::vector<Tensor<1,dim> >(n_components));
-        fe_v.get_function_grads(data_vector, vgrads);
+        fe_v.get_present_fe_values ().get_function_grads(data_vector, vgrads);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vgrads[q];
       }
@@ -310,25 +324,30 @@ namespace Functions
     std::vector<std::vector<unsigned int> > maps;
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
-
+    hp::MappingCollection<dim> mapping_collection (mapping);
+    hp::FECollection<dim> fe_collection (dh->get_fe ());
+    hp::QCollection<dim> quadrature_collection;
+                                     // Create quadrature collection
+    for (unsigned int i=0; i<ncells; ++i) {
+                                         // Number of quadrature points on this cell
+      unsigned int nq = qpoints[i].size();
+                                         // Construct a quadrature formula
+      std::vector< double > ww(nq, 1./((double) nq));
+      
+      quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
+    }
+                                     // Get a function value object
+    hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
+                           update_hessians);
              // Now gather all the informations we need
     for (unsigned int i=0; i<ncells; ++i)
       {
-           // Number of quadrature points on this cell
-  unsigned int nq = qpoints[i].size();
-
-           // Construct a quadrature formula
-  std::vector< double > ww(nq, 1./((double) nq));
-  Quadrature<dim> quad(qpoints[i], ww);
-
-           // Get a function value object
-  FEValues<dim> fe_v(mapping, dh->get_fe(), quad,
-         update_hessians);
-  fe_v.reinit(cells[i]);
-  std::vector< Vector<double> > vvalues (nq, Vector<double>(n_components));
-  fe_v.get_function_laplacians(data_vector, vvalues);
-  for (unsigned int q=0; q<nq; ++q)
-    values[maps[i][q]] = vvalues[q];
+        fe_v.reinit(cells[i], i, 0);
+        const unsigned int nq = qpoints[i].size();
+        std::vector< Vector<double> > vvalues (nq, Vector<double>(n_components));
+        fe_v.get_present_fe_values ().get_function_laplacians(data_vector, vvalues);
+        for (unsigned int q=0; q<nq; ++q)
+          values[maps[i][q]] = vvalues[q];
       }
   }
 
