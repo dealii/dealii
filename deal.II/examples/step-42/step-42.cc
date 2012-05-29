@@ -1,4 +1,3 @@
-
 /* $Id$ */
 /* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
@@ -58,6 +57,7 @@
 #include <deal.II/distributed/grid_refinement.h>
 
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/base/timer.h>
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -85,7 +85,7 @@ template <int dim>
 class Step4
 {
 public:
-  Step4 ();
+  Step4 (int _n_refinements_global, int _n_refinements_local);
   void run ();
 
 private:
@@ -114,7 +114,7 @@ private:
   IndexSet             locally_owned_dofs;
   IndexSet             locally_relevant_dofs;
 
-  int                  n_refinements;
+  int                  n_refinements_global;
   int                  n_refinements_local;
   unsigned int         number_iterations;
   std::vector<double>  run_time;
@@ -219,19 +219,15 @@ void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim>  &stre
 						   double                  &sigma_eff,
 						   double                  &yield)
 {
-  // Plane strain
   if (dim == 3)
   {
     SymmetricTensor<2,dim> stress_tensor;
     stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
     double tmp = E/((1+nu)*(1-2*nu));
-    double stress_tensor_33 = 0.0;//tmp*(strain_tensor[0][0] + strain_tensor[1][1])*nu;
 
     SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
 
     double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
-    deviator_stress_tensor_norm = std::sqrt (deviator_stress_tensor_norm*deviator_stress_tensor_norm +
-				  stress_tensor_33*stress_tensor_33);
 
     yield = 0;
     stress_strain_tensor = stress_strain_tensor_mu;
@@ -258,13 +254,11 @@ void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,
 							      SymmetricTensor<4,dim>  &stress_strain_tensor,
 							      SymmetricTensor<2,dim>  &strain_tensor)
 {
-  // Plane strains
   if (dim == 3)
   {
     SymmetricTensor<2,dim> stress_tensor;
     stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
     double tmp = E/((1+nu)*(1-2*nu));
-    double stress_tensor_33 = 0.0;//tmp*(strain_tensor[0][0] + strain_tensor[1][1])*nu;
 
     stress_strain_tensor = stress_strain_tensor_mu;
     stress_strain_tensor_linearized = stress_strain_tensor_mu;
@@ -272,7 +266,7 @@ void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,
     SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
 
     double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
-    deviator_stress_tensor_norm = std::sqrt (deviator_stress_tensor_norm*deviator_stress_tensor_norm + stress_tensor_33*stress_tensor_33);
+
     double beta = 1.0;
     if (deviator_stress_tensor_norm >= sigma_0)
     {
@@ -413,12 +407,12 @@ namespace EquationData
 	//   return_value = 1e+10;
 
 	// Hindernis Dortmund
-	// double x1 = p(0);
-	// double x2 = p(1);
-	// if (((x2-0.5)*(x2-0.5)+(x1-0.5)*(x1-0.5)<=0.3*0.3)&&((x2-0.5)*(x2-0.5)+(x1-1.0)*(x1-1.0)>=0.4*0.4)&&((x2-0.5)*(x2-0.5)+x1*x1>=0.4*0.4))
-	//   return_value = 0.999;
-	// else
-	//   return_value = 1e+10;
+	double x1 = p(0);
+	double x2 = p(1);
+	if (((x2-0.5)*(x2-0.5)+(x1-0.5)*(x1-0.5)<=0.3*0.3)&&((x2-0.5)*(x2-0.5)+(x1-1.0)*(x1-1.0)>=0.4*0.4)&&((x2-0.5)*(x2-0.5)+x1*x1>=0.4*0.4))
+	  return_value = 0.999;
+	else
+	  return_value = 1e+10;
 
 	// Hindernis Werkzeug TKSE
 	// double shift_walze_x = 0.0;
@@ -426,12 +420,12 @@ namespace EquationData
 	// return_value = 0.032 + data->dicke - input_copy->mikro_height (p(0) + shift_walze_x, p(1) + shift_walze_y, p(2));
 
 	// Ball with radius R
-	double R = 0.5;
-	if (std::pow ((p(0)-1.0/2.0), 2) + std::pow ((p(1)-1.0/2.0), 2) < R*R)
-	  return_value = 1.0 + R - 0.001 - sqrt (R*R  - std::pow ((p(0)-1.0/2.0), 2)
-						 - std::pow ((p(1)-1.0/2.0), 2));
-	else
-	  return_value = 1e+5;
+	// double R = 0.5;
+	// if (std::pow ((p(0)-1.0/2.0), 2) + std::pow ((p(1)-1.0/2.0), 2) < R*R)
+	//   return_value = 1.0 + R - 0.001 - sqrt (R*R  - std::pow ((p(0)-1.0/2.0), 2)
+	// 					 - std::pow ((p(1)-1.0/2.0), 2));
+	// else
+	//   return_value = 1e+5;
       }
     return return_value;
 
@@ -455,8 +449,10 @@ namespace EquationData
                                  // above. As before, we will write everything
 
 template <int dim>
-Step4<dim>::Step4 ()
+Step4<dim>::Step4 (int _n_refinements_global, int _n_refinements_local)
   :
+  n_refinements_global (_n_refinements_global),
+  n_refinements_local (_n_refinements_local),
   mpi_communicator (MPI_COMM_WORLD),
   triangulation (mpi_communicator),
   fe (FE_Q<dim>(1), dim),
@@ -465,7 +461,7 @@ Step4<dim>::Step4 ()
 	 (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
   sigma_0 (400),
   gamma (1.e-2),
-  e_modul (2.e5),
+  e_modul (2.0e5),
   nu (0.3)
 {
   // double _E, double _nu, double _sigma_0, double _gamma
@@ -512,33 +508,47 @@ void Step4<dim>::make_grid ()
 	  cell->face (face)->set_boundary_indicator (6);
       }
 
-  n_refinements = 3;
-  n_refinements_local = 3;
-  triangulation.refine_global (n_refinements);
+  triangulation.refine_global (n_refinements_global);
 
   // Lokale Verfeinerung des Gitters
   for (int step=0; step<n_refinements_local; ++step)
     {
       cell = triangulation.begin_active();  // Iterator ueber alle Zellen
 
-      double hlp_refinement = 0;
-      hlp_refinement = pow((double)(step)/(n_refinements_local),4.0);
-      pcout<< "Verfeinerungsfaktor: " << hlp_refinement <<std::endl;
-
       for (; cell!=endc; ++cell)
          for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
          {
-	   if (cell->face (face)->at_boundary()
-	       && cell->face (face)->boundary_indicator () == 9)
+// 	   if (cell->face (face)->at_boundary()
+// 	       && cell->face (face)->boundary_indicator () == 9)
+// 	     {
+// 	       cell->set_refine_flag ();
+// 	       break;
+// 	     }
+// 	   else if (cell->level () == n_refinements + n_refinements_local - 1)
+// 	     {
+// 	       cell->set_refine_flag ();
+// 	       break;
+// 	     }
+
+// 	   if (cell->face (face)->at_boundary()
+// 	       && cell->face (face)->boundary_indicator () == 9)
+// 	     {
+// 	       if (cell->face (face)->vertex (0)(0) <= 0.7 &&
+// 	           cell->face (face)->vertex (1)(0) >= 0.3 &&
+// 		   cell->face (face)->vertex (0)(1) <= 0.875 &&
+// 	           cell->face (face)->vertex (2)(1) >= 0.125)
+//  	         {
+// 	           cell->set_refine_flag ();
+// 	           break;
+// 	         }
+// 	     }
+	    
+	    if (step == 0 &&
+	        cell->center ()(2) < n_refinements_local*9.0/64.0)
 	     {
 	       cell->set_refine_flag ();
 	       break;
-	     }
-	   else if (cell->level () == n_refinements + n_refinements_local - 1)
-	     {
-	       cell->set_refine_flag ();
-	       break;
-	     }
+	     }     
         };
       triangulation.execute_coarsening_and_refinement ();
     };
@@ -601,15 +611,17 @@ void Step4<dim>::setup_system ()
     system_matrix_newton.reinit (sp);
 
     mass_matrix.reinit (sp);
-  }
+  }    
 
   assemble_mass_matrix ();
   const unsigned int
     start = (system_rhs_newton.local_range().first),
     end   = (system_rhs_newton.local_range().second);
-  for (unsigned int j=0; j<end; j++)
+  for (unsigned int j=start; j<end; j++)
     diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
   number_iterations = 0;
+  
+  diag_mass_matrix_vector.compress ();
 }
 
 template <int dim>
@@ -912,9 +924,11 @@ void Step4<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
 template <int dim>
 void Step4<dim>::projection_active_set ()
 {
+  clock_t                        start_proj, end_proj;
+  
   const EquationData::Obstacle<dim>     obstacle;
   std::vector<bool>                     vertex_touched (dof_handler.n_dofs (), false);
-
+  
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
@@ -925,7 +939,7 @@ void Step4<dim>::projection_active_set ()
   lambda = resid_vector;
   TrilinosWrappers::MPI::Vector         diag_mass_matrix_vector_relevant (solution);
   diag_mass_matrix_vector_relevant = diag_mass_matrix_vector;
-
+    
   constraints.reinit(locally_relevant_dofs);
   active_set.clear ();
   IndexSet     active_set_locally_owned;
@@ -935,7 +949,8 @@ void Step4<dim>::projection_active_set ()
   for (; cell!=endc; ++cell)
     if (cell->is_locally_owned())
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	if (cell->face (face)->boundary_indicator () == 9)
+	if (cell->face (face)->at_boundary()
+	    && cell->face (face)->boundary_indicator () == 9)
 	  for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
 	    {
 	      unsigned int index_z = cell->face (face)->vertex_dof_index (v,2);
@@ -978,7 +993,6 @@ void Step4<dim>::projection_active_set ()
 		  // 	   <<std::endl;
 		}
 	    }
-
   distributed_solution.compress(Insert);
 
   unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set_locally_owned.n_elements (),
@@ -1034,27 +1048,57 @@ void Step4<dim>::dirichlet_constraints ()
 template <int dim>
 void Step4<dim>::solve ()
 {
-  ReductionControl                 reduction_control (10000, 1e-15, 1e-4);
+  pcout << "Solving ..." << std::endl;
+  Timer t;
 
   TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
   distributed_solution = solution;
-
+  
   constraints_hanging_nodes.set_zero (distributed_solution);
 
   // Solving iterative
-  SolverCG<TrilinosWrappers::MPI::Vector>
-    solver (reduction_control, mpi_communicator);
+
+  MPI_Barrier (mpi_communicator);
+  t.restart();
 
   preconditioner_u.initialize (system_matrix_newton, additional_data);
+  
+  MPI_Barrier (mpi_communicator);
+  t.stop();
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+  run_time[6] += t.wall_time();
+  
+  MPI_Barrier (mpi_communicator);
+  t.restart();
 
-  solver.solve (system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
-  pcout << "Initial error: " << reduction_control.initial_value() <<std::endl;
-  pcout << "   " << reduction_control.last_step()
+//   ReductionControl                 reduction_control (10000, 1e-15, 1e-4);
+//   SolverCG<TrilinosWrappers::MPI::Vector>
+//     solver (reduction_control, mpi_communicator);
+//   solver.solve (system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
+
+  PrimitiveVectorMemory<TrilinosWrappers::MPI::Vector> mem;
+  TrilinosWrappers::MPI::Vector    tmp (system_rhs_newton);
+  const double solver_tolerance = 1e-4 *
+  	system_matrix_newton.residual (tmp, distributed_solution, system_rhs_newton);
+  SolverControl solver_control (system_matrix_newton.m(), solver_tolerance);
+  SolverFGMRES<TrilinosWrappers::MPI::Vector>
+     solver(solver_control, mem,
+     SolverFGMRES<TrilinosWrappers::MPI::Vector>::
+     AdditionalData(30, true));
+  solver.solve(system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);	    
+
+  pcout << "Initial error: " << solver_control.initial_value() <<std::endl;
+  pcout << "   " << solver_control.last_step()
   	    << " CG iterations needed to obtain convergence with an error: "
-  	    <<  reduction_control.last_value()
+  	    <<  solver_control.last_value()
   	    << std::endl;
 
-  number_iterations += reduction_control.last_step();
+  MPI_Barrier (mpi_communicator);
+  t.stop();
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+  run_time[7] += t.wall_time();
+
+  number_iterations += solver_control.last_step();
 
   constraints.distribute (distributed_solution);
 
@@ -1068,7 +1112,7 @@ void Step4<dim>::solve_newton ()
   double                         resid_old=100000;
   TrilinosWrappers::MPI::Vector  res (system_rhs_newton);
   TrilinosWrappers::MPI::Vector  tmp_vector (system_rhs_newton);
-  clock_t                        start, end;
+  Timer                          t;
 
   std::vector<std::vector<bool> > constant_modes;
   std::vector<bool>  components (dim,true);
@@ -1085,7 +1129,7 @@ void Step4<dim>::solve_newton ()
 
   IndexSet                            active_set_old (active_set);
   Vector<double>                      sigma_eff_vector;
-  sigma_eff_vector.reinit (triangulation.n_active_cells());
+  sigma_eff_vector.reinit (triangulation.n_active_cells());  
   unsigned int j = 0;
   unsigned int number_assemble_system = 0;
   for (; j<=100;j++)
@@ -1093,23 +1137,38 @@ void Step4<dim>::solve_newton ()
       pcout<< " " <<std::endl;
       pcout<< j << ". Iteration of the inexact Newton-method." <<std::endl;
       pcout<< "Update of active set" <<std::endl;
+      
+      MPI_Barrier (mpi_communicator);
+      t.restart(); 
+      
       projection_active_set ();
-
+      
+      MPI_Barrier (mpi_communicator);
+      t.stop();
+      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+        run_time[5] += t.wall_time();
+      
       pcout<< "Assembling ... " <<std::endl;
-      start = clock();
+      MPI_Barrier (mpi_communicator);
+      t.restart(); 
       system_matrix_newton = 0;
       system_rhs_newton = 0;
       assemble_nl_system (solution);  //compute Newton-Matrix
-      end = clock();
-      run_time[1] += (double)(end-start)/CLOCKS_PER_SEC;
+      MPI_Barrier (mpi_communicator);
+      t.stop();
+      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+        run_time[1] += t.wall_time();
 
       number_assemble_system += 1;
 
-      start = clock();
+      MPI_Barrier (mpi_communicator);
+      t.restart();
       solve ();
-      end = clock();
-      run_time[2] += (double)(end-start)/CLOCKS_PER_SEC;
-
+      MPI_Barrier (mpi_communicator);
+      t.stop();
+      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+        run_time[2] += t.wall_time();
+	
       TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
       distributed_solution = solution;
 
@@ -1122,7 +1181,8 @@ void Step4<dim>::solve_newton ()
 	  old_solution = tmp_vector;
 	  old_solution.sadd(1-a,a, distributed_solution);
 
-	  start = clock();
+	  MPI_Barrier (mpi_communicator);
+          t.restart();
 	  system_rhs_newton = 0;
 	  sigma_eff_vector = 0;
 	  solution = old_solution;
@@ -1151,8 +1211,10 @@ void Step4<dim>::solve_newton ()
 	      pcout<< "Newton-damping parameter alpha = " << a <<std::endl;
 	      damped=1;
 	    }
-	  end = clock();
-	  run_time[3] = (double)(end-start)/CLOCKS_PER_SEC;
+	  MPI_Barrier (mpi_communicator);
+          t.stop();
+          if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+            run_time[3] += t.wall_time();
 	}
 
       if (resid<1e-8)
@@ -1170,22 +1232,29 @@ void Step4<dim>::solve_newton ()
       active_set_old = active_set;
     } // End of active-set-loop
 
-  start = clock();
+  
   pcout<< "Creating output." <<std::endl;
+  MPI_Barrier (mpi_communicator);
+  t.restart();
   std::ostringstream filename_solution;
   filename_solution << "solution";
   // filename_solution << "solution_";
   // filename_solution << k;
   output_results (filename_solution.str ());
   // output_results (sigma_eff_vector, "sigma_eff");
-  end = clock();
-  run_time[4] = (double)(end-start)/CLOCKS_PER_SEC;
+  MPI_Barrier (mpi_communicator);
+  t.stop();
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+    run_time[4] += t.wall_time();
 
   pcout<< "Number of Solver-Iterations = " << number_iterations <<std::endl;
 
   pcout<< "%%%%%% Rechenzeit make grid and setup = " << run_time[0] <<std::endl;
+  pcout<< "%%%%%% Rechenzeit projection active set = " << run_time[5] <<std::endl;
   pcout<< "%%%%%% Rechenzeit assemble system = " << run_time[1] <<std::endl;
   pcout<< "%%%%%% Rechenzeit solve system = " << run_time[2] <<std::endl;
+  pcout<< "%%%%%% Rechenzeit preconditioner = " << run_time[6] <<std::endl;
+  pcout<< "%%%%%% Rechenzeit solve with CG = " << run_time[7] <<std::endl;
   pcout<< "%%%%%% Rechenzeit error and lambda = " << run_time[3] <<std::endl;
   pcout<< "%%%%%% Rechenzeit output = " << run_time[4] <<std::endl;
 }
@@ -1317,14 +1386,16 @@ void Step4<dim>::run ()
 {
   pcout << "Solving problem in " << dim << " space dimensions." << std::endl;
 
-  run_time.resize (5);
+  run_time.resize (8);
 
   clock_t     start, end;
 
   start = clock();
   make_grid();
   //  mesh_surface ();
-  setup_system ();
+  
+  setup_system (); 
+  
   end = clock();
   run_time[0] = (double)(end-start)/CLOCKS_PER_SEC;
 
@@ -1417,7 +1488,16 @@ int main (int argc, char *argv[])
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
   {
-    Step4<3> laplace_problem_3d;
+    int _n_refinements_global = 1;
+    int _n_refinements_local = 1;
+    
+    if (argc == 3)
+    {
+      _n_refinements_global = atoi(argv[1]);
+      _n_refinements_local = atoi(argv[2]);
+    }
+    
+    Step4<3> laplace_problem_3d (_n_refinements_global, _n_refinements_local);
     laplace_problem_3d.run ();
   }
 
