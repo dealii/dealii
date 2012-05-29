@@ -524,11 +524,13 @@ namespace DoFTools
                                     * following pattern of
                                     * couplings:
                                     * @f[
+                                    * \left[
                                     * \begin{array}{ccc}
                                     *   1 & 0 & 1 \\
                                     *   0 & 1 & 1 \\
                                     *   1 & 1 & 0
                                     * \end{array}
+                                    * \right]
                                     * @f]
                                     * where "1" indicates that two
                                     * variables (i.e. components of
