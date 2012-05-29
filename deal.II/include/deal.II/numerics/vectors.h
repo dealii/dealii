@@ -891,8 +891,8 @@ namespace VectorTools
                                const std::vector<bool>       &component_mask = std::vector<bool>());
 
                                    /**
-                                    * @deprecated This function is there
-                                    * mainly for backward compatibility.
+                                    * @deprecated This function exists
+                                    * only for backward compatibility.
                                     *
                                     * Same function as above, but taking
                                     * only one pair of boundary indicator
