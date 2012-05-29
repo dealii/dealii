@@ -100,12 +100,22 @@
  * This scheme of first building a linear system and then eliminating
  * constrained degrees of freedom is inefficient, and a bottleneck if there
  * are many constraints and matrices are full, i.e. especially for 3d and/or
- * higher order or hp finite elements. We therefore offer a second way of
+ * higher order or hp finite elements. Furthermore, it is impossible to
+ * implement for %parallel computations where a process may not have access
+ * to elements of the matrix. We therefore offer a second way of
  * building linear systems, using the
  * ConstraintMatrix::add_entries_local_to_global() and
  * ConstraintMatrix::distribute_local_to_global() functions discussed
  * below. The resulting linear systems are equivalent to those one gets after
  * calling the ConstraintMatrix::condense() functions.
+ *
+ * @note While these two ways are <i>equivalent</i>, i.e., the solution of
+ * linear systems computed via either approach is the same, the linear
+ * systems themselves do not necessarily have the same matrix and right
+ * hand side vector entries. Specifically, the matrix diagonal and right hand
+ * side entries corresponding to constrained degrees of freedom may be different
+ * as a result of the way in which we compute them; they are, however, always
+ * chosen in such a way that the solution to the linear system is the same.
  *
  *
  * <h4>Condensing matrices and sparsity patterns</h4>
