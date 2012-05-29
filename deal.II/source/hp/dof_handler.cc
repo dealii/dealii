@@ -3886,7 +3886,7 @@ template <>
                                                // we assume here, that only four faces
                                                // meet at the boundary; this assumption
                                                // is not justified and needs to be
-                                               // fixed some time. fortunately, ommitting
+                                               // fixed some time. fortunately, omitting
                                                // it for now does no harm since the
                                                // matrix will cry foul if its requirements
                                                // are not satisfied

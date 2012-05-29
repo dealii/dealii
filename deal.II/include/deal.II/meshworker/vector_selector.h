@@ -93,7 +93,7 @@ namespace MeshWorker
                                         * @note This function caches
                                         * the index associated with a
                                         * name. Therefore, it must be
-                                        * called everytime after the
+                                        * called every time after the
                                         * NamedData object has changed.
                                         */
       template <class DATA>

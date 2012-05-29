@@ -140,7 +140,7 @@ namespace SLEPcWrappers
                                     * being used (and can be more). To
                                     * avoid doing this, the fairly
                                     * standard calling sequence
-                                    * excecuted here is used:
+                                    * executed here is used:
                                     * Initialise; Set up matrices for
                                     * solving; Actually solve the
                                     * system; Gather the solution(s);
@@ -286,7 +286,7 @@ namespace SLEPcWrappers
       DeclException1 (ExcSLEPcError,
                       int,
                       << "    An error with error number " << arg1
-                      << " occured while calling a SLEPc function");
+                      << " occurred while calling a SLEPc function");
 
       DeclException2 (ExcSLEPcEigenvectorConvergenceMismatchError,
                       int, int,

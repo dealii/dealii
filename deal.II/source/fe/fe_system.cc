@@ -42,7 +42,7 @@ template <int dim, int spacedim>
 FESystem<dim,spacedim>::InternalData::~InternalData()
 {
                                    // delete pointers and set them to
-                                   // zero to avoid inadvertant use
+                                   // zero to avoid inadvertent use
   for (unsigned int i=0; i<base_fe_datas.size(); ++i)
     if (base_fe_datas[i])
       {
@@ -3510,7 +3510,7 @@ FESystem<dim,spacedim>::memory_consumption () const
 {
                                    // neglect size of data stored in
                                    // @p{base_elements} due to some
-                                   // problems with teh
+                                   // problems with the
                                    // compiler. should be neglectable
                                    // after all, considering the size
                                    // of the data of the subelements

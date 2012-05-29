@@ -27,7 +27,7 @@ namespace Algorithms
  * Operator class performing Newton's iteration with standard step
  * size control and adaptive matrix generation.
  *
- * This class performes a Newton iteration up to convergence
+ * This class performs a Newton iteration up to convergence
  * determined by #control. If after an update the norm of the residual
  * has become larger, then step size control is activated and the
  * update is subsequently divided by two until the residual actually

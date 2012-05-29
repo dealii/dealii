@@ -284,7 +284,7 @@
  * CompressedSimpleSparsityPattern indicates that it should store too few rows
  * of the matrix, the program will either abort when you attempt to write into
  * matrix entries that do not exist or the matrix class will silently allocate
- * more memory to accomodate them. As a consequence, it is useful to err on
+ * more memory to accommodate them. As a consequence, it is useful to err on
  * the side of caution when indicating which constraints to store and use the
  * result of DoFTools::extract_locally_relevant_dofs() rather than
  * DoFTools::extract_locally_active_dofs() . This is also affordable since the

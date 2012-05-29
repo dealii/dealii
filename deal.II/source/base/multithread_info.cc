@@ -91,7 +91,7 @@ unsigned int MultithreadInfo::get_n_cpus()
 #  elif defined(__MACH__) && defined(__APPLE__)
 // This is only tested on a dual G5 2.5GHz running MacOSX 10.3.6
 // and on an Intel Mac Book Pro.
-// If it doesnt work please contact the mailinglist.
+// If it doesn't work please contact the mailinglist.
 unsigned int MultithreadInfo::get_n_cpus()
 {
         int mib[2];

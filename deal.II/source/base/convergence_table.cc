@@ -137,7 +137,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
       case reduction_rate_log2:
             rate_key+="red.rate.log2";
             Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
-                                             // no value availble for the
+                                             // no value available for the
                                              // first row
             add_value(rate_key, std::string("-"));
             for (unsigned int i=1; i<n; ++i)

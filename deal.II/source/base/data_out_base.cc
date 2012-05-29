@@ -3138,7 +3138,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 
       if (!flags.bicubic_patch)
         {
-                                           // aproximate normal
+                                           // approximate normal
                                            // vectors in patch
           std::vector<Point<3> > nrml;
                                            // only if smooth triangles are used

@@ -732,7 +732,7 @@ namespace internal
 
                                          /**
                                           * Indices of the cells to be
-                                          * processed withing the
+                                          * processed within the
                                           * present sheet. If a cell
                                           * is being processed
                                           * presently, it is taken

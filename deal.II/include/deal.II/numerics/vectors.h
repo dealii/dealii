@@ -49,7 +49,7 @@ class ConstraintMatrix;
 //TODO: Move documentation of functions to the functions!
 
 /**
- * Provide a namespace which offers some operations on vectors. Amoung
+ * Provide a namespace which offers some operations on vectors. Among
  * these are assembling of standard vectors, integration of the
  * difference of a finite element solution and a continuous function,
  * interpolations and projections of continuous functions to the

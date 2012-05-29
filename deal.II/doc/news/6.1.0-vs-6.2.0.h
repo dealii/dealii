@@ -203,7 +203,7 @@ inconvenience this causes.
   New: A new tutorial program  step-34 was added to the
   library that shows the usage of the new codimension one functionality
   recently added to the library. In this tutorial we show the use of
-  bondary element methods on piecewise constant functions defined over
+  boundary element methods on piecewise constant functions defined over
   a surface, and we solve the irrotational flow problem, or exterior
   Neumann Laplace problem.
   <br>

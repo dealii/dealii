@@ -889,7 +889,7 @@ namespace GridTools
                                     * finer level faces to their
                                     * corresponding surface mesh
                                     * cells, for example to
-                                    * accomodate different geometry
+                                    * accommodate different geometry
                                     * descriptions in the case of
                                     * curved boundaries.
                                     */

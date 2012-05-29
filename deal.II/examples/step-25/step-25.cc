@@ -886,7 +886,7 @@ namespace Step25
                                  // program. It creates an object of
                                  // top-level class and calls its
                                  // principal function. Also, we
-                                 // supress some of the library output
+                                 // suppress some of the library output
                                  // by setting
                                  // <code>deallog.depth_console</code>
                                  // to zero. Furthermore, if

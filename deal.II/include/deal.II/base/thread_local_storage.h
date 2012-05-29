@@ -46,7 +46,7 @@ namespace Threads
    * <h3>Construction and destruction</h3>
    *
    * Objects of this class can either be default constructed or by providing an
-   * "exemplar", i.e. an object of type T so that everytime we need to create
+   * "exemplar", i.e. an object of type T so that every time we need to create
    * a T on a thread that doesn't already have such an object, it is copied from
    * the exemplar.
    *

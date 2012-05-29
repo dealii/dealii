@@ -846,7 +846,7 @@ namespace hp
                                         * listed in the given set. The
                                         * reason that a @p map rather
                                         * than a @p set is used is the
-                                        * same as descibed in the
+                                        * same as described in the
                                         * section on the
                                         * @p make_boundary_sparsity_pattern
                                         * function.

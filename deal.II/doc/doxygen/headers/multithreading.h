@@ -177,7 +177,7 @@
  * bit more creative. The way chosen is to introduce a function
  * <code>new_task</code> that takes as arguments the function to call as well
  * as the arguments to the call. The <code>new_task</code> function is
- * overloaded to accomodate starting tasks with functions that take no, one,
+ * overloaded to accommodate starting tasks with functions that take no, one,
  * two, and up to 9 arguments. In deal.II, these functions live in the Threads
  * namespace. Consequently, the actual code for what we try to do above looks
  * like this:

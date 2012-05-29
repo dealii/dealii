@@ -121,7 +121,7 @@ DEAL_II_NAMESPACE_OPEN
  * `zoom in' mesh). In one such example the bandwidth was increased by
  * about 50 per cent.
  *
- * In most other cases, the bandwith is reduced significantly. The reduction
+ * In most other cases, the bandwidth is reduced significantly. The reduction
  * is the better the less structured the grid is. With one grid where the
  * cells were refined according to a random driven algorithm, the bandwidth
  * was reduced by a factor of six.

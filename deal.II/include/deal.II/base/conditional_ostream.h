@@ -71,7 +71,7 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * system_matrix.print_formatted(pout);
  * @endcode
- * is <em>not</em> possible. Instead use the is_active() funtion for a
+ * is <em>not</em> possible. Instead use the is_active() function for a
  * work-around:
  *
  * @code

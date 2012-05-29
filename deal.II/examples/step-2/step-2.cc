@@ -417,7 +417,7 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
                                  // of course be ideal if all couplings were
                                  // in the lower or upper triangular part of a
                                  // matrix, since then solving the linear
-                                 // system would amoung to only forward or
+                                 // system would among to only forward or
                                  // backward substitution. This is of course
                                  // unachievable for symmetric sparsity
                                  // patterns, but in some special situations

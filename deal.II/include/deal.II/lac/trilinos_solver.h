@@ -191,7 +191,7 @@ namespace TrilinosWrappers
       DeclException1 (ExcTrilinosError,
                       int,
                       << "An error with error number " << arg1
-                      << " occured while calling a Trilinos function");
+                      << " occurred while calling a Trilinos function");
 
     protected:
 
@@ -611,7 +611,7 @@ namespace TrilinosWrappers
       DeclException1 (ExcTrilinosError,
                       int,
                       << "An error with error number " << arg1
-                      << " occured while calling a Trilinos function");
+                      << " occurred while calling a Trilinos function");
 
     private:
 

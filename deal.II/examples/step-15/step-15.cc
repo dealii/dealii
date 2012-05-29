@@ -184,7 +184,7 @@ namespace Step15
 				     // But only the first time, the starting solution has to be
 				     // initialized. Also the vector of the solution will be
 				     // resized in the <code>refine_grid</code> function, while the
-				     // vector is transfered to the new mesh.
+				     // vector is transferred to the new mesh.
 
     if (first_step)
       {

@@ -259,7 +259,7 @@ namespace hp
  *
  * <h5>Computing the correct basis from "raw" basis functions</h5>
  *
- * First, aready the basis of the shape function space may be
+ * First, already the basis of the shape function space may be
  * difficult to implement for arbitrary order and dimension. On the
  * other hand, if the @ref GlossNodes "node values" are given, then
  * the duality relation between node functionals and basis functions

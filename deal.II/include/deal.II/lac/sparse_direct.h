@@ -134,10 +134,10 @@ DEAL_II_NAMESPACE_OPEN
  * that we now have two programs that communicate via pipes.  The
  * forked copy of the program then actually replaces itself by a
  * program called <tt>detached_ma27</tt>, that is started in its place
- * through the <tt>execv</tt> system call. Now everytime you call one of
+ * through the <tt>execv</tt> system call. Now every time you call one of
  * the functions of this class, it relays the data to the other
  * program and lets it execute the respective function. The results
- * are then transfered back. Since the MA27 functions are only called
+ * are then transferred back. Since the MA27 functions are only called
  * in the detached program, they will now no longer interfere with the
  * respective calls to other functions with different data, so no
  * synchronisation is necessary any more.

@@ -2695,7 +2695,7 @@ GeometryInfo<3>::cell_to_child_coordinates (const Point<3>         &p,
       case RefinementCase<3>::cut_xz:
                                              // careful, this is slightly
                                              // different from xy and yz due to
-                                             // differnt internal numbering of
+                                             // different internal numbering of
                                              // children!
             point[0]*=2.0;
             point[2]*=2.0;
@@ -2802,7 +2802,7 @@ GeometryInfo<3>::child_to_cell_coordinates (const Point<3>         &p,
       case RefinementCase<3>::cut_xz:
                                              // careful, this is slightly
                                              // different from xy and yz due to
-                                             // differnt internal numbering of
+                                             // different internal numbering of
                                              // children!
             if (child_index/2==1)
               point[0]+=1.0;

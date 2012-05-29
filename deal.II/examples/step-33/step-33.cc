@@ -930,7 +930,7 @@ namespace Step33
                                    // entries at the top level of the
                                    // input file, as well as a few odd
                                    // other entries in subsections that
-                                   // are too short to warrent a
+                                   // are too short to warrant a
                                    // structure by themselves.
                                    //
                                    // It is worth pointing out one thing here:

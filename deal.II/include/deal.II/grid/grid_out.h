@@ -523,7 +523,7 @@ namespace GridOutFlags
                                        /**
                                         * Vertex numbers can be
                                         * written onto the
-                                        * vertices. This is controled
+                                        * vertices. This is controlled
                                         * by the following
                                         * flag. Default is @p false.
                                         */

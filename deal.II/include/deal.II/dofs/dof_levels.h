@@ -54,8 +54,8 @@ namespace internal
  * objects, i.e. on lines for 2D and on quads and lines for 3D are
  * treated similarly than that on cells. However, theses geometrical
  * objects, which are called faces as a generalisation, are not
- * organised in a hierachical structure of levels. Therefore, the
- * degrees of freedom located on these objects are stored in seperate
+ * organised in a hierarchical structure of levels. Therefore, the
+ * degrees of freedom located on these objects are stored in separate
  * classes, namely the <tt>DoFFaces</tt> classes.
  *
  *

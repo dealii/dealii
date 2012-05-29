@@ -123,7 +123,7 @@ namespace MeshWorker
                                           * true). In each of the two,
                                           * each block should have
                                           * equal size and be large
-                                          * enough to accomodate all
+                                          * enough to accommodate all
                                           * user indices set in the
                                           * cells and faces covered by
                                           * the loop it is used

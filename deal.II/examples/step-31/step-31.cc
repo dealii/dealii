@@ -2667,7 +2667,7 @@ namespace Step31
                                      // old mesh to the new one. To this end
                                      // we use the SolutionTransfer class and
                                      // we have to prepare the solution
-                                     // vectors that should be transfered to
+                                     // vectors that should be transferred to
                                      // the new grid (we will lose the old
                                      // grid once we have done the refinement
                                      // so the transfer has to happen

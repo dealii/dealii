@@ -133,7 +133,7 @@ namespace MGTools
                                     *
                                     * There is one matrix for
                                     * couplings in a cell and one
-                                    * for the couplings occuring in
+                                    * for the couplings occurring in
                                     * fluxes.
                                     */
   template <int dim, class SparsityPattern, int spacedim>

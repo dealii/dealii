@@ -87,7 +87,7 @@ template <typename number> class Vector;
  * call itself.
  *
  *
- * Support for time dependant functions can be found in the base
+ * Support for time dependent functions can be found in the base
  * class FunctionTime.
  *
  * @note if the functions you are dealing with have sizes which

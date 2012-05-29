@@ -101,7 +101,7 @@ of a FEValues object that uses a FE_RaviartThomas element, then we can set
 for the FiniteElement, but need to set <code>update_once=0</code>
 <code>update_each=update_jacobians</code> for the Mapping object.
 
-To accomodate this structure, at the time a FEValues object is constructed,
+To accommodate this structure, at the time a FEValues object is constructed,
 it asks both the FiniteElement and the Mapping object it uses the following:
 <ol>
 <li> Are any additional values required in order to compute the

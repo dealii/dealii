@@ -390,7 +390,7 @@ namespace Functions
                                      // found
     std::vector<bool> point_flags(np, false);
 
-                                     // Set this to true untill all
+                                     // Set this to true until all
                                      // points have been classified
     bool left_over = true;
 

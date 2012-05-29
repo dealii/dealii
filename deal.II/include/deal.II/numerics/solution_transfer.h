@@ -412,7 +412,7 @@ class SolutionTransfer
                                      /**
                                       * All cell data (the dof indices and
                                       * the dof values)
-                                      * should be accessable from each cell.
+                                      * should be accessible from each cell.
                                       * As each cell has got only one
                                       * @p user_pointer, multiple pointers to the
                                       * data need to be packetized in a structure.

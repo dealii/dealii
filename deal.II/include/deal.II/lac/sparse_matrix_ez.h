@@ -66,7 +66,7 @@ template<typename number> class FullMatrix;
  *
  * Finally, the @p default_reserve allocates extra space at the end
  * of the data array. This space is used whenever a row must be
- * enlarged. Since @p std::vector doubles the capacity everytime it
+ * enlarged. Since @p std::vector doubles the capacity every time it
  * must increase it, this value should allow for all the growth needed.
  *
  * Suggested settings: @p default_row_length should be the length of

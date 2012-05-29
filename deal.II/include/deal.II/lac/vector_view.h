@@ -182,7 +182,7 @@ class VectorView : public Vector<Number>
                                       * reinit function. You can, however,
                                       * resize the view that you have of the
                                       * original object. Notice that it is
-                                      * your own responsability to ensure that
+                                      * your own responsibility to ensure that
                                       * the memory you are pointing to is big
                                       * enough.
                                       *

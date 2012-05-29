@@ -110,7 +110,7 @@ class ExceptionBase : public std::exception
                                       *  Function derived from the base class
                                       *  which allows to pass information like
                                       *  the line and name of the file where the
-                                      *  exception occured as well as user
+                                      *  exception occurred as well as user
                                       *  information.
                                       *
                                       *  This function is mainly used

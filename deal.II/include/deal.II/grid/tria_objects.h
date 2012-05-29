@@ -198,7 +198,7 @@ namespace internal
             /**
              *  Assert that enough space
              *  is allocated to
-             *  accomodate
+             *  accommodate
              *  <code>new_objs_in_pairs</code>
              *  new objects, stored in
              *  pairs, plus
@@ -501,7 +501,7 @@ namespace internal
 /**
  * For hexahedrons the data of TriaObjects needs to be extended, as we can obtain faces
  * (quads) in non-standard-orientation, therefore we declare a class TriaObjectsHex, which
- * additionaly contains a bool-vector of the face-orientations.
+ * additionally contains a bool-vector of the face-orientations.
  */
 
     class TriaObjectsHex : public TriaObjects<TriaObject<3> >
@@ -580,7 +580,7 @@ namespace internal
 
                                          /**
                                           *  Assert that enough space is
-                                          *  allocated to accomodate
+                                          *  allocated to accommodate
                                           *  <code>new_objs</code> new objects.
                                           *  This function does not only call
                                           *  <code>vector::reserve()</code>, but
@@ -624,7 +624,7 @@ namespace internal
 /**
  * For quadrilaterals in 3D the data of TriaObjects needs to be extended, as we
  * can obtain faces (quads) with lines in non-standard-orientation, therefore we
- * declare a class TriaObjectsQuad3D, which additionaly contains a bool-vector
+ * declare a class TriaObjectsQuad3D, which additionally contains a bool-vector
  * of the line-orientations.
  */
 
@@ -659,7 +659,7 @@ namespace internal
                                          /**
                                           *  Assert that enough space
                                           *  is allocated to
-                                          *  accomodate
+                                          *  accommodate
                                           *  <code>new_quads_in_pairs</code>
                                           *  new quads, stored in
                                           *  pairs, plus

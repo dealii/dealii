@@ -1983,7 +1983,7 @@ namespace Step43
                                    // larger or smaller than a certain
                                    // threshold, preserving minimal
                                    // and maximal levels of mesh
-                                   // refinement. (iii) Transfering
+                                   // refinement. (iii) Transferring
                                    // the solution from the old to the
                                    // new mesh. None of this is
                                    // particularly difficult.

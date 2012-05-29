@@ -402,7 +402,7 @@ namespace parallel
                                           * Return whether the vector contains only
                                           * elements with value zero. This function
                                           * is mainly for internal consistency
-                                          * checks and should seldomly be used when
+                                          * checks and should seldom be used when
                                           * not in debug mode since it uses quite
                                           * some time.
                                           */

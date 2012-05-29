@@ -159,7 +159,7 @@
  *  (Note that function names and exact calling sequences may change
  *  over time, but the general principle remains the same.) I.e., if
  *  the given condition is violated, then the file and line in which
- *  the exception occured as well as the condition itself and the call
+ *  the exception occurred as well as the condition itself and the call
  *  sequence of the exception object is passed to the
  *  deal_II_exceptions::internals::issue_error_assert_1()
  *  function. Additionally an object of the form given by <tt>exc</tt>

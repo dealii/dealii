@@ -1780,7 +1780,7 @@ DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
                                              // this assumption is not
                                              // justified and needs to be
                                              // fixed some time. fortunately,
-                                             // ommitting it for now does no
+                                             // omitting it for now does no
                                              // harm since the matrix will cry
                                              // foul if its requirements are
                                              // not satisfied

@@ -1153,7 +1153,7 @@ namespace PETScWrappers
       DeclException1 (ExcPETScError,
                       int,
                       << "An error with error number " << arg1
-                      << " occured while calling a PETSc function");
+                      << " occurred while calling a PETSc function");
                                        /**
                                         * Exception
                                         */

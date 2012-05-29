@@ -807,7 +807,7 @@ class DataOutBase
                                           *
                                           * Default is the
                                           * Gnuplot-default of 30.
-                                          * An exemple of a
+                                          * An example of a
                                           * Gnuplot-default of 0 is
                                           * the following:
                                           *
@@ -1635,7 +1635,7 @@ class DataOutBase
  * make sure that the TECHOME environment variable points to the
  * Tecplot installation directory, and that the files
  * \$TECHOME/include/TECIO.h and \$TECHOME/lib/tecio.a are readable.
- * If these files are not availabe (or in the case of 1D) this
+ * If these files are not available (or in the case of 1D) this
  * function will simply call write_tecplot() and thus larger ASCII
  * data files will be produced rather than more efficient Tecplot
  * binary files.

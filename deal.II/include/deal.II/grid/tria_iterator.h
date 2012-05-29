@@ -125,7 +125,7 @@ template <typename> class TriaActiveIterator;
  * as template arguments, you can write your own versions here to add
  * more functionality.
  *
- * Furthermore, the iterators decribed here satisfy the requirement of
+ * Furthermore, the iterators described here satisfy the requirement of
  * input and bidirectional iterators as stated by the C++ standard and
  * the STL documentation. It is therefore possible to use the
  * functions from the algorithm section of the C++ standard,
@@ -215,7 +215,7 @@ template <typename> class TriaActiveIterator;
  *
  * Past-the-end iterators may also be used to compare an iterator with the
  * <i>before-the-start</i> value, when running backwards. There is no
- * distiction between the iterators pointing past the two ends of a vector.
+ * distinction between the iterators pointing past the two ends of a vector.
  *
  * By defining only one value to be past-the-end and making all other values
  * invalid provides a second track of security: if we should have forgotten

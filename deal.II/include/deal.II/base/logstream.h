@@ -521,7 +521,7 @@ class LogStream : public Subscriptor
                                       *
                                       * This functionality was
                                       * introduced to produce more
-                                      * reproducable floating point
+                                      * reproducible floating point
                                       * output for regression
                                       * tests. The rationale is, that
                                       * an exact output value is much

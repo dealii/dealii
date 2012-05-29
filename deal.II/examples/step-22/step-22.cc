@@ -52,7 +52,7 @@
 				 // for the sparse direct solver UMFPACK:
 #include <deal.II/lac/sparse_direct.h>
 
-				 // This includes the libary for the
+				 // This includes the library for the
 				 // incomplete LU factorization that will
 				 // be used as a preconditioner in 3D:
 #include <deal.II/lac/sparse_ilu.h>
@@ -688,7 +688,7 @@ namespace Step22
                                      // makes the algorithm to build the
                                      // sparsity pattern be quadratic in the
                                      // number of degrees of freedom. This
-                                     // doesn't become noticable until we get
+                                     // doesn't become noticeable until we get
                                      // well into the range of several 100,000
                                      // degrees of freedom, but eventually
                                      // dominates the setup of the linear

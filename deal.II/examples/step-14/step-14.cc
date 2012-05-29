@@ -1773,7 +1773,7 @@ namespace Step14
                                    // domains, boundary values, and
                                    // right hand sides do not fit
                                    // together any more, and starts
-                                   // loosing the overview over the
+                                   // losing the overview over the
                                    // whole structure. Encapsulating
                                    // everything belonging to a certain
                                    // test case into a structure of its

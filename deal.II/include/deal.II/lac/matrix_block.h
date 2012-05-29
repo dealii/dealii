@@ -160,7 +160,7 @@ class MatrixBlock
                                         * and ExcBlockIndexMismatch is
                                         * thrown, if the global index
                                         * does not point into the
-                                        * block refered to by #row and
+                                        * block referred to by #row and
                                         * #column.
                                         *
                                         * @todo
@@ -194,7 +194,7 @@ class MatrixBlock
                                         * and ExcBlockIndexMismatch is
                                         * thrown, if the global index
                                         * does not point into the
-                                        * block refered to by #row and
+                                        * block referred to by #row and
                                         * #column.
                                         *
                                         * @todo
@@ -234,7 +234,7 @@ class MatrixBlock
                                         * ExcBlockIndexMismatch is
                                         * thrown, if the global index
                                         * does not point into the
-                                        * block refered to by #row and
+                                        * block referred to by #row and
                                         * #column.
                                         *
                                         * @todo

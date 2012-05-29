@@ -3391,7 +3391,7 @@ namespace Step32
                                    // precompute the temperature
                                    // preconditioner as well. The reason is
                                    // that the setup of the Jacobi
-                                   // preconditioner takes a noticable time
+                                   // preconditioner takes a noticeable time
                                    // compared to the solver because we
                                    // usually only need between 10 and 20
                                    // iterations for solving the temperature

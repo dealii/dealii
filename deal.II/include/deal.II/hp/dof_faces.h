@@ -40,7 +40,7 @@ namespace internal
  *
  * These classes are similar to the internal::hp::DoFLevel classes. We here store
  * information that is associated with faces, rather than cells, as this information is
- * independent of the hierachical structure of cells, which are organized in levels. In 2D
+ * independent of the hierarchical structure of cells, which are organized in levels. In 2D
  * we store information on degrees of freedom located on lines whereas in 3D we store
  * information on drefrees of freedom located on quads and lines. In 1D we do nothing, as
  * the faces of lines are vertices which are treated seperately.

@@ -200,7 +200,7 @@ class Solver : public Subscriptor
     SolverControl &cntrl;
 
                                      /**
-                                      * Memory for auxilliary vectors.
+                                      * Memory for auxiliary vectors.
                                       */
     VectorMemory<VECTOR> &memory;
 };

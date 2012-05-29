@@ -1263,7 +1263,7 @@ MappingQ<dim,spacedim>::transform (
   const MappingType mapping_type) const
 {
   AssertDimension (input.size(), output.size());
-                                   // The data object may be jsut a
+                                   // The data object may be just a
                                    // MappingQ1::InternalData, so we
                                    // have to test for this first.
   const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
@@ -1302,7 +1302,7 @@ MappingQ<dim,spacedim>::transform (
   const MappingType mapping_type) const
 {
   AssertDimension (input.size(), output.size());
-                                   // The data object may be jsut a
+                                   // The data object may be just a
                                    // MappingQ1::InternalData, so we
                                    // have to test for this first.
   const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
@@ -1339,7 +1339,7 @@ void MappingQ<dim,spacedim>::transform
  const MappingType mapping_type) const
 {
   AssertDimension (input.size(), output.size());
-                                   // The data object may be jsut a
+                                   // The data object may be just a
                                    // MappingQ1::InternalData, so we
                                    // have to test for this first.
   const typename MappingQ1<dim,spacedim>::InternalData *q1_data =

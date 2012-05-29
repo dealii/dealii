@@ -440,7 +440,7 @@ class Mapping : public Subscriptor
  * @f[
  * \mathbf u(\mathbf x) = J(\mathbf{\hat x})\mathbf{\hat u}(\mathbf{\hat x}).
  * @f]
- * In physics, this is usually refered to as the contravariant
+ * In physics, this is usually referred to as the contravariant
  * transformation. Mathematically, it is the push forward of a
  * vector field.
  *

@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  * <li> The argument is a standard C++ data type, namely,
  * <tt>bool</tt>, <tt>float</tt>, <tt>double</tt> or any of the
  * integer types. In that case, memory_consumption() simple returns
- * <tt>sizeof</tt> of its argument. The libary also provides an
+ * <tt>sizeof</tt> of its argument. The library also provides an
  * estimate for the amount of memory occupied by a
  * <tt>std::string</tt> this way.
  *

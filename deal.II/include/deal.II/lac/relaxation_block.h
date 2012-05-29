@@ -141,7 +141,7 @@ class RelaxationBlock :
                                           * <li>If the length of the
                                           * vector is zero, then the
                                           * relaxation method will be
-                                          * exectued from first to
+                                          * executed from first to
                                           * last block.
                                           * <li> If the length is one,
                                           * then the inner vector must

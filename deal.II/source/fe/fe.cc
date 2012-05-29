@@ -97,7 +97,7 @@ FiniteElement<dim,spacedim>::InternalDataBase::~InternalDataBase ()
       {
                                          // delete pointer and set it
                                          // to zero to avoid
-                                         // inadvertant use
+                                         // inadvertent use
         delete differences[i];
         differences[i] = 0;
       };

@@ -200,7 +200,7 @@ double Coefficient<dim>::value (const Point<dim> &p,
                                  // argument) which will usually
                                  // terminate the program giving
                                  // information where the error
-                                 // occured and what the reason
+                                 // occurred and what the reason
                                  // was. This generally reduces the
                                  // time to find programming errors
                                  // dramatically and we have found
@@ -476,7 +476,7 @@ void Step5<dim>::assemble_system ()
                                    // dofs_per_cell*dofs_per_cell*n_q_points. On
                                    // the other hand, the function
                                    // will of course return the same
-                                   // value everytime it is called
+                                   // value every time it is called
                                    // with the same quadrature point,
                                    // independently of what shape
                                    // function we presently treat;

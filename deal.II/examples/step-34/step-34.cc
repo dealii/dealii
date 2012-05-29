@@ -1162,7 +1162,7 @@ namespace Step34
                                    // does not result only in a factor
                                    // appearing as a constant factor on
                                    // the entire integral, but also on
-                                   // an additional integral alltogether
+                                   // an additional integral altogether
                                    // that needs to be evaluated:
                                    //
                                    // \f[

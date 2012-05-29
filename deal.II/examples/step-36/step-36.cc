@@ -209,7 +209,7 @@ namespace Step36
                                    // these extra entries and aborts
                                    // with an error message.
                                    //
-                                   // In the absense of any obvious way
+                                   // In the absence of any obvious way
                                    // to avoid this, we simply settle
                                    // for the second best option, which
                                    // is have PETSc allocate memory as

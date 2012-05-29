@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-// helper function to aquire the number of levels within a grid
+// helper function to acquire the number of levels within a grid
   template <class GridClass>
   unsigned int
   get_n_levels (const GridClass &grid)

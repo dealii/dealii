@@ -5662,7 +5662,7 @@ namespace internal
                                                              // in memory, we won't find
                                                              // them later on, so we have
                                                              // to create new ones instead
-                                                             // and replace all occurances
+                                                             // and replace all occurrences
                                                              // of the old ones with those
                                                              // new ones. As this is kind
                                                              // of ugly, we hope we don't
@@ -6535,7 +6535,7 @@ namespace internal
                                                        // similar, the actual work
                                                        // strongly depends on the actual
                                                        // refinement case. therefore, we
-                                                       // use seperate blocks of code for
+                                                       // use separate blocks of code for
                                                        // each of these cases, which
                                                        // hopefully increases the
                                                        // readability to some extend.
@@ -9030,7 +9030,7 @@ namespace internal
                                                              // coordinate direction (0
                                                              // for faces 0 and 1, 1 for
                                                              // faces 2 and 3, 2 for faces
-                                                             // 4 and 5) and substract the
+                                                             // 4 and 5) and subtract the
                                                              // correct boundary value of
                                                              // the face (0 for faces 0,
                                                              // 2, and 4; 1 for faces 1, 3
@@ -9359,7 +9359,7 @@ namespace internal
                                                            // are further refined along
                                                            // the face, otherwise
                                                            // something went wrong in the
-                                                           // contruction of neighbor
+                                                           // construction of neighbor
                                                            // pointers.  then only allow
                                                            // coarsening if this neighbor
                                                            // will be coarsened as well
@@ -12543,7 +12543,7 @@ unsigned int Triangulation<dim, spacedim>::max_adjacent_cells () const
                                    // larger dimensions
   std::vector<unsigned short int> usage_count (max_vertex_index+1, 0);
                                    // touch a vertex's usage count
-                                   // everytime we find an adjacent
+                                   // every time we find an adjacent
                                    // element
   for (cell=begin(); cell!=endc; ++cell)
     for (unsigned vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
@@ -13263,7 +13263,7 @@ namespace
                                                  // now extract which
                                                  // refine case would
                                                  // be necessary to
-                                                 // achive the same
+                                                 // achieve the same
                                                  // face
                                                  // refinement. set
                                                  // the intersection
@@ -13423,7 +13423,7 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
                                    // 1/ do not coarsen a cell if
                                    //    'most of the neighbors' will be
                                    //    refined after the step. This is
-                                   //    to prevent occurence of
+                                   //    to prevent occurrence of
                                    //    unrefined islands.
                                    // 2/ eliminate refined islands in the
                                    //    interior and at the boundary. since
@@ -13518,7 +13518,7 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
                                        //    do not coarsen a cell if 'most of
                                        //    the neighbors' will be refined after
                                        //    the step. This is to prevent the
-                                       //    occurence of unrefined islands.
+                                       //    occurrence of unrefined islands.
                                        //    If patch_level_1 is set, this will
                                        //    be automatically fulfilled.
       if (smooth_grid & do_not_produce_unrefined_islands &&

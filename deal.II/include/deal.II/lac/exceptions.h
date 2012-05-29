@@ -49,7 +49,7 @@ namespace LACExceptions
   DeclException1 (ExcPETScError,
                   int,
                   << "An error with error number " << arg1
-                  << " occured while calling a PETSc function");
+                  << " occurred while calling a PETSc function");
 
                                    /**
                                     * An error of a Trilinos function was
@@ -59,7 +59,7 @@ namespace LACExceptions
   DeclException1 (ExcTrilinosError,
                   int,
                   << "An error with error number " << arg1
-                  << " occured while calling a Trilinos function");
+                  << " occurred while calling a Trilinos function");
 
                                    //@}
 }

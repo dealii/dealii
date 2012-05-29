@@ -341,8 +341,8 @@ a valid output file.
 <li> Improved: <code>PETScWrappers::SolverXXX</code> class was
 restricted to using default solver options for the KSP only. It is now
 possible to override those by using PETSc command-line options
-<code>-ksp_*</code>; giving greater flexability in controling PETSc
-solvers. (See class documentation).
+<code>-ksp_*</code>; giving greater flexibility in controlling PETSc
+solvers. (See the class's documentation).
 <br>
 (Vijay S. Mahadevan, 2011/12/22)
 

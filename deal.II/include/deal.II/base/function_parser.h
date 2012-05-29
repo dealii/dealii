@@ -196,7 +196,7 @@ template <typename> class Vector;
                   whose tangent is (A).
       atan2(A,B): Arc-tangent of A/B. The two main differences to atan() is
                   that it will return the right angle depending on the signs of
-                  A and B (atan() can only return values betwen -pi/2 and pi/2),
+                  A and B (atan() can only return values between -pi/2 and pi/2),
                   and that the return value of pi/2 and -pi/2 are possible.
       atanh(A)  : Same as atan() but for hyperbolic tangent.
       ceil(A)   : Ceiling of A. Returns the smallest integer greater than A.

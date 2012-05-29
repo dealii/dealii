@@ -419,7 +419,7 @@ void MGTransferBlockBase::build_matrices (
             continue;
 
                                 // need to delete all the columns in the
-                                // matrix that are on the boundary. to achive
+                                // matrix that are on the boundary. to achieve
                                 // this, create an array as long as there are
                                 // matrix columns, and find which columns we
                                 // need to filter away.

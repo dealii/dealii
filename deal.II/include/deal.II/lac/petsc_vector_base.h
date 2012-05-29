@@ -162,7 +162,7 @@ namespace PETScWrappers
         DeclException1 (ExcPETScError,
                         int,
                         << "An error with error number " << arg1
-                        << " occured while calling a PETSc function");
+                        << " occurred while calling a PETSc function");
                                          /**
                                           * Exception
                                           */
@@ -569,7 +569,7 @@ namespace PETScWrappers
                                         * only elements with value zero. This
                                         * function is mainly for internal
                                         * consistency checks and should
-                                        * seldomly be used when not in debug
+                                        * seldom be used when not in debug
                                         * mode since it uses quite some time.
                                         */
       bool all_zero () const;

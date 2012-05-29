@@ -149,7 +149,7 @@ Quadrature<dim>::Quadrature (const SubQuadrature &q1,
       double sum = 0;
       for (unsigned int i=0; i<size(); ++i)
         sum += weights[i];
-                                       // we cant guarantee the sum of weights
+                                       // we cannot guarantee the sum of weights
                                        // to be exactly one, but it should be
                                        // near that.
       Assert ((sum>0.999999) && (sum<1.000001), ExcInternalError());
@@ -186,7 +186,7 @@ Quadrature<1>::Quadrature (const SubQuadrature&,
       double sum = 0;
       for (unsigned int i=0; i<size(); ++i)
         sum += weights[i];
-                                       // we cant guarantee the sum of weights
+                                       // we cannot guarantee the sum of weights
                                        // to be exactly one, but it should be
                                        // near that.
       Assert ((sum>0.999999) && (sum<1.000001), ExcInternalError());
@@ -1230,7 +1230,7 @@ subface (const unsigned int face_no,
                                    // already for the isotropic
                                    // case. Additionally, we have three
                                    // different refinement cases, resulting in
-                                   // <tt>4 + 2 + 2 = 8</tt> differnt subfaces
+                                   // <tt>4 + 2 + 2 = 8</tt> different subfaces
                                    // for each face.
   const unsigned int total_subfaces_per_face=8;
 

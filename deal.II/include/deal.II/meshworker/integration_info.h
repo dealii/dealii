@@ -42,7 +42,7 @@ namespace MeshWorker
  * FEVALUES object is fixed in the constructor and only used to
  * initialize the pointers in #fevalv.
  *
- * Additionally, this function containes space to store the values of
+ * Additionally, this function contains space to store the values of
  * finite element functions stored in #global_data in the
  * quadrature points. These vectors are initialized automatically on
  * each cell or face. In order to avoid initializing unused vectors,

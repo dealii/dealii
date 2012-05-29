@@ -510,7 +510,7 @@ class SparsityPattern : public Subscriptor
                                       * structure is to hold. It is
                                       * assumed that this number is
                                       * sufficiently large to
-                                      * accomodate both the elements
+                                      * accommodate both the elements
                                       * in <tt>original</tt> as well
                                       * as the new off-diagonal
                                       * elements created by this

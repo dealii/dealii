@@ -596,7 +596,7 @@ class TimeDependent
                                       * equally well use
                                       * <tt>bind2nd(mem_fun1(&X::unary_function), arg)</tt>
                                       * which lets the @p do_loop
-                                      * function call teh given function with
+                                      * function call the given function with
                                       * the specified parameter. Note that you
                                       * need to bind the second parameter since
                                       * the first one implicitly contains
@@ -1477,7 +1477,7 @@ namespace TimeStepBase_Tria_Flags
                                         * number correction is done,
                                         * but before grid adaption, so
                                         * the cell number on this grid
-                                        * is not noticably influenced
+                                        * is not noticeably influenced
                                         * by the cells flagged
                                         * additionally on the previous
                                         * grid.
@@ -1696,7 +1696,7 @@ class TimeStepBase_Tria : public TimeStepBase
                                       * the respective @p wake_up function can
                                       * rebuild it. You should therefore call
                                       * this function from your overloaded
-                                      * version, preferrably at the end so
+                                      * version, preferably at the end so
                                       * that your function can use the
                                       * triangulation as long as ou need it.
                                       */

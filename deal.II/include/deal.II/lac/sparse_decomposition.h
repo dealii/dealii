@@ -406,7 +406,7 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
     bool decomposed;
 
                                      /**
-                                      * The default strenghtening
+                                      * The default strengthening
                                       * value, returned by
                                       * get_strengthen_diagonal().
                                       */

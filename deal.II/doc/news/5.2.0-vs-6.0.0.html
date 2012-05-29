@@ -91,7 +91,7 @@ inconvenience this causes.
 
   <li> <p>
        Changed: Lower dimensional objects have been removed from the
-       hierachical structure of levels in <code
+       hierarchical structure of levels in <code
        class="class">TriaLevel</code>. Faces, i.e. lines in 2D and
        lines and quads in 3D, have no associated level
        anymore. Therefore, the level argument of some iterator
@@ -210,7 +210,7 @@ inconvenience this causes.
   <li> <p>
        Changed: The internal numbering of faces, lines and vertices
        has been reimplemented. Now the numbering scheme uses a
-       lexicographic ordering (with x running fastest) whereever
+       lexicographic ordering (with x running fastest) wherever
        possible. For more information on the new numbering scheme, see
        the <a
        href="http://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2005/000827.html">announcement</a>
@@ -280,9 +280,9 @@ inconvenience this causes.
 		 lines of cells is in some cases a bit more complicated. The same applies,
        for example, 
 		 to the extraction of the information, which child of a neighbor is behind
-		 a given subface. However, this infomation is supplied by various
+		 a given subface. However, this information is supplied by various
 		 functions in <code class="class">GeometryInfo</code>. As a rule-of-thumb:
-		 if you want to use non-standard meshes, all occurances of
+		 if you want to use non-standard meshes, all occurrences of
 		 <tt>face_orientation</tt> have to be supplemented by <tt>face_flip</tt>
 		 and <tt>face_rotation</tt>.
        <br> In order to reduce the impact of possible bugs, the grid is still given to

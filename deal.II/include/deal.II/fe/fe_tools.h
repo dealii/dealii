@@ -1099,7 +1099,7 @@ namespace FETools
                                    //@}
                                    /**
                                     * The numbering of the degrees
-                                    * of freedom in continous finite
+                                    * of freedom in continuous finite
                                     * elements is hierarchic,
                                     * i.e. in such a way that we
                                     * first number the vertex dofs,

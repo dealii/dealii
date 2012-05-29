@@ -1162,7 +1162,7 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
                                    // Weimar
 
                                    // we first eliminate points based
-                                   // on the maximum and minumum of
+                                   // on the maximum and minimum of
                                    // the corner coordinates, then
                                    // transform to the unit cell, and
                                    // check there.

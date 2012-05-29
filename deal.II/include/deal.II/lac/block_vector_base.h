@@ -958,7 +958,7 @@ class BlockVectorBase : public Subscriptor
                                       * Return whether the vector contains only
                                       * elements with value zero. This function
                                       * is mainly for internal consistency
-                                      * check and should seldomly be used when
+                                      * check and should seldom be used when
                                       * not in debug mode since it uses quite
                                       * some time.
                                       */

@@ -738,7 +738,7 @@ Article{BK07,
  *
  * <dt class="glossary">@anchor GlossMaterialId <b>Material id</b></dt>
  * <dd>Each cell of a triangulation has associated with it a property called
- * "material id". It is commonly used in problems with heterogenous
+ * "material id". It is commonly used in problems with heterogeneous
  * coefficients to identify which part of the domain a cell is in and,
  * consequently, which value the coefficient should have on this particular
  * cell. The material id is inherited from mother to child cell upon mesh

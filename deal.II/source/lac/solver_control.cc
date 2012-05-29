@@ -43,7 +43,7 @@ SolverControl::NoConvergence::what () const throw ()
                                    //
                                    // we need to make this object static, since
                                    // we want to return the data stored in it
-                                   // and therefore need a liftime which is
+                                   // and therefore need a lifetime which is
                                    // longer than the execution time of this
                                    // function
   static std::string description;

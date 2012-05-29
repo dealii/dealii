@@ -203,7 +203,7 @@ namespace parallel
                                           * ordering in the deal.II mesh. As
                                           * assembly is done in the deal.II
                                           * cell ordering, this flag is
-                                          * required to get reproducable
+                                          * required to get reproducible
                                           * behaviour after snapshot/resume.
                                           */
         enum Settings

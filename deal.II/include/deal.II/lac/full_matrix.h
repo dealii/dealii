@@ -566,7 +566,7 @@ class FullMatrix : public Table<2,number>
                                       * value zero. This function is
                                       * mainly for internal
                                       * consistency checks and should
-                                      * seldomly be used when not in
+                                      * seldom be used when not in
                                       * debug mode since it uses quite
                                       * some time.
                                       */

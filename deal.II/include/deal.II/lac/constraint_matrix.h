@@ -353,7 +353,7 @@ class ConstraintMatrix : public Subscriptor
                                       * denoted by pairs of column indices
                                       * and values, to a line of
                                       * constraints. This function is
-                                      * equivalent to calling the preceeding
+                                      * equivalent to calling the preceding
                                       * function several times, but is
                                       * faster.
                                       */
@@ -638,7 +638,7 @@ class ConstraintMatrix : public Subscriptor
                                       *
                                       * @note The hanging nodes are
                                       * completely eliminated from the
-                                      * linear system refering to
+                                      * linear system referring to
                                       * <tt>condensed</tt>. Therefore, the
                                       * dimension of <tt>condensed</tt> is
                                       * the dimension of

@@ -1251,7 +1251,7 @@ namespace Threads
                                       * long as the thread
                                       * executes. This means that even
                                       * if all Threads::Thread objects
-                                      * that refered to this
+                                      * that referred to this
                                       * descriptor (through a
                                       * std::shared_ptr) have gone out
                                       * of scope, we must still hold

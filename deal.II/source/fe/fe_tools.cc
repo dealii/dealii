@@ -2311,7 +2311,7 @@ namespace FETools
         if (pos2 != pos1)
           name.erase(pos1, pos2-pos1+1);
       }
-                                     // Replace all occurences of "^dim"
+                                     // Replace all occurrences of "^dim"
                                      // by "^d" to be handled by the
                                      // next loop
     for (unsigned int pos = name.find("^dim");
@@ -2319,7 +2319,7 @@ namespace FETools
          pos = name.find("^dim"))
       name.erase(pos+2, 2);
 
-                                     // Replace all occurences of "^d"
+                                     // Replace all occurrences of "^d"
                                      // by using the actual dimension
     for (unsigned int pos = name.find("^d");
          pos < name.size();

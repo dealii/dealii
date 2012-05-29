@@ -157,7 +157,7 @@ namespace Patterns
                                     * integer. If bounds are given
                                     * to the constructor, then the
                                     * integer given also needs to be
-                                    * withing the interval specified
+                                    * within the interval specified
                                     * by these bounds. Note that
                                     * unlike common convention in
                                     * the C++ standard library, both
@@ -304,7 +304,7 @@ namespace Patterns
                                     * <tt>double</tt>. If bounds are
                                     * given to the constructor, then
                                     * the integer given also needs
-                                    * to be withing the interval
+                                    * to be within the interval
                                     * specified by these
                                     * bounds. Note that unlike
                                     * common convention in the C++
@@ -1213,7 +1213,7 @@ namespace Patterns
  *     ...
  *   @endcode
  *   You can use several sources of input successively. Entries which are changed more than
- *   once will be overwritten everytime they are used.
+ *   once will be overwritten every time they are used.
  *
  *   You should not try to declare entries using declare_entry() and
  *   enter_subsection() with as yet unknown subsection names after
@@ -2268,7 +2268,7 @@ class ParameterHandler : public Subscriptor
                                       * left by an <tt>END</tt> or <tt>end</tt>
                                       * statement, a value for a
                                       * non-declared entry was given
-                                      * or teh entry value did not
+                                      * or the entry value did not
                                       * match the regular
                                       * expression. <tt>true</tt> otherwise.
                                       *

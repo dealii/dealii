@@ -167,12 +167,12 @@ namespace internal
 
 
                                          /**
-                                          *  Reserve enough space to accomodate
+                                          *  Reserve enough space to accommodate
                                           *  @p total_cells cells on this level.
                                           *  Since there are no @p used flags on this
                                           *  level, you have to give the total number
                                           *  of cells, not only the number of newly
-                                          *  to accomodate ones, like in the
+                                          *  to accommodate ones, like in the
                                           *  <tt>TriaLevel<N>::reserve_space</tt>
                                           *  functions, with <tt>N>0</tt>.
                                           *

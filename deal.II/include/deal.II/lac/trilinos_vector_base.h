@@ -181,7 +181,7 @@ namespace TrilinosWrappers
         DeclException1 (ExcTrilinosError,
                         int,
                         << "An error with error number " << arg1
-                        << " occured while calling a Trilinos function");
+                        << " occurred while calling a Trilinos function");
 
                                        /**
                                         * Exception
@@ -549,7 +549,7 @@ namespace TrilinosWrappers
                                         * value zero. This function is
                                         * mainly for internal
                                         * consistency checks and should
-                                        * seldomly be used when not in
+                                        * seldom be used when not in
                                         * debug mode since it uses quite
                                         * some time.
                                         */
@@ -954,7 +954,7 @@ namespace TrilinosWrappers
       DeclException1 (ExcTrilinosError,
                       int,
                       << "An error with error number " << arg1
-                      << " occured while calling a Trilinos function");
+                      << " occurred while calling a Trilinos function");
 
                                        /**
                                         * Exception

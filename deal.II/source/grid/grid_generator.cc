@@ -1578,7 +1578,7 @@ GridGenerator::colorize_hyper_shell (
   Triangulation<2>& tria,
   const Point<2>&, const double, const double)
 {
-                                   // Inspite of receiving geometrical
+                                   // In spite of receiving geometrical
                                    // data, we do this only based on
                                    // topology.
 

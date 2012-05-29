@@ -79,7 +79,7 @@ namespace internal
                                           * postprocessor is going to be
                                           * used. In that case, the names and
                                           * vector declarations are going to
-                                          * be aquired from the postprocessor.
+                                          * be acquired from the postprocessor.
                                           */
         DataEntryBase (const DataPostprocessor<DH::space_dimension> *data_postprocessor);
 

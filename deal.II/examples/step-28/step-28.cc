@@ -1188,7 +1188,7 @@ namespace Step28
                                      // $\Sigma_{s,g'\to g}$). This is
                                      // straight forward, but note how
                                      // we determine which of the two
-                                     // cells is ther finer one by
+                                     // cells is the finer one by
                                      // looking at the refinement level
                                      // of the two cells:
     if (!cell_g->has_children() && !cell_g_prime->has_children())

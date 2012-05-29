@@ -16,7 +16,7 @@
 // single this file out from tensor.h, since we want to derive
 // Point<dim,Number> from Tensor<1,dim,Number>. However, the point class will
 // not need all the tensor stuff, so we don't want the whole tensor package to
-// be included everytime we use a point.
+// be included every time we use a point.
 
 
 #include <deal.II/base/config.h>

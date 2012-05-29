@@ -1489,7 +1489,7 @@ namespace internal
           Assert (perm_num != numbers::invalid_unsigned_int,
                   ExcGridOrientError("No node having 3 incoming edges found in curent hex."));
 
-                                           // So use the apropriate
+                                           // So use the appropriate
                                            // rotation to get the new
                                            // cube
           unsigned int temp[8];

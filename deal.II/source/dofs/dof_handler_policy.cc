@@ -1491,7 +1491,7 @@ namespace internal
 
 
                                            // * Create global_dof_indexsets by
-                                           // transfering our own owned_dofs to
+                                           // transferring our own owned_dofs to
                                            // every other machine.
           const unsigned int n_cpus = Utilities::System::
                                       get_n_mpi_processes (tr->get_communicator());
