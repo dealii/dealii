@@ -741,7 +741,35 @@ namespace GridTools
                               break;
                             }
                         if (!found)
+			  {
+							     //TODO: it is not
+							     //enough to walk
+							     //over faces to
+							     //the neighbors
+							     //because the
+							     //point may lie
+							     //in a cell that
+							     //only shares an
+							     //edge with cell
+							     //in 3d. Current
+							     //workaround: add
+							     //all neighbors
+							     //of all
+							     //neighbors if
+							     //this vertex is
+							     //a hanging node
+							     //in 3d. [TH]
                           adj_cells_set.insert(nb);
+			  if (dim==3)
+			    {
+			      for (unsigned faceindex = 0; faceindex < GeometryInfo<dim>::faces_per_cell; faceindex++)
+				{
+				  if (!nb->at_boundary(faceindex) && nb->neighbor(faceindex)->active())
+				    adj_cells_set.insert(nb->neighbor(faceindex));
+				}
+			    }
+			  }
+			
                       }
                   }
               }
