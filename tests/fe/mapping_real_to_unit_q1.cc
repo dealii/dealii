@@ -115,7 +115,7 @@ main()
   test_real_to_unit_cell<3,3>();
 
   test_real_to_unit_cell<1,2>();
-				   // test_real_to_unit_cell<1,3>();
+  test_real_to_unit_cell<1,3>();
   test_real_to_unit_cell<2,3>();
 
   return 0;
