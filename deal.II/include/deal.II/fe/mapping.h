@@ -169,7 +169,7 @@ enum MappingType
  *
  * <h4>Mapping of vector fields, differential forms and gradients of vector fields</h4>
  *
- * The tranfomation of vector fields, differential forms (gradients/jacobians) and
+ * The transfomation of vector fields, differential forms (gradients/jacobians) and
  * gradients of vector fields between the reference cell and the actual grid cell
  * follows the general form
  *
