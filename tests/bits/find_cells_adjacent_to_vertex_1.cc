@@ -1,8 +1,8 @@
 //  ---------------- find_cells_adjacent_to_vertex_1.cc  ------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors and Ralf B. Schulz
+//    Copyright (C) 2006, 2012 by the deal.II authors and Ralf B. Schulz
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,23 +41,23 @@
 
 void check (Triangulation<2> &tria)
 {
-   for(unsigned i=0; i<tria.n_vertices(); i++)
-      {
-         std::vector<Triangulation<2>::active_cell_iterator>
-            cells = GridTools::find_cells_adjacent_to_vertex(tria, i);
+  for(unsigned i=0; i<tria.n_vertices(); i++)
+    {
+      std::vector<Triangulation<2>::active_cell_iterator>
+	cells = GridTools::find_cells_adjacent_to_vertex(tria, i);
 
-         deallog << "Vertex " << i << " at " << tria.get_vertices()[i] << ": " << cells.size() << " cells" << std::endl;
+      deallog << "Vertex " << i << " at " << tria.get_vertices()[i] << ": " << cells.size() << " cells" << std::endl;
 
-         for(unsigned c=0; c<cells.size(); c++) {
-            for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-               deallog << "<" << cells[c]->vertex(v) << "> ";
-            deallog << std::endl;
-         }
+      for(unsigned c=0; c<cells.size(); c++) {
+	for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+	  deallog << "<" << cells[c]->vertex(v) << "> ";
+	deallog << std::endl;
       }
+    }
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("find_cells_adjacent_to_vertex_1/output");
   deallog.attach(logfile);
@@ -80,6 +80,3 @@ int main ()
       deallog << exc.what() << std::endl;
     }
 }
-
-  
-  
