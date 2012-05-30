@@ -1,0 +1,36 @@
+
+DEAL::dim=1, spacedim=1
+DEAL::Vertex displacement: 0.00000
+DEAL::Vertex displacement: 0.0800000
+DEAL::Vertex displacement: 0.160000
+DEAL::Vertex displacement: 0.240000
+DEAL::Vertex displacement: 0.320000
+DEAL::OK
+DEAL::dim=2, spacedim=2
+DEAL::Vertex displacement: 0.00000 0.00000
+DEAL::Vertex displacement: 0.0800000 0.0800000
+DEAL::Vertex displacement: 0.160000 0.160000
+DEAL::Vertex displacement: 0.240000 0.240000
+DEAL::Vertex displacement: 0.320000 0.320000
+DEAL::OK
+DEAL::dim=3, spacedim=3
+DEAL::Vertex displacement: 0.00000 0.00000 0.00000
+DEAL::Vertex displacement: 0.0800000 0.0800000 0.0800000
+DEAL::Vertex displacement: 0.160000 0.160000 0.160000
+DEAL::Vertex displacement: 0.240000 0.240000 0.240000
+DEAL::Vertex displacement: 0.320000 0.320000 0.320000
+DEAL::OK
+DEAL::dim=1, spacedim=2
+DEAL::Vertex displacement: 0.00000 0.00000
+DEAL::Vertex displacement: 0.0800000 0.0800000
+DEAL::Vertex displacement: 0.160000 0.160000
+DEAL::Vertex displacement: 0.240000 0.240000
+DEAL::Vertex displacement: 0.320000 0.320000
+DEAL::OK
+DEAL::dim=2, spacedim=3
+DEAL::Vertex displacement: 0.00000 0.00000 0.00000
+DEAL::Vertex displacement: 0.0800000 0.0800000 0.0800000
+DEAL::Vertex displacement: 0.160000 0.160000 0.160000
+DEAL::Vertex displacement: 0.240000 0.240000 0.240000
+DEAL::Vertex displacement: 0.320000 0.320000 0.320000
+DEAL::OK
