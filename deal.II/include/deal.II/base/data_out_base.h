@@ -1715,6 +1715,8 @@ class DataOutBase
  * a group. The DataOutInterface::write_pvtu_record() function can
  * generate such a master record. Likewise,
  * DataOutInterface::write_visit_record() does the same for VisIt.
+ * Finally, for time dependent problems, you may also want to look
+ * at DataOutInterface::write_pvd_record()
  *
  * The use of this function is explained in step-40.
  */
@@ -2282,7 +2284,11 @@ class DataOutInterface : private DataOutBase
                                       * function can generate such a
                                       * master record. Likewise,
                                       * DataOutInterface::write_visit_record()
-                                      * does the same for VisIt.
+                                      * does the same for VisIt. Finally,
+                                      * DataOutInterface::write_pvd_record()
+				      * can be used to group together
+				      * the files that jointly make up
+				      * a time dependent simulation.
                                       */
     void write_vtu (std::ostream &out) const;
 
@@ -2336,6 +2342,14 @@ class DataOutInterface : private DataOutBase
                                       * @note The use of this function is
                                       * explained in step-40.
                                       *
+				      * @note In order to tell Paraview to
+				      * group together multiple <code>pvtu</code>
+				      * files that each describe one time
+				      * step of a time dependent simulation,
+				      * see the
+                                      * DataOutInterface::write_pvd_record()
+				      * function.
+				      *
                                       * @note At the time of writing,
                                       * the other big VTK-based
                                       * visualization program, VisIt,
