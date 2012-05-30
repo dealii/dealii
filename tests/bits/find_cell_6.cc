@@ -2,7 +2,7 @@
 //    $Id: find_cell_5.cc 25229 2012-03-09 18:34:59Z pauletti $
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,7 +41,7 @@ The point <0.789000 0.313000 0.170000> could not be found inside any of the subc
 bool inside(Triangulation<3> &tria, Point<3> &p)
 {
   
-  for(typename Triangulation<3>::cell_iterator cell = tria.begin(0);
+  for(Triangulation<3>::cell_iterator cell = tria.begin(0);
       cell != tria.end(0); ++cell)
     if( cell->point_inside (p) )
       return true;
@@ -62,7 +62,7 @@ void check2 ()
   GridTools::find_active_cell_around_point(tria, p2); //OK
 
   int idx=0;
-  for (typename Triangulation<3>::active_cell_iterator  cell = tria.begin_active();  cell!=tria.end();  ++cell, ++idx)
+  for (Triangulation<3>::active_cell_iterator  cell = tria.begin_active();  cell!=tria.end();  ++cell, ++idx)
     {
       if (idx==21)
 	cell->set_refine_flag();      
@@ -89,7 +89,7 @@ void check1 ()
 	  GridTools::find_active_cell_around_point(tria, p);
 	}
 
-      for(typename Triangulation<3>::active_cell_iterator cell = tria.begin_active();
+      for(Triangulation<3>::active_cell_iterator cell = tria.begin_active();
 	  cell != tria.end(); ++cell)
 	for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
 	  {
