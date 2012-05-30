@@ -1933,10 +1933,8 @@ transform_real_to_unit_cell_internal_codim1
                                    // eps. Only if the first condition
                                    // failed, loop will have been
                                    // increased and tested, and thus
-                                   // havereached the limit.
-  AssertThrow(loop<loop_limit, ExcTransformationFailed());
-
-
+                                   // have reached the limit.
+  AssertThrow (loop<loop_limit, ExcTransformationFailed());
 }
 
 

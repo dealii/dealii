@@ -1445,9 +1445,10 @@ MappingQ<dim,spacedim>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<spacedim>                            &p) const
 {
-                                   // first a Newton iteration based
-                                   // on a Q1 mapping
-  Point<dim> p_unit = MappingQ1<dim,spacedim>::transform_real_to_unit_cell(cell, p);
+                                   // first a Newton iteration based on a Q1
+                                   // mapping.
+  Point<dim> p_unit =
+    MappingQ1<dim,spacedim>::transform_real_to_unit_cell(cell, p);
 
                                    // then a Newton iteration based on the
                                    // full MappingQ if we need this. note that
@@ -1459,6 +1460,19 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       use_mapping_q_on_all_cells ||
       (dim!=spacedim) )
     {
+				       // use the full mapping. in case the
+				       // function above should have given us
+				       // something back that lies outside the
+				       // unit cell (that might happen because
+				       // we may have given a point 'p' that
+				       // lies inside the cell with the higher
+				       // order mapping, but outside the
+				       // Q1-mapped reference cell), then
+				       // project it back into the reference
+				       // cell in hopes that this gives a
+				       // better starting point to the
+				       // following iteration
+      p_unit = GeometryInfo<dim>::project_to_unit_cell(p_unit);
 
       const Quadrature<dim> point_quadrature(p_unit);
 

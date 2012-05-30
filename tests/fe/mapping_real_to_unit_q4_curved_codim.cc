@@ -106,20 +106,13 @@ void test_real_to_unit_cell()
 int
 main()
 {
-  std::ofstream logfile ("mapping_real_to_unit_q4_curved/output");
+  std::ofstream logfile ("mapping_real_to_unit_q4_curved_codim/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
 
-  test_real_to_unit_cell<1,1>();
-  test_real_to_unit_cell<2,2>();
-  test_real_to_unit_cell<3,3>();
-
-  test_real_to_unit_cell<1,2>();
-
-// the following is not currently implemented
-//  test_real_to_unit_cell<1,3>();
+  test_real_to_unit_cell<2,3>();
 
   return 0;
 }
