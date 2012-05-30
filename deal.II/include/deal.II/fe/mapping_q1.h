@@ -492,7 +492,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
                                       *
                                       * This function is called by
                                       * @p transform_unit_to_real_cell
-                                      * and multiply (through the
+                                      * and multiple times (through the
                                       * Newton iteration) by
                                       * @p transform_real_to_unit_cell_internal.
                                       *
@@ -510,12 +510,13 @@ class MappingQ1 : public Mapping<dim,spacedim>
                                       * computations of the mapping
                                       * support points.
                                       */
-    Point<spacedim> transform_unit_to_real_cell_internal (const InternalData &mdata) const;
+    Point<spacedim>
+    transform_unit_to_real_cell_internal (const InternalData &mdata) const;
 
                                      /**
                                       * Transforms the point @p p on
-                                      * the real cell to the point
-                                      * @p p_unit on the unit cell
+                                      * the real cell to the corresponding
+                                      * point on the unit cell
                                       * @p cell by a Newton
                                       * iteration.
                                       *
@@ -529,34 +530,24 @@ class MappingQ1 : public Mapping<dim,spacedim>
                                       * and
                                       * @p update_transformation_gradients
                                       * and a one point Quadrature
-                                      * including the given point
-                                      * @p p_unit.  Hence this
+                                      * that includes the given
+                                      * initial guess for the
+                                      * transformation
+                                      * @p initial_p_unit.  Hence this
                                       * function assumes that
                                       * @p mdata already includes the
                                       * transformation shape values
                                       * and gradients computed at
-                                      * @p p_unit.
+                                      * @p initial_p_unit.
                                       *
-                                      * These assumptions should be
-                                      * fulfilled by the calling
-                                      * function. That is up to now
-                                      * only the function
-                                      * @p transform_real_to_unit_cell
-                                      * and its overloaded versions.
                                       * @p mdata will be changed by
                                       * this function.
                                       */
-    void transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                               const Point<spacedim> &p,
-                                               InternalData &mdata,
-                                               Point<dim> &p_unit) const;
-
-
-
-
-
-
-
+    Point<dim>
+    transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                          const Point<spacedim> &p,
+                                          const Point<dim> &initial_p_unit,
+                                          InternalData &mdata) const;
 
                                        /**
                                         * Always returns @p true because
@@ -581,11 +572,12 @@ class MappingQ1 : public Mapping<dim,spacedim>
   protected:
                                      /* Trick to templatize transform_real_to_unit_cell<dim, dim+1> */
     template<int dim_>
-    void transform_real_to_unit_cell_internal_codim1
+    Point<dim_>
+    transform_real_to_unit_cell_internal_codim1
     (const typename Triangulation<dim_,dim_+1>::cell_iterator &cell,
      const Point<dim_+1> &p,
-     InternalData        &mdata,
-     Point<dim_>         &p_unit) const;
+     const Point<dim_>         &initial_p_unit,
+     InternalData        &mdata) const;
 
 /**
    Compute an initial guess to pass to the Newton method in
@@ -752,32 +744,34 @@ class MappingQ1 : public Mapping<dim,spacedim>
 };
 
 
+// explicit specializations
+
 template<>
-void
+Point<2>
 MappingQ1<2,3>::
 transform_real_to_unit_cell_internal
 (const Triangulation<2,3>::cell_iterator &cell,
- const Point<3>                            &p,
- InternalData                                     &mdata,
- Point<2>                                       &p_unit) const;
+ const Point<3> &p,
+ const Point<2> &initial_p_unit,
+ InternalData    &mdata) const;
 
-/* Only used in mapping Q if degree > 1 */
 template<>
-void
+Point<1>
 MappingQ1<1,2>::
-transform_real_to_unit_cell_internal (const Triangulation<1,2>::cell_iterator &cell,
-                                      const Point<2> &p,
-                                      InternalData   &mdata,
-                                      Point<1>       &p_unit) const;
+transform_real_to_unit_cell_internal
+(const Triangulation<1,2>::cell_iterator &cell,
+ const Point<2> &p,
+ const Point<1> &initial_p_unit,
+ InternalData    &mdata) const;
 
-/* Only used in mapping Q if degree > 1 */
 template<>
-void
+Point<1>
 MappingQ1<1,3>::
-transform_real_to_unit_cell_internal (const Triangulation<1,3>::cell_iterator &cell,
-                                      const Point<3> &p,
-                                      InternalData   &mdata,
-                                      Point<1>       &p_unit) const;
+transform_real_to_unit_cell_internal
+(const Triangulation<1,3>::cell_iterator &cell,
+ const Point<3> &p,
+ const Point<1> &initial_p_unit,
+ InternalData    &mdata) const;
 
 
 /**

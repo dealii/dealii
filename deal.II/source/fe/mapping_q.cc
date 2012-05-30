@@ -1447,7 +1447,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 {
                                    // first a Newton iteration based on a Q1
                                    // mapping.
-  Point<dim> p_unit =
+  Point<dim> initial_p_unit =
     MappingQ1<dim,spacedim>::transform_real_to_unit_cell(cell, p);
 
                                    // then a Newton iteration based on the
@@ -1472,9 +1472,9 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 				       // cell in hopes that this gives a
 				       // better starting point to the
 				       // following iteration
-      p_unit = GeometryInfo<dim>::project_to_unit_cell(p_unit);
+      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
 
-      const Quadrature<dim> point_quadrature(p_unit);
+      const Quadrature<dim> point_quadrature(initial_p_unit);
 
       UpdateFlags update_flags = update_transformation_values|update_transformation_gradients;
       if (spacedim>dim)
@@ -1494,10 +1494,10 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
         mdata->mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
 
 
-      this->transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
+      return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit, *mdata);
     }
-
-  return p_unit;
+  else
+    return initial_p_unit;
 }
 
 

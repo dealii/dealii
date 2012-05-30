@@ -1566,7 +1566,6 @@ MappingQ1<dim,spacedim>::
 transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
                                            const Point<spacedim>               &p) const
 {
-
   Point<dim> p_unit;
 
   FullMatrix<double>  KA(GeometryInfo<dim>::vertices_per_cell, dim);
@@ -1600,14 +1599,13 @@ transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &
 
   A_1.vmult(dest,b); //A^{-1}*b
 
-
   for (unsigned int i=0;i<dim;++i)
     p_unit[i]=dest(i);
 
-
   return p_unit;
-
 }
+
+
 
 template<int dim, int spacedim>
 Point<dim>
@@ -1615,29 +1613,29 @@ MappingQ1<dim,spacedim>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<spacedim>                            &p) const
 {
-
-
                                    // Find the initial value for the
                                    // Newton iteration by a normal projection
                                    // to the least square plane determined by
                                    // the vertices of the cell
   std::vector<Point<spacedim> > a;
   compute_mapping_support_points (cell,a);
-  Point<dim> p_unit =
+  const Point<dim> initial_p_unit =
     transform_real_to_unit_cell_initial_guess(a,p);
 
                                    // if dim==1 there is nothing
-                                   // else to do the initial value is the answer.
-  if (dim>1)
+                                   // else to do to the initial
+                                   // value, and it is the answer
+  if (dim == 1)
+    return initial_p_unit;
+  else
     {
-
                                    // Use the get_data function to
                                    // create an InternalData with data
                                    // vectors of the right size and
                                    // transformation shape values and
                                    // derivatives already computed at
-                                   // point p_unit.
-      const Quadrature<dim> point_quadrature(p_unit);
+                                   // point initial_p_unit.
+      const Quadrature<dim> point_quadrature(initial_p_unit);
 
       UpdateFlags update_flags = update_transformation_values| update_transformation_gradients;
       if (spacedim>dim)
@@ -1657,23 +1655,23 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
                                        // Ignore non vertex support points.
       mdata->mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
 
-                                       // perform the newton iteration.
-      transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
+                                       // perform the Newton iteration and
+                                       // return the result
+      return transform_real_to_unit_cell_internal(cell, p, initial_p_unit,
+                                                  *mdata);
     }
-
-  return p_unit;
 }
 
 
 
 template<int dim, int spacedim>
-void
+Point<dim>
 MappingQ1<dim,spacedim>::
 transform_real_to_unit_cell_internal
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
  const Point<spacedim>                            &p,
- InternalData                                     &mdata,
- Point<dim>                                       &p_unit) const
+ const Point<dim>                                 &initial_p_unit,
+ InternalData                                     &mdata) const
 {
   const unsigned int n_shapes=mdata.shape_values.size();
   Assert(n_shapes!=0, ExcInternalError());
@@ -1698,6 +1696,8 @@ transform_real_to_unit_cell_internal
                                    // template specialization.
 
                                    // f(x)
+
+  Point<dim> p_unit = initial_p_unit;
 
   compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
   Point<spacedim> p_real(transform_unit_to_real_cell_internal(mdata));
@@ -1747,7 +1747,6 @@ transform_real_to_unit_cell_internal
                                        // f(x)
       p_real = transform_unit_to_real_cell_internal(mdata);
       f = p_real-p;
-
     }
 
                                    // Here we check that in the last
@@ -1759,6 +1758,8 @@ transform_real_to_unit_cell_internal
                                    // increased and tested, and thus
                                    // havereached the limit.
   AssertThrow(loop<loop_limit, ExcTransformationFailed());
+
+  return p_unit;
 }
 
 
@@ -1780,36 +1781,45 @@ transform_real_to_unit_cell_internal
  */
 
 template<>
-void MappingQ1<2,3>::
+Point<2>
+MappingQ1<2,3>::
 transform_real_to_unit_cell_internal (const Triangulation<2,3>::cell_iterator &cell,
                                       const Point<3> &p,
-                                      InternalData   &mdata,
-                                      Point<2>       &p_unit) const
+                                      const Point<2> &initial_p_unit,
+                                      InternalData   &mdata) const
 {
-  transform_real_to_unit_cell_internal_codim1(cell,p, mdata, p_unit);
+  return
+      transform_real_to_unit_cell_internal_codim1(cell, p, initial_p_unit,
+                                                  mdata);
 }
 
 
 
 
 template<>
-void MappingQ1<1,2>::
+Point<1>
+MappingQ1<1,2>::
 transform_real_to_unit_cell_internal (const Triangulation<1,2>::cell_iterator &cell,
                                       const Point<2> &p,
-                                      InternalData   &mdata,
-                                      Point<1>       &p_unit) const
+                                      const Point<1> &initial_p_unit,
+                                      InternalData   &mdata) const
 {
-  transform_real_to_unit_cell_internal_codim1(cell,p, mdata, p_unit);
+  return
+      transform_real_to_unit_cell_internal_codim1(cell, p, initial_p_unit,
+                                                  mdata);
 }
 
+
 template<>
-void MappingQ1<1,3>::
+Point<1>
+MappingQ1<1,3>::
 transform_real_to_unit_cell_internal (const Triangulation<1,3>::cell_iterator &/*cell*/,
                                       const Point<3> &/*p*/,
-                                      InternalData   &/*mdata*/,
-                                      Point<1>       &/*p_unit*/) const
+                                      const Point<1> &/*initial_p_unit*/,
+                                      InternalData   &/*mdata*/) const
 {
   Assert(false, ExcNotImplemented());
+  return Point<1>();
 }
 
 
@@ -1817,14 +1827,14 @@ transform_real_to_unit_cell_internal (const Triangulation<1,3>::cell_iterator &/
 
 template<int dim, int spacedim>
 template<int dim_>
-void MappingQ1<dim,spacedim>::
+Point<dim_>
+MappingQ1<dim,spacedim>::
 transform_real_to_unit_cell_internal_codim1
 (const typename Triangulation<dim_,dim_ + 1>::cell_iterator &cell,
  const Point<dim_ + 1>                                      &p,
- MappingQ1<dim,spacedim>::InternalData                      &mdata,
- Point<dim_ >                                               &p_unit) const
+ const Point<dim_ >                                         &initial_p_unit,
+ MappingQ1<dim,spacedim>::InternalData                      &mdata) const
 {
-
   const unsigned int spacedim1 = dim_+1;
   const unsigned int dim1 = dim_;
 
@@ -1842,6 +1852,7 @@ transform_real_to_unit_cell_internal_codim1
   Point<spacedim1>  DF[dim1];
   Point<spacedim1>  D2F[dim1][dim1];
 
+  Point<dim1> p_unit = initial_p_unit;
   Point<dim1> f;
   Tensor<2,dim1>  df;
 
@@ -1935,6 +1946,8 @@ transform_real_to_unit_cell_internal_codim1
                                    // increased and tested, and thus
                                    // have reached the limit.
   AssertThrow (loop<loop_limit, ExcTransformationFailed());
+
+  return p_unit;
 }
 
 
