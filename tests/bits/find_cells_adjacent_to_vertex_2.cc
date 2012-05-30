@@ -37,11 +37,8 @@ void check (Triangulation<3> &tria)
 
       deallog << "Vertex " << i << " at " << tria.get_vertices()[i] << ": " << cells.size() << " cells" << std::endl;
 
-      for(unsigned c=0; c<cells.size(); c++) {
-	for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
-	  deallog << "<" << cells[c]->vertex(v) << "> ";
-	deallog << std::endl;
-      }
+      for(unsigned c=0; c<cells.size(); c++)
+	deallog << "   " << cells[c] << std::endl;
     }
 }
 

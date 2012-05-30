@@ -276,12 +276,11 @@ namespace GridTools
                                     *
                                     * For locally refined grids, the
                                     * vertex itself might not be a vertex
-                                    * of all adjacent cells, but will
-                                    * always be located on a face or an
-                                    * edge of the adjacent cells returned.
-                                    *
-                                    * @author Ralf B. Schulz,
-                                    * Wolfgang Bangerth, 2006
+                                    * of all adjacent cells that are returned.
+                                    * However, it will
+                                    * always be either a vertex of a cell of be
+                                    * a hanging node located on a face or an
+                                    * edge of it.
                                     */
   template<int dim, template <int, int> class Container, int spacedim>
   std::vector<typename Container<dim,spacedim>::active_cell_iterator>

@@ -670,128 +670,113 @@ namespace GridTools
     Assert(get_tria(container).get_used_vertices()[vertex],
            ExcVertexNotUsed(vertex));
 
-                                     // We use a set instead of a vector
+                                     // use a set instead of a vector
                                      // to ensure that cells are inserted only
-                                     // once. A bug in the previous version
-                                     // prevented some cases to be
-                                     // treated correctly
-    std::set<typename Container<dim,spacedim>::active_cell_iterator> adj_cells_set;
+                                     // once
+    std::set<typename Container<dim,spacedim>::active_cell_iterator> adjacent_cells;
 
     typename Container<dim,spacedim>::active_cell_iterator
       cell = container.begin_active(),
       endc = container.end();
 
-                                     // go through all active cells and look
-                                     // if the vertex is part of that cell
+    // go through all active cells and look. if the vertex is part of that cell
+    //
+    // in 1d, this is all we need to care about. in 2d/3d we also need to worry
+    // that the vertex might be a hanging node on a face or edge of a cell; in
+    // this case, we would want to add those cells as well on whose faces the
+    // vertex is located but for which it is not a vertex itself.
+    //
+    // getting this right is a lot simpler in 2d than in 3d. in 2d, a hanging
+    // node can only be in the middle of a face and we can query the neighboring
+    // cell from the current cell. on the other hand, in 3d a hanging node
+    // vertex can also be on an edge but there can be many other cells on
+    // this edge and we can not access them from the cell we are currently
+    // on.
+    //
+    // so, in the 3d case, if we run the algorithm as in 2d, we catch all
+    // those cells for which the vertex we seek is on a *subface*, but we
+    // miss the case of cells for which the vertex we seek is on a
+    // sub-edge for which there is no corresponding sub-face (because the
+    // immediate neighbor behind this face is not refined), see for example
+    // the bits/find_cells_adjacent_to_vertex_6 testcase. thus, if we
+    // haven't yet found the vertex for the current cell we also need to
+    // look at the mid-points of edges
     for (; cell != endc; ++cell)
-      for (unsigned v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
-        if (cell->vertex_index(v) == vertex)
-          {
-                                             // OK, we found a cell that contains
-                                             // the particular vertex. We add it
-                                             // to the list.
-            adj_cells_set.insert(cell);
+      {
+        for (unsigned v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+          if (cell->vertex_index(v) == vertex)
+            {
+              // OK, we found a cell that contains
+              // the given vertex. We add it
+              // to the list.
+              adjacent_cells.insert(cell);
 
-                                             // Now we need to make sure that the
-                                             // vertex is not a locally refined
-                                             // vertex not being part of the
-                                             // neighboring cells. So we loop over
-                                             // all faces to which this vertex
-                                             // belongs, check the level of
-                                             // the neighbor, and if it is coarser,
-                                             // then check whether the vertex is
-                                             // part of that neighbor or not.
-            for (unsigned vface = 0; vface < dim; vface++)
-              {
-                const unsigned face =
-                  GeometryInfo<dim>::vertex_to_face[v][vface];
-                if (!cell->at_boundary(face))
+              // as explained above, in 2+d we need to check whether
+              // this vertex is on a face behind which there is a coarser
+              // neighbor. if this is the case, then we need to also
+              // add this neighbor
+              if (dim >= 2)
+                for (unsigned vface = 0; vface < dim; vface++)
                   {
-                    typename Container<dim,spacedim>::cell_iterator
-                      nb = cell->neighbor(face);
+                    const unsigned int face =
+                        GeometryInfo<dim>::vertex_to_face[v][vface];
 
-                                                     // Here we
-                                                     // check
-                                                     // whether
-                                                     // the
-                                                     // neighbor
-                                                     // is
-                                                     // coarser. If
-                                                     // it is, we
-                                                     // search
-                                                     // for the
-                                                     // vertex in
-                                                     // this
-                                                     // coarser
-                                                     // cell and
-                                                     // only if
-                                                     // not found
-                                                     // we will
-                                                     // add the
-                                                     // coarser
-                                                     // cell
-                                                     // itself
-                    if (nb->level() < cell->level())
+                    if (!cell->at_boundary(face)
+                        &&
+                        (cell->neighbor(face)->level() < cell->level()))
                       {
-                        bool found = false;
-                        for (unsigned v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
-                          if (nb->vertex_index(v) == vertex)
-                            {
-                              found = true;
-                              break;
-                            }
-                        if (!found)
-			  {
-							     //TODO: it is not
-							     //enough to walk
-							     //over faces to
-							     //the neighbors
-							     //because the
-							     //point may lie
-							     //in a cell that
-							     //only shares an
-							     //edge with cell
-							     //in 3d. Current
-							     //workaround: add
-							     //all neighbors
-							     //of all
-							     //neighbors if
-							     //this vertex is
-							     //a hanging node
-							     //in 3d. [TH]
-                          adj_cells_set.insert(nb);
-			  if (dim==3)
-			    {
-			      for (unsigned faceindex = 0; faceindex < GeometryInfo<dim>::faces_per_cell; faceindex++)
-				{
-				  if (!nb->at_boundary(faceindex) && nb->neighbor(faceindex)->active())
-				    adj_cells_set.insert(nb->neighbor(faceindex));
-				}
-			    }
-			  }
-			
+                        // there is a coarser cell behind a face to which the
+                        // vertex belongs. the vertex we are looking at is
+                        // then either a vertex of that coarser neighbor,
+                        // or it is a hanging node on one of the faces of
+                        // that cell. in either case, it is adjacent
+                        // to the vertex, so add it to the list as well
+                        // (if the cell was already in the list then
+                        // the std::set makes sure that we get it only once)
+                        adjacent_cells.insert (cell->neighbor(face));
+                        goto next_cell;
                       }
                   }
-              }
 
-            break;
+              // in any case, we have found a cell, so go to the next cell
+              goto next_cell;
+            }
+
+        // in 3d also loop over the edges
+        if (dim >= 3)
+          {
+            for (unsigned e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
+              if (cell->line(e)->has_children())
+                // the only place where this vertex could have been
+                // hiding is on the mid-edge point of the edge we
+                // are looking at
+                if (cell->line(e)->child(0)->vertex_index(1) == vertex)
+                  {
+                    adjacent_cells.insert(cell);
+
+                    // jump out of this tangle of nested loops
+                    goto next_cell;
+                  }
           }
 
+        // in more than 3d we would probably have to do the same as
+        // above also for even lower-dimensional objects
+        Assert (dim <= 3, ExcNotImplemented());
+
+        // move on to the next cell if we have found the
+        // vertex on the current one
+        next_cell:
+        ;
+      }
+
+    // if this was an active vertex then there needs to have been
+    // at least one cell to which it is adjacent!
+    Assert (adjacent_cells.size() > 0, ExcInternalError());
+
+    // return the result as a vector, rather than the set we built above
+    return
     std::vector<typename Container<dim,spacedim>::active_cell_iterator>
-      adjacent_cells;
-
-                                     // We now produce the output vector
-                                     // from the set that we assembled above.
-    typename std::set<typename Container<dim,spacedim>::active_cell_iterator>::iterator
-      it = adj_cells_set.begin(),
-      endit = adj_cells_set.end();
-    for(; it != endit; ++it)
-      adjacent_cells.push_back(*it);
-
-
-    Assert(adjacent_cells.size() > 0, ExcInternalError());
-
-    return adjacent_cells;
+    (adjacent_cells.begin(), adjacent_cells.end());
   }
 
 

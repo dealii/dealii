@@ -210,7 +210,7 @@ enabled due to a missing include file in file
 <li> Fixed: Bug in 3d with hanging nodes in GridTools::find_cells_adjacent_to_vertex()
 that caused find_active_cell_around_point() to fail in those cases.
 <br>
-(Timo Heister, 2012/05/29)
+(Timo Heister, Wolfgang Bangerth 2012/05/30)
 
 <li> New: The GridIn::read_unv function can now read meshes generated
 by the Salome framework, see http://www.salome-platform.org/ .
