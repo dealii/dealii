@@ -11,18 +11,8 @@
 //
 //----------------------------  find_cell_5.cc  ---------------------------
 
-// find_active_cell_around_point() stops working if some cells are refined.
-// this is most likely a rounding error, but it is frustrating.
-// check2 triggers the following error:
-/*
-An error occurred in line <838> of file </scratch/deal-trunk/deal.II/source/grid/grid_tools.cc> in function
-    std::pair<typename Container<dim, spacedim>::active_cell_iterator, dealii::Point<dim> > dealii::GridTools::find_active_cell_around_point(const dealii::Mapping<dim, spacedim>&, const Container<dim, spacedim>&, const dealii::Point<spacedim>&) [with int dim = 3, Container = dealii::Triangulation, int spacedim = 3, typename Container<dim, spacedim>::active_cell_iterator = dealii::TriaActiveIterator<dealii::CellAccessor<3, 3> >]
-The violated condition was: 
-    best_cell.first.state() == IteratorState::valid
-The name and call sequence of the exception was:
-    ExcPointNotFound<spacedim>(p)
-Additional Information: 
-The point <0.789000 0.313000 0.170000> could not be found inside any of the subcells of a coarse grid cell.*/
+// find_active_cell_around_point() stops working if some cells are refined in 3d.
+// this is caused by a bug in GridTools::find_cells_adjacent_to_vertex that got fixed in r 25562.
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -67,10 +57,11 @@ void check2 ()
       if (idx==21)
 	cell->set_refine_flag();      
     }
-  
   tria.execute_coarsening_and_refinement ();
+
   deallog << inside(tria, p2) << std::endl;
-  GridTools::find_active_cell_around_point(tria, p2); //triggers exception
+
+  GridTools::find_active_cell_around_point(tria, p2); //triggered exception
 }
 
 void check1 ()
@@ -79,9 +70,9 @@ void check1 ()
   GridGenerator::hyper_cube (tria);
   tria.refine_global (3);
 
-  for (int i=0;i<5;++i)
+  for (int i=0;i<3;++i)
     {
-      for (int j=0;j<10000;++j)
+      for (int j=0;j<1000;++j)
 	{
 	  Point<3> p ((rand()%1000)/1000.0,(rand()%1000)/1000.0,(rand()%1000)/1000.0);
 	  if (!inside(tria, p))
