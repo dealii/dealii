@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,11 +52,6 @@ class DataOutX : public DataOutInterface<2,2>
 template <int dim, int spacedim>
 void check(std::ostream& out)
 {
-  const unsigned int np = 4;
-  patches.resize (np);
-
-  create_patches(patches);
-
   names.resize (5);
   names[0] = "x1";
   names[1] = "x2";
