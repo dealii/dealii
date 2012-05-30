@@ -553,21 +553,31 @@ class MappingQ : public MappingQ1<dim,spacedim>
 template<> MappingQ<1>::MappingQ (const unsigned int,
                                   const bool);
 template<> MappingQ<1>::~MappingQ ();
-template<> void MappingQ<1>::compute_shapes_virtual (
-  const std::vector<Point<1> > &unit_points,
-  MappingQ1<1>::InternalData   &data) const;
-template <> void MappingQ<1>::set_laplace_on_quad_vector(
-  Table<2,double> &) const;
-template <> void MappingQ<3>::set_laplace_on_hex_vector(
-  Table<2,double> &lohvs) const;
-template <> void MappingQ<1>::compute_laplace_vector(
-  Table<2,double> &) const;
-template <> void MappingQ<1>::add_line_support_points (
-  const Triangulation<1>::cell_iterator &,
-  std::vector<Point<1> > &) const;
-template<> void MappingQ<3>::add_quad_support_points(
-  const Triangulation<3>::cell_iterator &cell,
-  std::vector<Point<3> >                &a) const;
+
+template<>
+void MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
+					  MappingQ1<1>::InternalData   &data) const;
+template <>
+void MappingQ<1>::set_laplace_on_quad_vector(Table<2,double> &) const;
+
+template <>
+void MappingQ<3>::set_laplace_on_hex_vector(Table<2,double> &lohvs) const;
+
+template <>
+void MappingQ<1>::compute_laplace_vector(Table<2,double> &) const;
+template <>
+void MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
+					   std::vector<Point<1> > &) const;
+template <>
+void MappingQ<1,2>::add_line_support_points (const Triangulation<1,2>::cell_iterator &,
+					     std::vector<Point<2> > &) const;
+template <>
+void MappingQ<1,3>::add_line_support_points (const Triangulation<1,3>::cell_iterator &,
+					     std::vector<Point<3> > &) const;
+
+template<>
+void MappingQ<3>::add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
+					  std::vector<Point<3> >                &a) const;
 
 #endif // DOXYGEN
 

@@ -908,7 +908,6 @@ MappingQ<dim,spacedim>::compute_support_points_laplace(const typename Triangulat
     switch (dim)
       {
         case 1:
-              Assert(spacedim == 2, ExcInternalError());
               add_line_support_points(cell, a);
               break;
         case 2:
@@ -937,7 +936,7 @@ MappingQ<dim,spacedim>::compute_support_points_laplace(const typename Triangulat
         default:
           Assert(false, ExcNotImplemented());
           break;
-      };
+      }
 }
 
 
@@ -960,7 +959,42 @@ void
 MappingQ<1,2>::add_line_support_points (const Triangulation<1,2>::cell_iterator &cell,
                                         std::vector<Point<2> > &a) const
 {
-  const unsigned int dim=1, spacedim=2;
+  const unsigned int dim      = 1;
+  const unsigned int spacedim = 2;
+                                   // Ask for the mid point, if that's
+                                   // the only thing we need.
+  if (degree==2)
+    {
+      const Boundary<dim,spacedim> * const boundary
+        = &(cell->get_triangulation().get_boundary(cell->material_id()));
+      a.push_back(boundary->get_new_point_on_line(cell));
+    }
+  else
+                                     // otherwise call the more
+                                     // complicated functions and ask
+                                     // for inner points from the
+                                     // boundary description
+    {
+      std::vector<Point<spacedim> > line_points (degree-1);
+
+      const Boundary<dim,spacedim> * const boundary
+        = &(cell->get_triangulation().get_boundary(cell->material_id()));
+
+      boundary->get_intermediate_points_on_line (cell, line_points);
+                                       // Append all points
+      a.insert (a.end(), line_points.begin(), line_points.end());
+    }
+}
+
+
+
+template <>
+void
+MappingQ<1,3>::add_line_support_points (const Triangulation<1,3>::cell_iterator &cell,
+                                        std::vector<Point<3> > &a) const
+{
+  const unsigned int dim      = 1;
+  const unsigned int spacedim = 3;
                                    // Ask for the mid point, if that's
                                    // the only thing we need.
   if (degree==2)
