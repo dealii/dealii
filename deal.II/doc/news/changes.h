@@ -48,12 +48,6 @@ used for boundary indicators.
 
 <ol>
 
-<li> New: DoFTools::make_periodicity_constraints implemented which
-inserts algebraic constraints due to periodic boundary conditions
-into a ConstraintMatrix.
-<br>
-(Matthias Maier, 2012/05/22)
-
 <li>
 New: step-48 demonstrates the solution of a nonlinear wave equation
 with an explicit time stepping method. The usage of Gauss-Lobatto
@@ -81,7 +75,7 @@ implemented using the FEEvaluation class.
 (Katharina Kormann and Martin Kronbichler, 2012/05/05)
 
 <li>
-New: step-44 demonstrates one approach to modelling large
+New: step-44 demonstrates one approach to modeling large
 deformations of nearly-incompressible elastic solids. The
 elastic response is governed by a non-linear, hyperelastic
 free-energy function. The geometrical response is also
@@ -207,10 +201,22 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The function DataOutInterface::write_pvd_record can be used
+to provide Paraview with metadata that describes which time in a
+simulation a particular output file corresponds to.
+<br>
+(Marco Engelhard 2012/05/30)
+
 <li> Fixed: Bug in 3d with hanging nodes in GridTools::find_cells_adjacent_to_vertex()
 that caused find_active_cell_around_point() to fail in those cases.
 <br>
 (Timo Heister, Wolfgang Bangerth 2012/05/30)
+
+<li> New: DoFTools::make_periodicity_constraints implemented which
+inserts algebraic constraints due to periodic boundary conditions
+into a ConstraintMatrix.
+<br>
+(Matthias Maier, 2012/05/22)
 
 <li> New: The GridIn::read_unv function can now read meshes generated
 by the Salome framework, see http://www.salome-platform.org/ .

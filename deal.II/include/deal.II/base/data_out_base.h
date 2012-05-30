@@ -2348,6 +2348,61 @@ class DataOutInterface : private DataOutBase
     void write_pvtu_record (std::ostream &out,
                             const std::vector<std::string> &piece_names) const;
 
+    /**
+     * In ParaView it is possible to visualize time-
+     * dependent data tagged with the current
+     * integration time of a time dependent simulation. To use this
+     * feature you need a <code>.pvd</code>
+     * file that describes which VTU or PVTU file
+     * belongs to which timestep. This function writes a file that
+     * provides this mapping, i.e., it takes a list of pairs each of
+     * which indicates a particular time instant and the corresponding
+     * file that contains the graphical data for this time instant.
+     *
+     * A typical use case, in program that computes a time dependent
+     * solution, would be the following (<code>time</code> and
+     * <code>time_step</code> are member variables of the class with types
+     * <code>double</code> and <code>unsigned int</code>, respectively;
+     * the variable <code>times_and_names</code> is of type
+     * <code>std::vector@<std::pair@<double,std::string@> @></code>):
+     *
+     * @code
+     * template <int dim>
+     *  void MyEquation<dim>::output_results () const
+     *  {
+     *    DataOut<dim> data_out;
+     *
+     *    data_out.attach_dof_handler (dof_handler);
+     *    data_out.add_data_vector (solution, "U");
+     *    data_out.build_patches ();
+     *
+     *    const std::string filename = "solution-" +
+     *                                 Utilities::int_to_string (timestep_number, 3) +
+     *                                 ".vtu";
+     *    std::ofstream output (filename.c_str());
+     *    data_out.write_vtu (output);
+     *
+     *    times_and_names.push_back (std::pair<double,std::string> (time, filename));
+     *    std::ofstream pvd_output ("solution.pvd");
+     *    data_out.write_pvd_record (pvd_output, times_and_names);
+     *  }
+     * @endcode
+     *
+     * @note See DataOutBase::write_vtu or
+     * DataOutBase::write_pvtu_record for
+     * writing solutions at each timestep.
+     *
+     * @note The second element of each pair, i.e., the file in which
+     * the graphical data for each time is stored, may itself be again
+     * a file that references other files. For example, it could be
+     * the name for a <code>.pvtu</code> file that references multiple
+     * parts of a parallel computation.
+     *
+     * @author Marco Engelhard, 2012
+     */
+    void write_pvd_record (std::ostream &out,
+                           const std::vector<std::pair<double,std::string> >  &times_and_names) const;
+
                                      /**
                                       * This function is the exact
                                       * equivalent of the
