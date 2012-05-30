@@ -2349,8 +2349,8 @@ class DataOutInterface : private DataOutBase
                             const std::vector<std::string> &piece_names) const;
 
     /**
-     * In ParaView it is possible to visualize time-
-     * dependent data tagged with the current
+     * In ParaView it is possible to visualize time-dependent
+     * data tagged with the current
      * integration time of a time dependent simulation. To use this
      * feature you need a <code>.pvd</code>
      * file that describes which VTU or PVTU file
@@ -2367,7 +2367,7 @@ class DataOutInterface : private DataOutBase
      * <code>std::vector@<std::pair@<double,std::string@> @></code>):
      *
      * @code
-     * template <int dim>
+     *  template <int dim>
      *  void MyEquation<dim>::output_results () const
      *  {
      *    DataOut<dim> data_out;
@@ -2389,7 +2389,7 @@ class DataOutInterface : private DataOutBase
      * @endcode
      *
      * @note See DataOutBase::write_vtu or
-     * DataOutBase::write_pvtu_record for
+     * DataOutInterface::write_pvtu_record for
      * writing solutions at each timestep.
      *
      * @note The second element of each pair, i.e., the file in which
