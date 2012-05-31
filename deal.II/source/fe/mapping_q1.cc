@@ -1619,7 +1619,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
                                    // the vertices of the cell
   std::vector<Point<spacedim> > a;
   compute_mapping_support_points (cell,a);
-  const Point<dim> initial_p_unit =
+  Point<dim> initial_p_unit =
     transform_real_to_unit_cell_initial_guess(a,p);
 
                                    // if dim==1 there is nothing
@@ -1629,12 +1629,32 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
     return initial_p_unit;
   else
     {
-                                   // Use the get_data function to
-                                   // create an InternalData with data
-                                   // vectors of the right size and
-                                   // transformation shape values and
-                                   // derivatives already computed at
-                                   // point initial_p_unit.
+				       // use the full mapping. in case the
+				       // function above should have given us
+				       // something back that lies outside the
+				       // unit cell (that might happen because
+                                       // either the function computing an
+                                       // initial guess gave us a poor initial
+                                       // guess or for the following reason:
+                                       // we call this function here in the Q1
+                                       // mapping to produce an initial guess
+                                       // for a higher order mapping, but
+				       // we may have given a point 'p' that
+				       // lies inside the cell with the higher
+				       // order mapping, but outside the
+				       // Q1-mapped reference cell), then
+				       // project it back into the reference
+				       // cell in hopes that this gives a
+				       // better starting point to the
+				       // following iteration
+      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
+
+				       // Use the get_data function to
+				       // create an InternalData with data
+				       // vectors of the right size and
+				       // transformation shape values and
+				       // derivatives already computed at
+				       // point initial_p_unit.
       const Quadrature<dim> point_quadrature(initial_p_unit);
 
       UpdateFlags update_flags = update_transformation_values| update_transformation_gradients;
@@ -1757,7 +1777,7 @@ transform_real_to_unit_cell_internal
                                    // failed, loop will have been
                                    // increased and tested, and thus
                                    // havereached the limit.
-  AssertThrow(loop<loop_limit, ExcTransformationFailed());
+  AssertThrow (loop<loop_limit, ExcTransformationFailed());
 
   return p_unit;
 }
