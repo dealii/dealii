@@ -68,13 +68,18 @@ namespace Step15
 
 				   // @sect3{The <code>MinimalSurfaceProblem</code> class template}
 
-				   // The class template is basically the same as in step 6.
-				   // Four additions are made: There are two solution vectors,
-				   // one for the Newton update, and one for the solution of
-				   // the original pde. Also we need a double for the residual
-				   // of the Newton method, an integer, which counts the mesh
-				   // refinements and a bool for the boundary condition in the first
-				   // Newton step.
+				   // The class template is basically
+				   // the same as in step 6.  Four
+				   // additions are made: There are
+				   // two solution vectors, one for
+				   // the Newton update, and one for
+				   // the solution of the original
+				   // pde. Also we need a double for
+				   // the residual of the Newton
+				   // method, an integer, which counts
+				   // the mesh refinements and a bool
+				   // for the boundary condition in
+				   // the first Newton step.
 
   template <int dim>
   class MinimalSurfaceProblem
@@ -112,17 +117,24 @@ namespace Step15
 
       unsigned int         refinement;
 
-				       // As described in the Introduction, the first Newton iteration
-				       // is special, because of the boundary condition. To implement
-				       // these correctly, there is a bool, which is true in the first
-				       // step and false ever after.
+				       // As described in the
+				       // Introduction, the first
+				       // Newton iteration is special,
+				       // because of the boundary
+				       // condition. To implement
+				       // these correctly, there is a
+				       // bool, which is true in the
+				       // first step and false ever
+				       // after.
       bool                                 first_step;
   };
 
 				   // @sect3{Boundary condition}
 
-				   // The boundary condition is implemented just like in step 4.
-				   // It was chosen as $g(x,y)=sin(2 \pi (x+y))$ in this example.
+				   // The boundary condition is
+				   // implemented just like in step 4.
+				   // It was chosen as $g(x,y)=sin(2
+				   // \pi (x+y))$ in this example.
 
   template <int dim>
   class BoundaryValues : public Function<dim>
@@ -146,8 +158,9 @@ namespace Step15
 
 				   // @sect4{MinimalSurfaceProblem::MinimalSurfaceProblem}
 
-				   // The constructor and destructor of the class are the same
-				   // as in the first few tutorials.
+				   // The constructor and destructor
+				   // of the class are the same as in
+				   // the first few tutorials.
 
   template <int dim>
   MinimalSurfaceProblem<dim>::MinimalSurfaceProblem ()
@@ -167,24 +180,36 @@ namespace Step15
 
 				   // @sect4{MinimalSurfaceProblem::setup_system}
 
-				   // As always in the setup-system function, we setup the variables
-				   // of the finite element method. There are same differences to
-				   // step 6, because we don't have to solve one pde over all,
-				   // but one in every Newton step. Also the starting function
-				   // has to be setup in the first step.
+				   // As always in the setup-system
+				   // function, we setup the variables
+				   // of the finite element
+				   // method. There are same
+				   // differences to step 6, because
+				   // we don't have to solve one pde
+				   // over all, but one in every
+				   // Newton step. Also the starting
+				   // function has to be setup in the
+				   // first step.
 
   template <int dim>
   void MinimalSurfaceProblem<dim>::setup_system ()
   {
 
-				     // This function will be called, every time we refine the mesh
-				     // to resize the system matrix,  Newton update - and right hand
-				     // side vector and to set the right values of hanging nodes to
-				     // get a continuous solution.
-				     // But only the first time, the starting solution has to be
-				     // initialized. Also the vector of the solution will be
-				     // resized in the <code>refine_grid</code> function, while the
-				     // vector is transferred to the new mesh.
+				     // This function will be called,
+				     // every time we refine the mesh
+				     // to resize the system matrix,
+				     // Newton update - and right hand
+				     // side vector and to set the
+				     // right values of hanging nodes
+				     // to get a continuous solution.
+				     // But only the first time, the
+				     // starting solution has to be
+				     // initialized. Also the vector
+				     // of the solution will be
+				     // resized in the
+				     // <code>refine_grid</code>
+				     // function, while the vector is
+				     // transferred to the new mesh.
 
     if (first_step)
       {
@@ -194,9 +219,13 @@ namespace Step15
 	  {
 	    present_solution(i)=0;
 	  }
-					 // The constraint matrix, holding a list of the hanging nodes,
-					 // will be setup in the <code>refine_grid</code> function
-					 // after refining the mesh.
+					 // The constraint matrix,
+					 // holding a list of the
+					 // hanging nodes, will be
+					 // setup in the
+					 // <code>refine_grid</code>
+					 // function after refining
+					 // the mesh.
 
 	hanging_node_constraints.clear ();
 	DoFTools::make_hanging_node_constraints (dof_handler,
@@ -205,7 +234,9 @@ namespace Step15
       }
 
 
-				     // The remaining parts of the function are the same as in step 6.
+				     // The remaining parts of the
+				     // function are the same as in
+				     // step 6.
 
     newton_update.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
@@ -221,10 +252,13 @@ namespace Step15
 
 				   // @sect4{MinimalSurfaceProblem::assemble_system}
 
-				   // This function does the same as in the previous tutorials.
-				   // The only additional step is the correct implementation of
-				   // the boundary condition and the usage of the gradients of
-				   // the old solution.
+				   // This function does the same as
+				   // in the previous tutorials.  The
+				   // only additional step is the
+				   // correct implementation of the
+				   // boundary condition and the usage
+				   // of the gradients of the old
+				   // solution.
 
   template <int dim>
   void MinimalSurfaceProblem<dim>::assemble_system ()
@@ -259,23 +293,36 @@ namespace Step15
 
 	for (unsigned int q_point = 0; q_point < n_q_points; ++q_point) {
 
-					   // To setup up the linear system, the gradient of the old solution
-					   // in the quadrature points is needed. For this purpose there is
-					   // is a function, which will write these gradients in a vector,
-					   // where every component of the vector is a vector itself:
+					   // To setup up the linear
+					   // system, the gradient of
+					   // the old solution in the
+					   // quadrature points is
+					   // needed. For this purpose
+					   // there is is a function,
+					   // which will write these
+					   // gradients in a vector,
+					   // where every component of
+					   // the vector is a vector
+					   // itself:
 
 	  std::vector<Tensor<1, dim> > gradients(n_q_points);
 	  fe_values.get_function_gradients(present_solution, gradients);
 
-					   // Having the gradients of the old solution in the quadrature
-					   // points, we are able to compute the coefficients $a_{n}$
-					   // in these points.
+					   // Having the gradients of
+					   // the old solution in the
+					   // quadrature points, we
+					   // are able to compute the
+					   // coefficients $a_{n}$ in
+					   // these points.
 
 	  const double coeff = 1/sqrt(1 + gradients[q_point] * gradients[q_point]);
 
-					   // The assembly of the system then is the same as always, except
-					   // of the damping parameter of the Newton method, which we set on
-					   // 0.1 in this case.
+					   // The assembly of the
+					   // system then is the same
+					   // as always, except of the
+					   // damping parameter of the
+					   // Newton method, which we
+					   // set on 0.1 in this case.
 
 	  for (unsigned int i = 0; i < dofs_per_cell; ++i) {
 	    for (unsigned int j = 0; j < dofs_per_cell; ++j) {
@@ -356,23 +403,36 @@ namespace Step15
 
 	for (unsigned int q_point = 0; q_point < n_q_points; ++q_point) {
 
-					   // To setup up the linear system, the gradient of the old solution
-					   // in the quadrature points is needed. For this purpose there is
-					   // is a function, which will write these gradients in a vector,
-					   // where every component of the vector is a vector itself:
+					   // To setup up the linear
+					   // system, the gradient of
+					   // the old solution in the
+					   // quadrature points is
+					   // needed. For this purpose
+					   // there is is a function,
+					   // which will write these
+					   // gradients in a vector,
+					   // where every component of
+					   // the vector is a vector
+					   // itself:
 
 	  std::vector<Tensor<1, dim> > gradients(n_q_points);
 	  fe_values.get_function_gradients(linearization_point, gradients);
 
-					   // Having the gradients of the old solution in the quadrature
-					   // points, we are able to compute the coefficients $a_{n}$
-					   // in these points.
+					   // Having the gradients of
+					   // the old solution in the
+					   // quadrature points, we
+					   // are able to compute the
+					   // coefficients $a_{n}$ in
+					   // these points.
 
 	  const double coeff = 1/sqrt(1 + gradients[q_point] * gradients[q_point]);
 
-					   // The assembly of the system then is the same as always, except
-					   // of the damping parameter of the Newton method, which we set on
-					   // 0.1 in this case.
+					   // The assembly of the
+					   // system then is the same
+					   // as always, except of the
+					   // damping parameter of the
+					   // Newton method, which we
+					   // set on 0.1 in this case.
 
 	  for (unsigned int i = 0; i < dofs_per_cell; ++i) {
 	    cell_rhs(i) -= (fe_values.shape_grad(i, q_point) * coeff
@@ -400,9 +460,11 @@ namespace Step15
 
 				   // @sect4{MinimalSurfaceProblem::solve}
 
-				   // The solve function is the same as always, we just have to
-				   // implement the minimal residual method as a solver and
-				   // apply the Newton update to the solution.
+				   // The solve function is the same
+				   // as always, we just have to
+				   // implement the minimal residual
+				   // method as a solver and apply the
+				   // Newton update to the solution.
 
   template <int dim>
   void MinimalSurfaceProblem<dim>::solve ()
@@ -419,7 +481,8 @@ namespace Step15
 
     hanging_node_constraints.distribute (newton_update);
 
-				     // In this step, the old solution is updated to the new one:
+				     // In this step, the old solution
+				     // is updated to the new one:
     const double alpha = determine_step_length();
     std::cout << "  step length alpha=" << alpha << std::endl;
     present_solution.add (alpha, newton_update);
@@ -433,10 +496,13 @@ namespace Step15
   }
 				   // @sect4{MinimalSurfaceProblem::refine_grid}
 
-				   // The first part of this function is the same as in step 6.
-				   // But after refining the mesh we have to transfer the old
-				   // solution to the new one, which is done with the help of
-				   // the SolutionTransfer class.
+				   // The first part of this function
+				   // is the same as in step 6.  But
+				   // after refining the mesh we have
+				   // to transfer the old solution to
+				   // the new one, which is done with
+				   // the help of the SolutionTransfer
+				   // class.
 
 
   template <int dim>
@@ -454,44 +520,74 @@ namespace Step15
 						     estimated_error_per_cell,
 						     0.3, 0.03);
 
-				     // Then we need an additional step: if, for example,
-				     // you flag a cell that is once more refined than its neighbor,
-				     // and that neighbor is not flagged for refinement, we would end
-				     // up with a jump of two refinement levels across a cell interface.
-				     // To avoid these situations, the library will
-				     // silently also have to refine the neighbor cell once. It does so
-				     // by calling the Triangulation::prepare_coarsening_and_refinement
-				     // function before actually doing the refinement and coarsening.
-				     // This function flags a set of additional cells for refinement or
-				     // coarsening, to enforce rules like the one-hanging-node rule.
-				     // The cells that are flagged for refinement and coarsening after
-				     // calling this function are exactly the ones that will actually
-				     // be refined or coarsened. Since the SolutionTransfer class needs
-				     // this information in order to store the data from the old mesh
-				     // and transfer to the new one.
+				     // Then we need an additional
+				     // step: if, for example, you
+				     // flag a cell that is once more
+				     // refined than its neighbor, and
+				     // that neighbor is not flagged
+				     // for refinement, we would end
+				     // up with a jump of two
+				     // refinement levels across a
+				     // cell interface.  To avoid
+				     // these situations, the library
+				     // will silently also have to
+				     // refine the neighbor cell
+				     // once. It does so by calling
+				     // the
+				     // Triangulation::prepare_coarsening_and_refinement
+				     // function before actually doing
+				     // the refinement and coarsening.
+				     // This function flags a set of
+				     // additional cells for
+				     // refinement or coarsening, to
+				     // enforce rules like the
+				     // one-hanging-node rule.  The
+				     // cells that are flagged for
+				     // refinement and coarsening
+				     // after calling this function
+				     // are exactly the ones that will
+				     // actually be refined or
+				     // coarsened. Since the
+				     // SolutionTransfer class needs
+				     // this information in order to
+				     // store the data from the old
+				     // mesh and transfer to the new
+				     // one.
 
     triangulation.prepare_coarsening_and_refinement ();
 
-				     // With this out of the way, we initialize a SolutionTransfer
-				     // object with the present DoFHandler and attach the solution
-				     // vector to it:
+				     // With this out of the way, we
+				     // initialize a SolutionTransfer
+				     // object with the present
+				     // DoFHandler and attach the
+				     // solution vector to it:
 
     SolutionTransfer<dim> solution_transfer(dof_handler);
     solution_transfer.prepare_for_coarsening_and_refinement(present_solution);
 
-				     // Then we do the actual refinement, and distribute degrees
-				     // of freedom on the new mesh:
+				     // Then we do the actual
+				     // refinement, and distribute
+				     // degrees of freedom on the new
+				     // mesh:
 
     triangulation.execute_coarsening_and_refinement();
     dof_handler.distribute_dofs(fe);
 
-				     // Finally, we retrieve the old solution interpolated to the new
-				     // mesh. Since the SolutionTransfer function does not actually
-				     // store the values of the old solution, but rather indices, we
-				     // need to preserve the old solution vector until we have gotten
-				     // the new interpolated values. Thus, we have the new values
-				     // written into a temporary vector, and only afterwards write
-				     // them into the solution vector object:
+				     // Finally, we retrieve the old
+				     // solution interpolated to the
+				     // new mesh. Since the
+				     // SolutionTransfer function does
+				     // not actually store the values
+				     // of the old solution, but
+				     // rather indices, we need to
+				     // preserve the old solution
+				     // vector until we have gotten
+				     // the new interpolated
+				     // values. Thus, we have the new
+				     // values written into a
+				     // temporary vector, and only
+				     // afterwards write them into the
+				     // solution vector object:
 
     Vector<double> tmp(dof_handler.n_dofs());
     solution_transfer.interpolate(present_solution,tmp);
@@ -499,16 +595,25 @@ namespace Step15
 
     set_boundary_values ();
 
-				     // On the new mesh, there are different hanging nodes, which shall
-				     // be enlisted in a matrix like before. To ensure there are no
-				     // hanging nodes of the old mesh in the matrix, it's first cleared:
+				     // On the new mesh, there are
+				     // different hanging nodes, which
+				     // shall be enlisted in a matrix
+				     // like before. To ensure there
+				     // are no hanging nodes of the
+				     // old mesh in the matrix, it's
+				     // first cleared:
     hanging_node_constraints.clear();
 
-				     // After doing so, the hanging nodes of the new mesh can be
-				     // enlisted in the matrix, like before. Calling the
-				     // <code>setup_system</code> function in the <code>run</code>
-				     // function again after this, the hanging nodes don't have to
-				     // be enlisted there once more.
+				     // After doing so, the hanging
+				     // nodes of the new mesh can be
+				     // enlisted in the matrix, like
+				     // before. Calling the
+				     // <code>setup_system</code>
+				     // function in the
+				     // <code>run</code> function
+				     // again after this, the hanging
+				     // nodes don't have to be
+				     // enlisted there once more.
 
     DoFTools::make_hanging_node_constraints(dof_handler, hanging_node_constraints);
     hanging_node_constraints.close();
@@ -519,10 +624,14 @@ namespace Step15
   template <int dim>
   void MinimalSurfaceProblem<dim>::set_boundary_values ()
   {
-				     // Having refined the mesh, there might be new nodal points on
-				     // the boundary. These have just interpolated values, but
-				     // not the right boundary values. This is fixed up, by
-				     // setting all boundary nodals explicit to the right value:
+				     // Having refined the mesh, there
+				     // might be new nodal points on
+				     // the boundary. These have just
+				     // interpolated values, but not
+				     // the right boundary
+				     // values. This is fixed up, by
+				     // setting all boundary nodals
+				     // explicit to the right value:
 
     std::map<unsigned int, double> boundary_values2;
     VectorTools::interpolate_boundary_values(dof_handler, 0,
@@ -533,40 +642,62 @@ namespace Step15
   }
 				   // @sect4{MinimalSurfaceProblem::run}
 
-				   // In the run function, the first grid is build. Also in this
-				   // function, the Newton iteration is implemented.
+				   // In the run function, the first
+				   // grid is build. Also in this
+				   // function, the Newton iteration
+				   // is implemented.
 
   template <int dim>
   void MinimalSurfaceProblem<dim>::run ()
   {
 
-				     // The integer refinement counts the mesh refinements. Obviously
-				     // starting the program, it should be zero.
+				     // The integer refinement counts
+				     // the mesh
+				     // refinements. Obviously
+				     // starting the program, it
+				     // should be zero.
     refinement=0;
     first_step=true;
 
-				     // As described in the introduction, the domain is a unitball around
-				     // the origin. The Mesh is globally refined two times, not to start
-				     // on the coarse mesh, which consists only of five cells.
+				     // As described in the
+				     // introduction, the domain is a
+				     // unitball around the
+				     // origin. The Mesh is globally
+				     // refined two times, not to
+				     // start on the coarse mesh,
+				     // which consists only of five
+				     // cells.
 
     GridGenerator::hyper_ball (triangulation);
     static const HyperBallBoundary<dim> boundary;
     triangulation.set_boundary (0, boundary);
     triangulation.refine_global(2);
 
-				     // The Newton iteration starts here. During the first step, there is
-				     // no residual computed, so the bool is needed here to enter the
-				     // iteration scheme. Later the Newton method will continue until the
-				     // residual is less than $10^{-3}$.
+				     // The Newton iteration starts
+				     // here. During the first step,
+				     // there is no residual computed,
+				     // so the bool is needed here to
+				     // enter the iteration
+				     // scheme. Later the Newton
+				     // method will continue until the
+				     // residual is less than
+				     // $10^{-3}$.
 
     double previous_res = 0;
     while(first_step || (previous_res>1e-3))
       {
 
-					 // In the first step, we compute the solution on the two times globally
-					 // refined mesh. After that the mesh will be refined
-					 // adaptively, in order to not get too many cells. The refinement
-					 // is the first thing done every time we restart the process in the while-loop.
+					 // In the first step, we
+					 // compute the solution on
+					 // the two times globally
+					 // refined mesh. After that
+					 // the mesh will be refined
+					 // adaptively, in order to
+					 // not get too many
+					 // cells. The refinement is
+					 // the first thing done every
+					 // time we restart the
+					 // process in the while-loop.
 	if(!first_step)
 	  {
 	    refine_grid();
@@ -576,8 +707,12 @@ namespace Step15
 	  }
 
 
-					 // First thing to do after refining the mesh, is to setup the vectors,
-					 // matrices, etc., which is done in the <code>setup_system</code>
+					 // First thing to do after
+					 // refining the mesh, is to
+					 // setup the vectors,
+					 // matrices, etc., which is
+					 // done in the
+					 // <code>setup_system</code>
 					 // function.
 
 	setup_system();
@@ -585,15 +720,21 @@ namespace Step15
 	if (first_step)
 	  set_boundary_values ();
 
-					 // On every mesh there are done five Newton steps, in order to get a
-					 // better solution, before the mesh gets too fine and the computations
-					 // take more time.
+					 // On every mesh there are
+					 // done five Newton steps, in
+					 // order to get a better
+					 // solution, before the mesh
+					 // gets too fine and the
+					 // computations take more
+					 // time.
 	std::cout<<"initial residual:"<<compute_residual(0)<<std::endl;
 
 	for(unsigned int i=0; i<5;++i)
 	  {
 
-					     // In every Newton step the system matrix and the right hand side
+					     // In every Newton step
+					     // the system matrix and
+					     // the right hand side
 					     // have to be computed.
 
 	    assemble_system ();
@@ -604,9 +745,13 @@ namespace Step15
 	    std::cout<<"residual:"<<compute_residual(0)<<std::endl;
 	  }
 
-					 // The fifth solution, as well as the Newton update,
-					 // on every mesh will be written in a vtk-file,
-					 // in order to show the convergence of the solution.
+					 // The fifth solution, as
+					 // well as the Newton update,
+					 // on every mesh will be
+					 // written in a vtk-file, in
+					 // order to show the
+					 // convergence of the
+					 // solution.
 
 	Assert (refinement < 100, ExcNotImplemented());
 
