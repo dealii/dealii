@@ -794,7 +794,7 @@ void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u)
       };
 
   system_matrix_newton.compress ();
-  system_rhs_newton.compress ();
+  system_rhs_newton.compress (Add);
 }
 
 template <int dim>
