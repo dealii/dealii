@@ -877,10 +877,9 @@ class ConstraintMatrix : public Subscriptor
                    BlockVectorType           &vector) const;
 
                                      /**
-                                      * Delete hanging nodes in a
-                                      * vector. Sets all hanging node
-                                      * values to zero. The @p
-                                      * VectorType may be a
+                                      * Sets the values of all constrained
+                                      * DoFs in a vector to zero.
+                                      * The @p VectorType may be a
                                       * Vector<float>, Vector<double>,
                                       * BlockVector<tt><...></tt>, a
                                       * PETSc or Trilinos vector
