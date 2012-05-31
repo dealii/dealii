@@ -97,7 +97,7 @@ namespace Step15
       void refine_grid ();
       void set_boundary_values ();
       double compute_residual (const double alpha) const;
-      double determine_step_length() const;
+      double determine_step_length () const;
 
       Triangulation<dim>   triangulation;
 
@@ -150,8 +150,7 @@ namespace Step15
   double BoundaryValues<dim>::value (const Point<dim> &p,
 				     const unsigned int /*component*/) const
   {
-    double return_value=sin(2*M_PI*(p[0]+p[1]));
-    return return_value;
+    return std::sin(2 * numbers::PI * (p[0]+p[1]));
   }
 
 				   // @sect3{The <code>MinimalSurfaceProblem</code> class implementation}

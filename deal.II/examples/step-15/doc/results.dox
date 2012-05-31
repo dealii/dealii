@@ -97,3 +97,12 @@ because there isn't much change in the solution. The final solution
 and mesh are shown here:
 
 @image html step-15.grid.png
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+<h4> Step length control </h4>
+
+<h4> Integrating mesh refinement and nonlinear solvers </h4>
