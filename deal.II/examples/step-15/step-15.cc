@@ -215,10 +215,7 @@ namespace Step15
       {
 	dof_handler.distribute_dofs (fe);
 	present_solution.reinit (dof_handler.n_dofs());
-	for(unsigned int i=0; i<dof_handler.n_dofs();++i)
-	  {
-	    present_solution(i)=0;
-	  }
+
 					 // The constraint matrix,
 					 // holding a list of the
 					 // hanging nodes, will be
@@ -291,55 +288,58 @@ namespace Step15
 	fe_values.reinit (cell);
 
 
-	for (unsigned int q_point = 0; q_point < n_q_points; ++q_point) {
+	for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+	  {
 
-					   // To setup up the linear
-					   // system, the gradient of
-					   // the old solution in the
-					   // quadrature points is
-					   // needed. For this purpose
-					   // there is is a function,
-					   // which will write these
-					   // gradients in a vector,
-					   // where every component of
-					   // the vector is a vector
-					   // itself:
+					     // To setup up the linear
+					     // system, the gradient of
+					     // the old solution in the
+					     // quadrature points is
+					     // needed. For this purpose
+					     // there is is a function,
+					     // which will write these
+					     // gradients in a vector,
+					     // where every component of
+					     // the vector is a vector
+					     // itself:
 
-	  std::vector<Tensor<1, dim> > gradients(n_q_points);
-	  fe_values.get_function_gradients(present_solution, gradients);
+	    std::vector<Tensor<1, dim> > gradients(n_q_points);
+	    fe_values.get_function_gradients(present_solution, gradients);
 
-					   // Having the gradients of
-					   // the old solution in the
-					   // quadrature points, we
-					   // are able to compute the
-					   // coefficients $a_{n}$ in
-					   // these points.
+					     // Having the gradients of
+					     // the old solution in the
+					     // quadrature points, we
+					     // are able to compute the
+					     // coefficients $a_{n}$ in
+					     // these points.
 
-	  const double coeff = 1/sqrt(1 + gradients[q_point] * gradients[q_point]);
+	    const double coeff = 1/sqrt(1 + gradients[q_point] * gradients[q_point]);
 
-					   // The assembly of the
-					   // system then is the same
-					   // as always, except of the
-					   // damping parameter of the
-					   // Newton method, which we
-					   // set on 0.1 in this case.
+					     // The assembly of the
+					     // system then is the same
+					     // as always, except of the
+					     // damping parameter of the
+					     // Newton method, which we
+					     // set on 0.1 in this case.
 
-	  for (unsigned int i = 0; i < dofs_per_cell; ++i) {
-	    for (unsigned int j = 0; j < dofs_per_cell; ++j) {
-	      cell_matrix(i, j) += (fe_values.shape_grad(i, q_point)
-				    * coeff
-				    * (fe_values.shape_grad(j, q_point)
-				       - coeff * coeff
-				       * (fe_values.shape_grad(j, q_point)
-					  * gradients[q_point])
-				       * gradients[q_point])
-				    * fe_values.JxW(q_point));
-	    }
+	    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+	      {
+		for (unsigned int j = 0; j < dofs_per_cell; ++j)
+		  {
+		    cell_matrix(i, j) += (fe_values.shape_grad(i, q_point)
+					  * coeff
+					  * (fe_values.shape_grad(j, q_point)
+					     - coeff * coeff
+					     * (fe_values.shape_grad(j, q_point)
+						* gradients[q_point])
+					     * gradients[q_point])
+					  * fe_values.JxW(q_point));
+		  }
 
-	    cell_rhs(i) -= (fe_values.shape_grad(i, q_point) * coeff
-			    * gradients[q_point] * fe_values.JxW(q_point));
+		cell_rhs(i) -= (fe_values.shape_grad(i, q_point) * coeff
+				* gradients[q_point] * fe_values.JxW(q_point));
+	      }
 	  }
-	}
 
 	cell->get_dof_indices (local_dof_indices);
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -401,44 +401,44 @@ namespace Step15
 	fe_values.reinit (cell);
 
 
-	for (unsigned int q_point = 0; q_point < n_q_points; ++q_point) {
+	for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+	  {
 
-					   // To setup up the linear
-					   // system, the gradient of
-					   // the old solution in the
-					   // quadrature points is
-					   // needed. For this purpose
-					   // there is is a function,
-					   // which will write these
-					   // gradients in a vector,
-					   // where every component of
-					   // the vector is a vector
-					   // itself:
+					     // To setup up the linear
+					     // system, the gradient of
+					     // the old solution in the
+					     // quadrature points is
+					     // needed. For this purpose
+					     // there is is a function,
+					     // which will write these
+					     // gradients in a vector,
+					     // where every component of
+					     // the vector is a vector
+					     // itself:
 
-	  std::vector<Tensor<1, dim> > gradients(n_q_points);
-	  fe_values.get_function_gradients(linearization_point, gradients);
+	    std::vector<Tensor<1, dim> > gradients(n_q_points);
+	    fe_values.get_function_gradients(linearization_point, gradients);
 
-					   // Having the gradients of
-					   // the old solution in the
-					   // quadrature points, we
-					   // are able to compute the
-					   // coefficients $a_{n}$ in
-					   // these points.
+					     // Having the gradients of
+					     // the old solution in the
+					     // quadrature points, we
+					     // are able to compute the
+					     // coefficients $a_{n}$ in
+					     // these points.
 
-	  const double coeff = 1/sqrt(1 + gradients[q_point] * gradients[q_point]);
+	    const double coeff = 1/sqrt(1 + gradients[q_point] * gradients[q_point]);
 
-					   // The assembly of the
-					   // system then is the same
-					   // as always, except of the
-					   // damping parameter of the
-					   // Newton method, which we
-					   // set on 0.1 in this case.
+					     // The assembly of the
+					     // system then is the same
+					     // as always, except of the
+					     // damping parameter of the
+					     // Newton method, which we
+					     // set on 0.1 in this case.
 
-	  for (unsigned int i = 0; i < dofs_per_cell; ++i) {
-	    cell_rhs(i) -= (fe_values.shape_grad(i, q_point) * coeff
-			    * gradients[q_point] * fe_values.JxW(q_point));
+	    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+	      cell_rhs(i) -= (fe_values.shape_grad(i, q_point) * coeff
+			      * gradients[q_point] * fe_values.JxW(q_point));
 	  }
-	}
 
 	cell->get_dof_indices (local_dof_indices);
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -684,7 +684,7 @@ namespace Step15
 				     // $10^{-3}$.
 
     double previous_res = 0;
-    while(first_step || (previous_res>1e-3))
+    while (first_step || (previous_res>1e-3))
       {
 
 					 // In the first step, we
@@ -698,7 +698,7 @@ namespace Step15
 					 // the first thing done every
 					 // time we restart the
 					 // process in the while-loop.
-	if(!first_step)
+	if (!first_step)
 	  {
 	    refine_grid();
 
