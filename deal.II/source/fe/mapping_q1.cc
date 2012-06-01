@@ -1647,7 +1647,10 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 				       // cell in hopes that this gives a
 				       // better starting point to the
 				       // following iteration
-      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
+//TODO: the following line was added in r25581 but it leads to
+// changes in the test results. investigate why this is so --
+// it shouldn't really make any difference...
+//      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
 
 				       // Use the get_data function to
 				       // create an InternalData with data
