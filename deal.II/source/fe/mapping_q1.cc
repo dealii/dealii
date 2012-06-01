@@ -1789,7 +1789,7 @@ transform_real_to_unit_cell_internal
 
 /*
   This function becomes a little tricky in dimension <2,3>.
-  There is a surface embbeded in R^3 and we pass a point p in R^3, that
+  There is a surface embedded in R^3 and we pass a point p in R^3, that
   is most likely not lying on the surface.
   We then ask,
   what point in R^2 (hopefully in the unit cell) satisfies that
