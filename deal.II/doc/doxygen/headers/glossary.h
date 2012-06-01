@@ -269,6 +269,41 @@
  * FiniteElement and FEValues classes.</dd>
  *
  *
+ * <dt class="glossary">@anchor GlossComponentMask <b>Component mask</b></dt>
+ *
+ * <dd>
+ * When using vector-valued elements (see @ref vector_valued) to solve systems
+ * of equations, one frequently wants to restrict some operations to only certain
+ * solution variables. For example, when solving the Stokes equations, one may
+ * wish to only interpolate boundary values for the velocity components
+ * but not the pressure. In deal.II, this is typically done by passing functions
+ * a <i>component mask</i>. Component masks are always specified as a
+ * <code>std::vector@<bool@></code>, i.e., an array with as many entries as the
+ * finite element has components (e.g., in the Stokes case, there are
+ * <code>dim+1</code> components) and where each entry is either true or false.
+ * In the example where we would like to interpolate boundary values only for
+ * the velocity components of the Stokes system, this component mask would then
+ * be <code>[true, true, false]</code> in 2d and <code>[true, true, true, false]</code>
+ * in 3d to indicate that no boundary values shall be set for the pressure variable
+ * (the last of the <code>dim+1</code> vector components of the solution.
+ *
+ * There are many functions that take such component masks, for example
+ * DoFTools::make_zero_boundary_values,
+ * VectorTools::interpolate_boundary_values,
+ * KellyErrorEstimator::estimate, etc. In some cases, there are multiple
+ * functions with these names but only some of them have a component mask
+ * argument.
+ *
+ * Many of the functions that take a component mask accept a vector of length
+ * zero to indicate <i>all components</i>, i.e., as if the vector had the
+ * correct length and was filled with only <code>true</code> values. The reason
+ * is that the empty vector can be constructed in place using the code snippet
+ * <code>std::vector@<bool@>()</code> and can thus be used as a default
+ * argument in function signatures.
+ * </dd>
+ *
+ *
+ *
  * <dt class="glossary">@anchor GlossCompress <b>Compressing distributed
  *                                              vectors and matrices</b></dt>
  *

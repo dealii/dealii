@@ -985,7 +985,8 @@ namespace DoFTools
                                     * as being constrained.
                                     *
                                     * The flags in the last parameter,
-                                    * @p component_mask denote which
+                                    * @p component_mask (see @ref GlossComponentMask)
+                                    * denote which
                                     * components of the finite element space
                                     * shall be constrained with periodic
                                     * boundary conditions. If it is left as
@@ -1063,7 +1064,8 @@ namespace DoFTools
                                     * marked as being constrained.
                                     *
                                     * The flags in the last parameter,
-                                    * @p component_mask denote which
+                                    * @p component_mask (see @ref GlossComponentMask)
+                                    * denote which
                                     * components of the finite element space
                                     * shall be constrained with periodic
                                     * boundary conditions. If it is left as
@@ -2578,6 +2580,11 @@ namespace DoFTools
                                     * shape function where at least
                                     * one of its nonzero components
                                     * is affected.
+                                    *
+                                    * The last argument indicates which
+                                    * components of the solution
+                                    * vector should be constrained to zero
+                                    * (see @ref GlossComponentMask).
                                     *
                                     * This function is used
                                     * in step-36, for

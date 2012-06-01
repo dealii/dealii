@@ -686,11 +686,16 @@ namespace VectorTools
                                     * map of boundary values.
                                     *
                                     * The parameter
-                                    * @p boundary_component
-                                    * corresponds to the number
+                                    * @p function_map argument
+                                    * provides a list of boundary
+                                    * indicators to be handled by
+                                    * this function and corresponding
+                                    * boundary value functions. The
+                                    * keys of this map
+                                    * correspond to the number
                                     * @p boundary_indicator of the
                                     * face.  types::internal_face_boundary_id
-                                    * is an illegal value, since
+                                    * is an illegal value for this key since
                                     * it is reserved for interior faces.
                                     *
                                     * The flags in the last
@@ -712,6 +717,7 @@ namespace VectorTools
                                     * boundary function will be used
                                     * for which the respective flag
                                     * was set in the component mask.
+                                    * See also @ref GlossComponentMask.
                                     *
                                     * It is assumed that the number
                                     * of components of the function
@@ -844,7 +850,8 @@ namespace VectorTools
                                     * reserved for interior faces.
                                     *
                                     * The flags in the last parameter, @p
-                                    * component_mask denote which
+                                    * component_mask (see @ref GlossComponentMask)
+                                    * denote which
                                     * components of the finite element
                                     * space shall be interpolated. If it
                                     * is left as specified by the default

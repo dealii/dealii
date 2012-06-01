@@ -254,7 +254,9 @@ class KellyErrorEstimator
                                       * vector-valued. You then have
                                       * to set those entries to true
                                       * in the bit-vector
-                                      * @p component_mask for which the
+                                      * @p component_mask
+                                      * (see @ref GlossComponentMask)
+                                      * for which the
                                       * respective component is to be
                                       * used in the error
                                       * estimator. The default is to
