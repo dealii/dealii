@@ -299,28 +299,30 @@
  * There are two ways to apply inhomogeneous constraints after creating the
  * ConstraintMatrix:
  *
- * First:
+ * First approach:
+ * - Apply the ConstraintMatrix::distribute_local_to_global() function to the
+ *   system matrix and the right-hand-side with the parameter
+ *   use_inhomogeneities_for_rhs = false (default)
  * - Set the solution to zero in the inhomogeneous constrained components
  *   using the ConstraintMatrix::set_zero() function (or start with a solution 
  *   vector equal to zero)
- * - Apply the ConstraintMatrix::distribute_local_to_global() function to the
- *   system matrix and the right-hand-side with the parameter 
- *   use_inhomogeneities_for_rhs = false (default)
  * - solve() the linear system
  * - Apply ConstraintMatrix::distribute() to the solution
  * 
- * Second:
- * - Set the concerning components of the solution to the inhomogeneous
- *   constrained values
+ * Second approach:
  * - Use the ConstraintMatrix::distribute_local_to_global() function with the parameter 
  *   use_inhomogeneities_for_rhs = true and apply it to
  *   the system matrix and the right-hand-side
+ * - Set the concerning components of the solution to the inhomogeneous
+ *   constrained values
  * - solve() the linear system
  * - Depending on the solver now you have to apply the ConstraintMatrix::distribute()
  *   function to the solution, because the solver could change the constrained
- *   values in the solution. For a krylov based solver this should not be the
- *   case, but it is still possible that there is a difference between the
- *   inhomogeneous value and the solution value in the order of machine precision.   
+ *   values in the solution. For a Krylov based solver this should not be strictly
+ *   necessary, but it is still possible that there is a difference between the
+ *   inhomogeneous value and the solution value in the order of machine precision,
+ *   and you may want to call ConstraintMatrix::distribute() anyway if you have
+ *   additional constraints such as from hanging nodes.
  *
  *
  * <h3>Dealing with conflicting constraints</h3>
