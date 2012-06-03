@@ -234,7 +234,10 @@ some more in the <a href="#Results">results section</a>.
 
 <h3> Summary of the algorithm and testcase </h3>
 
-Overall, the algorithm we use in this program works as follows:
+Overall, the program we have here is not unlike step-6 in many regards. The
+layout of the main class is essentially the same. On the other hand, the
+driving algorithm in the <code>run()</code> function is different and works as
+follows:
 <ol>
 <li>
   Start with the function $u^{0}\equiv 0$ and modify it in such a way
@@ -282,3 +285,8 @@ Overall, the algorithm we use in this program works as follows:
   Set $n\leftarrow n+1$ and go to step 2.
 </li>
 </ol>
+
+The testcase we solve is chosen as follows: We seek to find the solution of
+minimal surface over the unit disk $\Omega=\{\mathbf x: \|\mathbf
+x\|<1\}\subset \R^2$ where the surface attains the values
+$u(x,y)|{\partial\Omega} = g(x,y):=\sin(2 \pi (x+y))$ along the boundary.

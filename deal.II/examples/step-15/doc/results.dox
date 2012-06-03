@@ -3,45 +3,34 @@
 
 The output of the program looks as follows:
 @code
-residual:17.1036
-residual:0.0493566
-residual:0.0437197
-residual:0.0388877
-residual:0.0346918
-mesh-refinement:1
-residual:0.0479423
-residual:0.0427299
-residual:0.0381861
-residual:0.03418
-residual:0.0306245
-mesh-refinement:2
+* ******** Initial mesh  ********
+  Initial residual: 1.53143
+  Residual: 1.08746
+  Residual: 0.966748
+  Residual: 0.859602
+  Residual: 0.766462
+  Residual: 0.685475
+* ******** Refined mesh 1 ********
+  Initial residual: 0.865774
+  Residual: 0.759295
+  Residual: 0.675281
+  Residual: 0.603523
+  Residual: 0.540744
+  Residual: 0.485238
+* ******** Refined mesh 2 ********
+  Initial residual: 0.425581
+  Residual: 0.382042
+  Residual: 0.343307
+  Residual: 0.308718
 ....
-residual:0.00354605
-residual:0.00318818
-residual:0.00286721
-residual:0.00257911
-residual:0.00232034
-mesh-refinement:7
-residual:0.00211166
-residual:0.00189985
-residual:0.00170948
-residual:0.00153832
-residual:0.00138438
-mesh-refinement:8
-residual:0.00143114
-residual:0.00128729
-residual:0.00115805
-residual:0.00104189
-residual:0.000937454
-mesh-refinement:9
-
 @endcode
 
+Obviously, the scheme converges, if not very fast. We will come back to
+strategies for accelerating the method below.
 
-We can visualize the solution after each set of five Newton
+One can visualize the solution after each set of five Newton
 iterations, i.e., on each of the meshes on which we approximate the
 solution. This yields the following set of images:
-
 
 <TABLE WIDTH="100%">
 <tr>
@@ -103,6 +92,93 @@ and mesh are shown here:
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
+The program shows the basic structure of a solver for a nonlinear, stationary
+problem. However, it does not converge particularly fast, for good reasons:
+
+- The program always takes a step size of 0.1. This precludes the rapid,
+  quadratic convergence for which Newton's method is typically chosen.
+- It does not connect the nonlinear iteration with the mesh refinement
+  iteration.
+
+Obviously, a better program would have to address these two points.
+We will discuss them in the following.
+
+
 <h4> Step length control </h4>
 
-<h4> Integrating mesh refinement and nonlinear solvers </h4>
+Newton's method has two well known properties:
+- It does not converge from arbitrarily chosen starting points. Rather, a
+  starting point has to be close enough to the solution to guarantee
+  convergence. However, we can enlarge the area from which Newton's method
+  converges by damping the iteration using a <i>step length</i> 0<$\alpha^n\le
+  1$.
+- It exhibits rapid convergence of quadratic order if (i) the step length is
+  chosen as $\alpha^n=1$, and (ii) it does in fact converge with this choice
+  of step length.
+
+A consequence of these two observations is that a successful strategy is to
+choose $\alpha^n<1$ for the initial iterations until the iterate has come
+close enough to allow for convergence with full step length, at which point we
+want to switch to $\alpha^n=1$. The question is how to choose $\alpha^n$ in an
+automatic fashion that satisfies these criteria.
+
+We do not want to review the literature on this topic here, but only briefly
+mention that there are two fundamental approaches to the problem: backtracking
+line search and trust region methods. The former is more widely used for
+partial differential equations and essentially does the following:
+- Compute a search direction
+- See if the resulting residual of $u^n + \alpha^n\;\delta u^n$ with
+  $\alpha^n=1$ is "substantially smaller" than that of $u^n$ alone.
+- If so, then take $\alpha^n=1$.
+- If not, try whether the residual is "substantially smaller" with
+  $\alpha^n=2/3$.
+- If so, then take $\alpha^n=2/3$.
+- If not, try whether the residual is "substantially smaller" with
+  $\alpha^n=(2/3)^2$.
+- Etc.
+One can of course choose other factors $r, r^2, \ldots$ than the $2/3,
+(2/3)^2, \ldots$ chosen above, for $0<r<1$. It is obvious where the term
+"backtracking" comes from: we try a long step, but if that doesn't work we try
+a shorter step, and ever shorter step, etc. The function
+<code>determine_step_length()</code> is written the way it is to support
+exactly this kind of use case.
+
+Whether we accept a particular step length $\alpha^n$ depends on how we define
+"substantially smaller". There are a number of ways to do so, but without
+going into detail let us just mention that the most common ones are to use the
+Wolfe and Armijo-Goldstein conditions. For these, one can show the following:
+- There is always a step length $\alpha^n$ for which the conditions are
+  satisfied, i.e., the iteration never gets stuck as long as the problem is
+  convex.
+- If we are close enough to the solution, then the conditions allow for
+  $\alpha^n$, thereby enabling quadratic convergence.
+
+We will not dwell on this here any further but leave the implementation of
+such algorithms as an exercise. We note, however, that when implemented
+correctly then it is a common observation that most reasonably nonlinear
+problems can be solved in anywhere between 5 and 15 Newton iterations to
+engineering accuracy &mdash; substantially fewer than we need with the current
+version of the program.
+
+
+<h4> Integrating mesh refinement and nonlinear and linear solvers </h4>
+
+We currently do exactly 5 iterations on each mesh. But is this optimal? One
+could ask the following questions:
+- Maybe it is worthwhile doing more iterations on the initial meshes since
+  there, computations are cheap.
+- On the other hand, we do not want to do too many iterations on every mesh:
+  yes, we could drive the residual to zero on every mesh, but that would only
+  mean that the nonlinear iteration error is far smaller than the
+  discretization error.
+- Should we use solve the linear systems in each Newton step with higher or
+  lower accuracy?
+
+Ultimately, what this boils down to is that we somehow need to couple the
+discretization error on the current mesh with the nonlinear residual we want
+to achieve with the Newton iterations on a given mesh, and to the linear
+iteration we want to achieve with the CG method within each Newton
+iterations.
+
+How to do this is, again, not entirely trivial, and we again leave it as a
+future exercise.
