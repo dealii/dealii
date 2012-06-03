@@ -30,6 +30,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_gmres.h>
