@@ -1205,25 +1205,20 @@ namespace DoFTools
                                     * overwritten.
                                     *
                                     * If the finite element under
-                                    * consideration is not
-                                    * primitive, that is some or all
-                                    * of its shape functions are
-                                    * non-zero in more than one
-                                    * vector component (which holds,
-                                    * for example, for FE_Nedelec or
-                                    * FE_RaviartThomas elements), then
-                                    * shape functions cannot be
-                                    * associated with a single
-                                    * vector component. In this
-                                    * case, if <em>one</em> shape
-                                    * vector component of this
-                                    * element is flagged in
-                                    * @p component_select, then
-                                    * this is equivalent to
-                                    * selecting <em>all</em> vector
-                                    * components corresponding to
-                                    * this non-primitive base
-                                    * element.
+                                    * consideration is not primitive, that is
+                                    * some or all of its shape functions are
+                                    * non-zero in more than one vector
+                                    * component (which holds, for example, for
+                                    * FE_Nedelec or FE_RaviartThomas
+                                    * elements), then shape functions cannot
+                                    * be associated with a single vector
+                                    * component. In this case, if <em>one</em>
+                                    * shape vector component of this element
+                                    * is flagged in @p component_mask (see
+                                    * @ref GlossComponentMask), then this is
+                                    * equivalent to selecting <em>all</em>
+                                    * vector components corresponding to this
+                                    * non-primitive base element.
                                     */
   template <int dim, int spacedim>
   void
@@ -1268,7 +1263,7 @@ namespace DoFTools
    * freedom is at the boundary and
    * belongs to one of the selected
    * components, and @p false
-   * otherwise.
+   * otherwise. The function is used in step-15.
    *
    * By specifying the
    * @p boundary_indicator
@@ -1281,7 +1276,7 @@ namespace DoFTools
    * boundary indicators are
    * accepted.
    *
-   * The size of @p component_select
+   * The size of @p component_mask (see @ref GlossComponentMask)
    * shall equal the number of
    * components in the finite
    * element used by @p dof. The
@@ -1320,13 +1315,14 @@ namespace DoFTools
    *
    * @param dof_handler The object that describes which degrees of freedom
    *          live on which cell
-   * @param component_select A mask denoting the vector components of the
-   *          finite element that should be considered.
+   * @param component_mask A mask denoting the vector components of the
+   *          finite element that should be considered (see also
+   *          @ref GlossComponentMask).
    * @param selected_dofs The IndexSet object that is returned and that
    *          will contain the indices of degrees of freedom that are
    *          located on the boundary (and correspond to the selected
    *          vector components and boundary indicators, depending on
-   *          the values of the @p component_select and @p boundary_indicators
+   *          the values of the @p component_mask and @p boundary_indicators
    *          arguments).
    * @param boundary_indicators If empty, this function extracts the
    *          indices of the degrees of freedom for all parts of the boundary.
@@ -1337,7 +1333,7 @@ namespace DoFTools
   template <class DH>
   void
   extract_boundary_dofs (const DH                   &dof_handler,
-                         const std::vector<bool>    &component_select,
+                         const std::vector<bool>    &component_mask,
                          std::vector<bool>          &selected_dofs,
                          const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
 
@@ -1355,13 +1351,14 @@ namespace DoFTools
    *
    * @param dof_handler The object that describes which degrees of freedom
    *          live on which cell
-   * @param component_select A mask denoting the vector components of the
-   *          finite element that should be considered.
+   * @param component_mask A mask denoting the vector components of the
+   *          finite element that should be considered (see also
+   *          @ref GlossComponentMask).
    * @param selected_dofs The IndexSet object that is returned and that
    *          will contain the indices of degrees of freedom that are
    *          located on the boundary (and correspond to the selected
    *          vector components and boundary indicators, depending on
-   *          the values of the @p component_select and @p boundary_indicators
+   *          the values of the @p component_mask and @p boundary_indicators
    *          arguments).
    * @param boundary_indicators If empty, this function extracts the
    *          indices of the degrees of freedom for all parts of the boundary.
@@ -1372,7 +1369,7 @@ namespace DoFTools
   template <class DH>
   void
   extract_boundary_dofs (const DH                   &dof_handler,
-                         const std::vector<bool>    &component_select,
+                         const std::vector<bool>    &component_mask,
                          IndexSet                    &selected_dofs,
                          const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
 
@@ -1409,7 +1406,7 @@ namespace DoFTools
   template <class DH>
   void
   extract_dofs_with_support_on_boundary (const DH                   &dof_handler,
-                                         const std::vector<bool>    &component_select,
+                                         const std::vector<bool>    &component_mask,
                                          std::vector<bool>          &selected_dofs,
                                          const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
 
@@ -1914,17 +1911,17 @@ namespace DoFTools
                                    //@}
                                    /**
                                     * Extract a vector that represents the
-                                    * constant modes of the DoFHandler for
-                                    * the components chosen by
-                                    * <tt>component_select</tt>.  The
-                                    * constant modes on a discretization are
-                                    * the null space of a Laplace operator
-                                    * on the selected components with
-                                    * Neumann boundary conditions
-                                    * applied. The null space is a necessary
-                                    * ingredient for obtaining a good AMG
-                                    * preconditioner when using the class
-                                    * TrilinosWrappers::PreconditionAMG.
+                                    * constant modes of the DoFHandler for the
+                                    * components chosen by
+                                    * <tt>component_mask</tt> (see @ref
+                                    * GlossComponentMask).  The constant modes
+                                    * on a discretization are the null space
+                                    * of a Laplace operator on the selected
+                                    * components with Neumann boundary
+                                    * conditions applied. The null space is a
+                                    * necessary ingredient for obtaining a
+                                    * good AMG preconditioner when using the
+                                    * class TrilinosWrappers::PreconditionAMG.
                                     * Since the ML AMG package only works on
                                     * algebraic properties of the respective
                                     * matrix, it has no chance to detect
@@ -1932,22 +1929,22 @@ namespace DoFTools
                                     * or a vector valued problem. However, a
                                     * near null space supplies exactly the
                                     * needed information about these
-                                    * components.  The null space will
-                                    * consist of as many vectors as there
-                                    * are true arguments in
-                                    * <tt>component_select</tt>, each of
-                                    * which will be one in one vector component and
-                                    * zero in all others. We store this
-                                    * object in a vector of vectors, where
-                                    * the outer vector is of the size of the
-                                    * number of selected components, and
-                                    * each inner vector has as many
-                                    * components as there are (locally owned) degrees of
-                                    * freedom in the selected
-                                    * components. Note that any matrix
-                                    * associated with this null space must
-                                    * have been constructed using the same
-                                    * <tt>component_select</tt> argument,
+                                    * components.  The null space will consist
+                                    * of as many vectors as there are true
+                                    * arguments in <tt>component_mask</tt>
+                                    * (see @ref GlossComponentMask), each of
+                                    * which will be one in one vector
+                                    * component and zero in all others. We
+                                    * store this object in a vector of
+                                    * vectors, where the outer vector is of
+                                    * the size of the number of selected
+                                    * components, and each inner vector has as
+                                    * many components as there are (locally
+                                    * owned) degrees of freedom in the
+                                    * selected components. Note that any
+                                    * matrix associated with this null space
+                                    * must have been constructed using the
+                                    * same <tt>component_mask</tt> argument,
                                     * since the numbering of DoFs is done
                                     * relative to the selected dofs, not to
                                     * all dofs.
@@ -1960,7 +1957,7 @@ namespace DoFTools
   template <class DH>
   void
   extract_constant_modes (const DH                        &dof_handler,
-                          const std::vector<bool>         &component_select,
+                          const std::vector<bool>         &component_mask,
                           std::vector<std::vector<bool> > &constant_modes);
 
                                    /**
