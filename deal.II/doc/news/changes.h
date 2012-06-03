@@ -47,6 +47,13 @@ used for boundary indicators.
 
 
 <ol>
+<li>
+New: step-15 has been replaced by a program that demonstrates the
+solution of nonlinear problem (the minimal surface equation) using
+Newton's method.
+<br>
+(Sven Wetterauer, 2012/06/03)
+
 
 <li>
 New: step-48 demonstrates the solution of a nonlinear wave equation
@@ -201,6 +208,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: Computing the $W^{1,\infty}$ norm and seminorm in
+VectorTools::integrate_difference was not implemented. This is now
+fixed.
+<br>
+(Wolfgang Bangerth 2012/06/02)
+
 <li> Fixed: A problem in MappingQ::transform_real_to_unit_cell
 that sometimes led the algorithm in this function to abort.
 <br>

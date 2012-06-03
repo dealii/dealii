@@ -5192,9 +5192,9 @@ namespace VectorTools
                                                   0.0);
                       diff = std::sqrt(diff);
                       break;
+
                 case W1infty_seminorm:
                 case W1infty_norm:
-                      Assert(false, ExcNotImplemented());
                       std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
                       for (unsigned int k=0; k<n_components; ++k)
                         for (unsigned int q=0; q<n_q_points; ++q)
@@ -5207,8 +5207,16 @@ namespace VectorTools
                             psi_scalar[q] = std::max(psi_scalar[q],t);
                           }
 
-                      for (unsigned int i=0;i<psi_scalar.size();++i)
-                        diff = std::max (diff, psi_scalar[i]);
+                      // compute seminorm
+                      {
+                        double t = 0;
+                        for (unsigned int i=0;i<psi_scalar.size();++i)
+                          t = std::max (t, psi_scalar[i]);
+
+                        // then add seminorm to norm if that had previously been
+                        // computed
+                        diff += t;
+                      }
                       break;
                 default:
                       break;
