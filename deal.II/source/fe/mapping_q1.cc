@@ -1746,10 +1746,7 @@ transform_real_to_unit_cell_internal
 
                                        // Solve  [f'(x)]d=f(x)
       Tensor<1,spacedim> d;
-      Tensor<2,spacedim> df_1;
-
-      df_1 = invert(df);
-      contract (d, df_1, static_cast<const Tensor<1,spacedim>&>(f));
+      contract (d, invert(df), static_cast<const Tensor<1,spacedim>&>(f));
 
                                        // update of p_unit. The
                                        // spacedimth component of
