@@ -314,7 +314,7 @@
  *   use_inhomogeneities_for_rhs = true and apply it to
  *   the system matrix and the right-hand-side
  * - Set the concerning components of the solution to the inhomogeneous
- *   constrained values
+ *   constrained values (for example using ConstraintMatrix::distribute())
  * - solve() the linear system
  * - Depending on the solver now you have to apply the ConstraintMatrix::distribute()
  *   function to the solution, because the solver could change the constrained
