@@ -649,7 +649,7 @@ namespace FETools
   }
 
 
-
+/*
   template<>
   void
   compute_embedding_matrices(const FiniteElement<1,2> &,
@@ -680,7 +680,7 @@ namespace FETools
     Assert(false, ExcNotImplemented());
   }
 
-
+*/
 
   namespace {
     template<int dim, typename number, int spacedim>
@@ -688,7 +688,7 @@ namespace FETools
     compute_embedding_for_shape_function (
       const unsigned int i,
       const FiniteElement<dim, spacedim>& fe,
-      const FEValues<dim>& coarse,
+      const FEValues<dim, spacedim>& coarse,
       const Householder<double>& H,
       FullMatrix<number>& this_matrix)
     {
@@ -758,15 +758,15 @@ namespace FETools
       tria.begin_active()->set_refine_flag (RefinementCase<dim>(ref_case));
       tria.execute_coarsening_and_refinement ();
 
-      MappingCartesian<dim> mapping;
+      MappingQ1<dim,spacedim> mapping;
       const unsigned int degree = fe.degree;
       QGauss<dim> q_fine (degree+1);
       const unsigned int nq = q_fine.size();
 
-      FEValues<dim> fine (mapping, fe, q_fine,
-                          update_quadrature_points |
-                          update_JxW_values |
-                          update_values);
+      FEValues<dim,spacedim> fine (mapping, fe, q_fine,
+			           update_quadrature_points |
+			           update_JxW_values |
+			           update_values);
 
                                        // We search for the polynomial on
                                        // the small cell, being equal to
@@ -795,19 +795,24 @@ namespace FETools
 
       Threads::TaskGroup<void> task_group;
 
-      for (typename Triangulation<dim>::active_cell_iterator
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator
              fine_cell = tria.begin_active (); fine_cell != tria.end ();
            ++fine_cell, ++cell_number)
         {
           fine.reinit (fine_cell);
 
-                                           // evaluate on the coarse cell (which
-                                           // is the first -- inactive -- cell on
-                                           // the lowest level of the
-                                           // triangulation we have created)
-          const Quadrature<dim> q_coarse (fine.get_quadrature_points (),
-                                          fine.get_JxW_values ());
-          FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
+					   // evaluate on the coarse cell (which
+					   // is the first -- inactive -- cell on
+					   // the lowest level of the
+					   // triangulation we have created)
+          const std::vector<Point<spacedim> > &q_points_fine = fine.get_quadrature_points();
+          std::vector<Point<dim> > q_points_coarse(q_points_fine.size());
+          for (unsigned int i=0;i<q_points_fine.size();++i)
+              for (unsigned int j=0;j<dim;++j)
+                  q_points_coarse[i](j) = q_points_fine[i](j);
+	  const Quadrature<dim> q_coarse (q_points_coarse,
+					  fine.get_JxW_values ());
+	  FEValues<dim,spacedim> coarse (mapping, fe, q_coarse, update_values);
 
           coarse.reinit (tria.begin (0));
 
@@ -1072,7 +1077,7 @@ namespace FETools
   }
 
 
-
+/*
   template <>
   void
   compute_projection_matrices(const FiniteElement<1,2>&,
@@ -1097,7 +1102,7 @@ namespace FETools
   {
     Assert(false, ExcNotImplemented());
   }
-
+*/
 
 
   template <int dim, typename number, int spacedim>
@@ -1112,7 +1117,7 @@ namespace FETools
 
                                      // prepare FEValues, quadrature etc on
                                      // coarse cell
-    MappingCartesian<dim> mapping;
+    MappingQ1<dim,spacedim> mapping;
     QGauss<dim> q_fine(degree+1);
     const unsigned int nq = q_fine.size();
 
@@ -1123,7 +1128,7 @@ namespace FETools
       Triangulation<dim,spacedim> tr;
       GridGenerator::hyper_cube (tr, 0, 1);
 
-      FEValues<dim> coarse (mapping, fe, q_fine,
+      FEValues<dim,spacedim> coarse (mapping, fe, q_fine,
                             update_JxW_values | update_values);
 
       typename Triangulation<dim,spacedim>::cell_iterator coarse_cell
@@ -1181,9 +1186,9 @@ namespace FETools
         tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
         tr.execute_coarsening_and_refinement();
 
-        FEValues<dim> fine (mapping, fe, q_fine,
-                            update_quadrature_points | update_JxW_values |
-                            update_values);
+	FEValues<dim,spacedim> fine (mapping, fe, q_fine,
+			             update_quadrature_points | update_JxW_values |
+			             update_values);
 
         typename Triangulation<dim,spacedim>::cell_iterator coarse_cell
           = tr.begin(0);
@@ -1195,15 +1200,20 @@ namespace FETools
           {
             FullMatrix<double> &this_matrix = matrices[ref_case-1][cell_number];
 
-                                             // Compute right hand side,
-                                             // which is a fine level basis
-                                             // function tested with the
-                                             // coarse level functions.
-            fine.reinit(coarse_cell->child(cell_number));
-            Quadrature<dim> q_coarse (fine.get_quadrature_points(),
-                                      fine.get_JxW_values());
-            FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
-            coarse.reinit(coarse_cell);
+					     // Compute right hand side,
+					     // which is a fine level basis
+					     // function tested with the
+					     // coarse level functions.
+	    fine.reinit(coarse_cell->child(cell_number));
+            const std::vector<Point<spacedim> > &q_points_fine = fine.get_quadrature_points();
+            std::vector<Point<dim> > q_points_coarse(q_points_fine.size());
+            for (unsigned int q=0;q<q_points_fine.size();++q)
+                for (unsigned int j=0;j<dim;++j)
+                    q_points_coarse[q](j) = q_points_fine[q](j);            
+	    Quadrature<dim> q_coarse (q_points_coarse,
+				      fine.get_JxW_values());
+	    FEValues<dim,spacedim> coarse (mapping, fe, q_coarse, update_values);
+	    coarse.reinit(coarse_cell);
 
                                              // Build RHS
 

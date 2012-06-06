@@ -413,8 +413,8 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
  *
  * @author F. Prill 2006
  */
-template <int dim>
-class FE_DGQArbitraryNodes : public FE_DGQ<dim>
+template <int dim,int spacedim=dim>
+class FE_DGQArbitraryNodes : public FE_DGQ<dim,spacedim>
 {
   public:
                                      /**
@@ -448,7 +448,7 @@ class FE_DGQArbitraryNodes : public FE_DGQ<dim>
                                       * This function is needed by the
                                       * constructors of @p FESystem.
                                       */
-    virtual FiniteElement<dim> *clone() const;
+    virtual FiniteElement<dim,spacedim> *clone() const;
 };
 
 

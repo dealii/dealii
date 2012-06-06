@@ -207,6 +207,11 @@ enabled due to a missing include file in file
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
+<li> New: The finite element type FE_DGQArbitraryNodes is now
+working also in codimension one spaces. 
+<br>
+(Luca Heltai, Andrea Mola 2012/06/06)
+
 <ol>
 <li> Fixed: Computing the $W^{1,\infty}$ norm and seminorm in
 VectorTools::integrate_difference was not implemented. This is now

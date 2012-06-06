@@ -227,9 +227,9 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const Quadrature<1>& points)
                                    // matrices to the right sizes
   this->reinit_restriction_and_prolongation_matrices();
                                    // Fill prolongation matrices with embedding operators
-  FETools::compute_embedding_matrices (*this, this->prolongation);
+  FETools::compute_embedding_matrices<dim, double, spacedim> (*this, this->prolongation);
                                    // Fill restriction matrices with L2-projection
-  FETools::compute_projection_matrices (*this, this->restriction);
+  FETools::compute_projection_matrices<dim, double, spacedim> (*this, this->restriction);
 
                                    // Compute support points, which
                                    // are the tensor product of the
@@ -677,16 +677,16 @@ FE_DGQ<dim, spacedim>::memory_consumption () const
 
 
 
-template <int dim>
-FE_DGQArbitraryNodes<dim>::FE_DGQArbitraryNodes (const Quadrature<1>& points)
-                : FE_DGQ<dim>(points)
+template <int dim, int spacedim>
+FE_DGQArbitraryNodes<dim,spacedim>::FE_DGQArbitraryNodes (const Quadrature<1>& points)
+		: FE_DGQ<dim,spacedim>(points)
 {}
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::string
-FE_DGQArbitraryNodes<dim>::get_name () const
+FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
 {
                                    // note that the
                                    // FETools::get_fe_from_name
@@ -751,9 +751,9 @@ FE_DGQArbitraryNodes<dim>::get_name () const
 
 
 
-template <int dim>
-FiniteElement<dim> *
-FE_DGQArbitraryNodes<dim>::clone() const
+template <int dim, int spacedim>
+FiniteElement<dim,spacedim> *
+FE_DGQArbitraryNodes<dim,spacedim>::clone() const
 {
                                    // TODO[Prill] : There must be a better way
                                    // to extract 1D quadrature points from the
@@ -766,7 +766,7 @@ FE_DGQArbitraryNodes<dim>::clone() const
     qpoints[i] = Point<1>(this->unit_support_points[i][0]);
   Quadrature<1> pquadrature(qpoints);
 
-  return new FE_DGQArbitraryNodes<dim>(pquadrature);
+  return new FE_DGQArbitraryNodes<dim,spacedim>(pquadrature);
 }
 
 
