@@ -1832,6 +1832,8 @@ class Triangulation : public Subscriptor
                                       * replaces the boundary object given
                                       * before by a straight boundary
                                       * approximation.
+				      *
+				      * @ingroup boundary
                                       */
     void set_boundary (const types::boundary_id_t   number,
                        const Boundary<dim,spacedim> &boundary_object);
@@ -1844,6 +1846,8 @@ class Triangulation : public Subscriptor
                                       * undoes assignment of a different
                                       * boundary object by the function of
                                       * same name and two arguments.
+				      *
+				      * @ingroup boundary
                                       */
     void set_boundary (const types::boundary_id_t number);
 
@@ -1853,6 +1857,8 @@ class Triangulation : public Subscriptor
                                       * this triangulation.  Number is
                                       * the same as in
                                       * @p set_boundary
+				      *
+				      * @ingroup boundary
                                       */
     const Boundary<dim,spacedim> & get_boundary (const types::boundary_id_t number) const;
 
@@ -1868,6 +1874,8 @@ class Triangulation : public Subscriptor
                                       * the number of different
                                       * indicators (which is greater
                                       * or equal one).
+				      *
+				      * @ingroup boundary
                                       */
     std::vector<types::boundary_id_t> get_boundary_indicators() const;
 

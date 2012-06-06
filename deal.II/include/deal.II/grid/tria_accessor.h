@@ -1065,6 +1065,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * domain and so cannot determine whether
                                       * the value you are trying to set makes
                                       * sense under the current circumstances.
+				      *
+				      * @ingroup boundary
                                       */
     void set_boundary_indicator (const types::boundary_id_t) const;
 
@@ -1083,6 +1085,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * of face and edges are all set
                                       * at the same time using the
                                       * current function.
+				      *
+				      * @ingroup boundary
                                       */
     void set_all_boundary_indicators (const types::boundary_id_t) const;
 
@@ -2027,6 +2031,16 @@ class TriaAccessor<0, 1, spacedim>
                                       */
     static
     int isotropic_child_index (const unsigned int i);
+                                     /**
+                                      * @}
+                                      */
+
+                                     /**
+                                      *  @name Dealing with boundary indicators
+                                      */
+                                     /**
+                                      * @{
+                                      */
 
                                      /**
                                       * Set the boundary indicator.
@@ -2053,6 +2067,8 @@ class TriaAccessor<0, 1, spacedim>
                                       * domain and so cannot determine whether
                                       * the value you are trying to set makes
                                       * sense under the current circumstances.
+				      *
+				      * @ingroup boundary
                                       */
     void
     set_boundary_indicator (const types::boundary_id_t);
@@ -2062,9 +2078,14 @@ class TriaAccessor<0, 1, spacedim>
                                       * single vertex, call
                                       * set_boundary_indicator with the same
                                       * argument.
+				      *
+				      * @ingroup boundary
                                       */
     void
     set_all_boundary_indicators (const types::boundary_id_t);
+                                     /**
+                                      * @}
+                                      */
 
                                      /**
                                       * Return whether the vertex
