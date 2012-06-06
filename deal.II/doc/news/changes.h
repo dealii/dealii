@@ -48,12 +48,17 @@ used for boundary indicators.
 
 <ol>
 <li>
+New: step-43 is an extension of step-21 that shows efficient methods
+to solve multi-phase flow.
+<br>
+(Chih-Che Chueh, Wolfgang Bangerth, 2012/06/06)
+
+<li>
 New: step-15 has been replaced by a program that demonstrates the
 solution of nonlinear problem (the minimal surface equation) using
 Newton's method.
 <br>
 (Sven Wetterauer, 2012/06/03)
-
 
 <li>
 New: step-48 demonstrates the solution of a nonlinear wave equation
@@ -208,7 +213,7 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <li> New: The finite element type FE_DGQArbitraryNodes is now
-working also in codimension one spaces. 
+working also in codimension one spaces.
 <br>
 (Luca Heltai, Andrea Mola 2012/06/06)
 
