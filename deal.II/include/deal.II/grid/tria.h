@@ -1480,8 +1480,13 @@ class Triangulation : public Subscriptor
     };
 
 
-    typedef typename IteratorSelector::CellAccessor         cell_accessor;
-    typedef typename IteratorSelector::FaceAccessor         face_accessor;
+    typedef TriaRawIterator   <CellAccessor<dim,spacedim>         > raw_cell_iterator;
+    typedef TriaIterator      <CellAccessor<dim,spacedim>         > cell_iterator;
+    typedef TriaActiveIterator<CellAccessor<dim,spacedim>         > active_cell_iterator;
+
+    typedef TriaRawIterator   <TriaAccessor<dim-1, dim, spacedim> > raw_face_iterator;
+    typedef TriaIterator      <TriaAccessor<dim-1, dim, spacedim> > face_iterator;
+    typedef TriaActiveIterator<TriaAccessor<dim-1, dim, spacedim> > active_face_iterator;
 
     typedef typename IteratorSelector::raw_line_iterator    raw_line_iterator;
     typedef typename IteratorSelector::line_iterator        line_iterator;
@@ -1494,14 +1499,6 @@ class Triangulation : public Subscriptor
     typedef typename IteratorSelector::raw_hex_iterator    raw_hex_iterator;
     typedef typename IteratorSelector::hex_iterator        hex_iterator;
     typedef typename IteratorSelector::active_hex_iterator active_hex_iterator;
-
-    typedef typename IteratorSelector::raw_cell_iterator    raw_cell_iterator;
-    typedef typename IteratorSelector::cell_iterator        cell_iterator;
-    typedef typename IteratorSelector::active_cell_iterator active_cell_iterator;
-
-    typedef typename IteratorSelector::raw_face_iterator    raw_face_iterator;
-    typedef typename IteratorSelector::face_iterator        face_iterator;
-    typedef typename IteratorSelector::active_face_iterator active_face_iterator;
 
                                      /**
                                       *  Base class for refinement listeners.
