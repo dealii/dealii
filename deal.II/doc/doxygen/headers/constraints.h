@@ -302,7 +302,7 @@
  * First approach:
  * - Apply the ConstraintMatrix::distribute_local_to_global() function to the
  *   system matrix and the right-hand-side with the parameter
- *   use_inhomogeneities_for_rhs = false (default)
+ *   use_inhomogeneities_for_rhs = false (i.e., the default)
  * - Set the solution to zero in the inhomogeneous constrained components
  *   using the ConstraintMatrix::set_zero() function (or start with a solution
  *   vector equal to zero)
@@ -381,6 +381,15 @@
  *   solution vector to their correct values, by calling
  *   ConstraintMatrix::distribute() <i>before</i> solving the linear system
  *   (and then, as necessary, a second time after solving).
+ *
+ * In addition to these considerations, consider the case where we have
+ * inhomogeneous constraints of the kind $x_{3}=\tfrac 12 x_1 + \tfrac 12$,
+ * e.g., from a hanging node constraint of the form $x_{3}=\tfrac 12 (x_1 +
+ * x_2)$ where $x_2$ is itself constrained by boundary values to $x_2=1$.
+ * In this case, the ConstraintMatrix can of course not figure out what
+ * the final value of $x_3$ should be and, consequently, can not set the
+ * solution vector's third component correctly. Thus, the second approach will
+ * not work and you should take the first.
  *
  *
  * <h3>Dealing with conflicting constraints</h3>
