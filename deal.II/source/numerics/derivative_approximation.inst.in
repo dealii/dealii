@@ -56,6 +56,39 @@ template                                                 \
 void                                                     \
 DerivativeApproximation::                                \
 approximate_derivative_tensor<deal_II_dimension>         \
+(const Mapping<deal_II_dimension> & 	mapping,	 \
+ const DH<deal_II_dimension> &dof_handler,               \
+ const InputVector     &solution,                        \
+ const DH<deal_II_dimension>::active_cell_iterator &cell,\
+ Tensor<1,deal_II_dimension> &derivative,                \
+ const unsigned int     component);                      \
+                                                         \
+template                                                 \
+void                                                     \
+DerivativeApproximation::                                \
+approximate_derivative_tensor<deal_II_dimension>         \
+(const Mapping<deal_II_dimension> & 	mapping,	 \
+ const DH<deal_II_dimension> &dof_handler,               \
+ const InputVector     &solution,                        \
+ const DH<deal_II_dimension>::active_cell_iterator &cell,\
+ Tensor<2,deal_II_dimension> &derivative,                \
+ const unsigned int     component);                      \
+                                                         \
+template                                                 \
+void                                                     \
+DerivativeApproximation::                                \
+approximate_derivative_tensor<deal_II_dimension>         \
+(const Mapping<deal_II_dimension> & 	mapping,	 \
+ const DH<deal_II_dimension> &dof_handler,               \
+ const InputVector     &solution,                        \
+ const DH<deal_II_dimension>::active_cell_iterator &cell,\
+ Tensor<3,deal_II_dimension> &derivative,                \
+ const unsigned int     component);			 \
+							 \
+template                                                 \
+void                                                     \
+DerivativeApproximation::                                \
+approximate_derivative_tensor<deal_II_dimension>         \
 (const DH<deal_II_dimension> &dof_handler,               \
  const InputVector     &solution,                        \
  const DH<deal_II_dimension>::active_cell_iterator &cell,\

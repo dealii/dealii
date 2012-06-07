@@ -212,6 +212,11 @@ enabled due to a missing include file in file
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
+<li> Fixed: Some instantiations for
+DerivativeApproximation::approximate_derivative_tensor() were missing.
+<br>
+(Timo Heister 2012/06/07)
+
 <li> New: The finite element type FE_DGQArbitraryNodes is now
 working also in codimension one spaces.
 <br>
