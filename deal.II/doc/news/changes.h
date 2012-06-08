@@ -48,6 +48,13 @@ used for boundary indicators.
 
 <ol>
 <li>
+Fixed: Due to an apparent bug in autoconf, it was not possible to
+override the <code>F77</code> environment variable to select anything
+else than gfortran. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2012/06/08)
+
+<li>
 New: step-43 is an extension of step-21 that shows efficient methods
 to solve multi-phase flow.
 <br>

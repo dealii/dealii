@@ -279,7 +279,21 @@ dnl
 dnl It is possible that no Fortran 77 compiler was found. Don't care,
 dnl it may be that we don't need one (but we check below, when we must
 dnl have it).
-AC_PATH_PROGS(F77, [gfortran f77 g77])
+dnl
+dnl Note: While the autoconf documentation says that the AC_PATH_PROG
+dnl macro does nothing if the output variable (here: $F77) is already
+dnl set, this doesn't appear to be the case: if you set $F77 on the
+dnl command line, then it still finds /usr/bin/gfortran if gfortran
+dnl is listed first in the square brackets. Confusingly, it doesn't
+dnl find /usr/bin/gfortran if the order of things in square brackets
+dnl does *not* list gfortran first. Thus, explicitly test whether F77
+dnl is set and then short-circuit the process.
+if test "x$F77" = "x" ; then
+  AC_PATH_PROG(F77, [gfortran f77 g77])
+else
+  AC_PATH_PROG(F77, [$F77])
+fi
+
 
 dnl Next determine which f77 compiler we have here and set compilation
 dnl flags accordingly. Only do that if we have an F77 compiler at all.
