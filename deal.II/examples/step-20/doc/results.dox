@@ -297,7 +297,7 @@ follows:
 @image html step-20.u-random.png
 @image html step-20.p-random.png
 
-We will use these permeability fields again in step-21.
+We will use these permeability fields again in step-21 and step-43.
 
 
 <h4>Better linear solvers</h4>
