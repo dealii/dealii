@@ -283,6 +283,12 @@ KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
 }
 @endcode
 
+A piecewise constant interpolation of the diagonal elements of the
+inverse of this tensor (i.e., of <code>normalized_permeability</code>)
+looks as follows:
+
+@image html step-20.k-random.png
+
 
 With a permeability field like this, we would get x-velocities and pressures as
 follows:
