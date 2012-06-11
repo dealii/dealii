@@ -99,3 +99,13 @@ recomputed is appropriate; one may, for example, suggest that it is
 also important to decide whether (and by how much) a wrong velocity
 field in fact affects the solution of the saturation equation. This
 would then naturally lead to a sensitivity analysis.
+
+From an algorithmic viewpoint, we have here used a criterion for refinement
+that is often used in engineering, namely by looking at the gradient of
+the solution. However, if you inspect the solution, you will find that
+it quickly leads to refinement almost everywhere, even in regions where it
+is clearly not necessary: frequently used therefore does not need to imply
+that it is a useful criterion to begin with. On the other hand, replacing
+this criterion by a different and better one should not be very difficult.
+For example, the KellyErrorEstimator class used in many other programs
+should certainly be applicable to the current problem as well.
