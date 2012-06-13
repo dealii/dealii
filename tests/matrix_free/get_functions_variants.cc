@@ -37,9 +37,7 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
  public:
-  typedef VectorizedArray<Number> vector_t;
   typedef Vector<Number> VectorType;
-  static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data (data_in)
@@ -121,7 +119,7 @@ operator () (const MatrixFree<dim,Number> &data,
                                 // FEEvaluations. Those are tested in other
                                 // functions and seen as reference here
       for (unsigned int q=0; q<fe_eval.n_q_points; ++q)
-        for (unsigned int j=0; j<n_vectors; ++j)
+        for (unsigned int j=0; j<VectorizedArray<Number>::n_array_elements; ++j)
           {
             errors[0] += std::fabs(fe_eval.get_value(q)[j]-
                                    fe_eval2.get_value(q)[j]);

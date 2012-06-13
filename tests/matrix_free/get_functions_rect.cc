@@ -51,7 +51,7 @@ void test ()
   tria.begin(tria.n_levels()-1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  tria.refine_global (4-dim);
+  tria.refine_global (1);
 
   FE_Q<dim> fe (fe_degree);
   DoFHandler<dim> dof (tria);

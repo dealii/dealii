@@ -7,7 +7,7 @@ The algorithm for the matrix-vector product is based on the article <a
 href="http://dx.doi.org/10.1016/j.compfluid.2012.04.012">A generic
 interface for parallel cell-based finite element operator
 application</a> by Martin Kronbichler and Katharina Kormann, Computers
-and Fluids, 2012, and the paper &quot;Parallel finite element operator
+and Fluids 63:135&ndash;147, 2012, and the paper &quot;Parallel finite element operator
 application: Graph partitioning and coloring&quot; by Katharina
 Kormann and Martin Kronbichler in: Proceedings of the 7th IEEE
 International Conference on e-Science, 2011.  </i>
@@ -23,10 +23,12 @@ MatrixFree class handles constraints and how it can be
 parallelized over distributed nodes. Finally, we will use an explicit
 time-stepping method to solve the problem and introduce Gauss-Lobatto
 finite elements that are very convenient in this case since they have
-a diagonally, and thus trivially invertable, mass matrix. Moreover,
+a diagonal, and thus trivially invertible, mass matrix. Moreover,
 this type of elements clusters the nodes towards the element
-boundaries which is why it has good properties for high-order
-discretization methods.
+boundaries which is why they have good properties for high-order
+discretization methods. Indeed, the condition number of standard FE_Q
+elements with equidistant nodes grows exponentially with the degree,
+which destroys any benefit for orders of about five and higher.
 
 <h3> Problem statement and discretization </h3>
 

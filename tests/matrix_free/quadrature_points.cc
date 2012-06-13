@@ -63,9 +63,9 @@ void test ()
   }
 
   double error_points = 0, abs_points = 0;
-  const unsigned int n_cells = mf_data.get_size_info().n_macro_cells;
+  const unsigned int n_cells = mf_data.n_macro_cells();
   FEEvaluation<dim,fe_degree> fe_eval (mf_data);
-  FEValues<dim> fe_values (mapping, fe, mf_data.get_quad(),
+  FEValues<dim> fe_values (mapping, fe, mf_data.get_quadrature(),
                            update_quadrature_points);
 
   typedef VectorizedArray<double> vector_t;

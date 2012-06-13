@@ -25,9 +25,6 @@ template <int dim, typename Number>
 class MatrixFreeTestHP
 {
  public:
-  typedef VectorizedArray<Number> vector_t;
-  static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
-
   MatrixFreeTestHP(const MatrixFree<dim,Number> &data_in):
     data (data_in)
   {};

@@ -204,8 +204,9 @@ factor 12. This is the threshold when the cache in the processor can no longer
 hold all data necessary for the matrix-vector products and all matrix elements
 must be fetched from main memory. The second deviation is the times for the
 matrix-free solve which increase by less than a factor 8. This is because of
-more parallelism from more cells, exploited by the (involved) dynamic tasks
-scheduling approach CellFEOperator. Note that about 30% of the time in the
+more parallelism from more cells, exploited by the (involved) dynamic task
+scheduling approach taken in the cell loop of the MatrixFree class. Note
+that about 30% of the time in the
 matrix-free solver is spent on restriction and prolongation, which use sparse
 matrices. So the speedup could be even better if all parts where done
 efficiently.

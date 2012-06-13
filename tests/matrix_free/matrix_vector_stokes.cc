@@ -7,7 +7,7 @@
 
 // this function tests the correctness of the implementation of matrix free
 // matrix-vector products by comparing with the result of deal.II sparse
-// matrix. The mesh uses a hypercube mesh with no hanging nodes and no other
+// matrix. No hanging nodes and no other
 // constraints for a vector-valued problem (stokes equations).
 
 #include "../tests.h"
@@ -33,6 +33,8 @@ std::ofstream logfile("matrix_vector_stokes/output");
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vectors.h>
+
+#include "create_mesh.h"
 
 #include <fstream>
 #include <iostream>
@@ -113,23 +115,11 @@ template <int dim, int fe_degree>
 void test ()
 {
   Triangulation<dim>   triangulation;
-  {
-    std::vector<unsigned int> subdivisions (dim, 1);
-    subdivisions[0] = 4;
-
-    const Point<dim> bottom_left = (dim == 2 ?
-                                    Point<dim>(-2,-1) :
-                                    Point<dim>(-2,0,-1));
-    const Point<dim> top_right   = (dim == 2 ?
-                                    Point<dim>(2,0) :
-                                    Point<dim>(2,1,0));
-
-    GridGenerator::subdivided_hyper_rectangle (triangulation,
-                                               subdivisions,
-                                               bottom_left,
-                                               top_right);
-  }
-  triangulation.refine_global (4-dim);
+  create_mesh (triangulation);
+  if (fe_degree == 1)
+    triangulation.refine_global (4-dim);
+  else
+    triangulation.refine_global (3-dim);
 
   FE_Q<dim>            fe_u (fe_degree+1);
   FE_Q<dim>            fe_p (fe_degree);

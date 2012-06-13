@@ -42,12 +42,10 @@ template <int dim, int fe_degree, int n_q_points_1d=fe_degree+1, typename Number
 class MatrixFreeTest
 {
  public:
-  static const std::size_t n_vectors = VectorizedArray<Number>::n_vectors;
-
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data   (data_in),
     fe_val (data.get_dof_handler().get_fe(),
-            Quadrature<dim>(data.get_quad(0)),
+            Quadrature<dim>(data.get_quadrature(0)),
             update_values | update_gradients | update_hessians)
   {};
 
@@ -55,7 +53,7 @@ class MatrixFreeTest
              const Mapping<dim>               &mapping):
     data   (data_in),
     fe_val (mapping, data.get_dof_handler().get_fe(),
-            Quadrature<dim>(data.get_quad(0)),
+            Quadrature<dim>(data.get_quadrature(0)),
             update_values | update_gradients | update_hessians)
   {};
 
@@ -70,7 +68,6 @@ class MatrixFreeTest
                const Vector<Number> &src,
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
-    typedef VectorizedArray<Number> vector_t;
     FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval (data);
 
     std::vector<double> reference_values (fe_eval.n_q_points);
@@ -198,9 +195,6 @@ template <int dim, int fe_degree,typename Number>
 class MatrixFreeTest<dim,fe_degree,0,Number>
 {
  public:
-  typedef VectorizedArray<Number> vector_t;
-  static const std::size_t n_vectors = VectorizedArray<Number>::n_vectors;
-
   MatrixFreeTest(const MatrixFree<dim,Number> &)
   {};
 

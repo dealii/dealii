@@ -1,8 +1,9 @@
-/* Author: Katharina Kormann, Martin Kronbichler, Uppsala University, 2009-2011 */
+/* $Id$ */
+/* Author: Katharina Kormann, Martin Kronbichler, Uppsala University, 2009-2012 */
 
-/*    $Id$       */
+/*    $Id$    */
 /*                                                                */
-/*    Copyright (C) 2009, 2010, 2011, 2012 by the deal.II authors       */
+/*    Copyright (C) 2009, 2010, 2011, 2012 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -189,7 +190,7 @@ namespace Step37
                                    // writing to vectors), and hence SIMD can
                                    // be used to process several cells at
                                    // once. In all what follows, you can think
-                                   // of an AlignedVector to hold data from
+                                   // of a VectorizedArray to hold data from
                                    // several cells. For example, we evaluate
                                    // the coefficient shown here not on a
                                    // simple point as usually done, but we
@@ -206,7 +207,7 @@ namespace Step37
                                    // contains the x-coordinate for the first
                                    // point and the second point. You may
                                    // access the coordinates individually
-                                   // using e.g. <code>p[0][j]</code>, j=1,2,
+                                   // using e.g. <code>p[0][j]</code>, j=0,1,
                                    // but it is recommended to define
                                    // operations on a VectorizedArray as much
                                    // as possible in order to make use of

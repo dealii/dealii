@@ -38,17 +38,15 @@ template <int dim, int fe_degree, int n_q_points_1d=fe_degree+1, typename Number
 class MatrixFreeTest
 {
  public:
-  typedef VectorizedArray<Number> vector_t;
   typedef std::vector<Vector<Number> > VectorType;
-  static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data    (data_in),
     fe_val0 (data.get_dof_handler(0).get_fe(),
-             Quadrature<dim>(data.get_quad(0)),
+             Quadrature<dim>(data.get_quadrature(0)),
              update_values | update_gradients | update_hessians),
     fe_val1 (data.get_dof_handler(1).get_fe(),
-             Quadrature<dim>(data.get_quad(1)),
+             Quadrature<dim>(data.get_quadrature(1)),
              update_values | update_gradients | update_hessians)
   {};
 

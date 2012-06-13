@@ -932,8 +932,16 @@ public:
                                  * given hp index.
                                  */
   const Quadrature<dim> &
-  get_quad (const unsigned int quad_index = 0,
-            const unsigned int hp_active_fe_index = 0) const;
+  get_quadrature (const unsigned int quad_index = 0,
+                  const unsigned int hp_active_fe_index = 0) const;
+
+                                /**
+                                 * Returns the quadrature rule for
+                                 * given hp index.
+                                 */
+  const Quadrature<dim-1> &
+  get_face_quadrature (const unsigned int quad_index = 0,
+                       const unsigned int hp_active_fe_index = 0) const;
 
                                 /**
                                  * Queries whether or not the
@@ -1352,8 +1360,15 @@ MatrixFree<dim,Number>::create_cell_subrange_hp
  const unsigned int degree,
  const unsigned int vector_component) const
 {
-  if (dof_info[vector_component].cell_active_fe_index.size() == 0)
-    return range;
+  AssertIndexRange (vector_component, dof_info.size());
+  if (dof_info[vector_component].cell_active_fe_index.empty())
+    {
+      AssertDimension (dof_info[vector_component].fe_index_conversion.size(),1);
+      if (dof_info[vector_component].fe_index_conversion[0].first == degree)
+        return range;
+      else
+        return std::pair<unsigned int,unsigned int> (range.second,range.second);
+    }
 
   const unsigned int fe_index = 
     dof_info[vector_component].fe_index_from_degree(degree);
@@ -1691,12 +1706,25 @@ MatrixFree<dim,Number>::get_shape_info (const unsigned int index_fe,
 template <int dim, typename Number>
 inline
 const Quadrature<dim> &
-MatrixFree<dim,Number>::get_quad (const unsigned int quad_index,
-                                  const unsigned int active_fe_index) const
+MatrixFree<dim,Number>::get_quadrature (const unsigned int quad_index,
+                                        const unsigned int active_fe_index) const
 {
   AssertIndexRange (quad_index, mapping_info.mapping_data_gen.size());
   return mapping_info.mapping_data_gen[quad_index].
-    quadrature_formula[active_fe_index];
+    quadrature[active_fe_index];
+}
+
+
+
+template <int dim, typename Number>
+inline
+const Quadrature<dim-1> &
+MatrixFree<dim,Number>::get_face_quadrature (const unsigned int quad_index,
+                                             const unsigned int active_fe_index) const
+{
+  AssertIndexRange (quad_index, mapping_info.mapping_data_gen.size());
+  return mapping_info.mapping_data_gen[quad_index].
+    face_quadrature[active_fe_index];
 }
 
 

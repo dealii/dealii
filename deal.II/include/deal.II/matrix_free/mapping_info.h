@@ -261,14 +261,15 @@ namespace MatrixFreeFunctions
                                  * underlying the problem (constructed from a
                                  * 1D tensor product quadrature formula).
                                  */
-      dealii::hp::QCollection<dim>    quadrature_formula;
+      dealii::hp::QCollection<dim>    quadrature;
 
                                 /**
                                  * The (dim-1)-dimensional quadrature formula
-                                 * underlying the problem (constructed from a
-                                 * 1D tensor product quadrature formula).
+                                 * corresponding to face evaluation
+                                 * (constructed from a 1D tensor product
+                                 * quadrature formula).
                                  */
-      dealii::hp::QCollection<dim-1>  quadrature_formula_faces;
+      dealii::hp::QCollection<dim-1>  face_quadrature;
 
                                 /**
                                  * The number of quadrature points for the

@@ -25,9 +25,6 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTestGen : public MatrixFreeTest<dim, fe_degree, fe_degree+1, Number>
 {
  public:
-  typedef VectorizedArray<Number> vector_t;
-  static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
-
   MatrixFreeTestGen(const MatrixFree<dim,Number> &data,
                 const Mapping<dim>               &mapping):
     MatrixFreeTest<dim, fe_degree, fe_degree+1, Number>(data, mapping)

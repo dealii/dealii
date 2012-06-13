@@ -26,9 +26,6 @@ template <int dim, typename Number>
 class MatrixFreeTestHP
 {
  public:
-  typedef VectorizedArray<Number> vector_t;
-  static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
-
   MatrixFreeTestHP(const MatrixFree<dim,Number> &data_in):
     data (data_in)
   {};
@@ -132,11 +129,11 @@ void do_test (const unsigned int parallel_option)
   dof.distribute_dofs(fe_collection);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof,
-                                             constraints);
+                                           constraints);
   VectorTools::interpolate_boundary_values (dof,
-                                              0,
-                                              ZeroFunction<dim>(),
-                                              constraints);
+                                            0,
+                                            ZeroFunction<dim>(),
+                                            constraints);
   constraints.close ();
 
   //std::cout << "Number of cells: " << dof.get_tria().n_active_cells() << std::endl;
@@ -151,48 +148,55 @@ void do_test (const unsigned int parallel_option)
   mf_data.reinit (dof, constraints, quadrature_collection_mf, data);
   MatrixFreeTestHP<dim,number> mf (mf_data);
 
-  MatrixFree<dim,number> mf_data_par;
-  if (parallel_option == 0)
+                                // test different block sizes, starting from
+                                // auto setting (= 0)
+  for (unsigned int block_size = 0; block_size < 5; ++block_size)
     {
-      data.tasks_parallel_scheme =
-        MatrixFree<dim,number>::AdditionalData::partition_partition;
-      deallog << "Parallel option partition/partition" << std::endl;
-    }
-  else
-    {
-      data.tasks_parallel_scheme =
-        MatrixFree<dim,number>::AdditionalData::partition_color;
-      deallog << "Parallel option partition/color" << std::endl;
-    }
-  data.tasks_block_size = 1;
-  mf_data_par.reinit (dof, constraints, quadrature_collection_mf, data);
-  MatrixFreeTestHP<dim,number> mf_par(mf_data_par);
+      deallog.push ("blk_" + Utilities::int_to_string(block_size,1));
+      MatrixFree<dim,number> mf_data_par;
+      if (parallel_option == 0)
+        {
+          data.tasks_parallel_scheme =
+            MatrixFree<dim,number>::AdditionalData::partition_partition;
+          deallog << "Parallel option partition/partition" << std::endl;
+        }
+      else
+        {
+          data.tasks_parallel_scheme =
+            MatrixFree<dim,number>::AdditionalData::partition_color;
+          deallog << "Parallel option partition/color" << std::endl;
+        }
+      data.tasks_block_size = 1;
+      mf_data_par.reinit (dof, constraints, quadrature_collection_mf, data);
+      MatrixFreeTestHP<dim,number> mf_par(mf_data_par);
 
                                 // fill a right hand side vector with random
                                 // numbers in unconstrained degrees of freedom
-  Vector<number> src (dof.n_dofs());
-  Vector<number> result_ref(src), result_mf (src);
+      Vector<number> src (dof.n_dofs());
+      Vector<number> result_ref(src), result_mf (src);
 
-  for (unsigned int i=0; i<dof.n_dofs(); ++i)
-    {
-      if (constraints.is_constrained(i) == false)
-        src(i) = (double)rand()/RAND_MAX;
-    }
+      for (unsigned int i=0; i<dof.n_dofs(); ++i)
+        {
+          if (constraints.is_constrained(i) == false)
+            src(i) = (double)rand()/RAND_MAX;
+        }
 
-                                // now perform 50 matrix-vector products in
+                                // now perform 30 matrix-vector products in
                                 // parallel and check their correctness (take
                                 // many of them to make sure that we hit an
                                 // error)
-  mf.vmult (result_ref, src);
-  deallog << "Norm of difference: ";
-  for (unsigned int i=0; i<50; ++i)
-    {
-      mf_par.vmult (result_mf, src);
-      result_mf -= result_ref;
-      double diff_norm = result_mf.linfty_norm()/result_ref.linfty_norm();
-      deallog << diff_norm << "  ";
+      mf.vmult (result_ref, src);
+      deallog << "Norm of difference: ";
+      for (unsigned int i=0; i<50; ++i)
+        {
+          mf_par.vmult (result_mf, src);
+          result_mf -= result_ref;
+          double diff_norm = result_mf.linfty_norm()/result_ref.linfty_norm();
+          deallog << diff_norm << "  ";
+        }
+      deallog << std::endl << std::endl;
+      deallog.pop();
     }
-  deallog << std::endl << std::endl;
 }
 
 

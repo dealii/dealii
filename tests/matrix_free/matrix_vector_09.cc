@@ -20,6 +20,9 @@ std::ofstream logfile("matrix_vector_09/output");
 template <int dim, int fe_degree>
 void test ()
 {
+  if (fe_degree > 1)
+    return;
+
   Triangulation<dim> tria;
   create_mesh (tria, 1e-20);
   tria.begin_active ()->set_refine_flag();
@@ -31,12 +34,9 @@ void test ()
     if (cell->center().norm()<0.5*1e-20)
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  if (dim < 3 || fe_degree < 2)
-    tria.refine_global(1);
   tria.begin(tria.n_levels()-1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  tria.refine_global(1);
   cell = tria.begin_active ();
   for (unsigned int i=0; i<10-3*dim; ++i)
     {

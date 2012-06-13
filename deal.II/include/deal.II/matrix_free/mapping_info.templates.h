@@ -130,11 +130,11 @@ namespace MatrixFreeFunctions
   template <int dim, typename Number>
   void
   MappingInfo<dim,Number>::initialize
-  (const dealii::Triangulation<dim>                                 &tria,
+  (const dealii::Triangulation<dim>                         &tria,
    const std::vector<std::pair<unsigned int,unsigned int> > &cells,
    const std::vector<unsigned int>                          &active_fe_index,
    const Mapping<dim>                                       &mapping,
-   const std::vector<dealii::hp::QCollection<1> >                   &quad,
+   const std::vector<dealii::hp::QCollection<1> >           &quad,
    const UpdateFlags                                         update_flags_input)
   {
     clear();
@@ -204,16 +204,16 @@ namespace MatrixFreeFunctions
 
             current_data.n_q_points_face.push_back 
               (Utilities::fixed_power<dim-1>(n_q_points_1d[q]));
-            current_data.quadrature_formula.push_back
+            current_data.quadrature.push_back
               (Quadrature<dim>(quad[my_q][q]));
-            current_data.quadrature_formula_faces.push_back
+            current_data.face_quadrature.push_back
               (Quadrature<dim-1>(quad[my_q][q]));
 
                                 // set quadrature weights in vectorized form
             current_data.quadrature_weights[q].resize(n_q_points);
             for (unsigned int i=0; i<n_q_points; ++i)
               current_data.quadrature_weights[q][i] =
-                current_data.quadrature_formula[q].get_weights()[i];
+                current_data.quadrature[q].get_weights()[i];
 
             if (n_hp_quads > 1)
               current_data.quad_index_conversion[q] = n_q_points;
@@ -260,7 +260,7 @@ namespace MatrixFreeFunctions
                                 // finite element, so just hold a vector of
                                 // FEValues
         std::vector<std_cxx1x::shared_ptr<FEValues<dim> > >
-          fe_values (current_data.quadrature_formula.size());
+          fe_values (current_data.quadrature.size());
         UpdateFlags update_flags_feval =
           (update_flags & update_inverse_jacobians ? update_jacobians : update_default) |
           (update_flags & update_jacobian_grads ? update_jacobian_grads : update_default) |
@@ -307,7 +307,7 @@ namespace MatrixFreeFunctions
             if (fe_values[fe_index].get() == 0)
               fe_values[fe_index].reset 
                 (new FEValues<dim> (mapping, dummy_fe,
-                                    current_data.quadrature_formula[fe_index],
+                                    current_data.quadrature[fe_index],
                                     update_flags_feval));
             FEValues<dim> &fe_val = *fe_values[fe_index];
             data.resize (n_q_points);
@@ -912,8 +912,8 @@ namespace MatrixFreeFunctions
     memory += MemoryConsumption::memory_consumption (jacobians_grad_upper);
     memory += MemoryConsumption::memory_consumption (rowstart_q_points);
     memory += MemoryConsumption::memory_consumption (quadrature_points);
-    memory += MemoryConsumption::memory_consumption (quadrature_formula);
-    memory += MemoryConsumption::memory_consumption (quadrature_formula_faces);
+    memory += MemoryConsumption::memory_consumption (quadrature);
+    memory += MemoryConsumption::memory_consumption (face_quadrature);
     memory += MemoryConsumption::memory_consumption (quadrature_weights);
     memory += MemoryConsumption::memory_consumption (n_q_points);
     memory += MemoryConsumption::memory_consumption (n_q_points_face);

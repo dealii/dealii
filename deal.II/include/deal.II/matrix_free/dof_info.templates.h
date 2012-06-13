@@ -566,6 +566,8 @@ namespace MatrixFreeFunctions
                                        std::vector<unsigned int> &renumbering,
                                        std::vector<unsigned int> &irregular_cells)
   {
+    if (max_fe_index < 2)
+      return;
     const unsigned int n_active_cells = size_info.n_active_cells;
     const unsigned int vectorization_length = size_info.vectorization_length;
     irregular_cells.resize (0);

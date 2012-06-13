@@ -1,9 +1,9 @@
 /* $Id$ */
-/* Author: Katharina Kormann, Martin Kronbichler, Uppsala University, 2011 */
+/* Author: Katharina Kormann, Martin Kronbichler, Uppsala University, 2011-2012 */
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2011, 2012 by the deal.II authors       */
+/*    Copyright (C) 2011, 2012 by the deal.II authors             */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -96,8 +96,6 @@ namespace Step48
   class SineGordonOperation
   {
     public:
-      typedef VectorizedArray<double> vector_t;
-
       SineGordonOperation(const MatrixFree<dim,double> &data_in,
                           const double                      time_step);
 
@@ -105,12 +103,12 @@ namespace Step48
                   const std::vector<parallel::distributed::Vector<double>*> &src) const;
 
     private:
-      const MatrixFree<dim,double>     &data;
-      const vector_t                        delta_t_sqr;
+      const MatrixFree<dim,double>         &data;
+      const VectorizedArray<double>         delta_t_sqr;
       parallel::distributed::Vector<double> inv_mass_matrix;
 
-      void local_apply (const MatrixFree<dim,double>                  &data,
-                        parallel::distributed::Vector<double>             &dst,
+      void local_apply (const MatrixFree<dim,double>               &data,
+                        parallel::distributed::Vector<double>      &dst,
                         const std::vector<parallel::distributed::Vector<double>*>&src,
                         const std::pair<unsigned int,unsigned int> &cell_range) const;
   };
@@ -141,12 +139,12 @@ namespace Step48
   template <int dim, int fe_degree>
   SineGordonOperation<dim,fe_degree>::
   SineGordonOperation(const MatrixFree<dim,double> &data_in,
-                      const double                      time_step)
+                      const double                  time_step)
                   :
                   data(data_in),
                   delta_t_sqr(make_vectorized_array(time_step*time_step))
   {
-    vector_t one = make_vectorized_array (1.);
+    VectorizedArray<double> one = make_vectorized_array (1.);
 
     data.initialize_dof_vector (inv_mass_matrix);
 
@@ -242,8 +240,8 @@ namespace Step48
 
         for (unsigned int q=0; q<current.n_q_points; ++q)
           {
-            const vector_t current_value = current.get_value(q);
-            const vector_t old_value     = old.get_value(q);
+            const VectorizedArray<double> current_value = current.get_value(q);
+            const VectorizedArray<double> old_value     = old.get_value(q);
 
             current.submit_value (2.*current_value - old_value -
                                   delta_t_sqr * std::sin(current_value),q);
@@ -269,9 +267,9 @@ namespace Step48
                                    // the cell loop is implemented in the cell
                                    // finite element operator class. On each cell
                                    // it applies the routine defined as the
-                                   // <code>operator ()</code> method of the
+                                   // <code>local_apply()</code> method of the
                                    // class <code>SineGordonOperation</code>,
-                                   // i.e., <code>*this</code>. One could also
+                                   // i.e., <code>this</code>. One could also
                                    // provide a function with the same signature
                                    // that is not part of a class.
   template <int dim, int fe_degree>
@@ -468,7 +466,7 @@ namespace Step48
                                      // to use shared-memory parallelization (hence
                                      // one would use multithreading for intra-node
                                      // parallelism and not MPI; note that we here
-                                     // choose the standard option &mdash if we
+                                     // choose the standard option &mdash; if we
                                      // wanted to disable shared memory
                                      // parallelization, we would choose @p
                                      // none). Finally, three solution vectors are

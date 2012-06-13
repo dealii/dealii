@@ -184,7 +184,12 @@ internal_reinit(const Mapping<dim>                         &mapping,
                                 // cell, Jacobian determinants, quadrature
                                 // points in real space, based on the ordering
                                 // of the cells determined in @p
-                                // extract_local_to_global_indices.
+                                // extract_local_to_global_indices. The
+                                // algorithm assumes that the active FE index
+                                // for the transformations is given the active
+                                // FE index in the zeroth DoFHandler. TODO:
+                                // how do things look like in the more general
+                                // case?
   if(additional_data.initialize_mapping == true)
     {
       mapping_info.initialize (dof_handler[0]->get_tria(), cell_level_index,
@@ -486,14 +491,15 @@ void MatrixFree<dim,Number>::initialize_indices
           for (unsigned int f=0; f<fe.size(); ++f)
             fes.push_back (&fe[f]);
 
-          dof_info[no].cell_active_fe_index.resize(n_active_cells,
-                                                   numbers::invalid_unsigned_int);
           dof_info[no].max_fe_index = fe.size();
           dof_info[no].fe_index_conversion.resize (fe.size());
           for (unsigned int ind=0; ind<hpdof->get_fe().size(); ++ind)
             dof_info[no].fe_index_conversion[ind] =
               std::pair<unsigned int,unsigned int>(fe[ind].degree,
                                                    fe[ind].dofs_per_cell);
+          if (fe.size() > 1)
+            dof_info[no].cell_active_fe_index.resize(n_active_cells,
+                                                     numbers::invalid_unsigned_int);
         }
       else
         {
@@ -502,6 +508,10 @@ void MatrixFree<dim,Number>::initialize_indices
             &*dof_handlers.dof_handler[no] : &*dof_handlers.mg_dof_handler[no];
           fes.push_back (&dofh->get_fe());
           dof_info[no].max_fe_index = 1;
+          dof_info[no].fe_index_conversion.resize (1);
+          dof_info[no].fe_index_conversion[0] =
+            std::pair<unsigned int,unsigned int>(fes.back()->degree,
+                                                 fes.back()->dofs_per_cell);
         }
 
       lexicographic_inv[no].resize (fes.size());
@@ -654,8 +664,9 @@ void MatrixFree<dim,Number>::initialize_indices
                          cell_level_index[counter].first,
                          cell_level_index[counter].second,
                          dofh);
-              dof_info[no].cell_active_fe_index[counter] =
-                cell_it->active_fe_index();
+              if (dofh->get_fe().size() > 1)
+                dof_info[no].cell_active_fe_index[counter] =
+                  cell_it->active_fe_index();
               local_dof_indices.resize (cell_it->get_fe().dofs_per_cell);
               cell_it->get_dof_indices(local_dof_indices);
               dof_info[no].read_dof_indices (local_dof_indices,

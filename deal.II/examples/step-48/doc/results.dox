@@ -2,7 +2,7 @@
 
 <h3>Comparison with a sparse matrix</h3>
 
-In order to demonstrate the gain in using the CellFEOperator class instead of
+In order to demonstrate the gain in using the MatrixFree class instead of
 the standard <code>deal.II</code> assembly routines for evaluating the
 information from old time steps, we study a simple serial run of the code on a
 nonadaptive mesh. Since much time is spent on evaluating the sine function, we
@@ -59,7 +59,7 @@ following table.
    </tr>
 </table>
 
-It is apparent that the CellFEOperator outperforms the standard assembly
+It is apparent that the matrix-free code outperforms the standard assembly
 routines in deal.II by far. In 3D and for fourth order elements, one operator
 application is also almost ten times as fast as a sparse matrix-vector
 product.

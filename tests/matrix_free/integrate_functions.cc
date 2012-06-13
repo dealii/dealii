@@ -36,14 +36,12 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
  public:
-  typedef VectorizedArray<Number> vector_t;
   typedef std::vector<Vector<Number>*> VectorType;
-  static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data   (data_in),
     fe_val (data.get_dof_handler().get_fe(),
-            Quadrature<dim>(data.get_quad(0)),
+            Quadrature<dim>(data.get_quadrature(0)),
             update_values | update_gradients | update_JxW_values)
   {};
 
@@ -83,8 +81,8 @@ operator () (const MatrixFree<dim,Number> &data,
   FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
   const unsigned int n_q_points = fe_eval.n_q_points;
   const unsigned int dofs_per_cell = fe_eval.dofs_per_cell;
-  AlignedVector<vector_t> values (n_q_points);
-  AlignedVector<vector_t> gradients (dim*n_q_points);
+  AlignedVector<VectorizedArray<Number> > values (n_q_points);
+  AlignedVector<VectorizedArray<Number> > gradients (dim*n_q_points);
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
     {
@@ -121,7 +119,7 @@ operator () (const MatrixFree<dim,Number> &data,
       for (unsigned int q=0; q<n_q_points; ++q)
         {
           fe_eval.submit_value (values[q], q);
-          Tensor<1,dim,vector_t> submit (false);
+          Tensor<1,dim,VectorizedArray<Number> > submit (false);
           for (unsigned int d=0; d<dim; ++d)
             submit[d] = gradients[q*dim+d];
           fe_eval.submit_gradient (submit, q);

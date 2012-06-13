@@ -38,8 +38,6 @@ template <int dim, int fe_degree, int n_q_points_1d=fe_degree+1, typename Number
 class MatrixFreeTest
 {
  public:
-  static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
-
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data   (data_in)
   {};
@@ -52,8 +50,6 @@ class MatrixFreeTest
                const Vector<Number> &src,
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
-    typedef VectorizedArray<Number> vector_t;
-    const unsigned int n_vectors = sizeof(vector_t)/sizeof(Number);
     FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval (data);
     FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval_plain (data);
     for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
@@ -65,7 +61,7 @@ class MatrixFreeTest
         fe_eval_plain.read_dof_values_plain(src);
 
         for (unsigned int i=0; i<fe_eval.dofs_per_cell; ++i)
-          for (unsigned int j=0; j<n_vectors; ++j)
+          for (unsigned int j=0; j<VectorizedArray<Number>::n_array_elements; ++j)
             {
               error += std::fabs(fe_eval.get_dof_value(i)[j]-
                                  fe_eval_plain.get_dof_value(i)[j]);
