@@ -964,6 +964,7 @@ namespace Step47
         computed_quantities[q](0)
           = (uh[q](0)
              +
+//TODO: shift in weight function is missing!
              uh[q](1) * std::fabs(level_set(evaluation_points[q])));
         computed_quantities[q](1)
           = (computed_quantities[q](0)
@@ -981,8 +982,7 @@ namespace Step47
 
     std::string filename = "solution-";
     filename += ('0' + cycle);
-                                     //filename += ".vtk";
-    filename += ".gmv";
+    filename += ".vtk";
 
     std::ofstream output (filename.c_str());
 
@@ -994,8 +994,7 @@ namespace Step47
     data_out.add_data_vector (solution, postprocessor);
     data_out.build_patches (5);
 
-                                     //data_out.write_vtk (output);
-    data_out.write_gmv (output);
+    data_out.write_vtk (output);
   }
 
 
