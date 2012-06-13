@@ -288,5 +288,5 @@ follows:
 
 The testcase we solve is chosen as follows: We seek to find the solution of
 minimal surface over the unit disk $\Omega=\{\mathbf x: \|\mathbf
-x\|<1\}\subset \R^2$ where the surface attains the values
+x\|<1\}\subset {\mathbb R}^2$ where the surface attains the values
 $u(x,y)|{\partial\Omega} = g(x,y):=\sin(2 \pi (x+y))$ along the boundary.
