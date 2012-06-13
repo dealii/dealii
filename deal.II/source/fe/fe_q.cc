@@ -535,7 +535,7 @@ FE_Q<dim,spacedim>::FE_Q (const unsigned int degree)
 {
   Assert (degree > 0,
           ExcMessage ("This element can only be used for polynomial degrees "
-                      "at least zero"));
+                      "greater than zero"));
 
   std::vector<unsigned int> renumber (this->dofs_per_cell);
   FETools::hierarchic_to_lexicographic_numbering (*this, renumber);
