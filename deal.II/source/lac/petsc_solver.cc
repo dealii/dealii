@@ -285,7 +285,12 @@ namespace PETScWrappers
                                      // for a char*, even though KSPXXXX is of
                                      // type const char*
     int ierr;
+
+#if DEAL_II_PETSC_VERSION_LT(3,3,0)
     ierr = KSPSetType (ksp, const_cast<char *>(KSPCHEBYCHEV));
+#else
+    ierr = KSPSetType (ksp, const_cast<char *>(KSPCHEBYSHEV));
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in the deal.II solvers, we always

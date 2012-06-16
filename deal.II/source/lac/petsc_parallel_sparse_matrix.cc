@@ -195,7 +195,14 @@ namespace PETScWrappers
                                        // for all rows globally
       int ierr;
 
-#ifdef DEAL_II_USE_PETSC_DEV
+#if DEAL_II_PETSC_VERSION_LT(3,3,0)
+      ierr
+        = MatCreateMPIAIJ (communicator,
+                           local_rows, local_columns,
+                           m, n,
+                           n_nonzero_per_row, 0, 0, 0,
+                           &matrix);
+#else
       ierr
         = MatCreateAIJ (communicator,
                         local_rows, local_columns,
@@ -205,13 +212,6 @@ namespace PETScWrappers
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       ierr = MatSetOption (matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-#else
-      ierr
-        = MatCreateMPIAIJ (communicator,
-                           local_rows, local_columns,
-                           m, n,
-                           n_nonzero_per_row, 0, 0, 0,
-                           &matrix);
 #endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -275,7 +275,14 @@ namespace PETScWrappers
 
       int ierr;
 
-#ifdef DEAL_II_USE_PETSC_DEV
+#if DEAL_II_PETSC_VERSION_LT(3,3,0)
+      ierr
+        = MatCreateMPIAIJ (communicator,
+                           local_rows, local_columns,
+                           m, n,
+                           0, &int_row_lengths[0], 0, 0,
+                           &matrix);
+#else
       ierr
         = MatCreateAIJ (communicator,
                         local_rows, local_columns,
@@ -287,13 +294,6 @@ namespace PETScWrappers
 //TODO: Sometimes the actual number of nonzero entries allocated is greater than the number of nonzero entries, which petsc will complain about unless explicitly disabled with MatSetOption. There is probably a way to prevent a different number nonzero elements being allocated in the first place. (See also previous TODO).
 
       ierr = MatSetOption (matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-#else
-      ierr
-        = MatCreateMPIAIJ (communicator,
-                           local_rows, local_columns,
-                           m, n,
-                           0, &int_row_lengths[0], 0, 0,
-                           &matrix);
 #endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
