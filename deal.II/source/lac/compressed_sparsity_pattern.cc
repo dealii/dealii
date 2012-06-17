@@ -24,6 +24,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+#ifdef DEAL_II_MSVC
+__declspec(selectany)  // weak external binding because of multiple link error
+#endif
 const unsigned int CompressedSparsityPattern::Line::cache_size;
 
 

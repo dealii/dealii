@@ -29,7 +29,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+#ifdef DEAL_II_MSVC
+__declspec(selectany) // Weak extern binding due to multiple link error
+#endif
 const unsigned int SparsityPattern::invalid_entry;
 
 

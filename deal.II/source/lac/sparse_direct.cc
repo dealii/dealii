@@ -38,17 +38,21 @@
 #  define __GNUC__ 3
 #endif
 
-#include <sys/wait.h>
-#include <sys/types.h>
-#include <signal.h>
-#include <unistd.h>
-
+#ifndef DEAL_II_MSVC
+#  include <sys/wait.h>
+#  include <unistd.h>
 #ifndef DEAL_II_USE_DIRECT_ERRNO_H
 #  include <errno.h>
 #else
 #  include </usr/include/errno.h>
 #endif
 #include <sys/errno.h>
+#endif
+
+#include <pthread.h>
+#include <sys/types.h>
+#include <signal.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -324,12 +328,17 @@ struct SparseDirectMA27::DetachedModeData
                                              // repeat writing until
                                              // syscall is not
                                              // interrupted
-            int ret;
+            int ret = -1;
+#ifndef DEAL_II_MSVC
             do
               ret = write (server_client_pipe[1],
                            reinterpret_cast<const char *> (t) + count,
                            sizeof(T) * N - count);
             while ((ret<0) && (errno==EINTR));
+#else
+	    Assert (false,
+		    ExcMessage ("Detached mode isn't currently implemented on Windows"));
+#endif
             if (ret < 0)
               die ("error on client side in 'put'", ret, errno, child_pid);
 
@@ -355,12 +364,17 @@ struct SparseDirectMA27::DetachedModeData
         unsigned int count = 0;
         while (count < sizeof(T)*N)
           {
-            int ret;
+            int ret = -1;
+#ifndef DEAL_II_MSVC
             do
-              ret = read (client_server_pipe[0],
-                          reinterpret_cast<char *> (t) + count,
+              ret = write (server_client_pipe[1],
+                           reinterpret_cast<const char *> (t) + count,
                           sizeof(T) * N - count);
             while ((ret<0) && (errno==EINTR));
+#else
+	    Assert (false,
+		    ExcMessage ("Detached mode isn't currently implemented on Windows"));
+#endif
 
             if (ret < 0)
               die ("error on client side in 'get'", ret, errno, child_pid);
@@ -406,9 +420,14 @@ SparseDirectMA27::~SparseDirectMA27()
                                          // Assign the result of write
                                          // and reset the variable to
                                          // avoid compiler warnings
-//TODO:[WB] Should t be used to trace errors?
+#ifndef DEAL_II_MSVC
+//TODO:[WB] Shouldn't t be used to trace errors?
         ssize_t t = write (detached_mode_data->server_client_pipe[1], "7", 1);
         (void)t;
+#else
+	Assert (false,
+		ExcMessage ("Detached mode isn't currently implemented on Windows"));
+#endif
                                          // then also delete data
         delete detached_mode_data;
         detached_mode_data = 0;
@@ -460,17 +479,28 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                        // Assign the return value to a
                                        // variable to avoid compiler
                                        // warnings
+#ifndef DEAL_II_MSVC
 //TODO:[WB] Use t to trace errors?
       int t = pipe(detached_mode_data->server_client_pipe);
       (void)t;
-
+#else
+      Assert (false,
+	      ExcMessage ("Detached mode isn't currently implemented on Windows"));
+#endif
                                        // fflush(NULL) is said to be a
                                        // good idea before fork()
       std::fflush(NULL);
 
                                        // now fork and create child
                                        // process
+#ifndef DEAL_II_MSVC
+			// BG comment out until pipes are implemented in MSVC
       detached_mode_data->child_pid = fork();
+#else
+      Assert (false,
+	      ExcMessage ("Detached mode isn't currently implemented on Windows"));
+#endif
+
       if (detached_mode_data->child_pid == 0)
                                            // child process starts here
         {
@@ -478,6 +508,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                            // pipe to stdin, and
                                            // likewise with write end
                                            // of pipe to stdout
+#ifndef DEAL_II_MSVC
           dup2(detached_mode_data->server_client_pipe[0], 0);
           close(detached_mode_data->server_client_pipe[0]);
 
@@ -492,13 +523,19 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
           const char * const child_argv[] = { program_name, NULL };
           execv(program_name, const_cast<char * const *>(child_argv));
 
+
                                            // usually execv does not
                                            // return. if it does, then an
                                            // error happened and we report it
                                            // herewith:
-          AssertThrow (false,
-                       ExcMessage ("execv returned, which it is not supposed to do!"));
-          std::exit(1);
+	  AssertThrow (false,
+		       ExcMessage ("execv returned, which it is not supposed to do!"));
+	  std::exit(1);
+
+#else
+	  Assert (false,
+		  ExcMessage ("Detached mode isn't currently implemented on Windows"));
+#endif
         };
                                        // parent process continues
                                        // here.  first thing is to
@@ -510,8 +547,13 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                        // process was somehow
                                        // terminated without sending
                                        // him this information
+#ifndef DEAL_II_MSVC
       const pid_t parent_pid = getpid();
       detached_mode_data->put (&parent_pid, 1, "parent_pid");
+#else
+      Assert (false,
+	      ExcMessage ("Detached mode isn't currently implemented on Windows"));
+#endif
     };
 
 

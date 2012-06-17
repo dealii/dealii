@@ -262,10 +262,10 @@ for (deal_II_dimension : DIMENSIONS)
 	(const dealii::IndexSet&, std::vector<Tensor<1,deal_II_dimension> >&) const;
 
     template
-	void FEValuesViews::SymmetricTensor<2,deal_II_dimension>::get_function_values<dealii::IndexSet>
+	void FEValuesViews::SymmetricTensor<2,deal_II_dimension,deal_II_dimension>::get_function_values<dealii::IndexSet>
 	(const dealii::IndexSet&, std::vector<dealii::SymmetricTensor<2,deal_II_dimension> >&) const;
     template
-	void FEValuesViews::SymmetricTensor<2,deal_II_dimension>::get_function_divergences<dealii::IndexSet>
+	void FEValuesViews::SymmetricTensor<2,deal_II_dimension,deal_II_dimension>::get_function_divergences<dealii::IndexSet>
 	(const dealii::IndexSet&, std::vector<Tensor<1,deal_II_dimension> >&) const;
 
 
