@@ -23,7 +23,16 @@
 #include <ctime>
 #include <cerrno>
 #include <cmath>
-#include <unistd.h>
+
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+#endif
+#ifdef DEAL_II_MSVC
+#  include <winsock2.h>
+#endif
+
+#include <boost/math/special_functions/erf.hpp>
+
 #include <sys/types.h>
 #include <sstream>
 #include <iostream>
@@ -403,9 +412,11 @@ namespace Utilities
     unsigned int iteration = 0;
     while (true)
       {
-        const double residual = 0.5+erf(x/std::sqrt(2.)/sigma)/2-y;
+        const double residual = 0.5+boost::math::erf(x/std::sqrt(2.)/sigma)/2-y;
+
         if (std::fabs(residual) < 1e-7)
           break;
+
         const double F_prime = 1./std::sqrt(2*3.1415926536)/sigma *
                                std::exp(-x*x/sigma/sigma/2);
         x += -residual / F_prime;

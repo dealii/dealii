@@ -631,6 +631,17 @@
 #  define DEAL_VOLATILE
 #endif
 
+
+/**
+ * A #define that indicates whether we are using the Microsoft
+ * Windows Visual C/C++ compiler. We currently do not run ./configure
+ * on MS Windows, so the detection for this compiler happens via
+ * the appropriate #ifdef, not through a configuration testcase.
+ */
+#ifdef _MSC_VER
+#  define DEAL_II_MSVC
+#endif
+
 /*
  * There is an annoying problem in the Trilinos header ml_config.h: It
  * #define's HAVE_INTTYPES_H but doesn't give the symbol a value. This

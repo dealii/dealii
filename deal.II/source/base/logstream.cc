@@ -19,9 +19,11 @@
 
 // include sys/resource.h for rusage(). Mac OS X needs sys/time.h then
 // as well (strange), so include that, too.
-#include <sys/resource.h>
+#ifndef DEAL_II_MSVC
+#  include <sys/resource.h>
+#  include <unistd.h>
+#endif
 #include <sys/types.h>
-#include <unistd.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -321,6 +323,7 @@ LogStream::log_thread_id (const bool flag)
 void
 LogStream::print_line_head()
 {
+#ifndef DEAL_II_MSVC
   rusage usage;
   double utime = 0.;
   if (print_utime)
@@ -334,6 +337,9 @@ LogStream::print_line_head()
           utime = diff;
         }
     }
+#else
+  double utime = 0.;
+#endif
 
 /*
  * The following lines were used for debugging a memory leak.

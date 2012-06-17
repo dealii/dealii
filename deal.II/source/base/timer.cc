@@ -23,9 +23,13 @@
 
 // these includes should probably be properly
 // ./configure'd using the AC_HEADER_TIME macro:
-#include <sys/time.h>
-#include <sys/resource.h>
 
+#ifndef DEAL_II_MSVC
+#  include <sys/time.h>
+#  include <sys/resource.h>
+#else
+#  include <windows.h>
+#endif
 
 // on SunOS 4.x, getrusage is stated in the man pages and exists, but
 // is not declared in resource.h. declare it ourselves
@@ -71,6 +75,36 @@ Timer::Timer(MPI_Comm mpi_communicator,
 }
 #endif
 
+#ifdef DEAL_II_MSVC
+
+namespace
+{
+  namespace windows
+  {
+    double wall_clock()
+    {
+      LARGE_INTEGER freq, time;
+      QueryPerformanceFrequency(&freq);
+      QueryPerformanceCounter(&time);
+      return (double) time.QuadPart / freq.QuadPart;
+    }
+
+
+    double cpu_clock()
+    {
+      FILETIME cpuTime, sysTime, createTime, exitTime;
+      if (GetProcessTimes(GetCurrentProcess(),  &createTime,
+			  &exitTime, &sysTime, &cpuTime))
+	{
+	  return (double)(((unsigned long long)cpuTime.dwHighDateTime << 32)
+			  | cpuTime.dwLowDateTime) / 10e6;
+	}
+      return 0;
+    }
+  }
+}
+
+#endif
 
 
 void Timer::start ()
@@ -82,6 +116,14 @@ void Timer::start ()
     MPI_Barrier(mpi_communicator);
 #endif
 
+#ifdef DEAL_II_MSVC
+  start_wall_time = windows::wall_clock();
+  start_time = windows::cpu_clock();
+  start_time_children = start_time;
+#else
+
+//TODO: Break this out into a function like the functions in
+//namespace windows above
   struct timeval wall_timer;
   gettimeofday(&wall_timer, NULL);
   start_wall_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec;
@@ -93,6 +135,7 @@ void Timer::start ()
   rusage usage_children;
   getrusage (RUSAGE_CHILDREN, &usage_children);
   start_time_children = usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
+#endif
 }
 
 
@@ -102,6 +145,13 @@ double Timer::stop ()
   if (running)
     {
       running = false;
+
+#ifdef DEAL_II_MSVC
+      double time = windows::wall_clock() - start_wall_time;
+      cumulative_time += windows::cpu_clock() - start_time;
+#else
+//TODO: Break this out into a function like the functions in
+//namespace windows above
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
@@ -117,7 +167,7 @@ double Timer::stop ()
       gettimeofday(&wall_timer, NULL);
       double time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
                               - start_wall_time;
-
+#endif
 #ifdef DEAL_II_COMPILER_USE_MPI
       if (sync_wall_time && Utilities::System::job_supports_mpi())
         {
@@ -139,6 +189,10 @@ double Timer::operator() () const
 {
   if (running)
     {
+#ifdef DEAL_II_MSVC
+      const double running_time = windows::cpu_clock() - start_time + cumulative_time;
+      return running_time;
+#else
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
@@ -161,6 +215,7 @@ double Timer::operator() () const
         return Utilities::MPI::sum (running_time, mpi_communicator);
       else
         return running_time;
+#endif
     }
   else
     {
@@ -177,10 +232,16 @@ double Timer::wall_time () const
 {
   if (running)
     {
+#ifdef DEAL_II_MSVC
+      return 0;
+#else
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
-      return wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec - start_wall_time +
-        cumulative_wall_time;
+      return (wall_timer.tv_sec
+	      + 1.e-6 * wall_timer.tv_usec
+	      - start_wall_time
+	      + cumulative_wall_time);
+#endif
     }
   else
     return cumulative_wall_time;

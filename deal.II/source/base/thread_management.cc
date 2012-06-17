@@ -25,7 +25,9 @@
 #else
 #  include </usr/include/errno.h>
 #endif
-#include <sys/errno.h>
+#ifndef DEAL_II_MSVC
+#  include <sys/errno.h>
+#endif
 
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
@@ -151,7 +153,11 @@ namespace Threads
 #elif HAVE_GETPID
     const pid_t this_id = getpid();
 #else
+#  ifdef DEAL_II_MSVC
+    const unsigned this_id = 0;
+#  else
     const pid_t this_id = 0;
+#  endif
 #endif
     return static_cast<unsigned int>(this_id);
   }
