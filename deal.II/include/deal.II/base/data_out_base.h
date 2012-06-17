@@ -284,7 +284,11 @@ class DataOutBase
                                           * into neighborship of
                                           * sub-grid cells.
                                           */
-        unsigned int neighbors[GeometryInfo<dim>::faces_per_cell];
+        unsigned int neighbors[dim > 0
+			       ?
+			       GeometryInfo<dim>::faces_per_cell
+			       :
+			       1];
 
                                          /**
                                           * Number of this
