@@ -54,7 +54,7 @@ namespace internal
 template <int dim, int spacedim=dim>
 class MGDoFHandler : public DoFHandler<dim,spacedim>
 {
-    typedef internal::MGDoFHandler::Iterators<dim,spacedim> IteratorSelector;
+    typedef dealii::internal::MGDoFHandler::Iterators<dim,spacedim> IteratorSelector;
   public:
     typedef typename IteratorSelector::CellAccessor cell_accessor;
     typedef typename IteratorSelector::FaceAccessor face_accessor;
@@ -985,13 +985,13 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
                                       * are numbers which start from
                                       * zero on each level.
                                       */
-    std::vector<internal::DoFHandler::DoFLevel<dim>*>    mg_levels;
+    std::vector<dealii::internal::DoFHandler::DoFLevel<dim>*>    mg_levels;
 
                                      /**
                                       * Space to store the DoF numbers
                                       * for the faces.
                                       */
-    internal::DoFHandler::DoFFaces<dim> *                mg_faces;
+    dealii::internal::DoFHandler::DoFFaces<dim> *                mg_faces;
 
                                      /**
                                       * For each vertex there is a
@@ -1013,7 +1013,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
                                       * Make accessor objects friends.
                                       */
     template <int dim1, int dim2, int dim3> friend class MGDoFAccessor;
-    friend struct internal::MGDoFHandler::Implementation;
+    friend struct dealii::internal::MGDoFHandler::Implementation;
 };
 
 /*@}*/

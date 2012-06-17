@@ -1174,14 +1174,14 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
   Assert (numbers::is_finite(s), ExcNumberNotFinite());
   if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
-  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+  if (vec_size>dealii::internal::Vector::minimum_parallel_grain_size)
     parallel::apply_to_subranges (0U, vec_size,
-                                  std_cxx1x::bind(&internal::Vector::template
+                                  std_cxx1x::bind(&dealii::internal::Vector::template
                                                   set_subrange<Number>,
                                                   s, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::ref(*this)),
-                                  internal::Vector::minimum_parallel_grain_size);
+                                  dealii::internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    internal::Vector::set_subrange<Number>(s, 0U, vec_size, *this);
+    dealii::internal::Vector::set_subrange<Number>(s, 0U, vec_size, *this);
 
   return *this;
 }
@@ -1218,15 +1218,15 @@ Vector<Number>::operator = (const Vector<Number>& v)
 
   if (v.vec_size != vec_size)
     reinit (v.vec_size, true);
-  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+  if (vec_size>dealii::internal::Vector::minimum_parallel_grain_size)
     parallel::apply_to_subranges (0U, vec_size,
-                                  std_cxx1x::bind(&internal::Vector::template
+                                  std_cxx1x::bind(&dealii::internal::Vector::template
                                                   copy_subrange<Number>,
                                                   std_cxx1x::cref(v), std_cxx1x::_1, std_cxx1x::_2,
                                                   std_cxx1x::ref(*this)),
-                                  internal::Vector::minimum_parallel_grain_size);
+                                  dealii::internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    internal::Vector::copy_subrange<Number>(v, 0U, vec_size, *this);
+    dealii::internal::Vector::copy_subrange<Number>(v, 0U, vec_size, *this);
 
   return *this;
 }
@@ -1241,15 +1241,15 @@ Vector<Number>::operator = (const Vector<Number2>& v)
 {
   if (v.vec_size != vec_size)
     reinit (v.vec_size, true);
-  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+  if (vec_size>dealii::internal::Vector::minimum_parallel_grain_size)
     parallel::apply_to_subranges (0U, vec_size,
-                                  std_cxx1x::bind(&internal::Vector::template
+                                  std_cxx1x::bind(&dealii::internal::Vector::template
                                                   copy_subrange_ext<Number2,Number>,
                                                   std_cxx1x::cref(v), std_cxx1x::_1, std_cxx1x::_2,
                                                   std_cxx1x::ref(*this)),
-                                  internal::Vector::minimum_parallel_grain_size);
+                                  dealii::internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    internal::Vector::copy_subrange_ext<Number2,Number>(v, 0U, vec_size, *this);
+    dealii::internal::Vector::copy_subrange_ext<Number2,Number>(v, 0U, vec_size, *this);
 
   return *this;
 }
@@ -1383,7 +1383,7 @@ Vector<Number>::scale (const Number factor)
                        val+vec_size,
                        val,
                        (factor*boost::lambda::_1),
-                       internal::Vector::minimum_parallel_grain_size);
+                       dealii::internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -1452,7 +1452,7 @@ Vector<Number>::add (const Number a,
                        v.val,
                        val,
                        (boost::lambda::_1 + a*boost::lambda::_2),
-                       internal::Vector::minimum_parallel_grain_size);
+                       dealii::internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -1475,7 +1475,7 @@ Vector<Number>::sadd (const Number x,
                        v.val,
                        val,
                        (x*boost::lambda::_1 + a*boost::lambda::_2),
-                       internal::Vector::minimum_parallel_grain_size);
+                       dealii::internal::Vector::minimum_parallel_grain_size);
 }
 
 

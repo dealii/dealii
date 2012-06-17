@@ -245,7 +245,7 @@ namespace hp
  * @author Wolfgang Bangerth, 2003
  */
   template <int dim, int spacedim=dim>
-  class FEValues : public internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> >
+  class FEValues : public dealii::internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> >
   {
     public:
 
@@ -546,7 +546,7 @@ namespace hp
  * @author Wolfgang Bangerth, 2003
  */
   template <int dim, int spacedim=dim>
-  class FEFaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> >
+  class FEFaceValues : public dealii::internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> >
   {
     public:
                                        /**
@@ -827,7 +827,7 @@ namespace hp
  * @author Wolfgang Bangerth, 2003
  */
   template <int dim, int spacedim=dim>
-  class FESubfaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> >
+  class FESubfaceValues : public dealii::internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> >
   {
     public:
                                        /**

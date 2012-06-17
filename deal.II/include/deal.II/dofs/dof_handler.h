@@ -66,7 +66,7 @@ namespace internal
  * to the fact that indices in global vectors and matrices also refer to all
  * degrees of freedom and some kind of condensation is needed to restrict the
  * systems of equations to the unconstrained degrees of freedom only. The
- * actual layout of storage of the indices is described in the internal::DoFHandler::DoFLevel class
+ * actual layout of storage of the indices is described in the dealii::internal::DoFHandler::DoFLevel class
  * documentation.
  *
  * The class offers iterators to traverse all cells, in much the same way as
@@ -171,7 +171,7 @@ namespace internal
 template <int dim, int spacedim=dim>
 class DoFHandler  :  public Subscriptor
 {
-    typedef internal::DoFHandler::Iterators<DoFHandler<dim,spacedim> > IteratorSelector;
+    typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim> > IteratorSelector;
   public:
     typedef typename IteratorSelector::CellAccessor         cell_accessor;
     typedef typename IteratorSelector::FaceAccessor         face_accessor;
@@ -341,74 +341,74 @@ class DoFHandler  :  public Subscriptor
                                       */
     virtual void clear ();
 
-                                       /**
-                                        * Renumber degrees of freedom based on
-                                        * a list of new dof numbers for all the
-                                        * dofs.
-                                        *
-                                        * This function is called by
-                                        * the functions in
-                                        * DoFRenumbering function
-                                        * after computing the ordering
-                                        * of the degrees of freedom.
-                                        * This function is called, for
-                                        * example, by the functions in
-                                        * the DoFRenumbering
-                                        * namespace, but it can of
-                                        * course also be called from
-                                        * user code.
-                                        *
-                                        * @arg new_number This array
-                                        * must have a size equal to
-                                        * the number of degrees of
-                                        * freedom owned by the current
-                                        * processor, i.e. the size
-                                        * must be equal to what
-                                        * n_locally_owned_dofs()
-                                        * returns. If only one
-                                        * processor participates in
-                                        * storing the current mesh,
-                                        * then this equals the total
-                                        * number of degrees of
-                                        * freedom, i.e. the result of
-                                        * n_dofs(). The contents of
-                                        * this array are the new
-                                        * global indices for each
-                                        * freedom listed in the
-                                        * IndexSet returned by
-                                        * locally_owned_dofs(). In the
-                                        * case of a sequential mesh
-                                        * this means that the array is
-                                        * a list of new indices for
-                                        * each of the degrees of
-                                        * freedom on the current
-                                        * mesh. In the case that we
-                                        * have a
-                                        * parallel::distributed::Triangulation
-                                        * underlying this DoFHandler
-                                        * object, the array is a list
-                                        * of new indices for all the
-                                        * locally owned degrees of
-                                        * freedom, enumerated in the
-                                        * same order as the currently
-                                        * locally owned DoFs. In other
-                                        * words, assume that degree of
-                                        * freedom <code>i</code> is
-                                        * currently locally owned,
-                                        * then
-                                        * <code>new_numbers[locally_owned_dofs().index_within_set(i)]</code>
-                                        * returns the new global DoF
-                                        * index of
-                                        * <code>i</code>. Since the
-                                        * IndexSet of
-                                        * locally_owned_dofs() is
-                                        * complete in the sequential
-                                        * case, the latter convention
-                                        * for the content of the array
-                                        * reduces to the former in the
-                                        * case that only one processor
-                                        * participates in the mesh.
-                                        */
+                                     /**
+                                      * Renumber degrees of freedom based on
+                                      * a list of new dof numbers for all the
+                                      * dofs.
+                                      *
+                                      * This function is called by
+                                      * the functions in
+                                      * DoFRenumbering function
+                                      * after computing the ordering
+                                      * of the degrees of freedom.
+                                      * This function is called, for
+                                      * example, by the functions in
+                                      * the DoFRenumbering
+                                      * namespace, but it can of
+                                      * course also be called from
+                                      * user code.
+                                      *
+                                      * @arg new_number This array
+                                      * must have a size equal to
+                                      * the number of degrees of
+                                      * freedom owned by the current
+                                      * processor, i.e. the size
+                                      * must be equal to what
+                                      * n_locally_owned_dofs()
+                                      * returns. If only one
+                                      * processor participates in
+                                      * storing the current mesh,
+                                      * then this equals the total
+                                      * number of degrees of
+                                      * freedom, i.e. the result of
+                                      * n_dofs(). The contents of
+                                      * this array are the new
+                                      * global indices for each
+                                      * freedom listed in the
+                                      * IndexSet returned by
+                                      * locally_owned_dofs(). In the
+                                      * case of a sequential mesh
+                                      * this means that the array is
+                                      * a list of new indices for
+                                      * each of the degrees of
+                                      * freedom on the current
+                                      * mesh. In the case that we
+                                      * have a
+                                      * parallel::distributed::Triangulation
+                                      * underlying this DoFHandler
+                                      * object, the array is a list
+                                      * of new indices for all the
+                                      * locally owned degrees of
+                                      * freedom, enumerated in the
+                                      * same order as the currently
+                                      * locally owned DoFs. In other
+                                      * words, assume that degree of
+                                      * freedom <code>i</code> is
+                                      * currently locally owned,
+                                      * then
+                                      * <code>new_numbers[locally_owned_dofs().index_within_set(i)]</code>
+                                      * returns the new global DoF
+                                      * index of
+                                      * <code>i</code>. Since the
+                                      * IndexSet of
+                                      * locally_owned_dofs() is
+                                      * complete in the sequential
+                                      * case, the latter convention
+                                      * for the content of the array
+                                      * reduces to the former in the
+                                      * case that only one processor
+                                      * participates in the mesh.
+                                      */
     void renumber_dofs (const std::vector<unsigned int> &new_numbers);
 
                                      /**
@@ -775,7 +775,7 @@ class DoFHandler  :  public Subscriptor
                                       *  Return an iterator pointing to the last
                                       *  line of the level @p level, used or not.
 
-                                     */
+                                      */
     raw_line_iterator    last_raw_line (const unsigned int level) const;
 
                                      /**
@@ -872,7 +872,7 @@ class DoFHandler  :  public Subscriptor
                                       *  Return an iterator pointing to the last
                                       *  quad of the level @p level, used or not.
 
-                                     */
+                                      */
     raw_quad_iterator    last_raw_quad (const unsigned int level) const;
 
                                      /**
@@ -973,7 +973,7 @@ class DoFHandler  :  public Subscriptor
                                       *  Return an iterator pointing to the last
                                       *  hex of the level @p level, used or not.
 
-                                     */
+                                      */
     raw_hex_iterator
     last_raw_hex (const unsigned int level) const;
 
@@ -1228,18 +1228,18 @@ class DoFHandler  :  public Subscriptor
                                       * stream for the purpose of
                                       * serialization.
                                       */
-   template <class Archive>
-   void save (Archive & ar, const unsigned int version) const;
+    template <class Archive>
+    void save (Archive & ar, const unsigned int version) const;
 
                                      /**
                                       * Read the data of this object from a
                                       * stream for the purpose of
                                       * serialization.
                                       */
-   template <class Archive>
-   void load (Archive & ar, const unsigned int version);
+    template <class Archive>
+    void load (Archive & ar, const unsigned int version);
 
-   BOOST_SERIALIZATION_SPLIT_MEMBER()
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
                                      /**
                                       * We are trying to renumber the
@@ -1335,7 +1335,7 @@ class DoFHandler  :  public Subscriptor
                                       * of freedom should be distributed and
                                       * renumbered.
                                       */
-    std_cxx1x::shared_ptr<internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
+    std_cxx1x::shared_ptr<dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
 
                                      /**
                                       * A structure that contains all
@@ -1348,7 +1348,7 @@ class DoFHandler  :  public Subscriptor
                                       * accessor function in this
                                       * class that returns its value.
                                       */
-    internal::DoFHandler::NumberCache number_cache;
+    dealii::internal::DoFHandler::NumberCache number_cache;
 
   private:
 
@@ -1386,7 +1386,7 @@ class DoFHandler  :  public Subscriptor
                                       * <tt>levels[]</tt> tree of the
                                       * Triangulation objects.
                                       */
-    std::vector<internal::DoFHandler::DoFLevel<dim>*> levels;
+    std::vector<dealii::internal::DoFHandler::DoFLevel<dim>*> levels;
 
                                      /**
                                       * Space to store DoF numbers of
@@ -1396,18 +1396,18 @@ class DoFHandler  :  public Subscriptor
                                       * hierarchically, but in a flat
                                       * array.
                                       */
-    internal::DoFHandler::DoFFaces<dim> *faces;
+    dealii::internal::DoFHandler::DoFFaces<dim> *faces;
 
                                      /**
                                       * Make accessor objects friends.
                                       */
     template <int, class> friend class DoFAccessor;
     template <class> friend class DoFCellAccessor;
-    friend struct internal::DoFAccessor::Implementation;
-    friend struct internal::DoFCellAccessor::Implementation;
+    friend struct dealii::internal::DoFAccessor::Implementation;
+    friend struct dealii::internal::DoFCellAccessor::Implementation;
 
-    friend struct internal::DoFHandler::Implementation;
-    friend struct internal::DoFHandler::Policy::Implementation;
+    friend struct dealii::internal::DoFHandler::Implementation;
+    friend struct dealii::internal::DoFHandler::Policy::Implementation;
 };
 
 
@@ -1507,9 +1507,9 @@ void DoFHandler<dim,spacedim>::save (Archive & ar,
   ar & levels;
   ar & faces;
 
-  // write out the number of triangulation cells and later check
-  // during loading that this number is indeed correct; same with something that
-  // identifies the FE and the policy
+                                   // write out the number of triangulation cells and later check
+                                   // during loading that this number is indeed correct; same with something that
+                                   // identifies the FE and the policy
   unsigned int n_cells = tria->n_cells();
   std::string  fe_name = selected_fe->get_name();
   std::string  policy_name = typeid(*policy).name();
@@ -1527,10 +1527,10 @@ void DoFHandler<dim,spacedim>::load (Archive & ar,
   ar & vertex_dofs;
   ar & number_cache;
 
-  // boost::serialization can restore pointers just fine, but if the
-  // pointer object still points to something useful, that object is
-  // not destroyed and we end up with a memory leak. consequently,
-  // first delete previous content before re-loading stuff
+                                   // boost::serialization can restore pointers just fine, but if the
+                                   // pointer object still points to something useful, that object is
+                                   // not destroyed and we end up with a memory leak. consequently,
+                                   // first delete previous content before re-loading stuff
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
   levels.resize (0);
@@ -1540,7 +1540,7 @@ void DoFHandler<dim,spacedim>::load (Archive & ar,
   ar & levels;
   ar & faces;
 
-  // these are the checks that correspond to the last block in the save() function
+                                   // these are the checks that correspond to the last block in the save() function
   unsigned int n_cells;
   std::string  fe_name;
   std::string  policy_name;

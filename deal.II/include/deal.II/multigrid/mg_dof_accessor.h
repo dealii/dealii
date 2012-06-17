@@ -151,7 +151,7 @@ namespace internal
  * @author Wolfgang Bangerth, 1998, 2006, 2008
  */
 template <int structdim, int dim, int spacedim>
-class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,spacedim>::BaseClass
+class MGDoFAccessor : public dealii::internal::MGDoFAccessor::Inheritance<structdim,dim,spacedim>::BaseClass
 {
   public:
                                      /**
@@ -161,7 +161,7 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
                                       * simpler.
                                       */
     typedef
-    typename internal::MGDoFAccessor::Inheritance<structdim,dim,spacedim>::BaseClass
+    typename dealii::internal::MGDoFAccessor::Inheritance<structdim,dim,spacedim>::BaseClass
     BaseClass;
 
                                      /**
@@ -323,14 +323,14 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
                                       * Return a pointer to the @p ith line
                                       * bounding this @p Hex.
                                       */
-    typename internal::MGDoFHandler::Iterators<dim,spacedim>::line_iterator
+    typename dealii::internal::MGDoFHandler::Iterators<dim,spacedim>::line_iterator
     line (const unsigned int i) const;
 
                                      /**
                                       * Return a pointer to the @p ith quad
                                       * bounding this @p Hex.
                                       */
-    typename internal::MGDoFHandler::Iterators<dim,spacedim>::quad_iterator
+    typename dealii::internal::MGDoFHandler::Iterators<dim,spacedim>::quad_iterator
     quad (const unsigned int i) const;
 
                                      /**
@@ -416,7 +416,7 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
     operator = (const MGDoFAccessor &da);
 
     template <int, int> friend class MGDoFHandler;
-    friend struct internal::MGDoFHandler::Implementation;
+    friend struct dealii::internal::MGDoFHandler::Implementation;
 };
 
 
@@ -432,7 +432,7 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
  * @author Wolfgang Bangerth, 2010
  */
 template <int spacedim>
-class MGDoFAccessor<0,1,spacedim> : public internal::MGDoFAccessor::Inheritance<0,1,spacedim>::BaseClass
+class MGDoFAccessor<0,1,spacedim> : public dealii::internal::MGDoFAccessor::Inheritance<0,1,spacedim>::BaseClass
 {
   public:
                                      /**
@@ -442,7 +442,7 @@ class MGDoFAccessor<0,1,spacedim> : public internal::MGDoFAccessor::Inheritance<
                                       * simpler.
                                       */
     typedef
-    typename internal::MGDoFAccessor::Inheritance<0,1,spacedim>::BaseClass
+    typename dealii::internal::MGDoFAccessor::Inheritance<0,1,spacedim>::BaseClass
     BaseClass;
 
                                      /**
@@ -742,7 +742,7 @@ class MGDoFCellAccessor :  public MGDoFAccessor<dim,dim,spacedim>
                                       * This function is not implemented in 1D,
                                       * and maps to MGDoFAccessor<2, dim>::line in 2D.
                                       */
-    typename internal::MGDoFHandler::Iterators<dim,spacedim>::face_iterator
+    typename dealii::internal::MGDoFHandler::Iterators<dim,spacedim>::face_iterator
     face (const unsigned int i) const;
 
                                      /**
@@ -756,7 +756,7 @@ class MGDoFCellAccessor :  public MGDoFAccessor<dim,dim,spacedim>
                                       * access to the triangulation
                                       * data).
                                       */
-    typename internal::MGDoFHandler::Iterators<dim,spacedim>::cell_iterator
+    typename dealii::internal::MGDoFHandler::Iterators<dim,spacedim>::cell_iterator
     neighbor_child_on_subface (const unsigned int face_no,
                                const unsigned int subface_no) const;
 

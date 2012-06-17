@@ -738,8 +738,8 @@ class BlockVectorBase : public Subscriptor
     typedef typename BlockType::value_type  value_type;
     typedef value_type                     *pointer;
     typedef const value_type               *const_pointer;
-    typedef internal::BlockVectorIterators::Iterator<BlockVectorBase,false> iterator;
-    typedef internal::BlockVectorIterators::Iterator<BlockVectorBase,true>  const_iterator;
+    typedef dealii::internal::BlockVectorIterators::Iterator<BlockVectorBase,false> iterator;
+    typedef dealii::internal::BlockVectorIterators::Iterator<BlockVectorBase,true>  const_iterator;
     typedef typename BlockType::reference       reference;
     typedef typename BlockType::const_reference const_reference;
 
@@ -1163,7 +1163,7 @@ class BlockVectorBase : public Subscriptor
                                       */
 #ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
     template <typename N, bool C>
-    friend class internal::BlockVectorIterators::Iterator;
+    friend class dealii::internal::BlockVectorIterators::Iterator;
 #else
     friend class iterator;
     friend class const_iterator;

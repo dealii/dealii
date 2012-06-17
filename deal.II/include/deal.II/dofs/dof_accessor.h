@@ -169,7 +169,7 @@ namespace internal
  * @author Wolfgang Bangerth, 1998, 2006, 2008
  */
 template <int structdim, class DH>
-class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dimension, DH::space_dimension>::BaseClass
+class DoFAccessor : public dealii::internal::DoFAccessor::Inheritance<structdim, DH::dimension, DH::space_dimension>::BaseClass
 {
   public:
 
@@ -194,7 +194,7 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
                                       * simpler.
                                       */
     typedef
-    typename internal::DoFAccessor::Inheritance<structdim, dimension, space_dimension>::BaseClass
+    typename dealii::internal::DoFAccessor::Inheritance<structdim, dimension, space_dimension>::BaseClass
     BaseClass;
 
                                      /**
@@ -309,14 +309,14 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
                                       * Pointer to the @p ith line
                                       * bounding this object.
                                       */
-    typename internal::DoFHandler::Iterators<DH>::line_iterator
+    typename dealii::internal::DoFHandler::Iterators<DH>::line_iterator
     line (const unsigned int i) const;
 
                                      /**
                                       * Pointer to the @p ith quad
                                       * bounding this object.
                                       */
-    typename internal::DoFHandler::Iterators<DH>::quad_iterator
+    typename dealii::internal::DoFHandler::Iterators<DH>::quad_iterator
     quad (const unsigned int i) const;
 
                                      /**
@@ -767,10 +767,10 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
     template <int dim, int spacedim> friend class DoFHandler;
     template <int dim, int spacedim> friend class hp::DoFHandler;
 
-    friend struct internal::DoFHandler::Policy::Implementation;
-    friend struct internal::DoFHandler::Implementation;
-    friend struct internal::hp::DoFHandler::Implementation;
-    friend struct internal::DoFCellAccessor::Implementation;
+    friend struct dealii::internal::DoFHandler::Policy::Implementation;
+    friend struct dealii::internal::DoFHandler::Implementation;
+    friend struct dealii::internal::hp::DoFHandler::Implementation;
+    friend struct dealii::internal::DoFCellAccessor::Implementation;
 };
 
 
@@ -973,14 +973,14 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
                                       * Pointer to the @p ith line
                                       * bounding this object.
                                       */
-    typename internal::DoFHandler::Iterators<DH<1,spacedim> >::line_iterator
+    typename dealii::internal::DoFHandler::Iterators<DH<1,spacedim> >::line_iterator
     line (const unsigned int i) const;
 
                                      /**
                                       * Pointer to the @p ith quad
                                       * bounding this object.
                                       */
-    typename internal::DoFHandler::Iterators<DH<1,spacedim> >::quad_iterator
+    typename dealii::internal::DoFHandler::Iterators<DH<1,spacedim> >::quad_iterator
     quad (const unsigned int i) const;
 
                                      /**
@@ -1410,10 +1410,10 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
     template <int, int> friend class DoFHandler;
     template <int, int> friend class hp::DoFHandler;
 
-    friend struct internal::DoFHandler::Policy::Implementation;
-    friend struct internal::DoFHandler::Implementation;
-    friend struct internal::hp::DoFHandler::Implementation;
-    friend struct internal::DoFCellAccessor::Implementation;
+    friend struct dealii::internal::DoFHandler::Policy::Implementation;
+    friend struct dealii::internal::DoFHandler::Implementation;
+    friend struct dealii::internal::hp::DoFHandler::Implementation;
+    friend struct dealii::internal::DoFCellAccessor::Implementation;
 };
 
 
@@ -1529,7 +1529,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
                                       * without access to the DoF
                                       * data.
                                       */
-    typename internal::DoFHandler::Iterators<DH>::cell_iterator
+    typename dealii::internal::DoFHandler::Iterators<DH>::cell_iterator
     parent () const;
 
                                      /**
@@ -1548,7 +1548,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
                                       * without access to the DoF
                                       * data.
                                       */
-    typename internal::DoFHandler::Iterators<DH>::cell_iterator
+    typename dealii::internal::DoFHandler::Iterators<DH>::cell_iterator
     neighbor (const unsigned int) const;
 
                                      /**
@@ -1560,7 +1560,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
                                       * without access to the DoF
                                       * data.
                                       */
-    typename internal::DoFHandler::Iterators<DH>::cell_iterator
+    typename dealii::internal::DoFHandler::Iterators<DH>::cell_iterator
     child (const unsigned int) const;
 
                                      /**
@@ -1571,7 +1571,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
                                       * 1D, and maps to DoFAccessor::line
                                       * in 2D.
                                       */
-    typename internal::DoFHandler::Iterators<DH>::face_iterator
+    typename dealii::internal::DoFHandler::Iterators<DH>::face_iterator
     face (const unsigned int i) const;
 
                                      /**
@@ -1585,7 +1585,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
                                       * access to the triangulation
                                       * data).
                                       */
-    typename internal::DoFHandler::Iterators<DH>::cell_iterator
+    typename dealii::internal::DoFHandler::Iterators<DH>::cell_iterator
     neighbor_child_on_subface (const unsigned int face_no,
                                const unsigned int subface_no) const;
 
@@ -2106,7 +2106,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
                                       * function
                                       */
     template <int dim, int spacedim> friend class DoFHandler;
-    friend struct internal::DoFCellAccessor::Implementation;
+    friend struct dealii::internal::DoFCellAccessor::Implementation;
 };
 
 

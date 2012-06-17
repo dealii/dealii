@@ -417,7 +417,7 @@ class TriaAccessorBase
                                       * a Triangulation with same
                                       * dimension.
                                       */
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<structdim> > &
+    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<structdim> > &
     objects () const;
 
   public:
@@ -496,7 +496,7 @@ class TriaAccessorBase
                                       * (<tt>structdim==dim</tt>). Else,
                                       * contains zero.
                                       */
-    typename internal::TriaAccessor::PresentLevelType<structdim,dim>::type present_level;
+    typename dealii::internal::TriaAccessor::PresentLevelType<structdim,dim>::type present_level;
 
                                      /**
                                       *  Used to store the index of
@@ -762,7 +762,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * Pointer to the @p ith line
                                       * bounding this object.
                                       */
-    typename internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+    typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
     line (const unsigned int i) const;
 
                                      /**
@@ -780,7 +780,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * Pointer to the @p ith quad
                                       * bounding this object.
                                       */
-    typename internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+    typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
     quad (const unsigned int i) const;
 
                                      /**
@@ -1065,8 +1065,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * domain and so cannot determine whether
                                       * the value you are trying to set makes
                                       * sense under the current circumstances.
-				      *
-				      * @ingroup boundary
+                                      *
+                                      * @ingroup boundary
                                       */
     void set_boundary_indicator (const types::boundary_id_t) const;
 
@@ -1085,8 +1085,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * of face and edges are all set
                                       * at the same time using the
                                       * current function.
-				      *
-				      * @ingroup boundary
+                                      *
+                                      * @ingroup boundary
                                       */
     void set_all_boundary_indicators (const types::boundary_id_t) const;
 
@@ -1434,7 +1434,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       *  structures of a
                                       *  triangulation.
                                       */
-    void set (const internal::Triangulation::TriaObject<structdim> &o) const;
+    void set (const dealii::internal::Triangulation::TriaObject<structdim> &o) const;
 
                                      /**
                                       * Set the flag indicating, what
@@ -1591,8 +1591,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 
     template <int, int> friend class Triangulation;
 
-    friend struct internal::Triangulation::Implementation;
-    friend struct internal::TriaAccessor::Implementation;
+    friend struct dealii::internal::Triangulation::Implementation;
+    friend struct dealii::internal::TriaAccessor::Implementation;
 };
 
 
@@ -1873,7 +1873,7 @@ class TriaAccessor<0, 1, spacedim>
                                       * bounding this object. Will
                                       * point to an invalid object.
                                       */
-    typename internal::Triangulation::Iterators<1,spacedim>::line_iterator
+    typename dealii::internal::Triangulation::Iterators<1,spacedim>::line_iterator
     static line (const unsigned int);
 
                                      /**
@@ -1892,7 +1892,7 @@ class TriaAccessor<0, 1, spacedim>
                                       * bounding this object.
                                       */
     static
-    typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator
+    typename dealii::internal::Triangulation::Iterators<1,spacedim>::quad_iterator
     quad (const unsigned int i);
 
                                      /**
@@ -2067,8 +2067,8 @@ class TriaAccessor<0, 1, spacedim>
                                       * domain and so cannot determine whether
                                       * the value you are trying to set makes
                                       * sense under the current circumstances.
-				      *
-				      * @ingroup boundary
+                                      *
+                                      * @ingroup boundary
                                       */
     void
     set_boundary_indicator (const types::boundary_id_t);
@@ -2078,8 +2078,8 @@ class TriaAccessor<0, 1, spacedim>
                                       * single vertex, call
                                       * set_boundary_indicator with the same
                                       * argument.
-				      *
-				      * @ingroup boundary
+                                      *
+                                      * @ingroup boundary
                                       */
     void
     set_all_boundary_indicators (const types::boundary_id_t);
@@ -2577,7 +2577,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * function may only be called for active
                                       * cells in 2d and 3d.
                                       */
-    internal::SubfaceCase<dim> subface_case(const unsigned int face_no) const;
+    dealii::internal::SubfaceCase<dim> subface_case(const unsigned int face_no) const;
 
                                      /**
                                       *  Return whether the coarsen flag
@@ -2751,21 +2751,21 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       */
     bool active () const;
 
-    /**
-     * Return whether this cell is owned by the current processor
-     * or is owned by another processor. The function always returns
-     * true if applied to an object of type dealii::Triangulation,
-     * but may yield false if the triangulation is of type
-     * parallel::distributed::Triangulation.
-     *
-     * See the @ref GlossGhostCell
-     * "glossary" and the @ref
-     * distributed module for more
-     * information.
-     *
-     * @post The returned value is equal to <code>!is_ghost() &&
-     * !is_artificial()</code>.
-     **/
+                                     /**
+                                      * Return whether this cell is owned by the current processor
+                                      * or is owned by another processor. The function always returns
+                                      * true if applied to an object of type dealii::Triangulation,
+                                      * but may yield false if the triangulation is of type
+                                      * parallel::distributed::Triangulation.
+                                      *
+                                      * See the @ref GlossGhostCell
+                                      * "glossary" and the @ref
+                                      * distributed module for more
+                                      * information.
+                                      *
+                                      * @post The returned value is equal to <code>!is_ghost() &&
+                                      * !is_artificial()</code>.
+                                      **/
     bool is_locally_owned () const;
 
                                      /**
@@ -2857,7 +2857,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       to the manifold where the cell is embedded and
                                       then check if this projection is inside the cell.
 
-                                      */
+                                     */
     bool point_inside (const Point<spacedim> &p) const;
 
                                      /**
@@ -2974,7 +2974,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 
     template <int, int> friend class Triangulation;
 
-    friend struct internal::Triangulation::Implementation;
+    friend struct dealii::internal::Triangulation::Implementation;
 };
 
 

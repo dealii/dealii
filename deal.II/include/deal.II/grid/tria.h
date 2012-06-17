@@ -425,7 +425,7 @@ namespace internal
  *  are the ones one wants to use in the boundary element method.
  *
  *  This class is written to be as independent of the dimension as possible
- *  (thus the complex construction of the internal::Triangulation::TriaLevel
+ *  (thus the complex construction of the dealii::internal::Triangulation::TriaLevel
  *  classes) to allow code-sharing, to allow reducing the need to mirror
  *  changes in the code for one dimension to the code for other
  *  dimensions. Nonetheless, some of the functions are dependent of the
@@ -1438,7 +1438,7 @@ class Triangulation : public Subscriptor
                                       * the definition of the iterator
                                       * classes simpler.
                                       */
-    typedef internal::Triangulation::Iterators<dim, spacedim> IteratorSelector;
+    typedef dealii::internal::Triangulation::Iterators<dim, spacedim> IteratorSelector;
 
   public:
                                      /**
@@ -3682,7 +3682,7 @@ class Triangulation : public Subscriptor
                                       *  objects storing the cell data on the
                                       *  different levels.
                                       */
-    std::vector<internal::Triangulation::TriaLevel<dim>*> levels;
+    std::vector<dealii::internal::Triangulation::TriaLevel<dim>*> levels;
 
                                      /**
                                       *  Pointer to the faces of the triangulation. In 1d
@@ -3691,7 +3691,7 @@ class Triangulation : public Subscriptor
                                       *  these have no level and are therefore treated
                                       *  seperately.
                                       */
-    internal::Triangulation::TriaFaces<dim> * faces;
+    dealii::internal::Triangulation::TriaFaces<dim> * faces;
 
 
                                      /**
@@ -3746,7 +3746,7 @@ class Triangulation : public Subscriptor
                                       * frequent operation, this was not
                                       * an optimal solution.
                                       */
-    internal::Triangulation::NumberCache<dim> number_cache;
+    dealii::internal::Triangulation::NumberCache<dim> number_cache;
 
                                      /**
                                       * A map that relates the number of a
@@ -3796,11 +3796,11 @@ class Triangulation : public Subscriptor
 
     friend class CellAccessor<dim, spacedim>;
 
-    friend struct internal::TriaAccessor::Implementation;
+    friend struct dealii::internal::TriaAccessor::Implementation;
 
     friend class hp::DoFHandler<dim,spacedim>;
 
-    friend struct internal::Triangulation::Implementation;
+    friend struct dealii::internal::Triangulation::Implementation;
 };
 
 

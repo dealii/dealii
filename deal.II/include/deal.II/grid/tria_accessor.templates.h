@@ -271,9 +271,9 @@ namespace internal
                                       */
     template <int dim>
     inline
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<1> >*
-    get_objects (internal::Triangulation::TriaFaces<dim> *faces,
-                 const internal::int2type<1>)
+    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<1> >*
+    get_objects (dealii::internal::Triangulation::TriaFaces<dim> *faces,
+                 const dealii::internal::int2type<1>)
     {
       return &faces->lines;
     }
@@ -281,35 +281,35 @@ namespace internal
 
     template <int dim>
     inline
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<2> >*
-    get_objects (internal::Triangulation::TriaFaces<dim> *faces,
-                 const internal::int2type<2>)
+    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<2> >*
+    get_objects (dealii::internal::Triangulation::TriaFaces<dim> *faces,
+                 const dealii::internal::int2type<2>)
     {
       return &faces->quads;
     }
 
     inline
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<1> >*
-    get_objects (internal::Triangulation::TriaFaces<1>*,
-                 const internal::int2type<1>)
+    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<1> >*
+    get_objects (dealii::internal::Triangulation::TriaFaces<1>*,
+                 const dealii::internal::int2type<1>)
     {
       Assert (false, ExcInternalError());
       return 0;
     }
 
     inline
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<2> >*
-    get_objects (internal::Triangulation::TriaFaces<2>*,
-                 const internal::int2type<2>)
+    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<2> >*
+    get_objects (dealii::internal::Triangulation::TriaFaces<2>*,
+                 const dealii::internal::int2type<2>)
     {
       Assert (false, ExcInternalError());
       return 0;
     }
 
     inline
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<3> >*
-    get_objects (internal::Triangulation::TriaFaces<3>*,
-                 const internal::int2type<3>)
+    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<3> >*
+    get_objects (dealii::internal::Triangulation::TriaFaces<3>*,
+                 const dealii::internal::int2type<3>)
     {
       Assert (false, ExcInternalError());
       return 0;
@@ -322,9 +322,9 @@ namespace internal
                                       */
     template <int dim>
     inline
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<3> >*
-    get_objects (internal::Triangulation::TriaFaces<dim> *faces,
-                 const internal::int2type<3>)
+    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<3> >*
+    get_objects (dealii::internal::Triangulation::TriaFaces<dim> *faces,
+                 const dealii::internal::int2type<3>)
     {
       Assert (false, ExcInternalError());
       return 0;
@@ -336,9 +336,9 @@ namespace internal
                                       */
     template <int structdim, int dim>
     inline
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<structdim> >*
-    get_objects (internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<dim> >*,
-                 const internal::int2type<structdim>)
+    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<structdim> >*
+    get_objects (dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<dim> >*,
+                 const dealii::internal::int2type<structdim>)
     {
       Assert (false, ExcInternalError());
       return 0;
@@ -346,9 +346,9 @@ namespace internal
 
     template <int dim>
     inline
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<dim> >*
-    get_objects (internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<dim> >* cells,
-                 const internal::int2type<dim>)
+    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<dim> >*
+    get_objects (dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<dim> >* cells,
+                 const dealii::internal::int2type<dim>)
     {
       return cells;
     }
@@ -359,18 +359,18 @@ namespace internal
 
 template <int structdim, int dim, int spacedim>
 inline
-internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<structdim> > &
+dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<structdim> > &
 TriaAccessorBase<structdim,dim,spacedim>::objects() const
 {
   if (structdim != dim)
                                      // get sub-objects. note that the
                                      // current class is only used for
                                      // objects that are *not* cells
-    return *internal::TriaAccessorBase::get_objects (this->tria->faces,
-                                                     internal::int2type<structdim> ());
+    return *dealii::internal::TriaAccessorBase::get_objects (this->tria->faces,
+                                                             dealii::internal::int2type<structdim> ());
   else
-    return *internal::TriaAccessorBase::get_objects (&this->tria->levels[this->present_level]->cells,
-                                                     internal::int2type<structdim> ());
+    return *dealii::internal::TriaAccessorBase::get_objects (&this->tria->levels[this->present_level]->cells,
+                                                             dealii::internal::int2type<structdim> ());
 }
 
 
@@ -508,7 +508,7 @@ namespace internal
                                      // we mean the *class*
                                      // dealii::TriaAccessor, not the
                                      // enclosing namespace
-                                     // internal::TriaAccessor
+                                     // dealii::internal::TriaAccessor
     using dealii::TriaAccessor;
 
 /**
@@ -1101,9 +1101,9 @@ template <int structdim, int dim, int spacedim>
 inline
 TriaAccessor<structdim, dim, spacedim>::
 TriaAccessor (const Triangulation<dim,spacedim> *parent,
-               const int                 level,
-               const int                 index,
-               const AccessorData       *local_data)
+              const int                 level,
+              const int                 index,
+              const AccessorData       *local_data)
                 :
                 TriaAccessorBase<structdim,dim,spacedim> (parent, level, index, local_data)
 {}
@@ -1130,7 +1130,7 @@ vertex_index (const unsigned int corner) const
   Assert (corner<GeometryInfo<structdim>::vertices_per_cell,
           ExcIndexRange(corner,0,GeometryInfo<structdim>::vertices_per_cell));
 
-  return internal::TriaAccessor::Implementation::vertex_index (*this, corner);
+  return dealii::internal::TriaAccessor::Implementation::vertex_index (*this, corner);
 }
 
 
@@ -1146,11 +1146,11 @@ TriaAccessor<structdim, dim, spacedim>::vertex (const unsigned int i) const
 
 template <int structdim, int dim, int spacedim>
 inline
-typename internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
 TriaAccessor<structdim,dim,spacedim>::line (const unsigned int i) const
 {
                                    // checks happen in line_index
-  return typename internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
     (this->tria, 0, line_index (i));
 }
 
@@ -1164,7 +1164,7 @@ TriaAccessor<structdim,dim,spacedim>::line_index (const unsigned int i) const
   Assert (i < GeometryInfo<structdim>::lines_per_cell,
           ExcIndexRange (i, 0, GeometryInfo<structdim>::lines_per_cell));
 
-  return internal::TriaAccessor::Implementation::line_index (*this, i);
+  return dealii::internal::TriaAccessor::Implementation::line_index (*this, i);
 }
 
 
@@ -1172,11 +1172,11 @@ TriaAccessor<structdim,dim,spacedim>::line_index (const unsigned int i) const
 
 template <int structdim, int dim, int spacedim>
 inline
-typename internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
 TriaAccessor<structdim,dim,spacedim>::quad (const unsigned int i) const
 {
                                    // checks happen in quad_index
-  return typename internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
     (this->tria, 0, quad_index (i));
 }
 
@@ -1187,7 +1187,7 @@ inline
 unsigned int
 TriaAccessor<structdim,dim,spacedim>::quad_index (const unsigned int i) const
 {
-  return internal::TriaAccessor::Implementation::quad_index (*this, i);
+  return dealii::internal::TriaAccessor::Implementation::quad_index (*this, i);
 }
 
 
@@ -1199,7 +1199,7 @@ TriaAccessor<structdim,dim,spacedim>::face_orientation (const unsigned int face)
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  return internal::TriaAccessor::Implementation::face_orientation (*this, face);
+  return dealii::internal::TriaAccessor::Implementation::face_orientation (*this, face);
 }
 
 
@@ -1211,7 +1211,7 @@ TriaAccessor<structdim,dim,spacedim>::face_flip (const unsigned int face) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  return internal::TriaAccessor::Implementation::face_flip (*this, face);
+  return dealii::internal::TriaAccessor::Implementation::face_flip (*this, face);
 }
 
 
@@ -1222,7 +1222,7 @@ TriaAccessor<structdim,dim,spacedim>::face_rotation (const unsigned int face) co
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  return internal::TriaAccessor::Implementation::face_rotation (*this, face);
+  return dealii::internal::TriaAccessor::Implementation::face_rotation (*this, face);
 }
 
 
@@ -1236,7 +1236,7 @@ TriaAccessor<structdim,dim,spacedim>::line_orientation (const unsigned int line)
   Assert (line<GeometryInfo<structdim>::lines_per_cell,
           ExcIndexRange (line, 0, GeometryInfo<structdim>::lines_per_cell));
 
-  return internal::TriaAccessor::Implementation::line_orientation (*this, line);
+  return dealii::internal::TriaAccessor::Implementation::line_orientation (*this, line);
 }
 
 
@@ -1245,11 +1245,11 @@ template <int structdim, int dim, int spacedim>
 inline
 void
 TriaAccessor<structdim,dim,spacedim>::set_face_orientation (const unsigned int face,
-                                                             const bool value) const
+                                                            const bool value) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  internal::TriaAccessor::Implementation::set_face_orientation (*this, face, value);
+  dealii::internal::TriaAccessor::Implementation::set_face_orientation (*this, face, value);
 }
 
 
@@ -1258,11 +1258,11 @@ template <int structdim, int dim, int spacedim>
 inline
 void
 TriaAccessor<structdim,dim,spacedim>::set_face_flip (const unsigned int face,
-                                                      const bool value) const
+                                                     const bool value) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  internal::TriaAccessor::Implementation::set_face_flip (*this, face, value);
+  dealii::internal::TriaAccessor::Implementation::set_face_flip (*this, face, value);
 }
 
 
@@ -1270,11 +1270,11 @@ template <int structdim, int dim, int spacedim>
 inline
 void
 TriaAccessor<structdim,dim,spacedim>::set_face_rotation (const unsigned int face,
-                                                          const bool value) const
+                                                         const bool value) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  internal::TriaAccessor::Implementation::set_face_rotation (*this, face, value);
+  dealii::internal::TriaAccessor::Implementation::set_face_rotation (*this, face, value);
 }
 
 
@@ -1283,13 +1283,13 @@ template <int structdim, int dim, int spacedim>
 inline
 void
 TriaAccessor<structdim,dim,spacedim>::set_line_orientation (const unsigned int line,
-                                                             const bool value) const
+                                                            const bool value) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert (line<GeometryInfo<structdim>::lines_per_cell,
           ExcIndexRange (line, 0, GeometryInfo<structdim>::lines_per_cell));
 
-  internal::TriaAccessor::Implementation::set_line_orientation (*this, line, value);
+  dealii::internal::TriaAccessor::Implementation::set_line_orientation (*this, line, value);
 }
 
 
@@ -1321,9 +1321,9 @@ parent_index () const
 {
   Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
 
-                                        // the parent of two consecutive cells
-                                        // is stored only once, since it is
-                                        // the same
+                                   // the parent of two consecutive cells
+                                   // is stored only once, since it is
+                                   // the same
   return this->tria->levels[this->present_level]->parents[this->present_index / 2];
 }
 
@@ -1565,7 +1565,7 @@ TriaAccessor<structdim, dim, spacedim>::clear_refinement_case () const
 template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::set_children (const unsigned int i,
-                                                       const int index) const
+                                                      const int index) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert (i%2==0, TriaAccessorExceptions::ExcSetOnlyEvenChildren(i));
@@ -1924,7 +1924,7 @@ template <int structdim, int dim, int spacedim>
 double
 TriaAccessor<structdim, dim, spacedim>::minimum_vertex_distance () const
 {
-    switch (structdim)
+  switch (structdim)
     {
       case 1:
             return std::sqrt((this->vertex(1)-this->vertex(0)).square());
@@ -2188,10 +2188,10 @@ TriaAccessor<0, 1, spacedim>::center () const
 
 template <int spacedim>
 inline
-typename internal::Triangulation::Iterators<1,spacedim>::line_iterator
+typename dealii::internal::Triangulation::Iterators<1,spacedim>::line_iterator
 TriaAccessor<0, 1, spacedim>::line (const unsigned int)
 {
-  return typename internal::Triangulation::Iterators<1,spacedim>::line_iterator();
+  return typename dealii::internal::Triangulation::Iterators<1,spacedim>::line_iterator();
 }
 
 
@@ -2207,10 +2207,10 @@ TriaAccessor<0, 1, spacedim>::line_index (const unsigned int)
 
 template <int spacedim>
 inline
-typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator
+typename dealii::internal::Triangulation::Iterators<1,spacedim>::quad_iterator
 TriaAccessor<0, 1, spacedim>::quad (const unsigned int)
 {
-  return typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator();
+  return typename dealii::internal::Triangulation::Iterators<1,spacedim>::quad_iterator();
 }
 
 
@@ -2411,7 +2411,7 @@ CellAccessor (const Triangulation<dim,spacedim> *parent,
               const int                 index,
               const AccessorData       *local_data)
                 :
-    TriaAccessor<dim, dim, spacedim> (parent, level, index, local_data)
+                TriaAccessor<dim, dim, spacedim> (parent, level, index, local_data)
 {}
 
 
@@ -2480,7 +2480,7 @@ inline
 TriaIterator<TriaAccessor<dim-1, dim, spacedim> >
 CellAccessor<dim,spacedim>::face (const unsigned int i) const
 {
-  return internal::CellAccessor::get_face (*this, i);
+  return dealii::internal::CellAccessor::get_face (*this, i);
 }
 
 
@@ -2582,7 +2582,7 @@ template <int dim, int spacedim>
 inline
 bool
 CellAccessor<dim,spacedim>::flag_for_face_refinement (const unsigned int face_no,
-                                             const RefinementCase<dim-1> &face_refinement_case) const
+                                                      const RefinementCase<dim-1> &face_refinement_case) const
 {
   Assert (dim>1, ExcImpossibleInDim(dim));
   Assert (face_no<GeometryInfo<dim>::faces_per_cell,
@@ -2624,8 +2624,8 @@ CellAccessor<dim,spacedim>::flag_for_line_refinement (const unsigned int line_no
                                    // line refinement and the already existing
                                    // flagged refinement case
   RefinementCase<dim> old_ref_case=refine_flag_set(),
-                   new_ref_case=old_ref_case
-                                | GeometryInfo<dim>::min_cell_refinement_case_for_line_refinement(line_no);
+                      new_ref_case=old_ref_case
+                                   | GeometryInfo<dim>::min_cell_refinement_case_for_line_refinement(line_no);
   set_refine_flag(new_ref_case);
                                    // return, whether we had to change the
                                    // refinement flag
@@ -2636,60 +2636,60 @@ CellAccessor<dim,spacedim>::flag_for_line_refinement (const unsigned int line_no
 
 template <>
 inline
-internal::SubfaceCase<1>
+dealii::internal::SubfaceCase<1>
 CellAccessor<1>::subface_case(const unsigned int) const
 {
-  return internal::SubfaceCase<1>::case_none;
+  return dealii::internal::SubfaceCase<1>::case_none;
 }
 
 template <>
 inline
-internal::SubfaceCase<1>
+dealii::internal::SubfaceCase<1>
 CellAccessor<1,2>::subface_case(const unsigned int) const
 {
-  return internal::SubfaceCase<1>::case_none;
+  return dealii::internal::SubfaceCase<1>::case_none;
 }
 
 
 template <>
 inline
-internal::SubfaceCase<1>
+dealii::internal::SubfaceCase<1>
 CellAccessor<1,3>::subface_case(const unsigned int) const
 {
-  return internal::SubfaceCase<1>::case_none;
+  return dealii::internal::SubfaceCase<1>::case_none;
 }
 
 
 template <>
 inline
-internal::SubfaceCase<2>
+dealii::internal::SubfaceCase<2>
 CellAccessor<2>::subface_case(const unsigned int face_no) const
 {
   Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
   Assert(face_no<GeometryInfo<2>::faces_per_cell,
          ExcIndexRange(face_no,0,GeometryInfo<2>::faces_per_cell));
   return ((face(face_no)->has_children()) ?
-          internal::SubfaceCase<2>::case_x :
-          internal::SubfaceCase<2>::case_none);
+          dealii::internal::SubfaceCase<2>::case_x :
+          dealii::internal::SubfaceCase<2>::case_none);
 }
 
 template <>
 inline
-internal::SubfaceCase<2>
+dealii::internal::SubfaceCase<2>
 CellAccessor<2,3>::subface_case(const unsigned int face_no) const
 {
   Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
   Assert(face_no<GeometryInfo<2>::faces_per_cell,
          ExcIndexRange(face_no,0,GeometryInfo<2>::faces_per_cell));
   return ((face(face_no)->has_children()) ?
-          internal::SubfaceCase<2>::case_x :
-          internal::SubfaceCase<2>::case_none);
+          dealii::internal::SubfaceCase<2>::case_x :
+          dealii::internal::SubfaceCase<2>::case_none);
 }
 
 
 template <>
 inline
-internal::SubfaceCase<3>
+dealii::internal::SubfaceCase<3>
 CellAccessor<3>::subface_case(const unsigned int face_no) const
 {
   Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
@@ -2698,7 +2698,7 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
   switch (static_cast<unsigned char> (face(face_no)->refinement_case()))
     {
       case RefinementCase<3>::no_refinement:
-            return internal::SubfaceCase<3>::case_none;
+            return dealii::internal::SubfaceCase<3>::case_none;
             break;
       case RefinementCase<3>::cut_x:
             if (face(face_no)->child(0)->has_children())
@@ -2709,10 +2709,10 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
                   {
                     Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<2>::cut_y,
                            ExcInternalError());
-                    return internal::SubfaceCase<3>::case_x1y2y;
+                    return dealii::internal::SubfaceCase<3>::case_x1y2y;
                   }
                 else
-                  return internal::SubfaceCase<3>::case_x1y;
+                  return dealii::internal::SubfaceCase<3>::case_x1y;
               }
             else
               {
@@ -2720,10 +2720,10 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
                   {
                     Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<2>::cut_y,
                            ExcInternalError());
-                    return internal::SubfaceCase<3>::case_x2y;
+                    return dealii::internal::SubfaceCase<3>::case_x2y;
                   }
                 else
-                  return internal::SubfaceCase<3>::case_x;
+                  return dealii::internal::SubfaceCase<3>::case_x;
               }
             break;
       case RefinementCase<3>::cut_y:
@@ -2735,10 +2735,10 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
                   {
                     Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<2>::cut_x,
                            ExcInternalError());
-                    return internal::SubfaceCase<3>::case_y1x2x;
+                    return dealii::internal::SubfaceCase<3>::case_y1x2x;
                   }
                 else
-                  return internal::SubfaceCase<3>::case_y1x;
+                  return dealii::internal::SubfaceCase<3>::case_y1x;
               }
             else
               {
@@ -2746,20 +2746,20 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
                   {
                     Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<2>::cut_x,
                            ExcInternalError());
-                    return internal::SubfaceCase<3>::case_y2x;
+                    return dealii::internal::SubfaceCase<3>::case_y2x;
                   }
                 else
-                  return internal::SubfaceCase<3>::case_y;
+                  return dealii::internal::SubfaceCase<3>::case_y;
               }
             break;
       case RefinementCase<3>::cut_xy:
-            return internal::SubfaceCase<3>::case_xy;
+            return dealii::internal::SubfaceCase<3>::case_xy;
             break;
       default:
             Assert(false, ExcInternalError());
     }
                                    // we should never get here
-  return internal::SubfaceCase<3>::case_none;
+  return dealii::internal::SubfaceCase<3>::case_none;
 }
 
 
@@ -2811,7 +2811,7 @@ inline
 TriaIterator<CellAccessor<dim,spacedim> >
 CellAccessor<dim,spacedim>::neighbor (const unsigned int i) const
 {
-    TriaIterator<CellAccessor<dim,spacedim> >
+  TriaIterator<CellAccessor<dim,spacedim> >
     q (this->tria, neighbor_level (i), neighbor_index (i));
 
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
@@ -2827,7 +2827,7 @@ inline
 TriaIterator<CellAccessor<dim,spacedim> >
 CellAccessor<dim,spacedim>::child (const unsigned int i) const
 {
-    TriaIterator<CellAccessor<dim,spacedim> >
+  TriaIterator<CellAccessor<dim,spacedim> >
     q (this->tria, this->present_level+1, this->child_index (i));
 
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),

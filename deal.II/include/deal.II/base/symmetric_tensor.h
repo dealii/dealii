@@ -698,7 +698,7 @@ class SymmetricTensor
                                       * namespace is to work around
                                       * bugs in some older compilers.
                                       */
-    SymmetricTensor (const Number (&array) [internal::SymmetricTensorAccessors::StorageType<rank,dim,Number>::n_independent_components]);
+    SymmetricTensor (const Number (&array) [n_independent_components]);
 
                                      /**
                                       *  Assignment operator.
@@ -1155,7 +1155,7 @@ SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Tensor<2,dim,Number> &t
 
 template <int rank, int dim, typename Number>
 inline
-SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Number (&array) [internal::SymmetricTensorAccessors::StorageType<rank,dim,Number>::n_independent_components])
+SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Number (&array) [n_independent_components])
                 :
                 data (array)
 {}

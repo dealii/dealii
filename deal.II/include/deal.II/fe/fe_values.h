@@ -36,9 +36,9 @@
 #include <algorithm>
 #include <memory>
 
-                                // dummy include in order to have the
-                                // definition of PetscScalar available
-                                // without including other PETSc stuff
+                                 // dummy include in order to have the
+                                 // definition of PetscScalar available
+                                 // without including other PETSc stuff
 #ifdef DEAL_II_USE_PETSC
 #  include <petsc.h>
 #endif
@@ -652,7 +652,7 @@ namespace FEValuesViews
                                         * <code>spacedim=3</code> it is a
                                         * <code>Tensor@<1, dim@></code>.
                                         */
-      typedef typename internal::CurlType<spacedim>::type   curl_type;
+      typedef typename dealii::internal::CurlType<spacedim>::type   curl_type;
 
                                        /**
                                         * A typedef for the type of second
@@ -806,7 +806,7 @@ namespace FEValuesViews
                                         */
       curl_type
       curl (const unsigned int shape_function,
-                  const unsigned int q_point) const;
+            const unsigned int q_point) const;
 
                                        /**
                                         * Return the Hessian (the tensor of
@@ -936,7 +936,7 @@ namespace FEValuesViews
                                         */
       template <class InputVector>
       void get_function_curls (const InputVector& fe_function,
-                                     std::vector<curl_type>& curls) const;
+                               std::vector<curl_type>& curls) const;
 
                                        /**
                                         * Return the Hessians of the selected
@@ -1378,7 +1378,7 @@ namespace internal
         std::vector<dealii::FEValuesViews::Scalar<dim,spacedim> > scalars;
         std::vector<dealii::FEValuesViews::Vector<dim,spacedim> > vectors;
         std::vector<dealii::FEValuesViews::SymmetricTensor<2,dim,spacedim> >
-                symmetric_second_order_tensors;
+        symmetric_second_order_tensors;
 
                                          /**
                                           * Constructor.
@@ -3132,32 +3132,32 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
                                       */
     std::auto_ptr<const CellIteratorBase> present_cell;
 
-    /**
-     * A signal connection we use to ensure we get informed whenever the
-     * triangulation changes. We need to know about that because it
-     * invalidates all cell iterators and, as part of that, the
-     * 'present_cell' iterator we keep around between subsequent
-     * calls to reinit() in order to compute the cell similarity.
-     */
+                                     /**
+                                      * A signal connection we use to ensure we get informed whenever the
+                                      * triangulation changes. We need to know about that because it
+                                      * invalidates all cell iterators and, as part of that, the
+                                      * 'present_cell' iterator we keep around between subsequent
+                                      * calls to reinit() in order to compute the cell similarity.
+                                      */
     boost::signals2::connection tria_listener;
 
-    /**
-     * A function that is connected to the triangulation in
-     * order to reset the stored 'present_cell' iterator to an invalid
-     * one whenever the triangulation is changed and the iterator consequently
-     * becomes invalid.
-     */
+                                     /**
+                                      * A function that is connected to the triangulation in
+                                      * order to reset the stored 'present_cell' iterator to an invalid
+                                      * one whenever the triangulation is changed and the iterator consequently
+                                      * becomes invalid.
+                                      */
     void invalidate_present_cell ();
 
-    /**
-     * This function is called by the various reinit() functions in derived
-     * classes. Given the cell indicated by the argument, test whether
-     * we have to throw away the previously stored present_cell argument
-     * because it would require us to compare cells from different
-     * triangulations. In checking all this, also make sure that we have
-     * tria_listener connected to the triangulation to which we will set
-     * present_cell right after calling this function.
-     */
+                                     /**
+                                      * This function is called by the various reinit() functions in derived
+                                      * classes. Given the cell indicated by the argument, test whether
+                                      * we have to throw away the previously stored present_cell argument
+                                      * because it would require us to compare cells from different
+                                      * triangulations. In checking all this, also make sure that we have
+                                      * tria_listener connected to the triangulation to which we will set
+                                      * present_cell right after calling this function.
+                                      */
     void
     maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
 
@@ -3244,7 +3244,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
                                       * A cache for all possible FEValuesViews
                                       * objects.
                                       */
-    internal::FEValuesViews::Cache<dim,spacedim> fe_values_views_cache;
+    dealii::internal::FEValuesViews::Cache<dim,spacedim> fe_values_views_cache;
 
                                      /**
                                       * Make the view classes friends of this
@@ -4155,121 +4155,121 @@ namespace FEValuesViews
   inline
   typename Vector<dim,spacedim>::curl_type
   Vector<dim,spacedim>::curl (const unsigned int shape_function, const unsigned int q_point) const {
-     // this function works like in the case above
-     typedef FEValuesBase<dim,spacedim> FVB;
+                                     // this function works like in the case above
+    typedef FEValuesBase<dim,spacedim> FVB;
 
-     Assert (shape_function < fe_values.fe->dofs_per_cell,
-         ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-     Assert (fe_values.update_flags & update_gradients,
-         typename FVB::ExcAccessToUninitializedField());
-     // same as for the scalar case except that we have one more index
-     const int snc = shape_function_data[shape_function].single_nonzero_component;
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_gradients,
+            typename FVB::ExcAccessToUninitializedField());
+                                     // same as for the scalar case except that we have one more index
+    const int snc = shape_function_data[shape_function].single_nonzero_component;
 
-     if (snc == -2)
-        return curl_type ();
+    if (snc == -2)
+      return curl_type ();
 
-     else
-        switch (dim) {
-           case 1: {
-                  Assert (false, ExcMessage("Computing the curl in 1d is not a useful operation"));
-              return curl_type ();
-           }
-
-           case 2: {
-              if (snc != -1) {
-                 curl_type return_value;
-
-                                                  // the single
-                                                  // nonzero component
-                                                  // can only be zero
-                                                  // or one in 2d
-                 if (shape_function_data[shape_function].single_nonzero_component_index == 0)
-                   return_value[0] = -1.0 * fe_values.shape_gradients[snc][q_point][1];
-                 else
-                   return_value[0] = fe_values.shape_gradients[snc][q_point][0];
-
-                 return return_value;
-              }
-
-              else {
-                 curl_type return_value;
-
-                 return_value[0] = 0.0;
-
-                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[0])
-                    return_value[0]
-                      -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
-
-                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[1])
-                    return_value[0]
-                      += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
-
-                 return return_value;
-              }
-           }
-
-           case 3: {
-              if (snc != -1) {
-                 curl_type return_value;
-
-                 switch (shape_function_data[shape_function].single_nonzero_component_index) {
-                    case 0: {
-                       return_value[0] = 0;
-                       return_value[1] = fe_values.shape_gradients[snc][q_point][2];
-                       return_value[2] = -1.0 * fe_values.shape_gradients[snc][q_point][1];
-                       return return_value;
-                    }
-
-                    case 1: {
-                       return_value[0] = -1.0 * fe_values.shape_gradients[snc][q_point][2];
-                       return_value[1] = 0;
-                       return_value[2] = fe_values.shape_gradients[snc][q_point][0];
-                       return return_value;
-                    }
-
-                    default: {
-                       return_value[0] = fe_values.shape_gradients[snc][q_point][1];
-                       return_value[1] = -1.0 * fe_values.shape_gradients[snc][q_point][0];
-                       return_value[2] = 0;
-                       return return_value;
-                    }
-                 }
-              }
-
-              else {
-                 curl_type return_value;
-
-                 for (unsigned int i = 0; i < dim; ++i)
-                    return_value[i] = 0.0;
-
-                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[0]) {
-                    return_value[1]
-                      += fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][2];
-                    return_value[2]
-                      -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
-                 }
-
-                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[1]) {
-                    return_value[0]
-                      -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][2];
-                    return_value[2]
-                      += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
-                 }
-
-                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[2]) {
-                    return_value[0]
-                      += fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][1];
-                    return_value[1]
-                      -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][0];
-                 }
-
-                 return return_value;
-              }
-           }
+    else
+      switch (dim) {
+        case 1: {
+          Assert (false, ExcMessage("Computing the curl in 1d is not a useful operation"));
+          return curl_type ();
         }
-                                // should not end up here
-     Assert (false, ExcInternalError());
-     return curl_type();
+
+        case 2: {
+          if (snc != -1) {
+            curl_type return_value;
+
+                                             // the single
+                                             // nonzero component
+                                             // can only be zero
+                                             // or one in 2d
+            if (shape_function_data[shape_function].single_nonzero_component_index == 0)
+              return_value[0] = -1.0 * fe_values.shape_gradients[snc][q_point][1];
+            else
+              return_value[0] = fe_values.shape_gradients[snc][q_point][0];
+
+            return return_value;
+          }
+
+          else {
+            curl_type return_value;
+
+            return_value[0] = 0.0;
+
+            if (shape_function_data[shape_function].is_nonzero_shape_function_component[0])
+              return_value[0]
+                -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
+
+            if (shape_function_data[shape_function].is_nonzero_shape_function_component[1])
+              return_value[0]
+                += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
+
+            return return_value;
+          }
+        }
+
+        case 3: {
+          if (snc != -1) {
+            curl_type return_value;
+
+            switch (shape_function_data[shape_function].single_nonzero_component_index) {
+              case 0: {
+                return_value[0] = 0;
+                return_value[1] = fe_values.shape_gradients[snc][q_point][2];
+                return_value[2] = -1.0 * fe_values.shape_gradients[snc][q_point][1];
+                return return_value;
+              }
+
+              case 1: {
+                return_value[0] = -1.0 * fe_values.shape_gradients[snc][q_point][2];
+                return_value[1] = 0;
+                return_value[2] = fe_values.shape_gradients[snc][q_point][0];
+                return return_value;
+              }
+
+              default: {
+                return_value[0] = fe_values.shape_gradients[snc][q_point][1];
+                return_value[1] = -1.0 * fe_values.shape_gradients[snc][q_point][0];
+                return_value[2] = 0;
+                return return_value;
+              }
+            }
+          }
+
+          else {
+            curl_type return_value;
+
+            for (unsigned int i = 0; i < dim; ++i)
+              return_value[i] = 0.0;
+
+            if (shape_function_data[shape_function].is_nonzero_shape_function_component[0]) {
+              return_value[1]
+                += fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][2];
+              return_value[2]
+                -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
+            }
+
+            if (shape_function_data[shape_function].is_nonzero_shape_function_component[1]) {
+              return_value[0]
+                -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][2];
+              return_value[2]
+                += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
+            }
+
+            if (shape_function_data[shape_function].is_nonzero_shape_function_component[2]) {
+              return_value[0]
+                += fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][1];
+              return_value[1]
+                -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][0];
+            }
+
+            return return_value;
+          }
+        }
+      }
+                                     // should not end up here
+    Assert (false, ExcInternalError());
+    return curl_type();
   }
 
   template <int dim, int spacedim>

@@ -292,10 +292,10 @@ namespace hp
  * The piece of code in the constructor of a finite element
  * responsible for this looks like
  * @code
-  FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
-  FETools::compute_node_matrix(M, *this);
-  this->inverse_node_matrix.reinit(this->dofs_per_cell, this->dofs_per_cell);
-  this->inverse_node_matrix.invert(M);
+ FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
+ FETools::compute_node_matrix(M, *this);
+ this->inverse_node_matrix.reinit(this->dofs_per_cell, this->dofs_per_cell);
+ this->inverse_node_matrix.invert(M);
  * @endcode
  * Don't forget to make sure that #unit_support_points or
  * #generalized_support_points are initialized before this!
@@ -308,10 +308,10 @@ namespace hp
  *
  * This can be achieved by
  * @code
-  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-    this->prolongation[i].reinit (this->dofs_per_cell,
-                                  this->dofs_per_cell);
-  FETools::compute_embedding_matrices (*this, this->prolongation);
+ for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+ this->prolongation[i].reinit (this->dofs_per_cell,
+ this->dofs_per_cell);
+ FETools::compute_embedding_matrices (*this, this->prolongation);
  * @endcode
  *
  * <h5>Computing the #restriction matrices for error estimators</h5>
@@ -337,19 +337,19 @@ class FiniteElement : public Subscriptor,
                       public FiniteElementData<dim>
 {
   public:
-                                   /**
-                                    * Base class for internal data.
-                                    * Adds data for second derivatives to
-                                    * Mapping::InternalDataBase()
-                                    *
-                                    * For information about the
-                                    * general purpose of this class,
-                                    * see the documentation of the
-                                    * base class.
-                                    *
-                                    * @author Guido Kanschat, 2001
-                                    */
-  class InternalDataBase : public Mapping<dim,spacedim>::InternalDataBase
+                                     /**
+                                      * Base class for internal data.
+                                      * Adds data for second derivatives to
+                                      * Mapping::InternalDataBase()
+                                      *
+                                      * For information about the
+                                      * general purpose of this class,
+                                      * see the documentation of the
+                                      * base class.
+                                      *
+                                      * @author Guido Kanschat, 2001
+                                      */
+    class InternalDataBase : public Mapping<dim,spacedim>::InternalDataBase
     {
       public:
                                          /**
@@ -926,7 +926,7 @@ class FiniteElement : public Subscriptor,
                                       * succeed or generate the
                                       * exception.
                                       */
-    const FullMatrix<double> & constraints (const internal::SubfaceCase<dim> &subface_case=internal::SubfaceCase<dim>::case_isotropic) const;
+    const FullMatrix<double> & constraints (const dealii::internal::SubfaceCase<dim> &subface_case=dealii::internal::SubfaceCase<dim>::case_isotropic) const;
 
                                      /**
                                       * Return whether this element
@@ -958,7 +958,7 @@ class FiniteElement : public Subscriptor,
                                       * the lack of information this
                                       * just expresses.
                                       */
-    bool constraints_are_implemented (const internal::SubfaceCase<dim> &subface_case=internal::SubfaceCase<dim>::case_isotropic) const;
+    bool constraints_are_implemented (const dealii::internal::SubfaceCase<dim> &subface_case=dealii::internal::SubfaceCase<dim>::case_isotropic) const;
 
 
                                      /**
@@ -1262,8 +1262,8 @@ class FiniteElement : public Subscriptor,
                                       * from the system_to_component_index()
                                       * function.
                                       */
-   unsigned int component_to_system_index(const unsigned int component,
-                                          const unsigned int index) const;
+    unsigned int component_to_system_index(const unsigned int component,
+                                           const unsigned int index) const;
 
                                      /**
                                       * Same as
@@ -2645,7 +2645,7 @@ std::pair<unsigned int,unsigned int>
 FiniteElement<dim,spacedim>::system_to_component_index (const unsigned int index) const
 {
   Assert (index < system_to_component_table.size(),
-         ExcIndexRange(index, 0, system_to_component_table.size()));
+          ExcIndexRange(index, 0, system_to_component_table.size()));
   Assert (is_primitive (index),
           ( typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(index)) );
   return system_to_component_table[index];
@@ -2677,14 +2677,14 @@ template <int dim, int spacedim>
 inline
 unsigned int
 FiniteElement<dim,spacedim>::component_to_system_index (const unsigned int component,
-                                                   const unsigned int index) const
+                                                        const unsigned int index) const
 {
-   std::vector< std::pair<unsigned int, unsigned int> >::const_iterator
-      it = std::find(system_to_component_table.begin(), system_to_component_table.end(),
-                     std::pair<unsigned int, unsigned int>(component, index));
+  std::vector< std::pair<unsigned int, unsigned int> >::const_iterator
+    it = std::find(system_to_component_table.begin(), system_to_component_table.end(),
+                   std::pair<unsigned int, unsigned int>(component, index));
 
-   Assert(it != system_to_component_table.end(), ExcComponentIndexInvalid(component, index));
-   return std::distance(system_to_component_table.begin(), it);
+  Assert(it != system_to_component_table.end(), ExcComponentIndexInvalid(component, index));
+  return std::distance(system_to_component_table.begin(), it);
 }
 
 
@@ -2724,7 +2724,7 @@ std::pair<std::pair<unsigned int,unsigned int>,unsigned int>
 FiniteElement<dim,spacedim>::system_to_base_index (const unsigned int index) const
 {
   Assert (index < system_to_base_table.size(),
-         ExcIndexRange(index, 0, system_to_base_table.size()));
+          ExcIndexRange(index, 0, system_to_base_table.size()));
   return system_to_base_table[index];
 }
 
@@ -2787,9 +2787,9 @@ FiniteElement<dim,spacedim>::system_to_block_index (const unsigned int index) co
                                    // first block of this base plus
                                    // the index within the base blocks
   return std::pair<unsigned int, unsigned int>(
-     first_block_of_base(system_to_base_table[index].first.first)
-     + system_to_base_table[index].first.second,
-     system_to_base_table[index].second);
+    first_block_of_base(system_to_base_table[index].first.first)
+    + system_to_base_table[index].first.second,
+    system_to_base_table[index].second);
 }
 
 

@@ -75,7 +75,7 @@ namespace hp
   template <int dim, int spacedim=dim>
   class DoFHandler : public Subscriptor
   {
-      typedef internal::DoFHandler::Iterators<DoFHandler<dim,spacedim> > IteratorSelector;
+      typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim> > IteratorSelector;
     public:
       typedef typename IteratorSelector::CellAccessor         cell_accessor;
       typedef typename IteratorSelector::FaceAccessor         face_accessor;
@@ -1107,7 +1107,7 @@ namespace hp
                                         *  Create default tables for
                                         *  the active_fe_indices in
                                         *  the
-                                        *  internal::hp::DoFLevels. They
+                                        *  dealii::internal::hp::DoFLevels. They
                                         *  are initialized with the a
                                         *  zero indicator, meaning
                                         *  that fe[0] is going to be
@@ -1189,16 +1189,16 @@ namespace hp
                                         * entity.
                                         */
       void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
-                                   internal::int2type<0>);
+                                   dealii::internal::int2type<0>);
 
       void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
-                                   internal::int2type<1>);
+                                   dealii::internal::int2type<1>);
 
       void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
-                                   internal::int2type<2>);
+                                   dealii::internal::int2type<2>);
 
       void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
-                                   internal::int2type<3>);
+                                   dealii::internal::int2type<3>);
 
                                        /**
                                         * Space to store the DoF
@@ -1207,7 +1207,7 @@ namespace hp
                                         * <tt>levels[]</tt> tree of
                                         * the Triangulation objects.
                                         */
-      std::vector<internal::hp::DoFLevel<dim>*>    levels;
+      std::vector<dealii::internal::hp::DoFLevel<dim>*>    levels;
                                        /**
                                         * Space to store the DoF
                                         * numbers for the faces.
@@ -1215,7 +1215,7 @@ namespace hp
                                         * <tt>faces</tt> pointer of
                                         * the Triangulation objects.
                                         */
-      internal::hp::DoFFaces<dim> * faces;
+      dealii::internal::hp::DoFFaces<dim> * faces;
 
                                        /**
                                         * A structure that contains all
@@ -1228,7 +1228,7 @@ namespace hp
                                         * accessor function in this
                                         * class that returns its value.
                                         */
-      internal::DoFHandler::NumberCache number_cache;
+      dealii::internal::DoFHandler::NumberCache number_cache;
 
                                        /**
                                         * Array to store the indices
@@ -1301,8 +1301,8 @@ namespace hp
                                         */
       template <int, class> friend class dealii::DoFAccessor;
       template <class> friend class dealii::DoFCellAccessor;
-      friend struct internal::DoFAccessor::Implementation;
-      friend struct internal::DoFCellAccessor::Implementation;
+      friend struct dealii::internal::DoFAccessor::Implementation;
+      friend struct dealii::internal::DoFCellAccessor::Implementation;
 
                                        /**
                                         * Likewise for DoFLevel
@@ -1311,9 +1311,9 @@ namespace hp
                                         * the functions that set and
                                         * retrieve vertex dof indices.
                                         */
-      template <int> friend class internal::hp::DoFLevel;
-      template <int> friend class internal::hp::DoFObjects;
-      friend struct internal::hp::DoFHandler::Implementation;
+      template <int> friend class dealii::internal::hp::DoFLevel;
+      template <int> friend class dealii::internal::hp::DoFObjects;
+      friend struct dealii::internal::hp::DoFHandler::Implementation;
   };
 
 
