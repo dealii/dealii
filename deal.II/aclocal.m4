@@ -311,6 +311,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
    	                  GXX_VERSION_DETAILED="$GXX_VERSION"
                         else
 
+                          dnl Maybe CLang?
 			  is_clang="`($CXX --version 2>&1) | grep clang`"
 			  if test "x$is_clang" != x ; then
                             AC_MSG_RESULT(C++ compiler is clang)
@@ -319,11 +320,21 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
    	                    GXX_VERSION_DETAILED="$GXX_VERSION"
 			  else
 
-                            dnl  Aw, nothing suitable found...
-                            AC_MSG_RESULT(Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org)
-                            GXX_BRAND=Unknown
-			    GXX_VERSION=unknown_cc
-   	                    GXX_VERSION_DETAILED="$GXX_VERSION"
+                            dnl Maybe Cray C++?
+			    is_cray="`($CXX -V 2>&1) | grep Cray`"
+			    if test "x$is_cray" != x ; then
+                              AC_MSG_RESULT(C++ compiler is Cray C++)
+  	                      GXX_BRAND=cray
+			      GXX_VERSION=cray
+   	                      GXX_VERSION_DETAILED="$GXX_VERSION"
+			    else
+
+                              dnl  Aw, nothing suitable found...
+                              AC_MSG_RESULT(Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org)
+                              GXX_BRAND=Unknown
+			      GXX_VERSION=unknown_cc
+   	                      GXX_VERSION_DETAILED="$GXX_VERSION"
+                            fi
                           fi
                         fi
                       fi
@@ -2359,6 +2370,10 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
 	    ;;
 
         clang*)
+	    LDFLAGS="$LDFLAGS -lpthread"
+	    ;;
+
+        cray*)
 	    LDFLAGS="$LDFLAGS -lpthread"
 	    ;;
 
