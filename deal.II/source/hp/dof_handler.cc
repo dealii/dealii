@@ -323,7 +323,7 @@ namespace internal
           template <int spacedim>
           static
           unsigned int
-          distribute_dofs_on_cell (const typename DoFHandler<1,spacedim>::active_cell_iterator &cell,
+          distribute_dofs_on_cell (const typename dealii::hp::DoFHandler<1,spacedim>::active_cell_iterator &cell,
                                    unsigned int          next_free_dof)
             {
               const unsigned int dim = 1;
@@ -368,7 +368,7 @@ namespace internal
           template <int spacedim>
           static
           unsigned int
-          distribute_dofs_on_cell (const typename DoFHandler<2,spacedim>::active_cell_iterator &cell,
+          distribute_dofs_on_cell (const typename dealii::hp::DoFHandler<2,spacedim>::active_cell_iterator &cell,
                                    unsigned int          next_free_dof)
             {
               const unsigned int dim = 2;
@@ -431,7 +431,7 @@ namespace internal
           template <int spacedim>
           static
           unsigned int
-          distribute_dofs_on_cell (const typename DoFHandler<3,spacedim>::active_cell_iterator &cell,
+          distribute_dofs_on_cell (const typename dealii::hp::DoFHandler<3,spacedim>::active_cell_iterator &cell,
                                    unsigned int          next_free_dof)
             {
               const unsigned int dim = 3;

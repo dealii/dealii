@@ -97,7 +97,7 @@ namespace
 			  &exitTime, &sysTime, &cpuTime))
 	{
 	  return (double)(((unsigned long long)cpuTime.dwHighDateTime << 32)
-			  | cpuTime.dwLowDateTime) / 10e6;
+			  | cpuTime.dwLowDateTime) / 1e6;
 	}
       return 0;
     }
@@ -233,6 +233,7 @@ double Timer::wall_time () const
   if (running)
     {
 #ifdef DEAL_II_MSVC
+//TODO[BG]: Do something useful here
       return 0;
 #else
       struct timeval wall_timer;

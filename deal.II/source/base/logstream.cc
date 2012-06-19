@@ -338,6 +338,7 @@ LogStream::print_line_head()
         }
     }
 #else
+//TODO[BG]: Do something useful here
   double utime = 0.;
 #endif
 

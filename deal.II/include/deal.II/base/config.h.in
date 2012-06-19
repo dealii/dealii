@@ -642,6 +642,16 @@
 #  define DEAL_II_MSVC
 #endif
 
+/**
+ * Using pthreads under windows as a non-static library requires the following
+ * preprocessor switch to be undefined.
+ */
+#ifdef DEAL_II_MSVC
+#  if defined(PTW32_STATIC_LIB)
+#    undef PTW32_STATIC_LIB
+#  endif
+#endif
+
 /*
  * There is an annoying problem in the Trilinos header ml_config.h: It
  * #define's HAVE_INTTYPES_H but doesn't give the symbol a value. This
