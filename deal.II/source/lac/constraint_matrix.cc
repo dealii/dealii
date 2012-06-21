@@ -2421,6 +2421,8 @@ ONLY_MATRIX_FUNCTIONS(SparseMatrix<float>);
 ONLY_MATRIX_FUNCTIONS(SparseMatrix<double>);
 ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<float> >);
 ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<double> >);
+ONLY_MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
+ONLY_MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
 
 #ifdef DEAL_II_USE_TRILINOS
 ONLY_MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix);
