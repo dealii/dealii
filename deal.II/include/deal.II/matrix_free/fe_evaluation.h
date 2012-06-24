@@ -429,14 +429,16 @@ public:
   gradient_type get_gradient (const unsigned int q_point) const;
 
                                 /**
-                                 * Write a gradient to the field containing
-                                 * the values on quadrature points with
-                                 * component @p q_point. Access to the same
-                                 * field as through @p get_gradient. If
+                                 * Write a contribution that is tested
+                                 * by the gradient to the field
+                                 * containing the values on quadrature
+                                 * points with component @p
+                                 * q_point. Access to the same field
+                                 * as through @p get_gradient. If
                                  * applied before the function @p
-                                 * integrate(...,true) is called,
-                                 * this specifies the gradient which is tested
-                                 * by all basis function gradients on the
+                                 * integrate(...,true) is called, this
+                                 * specifies what is tested by all
+                                 * basis function gradients on the
                                  * current cell and integrated over.
                                  *
                                  * Note that the derived class
@@ -1081,17 +1083,17 @@ class FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,1,Number> :
   gradient_type get_gradient (const unsigned int q_point) const;
 
                                 /**
-                                 * Write a gradient to the field
+                                 * Write a contribution that is tested
+                                 * by the gradient to the field
                                  * containing the values on quadrature
                                  * points with component @p
                                  * q_point. Access to the same field
                                  * as through @p get_gradient. If
                                  * applied before the function @p
                                  * integrate(...,true) is called, this
-                                 * specifies the gradient which is
-                                 * tested by all basis function
-                                 * gradients on the current cell and
-                                 * integrated over.
+                                 * specifies what is tested by all
+                                 * basis function gradients on the
+                                 * current cell and integrated over.
                                  */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
@@ -1241,44 +1243,69 @@ class FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,dim,Number> :
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
 
                                 /**
-                                 * Write a gradient to the field containing
-                                 * the values on quadrature points with
-                                 * component @p q_point. Access to the same
-                                 * field as through @p get_gradient. If
+                                 * Write a contribution that is tested
+                                 * by the gradient to the field
+                                 * containing the values on quadrature
+                                 * points with component @p
+                                 * q_point. Access to the same field
+                                 * as through @p get_gradient. If
                                  * applied before the function @p
-                                 * integrate(...,true) is called,
-                                 * this specifies the gradient which is tested
-                                 * by all basis function gradients on the
+                                 * integrate(...,true) is called, this
+                                 * specifies what is tested by all
+                                 * basis function gradients on the
                                  * current cell and integrated over.
                                  */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
 
                                 /**
-                                 * Write a gradient to the field containing
-                                 * the values on quadrature points with
-                                 * component @p q_point. This function is an
-                                 * alternative to the other submit_gradient
-                                 * function when using a system of fixed
-                                 * number of equations which happens to
-                                 * coincide with the dimension for some
-                                 * dimensions, but not all. To allow for
-                                 * dimension-independent programming, this
-                                 * function can be used instead.
+                                 * Write a contribution that is tested
+                                 * by the gradient to the field
+                                 * containing the values on quadrature
+                                 * points with component @p
+                                 * q_point. This function is an
+                                 * alternative to the other
+                                 * submit_gradient function when using
+                                 * a system of fixed number of
+                                 * equations which happens to coincide
+                                 * with the dimension for some
+                                 * dimensions, but not all. To allow
+                                 * for dimension-independent
+                                 * programming, this function can be
+                                 * used instead.
                                  */
   void submit_gradient(const Tensor<1,dim,Tensor<1,dim,VectorizedArray<Number> > > grad_in,
                        const unsigned int q_point);
 
                                 /**
-                                 * Write a gradient to the field containing
-                                 * the values on quadrature points with
-                                 * component @p q_point. Access to the same
-                                 * field as through @p get_gradient. If
+                                 * Write a constribution that is
+                                 * tested by the divergence to the field
+                                 * containing the values on quadrature
+                                 * points with component @p
+                                 * q_point. Access to the same field
+                                 * as through @p get_gradient. If
                                  * applied before the function @p
-                                 * integrate(...,true) is called,
-                                 * this specifies the gradient which is tested
-                                 * by all basis function gradients on the
+                                 * integrate(...,true) is called, this
+                                 * specifies what is tested by all
+                                 * basis function gradients on the
                                  * current cell and integrated over.
+                                 */
+  void submit_divergence (const VectorizedArray<Number> div_in,
+                          const unsigned int q_point);
+
+                                /**
+                                 * Write a contribution that is tested
+                                 * by the gradient to the field
+                                 * containing the values on quadrature
+                                 * points with component @p
+                                 * q_point. Access to the same field
+                                 * as through @p get_gradient. If
+                                 * applied before the function @p
+                                 * integrate(...,true) is called, this
+                                 * specifies the gradient which is
+                                 * tested by all basis function
+                                 * gradients on the current cell and
+                                 * integrated over.
                                  */
   void submit_symmetric_gradient(const SymmetricTensor<2,dim,VectorizedArray<Number> > grad_in,
                                  const unsigned int      q_point);
@@ -3876,6 +3903,51 @@ FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,dim,Number>
                    const unsigned int q_point)
 {
   BaseClass::submit_gradient(grad_in, q_point);
+}
+
+template <int dim, int dofs_per_cell_, int n_q_points_,
+          typename Number>
+inline
+void
+FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,dim,Number>
+::submit_divergence (const VectorizedArray<Number> div_in,
+                     const unsigned int q_point)
+{
+#ifdef DEBUG
+  Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+  AssertIndexRange (q_point, n_q_points);
+  this->gradients_quad_submitted = true;
+#endif
+  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+    {
+      const VectorizedArray<Number> fac = this->J_value[0] *
+        this->quadrature_weights[q_point] * div_in;
+      for (unsigned int d=0; d<dim; ++d)
+        {
+          this->gradients_quad[d][d][q_point] = (fac *
+                                                 this->cartesian_data[0][d]);
+          for(unsigned int e=d+1;e<dim;++e)
+            {
+              this->gradients_quad[d][e][q_point] = VectorizedArray<Number>();
+              this->gradients_quad[e][d][q_point] = VectorizedArray<Number>();
+            }
+        }
+    }
+  else
+    {
+      const Tensor<2,dim,VectorizedArray<Number> > &jac =
+        this->cell_type == internal::MatrixFreeFunctions::general ?
+        this->jacobian[q_point] : this->jacobian[0];
+      const VectorizedArray<Number> fac =
+        (this->cell_type == internal::MatrixFreeFunctions::general ?
+         this->J_value[q_point] : this->J_value[0] * 
+         this->quadrature_weights[q_point]) * div_in;
+      for (unsigned int d=0; d<dim; ++d)
+        {
+          for (unsigned e=0; e<dim; ++e)
+            this->gradients_quad[d][e][q_point] = jac[d][e] * fac;
+        }
+    }
 }
 
 

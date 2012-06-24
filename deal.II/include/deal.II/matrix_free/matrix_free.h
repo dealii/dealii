@@ -1218,7 +1218,7 @@ MatrixFree<dim,Number>::initialize_dof_vector(VectorType &vec,
                                                   const unsigned int comp) const
 {
   AssertIndexRange (comp, n_components());
-  vec.reinit(dof_info[comp].vector_partitioner->global_size);
+  vec.reinit(dof_info[comp].vector_partitioner->size());
 }
 
 
