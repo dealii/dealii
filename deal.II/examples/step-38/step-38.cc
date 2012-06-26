@@ -579,7 +579,7 @@ namespace Step38
                             mapping.get_degree());
 
     std::string filename ("solution-");
-    filename += '0'+static_cast<char>(spacedim);
+    filename += static_cast<char>('0'+spacedim);
     filename += "d.vtk";
     std::ofstream output (filename.c_str());
     data_out.write_vtk (output);
