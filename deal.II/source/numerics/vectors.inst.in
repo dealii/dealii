@@ -16,7 +16,6 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
 #if deal_II_dimension <= deal_II_space_dimension
     namespace VectorTools \{
 
-
       template
         void integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_space_dimension>
         (const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
@@ -283,108 +282,14 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
 
 
 
-
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; DH : DOFHANDLER_TEMPLATES)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace VectorTools \{
       template
-        void interpolate_boundary_values (
-          const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const types::boundary_id_t,
-          const Function<deal_II_space_dimension>   &,
-          std::map<unsigned int,double>       &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const types::boundary_id_t,
-          const Function<deal_II_space_dimension>   &,
-          std::map<unsigned int,double>       &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const MGDoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const types::boundary_id_t,
-          const Function<deal_II_space_dimension>   &,
-          std::map<unsigned int,double>       &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const types::boundary_id_t,
-          const Function<deal_II_space_dimension>   &,
-          ConstraintMatrix                    &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const types::boundary_id_t,
-          const Function<deal_II_space_dimension>   &,
-          ConstraintMatrix                    &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const MGDoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const types::boundary_id_t,
-          const Function<deal_II_space_dimension>   &,
-          ConstraintMatrix                    &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
-          const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const FunctionMap<deal_II_space_dimension>::type   &,
-          ConstraintMatrix                    &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
-          const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const FunctionMap<deal_II_space_dimension>::type   &,
-          ConstraintMatrix                    &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
-          const MGDoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const FunctionMap<deal_II_space_dimension>::type   &,
-          ConstraintMatrix                    &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const FunctionMap<deal_II_space_dimension>::type   &,
-          ConstraintMatrix                    &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const FunctionMap<deal_II_space_dimension>::type   &,
-          ConstraintMatrix                    &,
-          const std::vector<bool>    &);
-
-      template
-        void interpolate_boundary_values (
-          const MGDoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-          const FunctionMap<deal_II_space_dimension>::type   &,
-          ConstraintMatrix                    &,
-          const std::vector<bool>    &);
-
-      template
         void interpolate_boundary_values
         (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
-         const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
+         const DH<deal_II_dimension,deal_II_space_dimension> &,
          const FunctionMap<deal_II_space_dimension>::type &,
          std::map<unsigned int,double>       &,
          const std::vector<bool>    &);
@@ -392,31 +297,68 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       template
         void interpolate_boundary_values
         (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
-         const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
+         const DH<deal_II_dimension,deal_II_space_dimension> &,
          const types::boundary_id_t,
          const Function<deal_II_space_dimension>   &,
          std::map<unsigned int,double>       &,
          const std::vector<bool>    &);
 
       template
-        void interpolate_boundary_values
-        (const Mapping<deal_II_dimension,deal_II_space_dimension>        &,
-         const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-         const types::boundary_id_t,
-         const Function<deal_II_space_dimension>       &,
-         std::map<unsigned int,double>           &,
-         const std::vector<bool>                 &);
+        void interpolate_boundary_values (
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const types::boundary_id_t,
+          const Function<deal_II_space_dimension>   &,
+          std::map<unsigned int,double>       &,
+          const std::vector<bool>    &);
 
       template
         void interpolate_boundary_values
-        (const Mapping<deal_II_dimension,deal_II_space_dimension>        &,
-         const MGDoFHandler<deal_II_dimension,deal_II_space_dimension>   &,
+        (const DH<deal_II_dimension,deal_II_space_dimension> &,
+         const FunctionMap<deal_II_space_dimension>::type &,
+         std::map<unsigned int,double>       &,
+         const std::vector<bool>    &);
+
+      template
+        void interpolate_boundary_values (
+          const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const FunctionMap<deal_II_space_dimension>::type   &,
+          ConstraintMatrix                    &,
+          const std::vector<bool>    &);
+
+      template
+        void interpolate_boundary_values
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+         const DH<deal_II_dimension,deal_II_space_dimension> &,
          const types::boundary_id_t,
-         const Function<deal_II_space_dimension>     &,
-         std::map<unsigned int,double>         &,
-         const std::vector<bool>               &);
+         const Function<deal_II_space_dimension>   &,
+         ConstraintMatrix                    &,
+         const std::vector<bool>             &);
+
+      template
+        void interpolate_boundary_values (
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const types::boundary_id_t,
+          const Function<deal_II_space_dimension>   &,
+          ConstraintMatrix                    &,
+          const std::vector<bool>    &);
+
+      template
+        void interpolate_boundary_values (
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const FunctionMap<deal_II_space_dimension>::type   &,
+          ConstraintMatrix                    &,
+          const std::vector<bool>    &);
+
+      \}
+#endif
+  }
 
 
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace VectorTools \{
       template
         void create_right_hand_side<deal_II_dimension,deal_II_space_dimension>
         (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
@@ -689,33 +631,6 @@ for (deal_II_dimension : DIMENSIONS)
      const Vector<double>                               &,
      const ConstraintMatrix                             &,
      Vector<double>                                     &);
-
-  template
-    void interpolate_boundary_values
-    (const Mapping<deal_II_dimension>    &,
-     const DoFHandler<deal_II_dimension> &,
-     const types::boundary_id_t,
-     const Function<deal_II_dimension>   &,
-     ConstraintMatrix                    &,
-     const std::vector<bool>             &);
-
-  template
-    void interpolate_boundary_values
-    (const Mapping<deal_II_dimension>        &,
-     const hp::DoFHandler<deal_II_dimension> &,
-     const types::boundary_id_t,
-     const Function<deal_II_dimension>       &,
-     ConstraintMatrix                        &,
-     const std::vector<bool>                 &);
-
-  template
-    void interpolate_boundary_values
-    (const Mapping<deal_II_dimension>      &,
-     const MGDoFHandler<deal_II_dimension> &,
-     const types::boundary_id_t,
-     const Function<deal_II_dimension>     &,
-     ConstraintMatrix                      &,
-     const std::vector<bool>               &);
 
   \}
 }
