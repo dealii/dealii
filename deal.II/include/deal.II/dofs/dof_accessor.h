@@ -29,6 +29,9 @@ class ConstraintMatrix;
 
 template <typename Accessor> class TriaRawIterator;
 
+template <int, int> class FiniteElement;
+
+
 namespace internal
 {
   namespace DoFCellAccessor
