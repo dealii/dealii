@@ -743,7 +743,6 @@ namespace VectorTools
                                     * information.
                                     */
   template <class DH>
-
   void
   interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension>            &mapping,
                                const DH                 &dof,
@@ -765,7 +764,6 @@ namespace VectorTools
                                     *
                                     */
   template <class DH>
-
   void
   interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension>            &mapping,
                                const DH                 &dof,
@@ -781,7 +779,6 @@ namespace VectorTools
                                     * <tt>mapping=MappingQ1@<dim@>()</tt>.
                                     */
   template <class DH>
-
   void
   interpolate_boundary_values (const DH        &dof,
                                const types::boundary_id_t            boundary_component,
@@ -797,7 +794,6 @@ namespace VectorTools
                                     * <tt>mapping=MappingQ1@<dim@>()</tt>.
                                     */
   template <class DH>
-
   void
   interpolate_boundary_values (const DH                &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
@@ -889,7 +885,6 @@ namespace VectorTools
                                     * @ingroup constraints
                                     */
   template <class DH>
-
   void
   interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension>            &mapping,
                                const DH                 &dof,
@@ -910,7 +905,6 @@ namespace VectorTools
                                     * @ingroup constraints
                                     */
   template <class DH>
-
   void
   interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension> &mapping,
                                const DH                            &dof,
@@ -928,7 +922,6 @@ namespace VectorTools
                                     * @ingroup constraints
                                     */
   template <class DH>
-
   void
   interpolate_boundary_values (const DH                            &dof,
                                const types::boundary_id_t                  boundary_component,
@@ -946,7 +939,6 @@ namespace VectorTools
                                     * @ingroup constraints
                                     */
   template <class DH>
-
   void
   interpolate_boundary_values (const DH                &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
