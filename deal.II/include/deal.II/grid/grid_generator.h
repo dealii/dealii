@@ -695,13 +695,21 @@ class GridGenerator
 
 
                                      /**
-                                      * Produce a quarter hyper-shell,
-                                      * i.e. the space between two circles in
-                                      * two space dimensions and the region
-                                      * between two spheres in 3d, with given
-                                      * inner and outer radius and a given
-                                      * number of elements for this initial
-                                      * triangulation.
+                                      * Produce a domain that is the
+                                      * intersection between a
+                                      * hyper-shell with given inner
+                                      * and outer radius, i.e. the
+                                      * space between two circles in
+                                      * two space dimensions and the
+                                      * region between two spheres in
+                                      * 3d, and the positive quadrant
+                                      * (in 2d) or octant (in 3d). In
+                                      * 2d, this is indeed a quarter
+                                      * of the full annulus, while the
+                                      * function is a misnomer in 3d
+                                      * because there the domain is
+                                      * not a quarter but one eighth
+                                      * of the full shell.
                                       *
                                       * If the number of initial cells is zero
                                       * (as is the default), then it is
