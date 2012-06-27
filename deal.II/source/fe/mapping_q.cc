@@ -1445,19 +1445,47 @@ MappingQ<dim,spacedim>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<spacedim>                            &p) const
 {
-                                   // first a Newton iteration based on a Q1
-                                   // mapping.
-  Point<dim> initial_p_unit =
-    MappingQ1<dim,spacedim>::transform_real_to_unit_cell(cell, p);
+                                   // first a Newton iteration based
+                                   // on a Q1 mapping to get a good
+                                   // starting point, the idea being
+                                   // that this is cheaper than trying
+                                   // to start with the real mapping
+                                   // and likely also more robust.
+				   //
+				   // that said, this doesn't always
+				   // work: there are cases where the
+				   // point is outside the cell and
+				   // the inverse mapping doesn't
+				   // converge. in that case, use the
+				   // center point of the cell as a
+				   // starting point
+  Point<dim> initial_p_unit;
+  bool       initial_p_unit_is_valid = false;
+  try
+    {
+      initial_p_unit
+	= MappingQ1<dim,spacedim>::transform_real_to_unit_cell(cell, p);
+
+      initial_p_unit_is_valid = true;
+    }
+  catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &)
+    {
+      for (unsigned int d=0; d<dim; ++d)
+	initial_p_unit[d] = 0.5;
+    }
 
                                    // then a Newton iteration based on the
                                    // full MappingQ if we need this. note that
                                    // for interior cells with dim==spacedim,
                                    // the mapping used is in fact a Q1
                                    // mapping, so there is nothing we need to
-                                   // do
-  if (cell->has_boundary_lines() ||
-      use_mapping_q_on_all_cells ||
+                                   // do unless the iteration above failed
+  if ((initial_p_unit_is_valid == false)
+      ||
+      cell->has_boundary_lines()
+      ||
+      use_mapping_q_on_all_cells
+      ||
       (dim!=spacedim) )
     {
 				       // use the full mapping. in case the

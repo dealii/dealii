@@ -47,6 +47,22 @@ used for boundary indicators.
 
 
 <ol>
+<li> Fixed: The MappingQ1::transform_real_to_unit_cell function as
+well as the equivalent ones in derived classes sometimes get into
+trouble if they are asked to compute the preimage of this point
+in reference cell coordinates. This is because for points outside
+the reference cell, the mapping from unit to real cell is not
+necessarily invertible, and consequently the Newton iteration to
+find the preimage did not always converge, leading to an exception.
+While this is not entirely wrong (we could, after all, not compute
+the desired quantity), not all callers of this function were prepared
+to accept this result -- in particular, the function
+CellAccessor<3>::point_inside should have really just returned false
+in such cases but instead let the exception so generated propagate
+through. This should now be fixed.
+<br>
+(Wolfgang Bangerth, Eric Heien, Sebastian Pauletti, 2012/06/27)
+
 <li> Fixed: The function VectorTools::compute_no_normal_flux_constraints had
 a bug that led to an exception whenever we were computing constraints for
 vector fields located on edges shared between two faces of a 3d cell if those

@@ -78,6 +78,31 @@ class MappingQ1 : public Mapping<dim,spacedim>
                                       * point @p p on the curve or
                                       * surface identified by the @p
                                       * cell.
+                                      *
+                                      * @note Polynomial mappings from
+                                      * the reference (unit) cell coordinates
+                                      * to the coordinate system of a real
+                                      * cell are not always invertible if
+                                      * the point for which the inverse
+                                      * mapping is to be computed lies
+                                      * outside the cell's boundaries.
+                                      * In such cases, the current function
+                                      * may fail to compute a point on
+                                      * the reference cell whose image
+                                      * under the mapping equals the given
+                                      * point @p p.  If this is the case
+                                      * then this function throws an
+                                      * exception of type
+                                      * Mapping::ExcTransformationFailed .
+                                      * Whether the given point @p p lies
+                                      * outside the cell can therefore be
+                                      * determined by checking whether the
+                                      * return reference coordinates lie
+                                      * inside of outside the reference
+                                      * cell (e.g., using
+                                      * GeometryInfo::is_inside_unit_cell)
+                                      * or whether the exception mentioned
+                                      * above has been thrown.
                                       */
     virtual Point<dim>
     transform_real_to_unit_cell (
@@ -555,19 +580,6 @@ class MappingQ1 : public Mapping<dim,spacedim>
                                         */
     virtual
     bool preserves_vertex_locations () const;
-
-                                     /**
-                                      * The Newton iteration computing
-                                      * the mapping between a
-                                      * real space point and a point
-                                      * in reference space did not
-                                      * converge, thus resulting in a
-                                      * wrong mapping.
-                                      *
-                                      * @ingroup Exceptions
-                                      */
-    DeclException0(ExcTransformationFailed);
-
 
   protected:
                                      /* Trick to templatize transform_real_to_unit_cell<dim, dim+1> */

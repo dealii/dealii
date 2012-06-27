@@ -12,9 +12,9 @@
 //-----------------------------------------------------------------------------
 
 
-// a redux of mapping_real_to_unit_q4_sphere_x.
-// It seems that the point is outside the cell??
-
+// a redux of mapping_real_to_unit_q4_sphere. one doesn't in fact need
+// the Q4 mapping, the problem already happens in the initial guess
+// generation using a Q1 mapping
 
 #include "../tests.h"
 
@@ -24,7 +24,6 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/fe/mapping_q.h>
 
-#include <deal.II/numerics/data_out.h>
 
 void test_real_to_unit_cell()
 {
@@ -61,32 +60,44 @@ void test_real_to_unit_cell()
   triangulation.create_triangulation (vertices, cells,
 				      SubCellData());
 
+				   // set the boundary indicator for
+				   // one face and adjacent edges of
+				   // the single cell
+  triangulation.set_boundary (1, boundary);
+  triangulation.begin_active()->face(5)->set_all_boundary_indicators (1);
 
-  FE_Q<dim> fe (1);
-  DoFHandler<dim> dh(triangulation);
-  dh.distribute_dofs (fe);
-  Vector<double> dummy;
-  dummy.reinit(dh.n_dofs());
-  DataOut<dim, DoFHandler<dim> > data_out;
-  data_out.attach_dof_handler (dh);
-  data_out.add_data_vector (dummy,"dummy");
-  data_out.build_patches ();
-  std::ofstream output ("mapping_real_to_unit_q4_sphere_xx/plot.vtk");
-  data_out.write_vtk (output);
-  
-				   
-  // const Point<dim> p (-3.56413e+06, 1.74215e+06, 2.14762e+06);
-  // MappingQ1<dim> map;
-  // typename Triangulation<dim >::active_cell_iterator
-  //   cell = triangulation.begin_active();
-  // deallog << map.transform_real_to_unit_cell(cell,p) << std::endl;
+				   // now try to find the coordinates
+				   // of the following point in the
+				   // reference coordinate system of
+				   // the cell
+  const Point<dim> p (-3.56413e+06, 1.74215e+06, 2.14762e+06);
+  MappingQ1<dim> map;
+  typename Triangulation<dim >::active_cell_iterator
+    cell = triangulation.begin_active();
+
+				   // the following call will fail
+				   // because the point is outside the
+				   // bounds of the cell. catch the
+				   // exception and make sure that
+				   // there is output that documents
+				   // that the function threw an
+				   // exception
+  try
+    {
+      map.transform_real_to_unit_cell(cell,p);
+    }
+  catch (const std::exception &e)
+    {
+      deallog << "Caught exception of type " << typeid(e).name()
+	      << std::endl;
+    }
 }
 
 
 int
 main()
 {
-  std::ofstream logfile ("mapping_real_to_unit_q4_sphere_xx/output");
+  std::ofstream logfile ("mapping_real_to_unit_q4_sphere_y/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

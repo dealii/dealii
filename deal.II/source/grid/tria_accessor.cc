@@ -1184,13 +1184,23 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
     if ((p[d] < minp[d]) || (p[d] > maxp[d]))
       return false;
 
-                                   // now we need to check more
-                                   // carefully: transform to the
-                                   // unit cube
-                                   // and check there.
-  const TriaRawIterator< CellAccessor<dim,spacedim> > cell_iterator (*this);
-  return (GeometryInfo<dim>::is_inside_unit_cell (
-              StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell_iterator, p)));
+  // now we need to check more carefully: transform to the
+  // unit cube and check there. unfortunately, this isn't
+  // completely trivial since the transform_real_to_unit_cell
+  // function may throw an exception that indicates that the
+  // point given could not be inverted. we take this as a sign
+  // that the point actually lies outside, as also documented
+  // for that function
+  try
+  {
+    const TriaRawIterator< CellAccessor<dim,spacedim> > cell_iterator (*this);
+    return (GeometryInfo<dim>::is_inside_unit_cell
+             (StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell_iterator, p)));
+  }
+  catch (const Mapping<dim,spacedim>::ExcTransformationFailed &e)
+  {
+    return false;
+  }
 }
 
 

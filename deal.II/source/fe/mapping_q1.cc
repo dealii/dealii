@@ -31,9 +31,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-
-
-
 template <int dim, int spacedim>
 const unsigned int MappingQ1<dim,spacedim>::n_shape_functions;
 
@@ -1678,8 +1675,10 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
                                        // Ignore non vertex support points.
       mdata->mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
 
-                                       // perform the Newton iteration and
-                                       // return the result
+      // perform the Newton iteration and
+      // return the result. note that this
+      // statement may throw an exception, which
+      // we simply pass up to the caller
       return transform_real_to_unit_cell_internal(cell, p, initial_p_unit,
                                                   *mdata);
     }
@@ -1727,10 +1726,10 @@ transform_real_to_unit_cell_internal
   Point<spacedim> f = p_real-p;
 
   const double eps = 1.e-12*cell->diameter();
-  const unsigned int loop_limit = 50;
+  const unsigned int newton_iteration_limit = 20;
 
-  unsigned int loop=0;
-  while (f.square()>eps*eps && loop++<loop_limit)
+  unsigned int newton_iteration=0;
+  while (f.square()>eps*eps)
     {
                                        // f'(x)
       Tensor<2,spacedim> df;
@@ -1745,41 +1744,67 @@ transform_real_to_unit_cell_internal
         }
 
                                        // Solve  [f'(x)]d=f(x)
-      Tensor<1,spacedim> d;
-      contract (d, invert(df), static_cast<const Tensor<1,spacedim>&>(f));
+      Tensor<1,spacedim> delta;
+      contract (delta, invert(df), static_cast<const Tensor<1,spacedim>&>(f));
 
-                                       // update of p_unit. The
-                                       // spacedimth component of
-                                       // transformed point is simply
-                                       // ignored in codimension one
-                                       // case. When this component is
-                                       // not zero, then we are
-                                       // projecting the point to the
-                                       // surface or curve identified
-                                       // by the cell.
-      for(unsigned int i=0;i<dim; ++i)
-        p_unit[i] -= d[i];
+      // do a line search
+      double step_length = 1;
+      do
+        {
+          // update of p_unit. The
+          // spacedimth component of
+          // transformed point is simply
+          // ignored in codimension one
+          // case. When this component is
+          // not zero, then we are
+          // projecting the point to the
+          // surface or curve identified
+          // by the cell.
+          Point<dim> p_unit_trial = p_unit;
+          for(unsigned int i=0;i<dim; ++i)
+            p_unit_trial[i] -= step_length * delta[i];
 
-                                       // shape values and derivatives
-                                       // at new p_unit point
-      compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
+          // shape values and derivatives
+          // at new p_unit point
+          compute_shapes(std::vector<Point<dim> > (1, p_unit_trial), mdata);
 
-                                       // f(x)
-      p_real = transform_unit_to_real_cell_internal(mdata);
-      f = p_real-p;
+          // f(x)
+          Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal(mdata);
+          const Point<spacedim> f_trial = p_real_trial-p;
+
+          // see if we are making progress with the current step length
+          // and if not, reduce it by a factor of two and try again
+          if (f_trial.norm() < f.norm())
+            {
+              p_real = p_real_trial;
+              p_unit = p_unit_trial;
+              f = f_trial;
+              break;
+            }
+          else if (step_length > 0.05)
+            step_length /= 2;
+          else
+            goto failure;
+        }
+      while (true);
+
+      ++newton_iteration;
+      if (newton_iteration > newton_iteration_limit)
+        goto failure;
     }
 
-                                   // Here we check that in the last
-                                   // execution of while the first
-                                   // condition was already wrong,
-                                   // meaning the residual was below
-                                   // eps. Only if the first condition
-                                   // failed, loop will have been
-                                   // increased and tested, and thus
-                                   // havereached the limit.
-  AssertThrow (loop<loop_limit, ExcTransformationFailed());
-
   return p_unit;
+
+  // if we get to the following label, then we have either run out
+  // of Newton iterations, or the line search has not converged.
+  // in either case, we need to give up, so throw an exception that
+  // can then be caught
+  failure:
+  AssertThrow (false, (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+
+  // ...the compiler wants us to return something, though we can
+  // of course never get here...
+  return Point<dim>();
 }
 
 
@@ -1944,6 +1969,8 @@ transform_real_to_unit_cell_internal_codim1
             }
         }
 
+//TODO: implement a line search here in much the same way as for
+// the corresponding function above that does so for codim==0.
       p_minus_F = p;
       p_minus_F -= transform_unit_to_real_cell_internal(mdata);
 
@@ -1965,7 +1992,7 @@ transform_real_to_unit_cell_internal_codim1
                                    // failed, loop will have been
                                    // increased and tested, and thus
                                    // have reached the limit.
-  AssertThrow (loop<loop_limit, ExcTransformationFailed());
+  AssertThrow (loop<loop_limit, (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
 
   return p_unit;
 }
