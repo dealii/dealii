@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-//    $Id: data_out_base_pvd.cc 25569 2012-05-30 12:53:31Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2012 by the deal.II authors
