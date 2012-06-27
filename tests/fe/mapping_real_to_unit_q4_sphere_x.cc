@@ -72,13 +72,13 @@ void test_real_to_unit_cell()
 				   // the cell
   const Point<dim> p (-3.56413e+06, 1.74215e+06, 2.14762e+06);
   MappingQ1<dim> map;
-  typename Triangulation<dim >::active_cell_iterator
+  Triangulation<dim >::active_cell_iterator
     cell = triangulation.begin_active();
   try
     {
       map.transform_real_to_unit_cell(cell,p);
     }
-  catch (const typename Mapping<dim>::ExcTransformationFailed &)
+  catch (const Mapping<dim>::ExcTransformationFailed &)
     {
       deallog << "Point is outside!" << std::endl;
     }
