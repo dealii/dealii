@@ -47,6 +47,13 @@ used for boundary indicators.
 
 
 <ol>
+<li> Fixed: The function VectorTools::compute_no_normal_flux_constraints had
+a bug that led to an exception whenever we were computing constraints for
+vector fields located on edges shared between two faces of a 3d cell if those
+faces were not parallel to the axes of the coordinate system. This is now fixed.
+<br>
+(Wolfgang Bangerth, Jennifer Worthen, 2012/06/27)
+
 <li>
 Fixed: Due to an apparent bug in autoconf, it was not possible to
 override the <code>F77</code> environment variable to select anything

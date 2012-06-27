@@ -31,46 +31,16 @@
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_boundary_lib.h>
+#include <grid/grid_out.h>
 #include <dofs/dof_handler.h>
 #include <fe/fe_system.h>
-#include <fe/mapping_q1.h>
+#include <fe/mapping_q.h>
 #include <numerics/vectors.h>
 #include <numerics/data_out.h>
 #include <base/exceptions.h>
 #include <base/function.h>
 
 
-template <int dim>
-static void
-colorize_sixty_deg_hyper_shell(Triangulation<dim> & tria,
-			       const Point<dim>& center,
-			       const double inner_radius,
-			       const double outer_radius);
-
-template<int dim>
-static void sixty_deg_hyper_shell (Triangulation<dim>   &tria,
-				   const Point<dim>     &center,
-				   const double        inner_radius,
-				   const double        outer_radius,
-				   const unsigned int  n_cells = 0,
-				   const bool colorize = false);
-
-template <int dim>
-class SixtyDegHyperShellBoundary : public HyperShellBoundary<dim>
-{
-  public:
-
-    SixtyDegHyperShellBoundary (const Point<dim> &center,
-				const double inner_radius,
-				const double outer_radius);
-
-  private:
-    const double inner_radius;
-    const double outer_radius;
-};
-
-// Implementation for 3D only
-template <>
 void
 colorize_sixty_deg_hyper_shell(Triangulation<3> & tria,
 			       const Point<3>& center,
@@ -145,72 +115,43 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> & tria,
       }
 }
 
-// Implementation for 3D only
-template <>
 void sixty_deg_hyper_shell (Triangulation<3> & tria,
 			    const Point<3>& center,
 			    const double inner_radius,
-			    const double outer_radius,
-			    const unsigned int n,
-			    const bool colorize)
+			    const double outer_radius)
 {
-				   //  Assert ((inner_radius > 0) && (inner_radius < outer_radius),
-				   //          ExcInvalidRadii ());
-  if (n == 0 || n == 2)
+  const double r0 = inner_radius;
+  const double r1 = outer_radius;
+
+  std::vector<Point<3> > vertices;
+
+  vertices.push_back (center+Point<3>( 1.0/sqrt(5.)*r0, 1.0/sqrt(5.)*r0, sqrt(3./5.)*r0));   //8 -> 0
+  vertices.push_back (center+Point<3>( 1.0/sqrt(5.)*r1, 1.0/sqrt(5.)*r1, sqrt(3./5.)*r1));   //9 -> 1
+  vertices.push_back (center+Point<3>( 1.0/sqrt(5.)*r0, -1.0/sqrt(5.)*r0, sqrt(3./5.)*r0));  //10 -> 2
+  vertices.push_back (center+Point<3>( 1.0/sqrt(5.)*r1, -1.0/sqrt(5.)*r1, sqrt(3./5.)*r1));  //11 -> 3
+  vertices.push_back (center+Point<3>( -1.0/sqrt(5.)*r0, 1.0/sqrt(5.)*r0, sqrt(3./5.)*r0));  //14 -> 4
+  vertices.push_back (center+Point<3>( -1.0/sqrt(5.)*r1, 1.0/sqrt(5.)*r1, sqrt(3./5.)*r1));  //15 -> 5
+  vertices.push_back (center+Point<3>( -1.0/sqrt(5.)*r0, -1.0/sqrt(5.)*r0, sqrt(3./5.)*r0)); //16 -> 6
+  vertices.push_back (center+Point<3>( -1.0/sqrt(5.)*r1, -1.0/sqrt(5.)*r1, sqrt(3./5.)*r1)); //17 -> 7
+
+  const int cell_vertices[1][8] = {
+	{6, 2, 4, 0, 7, 3, 5, 1},
+  };
+
+  std::vector<CellData<3> > cells(1);
+
+  for (unsigned int i=0; i<1; ++i)
     {
-      const double r0 = inner_radius;
-      const double r1 = outer_radius;
-
-      std::vector<Point<3> > vertices;
-
-      vertices.push_back (center+Point<3>( 1.0/sqrt(5.)*r0, 1.0/sqrt(5.)*r0, sqrt(3./5.)*r0));   //8 -> 0
-      vertices.push_back (center+Point<3>( 1.0/sqrt(5.)*r1, 1.0/sqrt(5.)*r1, sqrt(3./5.)*r1));   //9 -> 1
-      vertices.push_back (center+Point<3>( 1.0/sqrt(5.)*r0, -1.0/sqrt(5.)*r0, sqrt(3./5.)*r0));  //10 -> 2
-      vertices.push_back (center+Point<3>( 1.0/sqrt(5.)*r1, -1.0/sqrt(5.)*r1, sqrt(3./5.)*r1));  //11 -> 3
-      vertices.push_back (center+Point<3>( -1.0/sqrt(5.)*r0, 1.0/sqrt(5.)*r0, sqrt(3./5.)*r0));  //14 -> 4
-      vertices.push_back (center+Point<3>( -1.0/sqrt(5.)*r1, 1.0/sqrt(5.)*r1, sqrt(3./5.)*r1));  //15 -> 5
-      vertices.push_back (center+Point<3>( -1.0/sqrt(5.)*r0, -1.0/sqrt(5.)*r0, sqrt(3./5.)*r0)); //16 -> 6
-      vertices.push_back (center+Point<3>( -1.0/sqrt(5.)*r1, -1.0/sqrt(5.)*r1, sqrt(3./5.)*r1)); //17 -> 7
-
-      const int cell_vertices[1][8] = {
-	    {6, 2, 4, 0, 7, 3, 5, 1},
-      };
-
-      std::vector<CellData<3> > cells(1);
-
-      for (unsigned int i=0; i<1; ++i)
-        {
-          for (unsigned int j=0; j<8; ++j)
-            cells[i].vertices[j] = cell_vertices[i][j];
-          cells[i].material_id = 0;
-        }
-
-      tria.create_triangulation ( vertices, cells, SubCellData());      // no boundary information
-    }
-  else
-    {
-      AssertThrow(false, ExcNotImplemented());
+      for (unsigned int j=0; j<8; ++j)
+	cells[i].vertices[j] = cell_vertices[i][j];
+      cells[i].material_id = 0;
     }
 
-  if (colorize)
-    colorize_sixty_deg_hyper_shell(tria, center, inner_radius, outer_radius);
+  tria.create_triangulation ( vertices, cells, SubCellData());      // no boundary information
+
+  colorize_sixty_deg_hyper_shell(tria, center, inner_radius, outer_radius);
 }
 
-template<int dim>
-SixtyDegHyperShellBoundary<dim>::SixtyDegHyperShellBoundary (const Point<dim> &center,
-							     const double inner_radius,
-							     const double outer_radius)
-                :
-                HyperShellBoundary<dim> (center),
-                inner_radius (inner_radius),
-                outer_radius (outer_radius)
-{
-  if (dim > 2)
-    Assert ((inner_radius >= 0) &&
-            (outer_radius > 0) &&
-            (outer_radius > inner_radius),
-            ExcMessage ("Inner and outer radii must be specified explicitly in 3d."));
-}
 
 template <int dim>
 void run()
@@ -223,17 +164,28 @@ void run()
   sixty_deg_hyper_shell (triangulation,
 			 Point<dim>(),
 			 0.5,
-			 1.0,
-			 2,
-			 true);
+			 1.0);
 
-  static SixtyDegHyperShellBoundary<dim> boundary(Point<dim>(),
-						  0.5,
-						  1.0);
+  static HyperShellBoundary<dim> boundary((Point<dim>()));
   triangulation.set_boundary (0, boundary);
-  triangulation.set_boundary (1, boundary);
+
+				   // write out the mesh. may not be
+				   // strictly necessary here, but is
+				   // a good test for functionality
+				   // that may not actually be tested
+				   // anywhere else
+  MappingQ<3> m(4);
+  GridOut go;
+  GridOutFlags::Gnuplot gof;
+  gof.n_boundary_face_points = 6;
+  go.set_flags (gof);
+  go.write_gnuplot (triangulation, deallog.get_file_stream(), &m);
 
   dof_handler.distribute_dofs (fe);
+
+  for (unsigned int f=0; f<6; ++f)
+    deallog << "Face=" << f << ", boundary_id="
+	    << (int)triangulation.begin_active()->face(f)->boundary_indicator() << std::endl;
 
   std::set<unsigned char> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (0);
@@ -243,9 +195,10 @@ void run()
      no_normal_flux_boundaries,
      constraints);
 
-  constraints.close();
   constraints.print(deallog.get_file_stream());
 
+  deallog.get_file_stream() << std::flush;
+  constraints.close();
 
   deallog << "OK" << std::endl;
 }

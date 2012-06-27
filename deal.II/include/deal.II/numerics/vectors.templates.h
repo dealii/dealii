@@ -2585,7 +2585,65 @@ namespace VectorTools
           default:
                 Assert (false, ExcNotImplemented());
         }
+    }
 
+
+                                     /**
+                                      * Add the constraint $\vec u \|
+                                      * \vec t$ to the list of
+                                      * constraints. In 2d, this is a
+                                      * single constraint, in 3d these
+                                      * are two constraints
+                                      *
+                                      * Here, $\vec u$ is represented
+                                      * by the set of given DoF
+                                      * indices, and $\vec t$ by the
+                                      * vector specified as the second
+                                      * argument.
+                                      *
+                                      * The function does not add constraints
+                                      * if a degree of freedom is already
+                                      * constrained in the constraints object.
+                                      */
+    template <int dim>
+    void
+    add_tangentiality_constraints (const VectorDoFTuple<dim> &dof_indices,
+				   const Tensor<1,dim>       &tangent_vector,
+				   ConstraintMatrix          &constraints)
+    {
+
+                                       // choose the DoF that has the
+                                       // largest component in the
+                                       // tangent_vector as the
+                                       // independent component, and
+                                       // then constrain the others to
+                                       // it. specifically, if, say,
+                                       // component 0 of the tangent
+                                       // vector t is largest by
+                                       // magnitude, then
+                                       // x1=t[1]/t[0]*x_0, etc.
+      unsigned int largest_component = 0;
+      for (unsigned int d=1; d<dim; ++d)
+	if (std::fabs(tangent_vector[d]) > std::fabs(tangent_vector[largest_component]) + 1e-10)
+	  largest_component = d;
+
+				       // then constrain all of the
+				       // other degrees of freedom in
+				       // terms of the one just found
+      for (unsigned int d=0; d<dim; ++d)
+	if (d != largest_component)
+	  if (!constraints.is_constrained(dof_indices.dof_indices[d])
+	      &&
+	      constraints.can_store_line(dof_indices.dof_indices[d]))
+	    {
+	      constraints.add_line (dof_indices.dof_indices[d]);
+
+	      if (std::fabs (tangent_vector[d]/tangent_vector[largest_component])
+		  > std::numeric_limits<double>::epsilon())
+		constraints.add_entry (dof_indices.dof_indices[d],
+				       dof_indices.dof_indices[largest_component],
+				       tangent_vector[d]/tangent_vector[largest_component]);
+	    }
     }
 
 
@@ -4182,9 +4240,9 @@ namespace VectorTools
   }
 
 
+
   template <int dim, template <int, int> class DH, int spacedim>
   void
-
   compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
                                       const unsigned int     first_vector_component,
                                       const std::set<types::boundary_id_t> &boundary_ids,
@@ -4812,35 +4870,16 @@ namespace VectorTools
                 average_tangent += *t;
               average_tangent /= average_tangent.norm();
 
-                                               // from the tangent
-                                               // vector we now need to
-                                               // again reconstruct dim-1
-                                               // normal directions in
-                                               // which the vector field
-                                               // is to be constrained
-              Tensor<1,dim> constraining_normals[dim-1];
-              internal::
-                compute_orthonormal_vectors<dim> (average_tangent,
-                                                  constraining_normals);
-                                               // normalize again
-              for (unsigned int e=0; e<dim-1; ++e)
-                {
-                  for (unsigned int d=0; d<dim; ++d)
-                    if (std::fabs(constraining_normals[e][d]) < 1e-13)
-                      constraining_normals[e][d] = 0;
-                  constraining_normals[e] /= constraining_normals[e].norm();
-                }
-
                                                // now all that is left
                                                // is that we add the
-                                               // constraints for these
-                                               // dim-1 vectors
+                                               // constraints that the
+                                               // vector is parallel
+                                               // to the tangent
               const internal::VectorDoFTuple<dim> &
                 dof_indices = same_dof_range[0]->first;
-              for (unsigned int c=0; c<dim-1; ++c)
-                internal::add_constraint (dof_indices,
-                                          constraining_normals[c],
-                                          constraints);
+	      internal::add_tangentiality_constraints (dof_indices,
+						       average_tangent,
+						       constraints);
             }
           }
       }
