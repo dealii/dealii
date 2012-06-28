@@ -3552,15 +3552,15 @@ namespace internal
                                                                  // all information of the
                                                                  // two quads
                                 const int switch_1_lines[4]=
-                                  {switch_1->line_index(0),
-                                   switch_1->line_index(1),
-                                   switch_1->line_index(2),
-                                   switch_1->line_index(3)};
+                                  { static_cast<signed int>(switch_1->line_index(0)),
+				    static_cast<signed int>(switch_1->line_index(1)),
+				    static_cast<signed int>(switch_1->line_index(2)),
+				    static_cast<signed int>(switch_1->line_index(3)) };
                                 const bool switch_1_line_orientations[4]=
-                                  {switch_1->line_orientation(0),
-                                   switch_1->line_orientation(1),
-                                   switch_1->line_orientation(2),
-                                   switch_1->line_orientation(3)};
+                                  { switch_1->line_orientation(0),
+				    switch_1->line_orientation(1),
+				    switch_1->line_orientation(2),
+				    switch_1->line_orientation(3) };
                                 const types::boundary_id_t switch_1_boundary_indicator=switch_1->boundary_indicator();
                                 const unsigned int switch_1_user_index=switch_1->user_index();
                                 const bool switch_1_user_flag=switch_1->user_flag_set();
