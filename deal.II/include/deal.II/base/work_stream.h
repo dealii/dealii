@@ -515,8 +515,10 @@ namespace WorkStream
     Assert (queue_length > 0,
             ExcMessage ("The queue length must be at least one, and preferably "
                         "larger than the number of processors on this system."));
+    (void)queue_length; // removes -Wunused-parameter warning in optimized mode
     Assert (chunk_size > 0,
             ExcMessage ("The chunk_size must be at least one."));
+    (void)chunk_size; // removes -Wunused-parameter warning in optimized mode
 
                                      // if no work then skip. (only use
                                      // operator!= for iterators since we may

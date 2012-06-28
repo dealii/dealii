@@ -77,6 +77,7 @@ namespace internal
             type (const int level)
               {
                 Assert (level == 0, ExcInternalError());
+		(void)level; // removes -Wunused-parameter warning in optimized mode
               }
 
                                              /**

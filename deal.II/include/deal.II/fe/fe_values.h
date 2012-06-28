@@ -4325,6 +4325,7 @@ namespace FEValuesViews
                            const Tensor<1,1> &t)
     {
       Assert (n < 1, ExcIndexRange (n, 0, 1));
+      (void)n; // removes -Wunused-parameter warning in optimized mode
 
       const double array[1] = { t[0] };
       return dealii::SymmetricTensor<2,1>(array);

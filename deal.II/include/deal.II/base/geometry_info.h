@@ -2607,6 +2607,7 @@ GeometryInfo<1>::cell_to_child_coordinates (const Point<1>         &p,
           ExcIndexRange (child_index, 0, 2));
   Assert (refine_case==RefinementCase<1>::cut_x,
           ExcInternalError());
+  (void)refine_case; // removes -Wunused-parameter warning in optimized mode
 
   return p*2.0-unit_cell_vertex(child_index);
 }
@@ -2751,6 +2752,7 @@ GeometryInfo<1>::child_to_cell_coordinates (const Point<1>         &p,
           ExcIndexRange (child_index, 0, 2));
   Assert (refine_case==RefinementCase<1>::cut_x,
           ExcInternalError());
+  (void)refine_case; // removes -Wunused-parameter warning in optimized mode
 
   return (p+unit_cell_vertex(child_index))*0.5;
 }

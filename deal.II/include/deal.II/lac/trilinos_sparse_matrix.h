@@ -2855,6 +2855,7 @@ namespace TrilinosWrappers
                                           row_partitioner(), false);
 
             Assert (ierr == 0, ExcTrilinosError(ierr));
+	    (void)ierr; // removes -Wunused-but-set-variable in optimized mode
           }
 
         last_action = Add;
@@ -3195,6 +3196,7 @@ namespace TrilinosWrappers
   {
     const int ierr = matrix->Scale (a);
     Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
 
     return *this;
   }
@@ -3211,6 +3213,7 @@ namespace TrilinosWrappers
 
     const int ierr = matrix->Scale (factor);
     Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
 
     return *this;
   }
@@ -3233,6 +3236,7 @@ namespace TrilinosWrappers
     const int ierr = matrix->Multiply (false, src.trilinos_vector(),
                                        dst.trilinos_vector());
     Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
   }
 
 
@@ -3254,6 +3258,7 @@ namespace TrilinosWrappers
 
     const int ierr = matrix->Multiply (false, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
   }
 
 
@@ -3274,6 +3279,7 @@ namespace TrilinosWrappers
     const int ierr = matrix->Multiply (true, src.trilinos_vector(),
                                        dst.trilinos_vector());
     Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
   }
 
 
@@ -3295,6 +3301,7 @@ namespace TrilinosWrappers
 
     const int ierr = matrix->Multiply (true, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
   }
 
 

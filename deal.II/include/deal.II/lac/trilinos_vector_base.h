@@ -1753,6 +1753,7 @@ namespace TrilinosWrappers
 
     const int jerr = vector->Update(c, *(x.vector), 1.);
     Assert (jerr == 0, ExcTrilinosError(jerr));
+    (void)jerr; // removes -Wunused-parameter warning in optimized mode
   }
 
 
