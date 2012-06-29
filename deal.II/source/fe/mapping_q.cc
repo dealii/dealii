@@ -1458,20 +1458,36 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 				   // the inverse mapping doesn't
 				   // converge. in that case, use the
 				   // center point of the cell as a
-				   // starting point
+				   // starting point if we are to go
+				   // on using the full mapping, or
+				   // just propagate up the exception
+				   // if we had no intention of
+				   // continuing with the full mapping
   Point<dim> initial_p_unit;
-  bool       initial_p_unit_is_valid = false;
   try
     {
       initial_p_unit
 	= MappingQ1<dim,spacedim>::transform_real_to_unit_cell(cell, p);
-
-      initial_p_unit_is_valid = true;
     }
   catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &)
     {
-      for (unsigned int d=0; d<dim; ++d)
-	initial_p_unit[d] = 0.5;
+				       // mirror the conditions of the
+				       // code below to determine if
+				       // we need to use an arbitrary
+				       // starting point or if we just
+				       // need to rethrow the
+				       // exception
+      if (cell->has_boundary_lines()
+	  ||
+	  use_mapping_q_on_all_cells
+	  ||
+	  (dim!=spacedim) )
+	{
+	  for (unsigned int d=0; d<dim; ++d)
+	    initial_p_unit[d] = 0.5;
+	}
+      else
+	throw;
     }
 
                                    // then a Newton iteration based on the
@@ -1480,9 +1496,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
                                    // the mapping used is in fact a Q1
                                    // mapping, so there is nothing we need to
                                    // do unless the iteration above failed
-  if ((initial_p_unit_is_valid == false)
-      ||
-      cell->has_boundary_lines()
+  if (cell->has_boundary_lines()
       ||
       use_mapping_q_on_all_cells
       ||
