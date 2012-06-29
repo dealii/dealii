@@ -154,6 +154,19 @@ SolutionTransfer<dim, VECTOR, DH>::refine_interpolate(const VECTOR &in,
 
 namespace internal
 {
+				   /**
+				    * Generate a table that contains
+				    * interpolation matrices between
+				    * each combination of finite
+				    * elements used in a DoFHandler of
+				    * some kind. Since not all
+				    * elements can be interpolated
+				    * onto each other, the table may
+				    * contain empty matrices for those
+				    * combinations of elements for
+				    * which no such interpolation is
+				    * implemented.
+				    */
   template <typename DH>
   void extract_interpolation_matrices (const DH&,
                                        Table<2,FullMatrix<double> > &)
@@ -170,7 +183,33 @@ namespace internal
         if (i != j)
           {
             matrices(i,j).reinit (fe[i].dofs_per_cell, fe[j].dofs_per_cell);
-            fe[i].get_interpolation_matrix (fe[j], matrices(i,j));
+
+					     // see if we can get the
+					     // interpolation matrices
+					     // for this combination
+					     // of elements. if not,
+					     // reset the matrix sizes
+					     // to zero to indicate
+					     // that this particular
+					     // combination isn't
+					     // supported. this isn't
+					     // an outright error
+					     // right away since we
+					     // may never need to
+					     // actually interpolate
+					     // between these two
+					     // elements on actual
+					     // cells; we simply have
+					     // to trigger an error if
+					     // someone actually tries
+	    try
+	      {
+		fe[i].get_interpolation_matrix (fe[j], matrices(i,j));
+	      }
+	    catch (const typename FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented &)
+	      {
+		matrices(i,j).reinit (0,0);
+	      }
           }
   }
 
@@ -347,7 +386,50 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
                         {
                           tmp2.reinit (cell->child(most_general_child)->get_fe().dofs_per_cell,
                                        true);
-                          interpolation_hp (fe_ind_general, child_ind).vmult (tmp2, tmp);
+
+							   // if the
+							   // matrix
+							   // has size
+							   // 0 and
+							   // the
+							   // corresponding
+							   // elements
+							   // have
+							   // more
+							   // than
+							   // zero
+							   // DoFs,
+							   // then
+							   // this
+							   // means
+							   // that the
+							   // internal::extract_interpolation_matrices
+							   // function
+							   // above
+							   // couldn't
+							   // get the
+							   // interpolation
+							   // matrix
+							   // between
+							   // this
+							   // pair of
+							   // elements. since
+							   // we need
+							   // it here,
+							   // this is
+							   // an error
+			  if ((interpolation_hp(fe_ind_general, child_ind).m() == 0)
+			      &&
+			      (interpolation_hp(fe_ind_general, child_ind).n() == 0)
+			      &&
+			      ((tmp2.size() > 0) || (tmp.size() > 0)))
+			    Assert (false,
+				    ExcMessage (std::string("No interpolation from element ")
+						+ cell->child(child)->get_fe().get_name()
+						+ " to element "
+						+ cell->child(most_general_child)->get_fe().get_name()
+						+ " is available, but it is needed here."));
+                          interpolation_hp(fe_ind_general, child_ind).vmult (tmp2, tmp);
                         }
                       else
                         tmp2.swap (tmp);

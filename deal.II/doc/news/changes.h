@@ -47,6 +47,12 @@ used for boundary indicators.
 
 
 <ol>
+<li> Fixed: Using the SolutionTransfer class with hp::DoFHandler
+and on meshes where some cells are associated with a FE_Nothing element
+could result in an error. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2012/06/29)
+
 <li> Fixed: The MappingQ1::transform_real_to_unit_cell function as
 well as the equivalent ones in derived classes sometimes get into
 trouble if they are asked to compute the preimage of this point
