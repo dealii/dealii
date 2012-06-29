@@ -434,11 +434,16 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
                       else
                         tmp2.swap (tmp);
 
-                                // now do the interpolation operation
+                                // now do the interpolation
+                                // operation. FullMatrix only wants us
+                                // to call vmult if the matrix size is
+                                // actually non-zero, so check that
+                                // case
                       const unsigned int dofs_per_cell = tmp2.size();
                       tmp.reinit (dofs_per_cell, true);
-                      cell->child(most_general_child)->get_fe().
-                        get_restriction_matrix(child, cell->refinement_case()).vmult (tmp, tmp2);
+		      if (dofs_per_cell > 0)
+			cell->child(most_general_child)->get_fe().
+			  get_restriction_matrix(child, cell->refinement_case()).vmult (tmp, tmp2);
                       for (unsigned int i=0; i<dofs_per_cell; ++i)
                         if (restriction_is_additive[fe_ind_general][i])
                           dof_values_on_cell[n_cf][j](i) += tmp(i);

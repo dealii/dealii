@@ -236,12 +236,23 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
 
       for (unsigned int child=0; child<this->n_children(); ++child)
         {
-                                           // prolong the given data
-                                           // to the present cell
-          this->get_fe().get_prolongation_matrix(child, this->refinement_case())
-            .vmult (tmp, local_values);
+	  Assert (this->child(child)->get_fe().dofs_per_cell == dofs_per_cell,
+		  ExcNotImplemented());
 
-          this->child(child)->set_dof_values_by_interpolation (tmp, values);
+                                           // prolong the given data
+                                           // to the present
+                                           // cell. FullMatrix only
+                                           // wants us to call vmult
+                                           // if the matrix size is
+                                           // actually non-zero, so
+                                           // check that case
+	  if (tmp.size() > 0)
+	    {
+	      this->get_fe().get_prolongation_matrix(child, this->refinement_case())
+		.vmult (tmp, local_values);
+
+	      this->child(child)->set_dof_values_by_interpolation (tmp, values);
+	    }
         }
     }
 }
