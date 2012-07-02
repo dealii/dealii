@@ -45,6 +45,9 @@
 #include <sstream>
 #include <fstream>
 
+// we use uint32_t and uint8_t below, which are declared here:
+#include <stdint.h>
+
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif
