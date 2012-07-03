@@ -12,7 +12,7 @@
 //----------------------------  trilinos_vector_assign_01.cc  ---------------------------
 
 /*
-  test ::Vector::swap() (currently broken)
+  test ::Vector::swap() (fixed in r 25668)
  */
 
 
