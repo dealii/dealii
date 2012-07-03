@@ -402,13 +402,9 @@ namespace TrilinosWrappers
   void
   VectorBase::swap (VectorBase &v)
   {
-                                        // Just swap the pointers to
-                                        // the two Epetra vectors that
-                                        // hold all the data.
-    VectorBase *p_v = &v, *p_this = this;
-    VectorBase* tmp = p_v;
-    p_v = p_this;
-    p_this = tmp;
+    std::swap(last_action, v.last_action);
+    std::swap(compressed, v.compressed);
+    std::swap(vector, v.vector);
   }
 
 

@@ -248,6 +248,10 @@ enabled due to a missing include file in file
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
+<li> Fixed: TrilinosWrappers::VectorBase::swap() is now working as expected. (thanks Uwe Köcher)
+<br>
+(Timo Heister 2012/07/03)
+
 <li> Fixed: Some instantiations for
 DerivativeApproximation::approximate_derivative_tensor() were missing.
 <br>
