@@ -957,6 +957,12 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  CXXFLAGSG="$CXXFLAGSG -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
           CXXFLAGSO="$CXXFLAGSO -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
           CXXFLAGSPIC="-Kpic"
+
+	  dnl pgCC can't (as of writing this, with version 12.5 in mid-2012) compile a part of BOOST.
+	  dnl Fortunately, BOOST provides a workaround by setting a specific preprocessor
+	  dnl symbol that can be set. Do so.
+	  CXXFLAGSG="$CXXFLAGSG -DBOOST_MPL_CFG_NO_HAS_XXX_TEMPLATE"
+	  CXXFLAGSO="$CXXFLAGSO -DBOOST_MPL_CFG_NO_HAS_XXX_TEMPLATE"
           ;;
 
       kai_cc)
