@@ -61,10 +61,10 @@ namespace Functions
     typename DH::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
-    Point<dim> qp = mapping.transform_real_to_unit_cell(cell, p);
 
-                                     // Check if we already have all we need
-    if (!GeometryInfo<dim>::is_inside_unit_cell(qp))
+    boost::optional<Point<dim> >
+      qp = get_reference_coordinates (cell, p);
+    if (!qp)
       {
         const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
@@ -75,7 +75,7 @@ namespace Functions
     cell_hint.get() = cell;
 
                                      // Now we can find out about the point
-    Quadrature<dim> quad(qp);
+    Quadrature<dim> quad(qp.get());
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_values);
     fe_v.reinit(cell);
@@ -97,21 +97,22 @@ namespace Functions
   }
 
 
+
   template <int dim, typename DH, typename VECTOR>
   void
-  FEFieldFunction<dim, DH, VECTOR>::vector_gradient
-  (const Point<dim> &p,
-   std::vector<Tensor<1,dim> > &gradients) const
+  FEFieldFunction<dim, DH, VECTOR>::
+  vector_gradient (const Point<dim>            &p,
+		   std::vector<Tensor<1,dim> > &gradients) const
   {
     Assert (gradients.size() == n_components,
             ExcDimensionMismatch(gradients.size(), n_components));
     typename DH::active_cell_iterator cell = cell_hint.get();
     if(cell == dh->end())
       cell = dh->begin_active();
-    Point<dim> qp = mapping.transform_real_to_unit_cell(cell, p);
 
-                                     // Check if we already have all we need
-    if (!GeometryInfo<dim>::is_inside_unit_cell(qp))
+    boost::optional<Point<dim> >
+      qp = get_reference_coordinates (cell, p);
+    if (!qp)
       {
         std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
@@ -122,7 +123,7 @@ namespace Functions
     cell_hint.get() = cell;
 
                                      // Now we can find out about the point
-    Quadrature<dim> quad(qp);
+    Quadrature<dim> quad(qp.get());
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_gradients);
     fe_v.reinit(cell);
@@ -135,8 +136,10 @@ namespace Functions
 
 
   template <int dim, typename DH, typename VECTOR>
-  Tensor<1,dim> FEFieldFunction<dim, DH, VECTOR>::gradient
-  (const Point<dim>   &p, unsigned int comp) const
+  Tensor<1,dim>
+  FEFieldFunction<dim, DH, VECTOR>::
+  gradient (const Point<dim>   &p,
+	    const unsigned int comp) const
   {
     std::vector<Tensor<1,dim> > grads(n_components);
     vector_gradient(p, grads);
@@ -146,18 +149,20 @@ namespace Functions
 
 
   template <int dim, typename DH, typename VECTOR>
-  void FEFieldFunction<dim, DH, VECTOR>::vector_laplacian
-  (const Point<dim> &p,Vector<double>   &values) const
+  void
+  FEFieldFunction<dim, DH, VECTOR>::
+  vector_laplacian (const Point<dim> &p,
+		    Vector<double>   &values) const
   {
     Assert (values.size() == n_components,
             ExcDimensionMismatch(values.size(), n_components));
     typename DH::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
-    Point<dim> qp = mapping.transform_real_to_unit_cell(cell, p);
 
-                                     // Check if we already have all we need
-    if (!GeometryInfo<dim>::is_inside_unit_cell(qp))
+    boost::optional<Point<dim> >
+      qp = get_reference_coordinates (cell, p);
+    if (!qp)
       {
         const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
@@ -168,7 +173,7 @@ namespace Functions
     cell_hint.get() = cell;
 
                                      // Now we can find out about the point
-    Quadrature<dim> quad(qp);
+    Quadrature<dim> quad(qp.get());
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_hessians);
     fe_v.reinit(cell);

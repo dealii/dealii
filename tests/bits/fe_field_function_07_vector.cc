@@ -17,9 +17,9 @@
 // when it couldn't find the point on the reference cell that belongs
 // to a given point, rather than just silently giving up
 //
-// this is a variant of _04 found by inspecting the code in
-// FEFieldFunction but the (same) exception is triggered in a
-// different place
+// this is yet another variant of _04 and _05 and _06 found by
+// inspecting the code in FEFieldFunction but the (same) exception is
+// triggered in a different place
 
 #include "../tests.h"
 
@@ -39,11 +39,20 @@ class F : public Function<dim>
 {
   public:
     F() : Function<dim>(2) {}
+
     virtual void vector_value (const Point<dim> &p,
 			       Vector<double> &v) const
       {
-	v = 0;
-	v[0] = p.square();
+	v[0] = p[0];
+	v[1] = 0;
+      }
+
+    virtual void vector_gradient (const Point<dim> &p,
+				  std::vector<Tensor<1,dim> > &v) const
+      {
+	v[0] = 0;
+	v[1] = 0;
+	v[0][0] = 1;
       }
 };
 
@@ -71,7 +80,6 @@ void test()
   VectorTools::interpolate (dof_handler, F<dim>(), solution);
 
   Functions::FEFieldFunction<2> fe_function (dof_handler, solution);
-  std::vector<Point<dim> > points;
 
 				   // add only one points but also set
 				   // the active cell to one that
@@ -87,28 +95,28 @@ void test()
 				   // (it's too far away from that
 				   // cell, and the inverse mapping
 				   // does not converge
-  points.push_back (Point<dim>(-0.27999999999999992, -0.62999999999999989));
+  Point<dim> point(-0.27999999999999992, -0.62999999999999989);
   fe_function.set_active_cell (typename DoFHandler<dim>::active_cell_iterator
 			       (&triangulation,
 				1,
 				4,
 				&dof_handler));
 
-  std::vector<Vector<double> > m (points.size(), Vector<double>(2));
-  fe_function.vector_value_list (points, m);
+  std::vector<Tensor<1,dim> > m(2);
+  fe_function.vector_gradient (point, m);
 
-  for (unsigned int i=0; i<m.size(); ++i)
-    {
-      Assert (std::fabs(m[i](0) - points[i].square())
-	      <
-	      1e-10 * std::fabs(m[i](0) + points[i].square()),
-	      ExcInternalError());
-
-      Assert (std::fabs(m[i](1))
-	      <
-	      1e-10,
-	      ExcInternalError());
-    }
+  Assert (std::fabs(m[0][0] - 1)
+	  <
+	  1e-10 * std::fabs(m[0][0] + 1),
+	  ExcInternalError());
+  Assert (std::fabs(m[0][1])
+	  <
+	  1e-10,
+	  ExcInternalError());
+  Assert (m[1].norm()
+	  <
+	  1e-10,
+	  ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -116,7 +124,7 @@ void test()
 
 int main ()
 {
-  std::ofstream logfile("fe_field_function_05_vector/output");
+  std::ofstream logfile("fe_field_function_07_vector/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

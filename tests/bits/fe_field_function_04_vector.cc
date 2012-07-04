@@ -82,7 +82,7 @@ void test()
       points.push_back (Point<dim>(-0.7+i*0.07,-0.7+j*0.07));
   points.push_back (Point<dim>(-0.27999999999999992, -0.62999999999999989));
 
-  std::vector<Vector<double> > m (points.size());
+  std::vector<Vector<double> > m (points.size(), Vector<double>(2));
   fe_function.vector_value_list (points, m);
 
   for (unsigned int i=0; i<m.size(); ++i)
