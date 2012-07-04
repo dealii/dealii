@@ -422,7 +422,7 @@ namespace Functions
 	    my_pair  = GridTools::find_active_cell_around_point
 	    (mapping, *dh, points[0]);
 	  cell = my_pair.first;
-	  qp.reset (my_pair.second);
+	  qp = my_pair.second;
 	  point_flags[0] = true;
 	}
 
