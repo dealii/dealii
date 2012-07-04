@@ -842,7 +842,17 @@ namespace GridTools
           }
         catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
           {
-//TODO: Maybe say something
+					     // ok, the transformation
+					     // failed presumably
+					     // because the point we
+					     // are looking for lies
+					     // outside the current
+					     // cell. this means that
+					     // the current cell can't
+					     // be the cell around the
+					     // point, so just ignore
+					     // this cell and move on
+					     // to the next
           }
 
       }
