@@ -883,7 +883,7 @@ namespace GridTools
                                      //If we have only one element in the MappingCollection,
                                      //we use find_active_cell_around_point using only one
                                      //mapping.
-    if(mapping.size()==1)
+    if (mapping.size() == 1)
       best_cell = find_active_cell_around_point(mapping[0], container, p);
     else
       {
