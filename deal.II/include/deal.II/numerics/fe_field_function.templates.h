@@ -60,7 +60,7 @@ namespace Functions
             ExcDimensionMismatch(values.size(), n_components));
     typename DH::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
-        cell = dh->begin_active();
+      cell = dh->begin_active();
     Point<dim> qp = mapping.transform_real_to_unit_cell(cell, p);
 
                                      // Check if we already have all we need
@@ -107,7 +107,7 @@ namespace Functions
             ExcDimensionMismatch(gradients.size(), n_components));
     typename DH::active_cell_iterator cell = cell_hint.get();
     if(cell == dh->end())
-        cell = dh->begin_active();
+      cell = dh->begin_active();
     Point<dim> qp = mapping.transform_real_to_unit_cell(cell, p);
 
                                      // Check if we already have all we need
@@ -150,27 +150,27 @@ namespace Functions
   (const Point<dim> &p,Vector<double>   &values) const
   {
     Assert (values.size() == n_components,
-        ExcDimensionMismatch(values.size(), n_components));
+            ExcDimensionMismatch(values.size(), n_components));
     typename DH::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
     Point<dim> qp = mapping.transform_real_to_unit_cell(cell, p);
 
-    // Check if we already have all we need
+                                     // Check if we already have all we need
     if (!GeometryInfo<dim>::is_inside_unit_cell(qp))
       {
         const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
-        = GridTools::find_active_cell_around_point (mapping, *dh, p);
+          = GridTools::find_active_cell_around_point (mapping, *dh, p);
         cell = my_pair.first;
         qp = my_pair.second;
       }
 
     cell_hint.get() = cell;
 
-    // Now we can find out about the point
+                                     // Now we can find out about the point
     Quadrature<dim> quad(qp);
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
-        update_hessians);
+                       update_hessians);
     fe_v.reinit(cell);
     std::vector< Vector<double> > vvalues (1, values);
     fe_v.get_function_laplacians(data_vector, vvalues);
@@ -211,9 +211,9 @@ namespace Functions
     hp::QCollection<dim> quadrature_collection;
                                      // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i) {
-                                         // Number of quadrature points on this cell
+                                       // Number of quadrature points on this cell
       unsigned int nq = qpoints[i].size();
-                                         // Construct a quadrature formula
+                                       // Construct a quadrature formula
       std::vector< double > ww(nq, 1./((double) nq));
 
       quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
@@ -232,6 +232,8 @@ namespace Functions
           values[maps[i][q]] = vvalues[q];
       }
   }
+
+
 
   template <int dim, typename DH, typename VECTOR>
   void
@@ -270,9 +272,9 @@ namespace Functions
     hp::QCollection<dim> quadrature_collection;
                                      // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i) {
-                                         // Number of quadrature points on this cell
+                                       // Number of quadrature points on this cell
       unsigned int nq = qpoints[i].size();
-                                         // Construct a quadrature formula
+                                       // Construct a quadrature formula
       std::vector< double > ww(nq, 1./((double) nq));
 
       quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
@@ -314,10 +316,10 @@ namespace Functions
   void
   FEFieldFunction<dim, DH, VECTOR>::
   vector_laplacian_list (const std::vector<Point< dim > > &    points,
-         std::vector< Vector<double> > &values) const
+                         std::vector< Vector<double> > &values) const
   {
     Assert(points.size() == values.size(),
-     ExcDimensionMismatch(points.size(), values.size()));
+           ExcDimensionMismatch(points.size(), values.size()));
 
     std::vector<typename DH::active_cell_iterator > cells;
     std::vector<std::vector<Point<dim> > > qpoints;
@@ -329,9 +331,9 @@ namespace Functions
     hp::QCollection<dim> quadrature_collection;
                                      // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i) {
-                                         // Number of quadrature points on this cell
+                                       // Number of quadrature points on this cell
       unsigned int nq = qpoints[i].size();
-                                         // Construct a quadrature formula
+                                       // Construct a quadrature formula
       std::vector< double > ww(nq, 1./((double) nq));
 
       quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
@@ -339,7 +341,7 @@ namespace Functions
                                      // Get a function value object
     hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
                            update_hessians);
-             // Now gather all the informations we need
+                                     // Now gather all the informations we need
     for (unsigned int i=0; i<ncells; ++i)
       {
         fe_v.reinit(cells[i], i, 0);
@@ -355,11 +357,11 @@ namespace Functions
   void
   FEFieldFunction<dim, DH, VECTOR>::
   laplacian_list (const std::vector<Point< dim > > &points,
-        std::vector< double > &values,
-        const unsigned int  component) const
+                  std::vector< double > &values,
+                  const unsigned int  component) const
   {
     Assert(points.size() == values.size(),
-     ExcDimensionMismatch(points.size(), values.size()));
+           ExcDimensionMismatch(points.size(), values.size()));
     std::vector< Vector<double> > vvalues(points.size(), Vector<double>(n_components));
     vector_laplacian_list(points, vvalues);
     for (unsigned int q=0; q<points.size(); ++q)
@@ -400,33 +402,33 @@ namespace Functions
       cell = dh->begin_active();
 
     {
-				       // see if the point is
-				       // inside the
-				       // cell. there are two
-				       // ways that
-				       // transform_real_to_unit_cell
-				       // can indicate that a
-				       // point is outside: by
-				       // returning
-				       // coordinates that lie
-				       // outside the
-				       // reference cell, or
-				       // by throwing an
-				       // exception. handle
-				       // both
+                                       // see if the point is
+                                       // inside the
+                                       // cell. there are two
+                                       // ways that
+                                       // transform_real_to_unit_cell
+                                       // can indicate that a
+                                       // point is outside: by
+                                       // returning
+                                       // coordinates that lie
+                                       // outside the
+                                       // reference cell, or
+                                       // by throwing an
+                                       // exception. handle
+                                       // both
       boost::optional<Point<dim> >
-	qp = get_reference_coordinates (cell, points[0]);
+        qp = get_reference_coordinates (cell, points[0]);
       if (!qp)
-	{
-	  const std::pair<typename DH::active_cell_iterator, Point<dim> >
-	    my_pair  = GridTools::find_active_cell_around_point
-	    (mapping, *dh, points[0]);
-	  cell = my_pair.first;
-	  qp = my_pair.second;
-	  point_flags[0] = true;
-	}
+        {
+          const std::pair<typename DH::active_cell_iterator, Point<dim> >
+            my_pair  = GridTools::find_active_cell_around_point
+            (mapping, *dh, points[0]);
+          cell = my_pair.first;
+          qp = my_pair.second;
+          point_flags[0] = true;
+        }
 
-				       // Put in the first point.
+                                       // Put in the first point.
       cells.push_back(cell);
       qpoints.push_back(std::vector<Point<dim> >(1, qp.get()));
       maps.push_back(std::vector<unsigned int> (1, 0));
@@ -456,24 +458,24 @@ namespace Functions
                                          // If we found one in this cell, keep looking in the same cell
         for (unsigned int p=first_outside; p<np; ++p)
           if (point_flags[p] == false)
-	    {
-					       // same logic as above
-	      const boost::optional<Point<dim> >
-		qp = get_reference_coordinates (cells[c], points[p]);
-	      if (qp)
-		{
-		  point_flags[p] = true;
-		  qpoints[c].push_back(qp.get());
-		  maps[c].push_back(p);
-		}
-	      else
-		{
-						   // Set things up for next round
-		  if (left_over == false)
-		    first_outside = p;
-		  left_over = true;
-		}
-	    }
+            {
+                                               // same logic as above
+              const boost::optional<Point<dim> >
+                qp = get_reference_coordinates (cells[c], points[p]);
+              if (qp)
+                {
+                  point_flags[p] = true;
+                  qpoints[c].push_back(qp.get());
+                  maps[c].push_back(p);
+                }
+              else
+                {
+                                                   // Set things up for next round
+                  if (left_over == false)
+                    first_outside = p;
+                  left_over = true;
+                }
+            }
                                          // If we got here and there is
                                          // no left over, we are
                                          // done. Else we need to find
@@ -528,22 +530,22 @@ namespace Functions
   boost::optional<Point<dim> >
   FEFieldFunction<dim, DH, VECTOR>::
   get_reference_coordinates (const typename DH::active_cell_iterator &cell,
-			     const Point<dim>                        &point) const
+                             const Point<dim>                        &point) const
   {
     try
       {
-	Point<dim> qp =  mapping.transform_real_to_unit_cell(cell, point);
-	if (GeometryInfo<dim>::is_inside_unit_cell(qp))
-	  return qp;
-	else
-	  return boost::optional<Point<dim> >();
+        Point<dim> qp =  mapping.transform_real_to_unit_cell(cell, point);
+        if (GeometryInfo<dim>::is_inside_unit_cell(qp))
+          return qp;
+        else
+          return boost::optional<Point<dim> >();
       }
     catch (const typename Mapping<dim>::ExcTransformationFailed &)
       {
-					 // transformation failed, so
-					 // assume the point is
-					 // outside
-	return boost::optional<Point<dim> >();
+                                         // transformation failed, so
+                                         // assume the point is
+                                         // outside
+        return boost::optional<Point<dim> >();
       }
   }
 
