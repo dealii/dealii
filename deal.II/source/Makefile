@@ -1,5 +1,5 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998, 1999, 2000, 2001, 2002, 2010, 2011
+# Copyright W. Bangerth, University of Heidelberg, 1998, 1999, 2000, 2001, 2002, 2010, 2011, 2012
 
 
 ifneq ($(CLEAN),yes)
@@ -238,6 +238,48 @@ endif
 clean:
 	-rm -f Makefile.dep *~ */*~ */*/*~ */Makefile.dep source/*/*.inst \
 		$D/lib/{debug,optimized}/*.o
+
+
+################### coverage
+# A target that creates a visual representation of which files and
+# lines are covered by the testsuite, the example programs, and
+# possible other executables. To use this rule, configure deal.II
+# as usual, then add "-fprofile-arcs -ftest-coverage" to the following
+# variables in common/Make.global_options:
+# - SHLIBFLAGS
+# - LDFLAGS
+# - CXXFLAGS.g
+# Then compile the library and run all the executables for which you
+# want it reported that. Note, however, that you can't run them in
+# parallel or they will step on each other's toes when writing output.
+# In other words, the testsuite has to be run with -j1, however long
+# that may take.
+#
+# When all of these programs have been run, the do
+#   cd source
+#   make coverage
+# This may take a long time: both running lcov and, in particular,
+# genhtml can take hours. In the latter case, there isn't even an
+# indication that anything is happening, but it is -- just be
+# patient, let it run overnight.
+coverage:
+	for dir in $(all-dirs) ; do \
+	  cd $$dir ; \
+	  for file in *.cc ; do \
+	    basename=`echo $$file | perl -pi -e 's/\\.cc$$//;'` ; \
+	    for ext in o gcda gcno ; do \
+	      rm -f $${basename}.$$ext ; \
+	      if test -f $D/lib/debug/$${dir}_$${basename}.$$ext ; then \
+	        ln $D/lib/debug/$${dir}_$${basename}.$$ext $${basename}.$$ext ; \
+	      fi ; \
+	    done ; \
+	  done ; \
+	  cd .. ; \
+	done
+	lcov --base-directory . --directory . -c -o d2.info
+	lcov --remove d2.info "/usr*" -o d2.info
+	rm -rf ../coverage
+	genhtml -o ../coverage -t "deal.II test coverage" --num-spaces 8 d2.info
 
 
 ###################
