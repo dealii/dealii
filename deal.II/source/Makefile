@@ -1,5 +1,5 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998, 1999, 2000, 2001, 2002, 2010, 2011, 2012
+# Copyright by the deal.II authors, 1998, 1999, 2000, 2001, 2002, 2010, 2011, 2012
 
 
 ifneq ($(CLEAN),yes)
