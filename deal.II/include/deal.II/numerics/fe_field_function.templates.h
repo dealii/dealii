@@ -215,7 +215,7 @@ namespace Functions
       unsigned int nq = qpoints[i].size();
                                          // Construct a quadrature formula
       std::vector< double > ww(nq, 1./((double) nq));
-      
+
       quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
     }
                                      // Get a function value object
@@ -274,7 +274,7 @@ namespace Functions
       unsigned int nq = qpoints[i].size();
                                          // Construct a quadrature formula
       std::vector< double > ww(nq, 1./((double) nq));
-      
+
       quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
     }
                                      // Get a function value object
@@ -333,7 +333,7 @@ namespace Functions
       unsigned int nq = qpoints[i].size();
                                          // Construct a quadrature formula
       std::vector< double > ww(nq, 1./((double) nq));
-      
+
       quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
     }
                                      // Get a function value object
@@ -397,25 +397,51 @@ namespace Functions
                                      // Current quadrature point
     typename DH::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
-        cell = dh->begin_active();
-    Point<dim> qp = mapping.transform_real_to_unit_cell(cell, points[0]);
+      cell = dh->begin_active();
 
-                                     // Check if we already have a
-                                     // valid cell for the first point
-    if (!GeometryInfo<dim>::is_inside_unit_cell(qp))
-      {
-        const std::pair<typename DH::active_cell_iterator, Point<dim> >
-          my_pair  = GridTools::find_active_cell_around_point
-          (mapping, *dh, points[0]);
-        cell = my_pair.first;
-        qp = my_pair.second;
-        point_flags[0] = true;
-      }
+    {
+				       // see if the point is
+				       // inside the
+				       // cell. there are two
+				       // ways that
+				       // transform_real_to_unit_cell
+				       // can indicate that a
+				       // point is outside: by
+				       // returning
+				       // coordinates that lie
+				       // outside the
+				       // reference cell, or
+				       // by throwing an
+				       // exception. handle
+				       // both
+      bool point_is_inside;
+      Point<dim> qp;
+      try
+	{
+	  qp =  mapping.transform_real_to_unit_cell(cell, points[0]);
+	  point_is_inside = GeometryInfo<dim>::is_inside_unit_cell(qp);
+	}
+      catch (const typename Mapping<dim>::ExcTransformationFailed &)
+	{
+	  point_is_inside = false;
+	}
 
-                                     // Put in the first point.
-    cells.push_back(cell);
-    qpoints.push_back(std::vector<Point<dim> >(1, qp));
-    maps.push_back(std::vector<unsigned int> (1, 0));
+      if (point_is_inside)
+	{
+	  const std::pair<typename DH::active_cell_iterator, Point<dim> >
+	    my_pair  = GridTools::find_active_cell_around_point
+	    (mapping, *dh, points[0]);
+	  cell = my_pair.first;
+	  qp = my_pair.second;
+	  point_flags[0] = true;
+	}
+
+				       // Put in the first point.
+      cells.push_back(cell);
+      qpoints.push_back(std::vector<Point<dim> >(1, qp));
+      maps.push_back(std::vector<unsigned int> (1, 0));
+    }
+
 
                                      // Check if we need to do anything else
     if (points.size() > 1)
@@ -439,22 +465,35 @@ namespace Functions
 
                                          // If we found one in this cell, keep looking in the same cell
         for (unsigned int p=first_outside; p<np; ++p)
-          if (point_flags[p] == false) {
-            Point<dim> qpoint =  mapping.transform_real_to_unit_cell(cells[c], points[p]);
-            if (GeometryInfo<dim>::is_inside_unit_cell(qpoint))
-              {
-                point_flags[p] = true;
-                qpoints[c].push_back(qpoint);
-                maps[c].push_back(p);
-              }
-            else
-              {
-                                                 // Set things up for next round
-                if (left_over == false)
-                  first_outside = p;
-                left_over = true;
-              }
-          }
+          if (point_flags[p] == false)
+	    {
+					       // same logic as above
+	      bool point_is_inside;
+	      Point<dim> qpoint;
+	      try
+		{
+		  qpoint =  mapping.transform_real_to_unit_cell(cells[c], points[p]);
+		  point_is_inside = GeometryInfo<dim>::is_inside_unit_cell(qpoint);
+		}
+	      catch (const typename Mapping<dim>::ExcTransformationFailed &)
+		{
+		  point_is_inside = false;
+		}
+
+	      if (point_is_inside)
+		{
+		  point_flags[p] = true;
+		  qpoints[c].push_back(qpoint);
+		  maps[c].push_back(p);
+		}
+	      else
+		{
+						   // Set things up for next round
+		  if (left_over == false)
+		    first_outside = p;
+		  left_over = true;
+		}
+	    }
                                          // If we got here and there is
                                          // no left over, we are
                                          // done. Else we need to find
