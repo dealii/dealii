@@ -1,0 +1,10 @@
+
+DEAL::Ndofs :1026
+DEAL::V norm: 10.1440
+DEAL::Projection error: 0.00000
+DEAL::Ndofs :2178
+DEAL::V norm: 26.5652
+DEAL::Projection error: 0.00000
+DEAL::Ndofs :1458
+DEAL::V norm: 32.6964
+DEAL::Projection error: 0.00000
