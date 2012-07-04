@@ -26,6 +26,19 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/numerics/fe_field_function.h>
+#include <deal.II/numerics/vectors.h>
+
+
+template <int dim>
+class F : public Function<dim>
+{
+  public:
+    virtual double value (const Point<dim> &p,
+			  const unsigned int) const
+      {
+	return p.square();
+      }
+};
 
 
 template<int dim>
@@ -43,6 +56,7 @@ void test()
   dof_handler.distribute_dofs(fe);
 
   Vector<double> solution(dof_handler.n_dofs());
+  VectorTools::interpolate (dof_handler, F<dim>(), solution);
 
   Functions::FEFieldFunction<2> fe_function (dof_handler, solution);
   std::vector<Point<dim> > points;
@@ -68,7 +82,11 @@ void test()
   std::vector<double> m (points.size());
   fe_function.value_list (points, m);
 
-  triangulation.set_boundary (0);
+  for (unsigned int i=0; i<m.size(); ++i)
+    Assert (std::fabs(m[i] - points[i].square())
+	    <
+	    1e-10 * std::fabs(m[i] + points[i].square()),
+	    ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
