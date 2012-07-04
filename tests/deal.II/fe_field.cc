@@ -1,5 +1,5 @@
 //------------------------------  fe_field.cc  ----------------------------
-//    $Id: boundaries.cc 24689 2011-10-29 15:28:46Z kanschat $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2012 by the deal.II authors

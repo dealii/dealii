@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-//    $Id: mapping_real_to_unit_q1.cc 25655 2012-06-27 21:40:00Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2006, 2007, 2010, 2012 by the deal.II authors

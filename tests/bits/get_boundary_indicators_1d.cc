@@ -1,5 +1,5 @@
 //----------------------------  get_boundary_indicators_1d.cc  ---------------------------
-//    $Id: testsuite.html 23951 2011-07-20 11:44:09Z bangerth $
+//    $Id$
 //
 //    Copyright (C) 2011 by the deal.II authors
 //

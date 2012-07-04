@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: 2d_coarsening_01.cc 23710 2011-05-17 04:50:10Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2008, 2009 by the deal.II authors

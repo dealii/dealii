@@ -1,6 +1,6 @@
 
 //----------------------------  template.cc  ---------------------------
-//    $Id: mapping_q1_eulerian.cc 23710 2011-05-17 04:50:10Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2009, 2010, 2011 by the deal.II authors 

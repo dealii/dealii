@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//    $Id: map_dofs_to_support_points_hp_01.cc 24468 2011-09-29 15:44:06Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2003, 2004, 2005, 2009, 2011 by the deal.II authors

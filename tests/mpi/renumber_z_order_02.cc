@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: p4est_2d_dofhandler_01.cc 23710 2011-05-17 04:50:10Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009, 2010 by the deal.II authors

@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: no_flux_constraints.cc 24175 2011-08-24 12:14:21Z kronbichler $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009, 2010 by the deal.II authors

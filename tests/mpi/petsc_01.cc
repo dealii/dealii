@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: simple_mpi_01.cc 23327 2011-02-11 03:19:07Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009 by the deal.II authors

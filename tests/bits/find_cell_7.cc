@@ -1,5 +1,5 @@
 //----------------------------  find_cell_7.cc  ---------------------------
-//    $Id: find_cell_5.cc 25229 2012-03-09 18:34:59Z pauletti $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2003, 2004, 2005, 2006, 2012 by the deal.II authors

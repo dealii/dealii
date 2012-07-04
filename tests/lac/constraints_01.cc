@@ -1,5 +1,5 @@
 //----------------------------  constraints_zero.cc  ---------------------------
-//    $Id: constraints_zero.cc 18471 2009-03-10 13:20:31Z kronbichler $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors

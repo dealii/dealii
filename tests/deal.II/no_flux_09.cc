@@ -1,5 +1,5 @@
 //----------------------------  no_flux_09.cc  ---------------------------
-//    $Id: vectors_rhs_hp_02.cc 23710 2011-05-17 04:50:10Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2000, 2001, 2003, 2004, 2006, 2007, 2011, 2012 by the deal.II authors
