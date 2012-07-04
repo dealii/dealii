@@ -23,6 +23,9 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <boost/optional.hpp>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
@@ -151,7 +154,7 @@ namespace Functions
                                         * function. This will speed
                                         * things up a little.
                                         */
-      void set_active_cell(typename DH::active_cell_iterator &newcell);
+      void set_active_cell (const typename DH::active_cell_iterator &newcell);
 
                                        /**
                                         * Get ONE vector value at the
@@ -396,6 +399,19 @@ namespace Functions
                                         * components of this function.
                                         */
       const unsigned int n_components;
+
+				       /**
+					* Given a cell, return the
+					* reference coordinates of the
+					* given point within this cell
+					* if it indeed lies within the
+					* cell. Otherwise return an
+					* uninitialized
+					* boost::optional object.
+					*/
+      boost::optional<Point<dim> >
+      get_reference_coordinates (const typename DH::active_cell_iterator &cell,
+				 const Point<dim>                        &point) const;
   };
 }
 

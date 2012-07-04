@@ -45,7 +45,7 @@ namespace Functions
   template <int dim, typename DH, typename VECTOR>
   void
   FEFieldFunction<dim, DH, VECTOR>::
-  set_active_cell(typename DH::active_cell_iterator &newcell)
+  set_active_cell(const typename DH::active_cell_iterator &newcell)
   {
     cell_hint.get() = newcell;
   }
@@ -414,31 +414,21 @@ namespace Functions
 				       // by throwing an
 				       // exception. handle
 				       // both
-      bool point_is_inside;
-      Point<dim> qp;
-      try
-	{
-	  qp =  mapping.transform_real_to_unit_cell(cell, points[0]);
-	  point_is_inside = GeometryInfo<dim>::is_inside_unit_cell(qp);
-	}
-      catch (const typename Mapping<dim>::ExcTransformationFailed &)
-	{
-	  point_is_inside = false;
-	}
-
-      if (point_is_inside)
+      boost::optional<Point<dim> >
+	qp = get_reference_coordinates (cell, points[0]);
+      if (!qp)
 	{
 	  const std::pair<typename DH::active_cell_iterator, Point<dim> >
 	    my_pair  = GridTools::find_active_cell_around_point
 	    (mapping, *dh, points[0]);
 	  cell = my_pair.first;
-	  qp = my_pair.second;
+	  qp.reset (my_pair.second);
 	  point_flags[0] = true;
 	}
 
 				       // Put in the first point.
       cells.push_back(cell);
-      qpoints.push_back(std::vector<Point<dim> >(1, qp));
+      qpoints.push_back(std::vector<Point<dim> >(1, qp.get()));
       maps.push_back(std::vector<unsigned int> (1, 0));
     }
 
@@ -468,22 +458,12 @@ namespace Functions
           if (point_flags[p] == false)
 	    {
 					       // same logic as above
-	      bool point_is_inside;
-	      Point<dim> qpoint;
-	      try
-		{
-		  qpoint =  mapping.transform_real_to_unit_cell(cells[c], points[p]);
-		  point_is_inside = GeometryInfo<dim>::is_inside_unit_cell(qpoint);
-		}
-	      catch (const typename Mapping<dim>::ExcTransformationFailed &)
-		{
-		  point_is_inside = false;
-		}
-
-	      if (point_is_inside)
+	      const boost::optional<Point<dim> >
+		qp = get_reference_coordinates (cells[c], points[p]);
+	      if (qp)
 		{
 		  point_flags[p] = true;
-		  qpoints[c].push_back(qpoint);
+		  qpoints[c].push_back(qp.get());
 		  maps[c].push_back(p);
 		}
 	      else
@@ -542,6 +522,31 @@ namespace Functions
 
     return c;
   }
+
+
+  template <int dim, typename DH, typename VECTOR>
+  boost::optional<Point<dim> >
+  FEFieldFunction<dim, DH, VECTOR>::
+  get_reference_coordinates (const typename DH::active_cell_iterator &cell,
+			     const Point<dim>                        &point) const
+  {
+    try
+      {
+	Point<dim> qp =  mapping.transform_real_to_unit_cell(cell, point);
+	if (GeometryInfo<dim>::is_inside_unit_cell(qp))
+	  return qp;
+	else
+	  return boost::optional<Point<dim> >();
+      }
+    catch (const typename Mapping<dim>::ExcTransformationFailed &)
+      {
+					 // transformation failed, so
+					 // assume the point is
+					 // outside
+	return boost::optional<Point<dim> >();
+      }
+  }
+
 }
 
 DEAL_II_NAMESPACE_CLOSE
