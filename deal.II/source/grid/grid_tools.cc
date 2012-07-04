@@ -910,24 +910,41 @@ namespace GridTools
 
         for(; cell != endc; ++cell)
           {
-            const Point<dim> p_cell
-              = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
+	    try
+	      {
+		const Point<dim> p_cell
+		  = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
 
-                                             // calculate the infinity norm of
-                                             // the distance vector to the unit cell.
-            const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+						 // calculate the infinity norm of
+						 // the distance vector to the unit cell.
+		const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
 
-                                             // We compare if the point is inside the
-                                             // unit cell (or at least not too far
-                                             // outside). If it is, it is also checked
-                                             // that the cell has a more refined state
-            if (dist < best_distance ||
-                (dist == best_distance && (*cell)->level() > best_level))
-              {
-                best_distance = dist;
-                best_level    = (*cell)->level();
-                best_cell     = std::make_pair(*cell, p_cell);
-              }
+						 // We compare if the point is inside the
+						 // unit cell (or at least not too far
+						 // outside). If it is, it is also checked
+						 // that the cell has a more refined state
+		if (dist < best_distance ||
+		    (dist == best_distance && (*cell)->level() > best_level))
+		  {
+		    best_distance = dist;
+		    best_level    = (*cell)->level();
+		    best_cell     = std::make_pair(*cell, p_cell);
+		  }
+	      }
+	    catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
+	      {
+						 // ok, the transformation
+						 // failed presumably
+						 // because the point we
+						 // are looking for lies
+						 // outside the current
+						 // cell. this means that
+						 // the current cell can't
+						 // be the cell around the
+						 // point, so just ignore
+						 // this cell and move on
+						 // to the next
+	      }
           }
 
         Assert (best_cell.first.state() == IteratorState::valid,
