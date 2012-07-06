@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2011 by the deal.II authors
+//    Copyright (C) 2005, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -75,7 +75,7 @@ void test() {
 
 int main ()
 {
-  std::ofstream logfile("fe_field_function_03/output");
+  std::ofstream logfile("fe_field_function_03_vector/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
