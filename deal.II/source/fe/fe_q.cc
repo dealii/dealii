@@ -2066,8 +2066,8 @@ template <int dim, int spacedim>
 std::size_t
 FE_Q<dim,spacedim>::memory_consumption () const
 {
-  Assert (false, ExcNotImplemented ());
-  return 0;
+  return (FiniteElement<dim,spacedim>::memory_consumption() +
+	  MemoryConsumption::memory_consumption (face_index_map));
 }
 
 
