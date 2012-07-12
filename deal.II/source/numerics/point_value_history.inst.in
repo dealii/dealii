@@ -23,8 +23,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
   template
   void PointValueHistory<deal_II_dimension>::evaluate_field 
   (const std::string &,
-   const VEC &,
-   const unsigned int);
+   const VEC &);
 }
 
 
@@ -33,15 +32,25 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
   template
   void PointValueHistory<deal_II_dimension>::evaluate_field_at_requested_location 
   (const std::string &,
-   const VEC &,
-   const unsigned int);
+   const VEC &);
 }
 
 for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
 {  
   template
   void PointValueHistory<deal_II_dimension>::evaluate_field 
-  (const VEC &,
+  (const std::vector <std::string> &,
+   const VEC &,
+   const DataPostprocessor<deal_II_dimension> &,
+   const Quadrature<deal_II_dimension> &);
+}
+
+for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
+{  
+  template
+  void PointValueHistory<deal_II_dimension>::evaluate_field 
+  (const std::string &,
+   const VEC &,
    const DataPostprocessor<deal_II_dimension> &,
    const Quadrature<deal_II_dimension> &);
 }

@@ -101,9 +101,10 @@ namespace internal
  * just once at the start. However, this method is not suitable for
  * FiniteElement objects that do not assign dofs to actual mesh locations
  * (i.e. FEs without @ref GlossSupport "support points") or if adaptive mesh refinement is used.
- * The class will throw an exception if the finite element does not have support points
- * or any change in the @p dof_handler is identified. (The test is simply
- * whether the number of dofs changes.)
+ * The class will throw an exception if any change to the triangulation is made. Although the 
+ * listeners that detect this change could be used to recompute the nearest support points, 
+ * the location of the support point will most likely change slightly, making the interpretation
+ * of the data difficult, hence this is not implemented currently.
  *
  * <li> Secondly, @p evaluate_field_at_requested_location calls @p
  * VectorTools::point_value to compute values at the specific point requested.
@@ -119,16 +120,21 @@ namespace internal
  * code using adaptive refinement, but as the output will be meaningful (in
  * the sense that the quadrature point selected is guaranteed to remain in the
  * same vicinity, the class does not prevent the use of this method in adaptive
- * codes.
+ * codes. The class provides warnings in the output files if the mesh has changed.
  * </ol>
  *
- * When recording a new mnemonic name, the user must chose whether it should be
- * a strictly scalar field (@p add_scalar_field_name) or whether it should
- * depend on the @p FE (@p add_field_name). Calling @p add_field_name with a
- * @p dof_handler using a vector @p FE will result in a vector field. The vector
- * field will be of dimention @p FE.n_components(). Therefore, in this class the
- * distinction between vector and scalar is as related to the @p FE and not
- * whether a quantity is a logical vector.
+ * When recording a new mnemonic name, the user must supply a std::vector<unsigned int>
+ * components that lists the (generally FE) components to be extracted from the 
+ * given input. If the user simply wants to extract all the components, or the first
+ * n components then default parameters and overloaded functions mean that 
+ * the std::vector need not be explicitly supplied to the @p add_field_name method. 
+ * If the @p evaluate_field with a @p DataPostprocessor object is used, the components
+ * are interpreted as the component of the @p DataPostprocessor return vector. This 
+ * vector can be larger than the FE space.
+ *
+ * The class automatically generates names for the data stored based on the mnemoics 
+ * supplied. The methods @p add_component_names and @p add_independent_names allow 
+ * the user to provide lists of names to use instead if desired.
  *
  * Following is a little code snippet that shows a common usage of this class:
  *
@@ -184,24 +190,20 @@ class PointValueHistory
 
                                      /**
                                       * Constructor linking the class to a
-                                      * specific @p DoFHandler. Since this
+                                      * specific @p DoFHandler. This
                                       * class reads specific data from the @p
                                       * DoFHandler and stores it internally
                                       * for quick access (in particular dof
                                       * indices of closest neighbors to
                                       * requested points) the class is fairly
                                       * intolerant to changes to the @p
-                                      * DoFHandler.  Mesh refinement and @p
+                                      * DoFHandler if data at support points
+                                      * is required. Mesh refinement and @p
                                       * DoFRenumbering methods should be
                                       * performed before the @p add_points
                                       * method is called and adaptive grid
-                                      * refinement is not supported (unless it
-                                      * is completed before points are added).
-                                      * Changes to the @p DoFHandler are
-                                      * tested for by looking for a change in
-                                      * the number of dofs, which may not
-                                      * always occur so the user must be aware
-                                      * of these limitations.
+                                      * refinement is only supported by some
+                                      * methods.
                                       *
                                       * The user can store extra variables
                                       * which do not relate to mesh location
@@ -217,9 +219,7 @@ class PointValueHistory
                        const unsigned int n_independent_variables = 0);
 
                                      /**
-                                      * Copy constructor explicitly provided,
-                                      * although default copy operator would
-                                      * be sufficient.  This constructor can
+                                      * Copy constructor. This constructor can
                                       * be safely called with a @p
                                       * PointValueHistory object that contains
                                       * data, but this could be expensive and
@@ -228,9 +228,7 @@ class PointValueHistory
     PointValueHistory (const PointValueHistory & point_value_history);
 
                                      /**
-                                      * Assignment operator explicitly
-                                      * provided, although default assignment
-                                      * operator would be sufficient.  This
+                                      * Assignment operator. This
                                       * assignment operator can be safely
                                       * called once the class is closed and
                                       * data added, but this is provided
@@ -252,7 +250,7 @@ class PointValueHistory
                                       * Add a single point to the class. The
                                       * support points (one per component) in
                                       * the mesh that are closest to that
-                                      * point is found and its details stored
+                                      * point are found and their details stored
                                       * for use when @p evaluate_field is
                                       * called. If more than one point is
                                       * required rather used the @p add_points
@@ -265,7 +263,7 @@ class PointValueHistory
                                       * Add multiple points to the class. The
                                       * support points (one per component) in
                                       * the mesh that are closest to that
-                                      * point is found and its details stored
+                                      * point is found and their details stored
                                       * for use when @p evaluate_field is
                                       * called. If more than one point is
                                       * required, rather call this method as it
@@ -286,65 +284,58 @@ class PointValueHistory
                                      /**
                                       * Put another mnemonic string (and hence
                                       * @p VECTOR) into the class. This method
-                                      * adds storage space for FE.n_components()
-                                      * variables and should be used with methods
-                                      * that extract all FE components from a vector.
+                                      * adds storage space for components.size()
+                                      * variables. 
                                       * This also adds extra entries for points
                                       * that are already in the class, so
                                       * @p add_field_name and @p add_points can
                                       * be called in any order.
                                       */
-    void add_field_name(const std::string &vector_name);
-
+    void add_field_name(const std::string &vector_name, 
+                        const std::vector <unsigned int> &components = std::vector <unsigned int>());
+                        
                                      /**
                                       * Put another mnemonic string (and hence
                                       * @p VECTOR) into the class. This method
-                                      * only adds storage space for a single
-                                      * variable whether the FE is scalar or not
-                                      * so it can be used with
-                                      * @p DataPostprocessor objects that compute
-                                      * a scalar value(s) from a vector field.
+                                      * adds storage space for components.size()
+                                      * variables. 
                                       * This also adds extra entries for points
                                       * that are already in the class, so
                                       * @p add_field_name and @p add_points can
                                       * be called in any order.
+                                      * This method generates a std::vector 
+                                      * 0, ..., n_components-1 and calls the 
+                                      * previous function.
                                       */
-    void add_scalar_field_name(const std::string &vector_name);
+    void add_field_name(const std::string &vector_name, 
+                        const unsigned int n_components);
+                        
+                                       /**
+                                        * Provide optional names for each component
+                                        * of a field. These names will be used 
+                                        * instead of names generated from the 
+                                        * field name, if supplied.
+                                        */
+    void add_component_names(const std::string &vector_name, 
+                        const std::vector <std::string> &component_names);
+                        
+                                       /**
+                                        * Provide optional names for the
+                                        * independent values. These names will 
+                                        * be used instead of "Indep_...", if
+                                        * supplied.
+                                        */
+    void add_independent_names(const std::vector <std::string> &independent_names);
+
+
 
                                      /**
                                       * Extract values at the stored points
                                       * from the VECTOR supplied and add them
                                       * to the new dataset in vector_name.
-                                      * The scalar_component input is only
-                                      * used if the FE has multiple components
-                                      * and the field to be evaluated is scalar.
-                                      * In this case, the scalar_component input
-                                      * is used to select the component used. If
-                                      * a @p DoFHandler is used, one (and only
-                                      * one) evaluate_field method
-                                      * must be called for each dataset (time
-                                      * step, iteration, etc) for each
-                                      * vector_name, otherwise a @p
-                                      * ExcDataLostSync error can occur.
-                                      */
-    template <class VECTOR>
-    void evaluate_field(const std::string &vector_name, const VECTOR & solution, const unsigned int scalar_component = 0);
-
-
-                                     /**
-                                      * Compute values using a DataPostprocessor object
-                                      * with the VECTOR supplied and add them
-                                      * to the new dataset in vector_name.
-                                      * The DataPostprocessor component_interpretation
-                                      * is used to determine select scalar or vector data.
-                                      * If the component_is_part_of_vector flag is used, then
-                                      * the indicated vector must have the same number of
-                                      * components as the FE associated with the dof_handler.
-                                      * The DataPostprocessor object is queried for field names.
-                                      * In the case of vector fields, the name of the first
-                                      * component is used as the overall name of the vector.
-                                      * The quadrature object supplied is used for all
-                                      * components of a vector field.
+                                      * The list of components supplied when the
+                                      * field was added is used to select
+                                      * components to extract.
                                       * If a @p DoFHandler is used, one (and only
                                       * one) evaluate_field method
                                       * must be called for each dataset (time
@@ -353,7 +344,49 @@ class PointValueHistory
                                       * ExcDataLostSync error can occur.
                                       */
     template <class VECTOR>
-    void evaluate_field(const VECTOR & solution, const DataPostprocessor<dim> & data_postprocessor, const Quadrature<dim> & quadrature);
+    void evaluate_field(const std::string &vector_name, const VECTOR & solution);
+
+
+                                     /**
+                                      * Compute values using a @p DataPostprocessor object
+                                      * with the @p VECTOR supplied and add them
+                                      * to the new dataset in vector_name.
+                                      * The list of components supplied when the
+                                      * field was added is used to select
+                                      * components to extract from the @p DataPostprocessor
+                                      * return vector.
+                                      * This method takes a vector of field names to
+                                      * process and is preferred if many fields use the
+                                      * same @p DataPostprocessor object as each cell
+                                      * is only located once.
+                                      * The quadrature object supplied is used for all
+                                      * components of a vector field.
+                                      * Although this method will not throw an exception
+                                      * if the mesh has changed. (No internal data structures
+                                      * are invalidated as the quadrature points are repicked
+                                      * each time the function is called.) Nevertheless
+                                      * the user must be aware that if the mesh changes the
+                                      * point selected will also vary slightly, making 
+                                      * interpretation of the data more difficult. 
+                                      * If a @p DoFHandler is used, one (and only
+                                      * one) evaluate_field method
+                                      * must be called for each dataset (time
+                                      * step, iteration, etc) for each
+                                      * vector_name, otherwise a @p
+                                      * ExcDataLostSync error can occur.
+                                      */
+    template <class VECTOR>
+    void evaluate_field(const std::vector <std::string> &vector_names, const VECTOR & solution, const DataPostprocessor<dim> & data_postprocessor, const Quadrature<dim> & quadrature);
+
+                                     /** 
+                                      * Construct a std::vector <std::string> 
+                                      * containing only vector_name and
+                                      * call the above function. The above function
+                                      * is more efficient if multiple fields
+                                      * use the same @p DataPostprocessor object.
+                                      */
+    template <class VECTOR>
+    void evaluate_field(const std::string &vector_name, const VECTOR & solution, const DataPostprocessor<dim> & data_postprocessor, const Quadrature<dim> & quadrature);
 
 
                                      /**
@@ -365,15 +398,11 @@ class PointValueHistory
                                       * has been modified because it uses calls to
                                       * @p VectorTools::point_value to extract there
                                       * data. Therefore, if only this method is used,
-                                      * the class can be used with adaptive refinement.
-                                      * Specifically, the vector form of
-                                      * @p VectorTools::point_value that assumes a
-                                      * Q1 mapping is used.
-                                      * The scalar_component input is only
-                                      * used if the FE has multiple components
-                                      * and the field to be evaluated is scalar.
-                                      * In this case, the scalar_component input
-                                      * is used to select the component used. If
+                                      * the class is fully compatible with 
+                                      * adaptive refinement.
+                                      * The list of components supplied when the
+                                      * field was added is used to select
+                                      * components to extract. If
                                       * a @p DoFHandler is used, one (and only
                                       * one) evaluate_field method
                                       * must be called for each dataset (time
@@ -382,7 +411,8 @@ class PointValueHistory
                                       * ExcDataLostSync error can occur.
                                       */
     template <class VECTOR>
-    void evaluate_field_at_requested_location(const std::string &vector_name, const VECTOR & solution, const unsigned int scalar_component = 0);
+    void evaluate_field_at_requested_location(const std::string &vector_name, const VECTOR & solution); // changed
+
 
                                      /**
                                       * Add the key for the current dataset to
@@ -423,6 +453,10 @@ class PointValueHistory
                                       * key and independent data. The file
                                       * name agrees with the order the points
                                       * were added to the class.
+                                      * The names of the data columns can
+                                      * be supplied using the functions
+                                      * @p add_component_names and 
+                                      * @p add_independent_names.
                                       * The support point information is only
                                       * meaningful if the dof_handler has not
                                       * been changed. Therefore, if adaptive
@@ -527,7 +561,7 @@ class PointValueHistory
                                       * to the correct number of points by the
                                       * method.
                                       */
-    void get_postprocessor_locations (std::vector<Point <dim> > & locations, const Quadrature<dim> & quadrature);
+    void get_postprocessor_locations (const Quadrature<dim> & quadrature, std::vector<Point <dim> > & locations);
 
                                      /**
                                       * Once datasets have been added to the
@@ -593,6 +627,19 @@ class PointValueHistory
 
     bool deep_check (bool strict);
 
+
+                                       /**
+                                        *  A function that will be triggered
+                                        *  through signals whenever the
+                                        *  triangulation is modified.
+                                        *
+                                        *  It is currently used to check
+                                        *  if the triangulation has changed,
+                                        *  invalidating precomputed values.
+                                        */
+    void tria_change_listener ();
+
+
                                      /**
                                       * A call has been made to @p
                                       * push_back_independent when no
@@ -620,26 +667,21 @@ class PointValueHistory
                                      /**
                                       * A method which requires access to a @p
                                       * DoFHandler to be meaningful has been
-                                      * called when @p n_dofs is reported to
-                                      * be zero (most likely due to default
-                                      * constructor being called).  Only
+                                      * called when @p have_dof_handler is 
+                                      * false (most likely due to default
+                                      * constructor being called). Only
                                       * independent variables may be logged
                                       * with no DoFHandler.
                                       */
     DeclException0(ExcDoFHandlerRequired);
 
                                      /**
-                                      * @p n_dofs for the @p DoFHandler has
-                                      * changed since the constructor was
-                                      * called. Possibly the mesh has been
-                                      * refined in some way. This suggests
+                                      *    The triangulation indicated that mesh 
+                                      * has been refined in some way. This suggests
                                       * that the internal dof indices stored
                                       * are no longer meaningful.
                                       */
-    DeclException2(ExcDoFHandlerChanged,
-                   int,
-                   int,
-                   << "Original n_dofs (" << arg1 << ") != current n_dofs (" << arg2 << ")");
+    DeclException0(ExcDoFHandlerChanged);
 
   private:
                                      /**
@@ -654,6 +696,14 @@ class PointValueHistory
                                       * location.
                                       */
     std::vector <std::vector <double> > independent_values;
+    
+                                     /**
+                                      * Saves a vector listing component
+                                      * names associated with a independent_values.
+                                      * This will be an empty vector
+                                      * if the user does not supplies names.
+                                      */
+    std::vector<std::string> indep_names;
 
                                      /**
                                       * Saves data for each mnemonic entry.
@@ -667,14 +717,22 @@ class PointValueHistory
                                       * FE.n_components () long.
                                       */
     std::map <std::string, std::vector <std::vector <double> > > data_store;
-
+    
+    
                                      /**
-                                      * Saves a boolean representing whether
-                                      * the mnemonic links to a scalar field
-                                      * (true) or not (false).
+                                      * Saves a vector listing components
+                                      * associated with a mnemonic. 
                                       */
-    std::map <std::string, bool> scalar_field;
-
+    std::map <std::string, std::vector<unsigned int> > field_components;
+    
+                                     /**
+                                      * Saves a vector listing component
+                                      * names associated with a mnemonic.
+                                      * This will be an empty vector
+                                      * if the user does not supplies names.
+                                      */
+    std::map <std::string, std::vector<std::string> > component_names_map;
+    
                                      /**
                                       * Saves the location and other mesh info
                                       * about support points.
@@ -682,11 +740,6 @@ class PointValueHistory
     std::vector <internal::PointValueHistory::PointGeometryData <dim> >
     point_geometry_data;
 
-                                     /**
-                                      * A tempory pair used when adding to
-                                      * @p data_store.
-                                      */
-    std::pair<std::string, std::vector <std::vector <double> > > pair_data; // could possibly be removed
 
                                      /**
                                       * Used to enforce @p closed state for some
@@ -708,17 +761,26 @@ class PointValueHistory
                                       */
     SmartPointer<const DoFHandler<dim>,PointValueHistory<dim> > dof_handler;
 
+
                                      /**
-                                      * Variable to check that number of dofs
-                                      * in the dof_handler does not change.
-                                      *
-				      * A cheap way to check that the
-                                      * triangulation has not been refined in
-                                      * anyway since the class was set up.
-                                      * Refinement will invalidate stored dof
-                                      * indices linked to support points.
+                                      * Variable to check if the triangulation
+                                      * has changed. If it has changed, certain
+                                      * data is out of date (especially the
+                                      * PointGeometryData::solution_indices.
                                       */
-    unsigned int n_dofs;
+    bool triangulation_changed;
+
+                                     /**
+                                      * A boolean to record whether the class was
+                                      * initialized with a DoFHandler or not.
+                                      */
+    bool have_dof_handler;
+
+                                     /**
+                                      * Used to detect signals from the Triangulation.
+                                      */
+    boost::signals2::connection tria_listener;
+
                                      /**
                                       * Stores the number of independent
                                       * variables requested.
