@@ -31,7 +31,7 @@ std::vector<std::string> split_string(const std::string &text, const char delim=
   std::stringstream stream(text);
   while( getline(stream, word, delim) )
     result.push_back(word);
-  
+
   return result;
 }
 
@@ -46,7 +46,7 @@ void test_function(const std::string &original_text,
 
   std::vector<std::string> should_be_vec
     = split_string(result);
-  
+
 
   Assert(res_vec.size()==should_be_vec.size(), ExcInternalError());
   for (unsigned int i=0;i<res_vec.size();++i)
@@ -55,9 +55,9 @@ void test_function(const std::string &original_text,
 	std::cout << "'" << res_vec[i] << "!=" << should_be_vec[i] << "'" << std::endl;
       Assert(res_vec[i]==should_be_vec[i], ExcInternalError());
     }
-  
 
-  
+
+
 }
 
 
@@ -74,8 +74,8 @@ void test ()
   test_function("new\n\nline\n", 80, ' ', "new||line|");
   test_function("combining whitespace\nand new line", 10, ' ', "combining|whitespace|and new|line");
 
-  
-  deallog << "OK" << std::endl;  
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -84,8 +84,8 @@ void test ()
 int main()
 {
   std::ofstream logfile("utilities_04/output");
-//deallog.attach(logfile);
-//deallog.depth_console(0);
+  deallog.attach(logfile);
+  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   test ();
