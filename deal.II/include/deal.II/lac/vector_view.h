@@ -164,15 +164,6 @@ class VectorView : public Vector<Number>
     ~VectorView();
 
                                      /**
-                                      * Implicit cast to const
-                                      * Vector<Number>. This cast
-                                      * allows the use of this object
-                                      * everywhere a const
-                                      * Vector<double> is required.
-                                      */
-    operator const Vector<Number> &() const;
-
-                                     /**
                                       * The reinit function of this object has
                                       * a behavior which is different from the
                                       * one of the base class. VectorView does
@@ -295,14 +286,6 @@ VectorView<Number>::~VectorView()
     this->vec_size = 0;
     this->max_vec_size = 0;
     this->val = 0;
-}
-
-
-template<typename Number>
-inline
-VectorView<Number>::operator const Vector<Number> &() const
-{
-  return static_cast<const Vector<Number> &> (*this);
 }
 
 
