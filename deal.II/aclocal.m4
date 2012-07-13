@@ -759,7 +759,10 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl       (valid, but annoying and sometimes hard to work around)
           dnl #858: `type qualifier on return type is meaningless'
           dnl       (on conversion operators to types that are already const)
-          CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858"
+          dnl #1565: attributes are ignored on a class declaration that is not 
+	  dnl        also a definition (this happens in BOOST in a number of
+	  dnl        places)
+          CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858 -wd1565"
           CXXFLAGSO="$CXXFLAGSO -w0 -wd424 -wd11"
 
           dnl To reduce output, use -opt_report_levelmin where possible,
