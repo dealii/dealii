@@ -42,7 +42,9 @@ namespace Utilities
     my_pid (0),
     n_procs (1),
     communicator (MPI_COMM_SELF)
-  {}
+  {
+    ghost_indices_data.set_size (size);
+  }
 
 
 
