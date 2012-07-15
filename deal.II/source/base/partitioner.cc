@@ -33,9 +33,11 @@ namespace Utilities
 
 
 
+
   Partitioner::Partitioner (const unsigned int size)
     :
     global_size (size),
+    locally_owned_range_data (size),
     local_range_data (std::pair<types::global_dof_index, types::global_dof_index> (0, size)),
     n_ghost_indices_data (0),
     n_import_indices_data (0),
@@ -43,6 +45,8 @@ namespace Utilities
     n_procs (1),
     communicator (MPI_COMM_SELF)
   {
+    locally_owned_range_data.add_range (0, size);
+    locally_owned_range_data.compress ();
     ghost_indices_data.set_size (size);
   }
 
@@ -95,17 +99,17 @@ namespace Utilities
       }
 
                                 // set the local range
-    Assert (locally_owned_indices.is_contiguous() == 1,
+    Assert (locally_owned_indices.is_contiguous() == true,
             ExcMessage ("The index set specified in locally_owned_indices "
                         "is not contiguous."));
     locally_owned_indices.compress();
     if (locally_owned_indices.n_elements()>0)
       local_range_data = std::pair<types::global_dof_index, types::global_dof_index>
         (locally_owned_indices.nth_index_in_set(0),
-         locally_owned_indices.nth_index_in_set(0)+
+         locally_owned_indices.nth_index_in_set(0) +
          locally_owned_indices.n_elements());
     locally_owned_range_data.set_size (locally_owned_indices.size());
-    locally_owned_range_data.add_range (local_range_data.first,local_range_data.second);
+    locally_owned_range_data.add_range (local_range_data.first, local_range_data.second);
     locally_owned_range_data.compress();
 
     ghost_indices_data.set_size (locally_owned_indices.size());
@@ -125,6 +129,8 @@ namespace Utilities
             ExcDimensionMismatch (ghost_indices_in.size(),
                                   locally_owned_range_data.size()));
     ghost_indices_data = ghost_indices_in;
+    if (ghost_indices_data.size() != locally_owned_range_data.size())
+      ghost_indices_data.set_size(locally_owned_range_data.size());
     ghost_indices_data.subtract_set (locally_owned_range_data);
     ghost_indices_data.compress();
     n_ghost_indices_data = ghost_indices_data.n_elements();
@@ -328,6 +334,7 @@ namespace Utilities
   {
     std::size_t memory = (3*sizeof(types::global_dof_index)+4*sizeof(unsigned int)+
                           sizeof(MPI_Comm));
+    memory += MemoryConsumption::memory_consumption(locally_owned_range_data);
     memory += MemoryConsumption::memory_consumption(ghost_targets_data);
     memory += MemoryConsumption::memory_consumption(import_targets_data);
     memory += MemoryConsumption::memory_consumption(import_indices_data);
