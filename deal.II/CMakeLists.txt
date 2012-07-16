@@ -15,6 +15,7 @@
 #                Configuration of deal.II                   #
 # ###########################################################
 
+
 message ("")
 message ("=========================================")
 message ("==         Configuring deal.II         ==")
