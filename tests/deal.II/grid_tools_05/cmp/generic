@@ -1,0 +1,42 @@
+
+DEAL::
+DEAL::
+DEAL::Hyper cube, dimension 3:
+DEAL::Matching:
+DEAL::2.0  -  2.18
+DEAL::2.1  -  2.19
+DEAL::2.4  -  2.22
+DEAL::2.5  -  2.23
+DEAL::2.8  -  2.26
+DEAL::2.9  -  2.27
+DEAL::2.12  -  2.30
+DEAL::2.13  -  2.31
+DEAL::2.32  -  2.50
+DEAL::2.33  -  2.51
+DEAL::2.36  -  2.54
+DEAL::2.37  -  2.55
+DEAL::2.40  -  2.58
+DEAL::2.41  -  2.59
+DEAL::2.44  -  2.62
+DEAL::2.45  -  2.63
+DEAL::
+DEAL::
+DEAL::Parallelogram, dimension 2:
+DEAL::Matching, direction 0:
+DEAL::3.0  -  3.21
+DEAL::3.2  -  3.23
+DEAL::3.8  -  3.29
+DEAL::3.10  -  3.31
+DEAL::3.32  -  3.53
+DEAL::3.34  -  3.55
+DEAL::3.40  -  3.61
+DEAL::3.42  -  3.63
+DEAL::Matching, direction 1:
+DEAL::3.0  -  3.42
+DEAL::3.1  -  3.43
+DEAL::3.4  -  3.46
+DEAL::3.5  -  3.47
+DEAL::3.16  -  3.58
+DEAL::3.17  -  3.59
+DEAL::3.20  -  3.62
+DEAL::3.21  -  3.63

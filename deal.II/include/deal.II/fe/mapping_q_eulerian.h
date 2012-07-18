@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -124,39 +124,39 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
     virtual
     Mapping<dim,spacedim> * clone () const;
 
-				     /**
-				      * Always returns @p false because
-				      * MappingQ1Eulerian does not in general
-				      * preserve vertex locations (unless the
-				      * translation vector happens to provide
-				      * for zero displacements at vertex
-				      * locations).
-				      */
+                                     /**
+                                      * Always returns @p false because
+                                      * MappingQ1Eulerian does not in general
+                                      * preserve vertex locations (unless the
+                                      * translation vector happens to provide
+                                      * for zero displacements at vertex
+                                      * locations).
+                                      */
     bool preserves_vertex_locations () const;
-    
-				     /**
+
+                                     /**
                                       * Exception
                                       */
     DeclException0 (ExcInactiveCell);
-    
+
   protected:
-				     /**
-				      * Implementation of the interface in
-				      * MappingQ. Overrides the function in
-				      * the base class, since we cannot use
-				      * any cell similarity for this class.
-				      */
+                                     /**
+                                      * Implementation of the interface in
+                                      * MappingQ. Overrides the function in
+                                      * the base class, since we cannot use
+                                      * any cell similarity for this class.
+                                      */
     virtual void
     fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-		    const Quadrature<dim>                                     &quadrature,
-		    typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-		    typename std::vector<Point<spacedim> >                    &quadrature_points,
-		    std::vector<double>                                       &JxW_values,
-		    std::vector<Tensor<2,spacedim> >                          &jacobians,
-		    std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
-		    std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
-		    std::vector<Point<spacedim> >                             &cell_normal_vectors,
-		    CellSimilarity::Similarity                           &cell_similarity) const;
+                    const Quadrature<dim>                                     &quadrature,
+                    typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+                    typename std::vector<Point<spacedim> >                    &quadrature_points,
+                    std::vector<double>                                       &JxW_values,
+                    std::vector<DerivativeForm<1,dim,spacedim> >      &jacobians,
+                    std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
+                    std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
+                    std::vector<Point<spacedim> >                             &cell_normal_vectors,
+                    CellSimilarity::Similarity                           &cell_similarity) const;
 
                                      /**
                                       * Reference to the vector of
@@ -185,41 +185,41 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
     class SupportQuadrature : public Quadrature<dim>
     {
       public:
-					 /**
-					  * Constructor, with an argument
-					  * defining the desired polynomial
-					  * degree.
-					  */
+                                         /**
+                                          * Constructor, with an argument
+                                          * defining the desired polynomial
+                                          * degree.
+                                          */
 
         SupportQuadrature (const unsigned int map_degree);
 
     };
 
-				     /**
-				      * A member variable holding the
-				      * quadrature points in the right
-				      * order.
-				      */
+                                     /**
+                                      * A member variable holding the
+                                      * quadrature points in the right
+                                      * order.
+                                      */
     const SupportQuadrature support_quadrature;
 
-				     /**
+                                     /**
                                       * FEValues object used to query the
                                       * the given finite element field
                                       * at the support points in the
                                       * reference configuration.
-				      *
-				      * The variable is marked as
-				      * mutable since we have to call
-				      * FEValues::reinit from
-				      * compute_mapping_support_points,
-				      * a function that is 'const'.
+                                      *
+                                      * The variable is marked as
+                                      * mutable since we have to call
+                                      * FEValues::reinit from
+                                      * compute_mapping_support_points,
+                                      * a function that is 'const'.
                                       */
     mutable FEValues<dim,spacedim> fe_values;
 
-				     /**
-				      * A variable to guard access to
-				      * the fe_values variable.
-				      */
+                                     /**
+                                      * A variable to guard access to
+                                      * the fe_values variable.
+                                      */
     mutable Threads::ThreadMutex fe_values_mutex;
 
                                      /**

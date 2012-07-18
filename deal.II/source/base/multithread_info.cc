@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,26 +50,26 @@ DEAL_II_NAMESPACE_OPEN
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
-				   // on linux, we simply count the
-				   // number of lines listing
-				   // individual processors when
-				   // reading from /proc/cpuinfo
+                                   // on linux, we simply count the
+                                   // number of lines listing
+                                   // individual processors when
+                                   // reading from /proc/cpuinfo
   std::ifstream cpuinfo;
   std::string search;
   unsigned int nCPU = 0;
-  
+
   cpuinfo.open("/proc/cpuinfo");
 
   AssertThrow(cpuinfo,ExcProcNotPresent());
-  
+
   while(cpuinfo)
     {
       cpuinfo >> search;
       if (search.find("processor") != std::string::npos)
-	nCPU++;	  
+        nCPU++;
     }
   cpuinfo.close();
-  
+
   return nCPU;
 }
 
@@ -89,21 +89,21 @@ unsigned int MultithreadInfo::get_n_cpus()
 }
 
 #  elif defined(__MACH__) && defined(__APPLE__)
-// This is only tested on a dual G5 2.5GHz running MacOSX 10.3.6 
+// This is only tested on a dual G5 2.5GHz running MacOSX 10.3.6
 // and on an Intel Mac Book Pro.
-// If it doesnt work please contact the mailinglist.
+// If it doesn't work please contact the mailinglist.
 unsigned int MultithreadInfo::get_n_cpus()
 {
-	int mib[2];
-	int n_cpus;
-	size_t len;
-	
-	mib[0] = CTL_HW;
-	mib[1] = HW_NCPU;
-	len = sizeof(n_cpus);
-	sysctl(mib, 2, &n_cpus, &len, NULL, 0);
-	
-	return n_cpus;
+        int mib[2];
+        int n_cpus;
+        size_t len;
+
+        mib[0] = CTL_HW;
+        mib[1] = HW_NCPU;
+        len = sizeof(n_cpus);
+        sysctl(mib, 2, &n_cpus, &len, NULL, 0);
+
+        return n_cpus;
 }
 
 
@@ -138,7 +138,7 @@ unsigned int MultithreadInfo::get_n_cpus()
 #  endif
 
 
-#else				 // not in MT mode
+#else                            // not in MT mode
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
@@ -159,8 +159,8 @@ MultithreadInfo::MultithreadInfo ()
 std::size_t
 MultithreadInfo::memory_consumption ()
 {
-				   // only simple data elements, so
-				   // use sizeof operator
+                                   // only simple data elements, so
+                                   // use sizeof operator
   return sizeof (MultithreadInfo);
 }
 

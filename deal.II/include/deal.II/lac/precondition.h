@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,7 +41,7 @@ template <typename number> class SparseMatrix;
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
   cg.solve (system_matrix, solution, system_rhs,
-	    PreconditionIdentity());
+            PreconditionIdentity());
  @endverbatim
  *
  * See the step-3 tutorial program for an example and
@@ -56,72 +56,72 @@ class PreconditionIdentity : public Subscriptor
 {
   public:
 
-				     /**
-				      * This function is only
+                                     /**
+                                      * This function is only
                                       * present to
                                       * provide the interface of
                                       * a preconditioner to be
                                       * handed to a smoother.
                                       * This does nothing.
-				      */
+                                      */
   struct AdditionalData
   {
                                        /**
-					* Constructor.
-					*/
+                                        * Constructor.
+                                        */
     AdditionalData (){}
   };
 
-				     /**
-				      * The matrix
-				      * argument is ignored and here
-				      * just for compatibility with
-				      * more complex preconditioners.
-				      */
+                                     /**
+                                      * The matrix
+                                      * argument is ignored and here
+                                      * just for compatibility with
+                                      * more complex preconditioners.
+                                      */
   template <class MATRIX>
   void initialize (const MATRIX         &matrix,
-		   const AdditionalData &additional_data = AdditionalData());
+                   const AdditionalData &additional_data = AdditionalData());
 
-				     /**
-				      * Apply preconditioner.
-				      */
+                                     /**
+                                      * Apply preconditioner.
+                                      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Apply transpose
-				      * preconditioner. Since this is
-				      * the identity, this function is
-				      * the same as
-				      * vmult().
-				      */
+                                     /**
+                                      * Apply transpose
+                                      * preconditioner. Since this is
+                                      * the identity, this function is
+                                      * the same as
+                                      * vmult().
+                                      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Apply preconditioner, adding to the previous value.
-				      */
+                                     /**
+                                      * Apply preconditioner, adding to the previous value.
+                                      */
     template<class VECTOR>
     void vmult_add (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Apply transpose
-				      * preconditioner, adding. Since this is
-				      * the identity, this function is
-				      * the same as
-				      * vmult_add().
-				      */
+                                     /**
+                                      * Apply transpose
+                                      * preconditioner, adding. Since this is
+                                      * the identity, this function is
+                                      * the same as
+                                      * vmult_add().
+                                      */
     template<class VECTOR>
     void Tvmult_add (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * This function is only
+                                     /**
+                                      * This function is only
                                       * present to
                                       * provide the interface of
                                       * a preconditioner to be
                                       * handed to a smoother.
                                       * This does nothing.
-				      */
+                                      */
     void clear (){}
 };
 
@@ -142,97 +142,97 @@ class PreconditionIdentity : public Subscriptor
 class PreconditionRichardson : public Subscriptor
 {
   public:
-				     /**
-				      * Parameters for Richardson
-				      * preconditioner.
-				      */
+                                     /**
+                                      * Parameters for Richardson
+                                      * preconditioner.
+                                      */
     class AdditionalData
     {
       public:
-					 /**
-					  * Constructor. Block size
-					  * must be given since there
-					  * is no reasonable default
-					  * parameter.
-					  */
-	AdditionalData (const double relaxation = 1.);
+                                         /**
+                                          * Constructor. Block size
+                                          * must be given since there
+                                          * is no reasonable default
+                                          * parameter.
+                                          */
+        AdditionalData (const double relaxation = 1.);
 
-					 /**
-					  * Relaxation parameter.
-					  */
-	double relaxation;
+                                         /**
+                                          * Relaxation parameter.
+                                          */
+        double relaxation;
     };
 
-				     /**
-				      * Constructor, sets the
-				      * relaxation parameter to its
-				      * default.
-				      */
+                                     /**
+                                      * Constructor, sets the
+                                      * relaxation parameter to its
+                                      * default.
+                                      */
     PreconditionRichardson();
 
-				     /**
-				      * Change the relaxaton parameter.
-				      */
+                                     /**
+                                      * Change the relaxaton parameter.
+                                      */
     void initialize (const AdditionalData &parameters);
 
-				     /**
-				      * Change the relaxaton parameter
-				      * in a way consistent with other
-				      * preconditioners. The matrix
-				      * argument is ignored and here
-				      * just for compatibility with
-				      * more complex preconditioners.
-				      */
+                                     /**
+                                      * Change the relaxaton parameter
+                                      * in a way consistent with other
+                                      * preconditioners. The matrix
+                                      * argument is ignored and here
+                                      * just for compatibility with
+                                      * more complex preconditioners.
+                                      */
     template <class MATRIX>
     void initialize (const MATRIX&,
-		     const AdditionalData &parameters);
+                     const AdditionalData &parameters);
 
-				     /**
-				      * Apply preconditioner.
-				      */
+                                     /**
+                                      * Apply preconditioner.
+                                      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Apply transpose
-				      * preconditioner. Since this is
-				      * the identity, this function is
-				      * the same as
-				      * vmult().
-				      */
+                                     /**
+                                      * Apply transpose
+                                      * preconditioner. Since this is
+                                      * the identity, this function is
+                                      * the same as
+                                      * vmult().
+                                      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
-				     /**
-				      * Apply preconditioner, adding to the previous value.
-				      */
+                                     /**
+                                      * Apply preconditioner, adding to the previous value.
+                                      */
     template<class VECTOR>
     void vmult_add (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Apply transpose
-				      * preconditioner, adding. Since this is
-				      * the identity, this function is
-				      * the same as
-				      * vmult_add().
-				      */
+                                     /**
+                                      * Apply transpose
+                                      * preconditioner, adding. Since this is
+                                      * the identity, this function is
+                                      * the same as
+                                      * vmult_add().
+                                      */
     template<class VECTOR>
     void Tvmult_add (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * This function is only
-				      * present to
-				      * provide the interface of
-				      * a preconditioner to be
-				      * handed to a smoother.
-				      * This does nothing.
-				      */
+                                     /**
+                                      * This function is only
+                                      * present to
+                                      * provide the interface of
+                                      * a preconditioner to be
+                                      * handed to a smoother.
+                                      * This does nothing.
+                                      */
     void clear (){}
 
   private:
-				     /**
-				      * The relaxation parameter
-				      * multiplied with the vectors.
-				      */
+                                     /**
+                                      * The relaxation parameter
+                                      * multiplied with the vectors.
+                                      */
     double relaxation;
 };
 
@@ -257,8 +257,8 @@ class PreconditionRichardson : public Subscriptor
  *                Vector<double> >      gmres(control,memory,500);
  *
  *    gmres.solve (matrix, solution, right_hand_side,
- *		   PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >
- *		   (matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
+ *                 PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >
+ *                 (matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
  * This creates an unnamed object to be passed as the fourth parameter to
  * the solver function of the SolverGMRES class. It assumes that the
@@ -273,8 +273,8 @@ class PreconditionRichardson : public Subscriptor
  * @code
  *    ...
  *    gmres.solve (matrix, solution, right_hand_side,
- *		   PreconditionUseMatrix<>
- *		     (matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
+ *                 PreconditionUseMatrix<>
+ *                   (matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
@@ -283,43 +283,43 @@ template<class MATRIX = SparseMatrix<double>, class VECTOR = Vector<double> >
 class PreconditionUseMatrix : public Subscriptor
 {
   public:
-				     /**
-				      * Type of the preconditioning
-				      * function of the matrix.
-				      */
+                                     /**
+                                      * Type of the preconditioning
+                                      * function of the matrix.
+                                      */
     typedef void ( MATRIX::* function_ptr)(VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Constructor.
-				      * This constructor stores a
-				      * reference to the matrix object
-				      * for later use and selects a
-				      * preconditioning method, which
-				      * must be a member function of
-				      * that matrix.
-				      */
+                                     /**
+                                      * Constructor.
+                                      * This constructor stores a
+                                      * reference to the matrix object
+                                      * for later use and selects a
+                                      * preconditioning method, which
+                                      * must be a member function of
+                                      * that matrix.
+                                      */
     PreconditionUseMatrix(const MATRIX      &M,
-			  const function_ptr method);
+                          const function_ptr method);
 
-				     /**
-				      * Execute preconditioning. Calls the
-				      * function passed to the constructor
-				      * of this object with the two
-				      * arguments given here.
-				      */
+                                     /**
+                                      * Execute preconditioning. Calls the
+                                      * function passed to the constructor
+                                      * of this object with the two
+                                      * arguments given here.
+                                      */
     void vmult (VECTOR       &dst,
-		const VECTOR &src) const;
+                const VECTOR &src) const;
 
   private:
-				     /**
-				      * Pointer to the matrix in use.
-				      */
+                                     /**
+                                      * Pointer to the matrix in use.
+                                      */
     const MATRIX &matrix;
 
-				     /**
-				      * Pointer to the preconditioning
-				      * function.
-				      */
+                                     /**
+                                      * Pointer to the preconditioning
+                                      * function.
+                                      */
     const function_ptr precondition;
 };
 
@@ -336,51 +336,51 @@ template<class MATRIX = SparseMatrix<double> >
 class PreconditionRelaxation : public Subscriptor
 {
   public:
-				     /**
-				      * Class for parameters.
-				      */
+                                     /**
+                                      * Class for parameters.
+                                      */
     class AdditionalData
     {
       public:
-					 /**
-					  * Constructor.
-					  */
-	AdditionalData (const double relaxation = 1.);
+                                         /**
+                                          * Constructor.
+                                          */
+        AdditionalData (const double relaxation = 1.);
 
-					 /**
-					  * Relaxation parameter.
-					  */
-	double relaxation;
+                                         /**
+                                          * Relaxation parameter.
+                                          */
+        double relaxation;
     };
 
-				     /**
-				      * Initialize matrix and
-				      * relaxation parameter. The
-				      * matrix is just stored in the
-				      * preconditioner object. The
-				      * relaxation parameter should be
-				      * larger than zero and smaller
-				      * than 2 for numerical
-				      * reasons. It defaults to 1.
-				      */
+                                     /**
+                                      * Initialize matrix and
+                                      * relaxation parameter. The
+                                      * matrix is just stored in the
+                                      * preconditioner object. The
+                                      * relaxation parameter should be
+                                      * larger than zero and smaller
+                                      * than 2 for numerical
+                                      * reasons. It defaults to 1.
+                                      */
     void initialize (const MATRIX &A,
-		     const AdditionalData & parameters = AdditionalData());
+                     const AdditionalData & parameters = AdditionalData());
 
-				     /**
-				      * Release the matrix and reset
-				      * its pointer.
-				      */
+                                     /**
+                                      * Release the matrix and reset
+                                      * its pointer.
+                                      */
     void clear();
 
   protected:
-				     /**
-				      * Pointer to the matrix object.
-				      */
+                                     /**
+                                      * Pointer to the matrix object.
+                                      */
     SmartPointer<const MATRIX, PreconditionRelaxation<MATRIX> > A;
 
-				     /**
-				      * Relaxation parameter.
-				      */
+                                     /**
+                                      * Relaxation parameter.
+                                      */
     double relaxation;
 };
 
@@ -415,35 +415,35 @@ template <class MATRIX = SparseMatrix<double> >
 class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
 {
   public:
-				     /**
-				      * Apply preconditioner.
-				      */
+                                     /**
+                                      * Apply preconditioner.
+                                      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
 
-    				     /**
-				      * Apply transpose
-				      * preconditioner. Since this is
-				      * a symmetric preconditioner,
-				      * this function is the same as
-				      * vmult().
-				      */
+                                     /**
+                                      * Apply transpose
+                                      * preconditioner. Since this is
+                                      * a symmetric preconditioner,
+                                      * this function is the same as
+                                      * vmult().
+                                      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Perform one step of the
-				      * preconditioned Richardson
-				      * iteration.
-				      */
+                                     /**
+                                      * Perform one step of the
+                                      * preconditioned Richardson
+                                      * iteration.
+                                      */
     template<class VECTOR>
     void step (VECTOR& x, const VECTOR& rhs) const;
 
-				     /**
-				      * Perform one transposed step of
-				      * the preconditioned Richardson
-				      * iteration.
-				      */
+                                     /**
+                                      * Perform one transposed step of
+                                      * the preconditioned Richardson
+                                      * iteration.
+                                      */
     template<class VECTOR>
     void Tstep (VECTOR& x, const VECTOR& rhs) const;
 };
@@ -499,32 +499,32 @@ template <class MATRIX = SparseMatrix<double> >
 class PreconditionSOR : public PreconditionRelaxation<MATRIX>
 {
   public:
-				     /**
-				      * Apply preconditioner.
-				      */
+                                     /**
+                                      * Apply preconditioner.
+                                      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Apply transpose
-				      * preconditioner.
-				      */
+                                     /**
+                                      * Apply transpose
+                                      * preconditioner.
+                                      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Perform one step of the
-				      * preconditioned Richardson
-				      * iteration.
-				      */
+                                     /**
+                                      * Perform one step of the
+                                      * preconditioned Richardson
+                                      * iteration.
+                                      */
     template<class VECTOR>
     void step (VECTOR& x, const VECTOR& rhs) const;
 
-				     /**
-				      * Perform one transposed step of
-				      * the preconditioned Richardson
-				      * iteration.
-				      */
+                                     /**
+                                      * Perform one transposed step of
+                                      * the preconditioned Richardson
+                                      * iteration.
+                                      */
     template<class VECTOR>
     void Tstep (VECTOR& x, const VECTOR& rhs) const;
 };
@@ -561,64 +561,64 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 {
   public:
 
-				     /**
-				      * A typedef to the base class.
-				      */
+                                     /**
+                                      * A typedef to the base class.
+                                      */
     typedef PreconditionRelaxation<MATRIX> BaseClass;
 
 
-				     /**
-				      * Initialize matrix and
-				      * relaxation parameter. The
-				      * matrix is just stored in the
-				      * preconditioner object. The
-				      * relaxation parameter should be
-				      * larger than zero and smaller
-				      * than 2 for numerical
-				      * reasons. It defaults to 1.
-				      */
+                                     /**
+                                      * Initialize matrix and
+                                      * relaxation parameter. The
+                                      * matrix is just stored in the
+                                      * preconditioner object. The
+                                      * relaxation parameter should be
+                                      * larger than zero and smaller
+                                      * than 2 for numerical
+                                      * reasons. It defaults to 1.
+                                      */
     void initialize (const MATRIX &A,
-		     const typename BaseClass::AdditionalData &parameters = typename BaseClass::AdditionalData());
+                     const typename BaseClass::AdditionalData &parameters = typename BaseClass::AdditionalData());
 
-				     /**
-				      * Apply preconditioner.
-				      */
+                                     /**
+                                      * Apply preconditioner.
+                                      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Apply transpose
-				      * preconditioner. Since this is
-				      * a symmetric preconditioner,
-				      * this function is the same as
-				      * vmult().
-				      */
+                                     /**
+                                      * Apply transpose
+                                      * preconditioner. Since this is
+                                      * a symmetric preconditioner,
+                                      * this function is the same as
+                                      * vmult().
+                                      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
 
 
-				     /**
-				      * Perform one step of the
-				      * preconditioned Richardson
-				      * iteration
-				      */
+                                     /**
+                                      * Perform one step of the
+                                      * preconditioned Richardson
+                                      * iteration
+                                      */
     template<class VECTOR>
     void step (VECTOR& x, const VECTOR& rhs) const;
 
-				     /**
-				      * Perform one transposed step of
-				      * the preconditioned Richardson
-				      * iteration.
-				      */
+                                     /**
+                                      * Perform one transposed step of
+                                      * the preconditioned Richardson
+                                      * iteration.
+                                      */
     template<class VECTOR>
     void Tstep (VECTOR& x, const VECTOR& rhs) const;
 
   private:
-				     /**
-				      * An array that stores for each matrix
-				      * row where the first position after
-				      * the diagonal is located.
-				      */
+                                     /**
+                                      * An array that stores for each matrix
+                                      * row where the first position after
+                                      * the diagonal is located.
+                                      */
     std::vector<unsigned int> pos_right_of_diagonal;
 };
 
@@ -658,52 +658,52 @@ template <class MATRIX = SparseMatrix<double> >
 class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
 {
   public:
-				     /**
-				      * Initialize matrix and
-				      * relaxation parameter. The
-				      * matrix is just stored in the
-				      * preconditioner object.
-				      *
-				      * The permutation vector is
-				      * stored as a
-				      * pointer. Therefore, it has to
-				      * be assured that the lifetime
-				      * of the vector exceeds the
-				      * lifetime of the
-				      * preconditioner.
-				      *
-				      * The relaxation parameter
-				      * should be larger than zero and
-				      * smaller than 2 for numerical
-				      * reasons. It defaults to 1.
-				      */
+                                     /**
+                                      * Initialize matrix and
+                                      * relaxation parameter. The
+                                      * matrix is just stored in the
+                                      * preconditioner object.
+                                      *
+                                      * The permutation vector is
+                                      * stored as a
+                                      * pointer. Therefore, it has to
+                                      * be assured that the lifetime
+                                      * of the vector exceeds the
+                                      * lifetime of the
+                                      * preconditioner.
+                                      *
+                                      * The relaxation parameter
+                                      * should be larger than zero and
+                                      * smaller than 2 for numerical
+                                      * reasons. It defaults to 1.
+                                      */
     void initialize (const MATRIX &A,
-		     const std::vector<unsigned int> &permutation,
-		     const std::vector<unsigned int> &inverse_permutation,
-		     const typename PreconditionRelaxation<MATRIX>::AdditionalData &
-		     parameters = typename PreconditionRelaxation<MATRIX>::AdditionalData());
+                     const std::vector<unsigned int> &permutation,
+                     const std::vector<unsigned int> &inverse_permutation,
+                     const typename PreconditionRelaxation<MATRIX>::AdditionalData &
+                     parameters = typename PreconditionRelaxation<MATRIX>::AdditionalData());
 
-				     /**
-				      * Apply preconditioner.
-				      */
+                                     /**
+                                      * Apply preconditioner.
+                                      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Apply transpose
-				      * preconditioner.
-				      */
+                                     /**
+                                      * Apply transpose
+                                      * preconditioner.
+                                      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
   private:
-				     /**
-				      * Storage for the permutation vector.
-				      */
+                                     /**
+                                      * Storage for the permutation vector.
+                                      */
     const std::vector<unsigned int>* permutation;
-				     /**
-				      * Storage for the inverse
-				      * permutation vector.
-				      */
+                                     /**
+                                      * Storage for the inverse
+                                      * permutation vector.
+                                      */
     const std::vector<unsigned int>* inverse_permutation;
 };
 
@@ -764,42 +764,42 @@ template<class SOLVER, class MATRIX = SparseMatrix<double>, class PRECONDITION =
 class PreconditionLACSolver : public Subscriptor
 {
   public:
-				     /**
-				      * Constructor. All work is done
-				      * in initialize.
-				      */
+                                     /**
+                                      * Constructor. All work is done
+                                      * in initialize.
+                                      */
     PreconditionLACSolver ();
 
-				     /**
-				      * Initialization
-				      * function. Provide a solver
-				      * object, a matrix, and another
-				      * preconditioner for this.
-				      */
+                                     /**
+                                      * Initialization
+                                      * function. Provide a solver
+                                      * object, a matrix, and another
+                                      * preconditioner for this.
+                                      */
     void initialize (SOLVER&,
-		     const MATRIX&,
-		     const PRECONDITION&);
+                     const MATRIX&,
+                     const PRECONDITION&);
 
-				     /**
-				      * Execute preconditioning.
-				      */
+                                     /**
+                                      * Execute preconditioning.
+                                      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
 
   private:
-				     /**
-				      * The solver object to use.
-				      */
+                                     /**
+                                      * The solver object to use.
+                                      */
     SmartPointer<SOLVER,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > solver;
 
-				     /**
-				      * The matrix in use.
-				      */
+                                     /**
+                                      * The matrix in use.
+                                      */
     SmartPointer<const MATRIX,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > matrix;
 
-				     /**
-				      * The preconditioner to use.
-				      */
+                                     /**
+                                      * The preconditioner to use.
+                                      */
     SmartPointer<const PRECONDITION,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > precondition;
 };
 
@@ -822,45 +822,45 @@ template<class MATRIX, class PRECOND, class VECTOR>
 class PreconditionedMatrix : public Subscriptor
 {
   public:
-				     /**
-				      * Constructor. Provide matrix,
-				      * preconditioner and a memory
-				      * pool to obtain the auxiliary
-				      * vector.
-				      */
+                                     /**
+                                      * Constructor. Provide matrix,
+                                      * preconditioner and a memory
+                                      * pool to obtain the auxiliary
+                                      * vector.
+                                      */
     PreconditionedMatrix (const MATRIX &         A,
-			  const PRECOND &        P,
-			  VectorMemory<VECTOR> & mem);
+                          const PRECOND &        P,
+                          VectorMemory<VECTOR> & mem);
 
-				     /**
-				      * Preconditioned
-				      * matrix-vector-product.
-				      */
+                                     /**
+                                      * Preconditioned
+                                      * matrix-vector-product.
+                                      */
     void vmult (VECTOR &dst, const VECTOR &src) const;
 
-				     /**
-				      * Transposed preconditioned
-				      * matrix-vector-product.
-				      */
+                                     /**
+                                      * Transposed preconditioned
+                                      * matrix-vector-product.
+                                      */
     void Tvmult (VECTOR &dst, const VECTOR &src) const;
 
-				     /**
-				      * Residual $b-PAx$.
-				      */
+                                     /**
+                                      * Residual $b-PAx$.
+                                      */
     double residual (VECTOR &dst, const VECTOR &src, const VECTOR &rhs) const;
 
   private:
-				     /**
-				      * Storage for the matrix.
-				      */
+                                     /**
+                                      * Storage for the matrix.
+                                      */
     const MATRIX &A;
-				     /**
-				      * Storage for preconditioner.
-				      */
+                                     /**
+                                      * Storage for preconditioner.
+                                      */
     const PRECOND &P;
-				     /**
-				      * Memory pool for vectors.
-				      */
+                                     /**
+                                      * Memory pool for vectors.
+                                      */
     VectorMemory<VECTOR> &mem;
 };
 
@@ -884,190 +884,190 @@ template <class MATRIX=SparseMatrix<double>, class VECTOR=Vector<double> >
 class PreconditionChebyshev : public Subscriptor
 {
   public:
-				     /**
-				      * Standardized data struct to
-				      * pipe additional parameters
-				      * to the preconditioner.
-				      */
+                                     /**
+                                      * Standardized data struct to
+                                      * pipe additional parameters
+                                      * to the preconditioner.
+                                      */
     struct AdditionalData
     {
-					 /**
-					  * Constructor.
-					  */
-	AdditionalData (const unsigned int degree              = 0,
-			const double       smoothing_range     = 0.,
-			const bool         nonzero_starting    = false,
-			const unsigned int eig_cg_n_iterations = 8,
-			const double       eig_cg_residual     = 1e-2);
+                                         /**
+                                          * Constructor.
+                                          */
+        AdditionalData (const unsigned int degree              = 0,
+                        const double       smoothing_range     = 0.,
+                        const bool         nonzero_starting    = false,
+                        const unsigned int eig_cg_n_iterations = 8,
+                        const double       eig_cg_residual     = 1e-2);
 
-					 /**
-					  * This determines the degree of the
-					  * Chebyshev polynomial. The degree
-					  * of the polynomial gives the number
-					  * of matrix-vector products to be
-					  * performed for one application of
-					  * the vmult() operation. Degree zero
-					  * corresponds to a damped Jacobi
-					  * method.
-					  */
-	unsigned int degree;
+                                         /**
+                                          * This determines the degree of the
+                                          * Chebyshev polynomial. The degree
+                                          * of the polynomial gives the number
+                                          * of matrix-vector products to be
+                                          * performed for one application of
+                                          * the vmult() operation. Degree zero
+                                          * corresponds to a damped Jacobi
+                                          * method.
+                                          */
+        unsigned int degree;
 
-					 /**
-					  * This sets the range between the
-					  * largest eigenvalue in the matrix
-					  * and the smallest eigenvalue to be
-					  * treated. If the parameter is zero,
-					  * an estimate for the largest and
-					  * for the smallest eigenvalue will
-					  * be calculated
-					  * internally. Otherwise, the
-					  * Chebyshev polynomial will act in
-					  * the interval
-					  * $[\lambda_\mathrm{max}/
-					  * \tt{smoothing\_range},
-					  * \lambda_\mathrm{max}]$, where
-					  * $\lambda_\mathrm{max}$ is an
-					  * estimate of the maximum eigenvalue
-					  * of the matrix. A choice of
-					  * <tt>smoothing_range</tt> between 5
-					  * and 20 is useful in case the
-					  * preconditioner is used as a
-					  * smoother in multigrid.
-					  */
-	double smoothing_range;
+                                         /**
+                                          * This sets the range between the
+                                          * largest eigenvalue in the matrix
+                                          * and the smallest eigenvalue to be
+                                          * treated. If the parameter is zero,
+                                          * an estimate for the largest and
+                                          * for the smallest eigenvalue will
+                                          * be calculated
+                                          * internally. Otherwise, the
+                                          * Chebyshev polynomial will act in
+                                          * the interval
+                                          * $[\lambda_\mathrm{max}/
+                                          * \tt{smoothing\_range},
+                                          * \lambda_\mathrm{max}]$, where
+                                          * $\lambda_\mathrm{max}$ is an
+                                          * estimate of the maximum eigenvalue
+                                          * of the matrix. A choice of
+                                          * <tt>smoothing_range</tt> between 5
+                                          * and 20 is useful in case the
+                                          * preconditioner is used as a
+                                          * smoother in multigrid.
+                                          */
+        double smoothing_range;
 
-					 /**
-					  * When this flag is set to
-					  * <tt>true</tt>, it enables the
-					  * method <tt>vmult(dst, src)</tt> to
-					  * use non-zero data in the vector
-					  * <tt>dst</tt>, appending to it the
-					  * Chebyshev corrections. This can be
-					  * useful in some situations
-					  * (e.g. when used for high-frequency
-					  * error smoothing in a multigrid
-					  * algorithm), but not the way the
-					  * solver classes expect a
-					  * preconditioner to work (where one
-					  * ignores the content in
-					  * <tt>dst</tt> for the
-					  * preconditioner application).
-					  */
-	bool nonzero_starting;
+                                         /**
+                                          * When this flag is set to
+                                          * <tt>true</tt>, it enables the
+                                          * method <tt>vmult(dst, src)</tt> to
+                                          * use non-zero data in the vector
+                                          * <tt>dst</tt>, appending to it the
+                                          * Chebyshev corrections. This can be
+                                          * useful in some situations
+                                          * (e.g. when used for high-frequency
+                                          * error smoothing in a multigrid
+                                          * algorithm), but not the way the
+                                          * solver classes expect a
+                                          * preconditioner to work (where one
+                                          * ignores the content in
+                                          * <tt>dst</tt> for the
+                                          * preconditioner application).
+                                          */
+        bool nonzero_starting;
 
-					 /**
-					  * Maximum number of CG iterations
-					  * performed for finding the maximum
-					  * eigenvalue.
-					  */
-	unsigned int eig_cg_n_iterations;
+                                         /**
+                                          * Maximum number of CG iterations
+                                          * performed for finding the maximum
+                                          * eigenvalue.
+                                          */
+        unsigned int eig_cg_n_iterations;
 
-					 /**
-					  * Tolerance for CG iterations
-					  * performed for finding the maximum
-					  * eigenvalue.
-					  */
-	double eig_cg_residual;
+                                         /**
+                                          * Tolerance for CG iterations
+                                          * performed for finding the maximum
+                                          * eigenvalue.
+                                          */
+        double eig_cg_residual;
 
-					 /**
-					  * Stores the inverse of the diagonal
-					  * of the underlying matrix.
-					  */
-	VECTOR matrix_diagonal_inverse;
+                                         /**
+                                          * Stores the inverse of the diagonal
+                                          * of the underlying matrix.
+                                          */
+        VECTOR matrix_diagonal_inverse;
     };
 
     PreconditionChebyshev ();
 
-				     /**
-				      * Initialize function. Takes the
-				      * matrix which is used to form the
-				      * preconditioner, and additional
-				      * flags if there are any. This
-				      * function works only if the input
-				      * matrix has an operator
-				      * <tt>el(i,i)</tt> for accessing all
-				      * the elements in the
-				      * diagonal. Alternatively, the
-				      * diagonal can be supplied with the
-				      * help of the AdditionalData field.
-				      *
-				      * This function calculates an
-				      * estimate of the eigenvalue range
-				      * of the matrix weighted by its
-				      * diagonal using a modified CG
-				      * iteration.
-				      */
+                                     /**
+                                      * Initialize function. Takes the
+                                      * matrix which is used to form the
+                                      * preconditioner, and additional
+                                      * flags if there are any. This
+                                      * function works only if the input
+                                      * matrix has an operator
+                                      * <tt>el(i,i)</tt> for accessing all
+                                      * the elements in the
+                                      * diagonal. Alternatively, the
+                                      * diagonal can be supplied with the
+                                      * help of the AdditionalData field.
+                                      *
+                                      * This function calculates an
+                                      * estimate of the eigenvalue range
+                                      * of the matrix weighted by its
+                                      * diagonal using a modified CG
+                                      * iteration.
+                                      */
     void initialize (const MATRIX         &matrix,
-		     const AdditionalData &additional_data = AdditionalData());
+                     const AdditionalData &additional_data = AdditionalData());
 
-				     /**
-				      * Computes the action of the
-				      * preconditioner on <tt>src</tt>,
-				      * storing the result in
-				      * <tt>dst</tt>.
-				      */
+                                     /**
+                                      * Computes the action of the
+                                      * preconditioner on <tt>src</tt>,
+                                      * storing the result in
+                                      * <tt>dst</tt>.
+                                      */
     void vmult (VECTOR       &dst,
-		const VECTOR &src) const;
+                const VECTOR &src) const;
 
-				     /**
-				      * Computes the action of the
-				      * transposed preconditioner on
-				      * <tt>src</tt>, storing the result
-				      * in <tt>dst</tt>.
-				      */
+                                     /**
+                                      * Computes the action of the
+                                      * transposed preconditioner on
+                                      * <tt>src</tt>, storing the result
+                                      * in <tt>dst</tt>.
+                                      */
     void Tvmult (VECTOR       &dst,
-		 const VECTOR &src) const;
+                 const VECTOR &src) const;
 
-				     /**
-				      * Resets the preconditioner.
-				      */
+                                     /**
+                                      * Resets the preconditioner.
+                                      */
     void clear ();
 
   private:
 
-				     /**
-				      * A pointer to the underlying
-				      * matrix.
-				      */
+                                     /**
+                                      * A pointer to the underlying
+                                      * matrix.
+                                      */
     SmartPointer<const MATRIX,PreconditionChebyshev<MATRIX,VECTOR> > matrix_ptr;
 
-				     /**
-				      * Internal vector used for the
-				      * <tt>vmult</tt> operation.
-				      */
+                                     /**
+                                      * Internal vector used for the
+                                      * <tt>vmult</tt> operation.
+                                      */
     mutable VECTOR update1;
 
-				     /**
-				      * Internal vector used for the
-				      * <tt>vmult</tt> operation.
-				      */
+                                     /**
+                                      * Internal vector used for the
+                                      * <tt>vmult</tt> operation.
+                                      */
     mutable VECTOR update2;
 
-				     /**
-				      * Stores the additional data
-				      * provided to the initialize
-				      * function.
-				      */
+                                     /**
+                                      * Stores the additional data
+                                      * provided to the initialize
+                                      * function.
+                                      */
     AdditionalData data;
 
-				     /**
-				      * Average of the largest and
-				      * smallest eigenvalue under
-				      * consideration.
-				      */
+                                     /**
+                                      * Average of the largest and
+                                      * smallest eigenvalue under
+                                      * consideration.
+                                      */
     double theta;
 
-				     /**
-				      * Half the interval length between
-				      * the largest and smallest
-				      * eigenvalue under consideration.
-				      */
+                                     /**
+                                      * Half the interval length between
+                                      * the largest and smallest
+                                      * eigenvalue under consideration.
+                                      */
     double delta;
 
-				     /**
-				      * Stores whether the preconditioner
-				      * has been set up.
-				      */
+                                     /**
+                                      * Stores whether the preconditioner
+                                      * has been set up.
+                                      */
     bool is_initialized;
 };
 
@@ -1123,15 +1123,15 @@ PreconditionIdentity::Tvmult_add (VECTOR &dst, const VECTOR &src) const
 inline
 PreconditionRichardson::AdditionalData::AdditionalData (
   const double relaxation)
-		:
-		relaxation(relaxation)
+                :
+                relaxation(relaxation)
 {}
 
 
 inline
 PreconditionRichardson::PreconditionRichardson ()
-		:
-		relaxation(0)
+                :
+                relaxation(0)
 {
   AdditionalData add_data;
   relaxation=add_data.relaxation;
@@ -1196,7 +1196,7 @@ PreconditionRichardson::Tvmult_add (VECTOR &dst, const VECTOR &src) const
 template <class MATRIX>
 inline void
 PreconditionRelaxation<MATRIX>::initialize (const MATRIX &rA,
-					    const AdditionalData &parameters)
+                                            const AdditionalData &parameters)
 {
   A = &rA;
   relaxation = parameters.relaxation;
@@ -1307,41 +1307,41 @@ PreconditionSOR<MATRIX>::Tstep (VECTOR &dst, const VECTOR &src) const
 template <class MATRIX>
 inline void
 PreconditionSSOR<MATRIX>::initialize (const MATRIX &rA,
-				      const typename BaseClass::AdditionalData &parameters)
+                                      const typename BaseClass::AdditionalData &parameters)
 {
   this->PreconditionRelaxation<MATRIX>::initialize (rA, parameters);
 
-				   // in case we have a SparseMatrix class,
-				   // we can extract information about the
-				   // diagonal.
+                                   // in case we have a SparseMatrix class,
+                                   // we can extract information about the
+                                   // diagonal.
   const SparseMatrix<typename MATRIX::value_type> * mat =
     dynamic_cast<const SparseMatrix<typename MATRIX::value_type> *>(&*this->A);
 
-				   // calculate the positions first after
-				   // the diagonal.
+                                   // calculate the positions first after
+                                   // the diagonal.
   if (mat != 0)
     {
       const std::size_t  * rowstart_ptr =
-	mat->get_sparsity_pattern().get_rowstart_indices();
+        mat->get_sparsity_pattern().get_rowstart_indices();
       const unsigned int * const colnums =
-	mat->get_sparsity_pattern().get_column_numbers();
+        mat->get_sparsity_pattern().get_column_numbers();
       const unsigned int n = this->A->n();
       pos_right_of_diagonal.resize(n);
       for (unsigned int row=0; row<n; ++row, ++rowstart_ptr)
-	{
-				       // find the first element in this line
-				       // which is on the right of the diagonal.
-				       // we need to precondition with the
-				       // elements on the left only.
-				       // note: the first entry in each
-				       // line denotes the diagonal element,
-				       // which we need not check.
-	  pos_right_of_diagonal[row] =
-	    Utilities::lower_bound (&colnums[*rowstart_ptr+1],
-			      &colnums[*(rowstart_ptr+1)],
-			      row)
-	    - colnums;
-	}
+        {
+                                       // find the first element in this line
+                                       // which is on the right of the diagonal.
+                                       // we need to precondition with the
+                                       // elements on the left only.
+                                       // note: the first entry in each
+                                       // line denotes the diagonal element,
+                                       // which we need not check.
+          pos_right_of_diagonal[row] =
+            Utilities::lower_bound (&colnums[*rowstart_ptr+1],
+                              &colnums[*(rowstart_ptr+1)],
+                              row)
+            - colnums;
+        }
     }
 }
 
@@ -1433,9 +1433,9 @@ PreconditionPSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 
 template<class MATRIX, class VECTOR>
 PreconditionUseMatrix<MATRIX,VECTOR>::PreconditionUseMatrix(const MATRIX       &M,
-							    const function_ptr  method)
-		:
-		matrix(M), precondition(method)
+                                                            const function_ptr  method)
+                :
+                matrix(M), precondition(method)
 {}
 
 
@@ -1443,7 +1443,7 @@ PreconditionUseMatrix<MATRIX,VECTOR>::PreconditionUseMatrix(const MATRIX       &
 template<class MATRIX, class VECTOR>
 void
 PreconditionUseMatrix<MATRIX,VECTOR>::vmult (VECTOR &dst,
-					     const VECTOR &src) const
+                                             const VECTOR &src) const
 {
   (matrix.*precondition)(dst, src);
 }
@@ -1454,8 +1454,8 @@ template<class MATRIX>
 inline
 PreconditionRelaxation<MATRIX>::AdditionalData::
 AdditionalData (const double relaxation)
-		:
-		relaxation (relaxation)
+                :
+                relaxation (relaxation)
 {}
 
 
@@ -1465,8 +1465,8 @@ AdditionalData (const double relaxation)
 template<class SOLVER, class MATRIX, class PRECONDITION>
 PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
 ::PreconditionLACSolver ()
-		:
-		solver(0), matrix(0), precondition(0)
+                :
+                solver(0), matrix(0), precondition(0)
 {}
 
 
@@ -1474,8 +1474,8 @@ template<class SOLVER, class MATRIX, class PRECONDITION>
 void
 PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
 ::initialize (SOLVER &s,
-	      const MATRIX &m,
-	      const PRECONDITION &p)
+              const MATRIX &m,
+              const PRECONDITION &p)
 {
   solver = &s;
   matrix = &m;
@@ -1487,10 +1487,10 @@ template<class SOLVER, class MATRIX, class PRECONDITION>
 template<class VECTOR>
 void
 PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::vmult (VECTOR &dst,
-							  const VECTOR &src) const
+                                                          const VECTOR &src) const
 {
   Assert (solver !=0 && matrix != 0 && precondition != 0,
-	  ExcNotInitialized());
+          ExcNotInitialized());
 
   solver->solve(*matrix, dst, src, *precondition);
 }
@@ -1502,9 +1502,9 @@ template<class MATRIX, class PRECOND, class VECTOR>
 inline
 PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
 ::PreconditionedMatrix (const MATRIX & A,
-			const PRECOND &P,
-			VectorMemory<VECTOR> & mem):
-		A(A), P(P), mem(mem)
+                        const PRECOND &P,
+                        VectorMemory<VECTOR> & mem):
+                A(A), P(P), mem(mem)
 {}
 
 
@@ -1512,7 +1512,7 @@ template<class MATRIX, class PRECOND, class VECTOR>
 inline void
 PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
 ::vmult (VECTOR &dst,
-	 const VECTOR &src) const
+         const VECTOR &src) const
 {
   VECTOR* h = mem.alloc();
   h->reinit(src);
@@ -1527,7 +1527,7 @@ template<class MATRIX, class PRECOND, class VECTOR>
 inline void
 PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
 ::Tvmult (VECTOR &dst,
-	 const VECTOR &src) const
+         const VECTOR &src) const
 {
   VECTOR* h = mem.alloc();
   h->reinit(src);
@@ -1542,8 +1542,8 @@ template<class MATRIX, class PRECOND, class VECTOR>
 inline double
 PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
 ::residual (VECTOR &dst,
-	    const VECTOR &src,
-	    const VECTOR &rhs) const
+            const VECTOR &src,
+            const VECTOR &rhs) const
 {
   VECTOR* h = mem.alloc();
   h->reinit(src);
@@ -1562,16 +1562,16 @@ template <class MATRIX, class VECTOR>
 inline
 PreconditionChebyshev<MATRIX,VECTOR>::AdditionalData::
 AdditionalData (const unsigned int degree,
-		const double       smoothing_range,
-		const bool         nonzero_starting,
-		const unsigned int eig_cg_n_iterations,
-		const double       eig_cg_residual)
+                const double       smoothing_range,
+                const bool         nonzero_starting,
+                const unsigned int eig_cg_n_iterations,
+                const double       eig_cg_residual)
                 :
                 degree  (degree),
-		smoothing_range (smoothing_range),
-		nonzero_starting (nonzero_starting),
-		eig_cg_n_iterations (eig_cg_n_iterations),
-		eig_cg_residual (eig_cg_residual)
+                smoothing_range (smoothing_range),
+                nonzero_starting (nonzero_starting),
+                eig_cg_n_iterations (eig_cg_n_iterations),
+                eig_cg_residual (eig_cg_residual)
 {}
 
 
@@ -1589,33 +1589,33 @@ template <class MATRIX, class VECTOR>
 inline
 void
 PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
-						  const AdditionalData &additional_data)
+                                                  const AdditionalData &additional_data)
 {
   Assert (matrix.m() == matrix.n(), ExcMessage("Matrix not quadratic."));
   Assert (additional_data.eig_cg_n_iterations > 2,
-	  ExcMessage ("Need to set at least two iterations to find eigenvalues."));
+          ExcMessage ("Need to set at least two iterations to find eigenvalues."));
   matrix_ptr = &matrix;
   data = additional_data;
   if (data.matrix_diagonal_inverse.size() != matrix.m())
     {
       data.matrix_diagonal_inverse.reinit(matrix.m());
       for (unsigned int i=0; i<matrix.m(); ++i)
-	data.matrix_diagonal_inverse(i) = 1./matrix.el(i,i);
+        data.matrix_diagonal_inverse(i) = 1./matrix.el(i,i);
     }
   update1.reinit (data.matrix_diagonal_inverse, true);
   update2.reinit (data.matrix_diagonal_inverse, true);
 
 
-				 // calculate largest eigenvalue using a
-				 // hand-tuned CG iteration on the matrix
-				 // weighted by its diagonal. we start
-				 // with a vector that consists of ones
-				 // only, weighted by the length.
-				 //
-				 // TODO: can we obtain this with the
-				 // regular CG implementation? we would need
-				 // to read the logfile in that case, which
-				 // does not seem feasible.
+                                 // calculate largest eigenvalue using a
+                                 // hand-tuned CG iteration on the matrix
+                                 // weighted by its diagonal. we start
+                                 // with a vector that consists of ones
+                                 // only, weighted by the length.
+                                 //
+                                 // TODO: can we obtain this with the
+                                 // regular CG implementation? we would need
+                                 // to read the logfile in that case, which
+                                 // does not seem feasible.
   double max_eigenvalue, min_eigenvalue;
   {
     double eigen_beta_alpha = 0;
@@ -1638,48 +1638,48 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 
     while (true)
       {
-	it++;
-	matrix.vmult (update1, update2);
-	update1.scale (data.matrix_diagonal_inverse);
-	alpha = update2 * update1;
-	alpha = gh/alpha;
-	g.add (alpha, update1);
-	res = g.l2_norm();
+        it++;
+        matrix.vmult (update1, update2);
+        update1.scale (data.matrix_diagonal_inverse);
+        alpha = update2 * update1;
+        alpha = gh/alpha;
+        g.add (alpha, update1);
+        res = g.l2_norm();
 
-				// need at least two iterations to have
-				// maximum and minimum eigenvalue
-	if (it > data.eig_cg_n_iterations || (it > 2 &&
-					      res < data.eig_cg_residual))
-	  break;
+                                // need at least two iterations to have
+                                // maximum and minimum eigenvalue
+        if (it > data.eig_cg_n_iterations || (it > 2 &&
+                                              res < data.eig_cg_residual))
+          break;
 
-	beta = gh;
-	gh = res*res;
-	beta = gh/beta;
-	update2.sadd (beta, -1., g);
+        beta = gh;
+        gh = res*res;
+        beta = gh/beta;
+        update2.sadd (beta, -1., g);
 
-	diagonal.push_back (1./alpha + eigen_beta_alpha);
-	eigen_beta_alpha = beta/alpha;
-	offdiagonal.push_back(std::sqrt(beta)/alpha);
+        diagonal.push_back (1./alpha + eigen_beta_alpha);
+        eigen_beta_alpha = beta/alpha;
+        offdiagonal.push_back(std::sqrt(beta)/alpha);
       }
 
     TridiagonalMatrix<double> T(diagonal.size(), true);
     for (unsigned int i=0;i<diagonal.size();++i)
       {
-	T(i,i) = diagonal[i];
-	if (i< diagonal.size()-1)
-	  T(i,i+1) = offdiagonal[i];
+        T(i,i) = diagonal[i];
+        if (i< diagonal.size()-1)
+          T(i,i+1) = offdiagonal[i];
       }
     T.compute_eigenvalues();
     min_eigenvalue = T.eigenvalue(0);
     max_eigenvalue = T.eigenvalue(T.n()-1);
   }
 
-				 // include a safety factor since the CG
-				 // method will in general not be converged
+                                 // include a safety factor since the CG
+                                 // method will in general not be converged
   const double beta = 1.2 * max_eigenvalue;
   const double alpha = (data.smoothing_range > 0 ?
-			max_eigenvalue / data.smoothing_range :
-			max_eigenvalue / min_eigenvalue);
+                        max_eigenvalue / data.smoothing_range :
+                        max_eigenvalue / min_eigenvalue);
   delta = (beta-alpha)*0.5;
   theta = (beta+alpha)*0.5;
   is_initialized = true;
@@ -1691,7 +1691,7 @@ template <class MATRIX, class VECTOR>
 inline
 void
 PreconditionChebyshev<MATRIX,VECTOR>::vmult (VECTOR &dst,
-					     const VECTOR &src) const
+                                             const VECTOR &src) const
 {
   Assert (is_initialized, ExcMessage("Preconditioner not initialized"));
   double rhok  = delta / theta,  sigma = theta / delta;
@@ -1729,7 +1729,7 @@ template <class MATRIX, class VECTOR>
 inline
 void
 PreconditionChebyshev<MATRIX,VECTOR>::Tvmult (VECTOR &dst,
-					      const VECTOR &src) const
+                                              const VECTOR &src) const
 {
   Assert (is_initialized, ExcMessage("Preconditioner not initialized"));
   double rhok  = delta / theta,  sigma = theta / delta;

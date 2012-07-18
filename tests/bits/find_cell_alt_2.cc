@@ -41,10 +41,10 @@ void check (Triangulation<3> &tria)
 
   deallog << cell.first << std::endl;
   for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
-    deallog << "<" << cell.first->vertex(v) << "> ";
+    deallog << "<" << cell.first->vertex(v) << "> "<< std::endl;
   deallog << "[ " << cell.second << "] ";
 
-  deallog << std::endl;
+  deallog << std::endl << std::endl;
 
   Assert (p.distance (cell.first->center()) < cell.first->diameter()/2,
 	  ExcInternalError());

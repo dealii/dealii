@@ -1,1188 +1,1508 @@
-/* Author: Wolfgang Bangerth, Texas A&M University, 2008 */
+/* $Id$ */
+/* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
-/*    without copyright and license information. Please refer     */
+/*    without copyrightG and license information. Please refer     */
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+                                 // @sect3{Include files}
 
-				 // @sect3{Include files}
+				 // The first few (many?) include
+				 // files have already been used in
+				 // the previous example, so we will
+				 // not explain their meaning here
+				 // again.
 
-				 // As usual, we start by including
-				 // some well-known files:
+#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_values.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/utilities.h>
-
-#include <deal.II/lac/block_vector.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_precondition.h>
+#include <deal.II/lac/trilinos_solver.h>
 
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/grid_refinement.h>
 
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
-
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/error_estimator.h>
-
-
-#include <deal.II/lac/sparse_direct.h>
-
-#include <deal.II/lac/sparse_ilu.h>
-
-#include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
-#include <deal.II/multigrid/mg_constrained_dofs.h>
-#include <deal.II/multigrid/mg_transfer.h>
-#include <deal.II/multigrid/mg_tools.h>
-#include <deal.II/multigrid/mg_coarse.h>
-#include <deal.II/multigrid/mg_smoother.h>
-#include <deal.II/multigrid/mg_matrix.h>
-
+#include <deal.II/base/timer.h>
 #include <fstream>
-#include <sstream>
+#include <iostream>
+#include <list>
+#include <time.h>
 
+				 // This is new, however: in the previous
+				 // example we got some unwanted output from
+				 // the linear solvers. If we want to suppress
+				 // it, we have to include this file and add a
+				 // single line somewhere to the program (see
+				 // the main() function below for that):
+#include <deal.II/base/logstream.h>
 
-namespace Step42
+				 // The final step, as in previous
+				 // programs, is to import all the
+				 // deal.II class and function names
+				 // into the global namespace:
+using namespace dealii;
+
+                                 // @sect3{The <code>Step4</code> class template}
+
+template <int dim> class ConstitutiveLaw;
+
+template <int dim>
+class Step4
 {
-  using namespace dealii;
+public:
+  Step4 (int _n_refinements_global, int _n_refinements_local);
+  void run ();
 
+private:
+  void make_grid ();
+  void setup_system();
+  void assemble_mass_matrix ();
+  void assemble_nl_system (TrilinosWrappers::MPI::Vector &u);
+  void residual_nl_system (TrilinosWrappers::MPI::Vector &u,
+			   Vector<double>                &sigma_eff_vector);
+  void projection_active_set ();
+  void dirichlet_constraints ();
+  void solve ();
+  void solve_newton ();
+  void output_results (const std::string& title) const;
+  void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
+  void output_results (TrilinosWrappers::MPI::Vector vector, const std::string& title) const;
+  void output_results (Vector<double> vector, const std::string& title) const;
 
-  template <int dim>
-  struct InnerPreconditioner;
+  MPI_Comm             mpi_communicator;
 
+  parallel::distributed::Triangulation<dim>   triangulation;
 
-  template <>
-  struct InnerPreconditioner<2>
+  FESystem<dim>        fe;
+  DoFHandler<dim>      dof_handler;
+
+  IndexSet             locally_owned_dofs;
+  IndexSet             locally_relevant_dofs;
+
+  int                  n_refinements_global;
+  int                  n_refinements_local;
+  unsigned int         number_iterations;
+  std::vector<double>  run_time;
+
+  ConstraintMatrix     constraints;
+  ConstraintMatrix     constraints_hanging_nodes;
+  ConstraintMatrix     constraints_dirichlet_hanging_nodes;
+
+  TrilinosWrappers::SparseMatrix system_matrix_newton;
+  TrilinosWrappers::SparseMatrix mass_matrix;
+
+  TrilinosWrappers::MPI::Vector       solution;
+  TrilinosWrappers::MPI::Vector       old_solution;
+  TrilinosWrappers::MPI::Vector       system_rhs_newton;
+  TrilinosWrappers::MPI::Vector       resid_vector;
+  TrilinosWrappers::MPI::Vector       diag_mass_matrix_vector;
+  IndexSet                            active_set;
+
+  ConditionalOStream pcout;
+
+  TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
+  TrilinosWrappers::PreconditionAMG preconditioner_u;
+  TrilinosWrappers::PreconditionAMG preconditioner_t;
+
+  std::auto_ptr<ConstitutiveLaw<dim> > plast_lin_hard;
+
+  double sigma_0;    // Yield stress
+  double gamma;      // Parameter for the linear isotropic hardening
+  double e_modul;    // E-Modul
+  double nu;         // Poisson ratio
+
+  std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>  Mp_preconditioner;
+};
+
+template <int dim>
+class ConstitutiveLaw
+{
+public:
+  ConstitutiveLaw (double _E, double _nu, double _sigma_0, double _gamma, MPI_Comm _mpi_communicator, ConditionalOStream _pcout);
+  //     ConstitutiveLaw (double mu, double kappa);
+  void plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor,
+			       SymmetricTensor<2,dim>  &strain_tensor,
+			       unsigned int 	       &elast_points,
+			       unsigned int 	       &plast_points,
+			       double                  &sigma_eff,
+			       double                  &yield);
+  void linearized_plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor_linearized,
+					  SymmetricTensor<4,dim>  &stress_strain_tensor,
+					  SymmetricTensor<2,dim>  &strain_tensor);
+  inline SymmetricTensor<2,dim> get_strain (const FEValues<dim> &fe_values,
+					    const unsigned int  shape_func,
+					    const unsigned int  q_point) const;
+
+private:
+  SymmetricTensor<4,dim>  stress_strain_tensor_mu;
+  SymmetricTensor<4,dim>  stress_strain_tensor_kappa;
+  double E;
+  double nu;
+  double sigma_0;
+  double gamma;
+  double mu;
+  double kappa;
+  MPI_Comm mpi_communicator;
+  ConditionalOStream pcout;
+};
+
+template <int dim>
+ConstitutiveLaw<dim>::ConstitutiveLaw(double _E, double _nu, double _sigma_0, double _gamma, MPI_Comm _mpi_communicator, ConditionalOStream _pcout)
+ :E (_E),
+  nu (_nu),
+  sigma_0 (_sigma_0),
+  gamma (_gamma),
+  mpi_communicator (_mpi_communicator),
+  pcout (_pcout)
+{
+  mu = E/(2*(1+nu));
+  kappa = E/(3*(1-2*nu));
+  pcout<< "-----> mu = " << mu << ", kappa = " << kappa <<std::endl;
+  stress_strain_tensor_kappa = kappa*outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>());
+  stress_strain_tensor_mu = 2*mu*(identity_tensor<dim>() - outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>())/3.0);
+}
+
+template <int dim>
+inline
+SymmetricTensor<2,dim> ConstitutiveLaw<dim>::get_strain (const FEValues<dim> &fe_values,
+						     const unsigned int   shape_func,
+						     const unsigned int   q_point) const
+{
+  const FEValuesExtractors::Vector displacement (0);
+  SymmetricTensor<2,dim> tmp;
+
+  tmp = fe_values[displacement].symmetric_gradient (shape_func,q_point);
+
+  return tmp;
+}
+
+template <int dim>
+void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor,
+						   SymmetricTensor<2,dim>  &strain_tensor,
+						   unsigned int            &elast_points,
+						   unsigned int            &plast_points,
+						   double                  &sigma_eff,
+						   double                  &yield)
+{
+  if (dim == 3)
   {
-      typedef SparseDirectUMFPACK type;
-  };
+    SymmetricTensor<2,dim> stress_tensor;
+    stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
+    double tmp = E/((1+nu)*(1-2*nu));
 
+    SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
 
-  template <>
-  struct InnerPreconditioner<3>
-  {
-      typedef SparseILU<double> type;
-  };
+    double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
 
-  template <typename MATRIX>
-  void copy(const MATRIX &matrix,
-	    FullMatrix<double> &full_matrix)
-  {
-    const unsigned int m = matrix.m();
-    const unsigned int n = matrix.n();
-    full_matrix.reinit(n,m);
+    yield = 0;
+    stress_strain_tensor = stress_strain_tensor_mu;
+    double beta = 1.0;
+    if (deviator_stress_tensor_norm >= sigma_0)
+    {
+      beta = (sigma_0 + gamma)/deviator_stress_tensor_norm;
+      stress_strain_tensor *= beta;
+      yield = 1;
+      plast_points += 1;
+    }
+    else
+      elast_points += 1;
 
-    Vector<double> unit (n);
-    Vector<double> result (m);
-    for(unsigned int i=0; i<n; ++i)
-      {
-	unit(i) = 1;
-	for(unsigned int j=0; j<m; ++j)
-	  {
-	    matrix.vmult(result,unit);
-	    full_matrix(i,j) = result(j);
-	  }
-	unit(i) = 0;
-      }
+//     std::cout<< beta <<std::endl;
+    stress_strain_tensor += stress_strain_tensor_kappa;
+
+    sigma_eff = beta * deviator_stress_tensor_norm;
   }
+}
 
-  template <int dim>
-  class StokesProblem
+template <int dim>
+void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor_linearized,
+							      SymmetricTensor<4,dim>  &stress_strain_tensor,
+							      SymmetricTensor<2,dim>  &strain_tensor)
+{
+  if (dim == 3)
   {
-    public:
-      StokesProblem (const unsigned int degree);
-      void run ();
+    SymmetricTensor<2,dim> stress_tensor;
+    stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
+    double tmp = E/((1+nu)*(1-2*nu));
 
-    private:
-      void setup_dofs ();
-      void assemble_system ();
-      void assemble_multigrid ();
-      void solve ();
-      void solve_block ();
+    stress_strain_tensor = stress_strain_tensor_mu;
+    stress_strain_tensor_linearized = stress_strain_tensor_mu;
 
-      void find_dofs_on_lower_level (std::vector<std::vector<bool> > &lower_dofs,
-				     std::vector<std::vector<bool> > &boundary_dofs);
+    SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
 
-      void output_results (const unsigned int refinement_cycle) const;
-      void refine_mesh ();
+    double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
 
-      const unsigned int   degree;
+    double beta = 1.0;
+    if (deviator_stress_tensor_norm >= sigma_0)
+    {
+      beta = (sigma_0 + gamma)/deviator_stress_tensor_norm;
+      stress_strain_tensor *= beta;
+      stress_strain_tensor_linearized *= beta;
+      deviator_stress_tensor /= deviator_stress_tensor_norm;
+      stress_strain_tensor_linearized -= beta*2*mu*outer_product(deviator_stress_tensor, deviator_stress_tensor);
+    }
 
-      Triangulation<dim>   triangulation;
-      FESystem<dim>        fe;
-      MGDoFHandler<dim>    dof_handler;
-
-      ConstraintMatrix     constraints;
-
-      BlockSparsityPattern      sparsity_pattern;
-      BlockSparseMatrix<double> system_matrix;
-
-      BlockVector<double> solution;
-      BlockVector<double> system_rhs;
-
-      MGLevelObject<ConstraintMatrix>           mg_constraints;
-      MGLevelObject<BlockSparsityPattern>       mg_sparsity;
-      MGLevelObject<BlockSparseMatrix<double> > mg_matrices;
-
-      MGLevelObject<BlockSparseMatrix<double> > mg_interface_matrices;
-      MGConstrainedDoFs                         mg_constrained_dofs;
-      std::vector<std::vector<unsigned int> >   mg_dofs_per_component;
-
-      std::vector<std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> > mg_A_preconditioner;
-      std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
-  };
-
-
-  template <int dim>
-  class BoundaryValues : public Function<dim>
-  {
-    public:
-      BoundaryValues () : Function<dim>(dim+1) {}
-
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-
-      virtual void vector_value (const Point<dim> &p,
-				 Vector<double>   &value) const;
-  };
-
-
-  template <int dim>
-  double
-  BoundaryValues<dim>::value (const Point<dim>  &p,
-			      const unsigned int component) const
-  {
-    Assert (component < this->n_components,
-	    ExcIndexRange (component, 0, this->n_components));
-
-    if (component == 0 && p[0] == 0)
-      return (dim == 2 ? - p[1]*(p[1]-1.) : p[1]*(p[1]-1.) * p[2]*(p[2]-1.));
-    return 0;
+    stress_strain_tensor += stress_strain_tensor_kappa;
+    stress_strain_tensor_linearized += stress_strain_tensor_kappa;
   }
+}
 
-
-  template <int dim>
-  void
-  BoundaryValues<dim>::vector_value (const Point<dim> &p,
-				     Vector<double>   &values) const
-  {
-    for (unsigned int c=0; c<this->n_components; ++c)
-      values(c) = BoundaryValues<dim>::value (p, c);
-  }
-
-
-
-
+namespace EquationData
+{
   template <int dim>
   class RightHandSide : public Function<dim>
   {
-    public:
-      RightHandSide () : Function<dim>(dim+1) {}
+  public:
+    RightHandSide () : Function<dim>(dim) {}
 
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
 
-      virtual void vector_value (const Point<dim> &p,
-				 Vector<double>   &value) const;
-
+    virtual void vector_value (const Point<dim> &p,
+			       Vector<double>   &values) const;
   };
 
-
   template <int dim>
-  double
-  RightHandSide<dim>::value (const Point<dim>  &/*p*/,
-			     const unsigned int component) const
+  double RightHandSide<dim>::value (const Point<dim> &p,
+				    const unsigned int component) const
   {
-    return (component == 1 ? 1 : 0);
+    double return_value = 0.0;
+
+    if (component == 0)
+      return_value = 0.0;
+    if (component == 1)
+      return_value = 0.0;
+    if (component == 2)
+      // if ((p(0)-0.5)*(p(0)-0.5)+(p(1)-0.5)*(p(1)-0.5) < 0.2)
+      // 	return_value = -5000;
+      // else
+      return_value = 0.0;
+    // for (unsigned int i=0; i<dim; ++i)
+    //   return_value += 4*std::pow(p(i), 4);
+
+    return return_value;
   }
 
-
   template <int dim>
-  void
-  RightHandSide<dim>::vector_value (const Point<dim> &p,
-				    Vector<double>   &values) const
+  void RightHandSide<dim>::vector_value (const Point<dim> &p,
+					 Vector<double>   &values) const
   {
     for (unsigned int c=0; c<this->n_components; ++c)
       values(c) = RightHandSide<dim>::value (p, c);
   }
 
 
-
-
-  template <class Matrix, class Preconditioner>
-  class InverseMatrix : public Subscriptor
+  template <int dim>
+  class BoundaryValues : public Function<dim>
   {
-    public:
-      InverseMatrix (const Matrix         &m,
-		     const Preconditioner &preconditioner);
+  public:
+    BoundaryValues () : Function<dim>(dim) {};
 
-      void vmult (Vector<double>       &dst,
-		  const Vector<double> &src) const;
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
 
-      mutable std::string name;
-    private:
-      const SmartPointer<const Matrix> matrix;
-      const SmartPointer<const Preconditioner> preconditioner;
+    virtual void vector_value (const Point<dim> &p,
+			       Vector<double>   &values) const;
   };
 
-
-  template <class Matrix, class Preconditioner>
-  InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
-						       const Preconditioner &preconditioner)
-		  :
-		  matrix (&m),
-		  preconditioner (&preconditioner)
-  {}
-
-
-  template <class Matrix, class Preconditioner>
-  void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
-						    const Vector<double> &src) const
+  template <int dim>
+  double BoundaryValues<dim>::value (const Point<dim> &p,
+				     const unsigned int component) const
   {
-    SolverControl solver_control (src.size(), 1.0e-12*src.l2_norm());
-    SolverCG<>    cg (solver_control);
+    double return_value = 0;
 
-    dst = 0;
+    if (component == 0)
+      return_value = 0.0;
+    if (component == 1)
+      return_value = 0.0;
+    if (component == 2)
+      return_value = 0.0;
 
-    try
-      {
-	cg.solve (*matrix, dst, src, *preconditioner);
-      }
-    catch (...)
-      {
-	std::cout << "Failure in " << __PRETTY_FUNCTION__ << std::endl;
-	abort ();
-      }
-
-#ifdef STEP_42_TEST
-    if (name == "in schur")
-      std::cout << "      " << solver_control.last_step()
-		<< " inner CG steps inside the Schur complement ";
-    else if (name == "top left")
-      std::cout << "    " << solver_control.last_step()
-		<< " CG steps on the top left block ";
-    else if (name == "rhs")
-      std::cout << "    " << solver_control.last_step()
-		<< " CG steps for computing the r.h.s. ";
-    else
-      abort ();
-
-    std::cout << solver_control.initial_value() << "->" << solver_control.last_value()
-	      << std::endl;
-#endif
+    return return_value;
   }
 
-
-  template <class PreconditionerA, class PreconditionerMp>
-  class BlockSchurPreconditioner : public Subscriptor
+  template <int dim>
+  void BoundaryValues<dim>::vector_value (const Point<dim> &p,
+					   Vector<double>   &values) const
   {
-    public:
-      BlockSchurPreconditioner (const BlockSparseMatrix<double>         &S,
-				const InverseMatrix<SparseMatrix<double>,PreconditionerMp>  &Mpinv,
-				const PreconditionerA &Apreconditioner);
-
-      void vmult (BlockVector<double>       &dst,
-		  const BlockVector<double> &src) const;
-
-    private:
-      const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-      const SmartPointer<const InverseMatrix<SparseMatrix<double>,
-					     PreconditionerMp > > m_inverse;
-      const PreconditionerA &a_preconditioner;
-
-      mutable Vector<double> tmp;
-
-  };
-
-  template <class PreconditionerA, class PreconditionerMp>
-  BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::BlockSchurPreconditioner(
-    const BlockSparseMatrix<double>                            &S,
-    const InverseMatrix<SparseMatrix<double>,PreconditionerMp> &Mpinv,
-    const PreconditionerA &Apreconditioner
-  )
-		  :
-		  system_matrix           (&S),
-		  m_inverse               (&Mpinv),
-		  a_preconditioner        (Apreconditioner),
-		  tmp                     (S.block(1,1).m())
-  {}
-
-				   // Now the interesting function, the multiplication of
-				   // the preconditioner with a BlockVector.
-  template <class PreconditionerA, class PreconditionerMp>
-  void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
-    BlockVector<double>       &dst,
-    const BlockVector<double> &src) const
-  {
-				     // Form u_new = A^{-1} u
-    a_preconditioner.vmult (dst.block(0), src.block(0));
-				     // Form tmp = - B u_new + p
-				     // (<code>SparseMatrix::residual</code>
-				     // does precisely this)
-    system_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
-				     // Change sign in tmp
-    tmp *= -1;
-				     // Multiply by approximate Schur complement
-				     // (i.e. a pressure mass matrix)
-    m_inverse->vmult (dst.block(1), tmp);
+    for (unsigned int c=0; c<this->n_components; ++c)
+      values(c) = BoundaryValues<dim>::value (p, c);
   }
-
-  template <class Preconditioner>
-  class SchurComplement : public Subscriptor
-  {
-    public:
-      SchurComplement (const BlockSparseMatrix<double> &system_matrix,
-		       const InverseMatrix<SparseMatrix<double>, Preconditioner> &A_inverse);
-
-      void vmult (Vector<double>       &dst,
-		  const Vector<double> &src) const;
-
-      unsigned int m() const
-	{
-	  return system_matrix->block(1,1).m();
-	}
-
-      unsigned int n() const
-	{
-	  return system_matrix->block(1,1).n();
-	}
-
-    private:
-      const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-      const SmartPointer<const InverseMatrix<SparseMatrix<double>, Preconditioner> > A_inverse;
-
-      mutable Vector<double> tmp1, tmp2;
-  };
-
-
-
-  template <class Preconditioner>
-  SchurComplement<Preconditioner>::
-  SchurComplement (const BlockSparseMatrix<double> &system_matrix,
-		   const InverseMatrix<SparseMatrix<double>,Preconditioner> &A_inverse)
-		  :
-		  system_matrix (&system_matrix),
-		  A_inverse (&A_inverse),
-		  tmp1 (system_matrix.block(0,0).m()),
-		  tmp2 (system_matrix.block(0,0).m())
-  {}
-
-
-  template <class Preconditioner>
-  void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
-					       const Vector<double> &src) const
-  {
-    system_matrix->block(0,1).vmult (tmp1, src);
-    A_inverse->name = "in schur";
-    A_inverse->vmult (tmp2, tmp1);
-    system_matrix->block(1,0).vmult (dst, tmp2);
-    dst *= -1;
-    system_matrix->block(1,1).vmult_add (dst, src);
-    dst *= -1;
-  }
-
 
 
   template <int dim>
-  StokesProblem<dim>::StokesProblem (const unsigned int degree)
-		  :
-		  degree (degree),
-		  triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
-		  fe (FE_Q<dim>(degree+1), dim,
-		      FE_Q<dim>(degree), 1),
-		  dof_handler (triangulation)
-  {}
+  class Obstacle : public Function<dim>
+  {
+  public:
+    Obstacle () : Function<dim>(dim) {};
 
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
 
-
-
+    virtual void vector_value (const Point<dim> &p,
+			       Vector<double>   &values) const;
+  };
 
   template <int dim>
-  void StokesProblem<dim>::setup_dofs ()
+  double Obstacle<dim>::value (const Point<dim> &p,
+			       const unsigned int component) const
   {
-    A_preconditioner.reset ();
-    mg_A_preconditioner.resize (0);
-    system_matrix.clear ();
+    double R = 0.03;
+    double return_value = 0.0;
+    if (component == 0)
+      return_value = p(0);
+    if (component == 1)
+      return_value = p(1);
+    if (component == 2)
+      {
+	// double hz = 0.98;
+	// double position_x = 0.5;
+	// double alpha = 12.0;
+	// double s_x = 0.5039649116;
+	// double s_y = hz + 0.00026316298;
+	// if (p(0) > position_x - R && p(0) < s_x)
+	//   {
+	//     return_value = -sqrt(R*R - (p(0)-position_x)*(p(0)-position_x)) + hz + R;
+	//   }
+	// else if (p(0) >= s_x)
+	//   {
+	//     return_value = 12.0/90.0*p(0) + (s_y - alpha/90.0*s_x);
+	//   }
+	// else
+	//   return_value = 1e+10;
 
+	// Hindernis Dortmund
+	double x1 = p(0);
+	double x2 = p(1);
+	if (((x2-0.5)*(x2-0.5)+(x1-0.5)*(x1-0.5)<=0.3*0.3)&&((x2-0.5)*(x2-0.5)+(x1-1.0)*(x1-1.0)>=0.4*0.4)&&((x2-0.5)*(x2-0.5)+x1*x1>=0.4*0.4))
+	  return_value = 0.999;
+	else
+	  return_value = 1e+10;
+
+	// Hindernis Werkzeug TKSE
+	// double shift_walze_x = 0.0;
+	// double shift_walze_y = 0.0;
+	// return_value = 0.032 + data->dicke - input_copy->mikro_height (p(0) + shift_walze_x, p(1) + shift_walze_y, p(2));
+
+	// Ball with radius R
+	// double R = 0.5;
+	// if (std::pow ((p(0)-1.0/2.0), 2) + std::pow ((p(1)-1.0/2.0), 2) < R*R)
+	//   return_value = 1.0 + R - 0.001 - sqrt (R*R  - std::pow ((p(0)-1.0/2.0), 2)
+	// 					 - std::pow ((p(1)-1.0/2.0), 2));
+	// else
+	//   return_value = 1e+5;
+      }
+    return return_value;
+
+    // return 1e+10;//0.98;
+  }
+
+  template <int dim>
+  void Obstacle<dim>::vector_value (const Point<dim> &p,
+			            Vector<double> &values) const
+  {
+    for (unsigned int c=0; c<this->n_components; ++c)
+      values(c) = Obstacle<dim>::value (p, c);
+  }
+}
+
+
+                                 // @sect3{Implementation of the <code>Step4</code> class}
+
+                                 // Next for the implementation of the class
+                                 // template that makes use of the functions
+                                 // above. As before, we will write everything
+
+template <int dim>
+Step4<dim>::Step4 (int _n_refinements_global, int _n_refinements_local)
+  :
+  n_refinements_global (_n_refinements_global),
+  n_refinements_local (_n_refinements_local),
+  mpi_communicator (MPI_COMM_WORLD),
+  triangulation (mpi_communicator),
+  fe (FE_Q<dim>(1), dim),
+  dof_handler (triangulation),
+  pcout (std::cout,
+	 (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
+  sigma_0 (400),
+  gamma (1.e-2),
+  e_modul (2.0e5),
+  nu (0.3)
+{
+  // double _E, double _nu, double _sigma_0, double _gamma
+  plast_lin_hard.reset (new ConstitutiveLaw<dim> (e_modul, nu, sigma_0, gamma, mpi_communicator, pcout));
+}
+
+template <int dim>
+void Step4<dim>::make_grid ()
+{
+  std::vector<unsigned int> repet(3);
+  repet[0] = 1;//20;
+  repet[1] = 1;
+  repet[2] = 1;
+
+  Point<dim> p1 (0,0,0);
+  Point<dim> p2 (1.0, 1.0, 1.0);
+  GridGenerator::subdivided_hyper_rectangle (triangulation, repet, p1, p2);
+
+  Triangulation<3>::active_cell_iterator
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
+
+  /* boundary_indicators:
+            _______
+           /  9    /|
+          /______ / |
+        8|       | 8|
+         |   8   | /
+         |_______|/
+             6
+   */
+
+  for (; cell!=endc; ++cell)
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      {
+	if (cell->face (face)->center ()[2] == p2(2))
+	  cell->face (face)->set_boundary_indicator (9);
+	if (cell->face (face)->center ()[0] == p1(0) ||
+	    cell->face (face)->center ()[0] == p2(0) ||
+	    cell->face (face)->center ()[1] == p1(1) ||
+	    cell->face (face)->center ()[1] == p2(1))
+	  cell->face (face)->set_boundary_indicator (8);
+	if (cell->face (face)->center ()[2] == p1(2))
+	  cell->face (face)->set_boundary_indicator (6);
+      }
+
+  triangulation.refine_global (n_refinements_global);
+
+  // Lokale Verfeinerung des Gitters
+  for (int step=0; step<n_refinements_local; ++step)
+    {
+      cell = triangulation.begin_active();  // Iterator ueber alle Zellen
+
+      for (; cell!=endc; ++cell)
+         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+         {
+// 	   if (cell->face (face)->at_boundary()
+// 	       && cell->face (face)->boundary_indicator () == 9)
+// 	     {
+// 	       cell->set_refine_flag ();
+// 	       break;
+// 	     }
+// 	   else if (cell->level () == n_refinements + n_refinements_local - 1)
+// 	     {
+// 	       cell->set_refine_flag ();
+// 	       break;
+// 	     }
+
+// 	   if (cell->face (face)->at_boundary()
+// 	       && cell->face (face)->boundary_indicator () == 9)
+// 	     {
+// 	       if (cell->face (face)->vertex (0)(0) <= 0.7 &&
+// 	           cell->face (face)->vertex (1)(0) >= 0.3 &&
+// 		   cell->face (face)->vertex (0)(1) <= 0.875 &&
+// 	           cell->face (face)->vertex (2)(1) >= 0.125)
+//  	         {
+// 	           cell->set_refine_flag ();
+// 	           break;
+// 	         }
+// 	     }
+	    
+	    if (step == 0 &&
+	        cell->center ()(2) < n_refinements_local*9.0/64.0)
+	     {
+	       cell->set_refine_flag ();
+	       break;
+	     }     
+        };
+      triangulation.execute_coarsening_and_refinement ();
+    };
+}
+
+template <int dim>
+void Step4<dim>::setup_system ()
+{
+  // setup dofs
+  {
     dof_handler.distribute_dofs (fe);
-//  DoFRenumbering::Cuthill_McKee (dof_handler);
 
-    std::vector<unsigned int> block_component (dim+1,0);
-    block_component[dim] = 1;
-    DoFRenumbering::component_wise (dof_handler, block_component);
-
-
-    {
-      constraints.clear ();
-      typename FunctionMap<dim>::type      dirichlet_boundary;
-      ZeroFunction<dim>                    homogeneous_dirichlet_bc (dim+1); //TODO: go back to BoundaryValues
-
-      dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-      MappingQ1<dim> mapping;
-
-      std::vector<bool> component_mask (dim+1, true);
-      component_mask[dim] = false;
-      VectorTools::interpolate_boundary_values (mapping,
-						dof_handler,
-						dirichlet_boundary,
-						constraints,
-						component_mask);
-
-      DoFTools::make_hanging_node_constraints (dof_handler,
-					       constraints);
-
-      mg_constrained_dofs.clear();
-      mg_constrained_dofs.initialize(dof_handler, dirichlet_boundary);
-    }
-
-    constraints.close ();
-
-
-    std::vector<unsigned int> dofs_per_block (2);
-    DoFTools::count_dofs_per_block (dof_handler, dofs_per_block,
-				    block_component);
-    const unsigned int n_u = dofs_per_block[0],
-		       n_p = dofs_per_block[1];
-
-    std::cout << "   Number of active cells: "
-	      << triangulation.n_active_cells()
-	      << std::endl
-	      << "   Number of degrees of freedom: "
-	      << dof_handler.n_dofs()
-	      << " (" << n_u << '+' << n_p << ')'
-	      << std::endl;
-
-    {
-      BlockCompressedSimpleSparsityPattern csp (2,2);
-
-      csp.block(0,0).reinit (n_u, n_u);
-      csp.block(1,0).reinit (n_p, n_u);
-      csp.block(0,1).reinit (n_u, n_p);
-      csp.block(1,1).reinit (n_p, n_p);
-
-      csp.collect_sizes();
-
-      DoFTools::make_sparsity_pattern (
-        static_cast<const DoFHandler<dim>&>(dof_handler),
-        csp, constraints, false);
-      sparsity_pattern.copy_from (csp);
-    }
-
-
-    system_matrix.reinit (sparsity_pattern);
-
-    solution.reinit (2);
-    solution.block(0).reinit (n_u);
-    solution.block(1).reinit (n_p);
-    solution.collect_sizes ();
-
-    system_rhs.reinit (2);
-    system_rhs.block(0).reinit (n_u);
-    system_rhs.block(1).reinit (n_p);
-    system_rhs.collect_sizes ();
-
-				     //now setup stuff for mg
-    const unsigned int nlevels = triangulation.n_levels();
-
-    mg_matrices.resize(0, nlevels-1);
-    mg_matrices.clear ();
-    mg_interface_matrices.resize(0, nlevels-1);
-    mg_interface_matrices.clear ();
-    mg_sparsity.resize(0, nlevels-1);
-
-    mg_dofs_per_component.resize (nlevels);
-    for (unsigned int level=0; level<nlevels; ++level)
-      mg_dofs_per_component[level].resize (2);
-
-    MGTools::count_dofs_per_block (dof_handler, mg_dofs_per_component,
-				   block_component);
-    for (unsigned int level=0; level<nlevels; ++level)
-      std::cout << "                        Level " << level << ": "
-		<< dof_handler.n_dofs (level) << " ("
-		<< mg_dofs_per_component[level][0] << '+'
-		<< mg_dofs_per_component[level][1] << ')'
-		<< std::endl;
-
-    for (unsigned int level=0; level<nlevels; ++level)
-      {
-	DoFRenumbering::component_wise (dof_handler, level, block_component);
-
-	BlockCompressedSparsityPattern bcsp (mg_dofs_per_component[level],
-					     mg_dofs_per_component[level]);
-	MGTools::make_sparsity_pattern(dof_handler, bcsp, level);
-	mg_sparsity[level].copy_from (bcsp);
-	mg_matrices[level].reinit (mg_sparsity[level]);
-	mg_interface_matrices[level].reinit (mg_sparsity[level]);
-      }
+    locally_owned_dofs = dof_handler.locally_owned_dofs ();
+    locally_relevant_dofs.clear();
+    DoFTools::extract_locally_relevant_dofs (dof_handler,
+					     locally_relevant_dofs);
   }
 
-
-
-  template <int dim>
-  void StokesProblem<dim>::assemble_system ()
+  // setup hanging nodes and dirichlet constraints
   {
-    system_matrix=0;
-    system_rhs=0;
+    // constraints_hanging_nodes.clear ();
+    constraints_hanging_nodes.reinit (locally_relevant_dofs);
+    DoFTools::make_hanging_node_constraints (dof_handler,
+					     constraints_hanging_nodes);
+    constraints_hanging_nodes.close ();
 
-    QGauss<dim>   quadrature_formula(degree+2);
+    pcout << "Number of active cells: "
+	       << triangulation.n_active_cells()
+	       << std::endl
+	       << "Total number of cells: "
+	       << triangulation.n_cells()
+	       << std::endl
+	       << "Number of degrees of freedom: "
+	       << dof_handler.n_dofs ()
+	       << std::endl;
 
-    FEValues<dim> fe_values (fe, quadrature_formula,
-			     update_values    |
-			     update_quadrature_points  |
-			     update_JxW_values |
-			     update_gradients);
+    dirichlet_constraints ();
+  }
 
-    const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+  // Initialzation for matrices and vectors
+  {
+    solution.reinit (locally_relevant_dofs, mpi_communicator);
+    system_rhs_newton.reinit (locally_owned_dofs, mpi_communicator);
+    old_solution.reinit (system_rhs_newton);
+    resid_vector.reinit (system_rhs_newton);
+    diag_mass_matrix_vector.reinit (system_rhs_newton);
+    active_set.set_size (locally_relevant_dofs.size ());
+  }
 
-    const unsigned int   n_q_points      = quadrature_formula.size();
+  // setup sparsity pattern
+  {
+    TrilinosWrappers::SparsityPattern sp (locally_owned_dofs,
+					  mpi_communicator);
 
-    FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>       local_rhs (dofs_per_cell);
+    DoFTools::make_sparsity_pattern (dof_handler, sp, constraints_dirichlet_hanging_nodes, false,
+				     Utilities::MPI::this_mpi_process(mpi_communicator));
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    sp.compress();
 
-    const RightHandSide<dim>          right_hand_side;
-    std::vector<Vector<double> >      rhs_values (n_q_points,
-						  Vector<double>(dim+1));
+    system_matrix_newton.reinit (sp);
 
+    mass_matrix.reinit (sp);
+  }    
 
-    const FEValuesExtractors::Vector velocities (0);
-    const FEValuesExtractors::Scalar pressure (dim);
+  assemble_mass_matrix ();
+  const unsigned int
+    start = (system_rhs_newton.local_range().first),
+    end   = (system_rhs_newton.local_range().second);
+  for (unsigned int j=start; j<end; j++)
+    diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
+  number_iterations = 0;
+  
+  diag_mass_matrix_vector.compress ();
+}
 
+template <int dim>
+void Step4<dim>::assemble_mass_matrix ()
+{
+  QTrapez<dim-1>  face_quadrature_formula;
 
+  FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula,
+			              update_values   | update_quadrature_points | update_JxW_values);
 
-    std::vector<Tensor<2,dim> >          phi_grads_u (dofs_per_cell);
-    std::vector<double>                  div_phi_u   (dofs_per_cell);
-    std::vector<double>                  phi_p       (dofs_per_cell);
+  const unsigned int   dofs_per_cell      = fe.dofs_per_cell;
+  const unsigned int   dofs_per_face      = fe.dofs_per_face;
+  const unsigned int   n_face_q_points    = face_quadrature_formula.size();
 
-    typename MGDoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+  const FEValuesExtractors::Vector displacement (0);
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+
+  for (; cell!=endc; ++cell)
+    if (cell->is_locally_owned())
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	if (cell->face (face)->at_boundary()
+	    && cell->face (face)->boundary_indicator () == 9)
+	  {
+	    fe_values_face.reinit (cell, face);
+	    cell_matrix = 0;
+
+	    for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		cell_matrix(i,i) += (fe_values_face[displacement].value (i, q_point) *
+				     fe_values_face[displacement].value (i, q_point) *
+				     fe_values_face.JxW (q_point));
+
+	    cell->get_dof_indices (local_dof_indices);
+
+	    constraints_dirichlet_hanging_nodes.distribute_local_to_global (cell_matrix,
+									    local_dof_indices,
+									    mass_matrix);
+	  }
+
+  mass_matrix.compress ();
+}
+
+template <int dim>
+void Step4<dim>::assemble_nl_system (TrilinosWrappers::MPI::Vector &u)
+{
+  QGauss<dim>  quadrature_formula(2);
+  QGauss<dim-1>  face_quadrature_formula(2);
+
+  FEValues<dim> fe_values (fe, quadrature_formula,
+			   UpdateFlags(update_values    |
+				       update_gradients |
+				       update_q_points  |
+				       update_JxW_values));
+
+  FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula,
+				    update_values   | update_quadrature_points |
+				    update_JxW_values);
+
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.size ();
+  const unsigned int   n_face_q_points = face_quadrature_formula.size();
+
+  const EquationData::RightHandSide<dim> right_hand_side;
+  std::vector<Vector<double> > right_hand_side_values (n_q_points,
+                                                       Vector<double>(dim));
+  std::vector<Vector<double> > right_hand_side_values_face (n_face_q_points,
+							    Vector<double>(dim));
+
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs (dofs_per_cell);
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+						 endc = dof_handler.end();
+
+  const FEValuesExtractors::Vector displacement (0);
+
+  TrilinosWrappers::MPI::Vector   test_rhs(solution);
+  const double kappa = 1.0;
+  for (; cell!=endc; ++cell)
+    if (cell->is_locally_owned())
       {
 	fe_values.reinit (cell);
-	local_matrix = 0;
-	local_rhs = 0;
+	cell_matrix = 0;
+	cell_rhs = 0;
 
-	right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
-					  rhs_values);
+	right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
+					   right_hand_side_values);
 
-	for (unsigned int q=0; q<n_q_points; ++q)
+	std::vector<SymmetricTensor<2,dim> > strain_tensor (n_q_points);
+	fe_values[displacement].get_function_symmetric_gradients (u, strain_tensor);
+
+	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	  {
-	    for (unsigned int k=0; k<dofs_per_cell; ++k)
-	      {
-		phi_grads_u[k] = fe_values[velocities].gradient (k, q);
-		div_phi_u[k]   = fe_values[velocities].divergence (k, q);
-		phi_p[k]       = fe_values[pressure].value (k, q);
-	      }
+	    SymmetricTensor<4,dim> stress_strain_tensor_linearized;
+	    SymmetricTensor<4,dim> stress_strain_tensor;
+	    SymmetricTensor<2,dim> stress_tensor;
 
+	    plast_lin_hard->linearized_plast_linear_hardening (stress_strain_tensor_linearized,
+							       stress_strain_tensor,
+							       strain_tensor[q_point]);
+
+	    //   	if (q_point == 0)
+	    //  	std::cout<< stress_strain_tensor_linearized <<std::endl;
+	    //  	std::cout<< stress_strain_tensor <<std::endl;
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      {
+		stress_tensor = stress_strain_tensor_linearized * plast_lin_hard->get_strain(fe_values, i, q_point);
+
 		for (unsigned int j=0; j<dofs_per_cell; ++j)
 		  {
-		    local_matrix(i,j) += (scalar_product(phi_grads_u[i], phi_grads_u[j])
-					  - div_phi_u[i] * phi_p[j]
-					  - phi_p[i] * div_phi_u[j]
-					  - phi_p[i] * phi_p[j]
-		    )
-					 * fe_values.JxW(q);
+		    cell_matrix(i,j) += (stress_tensor *
+					 plast_lin_hard->get_strain(fe_values, j, q_point) *
+					 fe_values.JxW (q_point));
 		  }
 
-		const unsigned int component_i =
-		  fe.system_to_component_index(i).first;
-		local_rhs(i) += fe_values.shape_value(i,q) *
-				rhs_values[q](component_i) *
-				fe_values.JxW(q);
+		// the linearized part a(v^i;v^i,v) of the rhs
+		cell_rhs(i) += (stress_tensor *
+				strain_tensor[q_point] *
+				fe_values.JxW (q_point));
+
+		// the residual part a(v^i;v) of the rhs
+		cell_rhs(i) -= (strain_tensor[q_point] * stress_strain_tensor *
+				plast_lin_hard->get_strain(fe_values, i, q_point) *
+				fe_values.JxW (q_point));
+
+		// the residual part F(v) of the rhs
+		Tensor<1,dim> rhs_values;
+		rhs_values = 0;
+		cell_rhs(i) += (fe_values[displacement].value (i, q_point) *
+				rhs_values *
+				fe_values.JxW (q_point));
 	      }
 	  }
 
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  {
+	    if (cell->face (face)->at_boundary()
+		&& cell->face (face)->boundary_indicator () == 9)
+	      {
+		fe_values_face.reinit (cell, face);
 
+		right_hand_side.vector_value_list (fe_values_face.get_quadrature_points(),
+						   right_hand_side_values_face);
 
+		for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+		  {
+		    Tensor<1,dim> rhs_values;
+		    rhs_values = 0;
+		    for (unsigned int i=0; i<dofs_per_cell; ++i)
+		      cell_rhs(i) += (fe_values_face[displacement].value (i, q_point) *
+				      rhs_values *
+				      fe_values_face.JxW (q_point));
+		  }
+	      }
+	  }
 
 	cell->get_dof_indices (local_dof_indices);
-	constraints.distribute_local_to_global (local_matrix, local_rhs,
+	constraints.distribute_local_to_global (cell_matrix, cell_rhs,
 						local_dof_indices,
-						system_matrix, system_rhs);
-      }
-  }
-
-
-  template <int dim>
-  void StokesProblem<dim>::assemble_multigrid ()
-  {
-    QGauss<dim>   quadrature_formula(degree+2);
-    FEValues<dim> fe_values (fe, quadrature_formula,
-			     update_values    |
-			     update_quadrature_points  |
-			     update_JxW_values |
-			     update_gradients);
-
-    const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-    const unsigned int   n_q_points      = quadrature_formula.size();
-
-    FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-    const FEValuesExtractors::Vector velocities (0);
-    const FEValuesExtractors::Scalar pressure (dim);
-
-
-    std::vector<Tensor<2,dim> >          phi_grads_u (dofs_per_cell);
-    std::vector<double>                  div_phi_u   (dofs_per_cell);
-    std::vector<double>                  phi_p       (dofs_per_cell);
-
-    std::vector<std::vector<bool> > interface_dofs
-      = mg_constrained_dofs.get_refinement_edge_indices ();
-    std::vector<std::vector<bool> > boundary_interface_dofs
-      = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
-
-    std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_levels());
-    std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_levels());
-    for (unsigned int level=0; level<triangulation.n_levels(); ++level)
-      {
-	boundary_constraints[level].add_lines (interface_dofs[level]);
-	boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
-	boundary_constraints[level].close ();
-
-	boundary_interface_constraints[level]
-	  .add_lines (boundary_interface_dofs[level]);
-	boundary_interface_constraints[level].close ();
-      }
-
-    typename MGDoFHandler<dim>::cell_iterator
-      cell = dof_handler.begin(),
-      endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
-      {
-					 // Remember the level of the
-					 // current cell.
-	const unsigned int level = cell->level();
-					 // Compute the values specified
-					 // by update flags above.
-	fe_values.reinit (cell);
-	local_matrix = 0;
-
-	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-	    for (unsigned int k=0; k<dofs_per_cell; ++k)
-	      {
-		phi_grads_u[k] = fe_values[velocities].gradient (k, q);
-		div_phi_u[k]   = fe_values[velocities].divergence (k, q);
-		phi_p[k]       = fe_values[pressure].value (k, q);
-	      }
-
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		local_matrix(i,j) += (
-		  scalar_product(phi_grads_u[i], phi_grads_u[j])
-		  - div_phi_u[i] * phi_p[j]
-		  - phi_p[i] * div_phi_u[j]
-//                                        - phi_p[i] * phi_p[j]
-		)
-				     * fe_values.JxW(q);
-	  }
-
-	cell->get_mg_dof_indices (local_dof_indices);
-	boundary_constraints[level]
-	  .distribute_local_to_global (local_matrix,
-				       local_dof_indices,
-				       mg_matrices[level]);
-
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    if( !(interface_dofs[level][local_dof_indices[i]]==true &&
-		  interface_dofs[level][local_dof_indices[j]]==false))
-	      local_matrix(i,j) = 0;
-
-	boundary_interface_constraints[level]
-	  .distribute_local_to_global (local_matrix,
-				       local_dof_indices,
-				       mg_interface_matrices[level]);
-      }
-
-    mg_A_preconditioner.resize (triangulation.n_levels());
-    for (unsigned int level=0; level<triangulation.n_levels(); ++level)
-      {
-	mg_A_preconditioner[level]
-	  = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
-	mg_A_preconditioner[level]
-	  ->initialize (mg_matrices[level].block(0,0),
-			typename InnerPreconditioner<dim>::type::AdditionalData());
-      }
-  }
-
-
-  template <typename InnerPreconditioner>
-  class SchurComplementSmoother
-  {
-    public:
-      struct AdditionalData
-      {
-	  const InnerPreconditioner *A_preconditioner;
+						system_matrix_newton, system_rhs_newton, true);
       };
 
-      void initialize (const BlockSparseMatrix<double> &system_matrix,
-		       const AdditionalData            &data);
-
-      void vmult (BlockVector<double> &dst,
-		  const BlockVector<double> &src) const;
-
-      void Tvmult (BlockVector<double> &dst,
-		   const BlockVector<double> &src) const;
-
-      void clear ();
-
-    private:
-      SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-      SmartPointer<const InnerPreconditioner>        A_preconditioner;
-  };
-
-
-  template <typename InnerPreconditioner>
-  void
-  SchurComplementSmoother<InnerPreconditioner>::
-  initialize (const BlockSparseMatrix<double> &system_matrix,
-	      const AdditionalData            &data)
-  {
-    this->system_matrix    = &system_matrix;
-    this->A_preconditioner = data.A_preconditioner;
-  }
-
-
-
-
-  template <typename InnerPreconditioner>
-  void
-  SchurComplementSmoother<InnerPreconditioner>::
-  vmult (BlockVector<double> &dst,
-	 const BlockVector<double> &src) const
-  {
-#ifdef STEP_42_TEST
-    std::cout << "Entering smoother with " << dst.size() << " unknowns" << std::endl;
-#endif
-
-    SparseDirectUMFPACK direct_solver;
-    direct_solver.initialize(*system_matrix);
-    Vector<double> solution, rhs;
-    solution = dst;
-    rhs = src;
-    direct_solver.vmult(solution, rhs);
-    dst = solution;
-/*
-  const InverseMatrix<SparseMatrix<double>,InnerPreconditioner>
-  A_inverse (system_matrix->block(0,0), *A_preconditioner);
-  Vector<double> tmp (dst.block(0).size());
-
-
-  {
-  Vector<double> schur_rhs (dst.block(1).size());
-  A_inverse.name = "rhs";
-  A_inverse.vmult (tmp, src.block(0));
-//    std::cout << " TMP " << tmp.l2_norm() << std::endl;
-system_matrix->block(1,0).vmult (schur_rhs, tmp);
-schur_rhs -= src.block(1);
-//    std::cout << " BLOCK 1 " << src.block(1).l2_norm() << std::endl;
-//    std::cout << " SCHUR RHS " << schur_rhs.l2_norm() << std::endl;
-
-SchurComplement<InnerPreconditioner>
-schur_complement (*system_matrix, A_inverse);
-
-				 // The usual control structures for
-								  // the solver call are created...
-								  SolverControl solver_control (dst.block(1).size(),
-								  1e-1*schur_rhs.l2_norm());
-								  SolverGMRES<>    cg (solver_control);
-
-								  #ifdef STEP_42_TEST
-								  std::cout << "    Starting Schur complement solver -- "
-								  << schur_complement.m() << " unknowns"
-								  << std::endl;
-								  #endif
-								  try
-								  {
-								  cg.solve (schur_complement, dst.block(1), schur_rhs,
-								  PreconditionIdentity());
-								  }
-								  catch (...)
-								  {
-								  std::cout << "Failure in " << __PRETTY_FUNCTION__ << std::endl;
-								  std::cout << schur_rhs.l2_norm () << std::endl;
-								  abort ();
-								  }
-
-// no constraints to be taken care of here
-#ifdef STEP_42_TEST
-std::cout << "    "
-<< solver_control.last_step()
-<< " CG Schur complement iterations in smoother "
-<< solver_control.initial_value() << "->" << solver_control.last_value()
-<< std::endl;
-#endif
+  system_matrix_newton.compress ();
+  system_rhs_newton.compress (Add);
 }
 
-
+template <int dim>
+void Step4<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
+				     Vector<double>                &sigma_eff_vector)
 {
-system_matrix->block(0,1).vmult (tmp, dst.block(1));
-tmp *= -1;
-tmp += src.block(0);
+  QGauss<dim>  quadrature_formula(2);
+  QGauss<dim-1> face_quadrature_formula(2);
 
-A_inverse.name = "top left";
-A_inverse.vmult (dst.block(0), tmp);
-// no constraints here either
+  FEValues<dim> fe_values (fe, quadrature_formula,
+			   UpdateFlags(update_values    |
+				       update_gradients |
+				       update_q_points  |
+				       update_JxW_values));
+
+  FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula,
+				    update_values   | update_quadrature_points |
+				    update_JxW_values);
+
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.size ();
+  const unsigned int   n_face_q_points = face_quadrature_formula.size();
+
+  const EquationData::RightHandSide<dim> right_hand_side;
+  std::vector<Vector<double> > right_hand_side_values (n_q_points,
+                                                       Vector<double>(dim));
+  std::vector<Vector<double> > right_hand_side_values_face (n_face_q_points,
+							    Vector<double>(dim));
+
+  Vector<double>       cell_rhs (dofs_per_cell);
+  Vector<double>       cell_sigma_eff (dofs_per_cell);
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+  const FEValuesExtractors::Vector displacement (0);
+
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+						 endc = dof_handler.end();
+
+  unsigned int elast_points = 0;
+  unsigned int plast_points = 0;
+  double       sigma_eff = 0;
+  double       yield = 0;
+  unsigned int cell_number = 0;
+  for (; cell!=endc; ++cell)
+    if (cell->is_locally_owned())
+      {
+	fe_values.reinit (cell);
+	cell_rhs = 0;
+
+	right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
+					   right_hand_side_values);
+
+	std::vector<SymmetricTensor<2,dim> > strain_tensor (n_q_points);
+	fe_values[displacement].get_function_symmetric_gradients (u, strain_tensor);
+
+	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+	  {
+	    SymmetricTensor<4,dim> stress_strain_tensor;
+	    SymmetricTensor<2,dim> stress_tensor;
+
+	    plast_lin_hard->plast_linear_hardening (stress_strain_tensor, strain_tensor[q_point],
+						    elast_points, plast_points, sigma_eff, yield);
+
+	    // sigma_eff_vector (cell_number) += sigma_eff;
+	    sigma_eff_vector (cell_number) += yield;
+
+	    /*	if (q_point == 0)
+		std::cout<< stress_strain_tensor <<std::endl;*/
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      {
+		cell_rhs(i) -= (strain_tensor[q_point] * stress_strain_tensor * //(stress_tensor) *
+				plast_lin_hard->get_strain(fe_values, i, q_point) *
+				fe_values.JxW (q_point));
+
+		Tensor<1,dim> rhs_values;
+		rhs_values = 0;
+		cell_rhs(i) += ((fe_values[displacement].value (i, q_point) *
+				 rhs_values) *
+				fe_values.JxW (q_point));
+	      };
+	  };
+
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  {
+	    if (cell->face (face)->at_boundary()
+		&& cell->face (face)->boundary_indicator () == 9)
+	      {
+		fe_values_face.reinit (cell, face);
+
+		right_hand_side.vector_value_list (fe_values_face.get_quadrature_points(),
+						   right_hand_side_values_face);
+
+		for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+		  {
+		    Tensor<1,dim> rhs_values;
+		    rhs_values = 0;
+		    for (unsigned int i=0; i<dofs_per_cell; ++i)
+		      cell_rhs(i) += (fe_values_face[displacement].value (i, q_point) *
+				      rhs_values *
+				      fe_values_face.JxW (q_point));
+		  }
+	      }
+	  }
+
+	cell->get_dof_indices (local_dof_indices);
+	constraints_dirichlet_hanging_nodes.distribute_local_to_global (cell_rhs,
+									local_dof_indices,
+									system_rhs_newton);
+
+	sigma_eff_vector(cell_number) /= n_q_points;
+	cell_number += 1;
+      };
+
+  system_rhs_newton.compress ();
+
+  unsigned int sum_elast_points = Utilities::MPI::sum(elast_points, mpi_communicator);
+  unsigned int sum_plast_points = Utilities::MPI::sum(plast_points, mpi_communicator);
+  pcout<< "Elast-Points = " << sum_elast_points <<std::endl;
+  pcout<< "Plast-Points = " << sum_plast_points <<std::endl;
 }
-#ifdef STEP_42_TEST
-std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
-#endif
-*/
-  }
 
+                                 // @sect4{Step4::projection_active_set}
 
+				 // Projection and updating of the active set
+                                 // for the dofs which penetrates the obstacle.
+template <int dim>
+void Step4<dim>::projection_active_set ()
+{
+  clock_t                        start_proj, end_proj;
+  
+  const EquationData::Obstacle<dim>     obstacle;
+  std::vector<bool>                     vertex_touched (dof_handler.n_dofs (), false);
+  
+  typename DoFHandler<dim>::active_cell_iterator
+  cell = dof_handler.begin_active(),
+  endc = dof_handler.end();
 
-  template <typename InnerPreconditioner>
-  void
-  SchurComplementSmoother<InnerPreconditioner>::clear ()
-  {}
+  TrilinosWrappers::MPI::Vector         distributed_solution (system_rhs_newton);
+  distributed_solution = solution;
+  TrilinosWrappers::MPI::Vector         lambda (solution);
+  lambda = resid_vector;
+  TrilinosWrappers::MPI::Vector         diag_mass_matrix_vector_relevant (solution);
+  diag_mass_matrix_vector_relevant = diag_mass_matrix_vector;
+    
+  constraints.reinit(locally_relevant_dofs);
+  active_set.clear ();
+  IndexSet     active_set_locally_owned;
+  active_set_locally_owned.set_size (locally_owned_dofs.size ());
+  const double c = 100.0*e_modul;
 
+  for (; cell!=endc; ++cell)
+    if (cell->is_locally_owned())
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	if (cell->face (face)->at_boundary()
+	    && cell->face (face)->boundary_indicator () == 9)
+	  for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
+	    {
+	      unsigned int index_z = cell->face (face)->vertex_dof_index (v,2);
 
+	      if (vertex_touched[cell->face (face)->vertex_index(v)] == false)
+		vertex_touched[cell->face (face)->vertex_index(v)] = true;
+	      else
+		continue;
 
-  template <typename InnerPreconditioner>
-  void
-  SchurComplementSmoother<InnerPreconditioner>::
-  Tvmult (BlockVector<double> &,
-	  const BlockVector<double> &) const
-  {
-    Assert (false, ExcNotImplemented());
-  }
+	      // the local row where
+	      Point<dim> point (cell->face (face)->vertex (v)[0],/* + solution (index_x),*/
+				cell->face (face)->vertex (v)[1],
+				cell->face (face)->vertex (v)[2]);
 
+	      double obstacle_value = obstacle.value (point, 2);
+	      double solution_index_z = solution (index_z);
+	      double gap = obstacle_value - point (2);
 
+	      if (lambda (index_z) +
+		  c*diag_mass_matrix_vector_relevant (index_z)*(solution_index_z - gap) > 0)
+		{
+		  constraints.add_line (index_z);
+		  constraints.set_inhomogeneity (index_z, gap);
 
-  template <int dim>
-  void StokesProblem<dim>::solve ()
-  {
-    system_matrix.block(1,1) = 0;
-    assemble_multigrid ();
-    typedef PreconditionMG<dim, BlockVector<double>, MGTransferPrebuilt<BlockVector<double> > >
-      MGPREC;
+		  distributed_solution (index_z) = gap;
 
-    GrowingVectorMemory<BlockVector<double> >  mg_vector_memory;
+		  if (locally_relevant_dofs.is_element (index_z))
+		    active_set.add_index (index_z);
 
-    MGTransferPrebuilt<BlockVector<double> > mg_transfer(constraints, mg_constrained_dofs);
-    std::vector<unsigned int> block_component (dim+1,0);
-    block_component[dim] = 1;
-    mg_transfer.set_component_to_block_map (block_component);
-    mg_transfer.build_matrices(dof_handler);
+		  if (locally_owned_dofs.is_element (index_z))
+		    active_set_locally_owned.add_index (index_z);
 
-    FullMatrix<float> mg_coarse_matrix;
-    mg_coarse_matrix.copy_from (mg_matrices[0]);
-    MGCoarseGridHouseholder<float, BlockVector<double> > mg_coarse;
-    mg_coarse.initialize(mg_coarse_matrix);
+		  // std::cout<< index_z << ", "
+		  // 	   << "Error: " << lambda (index_z) +
+		  //   diag_mass_matrix_vector_relevant (index_z)*c*(solution_index_z - gap)
+		  // 	   << ", " << lambda (index_z)
+		  // 	   << ", " << diag_mass_matrix_vector_relevant (index_z)
+		  // 	   << ", " << obstacle_value
+		  // 	   << ", " << solution_index_z
+		  // 	   <<std::endl;
+		}
+	    }
+  distributed_solution.compress(Insert);
 
-    MGMatrix<BlockSparseMatrix<double>, BlockVector<double> >
-      mg_matrix(&mg_matrices);
-    MGMatrix<BlockSparseMatrix<double>, BlockVector<double> >
-      mg_interface_up(&mg_interface_matrices);
-    MGMatrix<BlockSparseMatrix<double>, BlockVector<double> >
-      mg_interface_down(&mg_interface_matrices);
+  unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set_locally_owned.n_elements (),
+							     mpi_communicator);
+  pcout << "Number of Contact-Constaints: " << sum_contact_constraints <<std::endl;
 
-    typedef
-      SchurComplementSmoother<typename InnerPreconditioner<dim>::type>
-      Smoother;
+  solution = distributed_solution;
 
-    MGSmootherPrecondition<BlockSparseMatrix<double>,
-      Smoother,
-      BlockVector<double> >
-      mg_smoother(mg_vector_memory);
+  constraints.close ();
 
-    MGLevelObject<typename Smoother::AdditionalData>
-      smoother_data (0, triangulation.n_levels()-1);
+  const ConstraintMatrix::MergeConflictBehavior
+    merge_conflict_behavior = ConstraintMatrix::left_object_wins;
+  constraints.merge (constraints_dirichlet_hanging_nodes, merge_conflict_behavior);
+}
 
-    for (unsigned int level=0; level<triangulation.n_levels(); ++level)
-      smoother_data[level].A_preconditioner = mg_A_preconditioner[level].get();
+template <int dim>
+void Step4<dim>::dirichlet_constraints ()
+{
+  /* boundary_indicators:
+            _______
+           /  9    /|
+          /______ / |
+        8|       | 8|
+         |   8   | /
+         |_______|/
+             6
+   */
 
-    mg_smoother.initialize(mg_matrices, smoother_data);
-    mg_smoother.set_steps(2);
+  constraints_dirichlet_hanging_nodes.reinit (locally_relevant_dofs);
+  constraints_dirichlet_hanging_nodes.merge (constraints_hanging_nodes);
 
-    Multigrid<BlockVector<double> > mg(dof_handler,
-				       mg_matrix,
-				       mg_coarse,
-				       mg_transfer,
-				       mg_smoother,
-				       mg_smoother);
-    mg.set_debug(3);
-    mg.set_edge_matrices(mg_interface_down, mg_interface_up);
+  std::vector<bool> component_mask (dim, true);
+  component_mask[0] = true;
+  component_mask[1] = true;
+  component_mask[2] = true;
+  VectorTools::interpolate_boundary_values (dof_handler,
+					    6,
+					    EquationData::BoundaryValues<dim>(),
+					    constraints_dirichlet_hanging_nodes,
+					    component_mask);
 
-    MGPREC  preconditioner(dof_handler, mg, mg_transfer);
+  component_mask[0] = true;
+  component_mask[1] = true;
+  component_mask[2] = false;
+  VectorTools::interpolate_boundary_values (dof_handler,
+  					    8,
+  					    EquationData::BoundaryValues<dim>(),
+  					    constraints_dirichlet_hanging_nodes,
+  					    component_mask);
+  constraints_dirichlet_hanging_nodes.close ();
+}
 
-    SolverControl solver_control (system_matrix.m(),
-				  1e-6*system_rhs.l2_norm());
-    GrowingVectorMemory<BlockVector<double> > vector_memory;
-    SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
-    gmres_data.max_n_tmp_vectors = 100;
+template <int dim>
+void Step4<dim>::solve ()
+{
+  pcout << "Solving ..." << std::endl;
+  Timer t;
 
-    SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
-					    gmres_data);
+  TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
+  distributed_solution = solution;
+  
+  constraints_hanging_nodes.set_zero (distributed_solution);
 
-//  PreconditionIdentity precondition_identity;
-#ifdef STEP_42_TEST
-    std::cout << "Starting outer GMRES complement solver" << std::endl;
-#endif
-    try
-      {
-	gmres.solve(system_matrix, solution, system_rhs,
-		    preconditioner);
-      }
-    catch (...)
-      {
-	std::cout << "Failure in " << __PRETTY_FUNCTION__ << std::endl;
-	abort ();
-      }
+  // Solving iterative
 
-    constraints.distribute (solution);
+  MPI_Barrier (mpi_communicator);
+  t.restart();
 
-    std::cout << solver_control.last_step()
-	      << " outer GMRES iterations ";
-  }
+  preconditioner_u.initialize (system_matrix_newton, additional_data);
+  
+  MPI_Barrier (mpi_communicator);
+  t.stop();
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+  run_time[6] += t.wall_time();
+  
+  MPI_Barrier (mpi_communicator);
+  t.restart();
 
+//   ReductionControl                 reduction_control (10000, 1e-15, 1e-4);
+//   SolverCG<TrilinosWrappers::MPI::Vector>
+//     solver (reduction_control, mpi_communicator);
+//   solver.solve (system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
 
-  template <int dim>
-  void StokesProblem<dim>::solve_block ()
-  {
-    std::cout << "   Computing preconditioner..." << std::endl << std::flush;
+  PrimitiveVectorMemory<TrilinosWrappers::MPI::Vector> mem;
+  TrilinosWrappers::MPI::Vector    tmp (system_rhs_newton);
+  const double solver_tolerance = 1e-4 *
+  	system_matrix_newton.residual (tmp, distributed_solution, system_rhs_newton);
+  SolverControl solver_control (system_matrix_newton.m(), solver_tolerance);
+  SolverFGMRES<TrilinosWrappers::MPI::Vector>
+     solver(solver_control, mem,
+     SolverFGMRES<TrilinosWrappers::MPI::Vector>::
+     AdditionalData(30, true));
+  solver.solve(system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);	    
 
-    A_preconditioner
-      = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
-    A_preconditioner->initialize (system_matrix.block(0,0),
-				  typename InnerPreconditioner<dim>::type::AdditionalData());
+  pcout << "Initial error: " << solver_control.initial_value() <<std::endl;
+  pcout << "   " << solver_control.last_step()
+  	    << " CG iterations needed to obtain convergence with an error: "
+  	    <<  solver_control.last_value()
+  	    << std::endl;
 
-    SparseMatrix<double> pressure_mass_matrix;
-    pressure_mass_matrix.reinit(sparsity_pattern.block(1,1));
-    pressure_mass_matrix.copy_from(system_matrix.block(1,1));
-    system_matrix.block(1,1) = 0;
+  MPI_Barrier (mpi_communicator);
+  t.stop();
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+  run_time[7] += t.wall_time();
 
-    SparseILU<double> pmass_preconditioner;
-    pmass_preconditioner.initialize (pressure_mass_matrix,
-				     SparseILU<double>::AdditionalData());
+  number_iterations += solver_control.last_step();
 
-    InverseMatrix<SparseMatrix<double>,SparseILU<double> >
-      m_inverse (pressure_mass_matrix, pmass_preconditioner);
+  constraints.distribute (distributed_solution);
 
-    BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
-      SparseILU<double> >
-      preconditioner (system_matrix, m_inverse, *A_preconditioner);
+  solution = distributed_solution;
+}
 
-    SolverControl solver_control (system_matrix.m(),
-				  1e-6*system_rhs.l2_norm());
-    GrowingVectorMemory<BlockVector<double> > vector_memory;
-    SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
-    gmres_data.max_n_tmp_vectors = 100;
+template <int dim>
+void Step4<dim>::solve_newton ()
+{
+  double                         resid=0;
+  double                         resid_old=100000;
+  TrilinosWrappers::MPI::Vector  res (system_rhs_newton);
+  TrilinosWrappers::MPI::Vector  tmp_vector (system_rhs_newton);
+  Timer                          t;
 
-    SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
-					    gmres_data);
+  std::vector<std::vector<bool> > constant_modes;
+  std::vector<bool>  components (dim,true);
+  components[dim] = false;
+  DoFTools::extract_constant_modes (dof_handler, components,
+				    constant_modes);
 
-    gmres.solve(system_matrix, solution, system_rhs,
-		preconditioner);
+  additional_data.elliptic = true;
+  additional_data.n_cycles = 1;
+  additional_data.w_cycle = false;
+  additional_data.output_details = false;
+  additional_data.smoother_sweeps = 2;
+  additional_data.aggregation_threshold = 1e-2;
 
-    constraints.distribute (solution);
+  IndexSet                            active_set_old (active_set);
+  Vector<double>                      sigma_eff_vector;
+  sigma_eff_vector.reinit (triangulation.n_active_cells());  
+  unsigned int j = 0;
+  unsigned int number_assemble_system = 0;
+  for (; j<=100;j++)
+    {
+      pcout<< " " <<std::endl;
+      pcout<< j << ". Iteration of the inexact Newton-method." <<std::endl;
+      pcout<< "Update of active set" <<std::endl;
+      
+      MPI_Barrier (mpi_communicator);
+      t.restart(); 
+      
+      projection_active_set ();
+      
+      MPI_Barrier (mpi_communicator);
+      t.stop();
+      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+        run_time[5] += t.wall_time();
+      
+      pcout<< "Assembling ... " <<std::endl;
+      MPI_Barrier (mpi_communicator);
+      t.restart(); 
+      system_matrix_newton = 0;
+      system_rhs_newton = 0;
+      assemble_nl_system (solution);  //compute Newton-Matrix
+      MPI_Barrier (mpi_communicator);
+      t.stop();
+      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+        run_time[1] += t.wall_time();
 
-    std::cout << " "
-	      << solver_control.last_step()
-	      << " block GMRES iterations ";
-  }
+      number_assemble_system += 1;
 
+      MPI_Barrier (mpi_communicator);
+      t.restart();
+      solve ();
+      MPI_Barrier (mpi_communicator);
+      t.stop();
+      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+        run_time[2] += t.wall_time();
+	
+      TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
+      distributed_solution = solution;
 
-  template <int dim>
-  void
-  StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
-  {
-    std::vector<std::string> solution_names (dim, "velocity");
-    solution_names.push_back ("pressure");
+      int damped = 0;
+      tmp_vector = old_solution;
+      double a = 0;
+      for (unsigned int i=0; (i<10)&&(!damped); i++)
+	{
+	  a=pow(0.5, static_cast<double>(i));
+	  old_solution = tmp_vector;
+	  old_solution.sadd(1-a,a, distributed_solution);
 
-    std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      data_component_interpretation
-      (dim, DataComponentInterpretation::component_is_part_of_vector);
+	  MPI_Barrier (mpi_communicator);
+          t.restart();
+	  system_rhs_newton = 0;
+	  sigma_eff_vector = 0;
+	  solution = old_solution;
+	  residual_nl_system (solution, sigma_eff_vector);
+	  res = system_rhs_newton;
+
+	  const unsigned int
+	    start_res     = (res.local_range().first),
+	    end_res       = (res.local_range().second);
+	  for (unsigned int n=start_res; n<end_res; ++n)
+	    if (constraints.is_inhomogeneously_constrained (n))
+	      {
+		// pcout<< i << ". " << constraints.get_inhomogeneity (n)
+		// 	 << ". " << res (n)
+		// 	 << ", start = " << start_res
+		// 	 << ", end = " << end_res
+		// 	 <<std::endl;
+		res(n) = 0;
+	      }
+
+	  resid = res.l2_norm ();
+	  pcout<< "Residual: " << resid <<std::endl;
+
+	  if (resid<resid_old)
+	    {
+	      pcout<< "Newton-damping parameter alpha = " << a <<std::endl;
+	      damped=1;
+	    }
+	  MPI_Barrier (mpi_communicator);
+          t.stop();
+          if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+            run_time[3] += t.wall_time();
+	}
+
+      if (resid<1e-8)
+	{
+	  pcout<< "Inexact Newton-method stopped with residual = " << resid <<std::endl;
+	  pcout<< "Number of Assembling systems = " << number_assemble_system <<std::endl;
+	  break;
+	}
+      resid_old=resid;
+
+      resid_vector = system_rhs_newton;
+
+      if (active_set == active_set_old && resid < 1e-10)
+	break;
+      active_set_old = active_set;
+    } // End of active-set-loop
+
+  
+  pcout<< "Creating output." <<std::endl;
+  MPI_Barrier (mpi_communicator);
+  t.restart();
+  std::ostringstream filename_solution;
+  filename_solution << "solution";
+  // filename_solution << "solution_";
+  // filename_solution << k;
+  output_results (filename_solution.str ());
+  // output_results (sigma_eff_vector, "sigma_eff");
+  MPI_Barrier (mpi_communicator);
+  t.stop();
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+    run_time[4] += t.wall_time();
+
+  pcout<< "Number of Solver-Iterations = " << number_iterations <<std::endl;
+
+  pcout<< "%%%%%% Rechenzeit make grid and setup = " << run_time[0] <<std::endl;
+  pcout<< "%%%%%% Rechenzeit projection active set = " << run_time[5] <<std::endl;
+  pcout<< "%%%%%% Rechenzeit assemble system = " << run_time[1] <<std::endl;
+  pcout<< "%%%%%% Rechenzeit solve system = " << run_time[2] <<std::endl;
+  pcout<< "%%%%%% Rechenzeit preconditioner = " << run_time[6] <<std::endl;
+  pcout<< "%%%%%% Rechenzeit solve with CG = " << run_time[7] <<std::endl;
+  pcout<< "%%%%%% Rechenzeit error and lambda = " << run_time[3] <<std::endl;
+  pcout<< "%%%%%% Rechenzeit output = " << run_time[4] <<std::endl;
+}
+
+template <int dim>
+void Step4<dim>::output_results (const std::string& title) const
+{
+  move_mesh (solution);
+
+  TrilinosWrappers::MPI::Vector         lambda (solution);
+  lambda = resid_vector;
+
+  DataOut<dim> data_out;
+
+  data_out.attach_dof_handler (dof_handler);
+
+  const std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation
-      .push_back (DataComponentInterpretation::component_is_scalar);
+    (dim, DataComponentInterpretation::component_is_part_of_vector);
+  data_out.add_data_vector (solution, std::vector<std::string>(dim, "Displacement"),
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
+  data_out.add_data_vector (lambda, std::vector<std::string>(dim, "Residual"),
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
+  data_out.add_data_vector (active_set, std::vector<std::string>(dim, "ActiveSet"),
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
 
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, solution_names,
-			      DataOut<dim>::type_dof_data,
-			      data_component_interpretation);
-    data_out.build_patches ();
+  Vector<float> subdomain (triangulation.n_active_cells());
+  for (unsigned int i=0; i<subdomain.size(); ++i)
+    subdomain(i) = triangulation.locally_owned_subdomain();
+  data_out.add_data_vector (subdomain, "subdomain");
 
-    std::ostringstream filename;
-    filename << "solution-"
-	     << Utilities::int_to_string (refinement_cycle, 2)
-	     << ".vtk";
+  data_out.build_patches ();
 
-    std::ofstream output (filename.str().c_str());
-    data_out.write_vtk (output);
-  }
+  const std::string filename = (title + "-" +
+  				Utilities::int_to_string
+  				(triangulation.locally_owned_subdomain(), 4));
 
+  std::ofstream output_vtu ((filename + ".vtu").c_str ());
+  data_out.write_vtu (output_vtu);
 
-
-  template <int dim>
-  void
-  StokesProblem<dim>::refine_mesh ()
-  {
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-
-    std::vector<bool> component_mask (dim+1, false);
-    component_mask[dim] = true;
-    KellyErrorEstimator<dim>::estimate (static_cast<const DoFHandler<dim>&>(dof_handler),
-					QGauss<dim-1>(degree+1),
-					typename FunctionMap<dim>::type(),
-					solution,
-					estimated_error_per_cell,
-					component_mask);
-
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-						     estimated_error_per_cell,
-						     0.3, 0.0);
-    triangulation.execute_coarsening_and_refinement ();
-  }
-
-
-
-  template <int dim>
-  void StokesProblem<dim>::run ()
-  {
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
     {
-      std::vector<unsigned int> subdivisions (dim, 1);
-      subdivisions[0] = 1;
+      std::vector<std::string> filenames;
+      for (unsigned int i=0;
+  	   i<Utilities::MPI::n_mpi_processes(mpi_communicator);
+  	   ++i)
+  	filenames.push_back ("solution-" +
+  			     Utilities::int_to_string (i, 4) +
+  			     ".vtu");
 
-      const Point<dim> bottom_left = (dim == 2 ?
-				      Point<dim>(0,0) :
-				      Point<dim>(0,0,0));
-      const Point<dim> top_right   = (dim == 2 ?
-				      Point<dim>(1,1) :
-				      Point<dim>(1,1,1));
-
-      GridGenerator::subdivided_hyper_rectangle (triangulation,
-						 subdivisions,
-						 bottom_left,
-						 top_right);
+      std::ofstream master_output ((filename + ".pvtu").c_str());
+      data_out.write_pvtu_record (master_output, filenames);
     }
 
+  TrilinosWrappers::MPI::Vector  tmp (solution);
+  tmp *= -1;
+  move_mesh (tmp);
+}
 
-    for (typename Triangulation<dim>::active_cell_iterator
-	   cell = triangulation.begin_active();
-	 cell != triangulation.end(); ++cell)
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	if (cell->face(f)->center()[0] == 1)
-	  cell->face(f)->set_all_boundary_indicators(1);
+template <int dim>
+void Step4<dim>::move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const
+{
+  pcout<< "Moving mesh." <<std::endl;
 
+  std::vector<bool> vertex_touched (triangulation.n_vertices(),
+				    false);
 
+  for (typename DoFHandler<dim>::active_cell_iterator
+	 cell = dof_handler.begin_active ();
+       cell != dof_handler.end(); ++cell)
+    if (cell->is_locally_owned())
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	{
+	  if (vertex_touched[cell->vertex_index(v)] == false)
+	    {
+	      vertex_touched[cell->vertex_index(v)] = true;
 
-    triangulation.refine_global (1);
+	      Point<dim> vertex_displacement;
+	      for (unsigned int d=0; d<dim; ++d)
+		{
+		  if (_complete_displacement(cell->vertex_dof_index(v,d)) != 0)
+		    vertex_displacement[d]
+		      = _complete_displacement(cell->vertex_dof_index(v,d));
+		}
 
+	      cell->vertex(v) += vertex_displacement;
+	    }
+	}
+}
 
-    for (unsigned int refinement_cycle = 0; refinement_cycle<10;
-	 ++refinement_cycle)
-      {
-	std::cout << "Refinement cycle " << refinement_cycle << std::endl;
+template <int dim>
+void Step4<dim>::output_results (TrilinosWrappers::MPI::Vector vector,
+				 const std::string& title) const
+{
+  DataOut<dim> data_out;
 
-	if (refinement_cycle > 0)
-	  refine_mesh ();
+  data_out.attach_dof_handler (dof_handler);
+  data_out.add_data_vector (vector, "vector_to_plot");
 
-	std::ostringstream out_filename;
-	out_filename << "gitter"
-		     << refinement_cycle
-		     << ".eps";
+  data_out.build_patches ();
 
-	std::ofstream grid_output (out_filename.str().c_str());
-	GridOut grid_out;
-	grid_out.write_eps (triangulation, grid_output);
+  std::ofstream output_vtk (dim == 2 ?
+			    (title + ".vtk").c_str () :
+			    (title + ".vtk").c_str ());
+  data_out.write_vtk (output_vtk);
+}
 
-	setup_dofs ();
+template <int dim>
+void Step4<dim>::output_results (Vector<double> vector, const std::string& title) const
+{
+  DataOut<dim> data_out;
 
-	std::cout << "   Assembling..." << std::endl << std::flush;
-	assemble_system ();
+  data_out.attach_dof_handler (dof_handler);
+  data_out.add_data_vector (vector, "vector_to_plot");
 
-	std::cout << "   Solving..." << std::flush;
+  data_out.build_patches ();
 
-	solve_block ();
-	output_results (refinement_cycle);
-	system ("mv solution-* block");
+  std::ofstream output_vtk (dim == 2 ?
+			    (title + ".vtk").c_str () :
+			    (title + ".vtk").c_str ());
+  data_out.write_vtk (output_vtk);
+}
 
-	solution = 0;
+template <int dim>
+void Step4<dim>::run ()
+{
+  pcout << "Solving problem in " << dim << " space dimensions." << std::endl;
 
-	solve ();
-	output_results (refinement_cycle);
-	system ("mv solution-* mg");
+  run_time.resize (8);
 
-	std::cout << std::endl;
-      }
-  }
+  clock_t     start, end;
+
+  start = clock();
+  make_grid();
+  //  mesh_surface ();
+  
+  setup_system (); 
+  
+  end = clock();
+  run_time[0] = (double)(end-start)/CLOCKS_PER_SEC;
+
+  solve_newton ();
 }
 
 
+                                 // @sect3{The <code>main</code> function}
 
-int main ()
+				 // And this is the main function. It also
+				 // looks mostly like in step-3, but if you
+				 // look at the code below, note how we first
+				 // create a variable of type
+				 // <code>Step4@<2@></code> (forcing
+				 // the compiler to compile the class template
+				 // with <code>dim</code> replaced by
+				 // <code>2</code>) and run a 2d simulation,
+				 // and then we do the whole thing over in 3d.
+				 //
+				 // In practice, this is probably not what you
+				 // would do very frequently (you probably
+				 // either want to solve a 2d problem, or one
+				 // in 3d, but not both at the same
+				 // time). However, it demonstrates the
+				 // mechanism by which we can simply change
+				 // which dimension we want in a single place,
+				 // and thereby force the compiler to
+				 // recompile the dimension independent class
+				 // templates for the dimension we
+				 // request. The emphasis here lies on the
+				 // fact that we only need to change a single
+				 // place. This makes it rather trivial to
+				 // debug the program in 2d where computations
+				 // are fast, and then switch a single place
+				 // to a 3 to run the much more computing
+				 // intensive program in 3d for `real'
+				 // computations.
+				 //
+				 // Each of the two blocks is enclosed in
+				 // braces to make sure that the
+				 // <code>laplace_problem_2d</code> variable
+				 // goes out of scope (and releases the memory
+				 // it holds) before we move on to allocate
+				 // memory for the 3d case. Without the
+				 // additional braces, the
+				 // <code>laplace_problem_2d</code> variable
+				 // would only be destroyed at the end of the
+				 // function, i.e. after running the 3d
+				 // problem, and would needlessly hog memory
+				 // while the 3d run could actually use it.
+                                 //
+                                 // Finally, the first line of the function is
+                                 // used to suppress some output.  Remember
+                                 // that in the previous example, we had the
+                                 // output from the linear solvers about the
+                                 // starting residual and the number of the
+                                 // iteration where convergence was
+                                 // detected. This can be suppressed through
+                                 // the <code>deallog.depth_console(0)</code>
+                                 // call.
+                                 //
+                                 // The rationale here is the following: the
+                                 // deallog (i.e. deal-log, not de-allog)
+                                 // variable represents a stream to which some
+                                 // parts of the library write output. It
+                                 // redirects this output to the console and
+                                 // if required to a file. The output is
+                                 // nested in a way so that each function can
+                                 // use a prefix string (separated by colons)
+                                 // for each line of output; if it calls
+                                 // another function, that may also use its
+                                 // prefix which is then printed after the one
+                                 // of the calling function. Since output from
+                                 // functions which are nested deep below is
+                                 // usually not as important as top-level
+                                 // output, you can give the deallog variable
+                                 // a maximal depth of nested output for
+                                 // output to console and file. The depth zero
+                                 // which we gave here means that no output is
+                                 // written. By changing it you can get more
+                                 // information about the innards of the
+                                 // library.
+int main (int argc, char *argv[])
 {
-  try
-    {
-      using namespace dealii;
-      using namespace Step42;
+  deallog.depth_console (0);
 
-      deallog.depth_console (0);
+  clock_t     start, end;
 
-      StokesProblem<2> flow_problem(1);
-      flow_problem.run ();
-    }
-  catch (std::exception &exc)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Exception on processing: " << std::endl
-                << exc.what() << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+  start = clock();
 
-      return 1;
-    }
-  catch (...)
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+  {
+    int _n_refinements_global = 1;
+    int _n_refinements_local = 1;
+    
+    if (argc == 3)
     {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Unknown exception!" << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
+      _n_refinements_global = atoi(argv[1]);
+      _n_refinements_local = atoi(argv[2]);
     }
+    
+    Step4<3> laplace_problem_3d (_n_refinements_global, _n_refinements_local);
+    laplace_problem_3d.run ();
+  }
+
+  end = clock();
+  cout<< "%%%%%% Rechenzeit overall = " << (double)(end-start)/CLOCKS_PER_SEC <<std::endl;
 
   return 0;
 }

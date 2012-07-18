@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -82,11 +82,11 @@ estimate<InputVector,DH<deal_II_dimension> > (const DH<deal_II_dimension>       
           const Function<deal_II_dimension>         *,    \
           const unsigned int           , \
           const unsigned int           , \
-	  const types::material_id_t);\
- 
+          const types::material_id_t);\
+
 #if deal_II_dimension == 2 || deal_II_dimension == 1
 
-#define INSTANTIATE_CODIM(InputVector,DH,Q)	\
+#define INSTANTIATE_CODIM(InputVector,DH,Q)     \
 template    \
 void    \
 KellyErrorEstimator<deal_II_dimension, deal_II_dimension+1>::    \
@@ -148,14 +148,14 @@ estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const DH<deal_
 #else
 #define INSTANTIATE_CODIM(InputVector,DH,Q)
 #endif
- 
+
 
 #define INSTANTIATE(InputVector,DH) \
      INSTANTIATE_1(InputVector,DH,Quadrature) \
      INSTANTIATE_1(InputVector,DH,hp::QCollection) \
      INSTANTIATE_CODIM(InputVector, DH, Quadrature) \
      INSTANTIATE_CODIM(InputVector, DH, hp::QCollection)
-       
+
 
 
 INSTANTIATE(Vector<double>,DoFHandler)

@@ -12,19 +12,13 @@
 //---------------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
-    template class MappingQ1Eulerian<deal_II_dimension, Vector<double> >;
-    template class MappingQ1Eulerian<deal_II_dimension, Vector<float> >;
+#if deal_II_dimension <= deal_II_space_dimension 	
+    template class MappingQ1Eulerian<deal_II_dimension, Vector<double>,	deal_II_space_dimension>;
+    template class MappingQ1Eulerian<deal_II_dimension, Vector<float>,	deal_II_space_dimension>;
 #ifdef DEAL_II_USE_PETSC
-    template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector>;
+    template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector, deal_II_space_dimension>;
 #endif
-
-#if deal_II_dimension != 3
-    template class MappingQ1Eulerian<deal_II_dimension, Vector<double>, deal_II_dimension+1 >;
-#	ifdef DEAL_II_USE_PETSC
-    template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector, deal_II_dimension+1>;
-#	endif
 #endif
   }
-

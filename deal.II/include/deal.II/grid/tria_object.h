@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,7 @@ namespace internal
 {
   namespace Triangulation
   {
-    
+
 /**
  * Class template for the <tt>structdim</tt>-dimensional cells constituting
  * a Triangulation of dimension <tt>structdim</tt> or lower dimensional
@@ -37,76 +37,76 @@ namespace internal
     class TriaObject
     {
       public:
-	static const unsigned int dimension = structdim;
-	
-					 /**
-					  * Default constructor,
-					  * setting all face indices
-					  * to invalid values.
-					  */				  
-	TriaObject ();
-	
-					 /**
-					  * Constructor for a line
-					  * object with the numbers of
-					  * its two end points.
-					  *
-					  * Throws an exception if
-					  * dimension is not one.
-					  */
-	TriaObject (const int i0, const int i1);
+        static const unsigned int dimension = structdim;
 
-					 /**
-					  * Constructor for a quadrilateral
-					  * object with the numbers of
-					  * its four lines.
-					  *
-					  * Throws an exception if
-					  * dimension is not two.
-					  */
-	TriaObject (const int i0, const int i1,
-		    const int i2, const int i3);
+                                         /**
+                                          * Default constructor,
+                                          * setting all face indices
+                                          * to invalid values.
+                                          */
+        TriaObject ();
 
-					 /**
-					  * Constructor for a hexahedron
-					  * object with the numbers of
-					  * its six quadrilaterals.
-					  *
-					  * Throws an exception if
-					  * dimension is not two.
-					  */
-	TriaObject (const int i0, const int i1,
+                                         /**
+                                          * Constructor for a line
+                                          * object with the numbers of
+                                          * its two end points.
+                                          *
+                                          * Throws an exception if
+                                          * dimension is not one.
+                                          */
+        TriaObject (const int i0, const int i1);
+
+                                         /**
+                                          * Constructor for a quadrilateral
+                                          * object with the numbers of
+                                          * its four lines.
+                                          *
+                                          * Throws an exception if
+                                          * dimension is not two.
+                                          */
+        TriaObject (const int i0, const int i1,
+                    const int i2, const int i3);
+
+                                         /**
+                                          * Constructor for a hexahedron
+                                          * object with the numbers of
+                                          * its six quadrilaterals.
+                                          *
+                                          * Throws an exception if
+                                          * dimension is not two.
+                                          */
+        TriaObject (const int i0, const int i1,
                     const int i2, const int i3,
                     const int i4, const int i5);
-    
 
-					 /**
-					  * Return the index of the
-					  * ith face object.
-					  */
-	int face (const unsigned int i) const;
 
-					 /**
-					  * Set the index of the ith
-					  * face object.
-					  */
-	void set_face (const unsigned int i, const int index);
+                                         /**
+                                          * Return the index of the
+                                          * ith face object.
+                                          */
+        int face (const unsigned int i) const;
 
-					 /**
+                                         /**
+                                          * Set the index of the ith
+                                          * face object.
+                                          */
+        void set_face (const unsigned int i, const int index);
+
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         static std::size_t memory_consumption ();
 
-	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);
-	
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
+
       protected:
                                          /**
                                           *  Global indices of the
@@ -125,14 +125,14 @@ namespace internal
     TriaObject<structdim>::TriaObject ()
     {
       for (unsigned int i=0; i<GeometryInfo<structdim>::faces_per_cell; ++i)
-	faces[i] = -1;
+        faces[i] = -1;
     }
 
 
     template <int structdim>
     inline
     TriaObject<structdim>::TriaObject (const int i0,
-				       const int i1)
+                                       const int i1)
     {
       Assert (structdim==1, ExcImpossibleInDim(structdim));
       faces[0] = i0;
@@ -143,9 +143,9 @@ namespace internal
     template <int structdim>
     inline
     TriaObject<structdim>::TriaObject (const int i0,
-				       const int i1,
-				       const int i2,
-				       const int i3)
+                                       const int i1,
+                                       const int i2,
+                                       const int i3)
     {
       Assert (structdim==2, ExcImpossibleInDim(structdim));
       faces[0] = i0;
@@ -158,11 +158,11 @@ namespace internal
     template <int structdim>
     inline
     TriaObject<structdim>::TriaObject (const int i0,
-				       const int i1,
-				       const int i2,
-				       const int i3,
-				       const int i4,
-				       const int i5)
+                                       const int i1,
+                                       const int i2,
+                                       const int i3,
+                                       const int i4,
+                                       const int i5)
     {
       Assert (structdim==3, ExcImpossibleInDim(structdim));
       faces[0] = i0;
@@ -182,9 +182,9 @@ namespace internal
               ExcIndexRange(i,0,GeometryInfo<structdim>::faces_per_cell));
       return faces[i];
     }
-    
-    
-    
+
+
+
     template <int structdim>
     inline
     void TriaObject<structdim>::set_face (const unsigned int i, const int index)
@@ -193,9 +193,9 @@ namespace internal
               ExcIndexRange(i,0,GeometryInfo<structdim>::faces_per_cell));
       faces[i] = index;
     }
-    
-    
-    
+
+
+
     template <int structdim>
     inline
     std::size_t
@@ -208,12 +208,12 @@ namespace internal
     template <int structdim>
     template <class Archive>
     void TriaObject<structdim>::serialize(Archive & ar,
-					  const unsigned int)
+                                          const unsigned int)
     {
       ar & faces;
     }
 
-    
+
   }
 }
 

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,12 +34,12 @@ DEAL_II_NAMESPACE_OPEN
  * @author Bärbel Janssen, 2007
  */
 
-class PolynomialsAdini 
+class PolynomialsAdini
 {
   public:
                                      /**
-                                      * Constructor for 
-                                      * the polynomials of 
+                                      * Constructor for
+                                      * the polynomials of
                                       * the described space
                                       */
     PolynomialsAdini ();
@@ -69,7 +69,7 @@ class PolynomialsAdini
                                       * loop over all polynomials.
                                       */
 
-    void compute (const Point<2> &unit_point, 
+    void compute (const Point<2> &unit_point,
                   std::vector<double> &values,
                   std::vector<Tensor<1,2> > &grads,
                   std::vector< Tensor<2,2> > &grad_grads) const;
@@ -82,7 +82,7 @@ class PolynomialsAdini
                                        * Consider using compute() instead.
                                        */
 
-    double compute_value (const unsigned int i, 
+    double compute_value (const unsigned int i,
                           const Point<2> &p) const;
 
                                       /**
@@ -109,11 +109,11 @@ class PolynomialsAdini
 
   private:
                                         /**
-                                         * Store the coefficients of the 
+                                         * Store the coefficients of the
                                          * polynominals in the order
                                          * $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
                                          */
-    Table<2, double> coef;    
+    Table<2, double> coef;
 
                                         /**
                                          * Store the coefficients of the x-derivative
@@ -121,32 +121,32 @@ class PolynomialsAdini
                                          * $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
                                          */
 
-    Table<2, double> dx;      
+    Table<2, double> dx;
                                         /**
                                          * Store the coefficients of the y-derivative
                                          * of the polynominals in the order
                                          * $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
                                          */
 
-    Table<2, double> dy;      
+    Table<2, double> dy;
                                         /**
                                          * Store the coefficients of the second x-derivative
                                          * of the polynominals in the order
                                          * $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
                                          */
-    Table<2, double> dxx;     
+    Table<2, double> dxx;
                                         /**
                                          * Store the coefficients of the second y-derivative
                                          * of the polynominals in the order
                                          * $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
                                          */
-    Table<2, double> dyy;     
+    Table<2, double> dyy;
                                         /**
                                          * Store the coefficients of the second mixed derivative
                                          * of the polynominals in the order
                                          * $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
                                          */
-    Table<2, double> dxy;     
+    Table<2, double> dxy;
 
 };
 

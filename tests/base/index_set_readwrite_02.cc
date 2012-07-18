@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-//    $Id: index_set_readwrite_01.cc 21799 2010-08-30 17:08:00Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2010 by the deal.II authors

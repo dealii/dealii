@@ -1,6 +1,6 @@
 
 //----------------------------  template.cc  ---------------------------
-//    $Id: grid_in_out_02.cc 22595 2010-11-03 11:30:11Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2005, 2008, 2010, 2011 by the deal.II authors

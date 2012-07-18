@@ -1,6 +1,6 @@
 /* $Id$
  *
- * Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009, 2011 by the deal.II authors
+ * Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009, 2011, 2012 by the deal.II authors
  *
  * This file is subject to QPL and may not be  distributed
  * without copyright and license information. Please refer
@@ -8,7 +8,7 @@
  * further information on this license.
  */
 
-				 // @sect3{Include files}
+                                 // @sect3{Include files}
 
                                  // The most fundamental class in the
                                  // library is the Triangulation
@@ -33,28 +33,28 @@
 
                                  // This is needed for C++ output:
 #include <fstream>
-				 // And this for the declarations of the
-				 // `sqrt' and `fabs' functions:
+                                 // And this for the declarations of the
+                                 // `sqrt' and `fabs' functions:
 #include <cmath>
 
-				 // The final step in importing
-				 // deal.II is this: All deal.II
-				 // functions and classes are in a
-				 // namespace <code>dealii</code>, to
-				 // make sure they don't clash with
-				 // symbols from other libraries you
-				 // may want to use in conjunction
-				 // with deal.II. One could use these
-				 // functions and classes by prefixing
-				 // every use of these names by
-				 // <code>dealii::</code>, but that
-				 // would quickly become cumbersome
-				 // and annoying. Rather, we simply
-				 // import the entire deal.II
-				 // namespace for general use:
+                                 // The final step in importing
+                                 // deal.II is this: All deal.II
+                                 // functions and classes are in a
+                                 // namespace <code>dealii</code>, to
+                                 // make sure they don't clash with
+                                 // symbols from other libraries you
+                                 // may want to use in conjunction
+                                 // with deal.II. One could use these
+                                 // functions and classes by prefixing
+                                 // every use of these names by
+                                 // <code>dealii::</code>, but that
+                                 // would quickly become cumbersome
+                                 // and annoying. Rather, we simply
+                                 // import the entire deal.II
+                                 // namespace for general use:
 using namespace dealii;
 
-				 // @sect3{Creating the first mesh}
+                                 // @sect3{Creating the first mesh}
 
                                  // In the following, first function, we
                                  // simply use the unit square as
@@ -67,7 +67,7 @@ void first_grid ()
                                    // triangulation of a
                                    // two-dimensional domain:
   Triangulation<2> triangulation;
-				   // Here and in many following
+                                   // Here and in many following
                                    // cases, the string "<2>" after a
                                    // class name indicates that this
                                    // is an object that shall work in
@@ -108,7 +108,7 @@ void first_grid ()
 
 
 
-				 // @sect3{Creating the second mesh}
+                                 // @sect3{Creating the second mesh}
 
                                  // The grid in the following, second
                                  // function is slightly more
@@ -137,7 +137,7 @@ void second_grid ()
                outer_radius = 1.0;
   GridGenerator::hyper_shell (triangulation,
                               center, inner_radius, outer_radius,
-			      10);
+                              10);
                                    // By default, the triangulation
                                    // assumes that all boundaries are
                                    // straight and given by the cells
@@ -150,8 +150,8 @@ void second_grid ()
                                    // assumed to be straight, then new
                                    // points will simply be in the
                                    // middle of the surrounding ones.
-				   //
-				   // Here, however, we would like to
+                                   //
+                                   // Here, however, we would like to
                                    // have a curved
                                    // boundary. Fortunately, some good
                                    // soul implemented an object which
@@ -208,8 +208,8 @@ void second_grid ()
                                        // <code>one-past-the-end</code>
                                        // iterator:
       Triangulation<2>::active_cell_iterator
-	cell = triangulation.begin_active(),
-	endc = triangulation.end();
+        cell = triangulation.begin_active(),
+        endc = triangulation.end();
 
                                        // The loop over all cells is
                                        // then rather trivial, and
@@ -321,21 +321,21 @@ void second_grid ()
                                    // default object, over which the
                                    // triangulation has full control.
   triangulation.set_boundary (0);
-				   // An alternative to doing so, and
-				   // one that is frequently more
-				   // convenient, would have been to
-				   // declare the boundary object
-				   // before the triangulation
-				   // object. In that case, the
-				   // triangulation would have let
-				   // lose of the boundary object upon
-				   // its destruction, and everything
-				   // would have been fine.
+                                   // An alternative to doing so, and
+                                   // one that is frequently more
+                                   // convenient, would have been to
+                                   // declare the boundary object
+                                   // before the triangulation
+                                   // object. In that case, the
+                                   // triangulation would have let
+                                   // lose of the boundary object upon
+                                   // its destruction, and everything
+                                   // would have been fine.
 }
 
 
 
-				 // @sect3{The main function}
+                                 // @sect3{The main function}
 
                                  // Finally, the main function. There
                                  // isn't much to do here, only to

@@ -128,10 +128,16 @@ is defined as
 contributions to the energy are positive, and so that decaying solutions have
 finite energy on unbounded domains.)
 
-Beyond this, clearly, adaptivity (i.e. time-adaptive grids) would be of
-interest to problems like these. Their complexity leads us to leave this out
-of this program again, though the general comments in the introduction of @ref
-step_23 "step-23" remain true.
+Beyond this, there are two obvious areas:
 
+- Clearly, adaptivity (i.e. time-adaptive grids) would be of interest
+  to problems like these. Their complexity leads us to leave this out
+  of this program again, though the general comments in the
+  introduction of @ref step_23 "step-23" remain true.
 
-
+- Faster schemes to solve this problem. While computers today are
+  plenty fast enough to solve 2d and, frequently, even 3d stationary
+  problems within not too much time, time dependent problems present
+  an entirely different class of problems. We address this topic in
+  step-48 where we show how to solve this problem in parallel and
+  without assembling or inverting any matrix at all.

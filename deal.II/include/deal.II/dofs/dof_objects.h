@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,11 +27,11 @@ namespace internal
   {
     template <int> class DoFLevel;
     template <int> class DoFFaces;
-    
+
 
 /**
  * Store the indices of the degrees of freedom which are located on
- * objects of dimension @p dim. 
+ * objects of dimension @p dim.
  *
  * <h3>Information for all DoFObjects classes</h3>
  *
@@ -93,13 +93,13 @@ namespace internal
                                           * class hierarchy between hp
                                           * and non-hp classes.
                                           */
-	template <int dh_dim, int spacedim>
+        template <int dh_dim, int spacedim>
         void
         set_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
-		       const unsigned int       obj_index,
-		       const unsigned int       fe_index,
-		       const unsigned int       local_index,
-		       const unsigned int       global_index);
+                       const unsigned int       obj_index,
+                       const unsigned int       fe_index,
+                       const unsigned int       local_index,
+                       const unsigned int       global_index);
 
                                          /**
                                           * Return the global index of
@@ -126,12 +126,12 @@ namespace internal
                                           * class hierarchy between hp
                                           * and non-hp classes.
                                           */
-	template <int dh_dim, int spacedim>
-	unsigned int
+        template <int dh_dim, int spacedim>
+        unsigned int
         get_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
-		       const unsigned int       obj_index,
-		       const unsigned int       fe_index,
-		       const unsigned int       local_index) const;
+                       const unsigned int       obj_index,
+                       const unsigned int       fe_index,
+                       const unsigned int       local_index) const;
 
                                          /**
                                           * Return the value 1. The
@@ -139,7 +139,7 @@ namespace internal
                                           * becomes clear by looking
                                           * at what the corresponding
                                           * functions in the classes
-                                          * internal::hp::DoFObjects 
+                                          * internal::hp::DoFObjects
                                           */
         template <int dh_dim, int spacedim>
         unsigned int
@@ -165,14 +165,14 @@ namespace internal
                                           */
         std::size_t memory_consumption () const;
 
-	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);
-	
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
+
                                          /**
                                           * Make the DoFHandler and
                                           * MGDoFHandler classes a
@@ -180,8 +180,8 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-	template <int> friend class DoFLevel;
-	template <int> friend class DoFFaces;	
+        template <int> friend class DoFLevel;
+        template <int> friend class DoFFaces;
     };
 
 
@@ -192,20 +192,20 @@ namespace internal
     inline
     unsigned int
     DoFObjects<dim>::n_active_fe_indices (const dealii::DoFHandler<dh_dim,spacedim> &,
-					  const unsigned) const
+                                          const unsigned) const
     {
       return 1;
     }
-    
 
-    
+
+
     template <int dim>
     template <int dh_dim, int spacedim>
     inline
     bool
     DoFObjects<dim>::fe_index_is_active (const dealii::DoFHandler<dh_dim,spacedim> &,
-					 const unsigned int,
-					 const unsigned int fe_index) const
+                                         const unsigned int,
+                                         const unsigned int fe_index) const
     {
       Assert (fe_index == 0,
               ExcMessage ("Only zero fe_index values are allowed for "
@@ -213,7 +213,7 @@ namespace internal
       return true;
     }
 
-    
+
 
     template <int dim>
     template <int dh_dim, int spacedim>
@@ -221,28 +221,28 @@ namespace internal
     unsigned int
     DoFObjects<dim>::
     get_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
-		   const unsigned int       obj_index,
-		   const unsigned int       fe_index,
-		   const unsigned int       local_index) const
+                   const unsigned int       obj_index,
+                   const unsigned int       fe_index,
+                   const unsigned int       local_index) const
     {
       Assert ((fe_index == dealii::DoFHandler<dh_dim,spacedim>::default_fe_index),
-	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
+              ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
       Assert (local_index<dof_handler.get_fe().template n_dofs_per_object<dim>(),
-	      ExcIndexRange (local_index, 0, dof_handler.get_fe().template n_dofs_per_object<dim>()));
+              ExcIndexRange (local_index, 0, dof_handler.get_fe().template n_dofs_per_object<dim>()));
       Assert (obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>()+local_index
-	      <
-	      dofs.size(),
-	      ExcInternalError());
-      
+              <
+              dofs.size(),
+              ExcInternalError());
+
       return dofs[obj_index * dof_handler.get_fe()
                   .template n_dofs_per_object<dim>() + local_index];
-    }    
+    }
 
 
     template <int dim>
     template <class Archive>
     void DoFObjects<dim>::serialize(Archive & ar,
-				    const unsigned int)
+                                    const unsigned int)
     {
       ar & dofs;
     }

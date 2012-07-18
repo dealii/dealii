@@ -269,6 +269,41 @@
  * FiniteElement and FEValues classes.</dd>
  *
  *
+ * <dt class="glossary">@anchor GlossComponentMask <b>Component mask</b></dt>
+ *
+ * <dd>
+ * When using vector-valued elements (see @ref vector_valued) to solve systems
+ * of equations, one frequently wants to restrict some operations to only certain
+ * solution variables. For example, when solving the Stokes equations, one may
+ * wish to only interpolate boundary values for the velocity components
+ * but not the pressure. In deal.II, this is typically done by passing functions
+ * a <i>component mask</i>. Component masks are always specified as a
+ * <code>std::vector@<bool@></code>, i.e., an array with as many entries as the
+ * finite element has components (e.g., in the Stokes case, there are
+ * <code>dim+1</code> components) and where each entry is either true or false.
+ * In the example where we would like to interpolate boundary values only for
+ * the velocity components of the Stokes system, this component mask would then
+ * be <code>[true, true, false]</code> in 2d and <code>[true, true, true, false]</code>
+ * in 3d to indicate that no boundary values shall be set for the pressure variable
+ * (the last of the <code>dim+1</code> vector components of the solution.
+ *
+ * There are many functions that take such component masks, for example
+ * DoFTools::make_zero_boundary_values,
+ * VectorTools::interpolate_boundary_values,
+ * KellyErrorEstimator::estimate, etc. In some cases, there are multiple
+ * functions with these names but only some of them have a component mask
+ * argument.
+ *
+ * Many of the functions that take a component mask accept a vector of length
+ * zero to indicate <i>all components</i>, i.e., as if the vector had the
+ * correct length and was filled with only <code>true</code> values. The reason
+ * is that the empty vector can be constructed in place using the code snippet
+ * <code>std::vector@<bool@>()</code> and can thus be used as a default
+ * argument in function signatures.
+ * </dd>
+ *
+ *
+ *
  * <dt class="glossary">@anchor GlossCompress <b>Compressing distributed
  *                                              vectors and matrices</b></dt>
  *
@@ -541,14 +576,14 @@
  * The full reference for the paper is as follows:
  * @code
 @Article{BBHK11,
-  author = 	 {Wolfgang Bangerth and Carsten Burstedde and Timo Heister
+  author =       {Wolfgang Bangerth and Carsten Burstedde and Timo Heister
                   and Martin Kronbichler},
-  title = 	 {Algorithms and data structures for massively parallel generic
+  title =        {Algorithms and data structures for massively parallel generic
   adaptive finite element codes},
-  journal = 	 {ACM Trans. Math. Softw.},
-  year = 	 2011,
-  volume = 	 38,
-  pages = 	 {14/1--28}}
+  journal =      {ACM Trans. Math. Softw.},
+  year =         2011,
+  volume =       38,
+  pages =        {14/1--28}}
  * @endcode
  * It is also available as
  * <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
@@ -652,14 +687,14 @@
  * The full reference for this paper is as follows:
  * @code
 Article{BK07,
-  author = 	 {Wolfgang Bangerth and Oliver Kayser-Herold},
-  title = 	 {Data Structures and Requirements for hp Finite Element
+  author =       {Wolfgang Bangerth and Oliver Kayser-Herold},
+  title =        {Data Structures and Requirements for hp Finite Element
                   Software},
-  journal = 	 {ACM Trans. Math. Softw.},
-  year = 	 2009,
-  volume = 	 36,
-  number = 	 1,
-  pages = 	 {4/1--4/31}
+  journal =      {ACM Trans. Math. Softw.},
+  year =         2009,
+  volume =       36,
+  number =       1,
+  pages =        {4/1--4/31}
 }
  * @endcode
  * It is available as Technical Report ISC-07-04-MATH from the
@@ -738,7 +773,7 @@ Article{BK07,
  *
  * <dt class="glossary">@anchor GlossMaterialId <b>Material id</b></dt>
  * <dd>Each cell of a triangulation has associated with it a property called
- * "material id". It is commonly used in problems with heterogenous
+ * "material id". It is commonly used in problems with heterogeneous
  * coefficients to identify which part of the domain a cell is in and,
  * consequently, which value the coefficient should have on this particular
  * cell. The material id is inherited from mother to child cell upon mesh
@@ -761,10 +796,10 @@ Article{BK07,
  * The full reference for this paper is as follows:
  * @code
 Article{JK10,
-  author = 	 {B. Janssen and G. Kanschat},
-  title = 	 {Adaptive multilevel methods with local smoothing},
-  journal = 	 {submitted},
-  year = 	 2010
+  author =       {B. Janssen and G. Kanschat},
+  title =        {Adaptive multilevel methods with local smoothing},
+  journal =      {submitted},
+  year =         2010
 }
  * @endcode
  * It is available as Technical Report IAMCS-2009-131 from the

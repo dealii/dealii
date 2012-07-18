@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,119 +45,119 @@ template <class VECTOR>
 class MGSmoother : public MGSmootherBase<VECTOR>
 {
   public:
-				     /**
-				      * Constructor. Sets smoothing
-				      * parameters and creates a
-				      * private GrowingVectorMemory
-				      * object to be used to retrieve vectors.
-				      */
+                                     /**
+                                      * Constructor. Sets smoothing
+                                      * parameters and creates a
+                                      * private GrowingVectorMemory
+                                      * object to be used to retrieve vectors.
+                                      */
     MGSmoother(const unsigned int steps = 1,
-	       const bool variable = false,
-	       const bool symmetric = false,
-	       const bool transpose = false);
+               const bool variable = false,
+               const bool symmetric = false,
+               const bool transpose = false);
 
-				     /**
-				      * @deprecated Since
-				      * GrowingVectorMemory now uses a
-				      * joint memory pool, it is
-				      * recommended to use the
-				      * constructor without the memory
-				      * object.
-				      *
-				      * Constructor. Sets memory and
-				      * smoothing parameters.
-				      */
+                                     /**
+                                      * @deprecated Since
+                                      * GrowingVectorMemory now uses a
+                                      * joint memory pool, it is
+                                      * recommended to use the
+                                      * constructor without the memory
+                                      * object.
+                                      *
+                                      * Constructor. Sets memory and
+                                      * smoothing parameters.
+                                      */
     MGSmoother(VectorMemory<VECTOR>& mem,
-	       const unsigned int steps = 1,
-	       const bool variable = false,
-	       const bool symmetric = false,
-	       const bool transpose = false);
+               const unsigned int steps = 1,
+               const bool variable = false,
+               const bool symmetric = false,
+               const bool transpose = false);
 
-				     /**
-				      * Modify the number of smoothing
-				      * steps on finest level.
-				      */
+                                     /**
+                                      * Modify the number of smoothing
+                                      * steps on finest level.
+                                      */
     void set_steps (const unsigned int);
 
-				     /**
-				      * Switch on/off variable
-				      * smoothing.
-				      */
+                                     /**
+                                      * Switch on/off variable
+                                      * smoothing.
+                                      */
     void set_variable (const bool);
 
-				     /**
-				      * Switch on/off symmetric
-				      * smoothing.
-				      */
+                                     /**
+                                      * Switch on/off symmetric
+                                      * smoothing.
+                                      */
     void set_symmetric (const bool);
 
-				     /**
-				      * Switch on/off transposed
-				      * smoothing. The effect is
-				      * overriden by set_symmetric().
-				      */
+                                     /**
+                                      * Switch on/off transposed
+                                      * smoothing. The effect is
+                                      * overriden by set_symmetric().
+                                      */
     void set_transpose (const bool);
 
-				     /**
-				      * Set #debug to a nonzero value
-				      * to get debug information
-				      * logged to #deallog. Increase
-				      * to get more information
-				      */
+                                     /**
+                                      * Set @p debug to a nonzero value
+                                      * to get debug information
+                                      * logged to @p deallog. Increase
+                                      * to get more information
+                                      */
     void set_debug (const unsigned int level);
 
   private:
-				     /**
-				      * The memory object to be used
-				      * if none is given to the
-				      * constructor.
-				      */
+                                     /**
+                                      * The memory object to be used
+                                      * if none is given to the
+                                      * constructor.
+                                      */
     GrowingVectorMemory<VECTOR> my_memory;
-    
+
   protected:
-				     /**
-				      * Number of smoothing steps on
-				      * the finest level. If no
-				      * #variable smoothing is chosen,
-				      * this is the number of steps on
-				      * all levels.
-				      */
+                                     /**
+                                      * Number of smoothing steps on
+                                      * the finest level. If no
+                                      * #variable smoothing is chosen,
+                                      * this is the number of steps on
+                                      * all levels.
+                                      */
     unsigned int steps;
 
-				     /**
-				      * Variable smoothing: double the
-				      * number of smoothing steps
-				      * whenever going to the next
-				      * coarser level
-				      */
+                                     /**
+                                      * Variable smoothing: double the
+                                      * number of smoothing steps
+                                      * whenever going to the next
+                                      * coarser level
+                                      */
     bool variable;
 
-				     /**
-				      * Symmetric smoothing: in the
-				      * smoothing iteration, alternate
-				      * between the relaxation method
-				      * and its transpose.
-				      */
+                                     /**
+                                      * Symmetric smoothing: in the
+                                      * smoothing iteration, alternate
+                                      * between the relaxation method
+                                      * and its transpose.
+                                      */
     bool symmetric;
 
-				     /*
-				      * Use the transpose of the
-				      * relaxation method instead of
-				      * the method itself. This has no
-				      * effect if #symmetric smoothing
-				      * is chosen.
-				      */
+                                     /*
+                                      * Use the transpose of the
+                                      * relaxation method instead of
+                                      * the method itself. This has no
+                                      * effect if #symmetric smoothing
+                                      * is chosen.
+                                      */
     bool transpose;
 
-				     /**
-				      * Output debugging information
-				      * to #deallog if this is
-				      * nonzero.
-				      */
+                                     /**
+                                      * Output debugging information
+                                      * to @p deallog if this is
+                                      * nonzero.
+                                      */
     unsigned int debug;
-				     /**
-				      * Memory for auxiliary vectors.
-				      */
+                                     /**
+                                      * Memory for auxiliary vectors.
+                                      */
     SmartPointer<VectorMemory<VECTOR>, MGSmoother<VECTOR> > mem;
 
 };
@@ -175,19 +175,19 @@ template <class VECTOR>
 class MGSmootherIdentity : public MGSmootherBase<VECTOR>
 {
   public:
-				     /**
-				      * Implementation of the
-				      * interface for @p Multigrid.
-				      * This function does nothing,
-				      * which by comparison with the
-				      * definition of this function
-				      * means that the the smoothing
-				      * operator equals the null
-				      * operator.
-				      */
+                                     /**
+                                      * Implementation of the
+                                      * interface for @p Multigrid.
+                                      * This function does nothing,
+                                      * which by comparison with the
+                                      * definition of this function
+                                      * means that the the smoothing
+                                      * operator equals the null
+                                      * operator.
+                                      */
     virtual void smooth (const unsigned int level,
-			 VECTOR&            u,
-			 const VECTOR&      rhs) const;
+                         VECTOR&            u,
+                         const VECTOR&      rhs) const;
     virtual void clear ();
 };
 
@@ -232,81 +232,81 @@ template<class RELAX, class VECTOR>
 class SmootherRelaxation : public MGLevelObject<RELAX>, public MGSmoother<VECTOR>
 {
   public:
-				     /**
-				      * Constructor. Sets memory and
-				      * smoothing parameters.
-				      */
+                                     /**
+                                      * Constructor. Sets memory and
+                                      * smoothing parameters.
+                                      */
     SmootherRelaxation(const unsigned int steps = 1,
-		       const bool variable = false,
-		       const bool symmetric = false,
-		       const bool transpose = false);
-    
-				     /**
-				      * Initialize for matrices. This
-				      * function initializes the
-				      * smoothing operator with the
-				      * same smoother for each level.
-				      *
-				      * @p additional_data is an
-				      * object of type
-				      * @p RELAX::AdditionalData and
-				      * is handed to the
-				      * initialization function of the
-				      * relaxation method.
-				      */
+                       const bool variable = false,
+                       const bool symmetric = false,
+                       const bool transpose = false);
+
+                                     /**
+                                      * Initialize for matrices. This
+                                      * function initializes the
+                                      * smoothing operator with the
+                                      * same smoother for each level.
+                                      *
+                                      * @p additional_data is an
+                                      * object of type
+                                      * @p RELAX::AdditionalData and
+                                      * is handed to the
+                                      * initialization function of the
+                                      * relaxation method.
+                                      */
     template <class MATRIX2>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
-    
-				     /**
-				      * Initialize matrices and
-				      * additional data for each
-				      * level.
-				      *
-				      * If minimal or maximal level of
-				      * the two objects differ, the
-				      * greatest common range is
-				      * utilized. This way, smoothing
-				      * can be restricted to certain
-				      * levels even if the matrix was
-				      * generated for all levels.
-				      */
+                     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
+
+                                     /**
+                                      * Initialize matrices and
+                                      * additional data for each
+                                      * level.
+                                      *
+                                      * If minimal or maximal level of
+                                      * the two objects differ, the
+                                      * greatest common range is
+                                      * utilized. This way, smoothing
+                                      * can be restricted to certain
+                                      * levels even if the matrix was
+                                      * generated for all levels.
+                                      */
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const MGLevelObject<DATA>& additional_data);
-				     /**
-				      * Initialize for matrix
-				      * blocks. This function
-				      * initializes the smoothing
-				      * operator with the same
-				      * smoother for each level.
-				      *
-				      * @p additional_data is an
-				      * object of type
-				      * @p RELAX::AdditionalData and
-				      * is handed to the
-				      * initialization function of the
-				      * relaxation method.
-				      */
+                     const MGLevelObject<DATA>& additional_data);
+                                     /**
+                                      * Initialize for matrix
+                                      * blocks. This function
+                                      * initializes the smoothing
+                                      * operator with the same
+                                      * smoother for each level.
+                                      *
+                                      * @p additional_data is an
+                                      * object of type
+                                      * @p RELAX::AdditionalData and
+                                      * is handed to the
+                                      * initialization function of the
+                                      * relaxation method.
+                                      */
 //     template <class MATRIX2>
 //     void initialize (const MGLevelObject<MatrixBlock<MATRIX2> >& matrices,
-// 		     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
+//                   const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
 
-				     /**
-				      * Empty all vectors.
-				      */
+                                     /**
+                                      * Empty all vectors.
+                                      */
     void clear ();
 
-				     /**
-				      * The actual smoothing method.
-				      */
+                                     /**
+                                      * The actual smoothing method.
+                                      */
     virtual void smooth (const unsigned int level,
-			 VECTOR&            u,
-			 const VECTOR&      rhs) const;
+                         VECTOR&            u,
+                         const VECTOR&      rhs) const;
 
-    				     /**
-				      * Memory used by this object.
-				      */
+                                     /**
+                                      * Memory used by this object.
+                                      */
     std::size_t memory_consumption () const;
 };
 }
@@ -356,134 +356,134 @@ template<class MATRIX, class RELAX, class VECTOR>
 class MGSmootherRelaxation : public MGSmoother<VECTOR>
 {
   public:
-				     /**
-				      * Constructor. Sets memory and
-				      * smoothing parameters.
-				      */
+                                     /**
+                                      * Constructor. Sets memory and
+                                      * smoothing parameters.
+                                      */
     MGSmootherRelaxation(VectorMemory<VECTOR>& mem,
-			 const unsigned int steps = 1,
-			 const bool variable = false,
-			 const bool symmetric = false,
-			 const bool transpose = false);
+                         const unsigned int steps = 1,
+                         const bool variable = false,
+                         const bool symmetric = false,
+                         const bool transpose = false);
 
-				     /**
-				      * Initialize for matrices. This
-				      * function stores pointers to
-				      * the level matrices and
-				      * initializes the smoothing
-				      * operator with the same smoother
+                                     /**
+                                      * Initialize for matrices. This
+                                      * function stores pointers to
+                                      * the level matrices and
+                                      * initializes the smoothing
+                                      * operator with the same smoother
                                       * for each level.
-				      *
-				      * @p additional_data is an
-				      * object of type
-				      * @p RELAX::AdditionalData and
-				      * is handed to the
-				      * initialization function of the
-				      * relaxation method.
-				      */
+                                      *
+                                      * @p additional_data is an
+                                      * object of type
+                                      * @p RELAX::AdditionalData and
+                                      * is handed to the
+                                      * initialization function of the
+                                      * relaxation method.
+                                      */
     template <class MATRIX2>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
+                     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
 
-				     /**
-				      * Initialize for matrices. This
-				      * function stores pointers to
-				      * the level matrices and
-				      * initializes the smoothing
-				      * operator with the according
+                                     /**
+                                      * Initialize for matrices. This
+                                      * function stores pointers to
+                                      * the level matrices and
+                                      * initializes the smoothing
+                                      * operator with the according
                                       * smoother for each level.
-				      *
-				      * @p additional_data is an
-				      * object of type
-				      * @p RELAX::AdditionalData and
-				      * is handed to the
-				      * initialization function of the
-				      * relaxation method.
-				      */
+                                      *
+                                      * @p additional_data is an
+                                      * object of type
+                                      * @p RELAX::AdditionalData and
+                                      * is handed to the
+                                      * initialization function of the
+                                      * relaxation method.
+                                      */
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const MGLevelObject<DATA>& additional_data);
+                     const MGLevelObject<DATA>& additional_data);
 
-				     /**
-				      * Initialize for single blocks
-				      * of matrices. Of this block
-				      * matrix, the block indicated by
-				      * @p block_row and
-				      * @p block_col is selected on
-				      * each level.  This function
-				      * stores pointers to the level
-				      * matrices and initializes the
-				      * smoothing operator with the
+                                     /**
+                                      * Initialize for single blocks
+                                      * of matrices. Of this block
+                                      * matrix, the block indicated by
+                                      * @p block_row and
+                                      * @p block_col is selected on
+                                      * each level.  This function
+                                      * stores pointers to the level
+                                      * matrices and initializes the
+                                      * smoothing operator with the
                                       * same smoother for each
-				      * level.
-				      *
-				      * @p additional_data is an
-				      * object of type
-				      * @p RELAX::AdditionalData and
-				      * is handed to the
-				      * initialization function of the
-				      * relaxation method.
-				      */
+                                      * level.
+                                      *
+                                      * @p additional_data is an
+                                      * object of type
+                                      * @p RELAX::AdditionalData and
+                                      * is handed to the
+                                      * initialization function of the
+                                      * relaxation method.
+                                      */
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const DATA& additional_data,
-		     const unsigned int block_row,
-		     const unsigned int block_col);
+                     const DATA& additional_data,
+                     const unsigned int block_row,
+                     const unsigned int block_col);
 
-				     /**
-				      * Initialize for single blocks
-				      * of matrices. Of this block
-				      * matrix, the block indicated by
-				      * @p block_row and
-				      * @p block_col is selected on
-				      * each level.  This function
-				      * stores pointers to the level
-				      * matrices and initializes the
-				      * smoothing operator with the
+                                     /**
+                                      * Initialize for single blocks
+                                      * of matrices. Of this block
+                                      * matrix, the block indicated by
+                                      * @p block_row and
+                                      * @p block_col is selected on
+                                      * each level.  This function
+                                      * stores pointers to the level
+                                      * matrices and initializes the
+                                      * smoothing operator with the
                                       * according smoother for each
-				      * level.
-				      *
-				      * @p additional_data is an
-				      * object of type
-				      * @p RELAX::AdditionalData and
-				      * is handed to the
-				      * initialization function of the
-				      * relaxation method.
-				      */
+                                      * level.
+                                      *
+                                      * @p additional_data is an
+                                      * object of type
+                                      * @p RELAX::AdditionalData and
+                                      * is handed to the
+                                      * initialization function of the
+                                      * relaxation method.
+                                      */
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const MGLevelObject<DATA>& additional_data,
-		     const unsigned int block_row,
-		     const unsigned int block_col);
+                     const MGLevelObject<DATA>& additional_data,
+                     const unsigned int block_row,
+                     const unsigned int block_col);
 
-				     /**
-				      * Empty all vectors.
-				      */
+                                     /**
+                                      * Empty all vectors.
+                                      */
     void clear ();
 
-				     /**
-				      * The actual smoothing method.
-				      */
+                                     /**
+                                      * The actual smoothing method.
+                                      */
     virtual void smooth (const unsigned int level,
-			 VECTOR&            u,
-			 const VECTOR&      rhs) const;
+                         VECTOR&            u,
+                         const VECTOR&      rhs) const;
 
- 				     /**
-				      * Object containing relaxation
-				      * methods.
-				      */
+                                     /**
+                                      * Object containing relaxation
+                                      * methods.
+                                      */
     MGLevelObject<RELAX> smoothers;
 
-    				     /**
-				      * Memory used by this object.
-				      */
+                                     /**
+                                      * Memory used by this object.
+                                      */
     std::size_t memory_consumption () const;
 
 
  private:
-				     /**
-				      * Pointer to the matrices.
-				      */
+                                     /**
+                                      * Pointer to the matrices.
+                                      */
     MGLevelObject<PointerMatrix<MATRIX, VECTOR> > matrices;
 
 };
@@ -525,134 +525,134 @@ template<class MATRIX, class PRECONDITIONER, class VECTOR>
 class MGSmootherPrecondition : public MGSmoother<VECTOR>
 {
   public:
-				     /**
-				      * Constructor. Sets memory and
-				      * smoothing parameters.
-				      */
+                                     /**
+                                      * Constructor. Sets memory and
+                                      * smoothing parameters.
+                                      */
     MGSmootherPrecondition(VectorMemory<VECTOR>& mem,
-			   const unsigned int steps = 1,
-			   const bool variable = false,
-			   const bool symmetric = false,
-			   const bool transpose = false);
+                           const unsigned int steps = 1,
+                           const bool variable = false,
+                           const bool symmetric = false,
+                           const bool transpose = false);
 
-				     /**
-				      * Initialize for matrices. This
-				      * function stores pointers to
-				      * the level matrices and
-				      * initializes the smoothing
-				      * operator with the same smoother
+                                     /**
+                                      * Initialize for matrices. This
+                                      * function stores pointers to
+                                      * the level matrices and
+                                      * initializes the smoothing
+                                      * operator with the same smoother
                                       * for each level.
-				      *
-				      * @p additional_data is an
-				      * object of type
-				      * @p PRECONDITIONER::AdditionalData and
-				      * is handed to the
-				      * initialization function of the
-				      * relaxation method.
-				      */
+                                      *
+                                      * @p additional_data is an
+                                      * object of type
+                                      * @p PRECONDITIONER::AdditionalData and
+                                      * is handed to the
+                                      * initialization function of the
+                                      * relaxation method.
+                                      */
     template <class MATRIX2>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const typename PRECONDITIONER::AdditionalData& additional_data = typename PRECONDITIONER::AdditionalData());
+                     const typename PRECONDITIONER::AdditionalData& additional_data = typename PRECONDITIONER::AdditionalData());
 
-				     /**
-				      * Initialize for matrices. This
-				      * function stores pointers to
-				      * the level matrices and
-				      * initializes the smoothing
-				      * operator with the according
+                                     /**
+                                      * Initialize for matrices. This
+                                      * function stores pointers to
+                                      * the level matrices and
+                                      * initializes the smoothing
+                                      * operator with the according
                                       * smoother for each level.
-				      *
-				      * @p additional_data is an
-				      * object of type
-				      * @p PRECONDITIONER::AdditionalData and
-				      * is handed to the
-				      * initialization function of the
-				      * relaxation method.
-				      */
+                                      *
+                                      * @p additional_data is an
+                                      * object of type
+                                      * @p PRECONDITIONER::AdditionalData and
+                                      * is handed to the
+                                      * initialization function of the
+                                      * relaxation method.
+                                      */
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const MGLevelObject<DATA>& additional_data);
+                     const MGLevelObject<DATA>& additional_data);
 
-				     /**
-				      * Initialize for single blocks
-				      * of matrices. Of this block
-				      * matrix, the block indicated by
-				      * @p block_row and
-				      * @p block_col is selected on
-				      * each level.  This function
-				      * stores pointers to the level
-				      * matrices and initializes the
-				      * smoothing operator with the
+                                     /**
+                                      * Initialize for single blocks
+                                      * of matrices. Of this block
+                                      * matrix, the block indicated by
+                                      * @p block_row and
+                                      * @p block_col is selected on
+                                      * each level.  This function
+                                      * stores pointers to the level
+                                      * matrices and initializes the
+                                      * smoothing operator with the
                                       * same smoother for each
-				      * level.
-				      *
-				      * @p additional_data is an
-				      * object of type
-				      * @p PRECONDITIONER::AdditionalData and
-				      * is handed to the
-				      * initialization function of the
-				      * relaxation method.
-				      */
+                                      * level.
+                                      *
+                                      * @p additional_data is an
+                                      * object of type
+                                      * @p PRECONDITIONER::AdditionalData and
+                                      * is handed to the
+                                      * initialization function of the
+                                      * relaxation method.
+                                      */
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const DATA& additional_data,
-		     const unsigned int block_row,
-		     const unsigned int block_col);
+                     const DATA& additional_data,
+                     const unsigned int block_row,
+                     const unsigned int block_col);
 
-				     /**
-				      * Initialize for single blocks
-				      * of matrices. Of this block
-				      * matrix, the block indicated by
-				      * @p block_row and
-				      * @p block_col is selected on
-				      * each level.  This function
-				      * stores pointers to the level
-				      * matrices and initializes the
-				      * smoothing operator with the
+                                     /**
+                                      * Initialize for single blocks
+                                      * of matrices. Of this block
+                                      * matrix, the block indicated by
+                                      * @p block_row and
+                                      * @p block_col is selected on
+                                      * each level.  This function
+                                      * stores pointers to the level
+                                      * matrices and initializes the
+                                      * smoothing operator with the
                                       * according smoother for each
-				      * level.
-				      *
-				      * @p additional_data is an
-				      * object of type
-				      * @p PRECONDITIONER::AdditionalData and
-				      * is handed to the
-				      * initialization function of the
-				      * relaxation method.
-				      */
+                                      * level.
+                                      *
+                                      * @p additional_data is an
+                                      * object of type
+                                      * @p PRECONDITIONER::AdditionalData and
+                                      * is handed to the
+                                      * initialization function of the
+                                      * relaxation method.
+                                      */
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const MGLevelObject<DATA>& additional_data,
-		     const unsigned int block_row,
-		     const unsigned int block_col);
+                     const MGLevelObject<DATA>& additional_data,
+                     const unsigned int block_row,
+                     const unsigned int block_col);
 
-				     /**
-				      * Empty all vectors.
-				      */
+                                     /**
+                                      * Empty all vectors.
+                                      */
     void clear ();
 
-				     /**
-				      * The actual smoothing method.
-				      */
+                                     /**
+                                      * The actual smoothing method.
+                                      */
     virtual void smooth (const unsigned int level,
-			 VECTOR&            u,
-			 const VECTOR&      rhs) const;
+                         VECTOR&            u,
+                         const VECTOR&      rhs) const;
 
- 				     /**
-				      * Object containing relaxation
-				      * methods.
-				      */
+                                     /**
+                                      * Object containing relaxation
+                                      * methods.
+                                      */
     MGLevelObject<PRECONDITIONER> smoothers;
 
-    				     /**
-				      * Memory used by this object.
-				      */
+                                     /**
+                                      * Memory used by this object.
+                                      */
     std::size_t memory_consumption () const;
 
 
  private:
-				     /**
-				      * Pointer to the matrices.
-				      */
+                                     /**
+                                      * Pointer to the matrices.
+                                      */
     MGLevelObject<PointerMatrix<MATRIX, VECTOR> > matrices;
 
 };
@@ -672,7 +672,7 @@ MGSmootherIdentity<VECTOR>::smooth (
 
 template <class VECTOR>
 inline void
-MGSmootherIdentity<VECTOR>::clear () 
+MGSmootherIdentity<VECTOR>::clear ()
 {}
 
 //---------------------------------------------------------------------------
@@ -684,13 +684,13 @@ MGSmoother<VECTOR>::MGSmoother(
   const bool variable,
   const bool symmetric,
   const bool transpose)
-		:
-		steps(steps),
-		variable(variable),
-		symmetric(symmetric),
-		transpose(transpose),
-		debug(0),
-		mem(&my_memory)
+                :
+                steps(steps),
+                variable(variable),
+                symmetric(symmetric),
+                transpose(transpose),
+                debug(0),
+                mem(&my_memory)
 {}
 
 
@@ -702,13 +702,13 @@ MGSmoother<VECTOR>::MGSmoother(
   const bool variable,
   const bool symmetric,
   const bool transpose)
-		:
-		steps(steps),
-		variable(variable),
-		symmetric(symmetric),
-		transpose(transpose),
-		debug(0),
-		mem(&mem)
+                :
+                steps(steps),
+                variable(variable),
+                symmetric(symmetric),
+                transpose(transpose),
+                debug(0),
+                mem(&mem)
 {}
 
 
@@ -762,18 +762,18 @@ namespace mg
     const bool variable,
     const bool symmetric,
     const bool transpose)
-		  : MGSmoother<VECTOR>(steps, variable, symmetric, transpose)
+                  : MGSmoother<VECTOR>(steps, variable, symmetric, transpose)
   {}
-  
-  
+
+
   template <class RELAX, class VECTOR>
   inline void
   SmootherRelaxation<RELAX, VECTOR>::clear ()
   {
     MGLevelObject<RELAX>::clear();
   }
-  
-  
+
+
   template <class RELAX, class VECTOR>
   template <class MATRIX2>
   inline void
@@ -783,14 +783,14 @@ namespace mg
   {
     const unsigned int min = m.get_minlevel();
     const unsigned int max = m.get_maxlevel();
-    
+
     this->resize(min, max);
-    
+
     for (unsigned int i=min;i<=max;++i)
       (*this)[i].initialize(m[i], data);
   }
 
-  
+
   template <class RELAX, class VECTOR>
   template <class MATRIX2, class DATA>
   inline void
@@ -800,14 +800,14 @@ namespace mg
   {
     const unsigned int min = std::max(m.get_minlevel(), data.get_minlevel());
     const unsigned int max = std::min(m.get_maxlevel(), data.get_maxlevel());
-    
+
     this->resize(min, max);
-    
+
     for (unsigned int i=min;i<=max;++i)
       (*this)[i].initialize(m[i], data[i]);
   }
 
-  
+
   template <class RELAX, class VECTOR>
   inline void
   SmootherRelaxation<RELAX, VECTOR>::smooth(
@@ -829,12 +829,12 @@ namespace mg
 
     for (unsigned int i=0; i<steps2; ++i)
       {
-	if (T)
-	  (*this)[level].Tstep(u, rhs);
-	else
-	  (*this)[level].step(u, rhs);
-	if (this->symmetric)
-	  T = !T;
+        if (T)
+          (*this)[level].Tstep(u, rhs);
+        else
+          (*this)[level].step(u, rhs);
+        if (this->symmetric)
+          T = !T;
       }
   }
 
@@ -863,8 +863,8 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::MGSmootherRelaxation(
   const bool variable,
   const bool symmetric,
   const bool transpose)
-		:
-		MGSmoother<VECTOR>(mem, steps, variable, symmetric, transpose)
+                :
+                MGSmoother<VECTOR>(mem, steps, variable, symmetric, transpose)
 {}
 
 
@@ -989,7 +989,7 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
 
   if (this->variable)
     steps2 *= (1<<(maxlevel-level));
-  
+
   typename VectorMemory<VECTOR>::Pointer r(*this->mem);
   typename VectorMemory<VECTOR>::Pointer d(*this->mem);
   r->reinit(u);
@@ -1004,30 +1004,30 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
-	{
-	  if (this->debug > 0)
-	    deallog << 'T';
-	  matrices[level].vmult(*r,u);
-	  r->sadd(-1.,1.,rhs);
-	  if (this->debug > 2)
-	    deallog << ' ' << r->l2_norm() << ' ';
-	  smoothers[level].Tvmult(*d, *r);
-	  if (this->debug > 1)
-	    deallog << ' ' << d->l2_norm() << ' ';
-	} else {
-	  if (this->debug > 0)
-	    deallog << 'N';
-	  matrices[level].vmult(*r,u);
-	  r->sadd(-1.,1.,rhs);
-	  if (this->debug > 2)
-	    deallog << ' ' << r->l2_norm() << ' ';
-	  smoothers[level].vmult(*d, *r);
-	  if (this->debug > 1)
-	    deallog << ' ' << d->l2_norm() << ' ';
-	}
+        {
+          if (this->debug > 0)
+            deallog << 'T';
+          matrices[level].vmult(*r,u);
+          r->sadd(-1.,1.,rhs);
+          if (this->debug > 2)
+            deallog << ' ' << r->l2_norm() << ' ';
+          smoothers[level].Tvmult(*d, *r);
+          if (this->debug > 1)
+            deallog << ' ' << d->l2_norm() << ' ';
+        } else {
+          if (this->debug > 0)
+            deallog << 'N';
+          matrices[level].vmult(*r,u);
+          r->sadd(-1.,1.,rhs);
+          if (this->debug > 2)
+            deallog << ' ' << r->l2_norm() << ' ';
+          smoothers[level].vmult(*d, *r);
+          if (this->debug > 1)
+            deallog << ' ' << d->l2_norm() << ' ';
+        }
       u += *d;
       if (this->symmetric)
-	T = !T;
+        T = !T;
     }
   if (this->debug > 0)
     deallog << std::endl;
@@ -1057,11 +1057,11 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
-	smoothers[level].Tstep(u, rhs);
+        smoothers[level].Tstep(u, rhs);
       else
-	smoothers[level].step(u, rhs);
+        smoothers[level].step(u, rhs);
       if (this->symmetric)
-	T = !T;
+        T = !T;
     }
 }
 
@@ -1091,8 +1091,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::MGSmootherPrecondition(
   const bool variable,
   const bool symmetric,
   const bool transpose)
-		:
-		MGSmoother<VECTOR>(mem, steps, variable, symmetric, transpose)
+                :
+                MGSmoother<VECTOR>(mem, steps, variable, symmetric, transpose)
 {}
 
 
@@ -1231,40 +1231,40 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
 
   r->reinit(u,true);
   d->reinit(u,true);
-  
+
   bool T = this->transpose;
   if (this->symmetric && (steps2 % 2 == 0))
     T = false;
   if (this->debug > 0)
     deallog << 'S' << level << ' ';
-  
+
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
-	{
-	  if (this->debug > 0)
-	    deallog << 'T';
-	  matrices[level].Tvmult(*r,u);
-	  r->sadd(-1.,1.,rhs);
-	  if (this->debug > 2)
-	    deallog << ' ' << r->l2_norm() << ' ';
-	  smoothers[level].Tvmult(*d, *r);
-	  if (this->debug > 1)
-	    deallog << ' ' << d->l2_norm() << ' ';
-	} else {
-	if (this->debug > 0)
-	  deallog << 'N';
-	matrices[level].vmult(*r,u);
-	r->sadd(-1.,rhs);
-	if (this->debug > 2)
-	  deallog << ' ' << r->l2_norm() << ' ';
-	smoothers[level].vmult(*d, *r);
-	if (this->debug > 1)
-	  deallog << ' ' << d->l2_norm() << ' ';
+        {
+          if (this->debug > 0)
+            deallog << 'T';
+          matrices[level].Tvmult(*r,u);
+          r->sadd(-1.,1.,rhs);
+          if (this->debug > 2)
+            deallog << ' ' << r->l2_norm() << ' ';
+          smoothers[level].Tvmult(*d, *r);
+          if (this->debug > 1)
+            deallog << ' ' << d->l2_norm() << ' ';
+        } else {
+        if (this->debug > 0)
+          deallog << 'N';
+        matrices[level].vmult(*r,u);
+        r->sadd(-1.,rhs);
+        if (this->debug > 2)
+          deallog << ' ' << r->l2_norm() << ' ';
+        smoothers[level].vmult(*d, *r);
+        if (this->debug > 1)
+          deallog << ' ' << d->l2_norm() << ' ';
       }
       u += *d;
       if (this->symmetric)
-	T = !T;
+        T = !T;
     }
   if (this->debug > 0)
     deallog << std::endl;

@@ -15,6 +15,7 @@ nofail-dirs = a-framework       \
               multigrid         \
               bits              \
               hp                \
+              matrix_free       \
               aniso             \
               codim_one         \
               serialization     \

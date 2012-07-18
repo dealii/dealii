@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id: laplace.h 23983 2011-07-29 22:45:15Z kanschat $
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,14 +45,14 @@ namespace LocalIntegrators
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
       AssertDimension(result.n_rows(), fe.n_quadrature_points);
       AssertDimension(result.n_cols(), n_comp+dim);
-      
+
       for (unsigned int k=0;k<fe.n_quadrature_points;++k)
-	{
-	  for (unsigned int d=0;d<dim;++d)
-	    result(k,d) = fe.quadrature_point(k)[d];
-	  for (unsigned int i=0;i<n_comp;++i)
-	    result(k,dim+i) = input[i][k];
-	}
+        {
+          for (unsigned int d=0;d<dim;++d)
+            result(k,d) = fe.quadrature_point(k)[d];
+          for (unsigned int i=0;i<n_comp;++i)
+            result(k,dim+i) = input[i][k];
+        }
     }
   }
 }

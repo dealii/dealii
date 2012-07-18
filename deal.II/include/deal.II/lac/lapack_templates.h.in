@@ -70,6 +70,17 @@ void dgeevx_ (const char* balanc, const char* jobvl, const char* jobvr,
 void dsyev_ (const char *jobz, const char *uplo, const int *n,
 	     double *A, const int *lda, double *w,
 	     double *work, const int *lwork, int *info);
+// Same functionality as dsyev_ but with more options: E.g.
+// Compute only eigenvalues in a specific interval,
+// Compute only eigenvalues with a specific index,
+// Set tolerance for eigenvalue computation
+void dsyevx_ (const char* jobz, const char* range,
+              const char* uplo, const int* n, double* A, const int* lda,
+              const double* vl, const double* vu,
+              const int* il, const int* iu, const double* abstol,
+              int* m, double* w, double* z,
+              const int* ldz, double* work, const int* lwork, int* iwork,
+              int* ifail, int* info);
 // Generalized eigenvalues and eigenvectors of
 // 1: A*x = lambda*B*x; 2: A*B*x = lambda*x; 3: B*A*x = lambda*x
 // A and B are symmetric and B is definite

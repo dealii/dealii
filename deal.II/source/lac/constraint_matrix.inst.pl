@@ -2,7 +2,7 @@
 # $Id$
 ######################################################################
 #
-# Copyright (C) 2011 by the deal.II authors
+# Copyright (C) 2011, 2012 by the deal.II authors
 #
 # This file is subject to QPL and may not be  distributed
 # without copyright and license information. Please refer
@@ -19,11 +19,17 @@ my $vector_functions = <<'EOT'
 
 template void ConstraintMatrix::condense<V1 >(const V1 &, V1&) const;
 template void ConstraintMatrix::condense<V1 >(V1 &vec) const;
-template void ConstraintMatrix::set_zero<V1 >(V1&) const;
 template void ConstraintMatrix::distribute_local_to_global<V1 > (
     const Vector<double>&, const std::vector<unsigned int> &, V1&, const FullMatrix<double>&) const;
 template void ConstraintMatrix::distribute<V1 >(const V1 &, V1&) const;
 template void ConstraintMatrix::distribute<V1 >(V1 &) const;
+EOT
+    ;
+
+my $vector_functions_also_parallel = <<'EOT'
+
+template void ConstraintMatrix::set_zero<V1 >(V1&) const;
+
 EOT
     ;
 
@@ -50,5 +56,8 @@ EOT
 ######################################################################
 
 multisubst($vector_functions, ['V1'], \@sequential_vectors);
+multisubst($vector_functions, ['V1'], \@deal_parallel_vectors);
+multisubst($vector_functions_also_parallel, ['V1'], \@sequential_vectors);
+multisubst($vector_functions_also_parallel, ['V1'], \@parallel_vectors);
 multisubst($scalar_functions, ['S1'], \@real_scalars);
 multisubst($scalar_scalar_functions, ['S1','S2'], \@real_scalars, \@real_scalars);

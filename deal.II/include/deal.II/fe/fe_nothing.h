@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,10 @@ DEAL_II_NAMESPACE_OPEN
  * FE_Nothing elements are used.  The hp::DoFHandler will therefore assign no
  * degrees of freedom to the FE_Nothing cells, and this subregion is therefore
  * implicitly deleted from the computation. step-46 shows a use case for this
- * element.
+ * element. An interesting application for this element is also presented in the
+ * paper A. Cangiani, J. Chapman, E. Georgoulis, M. Jensen:
+ * <b>Implementation of the Continuous-Discontinuous Galerkin Finite Element Method</b>,
+ * arXiv:1201.2878v1 [math.NA], 2012 (see http://arxiv.org/abs/1201.2878).
  *
  * Note that some care must be taken that the resulting mesh topology
  * continues to make sense when FE_Nothing elements are introduced.
@@ -54,8 +57,8 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  * Here, 0 denotes an FE_Nothing cell, and 1 denotes some other
  * element type.  The library has no difficulty computing the necessary
- * hanging node constraints in these cases (i.e. no constraint).  
- * However, the following geometry is NOT acceptable (at least 
+ * hanging node constraints in these cases (i.e. no constraint).
+ * However, the following geometry is NOT acceptable (at least
  * in the current implementation):
  * @code
  * +---------+----+----+
@@ -77,10 +80,10 @@ class FE_Nothing : public FiniteElement<dim>
                                     /**
                                       * Constructor. Argument denotes the
                                       * number of components to give this
-                                      * finite element (default = 1).  
+                                      * finite element (default = 1).
                                       */
     FE_Nothing (unsigned int n_components = 1);
-    
+
                                      /**
                                       * A sort of virtual copy
                                       * constructor. Some places in
@@ -105,7 +108,7 @@ class FE_Nothing : public FiniteElement<dim>
     virtual
     std::string
     get_name() const;
-    
+
                                      /**
                                       * Determine the values a finite
                                       * element should compute on
@@ -123,7 +126,7 @@ class FE_Nothing : public FiniteElement<dim>
                                       * are called with the result of
                                       * these.
                                       *
-                                      * In this case, since the element 
+                                      * In this case, since the element
                                       * has zero degrees of freedom and
                                       * no information can be computed on
                                       * it, this function simply returns
@@ -177,19 +180,19 @@ class FE_Nothing : public FiniteElement<dim>
                                       * FEValues object.
                                       *
                                       * In the current case, this function
-                                      * returns no meaningful information, 
+                                      * returns no meaningful information,
                                       * since the element has no degrees of
                                       * freedom.
                                       */
     virtual
     void
     fill_fe_values (const Mapping<dim> & mapping,
-		    const typename Triangulation<dim>::cell_iterator & cell,
-		    const Quadrature<dim> & quadrature,
-		    typename Mapping<dim>::InternalDataBase & mapping_data,
-		    typename Mapping<dim>::InternalDataBase & fedata,
-		    FEValuesData<dim,dim> & data,
-		    CellSimilarity::Similarity & cell_similarity) const;
+                    const typename Triangulation<dim>::cell_iterator & cell,
+                    const Quadrature<dim> & quadrature,
+                    typename Mapping<dim>::InternalDataBase & mapping_data,
+                    typename Mapping<dim>::InternalDataBase & fedata,
+                    FEValuesData<dim,dim> & data,
+                    CellSimilarity::Similarity & cell_similarity) const;
 
                                      /**
                                       * Fill the fields of
@@ -199,19 +202,19 @@ class FE_Nothing : public FiniteElement<dim>
                                       * FEFaceValues object.
                                       *
                                       * In the current case, this function
-                                      * returns no meaningful information, 
+                                      * returns no meaningful information,
                                       * since the element has no degrees of
                                       * freedom.
                                       */
     virtual
     void
     fill_fe_face_values (const Mapping<dim> & mapping,
-			 const typename Triangulation<dim> :: cell_iterator & cell,
-			 const unsigned int face,
-			 const Quadrature<dim-1> & quadrature,
-			 typename Mapping<dim> :: InternalDataBase & mapping_data,
-			 typename Mapping<dim> :: InternalDataBase & fedata,
-			 FEValuesData<dim,dim> & data) const;
+                         const typename Triangulation<dim> :: cell_iterator & cell,
+                         const unsigned int face,
+                         const Quadrature<dim-1> & quadrature,
+                         typename Mapping<dim> :: InternalDataBase & mapping_data,
+                         typename Mapping<dim> :: InternalDataBase & fedata,
+                         FEValuesData<dim,dim> & data) const;
 
                                      /**
                                       * Fill the fields of
@@ -221,20 +224,20 @@ class FE_Nothing : public FiniteElement<dim>
                                       * FESubFaceValues object.
                                       *
                                       * In the current case, this function
-                                      * returns no meaningful information, 
+                                      * returns no meaningful information,
                                       * since the element has no degrees of
                                       * freedom.
                                       */
     virtual
     void
     fill_fe_subface_values (const Mapping<dim> & mapping,
-			    const typename Triangulation<dim>::cell_iterator & cell,
-			    const unsigned int face,
-			    const unsigned int subface,
-			    const Quadrature<dim-1> & quadrature,
-			    typename Mapping<dim>::InternalDataBase & mapping_data,
-			    typename Mapping<dim>::InternalDataBase & fedata,
-			    FEValuesData<dim,dim> & data) const;
+                            const typename Triangulation<dim>::cell_iterator & cell,
+                            const unsigned int face,
+                            const unsigned int subface,
+                            const Quadrature<dim-1> & quadrature,
+                            typename Mapping<dim>::InternalDataBase & mapping_data,
+                            typename Mapping<dim>::InternalDataBase & fedata,
+                            FEValuesData<dim,dim> & data) const;
 
                                      /**
                                       * Prepare internal data
@@ -247,17 +250,17 @@ class FE_Nothing : public FiniteElement<dim>
                                       * includes destruction when it
                                       * is no more needed).
                                       *
-                                      * In the current case, this function 
+                                      * In the current case, this function
                                       * just returns a default pointer, since
-                                      * no meaningful data exists for this 
+                                      * no meaningful data exists for this
                                       * element.
                                       */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_data (const UpdateFlags     update_flags,
-	      const Mapping<dim>    & mapping,
-	      const Quadrature<dim> & quadrature) const;
-        
+              const Mapping<dim>    & mapping,
+              const Quadrature<dim> & quadrature) const;
+
                                      /**
                                       * Return whether this element dominates
                                       * the one given as argument when they
@@ -271,7 +274,7 @@ class FE_Nothing : public FiniteElement<dim>
                                       * particular the @ref hp_paper "hp paper".
                                       *
                                       * In the current case, this element
-                                      * is always assumed to dominate, unless 
+                                      * is always assumed to dominate, unless
                                       * it is also of type FE_Nothing().  In
                                       * that situation, either element can
                                       * dominate.
@@ -279,21 +282,21 @@ class FE_Nothing : public FiniteElement<dim>
     virtual
     FiniteElementDomination::Domination
     compare_for_face_domination (const FiniteElement<dim> & fe_other) const;
-    
-    
-    
+
+
+
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
-    
+
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
-    
+
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
-    
+
     virtual
     bool
     hp_constraints_are_implemented () const;
@@ -302,7 +305,7 @@ class FE_Nothing : public FiniteElement<dim>
                                       * Return the matrix
                                       * interpolating from a face of
                                       * of one element to the face of
-                                      * the neighboring element. 
+                                      * the neighboring element.
                                       * The size of the matrix is
                                       * then <tt>source.#dofs_per_face</tt> times
                                       * <tt>this->#dofs_per_face</tt>.
@@ -316,13 +319,13 @@ class FE_Nothing : public FiniteElement<dim>
     void
     get_face_interpolation_matrix (const FiniteElement<dim> &source_fe,
                                    FullMatrix<double>       &interpolation_matrix) const;
-                                   
-                                   
+
+
                                      /**
                                       * Return the matrix
                                       * interpolating from a face of
                                       * of one element to the subface of
-                                      * the neighboring element. 
+                                      * the neighboring element.
                                       * The size of the matrix is
                                       * then <tt>source.#dofs_per_face</tt> times
                                       * <tt>this->#dofs_per_face</tt>.
@@ -331,14 +334,14 @@ class FE_Nothing : public FiniteElement<dim>
                                       * degrees of freedom, the interpolation
                                       * matrix is necessarily empty.
                                       */
-                                      
+
     virtual
     void
     get_subface_interpolation_matrix (const FiniteElement<dim> & source_fe,
                                       const unsigned int index,
                                       FullMatrix<double>  &interpolation_matrix) const;
 
-    
+
 };
 
 

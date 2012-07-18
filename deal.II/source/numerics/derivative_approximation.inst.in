@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,6 +52,39 @@ approximate_second_derivative<deal_II_dimension>         \
  Vector<float>         &derivative_norm,                 \
  const unsigned int     component);                      \
                                                          \
+template                                                 \
+void                                                     \
+DerivativeApproximation::                                \
+approximate_derivative_tensor<deal_II_dimension>         \
+(const Mapping<deal_II_dimension> & 	mapping,	 \
+ const DH<deal_II_dimension> &dof_handler,               \
+ const InputVector     &solution,                        \
+ const DH<deal_II_dimension>::active_cell_iterator &cell,\
+ Tensor<1,deal_II_dimension> &derivative,                \
+ const unsigned int     component);                      \
+                                                         \
+template                                                 \
+void                                                     \
+DerivativeApproximation::                                \
+approximate_derivative_tensor<deal_II_dimension>         \
+(const Mapping<deal_II_dimension> & 	mapping,	 \
+ const DH<deal_II_dimension> &dof_handler,               \
+ const InputVector     &solution,                        \
+ const DH<deal_II_dimension>::active_cell_iterator &cell,\
+ Tensor<2,deal_II_dimension> &derivative,                \
+ const unsigned int     component);                      \
+                                                         \
+template                                                 \
+void                                                     \
+DerivativeApproximation::                                \
+approximate_derivative_tensor<deal_II_dimension>         \
+(const Mapping<deal_II_dimension> & 	mapping,	 \
+ const DH<deal_II_dimension> &dof_handler,               \
+ const InputVector     &solution,                        \
+ const DH<deal_II_dimension>::active_cell_iterator &cell,\
+ Tensor<3,deal_II_dimension> &derivative,                \
+ const unsigned int     component);			 \
+							 \
 template                                                 \
 void                                                     \
 DerivativeApproximation::                                \
@@ -129,7 +162,7 @@ derivative_norm(const Tensor<3,deal_II_dimension> &derivative);
 
 
 // static variables
-// 
+//
 // on AIX, the linker is unhappy about some missing symbols. they
 // should really be there, but explicitly instantiating them will also
 // not hurt

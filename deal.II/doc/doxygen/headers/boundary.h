@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,23 +16,26 @@
  *
  * The classes in this module are concerned with the description of the
  * boundary of a domain in which a Triangulation lives. This boundary
- * description is necessary in two contexts:
+ * description is necessary in three contexts:
  * <ul>
- * 
- *   <li> Mesh refinement: whenever a cell at the boundary is refined, it is
+ *
+ *   <li> Mesh refinement: Whenever a cell at the boundary is refined, it is
  *   necessary to introduce at least one new vertex on the boundary. In the
  *   simplest case, one assumes that the boundary consists of straight line
- *   segments between the vertices of the original, coarsest mesh, and the
- *   next vertex is simply put into the middle of the old ones. This is the
- *   default behavior of the Triangulation class, and is described by the
- *   StraightBoundary class.
+ *   segments (in 2d) or a bilinear surface (in 3d) between the vertices of
+ *   the original, coarsest mesh, and the next vertex is simply put into the
+ *   middle of the old ones. This is the default behavior of the Triangulation
+ *   class, and is described by the StraightBoundary class.
  *
  *   On the other hand, if one deals with curved boundaries, this is not the
  *   appropriate thing to do. The classes derived from the Boundary base class
  *   therefore describe the geometry of a domain. One can then attach an
  *   object of a class derived from this base class to the Triangulation
- *   object using the Triangulation::set_boundary() function. Several classes
- *   exist to support the most common geometries.
+ *   object using the Triangulation::set_boundary() function, and the
+ *   Triangulation will ask the boundary object where a new vertex should be
+ *   located upon mesh refinement. Several classes already exist to support
+ *   the most common geometries, e.g., CylinderBoundary, HyperBallBoundary, or
+ *   HyperShellBoundary.
  *
  *   <li> Integration: When using higher order finite element methods, it is
  *   often necessary to compute cell terms (like cell contributions to the
@@ -41,8 +44,15 @@
  *   approximation. The actual implementation of such curved elements happens
  *   in the Mapping class (see the @ref mapping module), which however obtains
  *   its information about the boundary of the domain from the classes
- *   described here.
+ *   described here. The same is, of course, true when integrating boundary
+ *   terms (e.g., inhomogenous Neumann boundary conditions).
  *
+ *   <li> In cases where a Triangulation is embedded into a higher dimensional
+ *   space, i.e., whenever the second template argument of the Triangulation
+ *   class is explicitly specified and larger than the first (for an example,
+ *   see step-34), the boundary description objects also serve as a tool to
+ *   describe the geometry not only of the boundary of the domain but of the
+ *   domain itself, in case the domain is a manifold that is in fact curved.
  * </ul>
  *
  * In the context of triangulations, each face of a cell that is located at
@@ -59,7 +69,7 @@
  * different purposes, for example to indicate that a part of the boundary has
  * a different kind of boundary condition in the partial differential
  * equation.
- * 
+ *
  * @ingroup grid
  * @author Wolfgang Bangerth, 1998-2006
  */

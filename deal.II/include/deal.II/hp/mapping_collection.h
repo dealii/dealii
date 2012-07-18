@@ -1,7 +1,7 @@
 //------------------------  mapping_collection.h  --------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,7 @@ namespace hp
  *
  * It implements the concepts stated in the @ref hpcollection module described
  * in the doxygen documentation.
- * 
+ *
  * Although it is recommended to supply an appropriate mapping for
  * each finite element kind used in a hp-computation, the
  * MappingCollection class implements a conversion constructor from a
@@ -42,9 +42,9 @@ namespace hp
  * single mapping object will usually suffice. See the hp::FEValues
  * class for the rules which mapping will be selected for a given
  * cell.
- * 
+ *
  * @ingroup hp hpcollection
- * 
+ *
  * @author Oliver Kayser-Herold, 2005
  */
   template<int dim, int spacedim=dim>
@@ -76,7 +76,7 @@ namespace hp
                                         * Copy constructor.
                                         */
       MappingCollection (const MappingCollection<dim,spacedim> &mapping_collection);
-      
+
                                        /**
                                         * Adds a new mapping to the
                                         * MappingCollection.  The
@@ -113,7 +113,7 @@ namespace hp
                                         * this container.
                                         */
       unsigned int size () const;
-    
+
                                        /**
                                         * Determine an estimate for the
                                         * memory consumption (in bytes)
@@ -153,7 +153,7 @@ namespace hp
                                         * static object.
                                         */
       static MappingQ1<dim,spacedim> mapping_q1;
-      
+
     public:
                                        /**
                                         * The publicly available
@@ -169,7 +169,7 @@ namespace hp
   template<int dim, int spacedim>
   inline
   unsigned int
-  MappingCollection<dim,spacedim>::size () const 
+  MappingCollection<dim,spacedim>::size () const
   {
     return mappings.size();
   }
@@ -185,7 +185,7 @@ namespace hp
             ExcIndexRange (index, 0, mappings.size ()));
     return *mappings[index];
   }
-  
+
 } // namespace hp
 
 

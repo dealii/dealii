@@ -101,7 +101,7 @@ This function has a member variable of type
 <code>DoFHandler@<dim@></code>. Again, the compiler can't
 compile this function until it knows for which dimension. If you call
 this function for a specific dimension as above, the compiler will
-take the template, replace all occurences of dim by the dimension for
+take the template, replace all occurrences of dim by the dimension for
 which it was called, and compile it. If you call the function several
 times for different dimensions, it will compile it several times, each
 time calling the right <code>make_grid</code> function and reserving the right

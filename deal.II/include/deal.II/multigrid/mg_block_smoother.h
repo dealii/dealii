@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,132 +47,132 @@ class MGSmootherBlock
   : public MGSmootherBase<BlockVector<number> >
 {
   public:
-    				     /**
-				      * Constructor. Sets memory and
-				      * smoothing parameters.
-				      */
+                                     /**
+                                      * Constructor. Sets memory and
+                                      * smoothing parameters.
+                                      */
     MGSmootherBlock(VectorMemory<BlockVector<number> >& mem,
-		    const unsigned int steps = 1,
-		    const bool variable = false,
-		    const bool symmetric = false,
-		    const bool transpose = false,
-		    const bool reverse = false);
+                    const unsigned int steps = 1,
+                    const bool variable = false,
+                    const bool symmetric = false,
+                    const bool transpose = false,
+                    const bool reverse = false);
 
-				     /**
-				      * Initialize for matrices. The
-				      * parameter <tt>matrices</tt> can be
-				      * any object having functions
-				      * <tt>get_minlevel()</tt> and
-				      * <tt>get_maxlevel()</tt> as well as
-				      * an <tt>operator[]</tt> returning a
-				      * reference to @p MATRIX.
-				      *
-				      * The same convention is used
-				      * for the parameter
-				      * <tt>smoothers</tt>, such that
-				      * <tt>operator[]</tt> returns
-				      * the object doing the
-				      * block-smoothing on a single
-				      * level.
-				      *
-				      * This function stores pointers
-				      * to the level matrices and
-				      * smoothing operator for each
-				      * level.
-				      */
+                                     /**
+                                      * Initialize for matrices. The
+                                      * parameter <tt>matrices</tt> can be
+                                      * any object having functions
+                                      * <tt>get_minlevel()</tt> and
+                                      * <tt>get_maxlevel()</tt> as well as
+                                      * an <tt>operator[]</tt> returning a
+                                      * reference to @p MATRIX.
+                                      *
+                                      * The same convention is used
+                                      * for the parameter
+                                      * <tt>smoothers</tt>, such that
+                                      * <tt>operator[]</tt> returns
+                                      * the object doing the
+                                      * block-smoothing on a single
+                                      * level.
+                                      *
+                                      * This function stores pointers
+                                      * to the level matrices and
+                                      * smoothing operator for each
+                                      * level.
+                                      */
     template <class MGMATRIX, class MGRELAX>
     void initialize (const MGMATRIX& matrices,
-		     const MGRELAX& smoothers);
+                     const MGRELAX& smoothers);
 
-				     /**
-				      * Empty all vectors.
-				      */
+                                     /**
+                                      * Empty all vectors.
+                                      */
     void clear ();
 
-				     /**
-				      * Modify the number of smoothing
-				      * steps on finest level.
-				      */
+                                     /**
+                                      * Modify the number of smoothing
+                                      * steps on finest level.
+                                      */
     void set_steps (const unsigned int);
 
-				     /**
-				      * Switch on/off variable
-				      * smoothing.
-				      */
+                                     /**
+                                      * Switch on/off variable
+                                      * smoothing.
+                                      */
     void set_variable (const bool);
 
-				     /**
-				      * Switch on/off symmetric
-				      * smoothing.
-				      */
+                                     /**
+                                      * Switch on/off symmetric
+                                      * smoothing.
+                                      */
     void set_symmetric (const bool);
 
-				     /**
-				      * Switch on/off transposed. This
-				      * is mutually exclusive with
-				      * reverse().
-				      */
+                                     /**
+                                      * Switch on/off transposed. This
+                                      * is mutually exclusive with
+                                      * reverse().
+                                      */
     void set_transpose (const bool);
 
-				     /**
-				      * Switch on/off reversed. This
-				      * is mutually exclusive with
-				      * transpose().
-				      */
+                                     /**
+                                      * Switch on/off reversed. This
+                                      * is mutually exclusive with
+                                      * transpose().
+                                      */
     void set_reverse (const bool);
 
-				     /**
-				      * Implementation of the
-				      * interface for @p Multigrid.
-				      * This function does nothing,
-				      * which by comparison with the
-				      * definition of this function
-				      * means that the the smoothing
-				      * operator equals the null
-				      * operator.
-				      */
+                                     /**
+                                      * Implementation of the
+                                      * interface for @p Multigrid.
+                                      * This function does nothing,
+                                      * which by comparison with the
+                                      * definition of this function
+                                      * means that the the smoothing
+                                      * operator equals the null
+                                      * operator.
+                                      */
     virtual void smooth (const unsigned int         level,
-			 BlockVector<number>&       u,
-			 const BlockVector<number>& rhs) const;
+                         BlockVector<number>&       u,
+                         const BlockVector<number>& rhs) const;
  private:
-				     /**
-				      * Pointer to the matrices.
-				      */
+                                     /**
+                                      * Pointer to the matrices.
+                                      */
     MGLevelObject<PointerMatrix<MATRIX, BlockVector<number> > > matrices;
 
-				     /**
-				      * Pointer to the matrices.
-				      */
+                                     /**
+                                      * Pointer to the matrices.
+                                      */
     MGLevelObject<PointerMatrix<RELAX, BlockVector<number> > > smoothers;
 
-				     /**
-				      * Number of smoothing steps.
-				      */
+                                     /**
+                                      * Number of smoothing steps.
+                                      */
     unsigned int steps;
 
-				     /**
-				      * Variable smoothing?
-				      */
+                                     /**
+                                      * Variable smoothing?
+                                      */
     bool variable;
 
-				     /**
-				      * Symmetric smoothing?
-				      */
+                                     /**
+                                      * Symmetric smoothing?
+                                      */
     bool symmetric;
 
-				     /*
-				      * Transposed?
-				      */
+                                     /*
+                                      * Transposed?
+                                      */
     bool transpose;
 
-				     /**
-				      * Reverse?
-				      */
+                                     /**
+                                      * Reverse?
+                                      */
     bool reverse;
 
-				     /**
-				      * Memory for auxiliary vectors.
-				      */
+                                     /**
+                                      * Memory for auxiliary vectors.
+                                      */
     VectorMemory<BlockVector<number> >& mem;
 
 };
@@ -192,13 +192,13 @@ MGSmootherBlock<MATRIX, RELAX, number>::MGSmootherBlock(
   const bool symmetric,
   const bool transpose,
   const bool reverse)
-		:
-		steps(steps),
-		variable(variable),
-		symmetric(symmetric),
-		transpose(transpose),
-		reverse(reverse),
-		mem(mem)
+                :
+                steps(steps),
+                variable(variable),
+                symmetric(symmetric),
+                transpose(transpose),
+                reverse(reverse),
+                mem(mem)
 {}
 
 
@@ -310,21 +310,21 @@ MGSmootherBlock<MATRIX, RELAX, number>::smooth(
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
-	{
-//	  cerr << 'T';
-	  matrices[level].vmult(*r,u);
-	  r->sadd(-1.,1.,rhs);
-	  smoothers[level].Tvmult(*d, *r);
-	} else {
-//	  cerr << 'N';
-	  matrices[level].vmult(*r,u);
-	  r->sadd(-1.,1.,rhs);
-	  smoothers[level].vmult(*d, *r);
-	}
+        {
+//        cerr << 'T';
+          matrices[level].vmult(*r,u);
+          r->sadd(-1.,1.,rhs);
+          smoothers[level].Tvmult(*d, *r);
+        } else {
+//        cerr << 'N';
+          matrices[level].vmult(*r,u);
+          r->sadd(-1.,1.,rhs);
+          smoothers[level].vmult(*d, *r);
+        }
 //      cerr << '{' << r->l2_norm() << '}';
       u += *d;
       if (symmetric)
-	T = !T;
+        T = !T;
  }
 
   mem.free(r);

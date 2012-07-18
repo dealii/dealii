@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,7 +62,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  *   PersistentTriangulation<dim> grid (coarse_grid);
  *
- *   for (...) 
+ *   for (...)
  *     {
  *                           // restore grid from coarse grid
  *                           // and stored refinement flags
@@ -100,202 +100,202 @@ DEAL_II_NAMESPACE_OPEN
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim, int spacedim=dim>
-class PersistentTriangulation : public Triangulation<dim, spacedim> 
+class PersistentTriangulation : public Triangulation<dim, spacedim>
 {
-  public:    
-				     /**
-				      * Make the dimension available
-				      * in function templates.
-				      */
+  public:
+                                     /**
+                                      * Make the dimension available
+                                      * in function templates.
+                                      */
     static const unsigned int dimension = dim;
     static const unsigned int spacedimension = spacedim;
-    
-				     /**
-				      * Build up the triangulation from the
-				      * coarse grid in future. Copy smoothing
-				      * flags, etc from that grid as well.
-				      * Note that the initial state of the
-				      * triangulation is empty, until
-				      * @p restore_grid is called for the
-				      * first time.
-				      *
-				      * The coarse grid must persist until
-				      * the end of this object, since it will
-				      * be used upon reconstruction of the
-				      * grid.
-				      */
+
+                                     /**
+                                      * Build up the triangulation from the
+                                      * coarse grid in future. Copy smoothing
+                                      * flags, etc from that grid as well.
+                                      * Note that the initial state of the
+                                      * triangulation is empty, until
+                                      * @p restore_grid is called for the
+                                      * first time.
+                                      *
+                                      * The coarse grid must persist until
+                                      * the end of this object, since it will
+                                      * be used upon reconstruction of the
+                                      * grid.
+                                      */
     PersistentTriangulation (const Triangulation<dim, spacedim> &coarse_grid);
 
-				     /**
-				      * Copy constructor. This operation
-				      * is only allowed, if the triangulation
-				      * underlying the object to be copied
-				      * is presently empty. Refinement flags
-				      * as well as the pointer to the
-				      * coarse grid are copied, however.
-				      */
+                                     /**
+                                      * Copy constructor. This operation
+                                      * is only allowed, if the triangulation
+                                      * underlying the object to be copied
+                                      * is presently empty. Refinement flags
+                                      * as well as the pointer to the
+                                      * coarse grid are copied, however.
+                                      */
     PersistentTriangulation (const PersistentTriangulation<dim, spacedim> &old_tria);
-    
-				     /**
-				      * Destructor.
-				      */
+
+                                     /**
+                                      * Destructor.
+                                      */
     virtual ~PersistentTriangulation ();
-    
-				     /**
-				      * Overloaded version of the same
-				      * function in the base class which
-				      * stores the refinement and coarsening
-				      * flags for later reconstruction of the
-				      * triangulation and after that calls
-				      * the respective function of the
-				      * base class.
-				      */
+
+                                     /**
+                                      * Overloaded version of the same
+                                      * function in the base class which
+                                      * stores the refinement and coarsening
+                                      * flags for later reconstruction of the
+                                      * triangulation and after that calls
+                                      * the respective function of the
+                                      * base class.
+                                      */
     virtual void execute_coarsening_and_refinement ();
 
-    				     /**
-				      * Restore the grid according to
-				      * the saved data. For this, the
-				      * coarse grid is copied and the
-				      * grid is stepwise rebuilt using
-				      * the saved flags.
-				      *
-				      * Note that this function will result in
-				      * an error if the underlying
-				      * triangulation is not empty, i.e. it
-				      * will only succeed if this object is
-				      * newly created or the <tt>clear()</tt>
-				      * function of the base class was called
-				      * on it before.
-				      *
-				      * Repeatedly calls the
-				      * <tt>restore(unsigned int)</tt>
-				      * function in a loop over all
-				      * refinement steps.
-				      */
+                                     /**
+                                      * Restore the grid according to
+                                      * the saved data. For this, the
+                                      * coarse grid is copied and the
+                                      * grid is stepwise rebuilt using
+                                      * the saved flags.
+                                      *
+                                      * Note that this function will result in
+                                      * an error if the underlying
+                                      * triangulation is not empty, i.e. it
+                                      * will only succeed if this object is
+                                      * newly created or the <tt>clear()</tt>
+                                      * function of the base class was called
+                                      * on it before.
+                                      *
+                                      * Repeatedly calls the
+                                      * <tt>restore(unsigned int)</tt>
+                                      * function in a loop over all
+                                      * refinement steps.
+                                      */
     void restore ();
 
-				     /**
-				      * Differential restore. Performs
-				      * the @p step_noth local
-				      * refinement and coarsening step.
-				      * Step 0 stands for the copying
-				      * of the coarse grid.
-				      *
-				      * This function will only
-				      * succeed if the triangulation
-				      * is in just the state it were
-				      * if restore would have been
-				      * called from
-				      * <tt>step=0...step_no-1</tt> before.
-				      */
+                                     /**
+                                      * Differential restore. Performs
+                                      * the @p step_noth local
+                                      * refinement and coarsening step.
+                                      * Step 0 stands for the copying
+                                      * of the coarse grid.
+                                      *
+                                      * This function will only
+                                      * succeed if the triangulation
+                                      * is in just the state it were
+                                      * if restore would have been
+                                      * called from
+                                      * <tt>step=0...step_no-1</tt> before.
+                                      */
     void restore (const unsigned int step_no);
 
-				     /**
-				      * Returns the number of
-				      * refinement and coarsening
-				      * steps. This is given by the
-				      * size of the @p refine_flags
-				      * vector.
-				      */
+                                     /**
+                                      * Returns the number of
+                                      * refinement and coarsening
+                                      * steps. This is given by the
+                                      * size of the @p refine_flags
+                                      * vector.
+                                      */
     unsigned int n_refinement_steps () const;
 
-				     /**
-				      * Overload this function to use
-				      * @p tria as a new coarse grid. The
-				      * present triangulation and all
-				      * refinement and coarsening flags
-				      * storing its history are deleted,
-				      * and the state of the underlying
-				      * triangulation is reset to be
-				      * empty, until @p restore_grid is
-				      * called the next time.
-				      *
-				      * The coarse grid must persist until
-				      * the end of this object, since it will
-				      * be used upon reconstruction of the
-				      * grid.
-				      */
+                                     /**
+                                      * Overload this function to use
+                                      * @p tria as a new coarse grid. The
+                                      * present triangulation and all
+                                      * refinement and coarsening flags
+                                      * storing its history are deleted,
+                                      * and the state of the underlying
+                                      * triangulation is reset to be
+                                      * empty, until @p restore_grid is
+                                      * called the next time.
+                                      *
+                                      * The coarse grid must persist until
+                                      * the end of this object, since it will
+                                      * be used upon reconstruction of the
+                                      * grid.
+                                      */
     virtual void copy_triangulation (const Triangulation<dim, spacedim> &tria);
 
-				     /**
-				      * Throw an error, since this function
-				      * is not useful in the context of this
-				      * class.
-				      */
+                                     /**
+                                      * Throw an error, since this function
+                                      * is not useful in the context of this
+                                      * class.
+                                      */
     virtual void create_triangulation (const std::vector<Point<spacedim> >    &vertices,
-				       const std::vector<CellData<dim> > &cells,
-				       const SubCellData                 &subcelldata);
+                                       const std::vector<CellData<dim> > &cells,
+                                       const SubCellData                 &subcelldata);
 
-				     /**
-				      * An overload of the respective function
-				      * of the base class.
-				      * 
-				      * Throw an error, since this function
-				      * is not useful in the context of this
-				      * class.
-				      */
+                                     /**
+                                      * An overload of the respective function
+                                      * of the base class.
+                                      *
+                                      * Throw an error, since this function
+                                      * is not useful in the context of this
+                                      * class.
+                                      */
     virtual void create_triangulation_compatibility (
       const std::vector<Point<spacedim> >    &vertices,
       const std::vector<CellData<dim> > &cells,
       const SubCellData                 &subcelldata);
 
-				     /**
-				      * Writes all refine and coarsen
-				      * flags to the ostream @p out.
-				      */
+                                     /**
+                                      * Writes all refine and coarsen
+                                      * flags to the ostream @p out.
+                                      */
     virtual void write_flags(std::ostream &out) const;
 
-				     /**
-				      * Reads all refine and coarsen flags
-				      * that previously were written by
-				      * <tt>write_flags(...)</tt>. This is especially
-				      * useful for rebuilding the triangulation
-				      * after the end or breakdown of a program
-				      * and its restart.
-				      */
+                                     /**
+                                      * Reads all refine and coarsen flags
+                                      * that previously were written by
+                                      * <tt>write_flags(...)</tt>. This is especially
+                                      * useful for rebuilding the triangulation
+                                      * after the end or breakdown of a program
+                                      * and its restart.
+                                      */
     virtual void read_flags(std::istream &in);
 
-				     /**
-				      * Clears all flags. Retains the
-				      * same coarse grid.
-				      */
+                                     /**
+                                      * Clears all flags. Retains the
+                                      * same coarse grid.
+                                      */
     virtual void clear_flags();
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object.
+                                      */
     virtual std::size_t memory_consumption () const;
 
-				     /**
-				      * Exception.
-				      */
+                                     /**
+                                      * Exception.
+                                      */
     DeclException0 (ExcTriaNotEmpty);
-				     /**
-				      * Exception.
-				      */
+                                     /**
+                                      * Exception.
+                                      */
     DeclException0 (ExcFlagsNotCleared);
-    
+
   private:
-				     /**
-				      * This grid shall be used as coarse
-				      * grid.
-				      */
+                                     /**
+                                      * This grid shall be used as coarse
+                                      * grid.
+                                      */
     SmartPointer<const Triangulation<dim,spacedim>,PersistentTriangulation<dim,spacedim> > coarse_grid;
-    
-    				     /**
-				      * Vectors holding the refinement and
-				      * coarsening flags of the different
-				      * sweeps on this time level. The
-				      * vectors therefore hold the history
-				      * of the grid.
-				      */
+
+                                     /**
+                                      * Vectors holding the refinement and
+                                      * coarsening flags of the different
+                                      * sweeps on this time level. The
+                                      * vectors therefore hold the history
+                                      * of the grid.
+                                      */
     std::vector<std::vector<bool> >   refine_flags;
 
-				     /**
-				      * @ref refine_flags
-				      */
+                                     /**
+                                      * @ref refine_flags
+                                      */
     std::vector<std::vector<bool> >   coarsen_flags;
 };
 

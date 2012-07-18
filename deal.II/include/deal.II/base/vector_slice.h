@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,82 +45,82 @@ template <class VECTOR>
 class VectorSlice
 {
   public:
-				     /**
-				      * Construct a vector slice
-				      * containing the whole
-				      * vector. Comes handy, if you
-				      * did not want to have a slice
-				      * at all, but the function you
-				      * call wants it: just put in the
-				      * vector itself as argument and
-				      * let this constructor make a
-				      * slice for you.
-				      */
+                                     /**
+                                      * Construct a vector slice
+                                      * containing the whole
+                                      * vector. Comes handy, if you
+                                      * did not want to have a slice
+                                      * at all, but the function you
+                                      * call wants it: just put in the
+                                      * vector itself as argument and
+                                      * let this constructor make a
+                                      * slice for you.
+                                      */
     VectorSlice(VECTOR& v);
-				     /**
-				      * The real constructor for a
-				      * vector slice, allowing you to
-				      * specify the start index and
-				      * the length of the slice.
-				      */
+                                     /**
+                                      * The real constructor for a
+                                      * vector slice, allowing you to
+                                      * specify the start index and
+                                      * the length of the slice.
+                                      */
     VectorSlice(VECTOR& v,
-		unsigned int start,
-		unsigned int length);
+                unsigned int start,
+                unsigned int length);
 
-				     /**
-				      * Return the length of the slice
-				      * using the same interface as
-				      * <tt>std::vector</tt>.
-				      */
+                                     /**
+                                      * Return the length of the slice
+                                      * using the same interface as
+                                      * <tt>std::vector</tt>.
+                                      */
     unsigned int size() const;
 
-				     /**
-				      * Access an element of the slice
-				      * using the same interface as
-				      * <tt>std::vector</tt>.
-				      */
+                                     /**
+                                      * Access an element of the slice
+                                      * using the same interface as
+                                      * <tt>std::vector</tt>.
+                                      */
     typename VECTOR::reference operator[] (unsigned int i);
 
-				     /**
-				      * Access an element of a
-				      * constant slice using the same
-				      * interface as
-				      * <tt>std::vector</tt>.
-				      */
+                                     /**
+                                      * Access an element of a
+                                      * constant slice using the same
+                                      * interface as
+                                      * <tt>std::vector</tt>.
+                                      */
     typename VECTOR::const_reference operator[] (unsigned int i) const;
 
-				     /**
-				      * STL conforming iterator function.
-				      */
+                                     /**
+                                      * STL conforming iterator function.
+                                      */
     typename VECTOR::iterator begin();
 
-				     /**
-				      * STL conforming iterator function.
-				      */
+                                     /**
+                                      * STL conforming iterator function.
+                                      */
     typename VECTOR::const_iterator begin() const;
 
-				     /**
-				      * STL conforming iterator function.
-				      */
+                                     /**
+                                      * STL conforming iterator function.
+                                      */
     typename VECTOR::iterator end();
 
-				     /**
-				      * STL conforming iterator function.
-				      */
+                                     /**
+                                      * STL conforming iterator function.
+                                      */
     typename VECTOR::const_iterator end() const;
 
   private:
-				     /**
-				      * The vector we extract from.
-				      */
+                                     /**
+                                      * The vector we extract from.
+                                      */
     VECTOR& v;
-				     /**
-				      * The start index of the slice.
-				      */
+                                     /**
+                                      * The start index of the slice.
+                                      */
     const unsigned int start;
-				     /**
-				      * The length of the slice.
-				      */
+                                     /**
+                                      * The length of the slice.
+                                      */
     const unsigned int length;
 };
 
@@ -154,8 +154,8 @@ template <class VECTOR>
 inline
 const VectorSlice<const VECTOR>
 make_slice (VECTOR& v,
-	    const unsigned int start,
-	    const unsigned int length)
+            const unsigned int start,
+            const unsigned int length)
 {
   const VectorSlice<const VECTOR> r(v, start, length);
   return r;
@@ -169,21 +169,21 @@ make_slice (VECTOR& v,
 template <class VECTOR>
 inline
 VectorSlice<VECTOR>::VectorSlice(VECTOR& v)
-		:
-		v(v), start(0), length(v.size())
+                :
+                v(v), start(0), length(v.size())
 {}
 
 
 template <class VECTOR>
 inline
 VectorSlice<VECTOR>::VectorSlice(VECTOR& v,
-			 unsigned int start,
-			 unsigned int length)
-		:
-		v(v), start(start), length(length)
+                         unsigned int start,
+                         unsigned int length)
+                :
+                v(v), start(start), length(length)
 {
   Assert((start+length<=v.size()),
-	 ExcIndexRange(length, 0, v.size()-start+1));
+         ExcIndexRange(length, 0, v.size()-start+1));
 }
 
 

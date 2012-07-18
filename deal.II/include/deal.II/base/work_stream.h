@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -130,378 +130,378 @@ namespace WorkStream
 
   namespace internal
   {
-				     /**
-				      * A class that creates a sequence of
-				      * items from a range of iterators.
-				      */
+                                     /**
+                                      * A class that creates a sequence of
+                                      * items from a range of iterators.
+                                      */
     template <typename Iterator,
-	      typename ScratchData,
-	      typename CopyData>
+              typename ScratchData,
+              typename CopyData>
     class IteratorRangeToItemStream : public tbb::filter
     {
       public:
-					 /**
-					  * A data type that we use to identify
-					  * items to be worked on.
-					  *
-					  * The first element indicates an array
-					  * of iterators to work on; the second
-					  * the scratch space; the third an
-					  * array of copy data spaces; and the
-					  * last the number of elements to work
-					  * on. This last argument is an integer
-					  * between one and chunk_size. The
-					  * arrays have a length of chunk_size.
-					  */
-	typedef
-	std_cxx1x::tuple<std::vector<Iterator>,
-			 ScratchData*,
-			 std::vector<CopyData>,
-			 unsigned int>
-	ItemType;
-	
+                                         /**
+                                          * A data type that we use to identify
+                                          * items to be worked on.
+                                          *
+                                          * The first element indicates an array
+                                          * of iterators to work on; the second
+                                          * the scratch space; the third an
+                                          * array of copy data spaces; and the
+                                          * last the number of elements to work
+                                          * on. This last argument is an integer
+                                          * between one and chunk_size. The
+                                          * arrays have a length of chunk_size.
+                                          */
+        typedef
+        std_cxx1x::tuple<std::vector<Iterator>,
+                         ScratchData*,
+                         std::vector<CopyData>,
+                         unsigned int>
+        ItemType;
 
-					 /**
-					  * Constructor. Take an iterator
-					  * range, the size of a buffer that
-					  * can hold items, and the sample
-					  * additional data object that will
-					  * be passed to each worker and
-					  * copier function invokation.
-					  */
-	IteratorRangeToItemStream (const Iterator       &begin,
-				   const Iterator       &end,
-				   const unsigned int    buffer_size,
-				   const unsigned int    chunk_size,
-				   const ScratchData    &sample_scratch_data,
-				   const CopyData       &sample_copy_data)
-			:
-			tbb::filter (/*is_serial=*/true),
-			remaining_iterator_range (begin, end),
-			ring_buffer (buffer_size),
-			n_emitted_items (0),
-			chunk_size (chunk_size)
-	  {
-					     // initialize copies of
-					     // additional_data. since
-					     // this is frequently
-					     // expensive (creating
-					     // FEValues objects etc) do
-					     // that in parallel
-	    Threads::TaskGroup<> tasks;
-	    for (unsigned int i=0; i<ring_buffer.size(); ++i)
-	      tasks += Threads::new_task (&IteratorRangeToItemStream::init_buffer_elements,
-					  *this,
-					  i,
-					  std_cxx1x::cref(sample_scratch_data),
-					  std_cxx1x::cref(sample_copy_data));
-	    tasks.join_all ();
-	  }
 
-					 /**
-					  * Destructor.
-					  */
-	~IteratorRangeToItemStream ()
-	  {
-	    for (unsigned int i=0; i<ring_buffer.size(); ++i)
-	      delete std_cxx1x::get<1>(ring_buffer[i]);
-	  }
-      
-					 /**
-					  * Create a item and return a
-					  * pointer to it.
-					  */
-	virtual void * operator () (void *)
-	  {
-					     // store the current
-					     // position of the pointer
-	    ItemType *current_item
-	      = &ring_buffer[n_emitted_items % ring_buffer.size()];
+                                         /**
+                                          * Constructor. Take an iterator
+                                          * range, the size of a buffer that
+                                          * can hold items, and the sample
+                                          * additional data object that will
+                                          * be passed to each worker and
+                                          * copier function invokation.
+                                          */
+        IteratorRangeToItemStream (const Iterator       &begin,
+                                   const Iterator       &end,
+                                   const unsigned int    buffer_size,
+                                   const unsigned int    chunk_size,
+                                   const ScratchData    &sample_scratch_data,
+                                   const CopyData       &sample_copy_data)
+                        :
+                        tbb::filter (/*is_serial=*/true),
+                        remaining_iterator_range (begin, end),
+                        ring_buffer (buffer_size),
+                        n_emitted_items (0),
+                        chunk_size (chunk_size)
+          {
+                                             // initialize copies of
+                                             // additional_data. since
+                                             // this is frequently
+                                             // expensive (creating
+                                             // FEValues objects etc) do
+                                             // that in parallel
+            Threads::TaskGroup<> tasks;
+            for (unsigned int i=0; i<ring_buffer.size(); ++i)
+              tasks += Threads::new_task (&IteratorRangeToItemStream::init_buffer_elements,
+                                          *this,
+                                          i,
+                                          std_cxx1x::cref(sample_scratch_data),
+                                          std_cxx1x::cref(sample_copy_data));
+            tasks.join_all ();
+          }
 
-					     // initialize the next item. it may
-					     // consist of at most chunk_size
-					     // elements
-	    std_cxx1x::get<3>(*current_item) = 0;
-	    while ((remaining_iterator_range.first !=
-		    remaining_iterator_range.second)
-		   &&
-		   (std_cxx1x::get<3>(*current_item) < chunk_size))
-	      {
-		std_cxx1x::get<0>(*current_item)[std_cxx1x::get<3>(*current_item)]
-		  = remaining_iterator_range.first;
+                                         /**
+                                          * Destructor.
+                                          */
+        ~IteratorRangeToItemStream ()
+          {
+            for (unsigned int i=0; i<ring_buffer.size(); ++i)
+              delete std_cxx1x::get<1>(ring_buffer[i]);
+          }
 
-		++remaining_iterator_range.first;
-		++std_cxx1x::get<3>(*current_item);
-	      }
+                                         /**
+                                          * Create a item and return a
+                                          * pointer to it.
+                                          */
+        virtual void * operator () (void *)
+          {
+                                             // store the current
+                                             // position of the pointer
+            ItemType *current_item
+              = &ring_buffer[n_emitted_items % ring_buffer.size()];
 
-	    if (std_cxx1x::get<3>(*current_item) == 0)
-					       // there were no items
-					       // left. terminate the pipeline
-	      return 0;
-	    else
-	      {
-		++n_emitted_items;
-		return current_item;
-	      }
-	  }
-	
+                                             // initialize the next item. it may
+                                             // consist of at most chunk_size
+                                             // elements
+            std_cxx1x::get<3>(*current_item) = 0;
+            while ((remaining_iterator_range.first !=
+                    remaining_iterator_range.second)
+                   &&
+                   (std_cxx1x::get<3>(*current_item) < chunk_size))
+              {
+                std_cxx1x::get<0>(*current_item)[std_cxx1x::get<3>(*current_item)]
+                  = remaining_iterator_range.first;
+
+                ++remaining_iterator_range.first;
+                ++std_cxx1x::get<3>(*current_item);
+              }
+
+            if (std_cxx1x::get<3>(*current_item) == 0)
+                                               // there were no items
+                                               // left. terminate the pipeline
+              return 0;
+            else
+              {
+                ++n_emitted_items;
+                return current_item;
+              }
+          }
+
       private:
-					 /**
-					  * The interval of iterators still to
-					  * be worked on. This range will shrink
-					  * over time.
-					  */
-	std::pair<Iterator,Iterator> remaining_iterator_range;
-      
-					 /**
-					  * A ring buffer that will store items.
-					  */
-	std::vector<ItemType>        ring_buffer;
+                                         /**
+                                          * The interval of iterators still to
+                                          * be worked on. This range will shrink
+                                          * over time.
+                                          */
+        std::pair<Iterator,Iterator> remaining_iterator_range;
 
-					 /**
-					  * Counter for the number of emitted
-					  * items. Each item may consist of up
-					  * to chunk_size iterator elements.
-					  */
-	unsigned int                 n_emitted_items;
+                                         /**
+                                          * A ring buffer that will store items.
+                                          */
+        std::vector<ItemType>        ring_buffer;
 
-					 /**
-					  * Number of elements of the
-					  * iterator range that each
-					  * thread should work on
-					  * sequentially; a large number
-					  * makes sure that each thread
-					  * gets a significant amount of
-					  * work before the next task
-					  * switch happens, whereas a
-					  * small number is better for
-					  * load balancing.
-					  */
-	const unsigned int           chunk_size;
+                                         /**
+                                          * Counter for the number of emitted
+                                          * items. Each item may consist of up
+                                          * to chunk_size iterator elements.
+                                          */
+        unsigned int                 n_emitted_items;
 
-					 /**
-					  * Initialize the pointers and vector
-					  * elements in the specified entry of
-					  * the ring buffer.
-					  */
-	void init_buffer_elements (const unsigned int element,
-				   const ScratchData &sample_scratch_data,
-				   const CopyData    &sample_copy_data)
-	  {
-	    Assert (std_cxx1x::get<1>(ring_buffer[element]) == 0,
-		    ExcInternalError());
-	      
-	    std_cxx1x::get<0>(ring_buffer[element])
-	      .resize (chunk_size, remaining_iterator_range.second);
-	    std_cxx1x::get<1>(ring_buffer[element])
-	      = new ScratchData(sample_scratch_data);
-	    std_cxx1x::get<2>(ring_buffer[element])
-	      .resize (chunk_size, sample_copy_data);
-	  }
+                                         /**
+                                          * Number of elements of the
+                                          * iterator range that each
+                                          * thread should work on
+                                          * sequentially; a large number
+                                          * makes sure that each thread
+                                          * gets a significant amount of
+                                          * work before the next task
+                                          * switch happens, whereas a
+                                          * small number is better for
+                                          * load balancing.
+                                          */
+        const unsigned int           chunk_size;
+
+                                         /**
+                                          * Initialize the pointers and vector
+                                          * elements in the specified entry of
+                                          * the ring buffer.
+                                          */
+        void init_buffer_elements (const unsigned int element,
+                                   const ScratchData &sample_scratch_data,
+                                   const CopyData    &sample_copy_data)
+          {
+            Assert (std_cxx1x::get<1>(ring_buffer[element]) == 0,
+                    ExcInternalError());
+
+            std_cxx1x::get<0>(ring_buffer[element])
+              .resize (chunk_size, remaining_iterator_range.second);
+            std_cxx1x::get<1>(ring_buffer[element])
+              = new ScratchData(sample_scratch_data);
+            std_cxx1x::get<2>(ring_buffer[element])
+              .resize (chunk_size, sample_copy_data);
+          }
     };
 
 
 
-				     /**
-				      * A class that manages calling the
-				      * worker function on a number of
-				      * parallel threads. Note that it is, in
-				      * the TBB notation, a filter that can
-				      * run in parallel.
-				      */
+                                     /**
+                                      * A class that manages calling the
+                                      * worker function on a number of
+                                      * parallel threads. Note that it is, in
+                                      * the TBB notation, a filter that can
+                                      * run in parallel.
+                                      */
     template <typename Iterator,
-	      typename ScratchData,
-	      typename CopyData>
+              typename ScratchData,
+              typename CopyData>
     class Worker : public tbb::filter
     {
       public:
-					 /**
-					  * Constructor. Takes a
-					  * reference to the object on
-					  * which we will operate as
-					  * well as a pointer to the
-					  * function that will do the
-					  * assembly.
-					  */
-	Worker (const std_cxx1x::function<void (const Iterator &,
-						ScratchData &,
-						CopyData &)> &worker)
-	:
-	tbb::filter (/* is_serial= */ false),
-	worker (worker)
-	{}
+                                         /**
+                                          * Constructor. Takes a
+                                          * reference to the object on
+                                          * which we will operate as
+                                          * well as a pointer to the
+                                          * function that will do the
+                                          * assembly.
+                                          */
+        Worker (const std_cxx1x::function<void (const Iterator &,
+                                                ScratchData &,
+                                                CopyData &)> &worker)
+        :
+        tbb::filter (/* is_serial= */ false),
+        worker (worker)
+        {}
 
 
-					 /**
-					  * Work on an item.
-					  */
-	void * operator () (void *item)
-	  {
-					     // first unpack the current item
-	    typedef
-	      typename IteratorRangeToItemStream<Iterator,ScratchData,CopyData>::ItemType
-	      ItemType;
-	    
-	    ItemType *current_item = reinterpret_cast<ItemType*> (item);
-	    
-					     // then call the worker function on
-					     // each element of the chunk we
-					     // were given
-	    for (unsigned int i=0; i<std_cxx1x::get<3>(*current_item); ++i)
-	      worker (std_cxx1x::get<0>(*current_item)[i],
-		      *std_cxx1x::get<1>(*current_item),
-		      std_cxx1x::get<2>(*current_item)[i]);
-	    
-					     // then return the original pointer
-					     // to the now modified object
-	    return item;
-	  }
-	
+                                         /**
+                                          * Work on an item.
+                                          */
+        void * operator () (void *item)
+          {
+                                             // first unpack the current item
+            typedef
+              typename IteratorRangeToItemStream<Iterator,ScratchData,CopyData>::ItemType
+              ItemType;
+
+            ItemType *current_item = reinterpret_cast<ItemType*> (item);
+
+                                             // then call the worker function on
+                                             // each element of the chunk we
+                                             // were given
+            for (unsigned int i=0; i<std_cxx1x::get<3>(*current_item); ++i)
+              worker (std_cxx1x::get<0>(*current_item)[i],
+                      *std_cxx1x::get<1>(*current_item),
+                      std_cxx1x::get<2>(*current_item)[i]);
+
+                                             // then return the original pointer
+                                             // to the now modified object
+            return item;
+          }
+
 
       private:
-					 /**
-					  * Pointer to the function
-					  * that does the assembling
-					  * on the sequence of cells.
-					  */
-	const std_cxx1x::function<void (const Iterator &,
-					ScratchData &,
-					CopyData &)> worker;
+                                         /**
+                                          * Pointer to the function
+                                          * that does the assembling
+                                          * on the sequence of cells.
+                                          */
+        const std_cxx1x::function<void (const Iterator &,
+                                        ScratchData &,
+                                        CopyData &)> worker;
     };
 
 
 
-				     /**
-				      * A class that manages calling the
-				      * copier function. Note that it is, in
-				      * the TBB notation, a filter that runs
-				      * sequentially, ensuring that all items
-				      * are copied in the same order in which
-				      * they are created.
-				      */
+                                     /**
+                                      * A class that manages calling the
+                                      * copier function. Note that it is, in
+                                      * the TBB notation, a filter that runs
+                                      * sequentially, ensuring that all items
+                                      * are copied in the same order in which
+                                      * they are created.
+                                      */
     template <typename Iterator,
-	      typename ScratchData,
-	      typename CopyData>
+              typename ScratchData,
+              typename CopyData>
     class Copier : public tbb::filter
     {
       public:
-					 /**
-					  * Constructor. Takes a
-					  * reference to the object on
-					  * which we will operate as
-					  * well as a pointer to the
-					  * function that will do the
-					  * copying from the
-					  * additional data object to
-					  * the global matrix or
-					  * similar.
-					  */
-	Copier (const std_cxx1x::function<void (const CopyData &)> &copier)
-			:
-			tbb::filter (/* is_serial= */ true),
-			copier (copier)
-	  {}
+                                         /**
+                                          * Constructor. Takes a
+                                          * reference to the object on
+                                          * which we will operate as
+                                          * well as a pointer to the
+                                          * function that will do the
+                                          * copying from the
+                                          * additional data object to
+                                          * the global matrix or
+                                          * similar.
+                                          */
+        Copier (const std_cxx1x::function<void (const CopyData &)> &copier)
+                        :
+                        tbb::filter (/* is_serial= */ true),
+                        copier (copier)
+          {}
 
 
-					 /**
-					  * Work on a single item.
-					  */
-	void * operator () (void *item)
-	  {
-					     // first unpack the current item
-	    typedef
-	      typename IteratorRangeToItemStream<Iterator,ScratchData,CopyData>::ItemType
-	      ItemType;
-	    
-	    ItemType *current_item = reinterpret_cast<ItemType*> (item);
+                                         /**
+                                          * Work on a single item.
+                                          */
+        void * operator () (void *item)
+          {
+                                             // first unpack the current item
+            typedef
+              typename IteratorRangeToItemStream<Iterator,ScratchData,CopyData>::ItemType
+              ItemType;
 
-					     // initiate copying data
-	    for (unsigned int i=0; i<std_cxx1x::get<3>(*current_item); ++i)
-	      copier (std_cxx1x::get<2>(*current_item)[i]);
+            ItemType *current_item = reinterpret_cast<ItemType*> (item);
 
-					     // return an invalid
-					     // item since we are at
-					     // the end of the
-					     // pipeline
-	    return 0;
-	  }
-	
+                                             // initiate copying data
+            for (unsigned int i=0; i<std_cxx1x::get<3>(*current_item); ++i)
+              copier (std_cxx1x::get<2>(*current_item)[i]);
+
+                                             // return an invalid
+                                             // item since we are at
+                                             // the end of the
+                                             // pipeline
+            return 0;
+          }
+
 
       private:
-					 /**
-					  * Pointer to the function
-					  * that does the copying of
-					  * data.
-					  */
-	const std_cxx1x::function<void (const CopyData &)> copier;
+                                         /**
+                                          * Pointer to the function
+                                          * that does the copying of
+                                          * data.
+                                          */
+        const std_cxx1x::function<void (const CopyData &)> copier;
     };
-    
+
   }
-  
+
 
 #endif // DEAL_II_USE_MT
 
 
 
-				   /**
-				    * This is the main function of the
-				    * WorkStream concept, doing work as
-				    * described in the introduction to this
-				    * namespace.
-				    *
-				    * This is the function that can be used
-				    * for worker and copier objects that are
-				    * either pointers to non-member
-				    * functions or objects that allow to be
-				    * called with an operator(), for example
-				    * objects created by std::bind.
-				    *
-				    * The argument passed as @p end must be
-				    * convertible to the same type as
-				    * @p begin, but doesn't have to be of the
-				    * same type itself. This allows to write
-				    * code like
-				    * <code>WorkStream().run(dof_handler.begin_active(),
-				    * dof_handler.end(), ...</code> where
-				    * the first is of type
-				    * DoFHandler::active_cell_iterator
-				    * whereas the second is of type
-				    * DoFHandler::raw_cell_iterator.
-				    *
-				    * The two data types
-				    * <tt>ScratchData</tt> and
-				    * <tt>CopyData</tt> need to have a
-				    * working copy
-				    * constructor. <tt>ScratchData</tt>
-				    * is only used in the
-				    * <tt>worker</tt> function, while
-				    * <tt>CopyData</tt> is the object
-				    * passed from the <tt>worker</tt>
-				    * to the <tt>copier</tt>.
-				    *
-				    * The @p queue_length argument indicates
-				    * the number of items that can be live
-				    * at any given time. Each item consists
-				    * of @p chunk_size elements of the input
-				    * stream that will be worked on by the
-				    * worker and copier functions one after
-				    * the other on the same thread.
-				    *
-				    * @note If your data objects are large,
-				    * or their constructors are expensive,
-				    * it is helpful to keep in mind
-				    * that <tt>queue_length</tt>
-				    * copies of the <tt>ScratchData</tt>
-				    * object and
-				    * <tt>queue_length*chunk_size</tt>
-				    * copies of the <tt>CopyData</tt>
-				    * object are generated.
-				    */
+                                   /**
+                                    * This is the main function of the
+                                    * WorkStream concept, doing work as
+                                    * described in the introduction to this
+                                    * namespace.
+                                    *
+                                    * This is the function that can be used
+                                    * for worker and copier objects that are
+                                    * either pointers to non-member
+                                    * functions or objects that allow to be
+                                    * called with an operator(), for example
+                                    * objects created by std::bind.
+                                    *
+                                    * The argument passed as @p end must be
+                                    * convertible to the same type as
+                                    * @p begin, but doesn't have to be of the
+                                    * same type itself. This allows to write
+                                    * code like
+                                    * <code>WorkStream().run(dof_handler.begin_active(),
+                                    * dof_handler.end(), ...</code> where
+                                    * the first is of type
+                                    * DoFHandler::active_cell_iterator
+                                    * whereas the second is of type
+                                    * DoFHandler::raw_cell_iterator.
+                                    *
+                                    * The two data types
+                                    * <tt>ScratchData</tt> and
+                                    * <tt>CopyData</tt> need to have a
+                                    * working copy
+                                    * constructor. <tt>ScratchData</tt>
+                                    * is only used in the
+                                    * <tt>worker</tt> function, while
+                                    * <tt>CopyData</tt> is the object
+                                    * passed from the <tt>worker</tt>
+                                    * to the <tt>copier</tt>.
+                                    *
+                                    * The @p queue_length argument indicates
+                                    * the number of items that can be live
+                                    * at any given time. Each item consists
+                                    * of @p chunk_size elements of the input
+                                    * stream that will be worked on by the
+                                    * worker and copier functions one after
+                                    * the other on the same thread.
+                                    *
+                                    * @note If your data objects are large,
+                                    * or their constructors are expensive,
+                                    * it is helpful to keep in mind
+                                    * that <tt>queue_length</tt>
+                                    * copies of the <tt>ScratchData</tt>
+                                    * object and
+                                    * <tt>queue_length*chunk_size</tt>
+                                    * copies of the <tt>CopyData</tt>
+                                    * object are generated.
+                                    */
   template <typename Worker,
-	    typename Copier,
-	    typename Iterator,
-	    typename ScratchData,
-	    typename CopyData>
+            typename Copier,
+            typename Iterator,
+            typename ScratchData,
+            typename CopyData>
   void
   run (const Iterator                          &begin,
        const typename identity<Iterator>::type &end,
@@ -513,129 +513,131 @@ namespace WorkStream
        const unsigned int chunk_size = 8)
   {
     Assert (queue_length > 0,
-	    ExcMessage ("The queue length must be at least one, and preferably "
-			"larger than the number of processors on this system."));
+            ExcMessage ("The queue length must be at least one, and preferably "
+                        "larger than the number of processors on this system."));
+    (void)queue_length; // removes -Wunused-parameter warning in optimized mode
     Assert (chunk_size > 0,
-	    ExcMessage ("The chunk_size must be at least one."));  
+            ExcMessage ("The chunk_size must be at least one."));
+    (void)chunk_size; // removes -Wunused-parameter warning in optimized mode
 
-				     // if no work then skip. (only use
-				     // operator!= for iterators since we may
-				     // not have an equality comparison
-				     // operator)
+                                     // if no work then skip. (only use
+                                     // operator!= for iterators since we may
+                                     // not have an equality comparison
+                                     // operator)
     if (!(begin != end))
       return;
-    
-#if DEAL_II_USE_MT == 1  
-				     // create the three stages of the
-				     // pipeline
+
+#if DEAL_II_USE_MT == 1
+                                     // create the three stages of the
+                                     // pipeline
     internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
       iterator_range_to_item_stream (begin, end,
-				     queue_length,
-				     chunk_size,
-				     sample_scratch_data,
-				     sample_copy_data);
+                                     queue_length,
+                                     chunk_size,
+                                     sample_scratch_data,
+                                     sample_copy_data);
 
     internal::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
     internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier);
 
-				     // now create a pipeline from
-				     // these stages
+                                     // now create a pipeline from
+                                     // these stages
     tbb::pipeline assembly_line;
     assembly_line.add_filter (iterator_range_to_item_stream);
     assembly_line.add_filter (worker_filter);
     assembly_line.add_filter (copier_filter);
 
-				     // and run it
-    assembly_line.run (queue_length);    
+                                     // and run it
+    assembly_line.run (queue_length);
 
     assembly_line.clear ();
 
 #else
 
-				     // need to copy the sample since it is
-				     // marked const
+                                     // need to copy the sample since it is
+                                     // marked const
     ScratchData scratch_data = sample_scratch_data;
     CopyData    copy_data    = sample_copy_data;
-    
+
     for (Iterator i=begin; i!=end; ++i)
       {
-	worker (i, scratch_data, copy_data);
-	copier (copy_data);
-      }  
+        worker (i, scratch_data, copy_data);
+        copier (copy_data);
+      }
 #endif
   }
 
 
 
-				   /**
-				    * This is the main function of the
-				    * WorkStream concept, doing work as
-				    * described in the introduction to this
-				    * namespace.
-				    *
-				    * This is the function that can be
-				    * used for worker and copier functions
-				    * that are member functions of a class.
-				    *
-				    * The argument passed as @p end must be
-				    * convertible to the same type as
-				    * @p begin, but doesn't have to be of the
-				    * same type itself. This allows to write
-				    * code like
-				    * <code>WorkStream().run(dof_handler.begin_active(),
-				    * dof_handler.end(), ...</code> where
-				    * the first is of type
-				    * DoFHandler::active_cell_iterator
-				    * whereas the second is of type
-				    * DoFHandler::raw_cell_iterator.
-				    *
-				    * The @p queue_length argument indicates
-				    * the number of items that can be live
-				    * at any given time. Each item consists
-				    * of @p chunk_size elements of the input
-				    * stream that will be worked on by the
-				    * worker and copier functions one after
-				    * the other on the same thread.
-				    *
-				    * @note If your data objects are large,
-				    * or their constructors are expensive,
-				    * it is helpful to keep in mind
-				    * that <tt>queue_length</tt>
-				    * copies of the <tt>ScratchData</tt>
-				    * object and
-				    * <tt>queue_length*chunk_size</tt>
-				    * copies of the <tt>CopyData</tt>
-				    * object are generated.
-				    */
+                                   /**
+                                    * This is the main function of the
+                                    * WorkStream concept, doing work as
+                                    * described in the introduction to this
+                                    * namespace.
+                                    *
+                                    * This is the function that can be
+                                    * used for worker and copier functions
+                                    * that are member functions of a class.
+                                    *
+                                    * The argument passed as @p end must be
+                                    * convertible to the same type as
+                                    * @p begin, but doesn't have to be of the
+                                    * same type itself. This allows to write
+                                    * code like
+                                    * <code>WorkStream().run(dof_handler.begin_active(),
+                                    * dof_handler.end(), ...</code> where
+                                    * the first is of type
+                                    * DoFHandler::active_cell_iterator
+                                    * whereas the second is of type
+                                    * DoFHandler::raw_cell_iterator.
+                                    *
+                                    * The @p queue_length argument indicates
+                                    * the number of items that can be live
+                                    * at any given time. Each item consists
+                                    * of @p chunk_size elements of the input
+                                    * stream that will be worked on by the
+                                    * worker and copier functions one after
+                                    * the other on the same thread.
+                                    *
+                                    * @note If your data objects are large,
+                                    * or their constructors are expensive,
+                                    * it is helpful to keep in mind
+                                    * that <tt>queue_length</tt>
+                                    * copies of the <tt>ScratchData</tt>
+                                    * object and
+                                    * <tt>queue_length*chunk_size</tt>
+                                    * copies of the <tt>CopyData</tt>
+                                    * object are generated.
+                                    */
   template <typename MainClass,
-	    typename Iterator,
-	    typename ScratchData,
-	    typename CopyData>
+            typename Iterator,
+            typename ScratchData,
+            typename CopyData>
   void
   run (const Iterator                          &begin,
        const typename identity<Iterator>::type &end,
        MainClass                               &main_object,
        void (MainClass::*worker) (const Iterator &,
-				  ScratchData &,
-				  CopyData &),
+                                  ScratchData &,
+                                  CopyData &),
        void (MainClass::*copier) (const CopyData &),
        const ScratchData                    &sample_scratch_data,
        const CopyData                       &sample_copy_data,
        const unsigned int queue_length = 2*multithread_info.n_default_threads,
        const unsigned int chunk_size = 8)
   {
-				     // forward to the other function
+                                     // forward to the other function
     run (begin, end,
-	 std_cxx1x::bind (worker,
-			  std_cxx1x::ref (main_object),
-			  std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
-	 std_cxx1x::bind (copier,
-			  std_cxx1x::ref (main_object),
-			  std_cxx1x::_1),
-	 sample_scratch_data,
-	 sample_copy_data,
-	 queue_length,
-	 chunk_size);
+         std_cxx1x::bind (worker,
+                          std_cxx1x::ref (main_object),
+                          std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
+         std_cxx1x::bind (copier,
+                          std_cxx1x::ref (main_object),
+                          std_cxx1x::_1),
+         sample_scratch_data,
+         sample_copy_data,
+         queue_length,
+         chunk_size);
   }
 
 }

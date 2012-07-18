@@ -28,7 +28,7 @@
  *
  * In addition, deal.II can read an intermediate graphics format using the
  * DataOutReader. This format is used as an intermediate step between data
- * associated wiht a simulation and is written by the DataOutBase class (or
+ * associated with a simulation and is written by the DataOutBase class (or
  * through the more derived classes described in the \ref output module). The
  * DataOutReader class reads this data back in, and it can then be converted
  * to any of a number of data formats supported by visualization programs.

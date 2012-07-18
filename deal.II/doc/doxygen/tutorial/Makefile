@@ -110,12 +110,14 @@ $(example-toc):
 
 $(example-dox-prog):
 	@echo ================== Making $@
+	@mkdir -p generated
 	@cat $D/examples/$(call get_basename, $@)/*.cc \
 	  | $(PERL) program2doxygen \
 	  > $@
 
 $(example-plain):
 	@echo ================== Making $@
+	@mkdir -p plain
 	@cat $D/examples/$(call get_basename, $(@F))/*cc | $(PERL) program2plain > $@
 
 $(example-dox-plain):
@@ -135,6 +137,7 @@ $(example-dox-plain):
 
 $(example-doxygen):
 	@echo ================== Assembling $@
+	@mkdir -p doxygen
 	@echo "/**" > $@
 	@echo " * @page $(shell echo $(call get_basename,$@) | $(PERL) -pi -e 's/-/_/g;') \
 	                The $(call get_basename,$@) tutorial program" >> $@

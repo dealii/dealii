@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -181,30 +181,30 @@ namespace GridRefinement
 
 
 
-				     /**
-				      * Refine the triangulation by flagging
-				      * certain cells to reach an optimal
-				      * grid: We try to minimize the error
-				      * multiplied with the number of cells in
-				      * the new grid. All cells with large
-				      * error indicator are refined to
-				      * generate an optimal grid in the above
-				      * sense.  We assume that the error in
-				      * one cell is reduced to 1-2^{-order}
-				      * after refinement, if 'order' is the
-				      * expected order of convergence. This
-				      * expected order of convergence must be
-				      * passed as an argument but is defaulted
-				      * to 2.  The new triangulation has
-				      * ($2^d-1$) new cells for every flagged
-				      * cell (the original cell is replaced by
-				      * $2^d$ cells but it then made
-				      * inactive).
-				      *
-				      * Refer to the general doc of
-				      * this class for more
-				      * information.
-				      */
+                                     /**
+                                      * Refine the triangulation by flagging
+                                      * certain cells to reach an optimal
+                                      * grid: We try to minimize the error
+                                      * multiplied with the number of cells in
+                                      * the new grid. All cells with large
+                                      * error indicator are refined to
+                                      * generate an optimal grid in the above
+                                      * sense.  We assume that the error in
+                                      * one cell is reduced to 1-2^{-order}
+                                      * after refinement, if 'order' is the
+                                      * expected order of convergence. This
+                                      * expected order of convergence must be
+                                      * passed as an argument but is defaulted
+                                      * to 2.  The new triangulation has
+                                      * ($2^d-1$) new cells for every flagged
+                                      * cell (the original cell is replaced by
+                                      * $2^d$ cells but it then made
+                                      * inactive).
+                                      *
+                                      * Refer to the general doc of
+                                      * this class for more
+                                      * information.
+                                      */
     template <int dim, class Vector, int spacedim>
     void
     refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
@@ -228,8 +228,8 @@ namespace GridRefinement
  */
     template <int dim, class Vector, int spacedim>
     void refine (Triangulation<dim,spacedim> &tria,
-		 const Vector                &criteria,
-		 const double                threshold);
+                 const Vector                &criteria,
+                 const double                threshold);
 
 /**
  * Flag all mesh cells for which the value in @p criteria
@@ -248,22 +248,22 @@ namespace GridRefinement
  */
     template <int dim, class Vector, int spacedim>
     void coarsen (Triangulation<dim,spacedim> &tria,
-		  const Vector                &criteria,
-		  const double                threshold);
+                  const Vector                &criteria,
+                  const double                threshold);
 
-				   /**
-				    * An exception thrown if the
-				    * vector with cell criteria contains
-				    * negative values
-				    */
+                                   /**
+                                    * An exception thrown if the
+                                    * vector with cell criteria contains
+                                    * negative values
+                                    */
   DeclException0(ExcNegativeCriteria);
 
-				   /**
-				    * One of the threshold parameters
-				    * causes trouble. Or the
-				    * refinement and coarsening
-				    * thresholds overlap.
-				    */
+                                   /**
+                                    * One of the threshold parameters
+                                    * causes trouble. Or the
+                                    * refinement and coarsening
+                                    * thresholds overlap.
+                                    */
   DeclException0 (ExcInvalidParameterValue);
 }
 

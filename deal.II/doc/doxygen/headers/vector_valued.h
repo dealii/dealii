@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2011 by the deal.II authors
+//    Copyright (C) 2008, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -279,13 +279,13 @@
           {
             for (unsigned int j=0; j<dofs_per_cell; ++j)
               local_matrix(i,j) += (fe_values[velocities].value (i, q) *
-		                    fe_values[velocities].value (j, q)
+                                    fe_values[velocities].value (j, q)
                                     -
-				    fe_values[velocities].divergence (i, q) *
-				    fe_values[pressure].value (j, q)
+                                    fe_values[velocities].divergence (i, q) *
+                                    fe_values[pressure].value (j, q)
                                     -
-				    fe_values[pressure].value (i, q) *
-				    fe_values[velocities].divergence (j, q)) *
+                                    fe_values[pressure].value (i, q) *
+                                    fe_values[velocities].divergence (j, q)) *
                                     fe_values.JxW(q);
 
             local_rhs(i) += - fe_values[pressure].value (i, q)
@@ -317,22 +317,22 @@
  *         V_j=\left(\begin{array}{c}\mathbf v_j \\ q_j\end{array}\right)$:
           @f{eqnarray*}
             (\mathbf v_i, \mathbf v_j)
-	    -
-	    (\mathrm{div}\ \mathbf v_i, q_j)
-	    -
-	    (q_i, \mathrm{div}\ \mathbf v_j)
+            -
+            (\mathrm{div}\ \mathbf v_i, q_j)
+            -
+            (q_i, \mathrm{div}\ \mathbf v_j)
           @f}
  *        whereas the implementation looked like this:
  *        @code
               local_matrix(i,j) += (fe_values[velocities].value (i, q) *
-		                    fe_values[velocities].value (j, q)
+                                    fe_values[velocities].value (j, q)
                                     -
-				    fe_values[velocities].divergence (i, q) *
-				    fe_values[pressure].value (j, q)
+                                    fe_values[velocities].divergence (i, q) *
+                                    fe_values[pressure].value (j, q)
                                     -
-				    fe_values[pressure].value (i, q) *
-				    fe_values[velocities].divergence (j, q)
-				   ) *
+                                    fe_values[pressure].value (i, q) *
+                                    fe_values[velocities].divergence (j, q)
+                                   ) *
                                    fe_values.JxW(q);
  *        @endcode
  *        The similarities are pretty obvious.
@@ -428,33 +428,33 @@
       ...
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  {
-	    const Tensor<2,dim> phi_i_grad
-	      = fe_values[displacements].gradient (i,q_point);
-	    const double phi_i_div
-	      = fe_values[displacements].divergence (i,q_point);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          {
+            const Tensor<2,dim> phi_i_grad
+              = fe_values[displacements].gradient (i,q_point);
+            const double phi_i_div
+              = fe_values[displacements].divergence (i,q_point);
 
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      {
-		const Tensor<2,dim> phi_j_grad
-		  = fe_values[displacements].gradient (j,q_point);
-		const double phi_j_div
-		  = fe_values[displacements].divergence (j,q_point);
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              {
+                const Tensor<2,dim> phi_j_grad
+                  = fe_values[displacements].gradient (j,q_point);
+                const double phi_j_div
+                  = fe_values[displacements].divergence (j,q_point);
 
-		cell_matrix(i,j)
-		  +=  (lambda_values[q_point] *
-		       phi_i_div * phi_j_div
-		       +
-		       mu_values[q_point] *
-		       scalar_product(phi_i_grad, phi_j_grad)
-		       +
-		       mu_values[q_point] *
-		       scalar_product(phi_i_grad, transpose(phi_j_grad))
-		      ) *
-		      fe_values.JxW(q_point);
-	      }
-	  }
+                cell_matrix(i,j)
+                  +=  (lambda_values[q_point] *
+                       phi_i_div * phi_j_div
+                       +
+                       mu_values[q_point] *
+                       scalar_product(phi_i_grad, phi_j_grad)
+                       +
+                       mu_values[q_point] *
+                       scalar_product(phi_i_grad, transpose(phi_j_grad))
+                      ) *
+                      fe_values.JxW(q_point);
+              }
+          }
  * @endcode
  *
  * The scalar product between two tensors used in this bilinear form is
@@ -464,7 +464,7 @@
 template <int dim>
 double
 scalar_product (const Tensor<2,dim> &u,
-		const Tensor<2,dim> &v)
+                const Tensor<2,dim> &v)
 {
   double tmp = 0;
   for (unsigned int i=0; i<dim; ++i)
@@ -540,30 +540,30 @@ scalar_product (const Tensor<2,dim> &u,
  *
  * @code
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  {
-	    const SymmetricTensor<2,dim> phi_i_symmgrad
-	      = fe_values[displacements].symmetric_gradient (i,q_point);
-	    const double phi_i_div
-	      = fe_values[displacements].divergence (i,q_point);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          {
+            const SymmetricTensor<2,dim> phi_i_symmgrad
+              = fe_values[displacements].symmetric_gradient (i,q_point);
+            const double phi_i_div
+              = fe_values[displacements].divergence (i,q_point);
 
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      {
-		const SymmetricTensor<2,dim> phi_j_symmgrad
-		  = fe_values[displacements].symmetric_gradient (j,q_point);
-		const double phi_j_div
-		  = fe_values[displacements].divergence (j,q_point);
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              {
+                const SymmetricTensor<2,dim> phi_j_symmgrad
+                  = fe_values[displacements].symmetric_gradient (j,q_point);
+                const double phi_j_div
+                  = fe_values[displacements].divergence (j,q_point);
 
-		cell_matrix(i,j)
-		  +=  (phi_i_div * phi_j_div *
-		       lambda_values[q_point]
-		       +
-		       2 *
-		       (phi_i_symmgrad * phi_j_symmgrad) *
-		       mu_values[q_point]) *
-		      fe_values.JxW(q_point));
-	      }
-	  }
+                cell_matrix(i,j)
+                  +=  (phi_i_div * phi_j_div *
+                       lambda_values[q_point]
+                       +
+                       2 *
+                       (phi_i_symmgrad * phi_j_symmgrad) *
+                       mu_values[q_point]) *
+                      fe_values.JxW(q_point));
+              }
+          }
  * @endcode
  *
  * So if, again, this is not the code we use in step-8, what do
@@ -746,7 +746,7 @@ scalar_product (const Tensor<2,dim> &u,
 
     cg.solve (system_matrix.block(0,0),
               solution.block(0),
-	      tmp,
+              tmp,
               PreconditionIdentity());
  * @endcode
  *
@@ -935,8 +935,8 @@ scalar_product (const Tensor<2,dim> &u,
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, solution_names,
-			    DataOut<dim>::type_dof_data,
-			    data_component_interpretation);
+                            DataOut<dim>::type_dof_data,
+                            data_component_interpretation);
   data_out.build_patches ();
  * @endcode
  * In other words, we here create an array of <code>dim+1</code> elements in

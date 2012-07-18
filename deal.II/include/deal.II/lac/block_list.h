@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -48,241 +48,241 @@ class BlockList :
   public Subscriptor
 {
   public:
-				     /// The container for each index set
+                                     /// The container for each index set
     typedef std::vector<unsigned int> block_container;
-				     /// The iterator for individual indices
+                                     /// The iterator for individual indices
     typedef block_container::const_iterator const_iterator;
 
-				     /**
-				      * Since SparsityPattern can
-				      * handle the tasks of BlockList,
-				      * this function allows us to
-				      * create one from an already
-				      * filled BlockList. A first step
-				      * to make BlockList obsolete.
-				      *
-				      * The additional integer
-				      * argument is the dimension of
-				      * the vector space.
-				      */
+                                     /**
+                                      * Since SparsityPattern can
+                                      * handle the tasks of BlockList,
+                                      * this function allows us to
+                                      * create one from an already
+                                      * filled BlockList. A first step
+                                      * to make BlockList obsolete.
+                                      *
+                                      * The additional integer
+                                      * argument is the dimension of
+                                      * the vector space.
+                                      */
     void create_sparsity_pattern(SparsityPattern& sparsity, unsigned int n) const;
 
-				     /**
-				      * Add the indices in
-				      * <tt>indices</tt> to block
-				      * <tt>block</tt>, eliminating
-				      * repeated indices.
-				      */
+                                     /**
+                                      * Add the indices in
+                                      * <tt>indices</tt> to block
+                                      * <tt>block</tt>, eliminating
+                                      * repeated indices.
+                                      */
     void add(unsigned int block, const std::vector<unsigned int>& indices);
 
-				     /**
-				      * Add the indices in
-				      * <tt>indices</tt> to block
-				      * <tt>block</tt>, eliminating
-				      * repeated indices. Only add
-				      * those indices for which
-				      * <tt>selected_indices</tt> is true.
-				      */
+                                     /**
+                                      * Add the indices in
+                                      * <tt>indices</tt> to block
+                                      * <tt>block</tt>, eliminating
+                                      * repeated indices. Only add
+                                      * those indices for which
+                                      * <tt>selected_indices</tt> is true.
+                                      */
     void add(unsigned int block,
-	     const std::vector<unsigned int>& indices,
-	     const std::vector<bool>& selected_indices,
+             const std::vector<unsigned int>& indices,
+             const std::vector<bool>& selected_indices,
              unsigned int offset = 0);
 
-				     /**
-				      * Just set up the correct size
-				      * and assign indices to blocks later.
-				      */
+                                     /**
+                                      * Just set up the correct size
+                                      * and assign indices to blocks later.
+                                      */
     void initialize(unsigned int n_blocks);
 
-				     /**
-				      * Set up all index sets using an
-				      * DoF iterator range. This
-				      * function will call
-				      * <tt>begin->get_dof_indices()</tt>
-				      * with a signature like
-				      * DoFCellAccessor::get_dof_indices().
-				      * Typically, the iterators will
-				      * loop over active cells of a
-				      * triangulation.
-				      *
-				      * In addition, the function
-				      * needs the total number of
-				      * blocks as its first argument.
-				      */
+                                     /**
+                                      * Set up all index sets using an
+                                      * DoF iterator range. This
+                                      * function will call
+                                      * <tt>begin->get_dof_indices()</tt>
+                                      * with a signature like
+                                      * DoFCellAccessor::get_dof_indices().
+                                      * Typically, the iterators will
+                                      * loop over active cells of a
+                                      * triangulation.
+                                      *
+                                      * In addition, the function
+                                      * needs the total number of
+                                      * blocks as its first argument.
+                                      */
     template <typename ITERATOR>
     void initialize(unsigned int n_blocks,
-		    const ITERATOR begin,
-		    const typename identity<ITERATOR>::type end);
+                    const ITERATOR begin,
+                    const typename identity<ITERATOR>::type end);
 
-				     /**
-				      * @deprecated This function will
-				      * move to DoFTools.
-				      *
-				      * Set up all index sets using an
-				      * DoF iterator range. This
-				      * function will call
-				      * <tt>begin->get_mg_dof_indices()</tt>
-				      * with a signature like
-				      * MGDoFCellAccessor::get_mg_dof_indices().
-				      * Typically, the iterators loop
-				      * over the cells of a single
-				      * level or a Triangulation.
-				      *
-				      * In addition, the function
-				      * needs the total number of
-				      * blocks as its first argument.
-				      */
+                                     /**
+                                      * @deprecated This function will
+                                      * move to DoFTools.
+                                      *
+                                      * Set up all index sets using an
+                                      * DoF iterator range. This
+                                      * function will call
+                                      * <tt>begin->get_mg_dof_indices()</tt>
+                                      * with a signature like
+                                      * MGDoFCellAccessor::get_mg_dof_indices().
+                                      * Typically, the iterators loop
+                                      * over the cells of a single
+                                      * level or a Triangulation.
+                                      *
+                                      * In addition, the function
+                                      * needs the total number of
+                                      * blocks as its first argument.
+                                      */
     template <typename ITERATOR>
     void initialize_mg(unsigned int n_blocks,
-		       const ITERATOR begin,
-		       const typename identity<ITERATOR>::type end);
+                       const ITERATOR begin,
+                       const typename identity<ITERATOR>::type end);
 
-				     /**
-				      * @deprecated This function will
-				      * move to DoFTools.
-				      *
-				      * Set up all index sets using an
-				      * DoF iterator range. This
-				      * function will call
-				      * <tt>begin->get_dof_indices()</tt>
-				      * with a signature like
-				      * DoFCellAccessor::get_dof_indices().
-				      * Typically, the iterators will
-				      * loop over active cells of a
-				      * triangulation.
-				      *
-				      * The argument vector
-				      * <tt>selected_dofs</tt> should
-				      * have the length  of dofs per
-				      * cell (thus, this function is
-				      * not suitable for hp), and a
-				      * true value for each degree of
-				      * freedom which should be added
-				      * to the index set of this
-				      * cell. If you are working on a
-				      * single block of a block
-				      * system, the <tt>offset</tt> is
-				      * the start index of this block.
-				      *
-				      * In addition, the function
-				      * needs the total number of
-				      * blocks as its first argument.
-				      */
+                                     /**
+                                      * @deprecated This function will
+                                      * move to DoFTools.
+                                      *
+                                      * Set up all index sets using an
+                                      * DoF iterator range. This
+                                      * function will call
+                                      * <tt>begin->get_dof_indices()</tt>
+                                      * with a signature like
+                                      * DoFCellAccessor::get_dof_indices().
+                                      * Typically, the iterators will
+                                      * loop over active cells of a
+                                      * triangulation.
+                                      *
+                                      * The argument vector
+                                      * <tt>selected_dofs</tt> should
+                                      * have the length  of dofs per
+                                      * cell (thus, this function is
+                                      * not suitable for hp), and a
+                                      * true value for each degree of
+                                      * freedom which should be added
+                                      * to the index set of this
+                                      * cell. If you are working on a
+                                      * single block of a block
+                                      * system, the <tt>offset</tt> is
+                                      * the start index of this block.
+                                      *
+                                      * In addition, the function
+                                      * needs the total number of
+                                      * blocks as its first argument.
+                                      */
     template <typename ITERATOR>
     void initialize(unsigned int n_blocks,
-		    const ITERATOR begin,
-		    const typename identity<ITERATOR>::type end,
-		    const std::vector<bool>& selected_dofs,
-		    unsigned int offset = 0);
-				     /**
-				      * @deprecated This function will
-				      * move to DoFTools.
-				      *
-				      * Set up all index sets using an
-				      * DoF iterator range. This
-				      * function will call
-				      * <tt>begin->get_mg_dof_indices()</tt>
-				      * with a signature like
-				      * MGDoFCellAccessor::get_mg_dof_indices().
-				      * Typically, the iterators will
-				      * loop over cells on a single
-				      * level of a triangulation.
-				      *
-				      * The argument vector
-				      * <tt>selected_dofs</tt> should
-				      * have the length  of dofs per
-				      * cell (thus, this function is
-				      * not suitable for hp), and a
-				      * true value for each degree of
-				      * freedom which should be added
-				      * to the index set of this
-				      * cell. If you are working on a
-				      * single block of a block
-				      * system, the <tt>offset</tt> is
-				      * the start index of this block.
-				      *
-				      * In addition, the function
-				      * needs the total number of
-				      * blocks as its first argument.
-				      */
+                    const ITERATOR begin,
+                    const typename identity<ITERATOR>::type end,
+                    const std::vector<bool>& selected_dofs,
+                    unsigned int offset = 0);
+                                     /**
+                                      * @deprecated This function will
+                                      * move to DoFTools.
+                                      *
+                                      * Set up all index sets using an
+                                      * DoF iterator range. This
+                                      * function will call
+                                      * <tt>begin->get_mg_dof_indices()</tt>
+                                      * with a signature like
+                                      * MGDoFCellAccessor::get_mg_dof_indices().
+                                      * Typically, the iterators will
+                                      * loop over cells on a single
+                                      * level of a triangulation.
+                                      *
+                                      * The argument vector
+                                      * <tt>selected_dofs</tt> should
+                                      * have the length  of dofs per
+                                      * cell (thus, this function is
+                                      * not suitable for hp), and a
+                                      * true value for each degree of
+                                      * freedom which should be added
+                                      * to the index set of this
+                                      * cell. If you are working on a
+                                      * single block of a block
+                                      * system, the <tt>offset</tt> is
+                                      * the start index of this block.
+                                      *
+                                      * In addition, the function
+                                      * needs the total number of
+                                      * blocks as its first argument.
+                                      */
     template <typename ITERATOR>
     void initialize_mg(unsigned int n_blocks,
-		       const ITERATOR begin,
-		       const typename identity<ITERATOR>::type end,
-		       const std::vector<bool>& selected_dofs,
-		       unsigned int offset = 0);
+                       const ITERATOR begin,
+                       const typename identity<ITERATOR>::type end,
+                       const std::vector<bool>& selected_dofs,
+                       unsigned int offset = 0);
 
-				     /**
-				      * @deprecated This function will
-				      * move to DoFTools.
-				      *
-				      * Same as initialize_mg(), but
-				      * instead of gathering the
-				      * degrees of freedom of a single
-				      * cell into a block, gather all
-				      * degrees of freedom of a patch
-				      * around a vertex.
-				      */
+                                     /**
+                                      * @deprecated This function will
+                                      * move to DoFTools.
+                                      *
+                                      * Same as initialize_mg(), but
+                                      * instead of gathering the
+                                      * degrees of freedom of a single
+                                      * cell into a block, gather all
+                                      * degrees of freedom of a patch
+                                      * around a vertex.
+                                      */
     template <int dim, typename ITERATOR>
     void initialize_vertex_patches_mg(unsigned int n_blocks,
-		       const ITERATOR begin,
-		       const typename identity<ITERATOR>::type end,
-		       const std::vector<bool>& selected_dofs = std::vector<bool>(),
-		       unsigned int offset = 0);
+                       const ITERATOR begin,
+                       const typename identity<ITERATOR>::type end,
+                       const std::vector<bool>& selected_dofs = std::vector<bool>(),
+                       unsigned int offset = 0);
 
-				     /**
-				      * @deprecated This function will
-				      * move to DoFTools.
-				      *
-				      * Auxiliary function, counting
-				      * the patches around vertices.
-				      */
+                                     /**
+                                      * @deprecated This function will
+                                      * move to DoFTools.
+                                      *
+                                      * Auxiliary function, counting
+                                      * the patches around vertices.
+                                      */
     template <int dim, typename ITERATOR>
     unsigned int count_vertex_patches(
       const ITERATOR begin,
       const typename identity<ITERATOR>::type end,
       bool same_level_only) const;
 
-				     /**
-				      * @deprecated This function will
-				      * move to DoFTools.
-				      *
-				      */
+                                     /**
+                                      * @deprecated This function will
+                                      * move to DoFTools.
+                                      *
+                                      */
     template <int dim, typename ITERATOR>
     bool cell_generates_vertex_patch(const ITERATOR cell,
-				     bool same_level_only) const;
+                                     bool same_level_only) const;
 
-				     /**
-				      * The number of blocks.
-				      */
+                                     /**
+                                      * The number of blocks.
+                                      */
     unsigned int size() const;
 
-				     /**
-				      * The size of a single block.
-				      */
+                                     /**
+                                      * The size of a single block.
+                                      */
     unsigned int block_size(unsigned int block) const;
 
-				     /**
-				      * Iterator to the first index in block.
-				      */
+                                     /**
+                                      * Iterator to the first index in block.
+                                      */
     const_iterator begin(unsigned int block) const;
-				     /**
-				      * End iterator for a single block.
-				      */
+                                     /**
+                                      * End iterator for a single block.
+                                      */
     const_iterator end(unsigned int block) const;
-				     /**
-				      * Return the position of
-				      * <tt>index</tt> in
-				      * <tt>block</tt>, or
-				      * numbers::invalid_unsigned_int,
-				      * if the index is not in the block.
-				      */
+                                     /**
+                                      * Return the position of
+                                      * <tt>index</tt> in
+                                      * <tt>block</tt>, or
+                                      * numbers::invalid_unsigned_int,
+                                      * if the index is not in the block.
+                                      */
     unsigned int local_index(unsigned int block, unsigned int index) const;
 
   private:
-				     /**
-				      * The container for t he index sets.
-				      */
+                                     /**
+                                      * The container for t he index sets.
+                                      */
     std::vector<block_container> index_sets;
 };
 
@@ -299,7 +299,7 @@ BlockList::create_sparsity_pattern(SparsityPattern& sparsity, unsigned int n) co
   for (unsigned int b=0;b<size();++b)
     {
       for (const_iterator i = begin(b); i != end(b); ++i)
-	sparsity.add(b,*i);
+        sparsity.add(b,*i);
     }
   sparsity.compress();
 }
@@ -315,10 +315,10 @@ BlockList::add(const unsigned int block, const std::vector<unsigned int>& indice
     {
       const unsigned int k = indices[i];
       if (k==numbers::invalid_unsigned_int)
-	continue;
+        continue;
       if (std::find(index_sets[block].begin(), index_sets[block].end(), k)
-	  == index_sets[block].end())
-	index_sets[block].push_back(k);
+          == index_sets[block].end())
+        index_sets[block].push_back(k);
     }
 }
 
@@ -338,10 +338,10 @@ BlockList::add(
     {
       const unsigned int k = indices[i];
       if (k==numbers::invalid_unsigned_int)
-	continue;
+        continue;
       if (selected[i] && std::find(index_sets[block].begin(), index_sets[block].end(), k-offset)
-	  == index_sets[block].end())
-	index_sets[block].push_back(k-offset);
+          == index_sets[block].end())
+        index_sets[block].push_back(k-offset);
     }
 }
 
@@ -447,28 +447,28 @@ BlockList::cell_generates_vertex_patch(
   switch(dim)
     {
       case 3:
-	    if (cell->at_boundary(4)) break;
-	    if (same_level_only && cell->neighbor(4)->level() != cell->level()) break;
-	    if (cell->neighbor(4)->at_boundary(0)) break;
-	    if (same_level_only && cell->neighbor(4)->neighbor(0)->level() != cell->level()) break;
-	    if (cell->neighbor(4)->at_boundary(2)) break;
-	    if (same_level_only && cell->neighbor(4)->neighbor(2)->level() != cell->level()) break;
-	    if (cell->neighbor(4)->neighbor(0)->at_boundary(2)) break;
-	    if (same_level_only && cell->neighbor(4)->neighbor(0)->neighbor(2)->level() != cell->level()) break;
-					     // No break here
+            if (cell->at_boundary(4)) break;
+            if (same_level_only && cell->neighbor(4)->level() != cell->level()) break;
+            if (cell->neighbor(4)->at_boundary(0)) break;
+            if (same_level_only && cell->neighbor(4)->neighbor(0)->level() != cell->level()) break;
+            if (cell->neighbor(4)->at_boundary(2)) break;
+            if (same_level_only && cell->neighbor(4)->neighbor(2)->level() != cell->level()) break;
+            if (cell->neighbor(4)->neighbor(0)->at_boundary(2)) break;
+            if (same_level_only && cell->neighbor(4)->neighbor(0)->neighbor(2)->level() != cell->level()) break;
+                                             // No break here
       case 2:
-	    if (cell->at_boundary(2)) break;
-	    if (same_level_only && cell->neighbor(2)->level() != cell->level()) break;
-	    if (cell->neighbor(2)->at_boundary(0)) break;
-	    if (same_level_only && cell->neighbor(2)->neighbor(0)->level() != cell->level()) break;
+            if (cell->at_boundary(2)) break;
+            if (same_level_only && cell->neighbor(2)->level() != cell->level()) break;
+            if (cell->neighbor(2)->at_boundary(0)) break;
+            if (same_level_only && cell->neighbor(2)->neighbor(0)->level() != cell->level()) break;
       case 1:
-	    if (cell->at_boundary(0)) break;
-	    if (same_level_only && cell->neighbor(0)->level() != cell->level()) break;
-	    return true;
-	    break;
+            if (cell->at_boundary(0)) break;
+            if (same_level_only && cell->neighbor(0)->level() != cell->level()) break;
+            return true;
+            break;
       default:
-	    Assert(false, ExcNotImplemented());
-	    break;
+            Assert(false, ExcNotImplemented());
+            break;
     }
   return false;
 }
@@ -511,92 +511,92 @@ BlockList::initialize_vertex_patches_mg(
   for (ITERATOR cell = begin; cell != end; ++cell)
     {
       if (cell_generates_vertex_patch<dim>(cell, true))
-	{
-	  indices.resize(cell->get_fe().dofs_per_cell);
+        {
+          indices.resize(cell->get_fe().dofs_per_cell);
 
-	  switch(dim)
-	    {
-	      case 3:
-		    cell->neighbor(4)->get_mg_dof_indices(indices);
-		    for (unsigned int i=0;i<fe.dofs_per_face;++i)
-		      {
-			indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
-			indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
-			indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
-		      }
-		    add(k, indices);
-		    cell->neighbor(4)->neighbor(0)->get_mg_dof_indices(indices);
-		    for (unsigned int i=0;i<fe.dofs_per_face;++i)
-		      {
-			indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
-			indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
-			indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
-		      }
-		    add(k, indices);
-		    cell->neighbor(4)->neighbor(2)->get_mg_dof_indices(indices);
-		    for (unsigned int i=0;i<fe.dofs_per_face;++i)
-		      {
-			indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
-			indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
-			indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
-		      }
-		    add(k, indices);
-		    cell->neighbor(4)->neighbor(2)->neighbor(0)->get_mg_dof_indices(indices);
-		    for (unsigned int i=0;i<fe.dofs_per_face;++i)
-		      {
-			indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
-			indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
-			indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
-		      }
-		    add(k, indices);
-	      case 2:
-		    cell->neighbor(2)->get_mg_dof_indices(indices);
-		    for (unsigned int i=0;i<fe.dofs_per_face;++i)
-		      {
-			indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
-			indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
-			if (dim>2)
-			  indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
-		      }
-		    add(k, indices);
-		    cell->neighbor(2)->neighbor(0)->get_mg_dof_indices(indices);
-		    for (unsigned int i=0;i<fe.dofs_per_face;++i)
-		      {
-			indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
-			indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
-			if (dim>2)
-			  indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
-		      }
-		    add(k, indices);
-						     // no break here
-	      case 1:
-		    cell->get_mg_dof_indices(indices);
-		    for (unsigned int i=0;i<fe.dofs_per_face;++i)
-		      {
-			indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
-			if (dim>1)
-			  indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
-			if (dim>2)
-			  indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
-		      }
-		    add(k, indices);
-		    cell->neighbor(0)->get_mg_dof_indices(indices);
-		    for (unsigned int i=0;i<fe.dofs_per_face;++i)
-		      {
-			indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
-			if (dim>1)
-			  indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
-			if (dim>2)
-			  indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
-		      }
-		    add(k, indices);
-		    break;
-	      default:
-		    Assert(false, ExcNotImplemented());
-		    break;
-	    }
-	  ++k;
-	}
+          switch(dim)
+            {
+              case 3:
+                    cell->neighbor(4)->get_mg_dof_indices(indices);
+                    for (unsigned int i=0;i<fe.dofs_per_face;++i)
+                      {
+                        indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
+                        indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
+                        indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
+                      }
+                    add(k, indices);
+                    cell->neighbor(4)->neighbor(0)->get_mg_dof_indices(indices);
+                    for (unsigned int i=0;i<fe.dofs_per_face;++i)
+                      {
+                        indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
+                        indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
+                        indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
+                      }
+                    add(k, indices);
+                    cell->neighbor(4)->neighbor(2)->get_mg_dof_indices(indices);
+                    for (unsigned int i=0;i<fe.dofs_per_face;++i)
+                      {
+                        indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
+                        indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
+                        indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
+                      }
+                    add(k, indices);
+                    cell->neighbor(4)->neighbor(2)->neighbor(0)->get_mg_dof_indices(indices);
+                    for (unsigned int i=0;i<fe.dofs_per_face;++i)
+                      {
+                        indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
+                        indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
+                        indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
+                      }
+                    add(k, indices);
+              case 2:
+                    cell->neighbor(2)->get_mg_dof_indices(indices);
+                    for (unsigned int i=0;i<fe.dofs_per_face;++i)
+                      {
+                        indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
+                        indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
+                        if (dim>2)
+                          indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
+                      }
+                    add(k, indices);
+                    cell->neighbor(2)->neighbor(0)->get_mg_dof_indices(indices);
+                    for (unsigned int i=0;i<fe.dofs_per_face;++i)
+                      {
+                        indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
+                        indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
+                        if (dim>2)
+                          indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
+                      }
+                    add(k, indices);
+                                                     // no break here
+              case 1:
+                    cell->get_mg_dof_indices(indices);
+                    for (unsigned int i=0;i<fe.dofs_per_face;++i)
+                      {
+                        indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
+                        if (dim>1)
+                          indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
+                        if (dim>2)
+                          indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
+                      }
+                    add(k, indices);
+                    cell->neighbor(0)->get_mg_dof_indices(indices);
+                    for (unsigned int i=0;i<fe.dofs_per_face;++i)
+                      {
+                        indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
+                        if (dim>1)
+                          indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
+                        if (dim>2)
+                          indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
+                      }
+                    add(k, indices);
+                    break;
+              default:
+                    Assert(false, ExcNotImplemented());
+                    break;
+            }
+          ++k;
+        }
     }
 }
 

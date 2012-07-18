@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -448,14 +448,14 @@ class TableHandler
                                       * add_value() function with an empty
                                       * string), then the entry of the table
                                       * is printed as <code>""</code>.
-				      *
-				      * The second argument indicates how
-				      * column keys are to be displayed. See
-				      * the description of TextOutputFormat
-				      * for more information
+                                      *
+                                      * The second argument indicates how
+                                      * column keys are to be displayed. See
+                                      * the description of TextOutputFormat
+                                      * for more information
                                       */
     void write_text (std::ostream &out,
-		     const TextOutputFormat format = table_with_headers) const;
+                     const TextOutputFormat format = table_with_headers) const;
 
                                      /**
                                       * Write table as a tex file. If
@@ -472,15 +472,15 @@ class TableHandler
     void write_tex (std::ostream &file, const bool with_header=true) const;
 
                                      /**
-				      * Read or write the data of this
-				      * object to or from a stream for
-				      * the purpose of serialization.
-				      */
+                                      * Read or write the data of this
+                                      * object to or from a stream for
+                                      * the purpose of serialization.
+                                      */
     template <class Archive>
     void serialize(Archive & ar, const unsigned int version);
 
-    				     /** @addtogroup Exceptions
-				      * @{ */
+                                     /** @addtogroup Exceptions
+                                      * @{ */
 
                                      /**
                                       * Exception
@@ -517,7 +517,7 @@ class TableHandler
     DeclException1 (ExcUndefinedTexFormat,
                     std::string,
                     << "<" << arg1 << "> is not a tex column format. Use l,c,r.");
-				     //@}
+                                     //@}
   protected:
 
                                      /**
@@ -537,27 +537,27 @@ class TableHandler
                                           */
         Column (const std::string &tex_caption);
 
-	/**
-	 * Pad this column with default constructed elements to the
-	 * number of rows given by the argument.
-	 */
-	void pad_column_below (const unsigned int length);
+        /**
+         * Pad this column with default constructed elements to the
+         * number of rows given by the argument.
+         */
+        void pad_column_below (const unsigned int length);
 
-				         /**
-				          * Read or write the data of this
-				          * object to or from a stream for
-				          * the purpose of serialization.
-				          */
-	template <class Archive>
-	void serialize(Archive & ar, const unsigned int version);
+                                         /**
+                                          * Read or write the data of this
+                                          * object to or from a stream for
+                                          * the purpose of serialization.
+                                          */
+        template <class Archive>
+        void serialize(Archive & ar, const unsigned int version);
 
                                          /**
                                           * List of entries within
                                           * this column. Values are
-					  * always immediately
-					  * converted to strings to
-					  * provide a uniform method
-					  * of lookup.
+                                          * always immediately
+                                          * converted to strings to
+                                          * provide a uniform method
+                                          * of lookup.
                                           */
         std::vector<internal::TableEntry> entries;
 
@@ -604,13 +604,13 @@ class TableHandler
                                           * Flag that may be used by
                                           * derived classes for
                                           * arbitrary purposes.
-					  *
-					  * In particular, the
-					  * ConvergenceTable class uses the
-					  * flag to denote columns for which
-					  * convergence information has
-					  * already been computed, or should
-					  * not be computed at all.
+                                          *
+                                          * In particular, the
+                                          * ConvergenceTable class uses the
+                                          * flag to denote columns for which
+                                          * convergence information has
+                                          * already been computed, or should
+                                          * not be computed at all.
                                           */
         unsigned int flag;
     };
@@ -655,12 +655,12 @@ class TableHandler
                                      /**
                                       * Maps the column keys to the
                                       * columns (not supercolumns).
-				      *
-				      * The field is declared mutable so
-				      * that the write_text() and write_tex()
-				      * functions can be const, even though they
-				      * may pad columns below if auto_fill_mode
-				      * is on.
+                                      *
+                                      * The field is declared mutable so
+                                      * that the write_text() and write_tex()
+                                      * functions can be const, even though they
+                                      * may pad columns below if auto_fill_mode
+                                      * is on.
                                       */
     mutable std::map<std::string,Column> columns;
 
@@ -693,11 +693,11 @@ class TableHandler
 
                                      /**
                                       * The caption of the table itself.
-				      */
+                                      */
     std::string tex_table_caption;
                                      /**
                                       * The label of the table.
-				      */
+                                      */
     std::string tex_table_label;
 
     /**
@@ -740,30 +740,30 @@ namespace internal
 
   template <class Archive>
   void TableEntry::save (Archive & ar,
-			 const unsigned int) const
+                         const unsigned int) const
   {
-				     // write first an identifier for the kind
-				     // of data stored and then the actual
-				     // data, in its correct data type
+                                     // write first an identifier for the kind
+                                     // of data stored and then the actual
+                                     // data, in its correct data type
     if (const int *p = boost::get<int>(&value))
       {
-	char c = 'i';
-	ar & c & *p;
+        char c = 'i';
+        ar & c & *p;
       }
     else if (const unsigned int *p = boost::get<unsigned int>(&value))
       {
-	char c = 'u';
-	ar & c & *p;
+        char c = 'u';
+        ar & c & *p;
       }
     else if (const double *p = boost::get<double>(&value))
       {
-	char c = 'd';
-	ar & c & *p;
+        char c = 'd';
+        ar & c & *p;
       }
     else if (const std::string *p = boost::get<std::string>(&value))
       {
-	char c = 's';
-	ar & c & *p;
+        char c = 's';
+        ar & c & *p;
       }
     else
       Assert (false, ExcInternalError());
@@ -773,58 +773,58 @@ namespace internal
 
   template <class Archive>
   void TableEntry::load (Archive & ar,
-			 const unsigned int)
+                         const unsigned int)
   {
-				     // following what we do in the save()
-				     // function, first read in the data type
-				     // as a one-character id, and then read
-				     // the data
+                                     // following what we do in the save()
+                                     // function, first read in the data type
+                                     // as a one-character id, and then read
+                                     // the data
     char c;
     ar & c;
 
     switch (c)
       {
-	case 'i':
-	{
-	  int val;
-	  ar & val;
-	  value = val;
-	  break;
-	}
+        case 'i':
+        {
+          int val;
+          ar & val;
+          value = val;
+          break;
+        }
 
-	case 'u':
-	{
-	  unsigned int val;
-	  ar & val;
-	  value = val;
-	  break;
-	}
+        case 'u':
+        {
+          unsigned int val;
+          ar & val;
+          value = val;
+          break;
+        }
 
-	case 'd':
-	{
-	  double val;
-	  ar & val;
-	  value = val;
-	  break;
-	}
+        case 'd':
+        {
+          double val;
+          ar & val;
+          value = val;
+          break;
+        }
 
-	case 's':
-	{
-	  std::string val;
-	  ar & val;
-	  value = val;
-	  break;
-	}
+        case 's':
+        {
+          std::string val;
+          ar & val;
+          value = val;
+          break;
+        }
 
-	default:
-	      Assert (false, ExcInternalError());
+        default:
+              Assert (false, ExcInternalError());
       }
   }
 }
 
 template <typename T>
 void TableHandler::add_value (const std::string &key,
-			      const T            value)
+                              const T            value)
 {
   // see if the column already exists
   if (columns.find(key) == columns.end())
@@ -855,7 +855,7 @@ void TableHandler::add_value (const std::string &key,
 template <class Archive>
 void
 TableHandler::Column::serialize(Archive & ar,
-				const unsigned int)
+                                const unsigned int)
 {
   ar & entries & tex_caption
     & tex_format & precision
@@ -868,7 +868,7 @@ TableHandler::Column::serialize(Archive & ar,
 template <class Archive>
 void
 TableHandler::serialize(Archive & ar,
-			const unsigned int)
+                        const unsigned int)
 {
   ar & column_order & columns
     & supercolumns & tex_supercaptions

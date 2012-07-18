@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,10 +26,10 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, class EulerVectorType, int spacedim>
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
 MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
-		   const DoFHandler<dim,spacedim> &shiftmap_dof_handler)
+                   const DoFHandler<dim,spacedim> &shiftmap_dof_handler)
                    :
-		   euler_transform_vectors(&euler_transform_vectors),
-		   shiftmap_dof_handler(&shiftmap_dof_handler)
+                   euler_transform_vectors(&euler_transform_vectors),
+                   shiftmap_dof_handler(&shiftmap_dof_handler)
 {}
 
 
@@ -38,16 +38,16 @@ template <int dim, class EulerVectorType, int spacedim>
 void
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
 compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-			       std::vector<Point<spacedim> > &a) const
+                               std::vector<Point<spacedim> > &a) const
 {
 
-				   // The assertions can not be in the
-				   // constructor, since this would
-				   // require to call
-				   // dof_handler.distribute_dofs(fe)
-				   // *before* the mapping object is
-				   // constructed, which is not
-				   // necessarily what we want.
+                                   // The assertions can not be in the
+                                   // constructor, since this would
+                                   // require to call
+                                   // dof_handler.distribute_dofs(fe)
+                                   // *before* the mapping object is
+                                   // constructed, which is not
+                                   // necessarily what we want.
 
 //TODO: Only one of these two assertions should be relevant
   AssertDimension (spacedim, shiftmap_dof_handler->get_fe().n_dofs_per_vertex());
@@ -55,30 +55,30 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
 
   AssertDimension (shiftmap_dof_handler->n_dofs(), euler_transform_vectors->size());
 
-				   // cast the
-				   // Triangulation<dim>::cell_iterator
-				   // into a
-				   // DoFHandler<dim>::cell_iterator
-				   // which is necessary for access to
-				   // DoFCellAccessor::get_dof_values()
+                                   // cast the
+                                   // Triangulation<dim>::cell_iterator
+                                   // into a
+                                   // DoFHandler<dim>::cell_iterator
+                                   // which is necessary for access to
+                                   // DoFCellAccessor::get_dof_values()
   typename DoFHandler<dim,spacedim>::cell_iterator
     dof_cell (const_cast<Triangulation<dim,spacedim> *> (&(cell->get_triangulation())),
-	      cell->level(),
-	      cell->index(),
-	      shiftmap_dof_handler);
+              cell->level(),
+              cell->index(),
+              shiftmap_dof_handler);
 
-				   // We require the cell to be active
-				   // since we can only then get nodal
-				   // values for the shifts
+                                   // We require the cell to be active
+                                   // since we can only then get nodal
+                                   // values for the shifts
   Assert (dof_cell->active() == true, ExcInactiveCell());
 
-				   // for Q1 elements, the number of
-				   // support points should equal the
-				   // number of vertices
+                                   // for Q1 elements, the number of
+                                   // support points should equal the
+                                   // number of vertices
   a.resize(GeometryInfo<dim>::vertices_per_cell);
 
-				   // now get the values of the shift
-				   // vectors at the vertices
+                                   // now get the values of the shift
+                                   // vectors at the vertices
   Vector<double> mapping_values (shiftmap_dof_handler->get_fe().dofs_per_cell);
   dof_cell->get_dof_values (*euler_transform_vectors, mapping_values);
 
@@ -87,17 +87,17 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
     {
       Point<spacedim> shift_vector;
 
-				       // pick out the value of the
-				       // shift vector at the present
-				       // vertex. since vertex dofs
-				       // are always numbered first,
-				       // we can access them easily
+                                       // pick out the value of the
+                                       // shift vector at the present
+                                       // vertex. since vertex dofs
+                                       // are always numbered first,
+                                       // we can access them easily
       for (unsigned int j=0; j<spacedim; ++j)
-	shift_vector[j] = mapping_values(i*spacedim+j);
+        shift_vector[j] = mapping_values(i*spacedim+j);
 
-				       // compute new support point by
-				       // old (reference) value and
-				       // added shift
+                                       // compute new support point by
+                                       // old (reference) value and
+                                       // added shift
       a[i] = cell->vertex(i) + shift_vector;
     }
 }
@@ -121,20 +121,20 @@ MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
   typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
   std::vector<Point<spacedim> >                             &quadrature_points,
   std::vector<double>                                       &JxW_values,
-  std::vector<Tensor<2,spacedim> >                          &jacobians,
-  std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
-  std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+  std::vector< DerivativeForm<1,dim,spacedim>   >              &jacobians,
+  std::vector<DerivativeForm<2,dim,spacedim>    >   &jacobian_grads,
+  std::vector<DerivativeForm<1,spacedim,dim>    >   &inverse_jacobians,
   std::vector<Point<spacedim> >                             &normal_vectors,
   CellSimilarity::Similarity                           &cell_similarity) const
 {
-				   // disable any previously detected
-				   // similarity and then enter the
-				   // respective function of the base class.
+                                   // disable any previously detected
+                                   // similarity and then enter the
+                                   // respective function of the base class.
   cell_similarity = CellSimilarity::invalid_next_cell;
   MappingQ1<dim,spacedim>::fill_fe_values (cell, q, mapping_data,
-					   quadrature_points, JxW_values, jacobians,
-					   jacobian_grads, inverse_jacobians,
-					   normal_vectors, cell_similarity);
+                                           quadrature_points, JxW_values, jacobians,
+                                           jacobian_grads, inverse_jacobians,
+                                           normal_vectors, cell_similarity);
 }
 
 

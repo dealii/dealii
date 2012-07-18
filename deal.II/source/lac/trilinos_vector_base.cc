@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2008, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,7 @@ namespace TrilinosWrappers
     VectorReference::operator TrilinosScalar () const
     {
       Assert (index < vector.size(),
-	      ExcIndexRange (index, 0, vector.size()));
+              ExcIndexRange (index, 0, vector.size()));
 
                                         // Trilinos allows for vectors
                                         // to be referenced by the [] or
@@ -42,9 +42,9 @@ namespace TrilinosWrappers
 
       const int local_index = vector.vector->Map().LID(index);
       Assert (local_index >= 0,
-	      ExcAccessToNonLocalElement (index,
-					  vector.vector->Map().MinMyGID(),
-					  vector.vector->Map().MaxMyGID()));
+              ExcAccessToNonLocalElement (index,
+                                          vector.vector->Map().MinMyGID(),
+                                          vector.vector->Map().MaxMyGID()));
 
 
       return (*(vector.vector))[0][local_index];
@@ -56,13 +56,13 @@ namespace TrilinosWrappers
   VectorBase::VectorBase ()
                         :
                         last_action (Zero),
-			compressed  (true),
+                        compressed  (true),
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-			vector(new Epetra_FEVector(
-				 Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF))))
+                        vector(new Epetra_FEVector(
+                                 Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF))))
 #else
-			vector(new Epetra_FEVector(
-				 Epetra_Map(0,0,Epetra_SerialComm())))
+                        vector(new Epetra_FEVector(
+                                 Epetra_Map(0,0,Epetra_SerialComm())))
 #endif
   {}
 
@@ -70,10 +70,10 @@ namespace TrilinosWrappers
 
   VectorBase::VectorBase (const VectorBase &v)
                         :
-			Subscriptor(),
-			last_action (Zero),
-			compressed (true),
-			vector(new Epetra_FEVector(*v.vector))
+                        Subscriptor(),
+                        last_action (Zero),
+                        compressed (true),
+                        vector(new Epetra_FEVector(*v.vector))
   {}
 
 
@@ -87,8 +87,8 @@ namespace TrilinosWrappers
   VectorBase::clear ()
   {
                                      // When we clear the vector,
-				     // reset the pointer and generate
-				     // an empty vector.
+                                     // reset the pointer and generate
+                                     // an empty vector.
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     Epetra_Map map (0, 0, Epetra_MpiComm(MPI_COMM_SELF));
 #else
@@ -105,27 +105,27 @@ namespace TrilinosWrappers
   VectorBase::operator = (const VectorBase &v)
   {
     Assert (vector.get() != 0,
-	    ExcMessage("Vector is not constructed properly."));
+            ExcMessage("Vector is not constructed properly."));
 
     if (local_range() != v.local_range())
       {
-	last_action = Zero;
-	vector.reset (new Epetra_FEVector(*v.vector));
+        last_action = Zero;
+        vector.reset (new Epetra_FEVector(*v.vector));
       }
     else
       {
-	Assert (vector->Map().SameAs(v.vector->Map()) == true,
-		ExcMessage ("The Epetra maps in the assignment operator ="
-			    " do not match, even though the local_range "
-			    " seems to be the same. Check vector setup!"));
-	int ierr;
-	ierr = vector->GlobalAssemble(last_action);
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+        Assert (vector->Map().SameAs(v.vector->Map()) == true,
+                ExcMessage ("The Epetra maps in the assignment operator ="
+                            " do not match, even though the local_range "
+                            " seems to be the same. Check vector setup!"));
+        int ierr;
+        ierr = vector->GlobalAssemble(last_action);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-	ierr = vector->Update(1.0, *v.vector, 0.0);
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+        ierr = vector->Update(1.0, *v.vector, 0.0);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-	last_action = Zero;
+        last_action = Zero;
       }
 
     return *this;
@@ -138,16 +138,16 @@ namespace TrilinosWrappers
   VectorBase::operator = (const ::dealii::Vector<number> &v)
   {
     Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
+            ExcDimensionMismatch(size(), v.size()));
 
-				     // this is probably not very efficient
-				     // but works. in particular, we could do
-				     // better if we know that
-				     // number==TrilinosScalar because then we
-				     // could elide the copying of elements
-				     //
-				     // let's hope this isn't a
-				     // particularly frequent operation
+                                     // this is probably not very efficient
+                                     // but works. in particular, we could do
+                                     // better if we know that
+                                     // number==TrilinosScalar because then we
+                                     // could elide the copying of elements
+                                     //
+                                     // let's hope this isn't a
+                                     // particularly frequent operation
     std::pair<unsigned int, unsigned int>
       local_range = this->local_range ();
     for (unsigned int i=local_range.first; i<local_range.second; ++i)
@@ -166,17 +166,17 @@ namespace TrilinosWrappers
     int trilinos_i = vector->Map().LID(index);
     TrilinosScalar value = 0.;
 
-				        // If the element is not
-				        // present on the current
-				        // processor, we can't
-				        // continue. Just print out 0.
+                                        // If the element is not
+                                        // present on the current
+                                        // processor, we can't
+                                        // continue. Just print out 0.
 
-				        // TODO: Is this reasonable?
+                                        // TODO: Is this reasonable?
     if (trilinos_i == -1 )
       {
-	return 0.;
+        return 0.;
         //Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
-	//				  local_range().second-1));
+        //                                local_range().second-1));
       }
     else
       value = (*vector)[0][trilinos_i];
@@ -194,15 +194,15 @@ namespace TrilinosWrappers
     int trilinos_i = vector->Map().LID(index);
     TrilinosScalar value = 0.;
 
-				        // If the element is not present
-				        // on the current processor, we
-				        // can't continue. This is the
-				        // main difference to the el()
-				        // function.
+                                        // If the element is not present
+                                        // on the current processor, we
+                                        // can't continue. This is the
+                                        // main difference to the el()
+                                        // function.
     if (trilinos_i == -1 )
       {
-	Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
-						  local_range().second-1));
+        Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
+                                                  local_range().second-1));
       }
     else
       value = (*vector)[0][trilinos_i];
@@ -214,21 +214,21 @@ namespace TrilinosWrappers
 
   void
   VectorBase::add (const VectorBase &v,
-		   const bool        allow_different_maps)
+                   const bool        allow_different_maps)
   {
     if (allow_different_maps == false)
       *this += v;
     else
       {
-	AssertThrow (size() == v.size(),
-		     ExcDimensionMismatch (size(), v.size()));
+        AssertThrow (size() == v.size(),
+                     ExcDimensionMismatch (size(), v.size()));
 
-	Epetra_Import data_exchange (vector->Map(), v.vector->Map());
+        Epetra_Import data_exchange (vector->Map(), v.vector->Map());
 
-	int ierr = vector->Import(*v.vector, data_exchange, Add);
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+        int ierr = vector->Import(*v.vector, data_exchange, Add);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-	last_action = Insert;
+        last_action = Insert;
       }
   }
 
@@ -238,7 +238,7 @@ namespace TrilinosWrappers
   VectorBase::operator == (const VectorBase &v) const
   {
     Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
+            ExcDimensionMismatch(size(), v.size()));
     if (local_size() != v.local_size())
       return false;
 
@@ -255,7 +255,7 @@ namespace TrilinosWrappers
   VectorBase::operator != (const VectorBase &v) const
   {
     Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
+            ExcDimensionMismatch(size(), v.size()));
 
     return (!(*this==v));
   }
@@ -270,18 +270,28 @@ namespace TrilinosWrappers
     TrilinosScalar *start_ptr = (*vector)[0];
     const TrilinosScalar *ptr  = start_ptr,
                          *eptr = start_ptr + local_size();
-    bool flag = true;
+    unsigned int flag = 0;
     while (ptr != eptr)
       {
-	if (*ptr != 0)
-	  {
-	    flag = false;
-	    break;
-	  }
-	++ptr;
+        if (*ptr != 0)
+          {
+            flag = 1;
+            break;
+          }
+        ++ptr;
       }
 
-    return flag;
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                                     // in parallel, check that the vector
+                                     // is zero on _all_ processors.
+    const Epetra_MpiComm *mpi_comm
+      = dynamic_cast<const Epetra_MpiComm*>(&vector->Map().Comm());
+    unsigned int num_nonzero = Utilities::MPI::sum(flag, mpi_comm->Comm());
+    return num_nonzero == 0;
+#else
+    return flag == 0;
+#endif
+
   }
 
 
@@ -289,6 +299,14 @@ namespace TrilinosWrappers
   bool
   VectorBase::is_non_negative () const
   {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                                     // if this vector is a parallel one, then
+                                     // we need to communicate to determine
+                                     // the answer to the current
+                                     // function. this still has to be
+                                     // implemented
+    AssertThrow(local_size() == size(), ExcNotImplemented());
+#endif
                                      // get a representation of the vector and
                                      // loop over all the elements
     TrilinosScalar *start_ptr;
@@ -296,21 +314,21 @@ namespace TrilinosWrappers
     int ierr = vector->ExtractView (&start_ptr, &leading_dimension);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-				       // TODO: This
-				       // won't work in parallel like
-				       // this. Find out a better way to
-				       // this in that case.
+                                       // TODO: This
+                                       // won't work in parallel like
+                                       // this. Find out a better way to
+                                       // this in that case.
     const TrilinosScalar *ptr  = start_ptr,
                          *eptr = start_ptr + size();
     bool flag = true;
     while (ptr != eptr)
       {
-	if (*ptr < 0.0)
-	  {
-	    flag = false;
-	    break;
-	  }
-	++ptr;
+        if (*ptr < 0.0)
+          {
+            flag = false;
+            break;
+          }
+        ++ptr;
       }
 
     return flag;
@@ -318,7 +336,7 @@ namespace TrilinosWrappers
 
 
 
-				        // TODO: up to now only local
+                                        // TODO: up to now only local
                                         // data printed out! Find a
                                         // way to neatly output
                                         // distributed data...
@@ -329,12 +347,12 @@ namespace TrilinosWrappers
 
     for (unsigned int j=0; j<size(); ++j)
       {
-	double t = (*vector)[0][j];
+        double t = (*vector)[0][j];
 
-	if (format != 0)
-	  std::printf (format, t);
-	else
-	  std::printf (" %5.2f", double(t));
+        if (format != 0)
+          std::printf (format, t);
+        else
+          std::printf (" %5.2f", double(t));
       }
     std::printf ("\n");
   }
@@ -343,9 +361,9 @@ namespace TrilinosWrappers
 
   void
   VectorBase::print (std::ostream      &out,
-		     const unsigned int precision,
-		     const bool         scientific,
-		     const bool         across) const
+                     const unsigned int precision,
+                     const bool         scientific,
+                     const bool         across) const
   {
     AssertThrow (out, ExcIO());
 
@@ -368,10 +386,10 @@ namespace TrilinosWrappers
 
     if (across)
       for (unsigned int i=0; i<size(); ++i)
-	out << static_cast<double>(val[i]) << ' ';
+        out << static_cast<double>(val[i]) << ' ';
     else
       for (unsigned int i=0; i<size(); ++i)
-	out << static_cast<double>(val[i]) << std::endl;
+        out << static_cast<double>(val[i]) << std::endl;
     out << std::endl;
 
                                         // restore the representation
@@ -384,13 +402,9 @@ namespace TrilinosWrappers
   void
   VectorBase::swap (VectorBase &v)
   {
-                                        // Just swap the pointers to
-                                        // the two Epetra vectors that
-                                        // hold all the data.
-    VectorBase *p_v = &v, *p_this = this;
-    VectorBase* tmp = p_v;
-    p_v = p_this;
-    p_this = tmp;
+    std::swap(last_action, v.last_action);
+    std::swap(compressed, v.compressed);
+    std::swap(vector, v.vector);
   }
 
 
@@ -398,11 +412,11 @@ namespace TrilinosWrappers
   std::size_t
   VectorBase::memory_consumption () const
   {
-				     //TODO[TH]: No accurate memory
-				     //consumption for Trilinos vectors
-				     //yet. This is a rough approximation with
-				     //one index and the value per local
-				     //entry.
+                                     //TODO[TH]: No accurate memory
+                                     //consumption for Trilinos vectors
+                                     //yet. This is a rough approximation with
+                                     //one index and the value per local
+                                     //entry.
     return sizeof(*this)
       + this->local_size()*( sizeof(double)+sizeof(int) );
   }

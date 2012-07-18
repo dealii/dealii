@@ -3,7 +3,7 @@
 //    Version: $Name$
 //    Author: Toby D. Young, Polish Academy of Sciences, 2008, 2009
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -68,7 +68,7 @@ namespace SLEPcWrappers
 
   void
   SolverBase::set_matrices (const PETScWrappers::MatrixBase &A,
-			    const PETScWrappers::MatrixBase &B)
+                            const PETScWrappers::MatrixBase &B)
   {
                                    // generalized eigenspectrum problem
     opA = &A;
@@ -120,13 +120,13 @@ namespace SLEPcWrappers
       {
 
 #if DEAL_II_PETSC_VERSION_LT(3,1,0)
-	ierr = EPSSetInitialVector (solver_data->eps, *initial_vector);
+        ierr = EPSSetInitialVector (solver_data->eps, *initial_vector);
 #else
-	Vec this_vector = *initial_vector;
-	ierr = EPSSetInitialSpace (solver_data->eps, 1, &this_vector);
+        Vec this_vector = *initial_vector;
+        ierr = EPSSetInitialSpace (solver_data->eps, 1, &this_vector);
 #endif
 
-	AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+        AssertThrow (ierr == 0, ExcSLEPcError(ierr));
       }
 
                                     // set transformation type if any
@@ -144,7 +144,7 @@ namespace SLEPcWrappers
                                     // set number of eigenvectors to
                                     // compute
     ierr = EPSSetDimensions (solver_data->eps, n_eigenvectors,
-			     PETSC_DECIDE, PETSC_DECIDE);
+                             PETSC_DECIDE, PETSC_DECIDE);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
                                     // set the solve options to the
@@ -161,9 +161,9 @@ namespace SLEPcWrappers
                                     // eigenstates
     ierr = EPSGetConverged (solver_data->eps,
 #ifdef PETSC_USE_64BIT_INDICES
-			    reinterpret_cast<PetscInt *>(n_converged));
+                            reinterpret_cast<PetscInt *>(n_converged));
 #else
-			    reinterpret_cast<int *>(n_converged));
+                            reinterpret_cast<int *>(n_converged));
 #endif
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
@@ -171,17 +171,17 @@ namespace SLEPcWrappers
   void
   SolverBase::get_eigenpair (const unsigned int         index,
 #ifndef DEAL_II_USE_PETSC_COMPLEX
-			     double                    &kr,
+                             double                    &kr,
 #else
-			     std::complex<double>      &kr,
+                             std::complex<double>      &kr,
 #endif
-			     PETScWrappers::VectorBase &vr)
+                             PETScWrappers::VectorBase &vr)
   {
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
 
                                     // get converged eigenpair
     int ierr = EPSGetEigenpair (solver_data->eps, index,
-				&kr, PETSC_NULL, vr, PETSC_NULL);
+                                &kr, PETSC_NULL, vr, PETSC_NULL);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -214,13 +214,13 @@ namespace SLEPcWrappers
   int
   SolverBase::convergence_test (EPS                 /*eps*/,
 #ifdef PETSC_USE_64BIT_INDICES
-				const PetscInt      iteration,
+                                const PetscInt      iteration,
 #else
-				const int           iteration,
+                                const int           iteration,
 #endif
-				const PetscReal     residual_norm,
-				EPSConvergedReason *reason,
-				void               *solver_control_x)
+                                const PetscReal     residual_norm,
+                                EPSConvergedReason *reason,
+                                void               *solver_control_x)
   {
     SolverControl &solver_control
       = *reinterpret_cast<SolverControl*>(solver_control_x);
@@ -231,22 +231,22 @@ namespace SLEPcWrappers
     switch (state)
       {
       case ::dealii::SolverControl::iterate:
-	*reason = EPS_CONVERGED_ITERATING;
-	break;
+        *reason = EPS_CONVERGED_ITERATING;
+        break;
 
       case ::dealii::SolverControl::success:
-	*reason = static_cast<EPSConvergedReason>(1);
-	break;
+        *reason = static_cast<EPSConvergedReason>(1);
+        break;
 
       case ::dealii::SolverControl::failure:
-	if (solver_control.last_step() > solver_control.max_steps())
-	  *reason = EPS_DIVERGED_ITS;
-	else
-	  *reason = EPS_DIVERGED_BREAKDOWN;
-	break;
+        if (solver_control.last_step() > solver_control.max_steps())
+          *reason = EPS_DIVERGED_ITS;
+        else
+          *reason = EPS_DIVERGED_BREAKDOWN;
+        break;
 
       default:
-	Assert (false, ExcNotImplemented());
+        Assert (false, ExcNotImplemented());
       }
 
                                     // return without failure.
@@ -256,8 +256,8 @@ namespace SLEPcWrappers
   /* ---------------------- SolverKrylovSchur ------------------------ */
 
   SolverKrylovSchur::SolverKrylovSchur (SolverControl        &cn,
-					const MPI_Comm       &mpi_communicator,
-					const AdditionalData &data)
+                                        const MPI_Comm       &mpi_communicator,
+                                        const AdditionalData &data)
     :
     SolverBase (cn, mpi_communicator),
     additional_data (data)
@@ -276,21 +276,21 @@ namespace SLEPcWrappers
                                     // the SLEPc convergence
                                     // criterion.
     ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
-			    this->solver_control.max_steps());
+                            this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
   /* ---------------------- SolverArnoldi ------------------------ */
 
   SolverArnoldi::AdditionalData::
-  AdditionalData (const bool delayed_reorthogonalization)                           
+  AdditionalData (const bool delayed_reorthogonalization)
     :
     delayed_reorthogonalization (delayed_reorthogonalization)
   {}
 
   SolverArnoldi::SolverArnoldi (SolverControl        &cn,
-				const MPI_Comm       &mpi_communicator,
-				const AdditionalData &data)
+                                const MPI_Comm       &mpi_communicator,
+                                const AdditionalData &data)
     :
     SolverBase (cn, mpi_communicator),
     additional_data (data)
@@ -309,7 +309,7 @@ namespace SLEPcWrappers
                                     // the SLEPc convergence
                                     // criterion.
     ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
-			    this->solver_control.max_steps());
+                            this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
                                     // if requested, set delayed
@@ -317,16 +317,16 @@ namespace SLEPcWrappers
                                     // Arnoldi iteration.
     if (additional_data.delayed_reorthogonalization)
       {
-	ierr = EPSArnoldiSetDelayed (eps, PETSC_TRUE);
-	AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+        ierr = EPSArnoldiSetDelayed (eps, PETSC_TRUE);
+        AssertThrow (ierr == 0, ExcSLEPcError(ierr));
       }
   }
 
   /* ---------------------- Lanczos ------------------------ */
 
   SolverLanczos::SolverLanczos (SolverControl        &cn,
-				const MPI_Comm       &mpi_communicator,
-				const AdditionalData &data)
+                                const MPI_Comm       &mpi_communicator,
+                                const AdditionalData &data)
     :
     SolverBase (cn, mpi_communicator),
     additional_data (data)
@@ -345,15 +345,15 @@ namespace SLEPcWrappers
                                     // the SLEPc convergence
                                     // criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
-			     this->solver_control.max_steps());
+                             this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
   /* ----------------------- Power ------------------------- */
 
   SolverPower::SolverPower (SolverControl        &cn,
-			    const MPI_Comm       &mpi_communicator,
-			    const AdditionalData &data)
+                            const MPI_Comm       &mpi_communicator,
+                            const AdditionalData &data)
     :
     SolverBase (cn, mpi_communicator),
     additional_data (data)
@@ -372,7 +372,7 @@ namespace SLEPcWrappers
                                     // the SLEPc convergence
                                     // criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
-			     this->solver_control.max_steps());
+                             this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -380,8 +380,8 @@ namespace SLEPcWrappers
   /* ---------------------- Davidson ----------------------- */
 
   SolverDavidson::SolverDavidson (SolverControl        &cn,
-				  const MPI_Comm       &mpi_communicator,
-				  const AdditionalData &data)
+                                  const MPI_Comm       &mpi_communicator,
+                                  const AdditionalData &data)
   :
     SolverBase (cn, mpi_communicator),
     additional_data (data)
@@ -400,7 +400,7 @@ namespace SLEPcWrappers
                                     // the SLEPc convergence
                                     // criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
-			     this->solver_control.max_steps());
+                             this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 #endif

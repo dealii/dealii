@@ -184,5 +184,5 @@ hour. What you'll notice, however, is that the solution is completely
 wrong: the mesh size is simply not small enough to resolve the
 solution's waves accurately, and you can see this in plots of the
 solution. Consequently, this is one of the cases where adaptivity is
-indispensible if you don't just want to throw a bigger (presumably
+indispensable if you don't just want to throw a bigger (presumably
 %parallel) machine at the problem.

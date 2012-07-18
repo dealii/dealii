@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -264,7 +264,7 @@ namespace PETScWrappers
                                           * get memory allocation right from
                                           * the start.
                                           */
-	template <typename SparsityType>
+        template <typename SparsityType>
         SparseMatrix (const MPI_Comm                  &communicator,
                       const SparsityType              &sparsity_pattern,
                       const std::vector<unsigned int> &local_rows_per_process,
@@ -357,7 +357,7 @@ namespace PETScWrappers
                                           * the start.
                                           */
         template <typename SparsityType>
-	void reinit (const MPI_Comm                  &communicator,
+        void reinit (const MPI_Comm                  &communicator,
                      const SparsityType              &sparsity_pattern,
                      const std::vector<unsigned int> &local_rows_per_process,
                      const std::vector<unsigned int> &local_columns_per_process,
@@ -371,16 +371,16 @@ namespace PETScWrappers
                                           */
         virtual const MPI_Comm & get_mpi_communicator () const;
 
-				     /** @addtogroup Exceptions
-				      * @{ */
-					 /**
-					  * Exception
-					  */
-	DeclException2 (ExcLocalRowsTooLarge,
-			int, int,
-			<< "The number of local rows " << arg1
-			<< " must be larger than the total number of rows " << arg2);
-					 //@}
+                                     /** @addtogroup Exceptions
+                                      * @{ */
+                                         /**
+                                          * Exception
+                                          */
+        DeclException2 (ExcLocalRowsTooLarge,
+                        int, int,
+                        << "The number of local rows " << arg1
+                        << " must be larger than the total number of rows " << arg2);
+                                         //@}
       private:
 
                                          /**
@@ -417,19 +417,19 @@ namespace PETScWrappers
                                          /**
                                           * Same as previous functions.
                                           */
-	template <typename SparsityType>
+        template <typename SparsityType>
         void do_reinit (const SparsityType              &sparsity_pattern,
                         const std::vector<unsigned int> &local_rows_per_process,
                         const std::vector<unsigned int> &local_columns_per_process,
                         const unsigned int               this_process,
                         const bool                       preset_nonzero_locations);
 
-				       /**
-				        *  To allow calling protected
-				        *  prepare_add() and
-				        *  prepare_set().
-				        */
-	friend class BlockMatrixBase<SparseMatrix>;
+                                       /**
+                                        *  To allow calling protected
+                                        *  prepare_add() and
+                                        *  prepare_set().
+                                        */
+        friend class BlockMatrixBase<SparseMatrix>;
     };
 
 

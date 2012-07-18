@@ -196,7 +196,7 @@ smaller errors.
 Besides evaluating the values of the solution at a certain point, the
 program also offers the possibility to evaluate the x-derivatives at a
 certain point, and also to tailor mesh refinement for this. To let the
-program compute these quantities, simply replace the two occurences of
+program compute these quantities, simply replace the two occurrences of
 <code>PointValueEvaluation</code> in the main function by
 <code>PointXDerivativeEvaluation</code>, and let the program run:
 @code

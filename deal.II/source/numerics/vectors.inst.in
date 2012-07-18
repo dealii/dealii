@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,215 +11,123 @@
 //
 //---------------------------------------------------------------------------
 
+for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace VectorTools \{
 
-for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
-{
-  namespace VectorTools \{
+      template
+        void integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_space_dimension>
+        (const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
+         const VEC&,
+         const Function<deal_II_space_dimension>&,
+         Vector<float>&,
+         const Quadrature<deal_II_dimension>&,
+         const NormType&,
+         const Function<deal_II_space_dimension>*,
+         const double);
 
-  template
-    void interpolate
-    (const Mapping<deal_II_dimension>&,
-     const DoFHandler<deal_II_dimension>&,
-     const Function<deal_II_dimension>&,
-     VEC&);
-   template
-     void interpolate
-      (const DoFHandler<deal_II_dimension>&,
-      const Function<deal_II_dimension>&,
-      VEC&);
+      template
+        void integrate_difference<deal_II_dimension, VEC, Vector<double>, deal_II_space_dimension >
+        (const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
+         const VEC&,
+         const Function<deal_II_space_dimension>&,
+         Vector<double>&,
+         const Quadrature<deal_II_dimension>&,
+         const NormType&,
+         const Function<deal_II_space_dimension>*,
+         const double);
 
-  template
-    void interpolate
-    (const Mapping<deal_II_dimension>&,
-     const hp::DoFHandler<deal_II_dimension>&,
-     const Function<deal_II_dimension>&,
-     VEC&);
-  template
-    void interpolate
-    (const hp::DoFHandler<deal_II_dimension>&,
-     const Function<deal_II_dimension>&,
-     VEC&);
+      template
+        void integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_space_dimension>
+        (const Mapping<deal_II_dimension, deal_II_space_dimension>&,
+         const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
+         const VEC&,
+         const Function<deal_II_space_dimension>&,
+         Vector<float>&,
+         const Quadrature<deal_II_dimension>&,
+         const NormType&,
+         const Function<deal_II_space_dimension>*,
+         const double);
 
-  template
-    void interpolate
-    (const Mapping<deal_II_dimension>&,
-     const MGDoFHandler<deal_II_dimension>&,
-     const Function<deal_II_dimension>&,
-     VEC&);
-  template
-    void interpolate
-    (const MGDoFHandler<deal_II_dimension>&,
-     const Function<deal_II_dimension>&,
-     VEC&);
+      template
+        void integrate_difference<deal_II_dimension, VEC, Vector<double>, deal_II_space_dimension >
+        (const Mapping<deal_II_dimension, deal_II_space_dimension>&,
+         const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
+         const VEC&,
+         const Function<deal_II_space_dimension>&,
+         Vector<double>&,
+         const Quadrature<deal_II_dimension>&,
+         const NormType&,
+         const Function<deal_II_space_dimension>*,
+         const double);
 
-  template
-    void interpolate
-    (const DoFHandler<deal_II_dimension>&,
-     const DoFHandler<deal_II_dimension>&,
-     const FullMatrix<double>&,
-     const VEC&,
-     VEC&);
 
-  template
-    void integrate_difference<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension>&,
-     const VEC&,
-     const Function<deal_II_dimension>&,
-     Vector<double>&,
-     const Quadrature<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension>*,
-     const double);
 
-#if deal_II_dimension != 3
-  template
-    void integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_dimension+1>
-    (const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
-     const VEC&,
-     const Function<deal_II_dimension+1>&,
-     Vector<float>&,
-     const Quadrature<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension+1>*,
-     const double);
+      template
+        double compute_mean_value<deal_II_dimension>
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>&,
+         const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
+         const Quadrature<deal_II_dimension>&,
+         const VEC&,
+         const unsigned int);
 
-  template
-    void integrate_difference<deal_II_dimension, VEC, Vector<double>, deal_II_dimension+1 >
-    (const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
-     const VEC&,
-     const Function<deal_II_dimension+1>&,
-     Vector<double>&,
-     const Quadrature<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension+1>*,
-     const double);
+      template
+        double compute_mean_value<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
+         const Quadrature<deal_II_dimension>&,
+         const VEC&,
+         const unsigned int);
 
-  template
-    void integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_dimension+1>
-    (const Mapping<deal_II_dimension, deal_II_dimension+1>&,
-     const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
-     const VEC&,
-     const Function<deal_II_dimension+1>&,
-     Vector<float>&,
-     const Quadrature<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension+1>*,
-     const double);
+      template
+        void interpolate
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>&,
+         const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
+         const Function<deal_II_space_dimension>&,
+         VEC&);
 
-  template
-    void integrate_difference<deal_II_dimension, VEC, Vector<double>, deal_II_dimension+1 >
-    (const Mapping<deal_II_dimension, deal_II_dimension+1>&,
-     const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
-     const VEC&,
-     const Function<deal_II_dimension+1>&,
-     Vector<double>&,
-     const Quadrature<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension+1>*,
-     const double);
+      template
+        void interpolate
+        (const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
+         const Function<deal_II_space_dimension>&,
+         VEC&);
+
+      template
+        void project
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>      &,
+         const DoFHandler<deal_II_dimension,deal_II_space_dimension>   &,
+         const ConstraintMatrix                &,
+         const Quadrature<deal_II_dimension>   &,
+         const Function<deal_II_space_dimension>     &,
+         VEC                                   &,
+         const bool,
+         const Quadrature<deal_II_dimension-1> &,
+         const bool);
+
+      template
+        void project
+        (const DoFHandler<deal_II_dimension,deal_II_space_dimension>   &,
+         const ConstraintMatrix                &,
+         const Quadrature<deal_II_dimension>   &,
+         const Function<deal_II_space_dimension>     &,
+         VEC                                   &,
+         const bool,
+         const Quadrature<deal_II_dimension-1> &,
+         const bool);
+      \}
 #endif
+  }
 
 
-  template
-    void integrate_difference<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension>&,
-     const VEC&,
-     const Function<deal_II_dimension>&,
-     Vector<float>&,
-     const Quadrature<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension>*,
-     const double);
-  template
-    void integrate_difference<deal_II_dimension>
-    (const Mapping<deal_II_dimension>&,
-     const DoFHandler<deal_II_dimension>&,
-     const VEC&,
-     const Function<deal_II_dimension>&,
-     Vector<double>&,
-     const Quadrature<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension>*,
-     const double);
-  template
-    void integrate_difference<deal_II_dimension>
-    (const Mapping<deal_II_dimension>&,
-     const DoFHandler<deal_II_dimension>&,
-     const VEC&,
-     const Function<deal_II_dimension>&,
-     Vector<float>&,
-     const Quadrature<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension>*,
-     const double);
 
-  template
-    void integrate_difference<deal_II_dimension>
-    (const hp::DoFHandler<deal_II_dimension>&,
-     const VEC&,
-     const Function<deal_II_dimension>&,
-     Vector<double>&,
-     const hp::QCollection<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension>*,
-     const double);
-  template
-    void integrate_difference<deal_II_dimension>
-    (const hp::DoFHandler<deal_II_dimension>&,
-     const VEC&,
-     const Function<deal_II_dimension>&,
-     Vector<float>&,
-     const hp::QCollection<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension>*,
-     const double);
-  template
-    void integrate_difference<deal_II_dimension>
-    (const hp::MappingCollection<deal_II_dimension>&,
-     const hp::DoFHandler<deal_II_dimension>&,
-     const VEC&,
-     const Function<deal_II_dimension>&,
-     Vector<double>&,
-     const hp::QCollection<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension>*,
-     const double);
-  template
-    void integrate_difference<deal_II_dimension>
-    (const hp::MappingCollection<deal_II_dimension>&,
-     const hp::DoFHandler<deal_II_dimension>&,
-     const VEC&,
-     const Function<deal_II_dimension>&,
-     Vector<float>&,
-     const hp::QCollection<deal_II_dimension>&,
-     const NormType&,
-     const Function<deal_II_dimension>*,
-     const double);
+//TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension, deal_II_space_dimension>
+// where applicable and move to codimension cases above also when applicable
+for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension == deal_II_space_dimension
 
-  template
-    void point_difference<deal_II_dimension> (
-      const DoFHandler<deal_II_dimension>&,
-      const VEC&,
-      const Function<deal_II_dimension>&,
-      Vector<double>&,
-      const Point<deal_II_dimension>&);
+    namespace VectorTools \{
 
-  template
-    void point_difference<deal_II_dimension> (
-      const Mapping<deal_II_dimension>&,
-      const DoFHandler<deal_II_dimension>&,
-      const VEC&,
-      const Function<deal_II_dimension>&,
-      Vector<double>&,
-      const Point<deal_II_dimension>&);
-
-  template
-    void point_value<deal_II_dimension> (
-      const DoFHandler<deal_II_dimension>&,
-      const VEC&,
-      const Point<deal_II_dimension>&,
-      Vector<double>&);
-      
   template
     void point_value<deal_II_dimension> (
       const hp::DoFHandler<deal_II_dimension>&,
@@ -227,26 +135,36 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
       const Point<deal_II_dimension>&,
       Vector<double>&);
 
-  template
-    double point_value<deal_II_dimension> (
-      const DoFHandler<deal_II_dimension>&,
-      const VEC&,
-      const Point<deal_II_dimension>&);
-      
+      template
+        void interpolate
+        (const Mapping<deal_II_dimension>&,
+         const hp::DoFHandler<deal_II_dimension>&,
+         const Function<deal_II_dimension>&,
+         VEC&);
+      template
+        void interpolate
+        (const hp::DoFHandler<deal_II_dimension>&,
+         const Function<deal_II_dimension>&,
+         VEC&);
+
   template
     double point_value<deal_II_dimension> (
       const hp::DoFHandler<deal_II_dimension>&,
       const VEC&,
       const Point<deal_II_dimension>&);
 
-  template
-    void point_value<deal_II_dimension> (
-      const Mapping<deal_II_dimension>&,
-      const DoFHandler<deal_II_dimension>&,
-      const VEC&,
-      const Point<deal_II_dimension>&,
-      Vector<double>&);
-      
+      template
+        void interpolate
+        (const Mapping<deal_II_dimension>&,
+         const MGDoFHandler<deal_II_dimension>&,
+         const Function<deal_II_dimension>&,
+         VEC&);
+      template
+        void interpolate
+        (const MGDoFHandler<deal_II_dimension>&,
+         const Function<deal_II_dimension>&,
+         VEC&);
+
   template
     void point_value<deal_II_dimension> (
       const hp::MappingCollection<deal_II_dimension>&,
@@ -255,13 +173,14 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
       const Point<deal_II_dimension>&,
       Vector<double>&);
 
-  template
-    double point_value<deal_II_dimension> (
-      const Mapping<deal_II_dimension>&,
-      const DoFHandler<deal_II_dimension>&,
-      const VEC&,
-      const Point<deal_II_dimension>&);
-      
+      template
+        void interpolate
+        (const DoFHandler<deal_II_dimension>&,
+         const DoFHandler<deal_II_dimension>&,
+         const FullMatrix<double>&,
+         const VEC&,
+         VEC&);
+
   template
     double point_value<deal_II_dimension> (
       const hp::MappingCollection<deal_II_dimension>&,
@@ -269,575 +188,400 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
       const VEC&,
       const Point<deal_II_dimension>&);
 
-  template
-    double compute_mean_value<deal_II_dimension>
-    (const Mapping<deal_II_dimension>&,
-     const DoFHandler<deal_II_dimension>&,
-     const Quadrature<deal_II_dimension>&,
-     const VEC&,
-     const unsigned int);
-  template
-    double compute_mean_value<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension>&,
-     const Quadrature<deal_II_dimension>&,
-     const VEC&,
-     const unsigned int);
+      template
+        void integrate_difference<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension>&,
+         const VEC&,
+         const Function<deal_II_dimension>&,
+         Vector<double>&,
+         const hp::QCollection<deal_II_dimension>&,
+         const NormType&,
+         const Function<deal_II_dimension>*,
+         const double);
+      template
+        void integrate_difference<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension>&,
+         const VEC&,
+         const Function<deal_II_dimension>&,
+         Vector<float>&,
+         const hp::QCollection<deal_II_dimension>&,
+         const NormType&,
+         const Function<deal_II_dimension>*,
+         const double);
+      template
+        void integrate_difference<deal_II_dimension>
+        (const hp::MappingCollection<deal_II_dimension>&,
+         const hp::DoFHandler<deal_II_dimension>&,
+         const VEC&,
+         const Function<deal_II_dimension>&,
+         Vector<double>&,
+         const hp::QCollection<deal_II_dimension>&,
+         const NormType&,
+         const Function<deal_II_dimension>*,
+         const double);
+      template
+        void integrate_difference<deal_II_dimension>
+        (const hp::MappingCollection<deal_II_dimension>&,
+         const hp::DoFHandler<deal_II_dimension>&,
+         const VEC&,
+         const Function<deal_II_dimension>&,
+         Vector<float>&,
+         const hp::QCollection<deal_II_dimension>&,
+         const NormType&,
+         const Function<deal_II_dimension>*,
+         const double);
 
-#if deal_II_dimension < 3
-  template
-    double compute_mean_value<deal_II_dimension>
-    (const Mapping<deal_II_dimension,deal_II_dimension+1>&,
-     const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-     const Quadrature<deal_II_dimension>&,
-     const VEC&,
-     const unsigned int);
-  template
-    double compute_mean_value<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-     const Quadrature<deal_II_dimension>&,
-     const VEC&,
-     const unsigned int);
+      template
+        void point_difference<deal_II_dimension> (
+          const DoFHandler<deal_II_dimension>&,
+          const VEC&,
+          const Function<deal_II_dimension>&,
+          Vector<double>&,
+          const Point<deal_II_dimension>&);
+
+      template
+        void point_difference<deal_II_dimension> (
+          const Mapping<deal_II_dimension>&,
+          const DoFHandler<deal_II_dimension>&,
+          const VEC&,
+          const Function<deal_II_dimension>&,
+          Vector<double>&,
+          const Point<deal_II_dimension>&);
+
+      template
+        void point_value<deal_II_dimension> (
+          const DoFHandler<deal_II_dimension>&,
+          const VEC&,
+          const Point<deal_II_dimension>&,
+          Vector<double>&);
+
+      template
+        double point_value<deal_II_dimension> (
+          const DoFHandler<deal_II_dimension>&,
+          const VEC&,
+          const Point<deal_II_dimension>&);
+
+      template
+        void point_value<deal_II_dimension> (
+          const Mapping<deal_II_dimension>&,
+          const DoFHandler<deal_II_dimension>&,
+          const VEC&,
+          const Point<deal_II_dimension>&,
+          Vector<double>&);
+
+      template
+        double point_value<deal_II_dimension> (
+          const Mapping<deal_II_dimension>&,
+          const DoFHandler<deal_II_dimension>&,
+          const VEC&,
+          const Point<deal_II_dimension>&);
+
+      \}
 #endif
+  }
 
 
-  template
-    void project
-    (const Mapping<deal_II_dimension>      &,
-     const DoFHandler<deal_II_dimension>   &,
-     const ConstraintMatrix                &,
-     const Quadrature<deal_II_dimension>   &,
-     const Function<deal_II_dimension>     &,
-     VEC                                   &,
-     const bool,
-     const Quadrature<deal_II_dimension-1> &,
-     const bool);
 
-  template
-    void project
-    (const DoFHandler<deal_II_dimension>   &,
-     const ConstraintMatrix                &,
-     const Quadrature<deal_II_dimension>   &,
-     const Function<deal_II_dimension>     &,
-     VEC                                   &,
-     const bool,
-     const Quadrature<deal_II_dimension-1> &,
-     const bool);
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; DH : DOFHANDLER_TEMPLATES)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace VectorTools \{
+      template
+        void interpolate_boundary_values
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+         const DH<deal_II_dimension,deal_II_space_dimension> &,
+         const FunctionMap<deal_II_space_dimension>::type &,
+         std::map<unsigned int,double>       &,
+         const std::vector<bool>    &);
 
+      template
+        void interpolate_boundary_values
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+         const DH<deal_II_dimension,deal_II_space_dimension> &,
+         const types::boundary_id_t,
+         const Function<deal_II_space_dimension>   &,
+         std::map<unsigned int,double>       &,
+         const std::vector<bool>    &);
 
-#if deal_II_dimension != 3
-  template
-    void interpolate
-    (const Mapping<deal_II_dimension,deal_II_dimension+1>&,
-     const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-     const Function<deal_II_dimension+1>&,
-     VEC&);
-  template
-    void interpolate
-    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-     const Function<deal_II_dimension+1>&,
-     VEC&);
+      template
+        void interpolate_boundary_values (
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const types::boundary_id_t,
+          const Function<deal_II_space_dimension>   &,
+          std::map<unsigned int,double>       &,
+          const std::vector<bool>    &);
 
-  template
-    void project
-    (const Mapping<deal_II_dimension,deal_II_dimension+1>      &,
-     const DoFHandler<deal_II_dimension,deal_II_dimension+1>   &,
-     const ConstraintMatrix                &,
-     const Quadrature<deal_II_dimension>   &,
-     const Function<deal_II_dimension+1>     &,
-     VEC                                   &,
-     const bool,
-     const Quadrature<deal_II_dimension-1> &,
-     const bool);
+      template
+        void interpolate_boundary_values
+        (const DH<deal_II_dimension,deal_II_space_dimension> &,
+         const FunctionMap<deal_II_space_dimension>::type &,
+         std::map<unsigned int,double>       &,
+         const std::vector<bool>    &);
 
-  template
-    void project
-    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>   &,
-     const ConstraintMatrix                &,
-     const Quadrature<deal_II_dimension>   &,
-     const Function<deal_II_dimension+1>     &,
-     VEC                                   &,
-     const bool,
-     const Quadrature<deal_II_dimension-1> &,
-     const bool);
+      template
+        void interpolate_boundary_values (
+          const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const FunctionMap<deal_II_space_dimension>::type   &,
+          ConstraintMatrix                    &,
+          const std::vector<bool>    &);
+
+      template
+        void interpolate_boundary_values
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+         const DH<deal_II_dimension,deal_II_space_dimension> &,
+         const types::boundary_id_t,
+         const Function<deal_II_space_dimension>   &,
+         ConstraintMatrix                    &,
+         const std::vector<bool>             &);
+
+      template
+        void interpolate_boundary_values (
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const types::boundary_id_t,
+          const Function<deal_II_space_dimension>   &,
+          ConstraintMatrix                    &,
+          const std::vector<bool>    &);
+
+      template
+        void interpolate_boundary_values (
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const FunctionMap<deal_II_space_dimension>::type   &,
+          ConstraintMatrix                    &,
+          const std::vector<bool>    &);
+
+      \}
 #endif
-  \}
-}
+  }
 
 
-for ( deal_II_dimension : DIMENSIONS )
-{
-namespace VectorTools \{
-template
-void create_right_hand_side<deal_II_dimension>
-(const Mapping<deal_II_dimension>    &,
- const DoFHandler<deal_II_dimension> &,
- const Quadrature<deal_II_dimension> &,
- const Function<deal_II_dimension>   &,
- Vector<double>                      &);
-template
-void create_right_hand_side<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Quadrature<deal_II_dimension> &,
- const Function<deal_II_dimension>   &,
- Vector<double>                      &);
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace VectorTools \{
+      template
+        void create_right_hand_side<deal_II_dimension,deal_II_space_dimension>
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+         const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
+         const Quadrature<deal_II_dimension> &,
+         const Function<deal_II_space_dimension>   &,
+         Vector<double>                      &);
 
-template
-void create_right_hand_side<deal_II_dimension>
-(const hp::MappingCollection<deal_II_dimension>    &,
- const hp::DoFHandler<deal_II_dimension> &,
- const hp::QCollection<deal_II_dimension> &,
- const Function<deal_II_dimension>   &,
- Vector<double>                      &);
-template
-void create_right_hand_side<deal_II_dimension>
-(const hp::DoFHandler<deal_II_dimension> &,
- const hp::QCollection<deal_II_dimension> &,
- const Function<deal_II_dimension>   &,
- Vector<double>                      &);
+      template
+        void create_right_hand_side<deal_II_dimension,deal_II_space_dimension>
+        (const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
+         const Quadrature<deal_II_dimension> &,
+         const Function<deal_II_space_dimension>   &,
+         Vector<double>  &);
 
-template
-void create_point_source_vector<deal_II_dimension>
-(const Mapping<deal_II_dimension>    &,
- const DoFHandler<deal_II_dimension> &,
- const Point<deal_II_dimension>      &,
- Vector<double>                      &);
-template
-void create_point_source_vector<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Point<deal_II_dimension>      &,
- Vector<double>                      &);
+      \}
+#endif
+  }
 
-template
-void create_point_source_vector<deal_II_dimension>
-(const hp::MappingCollection<deal_II_dimension>    &,
- const hp::DoFHandler<deal_II_dimension> &,
- const Point<deal_II_dimension>      &,
- Vector<double>                      &);
-template
-void create_point_source_vector<deal_II_dimension>
-(const hp::DoFHandler<deal_II_dimension> &,
- const Point<deal_II_dimension>      &,
- Vector<double>                      &);
+//TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension, deal_II_space_dimension>
+// where applicable and move to codimension cases above also when applicable
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension == deal_II_space_dimension
+    namespace VectorTools \{
+      template
+        void create_right_hand_side<deal_II_dimension>
+        (const hp::MappingCollection<deal_II_dimension>    &,
+         const hp::DoFHandler<deal_II_dimension> &,
+         const hp::QCollection<deal_II_dimension> &,
+         const Function<deal_II_dimension>   &,
+         Vector<double>                      &);
+
+      template
+        void create_right_hand_side<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension> &,
+         const hp::QCollection<deal_II_dimension> &,
+         const Function<deal_II_dimension>   &,
+         Vector<double>                      &);
+
+      template
+        void create_point_source_vector<deal_II_dimension>
+        (const Mapping<deal_II_dimension>    &,
+         const DoFHandler<deal_II_dimension> &,
+         const Point<deal_II_dimension>      &,
+         Vector<double>                      &);
+      template
+        void create_point_source_vector<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension> &,
+         const Point<deal_II_dimension>      &,
+         Vector<double>                      &);
+
+      template
+        void create_point_source_vector<deal_II_dimension>
+        (const hp::MappingCollection<deal_II_dimension>    &,
+         const hp::DoFHandler<deal_II_dimension> &,
+         const Point<deal_II_dimension>      &,
+         Vector<double>                      &);
+      template
+        void create_point_source_vector<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension> &,
+         const Point<deal_II_dimension>      &,
+         Vector<double>                      &);
+      template
+        void create_point_source_vector<deal_II_dimension>
+        (const Mapping<deal_II_dimension>    &,
+         const DoFHandler<deal_II_dimension> &,
+         const Point<deal_II_dimension>      &,
+         const Point<deal_II_dimension>      &,
+         Vector<double>                      &);
+      template
+        void create_point_source_vector<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension> &,
+         const Point<deal_II_dimension>      &,
+         const Point<deal_II_dimension>      &,
+         Vector<double>                      &);
+
+      template
+        void create_point_source_vector<deal_II_dimension>
+        (const hp::MappingCollection<deal_II_dimension>    &,
+         const hp::DoFHandler<deal_II_dimension> &,
+         const Point<deal_II_dimension>      &,
+         const Point<deal_II_dimension>      &,
+         Vector<double>                      &);
+      template
+        void create_point_source_vector<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension> &,
+         const Point<deal_II_dimension>      &,
+         const Point<deal_II_dimension>      &,
+         Vector<double>                      &);
 
 #if deal_II_dimension > 1
-template
-void
-create_boundary_right_hand_side<deal_II_dimension>
-(const Mapping<deal_II_dimension>    &,
- const DoFHandler<deal_II_dimension> &,
- const Quadrature<deal_II_dimension-1> &,
- const Function<deal_II_dimension>   &,
- Vector<double>                      &,
- const std::set<types::boundary_id_t> &);
+      template
+        void
+        create_boundary_right_hand_side<deal_II_dimension>
+        (const Mapping<deal_II_dimension>    &,
+         const DoFHandler<deal_II_dimension> &,
+         const Quadrature<deal_II_dimension-1> &,
+         const Function<deal_II_dimension>   &,
+         Vector<double>                      &,
+         const std::set<types::boundary_id_t> &);
 #endif
 
-template
-void
-create_boundary_right_hand_side<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Quadrature<deal_II_dimension-1> &,
- const Function<deal_II_dimension>   &,
- Vector<double>                      &,
- const std::set<types::boundary_id_t> &);
+      template
+        void
+        create_boundary_right_hand_side<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension> &,
+         const Quadrature<deal_II_dimension-1> &,
+         const Function<deal_II_dimension>   &,
+         Vector<double>                      &,
+         const std::set<types::boundary_id_t> &);
 
 #if deal_II_dimension > 1
-template
-void
-create_boundary_right_hand_side<deal_II_dimension>
-(const hp::MappingCollection<deal_II_dimension>    &,
- const hp::DoFHandler<deal_II_dimension> &,
- const hp::QCollection<deal_II_dimension-1> &,
- const Function<deal_II_dimension>   &,
- Vector<double>                      &,
- const std::set<types::boundary_id_t> &);
+      template
+        void
+        create_boundary_right_hand_side<deal_II_dimension>
+        (const hp::MappingCollection<deal_II_dimension>    &,
+         const hp::DoFHandler<deal_II_dimension> &,
+         const hp::QCollection<deal_II_dimension-1> &,
+         const Function<deal_II_dimension>   &,
+         Vector<double>                      &,
+         const std::set<types::boundary_id_t> &);
 #endif
 
-template
-void
-create_boundary_right_hand_side<deal_II_dimension>
-(const hp::DoFHandler<deal_II_dimension> &,
- const hp::QCollection<deal_II_dimension-1> &,
- const Function<deal_II_dimension>   &,
- Vector<double>                      &,
- const std::set<types::boundary_id_t> &);
+      template
+        void
+        create_boundary_right_hand_side<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension> &,
+         const hp::QCollection<deal_II_dimension-1> &,
+         const Function<deal_II_dimension>   &,
+         Vector<double>                      &,
+         const std::set<types::boundary_id_t> &);
 
-template
-void interpolate_boundary_values (
-  const DoFHandler<deal_II_dimension> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension>   &,
-  std::map<unsigned int,double>       &,
-  const std::vector<bool>    &);
 
-template
-void interpolate_boundary_values (
-  const hp::DoFHandler<deal_II_dimension> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension>   &,
-  std::map<unsigned int,double>       &,
-  const std::vector<bool>    &);
 
-template
-void interpolate_boundary_values (
-  const MGDoFHandler<deal_II_dimension> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension>   &,
-  std::map<unsigned int,double>       &,
-  const std::vector<bool>    &);
 
-template
-void interpolate_boundary_values (
-  const DoFHandler<deal_II_dimension> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension>   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const hp::DoFHandler<deal_II_dimension> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension>   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const MGDoFHandler<deal_II_dimension> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension>   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const Mapping<deal_II_dimension>    &,
-  const DoFHandler<deal_II_dimension> &,
-  const FunctionMap<deal_II_dimension>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const Mapping<deal_II_dimension>    &,
-  const hp::DoFHandler<deal_II_dimension> &,
-  const FunctionMap<deal_II_dimension>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const Mapping<deal_II_dimension>    &,
-  const MGDoFHandler<deal_II_dimension> &,
-  const FunctionMap<deal_II_dimension>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const DoFHandler<deal_II_dimension> &,
-  const FunctionMap<deal_II_dimension>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const hp::DoFHandler<deal_II_dimension> &,
-  const FunctionMap<deal_II_dimension>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const MGDoFHandler<deal_II_dimension> &,
-  const FunctionMap<deal_II_dimension>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-#if deal_II_dimension < 3
-template
-void interpolate_boundary_values (
-  const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension+1>   &,
-  std::map<unsigned int,double>       &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension+1>   &,
-  std::map<unsigned int,double>       &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension+1>   &,
-  std::map<unsigned int,double>       &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension+1>   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension+1>   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const types::boundary_id_t,
-  const Function<deal_II_dimension+1>   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
-  const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
-  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
-  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values (
-  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-#endif
 
 #if deal_II_dimension > 1
-template
-void project_boundary_values<deal_II_dimension>
-(const Mapping<deal_II_dimension>     &,
- const DoFHandler<deal_II_dimension>  &,
- const FunctionMap<deal_II_dimension>::type &,
- const Quadrature<deal_II_dimension-1>&,
- std::map<unsigned int,double>&, std::vector<unsigned int>);
+      template
+        void project_boundary_values<deal_II_dimension>
+        (const Mapping<deal_II_dimension>     &,
+         const DoFHandler<deal_II_dimension>  &,
+         const FunctionMap<deal_II_dimension>::type &,
+         const Quadrature<deal_II_dimension-1>&,
+         std::map<unsigned int,double>&, std::vector<unsigned int>);
 #endif
 
-template
-void project_boundary_values<deal_II_dimension>
-(const DoFHandler<deal_II_dimension>  &,
- const FunctionMap<deal_II_dimension>::type &,
- const Quadrature<deal_II_dimension-1>&,
- std::map<unsigned int,double>&, std::vector<unsigned int>);
+      template
+        void project_boundary_values<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension>  &,
+         const FunctionMap<deal_II_dimension>::type &,
+         const Quadrature<deal_II_dimension-1>&,
+         std::map<unsigned int,double>&, std::vector<unsigned int>);
 
 
-template
-void project_boundary_values<deal_II_dimension>
-(const Mapping<deal_II_dimension>     &,
- const DoFHandler<deal_II_dimension>  &,
- const FunctionMap<deal_II_dimension>::type &,
- const Quadrature<deal_II_dimension-1>&,
- ConstraintMatrix&, std::vector<unsigned int>);
+      template
+        void project_boundary_values<deal_II_dimension>
+        (const Mapping<deal_II_dimension>     &,
+         const DoFHandler<deal_II_dimension>  &,
+         const FunctionMap<deal_II_dimension>::type &,
+         const Quadrature<deal_II_dimension-1>&,
+         ConstraintMatrix&, std::vector<unsigned int>);
 
-template
-void project_boundary_values<deal_II_dimension>
-(const DoFHandler<deal_II_dimension>  &,
- const FunctionMap<deal_II_dimension>::type &,
- const Quadrature<deal_II_dimension-1>&,
- ConstraintMatrix&, std::vector<unsigned int>);
+      template
+        void project_boundary_values<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension>  &,
+         const FunctionMap<deal_II_dimension>::type &,
+         const Quadrature<deal_II_dimension-1>&,
+         ConstraintMatrix&, std::vector<unsigned int>);
 
 
 #if deal_II_dimension != 1
-template
-void project_boundary_values_curl_conforming<deal_II_dimension>
-(const DoFHandler<deal_II_dimension>&,
- const unsigned int,
- const Function<deal_II_dimension>&,
- const types::boundary_id_t,
- ConstraintMatrix&,
- const Mapping<deal_II_dimension>&);
-template
-void project_boundary_values_curl_conforming<deal_II_dimension>
-(const hp::DoFHandler<deal_II_dimension>&,
- const unsigned int,
- const Function<deal_II_dimension>&,
- const types::boundary_id_t,
- ConstraintMatrix&,
- const hp::MappingCollection<deal_II_dimension>&);
-template
-void project_boundary_values_div_conforming<deal_II_dimension>
-(const DoFHandler<deal_II_dimension>&,
- const unsigned int,
- const Function<deal_II_dimension>&,
- const types::boundary_id_t,
- ConstraintMatrix&,
- const Mapping<deal_II_dimension>&);
-template
-void project_boundary_values_div_conforming<deal_II_dimension>
-(const hp::DoFHandler<deal_II_dimension>&,
- const unsigned int,
- const Function<deal_II_dimension>&,
- const types::boundary_id_t,
- ConstraintMatrix&,
- const hp::MappingCollection<deal_II_dimension>&);
-template
-void
-compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
-						 const unsigned int     first_vector_component,
-						 const std::set<types::boundary_id_t> &boundary_ids,
-						 ConstraintMatrix      &constraints,
-						 const Mapping<deal_II_dimension>    &mapping);
-template
-void
-compute_no_normal_flux_constraints (const hp::DoFHandler<deal_II_dimension> &dof_handler,
-						 const unsigned int     first_vector_component,
-						 const std::set<types::boundary_id_t> &boundary_ids,
-						 ConstraintMatrix      &constraints,
-						 const Mapping<deal_II_dimension>    &mapping);
+      template
+        void project_boundary_values_curl_conforming<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension>&,
+         const unsigned int,
+         const Function<deal_II_dimension>&,
+         const types::boundary_id_t,
+         ConstraintMatrix&,
+         const Mapping<deal_II_dimension>&);
+      template
+        void project_boundary_values_curl_conforming<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension>&,
+         const unsigned int,
+         const Function<deal_II_dimension>&,
+         const types::boundary_id_t,
+         ConstraintMatrix&,
+         const hp::MappingCollection<deal_II_dimension>&);
+      template
+        void project_boundary_values_div_conforming<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension>&,
+         const unsigned int,
+         const Function<deal_II_dimension>&,
+         const types::boundary_id_t,
+         ConstraintMatrix&,
+         const Mapping<deal_II_dimension>&);
+      template
+        void project_boundary_values_div_conforming<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension>&,
+         const unsigned int,
+         const Function<deal_II_dimension>&,
+         const types::boundary_id_t,
+         ConstraintMatrix&,
+         const hp::MappingCollection<deal_II_dimension>&);
+      template
+        void
+        compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
+                                            const unsigned int     first_vector_component,
+                                            const std::set<types::boundary_id_t> &boundary_ids,
+                                            ConstraintMatrix      &constraints,
+                                            const Mapping<deal_II_dimension>    &mapping);
+      template
+        void
+        compute_no_normal_flux_constraints (const hp::DoFHandler<deal_II_dimension> &dof_handler,
+                                            const unsigned int     first_vector_component,
+                                            const std::set<types::boundary_id_t> &boundary_ids,
+                                            ConstraintMatrix      &constraints,
+                                            const Mapping<deal_II_dimension>    &mapping);
 #endif
-
-
-
-template
-void interpolate_boundary_values
-(const Mapping<deal_II_dimension>    &,
- const DoFHandler<deal_II_dimension> &,
- const FunctionMap<deal_II_dimension>::type &,
- std::map<unsigned int,double>       &,
- const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values
-(const Mapping<deal_II_dimension>    &,
- const hp::DoFHandler<deal_II_dimension> &,
- const FunctionMap<deal_II_dimension>::type &,
- std::map<unsigned int,double>       &,
- const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values
-(const Mapping<deal_II_dimension>    &,
- const MGDoFHandler<deal_II_dimension> &,
- const FunctionMap<deal_II_dimension>::type &,
- std::map<unsigned int,double>       &,
- const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values
-(const Mapping<deal_II_dimension>    &,
- const DoFHandler<deal_II_dimension> &,
- const types::boundary_id_t,
- const Function<deal_II_dimension>   &,
- std::map<unsigned int,double>       &,
- const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values
-(const Mapping<deal_II_dimension>    &,
- const hp::DoFHandler<deal_II_dimension> &,
- const types::boundary_id_t,
- const Function<deal_II_dimension>   &,
- ConstraintMatrix       &,
- const std::vector<bool>    &);
-
-#if deal_II_dimension < 3
-template
-void interpolate_boundary_values
-(const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
- const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- const FunctionMap<deal_II_dimension+1>::type &,
- std::map<unsigned int,double>       &,
- const std::vector<bool>    &);
-
-template
-void interpolate_boundary_values
-(const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
- const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- const types::boundary_id_t,
- const Function<deal_II_dimension+1>   &,
- std::map<unsigned int,double>       &,
- const std::vector<bool>    &);
+      \}
 #endif
+  }
 
-
-template
-void
-interpolate_boundary_values
-(const DoFHandler<deal_II_dimension>         &,
- const FunctionMap<deal_II_dimension>::type &,
- std::map<unsigned int,double> &,
- const std::vector<bool>       &);
-
-
-#if deal_II_dimension != 3
-
-template
-void create_right_hand_side<deal_II_dimension,deal_II_dimension+1>
-(const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
- const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- const Quadrature<deal_II_dimension> &,
- const Function<deal_II_dimension+1>   &,
- Vector<double>                      &);
-template
-void create_right_hand_side<deal_II_dimension,deal_II_dimension+1>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- const Quadrature<deal_II_dimension> &,
- const Function<deal_II_dimension+1>   &,
- Vector<double>                      &);
-
-// template
-// void create_right_hand_side<deal_II_dimension,deal_II_dimension+1>
-// (const hp::MappingCollection<deal_II_dimension,deal_II_dimension+1>    &,
-//  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-//  const hp::QCollection<deal_II_dimension> &,
-//  const Function<deal_II_dimension+1>   &,
-//  Vector<double>                      &);
-// template
-// void create_right_hand_side<deal_II_dimension,deal_II_dimension+1>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-//  const hp::QCollection<deal_II_dimension> &,
-//  const Function<deal_II_dimension+1>   &,
-//  Vector<double>                      &);
-
-#endif
-  \}
-}
 
 
 for (deal_II_dimension : DIMENSIONS)

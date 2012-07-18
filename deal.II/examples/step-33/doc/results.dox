@@ -151,7 +151,7 @@ We can also visualize the evolution of the adaptively refined grid:
 
 @image html step-33.slide_adapt.gif
 
-The adaptivity follows and preceeds the flow pattern, based on the heuristic
+The adaptivity follows and precedes the flow pattern, based on the heuristic
 refinement scheme discussed above.
 
 

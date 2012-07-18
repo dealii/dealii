@@ -149,7 +149,7 @@ clean-objects:  clean-debug clean-optimized \
 # object files and template instantiation files.
 # extract dir name from target
 clean-debug clean-optimized:
-	-cd $(@:clean-%=%) ; rm -f *.$(OBJEXT) *.ti *.ii
+	-cd $(@:clean-%=%) ; rm -f *.$(OBJEXT) *.ti *.ii *.gcda *.gcno
 
 clean-contrib:
 	-rm contrib/*/*.$(OBJEXT)

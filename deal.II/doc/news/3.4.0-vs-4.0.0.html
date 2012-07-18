@@ -747,7 +747,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
   <li> <p>
        New: The interface for sparse decompositions has been abstracted, and
        there is now an Modified Incomplete Cholesky (MIC) decomposition in
-       addition to the Imcomplete LU (ILU) decomposition.
+       addition to the Incomplete LU (ILU) decomposition.
        <br>
        (Stephen Kolaroff 2002/11/27)
        </p>
@@ -1051,7 +1051,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        New: Checked in new <code class="class">GridGenerator</code> 
        member function <code class="member">half_hyper_ball</code>,
        derived from member <code class="member">hyper_ball</code>.     
-       The intial mesh contains four elements. This mesh will work with
+       The initial mesh contains four elements. This mesh will work with
        the boundary class <code class="class">HalfHyperBallBoundary</code>.
        <br>
        (Brian Carnes 2002/12/16)
@@ -1061,7 +1061,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        New: Checked in new class <code class="class">FE_Q_Hierarchical</code>
        derived from class <code class="class">FiniteElement</code>.  
        This element is analogous to <code class="class">FE_Q</code>, but 
-       makes use of hierachical shape functions, based on the 
+       makes use of hierarchical shape functions, based on the 
        <code class="class">Polynomials::Hierarchical</code> class. 
        For <code>degree&gt;1</code>, the non-nodal basis functions are "bubble"
        functions, which are not Lagrange polynomials. Therefore, the usual

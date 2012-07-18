@@ -58,33 +58,33 @@ struct IsBlockVector
     struct yes_type { char c[1]; };
     struct no_type  { char c[2]; };
 
-				     /**
-				      * Overload returning true if the class
-				      * is derived from BlockVectorBase,
-				      * which is what block vectors do.
-				      */
+                                     /**
+                                      * Overload returning true if the class
+                                      * is derived from BlockVectorBase,
+                                      * which is what block vectors do.
+                                      */
     template <typename T>
     static yes_type check_for_block_vector (const BlockVectorBase<T> *);
 
-				     /**
-				      * Catch all for all other potential
-				      * vector types that are not block
-				      * matrices.
-				      */
+                                     /**
+                                      * Catch all for all other potential
+                                      * vector types that are not block
+                                      * matrices.
+                                      */
     static no_type check_for_block_vector (...);
 
   public:
-				     /**
-				      * A statically computable value that
-				      * indicates whether the template
-				      * argument to this class is a block
-				      * vector (in fact whether the type is
-				      * derived from BlockVectorBase<T>).
-				      */
+                                     /**
+                                      * A statically computable value that
+                                      * indicates whether the template
+                                      * argument to this class is a block
+                                      * vector (in fact whether the type is
+                                      * derived from BlockVectorBase<T>).
+                                      */
     static const bool value = (sizeof(check_for_block_vector
-				      ((VectorType*)0))
-			       ==
-			       sizeof(yes_type));
+                                      ((VectorType*)0))
+                               ==
+                               sizeof(yes_type));
 };
 
 
@@ -582,8 +582,8 @@ namespace internal
                                           */
         Iterator & operator -= (const difference_type &d);
 
-					 /** @addtogroup Exceptions
-					  * @{ */
+                                         /** @addtogroup Exceptions
+                                          * @{ */
 
                                          /**
                                           * Exception.
@@ -593,7 +593,7 @@ namespace internal
                                           * Exception.
                                           */
         DeclException0 (ExcCastingAwayConstness);
-					 //@}
+                                         //@}
       private:
                                          /**
                                           * Pointer to the block
@@ -725,45 +725,45 @@ class BlockVectorBase : public Subscriptor
                                       */
     typedef VectorType BlockType;
 
-				     /*
-				      * Declare standard types used in
-				      * all containers. These types
-				      * parallel those in the
-				      * <tt>C++</tt> standard
-				      * libraries
-				      * <tt>std::vector<...></tt>
-				      * class. This includes iterator
-				      * types.
-				      */
+                                     /*
+                                      * Declare standard types used in
+                                      * all containers. These types
+                                      * parallel those in the
+                                      * <tt>C++</tt> standard
+                                      * libraries
+                                      * <tt>std::vector<...></tt>
+                                      * class. This includes iterator
+                                      * types.
+                                      */
     typedef typename BlockType::value_type  value_type;
     typedef value_type                     *pointer;
     typedef const value_type               *const_pointer;
-    typedef internal::BlockVectorIterators::Iterator<BlockVectorBase,false> iterator;
-    typedef internal::BlockVectorIterators::Iterator<BlockVectorBase,true>  const_iterator;
+    typedef dealii::internal::BlockVectorIterators::Iterator<BlockVectorBase,false> iterator;
+    typedef dealii::internal::BlockVectorIterators::Iterator<BlockVectorBase,true>  const_iterator;
     typedef typename BlockType::reference       reference;
     typedef typename BlockType::const_reference const_reference;
 
     typedef std::size_t                     size_type;
 
-				     /**
-				      * Declare a type that has holds
-				      * real-valued numbers with the
-				      * same precision as the template
-				      * argument to this class. If the
-				      * template argument of this
-				      * class is a real data type,
-				      * then real_type equals the
-				      * template argument. If the
-				      * template argument is a
-				      * std::complex type then
-				      * real_type equals the type
-				      * underlying the complex
-				      * numbers.
-				      *
-				      * This typedef is used to
-				      * represent the return type of
-				      * norms.
-				      */
+                                     /**
+                                      * Declare a type that has holds
+                                      * real-valued numbers with the
+                                      * same precision as the template
+                                      * argument to this class. If the
+                                      * template argument of this
+                                      * class is a real data type,
+                                      * then real_type equals the
+                                      * template argument. If the
+                                      * template argument is a
+                                      * std::complex type then
+                                      * real_type equals the type
+                                      * underlying the complex
+                                      * numbers.
+                                      *
+                                      * This typedef is used to
+                                      * represent the return type of
+                                      * norms.
+                                      */
     typedef typename BlockType::real_type real_type;
 
                                      /**
@@ -771,17 +771,17 @@ class BlockVectorBase : public Subscriptor
                                       */
     BlockVectorBase ();
 
-				     /**
-				      * Update internal structures
-				      * after resizing
-				      * vectors. Whenever you reinited
-				      * a block of a block vector, the
-				      * internal data structures are
-				      * corrupted. Therefore, you
-				      * should call this function
-				      * after al blocks got their new
-				      * size.
-				      */
+                                     /**
+                                      * Update internal structures
+                                      * after resizing
+                                      * vectors. Whenever you reinited
+                                      * a block of a block vector, the
+                                      * internal data structures are
+                                      * corrupted. Therefore, you
+                                      * should call this function
+                                      * after al blocks got their new
+                                      * size.
+                                      */
     void collect_sizes ();
 
                                      /**
@@ -790,113 +790,113 @@ class BlockVectorBase : public Subscriptor
                                       */
     void compress ();
 
-				     /**
-				      * Access to a single block.
-				      */
+                                     /**
+                                      * Access to a single block.
+                                      */
     BlockType &
     block (const unsigned int i);
 
-				     /**
-				      * Read-only access to a single block.
-				      */
+                                     /**
+                                      * Read-only access to a single block.
+                                      */
     const BlockType &
     block (const unsigned int i) const;
 
-				     /**
-				      * Return a reference on the
-				      * object that describes the
-				      * mapping between block and
-				      * global indices. The use of
-				      * this function is highly
-				      * deprecated and it should
-				      * vanish in one of the next
-				      * versions
-				      */
+                                     /**
+                                      * Return a reference on the
+                                      * object that describes the
+                                      * mapping between block and
+                                      * global indices. The use of
+                                      * this function is highly
+                                      * deprecated and it should
+                                      * vanish in one of the next
+                                      * versions
+                                      */
     const BlockIndices &
     get_block_indices () const;
 
-				     /**
-				      * Number of blocks.
-				      */
+                                     /**
+                                      * Number of blocks.
+                                      */
     unsigned int n_blocks () const;
 
-  				     /**
-  				      * Return dimension of the vector. This
-  				      * is the sum of the dimensions of all
-  				      * components.
-  				      */
+                                     /**
+                                      * Return dimension of the vector. This
+                                      * is the sum of the dimensions of all
+                                      * components.
+                                      */
     unsigned int size () const;
 
-				     /**
-				      * Return an iterator pointing to
-				      * the first element.
-				      */
+                                     /**
+                                      * Return an iterator pointing to
+                                      * the first element.
+                                      */
     iterator begin ();
 
-				     /**
-				      * Return an iterator pointing to
-				      * the first element of a
-				      * constant block vector.
-				      */
+                                     /**
+                                      * Return an iterator pointing to
+                                      * the first element of a
+                                      * constant block vector.
+                                      */
     const_iterator begin () const;
 
-				     /**
-				      * Return an iterator pointing to
-				      * the element past the end.
-				      */
+                                     /**
+                                      * Return an iterator pointing to
+                                      * the element past the end.
+                                      */
     iterator end ();
 
-				     /**
-				      * Return an iterator pointing to
-				      * the element past the end of a
-				      * constant block vector.
-				      */
+                                     /**
+                                      * Return an iterator pointing to
+                                      * the element past the end of a
+                                      * constant block vector.
+                                      */
     const_iterator end () const;
 
-				     /**
-				      * Access components, returns U(i).
-				      */
+                                     /**
+                                      * Access components, returns U(i).
+                                      */
     value_type operator() (const unsigned int i) const;
 
-				     /**
-				      * Access components, returns U(i)
-				      * as a writeable reference.
-				      */
+                                     /**
+                                      * Access components, returns U(i)
+                                      * as a writeable reference.
+                                      */
     reference operator() (const unsigned int i);
 
-				     /**
-				      * Access components, returns U(i).
-				      *
-				      * Exactly the same as operator().
-				      */
+                                     /**
+                                      * Access components, returns U(i).
+                                      *
+                                      * Exactly the same as operator().
+                                      */
     value_type operator[] (const unsigned int i) const;
 
-				     /**
-				      * Access components, returns U(i)
-				      * as a writeable reference.
-				      *
-				      * Exactly the same as operator().
-				      */
+                                     /**
+                                      * Access components, returns U(i)
+                                      * as a writeable reference.
+                                      *
+                                      * Exactly the same as operator().
+                                      */
     reference operator[] (const unsigned int i);
 
-				     /**
-				      * Copy operator: fill all components of
-				      * the vector with the given scalar
-				      * value.
-				      */
+                                     /**
+                                      * Copy operator: fill all components of
+                                      * the vector with the given scalar
+                                      * value.
+                                      */
     BlockVectorBase & operator = (const value_type s);
 
-				     /**
-				      * Copy operator for arguments of the
-				      * same type.
-				      */
+                                     /**
+                                      * Copy operator for arguments of the
+                                      * same type.
+                                      */
     BlockVectorBase &
     operator= (const BlockVectorBase& V);
 
-				     /**
-				      * Copy operator for template arguments
-				      * of different types.
-				      */
+                                     /**
+                                      * Copy operator for template arguments
+                                      * of different types.
+                                      */
     template <class VectorType2>
     BlockVectorBase &
     operator= (const BlockVectorBase<VectorType2> &V);
@@ -918,50 +918,50 @@ class BlockVectorBase : public Subscriptor
     bool
     operator == (const BlockVectorBase<VectorType2> &v) const;
 
-    				     /**
-				      * $U = U * V$: scalar product.
-				      */
+                                     /**
+                                      * $U = U * V$: scalar product.
+                                      */
     value_type operator* (const BlockVectorBase& V) const;
 
-				     /**
-				      * Return square of the $l_2$-norm.
-				      */
+                                     /**
+                                      * Return square of the $l_2$-norm.
+                                      */
     real_type norm_sqr () const;
 
-				     /**
-				      * Return the mean value of the elements
-				      * of this vector.
-				      */
+                                     /**
+                                      * Return the mean value of the elements
+                                      * of this vector.
+                                      */
     value_type mean_value () const;
 
-				     /**
-				      * Return the $l_1$-norm of the vector,
-				      * i.e. the sum of the absolute values.
-				      */
+                                     /**
+                                      * Return the $l_1$-norm of the vector,
+                                      * i.e. the sum of the absolute values.
+                                      */
     real_type l1_norm () const;
 
-				     /**
-				      * Return the $l_2$-norm of the vector,
-				      * i.e. the square root of the sum of
-				      * the squares of the elements.
-				      */
+                                     /**
+                                      * Return the $l_2$-norm of the vector,
+                                      * i.e. the square root of the sum of
+                                      * the squares of the elements.
+                                      */
     real_type l2_norm () const;
 
-				     /**
-				      * Return the maximum absolute value of
-				      * the elements of this vector, which is
-				      * the $l_\infty$-norm of a vector.
-				      */
+                                     /**
+                                      * Return the maximum absolute value of
+                                      * the elements of this vector, which is
+                                      * the $l_\infty$-norm of a vector.
+                                      */
     real_type linfty_norm () const;
 
-				     /**
-				      * Return whether the vector contains only
-				      * elements with value zero. This function
-				      * is mainly for internal consistency
-				      * check and should seldomly be used when
-				      * not in debug mode since it uses quite
-				      * some time.
-				      */
+                                     /**
+                                      * Return whether the vector contains only
+                                      * elements with value zero. This function
+                                      * is mainly for internal consistency
+                                      * check and should seldom be used when
+                                      * not in debug mode since it uses quite
+                                      * some time.
+                                      */
     bool all_zero () const;
 
                                      /**
@@ -974,22 +974,22 @@ class BlockVectorBase : public Subscriptor
                                       */
     bool is_non_negative () const;
 
-				     /**
-				      * Addition operator.  Fast equivalent to
-				      * <tt>U.add(1, V)</tt>.
-				      */
+                                     /**
+                                      * Addition operator.  Fast equivalent to
+                                      * <tt>U.add(1, V)</tt>.
+                                      */
     BlockVectorBase &
     operator += (const BlockVectorBase &V);
 
-    				     /**
-				      * Subtraction operator.  Fast equivalent
-				      * to <tt>U.add(-1, V)</tt>.
-				      */
+                                     /**
+                                      * Subtraction operator.  Fast equivalent
+                                      * to <tt>U.add(-1, V)</tt>.
+                                      */
     BlockVectorBase &
     operator -= (const BlockVectorBase &V);
 
 
-				       /**
+                                       /**
                                         * A collective add operation:
                                         * This funnction adds a whole
                                         * set of values stored in @p
@@ -999,124 +999,124 @@ class BlockVectorBase : public Subscriptor
                                         */
     template <typename Number>
     void add (const std::vector<unsigned int> &indices,
-	      const std::vector<Number>       &values);
+              const std::vector<Number>       &values);
 
-				       /**
-				        * This is a second collective
-				        * add operation. As a
-				        * difference, this function
-				        * takes a deal.II vector of
-				        * values.
-				        */
+                                       /**
+                                        * This is a second collective
+                                        * add operation. As a
+                                        * difference, this function
+                                        * takes a deal.II vector of
+                                        * values.
+                                        */
     template <typename Number>
     void add (const std::vector<unsigned int> &indices,
-	      const Vector<Number>            &values);
+              const Vector<Number>            &values);
 
-				      /**
-				       * Take an address where
-				       * <tt>n_elements</tt> are stored
-				       * contiguously and add them into
-				       * the vector. Handles all cases
-				       * which are not covered by the
-				       * other two <tt>add()</tt>
-				       * functions above.
-				       */
+                                      /**
+                                       * Take an address where
+                                       * <tt>n_elements</tt> are stored
+                                       * contiguously and add them into
+                                       * the vector. Handles all cases
+                                       * which are not covered by the
+                                       * other two <tt>add()</tt>
+                                       * functions above.
+                                       */
     template <typename Number>
     void add (const unsigned int  n_elements,
-	      const unsigned int *indices,
-	      const Number       *values);
+              const unsigned int *indices,
+              const Number       *values);
 
-				     /**
-				      * $U(0-DIM)+=s$.  Addition of <tt>s</tt>
-				      * to all components. Note that
-				      * <tt>s</tt> is a scalar and not a
-				      * vector.
-				      */
+                                     /**
+                                      * $U(0-DIM)+=s$.  Addition of <tt>s</tt>
+                                      * to all components. Note that
+                                      * <tt>s</tt> is a scalar and not a
+                                      * vector.
+                                      */
     void add (const value_type s);
 
-				     /**
-				      * U+=V.
-				      * Simple vector addition, equal to the
-				      * <tt>operator +=</tt>.
-				      */
+                                     /**
+                                      * U+=V.
+                                      * Simple vector addition, equal to the
+                                      * <tt>operator +=</tt>.
+                                      */
     void add (const BlockVectorBase& V);
 
-				     /**
-				      * U+=a*V.
-				      * Simple addition of a scaled vector.
-				      */
+                                     /**
+                                      * U+=a*V.
+                                      * Simple addition of a scaled vector.
+                                      */
     void add (const value_type a, const BlockVectorBase& V);
 
-				     /**
-				      * U+=a*V+b*W.
-				      * Multiple addition of scaled vectors.
-				      */
+                                     /**
+                                      * U+=a*V+b*W.
+                                      * Multiple addition of scaled vectors.
+                                      */
     void add (const value_type a, const BlockVectorBase& V,
-	      const value_type b, const BlockVectorBase& W);
+              const value_type b, const BlockVectorBase& W);
 
-				     /**
-				      * U=s*U+V.
-				      * Scaling and simple vector addition.
-				      */
+                                     /**
+                                      * U=s*U+V.
+                                      * Scaling and simple vector addition.
+                                      */
     void sadd (const value_type s, const BlockVectorBase& V);
 
-				     /**
-				      * U=s*U+a*V.
-				      * Scaling and simple addition.
-				      */
+                                     /**
+                                      * U=s*U+a*V.
+                                      * Scaling and simple addition.
+                                      */
     void sadd (const value_type s, const value_type a, const BlockVectorBase& V);
 
-				     /**
-				      * U=s*U+a*V+b*W.
-				      * Scaling and multiple addition.
-				      */
+                                     /**
+                                      * U=s*U+a*V+b*W.
+                                      * Scaling and multiple addition.
+                                      */
     void sadd (const value_type s, const value_type a,
-	       const BlockVectorBase& V,
-	       const value_type b, const BlockVectorBase& W);
+               const BlockVectorBase& V,
+               const value_type b, const BlockVectorBase& W);
 
-				     /**
-				      * U=s*U+a*V+b*W+c*X.
-				      * Scaling and multiple addition.
-				      */
+                                     /**
+                                      * U=s*U+a*V+b*W+c*X.
+                                      * Scaling and multiple addition.
+                                      */
     void sadd (const value_type s, const value_type a,
-	       const BlockVectorBase& V,
-	       const value_type b, const BlockVectorBase& W,
-	       const value_type c, const BlockVectorBase& X);
+               const BlockVectorBase& V,
+               const value_type b, const BlockVectorBase& W,
+               const value_type c, const BlockVectorBase& X);
 
-				     /**
-				      * Scale each element of the
-				      * vector by a constant
-				      * value.
-				      */
+                                     /**
+                                      * Scale each element of the
+                                      * vector by a constant
+                                      * value.
+                                      */
     BlockVectorBase & operator *= (const value_type factor);
 
-				     /**
-				      * Scale each element of the
-				      * vector by the inverse of the
-				      * given value.
-				      */
+                                     /**
+                                      * Scale each element of the
+                                      * vector by the inverse of the
+                                      * given value.
+                                      */
     BlockVectorBase & operator /= (const value_type factor);
 
-				     /**
-				      * Multiply each element of this
-				      * vector by the corresponding
-				      * element of <tt>v</tt>.
-				      */
+                                     /**
+                                      * Multiply each element of this
+                                      * vector by the corresponding
+                                      * element of <tt>v</tt>.
+                                      */
     template <class BlockVector2>
     void scale (const BlockVector2 &v);
 
-				     /**
-				      *  U=a*V. Assignment.
-				      */
+                                     /**
+                                      *  U=a*V. Assignment.
+                                      */
     template <class BlockVector2>
     void equ (const value_type a, const BlockVector2 &V);
 
-				     /**
-				      * U=a*V+b*W.
-				      * Replacing by sum.
-				      */
+                                     /**
+                                      * U=a*V+b*W.
+                                      * Replacing by sum.
+                                      */
     void equ (const value_type a, const BlockVectorBase& V,
-	      const value_type b, const BlockVectorBase& W);
+              const value_type b, const BlockVectorBase& W);
 
                                      /**
                                       * This function does nothing but is
@@ -1135,35 +1135,35 @@ class BlockVectorBase : public Subscriptor
                                       */
     void update_ghost_values () const;
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object.
+                                      */
     std::size_t memory_consumption () const;
 
   protected:
-				     /**
-				      * Pointer to the array of components.
-				      */
+                                     /**
+                                      * Pointer to the array of components.
+                                      */
     std::vector<VectorType> components;
 
-				     /**
-				      * Object managing the
-				      * transformation between global
-				      * indices and indices within the
-				      * different blocks.
-				      */
+                                     /**
+                                      * Object managing the
+                                      * transformation between global
+                                      * indices and indices within the
+                                      * different blocks.
+                                      */
     BlockIndices block_indices;
 
-				     /**
-				      * Make the iterator class a
-				      * friend. We have to work around
-				      * a compiler bug here again.
-				      */
+                                     /**
+                                      * Make the iterator class a
+                                      * friend. We have to work around
+                                      * a compiler bug here again.
+                                      */
 #ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
     template <typename N, bool C>
-    friend class internal::BlockVectorIterators::Iterator;
+    friend class dealii::internal::BlockVectorIterators::Iterator;
 #else
     friend class iterator;
     friend class const_iterator;
@@ -1903,7 +1903,7 @@ BlockVectorBase<VectorType>::
 operator * (const BlockVectorBase<VectorType>& v) const
 {
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   value_type sum = 0.;
   for (unsigned int i=0;i<n_blocks();++i)
@@ -1970,7 +1970,7 @@ BlockVectorBase<VectorType>::linfty_norm () const
     {
       value_type newval = components[i].linfty_norm();
       if (sum<newval)
-	sum = newval;
+        sum = newval;
     }
   return sum;
 }
@@ -1992,7 +1992,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator -= (const BlockVectorBase<VectorType>& v)
 {
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (unsigned int i=0;i<n_blocks();++i)
     {
@@ -2008,10 +2008,10 @@ template <typename Number>
 inline
 void
 BlockVectorBase<VectorType>::add (const std::vector<unsigned int> &indices,
-				  const std::vector<Number>       &values)
+                                  const std::vector<Number>       &values)
 {
   Assert (indices.size() == values.size(),
-	  ExcDimensionMismatch(indices.size(), values.size()));
+          ExcDimensionMismatch(indices.size(), values.size()));
   add (indices.size(), &indices[0], &values[0]);
 }
 
@@ -2022,10 +2022,10 @@ template <typename Number>
 inline
 void
 BlockVectorBase<VectorType>::add (const std::vector<unsigned int> &indices,
-				  const Vector<Number>            &values)
+                                  const Vector<Number>            &values)
 {
   Assert (indices.size() == values.size(),
-	  ExcDimensionMismatch(indices.size(), values.size()));
+          ExcDimensionMismatch(indices.size(), values.size()));
   const unsigned int n_indices = indices.size();
   for (unsigned int i=0; i<n_indices; ++i)
     (*this)(indices[i]) += values(i);
@@ -2038,8 +2038,8 @@ template <typename Number>
 inline
 void
 BlockVectorBase<VectorType>::add (const unsigned int  n_indices,
-				  const unsigned int *indices,
-				  const Number       *values)
+                                  const unsigned int *indices,
+                                  const Number       *values)
 {
   for (unsigned int i=0; i<n_indices; ++i)
     (*this)(indices[i]) += values[i];
@@ -2064,7 +2064,7 @@ template <class VectorType>
 void BlockVectorBase<VectorType>::add (const BlockVectorBase<VectorType>& v)
 {
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (unsigned int i=0;i<n_blocks();++i)
     {
@@ -2082,7 +2082,7 @@ void BlockVectorBase<VectorType>::add (const value_type a,
   Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (unsigned int i=0;i<n_blocks();++i)
     {
@@ -2103,9 +2103,9 @@ void BlockVectorBase<VectorType>::add (const value_type a,
   Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), w.n_blocks()));
 
 
   for (unsigned int i=0;i<n_blocks();++i)
@@ -2124,7 +2124,7 @@ void BlockVectorBase<VectorType>::sadd (const value_type x,
   Assert (numbers::is_finite(x), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (unsigned int i=0;i<n_blocks();++i)
     {
@@ -2143,7 +2143,7 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
   Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (unsigned int i=0;i<n_blocks();++i)
     {
@@ -2165,9 +2165,9 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
   Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), w.n_blocks()));
 
   for (unsigned int i=0;i<n_blocks();++i)
     {
@@ -2192,16 +2192,16 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
   Assert (numbers::is_finite(c), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), w.n_blocks()));
   Assert (n_blocks() == y.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), y.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), y.n_blocks()));
 
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].sadd(x, a, v.components[i],
-			 b, w.components[i], c, y.components[i]);
+                         b, w.components[i], c, y.components[i]);
     }
 }
 
@@ -2212,7 +2212,7 @@ template <class BlockVector2>
 void BlockVectorBase<VectorType>::scale (const BlockVector2 &v)
 {
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   for (unsigned int i=0;i<n_blocks();++i)
     components[i].scale(v.block(i));
 }
@@ -2230,9 +2230,9 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
   Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), w.n_blocks()));
 
   for (unsigned int i=0;i<n_blocks();++i)
     {
@@ -2264,7 +2264,7 @@ void BlockVectorBase<VectorType>::equ (const value_type    a,
   Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (unsigned int i=0;i<n_blocks();++i)
     components[i].equ( a, v.components[i]);
@@ -2328,7 +2328,7 @@ BlockVectorBase<VectorType>&
 BlockVectorBase<VectorType>::operator = (const VectorType &v)
 {
   Assert (size() == v.size(),
-	  ExcDimensionMismatch(size(), v.size()));
+          ExcDimensionMismatch(size(), v.size()));
 
   unsigned int index_v = 0;
   for (unsigned int b=0;b<n_blocks();++b)

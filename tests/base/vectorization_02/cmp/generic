@@ -1,0 +1,8 @@
+
+DEAL::Constructor: OK
+DEAL::Insertion: OK
+DEAL::Shrinking: OK
+DEAL::Reserve: OK
+DEAL::Assignment: OK
+DEAL::Check large initialization: OK
+DEAL::Check large resize: OK

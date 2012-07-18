@@ -1,5 +1,5 @@
 //----------------------------  petsc_vector_assign_01.cc  ---------------------------
-//    $Id: vector_assign_01.cc 17443 2008-10-31 19:25:47Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2004, 2005 by the deal.II authors

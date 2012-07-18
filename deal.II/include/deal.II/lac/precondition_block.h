@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -77,254 +77,254 @@ class PreconditionBlock
     protected PreconditionBlockBase<inverse_type>
 {
   private:
-				     /**
-				      * Define number type of matrix.
-				      */
+                                     /**
+                                      * Define number type of matrix.
+                                      */
     typedef typename MATRIX::value_type number;
 
-				     /**
-				      * Value type for inverse matrices.
-				      */
+                                     /**
+                                      * Value type for inverse matrices.
+                                      */
     typedef inverse_type value_type;
 
   public:
-				     /**
-				      * Parameters for block preconditioners.
-				      */
+                                     /**
+                                      * Parameters for block preconditioners.
+                                      */
     class AdditionalData
     {
       public:
-					 /**
-					  * Constructor. Block size
-					  * must be given since there
-					  * is no reasonable default
-					  * parameter.
-					  */
-	AdditionalData (const unsigned int block_size,
-			const double relaxation = 1.,
-			const bool invert_diagonal = true,
-			const bool same_diagonal = false);
+                                         /**
+                                          * Constructor. Block size
+                                          * must be given since there
+                                          * is no reasonable default
+                                          * parameter.
+                                          */
+        AdditionalData (const unsigned int block_size,
+                        const double relaxation = 1.,
+                        const bool invert_diagonal = true,
+                        const bool same_diagonal = false);
 
-					 /**
-					  * Relaxation parameter.
-					  */
-	double relaxation;
+                                         /**
+                                          * Relaxation parameter.
+                                          */
+        double relaxation;
 
-					 /**
-					  * Block size.
-					  */
-	unsigned int block_size;
+                                         /**
+                                          * Block size.
+                                          */
+        unsigned int block_size;
 
-					 /**
-					  * Invert diagonal during initialization.
-					  */
-	bool invert_diagonal;
+                                         /**
+                                          * Invert diagonal during initialization.
+                                          */
+        bool invert_diagonal;
 
-					 /**
-					  * Assume all diagonal blocks
-					  * are equal to save memory.
-					  */
-	bool same_diagonal;
-					 /**
-					  * Choose the inversion
-					  * method for the blocks.
-					  */
-	typename PreconditionBlockBase<inverse_type>::Inversion inversion;
+                                         /**
+                                          * Assume all diagonal blocks
+                                          * are equal to save memory.
+                                          */
+        bool same_diagonal;
+                                         /**
+                                          * Choose the inversion
+                                          * method for the blocks.
+                                          */
+        typename PreconditionBlockBase<inverse_type>::Inversion inversion;
 
-					 /**
-					  * The if #inversion is SVD,
-					  * the threshold below which
-					  * a singular value will be
-					  * considered zero and thus
-					  * not inverted. This
-					  * parameter is used in the
-					  * call to LAPACKFullMatrix::compute_inverse_svd().
-					  */
-	double threshold;
+                                         /**
+                                          * The if #inversion is SVD,
+                                          * the threshold below which
+                                          * a singular value will be
+                                          * considered zero and thus
+                                          * not inverted. This
+                                          * parameter is used in the
+                                          * call to LAPACKFullMatrix::compute_inverse_svd().
+                                          */
+        double threshold;
     };
 
 
-				     /**
-				      * Constructor.
-				      */
+                                     /**
+                                      * Constructor.
+                                      */
     PreconditionBlock(bool store_diagonals = false);
 
-				     /**
-				      * Destructor.
-				      */
+                                     /**
+                                      * Destructor.
+                                      */
     ~PreconditionBlock();
 
-				     /**
-				      * Initialize matrix and block
-				      * size.  We store the matrix and
-				      * the block size in the
-				      * preconditioner object. In a
-				      * second step, the inverses of
-				      * the diagonal blocks may be
-				      * computed.
-				      *
-				      * Additionally, a relaxation
-				      * parameter for derived classes
-				      * may be provided.
-				      */
+                                     /**
+                                      * Initialize matrix and block
+                                      * size.  We store the matrix and
+                                      * the block size in the
+                                      * preconditioner object. In a
+                                      * second step, the inverses of
+                                      * the diagonal blocks may be
+                                      * computed.
+                                      *
+                                      * Additionally, a relaxation
+                                      * parameter for derived classes
+                                      * may be provided.
+                                      */
     void initialize (const MATRIX& A,
-		     const AdditionalData parameters);
+                     const AdditionalData parameters);
   protected:
-				     /**
-				      * Initialize matrix and block
-				      * size for permuted
-				      * preconditioning. Additionally
-				      * to the parameters of the other
-				      * initalize() function, we hand
-				      * over two index vectors with
-				      * the permutation and its
-				      * inverse. For the meaning of
-				      * these vectors see
-				      * PreconditionBlockSOR.
-				      *
-				      * In a second step, the inverses
-				      * of the diagonal blocks may be
-				      * computed. Make sure you use
-				      * invert_permuted_diagblocks()
-				      * to yield consistent data.
-				      *
-				      * Additionally, a relaxation
-				      * parameter for derived classes
-				      * may be provided.
-				      */
+                                     /**
+                                      * Initialize matrix and block
+                                      * size for permuted
+                                      * preconditioning. Additionally
+                                      * to the parameters of the other
+                                      * initalize() function, we hand
+                                      * over two index vectors with
+                                      * the permutation and its
+                                      * inverse. For the meaning of
+                                      * these vectors see
+                                      * PreconditionBlockSOR.
+                                      *
+                                      * In a second step, the inverses
+                                      * of the diagonal blocks may be
+                                      * computed. Make sure you use
+                                      * invert_permuted_diagblocks()
+                                      * to yield consistent data.
+                                      *
+                                      * Additionally, a relaxation
+                                      * parameter for derived classes
+                                      * may be provided.
+                                      */
     void initialize (const MATRIX& A,
-		     const std::vector<unsigned int>& permutation,
-		     const std::vector<unsigned int>& inverse_permutation,
-		     const AdditionalData parameters);
+                     const std::vector<unsigned int>& permutation,
+                     const std::vector<unsigned int>& inverse_permutation,
+                     const AdditionalData parameters);
 
-				     /**
-				      * Set either the permutation of
-				      * rows or the permutation of
-				      * blocks, depending on the size
-				      * of the vector.
-				      *
-				      * If the size of the permutation
-				      * vectors is equal to the
-				      * dimension of the linear
-				      * system, it is assumed that
-				      * rows are permuted
-				      * individually. In this case,
-				      * set_permutation() must be
-				      * called before initialize(),
-				      * since the diagonal blocks are
-				      * built from the permuted
-				      * entries of the matrix.
-				      *
-				      * If the size of the permutation
-				      * vector is not equal to the
-				      * dimension of the system, the
-				      * diagonal blocks are computed
-				      * from the unpermuted
-				      * entries. Instead, the
-				      * relaxation methods step() and
-				      * Tstep() are executed applying
-				      * the blocks in the order given
-				      * by the permutation
-				      * vector. They will throw an
-				      * exception if length of this
-				      * vector is not equal to the
-				      * number of blocks.
-				      *
-				      * @note Permutation of blocks
-				      * can only be applied to the
-				      * relaxation operators step()
-				      * and Tstep(), not to the
-				      * preconditioning operators
-				      * vmult() and Tvmult().
-				      *
-				      * @note It is safe to call
-				      * set_permutation() before
-				      * initialize(), while the other
-				      * order is only admissible for
-				      * block permutation.
-				      */
+                                     /**
+                                      * Set either the permutation of
+                                      * rows or the permutation of
+                                      * blocks, depending on the size
+                                      * of the vector.
+                                      *
+                                      * If the size of the permutation
+                                      * vectors is equal to the
+                                      * dimension of the linear
+                                      * system, it is assumed that
+                                      * rows are permuted
+                                      * individually. In this case,
+                                      * set_permutation() must be
+                                      * called before initialize(),
+                                      * since the diagonal blocks are
+                                      * built from the permuted
+                                      * entries of the matrix.
+                                      *
+                                      * If the size of the permutation
+                                      * vector is not equal to the
+                                      * dimension of the system, the
+                                      * diagonal blocks are computed
+                                      * from the unpermuted
+                                      * entries. Instead, the
+                                      * relaxation methods step() and
+                                      * Tstep() are executed applying
+                                      * the blocks in the order given
+                                      * by the permutation
+                                      * vector. They will throw an
+                                      * exception if length of this
+                                      * vector is not equal to the
+                                      * number of blocks.
+                                      *
+                                      * @note Permutation of blocks
+                                      * can only be applied to the
+                                      * relaxation operators step()
+                                      * and Tstep(), not to the
+                                      * preconditioning operators
+                                      * vmult() and Tvmult().
+                                      *
+                                      * @note It is safe to call
+                                      * set_permutation() before
+                                      * initialize(), while the other
+                                      * order is only admissible for
+                                      * block permutation.
+                                      */
     void set_permutation(const std::vector<unsigned int>& permutation,
-			 const std::vector<unsigned int>& inverse_permutation);
+                         const std::vector<unsigned int>& inverse_permutation);
 
-				     /**
-				      * Replacement of
-				      * invert_diagblocks() for
-				      * permuted preconditioning.
-				      */
+                                     /**
+                                      * Replacement of
+                                      * invert_diagblocks() for
+                                      * permuted preconditioning.
+                                      */
     void invert_permuted_diagblocks(
       const std::vector<unsigned int>& permutation,
       const std::vector<unsigned int>& inverse_permutation);
   public:
-				     /**
-				      * Deletes the inverse diagonal
-				      * block matrices if existent,
-				      * sets the blocksize to 0, hence
-				      * leaves the class in the state
-				      * that it had directly after
-				      * calling the constructor.
-				      */
+                                     /**
+                                      * Deletes the inverse diagonal
+                                      * block matrices if existent,
+                                      * sets the blocksize to 0, hence
+                                      * leaves the class in the state
+                                      * that it had directly after
+                                      * calling the constructor.
+                                      */
     void clear();
 
-				     /**
-				      * Checks whether the object is empty.
-				      */
+                                     /**
+                                      * Checks whether the object is empty.
+                                      */
     bool empty () const;
 
-				     /**
-				      * Read-only access to entries.
-				      * This function is only possible
-				      * if the inverse diagonal blocks
-				      * are stored.
-				      */
+                                     /**
+                                      * Read-only access to entries.
+                                      * This function is only possible
+                                      * if the inverse diagonal blocks
+                                      * are stored.
+                                      */
     value_type el(unsigned int i,
-		  unsigned int j) const;
+                  unsigned int j) const;
 
-    				     /**
-				      * Stores the inverse of the
-				      * diagonal blocks in
-				      * @p inverse. This costs some
-				      * additional memory - for DG
-				      * methods about 1/3 (for double
-				      * inverses) or 1/6 (for float
-				      * inverses) of that used for the
-				      * matrix - but it makes the
-				      * preconditioning much faster.
-				      *
-				      * It is not allowed to call this
-				      * function twice (will produce
-				      * an error) before a call of
-				      * <tt>clear(...)</tt>  because at the
-				      * second time there already
-				      * exist the inverse matrices.
-				      *
-				      * After this function is called,
-				      * the lock on the matrix given
-				      * through the @p use_matrix
-				      * function is released, i.e. you
-				      * may overwrite of delete it.
-				      * You may want to do this in
-				      * case you use this matrix to
-				      * precondition another matrix.
-				      */
+                                     /**
+                                      * Stores the inverse of the
+                                      * diagonal blocks in
+                                      * @p inverse. This costs some
+                                      * additional memory - for DG
+                                      * methods about 1/3 (for double
+                                      * inverses) or 1/6 (for float
+                                      * inverses) of that used for the
+                                      * matrix - but it makes the
+                                      * preconditioning much faster.
+                                      *
+                                      * It is not allowed to call this
+                                      * function twice (will produce
+                                      * an error) before a call of
+                                      * <tt>clear(...)</tt>  because at the
+                                      * second time there already
+                                      * exist the inverse matrices.
+                                      *
+                                      * After this function is called,
+                                      * the lock on the matrix given
+                                      * through the @p use_matrix
+                                      * function is released, i.e. you
+                                      * may overwrite of delete it.
+                                      * You may want to do this in
+                                      * case you use this matrix to
+                                      * precondition another matrix.
+                                      */
     void invert_diagblocks();
 
-				     /**
-				      * Perform one block relaxation
-				      * step in forward numbering.
-				      *
-				      * Depending on the arguments @p
-				      * dst and @p pref, this performs
-				      * an SOR step (both reference
-				      * the same vector) of a Jacobi
-				      * step (botha different
-				      * vectors). For the Jacobi step,
-				      * the calling function must copy
-				      * @p dst to @p pref after this.
-				      *
-				      * @note If a permutation is set,
-				      * it is automatically honored by
-				      * this function.
-				      */
+                                     /**
+                                      * Perform one block relaxation
+                                      * step in forward numbering.
+                                      *
+                                      * Depending on the arguments @p
+                                      * dst and @p pref, this performs
+                                      * an SOR step (both reference
+                                      * the same vector) of a Jacobi
+                                      * step (botha different
+                                      * vectors). For the Jacobi step,
+                                      * the calling function must copy
+                                      * @p dst to @p pref after this.
+                                      *
+                                      * @note If a permutation is set,
+                                      * it is automatically honored by
+                                      * this function.
+                                      */
     template <typename number2>
     void forward_step (
       Vector<number2>       &dst,
@@ -332,23 +332,23 @@ class PreconditionBlock
       const Vector<number2> &src,
       const bool transpose_diagonal) const;
 
-				     /**
-				      * Perform one block relaxation
-				      * step in backward numbering.
-				      *
-				      * Depending on the arguments @p
-				      * dst and @p pref, this performs
-				      * an SOR step (both reference
-				      * the same vector) of a Jacobi
-				      * step (botha different
-				      * vectors). For the Jacobi step,
-				      * the calling function must copy
-				      * @p dst to @p pref after this.
-				      *
-				      * @note If a permutation is set,
-				      * it is automatically honored by
-				      * this function.
-				      */
+                                     /**
+                                      * Perform one block relaxation
+                                      * step in backward numbering.
+                                      *
+                                      * Depending on the arguments @p
+                                      * dst and @p pref, this performs
+                                      * an SOR step (both reference
+                                      * the same vector) of a Jacobi
+                                      * step (botha different
+                                      * vectors). For the Jacobi step,
+                                      * the calling function must copy
+                                      * @p dst to @p pref after this.
+                                      *
+                                      * @note If a permutation is set,
+                                      * it is automatically honored by
+                                      * this function.
+                                      */
     template <typename number2>
     void backward_step (
       Vector<number2>       &dst,
@@ -357,91 +357,91 @@ class PreconditionBlock
       const bool transpose_diagonal) const;
 
 
-				     /**
-				      * Return the size of the blocks.
-				      */
+                                     /**
+                                      * Return the size of the blocks.
+                                      */
     unsigned int block_size () const;
 
-				     /**
-				      * @deprecated Use size()
-				      * instead.
-				      *
-				      * The number of blocks of the
-				      * matrix.
-				      */
+                                     /**
+                                      * @deprecated Use size()
+                                      * instead.
+                                      *
+                                      * The number of blocks of the
+                                      * matrix.
+                                      */
     unsigned int n_blocks() const;
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object.
+                                      */
     std::size_t memory_consumption () const;
 
-    				     /** @addtogroup Exceptions
-				      * @{ */
+                                     /** @addtogroup Exceptions
+                                      * @{ */
 
-				     /**
-				      * For non-overlapping block
-				      * preconditioners, the block
-				      * size must divide the matrix
-				      * size. If not, this exception
-				      * gets thrown.
-				      */
+                                     /**
+                                      * For non-overlapping block
+                                      * preconditioners, the block
+                                      * size must divide the matrix
+                                      * size. If not, this exception
+                                      * gets thrown.
+                                      */
     DeclException2 (ExcWrongBlockSize,
-		    int, int,
-		    << "The blocksize " << arg1
-		    << " and the size of the matrix " << arg2
-		    << " do not match.");
+                    int, int,
+                    << "The blocksize " << arg1
+                    << " and the size of the matrix " << arg2
+                    << " do not match.");
 
-				     /**
-				      * Exception
-				      */
+                                     /**
+                                      * Exception
+                                      */
     DeclException0 (ExcInverseMatricesAlreadyExist);
 
-				     //@}
+                                     //@}
 
   protected:
-				     /**
-				      * Size of the blocks. Each
-				      * diagonal block is assumed to
-				      * be of the same size.
-				      */
+                                     /**
+                                      * Size of the blocks. Each
+                                      * diagonal block is assumed to
+                                      * be of the same size.
+                                      */
     unsigned int blocksize;
 
-				     /**
-				      * Pointer to the matrix. Make
-				      * sure that the matrix exists as
-				      * long as this class needs it,
-				      * i.e. until calling
-				      * @p invert_diagblocks, or (if
-				      * the inverse matrices should
-				      * not be stored) until the last
-				      * call of the preconditoining
-				      * @p vmult function of the
-				      * derived classes.
-				      */
+                                     /**
+                                      * Pointer to the matrix. Make
+                                      * sure that the matrix exists as
+                                      * long as this class needs it,
+                                      * i.e. until calling
+                                      * @p invert_diagblocks, or (if
+                                      * the inverse matrices should
+                                      * not be stored) until the last
+                                      * call of the preconditoining
+                                      * @p vmult function of the
+                                      * derived classes.
+                                      */
     SmartPointer<const MATRIX,PreconditionBlock<MATRIX,inverse_type> > A;
-				     /**
-				      * Relaxation parameter to be
-				      * used by derived classes.
-				      */
+                                     /**
+                                      * Relaxation parameter to be
+                                      * used by derived classes.
+                                      */
     double relaxation;
 
-				     /**
-				      * The permutation vector
-				      */
+                                     /**
+                                      * The permutation vector
+                                      */
     std::vector<unsigned int> permutation;
 
-				     /**
-				      * The inverse permutation vector
-				      */
+                                     /**
+                                      * The inverse permutation vector
+                                      */
     std::vector<unsigned int> inverse_permutation;
 
-				     /**
-				      * Flag for diagonal compression.
-				      * @ref set_same_diagonal()
-				      */
+                                     /**
+                                      * Flag for diagonal compression.
+                                      * @ref set_same_diagonal()
+                                      */
 };
 
 
@@ -458,18 +458,18 @@ class PreconditionBlock
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlockJacobi : public virtual Subscriptor,
-				private PreconditionBlock<MATRIX, inverse_type>
+                                private PreconditionBlock<MATRIX, inverse_type>
 {
   private:
-				     /**
-				      * Define number type of matrix.
-				      */
+                                     /**
+                                      * Define number type of matrix.
+                                      */
     typedef typename MATRIX::value_type number;
 
   public:
-				     /**
-				      * STL conforming iterator.
-				      */
+                                     /**
+                                      * STL conforming iterator.
+                                      */
     class const_iterator
     {
       private:
@@ -513,26 +513,26 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
                                               */
             const PreconditionBlockJacobi<MATRIX, inverse_type>* matrix;
 
-					     /**
-					      * Save block size here
-					      * for further reference.
-					      */
-	    unsigned int bs;
+                                             /**
+                                              * Save block size here
+                                              * for further reference.
+                                              */
+            unsigned int bs;
 
-					     /**
-					      * Current block number.
-					      */
-	    unsigned int a_block;
+                                             /**
+                                              * Current block number.
+                                              */
+            unsigned int a_block;
 
-					     /**
-					      * Iterator inside block.
-					      */
-	    typename FullMatrix<inverse_type>::const_iterator b_iterator;
+                                             /**
+                                              * Iterator inside block.
+                                              */
+            typename FullMatrix<inverse_type>::const_iterator b_iterator;
 
-					     /**
-					      * End of current block.
-					      */
-	    typename FullMatrix<inverse_type>::const_iterator b_end;
+                                             /**
+                                              * End of current block.
+                                              */
+            typename FullMatrix<inverse_type>::const_iterator b_end;
 
                                              /**
                                               * Make enclosing class a
@@ -545,28 +545,28 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
                                          /**
                                           * Constructor.
                                           */
-	const_iterator(const PreconditionBlockJacobi<MATRIX, inverse_type>* matrix,
-		       const unsigned int row);
+        const_iterator(const PreconditionBlockJacobi<MATRIX, inverse_type>* matrix,
+                       const unsigned int row);
 
                                          /**
                                           * Prefix increment.
                                           */
-	const_iterator& operator++ ();
+        const_iterator& operator++ ();
 
                                          /**
                                           * Postfix increment.
                                           */
-	const_iterator& operator++ (int);
+        const_iterator& operator++ (int);
 
                                          /**
                                           * Dereferencing operator.
                                           */
-	const Accessor& operator* () const;
+        const Accessor& operator* () const;
 
                                          /**
                                           * Dereferencing operator.
                                           */
-	const Accessor* operator-> () const;
+        const Accessor* operator-> () const;
 
                                          /**
                                           * Comparison. True, if
@@ -574,11 +574,11 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
                                           * the same matrix
                                           * position.
                                           */
-	bool operator == (const const_iterator&) const;
+        bool operator == (const const_iterator&) const;
                                          /**
                                           * Inverse of <tt>==</tt>.
                                           */
-	bool operator != (const const_iterator&) const;
+        bool operator != (const const_iterator&) const;
 
                                          /**
                                           * Comparison
@@ -589,7 +589,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
                                           * equal and the first
                                           * index is smaller.
                                           */
-	bool operator < (const const_iterator&) const;
+        bool operator < (const const_iterator&) const;
 
       private:
                                          /**
@@ -599,9 +599,9 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
         Accessor accessor;
     };
 
-				     /**
-				      * import functions from private base class
-				      */
+                                     /**
+                                      * import functions from private base class
+                                      */
     using PreconditionBlock<MATRIX, inverse_type>::initialize;
     using PreconditionBlock<MATRIX, inverse_type>::clear;
     using PreconditionBlock<MATRIX, inverse_type>::empty;
@@ -613,104 +613,105 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
     using PreconditionBlockBase<inverse_type>::inverse;
     using PreconditionBlockBase<inverse_type>::inverse_householder;
     using PreconditionBlockBase<inverse_type>::inverse_svd;
-				     /**
-				      * @deprecated Use size() instead
-				      */
+    using PreconditionBlockBase<inverse_type>::log_statistics;
+                                     /**
+                                      * @deprecated Use size() instead
+                                      */
     using PreconditionBlock<MATRIX, inverse_type>::n_blocks;
     using PreconditionBlock<MATRIX, inverse_type>::set_permutation;
 
-				     /**
-				      * Execute block Jacobi
-				      * preconditioning.
-				      *
-				      * This function will
-				      * automatically use the inverse
-				      * matrices if they exist, if not
-				      * then BlockJacobi will need
-				      * much time inverting the
-				      * diagonal block matrices in
-				      * each preconditioning step.
-				      */
+                                     /**
+                                      * Execute block Jacobi
+                                      * preconditioning.
+                                      *
+                                      * This function will
+                                      * automatically use the inverse
+                                      * matrices if they exist, if not
+                                      * then BlockJacobi will need
+                                      * much time inverting the
+                                      * diagonal block matrices in
+                                      * each preconditioning step.
+                                      */
     template <typename number2>
     void vmult (Vector<number2>&, const Vector<number2>&) const;
 
-				     /**
-				      * Same as @p vmult, since Jacobi is symmetric.
-				      */
+                                     /**
+                                      * Same as @p vmult, since Jacobi is symmetric.
+                                      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
-				     /**
-				      * Execute block Jacobi
-				      * preconditioning, adding to @p dst.
-				      *
-				      * This function will
-				      * automatically use the inverse
-				      * matrices if they exist, if not
-				      * then BlockJacobi will need
-				      * much time inverting the
-				      * diagonal block matrices in
-				      * each preconditioning step.
-				      */
+                                     /**
+                                      * Execute block Jacobi
+                                      * preconditioning, adding to @p dst.
+                                      *
+                                      * This function will
+                                      * automatically use the inverse
+                                      * matrices if they exist, if not
+                                      * then BlockJacobi will need
+                                      * much time inverting the
+                                      * diagonal block matrices in
+                                      * each preconditioning step.
+                                      */
     template <typename number2>
     void vmult_add (Vector<number2>&, const Vector<number2>&) const;
 
-				     /**
-				      * Same as @p vmult_add, since
-				      * Jacobi is symmetric.
-				      */
+                                     /**
+                                      * Same as @p vmult_add, since
+                                      * Jacobi is symmetric.
+                                      */
     template <typename number2>
     void Tvmult_add (Vector<number2>&, const Vector<number2>&) const;
 
-				     /**
-				      * Perform one step of the Jacobi
-				      * iteration.
-				      */
+                                     /**
+                                      * Perform one step of the Jacobi
+                                      * iteration.
+                                      */
     template <typename number2>
     void step (Vector<number2>& dst, const Vector<number2>& rhs) const;
 
-				     /**
-				      * Perform one step of the Jacobi
-				      * iteration.
-				      */
+                                     /**
+                                      * Perform one step of the Jacobi
+                                      * iteration.
+                                      */
     template <typename number2>
     void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
 
-    				     /**
-				      * STL-like iterator with the
-				      * first entry.
-				      */
+                                     /**
+                                      * STL-like iterator with the
+                                      * first entry.
+                                      */
     const_iterator begin () const;
 
-				     /**
-				      * Final iterator.
-				      */
+                                     /**
+                                      * Final iterator.
+                                      */
     const_iterator end () const;
 
-				     /**
-				      * STL-like iterator with the
-				      * first entry of row @p r.
-				      */
+                                     /**
+                                      * STL-like iterator with the
+                                      * first entry of row @p r.
+                                      */
     const_iterator begin (const unsigned int r) const;
 
-				     /**
-				      * Final iterator of row @p r.
-				      */
+                                     /**
+                                      * Final iterator of row @p r.
+                                      */
     const_iterator end (const unsigned int r) const;
 
 
   private:
-				   /**
-				    * Actual implementation of the
-				    * preconditioner.
-				    *
-				    * Depending on @p adding, the
-				    * result of preconditioning is
-				    * added to the destination vector.
-				    */
+                                   /**
+                                    * Actual implementation of the
+                                    * preconditioner.
+                                    *
+                                    * Depending on @p adding, the
+                                    * result of preconditioning is
+                                    * added to the destination vector.
+                                    */
     template <typename number2>
     void do_vmult (Vector<number2>&,
-		   const Vector<number2>&,
-		   bool adding) const;
+                   const Vector<number2>&,
+                   bool adding) const;
 
     friend class Accessor;
     friend class const_iterator;
@@ -756,22 +757,22 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlockSOR : public virtual Subscriptor,
-			     protected PreconditionBlock<MATRIX, inverse_type>
+                             protected PreconditionBlock<MATRIX, inverse_type>
 {
   public:
-				     /**
-				      * Default constructor.
-				      */
+                                     /**
+                                      * Default constructor.
+                                      */
     PreconditionBlockSOR();
 
-				     /**
-				      * Define number type of matrix.
-				      */
+                                     /**
+                                      * Define number type of matrix.
+                                      */
     typedef typename MATRIX::value_type number;
 
-				     /**
-				      * import types and functions from protected base class.
-				      */
+                                     /**
+                                      * import types and functions from protected base class.
+                                      */
     using typename PreconditionBlock<MATRIX,inverse_type>::AdditionalData;
     using PreconditionBlock<MATRIX, inverse_type>::initialize;
     using PreconditionBlock<MATRIX, inverse_type>::clear;
@@ -784,141 +785,142 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     using PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
     using PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
     using PreconditionBlock<MATRIX, inverse_type>::set_permutation;
+    using PreconditionBlockBase<inverse_type>::log_statistics;
 
-				     /**
-				      * Execute block SOR
-				      * preconditioning.
-				      *
-				      * This function will
-				      * automatically use the inverse
-				      * matrices if they exist, if not
-				      * then BlockSOR will waste much
-				      * time inverting the diagonal
-				      * block matrices in each
-				      * preconditioning step.
-				      *
-				      * For matrices which are empty
-				      * above the diagonal blocks
-				      * BlockSOR is a direct solver.
-				      */
+                                     /**
+                                      * Execute block SOR
+                                      * preconditioning.
+                                      *
+                                      * This function will
+                                      * automatically use the inverse
+                                      * matrices if they exist, if not
+                                      * then BlockSOR will waste much
+                                      * time inverting the diagonal
+                                      * block matrices in each
+                                      * preconditioning step.
+                                      *
+                                      * For matrices which are empty
+                                      * above the diagonal blocks
+                                      * BlockSOR is a direct solver.
+                                      */
     template <typename number2>
     void vmult (Vector<number2>&, const Vector<number2>&) const;
 
-				     /**
-				      * Execute block SOR
-				      * preconditioning.
-				      *
-				      * Warning: this function
-				      * performs normal @p vmult
-				      * without adding. The reason for
-				      * its existence is that
-				      * BlockMatrixArray
-				      * requires the adding version by
-				      * default. On the other hand,
-				      * adding requires an additional
-				      * auxiliary vector, which is not
-				      * desirable.
-				      *
-				      * @see vmult
-				      */
+                                     /**
+                                      * Execute block SOR
+                                      * preconditioning.
+                                      *
+                                      * Warning: this function
+                                      * performs normal @p vmult
+                                      * without adding. The reason for
+                                      * its existence is that
+                                      * BlockMatrixArray
+                                      * requires the adding version by
+                                      * default. On the other hand,
+                                      * adding requires an additional
+                                      * auxiliary vector, which is not
+                                      * desirable.
+                                      *
+                                      * @see vmult
+                                      */
     template <typename number2>
     void vmult_add (Vector<number2>&, const Vector<number2>&) const;
 
-				     /**
-				      * Backward application of vmult().
-				      *
-				      * In the current implementation,
-				      * this is not the transpose of
-				      * vmult(). It is a
-				      * transposed Gauss-Seidel
-				      * algorithm applied to the whole
-				      * matrix, but the diagonal
-				      * blocks being inverted are not
-				      * transposed. Therefore, it is
-				      * the transposed, if the
-				      * diagonal blocks are symmetric.
-				      */
+                                     /**
+                                      * Backward application of vmult().
+                                      *
+                                      * In the current implementation,
+                                      * this is not the transpose of
+                                      * vmult(). It is a
+                                      * transposed Gauss-Seidel
+                                      * algorithm applied to the whole
+                                      * matrix, but the diagonal
+                                      * blocks being inverted are not
+                                      * transposed. Therefore, it is
+                                      * the transposed, if the
+                                      * diagonal blocks are symmetric.
+                                      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
 
-				     /**
-				      * Execute backward block SOR
-				      * preconditioning.
-				      *
-				      * Warning: this function
-				      * performs normal @p vmult
-				      * without adding. The reason for
-				      * its existence is that
-				      * BlockMatrixArray
-				      * requires the adding version by
-				      * default. On the other hand,
-				      * adding requires an additional
-				      * auxiliary vector, which is not
-				      * desirable.
-				      *
-				      * @see vmult
-				      */
+                                     /**
+                                      * Execute backward block SOR
+                                      * preconditioning.
+                                      *
+                                      * Warning: this function
+                                      * performs normal @p vmult
+                                      * without adding. The reason for
+                                      * its existence is that
+                                      * BlockMatrixArray
+                                      * requires the adding version by
+                                      * default. On the other hand,
+                                      * adding requires an additional
+                                      * auxiliary vector, which is not
+                                      * desirable.
+                                      *
+                                      * @see vmult
+                                      */
     template <typename number2>
     void Tvmult_add (Vector<number2>&, const Vector<number2>&) const;
 
-				     /**
-				      * Perform one step of the SOR
-				      * iteration.
-				      */
+                                     /**
+                                      * Perform one step of the SOR
+                                      * iteration.
+                                      */
     template <typename number2>
     void step (Vector<number2>& dst, const Vector<number2>& rhs) const;
 
-				     /**
-				      * Perform one step of the
-				      * transposed SOR iteration.
-				      */
+                                     /**
+                                      * Perform one step of the
+                                      * transposed SOR iteration.
+                                      */
     template <typename number2>
     void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
 
   protected:
-				     /**
-				      * Constructor to be used by
-				      * PreconditionBlockSSOR.
-				      */
+                                     /**
+                                      * Constructor to be used by
+                                      * PreconditionBlockSSOR.
+                                      */
     PreconditionBlockSOR(bool store);
 
-				     /**
-				      * Implementation of the forward
-				      * substitution loop called by
-				      * vmult() and vmult_add().
-				      *
-				      * If a #permutation is set by
-				      * set_permutation(), it will
-				      * automatically be honored by
-				      * this function.
-				      *
-				      * The parameter @p adding does
-				      * not have any function, yet.
-				      */
+                                     /**
+                                      * Implementation of the forward
+                                      * substitution loop called by
+                                      * vmult() and vmult_add().
+                                      *
+                                      * If a #permutation is set by
+                                      * set_permutation(), it will
+                                      * automatically be honored by
+                                      * this function.
+                                      *
+                                      * The parameter @p adding does
+                                      * not have any function, yet.
+                                      */
     template <typename number2>
     void forward (Vector<number2>&,
-		  const Vector<number2>&,
-		  const bool transpose_diagonal,
-		  const bool adding) const;
+                  const Vector<number2>&,
+                  const bool transpose_diagonal,
+                  const bool adding) const;
 
-				     /**
-				      * Implementation of the backward
-				      * substitution loop called by
-				      * Tvmult() and Tvmult_add().
-				      *
-				      * If a #permutation is set by
-				      * set_permutation(), it will
-				      * automatically be honored by
-				      * this function.
-				      *
-				      * The parameter @p adding does
-				      * not have any function, yet.
-				      */
+                                     /**
+                                      * Implementation of the backward
+                                      * substitution loop called by
+                                      * Tvmult() and Tvmult_add().
+                                      *
+                                      * If a #permutation is set by
+                                      * set_permutation(), it will
+                                      * automatically be honored by
+                                      * this function.
+                                      *
+                                      * The parameter @p adding does
+                                      * not have any function, yet.
+                                      */
     template <typename number2>
     void backward (Vector<number2>&,
-		   const Vector<number2>&,
-		   const bool transpose_diagonal,
-		   const bool adding) const;
+                   const Vector<number2>&,
+                   const bool transpose_diagonal,
+                   const bool adding) const;
 };
 
 
@@ -943,74 +945,75 @@ class PreconditionBlockSOR : public virtual Subscriptor,
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlockSSOR : public virtual Subscriptor,
-			      private PreconditionBlockSOR<MATRIX, inverse_type>
+                              private PreconditionBlockSOR<MATRIX, inverse_type>
 {
   public:
-				     /**
-				      * Define number type of matrix.
-				      */
+                                     /**
+                                      * Define number type of matrix.
+                                      */
     typedef typename MATRIX::value_type number;
 
-				     /**
-				      * Constructor.
-				      */
+                                     /**
+                                      * Constructor.
+                                      */
     PreconditionBlockSSOR ();
 
-				     // Keep AdditionalData accessible
+                                     // Keep AdditionalData accessible
     using typename PreconditionBlockSOR<MATRIX,inverse_type>::AdditionalData;
 
-				     // The following are the
-				     // functions of the base classes
-				     // which we want to keep
-				     // accessible.
-				     /**
-				      * Make initialization function
-				      * publicly available.
-				      */
+                                     // The following are the
+                                     // functions of the base classes
+                                     // which we want to keep
+                                     // accessible.
+                                     /**
+                                      * Make initialization function
+                                      * publicly available.
+                                      */
     using PreconditionBlockSOR<MATRIX,inverse_type>::initialize;
     using PreconditionBlockSOR<MATRIX,inverse_type>::clear;
     using PreconditionBlockBase<inverse_type>::size;
     using PreconditionBlockBase<inverse_type>::inverse;
     using PreconditionBlockBase<inverse_type>::inverse_householder;
     using PreconditionBlockBase<inverse_type>::inverse_svd;
+    using PreconditionBlockBase<inverse_type>::log_statistics;
     using PreconditionBlockSOR<MATRIX,inverse_type>::set_permutation;
     using PreconditionBlockSOR<MATRIX, inverse_type>::empty;
     using PreconditionBlockSOR<MATRIX, inverse_type>::el;
     using PreconditionBlockSOR<MATRIX,inverse_type>::set_same_diagonal;
     using PreconditionBlockSOR<MATRIX,inverse_type>::invert_diagblocks;
 
-				     /**
-				      * Execute block SSOR
-				      * preconditioning.
-				      *
-				      * This function will
-				      * automatically use the inverse
-				      * matrices if they exist, if not
-				      * then BlockSOR will waste much
-				      * time inverting the diagonal
-				      * block matrices in each
-				      * preconditioning step.
-				      */
+                                     /**
+                                      * Execute block SSOR
+                                      * preconditioning.
+                                      *
+                                      * This function will
+                                      * automatically use the inverse
+                                      * matrices if they exist, if not
+                                      * then BlockSOR will waste much
+                                      * time inverting the diagonal
+                                      * block matrices in each
+                                      * preconditioning step.
+                                      */
     template <typename number2>
     void vmult (Vector<number2>&, const Vector<number2>&) const;
 
-				     /**
-				      * Same as vmult()
-				      */
+                                     /**
+                                      * Same as vmult()
+                                      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
 
-				     /**
-				      * Perform one step of the SOR
-				      * iteration.
-				      */
+                                     /**
+                                      * Perform one step of the SOR
+                                      * iteration.
+                                      */
     template <typename number2>
     void step (Vector<number2>& dst, const Vector<number2>& rhs) const;
 
-				     /**
-				      * Perform one step of the
-				      * transposed SOR iteration.
-				      */
+                                     /**
+                                      * Perform one step of the
+                                      * transposed SOR iteration.
+                                      */
     template <typename number2>
     void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
 };
@@ -1067,16 +1070,16 @@ inline
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::
 Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type>* matrix,
           const unsigned int row)
-		:
-		matrix(matrix),
-		b_iterator(&matrix->inverse(0), 0, 0),
-		b_end(&matrix->inverse(0), 0, 0)
+                :
+                matrix(matrix),
+                b_iterator(&matrix->inverse(0), 0, 0),
+                b_end(&matrix->inverse(0), 0, 0)
 {
   bs = matrix->block_size();
   a_block = row / bs;
 
-				   // This is the end accessor, which
-				   // does not hava a valid block.
+                                   // This is the end accessor, which
+                                   // does not hava a valid block.
   if (a_block == matrix->n_blocks())
     return;
 
@@ -1086,7 +1089,7 @@ Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type>* matrix,
   b_end = matrix->inverse(a_block).end();
 
   Assert (a_block < matrix->n_blocks(),
-	  ExcIndexRange(a_block, 0, matrix->n_blocks()));
+          ExcIndexRange(a_block, 0, matrix->n_blocks()));
 }
 
 
@@ -1096,7 +1099,7 @@ unsigned int
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::row() const
 {
   Assert (a_block < matrix->n_blocks(),
-	  ExcIteratorPastEnd());
+          ExcIteratorPastEnd());
 
   return bs * a_block + b_iterator->row();
 }
@@ -1108,7 +1111,7 @@ unsigned int
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::column() const
 {
   Assert (a_block < matrix->n_blocks(),
-	  ExcIteratorPastEnd());
+          ExcIteratorPastEnd());
 
   return bs * a_block + b_iterator->column();
 }
@@ -1120,7 +1123,7 @@ inverse_type
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::value() const
 {
   Assert (a_block < matrix->n_blocks(),
-	  ExcIteratorPastEnd());
+          ExcIteratorPastEnd());
 
   return b_iterator->value();
 }
@@ -1131,8 +1134,8 @@ inline
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::
 const_iterator(const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
                const unsigned int row)
-		:
-		accessor(matrix, row)
+                :
+                accessor(matrix, row)
 {}
 
 
@@ -1149,10 +1152,10 @@ PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::operator++ ()
       ++accessor.a_block;
 
       if (accessor.a_block < accessor.matrix->n_blocks())
-	{
-	  accessor.b_iterator = accessor.matrix->inverse(accessor.a_block).begin();
-	  accessor.b_end = accessor.matrix->inverse(accessor.a_block).end();
-	}
+        {
+          accessor.b_iterator = accessor.matrix->inverse(accessor.a_block).begin();
+          accessor.b_end = accessor.matrix->inverse(accessor.a_block).end();
+        }
     }
   return *this;
 }
@@ -1211,7 +1214,7 @@ PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::
 operator < (const const_iterator& other) const
 {
   return (accessor.row() < other.accessor.row() ||
-	  (accessor.row() == other.accessor.row() &&
+          (accessor.row() == other.accessor.row() &&
            accessor.column() < other.accessor.column()));
 }
 

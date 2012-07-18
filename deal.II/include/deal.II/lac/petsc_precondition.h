@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,39 +61,39 @@ namespace PETScWrappers
                                         */
       virtual ~PreconditionerBase ();
 
-				       /**
-					* Apply the preconditioner once to the
-					* given src vector.
-					*/
+                                       /**
+                                        * Apply the preconditioner once to the
+                                        * given src vector.
+                                        */
       void vmult (VectorBase       &dst,
-		  const VectorBase &src) const;
+                  const VectorBase &src) const;
 
 
-				       /**
-					* Gives access to the underlying PETSc
-					* object.
-					*/
+                                       /**
+                                        * Gives access to the underlying PETSc
+                                        * object.
+                                        */
       const PC & get_pc () const;
-      
+
     protected:
-				       /**
-					* the PETSc preconditioner object
-					*/
+                                       /**
+                                        * the PETSc preconditioner object
+                                        */
       PC pc;
-      
+
                                        /**
                                         * A pointer to the matrix that acts as
                                         * a preconditioner.
                                         */
       Mat matrix;
 
-				       /**
-					* Internal function to create the
-					* PETSc preconditioner object. Fails
-					* if called twice.
-					*/
+                                       /**
+                                        * Internal function to create the
+                                        * PETSc preconditioner object. Fails
+                                        * if called twice.
+                                        */
       void create_pc ();
-      
+
                                        /**
                                         * Conversion operator to get a
                                         * representation of the matrix that
@@ -103,7 +103,7 @@ namespace PETScWrappers
                                         * the PETSc solvers.
                                         */
       operator Mat () const;
-      
+
                                        /**
                                         * Make the solver class a friend,
                                         * since it needs to call the
@@ -135,14 +135,14 @@ namespace PETScWrappers
       struct AdditionalData
       {};
 
-				       /**
-					* Empty Constructor. You need to call
-					* initialize() before using this
-					* object.
-					*/
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
       PreconditionJacobi ();
-      
-      
+
+
                                        /**
                                         * Constructor. Take the matrix which
                                         * is used to form the preconditioner,
@@ -152,19 +152,19 @@ namespace PETScWrappers
       PreconditionJacobi (const MatrixBase     &matrix,
                           const AdditionalData &additional_data = AdditionalData());
 
-				       /**
-					* Initializes the preconditioner
-					* object and calculate all data that
-					* is necessary for applying it in a
-					* solver. This function is
-					* automatically called when calling
-					* the constructor with the same
-					* arguments and is only used if you
-					* create the preconditioner without
-					* arguments.
-					*/
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments.
+                                        */
       void initialize (const MatrixBase     &matrix,
-		       const AdditionalData &additional_data = AdditionalData());
+                       const AdditionalData &additional_data = AdditionalData());
 
     protected:
                                        /**
@@ -203,12 +203,12 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-      
-				       /**
-					* Empty Constructor. You need to call
-					* initialize() before using this
-					* object.
-					*/
+
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
       PreconditionBlockJacobi ();
 
                                        /**
@@ -220,19 +220,19 @@ namespace PETScWrappers
       PreconditionBlockJacobi (const MatrixBase     &matrix,
                                const AdditionalData &additional_data = AdditionalData());
 
-				       /**
-					* Initializes the preconditioner
-					* object and calculate all data that
-					* is necessary for applying it in a
-					* solver. This function is
-					* automatically called when calling
-					* the constructor with the same
-					* arguments and is only used if you
-					* create the preconditioner without
-					* arguments.
-					*/
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments.
+                                        */
       void initialize (const MatrixBase     &matrix,
-		       const AdditionalData &additional_data = AdditionalData());
+                       const AdditionalData &additional_data = AdditionalData());
 
     protected:
                                        /**
@@ -277,11 +277,11 @@ namespace PETScWrappers
           double omega;
       };
 
-				       /**
-					* Empty Constructor. You need to call
-					* initialize() before using this
-					* object.
-					*/
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
       PreconditionSOR ();
 
                                        /**
@@ -293,17 +293,17 @@ namespace PETScWrappers
       PreconditionSOR (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
-				       /**
-					* Initializes the preconditioner
-					* object and calculate all data that
-					* is necessary for applying it in a
-					* solver. This function is
-					* automatically called when calling
-					* the constructor with the same
-					* arguments and is only used if you
-					* create the preconditioner without
-					* arguments.
-					*/
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments.
+                                        */
       void initialize (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
@@ -350,11 +350,11 @@ namespace PETScWrappers
           double omega;
       };
 
-				       /**
-					* Empty Constructor. You need to call
-					* initialize() before using this
-					* object.
-					*/
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
       PreconditionSSOR ();
 
                                        /**
@@ -366,17 +366,17 @@ namespace PETScWrappers
       PreconditionSSOR (const MatrixBase     &matrix,
                         const AdditionalData &additional_data = AdditionalData());
 
-				       /**
-					* Initializes the preconditioner
-					* object and calculate all data that
-					* is necessary for applying it in a
-					* solver. This function is
-					* automatically called when calling
-					* the constructor with the same
-					* arguments and is only used if you
-					* create the preconditioner without
-					* arguments.
-					*/
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments.
+                                        */
       void initialize (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
@@ -423,11 +423,11 @@ namespace PETScWrappers
           double omega;
       };
 
-				       /**
-					* Empty Constructor. You need to call
-					* initialize() before using this
-					* object.
-					*/
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
       PreconditionEisenstat ();
 
                                        /**
@@ -439,17 +439,17 @@ namespace PETScWrappers
       PreconditionEisenstat (const MatrixBase     &matrix,
                              const AdditionalData &additional_data = AdditionalData());
 
-				       /**
-					* Initializes the preconditioner
-					* object and calculate all data that
-					* is necessary for applying it in a
-					* solver. This function is
-					* automatically called when calling
-					* the constructor with the same
-					* arguments and is only used if you
-					* create the preconditioner without
-					* arguments.
-					*/
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments.
+                                        */
       void initialize (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
@@ -496,11 +496,11 @@ namespace PETScWrappers
           unsigned int levels;
       };
 
-				       /**
-					* Empty Constructor. You need to call
-					* initialize() before using this
-					* object.
-					*/
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
       PreconditionICC ();
 
                                        /**
@@ -512,17 +512,17 @@ namespace PETScWrappers
       PreconditionICC (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
-				       /**
-					* Initializes the preconditioner
-					* object and calculate all data that
-					* is necessary for applying it in a
-					* solver. This function is
-					* automatically called when calling
-					* the constructor with the same
-					* arguments and is only used if you
-					* create the preconditioner without
-					* arguments.
-					*/
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments.
+                                        */
       void initialize (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
@@ -569,11 +569,11 @@ namespace PETScWrappers
           unsigned int levels;
       };
 
-				       /**
-					* Empty Constructor. You need to call
-					* initialize() before using this
-					* object.
-					*/
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
       PreconditionILU ();
 
                                        /**
@@ -585,17 +585,17 @@ namespace PETScWrappers
       PreconditionILU (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
-				       /**
-					* Initializes the preconditioner
-					* object and calculate all data that
-					* is necessary for applying it in a
-					* solver. This function is
-					* automatically called when calling
-					* the constructor with the same
-					* arguments and is only used if you
-					* create the preconditioner without
-					* arguments.
-					*/
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments.
+                                        */
       void initialize (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
@@ -633,44 +633,44 @@ namespace PETScWrappers
       {
                                            /**
                                             * Constructor. (Default values
-					    * taken from function PCCreate_LU
-					    * of the PetSC lib.)
+                                            * taken from function PCCreate_LU
+                                            * of the PetSC lib.)
                                             */
           AdditionalData (const double pivoting = 1.e-6,
-			  const double zero_pivot = 1.e-12,
-			  const double damping = 0.0);
+                          const double zero_pivot = 1.e-12,
+                          const double damping = 0.0);
 
                                            /**
                                             * Determines, when Pivoting is
-					    * done during LU decomposition.
-					    * 0.0 indicates no pivoting,
-					    * and 1.0 complete pivoting.
-					    * Confer PetSC manual for more
-					    * details.
+                                            * done during LU decomposition.
+                                            * 0.0 indicates no pivoting,
+                                            * and 1.0 complete pivoting.
+                                            * Confer PetSC manual for more
+                                            * details.
                                             */
           double pivoting;
 
                                            /**
                                             * Size at which smaller pivots
-					    * are declared to be zero.
-					    * Confer PetSC manual for more
-					    * details.
-					    */
-	  double zero_pivot;
+                                            * are declared to be zero.
+                                            * Confer PetSC manual for more
+                                            * details.
+                                            */
+          double zero_pivot;
 
                                            /**
                                             * This quantity is added to the
-					    * diagonal of the matrix during
-					    * factorisation.
-					    */
-	  double damping;
+                                            * diagonal of the matrix during
+                                            * factorisation.
+                                            */
+          double damping;
       };
 
-				       /**
-					* Empty Constructor. You need to call
-					* initialize() before using this
-					* object.
-					*/
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
       PreconditionLU ();
 
                                        /**
@@ -680,19 +680,19 @@ namespace PETScWrappers
                                         * any.
                                         */
       PreconditionLU (const MatrixBase     &matrix,
-		      const AdditionalData &additional_data = AdditionalData());
+                      const AdditionalData &additional_data = AdditionalData());
 
-				       /**
-					* Initializes the preconditioner
-					* object and calculate all data that
-					* is necessary for applying it in a
-					* solver. This function is
-					* automatically called when calling
-					* the constructor with the same
-					* arguments and is only used if you
-					* create the preconditioner without
-					* arguments.
-					*/
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments.
+                                        */
       void initialize (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
@@ -734,83 +734,83 @@ namespace PETScWrappers
                                             * than what is exposed here.
                                             */
           AdditionalData (
-	    const bool symmetric_operator = false,
-	    const double strong_threshold = 0.25,
-	    const double max_row_sum = 0.9,
-	    const unsigned int aggressive_coarsening_num_levels = 0,
-	    const bool output_details = false
-	  );
+            const bool symmetric_operator = false,
+            const double strong_threshold = 0.25,
+            const double max_row_sum = 0.9,
+            const unsigned int aggressive_coarsening_num_levels = 0,
+            const bool output_details = false
+          );
 
-					   /**
-					    * Set this flag to true if you
-					    * have a symmetric system matrix
-					    * and you want to use a solver
-					    * which asumes a symmetric
-					    * preconditioner like CG. The
-					    * relaxation is done with
-					    * SSOR/Jacobi when set to true and
-					    * with SOR/Jacobi otherwise.
-					    */
-	  bool symmetric_operator;
+                                           /**
+                                            * Set this flag to true if you
+                                            * have a symmetric system matrix
+                                            * and you want to use a solver
+                                            * which asumes a symmetric
+                                            * preconditioner like CG. The
+                                            * relaxation is done with
+                                            * SSOR/Jacobi when set to true and
+                                            * with SOR/Jacobi otherwise.
+                                            */
+          bool symmetric_operator;
 
-					   /**
-					    * Threshold of when nodes are
-					    * considered strongly
-					    * connected. See
-					    * HYPRE_BoomerAMGSetStrongThreshold(). Recommended
-					    * values are 0.25 for 2d and 0.5
-					    * for 3d problems, but it is
-					    * problem dependent.
-					    */
-	  double strong_threshold;
+                                           /**
+                                            * Threshold of when nodes are
+                                            * considered strongly
+                                            * connected. See
+                                            * HYPRE_BoomerAMGSetStrongThreshold(). Recommended
+                                            * values are 0.25 for 2d and 0.5
+                                            * for 3d problems, but it is
+                                            * problem dependent.
+                                            */
+          double strong_threshold;
 
-					   /**
-					    * If set to a value smaller than
-					    * 1.0 then diagonally dominant
-					    * parts of the matrix are treated
-					    * as having no strongly connected
-					    * nodes. If the row sum weighted
-					    * by the diagonal entry is bigger
-					    * than the given value, it is
-					    * considered diagonally
-					    * dominant. This feature is turned
-					    * of by setting the value to
-					    * 1.0. This is the default as some
-					    * matrices can result in having
-					    * only diagonally dominant entries
-					    * and thus no multigrid levels are
-					    * constructed. The default in
-					    * BoomerAMG for this is 0.9. When
-					    * you try this, check for a
-					    * reasonable number of levels
-					    * created.
-					    */
-	  double max_row_sum;
+                                           /**
+                                            * If set to a value smaller than
+                                            * 1.0 then diagonally dominant
+                                            * parts of the matrix are treated
+                                            * as having no strongly connected
+                                            * nodes. If the row sum weighted
+                                            * by the diagonal entry is bigger
+                                            * than the given value, it is
+                                            * considered diagonally
+                                            * dominant. This feature is turned
+                                            * of by setting the value to
+                                            * 1.0. This is the default as some
+                                            * matrices can result in having
+                                            * only diagonally dominant entries
+                                            * and thus no multigrid levels are
+                                            * constructed. The default in
+                                            * BoomerAMG for this is 0.9. When
+                                            * you try this, check for a
+                                            * reasonable number of levels
+                                            * created.
+                                            */
+          double max_row_sum;
 
-					     /**
-					    * Number of levels of aggressive
-					    * coarsening. Increasing this
-					    * value reduces the construction
-					    * time and memory requirements but
-					    * may decrease effectiveness.*/
-	  unsigned int aggressive_coarsening_num_levels;
+                                             /**
+                                            * Number of levels of aggressive
+                                            * coarsening. Increasing this
+                                            * value reduces the construction
+                                            * time and memory requirements but
+                                            * may decrease effectiveness.*/
+          unsigned int aggressive_coarsening_num_levels;
 
-       					   /**
-					    * Setting this flag to true
-					    * produces debug output from
-					    * HYPRE, when the preconditioner
-					    * is constructed.
-					    */
-	  bool output_details;
+                                           /**
+                                            * Setting this flag to true
+                                            * produces debug output from
+                                            * HYPRE, when the preconditioner
+                                            * is constructed.
+                                            */
+          bool output_details;
       };
 
 
 
-				       /**
-					* Empty Constructor. You need to call
-					* initialize() before using this
-					* object.
-					*/
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
       PreconditionBoomerAMG ();
 
                                        /**
@@ -820,19 +820,19 @@ namespace PETScWrappers
                                         * any.
                                         */
       PreconditionBoomerAMG (const MatrixBase     &matrix,
-			     const AdditionalData &additional_data = AdditionalData());
+                             const AdditionalData &additional_data = AdditionalData());
 
-				       /**
-					* Initializes the preconditioner
-					* object and calculate all data that
-					* is necessary for applying it in a
-					* solver. This function is
-					* automatically called when calling
-					* the constructor with the same
-					* arguments and is only used if you
-					* create the preconditioner without
-					* arguments.
-					*/
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments.
+                                        */
       void initialize (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 

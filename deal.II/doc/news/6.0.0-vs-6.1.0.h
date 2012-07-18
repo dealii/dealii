@@ -66,7 +66,7 @@ inconvenience this causes.
   </p>
 
   <li> <p>Changed: The version number of the deal.II intermediate format written by
-  DataOutBase::write_deal_II_intermediate has been increased to 3 to accomodate the fact that
+  DataOutBase::write_deal_II_intermediate has been increased to 3 to accommodate the fact that
   we now support writing vector-valued data to output files in at least some output formats.
   (Previously, vector-valued date was written as a collection of scalar fields.) Since
   we can only read files written in intermediate format that has the same number as the

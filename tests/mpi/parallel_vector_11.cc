@@ -30,8 +30,8 @@ void test ()
 
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
-				// global size: 20, local_size: 3 as long as
-				// less than 20
+                                // global size: 20, local_size: 3 as long as
+                                // less than 20
   const unsigned int local_size = 3;
   const unsigned int global_size = std::min(20U, local_size * numproc);
   const int my_start = std::min (local_size * myid, global_size);
@@ -41,17 +41,17 @@ void test ()
   IndexSet local_owned (global_size);
   if (my_end > my_start)
     local_owned.add_range(static_cast<unsigned int>(my_start),
-			  static_cast<unsigned int>(my_end));
+                          static_cast<unsigned int>(my_end));
   IndexSet local_relevant(global_size);
   local_relevant = local_owned;
   local_relevant.add_index (2);
 
   parallel::distributed::Vector<double> v(local_owned, local_relevant,
-					  MPI_COMM_WORLD);
+                                          MPI_COMM_WORLD);
   AssertDimension (actual_local_size, v.local_size());
   parallel::distributed::Vector<double> w (v), x(v), y(v);
 
-				// set local elements
+                                // set local elements
   for (int i=0; i<actual_local_size; ++i)
     {
       v.local_element(i) = i + my_start;

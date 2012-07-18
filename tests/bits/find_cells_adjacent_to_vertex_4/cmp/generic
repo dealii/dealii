@@ -1,0 +1,69 @@
+
+DEAL::Vertex 0 at 0.00000 0.00000: 8 cells
+DEAL::   0.1
+DEAL::   0.2
+DEAL::   0.3
+DEAL::   0.4
+DEAL::   0.5
+DEAL::   0.6
+DEAL::   0.7
+DEAL::   1.0
+DEAL::Vertex 1 at 1.00000 0.00000: 2 cells
+DEAL::   0.7
+DEAL::   1.1
+DEAL::Vertex 2 at 0.923880 0.382683: 1 cells
+DEAL::   1.3
+DEAL::Vertex 3 at 0.707107 0.707107: 2 cells
+DEAL::   0.1
+DEAL::   1.2
+DEAL::Vertex 4 at 0.382683 0.923880: 1 cells
+DEAL::   0.1
+DEAL::Vertex 5 at 6.12323e-17 1.00000: 2 cells
+DEAL::   0.1
+DEAL::   0.2
+DEAL::Vertex 6 at -0.382683 0.923880: 1 cells
+DEAL::   0.2
+DEAL::Vertex 7 at -0.707107 0.707107: 2 cells
+DEAL::   0.2
+DEAL::   0.3
+DEAL::Vertex 8 at -0.923880 0.382683: 1 cells
+DEAL::   0.3
+DEAL::Vertex 9 at -1.00000 1.22465e-16: 2 cells
+DEAL::   0.3
+DEAL::   0.4
+DEAL::Vertex 10 at -0.923880 -0.382683: 1 cells
+DEAL::   0.4
+DEAL::Vertex 11 at -0.707107 -0.707107: 2 cells
+DEAL::   0.4
+DEAL::   0.5
+DEAL::Vertex 12 at -0.382683 -0.923880: 1 cells
+DEAL::   0.5
+DEAL::Vertex 13 at -1.83697e-16 -1.00000: 2 cells
+DEAL::   0.5
+DEAL::   0.6
+DEAL::Vertex 14 at 0.382683 -0.923880: 1 cells
+DEAL::   0.6
+DEAL::Vertex 15 at 0.707107 -0.707107: 2 cells
+DEAL::   0.6
+DEAL::   0.7
+DEAL::Vertex 16 at 0.923880 -0.382683: 1 cells
+DEAL::   0.7
+DEAL::Vertex 17 at 0.500000 0.00000: 3 cells
+DEAL::   0.7
+DEAL::   1.0
+DEAL::   1.1
+DEAL::Vertex 18 at 0.353553 0.353553: 3 cells
+DEAL::   0.1
+DEAL::   1.0
+DEAL::   1.2
+DEAL::Vertex 19 at 0.961940 0.191342: 2 cells
+DEAL::   1.1
+DEAL::   1.3
+DEAL::Vertex 20 at 0.815493 0.544895: 2 cells
+DEAL::   1.2
+DEAL::   1.3
+DEAL::Vertex 21 at 0.657747 0.272448: 4 cells
+DEAL::   1.0
+DEAL::   1.1
+DEAL::   1.2
+DEAL::   1.3

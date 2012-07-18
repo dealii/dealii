@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  * @verbatim
  * Grid 1:
  *   x--x--x-----x-----------x
- *    1  2    3        4 
+ *    1  2    3        4
  *
  * Grid 2:
  *   x-----x-----x-----x-----x
@@ -116,114 +116,114 @@ class InterGridMap : public Subscriptor
 {
   public:
 
-				     /**
-				      * Typedef to the iterator type of
-				      * the grid class under consideration.
-				      */
+                                     /**
+                                      * Typedef to the iterator type of
+                                      * the grid class under consideration.
+                                      */
     typedef typename GridClass::cell_iterator cell_iterator;
 
-				     /**
-				      * Constructor setting the class
-				      * name arguments in the
-				      * SmartPointer members.
-				      */
+                                     /**
+                                      * Constructor setting the class
+                                      * name arguments in the
+                                      * SmartPointer members.
+                                      */
     InterGridMap();
-    
-				     /**
-				      * Create the mapping between the two
-				      * grids.
-				      */
-    void make_mapping (const GridClass &source_grid,
-		       const GridClass &destination_grid);
 
-				     /**
-				      * Access operator: give a cell
-				      * on the source grid and receive
-				      * the respective cell on the
-				      * other grid, or if that does not
-				      * exist, the most refined cell
-				      * of which the source cell would
-				      * be created if it were further
-				      * refined.
-				      */
+                                     /**
+                                      * Create the mapping between the two
+                                      * grids.
+                                      */
+    void make_mapping (const GridClass &source_grid,
+                       const GridClass &destination_grid);
+
+                                     /**
+                                      * Access operator: give a cell
+                                      * on the source grid and receive
+                                      * the respective cell on the
+                                      * other grid, or if that does not
+                                      * exist, the most refined cell
+                                      * of which the source cell would
+                                      * be created if it were further
+                                      * refined.
+                                      */
     cell_iterator operator [] (const cell_iterator &source_cell) const;
 
-				     /**
-				      * Delete all data of this class.
-				      */
+                                     /**
+                                      * Delete all data of this class.
+                                      */
     void clear ();
 
-				     /**
-				      * Return a pointer to the source
-				      * grid.
-				      */
+                                     /**
+                                      * Return a pointer to the source
+                                      * grid.
+                                      */
     const GridClass & get_source_grid () const;
-    
-				     /**
-				      * Return a pointer to the
-				      * destination grid.
-				      */
+
+                                     /**
+                                      * Return a pointer to the
+                                      * destination grid.
+                                      */
     const GridClass & get_destination_grid () const;
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object.
+                                      */
     std::size_t memory_consumption () const;
-    
-				     /**
-				      * Exception
-				      */
+
+                                     /**
+                                      * Exception
+                                      */
     DeclException1 (ExcInvalidKey,
-		    cell_iterator,
-		    << "The iterator " << arg1 << " is not valid as key for "
-		    << "this map.");
-				     /**
-				      * Exception
-				      */
+                    cell_iterator,
+                    << "The iterator " << arg1 << " is not valid as key for "
+                    << "this map.");
+                                     /**
+                                      * Exception
+                                      */
     DeclException0 (ExcIncompatibleGrids);
-    
+
   private:
-				     /**
-				      * The actual data. Hold one iterator
-				      * for each cell on each level.
-				      */
+                                     /**
+                                      * The actual data. Hold one iterator
+                                      * for each cell on each level.
+                                      */
     std::vector<std::vector<cell_iterator> > mapping;
 
-				     /**
-				      * Store a pointer to the source grid.
-				      */
+                                     /**
+                                      * Store a pointer to the source grid.
+                                      */
     SmartPointer<const GridClass,InterGridMap<GridClass> > source_grid;
 
-				     /**
-				      * Likewise for the destination grid.
-				      */
+                                     /**
+                                      * Likewise for the destination grid.
+                                      */
     SmartPointer<const GridClass,InterGridMap<GridClass> > destination_grid;
 
-				     /**
-				      * Set the mapping for the pair of
-				      * cells given. These shall match
-				      * in level of refinement and all
-				      * other properties.
-				      */
+                                     /**
+                                      * Set the mapping for the pair of
+                                      * cells given. These shall match
+                                      * in level of refinement and all
+                                      * other properties.
+                                      */
     void set_mapping (const cell_iterator &src_cell,
-		      const cell_iterator &dst_cell);
+                      const cell_iterator &dst_cell);
 
-				     /**
-				      * Set the value of the key @p src_cell
-				      * to @p dst_cell. Do so as well for
-				      * all the children and their children
-				      * of @p src_cell. This function is
-				      * used for cells which are more
-				      * refined on @p src_grid than on
-				      * @p dst_grid; then all values of
-				      * the hierarchy of cells and their
-				      * children point to one cell on the
-				      * @p dst_grid.
-				      */
+                                     /**
+                                      * Set the value of the key @p src_cell
+                                      * to @p dst_cell. Do so as well for
+                                      * all the children and their children
+                                      * of @p src_cell. This function is
+                                      * used for cells which are more
+                                      * refined on @p src_grid than on
+                                      * @p dst_grid; then all values of
+                                      * the hierarchy of cells and their
+                                      * children point to one cell on the
+                                      * @p dst_grid.
+                                      */
     void set_entries_to_cell (const cell_iterator &src_cell,
-			      const cell_iterator &dst_cell);
+                              const cell_iterator &dst_cell);
 };
 
 

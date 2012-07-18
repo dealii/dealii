@@ -1,4 +1,4 @@
-/* $Id: polynomial.cc  $ */
+/* $Id$ */
 /* Author: Andrew McBride, 2010 */
 /*                                                                */
 /*    Copyright (C) 2010 by the deal.II authors */

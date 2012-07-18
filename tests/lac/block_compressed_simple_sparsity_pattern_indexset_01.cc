@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//    $Id: block_sparsity_pattern_01.cc 15661 2008-01-24 04:59:09Z kanschat $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006, 2008 by the deal.II authors

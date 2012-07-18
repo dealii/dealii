@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,9 +18,9 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 PolynomialsP<dim>::PolynomialsP (const unsigned int p)
-		:
-		PolynomialSpace<dim>(Polynomials::Monomial<double>::generate_complete_basis(p)),
-		p(p)
+                :
+                PolynomialSpace<dim>(Polynomials::Monomial<double>::generate_complete_basis(p)),
+                p(p)
 {
   std::vector<unsigned int> index_map(this->n());
   create_polynomial_ordering(index_map);
@@ -33,9 +33,9 @@ void PolynomialsP<1>::create_polynomial_ordering(
   std::vector<unsigned int> &index_map) const
 {
   Assert(index_map.size()==this->n(),
-	 ExcDimensionMismatch(index_map.size(), this->n()));
+         ExcDimensionMismatch(index_map.size(), this->n()));
 
-				   // identity
+                                   // identity
   for (unsigned int i=0; i<this->n(); ++i)
     index_map[i]=i;
 }
@@ -57,15 +57,15 @@ void PolynomialsP<2>::create_polynomial_ordering(
   std::vector<unsigned int> &index_map) const
 {
   Assert(index_map.size()==this->n(),
-	 ExcDimensionMismatch(index_map.size(), this->n()));
+         ExcDimensionMismatch(index_map.size(), this->n()));
   Assert(p<=5, ExcNotImplemented());
-  
-				   // Given the number i of the
-				   // polynomial in
-				   // $1,x,y,xy,x2,y2,...$,
-				   // index_map[i] gives the number of
-				   // the polynomial in
-				   // PolynomialSpace.
+
+                                   // Given the number i of the
+                                   // polynomial in
+                                   // $1,x,y,xy,x2,y2,...$,
+                                   // index_map[i] gives the number of
+                                   // the polynomial in
+                                   // PolynomialSpace.
   for (unsigned int i=0; i<this->n(); ++i)
     index_map[i]=imap2[p][i];
 }
@@ -83,15 +83,15 @@ void PolynomialsP<3>::create_polynomial_ordering(
   std::vector<unsigned int> &index_map) const
 {
   Assert(index_map.size()==this->n(),
-	 ExcDimensionMismatch(index_map.size(), this->n()));
+         ExcDimensionMismatch(index_map.size(), this->n()));
   Assert(p<=3, ExcNotImplemented());
-  
-				   // Given the number i of the
-				   // polynomial in
-				   // $1,x,y,xy,x2,y2,...$,
-				   // index_map[i] gives the number of
-				   // the polynomial in
-				   // PolynomialSpace.
+
+                                   // Given the number i of the
+                                   // polynomial in
+                                   // $1,x,y,xy,x2,y2,...$,
+                                   // index_map[i] gives the number of
+                                   // the polynomial in
+                                   // PolynomialSpace.
   for (unsigned int i=0; i<this->n(); ++i)
     index_map[i]=imap3[p][i];
 }

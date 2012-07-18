@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename Number>
 BlockVector<Number>::BlockVector (const unsigned int n_blocks,
-				  const unsigned int block_size)
+                                  const unsigned int block_size)
 {
   reinit (n_blocks, block_size);
 }
@@ -51,13 +51,13 @@ BlockVector<Number>::BlockVector (const BlockVector<Number>& v)
 {
   this->components.resize (v.n_blocks());
   this->block_indices = v.block_indices;
-  
+
   for (unsigned int i=0; i<this->n_blocks(); ++i)
     this->components[i] = v.components[i];
 }
 
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG    
+#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
 template <typename Number>
 template <typename OtherNumber>
@@ -89,8 +89,8 @@ BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
 
 template <typename Number>
 void BlockVector<Number>::reinit (const unsigned int n_bl,
-				  const unsigned int bl_sz,
-				  const bool         fast)
+                                  const unsigned int bl_sz,
+                                  const bool         fast)
 {
   std::vector<unsigned int> n(n_bl, bl_sz);
   reinit(n, fast);
@@ -99,12 +99,12 @@ void BlockVector<Number>::reinit (const unsigned int n_bl,
 
 template <typename Number>
 void BlockVector<Number>::reinit (const std::vector<unsigned int> &n,
-				  const bool                       fast)
+                                  const bool                       fast)
 {
   this->block_indices.reinit (n);
   if (this->components.size() != this->n_blocks())
     this->components.resize(this->n_blocks());
-  
+
   for (unsigned int i=0; i<this->n_blocks(); ++i)
     this->components[i].reinit(n[i], fast);
 }
@@ -118,7 +118,7 @@ void BlockVector<Number>::reinit (
   this->block_indices = n;
   if (this->components.size() != this->n_blocks())
     this->components.resize(this->n_blocks());
-  
+
   for (unsigned int i=0; i<this->n_blocks(); ++i)
     this->components[i].reinit(n.block_size(i), fast);
 }
@@ -132,7 +132,7 @@ void BlockVector<Number>::reinit (const BlockVector<Number2>& v,
   this->block_indices = v.get_block_indices();
   if (this->components.size() != this->n_blocks())
     this->components.resize(this->n_blocks());
-  
+
   for (unsigned int i=0;i<this->n_blocks();++i)
     this->block(i).reinit(v.block(i), fast);
 }
@@ -159,8 +159,8 @@ template <typename Number>
 void BlockVector<Number>::swap (BlockVector<Number> &v)
 {
   Assert (this->n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
-  
+          ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
+
   for (unsigned int i=0; i<this->n_blocks(); ++i)
     dealii::swap (this->components[i], v.components[i]);
   dealii::swap (this->block_indices, v.block_indices);
@@ -170,16 +170,16 @@ void BlockVector<Number>::swap (BlockVector<Number> &v)
 
 template <typename Number>
 void BlockVector<Number>::print (std::ostream       &out,
-				 const unsigned int  precision,
-				 const bool          scientific,
-				 const bool          across) const
+                                 const unsigned int  precision,
+                                 const bool          scientific,
+                                 const bool          across) const
 {
   for (unsigned int i=0;i<this->n_blocks();++i)
     {
       if (across)
-	out << 'C' << i << ':';
+        out << 'C' << i << ':';
       else
-	out << "Component " << i << std::endl;
+        out << "Component " << i << std::endl;
       this->components[i].print(out, precision, scientific, across);
     }
 }

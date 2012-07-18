@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2007, 2009 by the deal.II authors
+//    Copyright (C) 2007, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,6 +22,9 @@
 #include <deal.II/base/thread_local_storage.h>
 
 #include <deal.II/lac/vector.h>
+
+#include <boost/optional.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -58,9 +61,9 @@ namespace Functions
  * compute_point_locations alone.
  *
  * An example of how to use this function is the following:
- *    
+ *
  * \code
- * 
+ *
  * // Generate two triangulations
  * Triangulation<dim> tria_1;
  * Triangulation<dim> tria_2;
@@ -94,7 +97,7 @@ namespace Functions
  * \endcode
  *
  * The snippet of code above will work assuming that the second
- * triangulation is entirely included in the first one. 
+ * triangulation is entirely included in the first one.
  *
  * FEFieldFunction is designed to be an easy way to get the results of
  * your computations across different, possibly non matching,
@@ -113,190 +116,188 @@ namespace Functions
  *
  *  \ingroup functions
  *
- *  \author Luca Heltai, 2006    
- *  
- *  \todo Add hp functionality
+ *  \author Luca Heltai, 2006, Markus Buerg, 2012
  */
-  template <int dim, 
-	    typename DH=DoFHandler<dim>,
-	    typename VECTOR=Vector<double> >
-  class FEFieldFunction :  public Function<dim> 
+  template <int dim,
+            typename DH=DoFHandler<dim>,
+            typename VECTOR=Vector<double> >
+  class FEFieldFunction :  public Function<dim>
   {
     public:
-				       /**
-					* Construct a vector
-					* function. A smart pointers
-					* is stored to the dof
-					* handler, so you have to make
-					* sure that it make sense for
-					* the entire lifetime of this
-					* object. The number of
-					* components of this functions
-					* is equal to the number of
-					* components of the finite
-					* element object. If a mapping
-					* is specified, that is what
-					* is used to find out where
-					* the points lay. Otherwise
-					* the standard Q1 mapping is
-					* used.
-					*/
+                                       /**
+                                        * Construct a vector
+                                        * function. A smart pointers
+                                        * is stored to the dof
+                                        * handler, so you have to make
+                                        * sure that it make sense for
+                                        * the entire lifetime of this
+                                        * object. The number of
+                                        * components of this functions
+                                        * is equal to the number of
+                                        * components of the finite
+                                        * element object. If a mapping
+                                        * is specified, that is what
+                                        * is used to find out where
+                                        * the points lay. Otherwise
+                                        * the standard Q1 mapping is
+                                        * used.
+                                        */
       FEFieldFunction (const DH           &dh,
-		       const VECTOR       &data_vector, 
-		       const Mapping<dim> &mapping = StaticMappingQ1<dim>::mapping);
-  
-				       /**
-					* Set the current cell. If you
-					* know in advance where your
-					* points lie, you can tell
-					* this object by calling this
-					* function. This will speed
-					* things up a little. 
-					*/
-      void set_active_cell(typename DH::active_cell_iterator &newcell);
+                       const VECTOR       &data_vector,
+                       const Mapping<dim> &mapping = StaticMappingQ1<dim>::mapping);
 
-				       /**
-					* Get ONE vector value at the
-					* given point. It is
-					* inefficient to use single
-					* points. If you need more
-					* than one at a time, use the
-					* vector_value_list()
-					* function. For efficiency
-					* reasons, it is better if all
-					* the points lie on the same
-					* cell. This is not mandatory,
-					* however it does speed things
-					* up.
-					*/ 
+                                       /**
+                                        * Set the current cell. If you
+                                        * know in advance where your
+                                        * points lie, you can tell
+                                        * this object by calling this
+                                        * function. This will speed
+                                        * things up a little.
+                                        */
+      void set_active_cell (const typename DH::active_cell_iterator &newcell);
+
+                                       /**
+                                        * Get ONE vector value at the
+                                        * given point. It is
+                                        * inefficient to use single
+                                        * points. If you need more
+                                        * than one at a time, use the
+                                        * vector_value_list()
+                                        * function. For efficiency
+                                        * reasons, it is better if all
+                                        * the points lie on the same
+                                        * cell. This is not mandatory,
+                                        * however it does speed things
+                                        * up.
+                                        */
       virtual void vector_value (const Point<dim> &p,
-				 Vector<double>   &values) const;
+                                 Vector<double>   &values) const;
 
-				       /**
-					* Return the value of the
-					* function at the given
-					* point. Unless there is only
-					* one component (i.e. the
-					* function is scalar), you
-					* should state the component
-					* you want to have evaluated;
-					* it defaults to zero,
-					* i.e. the first component.
-					* It is inefficient to use
-					* single points. If you need
-					* more than one at a time, use
-					* the vector_value_list
-					* function. For efficiency
-					* reasons, it is better if all
-					* the points lie on the same
-					* cell. This is not mandatory,
-					* however it does speed things
-					* up.
-					*/
+                                       /**
+                                        * Return the value of the
+                                        * function at the given
+                                        * point. Unless there is only
+                                        * one component (i.e. the
+                                        * function is scalar), you
+                                        * should state the component
+                                        * you want to have evaluated;
+                                        * it defaults to zero,
+                                        * i.e. the first component.
+                                        * It is inefficient to use
+                                        * single points. If you need
+                                        * more than one at a time, use
+                                        * the vector_value_list
+                                        * function. For efficiency
+                                        * reasons, it is better if all
+                                        * the points lie on the same
+                                        * cell. This is not mandatory,
+                                        * however it does speed things
+                                        * up.
+                                        */
       virtual double value (const Point< dim > &    p,
-			    const unsigned int  component = 0)    const;
-  
-				       /**
-					* Set @p values to the point
-					* values of the specified
-					* component of the function at
-					* the @p points. It is assumed
-					* that @p values already has
-					* the right size, i.e. the
-					* same size as the points
-					* array. This is rather
-					* efficient if all the points
-					* lie on the same cell. If
-					* this is not the case, things
-					* may slow down a bit.
-					*/
+                            const unsigned int  component = 0)    const;
+
+                                       /**
+                                        * Set @p values to the point
+                                        * values of the specified
+                                        * component of the function at
+                                        * the @p points. It is assumed
+                                        * that @p values already has
+                                        * the right size, i.e. the
+                                        * same size as the points
+                                        * array. This is rather
+                                        * efficient if all the points
+                                        * lie on the same cell. If
+                                        * this is not the case, things
+                                        * may slow down a bit.
+                                        */
       virtual void value_list (const std::vector<Point< dim > > &    points,
-			       std::vector< double > &values, 
-			       const unsigned int  component = 0)    const;
+                               std::vector< double > &values,
+                               const unsigned int  component = 0)    const;
 
-  
-				       /**
-					* Set @p values to the point
-					* values of the function at
-					* the @p points. It is assumed
-					* that @p values already has
-					* the right size, i.e. the
-					* same size as the points
-					* array. This is rather
-					* efficient if all the points
-					* lie on the same cell. If
-					* this is not the case, things
-					* may slow down a bit.
-					*/
+
+                                       /**
+                                        * Set @p values to the point
+                                        * values of the function at
+                                        * the @p points. It is assumed
+                                        * that @p values already has
+                                        * the right size, i.e. the
+                                        * same size as the points
+                                        * array. This is rather
+                                        * efficient if all the points
+                                        * lie on the same cell. If
+                                        * this is not the case, things
+                                        * may slow down a bit.
+                                        */
       virtual void vector_value_list (const std::vector<Point< dim > > &    points,
-				      std::vector< Vector<double> > &values) const;
-  
-				       /**
-					* Return the gradient of all
-					* components of the function
-					* at the given point.  It is
-					* inefficient to use single
-					* points. If you need more
-					* than one at a time, use the
-					* vector_value_list
-					* function. For efficiency
-					* reasons, it is better if all
-					* the points lie on the same
-					* cell. This is not mandatory,
-					* however it does speed things
-					* up.
-					*/
-      virtual void 
-      vector_gradient (const Point< dim > &p, 
-		       std::vector< Tensor< 1, dim > > &gradients) const;
-  
-				       /**
-					* Return the gradient of the
-					* specified component of the
-					* function at the given point.
-					* It is inefficient to use
-					* single points. If you need
-					* more than one at a time, use
-					* the vector_value_list
-					* function. For efficiency
-					* reasons, it is better if all
-					* the points lie on the same
-					* cell. This is not mandatory,
-					* however it does speed things
-					* up.
-					*/
-      virtual Tensor<1,dim> gradient(const Point< dim > &p, 
-				     const unsigned int component = 0)const;
-  
-				       /**
-					* Return the gradient of all
-					* components of the function
-					* at all the given points.
-					* This is rather efficient if
-					* all the points lie on the
-					* same cell. If this is not
-					* the case, things may slow
-					* down a bit.
-					*/
-      virtual void 
-      vector_gradient_list (const std::vector< Point< dim > > &p, 
-			    std::vector< 
-			    std::vector< Tensor< 1, dim > > > &gradients) const;
+                                      std::vector< Vector<double> > &values) const;
 
-				       /**
-					* Return the gradient of the
-					* specified component of the
-					* function at all the given
-					* points.  This is rather
-					* efficient if all the points
-					* lie on the same cell. If
-					* this is not the case, things
-					* may slow down a bit.
-					*/
-      virtual void 
-      gradient_list (const std::vector< Point< dim > > &p, 
-		     std::vector< Tensor< 1, dim > > &gradients, 
-		     const unsigned int component=0) const;
+                                       /**
+                                        * Return the gradient of all
+                                        * components of the function
+                                        * at the given point.  It is
+                                        * inefficient to use single
+                                        * points. If you need more
+                                        * than one at a time, use the
+                                        * vector_value_list
+                                        * function. For efficiency
+                                        * reasons, it is better if all
+                                        * the points lie on the same
+                                        * cell. This is not mandatory,
+                                        * however it does speed things
+                                        * up.
+                                        */
+      virtual void
+      vector_gradient (const Point< dim > &p,
+                       std::vector< Tensor< 1, dim > > &gradients) const;
+
+                                       /**
+                                        * Return the gradient of the
+                                        * specified component of the
+                                        * function at the given point.
+                                        * It is inefficient to use
+                                        * single points. If you need
+                                        * more than one at a time, use
+                                        * the vector_value_list
+                                        * function. For efficiency
+                                        * reasons, it is better if all
+                                        * the points lie on the same
+                                        * cell. This is not mandatory,
+                                        * however it does speed things
+                                        * up.
+                                        */
+      virtual Tensor<1,dim> gradient(const Point< dim > &p,
+                                     const unsigned int component = 0)const;
+
+                                       /**
+                                        * Return the gradient of all
+                                        * components of the function
+                                        * at all the given points.
+                                        * This is rather efficient if
+                                        * all the points lie on the
+                                        * same cell. If this is not
+                                        * the case, things may slow
+                                        * down a bit.
+                                        */
+      virtual void
+      vector_gradient_list (const std::vector< Point< dim > > &p,
+                            std::vector<
+                            std::vector< Tensor< 1, dim > > > &gradients) const;
+
+                                       /**
+                                        * Return the gradient of the
+                                        * specified component of the
+                                        * function at all the given
+                                        * points.  This is rather
+                                        * efficient if all the points
+                                        * lie on the same cell. If
+                                        * this is not the case, things
+                                        * may slow down a bit.
+                                        */
+      virtual void
+      gradient_list (const std::vector< Point< dim > > &p,
+                     std::vector< Tensor< 1, dim > > &gradients,
+                     const unsigned int component=0) const;
 
 
       /**
@@ -332,72 +333,85 @@ namespace Functions
       virtual void
       vector_laplacian_list (const std::vector<Point<dim> > &points,
           std::vector<Vector<double> >   &values) const;
-  
-				       /**
-					* Create quadrature
-					* rules. This function groups
-					* the points into blocks that
-					* live in the same cell, and
-					* fills up three vectors: @p
-					* cells, @p qpoints and @p
-					* maps. The first is a list of
-					* the cells that contain the
-					* points, the second is a list
-					* of quadrature points
-					* matching each cell of the
-					* first list, and the third
-					* contains the index of the
-					* given quadrature points,
-					* i.e., @p points[maps[3][4]]
-					* ends up as the 5th
-					* quadrature point in the 4th
-					* cell. This is where
-					* optimization would
-					* help. This function returns
-					* the number of cells that
-					* contain the given set of
-					* points.
-					*/
+
+                                       /**
+                                        * Create quadrature
+                                        * rules. This function groups
+                                        * the points into blocks that
+                                        * live in the same cell, and
+                                        * fills up three vectors: @p
+                                        * cells, @p qpoints and @p
+                                        * maps. The first is a list of
+                                        * the cells that contain the
+                                        * points, the second is a list
+                                        * of quadrature points
+                                        * matching each cell of the
+                                        * first list, and the third
+                                        * contains the index of the
+                                        * given quadrature points,
+                                        * i.e., @p points[maps[3][4]]
+                                        * ends up as the 5th
+                                        * quadrature point in the 4th
+                                        * cell. This is where
+                                        * optimization would
+                                        * help. This function returns
+                                        * the number of cells that
+                                        * contain the given set of
+                                        * points.
+                                        */
       unsigned int
       compute_point_locations(const std::vector<Point<dim> > &points,
-			      std::vector<typename DH::active_cell_iterator > &cells,
-			      std::vector<std::vector<Point<dim> > > &qpoints,
-			      std::vector<std::vector<unsigned int> > &maps) const;
-    
+                              std::vector<typename DH::active_cell_iterator > &cells,
+                              std::vector<std::vector<Point<dim> > > &qpoints,
+                              std::vector<std::vector<unsigned int> > &maps) const;
+
     private:
-      				       /**
-					* Typedef holding the local cell_hint.
-					*/
-      typedef Threads::ThreadLocalStorage < 
-	typename DH::active_cell_iterator > cell_hint_t; 
+                                       /**
+                                        * Typedef holding the local cell_hint.
+                                        */
+      typedef Threads::ThreadLocalStorage <
+        typename DH::active_cell_iterator > cell_hint_t;
+
+                                       /**
+                                        * Pointer to the dof handler.
+                                        */
+      SmartPointer<const DH,FEFieldFunction<dim, DH, VECTOR> > dh;
+
+                                       /**
+                                        * A reference to the actual
+                                        * data vector.
+                                        */
+      const VECTOR & data_vector;
+
+                                       /**
+                                        * A reference to the mapping
+                                        * being used.
+                                        */
+      const Mapping<dim> & mapping;
+
+                                       /**
+                                        * The latest cell hint.
+                                        */
+      mutable cell_hint_t cell_hint;
+
+                                       /**
+                                        * Store the number of
+                                        * components of this function.
+                                        */
+      const unsigned int n_components;
 
 				       /**
-					* Pointer to the dof handler.
+					* Given a cell, return the
+					* reference coordinates of the
+					* given point within this cell
+					* if it indeed lies within the
+					* cell. Otherwise return an
+					* uninitialized
+					* boost::optional object.
 					*/
-      SmartPointer<const DH,FEFieldFunction<dim, DH, VECTOR> > dh;
-    
-				       /**
-					* A reference to the actual
-					* data vector.
-					*/
-      const VECTOR & data_vector;
-    
-				       /**
-					* A reference to the mapping
-					* being used.
-					*/
-      const Mapping<dim> & mapping;
-  
-				       /**
-					* The latest cell hint.
-					*/
-      mutable cell_hint_t cell_hint;
-  
-				       /**
-					* Store the number of
-					* components of this function.
-					*/
-      const unsigned int n_components;
+      boost::optional<Point<dim> >
+      get_reference_coordinates (const typename DH::active_cell_iterator &cell,
+				 const Point<dim>                        &point) const;
   };
 }
 

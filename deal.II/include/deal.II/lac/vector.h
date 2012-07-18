@@ -89,12 +89,12 @@ template <typename Number>
 class Vector : public Subscriptor
 {
   public:
-				     /**
-				      * Declare standard types used in all
-				      * containers. These types parallel
-				      * those in the <tt>C++</tt> standard libraries
-				      * <tt>vector<...></tt> class.
-				      */
+                                     /**
+                                      * Declare standard types used in all
+                                      * containers. These types parallel
+                                      * those in the <tt>C++</tt> standard libraries
+                                      * <tt>vector<...></tt> class.
+                                      */
     typedef Number                                            value_type;
     typedef value_type                                       *pointer;
     typedef const value_type                                 *const_pointer;
@@ -104,72 +104,72 @@ class Vector : public Subscriptor
     typedef const value_type                                 &const_reference;
     typedef std::size_t                                       size_type;
 
-				     /**
-				      * Declare a type that has holds
-				      * real-valued numbers with the
-				      * same precision as the template
-				      * argument to this class. If the
-				      * template argument of this
-				      * class is a real data type,
-				      * then real_type equals the
-				      * template argument. If the
-				      * template argument is a
-				      * std::complex type then
-				      * real_type equals the type
-				      * underlying the complex
-				      * numbers.
-				      *
-				      * This typedef is used to
-				      * represent the return type of
-				      * norms.
-				      */
+                                     /**
+                                      * Declare a type that has holds
+                                      * real-valued numbers with the
+                                      * same precision as the template
+                                      * argument to this class. If the
+                                      * template argument of this
+                                      * class is a real data type,
+                                      * then real_type equals the
+                                      * template argument. If the
+                                      * template argument is a
+                                      * std::complex type then
+                                      * real_type equals the type
+                                      * underlying the complex
+                                      * numbers.
+                                      *
+                                      * This typedef is used to
+                                      * represent the return type of
+                                      * norms.
+                                      */
     typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
   public:
 
-				     /**
-				      * @name 1: Basic Object-handling
-				      */
-				     //@{
-				     /**
-				      *  Constructor. Create a vector of
-				      *  dimension zero.
-				      */
+                                     /**
+                                      * @name 1: Basic Object-handling
+                                      */
+                                     //@{
+                                     /**
+                                      *  Constructor. Create a vector of
+                                      *  dimension zero.
+                                      */
     Vector ();
 
-				     /**
-				      * Copy-constructor. Sets the dimension
+                                     /**
+                                      * Copy-constructor. Sets the dimension
                                       * to that of the given vector, and
                                       * copies all elements.
-				      *
-				      * We would like to make this
-				      * constructor explicit, but STL
-				      * insists on using it implicitly.
-				      */
+                                      *
+                                      * We would like to make this
+                                      * constructor explicit, but STL
+                                      * insists on using it implicitly.
+                                      */
     Vector (const Vector<Number> &v);
 
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
-				     /**
-				      * Copy constructor taking a vector of
-				      * another data type. This will fail if
-				      * there is no conversion path from
-				      * @p OtherNumber to @p Number. Note that
-				      * you may lose accuracy when copying
-				      * to a vector with data elements with
-				      * less accuracy.
-				      *
-				      * Older versions of gcc did not honor
-				      * the @p explicit keyword on template
-				      * constructors. In such cases, it is
-				      * easy to accidentally write code that
-				      * can be very inefficient, since the
-				      * compiler starts performing hidden
-				      * conversions. To avoid this, this
-				      * function is disabled if we have
-				      * detected a broken compiler during
-				      * configuration.
-				      */
+                                     /**
+                                      * Copy constructor taking a vector of
+                                      * another data type. This will fail if
+                                      * there is no conversion path from
+                                      * @p OtherNumber to @p Number. Note that
+                                      * you may lose accuracy when copying
+                                      * to a vector with data elements with
+                                      * less accuracy.
+                                      *
+                                      * Older versions of gcc did not honor
+                                      * the @p explicit keyword on template
+                                      * constructors. In such cases, it is
+                                      * easy to accidentally write code that
+                                      * can be very inefficient, since the
+                                      * compiler starts performing hidden
+                                      * conversions. To avoid this, this
+                                      * function is disabled if we have
+                                      * detected a broken compiler during
+                                      * configuration.
+                                      */
     template <typename OtherNumber>
     explicit
     Vector (const Vector<OtherNumber> &v);
@@ -212,19 +212,19 @@ class Vector : public Subscriptor
                                       * constructor is only available if
                                       * Trilinos was detected during
                                       * configuration time.
-				      *
-				      * Note that due to the
-				      * communication model used in MPI,
-				      * this operation can only succeed
-				      * if all processes do it at the
-				      * same time. This means that it is
-				      * not possible for only one
-				      * process to obtain a copy of a
-				      * parallel vector while the other
-				      * jobs do something else. This
-				      * call will rather result in a
-				      * copy of the vector on all
-				      * processors.
+                                      *
+                                      * Note that due to the
+                                      * communication model used in MPI,
+                                      * this operation can only succeed
+                                      * if all processes do it at the
+                                      * same time. This means that it is
+                                      * not possible for only one
+                                      * process to obtain a copy of a
+                                      * parallel vector while the other
+                                      * jobs do something else. This
+                                      * call will rather result in a
+                                      * copy of the vector on all
+                                      * processors.
                                       */
     Vector (const TrilinosWrappers::MPI::Vector &v);
 
@@ -240,42 +240,42 @@ class Vector : public Subscriptor
     Vector (const TrilinosWrappers::Vector &v);
 #endif
 
-				     /**
-				      * Constructor. Set dimension to
-				      * @p n and initialize all
-				      * elements with zero.
-				      *
-				      * The constructor is made
-				      * explicit to avoid accidents
-				      * like this:
-				      * <tt>v=0;</tt>. Presumably, the user
-				      * wants to set every element of
-				      * the vector to zero, but
-				      * instead, what happens is this
-				      * call:
-				      * <tt>v=Vector@<number@>(0);</tt>,
-				      * i.e. the vector is replaced by
-				      * one of length zero.
-				      */
+                                     /**
+                                      * Constructor. Set dimension to
+                                      * @p n and initialize all
+                                      * elements with zero.
+                                      *
+                                      * The constructor is made
+                                      * explicit to avoid accidents
+                                      * like this:
+                                      * <tt>v=0;</tt>. Presumably, the user
+                                      * wants to set every element of
+                                      * the vector to zero, but
+                                      * instead, what happens is this
+                                      * call:
+                                      * <tt>v=Vector@<number@>(0);</tt>,
+                                      * i.e. the vector is replaced by
+                                      * one of length zero.
+                                      */
     explicit Vector (const unsigned int n);
 
-				     /**
-				      * Initialize the vector with a
-				      * given range of values pointed
-				      * to by the iterators. This
-				      * function is there in analogy
-				      * to the @p std::vector class.
-				      */
+                                     /**
+                                      * Initialize the vector with a
+                                      * given range of values pointed
+                                      * to by the iterators. This
+                                      * function is there in analogy
+                                      * to the @p std::vector class.
+                                      */
     template <typename InputIterator>
     Vector (const InputIterator first,
             const InputIterator last);
 
-				     /**
-				      * Destructor, deallocates
-				      * memory. Made virtual to allow
-				      * for derived classes to behave
-				      * properly.
-				      */
+                                     /**
+                                      * Destructor, deallocates
+                                      * memory. Made virtual to allow
+                                      * for derived classes to behave
+                                      * properly.
+                                      */
     virtual ~Vector ();
 
                                      /**
@@ -299,78 +299,78 @@ class Vector : public Subscriptor
                                       */
     void compress () const;
 
-				     /**
-				      * Change the dimension of the vector to
-				      * @p N. The reserved memory for this
-				      * vector remains unchanged if possible,
-				      * to make things faster; this may waste
-				      * some memory, so keep this in mind.
-				      * However, if <tt>N==0</tt> all memory is
-				      * freed, i.e. if you want to resize the
-				      * vector and release the memory not
-				      * needed, you have to first call
-				      * <tt>reinit(0)</tt> and then
-				      * <tt>reinit(N)</tt>. This cited behaviour is
-				      * analogous to that of the STL
-				      * containers.
-				      *
-				      * If @p fast is false, the vector is
-				      * filled by zeros. Otherwise, the
-				      * elements are left an unspecified
-				      * state.
-				      *
-				      * This function is virtual in
-				      * order to allow for derived
-				      * classes to handle memory
-				      * separately.
-				      */
+                                     /**
+                                      * Change the dimension of the vector to
+                                      * @p N. The reserved memory for this
+                                      * vector remains unchanged if possible,
+                                      * to make things faster; this may waste
+                                      * some memory, so keep this in mind.
+                                      * However, if <tt>N==0</tt> all memory is
+                                      * freed, i.e. if you want to resize the
+                                      * vector and release the memory not
+                                      * needed, you have to first call
+                                      * <tt>reinit(0)</tt> and then
+                                      * <tt>reinit(N)</tt>. This cited behaviour is
+                                      * analogous to that of the STL
+                                      * containers.
+                                      *
+                                      * If @p fast is false, the vector is
+                                      * filled by zeros. Otherwise, the
+                                      * elements are left an unspecified
+                                      * state.
+                                      *
+                                      * This function is virtual in
+                                      * order to allow for derived
+                                      * classes to handle memory
+                                      * separately.
+                                      */
     virtual void reinit (const unsigned int N,
-			 const bool         fast=false);
+                         const bool         fast=false);
 
-				     /**
-				      * Change the dimension to that of the
-				      * vector @p V. The same applies as for
-				      * the other @p reinit function.
-				      *
-				      * The elements of @p V are not copied,
-				      * i.e.  this function is the same as
-				      * calling <tt>reinit (V.size(), fast)</tt>.
-				      */
+                                     /**
+                                      * Change the dimension to that of the
+                                      * vector @p V. The same applies as for
+                                      * the other @p reinit function.
+                                      *
+                                      * The elements of @p V are not copied,
+                                      * i.e.  this function is the same as
+                                      * calling <tt>reinit (V.size(), fast)</tt>.
+                                      */
     template <typename Number2>
     void reinit (const Vector<Number2> &V,
-		 const bool            fast=false);
+                 const bool            fast=false);
 
-				     /**
-				      * Swap the contents of this
-				      * vector and the other vector
-				      * @p v. One could do this
-				      * operation with a temporary
-				      * variable and copying over the
-				      * data elements, but this
-				      * function is significantly more
-				      * efficient since it only swaps
-				      * the pointers to the data of
-				      * the two vectors and therefore
-				      * does not need to allocate
-				      * temporary storage and move
-				      * data around.
-				      *
-				      * This function is analog to the
-				      * the @p swap function of all C++
-				      * standard containers. Also,
-				      * there is a global function
-				      * <tt>swap(u,v)</tt> that simply calls
-				      * <tt>u.swap(v)</tt>, again in analogy
-				      * to standard functions.
-				      *
-				      * This function is virtual in
-				      * order to allow for derived
-				      * classes to handle memory
-				      * separately.
-				      */
+                                     /**
+                                      * Swap the contents of this
+                                      * vector and the other vector
+                                      * @p v. One could do this
+                                      * operation with a temporary
+                                      * variable and copying over the
+                                      * data elements, but this
+                                      * function is significantly more
+                                      * efficient since it only swaps
+                                      * the pointers to the data of
+                                      * the two vectors and therefore
+                                      * does not need to allocate
+                                      * temporary storage and move
+                                      * data around.
+                                      *
+                                      * This function is analog to the
+                                      * the @p swap function of all C++
+                                      * standard containers. Also,
+                                      * there is a global function
+                                      * <tt>swap(u,v)</tt> that simply calls
+                                      * <tt>u.swap(v)</tt>, again in analogy
+                                      * to standard functions.
+                                      *
+                                      * This function is virtual in
+                                      * order to allow for derived
+                                      * classes to handle memory
+                                      * separately.
+                                      */
     virtual void swap (Vector<Number> &v);
 
-				     /**
+                                     /**
                                       * Set all components of the vector to
                                       * the given number @p s. Simply pass
                                       * this down to the individual block
@@ -388,19 +388,19 @@ class Vector : public Subscriptor
                                       * notation <tt>v=0</tt>. Assigning
                                       * other values is deprecated and may
                                       * be disallowed in the future.
-				      */
+                                      */
     Vector<Number> & operator = (const Number s);
 
-				     /**
-				      * Copy the given vector. Resize the
-				      * present vector if necessary.
-				      */
+                                     /**
+                                      * Copy the given vector. Resize the
+                                      * present vector if necessary.
+                                      */
     Vector<Number> & operator= (const Vector<Number> &c);
 
-				     /**
-				      * Copy the given vector. Resize the
-				      * present vector if necessary.
-				      */
+                                     /**
+                                      * Copy the given vector. Resize the
+                                      * present vector if necessary.
+                                      */
     template <typename Number2>
     Vector<Number> & operator= (const Vector<Number2> &v);
 
@@ -447,15 +447,15 @@ class Vector : public Subscriptor
 
 
 #ifdef DEAL_II_USE_TRILINOS
-				     /**
-				      * Another copy operator: copy
-				      * the values from a (sequential
-				      * or parallel, depending on the
-				      * underlying compiler) Trilinos
-				      * wrapper vector class. This
-				      * operator is only available if
-				      * Trilinos was detected during
-				      * configuration time.
+                                     /**
+                                      * Another copy operator: copy
+                                      * the values from a (sequential
+                                      * or parallel, depending on the
+                                      * underlying compiler) Trilinos
+                                      * wrapper vector class. This
+                                      * operator is only available if
+                                      * Trilinos was detected during
+                                      * configuration time.
                                       *
                                       * Note that due to the
                                       * communication model used in MPI,
@@ -466,19 +466,19 @@ class Vector : public Subscriptor
                                       * obtain a copy of a parallel
                                       * vector while the other jobs do
                                       * something else.
-				      */
+                                      */
     Vector<Number> &
     operator = (const TrilinosWrappers::MPI::Vector &v);
 
-				     /**
-				      * Another copy operator: copy the
-				      * values from a sequential
-				      * Trilinos wrapper vector
-				      * class. This operator is only
-				      * available if Trilinos was
-				      * detected during configuration
-				      * time.
-				      */
+                                     /**
+                                      * Another copy operator: copy the
+                                      * values from a sequential
+                                      * Trilinos wrapper vector
+                                      * class. This operator is only
+                                      * available if Trilinos was
+                                      * detected during configuration
+                                      * time.
+                                      */
     Vector<Number> &
     operator = (const TrilinosWrappers::Vector &v);
 #endif
@@ -506,76 +506,76 @@ class Vector : public Subscriptor
     template <typename Number2>
     bool operator != (const Vector<Number2> &v) const;
 
-				     /**
-				      * Return the scalar product of
-				      * two vectors.  The return type
-				      * is the underlying type of
-				      * @p this vector, so the return
-				      * type and the accuracy with
-				      * which it the result is
-				      * computed depend on the order
-				      * of the arguments of this
-				      * vector.
-				      *
-				      * For complex vectors, the
-				      * scalar product is implemented
-				      * as $\left<v,w\right>=\sum_i
-				      * v_i \bar{w_i}$.
-				      */
+                                     /**
+                                      * Return the scalar product of
+                                      * two vectors.  The return type
+                                      * is the underlying type of
+                                      * @p this vector, so the return
+                                      * type and the accuracy with
+                                      * which it the result is
+                                      * computed depend on the order
+                                      * of the arguments of this
+                                      * vector.
+                                      *
+                                      * For complex vectors, the
+                                      * scalar product is implemented
+                                      * as $\left<v,w\right>=\sum_i
+                                      * v_i \bar{w_i}$.
+                                      */
     template <typename Number2>
     Number operator * (const Vector<Number2> &V) const;
 
-				     /**
-				      * Return square of the $l_2$-norm.
-				      */
+                                     /**
+                                      * Return square of the $l_2$-norm.
+                                      */
     real_type norm_sqr () const;
 
-				     /**
-				      * Mean value of the elements of
-				      * this vector.
-				      */
+                                     /**
+                                      * Mean value of the elements of
+                                      * this vector.
+                                      */
     Number mean_value () const;
 
-				     /**
-				      * $l_1$-norm of the vector.
-				      * The sum of the absolute values.
-				      */
+                                     /**
+                                      * $l_1$-norm of the vector.
+                                      * The sum of the absolute values.
+                                      */
     real_type l1_norm () const;
 
-				     /**
-				      * $l_2$-norm of the vector.  The
-				      * square root of the sum of the
-				      * squares of the elements.
-				      */
+                                     /**
+                                      * $l_2$-norm of the vector.  The
+                                      * square root of the sum of the
+                                      * squares of the elements.
+                                      */
     real_type l2_norm () const;
 
-				     /**
-				      * $l_p$-norm of the vector. The
-				      * pth root of the sum of the pth
-				      * powers of the absolute values
-				      * of the elements.
-				      */
+                                     /**
+                                      * $l_p$-norm of the vector. The
+                                      * pth root of the sum of the pth
+                                      * powers of the absolute values
+                                      * of the elements.
+                                      */
     real_type lp_norm (const real_type p) const;
 
-				     /**
-				      * Maximum absolute value of the
-				      * elements.
-				      */
+                                     /**
+                                      * Maximum absolute value of the
+                                      * elements.
+                                      */
     real_type linfty_norm () const;
 
-				     /**
-				      * Return dimension of the vector.
-				      */
+                                     /**
+                                      * Return dimension of the vector.
+                                      */
     unsigned int size () const;
 
-				     /**
-				      * Return whether the vector contains only
-				      * elements with value zero. This function
-				      * is mainly for internal consistency
-				      * checks and should seldomly be used when
-				      * not in debug mode since it uses quite
-				      * some time.
-				      */
+                                     /**
+                                      * Return whether the vector contains only
+                                      * elements with value zero. This function
+                                      * is mainly for internal consistency
+                                      * checks and should seldom be used when
+                                      * not in debug mode since it uses quite
+                                      * some time.
+                                      */
     bool all_zero () const;
 
                                      /**
@@ -585,96 +585,96 @@ class Vector : public Subscriptor
                                       * used, for example, to check whether
                                       * refinement indicators are really all
                                       * positive (or zero).
-				      *
-				      * The function obviously only makes
-				      * sense if the template argument of this
-				      * class is a real type. If it is a
-				      * complex type, then an exception is
-				      * thrown.
+                                      *
+                                      * The function obviously only makes
+                                      * sense if the template argument of this
+                                      * class is a real type. If it is a
+                                      * complex type, then an exception is
+                                      * thrown.
                                       */
     bool is_non_negative () const;
 
-				     /**
-				      * Make the @p Vector class a bit like
-				      * the <tt>vector<></tt> class of the C++
-				      * standard library by returning
-				      * iterators to the start and end of the
-				      * elements of this vector.
-				      */
+                                     /**
+                                      * Make the @p Vector class a bit like
+                                      * the <tt>vector<></tt> class of the C++
+                                      * standard library by returning
+                                      * iterators to the start and end of the
+                                      * elements of this vector.
+                                      */
     iterator begin ();
 
-				     /**
-				      * Return constant iterator to the start of
-				      * the vectors.
-				      */
+                                     /**
+                                      * Return constant iterator to the start of
+                                      * the vectors.
+                                      */
     const_iterator begin () const;
 
-				     /**
-				      * Return an iterator pointing to the
-				      * element past the end of the array.
-				      */
+                                     /**
+                                      * Return an iterator pointing to the
+                                      * element past the end of the array.
+                                      */
     iterator end ();
 
-    				     /**
-				      * Return a constant iterator pointing to
-				      * the element past the end of the array.
-				      */
+                                     /**
+                                      * Return a constant iterator pointing to
+                                      * the element past the end of the array.
+                                      */
     const_iterator end () const;
-				     //@}
+                                     //@}
 
 
-				     /**
-				      * @name 2: Data-Access
-				      */
-				     //@{
-				     /**
-				      * Access the value of the @p ith
-				      * component.
-				      */
+                                     /**
+                                      * @name 2: Data-Access
+                                      */
+                                     //@{
+                                     /**
+                                      * Access the value of the @p ith
+                                      * component.
+                                      */
     Number operator() (const unsigned int i) const;
 
-				     /**
-				      * Access the @p ith component
-				      * as a writeable reference.
-				      */
+                                     /**
+                                      * Access the @p ith component
+                                      * as a writeable reference.
+                                      */
     Number& operator() (const unsigned int i);
 
-				     /**
-				      * Access the value of the @p ith
-				      * component.
-				      *
-				      * Exactly the same as operator().
-				      */
+                                     /**
+                                      * Access the value of the @p ith
+                                      * component.
+                                      *
+                                      * Exactly the same as operator().
+                                      */
     Number operator[] (const unsigned int i) const;
 
-				     /**
-				      * Access the @p ith component
-				      * as a writeable reference.
-				      *
-				      * Exactly the same as operator().
-				      */
+                                     /**
+                                      * Access the @p ith component
+                                      * as a writeable reference.
+                                      *
+                                      * Exactly the same as operator().
+                                      */
     Number& operator[] (const unsigned int i);
-				     //@}
+                                     //@}
 
 
-				     /**
-				      * @name 3: Modification of vectors
-				      */
-				     //@{
+                                     /**
+                                      * @name 3: Modification of vectors
+                                      */
+                                     //@{
 
-				     /**
-				      * Add the given vector to the present
-				      * one.
-				      */
+                                     /**
+                                      * Add the given vector to the present
+                                      * one.
+                                      */
     Vector<Number> & operator += (const Vector<Number> &V);
 
-    				     /**
-				      * Subtract the given vector from the
-				      * present one.
-				      */
+                                     /**
+                                      * Subtract the given vector from the
+                                      * present one.
+                                      */
     Vector<Number> & operator -= (const Vector<Number> &V);
 
-				       /**
+                                       /**
                                         * A collective add operation:
                                         * This funnction adds a whole
                                         * set of values stored in @p
@@ -684,188 +684,188 @@ class Vector : public Subscriptor
                                         */
     template <typename OtherNumber>
     void add (const std::vector<unsigned int> &indices,
-	      const std::vector<OtherNumber>  &values);
+              const std::vector<OtherNumber>  &values);
 
-				       /**
-				        * This is a second collective
-				        * add operation. As a
-				        * difference, this function
-				        * takes a deal.II vector of
-				        * values.
-				        */
+                                       /**
+                                        * This is a second collective
+                                        * add operation. As a
+                                        * difference, this function
+                                        * takes a deal.II vector of
+                                        * values.
+                                        */
     template <typename OtherNumber>
     void add (const std::vector<unsigned int> &indices,
-	      const Vector<OtherNumber>       &values);
+              const Vector<OtherNumber>       &values);
 
-				      /**
-				       * Take an address where
-				       * <tt>n_elements</tt> are stored
-				       * contiguously and add them into
-				       * the vector. Handles all cases
-				       * which are not covered by the
-				       * other two <tt>add()</tt>
-				       * functions above.
-				       */
+                                      /**
+                                       * Take an address where
+                                       * <tt>n_elements</tt> are stored
+                                       * contiguously and add them into
+                                       * the vector. Handles all cases
+                                       * which are not covered by the
+                                       * other two <tt>add()</tt>
+                                       * functions above.
+                                       */
     template <typename OtherNumber>
     void add (const unsigned int  n_elements,
-	      const unsigned int *indices,
-	      const OtherNumber  *values);
+              const unsigned int *indices,
+              const OtherNumber  *values);
 
-				     /**
-				      * Addition of @p s to all
-				      * components. Note that @p s is a
-				      * scalar and not a vector.
-				      */
+                                     /**
+                                      * Addition of @p s to all
+                                      * components. Note that @p s is a
+                                      * scalar and not a vector.
+                                      */
     void add (const Number s);
 
-				     /**
-				      * Simple vector addition, equal to the
-				      * <tt>operator +=</tt>.
-				      */
+                                     /**
+                                      * Simple vector addition, equal to the
+                                      * <tt>operator +=</tt>.
+                                      */
     void add (const Vector<Number> &V);
 
-				     /**
-				      * Simple addition of a multiple of a
-				      * vector, i.e. <tt>*this += a*V</tt>.
-				      */
+                                     /**
+                                      * Simple addition of a multiple of a
+                                      * vector, i.e. <tt>*this += a*V</tt>.
+                                      */
     void add (const Number a, const Vector<Number> &V);
 
-				     /**
-				      * Multiple addition of scaled vectors,
-				      * i.e. <tt>*this += a*V+b*W</tt>.
-				      */
+                                     /**
+                                      * Multiple addition of scaled vectors,
+                                      * i.e. <tt>*this += a*V+b*W</tt>.
+                                      */
     void add (const Number a, const Vector<Number> &V,
-	      const Number b, const Vector<Number> &W);
+              const Number b, const Vector<Number> &W);
 
-				     /**
-				      * Scaling and simple vector addition,
-				      * i.e.
-				      * <tt>*this = s*(*this)+V</tt>.
-				      */
+                                     /**
+                                      * Scaling and simple vector addition,
+                                      * i.e.
+                                      * <tt>*this = s*(*this)+V</tt>.
+                                      */
     void sadd (const Number          s,
                const Vector<Number> &V);
 
-				     /**
-				      * Scaling and simple addition, i.e.
-				      * <tt>*this = s*(*this)+a*V</tt>.
-				      */
+                                     /**
+                                      * Scaling and simple addition, i.e.
+                                      * <tt>*this = s*(*this)+a*V</tt>.
+                                      */
     void sadd (const Number          s,
                const Number          a,
                const Vector<Number> &V);
 
-				     /**
-				      * Scaling and multiple addition.
-				      */
+                                     /**
+                                      * Scaling and multiple addition.
+                                      */
     void sadd (const Number          s,
                const Number          a,
-	       const Vector<Number> &V,
+               const Vector<Number> &V,
                const Number          b,
                const Vector<Number> &W);
 
-				     /**
-				      * Scaling and multiple addition.
-				      * <tt>*this = s*(*this)+a*V + b*W + c*X</tt>.
-				      */
+                                     /**
+                                      * Scaling and multiple addition.
+                                      * <tt>*this = s*(*this)+a*V + b*W + c*X</tt>.
+                                      */
     void sadd (const Number          s,
                const Number          a,
-	       const Vector<Number> &V,
+               const Vector<Number> &V,
                const Number          b,
                const Vector<Number> &W,
-	       const Number          c,
+               const Number          c,
                const Vector<Number> &X);
 
-				     /**
-				      * Scale each element of the
-				      * vector by the given factor.
-				      *
-				      * This function is deprecated
-				      * and will be removed in a
-				      * future version. Use
-				      * <tt>operator *=</tt> and
-				      * <tt>operator /=</tt> instead.
-				      */
+                                     /**
+                                      * Scale each element of the
+                                      * vector by the given factor.
+                                      *
+                                      * This function is deprecated
+                                      * and will be removed in a
+                                      * future version. Use
+                                      * <tt>operator *=</tt> and
+                                      * <tt>operator /=</tt> instead.
+                                      */
     void scale (const Number factor);
 
 
-				     /**
-				      * Scale each element of the
-				      * vector by a constant
-				      * value.
-				      */
+                                     /**
+                                      * Scale each element of the
+                                      * vector by a constant
+                                      * value.
+                                      */
     Vector<Number> & operator *= (const Number factor);
 
-				     /**
-				      * Scale each element of the
-				      * vector by the inverse of the
-				      * given value.
-				      */
+                                     /**
+                                      * Scale each element of the
+                                      * vector by the inverse of the
+                                      * given value.
+                                      */
     Vector<Number> & operator /= (const Number factor);
 
-				     /**
-				      * Scale each element of this
-				      * vector by the corresponding
-				      * element in the argument. This
-				      * function is mostly meant to
-				      * simulate multiplication (and
-				      * immediate re-assignment) by a
-				      * diagonal scaling matrix.
-				      */
+                                     /**
+                                      * Scale each element of this
+                                      * vector by the corresponding
+                                      * element in the argument. This
+                                      * function is mostly meant to
+                                      * simulate multiplication (and
+                                      * immediate re-assignment) by a
+                                      * diagonal scaling matrix.
+                                      */
     void scale (const Vector<Number> &scaling_factors);
 
-				     /**
-				      * Scale each element of this
-				      * vector by the corresponding
-				      * element in the argument. This
-				      * function is mostly meant to
-				      * simulate multiplication (and
-				      * immediate re-assignment) by a
-				      * diagonal scaling matrix.
-				      */
+                                     /**
+                                      * Scale each element of this
+                                      * vector by the corresponding
+                                      * element in the argument. This
+                                      * function is mostly meant to
+                                      * simulate multiplication (and
+                                      * immediate re-assignment) by a
+                                      * diagonal scaling matrix.
+                                      */
     template <typename Number2>
     void scale (const Vector<Number2> &scaling_factors);
 
-				     /**
-				      * Assignment <tt>*this = a*u</tt>.
-				      */
+                                     /**
+                                      * Assignment <tt>*this = a*u</tt>.
+                                      */
     void equ (const Number a, const Vector<Number>& u);
 
-				     /**
-				      * Assignment <tt>*this = a*u</tt>.
-				      */
+                                     /**
+                                      * Assignment <tt>*this = a*u</tt>.
+                                      */
     template <typename Number2>
     void equ (const Number a, const Vector<Number2>& u);
 
-				     /**
-				      * Assignment <tt>*this = a*u + b*v</tt>.
-				      */
+                                     /**
+                                      * Assignment <tt>*this = a*u + b*v</tt>.
+                                      */
     void equ (const Number a, const Vector<Number>& u,
-	      const Number b, const Vector<Number>& v);
+              const Number b, const Vector<Number>& v);
 
-				     /**
-				      * Assignment <tt>*this = a*u + b*v + b*w</tt>.
-				      */
+                                     /**
+                                      * Assignment <tt>*this = a*u + b*v + b*w</tt>.
+                                      */
     void equ (const Number a, const Vector<Number>& u,
-	      const Number b, const Vector<Number>& v,
-	      const Number c, const Vector<Number>& w);
+              const Number b, const Vector<Number>& v,
+              const Number c, const Vector<Number>& w);
 
-				     /**
-				      * Compute the elementwise ratio of the
-				      * two given vectors, that is let
-				      * <tt>this[i] = a[i]/b[i]</tt>. This is
-				      * useful for example if you want to
-				      * compute the cellwise ratio of true to
-				      * estimated error.
-				      *
-				      * This vector is appropriately
-				      * scaled to hold the result.
-				      *
-				      * If any of the <tt>b[i]</tt> is
-				      * zero, the result is
-				      * undefined. No attempt is made
-				      * to catch such situations.
-				      */
+                                     /**
+                                      * Compute the elementwise ratio of the
+                                      * two given vectors, that is let
+                                      * <tt>this[i] = a[i]/b[i]</tt>. This is
+                                      * useful for example if you want to
+                                      * compute the cellwise ratio of true to
+                                      * estimated error.
+                                      *
+                                      * This vector is appropriately
+                                      * scaled to hold the result.
+                                      *
+                                      * If any of the <tt>b[i]</tt> is
+                                      * zero, the result is
+                                      * undefined. No attempt is made
+                                      * to catch such situations.
+                                      */
     void ratio (const Vector<Number> &a,
-		const Vector<Number> &b);
+                const Vector<Number> &b);
 
                                      /**
                                       * This function does nothing but is
@@ -883,96 +883,96 @@ class Vector : public Subscriptor
                                       * an empty function.
                                       */
     void update_ghost_values () const;
-				     //@}
+                                     //@}
 
 
-				     /**
-				      * @name 5: Mixed stuff
-				      */
-				     //@{
-				     /**
-				      *  Output of vector in user-defined
-				      *  format. For complex-valued vectors,
-				      *  the format should include specifiers
-				      *  for both the real and imaginary
-				      *  parts.
-				      */
+                                     /**
+                                      * @name 5: Mixed stuff
+                                      */
+                                     //@{
+                                     /**
+                                      *  Output of vector in user-defined
+                                      *  format. For complex-valued vectors,
+                                      *  the format should include specifiers
+                                      *  for both the real and imaginary
+                                      *  parts.
+                                      */
     void print (const char* format = 0) const;
 
-				     /**
-				      * Print to a
-				      * stream. @p precision denotes
-				      * the desired precision with
-				      * which values shall be printed,
-				      * @p scientific whether
-				      * scientific notation shall be
-				      * used. If @p across is
-				      * @p true then the vector is
-				      * printed in a line, while if
-				      * @p false then the elements
-				      * are printed on a separate line
-				      * each.
-				      */
+                                     /**
+                                      * Print to a
+                                      * stream. @p precision denotes
+                                      * the desired precision with
+                                      * which values shall be printed,
+                                      * @p scientific whether
+                                      * scientific notation shall be
+                                      * used. If @p across is
+                                      * @p true then the vector is
+                                      * printed in a line, while if
+                                      * @p false then the elements
+                                      * are printed on a separate line
+                                      * each.
+                                      */
     void print (std::ostream& out,
-		const unsigned int precision  = 3,
-		const bool scientific = true,
-		const bool across     = true) const;
+                const unsigned int precision  = 3,
+                const bool scientific = true,
+                const bool across     = true) const;
 
-				     /**
-				      * Print to a
-				      * LogStream. <tt>width</tt> is
-				      * used as argument to the
-				      * std::setw manipulator, if
-				      * printing across.  If @p
-				      * across is @p true then the
-				      * vector is printed in a line,
-				      * while if @p false then the
-				      * elements are printed on a
-				      * separate line each.
-				      */
+                                     /**
+                                      * Print to a
+                                      * LogStream. <tt>width</tt> is
+                                      * used as argument to the
+                                      * std::setw manipulator, if
+                                      * printing across.  If @p
+                                      * across is @p true then the
+                                      * vector is printed in a line,
+                                      * while if @p false then the
+                                      * elements are printed on a
+                                      * separate line each.
+                                      */
     void print (LogStream& out,
-		const unsigned int width = 6,
-		const bool across = true) const;
+                const unsigned int width = 6,
+                const bool across = true) const;
 
-				     /**
-				      * Write the vector en bloc to a
-				      * file. This is done in a binary
-				      * mode, so the output is neither
-				      * readable by humans nor
-				      * (probably) by other computers
-				      * using a different operating
-				      * system or number format.
-				      */
+                                     /**
+                                      * Write the vector en bloc to a
+                                      * file. This is done in a binary
+                                      * mode, so the output is neither
+                                      * readable by humans nor
+                                      * (probably) by other computers
+                                      * using a different operating
+                                      * system or number format.
+                                      */
     void block_write (std::ostream &out) const;
 
-				     /**
-				      * Read a vector en block from a
-				      * file. This is done using the
-				      * inverse operations to the
-				      * above function, so it is
-				      * reasonably fast because the
-				      * bitstream is not interpreted.
-				      *
-				      * The vector is resized if
-				      * necessary.
-				      *
-				      * A primitive form of error
-				      * checking is performed which
-				      * will recognize the bluntest
-				      * attempts to interpret some
-				      * data as a vector stored
-				      * bitwise to a file, but not
-				      * more.
-				      */
+                                     /**
+                                      * Read a vector en block from a
+                                      * file. This is done using the
+                                      * inverse operations to the
+                                      * above function, so it is
+                                      * reasonably fast because the
+                                      * bitstream is not interpreted.
+                                      *
+                                      * The vector is resized if
+                                      * necessary.
+                                      *
+                                      * A primitive form of error
+                                      * checking is performed which
+                                      * will recognize the bluntest
+                                      * attempts to interpret some
+                                      * data as a vector stored
+                                      * bitwise to a file, but not
+                                      * more.
+                                      */
     void block_read (std::istream &in);
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object.
+                                      */
     std::size_t memory_consumption () const;
-				     //@}
+                                     //@}
 
                      /**
                       * Write the data of this object to
@@ -992,32 +992,32 @@ class Vector : public Subscriptor
 
   protected:
 
-				     /**
-				      * Dimension. Actual number of
-				      * components contained in the
-				      * vector.  Get this number by
-				      * calling <tt>size()</tt>.
-				      */
+                                     /**
+                                      * Dimension. Actual number of
+                                      * components contained in the
+                                      * vector.  Get this number by
+                                      * calling <tt>size()</tt>.
+                                      */
     unsigned int vec_size;
 
-				     /**
-				      * Amount of memory actually
-				      * reserved for this vector. This
-				      * number may be greater than
-				      * @p vec_size if a @p reinit was
-				      * called with less memory
-				      * requirements than the vector
-				      * needed last time. At present
-				      * @p reinit does not free
-				      * memory when the number of
-				      * needed elements is reduced.
-				      */
+                                     /**
+                                      * Amount of memory actually
+                                      * reserved for this vector. This
+                                      * number may be greater than
+                                      * @p vec_size if a @p reinit was
+                                      * called with less memory
+                                      * requirements than the vector
+                                      * needed last time. At present
+                                      * @p reinit does not free
+                                      * memory when the number of
+                                      * needed elements is reduced.
+                                      */
     unsigned int max_vec_size;
 
-				     /**
-				      * Pointer to the array of
-				      * elements of this vector.
-				      */
+                                     /**
+                                      * Pointer to the array of
+                                      * elements of this vector.
+                                      */
     Number *val;
 
                                      /*
@@ -1025,15 +1025,15 @@ class Vector : public Subscriptor
                                       * friends.
                                       */
     template <typename Number2> friend class Vector;
-				     /*
-				      * LAPACK matrices need access to
-				      * the data.
-				      */
+                                     /*
+                                      * LAPACK matrices need access to
+                                      * the data.
+                                      */
     friend class LAPACKFullMatrix<Number>;
-				     /*
-				      * VectorView will access the
-				      * pointer.
-				      */
+                                     /*
+                                      * VectorView will access the
+                                      * pointer.
+                                      */
     friend class VectorView<Number>;
 };
 
@@ -1048,9 +1048,9 @@ template <typename Number>
 inline
 Vector<Number>::Vector ()
                 :
-		vec_size(0),
-		max_vec_size(0),
-		val(0)
+                vec_size(0),
+                max_vec_size(0),
+                val(0)
 {}
 
 
@@ -1058,14 +1058,14 @@ Vector<Number>::Vector ()
 template <typename Number>
 template <typename InputIterator>
 Vector<Number>::Vector (const InputIterator first, const InputIterator last)
-		:
-		vec_size (0),
-		max_vec_size (0),
-		val (0)
+                :
+                vec_size (0),
+                max_vec_size (0),
+                val (0)
 {
-				   // allocate memory. do not
-				   // initialize it, as we will copy
-				   // over to it in a second
+                                   // allocate memory. do not
+                                   // initialize it, as we will copy
+                                   // over to it in a second
   reinit (std::distance (first, last), true);
   std::copy (first, last, begin());
 }
@@ -1076,9 +1076,9 @@ template <typename Number>
 inline
 Vector<Number>::Vector (const unsigned int n)
                 :
-		vec_size(0),
-		max_vec_size(0),
-		val(0)
+                vec_size(0),
+                max_vec_size(0),
+                val(0)
 {
   reinit (n, false);
 }
@@ -1130,37 +1130,37 @@ namespace internal
   {
     template<typename T>
     void set_subrange (const T            s,
-		       const unsigned int begin,
-		       const unsigned int end,
-		       dealii::Vector<T> &dst)
+                       const unsigned int begin,
+                       const unsigned int end,
+                       dealii::Vector<T> &dst)
     {
       if (s == T())
-	std::memset ((dst.begin()+begin),0,(end-begin)*sizeof(T));
+        std::memset ((dst.begin()+begin),0,(end-begin)*sizeof(T));
       else
-	std::fill (&*(dst.begin()+begin), &*(dst.begin()+end), s);
+        std::fill (&*(dst.begin()+begin), &*(dst.begin()+end), s);
     }
 
     template<typename T>
     void copy_subrange (const dealii::Vector<T>&src,
-			const unsigned int      begin,
-			const unsigned int      end,
-			dealii::Vector<T>      &dst)
+                        const unsigned int      begin,
+                        const unsigned int      end,
+                        dealii::Vector<T>      &dst)
     {
       memcpy(&*(dst.begin()+begin), &*(src.begin()+begin),
-	     (end-begin)*sizeof(T));
+             (end-begin)*sizeof(T));
     }
 
     template<typename T, typename U>
     void copy_subrange_ext (const dealii::Vector<T>&src,
-			    const unsigned int      begin,
-			    const unsigned int      end,
-			    dealii::Vector<U>      &dst)
+                            const unsigned int      begin,
+                            const unsigned int      end,
+                            dealii::Vector<U>      &dst)
     {
       const T* q = src.begin()+begin;
       const T* const end_q = src.begin()+end;
       U* p = dst.begin()+begin;
       for (; q!=end_q; ++q, ++p)
-	*p = *q;
+        *p = *q;
     }
   }
 }
@@ -1174,14 +1174,14 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
   Assert (numbers::is_finite(s), ExcNumberNotFinite());
   if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
-  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+  if (vec_size>dealii::internal::Vector::minimum_parallel_grain_size)
     parallel::apply_to_subranges (0U, vec_size,
-				  std_cxx1x::bind(&internal::Vector::template
-						  set_subrange<Number>,
-						  s, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::ref(*this)),
-				  internal::Vector::minimum_parallel_grain_size);
+                                  std_cxx1x::bind(&dealii::internal::Vector::template
+                                                  set_subrange<Number>,
+                                                  s, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::ref(*this)),
+                                  dealii::internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    internal::Vector::set_subrange<Number>(s, 0U, vec_size, *this);
+    dealii::internal::Vector::set_subrange<Number>(s, 0U, vec_size, *this);
 
   return *this;
 }
@@ -1211,22 +1211,22 @@ inline
 Vector<Number> &
 Vector<Number>::operator = (const Vector<Number>& v)
 {
-				// if v is the same vector as *this, there is
-				// nothing to
+                                // if v is the same vector as *this, there is
+                                // nothing to
   if (PointerComparison::equal(this, &v) == true)
     return *this;
 
   if (v.vec_size != vec_size)
     reinit (v.vec_size, true);
-  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+  if (vec_size>dealii::internal::Vector::minimum_parallel_grain_size)
     parallel::apply_to_subranges (0U, vec_size,
-				  std_cxx1x::bind(&internal::Vector::template
-						  copy_subrange<Number>,
-						  std_cxx1x::cref(v), std_cxx1x::_1, std_cxx1x::_2,
-						  std_cxx1x::ref(*this)),
-				  internal::Vector::minimum_parallel_grain_size);
+                                  std_cxx1x::bind(&dealii::internal::Vector::template
+                                                  copy_subrange<Number>,
+                                                  std_cxx1x::cref(v), std_cxx1x::_1, std_cxx1x::_2,
+                                                  std_cxx1x::ref(*this)),
+                                  dealii::internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    internal::Vector::copy_subrange<Number>(v, 0U, vec_size, *this);
+    dealii::internal::Vector::copy_subrange<Number>(v, 0U, vec_size, *this);
 
   return *this;
 }
@@ -1241,15 +1241,15 @@ Vector<Number>::operator = (const Vector<Number2>& v)
 {
   if (v.vec_size != vec_size)
     reinit (v.vec_size, true);
-  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+  if (vec_size>dealii::internal::Vector::minimum_parallel_grain_size)
     parallel::apply_to_subranges (0U, vec_size,
-				  std_cxx1x::bind(&internal::Vector::template
-						  copy_subrange_ext<Number2,Number>,
-						  std_cxx1x::cref(v), std_cxx1x::_1, std_cxx1x::_2,
-						  std_cxx1x::ref(*this)),
-				  internal::Vector::minimum_parallel_grain_size);
+                                  std_cxx1x::bind(&dealii::internal::Vector::template
+                                                  copy_subrange_ext<Number2,Number>,
+                                                  std_cxx1x::cref(v), std_cxx1x::_1, std_cxx1x::_2,
+                                                  std_cxx1x::ref(*this)),
+                                  dealii::internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    internal::Vector::copy_subrange_ext<Number2,Number>(v, 0U, vec_size, *this);
+    dealii::internal::Vector::copy_subrange_ext<Number2,Number>(v, 0U, vec_size, *this);
 
   return *this;
 }
@@ -1380,10 +1380,10 @@ Vector<Number>::scale (const Number factor)
   Assert (vec_size!=0, ExcEmptyObject());
 
   parallel::transform (val,
-		       val+vec_size,
-		       val,
-		       (factor*boost::lambda::_1),
-		       internal::Vector::minimum_parallel_grain_size);
+                       val+vec_size,
+                       val,
+                       (factor*boost::lambda::_1),
+                       dealii::internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -1393,10 +1393,10 @@ template <typename OtherNumber>
 inline
 void
 Vector<Number>::add (const std::vector<unsigned int> &indices,
-		     const std::vector<OtherNumber>  &values)
+                     const std::vector<OtherNumber>  &values)
 {
   Assert (indices.size() == values.size(),
-	  ExcDimensionMismatch(indices.size(), values.size()));
+          ExcDimensionMismatch(indices.size(), values.size()));
   add (indices.size(), &indices[0], &values[0]);
 }
 
@@ -1407,10 +1407,10 @@ template <typename OtherNumber>
 inline
 void
 Vector<Number>::add (const std::vector<unsigned int> &indices,
-		     const Vector<OtherNumber>       &values)
+                     const Vector<OtherNumber>       &values)
 {
   Assert (indices.size() == values.size(),
-	  ExcDimensionMismatch(indices.size(), values.size()));
+          ExcDimensionMismatch(indices.size(), values.size()));
   add (indices.size(), &indices[0], values.val);
 }
 
@@ -1421,14 +1421,14 @@ template <typename OtherNumber>
 inline
 void
 Vector<Number>::add (const unsigned int  n_indices,
-		     const unsigned int *indices,
-		     const OtherNumber  *values)
+                     const unsigned int *indices,
+                     const OtherNumber  *values)
 {
   for (unsigned int i=0; i<n_indices; ++i)
     {
       Assert (indices[i] < vec_size, ExcIndexRange(indices[i],0,vec_size));
       Assert (numbers::is_finite(values[i]),
-	      ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+              ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
       val[indices[i]] += values[i];
     }
@@ -1440,7 +1440,7 @@ template <typename Number>
 inline
 void
 Vector<Number>::add (const Number a,
-		     const Vector<Number>& v)
+                     const Vector<Number>& v)
 {
   Assert (numbers::is_finite(a),ExcNumberNotFinite());
 
@@ -1448,11 +1448,11 @@ Vector<Number>::add (const Number a,
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
   parallel::transform (val,
-		       val+vec_size,
-		       v.val,
-		       val,
-		       (boost::lambda::_1 + a*boost::lambda::_2),
-		       internal::Vector::minimum_parallel_grain_size);
+                       val+vec_size,
+                       v.val,
+                       val,
+                       (boost::lambda::_1 + a*boost::lambda::_2),
+                       dealii::internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -1461,8 +1461,8 @@ template <typename Number>
 inline
 void
 Vector<Number>::sadd (const Number x,
-		      const Number a,
-		      const Vector<Number>& v)
+                      const Number a,
+                      const Vector<Number>& v)
 {
   Assert (numbers::is_finite(x),ExcNumberNotFinite());
   Assert (numbers::is_finite(a),ExcNumberNotFinite());
@@ -1471,11 +1471,11 @@ Vector<Number>::sadd (const Number x,
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
   parallel::transform (val,
-		       val+vec_size,
-		       v.val,
-		       val,
-		       (x*boost::lambda::_1 + a*boost::lambda::_2),
-		       internal::Vector::minimum_parallel_grain_size);
+                       val+vec_size,
+                       v.val,
+                       val,
+                       (x*boost::lambda::_1 + a*boost::lambda::_2),
+                       dealii::internal::Vector::minimum_parallel_grain_size);
 }
 
 

@@ -13,6 +13,8 @@
 \item {\it Parameter name:} {\tt double}
 
 
+\index[prmindex]{double}
+\index[prmindexfull]{Testing!double}
 {\it Value:} 3.1415926
 
 
@@ -26,6 +28,8 @@
 \item {\it Parameter name:} {\tt int}
 
 
+\index[prmindex]{int}
+\index[prmindexfull]{Testing!int}
 {\it Value:} 3
 
 
@@ -36,6 +40,8 @@
 \item {\it Parameter name:} {\tt string list}
 
 
+\index[prmindex]{string list}
+\index[prmindexfull]{Testing!string list}
 {\it Value:} a, b, c
 
 
@@ -57,6 +63,8 @@
 \item {\it Parameter name:} {\tt double 2}
 
 
+\index[prmindex]{double 2}
+\index[prmindexfull]{Testing!Testing 2!double 2}
 {\it Value:} 3.1415926
 
 
@@ -70,6 +78,8 @@
 \item {\it Parameter name:} {\tt int 2}
 
 
+\index[prmindex]{int 2}
+\index[prmindexfull]{Testing!Testing 2!int 2}
 {\it Value:} 1
 
 
@@ -80,6 +90,8 @@
 \item {\it Parameter name:} {\tt string list 2}
 
 
+\index[prmindex]{string list 2}
+\index[prmindexfull]{Testing!Testing 2!string list 2}
 {\it Value:} a
 
 

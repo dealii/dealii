@@ -1,0 +1,121 @@
+
+DEAL:2d:double:blk_0::Parallel option partition/partition
+DEAL:2d:double:blk_0::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double:blk_0::
+DEAL:2d:double:blk_1::Parallel option partition/partition
+DEAL:2d:double:blk_1::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double:blk_1::
+DEAL:2d:double:blk_2::Parallel option partition/partition
+DEAL:2d:double:blk_2::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double:blk_2::
+DEAL:2d:double:blk_3::Parallel option partition/partition
+DEAL:2d:double:blk_3::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double:blk_3::
+DEAL:2d:double:blk_4::Parallel option partition/partition
+DEAL:2d:double:blk_4::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double:blk_4::
+DEAL:2d:float:blk_0::Parallel option partition/partition
+DEAL:2d:float:blk_0::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float:blk_0::
+DEAL:2d:float:blk_1::Parallel option partition/partition
+DEAL:2d:float:blk_1::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float:blk_1::
+DEAL:2d:float:blk_2::Parallel option partition/partition
+DEAL:2d:float:blk_2::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float:blk_2::
+DEAL:2d:float:blk_3::Parallel option partition/partition
+DEAL:2d:float:blk_3::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float:blk_3::
+DEAL:2d:float:blk_4::Parallel option partition/partition
+DEAL:2d:float:blk_4::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float:blk_4::
+DEAL:2d:double:blk_0::Parallel option partition/color
+DEAL:2d:double:blk_0::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double:blk_0::
+DEAL:2d:double:blk_1::Parallel option partition/color
+DEAL:2d:double:blk_1::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double:blk_1::
+DEAL:2d:double:blk_2::Parallel option partition/color
+DEAL:2d:double:blk_2::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double:blk_2::
+DEAL:2d:double:blk_3::Parallel option partition/color
+DEAL:2d:double:blk_3::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double:blk_3::
+DEAL:2d:double:blk_4::Parallel option partition/color
+DEAL:2d:double:blk_4::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:double:blk_4::
+DEAL:2d:float:blk_0::Parallel option partition/color
+DEAL:2d:float:blk_0::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float:blk_0::
+DEAL:2d:float:blk_1::Parallel option partition/color
+DEAL:2d:float:blk_1::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float:blk_1::
+DEAL:2d:float:blk_2::Parallel option partition/color
+DEAL:2d:float:blk_2::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float:blk_2::
+DEAL:2d:float:blk_3::Parallel option partition/color
+DEAL:2d:float:blk_3::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float:blk_3::
+DEAL:2d:float:blk_4::Parallel option partition/color
+DEAL:2d:float:blk_4::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:2d:float:blk_4::
+DEAL:3d:double:blk_0::Parallel option partition/partition
+DEAL:3d:double:blk_0::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double:blk_0::
+DEAL:3d:double:blk_1::Parallel option partition/partition
+DEAL:3d:double:blk_1::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double:blk_1::
+DEAL:3d:double:blk_2::Parallel option partition/partition
+DEAL:3d:double:blk_2::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double:blk_2::
+DEAL:3d:double:blk_3::Parallel option partition/partition
+DEAL:3d:double:blk_3::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double:blk_3::
+DEAL:3d:double:blk_4::Parallel option partition/partition
+DEAL:3d:double:blk_4::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double:blk_4::
+DEAL:3d:float:blk_0::Parallel option partition/partition
+DEAL:3d:float:blk_0::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float:blk_0::
+DEAL:3d:float:blk_1::Parallel option partition/partition
+DEAL:3d:float:blk_1::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float:blk_1::
+DEAL:3d:float:blk_2::Parallel option partition/partition
+DEAL:3d:float:blk_2::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float:blk_2::
+DEAL:3d:float:blk_3::Parallel option partition/partition
+DEAL:3d:float:blk_3::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float:blk_3::
+DEAL:3d:float:blk_4::Parallel option partition/partition
+DEAL:3d:float:blk_4::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float:blk_4::
+DEAL:3d:double:blk_0::Parallel option partition/color
+DEAL:3d:double:blk_0::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double:blk_0::
+DEAL:3d:double:blk_1::Parallel option partition/color
+DEAL:3d:double:blk_1::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double:blk_1::
+DEAL:3d:double:blk_2::Parallel option partition/color
+DEAL:3d:double:blk_2::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double:blk_2::
+DEAL:3d:double:blk_3::Parallel option partition/color
+DEAL:3d:double:blk_3::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double:blk_3::
+DEAL:3d:double:blk_4::Parallel option partition/color
+DEAL:3d:double:blk_4::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:double:blk_4::
+DEAL:3d:float:blk_0::Parallel option partition/color
+DEAL:3d:float:blk_0::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float:blk_0::
+DEAL:3d:float:blk_1::Parallel option partition/color
+DEAL:3d:float:blk_1::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float:blk_1::
+DEAL:3d:float:blk_2::Parallel option partition/color
+DEAL:3d:float:blk_2::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float:blk_2::
+DEAL:3d:float:blk_3::Parallel option partition/color
+DEAL:3d:float:blk_3::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float:blk_3::
+DEAL:3d:float:blk_4::Parallel option partition/color
+DEAL:3d:float:blk_4::Norm of difference: 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+DEAL:3d:float:blk_4::

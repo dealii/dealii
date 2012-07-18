@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,127 +61,127 @@ template <int dim, int spacedim> class MGDoFHandler;
 class MGTransferBlockBase
 {
   public:
-				     /**
-				      * Constructor without constraint
-				      * matrices. Use this constructor
-				      * only with discontinuous finite
-				      * elements or with no local
-				      * refinement.
-				      */
+                                     /**
+                                      * Constructor without constraint
+                                      * matrices. Use this constructor
+                                      * only with discontinuous finite
+                                      * elements or with no local
+                                      * refinement.
+                                      */
     MGTransferBlockBase ();
-				     /**
-				      * Constructor with constraint matrices as well as mg_constrained_dofs.
-				      */
-    MGTransferBlockBase (const ConstraintMatrix& constraints, 
+                                     /**
+                                      * Constructor with constraint matrices as well as mg_constrained_dofs.
+                                      */
+    MGTransferBlockBase (const ConstraintMatrix& constraints,
         const MGConstrainedDoFs& mg_constrained_dofs);
-    				     /**
-				      * Memory used by this object.
-				      */
+                                     /**
+                                      * Memory used by this object.
+                                      */
     std::size_t memory_consumption () const;
-    
-  protected:  
-				     /**
-				      * Actually build the prolongation
-				      * matrices for each level.
-				      *
-				      * This function is only called
-				      * by derived classes. These can
-				      * also set the member variables
-				      * #selected and others to
-				      * restrict the transfer matrices
-				      * to certain blocks.
-				      */
+
+  protected:
+                                     /**
+                                      * Actually build the prolongation
+                                      * matrices for each level.
+                                      *
+                                      * This function is only called
+                                      * by derived classes. These can
+                                      * also set the member variables
+                                      * #selected and others to
+                                      * restrict the transfer matrices
+                                      * to certain blocks.
+                                      */
     template <int dim, int spacedim>
     void build_matrices (const DoFHandler<dim,spacedim>& dof,
-			 const MGDoFHandler<dim,spacedim>& mg_dof);
+                         const MGDoFHandler<dim,spacedim>& mg_dof);
 
-				   /**
-				    * Flag of selected blocks.
-				    *
-				    * The transfer operators only act
-				    * on the blocks having a
-				    * <tt>true</tt> entry here.
-				    */
+                                   /**
+                                    * Flag of selected blocks.
+                                    *
+                                    * The transfer operators only act
+                                    * on the blocks having a
+                                    * <tt>true</tt> entry here.
+                                    */
     std::vector<bool> selected;
 
-				     /**
-				      * Number of blocks of multigrid
-				      * vector.
-				      */
+                                     /**
+                                      * Number of blocks of multigrid
+                                      * vector.
+                                      */
     unsigned int n_mg_blocks;
-    
-				     /**
-				      * For each block of the whole
-				      * block vector, list to what
-				      * block of the multigrid vector
-				      * it is mapped. Since depending
-				      * on #selected, there may be
-				      * fewer mutlilevel blocks than
-				      * original blocks, some of the
-				      * entries may be illegal
-				      * unsigned integers.
-				      */
+
+                                     /**
+                                      * For each block of the whole
+                                      * block vector, list to what
+                                      * block of the multigrid vector
+                                      * it is mapped. Since depending
+                                      * on #selected, there may be
+                                      * fewer mutlilevel blocks than
+                                      * original blocks, some of the
+                                      * entries may be illegal
+                                      * unsigned integers.
+                                      */
     std::vector<unsigned int> mg_block;
-    
-				   /**
-				    * Sizes of the multi-level vectors.
-				    */
+
+                                   /**
+                                    * Sizes of the multi-level vectors.
+                                    */
     mutable std::vector<std::vector<unsigned int> > sizes;
-  
-				   /**
-				    * Start index of each block.
-				    */
+
+                                   /**
+                                    * Start index of each block.
+                                    */
     std::vector<unsigned int> block_start;
-  
-				   /**
-				    * Start index of each block on
-				    * all levels.
-				    */
+
+                                   /**
+                                    * Start index of each block on
+                                    * all levels.
+                                    */
     std::vector<std::vector<unsigned int> > mg_block_start;
-    
-				     /**
-				      * Call build_matrices()
-				      * function first.
-				      */
+
+                                     /**
+                                      * Call build_matrices()
+                                      * function first.
+                                      */
     DeclException0(ExcMatricesNotBuilt);
-    
+
   private:
     std::vector<std_cxx1x::shared_ptr<BlockSparsityPattern> >   prolongation_sparsities;
-    
+
   protected:
-    
-				     /**
-				      * The actual prolongation matrix.
-				      * column indices belong to the
-				      * dof indices of the mother cell,
-				      * i.e. the coarse level.
-				      * while row indices belong to the
-				      * child cell, i.e. the fine level.
-				      */
+
+                                     /**
+                                      * The actual prolongation matrix.
+                                      * column indices belong to the
+                                      * dof indices of the mother cell,
+                                      * i.e. the coarse level.
+                                      * while row indices belong to the
+                                      * child cell, i.e. the fine level.
+                                      */
     std::vector<std_cxx1x::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
-    
-				     /**
-				      * Mapping for the
-				      * <tt>copy_to/from_mg</tt>-functions.
-				      * The indices into this vector
-				      * are (in this order): global
-				      * block number, level
-				      * number. The data is first the
-				      * global index inside the block,
-				      * then the level index inside
-				      * the block.
-				     */
+
+                                     /**
+                                      * Mapping for the
+                                      * <tt>copy_to/from_mg</tt>-functions.
+                                      * The indices into this vector
+                                      * are (in this order): global
+                                      * block number, level
+                                      * number. The data is first the
+                                      * global index inside the block,
+                                      * then the level index inside
+                                      * the block.
+                                     */
     std::vector<std::vector<std::vector<std::pair<unsigned int, unsigned int> > > >
       copy_indices;
-				     /**
-				      * The constraints of the global
-				      * system.
-				      */
+                                     /**
+                                      * The constraints of the global
+                                      * system.
+                                      */
     SmartPointer<const ConstraintMatrix, MGTransferBlockBase> constraints;
-				     /**
-				      * The mg_constrained_dofs of the level
-				      * systems.
-				      */
+                                     /**
+                                      * The mg_constrained_dofs of the level
+                                      * systems.
+                                      */
 
     SmartPointer<const MGConstrainedDoFs, MGTransferBlockBase> mg_constrained_dofs;
 };
@@ -208,115 +208,115 @@ class MGTransferBlockBase
  */
 template <typename number>
 class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
-			private MGTransferBlockBase
+                        private MGTransferBlockBase
 {
   public:
-				     /**
-				      * Default constructor.
-				      */
+                                     /**
+                                      * Default constructor.
+                                      */
     MGTransferBlock();
 
-				     /**
-				      * Destructor.
-				      */
+                                     /**
+                                      * Destructor.
+                                      */
     virtual ~MGTransferBlock ();
-    
-				     /**
-				      * Initialize additional #factors
-				      * and #memory if the restriction
-				      * of the blocks is to be
-				      * weighted differently.
-				      */
+
+                                     /**
+                                      * Initialize additional #factors
+                                      * and #memory if the restriction
+                                      * of the blocks is to be
+                                      * weighted differently.
+                                      */
     void initialize (const std::vector<number>& factors,
-		     VectorMemory<Vector<number> >& memory);
-    
-				     /**
-				      * Build the prolongation
-				      * matrices for each level.
-				      * 
-				      * This function is a front-end
-				      * for the same function in
-				      * MGTransferBlockBase.
-				      */
+                     VectorMemory<Vector<number> >& memory);
+
+                                     /**
+                                      * Build the prolongation
+                                      * matrices for each level.
+                                      *
+                                      * This function is a front-end
+                                      * for the same function in
+                                      * MGTransferBlockBase.
+                                      */
     template<int dim, int spacedim>
     void build_matrices (const DoFHandler<dim,spacedim> &dof,
-			 const MGDoFHandler<dim,spacedim> &mg_dof,
-			 const std::vector<bool>& selected);
+                         const MGDoFHandler<dim,spacedim> &mg_dof,
+                         const std::vector<bool>& selected);
 
     virtual void prolongate (const unsigned int    to_level,
-			     BlockVector<number>       &dst,
-			     const BlockVector<number> &src) const;
+                             BlockVector<number>       &dst,
+                             const BlockVector<number> &src) const;
 
     virtual void restrict_and_add (const unsigned int    from_level,
-				   BlockVector<number>       &dst,
-				   const BlockVector<number> &src) const;
+                                   BlockVector<number>       &dst,
+                                   const BlockVector<number> &src) const;
 
-    				     /**
-				      * Transfer from a vector on the
-				      * global grid to a multilevel
-				      * vector.
-				      *
-				      * The action for discontinuous
-				      * elements is as follows: on an
-				      * active mesh cell, the global
-				      * vector entries are simply
-				      * copied to the corresponding
-				      * entries of the level
-				      * vector. Then, these values are
-				      * restricted down to the
-				      * coarsest level.
-				      */
+                                     /**
+                                      * Transfer from a vector on the
+                                      * global grid to a multilevel
+                                      * vector.
+                                      *
+                                      * The action for discontinuous
+                                      * elements is as follows: on an
+                                      * active mesh cell, the global
+                                      * vector entries are simply
+                                      * copied to the corresponding
+                                      * entries of the level
+                                      * vector. Then, these values are
+                                      * restricted down to the
+                                      * coarsest level.
+                                      */
     template <int dim, typename number2, int spacedim>
     void
     copy_to_mg (const MGDoFHandler<dim,spacedim>& mg_dof,
-		MGLevelObject<BlockVector<number> >& dst,
-		const BlockVector<number2>& src) const;
+                MGLevelObject<BlockVector<number> >& dst,
+                const BlockVector<number2>& src) const;
 
-				     /**
-				      * Transfer from multi-level vector to
-				      * normal vector.
-				      *
-				      * Copies data from active
-				      * portions of a multilevel
-				      * vector into the respective
-				      * positions of a global vector.
-				      */
+                                     /**
+                                      * Transfer from multi-level vector to
+                                      * normal vector.
+                                      *
+                                      * Copies data from active
+                                      * portions of a multilevel
+                                      * vector into the respective
+                                      * positions of a global vector.
+                                      */
     template <int dim, typename number2, int spacedim>
     void
     copy_from_mg (const MGDoFHandler<dim,spacedim>& mg_dof,
-		  BlockVector<number2>& dst,
-		  const MGLevelObject<BlockVector<number> > &src) const;
+                  BlockVector<number2>& dst,
+                  const MGLevelObject<BlockVector<number> > &src) const;
 
-				     /**
-				      * Add a multi-level vector to a
-				      * normal vector.
-				      *
-				      * Works as the previous
-				      * function, but probably not for
-				      * continuous elements.
-				      */
+                                     /**
+                                      * Add a multi-level vector to a
+                                      * normal vector.
+                                      *
+                                      * Works as the previous
+                                      * function, but probably not for
+                                      * continuous elements.
+                                      */
     template <int dim, typename number2, int spacedim>
     void
     copy_from_mg_add (const MGDoFHandler<dim,spacedim>& mg_dof,
-		      BlockVector<number2>& dst,
-		      const MGLevelObject<BlockVector<number> > &src) const;
+                      BlockVector<number2>& dst,
+                      const MGLevelObject<BlockVector<number> > &src) const;
 
     using MGTransferBlockBase::memory_consumption;
-    
+
   private:
-				     /**
-				      * Optional multiplication
-				      * factors for each
-				      * block. Requires
-				      * initialization of #memory.
-				      */
+                                     /**
+                                      * Optional multiplication
+                                      * factors for each
+                                      * block. Requires
+                                      * initialization of #memory.
+                                      */
     std::vector<number> factors;
 
-				     /**
-				      * Memory pool required if
-				      * additional multiplication
-				      * using #factors is desired.
-				      */
+                                     /**
+                                      * Memory pool required if
+                                      * additional multiplication
+                                      * using #factors is desired.
+                                      */
     SmartPointer<VectorMemory<Vector<number> >,MGTransferBlock<number> > memory;
 };
 
@@ -337,184 +337,184 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
  */
 template <typename number>
 class MGTransferBlockSelect : public MGTransferBase<Vector<number> >,
-			      private MGTransferBlockBase
+                              private MGTransferBlockBase
 {
   public:
-				     /**
-				      * Constructor without constraint
-				      * matrices. Use this constructor
-				      * only with discontinuous finite
-				      * elements or with no local
-				      * refinement.
-				      */
+                                     /**
+                                      * Constructor without constraint
+                                      * matrices. Use this constructor
+                                      * only with discontinuous finite
+                                      * elements or with no local
+                                      * refinement.
+                                      */
     MGTransferBlockSelect ();
-				     /**
-				      * Constructor with constraint matrices as well as mg_constrained_dofs.
-				      */
-    MGTransferBlockSelect (const ConstraintMatrix& constraints, 
+                                     /**
+                                      * Constructor with constraint matrices as well as mg_constrained_dofs.
+                                      */
+    MGTransferBlockSelect (const ConstraintMatrix& constraints,
         const MGConstrainedDoFs& mg_constrained_dofs);
-				     /**
-				      * Destructor.
-				      */
+                                     /**
+                                      * Destructor.
+                                      */
     virtual ~MGTransferBlockSelect ();
-    
-				     /**
-				      * Actually build the prolongation
-				      * matrices for grouped blocks.
-				      *
-				      * This function is a front-end
-				      * for the same function in
-				      * MGTransferBlockBase.
-				      *
-				      * @arg selected: Number of the
-				      * block of the global vector
-				      * to be copied from and to the
-				      * multilevel vector.
-				      *
-				      * @arg mg_selected: Number
-				      * of the component for which the
-				      * transfer matrices should be
-				      * built.
-				      */
+
+                                     /**
+                                      * Actually build the prolongation
+                                      * matrices for grouped blocks.
+                                      *
+                                      * This function is a front-end
+                                      * for the same function in
+                                      * MGTransferBlockBase.
+                                      *
+                                      * @arg selected: Number of the
+                                      * block of the global vector
+                                      * to be copied from and to the
+                                      * multilevel vector.
+                                      *
+                                      * @arg mg_selected: Number
+                                      * of the component for which the
+                                      * transfer matrices should be
+                                      * built.
+                                      */
     template<int dim, int spacedim>
     void build_matrices (const DoFHandler<dim,spacedim> &dof,
-			 const MGDoFHandler<dim,spacedim> &mg_dof,
-			 unsigned int selected);
+                         const MGDoFHandler<dim,spacedim> &mg_dof,
+                         unsigned int selected);
 
-				     /**
-				      * Change selected
-				      * block. Handle with care!
-				      */
+                                     /**
+                                      * Change selected
+                                      * block. Handle with care!
+                                      */
     void select (const unsigned int block);
-    
+
     virtual void prolongate (const unsigned int    to_level,
-			     Vector<number>       &dst,
-			     const Vector<number> &src) const;
+                             Vector<number>       &dst,
+                             const Vector<number> &src) const;
 
     virtual void restrict_and_add (const unsigned int    from_level,
-				   Vector<number>       &dst,
-				   const Vector<number> &src) const;
-    
-    				     /**
-				      * Transfer a single block from a
-				      * vector on the global grid to a
-				      * multilevel vector.
-				      */
+                                   Vector<number>       &dst,
+                                   const Vector<number> &src) const;
+
+                                     /**
+                                      * Transfer a single block from a
+                                      * vector on the global grid to a
+                                      * multilevel vector.
+                                      */
     template <int dim, typename number2, int spacedim>
     void
     copy_to_mg (const MGDoFHandler<dim,spacedim>        &mg_dof,
-		MGLevelObject<Vector<number> > &dst,
-		const Vector<number2>          &src) const;
+                MGLevelObject<Vector<number> > &dst,
+                const Vector<number2>          &src) const;
 
-				     /**
-				      * Transfer from multilevel vector to
-				      * normal vector.
-				      *
-				      * Copies data from active
-				      * portions of an multilevel
-				      * vector into the respective
-				      * positions of a Vector.
-				      */
+                                     /**
+                                      * Transfer from multilevel vector to
+                                      * normal vector.
+                                      *
+                                      * Copies data from active
+                                      * portions of an multilevel
+                                      * vector into the respective
+                                      * positions of a Vector.
+                                      */
     template <int dim, typename number2, int spacedim>
     void
     copy_from_mg (const MGDoFHandler<dim,spacedim>              &mg_dof,
-		  Vector<number2>                      &dst,
-		  const MGLevelObject<Vector<number> > &src) const;
+                  Vector<number2>                      &dst,
+                  const MGLevelObject<Vector<number> > &src) const;
 
-				     /**
-				      * Add a multi-level vector to a
-				      * normal vector.
-				      *
-				      * Works as the previous
-				      * function, but probably not for
-				      * continuous elements.
-				      */
+                                     /**
+                                      * Add a multi-level vector to a
+                                      * normal vector.
+                                      *
+                                      * Works as the previous
+                                      * function, but probably not for
+                                      * continuous elements.
+                                      */
     template <int dim, typename number2, int spacedim>
     void
     copy_from_mg_add (const MGDoFHandler<dim,spacedim>              &mg_dof,
-		      Vector<number2>                      &dst,
-		      const MGLevelObject<Vector<number> > &src) const;
+                      Vector<number2>                      &dst,
+                      const MGLevelObject<Vector<number> > &src) const;
 
-    				     /**
-				      * Transfer a block from a vector
-				      * on the global grid to
-				      * multilevel vectors. Only the
-				      * block selected is transfered.
-				      */
+                                     /**
+                                      * Transfer a block from a vector
+                                      * on the global grid to
+                                      * multilevel vectors. Only the
+                                      * block selected is transfered.
+                                      */
     template <int dim, typename number2, int spacedim>
     void
     copy_to_mg (const MGDoFHandler<dim,spacedim>        &mg_dof,
-		MGLevelObject<Vector<number> > &dst,
-		const BlockVector<number2>     &src) const;
+                MGLevelObject<Vector<number> > &dst,
+                const BlockVector<number2>     &src) const;
 
-				     /**
-				      * Transfer from multilevel vector to
-				      * normal vector.
-				      *
-				      * Copies data from active
-				      * portions of a multilevel
-				      * vector into the respective
-				      * positions of a global
-				      * BlockVector.
-				      */
+                                     /**
+                                      * Transfer from multilevel vector to
+                                      * normal vector.
+                                      *
+                                      * Copies data from active
+                                      * portions of a multilevel
+                                      * vector into the respective
+                                      * positions of a global
+                                      * BlockVector.
+                                      */
     template <int dim, typename number2, int spacedim>
     void
     copy_from_mg (const MGDoFHandler<dim,spacedim>              &mg_dof,
-		  BlockVector<number2>                 &dst,
-		  const MGLevelObject<Vector<number> > &src) const;
+                  BlockVector<number2>                 &dst,
+                  const MGLevelObject<Vector<number> > &src) const;
 
-				     /**
-				      * Add a multi-level vector to a
-				      * normal vector.
-				      *
-				      * Works as the previous
-				      * function, but probably not for
-				      * continuous elements.
-				      */
+                                     /**
+                                      * Add a multi-level vector to a
+                                      * normal vector.
+                                      *
+                                      * Works as the previous
+                                      * function, but probably not for
+                                      * continuous elements.
+                                      */
     template <int dim, typename number2, int spacedim>
     void
     copy_from_mg_add (const MGDoFHandler<dim,spacedim>              &mg_dof,
-		      BlockVector<number2>                 &dst,
-		      const MGLevelObject<Vector<number> > &src) const;
+                      BlockVector<number2>                 &dst,
+                      const MGLevelObject<Vector<number> > &src) const;
 
-				     /**
-				      * Memory used by this object.
-				      */
+                                     /**
+                                      * Memory used by this object.
+                                      */
     std::size_t memory_consumption () const;
-    
+
   private:
-				     /**
-				      * Implementation of the public
-				      * function.
-				      */
+                                     /**
+                                      * Implementation of the public
+                                      * function.
+                                      */
     template <int dim, class OutVector, int spacedim>
     void
     do_copy_from_mg (const MGDoFHandler<dim,spacedim>              &mg_dof,
-		     OutVector                            &dst,
-		     const MGLevelObject<Vector<number> > &src,
-		     const unsigned int offset) const;
+                     OutVector                            &dst,
+                     const MGLevelObject<Vector<number> > &src,
+                     const unsigned int offset) const;
 
-				     /**
-				      * Implementation of the public
-				      * function.
-				      */
+                                     /**
+                                      * Implementation of the public
+                                      * function.
+                                      */
     template <int dim, class OutVector, int spacedim>
     void
     do_copy_from_mg_add (const MGDoFHandler<dim,spacedim>              &mg_dof,
-			 OutVector                            &dst,
-			 const MGLevelObject<Vector<number> > &src,
-			 const unsigned int offset) const;
+                         OutVector                            &dst,
+                         const MGLevelObject<Vector<number> > &src,
+                         const unsigned int offset) const;
 
-				     /**
-				      * Actual implementation of
-				      * copy_to_mg().
-				      */
+                                     /**
+                                      * Actual implementation of
+                                      * copy_to_mg().
+                                      */
     template <int dim, class InVector, int spacedim>
     void
     do_copy_to_mg (const MGDoFHandler<dim,spacedim>        &mg_dof,
-		   MGLevelObject<Vector<number> > &dst,
-		   const InVector                 &src,
-		   const unsigned int              offset) const;
+                   MGLevelObject<Vector<number> > &dst,
+                   const InVector                 &src,
+                   const unsigned int              offset) const;
                                      /**
                                       * Selected block.
                                       */

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -77,15 +77,15 @@ DoFCellAccessor<DH>::set_dof_indices (const std::vector<unsigned int> &local_dof
 template <class DH>
 typename internal::DoFHandler::Iterators<DH>::cell_iterator
 DoFCellAccessor<DH>::neighbor_child_on_subface (const unsigned int face,
-						const unsigned int subface) const
+                                                const unsigned int subface) const
 {
   const TriaIterator<CellAccessor<dim,spacedim> > q
     = CellAccessor<dim,spacedim>::neighbor_child_on_subface (face, subface);
   return
     typename internal::DoFHandler::Iterators<DH>::cell_iterator (this->tria,
-								 q->level (),
-								 q->index (),
-								 this->dof_handler);
+                                                                 q->level (),
+                                                                 q->index (),
+                                                                 this->dof_handler);
 }
 
 
@@ -95,26 +95,26 @@ template <class InputVector, typename number>
 void
 DoFCellAccessor<DH>::
 get_interpolated_dof_values (const InputVector &values,
-			     Vector<number>    &interpolated_values) const
+                             Vector<number>    &interpolated_values) const
 {
   const FiniteElement<dim,spacedim> &fe            = this->get_fe();
   const unsigned int        dofs_per_cell = fe.dofs_per_cell;
 
   Assert (this->dof_handler != 0,
-	  typename BaseClass::ExcInvalidObject());
+          typename BaseClass::ExcInvalidObject());
   Assert (&fe != 0,
-	  typename BaseClass::ExcInvalidObject());
+          typename BaseClass::ExcInvalidObject());
   Assert (interpolated_values.size() == dofs_per_cell,
-	  typename BaseClass::ExcVectorDoesNotMatch());
+          typename BaseClass::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
-	  typename BaseClass::ExcVectorDoesNotMatch());
+          typename BaseClass::ExcVectorDoesNotMatch());
 
   if (!this->has_children())
-				     // if this cell has no children: simply
-				     // return the exact values on this cell
+                                     // if this cell has no children: simply
+                                     // return the exact values on this cell
     this->get_dof_values (values, interpolated_values);
   else
-				     // otherwise clobber them from the children
+                                     // otherwise clobber them from the children
     {
       Vector<number> tmp1(dofs_per_cell);
       Vector<number> tmp2(dofs_per_cell);
@@ -183,25 +183,25 @@ get_interpolated_dof_values (const InputVector &values,
         restriction_is_additive[i] = fe.restriction_is_additive(i);
 
       for (unsigned int child=0; child<this->n_children(); ++child)
-	{
-					   // get the values from the present
-					   // child, if necessary by
-					   // interpolation itself
-	  this->child(child)->get_interpolated_dof_values (values,
-							   tmp1);
-					   // interpolate these to the mother
-					   // cell
-	  fe.get_restriction_matrix(child, this->refinement_case()).vmult (tmp2, tmp1);
+        {
+                                           // get the values from the present
+                                           // child, if necessary by
+                                           // interpolation itself
+          this->child(child)->get_interpolated_dof_values (values,
+                                                           tmp1);
+                                           // interpolate these to the mother
+                                           // cell
+          fe.get_restriction_matrix(child, this->refinement_case()).vmult (tmp2, tmp1);
 
                                            // and add up or set them
                                            // in the output vector
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
             if (restriction_is_additive[i])
               interpolated_values(i) += tmp2(i);
             else
               if (tmp2(i) != number())
                 interpolated_values(i) = tmp2(i);
-	}
+        }
     }
 }
 
@@ -212,37 +212,48 @@ template <class OutputVector, typename number>
 void
 DoFCellAccessor<DH>::
 set_dof_values_by_interpolation (const Vector<number> &local_values,
-				 OutputVector         &values) const
+                                 OutputVector         &values) const
 {
   const unsigned int dofs_per_cell = this->get_fe().dofs_per_cell;
 
   Assert (this->dof_handler != 0,
-	  typename BaseClass::ExcInvalidObject());
+          typename BaseClass::ExcInvalidObject());
   Assert (&this->get_fe() != 0,
-	  typename BaseClass::ExcInvalidObject());
+          typename BaseClass::ExcInvalidObject());
   Assert (local_values.size() == dofs_per_cell,
-	  typename BaseClass::ExcVectorDoesNotMatch());
+          typename BaseClass::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
-	  typename BaseClass::ExcVectorDoesNotMatch());
+          typename BaseClass::ExcVectorDoesNotMatch());
 
   if (!this->has_children())
                                      // if this cell has no children: simply
-				     // set the values on this cell
+                                     // set the values on this cell
     this->set_dof_values (local_values, values);
   else
-				     // otherwise distribute them to the children
+                                     // otherwise distribute them to the children
     {
       Vector<number> tmp(dofs_per_cell);
 
       for (unsigned int child=0; child<this->n_children(); ++child)
-	{
-					   // prolong the given data
-					   // to the present cell
-	  this->get_fe().get_prolongation_matrix(child, this->refinement_case())
-            .vmult (tmp, local_values);
+        {
+	  Assert (this->child(child)->get_fe().dofs_per_cell == dofs_per_cell,
+		  ExcNotImplemented());
 
-	  this->child(child)->set_dof_values_by_interpolation (tmp, values);
-	}
+                                           // prolong the given data
+                                           // to the present
+                                           // cell. FullMatrix only
+                                           // wants us to call vmult
+                                           // if the matrix size is
+                                           // actually non-zero, so
+                                           // check that case
+	  if (tmp.size() > 0)
+	    {
+	      this->get_fe().get_prolongation_matrix(child, this->refinement_case())
+		.vmult (tmp, local_values);
+
+	      this->child(child)->set_dof_values_by_interpolation (tmp, values);
+	    }
+        }
     }
 }
 

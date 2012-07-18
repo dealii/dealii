@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,7 +33,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FunctionParser<dim>::FunctionParser(const unsigned int n_components,
-				    const double       initial_time)
+                                    const double       initial_time)
                 :
                 Function<dim>(n_components, initial_time),
                 fp (0)
@@ -70,20 +70,20 @@ void FunctionParser<dim>::initialize (const std::string                   &varia
 
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string   &variables,
-				      const std::vector<std::string>      &expressions,
-				      const std::map<std::string, double> &constants,
-				      const std::map<std::string, double> &units,
-				      const bool time_dependent,
-				      const bool use_degrees)
+                                      const std::vector<std::string>      &expressions,
+                                      const std::map<std::string, double> &constants,
+                                      const std::map<std::string, double> &units,
+                                      const bool time_dependent,
+                                      const bool use_degrees)
 {
-				   // We check that the number of
-				   // components of this function
-				   // matches the number of components
-				   // passed in as a vector of
-				   // strings.
+                                   // We check that the number of
+                                   // components of this function
+                                   // matches the number of components
+                                   // passed in as a vector of
+                                   // strings.
   AssertThrow(this->n_components == expressions.size(),
-	      ExcInvalidExpressionSize(this->n_components,
-				       expressions.size()) );
+              ExcInvalidExpressionSize(this->n_components,
+                                       expressions.size()) );
 
 
 
@@ -104,55 +104,55 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
 
 
 
-				       // Add the various constants to
-				       // the parser.
+                                       // Add the various constants to
+                                       // the parser.
       std::map< std::string, double >::const_iterator
-	constant = constants.begin(),
-	endc  = constants.end();
+        constant = constants.begin(),
+        endc  = constants.end();
       for(; constant != endc; ++constant)
-	{
-	  const bool success = fp[i].AddConstant(constant->first, constant->second);
-	  AssertThrow (success, ExcMessage("Invalid Constant Name"));
-	}
+        {
+          const bool success = fp[i].AddConstant(constant->first, constant->second);
+          AssertThrow (success, ExcMessage("Invalid Constant Name"));
+        }
 
       const int ret_value = fp[i].Parse(expressions[i],
-					variables,
-					use_degrees);
+                                        variables,
+                                        use_degrees);
       AssertThrow (ret_value == -1,
-		   ExcParseError(ret_value, fp[i].ErrorMsg()));
+                   ExcParseError(ret_value, fp[i].ErrorMsg()));
 
-				       // The fact that the parser did
-				       // not throw an error does not
-				       // mean that everything went
-				       // ok... we can still have
-				       // problems with the number of
-				       // variables...
+                                       // The fact that the parser did
+                                       // not throw an error does not
+                                       // mean that everything went
+                                       // ok... we can still have
+                                       // problems with the number of
+                                       // variables...
     }
 
-				   // Now we define how many variables
-				   // we expect to read in.  We
-				   // distinguish between two cases:
-				   // Time dependent problems, and not
-				   // time dependent problems. In the
-				   // first case the number of
-				   // variables is given by the
-				   // dimension plus one. In the other
-				   // case, the number of variables is
-				   // equal to the dimension. Once we
-				   // parsed the variables string, if
-				   // none of this is the case, then
-				   // an exception is thrown.
+                                   // Now we define how many variables
+                                   // we expect to read in.  We
+                                   // distinguish between two cases:
+                                   // Time dependent problems, and not
+                                   // time dependent problems. In the
+                                   // first case the number of
+                                   // variables is given by the
+                                   // dimension plus one. In the other
+                                   // case, the number of variables is
+                                   // equal to the dimension. Once we
+                                   // parsed the variables string, if
+                                   // none of this is the case, then
+                                   // an exception is thrown.
   if (time_dependent)
     n_vars = dim+1;
   else
     n_vars = dim;
 
-				   // Let's check if the number of
-				   // variables is correct...
+                                   // Let's check if the number of
+                                   // variables is correct...
   AssertThrow (n_vars == fp[0].NVars(),
-	       ExcDimensionMismatch(n_vars,fp[0].NVars()));
+               ExcDimensionMismatch(n_vars,fp[0].NVars()));
 
-				   // Now set the initialization bit.
+                                   // Now set the initialization bit.
   initialized = true;
 }
 
@@ -160,13 +160,13 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
 
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string &variables,
-				      const std::string &expression,
-				      const std::map<std::string, double> &constants,
-				      const bool time_dependent,
-				      const bool use_degrees)
+                                      const std::string &expression,
+                                      const std::map<std::string, double> &constants,
+                                      const bool time_dependent,
+                                      const bool use_degrees)
 {
-				   // initialize with the things
-				   // we got.
+                                   // initialize with the things
+                                   // we got.
   initialize (variables,
               Utilities::split_string_list (expression, ';'),
               constants,
@@ -198,32 +198,32 @@ void FunctionParser<dim>::initialize (const std::string &variables,
 
 template <int dim>
 double FunctionParser<dim>::value (const Point<dim>  &p,
-				   const unsigned int component) const
+                                   const unsigned int component) const
 {
   Assert (initialized==true, ExcNotInitialized());
   Assert (component < this->n_components,
-	  ExcIndexRange(component, 0, this->n_components));
+          ExcIndexRange(component, 0, this->n_components));
 
-				   // Statically allocate dim+1
-				   // double variables.
+                                   // Statically allocate dim+1
+                                   // double variables.
   double vars[dim+1];
 
   for (unsigned int i=0; i<dim; ++i)
     vars[i] = p(i);
 
-				   // We need the time variable only
-				   // if the number of variables is
-				   // different from the dimension. In
-				   // this case it can only be dim+1,
-				   // otherwise an exception would
-				   // have already been thrown
+                                   // We need the time variable only
+                                   // if the number of variables is
+                                   // different from the dimension. In
+                                   // this case it can only be dim+1,
+                                   // otherwise an exception would
+                                   // have already been thrown
   if (dim != n_vars)
     vars[dim] = this->get_time();
 
   double my_value = fp[component].Eval((double*)vars);
 
   AssertThrow (fp[component].EvalError() == 0,
-	       ExcMessage(fp[component].ErrorMsg()));
+               ExcMessage(fp[component].ErrorMsg()));
   return my_value;
 }
 
@@ -231,25 +231,25 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
 
 template <int dim>
 void FunctionParser<dim>::vector_value (const Point<dim> &p,
-					Vector<double>   &values) const
+                                        Vector<double>   &values) const
 {
   Assert (initialized==true, ExcNotInitialized());
   Assert (values.size() == this->n_components,
-	  ExcDimensionMismatch (values.size(), this->n_components));
+          ExcDimensionMismatch (values.size(), this->n_components));
 
-				   // Statically allocates dim+1
-				   // double variables.
+                                   // Statically allocates dim+1
+                                   // double variables.
   double vars[dim+1];
 
   for(unsigned int i=0; i<dim; ++i)
     vars[i] = p(i);
 
-				   // We need the time variable only
-				   // if the number of variables is
-				   // different from the dimension. In
-				   // this case it can only be dim+1,
-				   // otherwise an exception would
-				   // have already been thrown
+                                   // We need the time variable only
+                                   // if the number of variables is
+                                   // different from the dimension. In
+                                   // this case it can only be dim+1,
+                                   // otherwise an exception would
+                                   // have already been thrown
   if(dim != n_vars)
     vars[dim] = this->get_time();
 
@@ -258,7 +258,7 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
     {
       values(component) = fp[component].Eval((double*)vars);
       AssertThrow(fp[component].EvalError() == 0,
-		  ExcMessage(fp[component].ErrorMsg()));
+                  ExcMessage(fp[component].ErrorMsg()));
     }
 }
 
@@ -268,10 +268,10 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
 template <int dim>
 void
 FunctionParser<dim>::initialize(const std::string &,
-				const std::vector<std::string> &,
-				const std::map<std::string, double> &,
-				const bool,
-				const bool)
+                                const std::vector<std::string> &,
+                                const std::map<std::string, double> &,
+                                const bool,
+                                const bool)
 {
   Assert(false, ExcDisabled("parser"));
 }
@@ -280,10 +280,10 @@ FunctionParser<dim>::initialize(const std::string &,
 template <int dim>
 void
 FunctionParser<dim>::initialize(const std::string &,
-				const std::string &,
-				const std::map<std::string, double> &,
-				const bool,
-				const bool)
+                                const std::string &,
+                                const std::map<std::string, double> &,
+                                const bool,
+                                const bool)
 {
   Assert(false, ExcDisabled("parser"));
 }

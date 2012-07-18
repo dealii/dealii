@@ -91,7 +91,7 @@ H^1(\Omega_s)^d$ such that
 	0,
 @f}
 for all test functions $\mathbf a, q, \mathbf b$.
-Note that $Y$ is only a subspace of the spaces listed above to accomodate for
+Note that $Y$ is only a subspace of the spaces listed above to accommodate for
 the various Dirichlet boundary conditions.
 
 This sort of coupling is of course possible by simply having two Triangulation

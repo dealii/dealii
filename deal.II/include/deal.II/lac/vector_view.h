@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -132,128 +132,119 @@ template<typename Number>
 class VectorView : public Vector<Number>
 {
   public:
-				     /**
-				      * Read write constructor. Takes the size
-				      * of the vector, just like the standard
-				      * one, but the data is picked starting
-				      * from the location of the pointer @p
-				      * ptr.
-				      */
+                                     /**
+                                      * Read write constructor. Takes the size
+                                      * of the vector, just like the standard
+                                      * one, but the data is picked starting
+                                      * from the location of the pointer @p
+                                      * ptr.
+                                      */
     VectorView(const unsigned int new_size, Number *ptr);
 
-				     /**
-				      * The constant constructor is the same
-				      * as above, however you will not be able
-				      * to access the data for write access.
-				      *
-				      * You should only use this class by
-				      * constructing it as a const
-				      * VectorView<double>(size, ptr) object.
-				      *
-				      * Undefined behavior will occur if you
-				      * construct it as a non const object or
-				      * attempt to write on it.
-				      */
+                                     /**
+                                      * The constant constructor is the same
+                                      * as above, however you will not be able
+                                      * to access the data for write access.
+                                      *
+                                      * You should only use this class by
+                                      * constructing it as a const
+                                      * VectorView<double>(size, ptr) object.
+                                      *
+                                      * Undefined behavior will occur if you
+                                      * construct it as a non const object or
+                                      * attempt to write on it.
+                                      */
     VectorView(const unsigned int new_size, const Number *ptr);
 
-				     /**
-				      * This desctructor will only reset the
-				      * internal sizes and the internal
-				      * pointers, but it will NOT clear the
-				      * memory. */
+                                     /**
+                                      * This desctructor will only reset the
+                                      * internal sizes and the internal
+                                      * pointers, but it will NOT clear the
+                                      * memory. */
     ~VectorView();
 
-				     /**
-				      * Implicit cast to const
-				      * Vector<Number>. This cast
-				      * allows the use of this object
-				      * everywhere a const
-				      * Vector<double> is required.
-				      */
-    operator const Vector<Number> &() const;
-
-				     /**
-				      * The reinit function of this object has
-				      * a behavior which is different from the
-				      * one of the base class. VectorView does
-				      * not handle memory, and you should not
-				      * attempt to resize the memory that is
-				      * pointed to by this object using the
-				      * reinit function. You can, however,
-				      * resize the view that you have of the
-				      * original object. Notice that it is
-				      * your own responsability to ensure that
-				      * the memory you are pointing to is big
-				      * enough.
-				      *
-				      * Similarly to what happens in the base
-				      * class, if fast is false, then the
-				      * entire content of the vector is set to
-				      * 0, otherwise the content of the memory
-				      * is left unchanged.
-				      *
-				      * Notice that the following snippet of
-				      * code may not produce what you expect:
-				      *
-				      * @code
-				      * // Create a vector of length 1.
-				      * Vector<double> long_vector(1);
-				      *
-				      * // Make a view of it
-				      * VectorView<double> view_of_long_vector(1, long_vector.begin());
-				      *
-				      * // Resize the original vector to a bigger size
-				      * long_vector.reinit(100);
-				      *
-				      * // And the view, leaving the memory untouched
-				      * view_of_long_vector.reinit(100, true);
-				      * @endcode
-				      *
-				      * In the above case, the
-				      * Vector<double>::reinit method is
-				      * called, and a NEW area of memory is
-				      * reserved, possibly not starting at the
-				      * same place as before. Hoever, the
-				      * VectorView<double> object keeps
-				      * pointing to the same old area. After
-				      * the two reinits, any call to
-				      * view_of_long_vector(i), with i>0 might
-				      * cause an attempt to access invalid
-				      * areas of memory, or might function
-				      * properly, depending on wether or not
-				      * the system was able to allocate some
-				      * memory consecutively after the
-				      * original allocation.
-				      *
-				      * In any case, you should not rely on
-				      * this behavior, and you should only
-				      * call this reinit function if you
-				      * really know what you are doing.
-				      */
+                                     /**
+                                      * The reinit function of this object has
+                                      * a behavior which is different from the
+                                      * one of the base class. VectorView does
+                                      * not handle memory, and you should not
+                                      * attempt to resize the memory that is
+                                      * pointed to by this object using the
+                                      * reinit function. You can, however,
+                                      * resize the view that you have of the
+                                      * original object. Notice that it is
+                                      * your own responsibility to ensure that
+                                      * the memory you are pointing to is big
+                                      * enough.
+                                      *
+                                      * Similarly to what happens in the base
+                                      * class, if fast is false, then the
+                                      * entire content of the vector is set to
+                                      * 0, otherwise the content of the memory
+                                      * is left unchanged.
+                                      *
+                                      * Notice that the following snippet of
+                                      * code may not produce what you expect:
+                                      *
+                                      * @code
+                                      * // Create a vector of length 1.
+                                      * Vector<double> long_vector(1);
+                                      *
+                                      * // Make a view of it
+                                      * VectorView<double> view_of_long_vector(1, long_vector.begin());
+                                      *
+                                      * // Resize the original vector to a bigger size
+                                      * long_vector.reinit(100);
+                                      *
+                                      * // And the view, leaving the memory untouched
+                                      * view_of_long_vector.reinit(100, true);
+                                      * @endcode
+                                      *
+                                      * In the above case, the
+                                      * Vector<double>::reinit method is
+                                      * called, and a NEW area of memory is
+                                      * reserved, possibly not starting at the
+                                      * same place as before. Hoever, the
+                                      * VectorView<double> object keeps
+                                      * pointing to the same old area. After
+                                      * the two reinits, any call to
+                                      * view_of_long_vector(i), with i>0 might
+                                      * cause an attempt to access invalid
+                                      * areas of memory, or might function
+                                      * properly, depending on wether or not
+                                      * the system was able to allocate some
+                                      * memory consecutively after the
+                                      * original allocation.
+                                      *
+                                      * In any case, you should not rely on
+                                      * this behavior, and you should only
+                                      * call this reinit function if you
+                                      * really know what you are doing.
+                                      */
     virtual void reinit (const unsigned int N,
-			 const bool         fast=false);
+                         const bool         fast=false);
 
-				     /** This reinit function is
-					 equivalent to constructing a
-					 new object with the given
-					 size, starting from the
-					 pointer ptr. */
+                                     /** This reinit function is
+                                         equivalent to constructing a
+                                         new object with the given
+                                         size, starting from the
+                                         pointer ptr. */
     void reinit(const unsigned int N, Number * ptr);
 
-				     /** This reinit function is
-					 equivalent to constructing a
-					 new object with the given
-					 size, starting from the
-					 pointer ptr. The same
-					 considerations made for the
-					 constructor apply here. */
+                                     /** This reinit function is
+                                         equivalent to constructing a
+                                         new object with the given
+                                         size, starting from the
+                                         pointer ptr. The same
+                                         considerations made for the
+                                         constructor apply here. */
     void reinit(const unsigned int N, const Number * ptr);
 
-				     /**
-				      * This function is here to prevent
-				      * memory corruption. It should never be
-				      * called, and will throw an exception if
-				      * you try to do so. */
+                                     /**
+                                      * This function is here to prevent
+                                      * memory corruption. It should never be
+                                      * called, and will throw an exception if
+                                      * you try to do so. */
     virtual void swap (Vector<Number> &v);
 };
 
@@ -268,9 +259,9 @@ template<typename Number>
 inline
 VectorView<Number>::VectorView(const unsigned int new_size, Number * ptr)
 {
-    this->vec_size	= new_size;
-    this->max_vec_size	= new_size;
-    this->val		= ptr;
+    this->vec_size      = new_size;
+    this->max_vec_size  = new_size;
+    this->val           = ptr;
 }
 
 
@@ -279,9 +270,9 @@ template<typename Number>
 inline
 VectorView<Number>::VectorView(const unsigned int new_size, const Number * ptr)
 {
-    this->vec_size	= new_size;
-    this->max_vec_size	= new_size;
-    this->val		= const_cast<Number*>(ptr);
+    this->vec_size      = new_size;
+    this->max_vec_size  = new_size;
+    this->val           = const_cast<Number*>(ptr);
 }
 
 
@@ -290,19 +281,11 @@ template<typename Number>
 inline
 VectorView<Number>::~VectorView()
 {
-				   // avoid that the base class releases
-				   // memory it doesn't own
+                                   // avoid that the base class releases
+                                   // memory it doesn't own
     this->vec_size = 0;
     this->max_vec_size = 0;
     this->val = 0;
-}
-
-
-template<typename Number>
-inline
-VectorView<Number>::operator const Vector<Number> &() const
-{
-  return static_cast<const Vector<Number> &> (*this);
 }
 
 
@@ -313,7 +296,7 @@ void VectorView<Number>::reinit(const unsigned int N, const bool fast)
     this->vec_size = N;
     this->max_vec_size = N;
     if(fast == false)
-	Vector<Number>::operator=(static_cast<Number>(0));
+        Vector<Number>::operator=(static_cast<Number>(0));
 }
 
 
@@ -321,9 +304,9 @@ template<typename Number>
 inline
 void VectorView<Number>::reinit(const unsigned int new_size, Number * ptr)
 {
-    this->vec_size	= new_size;
-    this->max_vec_size	= new_size;
-    this->val		= ptr;
+    this->vec_size      = new_size;
+    this->max_vec_size  = new_size;
+    this->val           = ptr;
 }
 
 
@@ -331,9 +314,9 @@ template<typename Number>
 inline
 void VectorView<Number>::reinit(const unsigned int new_size, const Number * ptr)
 {
-    this->vec_size	= new_size;
-    this->max_vec_size	= new_size;
-    this->val		= const_cast<Number*>(ptr);
+    this->vec_size      = new_size;
+    this->max_vec_size  = new_size;
+    this->val           = const_cast<Number*>(ptr);
 }
 
 

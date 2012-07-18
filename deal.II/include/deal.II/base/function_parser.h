@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -73,8 +73,8 @@ template <typename> class Vector;
 
   // And populate it with the newly created objects.
   vector_function.initialize(variables,
- 			    expressions,
- 			    constants);
+                            expressions,
+                            constants);
   @endverbatim
 
  * FunctionParser also provides an option to use <b>units</b> in expressions.
@@ -185,18 +185,18 @@ template <typename> class Vector;
       The class supports these functions:
 
       abs(A)    : Absolute value of A. If A is negative, returns -A otherwise
-		  returns A.
+                  returns A.
       acos(A)   : Arc-cosine of A. Returns the angle, measured in radians,
-		  whose cosine is A.
+                  whose cosine is A.
       acosh(A)  : Same as acos() but for hyperbolic cosine.
       asin(A)   : Arc-sine of A. Returns the angle, measured in radians, whose
-		  sine is A.
+                  sine is A.
       asinh(A)  : Same as asin() but for hyperbolic sine.
       atan(A)   : Arc-tangent of (A). Returns the angle, measured in radians,
                   whose tangent is (A).
       atan2(A,B): Arc-tangent of A/B. The two main differences to atan() is
                   that it will return the right angle depending on the signs of
-                  A and B (atan() can only return values betwen -pi/2 and pi/2),
+                  A and B (atan() can only return values between -pi/2 and pi/2),
                   and that the return value of pi/2 and -pi/2 are possible.
       atanh(A)  : Same as atan() but for hyperbolic tangent.
       ceil(A)   : Ceiling of A. Returns the smallest integer greater than A.
@@ -208,8 +208,8 @@ template <typename> class Vector;
       csc(A)    : Cosecant of A (equivalent to 1/sin(A)).
       eval(...) : This a recursive call to the function to be evaluated. The
                   number of parameters must be the same as the number of parameters
-		  taken by the function. Usually called inside if() to avoid
-		  infinite recursion.
+                  taken by the function. Usually called inside if() to avoid
+                  infinite recursion.
       exp(A)    : Exponential of A. Returns the value of e raised to the power
                   A where e is the base of the natural logarithm, i.e. the
                   non-repeating value approximately equal to 2.71828182846.
@@ -277,12 +277,12 @@ template <typename> class Vector;
 
       // And populate it with the newly created objects.
       function.initialize(variables,
-			  expression,
-			  constants,
-			  true);	// This tells the parser that
-				 	// it is a time-dependent function
-					// and there is another variable
-					// to be taken into account (t).
+                          expression,
+                          constants,
+                          true);        // This tells the parser that
+                                        // it is a time-dependent function
+                                        // and there is another variable
+                                        // to be taken into account (t).
 
      @endverbatim
 
@@ -304,8 +304,8 @@ template <typename> class Vector;
 
       // And populate it with the newly created objects.
       function.initialize(variables,
-			  expression,
-			  constants);
+                          expression,
+                          constants);
 
      @endverbatim
  *
@@ -317,43 +317,43 @@ template <int dim>
 class FunctionParser : public Function<dim>
 {
   public:
-				     /**
-				      * Constructor for Parsed
-				      * functions. Its arguments are
-				      * the same of the base class
-				      * Function. The only difference
-				      * is that this object needs to
-				      * be initialized with
-				      * initialize() method before you
-				      * can use it. If an attempt to
-				      * use this function is made
-				      * before the initialize() method
-				      * has been called, then an
-				      * exception is thrown.
-				      */
+                                     /**
+                                      * Constructor for Parsed
+                                      * functions. Its arguments are
+                                      * the same of the base class
+                                      * Function. The only difference
+                                      * is that this object needs to
+                                      * be initialized with
+                                      * initialize() method before you
+                                      * can use it. If an attempt to
+                                      * use this function is made
+                                      * before the initialize() method
+                                      * has been called, then an
+                                      * exception is thrown.
+                                      */
     FunctionParser (const unsigned int n_components = 1,
-		    const double       initial_time = 0.0);
+                    const double       initial_time = 0.0);
 
-				     /**
-				      * Destructor. Explicitly delete
-				      * the FunctionParser objects
-				      * (there is one for each
-				      * component of the function).
-				      */
+                                     /**
+                                      * Destructor. Explicitly delete
+                                      * the FunctionParser objects
+                                      * (there is one for each
+                                      * component of the function).
+                                      */
     ~FunctionParser();
 
-				     /**
-				      * Type for the constant
-				      * map. Used by the initialize()
-				      * method.
-				      */
+                                     /**
+                                      * Type for the constant
+                                      * map. Used by the initialize()
+                                      * method.
+                                      */
     typedef std::map<std::string, double> ConstMap;
 
-				     /**
-				      * Iterator for the constants
-				      * map. Used by the initialize()
-				      * method.
-				      */
+                                     /**
+                                      * Iterator for the constants
+                                      * map. Used by the initialize()
+                                      * method.
+                                      */
     typedef ConstMap::iterator ConstMapIterator;
 
                                      /**
@@ -478,42 +478,42 @@ class FunctionParser : public Function<dim>
                      const bool time_dependent = false,
                      const bool use_degrees = false);
 
-				     /**
-				      * A function that returns
-				      * default names for variables,
-				      * to be used in the first
-				      * argument of the initialize()
-				      * functions: it returns "x" in
-				      * 1d, "x,y" in 2d, and "x,y,z"
-				      * in 3d.
-				      */
+                                     /**
+                                      * A function that returns
+                                      * default names for variables,
+                                      * to be used in the first
+                                      * argument of the initialize()
+                                      * functions: it returns "x" in
+                                      * 1d, "x,y" in 2d, and "x,y,z"
+                                      * in 3d.
+                                      */
     static
     std::string
     default_variable_names ();
 
-				     /**
-				      * Return the value of the
-				      * function at the given
-				      * point. Unless there is only
-				      * one component (i.e. the
-				      * function is scalar), you
-				      * should state the component you
-				      * want to have evaluated; it
-				      * defaults to zero, i.e. the
-				      * first component.
-				      */
+                                     /**
+                                      * Return the value of the
+                                      * function at the given
+                                      * point. Unless there is only
+                                      * one component (i.e. the
+                                      * function is scalar), you
+                                      * should state the component you
+                                      * want to have evaluated; it
+                                      * defaults to zero, i.e. the
+                                      * first component.
+                                      */
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
 
-				     /**
-				      * Return all components of a
-				      * vector-valued function at a
-				      * given point.
-				      *
-				      * <tt>values</tt> shall have the
-				      * right size beforehand,
-				      * i.e. #n_components.
-				      */
+                                     /**
+                                      * Return all components of a
+                                      * vector-valued function at a
+                                      * given point.
+                                      *
+                                      * <tt>values</tt> shall have the
+                                      * right size beforehand,
+                                      * i.e. #n_components.
+                                      */
     virtual void vector_value (const Point<dim>   &p,
                                Vector<double>     &values) const;
 
@@ -532,34 +532,34 @@ class FunctionParser : public Function<dim>
 
                                      //@}
   private:
-				     /**
-				      * A pointer to the actual
-				      * function parsers.
-				      */
+                                     /**
+                                      * A pointer to the actual
+                                      * function parsers.
+                                      */
     fparser::FunctionParser * fp;
 
-				     /**
-				      * State of usability. This
-				      * variable is checked every time
-				      * the function is called for
-				      * evaluation. It's set to true
-				      * in the initialize() methods.
-				      */
+                                     /**
+                                      * State of usability. This
+                                      * variable is checked every time
+                                      * the function is called for
+                                      * evaluation. It's set to true
+                                      * in the initialize() methods.
+                                      */
     bool initialized;
 
-				     /**
-				      * Number of variables. If this
-				      * is also a function of time,
-				      * then the number of variables
-				      * is dim+1, otherwhise it is
-				      * dim. In the case that this is
-				      * a time dependent function, the
-				      * time is supposed to be the
-				      * last variable. If #n_vars is
-				      * not identical to the number of
-				      * the variables parsed by the
-				      * initialize() method, then an
-				      * exception is thrown.
+                                     /**
+                                      * Number of variables. If this
+                                      * is also a function of time,
+                                      * then the number of variables
+                                      * is dim+1, otherwhise it is
+                                      * dim. In the case that this is
+                                      * a time dependent function, the
+                                      * time is supposed to be the
+                                      * last variable. If #n_vars is
+                                      * not identical to the number of
+                                      * the variables parsed by the
+                                      * initialize() method, then an
+                                      * exception is thrown.
                                       */
     unsigned int n_vars;
 };
@@ -572,13 +572,13 @@ FunctionParser<dim>::default_variable_names ()
   switch (dim)
     {
       case 1:
-	    return "x";
+            return "x";
       case 2:
-	    return "x,y";
+            return "x,y";
       case 3:
-	    return "x,y,z";
+            return "x,y,z";
       default:
-	    Assert (false, ExcNotImplemented());
+            Assert (false, ExcNotImplemented());
     }
   return "";
 }

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,7 +56,7 @@ class BlockDiagonalMatrix : public Subscriptor
     template <typename number1, typename number2>
     void vmult (BlockVector<number1>& dst,
                 const BlockVector<number2>& src) const;
-  
+
                                      /**
                                       * Transposed matrix-vector-multiplication.
                                       */
@@ -80,7 +80,7 @@ class BlockDiagonalMatrix : public Subscriptor
 
 template <class MATRIX>
 BlockDiagonalMatrix<MATRIX>::BlockDiagonalMatrix (const MATRIX& M,
-						  const unsigned int num_blocks)
+                                                  const unsigned int num_blocks)
                 :
                 num_blocks (num_blocks),
                 matrix(&M)
@@ -94,9 +94,9 @@ BlockDiagonalMatrix<MATRIX>::vmult (BlockVector<number1>& dst,
                                     const BlockVector<number2>& src) const
 {
   Assert (dst.n_blocks()==num_blocks,
-	  ExcDimensionMismatch(dst.n_blocks(),num_blocks));
+          ExcDimensionMismatch(dst.n_blocks(),num_blocks));
   Assert (src.n_blocks()==num_blocks,
-	  ExcDimensionMismatch(src.n_blocks(),num_blocks));
+          ExcDimensionMismatch(src.n_blocks(),num_blocks));
 
   for (unsigned int i=0;i<num_blocks;++i)
     matrix->vmult (dst.block(i), src.block(i));
@@ -107,12 +107,12 @@ template <class MATRIX>
 template <typename number1, typename number2>
 void
 BlockDiagonalMatrix<MATRIX>::Tvmult (BlockVector<number1>& dst,
-				     const BlockVector<number2>& src) const
+                                     const BlockVector<number2>& src) const
 {
   Assert (dst.n_blocks()==num_blocks,
-	  ExcDimensionMismatch(dst.n_blocks(),num_blocks));
+          ExcDimensionMismatch(dst.n_blocks(),num_blocks));
   Assert (src.n_blocks()==num_blocks,
-	  ExcDimensionMismatch(src.n_blocks(),num_blocks));
+          ExcDimensionMismatch(src.n_blocks(),num_blocks));
 
   for (unsigned int i=0;i<num_blocks;++i)
     matrix->Tvmult (dst.block(i), src.block(i));

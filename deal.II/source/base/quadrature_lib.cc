@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,12 +41,12 @@ namespace
 template <>
 QGauss<0>::QGauss (const unsigned int)
                 :
-						 // there are n_q^dim == 1
-						 // points
+                                                 // there are n_q^dim == 1
+                                                 // points
                 Quadrature<0> (1)
 {
-				   // the single quadrature point gets unit
-				   // weight
+                                   // the single quadrature point gets unit
+                                   // weight
   this->weights[0] = 1;
 }
 
@@ -55,12 +55,12 @@ QGauss<0>::QGauss (const unsigned int)
 template <>
 QGaussLobatto<0>::QGaussLobatto (const unsigned int)
                 :
-						 // there are n_q^dim == 1
-						 // points
+                                                 // there are n_q^dim == 1
+                                                 // points
                 Quadrature<0> (1)
 {
-				   // the single quadrature point gets unit
-				   // weight
+                                   // the single quadrature point gets unit
+                                   // weight
   this->weights[0] = 1;
 }
 
@@ -86,22 +86,22 @@ QGauss<1>::QGauss (const unsigned int n)
                                    // of the accuracy of double there,
                                    // while on other machines we'd
                                    // like to go further down
-				   //
-				   // the situation is complicated by
-				   // the fact that even if long
-				   // double exists and is described
-				   // by std::numeric_limits, we may
-				   // not actually get the additional
-				   // precision. One case where this
-				   // happens is on x86, where one can
-				   // set hardware flags that disable
-				   // long double precision even for
-				   // long double variables. these
-				   // flags are not usually set, but
-				   // for example matlab sets them and
-				   // this then breaks deal.II code
-				   // that is run as a subroutine to
-				   // matlab...
+                                   //
+                                   // the situation is complicated by
+                                   // the fact that even if long
+                                   // double exists and is described
+                                   // by std::numeric_limits, we may
+                                   // not actually get the additional
+                                   // precision. One case where this
+                                   // happens is on x86, where one can
+                                   // set hardware flags that disable
+                                   // long double precision even for
+                                   // long double variables. these
+                                   // flags are not usually set, but
+                                   // for example matlab sets them and
+                                   // this then breaks deal.II code
+                                   // that is run as a subroutine to
+                                   // matlab...
                                    //
                                    // a similar situation exists, btw,
                                    // when running programs under
@@ -120,16 +120,16 @@ QGauss<1>::QGauss (const unsigned int n)
     double_eps      = 2.23-16;
 #endif
 
-				   // now check whether long double is more
-				   // accurate than double, and set
-				   // tolerances accordingly. generate a one
-				   // that really is generated at run-time
-				   // and is not optimized away by the
-				   // compiler. that makes sure that the
-				   // tolerance is set at run-time with the
-				   // current behavior, not at compile-time
-				   // (not doing so leads to trouble with
-				   // valgrind for example).
+                                   // now check whether long double is more
+                                   // accurate than double, and set
+                                   // tolerances accordingly. generate a one
+                                   // that really is generated at run-time
+                                   // and is not optimized away by the
+                                   // compiler. that makes sure that the
+                                   // tolerance is set at run-time with the
+                                   // current behavior, not at compile-time
+                                   // (not doing so leads to trouble with
+                                   // valgrind for example).
   volatile long double runtime_one = 1.0;
   const long double tolerance
     = (runtime_one + long_double_eps != runtime_one
@@ -149,19 +149,19 @@ QGauss<1>::QGauss (const unsigned int n)
 
                                        // Newton iteration
       do
-	{
-					   // compute L_n (z)
-	  p1 = 1.;
-	  p2 = 0.;
-	  for (unsigned int j=0;j<n;++j)
-	    {
-	      p3 = p2;
-	      p2 = p1;
-	      p1 = ((2.*j+1.)*z*p2-j*p3)/(j+1);
-	    }
-	  pp = n*(z*p1-p2)/(z*z-1);
-	  z = z-p1/pp;
-	}
+        {
+                                           // compute L_n (z)
+          p1 = 1.;
+          p2 = 0.;
+          for (unsigned int j=0;j<n;++j)
+            {
+              p3 = p2;
+              p2 = p1;
+              p1 = ((2.*j+1.)*z*p2-j*p3)/(j+1);
+            }
+          pp = n*(z*p1-p2)/(z*z-1);
+          z = z-p1/pp;
+        }
       while (abs(p1/pp) > tolerance);
 
       double x = .5*z;
@@ -177,16 +177,16 @@ QGauss<1>::QGauss (const unsigned int n)
 
 template <>
 QGaussLobatto<1>::QGaussLobatto (const unsigned int n)
-		:
-		Quadrature<1> (n)
+                :
+                Quadrature<1> (n)
 {
   Assert (n >= 2, ExcNotImplemented());
 
   std::vector<long double> points  = compute_quadrature_points(n, 1, 1);
   std::vector<long double> w       = compute_quadrature_weights(points, 0, 0);
 
-				   // scale points to the interval
-				   // [0.0, 1.0]:
+                                   // scale points to the interval
+                                   // [0.0, 1.0]:
   for (unsigned int i=0; i<points.size(); ++i)
     {
       this->quadrature_points[i] = Point<1>(0.5 + 0.5*static_cast<double>(points[i]));
@@ -199,17 +199,17 @@ QGaussLobatto<1>::QGaussLobatto (const unsigned int n)
 template <>
 std::vector<long double> QGaussLobatto<1>::
 compute_quadrature_points(const unsigned int q,
-			  const int alpha,
-			  const int beta) const
+                          const int alpha,
+                          const int beta) const
 {
   const unsigned int m = q-2; // no. of inner points
   std::vector<long double> x(m);
 
-				   // compute quadrature points with
-				   // a Newton algorithm.
+                                   // compute quadrature points with
+                                   // a Newton algorithm.
 
-				   // Set tolerance. See class QGauss
-				   // for detailed explanation.
+                                   // Set tolerance. See class QGauss
+                                   // for detailed explanation.
 #ifdef HAVE_STD_NUMERIC_LIMITS
   const long double
     long_double_eps = static_cast<long double>(std::numeric_limits<long double>::epsilon()),
@@ -220,9 +220,9 @@ compute_quadrature_points(const unsigned int q,
     double_eps      = 2.23-16;
 #endif
 
-				   // check whether long double is
-				   // more accurate than double, and
-				   // set tolerances accordingly
+                                   // check whether long double is
+                                   // more accurate than double, and
+                                   // set tolerances accordingly
   volatile long double runtime_one = 1.0;
   const long double tolerance
     = (runtime_one + long_double_eps != runtime_one
@@ -232,17 +232,17 @@ compute_quadrature_points(const unsigned int q,
        double_eps * 5
        );
 
-				   // The following implementation
-				   // follows closely the one given in
-				   // the appendix of the book by
-				   // Karniadakis and Sherwin:
-				   // Spectral/hp element methods for
-				   // computational fluid dynamics
-				   // (Oxford University Press, 2005)
+                                   // The following implementation
+                                   // follows closely the one given in
+                                   // the appendix of the book by
+                                   // Karniadakis and Sherwin:
+                                   // Spectral/hp element methods for
+                                   // computational fluid dynamics
+                                   // (Oxford University Press, 2005)
 
-				   // we take the zeros of the Chebyshev
-				   // polynomial (alpha=beta=-0.5) as
-				   // initial values:
+                                   // we take the zeros of the Chebyshev
+                                   // polynomial (alpha=beta=-0.5) as
+                                   // initial values:
   for (unsigned int i=0; i<m; ++i)
     x[i] = - std::cos( (long double) (2*i+1)/(2*m) * numbers::PI );
 
@@ -252,25 +252,25 @@ compute_quadrature_points(const unsigned int q,
     {
       r = x[k];
       if (k>0)
-	r = (r + x[k-1])/2;
+        r = (r + x[k-1])/2;
 
       do
-	{
-	  s = 0.;
-	  for (unsigned int i=0; i<k; ++i)
-	    s += 1./(r - x[i]);
+        {
+          s = 0.;
+          for (unsigned int i=0; i<k; ++i)
+            s += 1./(r - x[i]);
 
-	  J_x   =  0.5*(alpha + beta + m + 1)*JacobiP(r, alpha+1, beta+1, m-1);
-	  f     = JacobiP(r, alpha, beta, m);
-	  delta = f/(f*s- J_x);
-	  r += delta;
-	}
+          J_x   =  0.5*(alpha + beta + m + 1)*JacobiP(r, alpha+1, beta+1, m-1);
+          f     = JacobiP(r, alpha, beta, m);
+          delta = f/(f*s- J_x);
+          r += delta;
+        }
       while (std::fabs(delta) >= tolerance);
 
       x[k] = r;
     } // for
 
-				   // add boundary points:
+                                   // add boundary points:
   x.insert(x.begin(), -1.L);
   x.push_back(+1.L);
 
@@ -282,17 +282,17 @@ compute_quadrature_points(const unsigned int q,
 template <>
 std::vector<long double> QGaussLobatto<1>::
 compute_quadrature_weights(const std::vector<long double> &x,
-			   const int alpha,
-			   const int beta) const
+                           const int alpha,
+                           const int beta) const
 {
   const unsigned int q = x.size();
   std::vector<long double> w(q);
   long double s = 0.L;
 
   const long double factor = std::pow(2., alpha+beta+1) *
-			     gamma(alpha+q) *
-			     gamma(beta+q) /
-			     ((q-1)*gamma(q)*gamma(alpha+beta+q+1));
+                             gamma(alpha+q) *
+                             gamma(beta+q) /
+                             ((q-1)*gamma(q)*gamma(alpha+beta+q+1));
   for (unsigned int i=0; i<q; ++i)
     {
       s = JacobiP(x[i], alpha, beta, q-1);
@@ -308,16 +308,16 @@ compute_quadrature_weights(const std::vector<long double> &x,
 
 template <>
 long double QGaussLobatto<1>::JacobiP(const long double x,
-				      const int alpha,
-				      const int beta,
-				      const unsigned int n) const
+                                      const int alpha,
+                                      const int beta,
+                                      const unsigned int n) const
 {
-				   // the Jacobi polynomial is evaluated
-				   // using a recursion formula.
+                                   // the Jacobi polynomial is evaluated
+                                   // using a recursion formula.
   std::vector<long double> p(n+1);
   int v, a1, a2, a3, a4;
 
-				   // initial values P_0(x), P_1(x):
+                                   // initial values P_0(x), P_1(x):
   p[0] = 1.0L;
   if (n==0) return p[0];
   p[1] = ((alpha+beta+2)*x + (alpha-beta))/2;
@@ -352,7 +352,7 @@ long double QGaussLobatto<1>::gamma(const unsigned int n) const
 template <>
 QMidpoint<1>::QMidpoint ()
                 :
-		Quadrature<1>(1)
+                Quadrature<1>(1)
 {
   this->quadrature_points[0] = Point<1>(0.5);
   this->weights[0] = 1.0;
@@ -363,7 +363,7 @@ QMidpoint<1>::QMidpoint ()
 template <>
 QTrapez<1>::QTrapez ()
                 :
-		Quadrature<1> (2)
+                Quadrature<1> (2)
 {
   static const double xpts[] = { 0.0, 1.0 };
   static const double wts[]  = { 0.5, 0.5 };
@@ -380,7 +380,7 @@ QTrapez<1>::QTrapez ()
 template <>
 QSimpson<1>::QSimpson ()
                 :
-		Quadrature<1> (3)
+                Quadrature<1> (3)
 {
   static const double xpts[] = { 0.0, 0.5, 1.0 };
   static const double wts[]  = { 1./6., 2./3., 1./6. };
@@ -397,7 +397,7 @@ QSimpson<1>::QSimpson ()
 template <>
 QMilne<1>::QMilne ()
                 :
-		Quadrature<1> (5)
+                Quadrature<1> (5)
 {
   static const double xpts[] = { 0.0, .25, .5, .75, 1.0 };
   static const double wts[]  = { 7./90., 32./90., 12./90., 32./90., 7./90. };
@@ -414,11 +414,11 @@ QMilne<1>::QMilne ()
 template <>
 QWeddle<1>::QWeddle ()
                 :
-		Quadrature<1> (7)
+                Quadrature<1> (7)
 {
   static const double xpts[] = { 0.0, 1./6., 1./3., .5, 2./3., 5./6., 1.0 };
   static const double wts[]  = { 41./840., 216./840., 27./840., 272./840.,
-				 27./840., 216./840., 41./840.
+                                 27./840., 216./840., 41./840.
   };
 
   for (unsigned int i=0; i<this->size(); ++i)
@@ -441,11 +441,11 @@ QGaussLog<1>::QGaussLog(const unsigned int n,
 
   for (unsigned int i=0; i<this->size(); ++i)
     {
-	// Using the change of variables x=1-t, it's possible to show
-	// that int f(x)ln|1-x| = int f(1-t) ln|t|, which implies that
-	// we can use this quadrature formula also with weight ln|1-x|.
-	this->quadrature_points[i] = revert ? Point<1>(1-p[n-1-i]) : Point<1>(p[i]);
-	this->weights[i]           = revert ? w[n-1-i] : w[i];
+        // Using the change of variables x=1-t, it's possible to show
+        // that int f(x)ln|1-x| = int f(1-t) ln|t|, which implies that
+        // we can use this quadrature formula also with weight ln|1-x|.
+        this->quadrature_points[i] = revert ? Point<1>(1-p[n-1-i]) : Point<1>(p[i]);
+        this->weights[i]           = revert ? w[n-1-i] : w[i];
     }
 
 }
@@ -720,11 +720,11 @@ QGaussLog<1>::set_quadrature_weights(const unsigned int n) const
 
 template<>
 QGaussLogR<1>::QGaussLogR(const unsigned int n,
-			  const Point<1> origin,
-			  const double alpha,
-			  const bool factor_out_singularity) :
+                          const Point<1> origin,
+                          const double alpha,
+                          const bool factor_out_singularity) :
     Quadrature<1>( ( (origin[0] == 0) || (origin[0] == 1) ) ?
-		   (alpha == 1 ? n : 2*n ) : 4*n ),
+                   (alpha == 1 ? n : 2*n ) : 4*n ),
     fraction( ( (origin[0] == 0) || (origin[0] == 1.) ) ? 1. : origin[0] )
 {
     // The three quadrature formulas that make this one up. There are
@@ -746,55 +746,55 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
 
     // Check that the origin is inside 0,1
     Assert( (fraction >= 0) && (fraction <= 1),
-	    ExcMessage("Origin is outside [0,1]."));
+            ExcMessage("Origin is outside [0,1]."));
 
     // Non singular offset. This is the start of non singular quad
     // points.
     unsigned int ns_offset = (fraction == 1) ? n : 2*n;
 
     for(unsigned int i=0, j=ns_offset; i<n; ++i, ++j) {
-	// The first i quadrature points are the same as quad1, and
-	// are by default singular.
-	this->quadrature_points[i] = quad1.point(i)*fraction;
-	this->weights[i] = quad1.weight(i)*fraction;
+        // The first i quadrature points are the same as quad1, and
+        // are by default singular.
+        this->quadrature_points[i] = quad1.point(i)*fraction;
+        this->weights[i] = quad1.weight(i)*fraction;
 
-	// We need to scale with -log|fraction*alpha|
-	if( (alpha != 1) || (fraction != 1) ) {
-	    this->quadrature_points[j] = quad.point(i)*fraction;
-	    this->weights[j] = -std::log(alpha/fraction)*quad.weight(i)*fraction;
-	}
-	// In case we need the second quadrature as well, do it now.
-	if(fraction != 1) {
-	    this->quadrature_points[i+n] = quad2.point(i)*(1-fraction)+Point<1>(fraction);
-	    this->weights[i+n] = quad2.weight(i)*(1-fraction);
+        // We need to scale with -log|fraction*alpha|
+        if( (alpha != 1) || (fraction != 1) ) {
+            this->quadrature_points[j] = quad.point(i)*fraction;
+            this->weights[j] = -std::log(alpha/fraction)*quad.weight(i)*fraction;
+        }
+        // In case we need the second quadrature as well, do it now.
+        if(fraction != 1) {
+            this->quadrature_points[i+n] = quad2.point(i)*(1-fraction)+Point<1>(fraction);
+            this->weights[i+n] = quad2.weight(i)*(1-fraction);
 
-	    // We need to scale with -log|fraction*alpha|
-	    this->quadrature_points[j+n] = quad.point(i)*(1-fraction)+Point<1>(fraction);
-	    this->weights[j+n] = -std::log(alpha/(1-fraction))*quad.weight(i)*(1-fraction);
-	}
+            // We need to scale with -log|fraction*alpha|
+            this->quadrature_points[j+n] = quad.point(i)*(1-fraction)+Point<1>(fraction);
+            this->weights[j+n] = -std::log(alpha/(1-fraction))*quad.weight(i)*(1-fraction);
+        }
     }
     if(factor_out_singularity == true)
-	for(unsigned int i=0; i<size(); ++i) {
-	    Assert( this->quadrature_points[i] != origin,
-		    ExcMessage("The singularity cannot be on a Gauss point of the same order!") );
-	    this->weights[i] /= std::log(std::abs( (this->quadrature_points[i]-origin)[0] )/alpha );
-	}
+        for(unsigned int i=0; i<size(); ++i) {
+            Assert( this->quadrature_points[i] != origin,
+                    ExcMessage("The singularity cannot be on a Gauss point of the same order!") );
+            this->weights[i] /= std::log(std::abs( (this->quadrature_points[i]-origin)[0] )/alpha );
+        }
 }
 
 
 template<>
 unsigned int QGaussOneOverR<2>::quad_size(const Point<2> singularity,
-						 const unsigned int n)
+                                                 const unsigned int n)
 {
   double eps=1e-8;
   bool on_edge=false;
   bool on_vertex=false;
   for(unsigned int i=0; i<2; ++i)
     if( ( std::abs(singularity[i]  ) < eps ) ||
-	( std::abs(singularity[i]-1) < eps ) )
+        ( std::abs(singularity[i]-1) < eps ) )
       on_edge = true;
   if(on_edge && (std::abs( (singularity-Point<2>(.5, .5)).square()-.5)
-		 < eps) )
+                 < eps) )
     on_vertex = true;
   if(on_vertex) return (2*n*n);
   if(on_edge) return (4*n*n);
@@ -803,20 +803,20 @@ unsigned int QGaussOneOverR<2>::quad_size(const Point<2> singularity,
 
 template<>
 QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
-				  const Point<2> singularity,
-				  const bool factor_out_singularity) :
-		Quadrature<2>(quad_size(singularity, n))
+                                  const Point<2> singularity,
+                                  const bool factor_out_singularity) :
+                Quadrature<2>(quad_size(singularity, n))
 {
-				   // We treat all the cases in the
-				   // same way. Split the element in 4
-				   // pieces, measure the area, if
-				   // it's relevant, add the
-				   // quadrature connected to that
-				   // singularity.
+                                   // We treat all the cases in the
+                                   // same way. Split the element in 4
+                                   // pieces, measure the area, if
+                                   // it's relevant, add the
+                                   // quadrature connected to that
+                                   // singularity.
   std::vector<QGaussOneOverR<2> > quads;
   std::vector<Point<2> > origins;
-				   // Id of the corner with a
-				   // singularity
+                                   // Id of the corner with a
+                                   // singularity
   quads.push_back(QGaussOneOverR(n, 3, factor_out_singularity));
   quads.push_back(QGaussOneOverR(n, 2, factor_out_singularity));
   quads.push_back(QGaussOneOverR(n, 1, factor_out_singularity));
@@ -827,7 +827,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   origins.push_back(Point<2>(0.,singularity[1]));
   origins.push_back(singularity);
 
-				   // Lexycographical ordering.
+                                   // Lexycographical ordering.
 
   double eps = 1e-8;
   unsigned int q_id = 0; // Current quad point index.
@@ -840,32 +840,32 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
       dist = Point<2>(std::abs(dist[0]), std::abs(dist[1]));
       area = dist[0]*dist[1];
       if(area > eps)
-	for(unsigned int q=0; q<quads[box].size(); ++q, ++q_id)
-	  {
-	    const Point<2> &qp = quads[box].point(q);
-	    this->quadrature_points[q_id] =
-	      origins[box]+
-	      Point<2>(dist[0]*qp[0], dist[1]*qp[1]);
-	    this->weights[q_id] = quads[box].weight(q)*area;
-	  }
+        for(unsigned int q=0; q<quads[box].size(); ++q, ++q_id)
+          {
+            const Point<2> &qp = quads[box].point(q);
+            this->quadrature_points[q_id] =
+              origins[box]+
+              Point<2>(dist[0]*qp[0], dist[1]*qp[1]);
+            this->weights[q_id] = quads[box].weight(q)*area;
+          }
     }
 }
 
 
 template<>
 QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
-				  const unsigned int vertex_index,
-				  const bool factor_out_singularity) :
+                                  const unsigned int vertex_index,
+                                  const bool factor_out_singularity) :
     Quadrature<2>(2*n*n)
 {
-				   // This version of the constructor
-				   // works only for the 4
-				   // vertices. If you need a more
-				   // general one, you should use the
-				   // one with the Point<2> in the
-				   // constructor.
+                                   // This version of the constructor
+                                   // works only for the 4
+                                   // vertices. If you need a more
+                                   // general one, you should use the
+                                   // one with the Point<2> in the
+                                   // constructor.
     Assert(vertex_index <4, ExcIndexRange(vertex_index, 0, 4));
-    
+
     // Start with the gauss quadrature formula on the (u,v) reference
     // element.
     QGauss<2> gauss(n);
@@ -890,52 +890,52 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
     //
     // And we get rid of R to take into account the singularity,
     // unless specified differently in the constructor.
-    std::vector<Point<2> >	&ps = this->quadrature_points;
-    std::vector<double>		&ws = this->weights;
+    std::vector<Point<2> >      &ps = this->quadrature_points;
+    std::vector<double>         &ws = this->weights;
     double pi4 = numbers::PI/4;
 
     for(unsigned int q=0; q<gauss.size(); ++q) {
-	const Point<2> &gp = gauss.point(q);
-	ps[q][0] = gp[0];
-	ps[q][1] = gp[0] * std::tan(pi4*gp[1]);
-	ws[q]    = gauss.weight(q)*pi4/std::cos(pi4 *gp[1]);
-	if(factor_out_singularity)
-	    ws[q] *= (ps[q]-GeometryInfo<2>::unit_cell_vertex(0)).norm();
-	// The other half of the quadrilateral is symmetric with
-	// respect to xy plane.
-	ws[gauss.size()+q]    = ws[q];
-	ps[gauss.size()+q][0] = ps[q][1];
-	ps[gauss.size()+q][1] = ps[q][0];
+        const Point<2> &gp = gauss.point(q);
+        ps[q][0] = gp[0];
+        ps[q][1] = gp[0] * std::tan(pi4*gp[1]);
+        ws[q]    = gauss.weight(q)*pi4/std::cos(pi4 *gp[1]);
+        if(factor_out_singularity)
+            ws[q] *= (ps[q]-GeometryInfo<2>::unit_cell_vertex(0)).norm();
+        // The other half of the quadrilateral is symmetric with
+        // respect to xy plane.
+        ws[gauss.size()+q]    = ws[q];
+        ps[gauss.size()+q][0] = ps[q][1];
+        ps[gauss.size()+q][1] = ps[q][0];
     }
 
     // Now we distribute these vertices in the correct manner
     double theta = 0;
     switch(vertex_index) {
     case 0:
-	theta = 0;
-	break;
+        theta = 0;
+        break;
     case 1:
-	//
-	theta = numbers::PI/2;
-	break;
+        //
+        theta = numbers::PI/2;
+        break;
     case 2:
-	theta = -numbers::PI/2;
-	break;
+        theta = -numbers::PI/2;
+        break;
     case 3:
-	theta = numbers::PI;
-	break;
+        theta = numbers::PI;
+        break;
     }
 
     double R00 =  std::cos(theta), R01 = -std::sin(theta);
     double R10 =  std::sin(theta), R11 =  std::cos(theta);
 
     if(vertex_index != 0)
-	for(unsigned int q=0; q<size(); ++q) {
-	    double x = ps[q][0]-.5,  y = ps[q][1]-.5;
+        for(unsigned int q=0; q<size(); ++q) {
+            double x = ps[q][0]-.5,  y = ps[q][1]-.5;
 
-	    ps[q][0] = R00*x + R01*y + .5;
-	    ps[q][1] = R10*x + R11*y + .5;
-	}
+            ps[q][0] = R00*x + R01*y + .5;
+            ps[q][1] = R10*x + R11*y + .5;
+        }
 }
 
 
@@ -959,7 +959,7 @@ QGaussLobatto<dim>::QGaussLobatto (const unsigned int n)
 template <int dim>
 QMidpoint<dim>::QMidpoint ()
                 :
-		Quadrature<dim> (QMidpoint<dim-1>(), QMidpoint<1>())
+                Quadrature<dim> (QMidpoint<dim-1>(), QMidpoint<1>())
 {}
 
 
@@ -967,7 +967,7 @@ QMidpoint<dim>::QMidpoint ()
 template <int dim>
 QTrapez<dim>::QTrapez ()
                 :
-		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>())
+                Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>())
 {}
 
 
@@ -975,7 +975,7 @@ QTrapez<dim>::QTrapez ()
 template <int dim>
 QSimpson<dim>::QSimpson ()
                 :
-		Quadrature<dim> (QSimpson<dim-1>(), QSimpson<1>())
+                Quadrature<dim> (QSimpson<dim-1>(), QSimpson<1>())
 {}
 
 
@@ -983,14 +983,14 @@ QSimpson<dim>::QSimpson ()
 template <int dim>
 QMilne<dim>::QMilne ()
                 :
-		Quadrature<dim> (QMilne<dim-1>(), QMilne<1>())
+                Quadrature<dim> (QMilne<dim-1>(), QMilne<1>())
 {}
 
 
 template <int dim>
 QWeddle<dim>::QWeddle ()
                 :
-		Quadrature<dim> (QWeddle<dim-1>(), QWeddle<1>())
+                Quadrature<dim> (QWeddle<dim-1>(), QWeddle<1>())
 {}
 
 

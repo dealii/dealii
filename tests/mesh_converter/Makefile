@@ -71,11 +71,11 @@ report:
 	@echo 'Date: ' `date -u +"%Y %j  %F  %U-%w"`
 	@echo 'Id: ' $(ID)
 	@for test in $(TESTS) ; do \
-		testname=mesh-converter/`echo $$test | perl -pi -e 's/.*include.//g; s/\//-/g;'` ; \
+		testname=`echo $$test | perl -pi -e 's/.*include.//g; s/\//-/g;'` ; \
 		if test -f $$test ; then \
-			echo "`date -u +"%Y-%m-%d %H:%M"`   +  $$testname" ; \
+			echo "`date -u +"%Y-%m-%d %H:%M"`   +  $(WORKDIR)/$$testname" ; \
 		else \
-			echo "`date -u +"%Y-%m-%d %H:%M"`  0   $$testname" ; \
+			echo "`date -u +"%Y-%m-%d %H:%M"`  0   $(WORKDIR)/$$testname" ; \
 		fi ; \
 	done
 

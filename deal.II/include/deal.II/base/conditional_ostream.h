@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -71,7 +71,7 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * system_matrix.print_formatted(pout);
  * @endcode
- * is <em>not</em> possible. Instead use the is_active() funtion for a
+ * is <em>not</em> possible. Instead use the is_active() function for a
  * work-around:
  *
  * @code
@@ -85,79 +85,79 @@ DEAL_II_NAMESPACE_OPEN
 class ConditionalOStream
 {
   public:
-				     /**
-				      * Constructor. Set the stream to which
-				      * we want to write, and the condition
-				      * based on which writes are actually
-				      * forwarded. Per default the condition
-				      * of an object is active.
-				      */
+                                     /**
+                                      * Constructor. Set the stream to which
+                                      * we want to write, and the condition
+                                      * based on which writes are actually
+                                      * forwarded. Per default the condition
+                                      * of an object is active.
+                                      */
     ConditionalOStream (std::ostream &stream,
                         const bool    active = true);
 
-				     /**
-				      * Depending on the
-				      * <tt>active</tt> flag set the
-				      * condition of this stream to
-				      * active (true) or non-active
-				      * (false). An object of this
-				      * class prints to <tt>cout</tt>
-				      * if and only if its condition
-				      * is active.
-				      */
+                                     /**
+                                      * Depending on the
+                                      * <tt>active</tt> flag set the
+                                      * condition of this stream to
+                                      * active (true) or non-active
+                                      * (false). An object of this
+                                      * class prints to <tt>cout</tt>
+                                      * if and only if its condition
+                                      * is active.
+                                      */
     void set_condition (const bool active);
 
-				     /**
-				      * Return the condition of the object.
-				      */
+                                     /**
+                                      * Return the condition of the object.
+                                      */
     bool is_active() const;
 
-				     /**
-				      * Return a reference to the stream
-				      * currently in use.
-				      */
+                                     /**
+                                      * Return a reference to the stream
+                                      * currently in use.
+                                      */
     std::ostream & get_stream () const;
-    
-    				     /**
-				      * Output a constant something through
-				      * this stream. This function must be @p
-				      * const so that member objects of this
-				      * type can also be used from @p const
-				      * member functions of the surrounding
-				      * class.
-				      */
+
+                                     /**
+                                      * Output a constant something through
+                                      * this stream. This function must be @p
+                                      * const so that member objects of this
+                                      * type can also be used from @p const
+                                      * member functions of the surrounding
+                                      * class.
+                                      */
     template <typename T>
     const ConditionalOStream &
     operator << (const T &t) const;
 
-				     /**
-				      * Treat ostream manipulators. This
-				      * function must be @p const so that
-				      * member objects of this type can also
-				      * be used from @p const member functions
-				      * of the surrounding class.
-				      *
-				      * Note that compilers want to see this
-				      * treated differently from the general
-				      * template above since functions like @p
-				      * std::endl are actually overloaded and
-				      * can't be bound directly to a template
-				      * type.
-				      */
+                                     /**
+                                      * Treat ostream manipulators. This
+                                      * function must be @p const so that
+                                      * member objects of this type can also
+                                      * be used from @p const member functions
+                                      * of the surrounding class.
+                                      *
+                                      * Note that compilers want to see this
+                                      * treated differently from the general
+                                      * template above since functions like @p
+                                      * std::endl are actually overloaded and
+                                      * can't be bound directly to a template
+                                      * type.
+                                      */
     const ConditionalOStream &
     operator<< (std::ostream& (*p) (std::ostream&)) const;
 
   private:
-				     /**
-				      * Reference to the stream we
-				      * want to write to.
-				      */
+                                     /**
+                                      * Reference to the stream we
+                                      * want to write to.
+                                      */
     std::ostream  &output_stream;
 
-				     /**
-				      * Stores the actual condition
-				      * the object is in.
-				      */
+                                     /**
+                                      * Stores the actual condition
+                                      * the object is in.
+                                      */
     bool active_flag;
 };
 

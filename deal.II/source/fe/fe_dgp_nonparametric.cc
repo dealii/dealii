@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,15 +26,15 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_DGPNonparametric<dim,spacedim>::FE_DGPNonparametric (const unsigned int degree)
-		:
-		FiniteElement<dim,spacedim> (
-		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree,
-					 FiniteElementData<dim>::L2),
-		  std::vector<bool>(
-		    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
-				    std::vector<std::vector<bool> >(
-				      FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
-				      std::vector<bool>(1,true))),
+                :
+                FiniteElement<dim,spacedim> (
+                  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree,
+                                         FiniteElementData<dim>::L2),
+                  std::vector<bool>(
+                    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
+                                    std::vector<std::vector<bool> >(
+                                      FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
+                                      std::vector<bool>(1,true))),
                 degree(degree),
                 polynomial_space (Polynomials::Legendre::generate_complete_basis(degree))
 {
@@ -43,20 +43,20 @@ FE_DGPNonparametric<dim,spacedim>::FE_DGPNonparametric (const unsigned int degre
        ref_case<RefinementCase<dim>::isotropic_refinement+1; ++ref_case)
     {
       if (dim!=2 && ref_case!=RefinementCase<dim>::isotropic_refinement)
-					 // do nothing, as anisotropic
-					 // refinement is not
-					 // implemented so far
-	continue;
+                                         // do nothing, as anisotropic
+                                         // refinement is not
+                                         // implemented so far
+        continue;
 
       const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
       for (unsigned int i=0;i<nc;++i)
-	{
-	  this->prolongation[ref_case-1][i].reinit (n_dofs, n_dofs);
-					   // Fill prolongation matrices with
-					   // embedding operators
-	  for (unsigned int j=0;j<n_dofs;++j)
-	    this->prolongation[ref_case-1][i](j,j) = 1.;
-	}
+        {
+          this->prolongation[ref_case-1][i].reinit (n_dofs, n_dofs);
+                                           // Fill prolongation matrices with
+                                           // embedding operators
+          for (unsigned int j=0;j<n_dofs;++j)
+            this->prolongation[ref_case-1][i](j,j) = 1.;
+        }
     }
 
                                    // restriction can be defined
@@ -73,7 +73,7 @@ FE_DGPNonparametric<dim,spacedim>::FE_DGPNonparametric (const unsigned int degre
 //        restriction[0].fill (Matrices::projection_matrices[degree]);
 //      }
 //    else
-//  				     // matrix undefined, set size to zero
+//                                   // matrix undefined, set size to zero
 //      for (unsigned int i=0;i<GeometryInfo<dim>::max_children_per_cell;++i)
 //        restriction[i].reinit(0, 0);
                                    // since not implemented, set to
@@ -94,12 +94,12 @@ template <int dim, int spacedim>
 std::string
 FE_DGPNonparametric<dim,spacedim>::get_name () const
 {
-				   // note that the
-				   // FETools::get_fe_from_name
-				   // function depends on the
-				   // particular format of the string
-				   // this function returns, so they
-				   // have to be kept in synch
+                                   // note that the
+                                   // FETools::get_fe_from_name
+                                   // function depends on the
+                                   // particular format of the string
+                                   // this function returns, so they
+                                   // have to be kept in synch
 
   std::ostringstream namebuf;
   namebuf << "FE_DGPNonparametric<" << dim << ">(" << degree << ")";
@@ -121,7 +121,7 @@ FE_DGPNonparametric<dim,spacedim>::clone() const
 template <int dim, int spacedim>
 double
 FE_DGPNonparametric<dim,spacedim>::shape_value (const unsigned int i,
-			  const Point<dim> &p) const
+                          const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return polynomial_space.compute_value(i, p);
@@ -132,8 +132,8 @@ FE_DGPNonparametric<dim,spacedim>::shape_value (const unsigned int i,
 template <int dim, int spacedim>
 double
 FE_DGPNonparametric<dim,spacedim>::shape_value_component (const unsigned int i,
-				    const Point<dim> &p,
-				    const unsigned int component) const
+                                    const Point<dim> &p,
+                                    const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
@@ -145,7 +145,7 @@ FE_DGPNonparametric<dim,spacedim>::shape_value_component (const unsigned int i,
 template <int dim, int spacedim>
 Tensor<1,dim>
 FE_DGPNonparametric<dim,spacedim>::shape_grad (const unsigned int i,
-			 const Point<dim> &p) const
+                         const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return polynomial_space.compute_grad(i, p);
@@ -155,8 +155,8 @@ FE_DGPNonparametric<dim,spacedim>::shape_grad (const unsigned int i,
 template <int dim, int spacedim>
 Tensor<1,dim>
 FE_DGPNonparametric<dim,spacedim>::shape_grad_component (const unsigned int i,
-				   const Point<dim> &p,
-				   const unsigned int component) const
+                                   const Point<dim> &p,
+                                   const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
@@ -168,7 +168,7 @@ FE_DGPNonparametric<dim,spacedim>::shape_grad_component (const unsigned int i,
 template <int dim, int spacedim>
 Tensor<2,dim>
 FE_DGPNonparametric<dim,spacedim>::shape_grad_grad (const unsigned int i,
-			      const Point<dim> &p) const
+                              const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return polynomial_space.compute_grad_grad(i, p);
@@ -179,8 +179,8 @@ FE_DGPNonparametric<dim,spacedim>::shape_grad_grad (const unsigned int i,
 template <int dim, int spacedim>
 Tensor<2,dim>
 FE_DGPNonparametric<dim,spacedim>::shape_grad_grad_component (const unsigned int i,
-					const Point<dim> &p,
-					const unsigned int component) const
+                                        const Point<dim> &p,
+                                        const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
@@ -212,11 +212,11 @@ template <int dim, int spacedim>
 UpdateFlags
 FE_DGPNonparametric<dim,spacedim>::update_once (const UpdateFlags) const
 {
-				   // for this kind of elements, only
-				   // the values can be precomputed
-				   // once and for all. set this flag
-				   // if the values are requested at
-				   // all
+                                   // for this kind of elements, only
+                                   // the values can be precomputed
+                                   // once and for all. set this flag
+                                   // if the values are requested at
+                                   // all
   return update_default;
 }
 
@@ -245,21 +245,21 @@ FE_DGPNonparametric<dim,spacedim>::get_data (
   const Mapping<dim,spacedim>&,
   const Quadrature<dim>&) const
 {
-				   // generate a new data object
+                                   // generate a new data object
   InternalData* data = new InternalData;
-				   // check what needs to be
-				   // initialized only once and what
-				   // on every cell/face/subface we
-				   // visit
+                                   // check what needs to be
+                                   // initialized only once and what
+                                   // on every cell/face/subface we
+                                   // visit
   data->update_once = update_once(update_flags);
   data->update_each = update_each(update_flags);
   data->update_flags = data->update_once | data->update_each;
 
   const UpdateFlags flags(data->update_flags);
 
-				   // initialize fields only if really
-				   // necessary. otherwise, don't
-				   // allocate memory
+                                   // initialize fields only if really
+                                   // necessary. otherwise, don't
+                                   // allocate memory
   if (flags & update_values)
     {
       data->values.resize (this->dofs_per_cell);
@@ -294,12 +294,12 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
   FEValuesData<dim,spacedim>&data,
   CellSimilarity::Similarity &/*cell_similarity*/) const
 {
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
+                                   // convert data object to internal
+                                   // data for this class. fails with
+                                   // an exception if that is not
+                                   // possible
   Assert (dynamic_cast<InternalData *> (&fedata) != 0,
-	  ExcInternalError());
+          ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
@@ -310,17 +310,17 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
-	polynomial_space.compute(data.quadrature_points[i],
-				 fe_data.values, fe_data.grads, fe_data.grad_grads);
-	for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	  {
-	    if (flags & update_values)
-	      data.shape_values[k][i] = fe_data.values[k];
-	    if (flags & update_gradients)
-	      data.shape_gradients[k][i] = fe_data.grads[k];
-	    if (flags & update_hessians)
-	      data.shape_hessians[k][i] = fe_data.grad_grads[k];
-	  }
+        polynomial_space.compute(data.quadrature_points[i],
+                                 fe_data.values, fe_data.grads, fe_data.grad_grads);
+        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+          {
+            if (flags & update_values)
+              data.shape_values[k][i] = fe_data.values[k];
+            if (flags & update_gradients)
+              data.shape_gradients[k][i] = fe_data.grads[k];
+            if (flags & update_hessians)
+              data.shape_hessians[k][i] = fe_data.grad_grads[k];
+          }
       }
 }
 
@@ -337,12 +337,12 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_face_values (
   typename Mapping<dim,spacedim>::InternalDataBase&       fedata,
   FEValuesData<dim,spacedim>&                             data) const
 {
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
+                                   // convert data object to internal
+                                   // data for this class. fails with
+                                   // an exception if that is not
+                                   // possible
   Assert (dynamic_cast<InternalData *> (&fedata) != 0,
-	  ExcInternalError());
+          ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
@@ -353,17 +353,17 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_face_values (
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
-	polynomial_space.compute(data.quadrature_points[i],
-				 fe_data.values, fe_data.grads, fe_data.grad_grads);
-	for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	  {
-	    if (flags & update_values)
-	      data.shape_values[k][i] = fe_data.values[k];
-	    if (flags & update_gradients)
-	      data.shape_gradients[k][i] = fe_data.grads[k];
-	    if (flags & update_hessians)
-	      data.shape_hessians[k][i] = fe_data.grad_grads[k];
-	  }
+        polynomial_space.compute(data.quadrature_points[i],
+                                 fe_data.values, fe_data.grads, fe_data.grad_grads);
+        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+          {
+            if (flags & update_values)
+              data.shape_values[k][i] = fe_data.values[k];
+            if (flags & update_gradients)
+              data.shape_gradients[k][i] = fe_data.grads[k];
+            if (flags & update_hessians)
+              data.shape_hessians[k][i] = fe_data.grad_grads[k];
+          }
       }
 }
 
@@ -381,12 +381,12 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_subface_values (
   typename Mapping<dim,spacedim>::InternalDataBase&       fedata,
   FEValuesData<dim,spacedim>&                             data) const
 {
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
+                                   // convert data object to internal
+                                   // data for this class. fails with
+                                   // an exception if that is not
+                                   // possible
   Assert (dynamic_cast<InternalData *> (&fedata) != 0,
-	  ExcInternalError());
+          ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
@@ -397,17 +397,17 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_subface_values (
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
-	polynomial_space.compute(data.quadrature_points[i],
-				 fe_data.values, fe_data.grads, fe_data.grad_grads);
-	for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	  {
-	    if (flags & update_values)
-	      data.shape_values[k][i] = fe_data.values[k];
-	    if (flags & update_gradients)
-	      data.shape_gradients[k][i] = fe_data.grads[k];
-	    if (flags & update_hessians)
-	      data.shape_hessians[k][i] = fe_data.grad_grads[k];
-	  }
+        polynomial_space.compute(data.quadrature_points[i],
+                                 fe_data.values, fe_data.grads, fe_data.grad_grads);
+        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+          {
+            if (flags & update_values)
+              data.shape_values[k][i] = fe_data.values[k];
+            if (flags & update_gradients)
+              data.shape_gradients[k][i] = fe_data.grads[k];
+            if (flags & update_hessians)
+              data.shape_hessians[k][i] = fe_data.grad_grads[k];
+          }
       }
 }
 
@@ -417,15 +417,15 @@ template <int dim, int spacedim>
 void
 FE_DGPNonparametric<dim,spacedim>::
 get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
-			       FullMatrix<double>       &interpolation_matrix) const
+                               FullMatrix<double>       &interpolation_matrix) const
 {
-				   // this is only implemented, if the source
-				   // FE is also a DGPNonparametric element. in that case,
-				   // both elements have no dofs on their
-				   // faces and the face interpolation matrix
-				   // is necessarily empty -- i.e. there isn't
-				   // much we need to do here.
-  typedef	       FiniteElement<dim,spacedim> FEE;
+                                   // this is only implemented, if the source
+                                   // FE is also a DGPNonparametric element. in that case,
+                                   // both elements have no dofs on their
+                                   // faces and the face interpolation matrix
+                                   // is necessarily empty -- i.e. there isn't
+                                   // much we need to do here.
+  typedef              FiniteElement<dim,spacedim> FEE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPNonparametric<") == 0)
                ||
                (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&x_source_fe) != 0),
@@ -433,11 +433,11 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                ExcInterpolationNotImplemented());
 
   Assert (interpolation_matrix.m() == 0,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
-				0));
+          ExcDimensionMismatch (interpolation_matrix.m(),
+                                0));
   Assert (interpolation_matrix.n() == 0,
-	  ExcDimensionMismatch (interpolation_matrix.n(),
-				0));
+          ExcDimensionMismatch (interpolation_matrix.n(),
+                                0));
 }
 
 
@@ -446,28 +446,28 @@ template <int dim, int spacedim>
 void
 FE_DGPNonparametric<dim,spacedim>::
 get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
-				  const unsigned int ,
-				  FullMatrix<double>           &interpolation_matrix) const
+                                  const unsigned int ,
+                                  FullMatrix<double>           &interpolation_matrix) const
 {
-				   // this is only implemented, if the source
-				   // FE is also a DGPNonparametric element. in that case,
-				   // both elements have no dofs on their
-				   // faces and the face interpolation matrix
-				   // is necessarily empty -- i.e. there isn't
-				   // much we need to do here.
-  typedef	       FiniteElement<dim,spacedim> FEE;
+                                   // this is only implemented, if the source
+                                   // FE is also a DGPNonparametric element. in that case,
+                                   // both elements have no dofs on their
+                                   // faces and the face interpolation matrix
+                                   // is necessarily empty -- i.e. there isn't
+                                   // much we need to do here.
+  typedef              FiniteElement<dim,spacedim> FEE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPNonparametric<") == 0)
                ||
                (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&x_source_fe) != 0),
                typename FEE::
-	       ExcInterpolationNotImplemented());
+               ExcInterpolationNotImplemented());
 
   Assert (interpolation_matrix.m() == 0,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
-				0));
+          ExcDimensionMismatch (interpolation_matrix.m(),
+                                0));
   Assert (interpolation_matrix.n() == 0,
-	  ExcDimensionMismatch (interpolation_matrix.n(),
-				0));
+          ExcDimensionMismatch (interpolation_matrix.n(),
+                                0));
 }
 
 
@@ -486,8 +486,8 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGPNonparametric<dim,spacedim>::
 hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
-				   // there are no such constraints for DGPNonparametric
-				   // elements at all
+                                   // there are no such constraints for DGPNonparametric
+                                   // elements at all
   if (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
@@ -505,8 +505,8 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGPNonparametric<dim,spacedim>::
 hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
-				   // there are no such constraints for DGPNonparametric
-				   // elements at all
+                                   // there are no such constraints for DGPNonparametric
+                                   // elements at all
   if (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
@@ -524,8 +524,8 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGPNonparametric<dim,spacedim>::
 hp_quad_dof_identities (const FiniteElement<dim,spacedim>        &fe_other) const
 {
-				   // there are no such constraints for DGPNonparametric
-				   // elements at all
+                                   // there are no such constraints for DGPNonparametric
+                                   // elements at all
   if (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
@@ -543,9 +543,9 @@ FiniteElementDomination::Domination
 FE_DGPNonparametric<dim,spacedim>::
 compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 {
-				   // check whether both are discontinuous
-				   // elements, see the description of
-				   // FiniteElementDomination::Domination
+                                   // check whether both are discontinuous
+                                   // elements, see the description of
+                                   // FiniteElementDomination::Domination
   if (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&fe_other) != 0)
     return FiniteElementDomination::no_requirements;
 
@@ -558,7 +558,7 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 template <int dim, int spacedim>
 bool
 FE_DGPNonparametric<dim,spacedim>::has_support_on_face (const unsigned int,
-				  const unsigned int) const
+                                  const unsigned int) const
 {
   return true;
 }

@@ -45,6 +45,21 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
 # settings
 include $D/common/Make.global_options
 
+################################################################
+# This example program will only work if Trilinos is installed. If this
+# # is not the case, then simply redefine the main targets to do nothing
+ifneq ($(USE_CONTRIB_LAPACK),yes)
+default run clean:
+	@echo
+	@echo "==========================================================="
+	@echo "=   This program can only be run with LAPACK enabled.     ="
+	@echo "==========================================================="
+	@echo
+else
+#
+#################################################################
+
+
 
 # Since the whole project consists of only one file, we need not
 # consider difficult dependencies. We only have to declare the
@@ -73,6 +88,7 @@ endif
 # file produced from the single C++ file into the executable. Since
 # this is the first rule in the Makefile, it is the one `make' selects
 # if you call it without arguments.
+all: $(target)$(EXEEXT)
 $(target)$(EXEEXT) : $(libraries)
 	@echo ============================ Linking $@
 	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
@@ -114,7 +130,7 @@ clean:
 # The following statement tells make that the rules `run' and `clean'
 # are not expected to produce files of the same name as Makefile rules
 # usually do.
-.PHONY: run clean
+.PHONY: all run clean
 
 
 # Finally there is a rule which you normally need not care much about:
@@ -140,4 +156,5 @@ Makefile.dep: $(target).cc Makefile \
 # them:
 include Makefile.dep
 
+endif  # USE_CONTRIB_LAPACK
 

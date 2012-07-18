@@ -33,9 +33,8 @@ deps: config.log
 	  then : ;\
 	  else rm Makefile.dep && $(MAKE) $(MAKEOPTIONS) Makefile.dep; fi
 	@cd lib && $(MAKE) $(MAKEOPTIONS) external-links
-	@mkdir -p lib/debug
-	@mkdir -p lib/optimized
-	@echo Created lib/debug and lib/optimized  directories.
+	@if test ! -d lib/debug ; then     mkdir -p lib/debug     && echo "Created lib/debug" ;     fi
+	@if test ! -d lib/optimized ; then mkdir -p lib/optimized && echo "Created lib/optimized" ; fi
 
 
 

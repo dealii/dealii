@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2006, 2008, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,8 +28,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace PETScWrappers
 {
   PreconditionerBase::PreconditionerBase ()
-		  :
-		  pc(NULL), matrix(NULL)
+                  :
+                  pc(NULL), matrix(NULL)
   {}
 
 
@@ -38,42 +38,42 @@ namespace PETScWrappers
     if (pc!=NULL)
       {
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-	int ierr = PCDestroy(pc);
+        int ierr = PCDestroy(pc);
 #else
-	int ierr = PCDestroy(&pc);
+        int ierr = PCDestroy(&pc);
 #endif
-	AssertThrow (ierr == 0, ExcPETScError(ierr));
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
   }
-  
-  
+
+
   void
   PreconditionerBase::vmult (VectorBase       &dst,
-			     const VectorBase &src) const
+                             const VectorBase &src) const
   {
     AssertThrow (pc != NULL, StandardExceptions::ExcInvalidState ());
 
     int ierr;
     ierr = PCApply(pc, src, dst);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-  }  
+  }
 
-  
+
   void
   PreconditionerBase::create_pc ()
   {
-				     // only allow the creation of the
-				     // preconditioner once
+                                     // only allow the creation of the
+                                     // preconditioner once
     AssertThrow (pc == NULL, StandardExceptions::ExcInvalidState ());
-    
+
     MPI_Comm comm;
     int ierr;
-				     // this ugly cast is necessay because the
-				     // type Mat and PETScObject are
-				     // unrelated.
+                                     // this ugly cast is necessay because the
+                                     // type Mat and PETScObject are
+                                     // unrelated.
     ierr = PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
     ierr = PCCreate(comm, &pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -88,7 +88,7 @@ namespace PETScWrappers
     return pc;
   }
 
-  
+
   PreconditionerBase::operator Mat () const
   {
     return matrix;
@@ -99,24 +99,24 @@ namespace PETScWrappers
 
   PreconditionJacobi::PreconditionJacobi ()
   {}
-  
-    
+
+
   PreconditionJacobi::PreconditionJacobi (const MatrixBase     &matrix,
                                           const AdditionalData &additional_data)
   {
-    initialize(matrix, additional_data);    
+    initialize(matrix, additional_data);
   }
 
 
   void
   PreconditionJacobi::initialize (const MatrixBase     &matrix_,
-				  const AdditionalData &additional_data_)
+                                  const AdditionalData &additional_data_)
   {
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
-    
+
     create_pc();
-    
+
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -133,22 +133,22 @@ namespace PETScWrappers
 
   PreconditionBlockJacobi::PreconditionBlockJacobi ()
   {}
-  
-    
+
+
   PreconditionBlockJacobi::
   PreconditionBlockJacobi (const MatrixBase     &matrix,
                            const AdditionalData &additional_data)
   {
-    initialize(matrix, additional_data);    
+    initialize(matrix, additional_data);
   }
 
   void
   PreconditionBlockJacobi::initialize (const MatrixBase     &matrix_,
-				       const AdditionalData &additional_data_)
+                                       const AdditionalData &additional_data_)
   {
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
-    
+
     create_pc();
 
     int ierr;
@@ -174,22 +174,22 @@ namespace PETScWrappers
 
   PreconditionSOR::PreconditionSOR ()
   {}
-  
+
 
   PreconditionSOR::PreconditionSOR (const MatrixBase     &matrix,
                                     const AdditionalData &additional_data)
   {
-    initialize(matrix, additional_data);    
+    initialize(matrix, additional_data);
   }
 
 
   void
   PreconditionSOR::initialize (const MatrixBase     &matrix_,
-			       const AdditionalData &additional_data_)
+                               const AdditionalData &additional_data_)
   {
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
-    
+
     create_pc();
 
     int ierr;
@@ -216,7 +216,7 @@ namespace PETScWrappers
                   omega (omega)
   {}
 
-  
+
   PreconditionSSOR::PreconditionSSOR ()
   {}
 
@@ -224,17 +224,17 @@ namespace PETScWrappers
   PreconditionSSOR::PreconditionSSOR (const MatrixBase     &matrix,
                                       const AdditionalData &additional_data)
   {
-    initialize(matrix, additional_data);    
+    initialize(matrix, additional_data);
   }
 
 
   void
   PreconditionSSOR::initialize (const MatrixBase     &matrix_,
-				const AdditionalData &additional_data_)
+                                const AdditionalData &additional_data_)
   {
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
-    
+
     create_pc();
 
     int ierr;
@@ -268,22 +268,22 @@ namespace PETScWrappers
 
   PreconditionEisenstat::PreconditionEisenstat ()
   {}
-  
+
 
   PreconditionEisenstat::PreconditionEisenstat (const MatrixBase     &matrix,
                                                 const AdditionalData &additional_data)
   {
-    initialize(matrix, additional_data);    
+    initialize(matrix, additional_data);
   }
 
 
   void
   PreconditionEisenstat::initialize (const MatrixBase     &matrix_,
-				     const AdditionalData &additional_data_)
+                                     const AdditionalData &additional_data_)
   {
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
-    
+
     create_pc();
 
     int ierr;
@@ -315,21 +315,21 @@ namespace PETScWrappers
   PreconditionICC::PreconditionICC ()
   {}
 
-  
+
   PreconditionICC::PreconditionICC (const MatrixBase     &matrix,
                                     const AdditionalData &additional_data)
   {
-    initialize(matrix, additional_data);    
+    initialize(matrix, additional_data);
   }
 
 
   void
   PreconditionICC::initialize (const MatrixBase     &matrix_,
-			       const AdditionalData &additional_data_)
+                               const AdditionalData &additional_data_)
   {
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
-    
+
     create_pc();
 
     int ierr;
@@ -363,22 +363,22 @@ namespace PETScWrappers
 
   PreconditionILU::PreconditionILU ()
   {}
-  
+
 
   PreconditionILU::PreconditionILU (const MatrixBase     &matrix,
                                     const AdditionalData &additional_data)
   {
-    initialize(matrix, additional_data);    
+    initialize(matrix, additional_data);
   }
 
 
   void
   PreconditionILU::initialize (const MatrixBase     &matrix_,
-			       const AdditionalData &additional_data_)
+                               const AdditionalData &additional_data_)
   {
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
-    
+
     create_pc();
 
     int ierr;
@@ -405,34 +405,34 @@ namespace PETScWrappers
 
   PreconditionBoomerAMG::AdditionalData::
   AdditionalData(const bool symmetric_operator,
-		 const double strong_threshold,
-		 const double max_row_sum,
-		 const unsigned int aggressive_coarsening_num_levels,
-		 const bool output_details
+                 const double strong_threshold,
+                 const double max_row_sum,
+                 const unsigned int aggressive_coarsening_num_levels,
+                 const bool output_details
   )
-		  :
-		  symmetric_operator(symmetric_operator),
-		  strong_threshold(strong_threshold),
-		  max_row_sum(max_row_sum),
-		  aggressive_coarsening_num_levels(aggressive_coarsening_num_levels),
-		  output_details(output_details)
+                  :
+                  symmetric_operator(symmetric_operator),
+                  strong_threshold(strong_threshold),
+                  max_row_sum(max_row_sum),
+                  aggressive_coarsening_num_levels(aggressive_coarsening_num_levels),
+                  output_details(output_details)
   {}
 
 
   PreconditionBoomerAMG::PreconditionBoomerAMG ()
   {}
 
-  
+
   PreconditionBoomerAMG::PreconditionBoomerAMG (const MatrixBase     &matrix,
-						const AdditionalData &additional_data)
+                                                const AdditionalData &additional_data)
   {
-    initialize(matrix, additional_data);    
+    initialize(matrix, additional_data);
   }
 
 
   void
   PreconditionBoomerAMG::initialize (const MatrixBase     &matrix_,
-				     const AdditionalData &additional_data_)
+                                     const AdditionalData &additional_data_)
   {
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -451,9 +451,9 @@ namespace PETScWrappers
       PetscOptionsSetValue("-pc_hypre_boomeramg_print_statistics","1");
 
     PetscOptionsSetValue("-pc_hypre_boomeramg_agg_nl",
-			 Utilities::int_to_string(
-			   additional_data.aggressive_coarsening_num_levels
-			 ).c_str());
+                         Utilities::int_to_string(
+                           additional_data.aggressive_coarsening_num_levels
+                         ).c_str());
 
     std::stringstream ssStream;
     ssStream << additional_data.max_row_sum;
@@ -465,15 +465,15 @@ namespace PETScWrappers
 
     if (additional_data.symmetric_operator)
       {
-	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_up", "symmetric-SOR/Jacobi");
-	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_down", "symmetric-SOR/Jacobi");
-	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
+        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_up", "symmetric-SOR/Jacobi");
+        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_down", "symmetric-SOR/Jacobi");
+        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
       }
     else
       {
-	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
-	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_down", "SOR/Jacobi");
-	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
+        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
+        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_down", "SOR/Jacobi");
+        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
       }
 
     ierr = PCSetFromOptions (pc);
@@ -485,8 +485,8 @@ namespace PETScWrappers
 #else // PETSC_HAVE_HYPRE
     (void)pc;
     Assert (false,
-	    ExcMessage ("Your PETSc installation does not include a copy of "
-			"the hypre package necessary for this preconditioner."));
+            ExcMessage ("Your PETSc installation does not include a copy of "
+                        "the hypre package necessary for this preconditioner."));
 #endif
   }
 
@@ -495,33 +495,33 @@ namespace PETScWrappers
 
   PreconditionLU::AdditionalData::
   AdditionalData (const double pivoting,
-		  const double zero_pivot,
-		  const double damping)
+                  const double zero_pivot,
+                  const double damping)
                   :
                   pivoting (pivoting),
                   zero_pivot (zero_pivot),
-		  damping (damping)
+                  damping (damping)
   {}
 
 
   PreconditionLU::PreconditionLU ()
   {}
 
-  
+
   PreconditionLU::PreconditionLU (const MatrixBase     &matrix,
-				  const AdditionalData &additional_data)
+                                  const AdditionalData &additional_data)
   {
-    initialize(matrix, additional_data);    
+    initialize(matrix, additional_data);
   }
 
 
   void
   PreconditionLU::initialize (const MatrixBase     &matrix_,
-			      const AdditionalData &additional_data_)
+                              const AdditionalData &additional_data_)
   {
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
-    
+
     create_pc();
 
     int ierr;

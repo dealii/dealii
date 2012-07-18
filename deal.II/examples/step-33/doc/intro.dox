@@ -225,7 +225,7 @@ of a lot of zeros: the elements of the local residual vector are
 independent of almost all elements of the solution vector, and
 consequently their derivatives are zero; however, trying to compute
 these zeros can easily take 90% or more of the compute time of the
-entire program in an experiment inadvertantly made by a student a few
+entire program, as shown in an experiment inadvertently made by a student a few
 years after this program was first written.
 
 

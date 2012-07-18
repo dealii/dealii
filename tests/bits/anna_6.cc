@@ -183,7 +183,7 @@ void ImposeBC<dim>::test_extract_boundary_DoFs ()
   bc_component_select[2] = false;
   			
   std::vector<bool> ned_boundary_dofs (dof_handler.n_dofs());
-  std::set<unsigned char> boundary_indicators;
+  std::set<types::boundary_id_t> boundary_indicators;
   boundary_indicators.insert (0);
   DoFTools::extract_boundary_dofs (dof_handler, 
                                    bc_component_select,
@@ -222,7 +222,7 @@ void ImposeBC<dim>::test_interpolate_BC ()
                                    // (the pressure is assumed to be set to 1
                                    // on the boundary)					 
   std::vector<bool> p_boundary_dofs (dof_handler.n_dofs());
-  std::set<unsigned char> boundary_indicators;
+  std::set<types::boundary_id_t> boundary_indicators;
   boundary_indicators.insert (0);
   DoFTools::extract_boundary_dofs (dof_handler, 
                                    bc_component_select,

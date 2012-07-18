@@ -1,0 +1,174 @@
+<h1>Results</h1>
+
+<h3>Comparison with a sparse matrix</h3>
+
+In order to demonstrate the gain in using the MatrixFree class instead of
+the standard <code>deal.II</code> assembly routines for evaluating the
+information from old time steps, we study a simple serial run of the code on a
+nonadaptive mesh. Since much time is spent on evaluating the sine function, we
+do not only show the numbers of the full sine-Gordon equation but also for the
+wave equation (the sine-term skipped from the sine-Gordon equation). We use
+both second and fourth order elements. The results are summarized in the
+following table.
+
+<table align="center" border="1">
+  <tr>
+    <th>&nbsp;</th>
+    <th colspan="3">wave equation</th>
+    <th colspan="2">sine-Gordon</th>
+  </tr>
+  <tr>
+    <th>&nbsp;</th>
+    <th>MF</th>
+    <th>SpMV</th>
+    <th>dealii</th>
+    <th>MF</th>
+    <th>dealii</th>
+  </tr>
+  <tr>
+    <td>2D, $\mathcal{Q}_2$</td>
+    <td align="right"> 0.0106</td>
+    <td align="right"> 0.00971</td>
+    <td align="right"> 0.109</td>
+    <td align="right"> 0.0243</td>
+    <td align="right"> 0.124</td>
+  </tr>
+  <tr>
+    <td>2D, $\mathcal{Q}_4$</td>
+    <td align="right"> 0.0328</td>
+    <td align="right"> 0.0706</td>
+    <td align="right"> 0.528</td>
+    <td align="right"> 0.0714</td>
+    <td align="right"> 0.502</td>
+   </tr>
+   <tr>
+    <td>3D, $\mathcal{Q}_2$</td>
+    <td align="right"> 0.0151</td>
+    <td align="right"> 0.0320</td>
+    <td align="right"> 0.331</td>
+    <td align="right"> 0.0376</td>
+    <td align="right"> 0.364</td>
+   </tr>
+   <tr>
+    <td>3D, $\mathcal{Q}_4$</td>
+    <td align="right"> 0.0918</td>
+    <td align="right"> 0.844</td>
+    <td align="right"> 6.83</td>
+    <td align="right"> 0.194</td>
+    <td align="right"> 6.95</td>
+   </tr>
+</table>
+
+It is apparent that the matrix-free code outperforms the standard assembly
+routines in deal.II by far. In 3D and for fourth order elements, one operator
+application is also almost ten times as fast as a sparse matrix-vector
+product.
+
+<h3>Parallel run in 3D</h3>
+
+To demonstrate how the example scales for a parallel run and to demsonstrate
+that hanging node constraints can be handled in an efficient way, we run the
+example in 3D with $\mathcal{Q}_4$ elements. First, we run it on a notebook
+with 2 cores (Sandy Bridge CPU) at 2.7 GHz.
+@code
+\$ make debug-mode=off run
+   Number of global active cells: 17592
+   Number of degrees of freedom: 1193881
+   Time step size: 0.0117233, finest cell: 0.46875
+
+   Time:     -10, solution norm:  29.558
+   Time:   -7.66, solution norm:  129.13
+   Time:   -5.31, solution norm:  67.753
+   Time:   -2.97, solution norm:  79.245
+   Time:  -0.621, solution norm:  123.52
+   Time:    1.72, solution norm:  43.525
+   Time:    4.07, solution norm:  93.285
+   Time:    6.41, solution norm:  97.722
+   Time:    8.76, solution norm:  36.734
+   Time:      10, solution norm:  94.115
+
+   Performed 1706 time steps.
+   Average wallclock time per time step: 0.038261s
+   Spent 11.977s on output and 65.273s on computations.
+@endcode
+
+It takes 0.04 seconds for one time step on a notebook with more than a million
+degrees of freedom (note that we would need many processors to reach such
+numbers when solving linear systems). If we run the same 3D code on a
+cluster with 2 nodes and each node runs 8 threads, we get the following times:
+
+@code
+\$ mpirun --bynode -n 2 ./\step-48
+...
+   Performed 1706 time steps.
+   Average wallclock time per time step: 0.0123188s
+   Spent 6.74378s on output and 21.0158s on computations.
+@endcode
+
+We observe a considerable speedup over the notebook (16 cores versus 2 cores;
+nonethess, one notebook core is considerably faster than one core of the
+cluster because of a newer processor architecture). If we run the same program
+on 4 nodes with 8 threads on each node, we get:
+@code
+\$ mpirun --bynode -n 4 ./\step-48
+...
+   Performed 1706 time steps.
+   Average wallclock time per time step: 0.00689865s
+   Spent 3.54145s on output and 11.7691s on computations.
+@endcode
+
+By comparing the times for two nodes and four nodes, we observe the nice
+scaling behavior of the implementation. Of course, the code can also be run in
+MPI-mode only by disabling the multithreading flag in the code. If we use the
+same 32 cores as for the hybrid parallelization above, we observe the
+following run-time:
+
+@code
+\$ mpirun -n 32 ./\step-48
+...
+   Performed 1706 time steps.
+   Average wallclock time per time step: 0.0189041s
+   Spent 0.968967s on output and 32.2504s on computations.
+@endcode
+
+We observe slower speed for computations, but faster output (which makes
+sense, as output is only parallelized by MPI and not threads), whereas the
+computations are faster if we use hybrid parallelism in the given case.
+
+<h3>Possibilities for extensions</h3>
+
+There are several things in this program that could be improved to make it
+even more efficient (besides improved boundary conditions and physical
+stuff as discussed in step-25):
+
+<ul> <li> <b>Faster evaluation of sine terms:</b> As becomes obvious
+  from the comparison of the plain wave equation and the sine-Gordon
+  equation above, the evaluation of the sine terms dominates the total
+  time for the finite element operator application. There are a few
+  reasons for this: Firstly, the deal.II sine computation of a
+  VectorizedArray field is not vectorized (as opposed to the rest of
+  the operator application). This could be cured by handing the sine
+  computation to a library with vectorized sine computations like
+  Intel's math kernel library (MKL). By using the function
+  <code>vdSin</code> in MKL, the program uses half the computing time
+  in 2D and 40 percent less time in 3D. On the other hand, the sine
+  computation is structurally much more complicated than the simple
+  arithmetic operations like additions and multiplications in the rest
+  of the local operation.
+
+  <li> <b>Higher order time stepping:</b> While the implementation allows for
+  arbitrary order in the spatial part (by adjusting the degree of the finite
+  element), the time stepping scheme is a standard second-order leap-frog
+  scheme. Since solutions in wave propagation problems are usually very
+  smooth, the error is likely dominated by the time stepping part. Of course,
+  this could be cured by using smaller time steps (at a fixed spatial
+  resolution), but it would be more efficient to use higher order time
+  stepping as well. While it would be straight-forward to do so for a
+  first-order system (use some Runge&ndash;Kutta scheme of higher order,
+  probably combined with adaptive time step selection like the <a
+  href="http://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method">Dormand&ndash;Prince
+  method</a>), it is more challenging for the second-order formulation. At
+  least in the finite difference community, people usually use the PDE to find
+  spatial correction terms that improve the temporal error.
+
+</ul>

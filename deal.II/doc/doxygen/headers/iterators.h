@@ -440,10 +440,10 @@ You can check this by calling the TriaAccessorBase::state() function.
 
 Past-the-end iterators may also be used to compare an iterator with
 the before-the-start value, when running backwards. There is no
-distiction between the iterators pointing past the two ends of a
+distinction between the iterators pointing past the two ends of a
 vector.
 
-Cells are stored based on a hierachical structure of levels, therefore the
+Cells are stored based on a hierarchical structure of levels, therefore the
 above mentioned structure is useful. Faces however are not organized in
 levels, and accessors for objects of lower dimensionality do not have a
 <code>present_level</code> member variable.

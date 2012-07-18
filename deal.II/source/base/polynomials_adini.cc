@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,7 @@
 
 #include <deal.II/base/polynomials_adini.h>
 
-#define ENTER_COEFFICIENTS(koefs,z,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11)	\
+#define ENTER_COEFFICIENTS(koefs,z,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11)       \
   koefs(0, z)= a0; koefs(1, z)=a1; koefs(2, z)=a2; koefs(3, z)=a3; koefs( 4, z)=a4 ; koefs( 5, z)=a5 ; \
   koefs(6, z)= a6; koefs(7, z)=a7; koefs(8, z)=a8; koefs(9, z)=a9; koefs(10, z)=a10; koefs(11, z)=a11;
 

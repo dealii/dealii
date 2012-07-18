@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,24 +51,24 @@ namespace internal
     class TriaLevel
     {
       public:
-					 /**
-					  *  @p RefinementCase<dim>::Type flags
-					  *  for the cells to be
-					  *  refined with or not
-					  *  (RefinementCase<dim>::no_refinement). The
-					  *  meaning what a cell is,
-					  *  is dimension specific,
-					  *  therefore also the length
-					  *  of this vector depends on
-					  *  the dimension: in one
-					  *  dimension, the length of
-					  *  this vector equals the
-					  *  length of the @p lines
-					  *  vector, in two dimensions
-					  *  that of the @p quads
-					  *  vector, etc.
-					  */
-	std::vector<unsigned char> refine_flags;
+                                         /**
+                                          *  @p RefinementCase<dim>::Type flags
+                                          *  for the cells to be
+                                          *  refined with or not
+                                          *  (RefinementCase<dim>::no_refinement). The
+                                          *  meaning what a cell is,
+                                          *  is dimension specific,
+                                          *  therefore also the length
+                                          *  of this vector depends on
+                                          *  the dimension: in one
+                                          *  dimension, the length of
+                                          *  this vector equals the
+                                          *  length of the @p lines
+                                          *  vector, in two dimensions
+                                          *  that of the @p quads
+                                          *  vector, etc.
+                                          */
+        std::vector<unsigned char> refine_flags;
 
                                          /**
                                           * Same meaning as the one above, but
@@ -147,32 +147,32 @@ namespace internal
                                           */
         std::vector<int> parents;
 
-					 /**
-					  * One bool per cell to indicate the
-					  * direction of the normal
-					  * true:  use orientation from vertex
-					  * false: revert the orientation. See
-					  * @ref GlossDirectionFlag .
-					  *
-					  * This is only used for
-					  * codim==1 meshes.
-					  */
+                                         /**
+                                          * One bool per cell to indicate the
+                                          * direction of the normal
+                                          * true:  use orientation from vertex
+                                          * false: revert the orientation. See
+                                          * @ref GlossDirectionFlag .
+                                          *
+                                          * This is only used for
+                                          * codim==1 meshes.
+                                          */
         std::vector<bool> direction_flags;
 
-					 /**
-					  * The object containing the data on lines and
-					  * related functions
-					  */
-	TriaObjects<TriaObject<dim> > cells;
+                                         /**
+                                          * The object containing the data on lines and
+                                          * related functions
+                                          */
+        TriaObjects<TriaObject<dim> > cells;
 
 
                                          /**
-                                          *  Reserve enough space to accomodate
+                                          *  Reserve enough space to accommodate
                                           *  @p total_cells cells on this level.
                                           *  Since there are no @p used flags on this
                                           *  level, you have to give the total number
                                           *  of cells, not only the number of newly
-                                          *  to accomodate ones, like in the
+                                          *  to accommodate ones, like in the
                                           *  <tt>TriaLevel<N>::reserve_space</tt>
                                           *  functions, with <tt>N>0</tt>.
                                           *
@@ -184,7 +184,7 @@ namespace internal
 
         void reserve_space (const unsigned int total_cells,
                             const unsigned int dimension,
-			    const unsigned int space_dimension);
+                            const unsigned int space_dimension);
 
                                          /**
                                           *  Check the memory consistency of the
@@ -203,13 +203,13 @@ namespace internal
                                           */
         std::size_t memory_consumption () const;
 
-	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
 
                                          /**
                                           *  Exception
@@ -245,29 +245,29 @@ namespace internal
         std::vector<types::subdomain_id_t> subdomain_ids;
         std::vector<int> parents;
 
-					 // The following is not used
-					 // since we don't support
-					 // codim=1 meshes in 3d; only
-					 // needed to allow
-					 // compilation
+                                         // The following is not used
+                                         // since we don't support
+                                         // codim=1 meshes in 3d; only
+                                         // needed to allow
+                                         // compilation
         std::vector<bool> direction_flags;
 
-	TriaObjectsHex cells;
+        TriaObjectsHex cells;
 
 
         void reserve_space (const unsigned int total_cells,
                             const unsigned int dimension,
-			    const unsigned int space_dimension);
+                            const unsigned int space_dimension);
         void monitor_memory (const unsigned int true_dimension) const;
         std::size_t memory_consumption () const;
 
-	/**
-	 * Read or write the data of this object to or 
-	 * from a stream for the purpose of serialization
-	 */ 
-	template <class Archive>
-	void serialize(Archive & ar,
-		       const unsigned int version);
+        /**
+         * Read or write the data of this object to or
+         * from a stream for the purpose of serialization
+         */
+        template <class Archive>
+        void serialize(Archive & ar,
+                       const unsigned int version);
 
                                          /**
                                           *  Exception
@@ -286,12 +286,12 @@ namespace internal
                         << arg2 << ", which is not as expected.");
     };
 
-    
-    
+
+
     template <int dim>
     template <class Archive>
     void TriaLevel<dim>::serialize(Archive & ar,
-				   const unsigned int)
+                                   const unsigned int)
     {
       ar & refine_flags & coarsen_flags;
       ar & neighbors;
@@ -305,7 +305,7 @@ namespace internal
 
     template <class Archive>
     void TriaLevel<3>::serialize(Archive & ar,
-				 const unsigned int)
+                                 const unsigned int)
     {
       ar & refine_flags & coarsen_flags;
       ar & neighbors;

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,27 +22,27 @@ DEAL_II_NAMESPACE_OPEN
 template <class POLY, int dim, int spacedim>
 FE_DGVector<POLY,dim,spacedim>::FE_DGVector (
   const unsigned int deg, MappingType map)
-		:
-		FE_PolyTensor<POLY, dim, spacedim>(
-		  deg,
-		  FiniteElementData<dim>(
-		    get_dpo_vector(deg), dim, deg+1, FiniteElementData<dim>::L2, 1),
-		  std::vector<bool>(POLY::compute_n_pols(deg), true),
-		  std::vector<std::vector<bool> >(POLY::compute_n_pols(deg),
-						  std::vector<bool>(dim,true)))
+                :
+                FE_PolyTensor<POLY, dim, spacedim>(
+                  deg,
+                  FiniteElementData<dim>(
+                    get_dpo_vector(deg), dim, deg+1, FiniteElementData<dim>::L2, 1),
+                  std::vector<bool>(POLY::compute_n_pols(deg), true),
+                  std::vector<std::vector<bool> >(POLY::compute_n_pols(deg),
+                                                  std::vector<bool>(dim,true)))
 {
   this->mapping_type = map;
   const unsigned int polynomial_degree = this->tensor_degree();
-  
+
   QGauss<dim> quadrature(polynomial_degree+1);
   this->generalized_support_points = quadrature.get_points();
-  
+
  this->reinit_restriction_and_prolongation_matrices(true, true);
  FETools::compute_projection_matrices (*this, this->restriction, true);
  FETools::compute_embedding_matrices (*this, this->prolongation, true);
 }
 
-		
+
 template <class POLY, int dim, int spacedim>
 FiniteElement<dim, spacedim> *
 FE_DGVector<POLY,dim,spacedim>::clone() const
@@ -55,9 +55,9 @@ template <class POLY, int dim, int spacedim>
 std::string
 FE_DGVector<POLY,dim,spacedim>::get_name() const
 {
-  std::ostringstream namebuf;  
+  std::ostringstream namebuf;
   namebuf << "FE_DGVector_" << this->poly_space.name()
-	  << "<" << dim << ">(" << this->degree-1 << ")";
+          << "<" << dim << ">(" << this->degree-1 << ")";
   return namebuf.str();
 }
 
@@ -68,7 +68,7 @@ FE_DGVector<POLY,dim,spacedim>::get_dpo_vector (const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim+1);
   dpo[dim] = POLY::compute_n_pols(deg);
-  
+
   return dpo;
 }
 

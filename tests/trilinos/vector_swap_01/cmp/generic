@@ -1,0 +1,7 @@
+
+DEAL::v: size= 5 el(0)= 1.00000 l2norm()= 2.23607
+DEAL::w: size= 9 el(0)= 2.00000 l2norm()= 6.00000
+DEAL::**swap**
+DEAL::v: size= 9 el(0)= 2.00000 l2norm()= 6.00000
+DEAL::w: size= 5 el(0)= 1.00000 l2norm()= 2.23607
+DEAL::OK

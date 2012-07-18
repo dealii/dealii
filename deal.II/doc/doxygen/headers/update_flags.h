@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,7 @@ have to compute
 @f[
   A^K_{ij} = \sum_{q}J^{-1}(\hat{\bf x}_q) \hat \nabla \varphi_i(\hat{\bf x}_q) \cdot
   J^{-1}(\hat{\bf x}_q) \hat \nabla \varphi_j(\hat{\bf x}_q)\ |\textrm{det}\ J(\hat{\bf x}_q)|
-  w_q, 
+  w_q,
 @f]
 where a hat indicates reference coordinates, and $J(\hat{\bf
 x}_q)$ is the Jacobian
@@ -100,8 +100,8 @@ of a FEValues object that uses a FE_RaviartThomas element, then we can set
 <code>update_once=update_values</code> and <code>update_each=0</code>
 for the FiniteElement, but need to set <code>update_once=0</code>
 <code>update_each=update_jacobians</code> for the Mapping object.
- 
-To accomodate this structure, at the time a FEValues object is constructed,
+
+To accommodate this structure, at the time a FEValues object is constructed,
 it asks both the FiniteElement and the Mapping object it uses the following:
 <ol>
 <li> Are any additional values required in order to compute the
@@ -123,7 +123,7 @@ required from the Mapping. The function in FEValues computing the
 actual set of flags from the desired one looks like this:
 <code>
   flags |= fe->update_once (flags)
-	|  fe->update_each (flags);
+        |  fe->update_each (flags);
   flags |= mapping->update_once (flags)
         |  mapping->update_each (flags);
 </code>

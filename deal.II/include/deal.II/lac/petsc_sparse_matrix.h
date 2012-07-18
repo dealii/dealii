@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -70,7 +70,7 @@ namespace PETScWrappers
                                         * matrix.
                                         */
       SparseMatrix ();
-      
+
                                        /**
                                         * Create a sparse matrix of dimensions
                                         * @p m times @p n, with an
@@ -303,12 +303,12 @@ namespace PETScWrappers
       template <typename SparsityType>
       void do_reinit (const SparsityType &sparsity_pattern,
                       const bool          preset_nonzero_locations);
-                      
-				       /**
-				        *  To allow calling protected
-				        *  prepare_add() and
-				        *  prepare_set().
-				        */                       
+
+                                       /**
+                                        *  To allow calling protected
+                                        *  prepare_add() and
+                                        *  prepare_set().
+                                        */
       friend class BlockMatrixBase<SparseMatrix>;
   };
 }

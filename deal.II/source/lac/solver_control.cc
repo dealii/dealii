@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,30 +25,30 @@ DEAL_II_NAMESPACE_OPEN
 
 
 SolverControl::NoConvergence::NoConvergence (const unsigned int last_step,
-					     const double       last_residual)
-		:
-		last_step (last_step),
-		last_residual (last_residual)
+                                             const double       last_residual)
+                :
+                last_step (last_step),
+                last_residual (last_residual)
 {}
 
 
 const char *
 SolverControl::NoConvergence::what () const throw ()
 {
-  				   // have a place where to store the
-				   // description of the exception as a char *
-				   //
-				   // this thing obviously is not multi-threading
-				   // safe, but we don't care about that for now
-				   //
-				   // we need to make this object static, since
-				   // we want to return the data stored in it
-				   // and therefore need a liftime which is
-				   // longer than the execution time of this
-				   // function
+                                   // have a place where to store the
+                                   // description of the exception as a char *
+                                   //
+                                   // this thing obviously is not multi-threading
+                                   // safe, but we don't care about that for now
+                                   //
+                                   // we need to make this object static, since
+                                   // we want to return the data stored in it
+                                   // and therefore need a lifetime which is
+                                   // longer than the execution time of this
+                                   // function
   static std::string description;
-				   // convert the messages printed by the
-				   // exceptions into a std::string
+                                   // convert the messages printed by the
+                                   // exceptions into a std::string
   std::ostringstream out;
   out << "Iterative method reported convergence failure in step "
       << last_step << " with residual " << last_residual;
@@ -60,78 +60,78 @@ SolverControl::NoConvergence::what () const throw ()
 
 
 SolverControl::SolverControl (const unsigned int maxiter,
-			      const double tolerance,
-			      const bool m_log_history,
-			      const bool m_log_result)
-		:
-		maxsteps(maxiter),
-		tol(tolerance),
-		lvalue(1.e300),
-		lstep(0),
-		check_failure(false),
-		relative_failure_residual(0),
-		failure_residual(0),
-		m_log_history(m_log_history),
-		m_log_frequency(1),
-		m_log_result(m_log_result),
-		history_data_enabled(false)
+                              const double tolerance,
+                              const bool m_log_history,
+                              const bool m_log_result)
+                :
+                maxsteps(maxiter),
+                tol(tolerance),
+                lvalue(1.e300),
+                lstep(0),
+                check_failure(false),
+                relative_failure_residual(0),
+                failure_residual(0),
+                m_log_history(m_log_history),
+                m_log_frequency(1),
+                m_log_result(m_log_result),
+                history_data_enabled(false)
 {}
 
 
 
-SolverControl::~SolverControl() 
+SolverControl::~SolverControl()
 {}
 
 
 
 SolverControl::State
 SolverControl::check (const unsigned int step,
-		      const double check_value)
+                      const double check_value)
 {
-				   // if this is the first time we
-				   // come here, then store the
-				   // residual for later comparisons
+                                   // if this is the first time we
+                                   // come here, then store the
+                                   // residual for later comparisons
   if (step==0)
     {
       initial_val = check_value;
       if (history_data_enabled)
-	history_data.resize(maxsteps);
+        history_data.resize(maxsteps);
     }
-  
+
   if (m_log_history && ((step % m_log_frequency) == 0))
     deallog << "Check " << step << "\t" << check_value << std::endl;
-  
+
   lstep  = step;
   lvalue = check_value;
 
   if (step==0)
     {
       if (check_failure)
-	failure_residual=relative_failure_residual*check_value;
-      
+        failure_residual=relative_failure_residual*check_value;
+
       if (m_log_result)
-	deallog << "Starting value " << check_value << std::endl;
+        deallog << "Starting value " << check_value << std::endl;
     }
 
   if (history_data_enabled)
     history_data[step] = check_value;
-  
+
   if (check_value <= tol)
     {
       if (m_log_result)
-	deallog << "Convergence step " << step
-		<< " value " << check_value << std::endl;
+        deallog << "Convergence step " << step
+                << " value " << check_value << std::endl;
       lcheck = success;
       return success;
     }
-  
+
   if ((step >= maxsteps) ||
 #ifdef HAVE_ISNAN
       isnan(check_value) ||
 #else
 #  if HAVE_UNDERSCORE_ISNAN
-				       // on Microsoft Windows, the
-				       // function is called _isnan
+                                       // on Microsoft Windows, the
+                                       // function is called _isnan
       _isnan(check_value) ||
 #  endif
 #endif
@@ -139,8 +139,8 @@ SolverControl::check (const unsigned int step,
   )
     {
       if (m_log_result)
-	deallog << "Failure step " << step
-		<< " value " << check_value << std::endl;
+        deallog << "Failure step " << step
+                << " value " << check_value << std::endl;
       lcheck = failure;
       return failure;
     }
@@ -202,12 +202,12 @@ SolverControl::average_reduction() const
 {
   if (lstep == 0)
     return 0.;
-  
+
   Assert (history_data_enabled, ExcHistoryDataRequired());
   Assert (history_data.size() > lstep, ExcInternalError());
   Assert (history_data[0] > 0., ExcInternalError());
   Assert (history_data[lstep] > 0., ExcInternalError());
-  
+
   return std::pow(history_data[lstep]/history_data[0], 1./lstep);
 }
 
@@ -220,7 +220,7 @@ SolverControl::step_reduction(unsigned int step) const
   Assert (history_data.size() > lstep, ExcInternalError());
   Assert (step <=lstep, ExcIndexRange(step,1,lstep+1));
   Assert (step>0, ExcIndexRange(step,1,lstep+1));
-  
+
   return history_data[step]/history_data[step-1];
 }
 
@@ -231,7 +231,7 @@ SolverControl::final_reduction() const
   return step_reduction(lstep);
 }
 
-  
+
 void
 SolverControl::declare_parameters (ParameterHandler& param)
 {
@@ -256,19 +256,19 @@ void SolverControl::parse_parameters (ParameterHandler& param)
 
 
 ReductionControl::ReductionControl(const unsigned int n,
-				   const double tol,
-				   const double red,
-				   const bool m_log_history,
-				   const bool m_log_result)
-		:
-		SolverControl (n, tol, m_log_history, m_log_result),
-		reduce(red)
+                                   const double tol,
+                                   const double red,
+                                   const bool m_log_history,
+                                   const bool m_log_result)
+                :
+                SolverControl (n, tol, m_log_history, m_log_result),
+                reduce(red)
 {}
 
 
 ReductionControl::ReductionControl (const SolverControl& c)
-		:
-		SolverControl(c)
+                :
+                SolverControl(c)
 {
   set_reduction(0.);
 }
@@ -289,29 +289,29 @@ ReductionControl::~ReductionControl()
 
 SolverControl::State
 ReductionControl::check (const unsigned int step,
-			 const double check_value)
+                         const double check_value)
 {
-				   // if this is the first time we
-				   // come here, then store the
-				   // residual for later comparisons
+                                   // if this is the first time we
+                                   // come here, then store the
+                                   // residual for later comparisons
   if (step==0)
     {
       initial_val = check_value;
       reduced_tol = check_value * reduce;
     };
 
-				   // check whether desired reduction
-				   // has been achieved. also check
-				   // for equality in case initial
-				   // residual already was zero
+                                   // check whether desired reduction
+                                   // has been achieved. also check
+                                   // for equality in case initial
+                                   // residual already was zero
   if (check_value <= reduced_tol)
     {
       if (m_log_result)
-	deallog << "Convergence step " << step
-		<< " value " << check_value << std::endl;
+        deallog << "Convergence step " << step
+                << " value " << check_value << std::endl;
       lstep  = step;
       lvalue = check_value;
-      
+
       lcheck = success;
       return success;
     }

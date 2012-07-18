@@ -724,7 +724,7 @@ Essentially, there are currently two algorithms in the program that do not
 scale linearly with the number of degrees of freedom: renumbering of degrees
 of freedom (which is ${\cal O}(N \log N)$, and the linear solver (which is
 ${\cal O}(N^{4/3})$). As for the first, while reordering degrees of freedom
-may not scale linearly, it is an indispensible part of the overall algorithm
+may not scale linearly, it is an indispensable part of the overall algorithm
 as it greatly improves the quality of the sparse ILU, easily making up for
 the time spent on computing the renumbering; graphs and timings to
 demonstrate this are shown in the documentation of the DoFRenumbering

@@ -2,7 +2,7 @@
 //      $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,9 +50,9 @@ namespace Polynomials
   template <typename number>
   Polynomial<number>::Polynomial (const std::vector<number> &a)
                   :
-		  coefficients             (a),
-		  in_lagrange_product_form (false),
-		  lagrange_weight          (1.)
+                  coefficients             (a),
+                  in_lagrange_product_form (false),
+                  lagrange_weight          (1.)
   {}
 
 
@@ -61,15 +61,15 @@ namespace Polynomials
   Polynomial<number>::Polynomial (const unsigned int n)
                   :
                   coefficients             (n+1, 0.),
-		  in_lagrange_product_form (false),
-		  lagrange_weight          (1.)
+                  in_lagrange_product_form (false),
+                  lagrange_weight          (1.)
   {}
 
 
 
   template <typename number>
   Polynomial<number>::Polynomial (const std::vector<Point<1> > &supp,
-				  const unsigned int            center)
+                                  const unsigned int            center)
                   :
                   in_lagrange_product_form (true)
   {
@@ -80,17 +80,17 @@ namespace Polynomials
     number tmp_lagrange_weight = 1.;
     for (unsigned int i=0; i<supp.size(); ++i)
       if (i!=center)
-	{
-	  lagrange_support_points.push_back(supp[i](0));
-	  tmp_lagrange_weight *= supp[center](0) - supp[i](0);
-	}
+        {
+          lagrange_support_points.push_back(supp[i](0));
+          tmp_lagrange_weight *= supp[center](0) - supp[i](0);
+        }
 
-				// check for underflow and overflow
+                                // check for underflow and overflow
 #ifdef HAVE_STD_NUMERIC_LIMITS
     Assert (std::fabs(tmp_lagrange_weight) > std::numeric_limits<number>::min(),
-	    ExcMessage ("Underflow in computation of Lagrange denominator."));
+            ExcMessage ("Underflow in computation of Lagrange denominator."));
     Assert (std::fabs(tmp_lagrange_weight) < std::numeric_limits<number>::max(),
-	    ExcMessage ("Overflow in computation of Lagrange denominator."));
+            ExcMessage ("Overflow in computation of Lagrange denominator."));
 #endif
     lagrange_weight = static_cast<number>(1.)/tmp_lagrange_weight;
   }
@@ -105,106 +105,106 @@ namespace Polynomials
     Assert (values.size() > 0, ExcZero());
     const unsigned int values_size=values.size();
 
-				// evaluate Lagrange polynomial and
-				// derivatives
+                                // evaluate Lagrange polynomial and
+                                // derivatives
     if (in_lagrange_product_form == true)
       {
-				// to compute the value and all derivatives of
-				// a polynomial of the form
-				// (x-x_1)*(x-x_2)*...*(x-x_n), expand the
-				// derivatives like automatic differentiation
-				// does.
-	const unsigned int n_supp = lagrange_support_points.size();
-	switch (values_size)
-	  {
-	  default:
-	    values[0] = 1;
-	    for (unsigned int d=1; d<values_size; ++d)
-	      values[d] = 0;
-	    for (unsigned int i=0; i<n_supp; ++i)
-	      {
-		const number v = x-lagrange_support_points[i];
+                                // to compute the value and all derivatives of
+                                // a polynomial of the form
+                                // (x-x_1)*(x-x_2)*...*(x-x_n), expand the
+                                // derivatives like automatic differentiation
+                                // does.
+        const unsigned int n_supp = lagrange_support_points.size();
+        switch (values_size)
+          {
+          default:
+            values[0] = 1;
+            for (unsigned int d=1; d<values_size; ++d)
+              values[d] = 0;
+            for (unsigned int i=0; i<n_supp; ++i)
+              {
+                const number v = x-lagrange_support_points[i];
 
-				// multiply by (x-x_i) and compute action on
-				// all derivatives, too (inspired from
-				// automatic differentiation: implement the
-				// product rule for the old value and the new
-				// variable 'v', i.e., expand value v and
-				// derivative one). since we reuse a value
-				// from the next lower derivative from the
-				// steps before, need to start from the
-				// highest derivative
-		for (unsigned int k=values_size-1; k>0; --k)
-		  values[k] = (values[k] * v + values[k-1]);
-		values[0] *= v;
-	      }
-				// finally, multiply by the weight in the
-				// Lagrange denominator. Could be done instead
-				// of setting values[0] = 1 above, but that
-				// gives different accumulation of round-off
-				// errors (multiplication is not associative)
-				// compared to when we computed the weight,
-				// and hence a basis function might not be
-				// exactly one at the center point, which is
-				// nice to have. We also multiply derivatives
-				// by k! to transform the product p_n =
-				// p^(n)(x)/k! into the actual form of the
-				// derivative
-	    {
-	      number k_faculty = 1;
-	      for (unsigned int k=0; k<values_size; ++k)
-		{
-		  values[k] *= k_faculty * lagrange_weight;
-		  k_faculty *= static_cast<number>(k+1);
-		}
-	    }
-	    break;
+                                // multiply by (x-x_i) and compute action on
+                                // all derivatives, too (inspired from
+                                // automatic differentiation: implement the
+                                // product rule for the old value and the new
+                                // variable 'v', i.e., expand value v and
+                                // derivative one). since we reuse a value
+                                // from the next lower derivative from the
+                                // steps before, need to start from the
+                                // highest derivative
+                for (unsigned int k=values_size-1; k>0; --k)
+                  values[k] = (values[k] * v + values[k-1]);
+                values[0] *= v;
+              }
+                                // finally, multiply by the weight in the
+                                // Lagrange denominator. Could be done instead
+                                // of setting values[0] = 1 above, but that
+                                // gives different accumulation of round-off
+                                // errors (multiplication is not associative)
+                                // compared to when we computed the weight,
+                                // and hence a basis function might not be
+                                // exactly one at the center point, which is
+                                // nice to have. We also multiply derivatives
+                                // by k! to transform the product p_n =
+                                // p^(n)(x)/k! into the actual form of the
+                                // derivative
+            {
+              number k_faculty = 1;
+              for (unsigned int k=0; k<values_size; ++k)
+                {
+                  values[k] *= k_faculty * lagrange_weight;
+                  k_faculty *= static_cast<number>(k+1);
+                }
+            }
+            break;
 
-				// manually implement size 1 (values only),
-				// size 2 (value + first derivative), and size
-				// 3 (up to second derivative) since they
-				// might be called often. then, we can unroll
-				// the loop.
-	  case 1:
-	    values[0] = 1;
-	    for (unsigned int i=0; i<n_supp; ++i)
-	      {
-		const number v = x-lagrange_support_points[i];
-		values[0] *= v;
-	      }
-	    values[0] *= lagrange_weight;
-	    break;
+                                // manually implement size 1 (values only),
+                                // size 2 (value + first derivative), and size
+                                // 3 (up to second derivative) since they
+                                // might be called often. then, we can unroll
+                                // the loop.
+          case 1:
+            values[0] = 1;
+            for (unsigned int i=0; i<n_supp; ++i)
+              {
+                const number v = x-lagrange_support_points[i];
+                values[0] *= v;
+              }
+            values[0] *= lagrange_weight;
+            break;
 
-	  case 2:
-	    values[0] = 1;
-	    values[1] = 0;
-	    for (unsigned int i=0; i<n_supp; ++i)
-	      {
-		const number v = x-lagrange_support_points[i];
-		values[1] = values[1] * v + values[0];
-		values[0] *= v;
-	      }
-	    values[0] *= lagrange_weight;
-	    values[1] *= lagrange_weight;
-	    break;
+          case 2:
+            values[0] = 1;
+            values[1] = 0;
+            for (unsigned int i=0; i<n_supp; ++i)
+              {
+                const number v = x-lagrange_support_points[i];
+                values[1] = values[1] * v + values[0];
+                values[0] *= v;
+              }
+            values[0] *= lagrange_weight;
+            values[1] *= lagrange_weight;
+            break;
 
-	  case 3:
-	    values[0] = 1;
-	    values[1] = 0;
-	    values[2] = 0;
-	    for (unsigned int i=0; i<n_supp; ++i)
-	      {
-		const number v = x-lagrange_support_points[i];
-		values[2] = values[2] * v + values[1];
-		values[1] = values[1] * v + values[0];
-		values[0] *= v;
-	      }
-	    values[0] *= lagrange_weight;
-	    values[1] *= lagrange_weight;
-	    values[2] *= static_cast<number>(2) * lagrange_weight;
-	    break;
-	  }
-	return;
+          case 3:
+            values[0] = 1;
+            values[1] = 0;
+            values[2] = 0;
+            for (unsigned int i=0; i<n_supp; ++i)
+              {
+                const number v = x-lagrange_support_points[i];
+                values[2] = values[2] * v + values[1];
+                values[1] = values[1] * v + values[0];
+                values[0] *= v;
+              }
+            values[0] *= lagrange_weight;
+            values[1] *= lagrange_weight;
+            values[2] *= static_cast<number>(2) * lagrange_weight;
+            break;
+          }
+        return;
       }
 
     Assert (coefficients.size() > 0, ExcEmptyObject());
@@ -257,33 +257,33 @@ namespace Polynomials
   void
   Polynomial<number>::transform_into_standard_form ()
   {
-				// should only be called when the product form
-				// is active
+                                // should only be called when the product form
+                                // is active
     Assert (in_lagrange_product_form == true, ExcInternalError());
     Assert (coefficients.size() == 0, ExcInternalError());
 
-				// compute coefficients by expanding the
-				// product (x-x_i) term by term
+                                // compute coefficients by expanding the
+                                // product (x-x_i) term by term
     coefficients.resize (lagrange_support_points.size()+1);
     if (lagrange_support_points.size() == 0)
       coefficients[0] = 1.;
     else
       {
-	coefficients[0] = -lagrange_support_points[0];
-	coefficients[1] = 1.;
-	for (unsigned int i=1; i<lagrange_support_points.size(); ++i)
-	  {
-	    coefficients[i+1] = 1.;
-	    for (unsigned int j=i; j>0; --j)
-	      coefficients[j] = (-lagrange_support_points[i]*coefficients[j] +
-				 coefficients[j-1]);
-	    coefficients[0] *= -lagrange_support_points[i];
-	  }
+        coefficients[0] = -lagrange_support_points[0];
+        coefficients[1] = 1.;
+        for (unsigned int i=1; i<lagrange_support_points.size(); ++i)
+          {
+            coefficients[i+1] = 1.;
+            for (unsigned int j=i; j>0; --j)
+              coefficients[j] = (-lagrange_support_points[i]*coefficients[j] +
+                                 coefficients[j-1]);
+            coefficients[0] *= -lagrange_support_points[i];
+          }
       }
     for (unsigned int i=0; i<lagrange_support_points.size()+1; ++i)
       coefficients[i] *= lagrange_weight;
 
-				// delete the product form data
+                                // delete the product form data
     std::vector<number> new_points;
     lagrange_support_points.swap(new_points);
     in_lagrange_product_form = false;
@@ -312,21 +312,21 @@ namespace Polynomials
   void
   Polynomial<number>::scale (const number factor)
   {
-				// to scale (x-x_0)*(x-x_1)*...*(x-x_n), scale
-				// support points by 1./factor and the weight
-				// likewise
+                                // to scale (x-x_0)*(x-x_1)*...*(x-x_n), scale
+                                // support points by 1./factor and the weight
+                                // likewise
     if (in_lagrange_product_form == true)
       {
-	number inv_fact = number(1.)/factor;
-	number accumulated_fact = 1.;
-	for (unsigned int i=0; i<lagrange_support_points.size(); ++i)
-	  {
-	    lagrange_support_points[i] *= inv_fact;
-	    accumulated_fact *= factor;
-	  }
-	lagrange_weight *= accumulated_fact;
+        number inv_fact = number(1.)/factor;
+        number accumulated_fact = 1.;
+        for (unsigned int i=0; i<lagrange_support_points.size(); ++i)
+          {
+            lagrange_support_points[i] *= inv_fact;
+            accumulated_fact *= factor;
+          }
+        lagrange_weight *= accumulated_fact;
       }
-				// otherwise, use the function above
+                                // otherwise, use the function above
     else
       scale (coefficients, factor);
   }
@@ -353,9 +353,9 @@ namespace Polynomials
       lagrange_weight *= s;
     else
       {
-	for (typename std::vector<number>::iterator c = coefficients.begin();
-	     c != coefficients.end(); ++c)
-	  *c *= s;
+        for (typename std::vector<number>::iterator c = coefficients.begin();
+             c != coefficients.end(); ++c)
+          *c *= s;
       }
     return *this;
   }
@@ -366,30 +366,30 @@ namespace Polynomials
   Polynomial<number>&
   Polynomial<number>::operator *= (const Polynomial<number>& p)
   {
-				// if we are in Lagrange form, just append the
-				// new points
+                                // if we are in Lagrange form, just append the
+                                // new points
     if (in_lagrange_product_form == true && p.in_lagrange_product_form == true)
       {
-	lagrange_weight *= p.lagrange_weight;
-	lagrange_support_points.insert (lagrange_support_points.end(),
-					p.lagrange_support_points.begin(),
-					p.lagrange_support_points.end());
+        lagrange_weight *= p.lagrange_weight;
+        lagrange_support_points.insert (lagrange_support_points.end(),
+                                        p.lagrange_support_points.begin(),
+                                        p.lagrange_support_points.end());
       }
 
-				// cannot retain product form, recompute...
+                                // cannot retain product form, recompute...
     else if (in_lagrange_product_form == true)
       transform_into_standard_form();
 
-				// need to transform p into standard form as
-				// well if necessary. copy the polynomial to
-				// do this
+                                // need to transform p into standard form as
+                                // well if necessary. copy the polynomial to
+                                // do this
     std_cxx1x::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> * q = 0;
     if (p.in_lagrange_product_form == true)
       {
-	q_data.reset (new Polynomial<number>(p));
-	q_data->transform_into_standard_form();
-	q = q_data.get();
+        q_data.reset (new Polynomial<number>(p));
+        q_data->transform_into_standard_form();
+        q = q_data.get();
       }
     else
       q = &p;
@@ -401,7 +401,7 @@ namespace Polynomials
 
     for (unsigned int i=0; i<q->coefficients.size(); ++i)
       for (unsigned int j=0; j<this->coefficients.size(); ++j)
-	new_coefficients[i+j] += this->coefficients[j]*q->coefficients[i];
+        new_coefficients[i+j] += this->coefficients[j]*q->coefficients[i];
     this->coefficients = new_coefficients;
 
     return *this;
@@ -413,27 +413,27 @@ namespace Polynomials
   Polynomial<number>&
   Polynomial<number>::operator += (const Polynomial<number>& p)
   {
-				// Lagrange product form cannot reasonably be
-				// retained after polynomial addition. we
-				// could in theory check if either this
-				// polynomial or the other is a zero
-				// polynomial and retain it, but we actually
-				// currently (r23974) assume that the addition
-				// of a zero polynomial changes the state and
-				// tests equivalence.
+                                // Lagrange product form cannot reasonably be
+                                // retained after polynomial addition. we
+                                // could in theory check if either this
+                                // polynomial or the other is a zero
+                                // polynomial and retain it, but we actually
+                                // currently (r23974) assume that the addition
+                                // of a zero polynomial changes the state and
+                                // tests equivalence.
     if (in_lagrange_product_form == true)
       transform_into_standard_form();
 
-				// need to transform p into standard form as
-				// well if necessary. copy the polynomial to
-				// do this
+                                // need to transform p into standard form as
+                                // well if necessary. copy the polynomial to
+                                // do this
     std_cxx1x::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> * q = 0;
     if (p.in_lagrange_product_form == true)
       {
-	q_data.reset (new Polynomial<number>(p));
-	q_data->transform_into_standard_form();
-	q = q_data.get();
+        q_data.reset (new Polynomial<number>(p));
+        q_data->transform_into_standard_form();
+        q = q_data.get();
       }
     else
       q = &p;
@@ -455,21 +455,21 @@ namespace Polynomials
   Polynomial<number>&
   Polynomial<number>::operator -= (const Polynomial<number>& p)
   {
-				// Lagrange product form cannot reasonably be
-				// retained after polynomial addition
+                                // Lagrange product form cannot reasonably be
+                                // retained after polynomial addition
     if (in_lagrange_product_form == true)
       transform_into_standard_form();
 
-				// need to transform p into standard form as
-				// well if necessary. copy the polynomial to
-				// do this
+                                // need to transform p into standard form as
+                                // well if necessary. copy the polynomial to
+                                // do this
     std_cxx1x::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> * q = 0;
     if (p.in_lagrange_product_form == true)
       {
-	q_data.reset (new Polynomial<number>(p));
-	q_data->transform_into_standard_form();
-	q = q_data.get();
+        q_data.reset (new Polynomial<number>(p));
+        q_data->transform_into_standard_form();
+        q = q_data.get();
       }
     else
       q = &p;
@@ -491,26 +491,26 @@ namespace Polynomials
   bool
   Polynomial<number>::operator == (const Polynomial<number> & p)  const
   {
-				// need to distinguish a few cases based on
-				// whether we are in product form or not. two
-				// polynomials can still be the same when they
-				// are on different forms, but the expansion
-				// is the same
+                                // need to distinguish a few cases based on
+                                // whether we are in product form or not. two
+                                // polynomials can still be the same when they
+                                // are on different forms, but the expansion
+                                // is the same
     if (in_lagrange_product_form == true &&
-	p.in_lagrange_product_form == true)
+        p.in_lagrange_product_form == true)
       return ((lagrange_weight == p.lagrange_weight) &&
-	      (lagrange_support_points == p.lagrange_support_points));
+              (lagrange_support_points == p.lagrange_support_points));
     else if (in_lagrange_product_form == true)
       {
-	Polynomial<number> q = *this;
-	q.transform_into_standard_form();
-	return (q.coefficients == p.coefficients);
+        Polynomial<number> q = *this;
+        q.transform_into_standard_form();
+        return (q.coefficients == p.coefficients);
       }
     else if (p.in_lagrange_product_form == true)
       {
-	Polynomial<number> q = p;
-	q.transform_into_standard_form();
-	return (q.coefficients == coefficients);
+        Polynomial<number> q = p;
+        q.transform_into_standard_form();
+        return (q.coefficients == coefficients);
       }
     else
       return (p.coefficients == coefficients);
@@ -537,8 +537,8 @@ namespace Polynomials
     coefficients[0] = offset;
 #else
 
-				// too many coefficients cause overflow in
-				// the binomial coefficient used below
+                                // too many coefficients cause overflow in
+                                // the binomial coefficient used below
     Assert (coefficients.size() < 31, ExcNotImplemented());
 
                                      // Copy coefficients to a vector of
@@ -600,16 +600,16 @@ namespace Polynomials
   void
   Polynomial<number>::shift (const number2 offset)
   {
-				// shift is simple for a polynomial in product
-				// form, (x-x_0)*(x-x_1)*...*(x-x_n). just add
-				// offset to all shifts
+                                // shift is simple for a polynomial in product
+                                // form, (x-x_0)*(x-x_1)*...*(x-x_n). just add
+                                // offset to all shifts
     if (in_lagrange_product_form == true)
       {
-	for (unsigned int i=0; i<lagrange_support_points.size(); ++i)
-	  lagrange_support_points[i] -= offset;
+        for (unsigned int i=0; i<lagrange_support_points.size(); ++i)
+          lagrange_support_points[i] -= offset;
       }
     else
-				// do the shift in any case
+                                // do the shift in any case
       shift (coefficients, offset);
   }
 
@@ -619,8 +619,8 @@ namespace Polynomials
   Polynomial<number>
   Polynomial<number>::derivative () const
   {
-				// no simple form possible for Lagrange
-				// polynomial on product form
+                                // no simple form possible for Lagrange
+                                // polynomial on product form
     if (degree() == 0)
       return Monomial<number>(0, 0.);
 
@@ -628,9 +628,9 @@ namespace Polynomials
     const Polynomial<number> * q = 0;
     if (in_lagrange_product_form == true)
       {
-	q_data.reset (new Polynomial<number>(*this));
-	q_data->transform_into_standard_form();
-	q = q_data.get();
+        q_data.reset (new Polynomial<number>(*this));
+        q_data->transform_into_standard_form();
+        q = q_data.get();
       }
     else
       q = this;
@@ -648,15 +648,15 @@ namespace Polynomials
   Polynomial<number>
   Polynomial<number>::primitive () const
   {
-				// no simple form possible for Lagrange
-				// polynomial on product form
+                                // no simple form possible for Lagrange
+                                // polynomial on product form
     std_cxx1x::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> * q = 0;
     if (in_lagrange_product_form == true)
       {
-	q_data.reset (new Polynomial<number>(*this));
-	q_data->transform_into_standard_form();
-	q = q_data.get();
+        q_data.reset (new Polynomial<number>(*this));
+        q_data->transform_into_standard_form();
+        q = q_data.get();
       }
     else
       q = this;
@@ -677,16 +677,16 @@ namespace Polynomials
   {
     if (in_lagrange_product_form == true)
       {
-	out << lagrange_weight;
-	for (unsigned int i=0; i<lagrange_support_points.size(); ++i)
-	  out << " (x-" << lagrange_support_points[i] << ")";
-	out << std::endl;
+        out << lagrange_weight;
+        for (unsigned int i=0; i<lagrange_support_points.size(); ++i)
+          out << " (x-" << lagrange_support_points[i] << ")";
+        out << std::endl;
       }
     else
       for (int i=degree();i>=0;--i)
-	{
-	  out << coefficients[i] << " x^" << i << std::endl;
-	}
+        {
+          out << coefficients[i] << " x^" << i << std::endl;
+        }
   }
 
 
@@ -735,11 +735,11 @@ namespace Polynomials
       std::vector<Point<1> >
       generate_equidistant_unit_points (const unsigned int n)
       {
-	std::vector<Point<1> > points (n+1);
-	const double one_over_n = 1./n;
+        std::vector<Point<1> > points (n+1);
+        const double one_over_n = 1./n;
         for (unsigned int k=0;k<=n;++k)
-	  points[k](0) = static_cast<double>(k)*one_over_n;
-	return points;
+          points[k](0) = static_cast<double>(k)*one_over_n;
+        return points;
       }
     }
   }
@@ -750,21 +750,21 @@ namespace Polynomials
                                             const unsigned int support_point)
     :
     Polynomial<double> (internal::LagrangeEquidistant::
-			generate_equidistant_unit_points (n),
-			support_point)
+                        generate_equidistant_unit_points (n),
+                        support_point)
   {
     Assert (coefficients.size() == 0, ExcInternalError());
 
-				// For polynomial order up to 3, we have
-				// precomputed weights. Use these weights
-				// instead of the product form
+                                // For polynomial order up to 3, we have
+                                // precomputed weights. Use these weights
+                                // instead of the product form
     if (n <= 3)
       {
-	this->in_lagrange_product_form = false;
-	this->lagrange_weight = 1.;
-	std::vector<double> new_support_points;
-	this->lagrange_support_points.swap(new_support_points);
-	this->coefficients.resize (n+1);
+        this->in_lagrange_product_form = false;
+        this->lagrange_weight = 1.;
+        std::vector<double> new_support_points;
+        this->lagrange_support_points.swap(new_support_points);
+        this->coefficients.resize (n+1);
         compute_coefficients(n, support_point, this->coefficients);
       }
   }
@@ -919,25 +919,25 @@ namespace Polynomials
                                        // no, then generate the
                                        // respective coefficients
       {
-					 // make sure that there is enough
-					 // space in the array for the
-					 // coefficients, so we have to resize
-					 // it to size k+1
+                                         // make sure that there is enough
+                                         // space in the array for the
+                                         // coefficients, so we have to resize
+                                         // it to size k+1
 
-					 // but it's more complicated than
-					 // that: we call this function
-					 // recursively, so if we simply
-					 // resize it to k+1 here, then
-					 // compute the coefficients for
-					 // degree k-1 by calling this
-					 // function recursively, then it will
-					 // reset the size to k -- not enough
-					 // for what we want to do below. the
-					 // solution therefore is to only
-					 // resize the size if we are going to
-					 // *increase* it
-	if (recursive_coefficients.size() < k+1)
-	  recursive_coefficients.resize (k+1);
+                                         // but it's more complicated than
+                                         // that: we call this function
+                                         // recursively, so if we simply
+                                         // resize it to k+1 here, then
+                                         // compute the coefficients for
+                                         // degree k-1 by calling this
+                                         // function recursively, then it will
+                                         // reset the size to k -- not enough
+                                         // for what we want to do below. the
+                                         // solution therefore is to only
+                                         // resize the size if we are going to
+                                         // *increase* it
+        if (recursive_coefficients.size() < k+1)
+          recursive_coefficients.resize (k+1);
 
         if (k<=1)
           {
@@ -1175,25 +1175,25 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
                                            // no, then generate the
                                            // respective coefficients
       {
-					 // make sure that there is enough
-					 // space in the array for the
-					 // coefficients, so we have to resize
-					 // it to size k+1
+                                         // make sure that there is enough
+                                         // space in the array for the
+                                         // coefficients, so we have to resize
+                                         // it to size k+1
 
-					 // but it's more complicated than
-					 // that: we call this function
-					 // recursively, so if we simply
-					 // resize it to k+1 here, then
-					 // compute the coefficients for
-					 // degree k-1 by calling this
-					 // function recursively, then it will
-					 // reset the size to k -- not enough
-					 // for what we want to do below. the
-					 // solution therefore is to only
-					 // resize the size if we are going to
-					 // *increase* it
-	if (recursive_coefficients.size() < k+1)
-	  recursive_coefficients.resize (k+1);
+                                         // but it's more complicated than
+                                         // that: we call this function
+                                         // recursively, so if we simply
+                                         // resize it to k+1 here, then
+                                         // compute the coefficients for
+                                         // degree k-1 by calling this
+                                         // function recursively, then it will
+                                         // reset the size to k -- not enough
+                                         // for what we want to do below. the
+                                         // solution therefore is to only
+                                         // resize the size if we are going to
+                                         // *increase* it
+        if (recursive_coefficients.size() < k+1)
+          recursive_coefficients.resize (k+1);
 
         if (k<=1)
           {
@@ -1216,9 +1216,9 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
                                              // now make these arrays
                                              // const
             recursive_coefficients[0] =
-	      std_cxx1x::shared_ptr<const std::vector<double> >(c0);
+              std_cxx1x::shared_ptr<const std::vector<double> >(c0);
             recursive_coefficients[1] =
-	      std_cxx1x::shared_ptr<const std::vector<double> >(c1);
+              std_cxx1x::shared_ptr<const std::vector<double> >(c1);
           }
         else if (k==2)
           {
@@ -1235,7 +1235,7 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
             (*c2)[2] =   4.*a;
 
             recursive_coefficients[2] =
-	      std_cxx1x::shared_ptr<const std::vector<double> >(c2);
+              std_cxx1x::shared_ptr<const std::vector<double> >(c2);
           }
         else
           {
@@ -1279,7 +1279,7 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
                                              // const pointer in the
                                              // coefficients array
             recursive_coefficients[k] =
-	      std_cxx1x::shared_ptr<const std::vector<double> >(ck);
+              std_cxx1x::shared_ptr<const std::vector<double> >(ck);
           };
       };
   }
@@ -1295,7 +1295,7 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
 
                                    // then get a pointer to the array
                                    // of coefficients. do that in a MT
-				   // safe way
+                                   // safe way
     Threads::ThreadMutex::ScopedLock lock (coefficients_lock);
     return *recursive_coefficients[k];
   }

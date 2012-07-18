@@ -2,7 +2,7 @@
 //    $Id$
 //    Author: Toby D. Young, Polish Academy of Sciences, 2008, 2009
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -117,7 +117,7 @@ namespace SLEPcWrappers
                                     * computations are to happen.
                                     */
       SolverBase (SolverControl &cn,
-		  const MPI_Comm &mpi_communicator);
+                  const MPI_Comm &mpi_communicator);
 
                                    /**
                                     * Destructor.
@@ -140,7 +140,7 @@ namespace SLEPcWrappers
                                     * being used (and can be more). To
                                     * avoid doing this, the fairly
                                     * standard calling sequence
-                                    * excecuted here is used:
+                                    * executed here is used:
                                     * Initialise; Set up matrices for
                                     * solving; Actually solve the
                                     * system; Gather the solution(s);
@@ -160,26 +160,26 @@ namespace SLEPcWrappers
                                     * ignoring any extras. By default
                                     * one eigenvector/eigenvalue pair
                                     * is computed.
-				    */
+                                    */
       template <typename OutputVector>
-	void
-	solve (const PETScWrappers::MatrixBase &A,
-	       std::vector<double>             &kr,
-	       std::vector<OutputVector>       &vr,
-	       const unsigned int              n_eigenvectors);
+        void
+        solve (const PETScWrappers::MatrixBase &A,
+               std::vector<double>             &kr,
+               std::vector<OutputVector>       &vr,
+               const unsigned int              n_eigenvectors);
 
                                    /**
-				    * Same as above, but here a
+                                    * Same as above, but here a
                                     * composite method for solving the
                                     * system $A x=\lambda B x$.
                                     */
       template <typename OutputVector>
-	void
-	solve (const PETScWrappers::MatrixBase &A,
-	       const PETScWrappers::MatrixBase &B,
-	       std::vector<double>             &kr,
-	       std::vector<OutputVector>       &vr,
-	       const unsigned int               n_eigenvectors);
+        void
+        solve (const PETScWrappers::MatrixBase &A,
+               const PETScWrappers::MatrixBase &B,
+               std::vector<double>             &kr,
+               std::vector<OutputVector>       &vr,
+               const unsigned int               n_eigenvectors);
 
                                    /**
                                     * Initialize solver for the linear
@@ -188,57 +188,57 @@ namespace SLEPcWrappers
                                     * solve ())
                                     */
       void
-	set_matrices (const PETScWrappers::MatrixBase &A);
+        set_matrices (const PETScWrappers::MatrixBase &A);
 
                                    /**
-				    * Same as above, but here
+                                    * Same as above, but here
                                     * initialize solver for the linear
                                     * system $A x=\lambda B x$.
                                     */
       void
-	set_matrices (const PETScWrappers::MatrixBase &A,
-		      const PETScWrappers::MatrixBase &B);
+        set_matrices (const PETScWrappers::MatrixBase &A,
+                      const PETScWrappers::MatrixBase &B);
 
                                    /**
                                     * Set the initial vector for the
                                     * solver.
                                     */
       void
-	set_initial_vector 
-	(const PETScWrappers::VectorBase &this_initial_vector);
+        set_initial_vector
+        (const PETScWrappers::VectorBase &this_initial_vector);
 
                                    /**
-				    * Set the spectral transformation
-				    * to be used.
+                                    * Set the spectral transformation
+                                    * to be used.
                                     */
       void
-	set_transformation (SLEPcWrappers::TransformationBase &this_transformation);
+        set_transformation (SLEPcWrappers::TransformationBase &this_transformation);
 
                                    /**
-				    * Indicate which part of the
-				    * spectrum is to be computed. By
-				    * default largest magnitude
-				    * eigenvalues are computed.  For
-				    * other allowed values see the
-				    * SLEPc documentation.
+                                    * Indicate which part of the
+                                    * spectrum is to be computed. By
+                                    * default largest magnitude
+                                    * eigenvalues are computed.  For
+                                    * other allowed values see the
+                                    * SLEPc documentation.
                                     */
       void
-	set_which_eigenpairs (EPSWhich set_which);
+        set_which_eigenpairs (EPSWhich set_which);
 
                                    /**
                                     * Solve the linear system for
-				    * n_eigenvectors
-				    * eigenstates. Parameter
-				    * <code>n_converged</code>
-				    * contains the actual number of
-				    * eigenstates that have .
-				    * converged; this can be both
-				    * fewer or more than
-				    * n_eigenvectors, depending on the
-				    * SLEPc eigensolver used.
+                                    * n_eigenvectors
+                                    * eigenstates. Parameter
+                                    * <code>n_converged</code>
+                                    * contains the actual number of
+                                    * eigenstates that have .
+                                    * converged; this can be both
+                                    * fewer or more than
+                                    * n_eigenvectors, depending on the
+                                    * SLEPc eigensolver used.
                                     */
       void
-	solve (const unsigned int n_eigenvectors, unsigned int *n_converged);
+        solve (const unsigned int n_eigenvectors, unsigned int *n_converged);
 
 
                                    /**
@@ -249,27 +249,27 @@ namespace SLEPcWrappers
                                     * \text{n\_converged}-1$.
                                     */
       void
-	get_eigenpair (const unsigned int index,
+        get_eigenpair (const unsigned int index,
 #ifndef DEAL_II_USE_PETSC_COMPLEX
-		       double                    &kr,
+                       double                    &kr,
 #else
-		       std::complex<double>      &kr,
+                       std::complex<double>      &kr,
 #endif
-		       PETScWrappers::VectorBase &vr);
+                       PETScWrappers::VectorBase &vr);
 
                                    /**
                                     * Reset the solver, and return
                                     * memory for eigenvectors
                                     */
       void
-	reset();
+        reset();
 
                                    /**
-				    * Retrieve the SLEPc solver object
-				    * that is internally used.
+                                    * Retrieve the SLEPc solver object
+                                    * that is internally used.
                                     */
       EPS *
-	get_EPS ();
+        get_EPS ();
 
 
                                    /**
@@ -284,14 +284,14 @@ namespace SLEPcWrappers
       DeclException0 (ExcSLEPcWrappersUsageError);
 
       DeclException1 (ExcSLEPcError,
-		      int,
-		      << "    An error with error number " << arg1
-		      << " occured while calling a SLEPc function");
+                      int,
+                      << "    An error with error number " << arg1
+                      << " occurred while calling a SLEPc function");
 
       DeclException2 (ExcSLEPcEigenvectorConvergenceMismatchError,
-		      int, int,
-		      << "    The number of converged eigenvectors is " << arg1
-		      << " but " << arg2 << " were requested. ");
+                      int, int,
+                      << "    The number of converged eigenvectors is " << arg1
+                      << " but " << arg2 << " were requested. ");
 
     protected:
 
@@ -320,7 +320,7 @@ namespace SLEPcWrappers
 
                                    /**
                                     * Which portion of the spectrum to
-				    * solve from.
+                                    * solve from.
                                     */
       EPSWhich set_which;
 
@@ -362,16 +362,16 @@ namespace SLEPcWrappers
                                     * if convergence has been reached.
                                     */
       static
-	int
-	convergence_test (EPS                 eps,
+        int
+        convergence_test (EPS                 eps,
 #ifdef PETSC_USE_64BIT_INDICES
-			  const PetscInt      iteration,
+                          const PetscInt      iteration,
 #else
-			  const int           iteration,
+                          const int           iteration,
 #endif
-			  const PetscReal     residual_norm,
-			  EPSConvergedReason *reason,
-			  void               *solver_control);
+                          const PetscReal     residual_norm,
+                          EPSConvergedReason *reason,
+                          void               *solver_control);
 
                                    /**
                                     * Objects of this type are
@@ -390,15 +390,15 @@ namespace SLEPcWrappers
       {
 
                                    /**
-                           	    * Destructor.
-                              	    */
-	~SolverData ();
+                                    * Destructor.
+                                    */
+        ~SolverData ();
 
                                    /**
                                     * Objects for Eigenvalue Problem
                                     * Solver.
                                     */
-	EPS eps;
+        EPS eps;
       };
 
       std_cxx1x::shared_ptr<SolverData> solver_data;
@@ -433,9 +433,9 @@ namespace SLEPcWrappers
                                     * the PETScWrappers, but you can
                                     * change that.
                                     */
-       SolverKrylovSchur (SolverControl        &cn, 
-			  const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-			  const AdditionalData &data = AdditionalData());
+       SolverKrylovSchur (SolverControl        &cn,
+                          const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+                          const AdditionalData &data = AdditionalData());
 
     protected:
 
@@ -479,11 +479,11 @@ namespace SLEPcWrappers
                                     */
           AdditionalData (const bool delayed_reorthogonalization = false);
 
-	                           /**
-				    * Flag for delayed
-				    * reorthogonalization.
-				    */
-	  bool delayed_reorthogonalization;
+                                   /**
+                                    * Flag for delayed
+                                    * reorthogonalization.
+                                    */
+          bool delayed_reorthogonalization;
       };
 
                                    /**
@@ -496,8 +496,8 @@ namespace SLEPcWrappers
                                     * change that.
                                     */
       SolverArnoldi (SolverControl        &cn,
-		     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-		     const AdditionalData &data = AdditionalData());
+                     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+                     const AdditionalData &data = AdditionalData());
 
     protected:
 
@@ -545,8 +545,8 @@ namespace SLEPcWrappers
                                     * change that.
                                     */
       SolverLanczos (SolverControl        &cn,
-		     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-		     const AdditionalData &data = AdditionalData());
+                     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+                     const AdditionalData &data = AdditionalData());
 
     protected:
 
@@ -595,8 +595,8 @@ namespace SLEPcWrappers
                                     * change that.
                                     */
       SolverPower (SolverControl        &cn,
-		   const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-		   const AdditionalData &data = AdditionalData());
+                   const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+                   const AdditionalData &data = AdditionalData());
 
     protected:
 
@@ -645,8 +645,8 @@ namespace SLEPcWrappers
                                     * change that.
                                     */
       SolverDavidson (SolverControl        &cn,
-		      const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-		      const AdditionalData &data = AdditionalData());
+                      const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+                      const AdditionalData &data = AdditionalData());
 
     protected:
 
@@ -686,16 +686,16 @@ namespace SLEPcWrappers
       solve (n_eigenvectors,&n_converged);
 
       if (n_converged > n_eigenvectors)
-	n_converged = n_eigenvectors;
+        n_converged = n_eigenvectors;
       AssertThrow (n_converged == n_eigenvectors,
-		   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
+                   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
 
       AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
       vr.resize (n_converged, vr.front());
       kr.resize (n_converged);
 
       for (unsigned int index=0; index < n_converged; ++index)
-	get_eigenpair (index, kr[index], vr[index]);
+        get_eigenpair (index, kr[index], vr[index]);
     }
 
   template <typename OutputVector>
@@ -712,17 +712,17 @@ namespace SLEPcWrappers
       solve (n_eigenvectors, &n_converged);
 
       if (n_converged >= n_eigenvectors)
-	n_converged = n_eigenvectors;
+        n_converged = n_eigenvectors;
 
       AssertThrow (n_converged == n_eigenvectors,
-		   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
+                   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
       AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
 
       vr.resize (n_converged, vr.front());
       kr.resize (n_converged);
 
       for (unsigned int index=0; index < n_converged; ++index)
-	get_eigenpair (index, kr[index], vr[index]);
+        get_eigenpair (index, kr[index], vr[index]);
     }
 }
 

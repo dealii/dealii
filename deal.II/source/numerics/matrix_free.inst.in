@@ -1,0 +1,62 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+for (deal_II_dimension : DIMENSIONS)
+{
+  template class MatrixFree<deal_II_dimension,double>;
+  template class MatrixFree<deal_II_dimension,float>;
+
+  // reinit for DoFHandler
+  template void MatrixFree<deal_II_dimension,double>::internal_reinit
+  (const Mapping<deal_II_dimension>                           &,
+   const std::vector<const DoFHandler<deal_II_dimension>*>    &,
+   const std::vector<const ConstraintMatrix*>                 &,
+   const std::vector<IndexSet>                                &,
+   const std::vector<hp::QCollection<1> >                     &,
+   const MatrixFree<deal_II_dimension,double>::AdditionalData);
+  template void MatrixFree<deal_II_dimension,float>::internal_reinit
+  (const Mapping<deal_II_dimension>                           &,
+   const std::vector<const DoFHandler<deal_II_dimension>*>    &,
+   const std::vector<const ConstraintMatrix*>                 &,
+   const std::vector<IndexSet>                                &,
+   const std::vector<hp::QCollection<1> >                     &,
+   const MatrixFree<deal_II_dimension,float>::AdditionalData);
+
+
+  // reinit for MGDoFHandler
+  template void MatrixFree<deal_II_dimension,double>::internal_reinit
+  (const Mapping<deal_II_dimension>                           &,
+   const std::vector<const MGDoFHandler<deal_II_dimension>*>  &,
+   const std::vector<const ConstraintMatrix*>                 &,
+   const std::vector<IndexSet>                                &,
+   const std::vector<hp::QCollection<1> >                     &,
+   const MatrixFree<deal_II_dimension,double>::AdditionalData);
+  template void MatrixFree<deal_II_dimension,float>::internal_reinit
+  (const Mapping<deal_II_dimension>                           &,
+   const std::vector<const MGDoFHandler<deal_II_dimension>*>  &,
+   const std::vector<const ConstraintMatrix*>                 &,
+   const std::vector<IndexSet>                                &,
+   const std::vector<hp::QCollection<1> >                     &,
+   const MatrixFree<deal_II_dimension,float>::AdditionalData);
+
+  template void MatrixFree<deal_II_dimension,double>::
+  print_memory_consumption<std::ostream> (std::ostream &) const;
+  template void MatrixFree<deal_II_dimension,double>::
+  print_memory_consumption<ConditionalOStream> (ConditionalOStream &) const;
+
+  template void MatrixFree<deal_II_dimension,float>::
+  print_memory_consumption<std::ostream> (std::ostream &) const;
+  template void MatrixFree<deal_II_dimension,float>::
+  print_memory_consumption<ConditionalOStream> (ConditionalOStream &) const;
+}
+

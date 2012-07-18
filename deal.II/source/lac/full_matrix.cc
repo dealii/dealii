@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,7 @@ DEAL_II_NAMESPACE_OPEN
 // arguments is covered by the default copy constructor and copy operator that
 // is declared separately)
 
-#define TEMPL_OP_EQ(S1,S2)			      \
+#define TEMPL_OP_EQ(S1,S2)                            \
   template FullMatrix<S1>& FullMatrix<S1>::operator = \
   (const FullMatrix<S2>&)
 

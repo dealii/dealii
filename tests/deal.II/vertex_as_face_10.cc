@@ -33,7 +33,7 @@ void test ()
   tria.begin_active()->face(0)->set_boundary_indicator(2);
   tria.begin_active()->face(1)->set_boundary_indicator(4);
 
-  std::vector<unsigned char>
+  std::vector<types::boundary_id_t>
     boundary_ids = tria.get_boundary_indicators ();
 
   for (unsigned int i=0; i<boundary_ids.size(); ++i)

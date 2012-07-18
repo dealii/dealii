@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,127 +49,127 @@ DEAL_II_NAMESPACE_OPEN
  *  similarly simply.
  *
  *  @ingroup functions
- *  @author Guido Kanschat, 1999 
+ *  @author Guido Kanschat, 1999
  */
 template <int rank, int dim>
 class TensorFunction : public FunctionTime,
-		       public Subscriptor
+                       public Subscriptor
 {
   public:
-				     /**
-				      * Define typedefs for the return
-				      * types of the <tt>value</tt>
-				      * functions.
-				      */
+                                     /**
+                                      * Define typedefs for the return
+                                      * types of the <tt>value</tt>
+                                      * functions.
+                                      */
     typedef Tensor<rank,dim> value_type;
 
 #ifdef DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND
-				     /**
-				      * Define a typedef for the
-				      * return value of the gradient
-				      * function.
-				      *
-				      * The construct here is only
-				      * used in case we hit a certain
-				      * bug in Sun's Forte
-				      * compiler. See the respective
-				      * macro in the aclocal.m4 file
-				      * for a full description of the
-				      * bug, or the documentation to
-				      * the quadrature class.
-				      *
-				      * For better readability we
-				      * later typedef this so-created
-				      * type to one in the enclosing
-				      * class.
-				      */
+                                     /**
+                                      * Define a typedef for the
+                                      * return value of the gradient
+                                      * function.
+                                      *
+                                      * The construct here is only
+                                      * used in case we hit a certain
+                                      * bug in Sun's Forte
+                                      * compiler. See the respective
+                                      * macro in the aclocal.m4 file
+                                      * for a full description of the
+                                      * bug, or the documentation to
+                                      * the quadrature class.
+                                      *
+                                      * For better readability we
+                                      * later typedef this so-created
+                                      * type to one in the enclosing
+                                      * class.
+                                      */
     template <int dim2>
     struct GradientTypeHelper
     {
-	typedef Tensor<rank+1,dim> type;
+        typedef Tensor<rank+1,dim> type;
     };
 
-				     /**
-				      * Typedef the kludge declared
-				      * above to a type in the class
-				      * in which we would like to use
-				      * it.
-				      *
-				      * This typedef is only used if
-				      * the respective bug in the
-				      * compiler is encountered,
-				      * otherwise the proper typedef
-				      * below is used.
-				      */
+                                     /**
+                                      * Typedef the kludge declared
+                                      * above to a type in the class
+                                      * in which we would like to use
+                                      * it.
+                                      *
+                                      * This typedef is only used if
+                                      * the respective bug in the
+                                      * compiler is encountered,
+                                      * otherwise the proper typedef
+                                      * below is used.
+                                      */
     typedef typename GradientTypeHelper<dim>::type gradient_type;
 #else
     typedef Tensor<rank+1,dim> gradient_type;
-#endif    
-    
-				     /**
-				      * Constructor. May take an
-				      * initial value for the time
-				      * variable, which defaults to
-				      * zero.  
-				      */
+#endif
+
+                                     /**
+                                      * Constructor. May take an
+                                      * initial value for the time
+                                      * variable, which defaults to
+                                      * zero.
+                                      */
     TensorFunction (const double initial_time = 0.0);
-    
-				     /**
-				      * Virtual destructor; absolutely
-				      * necessary in this case, as
-				      * classes are usually not used
-				      * by their true type, but rather
-				      * through pointers to this base
-				      * class.  
-				      */
+
+                                     /**
+                                      * Virtual destructor; absolutely
+                                      * necessary in this case, as
+                                      * classes are usually not used
+                                      * by their true type, but rather
+                                      * through pointers to this base
+                                      * class.
+                                      */
     virtual ~TensorFunction ();
-    
-				     /**
-				      * Return the value of the function
-				      * at the given point.
-				      */
+
+                                     /**
+                                      * Return the value of the function
+                                      * at the given point.
+                                      */
     virtual value_type value (const Point<dim> &p) const;
 
-				     /**
-				      * Set <tt>values</tt> to the point
-				      * values of the function at the
-				      * <tt>points</tt>.  It is assumed
-				      * that <tt>values</tt> already has
-				      * the right size, i.e.  the same
-				      * size as the <tt>points</tt> array.  
-				      */
+                                     /**
+                                      * Set <tt>values</tt> to the point
+                                      * values of the function at the
+                                      * <tt>points</tt>.  It is assumed
+                                      * that <tt>values</tt> already has
+                                      * the right size, i.e.  the same
+                                      * size as the <tt>points</tt> array.
+                                      */
     virtual void value_list (const std::vector<Point<dim> > &points,
-			     std::vector<value_type> &values) const;
+                             std::vector<value_type> &values) const;
 
-				     /**
-				      * Return the gradient of the
-				      * function at the given point.
-				      */
+                                     /**
+                                      * Return the gradient of the
+                                      * function at the given point.
+                                      */
     virtual gradient_type gradient (const Point<dim> &p) const;
 
-				     /**
-				      * Set <tt>gradients</tt> to the
-				      * gradients of the function at
-				      * the <tt>points</tt>.  It is assumed
-				      * that <tt>values</tt> already has
-				      * the right size, i.e.  the same
-				      * size as the <tt>points</tt> array.  
-				      */
+                                     /**
+                                      * Set <tt>gradients</tt> to the
+                                      * gradients of the function at
+                                      * the <tt>points</tt>.  It is assumed
+                                      * that <tt>values</tt> already has
+                                      * the right size, i.e.  the same
+                                      * size as the <tt>points</tt> array.
+                                      */
     virtual void gradient_list (const std::vector<Point<dim> >   &points,
-				std::vector<gradient_type> &gradients) const;
+                                std::vector<gradient_type> &gradients) const;
 
-				     /**
-				      * Exception
-				      */
+                                     /**
+                                      * Exception
+                                      */
     DeclException0 (ExcPureFunctionCalled);
-				     /**
-				      * Exception
-				      */
+                                     /**
+                                      * Exception
+                                      */
     DeclException2 (ExcVectorHasWrongSize,
-		    int, int,
-		    << "The vector has size " << arg1 << " but should have "
-		    << arg2 << " elements.");
-    
+                    int, int,
+                    << "The vector has size " << arg1 << " but should have "
+                    << arg2 << " elements.");
+
 };
 
 DEAL_II_NAMESPACE_CLOSE

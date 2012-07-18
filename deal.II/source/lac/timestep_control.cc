@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2010 by Guido Kanschat
+//    Copyright (C) 2006, 2007, 2010, 2012 by Guido Kanschat
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,11 +18,11 @@ DEAL_II_NAMESPACE_OPEN
 using namespace Algorithms;
 
 TimestepControl::TimestepControl (double start,
-				  double final,
-				  double tolerance,
-				  double start_step,
-				  double print_step,
-				  double max_step)
+                                  double final,
+                                  double tolerance,
+                                  double start_step,
+                                  double print_step,
+                                  double max_step)
   : start_val(start),
     final_val(final),
     tolerance_val(tolerance),
@@ -49,7 +49,7 @@ void TimestepControl::declare_parameters (ParameterHandler& param)
   param.declare_entry ("Tolerance", "1.e-2", Patterns::Double());
   param.declare_entry ("Print step", "-1.", Patterns::Double());
   param.declare_entry ("Strategy", "uniform",
-		       Patterns::Selection("uniform|doubling"));
+                       Patterns::Selection("uniform|doubling"));
 }
 
 
@@ -79,29 +79,29 @@ TimestepControl::advance ()
   bool changed = false;
   double s = step_val;
 
-				   // Do time step control, but not in
-				   // first step.
+                                   // Do time step control, but not in
+                                   // first step.
   if (now_val != start())
     {
       if (strategy_val == doubling && 2*s <= tolerance_val)
-	s *= 2;
+        s *= 2;
       if (s > max_step_val)
-	s = max_step_val;
+        s = max_step_val;
     }
 
-				   // Try incrementing time by s
+                                   // Try incrementing time by s
   double h = now_val + s;
   changed = s != step_val;
-  
+
   step_val = s;
   current_step_val = s;
-				   // If we just missed the final
-				   // time, increase the step size a
-				   // bit. This way, we avoid a very
-				   // small final step. If the step
-				   // shot over the final time, adjust
-				   // it so we hit the final time
-				   // exactly.
+                                   // If we just missed the final
+                                   // time, increase the step size a
+                                   // bit. This way, we avoid a very
+                                   // small final step. If the step
+                                   // shot over the final time, adjust
+                                   // it so we hit the final time
+                                   // exactly.
   double s1 = .01*s;
   if (h > final_val-s1)
     {
@@ -109,7 +109,7 @@ TimestepControl::advance ()
       h = final_val;
       changed = true;
     }
-  
+
   now_val = h;
   return changed;
 }
@@ -121,14 +121,14 @@ bool TimestepControl::print ()
     return false;
   if (print_step < 0.)
     return true;
-  
+
   bool result = (now_val >= next_print_val);
 
   if (result)
     {
       next_print_val += print_step;
       if (next_print_val > final_val)
-	next_print_val = final_val;
+        next_print_val = final_val;
     }
   return result;
 }

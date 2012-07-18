@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,8 +35,8 @@ namespace TrilinosWrappers
   class SparseMatrix;
   class VectorBase;
   class PreconditionBase;
-  
-  
+
+
 /**
  * Base class for solver classes using the Trilinos solvers. Since
  * solvers in Trilinos are selected based on flags passed to a generic
@@ -61,20 +61,20 @@ namespace TrilinosWrappers
   {
     public:
 
-				       /**
-					* Enumeration object that is
-					* set in the constructor of
-					* the derived classes and
-					* tells Trilinos which solver
-					* to use. This option can also
-					* be set in the user program,
-					* so one might use this base
-					* class instead of one of the
-					* specialized derived classes
-					* when the solver should be
-					* set at runtime. Currently
-					* enabled options are:
-					*/
+                                       /**
+                                        * Enumeration object that is
+                                        * set in the constructor of
+                                        * the derived classes and
+                                        * tells Trilinos which solver
+                                        * to use. This option can also
+                                        * be set in the user program,
+                                        * so one might use this base
+                                        * class instead of one of the
+                                        * specialized derived classes
+                                        * when the solver should be
+                                        * set at runtime. Currently
+                                        * enabled options are:
+                                        */
       enum SolverName {cg, cgs, gmres, bicgstab, tfqmr} solver_name;
 
                                        /**
@@ -85,34 +85,34 @@ namespace TrilinosWrappers
 
       struct AdditionalData
       {
-				       /**
-					* Sets the additional data field to
-					* the desired output format and puts
-					* the restart parameter in case the
-					* derived class is GMRES.
-					* 
-					* TODO: Find a better way for
-					* setting the GMRES restart
-					* parameter since it is quite
-					* inelegant to set a specific option
-					* of one solver in the base class
-					* for all solvers.
-					*/
-	AdditionalData (const bool         output_solver_details   = false,
-			const unsigned int gmres_restart_parameter = 30);
+                                       /**
+                                        * Sets the additional data field to
+                                        * the desired output format and puts
+                                        * the restart parameter in case the
+                                        * derived class is GMRES.
+                                        *
+                                        * TODO: Find a better way for
+                                        * setting the GMRES restart
+                                        * parameter since it is quite
+                                        * inelegant to set a specific option
+                                        * of one solver in the base class
+                                        * for all solvers.
+                                        */
+        AdditionalData (const bool         output_solver_details   = false,
+                        const unsigned int gmres_restart_parameter = 30);
 
-				       /**
-				        * Enables/disables the output of
-					* solver details (residual in each
-					* iterations etc.).
-					*/
-	const bool output_solver_details;
+                                       /**
+                                        * Enables/disables the output of
+                                        * solver details (residual in each
+                                        * iterations etc.).
+                                        */
+        const bool output_solver_details;
 
-				       /**
-					* Restart parameter for GMRES
-					* solver.
-					*/
-	const unsigned int gmres_restart_parameter;
+                                       /**
+                                        * Restart parameter for GMRES
+                                        * solver.
+                                        */
+        const unsigned int gmres_restart_parameter;
       };
 
                                        /**
@@ -131,8 +131,8 @@ namespace TrilinosWrappers
                                         * method.
                                         */
       SolverBase (const enum SolverName  solver_name,
-		  SolverControl         &cn);
-      
+                  SolverControl         &cn);
+
                                        /**
                                         * Destructor.
                                         */
@@ -191,7 +191,7 @@ namespace TrilinosWrappers
       DeclException1 (ExcTrilinosError,
                       int,
                       << "An error with error number " << arg1
-                      << " occured while calling a Trilinos function");
+                      << " occurred while calling a Trilinos function");
 
     protected:
 
@@ -212,13 +212,13 @@ namespace TrilinosWrappers
     private:
 
                                        /**
-					* A structure that collects
-					* the Trilinos sparse matrix,
-					* the right hand side vector
-					* and the solution vector,
-					* which is passed down to the
-					* Trilinos solver.
-					*/
+                                        * A structure that collects
+                                        * the Trilinos sparse matrix,
+                                        * the right hand side vector
+                                        * and the solution vector,
+                                        * which is passed down to the
+                                        * Trilinos solver.
+                                        */
       std_cxx1x::shared_ptr<Epetra_LinearProblem> linear_problem;
 
                                        /**
@@ -256,18 +256,18 @@ namespace TrilinosWrappers
 
       struct AdditionalData
       {
-				       /**
-					* Sets the additional data field to
-					* the desired output format.
-					*/
-	AdditionalData (const bool output_solver_details = false);
+                                       /**
+                                        * Sets the additional data field to
+                                        * the desired output format.
+                                        */
+        AdditionalData (const bool output_solver_details = false);
 
-				       /**
-				        * Enables/disables the output of
-					* solver details (residual in each
-					* iterations etc.).
-					*/
-	bool output_solver_details;
+                                       /**
+                                        * Enables/disables the output of
+                                        * solver details (residual in each
+                                        * iterations etc.).
+                                        */
+        bool output_solver_details;
       };
 
                                        /**
@@ -275,7 +275,7 @@ namespace TrilinosWrappers
                                         * deal.II's own solvers, there is no
                                         * need to give a vector memory
                                         * object.
-					*
+                                        *
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
@@ -310,26 +310,26 @@ namespace TrilinosWrappers
                                         */
       struct AdditionalData
       {
-				       /**
-					* Sets the additional data field to
-					* the desired output format.
-					*/
-	AdditionalData (const bool output_solver_details = false);
+                                       /**
+                                        * Sets the additional data field to
+                                        * the desired output format.
+                                        */
+        AdditionalData (const bool output_solver_details = false);
 
-				       /**
-				        * Enables/disables the output of
-					* solver details (residual in each
-					* iterations etc.).
-					*/
-	bool output_solver_details;
+                                       /**
+                                        * Enables/disables the output of
+                                        * solver details (residual in each
+                                        * iterations etc.).
+                                        */
+        bool output_solver_details;
       };
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
                                         * need to give a vector memory
                                         * object.
-					*
+                                        *
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
@@ -369,23 +369,23 @@ namespace TrilinosWrappers
                                             * 30, i.e. do a restart every 30
                                             * iterations.
                                             */
-	  AdditionalData (const bool         output_solver_details = false,
-			  const unsigned int restart_parameter = 30);
-
-				       /**
-				        * Enables/disables the output of
-					* solver details (residual in each
-					* iterations etc.).
-					*/
-	  bool output_solver_details;
+          AdditionalData (const bool         output_solver_details = false,
+                          const unsigned int restart_parameter = 30);
 
                                        /**
-					* Maximum number of
-					* tmp vectors.
-					*/
+                                        * Enables/disables the output of
+                                        * solver details (residual in each
+                                        * iterations etc.).
+                                        */
+          bool output_solver_details;
+
+                                       /**
+                                        * Maximum number of
+                                        * tmp vectors.
+                                        */
           unsigned int restart_parameter;
       };
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -426,20 +426,20 @@ namespace TrilinosWrappers
                                         */
       struct AdditionalData
       {
-				       /**
-					* Sets the additional data field to
-					* the desired output format.
-					*/
-	AdditionalData (const bool output_solver_details = false);
+                                       /**
+                                        * Sets the additional data field to
+                                        * the desired output format.
+                                        */
+        AdditionalData (const bool output_solver_details = false);
 
-				       /**
-				        * Enables/disables the output of
-					* solver details (residual in each
-					* iterations etc.).
-					*/
-	bool output_solver_details;
+                                       /**
+                                        * Enables/disables the output of
+                                        * solver details (residual in each
+                                        * iterations etc.).
+                                        */
+        bool output_solver_details;
       };
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -480,26 +480,26 @@ namespace TrilinosWrappers
                                         */
       struct AdditionalData
       {
-				       /**
-					* Sets the additional data field to
-					* the desired output format.
-					*/
-	AdditionalData (const bool output_solver_details = false);
+                                       /**
+                                        * Sets the additional data field to
+                                        * the desired output format.
+                                        */
+        AdditionalData (const bool output_solver_details = false);
 
-				       /**
-				        * Enables/disables the output of
-					* solver details (residual in each
-					* iterations etc.).
-					*/
-	bool output_solver_details;
+                                       /**
+                                        * Enables/disables the output of
+                                        * solver details (residual in each
+                                        * iterations etc.).
+                                        */
+        bool output_solver_details;
       };
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
                                         * need to give a vector memory
                                         * object.
-					*
+                                        *
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
@@ -536,18 +536,18 @@ namespace TrilinosWrappers
 
       struct AdditionalData
       {
-				       /**
-					* Sets the additional data field to
-					* the desired output format.
-					*/
-	AdditionalData (const bool output_solver_details = false);
+                                       /**
+                                        * Sets the additional data field to
+                                        * the desired output format.
+                                        */
+        AdditionalData (const bool output_solver_details = false);
 
-				       /**
-				        * Enables/disables the output of
-					* solver details (residual in each
-					* iterations etc.).
-					*/
-	bool output_solver_details;
+                                       /**
+                                        * Enables/disables the output of
+                                        * solver details (residual in each
+                                        * iterations etc.).
+                                        */
+        bool output_solver_details;
       };
 
                                        /**
@@ -556,8 +556,8 @@ namespace TrilinosWrappers
                                         * creates the solver.
                                         */
       SolverDirect (SolverControl  &cn,
-		    const AdditionalData &data = AdditionalData());
-      
+                    const AdditionalData &data = AdditionalData());
+
                                        /**
                                         * Destructor.
                                         */
@@ -611,7 +611,7 @@ namespace TrilinosWrappers
       DeclException1 (ExcTrilinosError,
                       int,
                       << "An error with error number " << arg1
-                      << " occured while calling a Trilinos function");
+                      << " occurred while calling a Trilinos function");
 
     private:
 
@@ -630,13 +630,13 @@ namespace TrilinosWrappers
       SolverControl &solver_control;
 
                                        /**
-					* A structure that collects
-					* the Trilinos sparse matrix,
-					* the right hand side vector
-					* and the solution vector,
-					* which is passed down to the
-					* Trilinos solver.
-					*/
+                                        * A structure that collects
+                                        * the Trilinos sparse matrix,
+                                        * the right hand side vector
+                                        * and the solution vector,
+                                        * which is passed down to the
+                                        * Trilinos solver.
+                                        */
       std_cxx1x::shared_ptr<Epetra_LinearProblem> linear_problem;
 
                                        /**

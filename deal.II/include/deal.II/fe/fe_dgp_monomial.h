@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,7 +61,7 @@ template <int dim, int spacedim> class MappingQ;
  * This can be understood by the following 2-d example: consider the
  * cell with vertices at $(0,0),(1,0),(0,1),(s,s)$:
  * @image html dgp_doesnt_contain_p.png
- * 
+ *
  * For this cell, a bilinear transformation $F$ produces the relations
  * $x=\hat x+\hat x\hat y$ and $y=\hat y+\hat x\hat y$ that correlate
  * reference coordinates $\hat x,\hat y$ and coordinates in real space
@@ -80,103 +80,103 @@ template <int dim, int spacedim> class MappingQ;
  * linear functions are not within the range of the mapped $P_1$
  * polynomials.
  *
- * 
+ *
  * @author Ralf Hartmann, 2004
  */
 template <int dim>
 class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 {
   public:
-				     /**
-				      * Constructor for the polynomial
-				      * space of degree <tt>p</tt>.
-				      */
+                                     /**
+                                      * Constructor for the polynomial
+                                      * space of degree <tt>p</tt>.
+                                      */
     FE_DGPMonomial (const unsigned int p);
-    
-				     /**
-				      * Return a string that uniquely
-				      * identifies a finite
-				      * element. This class returns
-				      * <tt>FE_DGPMonomial<dim>(degree)</tt>,
-				      * with <tt>dim</tt> and
-				      * <tt>p</tt> replaced by
-				      * appropriate values.
-				      */
+
+                                     /**
+                                      * Return a string that uniquely
+                                      * identifies a finite
+                                      * element. This class returns
+                                      * <tt>FE_DGPMonomial<dim>(degree)</tt>,
+                                      * with <tt>dim</tt> and
+                                      * <tt>p</tt> replaced by
+                                      * appropriate values.
+                                      */
     virtual std::string get_name () const;
-    
-				     /**
-				      * @name Functions to support hp 
-				      * @{
-				      */
-    
-				     /**
-				      * If, on a vertex, several
-				      * finite elements are active,
-				      * the hp code first assigns the
-				      * degrees of freedom of each of
-				      * these FEs different global
-				      * indices. It then calls this
-				      * function to find out which of
-				      * them should get identical
-				      * values, and consequently can
-				      * receive the same global DoF
-				      * index. This function therefore
-				      * returns a list of identities
-				      * between DoFs of the present
-				      * finite element object with the
-				      * DoFs of @p fe_other, which is
-				      * a reference to a finite
-				      * element object representing
-				      * one of the other finite
-				      * elements active on this
-				      * particular vertex. The
-				      * function computes which of the
-				      * degrees of freedom of the two
-				      * finite element objects are
-				      * equivalent, and returns a list
-				      * of pairs of global dof indices
-				      * in @p identities. The first
-				      * index of each pair denotes one
-				      * of the vertex dofs of the
-				      * present element, whereas the
-				      * second is the corresponding
-				      * index of the other finite
-				      * element.
-				      *
-				      * This being a discontinuous element,
-				      * the set of such constraints is of
-				      * course empty.
-				      */
+
+                                     /**
+                                      * @name Functions to support hp
+                                      * @{
+                                      */
+
+                                     /**
+                                      * If, on a vertex, several
+                                      * finite elements are active,
+                                      * the hp code first assigns the
+                                      * degrees of freedom of each of
+                                      * these FEs different global
+                                      * indices. It then calls this
+                                      * function to find out which of
+                                      * them should get identical
+                                      * values, and consequently can
+                                      * receive the same global DoF
+                                      * index. This function therefore
+                                      * returns a list of identities
+                                      * between DoFs of the present
+                                      * finite element object with the
+                                      * DoFs of @p fe_other, which is
+                                      * a reference to a finite
+                                      * element object representing
+                                      * one of the other finite
+                                      * elements active on this
+                                      * particular vertex. The
+                                      * function computes which of the
+                                      * degrees of freedom of the two
+                                      * finite element objects are
+                                      * equivalent, and returns a list
+                                      * of pairs of global dof indices
+                                      * in @p identities. The first
+                                      * index of each pair denotes one
+                                      * of the vertex dofs of the
+                                      * present element, whereas the
+                                      * second is the corresponding
+                                      * index of the other finite
+                                      * element.
+                                      *
+                                      * This being a discontinuous element,
+                                      * the set of such constraints is of
+                                      * course empty.
+                                      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
 
-				     /**
-				      * Same as
-				      * hp_vertex_dof_indices(),
-				      * except that the function
-				      * treats degrees of freedom on
-				      * lines.
-				      *
-				      * This being a discontinuous element,
-				      * the set of such constraints is of
-				      * course empty.
-				      */
+                                     /**
+                                      * Same as
+                                      * hp_vertex_dof_indices(),
+                                      * except that the function
+                                      * treats degrees of freedom on
+                                      * lines.
+                                      *
+                                      * This being a discontinuous element,
+                                      * the set of such constraints is of
+                                      * course empty.
+                                      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
 
-				     /**
-				      * Same as
-				      * hp_vertex_dof_indices(),
-				      * except that the function
-				      * treats degrees of freedom on
-				      * quads.
-				      *
-				      * This being a discontinuous element,
-				      * the set of such constraints is of
-				      * course empty.
-				      */
+                                     /**
+                                      * Same as
+                                      * hp_vertex_dof_indices(),
+                                      * except that the function
+                                      * treats degrees of freedom on
+                                      * quads.
+                                      *
+                                      * This being a discontinuous element,
+                                      * the set of such constraints is of
+                                      * course empty.
+                                      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
@@ -185,174 +185,174 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
                                       * Return whether this element
                                       * implements its hanging node
                                       * constraints in the new way,
-				      * which has to be used to make
-				      * elements "hp compatible".
+                                      * which has to be used to make
+                                      * elements "hp compatible".
                                       *
-				      * For the FE_DGPMonomial class the
-				      * result is always true (independent of
-				      * the degree of the element), as it has
-				      * no hanging nodes (being a
-				      * discontinuous element).
+                                      * For the FE_DGPMonomial class the
+                                      * result is always true (independent of
+                                      * the degree of the element), as it has
+                                      * no hanging nodes (being a
+                                      * discontinuous element).
                                       */
     virtual bool hp_constraints_are_implemented () const;
 
-				     /**
-				      * Return whether this element dominates
-				      * the one given as argument when they
-				      * meet at a common face,
-				      * whether it is the other way around,
-				      * whether neither dominates, or if
-				      * either could dominate.
-				      *
-				      * For a definition of domination, see
-				      * FiniteElementBase::Domination and in
-				      * particular the @ref hp_paper "hp paper".
-				      */
+                                     /**
+                                      * Return whether this element dominates
+                                      * the one given as argument when they
+                                      * meet at a common face,
+                                      * whether it is the other way around,
+                                      * whether neither dominates, or if
+                                      * either could dominate.
+                                      *
+                                      * For a definition of domination, see
+                                      * FiniteElementBase::Domination and in
+                                      * particular the @ref hp_paper "hp paper".
+                                      */
     virtual
     FiniteElementDomination::Domination
     compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
 
-				     /**
-				      * @}
-				      */
-    
-				     /**
-				      * Return the matrix
-				      * interpolating from the given
-				      * finite element to the present
-				      * one. The size of the matrix is
-				      * then @p dofs_per_cell times
-				      * <tt>source.dofs_per_cell</tt>.
-				      *
-				      * These matrices are only
-				      * available if the source
-				      * element is also a @p FE_Q
-				      * element. Otherwise, an
-				      * exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented
-				      * is thrown.
-				      */
+                                     /**
+                                      * @}
+                                      */
+
+                                     /**
+                                      * Return the matrix
+                                      * interpolating from the given
+                                      * finite element to the present
+                                      * one. The size of the matrix is
+                                      * then @p dofs_per_cell times
+                                      * <tt>source.dofs_per_cell</tt>.
+                                      *
+                                      * These matrices are only
+                                      * available if the source
+                                      * element is also a @p FE_Q
+                                      * element. Otherwise, an
+                                      * exception of type
+                                      * FiniteElement<dim>::ExcInterpolationNotImplemented
+                                      * is thrown.
+                                      */
     virtual void
     get_interpolation_matrix (const FiniteElement<dim> &source,
-			      FullMatrix<double>           &matrix) const;
-    
-				     /**
-				      * Return the matrix
-				      * interpolating from a face of
-				      * of one element to the face of
-				      * the neighboring element. 
-				      * The size of the matrix is
-				      * then @p dofs_per_face times
-				      * <tt>source.dofs_per_face</tt>.
-				      *
-				      * Derived elements will have to
-				      * implement this function. They
-				      * may only provide interpolation
-				      * matrices for certain source
-				      * finite elements, for example
-				      * those from the same family. If
-				      * they don't implement
-				      * interpolation from a given
-				      * element, then they must throw
-				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
-				      */
+                              FullMatrix<double>           &matrix) const;
+
+                                     /**
+                                      * Return the matrix
+                                      * interpolating from a face of
+                                      * of one element to the face of
+                                      * the neighboring element.
+                                      * The size of the matrix is
+                                      * then @p dofs_per_face times
+                                      * <tt>source.dofs_per_face</tt>.
+                                      *
+                                      * Derived elements will have to
+                                      * implement this function. They
+                                      * may only provide interpolation
+                                      * matrices for certain source
+                                      * finite elements, for example
+                                      * those from the same family. If
+                                      * they don't implement
+                                      * interpolation from a given
+                                      * element, then they must throw
+                                      * an exception of type
+                                      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+                                      */
     virtual void
     get_face_interpolation_matrix (const FiniteElement<dim> &source,
-				   FullMatrix<double>       &matrix) const;    
+                                   FullMatrix<double>       &matrix) const;
 
-				     /**
-				      * Return the matrix
-				      * interpolating from a face of
-				      * of one element to the face of
-				      * the neighboring element. 
-				      * The size of the matrix is
-				      * then @p dofs_per_face times
-				      * <tt>source.dofs_per_face</tt>.
-				      *
-				      * Derived elements will have to
-				      * implement this function. They
-				      * may only provide interpolation
-				      * matrices for certain source
-				      * finite elements, for example
-				      * those from the same family. If
-				      * they don't implement
-				      * interpolation from a given
-				      * element, then they must throw
-				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
-				      */
+                                     /**
+                                      * Return the matrix
+                                      * interpolating from a face of
+                                      * of one element to the face of
+                                      * the neighboring element.
+                                      * The size of the matrix is
+                                      * then @p dofs_per_face times
+                                      * <tt>source.dofs_per_face</tt>.
+                                      *
+                                      * Derived elements will have to
+                                      * implement this function. They
+                                      * may only provide interpolation
+                                      * matrices for certain source
+                                      * finite elements, for example
+                                      * those from the same family. If
+                                      * they don't implement
+                                      * interpolation from a given
+                                      * element, then they must throw
+                                      * an exception of type
+                                      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+                                      */
     virtual void
     get_subface_interpolation_matrix (const FiniteElement<dim> &source,
-				      const unsigned int        subface,
-				      FullMatrix<double>       &matrix) const;
+                                      const unsigned int        subface,
+                                      FullMatrix<double>       &matrix) const;
 
-				     /**
-				      * Check for non-zero values on a face.
-				      *
-				      * This function returns
-				      * @p true, if the shape
-				      * function @p shape_index has
-				      * non-zero values on the face
-				      * @p face_index.
-				      *
-				      * Implementation of the
-				      * interface in
-				      * FiniteElement
-				      */
+                                     /**
+                                      * Check for non-zero values on a face.
+                                      *
+                                      * This function returns
+                                      * @p true, if the shape
+                                      * function @p shape_index has
+                                      * non-zero values on the face
+                                      * @p face_index.
+                                      *
+                                      * Implementation of the
+                                      * interface in
+                                      * FiniteElement
+                                      */
     virtual bool has_support_on_face (const unsigned int shape_index,
-				      const unsigned int face_index) const;
+                                      const unsigned int face_index) const;
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      *
-				      * This function is made virtual,
-				      * since finite element objects
-				      * are usually accessed through
-				      * pointers to their base class,
-				      * rather than the class itself.
-				      */
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object.
+                                      *
+                                      * This function is made virtual,
+                                      * since finite element objects
+                                      * are usually accessed through
+                                      * pointers to their base class,
+                                      * rather than the class itself.
+                                      */
     virtual std::size_t memory_consumption () const;
 
   protected:
 
-				     /**
-				      * @p clone function instead of
-				      * a copy constructor.
-				      *
-				      * This function is needed by the
-				      * constructors of @p FESystem.
-				      */
+                                     /**
+                                      * @p clone function instead of
+                                      * a copy constructor.
+                                      *
+                                      * This function is needed by the
+                                      * constructors of @p FESystem.
+                                      */
     virtual FiniteElement<dim> *clone() const;
 
   private:
-    
-				     /**
-				      * Only for internal use. Its
-				      * full name is
-				      * @p get_dofs_per_object_vector
-				      * function and it creates the
-				      * @p dofs_per_object vector that is
-				      * needed within the constructor to
-				      * be passed to the constructor of
-				      * @p FiniteElementData.
-				      */
+
+                                     /**
+                                      * Only for internal use. Its
+                                      * full name is
+                                      * @p get_dofs_per_object_vector
+                                      * function and it creates the
+                                      * @p dofs_per_object vector that is
+                                      * needed within the constructor to
+                                      * be passed to the constructor of
+                                      * @p FiniteElementData.
+                                      */
     static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
 
-				     /**
-				      * Initialize the embedding
-				      * matrices. Called from the
-				      * constructor.
-				      */
+                                     /**
+                                      * Initialize the embedding
+                                      * matrices. Called from the
+                                      * constructor.
+                                      */
     void initialize_embedding ();
 
-				     /**
-				      * Initialize the restriction
-				      * matrices. Called from the
-				      * constructor.
-				      */
+                                     /**
+                                      * Initialize the restriction
+                                      * matrices. Called from the
+                                      * constructor.
+                                      */
     void initialize_restriction ();
 };
 

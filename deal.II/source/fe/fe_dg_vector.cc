@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,12 +28,12 @@ template <int dim, int spacedim>
 std::string
 FE_DGNedelec<dim, spacedim>::get_name () const
 {
-				   // note that the
-				   // FETools::get_fe_from_name
-				   // function depends on the
-				   // particular format of the string
-				   // this function returns, so they
-				   // have to be kept in synch
+                                   // note that the
+                                   // FETools::get_fe_from_name
+                                   // function depends on the
+                                   // particular format of the string
+                                   // this function returns, so they
+                                   // have to be kept in synch
 
   std::ostringstream namebuf;
   namebuf << "FE_DGNedelec<" << dim << ',' << spacedim << ">(" << this->degree-1 << ")";
@@ -52,12 +52,12 @@ template <int dim, int spacedim>
 std::string
 FE_DGRaviartThomas<dim, spacedim>::get_name () const
 {
-				   // note that the
-				   // FETools::get_fe_from_name
-				   // function depends on the
-				   // particular format of the string
-				   // this function returns, so they
-				   // have to be kept in synch
+                                   // note that the
+                                   // FETools::get_fe_from_name
+                                   // function depends on the
+                                   // particular format of the string
+                                   // this function returns, so they
+                                   // have to be kept in synch
 
   std::ostringstream namebuf;
   namebuf << "FE_DGRaviartThomas<" << dim << ',' << spacedim << ">(" << this->degree-1 << ")";
@@ -76,12 +76,12 @@ template <int dim, int spacedim>
 std::string
 FE_DGBDM<dim, spacedim>::get_name () const
 {
-				   // note that the
-				   // FETools::get_fe_from_name
-				   // function depends on the
-				   // particular format of the string
-				   // this function returns, so they
-				   // have to be kept in synch
+                                   // note that the
+                                   // FETools::get_fe_from_name
+                                   // function depends on the
+                                   // particular format of the string
+                                   // this function returns, so they
+                                   // have to be kept in synch
 
   std::ostringstream namebuf;
   namebuf << "FE_DGBDM<" << dim << ',' << spacedim << ">(" << this->degree-1 << ")";

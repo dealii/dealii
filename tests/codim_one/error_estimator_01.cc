@@ -128,7 +128,7 @@ check ()
   MappingQ<dim,spacedim> mapping(3);
   Quadrature<dim-1> &q_face = get_q_face<dim>();
 
-  std::map<unsigned char,const Function<spacedim>*> neumann_bc;
+  std::map<types::boundary_id_t,const Function<spacedim>*> neumann_bc;
   neumann_bc[0] = &function;
   
   Vector<double> v (dof.n_dofs());

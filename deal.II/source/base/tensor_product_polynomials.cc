@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -79,7 +79,7 @@ TensorProductPolynomials<dim>::output_indices(std::ostream &out) const
       compute_index(i,ix);
       out << i << "\t";
       for (unsigned int d=0; d<dim; ++d)
-	out << ix[d] << " ";
+        out << ix[d] << " ";
       out << std::endl;
     }
 }
@@ -92,7 +92,7 @@ TensorProductPolynomials<dim>::set_numbering(
   const std::vector<unsigned int> &renumber)
 {
   Assert(renumber.size()==index_map.size(),
-	 ExcDimensionMismatch(renumber.size(), index_map.size()));
+         ExcDimensionMismatch(renumber.size(), index_map.size()));
 
   index_map=renumber;
   for (unsigned int i=0; i<index_map.size(); ++i)
@@ -121,7 +121,7 @@ TensorProductPolynomials<dim>::compute_value (const unsigned int i,
 template <>
 double
 TensorProductPolynomials<0>::compute_value (const unsigned int ,
-					    const Point<0> &) const
+                                            const Point<0> &) const
 {
   Assert (false, ExcNotImplemented());
   return 0.;
@@ -146,9 +146,9 @@ TensorProductPolynomials<dim>::compute_grad (const unsigned int i,
     std::vector<double> tmp (2);
     for (unsigned int d=0; d<dim; ++d)
       {
-	polynomials[indices[d]].value (p(d), tmp);
-	v[d][0] = tmp[0];
-	v[d][1] = tmp[1];
+        polynomials[indices[d]].value (p(d), tmp);
+        v[d][0] = tmp[0];
+        v[d][1] = tmp[1];
       }
   }
 
@@ -177,10 +177,10 @@ TensorProductPolynomials<dim>::compute_grad_grad (const unsigned int i,
     std::vector<double> tmp (3);
     for (unsigned int d=0; d<dim; ++d)
       {
-	polynomials[indices[d]].value (p(d), tmp);
-	v[d][0] = tmp[0];
-	v[d][1] = tmp[1];
-	v[d][2] = tmp[2];
+        polynomials[indices[d]].value (p(d), tmp);
+        v[d][0] = tmp[0];
+        v[d][1] = tmp[1];
+        v[d][2] = tmp[2];
       }
   }
 
@@ -253,11 +253,11 @@ compute (const Point<dim>            &p,
     std::vector<double> tmp (n_values_and_derivatives);
     for (unsigned int d=0; d<dim; ++d)
       for (unsigned int i=0; i<polynomials.size(); ++i)
-	{
-	  polynomials[i].value(p(d), tmp);
-	  for (unsigned int e=0; e<n_values_and_derivatives; ++e)
-	    v(d,i)[e] = tmp[e];
-	};
+        {
+          polynomials[i].value(p(d), tmp);
+          for (unsigned int e=0; e<n_values_and_derivatives; ++e)
+            v(d,i)[e] = tmp[e];
+        };
   }
 
   for (unsigned int i=0; i<n_tensor_pols; ++i)
@@ -333,9 +333,9 @@ TensorProductPolynomials<0>::n() const
 template <int dim>
 AnisotropicPolynomials<dim>::
 AnisotropicPolynomials(const std::vector<std::vector<Polynomials::Polynomial<double> > > &pols)
-		:
-		polynomials (pols),
-		n_tensor_pols(get_n_tensor_pols(pols))
+                :
+                polynomials (pols),
+                n_tensor_pols(get_n_tensor_pols(pols))
 {
   Assert (pols.size() == dim, ExcDimensionMismatch(pols.size(), dim));
   for (unsigned int d=0; d<dim; ++d)

@@ -74,7 +74,7 @@ in connection to the changed outlined below for _1, _2, etc. Consequently,
 if the compiler used supports C++ 1x, we now selectively import elements of the
 compiler's namespace std into namespace std_cxx1x as well. This may lead to
 incompatibilities if you are already using elements of the C++ 1x
-standard by refering to them through the std_cxx1x namespace and these elements
+standard by referring to them through the std_cxx1x namespace and these elements
 are not on the list of selectively imported ones.
 <br>
 (Wolfgang Bangerth, 2011/05/29)

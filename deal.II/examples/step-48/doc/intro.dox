@@ -1,0 +1,173 @@
+
+<i>
+This program was contributed by Katharina Kormann and Martin
+Kronbichler.
+
+The algorithm for the matrix-vector product is based on the article <a
+href="http://dx.doi.org/10.1016/j.compfluid.2012.04.012">A generic
+interface for parallel cell-based finite element operator
+application</a> by Martin Kronbichler and Katharina Kormann, Computers
+and Fluids 63:135&ndash;147, 2012, and the paper &quot;Parallel finite element operator
+application: Graph partitioning and coloring&quot; by Katharina
+Kormann and Martin Kronbichler in: Proceedings of the 7th IEEE
+International Conference on e-Science, 2011.  </i>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This program demonstrates how to use the cell-based implementation of
+finite element operators with the MatrixFree class,
+first introduced in step-37, to solve nonlinear partial
+differential equations. Moreover, we demonstrate how the
+MatrixFree class handles constraints and how it can be
+parallelized over distributed nodes. Finally, we will use an explicit
+time-stepping method to solve the problem and introduce Gauss-Lobatto
+finite elements that are very convenient in this case since they have
+a diagonal, and thus trivially invertible, mass matrix. Moreover,
+this type of elements clusters the nodes towards the element
+boundaries which is why they have good properties for high-order
+discretization methods. Indeed, the condition number of standard FE_Q
+elements with equidistant nodes grows exponentially with the degree,
+which destroys any benefit for orders of about five and higher.
+
+<h3> Problem statement and discretization </h3>
+
+As an example, we choose to solve the sine-Gordon soliton equation
+\f{eqnarray*}
+u_{tt} &=& \Delta u -\sin(u) \quad\mbox{for}\quad (x,t) \in
+\Omega \times (t_0,t_f],\\
+{\mathbf n} \cdot \nabla u &=& 0
+\quad\mbox{for}\quad (x,t) \in \partial\Omega \times (t_0,t_f],\\
+u(x,t_0) &=& u_0(x).
+\f}
+
+that was already introduced in step-25. As a simple explicit time
+integration method, we choose leap frog scheme using the second-order
+formulation of the equation. Then, the scheme reads in weak form
+
+\f{eqnarray*}
+(v,u^{n+1}) = (v,2 u^n-u^{n-1} -
+(\Delta t)^2 \sin(u^n)) - (\nabla v, (\Delta t)^2 \nabla u^n),
+\f}
+where <i> v</i> denotes a test function and the index <i>n</i> stands for
+the time step number.
+
+For the spatial discretization, we choose FE_Q elements
+with basis functions defined to interpolate the support points of the
+Gauss-Lobatto quadrature rule. Moreover, when we compute the integrals
+over the basis functions to form the mass matrix and the operator on
+the right hand side of the equation above, we use the
+Gauss-Lobatto quadrature rule with the same support points as the
+node points of the finite element to evaluate the integrals. Since the
+finite element is Lagrangian, this will yield a diagonal mass matrix
+on the left hand side of the equation, making the solution of the
+linear system in each time step trivial.
+
+Using this quadrature rule, for a <i>p</i>th order finite element, we
+use a <i>(2p-1)</i>th order accurate formula to evaluate the
+integrals. Since the product of two <i>p</i>th order basis functions
+when computing a mass matrix gives a function with polynomial degree
+<i>2p</i> in each direction, the integrals are not exactly
+evaluated. However, considering the fact that the interpolation order
+of finite elements of degree <i>p</i> is <i>p+1</i>, the overall
+convergence properties are not disturbed by the quadrature error, in
+particular not when we use high orders.
+
+Apart from the fact, that we avoid solving linear systems with this
+type of elements when using explicit time-stepping, they come with two
+other advantages. When we are using the sum-factorization approach to
+evaluate the finite element operator (cf. step-37), we have to
+evaluate the function at the quadrature points. In the case of
+Gauss-Lobatto elements, where quadrature points and node points of the
+finite element coincide, this operation is trivial since the value
+of the function at the quadrature points is given by its one-dimensional
+coefficients. In this way, the complexity of a finite element operator
+evaluation is further reduced compared to equidistant elements.
+
+The third advantage is the fact that these elements are better conditioned as
+equidistant Lagrange polynomials for increasing order so that we can use
+higher order elements for an accurate solution of the equation. Lagrange
+elements FE_Q with equidistant points should not be used for polynomial
+degrees four and higher.
+
+To sum up the discussion, by using the right finite element and
+quadrature rule combination, we end up with a scheme where we in each
+time step need to compute the right hand side vector corresponding
+to the formulation above and then multiply it by the inverse of the
+diagonal mass matrix. In practice, of course, we extract the diagonal
+elements and invert them only once at the beginning of the program.
+
+<h3>Implementation of constraints</h3>
+
+The usual way to handle constraints in <code>deal.II</code> is to use
+the ConstraintMatrix class that builds a sparse matrix storing
+information about which degrees of freedom (DoF) are constrained and
+how they are constrained. This format uses an unnecessarily large
+amount of memory since there are not so many different types of
+constraints: for example, in the case of hanging nodes when using
+linear finite element on every cell, constraints most have the form
+$x_k = \frac 12 x_i + \frac 12 x_j$ where the coefficients $\frac 12$
+are always the same and only $i,j,k$ are different. While storing this
+redundant information is not a problem in general because it is only
+needed once during matrix and right hand side assembly, it becomes a
+problem when we want to use the matrix-free approach since there this
+information has to be accessed every time we apply the operator. Thus,
+instead of a ConstraintMatrix, we use a variable that we call
+<code>constraint_pool</code> that collects the weights of the
+different constraints. Then, we only have to store an identifier of
+each constraint in the mesh instead of all the weights. Moreover, we
+do not want to apply the constraints in a pre- and postprocessing step
+but want to take care of constraints as we evaluate the finite element
+operator. Therefore, we embed the constraint information into the
+variable <code>indices_local_to_global</code> that is used to extract
+the cell information from the global vector. If a DoF is constrained,
+the <code>indices_local_to_global</code> variable contains the global
+indices of the DoFs that it is constrained to. Then, we have another
+variable <code>constraint_indicator</code> at hand that holds, for
+each cell, the local indices of DoFs that are constrained as well as
+the identifer of the type of constraint. Actually, you will not see
+these data structures in the example program since the class
+<code>FEEvaluationGL</code> takes care of the constraints without user
+interaction.
+
+
+<h3> Parallelization </h3>
+
+The MatrixFree class comes with the option to be
+parallelized on three levels: MPI parallelization on clusters of
+distributed nodes, thread parallelization scheduled by the Threading
+Building Blocks library, and finally with a vectorization by clustering of two
+(or more) cells into a SIMD data type for the operator application. We
+have already seen how shared-memory parallelism can be exploited in
+step-37. Here, we demonstrate MPI parallelization.
+
+To facilitate parallelism with distributed memory (MPI), we use a special
+vector type parallel::distributed::Vector that holds the
+processor-local part of the solution as well as information on and data
+fields for the ghost DoFs, i.e. DoFs that are owned by a remote
+processor but needed on cells that are treated by the present
+processor. Moreover, it holds the MPI-send information for DoFs that
+are owned locally but needed by other processors. This is similar to
+the PETScWrappers::MPI::Vector and TrilinosWrappers::MPI::Vector data
+types we have used in step-40 and step-32 before, but since we do not
+need any other parallel functionality of these libraries, we use the
+parallel::distributed::Vector class of deal.II instead of linking in
+another large library.
+
+Note that this program is designed to be run with a distributed triangulation
+(parallel::distributed::Triangulation), which requires deal.II to be
+configured with <a href="http://www.p4est.org/">p4est</a> as described
+in the <a href="../../readme.html">deal.II ReadMe</a> file. However, a
+non-distributed triangulation is also supported, in which case the
+computation will be run in serial.
+
+<h3> The test case </h3>
+
+In our example, we choose the initial value to be \f{eqnarray*} u(x,t) =
+\prod_{i=1}^{d} -4 \arctan \left(
+\frac{m}{\sqrt{1-m^2}}\frac{\sin\left(\sqrt{1-m^2} t +c_2\right)}{\cosh(mx_i+c_1)}\right)
+\f} and solve the equation over the time interval [-10,10]. The
+constants are chosen to be $c_1=c_1=0$ and <i> m=0.5</i>. As mentioned
+in step-25, in one dimension <i>u</i> as a function of <i>t</i> is the exact
+solution of the sine-Gordon equation. For higher dimension, this is however
+not the case.

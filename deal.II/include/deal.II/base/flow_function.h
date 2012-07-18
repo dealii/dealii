@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,110 +45,110 @@ namespace Functions
   class FlowFunction : public Function<dim>
   {
     public:
-				       /**
-					* Constructor, setting up some
-					* internal data structures.
-					*/
+                                       /**
+                                        * Constructor, setting up some
+                                        * internal data structures.
+                                        */
       FlowFunction();
 
-				       /**
-					* Virtual destructor.
-					*/
+                                       /**
+                                        * Virtual destructor.
+                                        */
       virtual ~FlowFunction();
 
-				       /**
-					* Store an adjustment for the
-					* pressure function, such that
-					* its mean value is
-					* <tt>p</tt>.
-					*/
+                                       /**
+                                        * Store an adjustment for the
+                                        * pressure function, such that
+                                        * its mean value is
+                                        * <tt>p</tt>.
+                                        */
       void pressure_adjustment(double p);
 
-				       /**
-					* Values in a structure more
-					* suitable for vector valued
-					* functions. The outer vector
-					* is indexed by solution
-					* component, the inner by
-					* quadrature point.
-					*/
+                                       /**
+                                        * Values in a structure more
+                                        * suitable for vector valued
+                                        * functions. The outer vector
+                                        * is indexed by solution
+                                        * component, the inner by
+                                        * quadrature point.
+                                        */
       virtual void vector_values (const std::vector<Point<dim> >& points,
-				  std::vector<std::vector<double> >& values) const = 0;
-				       /**
-					* Gradients in a structure more
-					* suitable for vector valued
-					* functions. The outer vector
-					* is indexed by solution
-					* component, the inner by
-					* quadrature point.
-					*/
+                                  std::vector<std::vector<double> >& values) const = 0;
+                                       /**
+                                        * Gradients in a structure more
+                                        * suitable for vector valued
+                                        * functions. The outer vector
+                                        * is indexed by solution
+                                        * component, the inner by
+                                        * quadrature point.
+                                        */
       virtual void vector_gradients (const std::vector<Point<dim> >            &points,
-				     std::vector<std::vector<Tensor<1,dim> > > &gradients) const = 0;
-				       /**
-					* Force terms in a structure more
-					* suitable for vector valued
-					* functions. The outer vector
-					* is indexed by solution
-					* component, the inner by
-					* quadrature point.
-					*
-					* @warning This is not the
-					* true Laplacian, but the
-					* force term to be used as
-					* right hand side in Stokes'
-					* equations
-					*/
+                                     std::vector<std::vector<Tensor<1,dim> > > &gradients) const = 0;
+                                       /**
+                                        * Force terms in a structure more
+                                        * suitable for vector valued
+                                        * functions. The outer vector
+                                        * is indexed by solution
+                                        * component, the inner by
+                                        * quadrature point.
+                                        *
+                                        * @warning This is not the
+                                        * true Laplacian, but the
+                                        * force term to be used as
+                                        * right hand side in Stokes'
+                                        * equations
+                                        */
       virtual void vector_laplacians (const std::vector<Point<dim> > &points,
-				      std::vector<std::vector<double> >   &values) const = 0;
+                                      std::vector<std::vector<double> >   &values) const = 0;
 
       virtual void vector_value (const Point<dim>& points, Vector<double>& value) const;
       virtual double value (const Point<dim>& points, const unsigned int component) const;
       virtual void vector_value_list (const std::vector<Point<dim> > &points,
-				      std::vector<Vector<double> >   &values) const;
+                                      std::vector<Vector<double> >   &values) const;
       virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
-					 std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
-				       /**
-					* The force term in the
-					* momentum equation.
-					*/
+                                         std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
+                                       /**
+                                        * The force term in the
+                                        * momentum equation.
+                                        */
       virtual void vector_laplacian_list (const std::vector<Point<dim> > &points,
-					  std::vector<Vector<double> >   &values) const;
+                                          std::vector<Vector<double> >   &values) const;
 
       std::size_t memory_consumption () const;
 
     protected:
-				       /**
-					* Mean value of the pressure
-					* to be added by derived
-					* classes.
-					*/
+                                       /**
+                                        * Mean value of the pressure
+                                        * to be added by derived
+                                        * classes.
+                                        */
       double mean_pressure;
 
     private:
 
-				       /**
-					* A mutex that guards the
-					* following scratch arrays.
-					*/
+                                       /**
+                                        * A mutex that guards the
+                                        * following scratch arrays.
+                                        */
       mutable Threads::Mutex mutex;
 
-				       /**
-					* Auxiliary values for the usual
-					* Function interface.
-					*/
+                                       /**
+                                        * Auxiliary values for the usual
+                                        * Function interface.
+                                        */
       mutable std::vector<std::vector<double> > aux_values;
 
-				       /**
-					* Auxiliary values for the usual
-					* Function interface.
-					*/
+                                       /**
+                                        * Auxiliary values for the usual
+                                        * Function interface.
+                                        */
       mutable std::vector<std::vector<Tensor<1,dim> > > aux_gradients;
   };
 
 /**
  * Laminar pipe flow in two and three dimensions. The channel
- * stretches along the <i>x</i>-axis and has radius #radius. The
- * #Reynolds number is used to scale the pressure properly for a
+ * stretches along the <i>x</i>-axis and has radius @p radius. The
+ * @p Reynolds number is used to scale the pressure properly for a
  * Navier-Stokes problem.
  *
  * @ingroup functions
@@ -158,22 +158,22 @@ namespace Functions
   class PoisseuilleFlow : public FlowFunction<dim>
   {
     public:
-				       /**
-					* Construct an object for the
-					* given channel radius
-					* <tt>r</tt> and the Reynolds
-					* number <tt>Re</tt>.
-					*/
+                                       /**
+                                        * Construct an object for the
+                                        * given channel radius
+                                        * <tt>r</tt> and the Reynolds
+                                        * number <tt>Re</tt>.
+                                        */
       PoisseuilleFlow<dim> (const double r,
-			    const double Re);
+                            const double Re);
       virtual ~PoisseuilleFlow();
 
       virtual void vector_values (const std::vector<Point<dim> >& points,
-				  std::vector<std::vector<double> >& values) const;
+                                  std::vector<std::vector<double> >& values) const;
       virtual void vector_gradients (const std::vector<Point<dim> >& points,
-				     std::vector<std::vector<Tensor<1,dim> > >& gradients) const;
+                                     std::vector<std::vector<Tensor<1,dim> > >& gradients) const;
       virtual void vector_laplacians (const std::vector<Point<dim> > &points,
-				      std::vector<std::vector<double> >   &values) const;
+                                      std::vector<std::vector<double> >   &values) const;
 
     private:
       const double radius;
@@ -199,31 +199,31 @@ namespace Functions
       public FlowFunction<dim>
   {
     public:
-				       /**
-					* Constructor setting the
-					* Reynolds number required for
-					* pressure computation and
-					* scaling of the right hand side.
-					*/
+                                       /**
+                                        * Constructor setting the
+                                        * Reynolds number required for
+                                        * pressure computation and
+                                        * scaling of the right hand side.
+                                        */
       StokesCosine (const double viscosity = 1., const double reaction = 0.);
-				       /**
-					* Change the viscosity and the
-					* reaction parameter.
-					*/
+                                       /**
+                                        * Change the viscosity and the
+                                        * reaction parameter.
+                                        */
       void set_parameters (const double viscosity, const double reaction);
       virtual ~StokesCosine();
 
       virtual void vector_values (const std::vector<Point<dim> >& points,
-				  std::vector<std::vector<double> >& values) const;
+                                  std::vector<std::vector<double> >& values) const;
       virtual void vector_gradients (const std::vector<Point<dim> >& points,
-				     std::vector<std::vector<Tensor<1,dim> > >& gradients) const;
+                                     std::vector<std::vector<Tensor<1,dim> > >& gradients) const;
       virtual void vector_laplacians (const std::vector<Point<dim> > &points,
-				      std::vector<std::vector<double> >   &values) const;
+                                      std::vector<std::vector<double> >   &values) const;
 
     private:
-				       /// The viscosity
+                                       /// The viscosity
       double viscosity;
-				       /// The reaction parameter
+                                       /// The reaction parameter
       double reaction;
   };
 
@@ -239,35 +239,35 @@ namespace Functions
   class StokesLSingularity : public FlowFunction<2>
   {
     public:
-				       /// Constructor setting upsome data.
+                                       /// Constructor setting upsome data.
       StokesLSingularity();
 
       virtual void vector_values (const std::vector<Point<2> >& points,
-				  std::vector<std::vector<double> >& values) const;
+                                  std::vector<std::vector<double> >& values) const;
       virtual void vector_gradients (const std::vector<Point<2> >& points,
-				     std::vector<std::vector<Tensor<1,2> > >& gradients) const;
+                                     std::vector<std::vector<Tensor<1,2> > >& gradients) const;
       virtual void vector_laplacians (const std::vector<Point<2> > &points,
-				      std::vector<std::vector<double> >   &values) const;
+                                      std::vector<std::vector<double> >   &values) const;
     private:
-				       /// The auxiliary function Psi.
+                                       /// The auxiliary function Psi.
       double Psi(double phi) const;
-				       /// The derivative of Psi()
+                                       /// The derivative of Psi()
       double Psi_1(double phi) const;
-				       /// The 2nd derivative of Psi()
+                                       /// The 2nd derivative of Psi()
       double Psi_2(double phi) const;
-				       /// The 3rd derivative of Psi()
+                                       /// The 3rd derivative of Psi()
       double Psi_3(double phi) const;
-				       /// The 4th derivative of Psi()
+                                       /// The 4th derivative of Psi()
       double Psi_4(double phi) const;
-				       /// The angle of the reentrant corner
+                                       /// The angle of the reentrant corner
       const double omega;
-				       /// The exponent of the radius
+                                       /// The exponent of the radius
       static const double lambda;
-				       /// Cosine of lambda times omega
+                                       /// Cosine of lambda times omega
       const double coslo;
-				       /// Auxiliary variable 1+lambda
+                                       /// Auxiliary variable 1+lambda
       const double lp;
-				       /// Auxiliary variable 1-lambda
+                                       /// Auxiliary variable 1-lambda
       const double lm;
   };
 
@@ -283,31 +283,31 @@ namespace Functions
   class Kovasznay : public FlowFunction<2>
   {
     public:
-				       /**
-					* Construct an object for the
-					* give Reynolds number
-					* <tt>Re</tt>. If the
-					* parameter <tt>Stokes</tt> is
-					* true, the right hand side of
-					* the momentum equation
-					* returned by
-					* vector_laplacians() contains
-					* the nonlinearity, such that
-					* the Kovasznay solution can
-					* be obtained as the solution
-					* to a Stokes problem.
-					*/
+                                       /**
+                                        * Construct an object for the
+                                        * give Reynolds number
+                                        * <tt>Re</tt>. If the
+                                        * parameter <tt>Stokes</tt> is
+                                        * true, the right hand side of
+                                        * the momentum equation
+                                        * returned by
+                                        * vector_laplacians() contains
+                                        * the nonlinearity, such that
+                                        * the Kovasznay solution can
+                                        * be obtained as the solution
+                                        * to a Stokes problem.
+                                        */
       Kovasznay (const double Re, bool Stokes = false);
       virtual ~Kovasznay();
 
       virtual void vector_values (const std::vector<Point<2> >& points,
-				  std::vector<std::vector<double> >& values) const;
+                                  std::vector<std::vector<double> >& values) const;
       virtual void vector_gradients (const std::vector<Point<2> >& points,
-				     std::vector<std::vector<Tensor<1,2> > >& gradients) const;
+                                     std::vector<std::vector<Tensor<1,2> > >& gradients) const;
       virtual void vector_laplacians (const std::vector<Point<2> > &points,
-				      std::vector<std::vector<double> >   &values) const;
+                                      std::vector<std::vector<double> >   &values) const;
 
-				       /// The value of lambda.
+                                       /// The value of lambda.
       double lambda () const;
     private:
       const double Reynolds;

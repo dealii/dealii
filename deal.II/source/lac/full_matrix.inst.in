@@ -22,25 +22,22 @@ for (S : REAL_SCALARS)
       std::ostream&, const unsigned int, const unsigned int) const;    
 
     template void FullMatrix<S>::copy_from<1>(
-      Tensor<2,1>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+      const Tensor<2,1>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
 
     template void FullMatrix<S>::copy_from<2>(
-      Tensor<2,2>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+      const Tensor<2,2>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
 
     template void FullMatrix<S>::copy_from<3>(
-      Tensor<2,3>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+      const Tensor<2,3>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
 
     template void FullMatrix<S>::copy_to<1>(
-      Tensor<2,1>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+      Tensor<2,1>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned) const;
 
     template void FullMatrix<S>::copy_to<2>(
-      Tensor<2,2>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+      Tensor<2,2>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned) const;
 
     template void FullMatrix<S>::copy_to<3>(
-      Tensor<2,3>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
-
-
-
+      Tensor<2,3>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned) const;
   }
 
 for (S1, S2 : REAL_SCALARS)

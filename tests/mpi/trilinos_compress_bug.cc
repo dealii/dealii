@@ -1,5 +1,5 @@
 //----------------------------  trilinos_vector_reinit.cc  ---------------------------
-//    $Id: trilinos_vector_reinit.cc 23710 2011-05-17 04:50:10Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2011 by the deal.II authors

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -70,49 +70,49 @@ class VectorMemory : public Subscriptor
 {
   public:
 
-				     /**
-				      * Virtual destructor is needed
-				      * as there are virtual functions
-				      * in this class.
-				      */
+                                     /**
+                                      * Virtual destructor is needed
+                                      * as there are virtual functions
+                                      * in this class.
+                                      */
     virtual ~VectorMemory() {}
 
-				     /**
-				      * Return a pointer to a new
-				      * vector. The number of elements
-				      * or their subdivision into
-				      * blocks (if applicable) is
-				      * unspecified and users of this
-				      * function should reset vectors
-				      * to their proper size. The same
-				      * holds for the contents of
-				      * vectors: they are unspecified.
-				      */
+                                     /**
+                                      * Return a pointer to a new
+                                      * vector. The number of elements
+                                      * or their subdivision into
+                                      * blocks (if applicable) is
+                                      * unspecified and users of this
+                                      * function should reset vectors
+                                      * to their proper size. The same
+                                      * holds for the contents of
+                                      * vectors: they are unspecified.
+                                      */
     virtual VECTOR* alloc () = 0;
 
-				     /**
-				      * Return a vector and indicate
-				      * that it is not going to be
-				      * used any further by the
-				      * instance that called alloc()
-				      * to get a pointer to it.
-				      */
+                                     /**
+                                      * Return a vector and indicate
+                                      * that it is not going to be
+                                      * used any further by the
+                                      * instance that called alloc()
+                                      * to get a pointer to it.
+                                      */
     virtual void free (const VECTOR * const) = 0;
 
-				     /** @addtogroup Exceptions
-				      * @{ */
+                                     /** @addtogroup Exceptions
+                                      * @{ */
 
-				     /**
-				      * No more available vectors.
-				      */
+                                     /**
+                                      * No more available vectors.
+                                      */
     DeclException0(ExcNoMoreVectors);
-				     /**
-				      * Vector was not allocated from
-				      * this memory pool.
-				      */
+                                     /**
+                                      * Vector was not allocated from
+                                      * this memory pool.
+                                      */
     DeclException0(ExcNotAllocatedHere);
 
-				     //@}
+                                     //@}
 /**
  * Pointer to vectors allocated from VectorMemory objects. This
  * pointer is safe in the sense that it automatically calls free()
@@ -124,42 +124,42 @@ class VectorMemory : public Subscriptor
     class Pointer
     {
       public:
-					 /**
-					  * Constructor, automatically
-					  * allocating a vector from
-					  * @p mem.
-					  */
-	Pointer(VectorMemory<VECTOR>& mem);
-					 /**
-					  * Destructor, automatically
-					  * releasing the vector from
-					  * the memory #pool.
-					  */
-	~Pointer();
+                                         /**
+                                          * Constructor, automatically
+                                          * allocating a vector from
+                                          * @p mem.
+                                          */
+        Pointer(VectorMemory<VECTOR>& mem);
+                                         /**
+                                          * Destructor, automatically
+                                          * releasing the vector from
+                                          * the memory #pool.
+                                          */
+        ~Pointer();
 
-					 /**
-					  * Conversion to regular pointer.
-					  */
-	operator VECTOR* () const;
+                                         /**
+                                          * Conversion to regular pointer.
+                                          */
+        operator VECTOR* () const;
 
-					 /**
-					  * Dereferencing operator.
-					  */
-	VECTOR& operator * () const;
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+        VECTOR& operator * () const;
 
-					 /**
-					  * Dereferencing operator.
-					  */
-	VECTOR * operator -> () const;
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+        VECTOR * operator -> () const;
       private:
-					 /**
-					  * The memory pool used.
-					  */
-	SmartPointer<VectorMemory<VECTOR>,Pointer> pool;
-					 /**
-					  * The pointer to the vector.
-					  */
-	VECTOR* v;
+                                         /**
+                                          * The memory pool used.
+                                          */
+        SmartPointer<VectorMemory<VECTOR>,Pointer> pool;
+                                         /**
+                                          * The pointer to the vector.
+                                          */
+        VECTOR* v;
     };
 };
 
@@ -177,47 +177,47 @@ template<class VECTOR = dealii::Vector<double> >
 class PrimitiveVectorMemory : public VectorMemory<VECTOR>
 {
   public:
-				     /**
-				      * Constructor.
-				      */
+                                     /**
+                                      * Constructor.
+                                      */
     PrimitiveVectorMemory () {}
 
-				     /**
-				      * Return a pointer to a new
-				      * vector. The number of elements
-				      * or their subdivision into
-				      * blocks (if applicable) is
-				      * unspecified and users of this
-				      * function should reset vectors
-				      * to their proper size. The same
-				      * holds for the contents of
-				      * vectors: they are unspecified.
-				      *
-				      * For the present class, calling
-				      * this function will allocate a
-				      * new vector on the heap and
-				      * returning a pointer to it.
-				      */
+                                     /**
+                                      * Return a pointer to a new
+                                      * vector. The number of elements
+                                      * or their subdivision into
+                                      * blocks (if applicable) is
+                                      * unspecified and users of this
+                                      * function should reset vectors
+                                      * to their proper size. The same
+                                      * holds for the contents of
+                                      * vectors: they are unspecified.
+                                      *
+                                      * For the present class, calling
+                                      * this function will allocate a
+                                      * new vector on the heap and
+                                      * returning a pointer to it.
+                                      */
     virtual VECTOR* alloc ()
       {
-	return new VECTOR();
+        return new VECTOR();
       }
 
-				     /**
-				      * Return a vector and indicate
-				      * that it is not going to be
-				      * used any further by the
-				      * instance that called alloc()
-				      * to get a pointer to it.
-				      *
-				      *
-				      * For the present class, this
-				      * means that the vector is
-				      * returned to the global heap.
-				      */
+                                     /**
+                                      * Return a vector and indicate
+                                      * that it is not going to be
+                                      * used any further by the
+                                      * instance that called alloc()
+                                      * to get a pointer to it.
+                                      *
+                                      *
+                                      * For the present class, this
+                                      * means that the vector is
+                                      * returned to the global heap.
+                                      */
     virtual void free (const VECTOR * const v)
       {
-	delete v;
+        delete v;
       }
 };
 
@@ -253,149 +253,149 @@ template<class VECTOR = dealii::Vector<double> >
 class GrowingVectorMemory : public VectorMemory<VECTOR>
 {
   public:
-				     /**
-				      * Constructor.  The argument
-				      * allows to preallocate a
-				      * certain number of vectors. The
-				      * default is not to do this.
-				      */
+                                     /**
+                                      * Constructor.  The argument
+                                      * allows to preallocate a
+                                      * certain number of vectors. The
+                                      * default is not to do this.
+                                      */
     GrowingVectorMemory (const unsigned int initial_size = 0,
-			 const bool log_statistics = false);
+                         const bool log_statistics = false);
 
-				     /**
-				      * Destructor.
-				      * Release all vectors.
-				      * This destructor also offers
-				      * some statistic on the number
-				      * of allocated vectors.
-				      *
-				      * The log file will also contain
-				      * a warning message, if there
-				      * are allocated vectors left.
-				      */
+                                     /**
+                                      * Destructor.
+                                      * Release all vectors.
+                                      * This destructor also offers
+                                      * some statistic on the number
+                                      * of allocated vectors.
+                                      *
+                                      * The log file will also contain
+                                      * a warning message, if there
+                                      * are allocated vectors left.
+                                      */
     ~GrowingVectorMemory();
 
-				     /**
-				      * Return a pointer to a new
-				      * vector. The number of elements
-				      * or their subdivision into
-				      * blocks (if applicable) is
-				      * unspecified and users of this
-				      * function should reset vectors
-				      * to their proper size. The same
-				      * holds for the contents of
-				      * vectors: they are unspecified.
-				      */
+                                     /**
+                                      * Return a pointer to a new
+                                      * vector. The number of elements
+                                      * or their subdivision into
+                                      * blocks (if applicable) is
+                                      * unspecified and users of this
+                                      * function should reset vectors
+                                      * to their proper size. The same
+                                      * holds for the contents of
+                                      * vectors: they are unspecified.
+                                      */
     virtual VECTOR* alloc ();
 
-				     /**
-				      * Return a vector and indicate
-				      * that it is not going to be
-				      * used any further by the
-				      * instance that called alloc()
-				      * to get a pointer to it.
-				      *
-				      * For the present class, this
-				      * means retaining the vector for
-				      * later reuse by the alloc()
-				      * method.
-				      */
+                                     /**
+                                      * Return a vector and indicate
+                                      * that it is not going to be
+                                      * used any further by the
+                                      * instance that called alloc()
+                                      * to get a pointer to it.
+                                      *
+                                      * For the present class, this
+                                      * means retaining the vector for
+                                      * later reuse by the alloc()
+                                      * method.
+                                      */
     virtual void free (const VECTOR * const);
 
-				     /**
-				      * Release all vectors that are
-				      * not currently in use.
-				      */
+                                     /**
+                                      * Release all vectors that are
+                                      * not currently in use.
+                                      */
     static void release_unused_memory ();
 
-				     /**
-				      * Memory consumed by this class
-				      * and all currently allocated
-				      * vectors.
-				      */
+                                     /**
+                                      * Memory consumed by this class
+                                      * and all currently allocated
+                                      * vectors.
+                                      */
     virtual std::size_t memory_consumption() const;
 
   private:
-				     /**
-				      * Type to enter into the
-				      * array. First component will be
-				      * a flag telling whether the
-				      * vector is used, second the
-				      * vector itself.
-				      */
+                                     /**
+                                      * Type to enter into the
+                                      * array. First component will be
+                                      * a flag telling whether the
+                                      * vector is used, second the
+                                      * vector itself.
+                                      */
     typedef std::pair<bool, VECTOR*> entry_type;
 
-				     /**
-				      * The class providing the actual
-				      * storage for the memory pool.
-				      *
-				      * This is where the actual
-				      * storage for GrowingVectorMemory
-				      * is provided. Only one of these
-				      * pools is used for each vector
-				      * type, thus allocating all
-				      * vectors from the same storage.
-				      *
-				      * @author Guido Kanschat, 2007
-				      */
+                                     /**
+                                      * The class providing the actual
+                                      * storage for the memory pool.
+                                      *
+                                      * This is where the actual
+                                      * storage for GrowingVectorMemory
+                                      * is provided. Only one of these
+                                      * pools is used for each vector
+                                      * type, thus allocating all
+                                      * vectors from the same storage.
+                                      *
+                                      * @author Guido Kanschat, 2007
+                                      */
     struct Pool
     {
-					 /**
-					  * Standard constructor
-					  * creating an empty pool
-					  */
-	Pool();
-					 /**
-					  * Destructor. Frees memory
-					  * and warns about memory
-					  * leaks
-					  */
-	~Pool();
-					 /**
-					  * Create data vector; does
-					  * nothing after first
-					  * initialization
-					  */
-	void initialize(const unsigned int size);
-					 /**
-					  * Pointer to the storage
-					  * object
-					  */
-	std::vector<entry_type>* data;
+                                         /**
+                                          * Standard constructor
+                                          * creating an empty pool
+                                          */
+        Pool();
+                                         /**
+                                          * Destructor. Frees memory
+                                          * and warns about memory
+                                          * leaks
+                                          */
+        ~Pool();
+                                         /**
+                                          * Create data vector; does
+                                          * nothing after first
+                                          * initialization
+                                          */
+        void initialize(const unsigned int size);
+                                         /**
+                                          * Pointer to the storage
+                                          * object
+                                          */
+        std::vector<entry_type>* data;
     };
 
-				     /**
-				      * Array of allocated vectors.
-				      */
+                                     /**
+                                      * Array of allocated vectors.
+                                      */
     static Pool pool;
 
-				     /**
-				      * Overall number of
-				      * allocations. Only used for
-				      * bookkeeping and to generate
-				      * output at the end of an
-				      * object's lifetime.
-				      */
+                                     /**
+                                      * Overall number of
+                                      * allocations. Only used for
+                                      * bookkeeping and to generate
+                                      * output at the end of an
+                                      * object's lifetime.
+                                      */
     unsigned int total_alloc;
-				     /**
-				      * Number of vectors currently
-				      * allocated in this object; used
-				      * for detecting memory leaks.
-				      */
+                                     /**
+                                      * Number of vectors currently
+                                      * allocated in this object; used
+                                      * for detecting memory leaks.
+                                      */
     unsigned int current_alloc;
 
-				     /**
-				      * A flag controlling the logging
-				      * of statistics by the
-				      * destructor.
-				      */
+                                     /**
+                                      * A flag controlling the logging
+                                      * of statistics by the
+                                      * destructor.
+                                      */
     bool log_statistics;
 
-				     /**
-				      * Mutex to synchronise access to
-				      * internal data of this object
-				      * from multiple threads.
-				      */
+                                     /**
+                                      * Mutex to synchronise access to
+                                      * internal data of this object
+                                      * from multiple threads.
+                                      */
     static Threads::ThreadMutex mutex;
 };
 
@@ -408,8 +408,8 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 template <typename VECTOR>
 inline
 VectorMemory<VECTOR>::Pointer::Pointer(VectorMemory<VECTOR>& mem)
-		:
-		pool(&mem, typeid(*this).name()), v(0)
+                :
+                pool(&mem, typeid(*this).name()), v(0)
 {
   v = pool->alloc();
 }

@@ -2579,7 +2579,7 @@ namespace Step18
 				   // should have computed an
 				   // incremental displacement update
 				   // so that the material in its new
-				   // configuration accomodates for
+				   // configuration accommodates for
 				   // the difference between the
 				   // external body and boundary
 				   // forces applied during this time

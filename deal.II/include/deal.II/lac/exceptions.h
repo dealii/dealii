@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,52 +16,52 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace LACExceptions 
+namespace LACExceptions
 {
-				   /**
-				    * @addtogroup Exceptions
-				    */
-				   //@{
+                                   /**
+                                    * @addtogroup Exceptions
+                                    */
+                                   //@{
 
-				   /**
-				    * This function only works for
-				    * quadratic matrices.
-				    */
+                                   /**
+                                    * This function only works for
+                                    * quadratic matrices.
+                                    */
   DeclException0 (ExcNotQuadratic);
 
-				   /**
-				    * The operation cannot be finished
-				    * since the matrix is singular.
-				    */
+                                   /**
+                                    * The operation cannot be finished
+                                    * since the matrix is singular.
+                                    */
   DeclException0 (ExcSingular);
-  
-				   /**
-				    * Block indices of two block
-				    * objects are different.
-				    */
+
+                                   /**
+                                    * Block indices of two block
+                                    * objects are different.
+                                    */
   DeclException0 (ExcDifferentBlockIndices);
-  
-				   /**
-				    * An error of a PETSc function was
-				    * encountered. Check the PETSc
-				    * documentation for details.
-				    */
+
+                                   /**
+                                    * An error of a PETSc function was
+                                    * encountered. Check the PETSc
+                                    * documentation for details.
+                                    */
   DeclException1 (ExcPETScError,
-		  int,
-		  << "An error with error number " << arg1
-		  << " occured while calling a PETSc function");
-  
-				   /**
-				    * An error of a Trilinos function was
-				    * encountered. Check the Trilinos
-				    * documentation for details.
-				    */
+                  int,
+                  << "An error with error number " << arg1
+                  << " occurred while calling a PETSc function");
+
+                                   /**
+                                    * An error of a Trilinos function was
+                                    * encountered. Check the Trilinos
+                                    * documentation for details.
+                                    */
   DeclException1 (ExcTrilinosError,
-		  int,
-		  << "An error with error number " << arg1
-		  << " occured while calling a Trilinos function");
-  
-				   //@}
+                  int,
+                  << "An error with error number " << arg1
+                  << " occurred while calling a Trilinos function");
+
+                                   //@}
 }
 
 

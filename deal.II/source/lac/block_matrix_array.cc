@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2008, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,12 +19,12 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 BlockMatrixArray<number>::Entry::Entry (const Entry& e)
-		:
-		row(e.row),
-		col(e.col),
-		prefix(e.prefix),
-		transpose(e.transpose),
-		matrix(e.matrix)
+                :
+                row(e.row),
+                col(e.col),
+                prefix(e.prefix),
+                transpose(e.transpose),
+                matrix(e.matrix)
 {
   Entry& e2 = const_cast<Entry&>(e);
   e2.matrix = 0;
@@ -43,8 +43,8 @@ BlockMatrixArray<number>::Entry::~Entry ()
 
 template <typename number>
 BlockMatrixArray<number>::BlockMatrixArray ()
-		: block_rows (0),
-		  block_cols (0)
+                : block_rows (0),
+                  block_cols (0)
 {}
 
 
@@ -53,8 +53,8 @@ template <typename number>
 BlockMatrixArray<number>::BlockMatrixArray (
   const unsigned int n_block_rows,
   const unsigned int n_block_cols)
-		: block_rows (n_block_rows),
-		  block_cols (n_block_cols)
+                : block_rows (n_block_rows),
+                  block_cols (n_block_cols)
 {}
 
 
@@ -63,8 +63,8 @@ BlockMatrixArray<number>::BlockMatrixArray (
   const unsigned int n_block_rows,
   const unsigned int n_block_cols,
   VectorMemory<Vector<number> >&)
-		: block_rows (n_block_rows),
-		  block_cols (n_block_cols)
+                : block_rows (n_block_rows),
+                  block_cols (n_block_cols)
 {}
 
 
@@ -116,13 +116,13 @@ BlockMatrixArray<number>::clear ()
 template <typename number>
 void
 BlockMatrixArray<number>::vmult_add (BlockVector<number>& dst,
-				     const BlockVector<number>& src) const
+                                     const BlockVector<number>& src) const
 {
   GrowingVectorMemory<Vector<number> > mem;
   Assert (dst.n_blocks() == block_rows,
-	  ExcDimensionMismatch(dst.n_blocks(), block_rows));
+          ExcDimensionMismatch(dst.n_blocks(), block_rows));
   Assert (src.n_blocks() == block_cols,
-	  ExcDimensionMismatch(src.n_blocks(), block_cols));
+          ExcDimensionMismatch(src.n_blocks(), block_cols));
 
   typename VectorMemory<Vector<number> >::Pointer p_aux(mem);
   Vector<number>& aux = *p_aux;
@@ -134,9 +134,9 @@ BlockMatrixArray<number>::vmult_add (BlockVector<number>& dst,
     {
       aux.reinit(dst.block(m->row));
       if (m->transpose)
-	m->matrix->Tvmult(aux, src.block(m->col));
+        m->matrix->Tvmult(aux, src.block(m->col));
       else
-	m->matrix->vmult(aux, src.block(m->col));
+        m->matrix->vmult(aux, src.block(m->col));
       dst.block(m->row).add (m->prefix, aux);
     }
 }
@@ -147,7 +147,7 @@ BlockMatrixArray<number>::vmult_add (BlockVector<number>& dst,
 template <typename number>
 void
 BlockMatrixArray<number>::vmult (BlockVector<number>& dst,
-				 const BlockVector<number>& src) const
+                                 const BlockVector<number>& src) const
 {
   dst = 0.;
   vmult_add (dst, src);
@@ -159,13 +159,13 @@ BlockMatrixArray<number>::vmult (BlockVector<number>& dst,
 template <typename number>
 void
 BlockMatrixArray<number>::Tvmult_add (BlockVector<number>& dst,
-				      const BlockVector<number>& src) const
+                                      const BlockVector<number>& src) const
 {
   GrowingVectorMemory<Vector<number> > mem;
   Assert (dst.n_blocks() == block_cols,
-	  ExcDimensionMismatch(dst.n_blocks(), block_cols));
+          ExcDimensionMismatch(dst.n_blocks(), block_cols));
   Assert (src.n_blocks() == block_rows,
-	  ExcDimensionMismatch(src.n_blocks(), block_rows));
+          ExcDimensionMismatch(src.n_blocks(), block_rows));
 
   typename std::vector<Entry>::const_iterator m = entries.begin();
   typename std::vector<Entry>::const_iterator end = entries.end();
@@ -177,9 +177,9 @@ BlockMatrixArray<number>::Tvmult_add (BlockVector<number>& dst,
     {
       aux.reinit(dst.block(m->col));
       if (m->transpose)
-	m->matrix->vmult(aux, src.block(m->row));
+        m->matrix->vmult(aux, src.block(m->row));
       else
-	m->matrix->Tvmult(aux, src.block(m->row));
+        m->matrix->Tvmult(aux, src.block(m->row));
       dst.block(m->col).add (m->prefix, aux);
     }
 }
@@ -189,7 +189,7 @@ BlockMatrixArray<number>::Tvmult_add (BlockVector<number>& dst,
 template <typename number>
 void
 BlockMatrixArray<number>::Tvmult (BlockVector<number>& dst,
-				  const BlockVector<number>& src) const
+                                  const BlockVector<number>& src) const
 {
   dst = 0.;
   Tvmult_add (dst, src);
@@ -206,9 +206,9 @@ BlockMatrixArray<number>::matrix_scalar_product (
 {
   GrowingVectorMemory<Vector<number> > mem;
   Assert (u.n_blocks() == block_rows,
-	  ExcDimensionMismatch(u.n_blocks(), block_rows));
+          ExcDimensionMismatch(u.n_blocks(), block_rows));
   Assert (v.n_blocks() == block_cols,
-	  ExcDimensionMismatch(v.n_blocks(), block_cols));
+          ExcDimensionMismatch(v.n_blocks(), block_cols));
 
   typename VectorMemory<Vector<number> >::Pointer p_aux(mem);
   Vector<number>& aux = *p_aux;
@@ -222,14 +222,14 @@ BlockMatrixArray<number>::matrix_scalar_product (
     {
       aux.reinit(u.block(i));
       for (m = entries.begin(); m != end ; ++m)
-	{
-	  if (m->row != i)
-	    continue;
-	  if (m->transpose)
-	    m->matrix->Tvmult_add(aux, v.block(m->col));
-	  else
-	    m->matrix->vmult(aux, v.block(m->col));
-	}
+        {
+          if (m->row != i)
+            continue;
+          if (m->transpose)
+            m->matrix->Tvmult_add(aux, v.block(m->col));
+          else
+            m->matrix->vmult(aux, v.block(m->col));
+        }
       result += u.block(i)*aux;
     }
 
@@ -270,8 +270,8 @@ BlockMatrixArray<number>::n_block_cols () const
 
 template <typename number>
 BlockTrianglePrecondition<number>::BlockTrianglePrecondition()
-		: BlockMatrixArray<number> (),
-		  backward(false)
+                : BlockMatrixArray<number> (),
+                  backward(false)
 {}
 
 
@@ -280,18 +280,18 @@ BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
   unsigned int block_rows,
   VectorMemory<Vector<number> >& mem,
   bool backward)
-		:
-		BlockMatrixArray<number> (block_rows, block_rows, mem),
-		backward(backward)
+                :
+                BlockMatrixArray<number> (block_rows, block_rows, mem),
+                backward(backward)
 {}
 
 
 template <typename number>
 BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
   unsigned int block_rows)
-		:
-		BlockMatrixArray<number> (block_rows, block_rows),
-		backward(false)
+                :
+                BlockMatrixArray<number> (block_rows, block_rows),
+                backward(false)
 {}
 
 
@@ -335,61 +335,61 @@ BlockTrianglePrecondition<number>::do_row (
 
   aux.reinit(dst.block(row_num), true);
 
-				   // Loop over all entries, since
-				   // they are not ordered by rows.
+                                   // Loop over all entries, since
+                                   // they are not ordered by rows.
   for (; m != end ; ++m)
     {
       const unsigned int i=m->row;
-				       // Ignore everything not in
-				       // this row
+                                       // Ignore everything not in
+                                       // this row
       if (i != row_num)
-	continue;
+        continue;
       const unsigned int j=m->col;
-				       // Only use the lower (upper)
-				       // triangle for forward
-				       // (backward) substitution
+                                       // Only use the lower (upper)
+                                       // triangle for forward
+                                       // (backward) substitution
       if (((j > i) && !backward) || ((j < i) && backward))
-	continue;
+        continue;
       if (j == i)
-	{
-	  diagonals.push_back(m);
-	} else {
-	  if (m->transpose)
-	    m->matrix->Tvmult(aux, dst.block(j));
-	  else
-	    m->matrix->vmult(aux, dst.block(j));
-	  dst.block(i).add (-1 * m->prefix, aux);
-	}
+        {
+          diagonals.push_back(m);
+        } else {
+          if (m->transpose)
+            m->matrix->Tvmult(aux, dst.block(j));
+          else
+            m->matrix->vmult(aux, dst.block(j));
+          dst.block(i).add (-1 * m->prefix, aux);
+        }
     }
   Assert (diagonals.size() != 0, ExcNoDiagonal(row_num));
 
-				   // Inverting the diagonal block is
-				   // simple, if there is only one
-				   // matrix
+                                   // Inverting the diagonal block is
+                                   // simple, if there is only one
+                                   // matrix
   if (diagonals.size() == 1)
     {
       if (diagonals[0]->transpose)
-	diagonals[0]->matrix->Tvmult(aux, dst.block(row_num));
+        diagonals[0]->matrix->Tvmult(aux, dst.block(row_num));
       else
-	diagonals[0]->matrix->vmult(aux, dst.block(row_num));
+        diagonals[0]->matrix->vmult(aux, dst.block(row_num));
       dst.block(row_num).equ (diagonals[0]->prefix, aux);
     }
   else
     {
       aux = 0.;
       for (unsigned int i=0;i<diagonals.size();++i)
-	{
-	  m = diagonals[i];
-					   // First, divide by the current
-					   // factor, such that we can
-					   // multiply by it later.
-	  aux.scale(1./m->prefix);
-	  if (m->transpose)
-	    m->matrix->Tvmult_add(aux, dst.block(row_num));
-	  else
-	    m->matrix->vmult_add(aux, dst.block(row_num));
-	  aux.scale(m->prefix);
-	}
+        {
+          m = diagonals[i];
+                                           // First, divide by the current
+                                           // factor, such that we can
+                                           // multiply by it later.
+          aux.scale(1./m->prefix);
+          if (m->transpose)
+            m->matrix->Tvmult_add(aux, dst.block(row_num));
+          else
+            m->matrix->vmult_add(aux, dst.block(row_num));
+          aux.scale(m->prefix);
+        }
       dst.block(row_num) = aux;
     }
 }
@@ -403,9 +403,9 @@ BlockTrianglePrecondition<number>::vmult_add (
   const BlockVector<number>& src) const
 {
   Assert (dst.n_blocks() == n_block_rows(),
-	  ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
+          ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
   Assert (src.n_blocks() == n_block_cols(),
-	  ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
+          ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   BlockVector<number> aux;
   aux.reinit(dst);
@@ -422,19 +422,19 @@ BlockTrianglePrecondition<number>::vmult (
   const BlockVector<number>& src) const
 {
   Assert (dst.n_blocks() == n_block_rows(),
-	  ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
+          ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
   Assert (src.n_blocks() == n_block_cols(),
-	  ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
+          ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   dst.equ(1., src);
 
   if (backward)
     {
       for (unsigned int i=n_block_rows(); i>0;)
-	do_row(dst, --i);
+        do_row(dst, --i);
     } else {
       for (unsigned int i=0; i<n_block_rows(); ++i)
-	do_row(dst, i);
+        do_row(dst, i);
     }
 
 }

@@ -23,63 +23,64 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace types
 {
-
-				   /**
-				    * The type used to denote
-				    * subdomain_ids of cells.
-				    *
-				    * See the @ref GlossSubdomainId
-				    * "glossary" for more information.
-				    */
+                                   /**
+                                    * The type used to denote
+                                    * subdomain_ids of cells.
+                                    *
+                                    * See the @ref GlossSubdomainId
+                                    * "glossary" for more information.
+                                    */
   typedef unsigned int subdomain_id_t;
 
-				   /**
-				    * A special id for an invalid
-				    * subdomain id. This value may not
-				    * be used as a valid id but is
-				    * used, for example, for default
-				    * arguments to indicate a
-				    * subdomain id that is not to be
-				    * used.
-				    *
-				    * See the @ref GlossSubdomainId
-				    * "glossary" for more information.
-				    */
+                                   /**
+                                    * A special id for an invalid
+                                    * subdomain id. This value may not
+                                    * be used as a valid id but is
+                                    * used, for example, for default
+                                    * arguments to indicate a
+                                    * subdomain id that is not to be
+                                    * used.
+                                    *
+                                    * See the @ref GlossSubdomainId
+                                    * "glossary" for more information.
+                                    */
   const unsigned int invalid_subdomain_id = static_cast<subdomain_id_t>(-1);
 
-				   /**
-				    * The subdomain id assigned to a
-				    * cell whose true subdomain id we
-				    * don't know, for example because
-				    * it resides on a different
-				    * processor on a mesh that is kept
-				    * distributed on many
-				    * processors. Such cells are
-				    * called "artificial".
-				    *
-				    * See the glossary entries on @ref
-				    * GlossSubdomainId "subdomain ids"
-				    * and @ref GlossArtificialCell
-				    * "artificial cells" as well as
-				    * the @ref distributed module for
-				    * more information.
-				    */
+                                   /**
+                                    * The subdomain id assigned to a
+                                    * cell whose true subdomain id we
+                                    * don't know, for example because
+                                    * it resides on a different
+                                    * processor on a mesh that is kept
+                                    * distributed on many
+                                    * processors. Such cells are
+                                    * called "artificial".
+                                    *
+                                    * See the glossary entries on @ref
+                                    * GlossSubdomainId "subdomain ids"
+                                    * and @ref GlossArtificialCell
+                                    * "artificial cells" as well as
+                                    * the @ref distributed module for
+                                    * more information.
+                                    */
   const unsigned int artificial_subdomain_id = static_cast<subdomain_id_t>(-2);
 
-				   /**
-				    * The type used to denote global dof
-				    * indices.
-				    */
+                                   /**
+                                    * The type used to denote global dof
+                                    * indices.
+                                    */
   typedef unsigned int global_dof_index;
 
-				   /**
-				    * An invalid value for indices of degrees
-				    * of freedom.
-				    */
+                                   /**
+                                    * An invalid value for indices of degrees
+                                    * of freedom.
+                                    */
   const global_dof_index invalid_dof_index = static_cast<global_dof_index>(-1);
 
           /**
-           * The type used to denote boundary_indicators.
+           * The type used to denote boundary indicators associated with every
+           * piece of the boundary and, in the case of meshes that describe
+           * manifolds in higher dimensions, associated with every cell.
            */
   typedef unsigned char boundary_id_t;
 
@@ -90,7 +91,8 @@ namespace types
   const boundary_id_t internal_face_boundary_id = static_cast<boundary_id_t>(-1);
 
           /**
-           * The type used to denote boundary_indicators.
+           * The type used to denote material indicators associated with every
+           * cell.
            */
   typedef unsigned char material_id_t;
 

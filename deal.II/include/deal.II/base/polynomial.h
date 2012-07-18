@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -74,18 +74,18 @@ namespace Polynomials
                                         */
       Polynomial (const unsigned int n);
 
-				/**
-				 * Constructor for Lagrange polynomial and its
-				 * point of evaluation. The idea is to
-				 * construct $\prod_{i\neq j}
-				 * \frac{x-x_i}{x_j-x_i}$, where j is the
-				 * evaluation point specified as argument and
-				 * the support points contain all points
-				 * (including x_j, which will internally not
-				 * be stored).
-				 */
+                                /**
+                                 * Constructor for Lagrange polynomial and its
+                                 * point of evaluation. The idea is to
+                                 * construct $\prod_{i\neq j}
+                                 * \frac{x-x_i}{x_j-x_i}$, where j is the
+                                 * evaluation point specified as argument and
+                                 * the support points contain all points
+                                 * (including x_j, which will internally not
+                                 * be stored).
+                                 */
     Polynomial (const std::vector<Point<1> > &lagrange_support_points,
-		const unsigned int            evaluation_point);
+                const unsigned int            evaluation_point);
 
                                        /**
                                         * Default constructor creating
@@ -212,9 +212,9 @@ namespace Polynomials
                                         */
       Polynomial<number>& operator -= (const Polynomial<number>& p);
 
-    				                   /**
-				                        *  Test for equality of two polynomials.
-				                        */
+                                                   /**
+                                                        *  Test for equality of two polynomials.
+                                                        */
       bool operator == (const Polynomial<number> & p)  const;
 
                                        /**
@@ -252,13 +252,13 @@ namespace Polynomials
       static void multiply (std::vector<number>& coefficients,
                             const number factor);
 
-				       /**
-					* Transforms polynomial form of
-					* product of linear factors into
-					* standard form, $\sum_i a_i
-					* x^i$. Deletes all data structures
-					* related to the product form.
-					*/
+                                       /**
+                                        * Transforms polynomial form of
+                                        * product of linear factors into
+                                        * standard form, $\sum_i a_i
+                                        * x^i$. Deletes all data structures
+                                        * related to the product form.
+                                        */
       void transform_into_standard_form ();
 
                                        /**
@@ -275,28 +275,28 @@ namespace Polynomials
                                         */
       std::vector<number> coefficients;
 
-				       /**
-					* Stores whether the polynomial is in
-					* Lagrange product form, i.e.,
-					* constructed as a product $(x-x_0)
-					* (x-x_1) \ldots (x-x_n)/c$, or not.
-					*/
+                                       /**
+                                        * Stores whether the polynomial is in
+                                        * Lagrange product form, i.e.,
+                                        * constructed as a product $(x-x_0)
+                                        * (x-x_1) \ldots (x-x_n)/c$, or not.
+                                        */
       bool in_lagrange_product_form;
 
-				       /**
-					* If the polynomial is in Lagrange
-					* product form, i.e., constructed as a
-					* product $(x-x_0) (x-x_1) \ldots
-					* (x-x_n)/c$, store the shifts $x_i$.
-					*/
+                                       /**
+                                        * If the polynomial is in Lagrange
+                                        * product form, i.e., constructed as a
+                                        * product $(x-x_0) (x-x_1) \ldots
+                                        * (x-x_n)/c$, store the shifts $x_i$.
+                                        */
       std::vector<number> lagrange_support_points;
 
-				       /**
-					* If the polynomial is in Lagrange
-					* product form, i.e., constructed as a
-					* product $(x-x_0) (x-x_1) \ldots
-					* (x-x_n)/c$, store the weight c.
-					*/
+                                       /**
+                                        * If the polynomial is in Lagrange
+                                        * product form, i.e., constructed as a
+                                        * product $(x-x_0) (x-x_1) \ldots
+                                        * (x-x_n)/c$, store the weight c.
+                                        */
       number lagrange_weight;
   };
 
@@ -416,16 +416,16 @@ namespace Polynomials
   };
 
 
-				   /**
-				    * Given a set of points along the
-				    * real axis, this function returns
-				    * all Lagrange polynomials for
-				    * interpolation of these
-				    * points. The number of
-				    * polynomials is equal to the
-				    * number of points and the maximum
-				    * degree is one less.
-				    */
+                                   /**
+                                    * Given a set of points along the
+                                    * real axis, this function returns
+                                    * all Lagrange polynomials for
+                                    * interpolation of these
+                                    * points. The number of
+                                    * polynomials is equal to the
+                                    * number of points and the maximum
+                                    * degree is one less.
+                                    */
   std::vector<Polynomial<double> >
   generate_complete_Lagrange_basis (const std::vector<Point<1> >& points);
 
@@ -493,15 +493,15 @@ namespace Polynomials
 
                                        /**
                                         * Compute coefficients recursively.
-					* The coefficients are stored in a
-					* static data vector to be available
-					* when needed next time. Since the
-					* recursion is performed for the
-					* interval $[-1,1]$, the polynomials
-					* are shifted to $[0,1]$ by the
-					* <tt>scale</tt> and <tt>shift</tt>
-					* functions of <tt>Polynomial</tt>,
-					* afterwards.
+                                        * The coefficients are stored in a
+                                        * static data vector to be available
+                                        * when needed next time. Since the
+                                        * recursion is performed for the
+                                        * interval $[-1,1]$, the polynomials
+                                        * are shifted to $[0,1]$ by the
+                                        * <tt>scale</tt> and <tt>shift</tt>
+                                        * functions of <tt>Polynomial</tt>,
+                                        * afterwards.
                                         */
       static void compute_coefficients (const unsigned int p);
 
@@ -699,12 +699,12 @@ namespace Polynomials
   {
     if (in_lagrange_product_form == true)
       {
-	return lagrange_support_points.size();
+        return lagrange_support_points.size();
       }
     else
       {
-	Assert (coefficients.size()>0, ExcEmptyObject());
-	return coefficients.size() - 1;
+        Assert (coefficients.size()>0, ExcEmptyObject());
+        return coefficients.size() - 1;
       }
   }
 
@@ -717,24 +717,24 @@ namespace Polynomials
   {
     if (in_lagrange_product_form == false)
       {
-	Assert (coefficients.size() > 0, ExcEmptyObject());
+        Assert (coefficients.size() > 0, ExcEmptyObject());
 
                                      // Horner scheme
-	const unsigned int m=coefficients.size();
-	number value = coefficients.back();
-	for (int k=m-2; k>=0; --k)
-	  value = value*x + coefficients[k];
-	return value;
+        const unsigned int m=coefficients.size();
+        number value = coefficients.back();
+        for (int k=m-2; k>=0; --k)
+          value = value*x + coefficients[k];
+        return value;
       }
     else
       {
-				// direct evaluation of Lagrange polynomial
-	const unsigned int m = lagrange_support_points.size();
-	number value = 1.;
-	for (unsigned int j=0; j<m; ++j)
-	  value *= x-lagrange_support_points[j];
-	value *= lagrange_weight;
-	return value;
+                                // direct evaluation of Lagrange polynomial
+        const unsigned int m = lagrange_support_points.size();
+        number value = 1.;
+        for (unsigned int j=0; j<m; ++j)
+          value *= x-lagrange_support_points[j];
+        value *= lagrange_weight;
+        return value;
       }
   }
 

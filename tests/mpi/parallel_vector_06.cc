@@ -31,7 +31,7 @@ void test ()
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
 
-				   // each processor from processor 1 to 8
+                                   // each processor from processor 1 to 8
                                    // owns 2 indices (the other processors do
                                    // not own any dof), and all processors are
                                    // ghosting element 1 (the second)
@@ -58,57 +58,57 @@ void test ()
       Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
     }
 
-				// check l2 norm
+                                // check l2 norm
   {
     const double l2_norm = v.l2_norm();
     if (myid == 0)
       deallog << "l2 norm: " << l2_norm << std::endl;
   }
 
-				// check l1 norm
+                                // check l1 norm
   {
     const double l1_norm = v.l1_norm();
     if (myid == 0)
       deallog << "l1 norm: " << l1_norm << std::endl;
   }
 
-				// check linfty norm
+                                // check linfty norm
   {
     const double linfty_norm = v.linfty_norm();
     if (myid == 0)
       deallog << "linfty norm: " << linfty_norm << std::endl;
   }
 
-				// check lp norm
+                                // check lp norm
   {
     const double lp_norm = v.lp_norm(2.2);
     if (myid == 0)
       deallog << "l2.2 norm: " << lp_norm << std::endl;
 
     Assert (std::fabs (v.l2_norm() - v.lp_norm(2.0)) < 1e-14,
-	    ExcInternalError());
+            ExcInternalError());
   }
 
-				// check mean value (should be equal to l1
-				// norm here since we have no negative
-				// entries)
+                                // check mean value (should be equal to l1
+                                // norm here since we have no negative
+                                // entries)
   {
     const double mean = v.mean_value();
     if (myid == 0)
       deallog << "Mean value: " << mean << std::endl;
 
     Assert (std::fabs (mean * v.size() - v.l1_norm()) < 1e-15,
-	    ExcInternalError());
+            ExcInternalError());
   }
-				// check inner product
+                                // check inner product
   {
     const double norm_sqr = v.norm_sqr();
     Assert (std::fabs(v * v - norm_sqr) < 1e-15,
-	    ExcInternalError());
+            ExcInternalError());
     parallel::distributed::Vector<double> v2;
     v2 = v;
     Assert (std::fabs(v2 * v - norm_sqr) < 1e-15,
-	    ExcInternalError());
+            ExcInternalError());
 
     if(myid<8)
       v2.local_element(0) = -1;
@@ -117,7 +117,7 @@ void test ()
       deallog << "Inner product: " << inner_prod << std::endl;
   }
 
-				// check operator ==
+                                // check operator ==
   {
     parallel::distributed::Vector<double> v2 (v);
     bool equal = (v2 == v);
@@ -128,7 +128,7 @@ void test ()
     if (myid == 0)
       deallog << " v!=v2 ? " << not_equal << std::endl;
 
-				// change v2 on one proc only
+                                // change v2 on one proc only
     if (myid == 0)
       v2.local_element(1) = 2.2212;
 
@@ -139,7 +139,7 @@ void test ()
     if (myid == 0)
       deallog << " v!=v2 ? " << not_equal << std::endl;
 
-				// reset
+                                // reset
     v2 = v;
     equal = (v2 == v);
     if (myid == 0)
@@ -148,7 +148,7 @@ void test ()
     if (myid == 0)
       deallog << " v!=v2 ? " << not_equal << std::endl;
 
-				// change some value on all procs
+                                // change some value on all procs
     if (myid < 8)
       v2.local_element(0) = -1;
     equal = (v2 == v);
@@ -159,7 +159,7 @@ void test ()
       deallog << " v!=v2 ? " << not_equal << std::endl;
   }
 
-				// check all_zero
+                                // check all_zero
   {
     bool allzero = v.all_zero();
     if (myid == 0)
@@ -170,7 +170,7 @@ void test ()
     if (myid == 0)
       deallog << " v2==0 ? " << allzero << std::endl;
 
-				// now change one element to nonzero
+                                // now change one element to nonzero
     if (myid == 0)
       v2.local_element(1) = 1;
     allzero = v2.all_zero();
@@ -179,15 +179,15 @@ void test ()
   }
 
 
-				// check all_non_negative
+                                // check all_non_negative
   {
     bool allnonneg = v.is_non_negative();
     if (myid == 0)
       deallog << " v>=0 ? " << allnonneg << std::endl;
     parallel::distributed::Vector<double> v2, v3;
 
-				// vector where all processors have
-				// non-negative entries
+                                // vector where all processors have
+                                // non-negative entries
     v2 = v;
     if (myid < 8)
       v2.local_element(0) = -1;
@@ -195,13 +195,13 @@ void test ()
     if (myid == 0)
       deallog << " v2>=0 ? " << allnonneg << std::endl;
 
-				// zero vector
+                                // zero vector
     v3.reinit (v2);
     allnonneg = v3.is_non_negative();
     if (myid == 0)
       deallog << " v3>=0 ? " << allnonneg << std::endl;
 
-				// only one processor has non-negative entry
+                                // only one processor has non-negative entry
     v3 = v;
     if (myid == 1)
       v3.local_element(0) = -1;

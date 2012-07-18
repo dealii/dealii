@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,13 +33,13 @@ template <int dim>
 class QGauss : public Quadrature<dim>
 {
   public:
-				   /**
-				    * Generate a formula with
-				    * <tt>n</tt> quadrature points (in
-				    * each space direction), exact for
-				    * polynomials of degree
-				    * <tt>2n-1</tt>.
-				    */
+                                   /**
+                                    * Generate a formula with
+                                    * <tt>n</tt> quadrature points (in
+                                    * each space direction), exact for
+                                    * polynomials of degree
+                                    * <tt>2n-1</tt>.
+                                    */
     QGauss (const unsigned int n);
 };
 
@@ -74,65 +74,65 @@ template<int dim>
 class QGaussLobatto : public Quadrature<dim>
 {
   public:
-				     /**
-				      * Generate a formula with
-				      * <tt>n</tt> quadrature points
-				      * (in each space direction).
-				      */
+                                     /**
+                                      * Generate a formula with
+                                      * <tt>n</tt> quadrature points
+                                      * (in each space direction).
+                                      */
     QGaussLobatto(const unsigned int n);
 
   protected:
-				     /**
-				      * Compute Legendre-Gauss-Lobatto
-				      * quadrature points in the
-				      * interval $[-1, +1]$. They are
-				      * equal to the roots of the
-				      * corresponding Jacobi
-				      * polynomial (specified by @p
-				      * alpha, @p beta).  @p q is
-				      * number of points.
-				      *
-				      * @return vector containing nodes.
-				      */
+                                     /**
+                                      * Compute Legendre-Gauss-Lobatto
+                                      * quadrature points in the
+                                      * interval $[-1, +1]$. They are
+                                      * equal to the roots of the
+                                      * corresponding Jacobi
+                                      * polynomial (specified by @p
+                                      * alpha, @p beta).  @p q is
+                                      * number of points.
+                                      *
+                                      * @return vector containing nodes.
+                                      */
     std::vector<long double>
     compute_quadrature_points (const unsigned int q,
-			       const int alpha,
-			       const int beta) const;
+                               const int alpha,
+                               const int beta) const;
 
-    				     /**
-				      * Compute Legendre-Gauss-Lobatto quadrature
-				      * weights.
-				      * The quadrature points and weights are
-				      * related to Jacobi polynomial specified
-				      * by @p alpha, @p beta.
-				      * @p x denotes the quadrature points.
-				      * @return vector containing weights.
-				      */
+                                     /**
+                                      * Compute Legendre-Gauss-Lobatto quadrature
+                                      * weights.
+                                      * The quadrature points and weights are
+                                      * related to Jacobi polynomial specified
+                                      * by @p alpha, @p beta.
+                                      * @p x denotes the quadrature points.
+                                      * @return vector containing weights.
+                                      */
     std::vector<long double>
     compute_quadrature_weights (const std::vector<long double> &x,
-				const int alpha,
-				const int beta) const;
+                                const int alpha,
+                                const int beta) const;
 
-				     /**
-				      * Evaluate a Jacobi polynomial
-				      * $ P^{\alpha, \beta}_n(x) $
-				      * specified by the parameters
-				      * @p alpha, @p beta, @p n.
-				      * Note: The Jacobi polynomials are
-				      * not orthonormal and defined on
-				      * the interval $[-1, +1]$.
-				      * @p x is the point of evaluation.
-				      */
+                                     /**
+                                      * Evaluate a Jacobi polynomial
+                                      * $ P^{\alpha, \beta}_n(x) $
+                                      * specified by the parameters
+                                      * @p alpha, @p beta, @p n.
+                                      * Note: The Jacobi polynomials are
+                                      * not orthonormal and defined on
+                                      * the interval $[-1, +1]$.
+                                      * @p x is the point of evaluation.
+                                      */
     long double JacobiP(const long double x,
-			const int alpha,
-			const int beta,
-			const unsigned int n) const;
+                        const int alpha,
+                        const int beta,
+                        const unsigned int n) const;
 
-    				     /**
-				      * Evaluate the Gamma function
-				      * $ \Gamma(n) = (n-1)! $.
-				      * @param n  point of evaluation (integer).
-				      */
+                                     /**
+                                      * Evaluate the Gamma function
+                                      * $ \Gamma(n) = (n-1)! $.
+                                      * @param n  point of evaluation (integer).
+                                      */
     long double gamma(const unsigned int n) const;
 };
 
@@ -214,25 +214,25 @@ template <int dim>
 class QGaussLog : public Quadrature<dim>
 {
   public:
-				   /**
-				    * Generate a formula with
-				    * <tt>n</tt> quadrature points
-				    */
+                                   /**
+                                    * Generate a formula with
+                                    * <tt>n</tt> quadrature points
+                                    */
   QGaussLog(const unsigned int n,
             const bool revert=false);
 
   protected:
                                     /**
-				     * Sets the points of the
-				     * quadrature formula.
-				     */
+                                     * Sets the points of the
+                                     * quadrature formula.
+                                     */
   std::vector<double>
   set_quadrature_points(const unsigned int n) const;
 
                                     /**
-				     * Sets the weights of the
-				     * quadrature formula.
-				     */
+                                     * Sets the weights of the
+                                     * quadrature formula.
+                                     */
   std::vector<double>
   set_quadrature_weights(const unsigned int n) const;
 
@@ -288,29 +288,29 @@ template<int dim>
 class QGaussLogR : public Quadrature<dim>
 {
   public:
-				     /**
-				      * The constructor takes four arguments:
-				      * the order of the gauss formula on each
-				      * of the segments $[0,x_0]$ and
-				      * $[x_0,1]$, the actual location of the
-				      * singularity, the scale factor inside
-				      * the logarithmic function and a flag
-				      * that decides wether the singularity is
-				      * left inside the quadrature formula or
-				      * it is factored out, to be included in
-				      * the integrand.
-				      */
+                                     /**
+                                      * The constructor takes four arguments:
+                                      * the order of the gauss formula on each
+                                      * of the segments $[0,x_0]$ and
+                                      * $[x_0,1]$, the actual location of the
+                                      * singularity, the scale factor inside
+                                      * the logarithmic function and a flag
+                                      * that decides wether the singularity is
+                                      * left inside the quadrature formula or
+                                      * it is factored out, to be included in
+                                      * the integrand.
+                                      */
     QGaussLogR(const unsigned int n,
-	       const Point<dim> x0 = Point<dim>(),
-	       const double alpha = 1,
-	       const bool factor_out_singular_weight=false);
+               const Point<dim> x0 = Point<dim>(),
+               const double alpha = 1,
+               const bool factor_out_singular_weight=false);
 
   protected:
-				     /**
-				      * This is the length of interval
-				      * $(0,origin)$, or 1 if either of the two
-				      * extremes have been selected.
-				      */
+                                     /**
+                                      * This is the length of interval
+                                      * $(0,origin)$, or 1 if either of the two
+                                      * extremes have been selected.
+                                      */
     const double fraction;
 };
 
@@ -364,7 +364,7 @@ class QGaussOneOverR : public Quadrature<dim>
      * QGaussOneOverR singular_quad(order, q_point, false);
      * // This will produce the integral of f(x)/R
      * for(unsigned int i=0; i<singular_quad.size(); ++i)
-     * 	 integral += f(singular_quad.point(i))*singular_quad.weight(i);
+     *   integral += f(singular_quad.point(i))*singular_quad.weight(i);
      *
      * // And the same here
      * QGaussOneOverR singular_quad_noR(order, q_point, true);
@@ -378,8 +378,8 @@ class QGaussOneOverR : public Quadrature<dim>
      * @endcode
      */
     QGaussOneOverR(const unsigned int n,
-		   const Point<dim> singularity,
-		   const bool factor_out_singular_weight=false);
+                   const Point<dim> singularity,
+                   const bool factor_out_singular_weight=false);
     /**
      * The constructor takes three arguments: the order of the Gauss
      * formula, the index of the vertex where the singularity is
@@ -403,7 +403,7 @@ class QGaussOneOverR : public Quadrature<dim>
      * QGaussOneOverR singular_quad(order, vertex_id, false);
      * // This will produce the integral of f(x)/R
      * for(unsigned int i=0; i<singular_quad.size(); ++i)
-     * 	 integral += f(singular_quad.point(i))*singular_quad.weight(i);
+     *   integral += f(singular_quad.point(i))*singular_quad.weight(i);
      *
      * // And the same here
      * QGaussOneOverR singular_quad_noR(order, vertex_id, true);
@@ -417,15 +417,15 @@ class QGaussOneOverR : public Quadrature<dim>
      * @endcode
      */
     QGaussOneOverR(const unsigned int n,
-		   const unsigned int vertex_index,
-		   const bool factor_out_singular_weight=false);
+                   const unsigned int vertex_index,
+                   const bool factor_out_singular_weight=false);
   private:
    /** Given a quadrature point and a degree n, this function returns
      * the size of the singular quadrature rule, considering whether
      * the point is inside the cell, on an edge of the cell, or on a
      * corner of the cell. */
     static unsigned int quad_size(const Point<dim> singularity,
-				  const unsigned int n);
+                                  const unsigned int n);
 };
 
 

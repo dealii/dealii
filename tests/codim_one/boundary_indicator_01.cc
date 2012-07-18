@@ -85,7 +85,7 @@ int main ()
 
 				     // now extract a mesh of the 5
 				     // surface faces
-    std::set<unsigned char> boundary_indicators;
+    std::set<types::boundary_id_t> boundary_indicators;
     boundary_indicators.insert (0);
     GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
 				      boundary_indicators);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,7 @@ DEAL_II_NAMESPACE_OPEN
 // arguments is covered by the default copy constructor and copy operator that
 // is declared separately)
 
-#define TEMPL_COPY_CONSTRUCTOR(S1,S2)			\
+#define TEMPL_COPY_CONSTRUCTOR(S1,S2)                   \
   template Vector<S1>::Vector (const Vector<S2> &)
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
@@ -52,7 +52,7 @@ TEMPL_COPY_CONSTRUCTOR(std::complex<float>,std::complex<long double>);
 
 
 #define TEMPL_OP_EQ(S1,S2) \
-  template void Vector<S1>::scale (const Vector<S2>&);	\
+  template void Vector<S1>::scale (const Vector<S2>&);  \
   template void Vector<S1>::equ (const S1, const Vector<S2>&)
 
 TEMPL_OP_EQ(double,float);

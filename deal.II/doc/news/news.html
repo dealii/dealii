@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>The deal.II news page</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="keywords" content="deal.II">
   <meta name="svn_id" content="$Id$">
@@ -32,6 +32,76 @@
     <a href="../doxygen/deal.II/changes_after_7_1.html">here.</a></p>
 
     <dl>
+      <dt>
+        <strong>2012/06/06: step-43 &mdash; an efficient solver for
+        two-phase flow</strong>
+      </dt>
+      <dd>
+        The step-21 tutorial program was the first program in the
+        deal.II tutorial to demonstrate the solution of two-phase flow
+        problems, but it suffered from the fact that it was very
+        slow. step-43 demonstrates some of the techniques that can be
+        used to make solvers for such problems more efficient and
+        accurate.
+      </dd>
+
+
+      <dt>
+        <strong>2012/06/03: New step-15</strong>
+      </dt>
+      <dd>
+        Step-15 used to be a program that demonstrated techniques for solving
+        a rather quirky, nonlinear, 1d problem. It was an interesting problem,
+        but it served little purpose in teaching deal.II or in demonstrating
+        nonlinear solution techniques. It has now been replaced by a more
+        illustrative example, contributed in large part by Sven Wetterauer, in
+        which we solve the nonlinear elliptic minimal surface equation using a
+        Newton iteration.
+      </dd>
+
+
+      <dt>
+        <strong>2012/05/05: Matrix-free implementation framework</strong>
+      </dt>
+      <dd>
+        A matrix-free framework has been contributed by Katharina
+        Kormann and Martin Kronbichler. The implementation is memory
+        efficient and includes parallelism via MPI for distributed
+        meshes, threads for shared-memory computations, and usage of
+        processors' vector units. The two new tutorial programs step-37
+        (multigrid solver) and step-48 (nonlinear wave equation with
+        distributed grid) demonstrate the new features.
+      </dd>
+
+
+      <dt>
+          <strong>2012/04/02: step-44 &mdash; a finite strain
+          elasticity solver</strong>
+      </dt>
+      <dd>
+          step-44, contributed by Andrew McBride and Jean-Paul
+          Pelteret, demonstrates one approach to modelling large
+          deformations of nearly-incompressible elastic solids. The
+          elastic response is governed by a non-linear, hyperelastic
+          free-energy function. The geometrical response is also
+          nonlinear, i.e., the program considers finite deformations.
+      </dd>
+
+
+      <dt>
+          <strong>2012/04/02: step-41 solves the obstacle problem</strong>
+      </dt>
+      <dd>
+          step-41, a program contributed by J&ouml;rg Frohne, shows
+          how to solve the obstacle problem. This problem describes
+          the deformation of a body subject to an inequality
+          constraint that arises from the fact that the deformation is
+          constrained by contact of the body with some external
+          obstacle. The program uses the primal-dual active set method
+          to solve this problem.
+      </dd>
+
+
       <dt>
           <strong style="color:red">2011/10/09: Version 7.1 released</strong>
       </dt>

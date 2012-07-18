@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,195 +61,195 @@ template <int dim>
 class TensorProductPolynomials
 {
   public:
-				     /**
-				      * Access to the dimension of
-				      * this object, for checking and
-				      * automatic setting of dimension
-				      * in other classes.
-				      */
+                                     /**
+                                      * Access to the dimension of
+                                      * this object, for checking and
+                                      * automatic setting of dimension
+                                      * in other classes.
+                                      */
     static const unsigned int dimension = dim;
 
-				     /**
-				      * Constructor. <tt>pols</tt> is
-				      * a vector of objects that
-				      * should be derived or otherwise
-				      * convertible to one-dimensional
-				      * polynomial objects. It will be
-				      * copied element by element into
-				      * a private variable.
-				      */
+                                     /**
+                                      * Constructor. <tt>pols</tt> is
+                                      * a vector of objects that
+                                      * should be derived or otherwise
+                                      * convertible to one-dimensional
+                                      * polynomial objects. It will be
+                                      * copied element by element into
+                                      * a private variable.
+                                      */
     template <class Pol>
     TensorProductPolynomials (const std::vector<Pol> &pols);
 
-				     /**
-				      * Prints the list of the indices
-				      * to <tt>out</tt>.
-				      */
+                                     /**
+                                      * Prints the list of the indices
+                                      * to <tt>out</tt>.
+                                      */
     void output_indices(std::ostream &out) const;
 
-				     /**
-				      * Sets the ordering of the
-				      * polynomials. Requires
-				      * <tt>renumber.size()==n()</tt>.
-				      * Stores a copy of
-				      * <tt>renumber</tt>.
-				      */
+                                     /**
+                                      * Sets the ordering of the
+                                      * polynomials. Requires
+                                      * <tt>renumber.size()==n()</tt>.
+                                      * Stores a copy of
+                                      * <tt>renumber</tt>.
+                                      */
     void set_numbering(const std::vector<unsigned int> &renumber);
 
-				     /**
-				      * Gives read access to the
-				      * renumber vector.
-				      */
+                                     /**
+                                      * Gives read access to the
+                                      * renumber vector.
+                                      */
     const std::vector<unsigned int> &get_numbering() const;
 
-				     /**
-				      * Gives read access to the
-				      * inverse renumber vector.
-				      */
+                                     /**
+                                      * Gives read access to the
+                                      * inverse renumber vector.
+                                      */
     const std::vector<unsigned int> &get_numbering_inverse() const;
 
-				     /**
-				      * Computes the value and the
-				      * first and second derivatives
-				      * of each tensor product
-				      * polynomial at <tt>unit_point</tt>.
-				      *
-				      * The size of the vectors must
-				      * either be equal 0 or equal
-				      * n(). In the first case, the
-				      * function will not compute
-				      * these values.
-				      *
-				      * If you need values or
-				      * derivatives of all tensor
-				      * product polynomials then use
-				      * this function, rather than
-				      * using any of the
-				      * compute_value(),
-				      * compute_grad() or
-				      * compute_grad_grad()
-				      * functions, see below, in a
-				      * loop over all tensor product
-				      * polynomials.
-				      */
+                                     /**
+                                      * Computes the value and the
+                                      * first and second derivatives
+                                      * of each tensor product
+                                      * polynomial at <tt>unit_point</tt>.
+                                      *
+                                      * The size of the vectors must
+                                      * either be equal 0 or equal
+                                      * n(). In the first case, the
+                                      * function will not compute
+                                      * these values.
+                                      *
+                                      * If you need values or
+                                      * derivatives of all tensor
+                                      * product polynomials then use
+                                      * this function, rather than
+                                      * using any of the
+                                      * compute_value(),
+                                      * compute_grad() or
+                                      * compute_grad_grad()
+                                      * functions, see below, in a
+                                      * loop over all tensor product
+                                      * polynomials.
+                                      */
     void compute (const Point<dim>            &unit_point,
                   std::vector<double>         &values,
                   std::vector<Tensor<1,dim> > &grads,
                   std::vector<Tensor<2,dim> > &grad_grads) const;
 
-				     /**
-				      * Computes the value of the
-				      * <tt>i</tt>th tensor product
-				      * polynomial at
-				      * <tt>unit_point</tt>. Here <tt>i</tt> is
-				      * given in tensor product
-				      * numbering.
-				      *
-				      * Note, that using this function
-				      * within a loop over all tensor
-				      * product polynomials is not
-				      * efficient, because then each
-				      * point value of the underlying
-				      * (one-dimensional) polynomials
-				      * is (unnecessarily) computed
-				      * several times.  Instead use
-				      * the compute() function with
-				      * <tt>values.size()==</tt>n()
-				      * to get the point values of all
-				      * tensor polynomials all at once
-				      * and in a much more efficient
-				      * way.
-				      */
+                                     /**
+                                      * Computes the value of the
+                                      * <tt>i</tt>th tensor product
+                                      * polynomial at
+                                      * <tt>unit_point</tt>. Here <tt>i</tt> is
+                                      * given in tensor product
+                                      * numbering.
+                                      *
+                                      * Note, that using this function
+                                      * within a loop over all tensor
+                                      * product polynomials is not
+                                      * efficient, because then each
+                                      * point value of the underlying
+                                      * (one-dimensional) polynomials
+                                      * is (unnecessarily) computed
+                                      * several times.  Instead use
+                                      * the compute() function with
+                                      * <tt>values.size()==</tt>n()
+                                      * to get the point values of all
+                                      * tensor polynomials all at once
+                                      * and in a much more efficient
+                                      * way.
+                                      */
     double compute_value (const unsigned int i,
-			  const Point<dim> &p) const;
+                          const Point<dim> &p) const;
 
-				     /**
-				      * Computes the grad of the
-				      * <tt>i</tt>th tensor product
-				      * polynomial at
-				      * <tt>unit_point</tt>. Here <tt>i</tt> is
-				      * given in tensor product
-				      * numbering.
-				      *
-				      * Note, that using this function
-				      * within a loop over all tensor
-				      * product polynomials is not
-				      * efficient, because then each
-				      * derivative value of the
-				      * underlying (one-dimensional)
-				      * polynomials is (unnecessarily)
-				      * computed several times.
-				      * Instead use the compute()
-				      * function, see above, with
-				      * <tt>grads.size()==</tt>n()
-				      * to get the point value of all
-				      * tensor polynomials all at once
-				      * and in a much more efficient
-				      * way.
-				      */
+                                     /**
+                                      * Computes the grad of the
+                                      * <tt>i</tt>th tensor product
+                                      * polynomial at
+                                      * <tt>unit_point</tt>. Here <tt>i</tt> is
+                                      * given in tensor product
+                                      * numbering.
+                                      *
+                                      * Note, that using this function
+                                      * within a loop over all tensor
+                                      * product polynomials is not
+                                      * efficient, because then each
+                                      * derivative value of the
+                                      * underlying (one-dimensional)
+                                      * polynomials is (unnecessarily)
+                                      * computed several times.
+                                      * Instead use the compute()
+                                      * function, see above, with
+                                      * <tt>grads.size()==</tt>n()
+                                      * to get the point value of all
+                                      * tensor polynomials all at once
+                                      * and in a much more efficient
+                                      * way.
+                                      */
     Tensor<1,dim> compute_grad (const unsigned int i,
-				const Point<dim> &p) const;
+                                const Point<dim> &p) const;
 
-				     /**
-				      * Computes the second
-				      * derivative (grad_grad) of the
-				      * <tt>i</tt>th tensor product
-				      * polynomial at
-				      * <tt>unit_point</tt>. Here <tt>i</tt> is
-				      * given in tensor product
-				      * numbering.
-				      *
-				      * Note, that using this function
-				      * within a loop over all tensor
-				      * product polynomials is not
-				      * efficient, because then each
-				      * derivative value of the
-				      * underlying (one-dimensional)
-				      * polynomials is (unnecessarily)
-				      * computed several times.
-				      * Instead use the compute()
-				      * function, see above, with
-				      * <tt>grad_grads.size()==</tt>n()
-				      * to get the point value of all
-				      * tensor polynomials all at once
-				      * and in a much more efficient
-				      * way.
-				      */
+                                     /**
+                                      * Computes the second
+                                      * derivative (grad_grad) of the
+                                      * <tt>i</tt>th tensor product
+                                      * polynomial at
+                                      * <tt>unit_point</tt>. Here <tt>i</tt> is
+                                      * given in tensor product
+                                      * numbering.
+                                      *
+                                      * Note, that using this function
+                                      * within a loop over all tensor
+                                      * product polynomials is not
+                                      * efficient, because then each
+                                      * derivative value of the
+                                      * underlying (one-dimensional)
+                                      * polynomials is (unnecessarily)
+                                      * computed several times.
+                                      * Instead use the compute()
+                                      * function, see above, with
+                                      * <tt>grad_grads.size()==</tt>n()
+                                      * to get the point value of all
+                                      * tensor polynomials all at once
+                                      * and in a much more efficient
+                                      * way.
+                                      */
     Tensor<2,dim> compute_grad_grad (const unsigned int i,
                                      const Point<dim> &p) const;
 
-				     /**
-				      * Returns the number of tensor
-				      * product polynomials. For <i>n</i>
-				      * 1d polynomials this is <i>n<sup>dim</sup></i>.
-				      */
+                                     /**
+                                      * Returns the number of tensor
+                                      * product polynomials. For <i>n</i>
+                                      * 1d polynomials this is <i>n<sup>dim</sup></i>.
+                                      */
     unsigned int n () const;
 
 
   private:
-				     /**
-				      * Copy of the vector <tt>pols</tt> of
-				      * polynomials given to the
-				      * constructor.
-				      */
+                                     /**
+                                      * Copy of the vector <tt>pols</tt> of
+                                      * polynomials given to the
+                                      * constructor.
+                                      */
     std::vector<Polynomials::Polynomial<double> > polynomials;
 
-				     /**
-				      * Number of tensor product
-				      * polynomials. See n().
-				      */
+                                     /**
+                                      * Number of tensor product
+                                      * polynomials. See n().
+                                      */
     unsigned int n_tensor_pols;
 
-				     /**
-				      * Index map for reordering the
-				      * polynomials.
-				      */
+                                     /**
+                                      * Index map for reordering the
+                                      * polynomials.
+                                      */
     std::vector<unsigned int> index_map;
 
-				     /**
-				      * Index map for reordering the
-				      * polynomials.
-				      */
+                                     /**
+                                      * Index map for reordering the
+                                      * polynomials.
+                                      */
     std::vector<unsigned int> index_map_inverse;
 
                                      /**
@@ -262,17 +262,17 @@ class TensorProductPolynomials
                                       * for each space direction,
                                       * given the index <i>i</i>.
                                       */
-				// fix to avoid compiler warnings about zero
-				// length arrays
+                                // fix to avoid compiler warnings about zero
+                                // length arrays
     void compute_index (const unsigned int i,
                         unsigned int       (&indices)[(dim>0?dim:1)]) const;
 
-				     /**
-				      * Computes
-				      * <i>x<sup>dim</sup></i> for
-				      * unsigned int <i>x</i>. Used in
-				      * the constructor.
-				      */
+                                     /**
+                                      * Computes
+                                      * <i>x<sup>dim</sup></i> for
+                                      * unsigned int <i>x</i>. Used in
+                                      * the constructor.
+                                      */
     static
     unsigned int x_to_the_dim (const unsigned int x);
 };
@@ -323,157 +323,157 @@ template <int dim>
 class AnisotropicPolynomials
 {
   public:
-				     /**
-				      * Constructor. <tt>pols</tt> is a
-				      * table of one-dimensional
-				      * polynomials. The number of
-				      * rows in this table should be
-				      * equal to the space dimension,
-				      * with the elements of each row
-				      * giving the polynomials that
-				      * shall be used in this
-				      * particular coordinate
-				      * direction. These polynomials
-				      * may vary between coordinates,
-				      * as well as their number.
-				      */
+                                     /**
+                                      * Constructor. <tt>pols</tt> is a
+                                      * table of one-dimensional
+                                      * polynomials. The number of
+                                      * rows in this table should be
+                                      * equal to the space dimension,
+                                      * with the elements of each row
+                                      * giving the polynomials that
+                                      * shall be used in this
+                                      * particular coordinate
+                                      * direction. These polynomials
+                                      * may vary between coordinates,
+                                      * as well as their number.
+                                      */
     AnisotropicPolynomials (const std::vector<std::vector<Polynomials::Polynomial<double> > > &pols);
 
-				     /**
-				      * Computes the value and the
-				      * first and second derivatives
-				      * of each tensor product
-				      * polynomial at <tt>unit_point</tt>.
-				      *
-				      * The size of the vectors must
-				      * either be equal <tt>0</tt> or equal
-				      * <tt>n_tensor_pols</tt>.  In the
-				      * first case, the function will
-				      * not compute these values.
-				      *
-				      * If you need values or
-				      * derivatives of all tensor
-				      * product polynomials then use
-				      * this function, rather than
-				      * using any of the
-				      * <tt>compute_value</tt>,
-				      * <tt>compute_grad</tt> or
-				      * <tt>compute_grad_grad</tt>
-				      * functions, see below, in a
-				      * loop over all tensor product
-				      * polynomials.
-				      */
+                                     /**
+                                      * Computes the value and the
+                                      * first and second derivatives
+                                      * of each tensor product
+                                      * polynomial at <tt>unit_point</tt>.
+                                      *
+                                      * The size of the vectors must
+                                      * either be equal <tt>0</tt> or equal
+                                      * <tt>n_tensor_pols</tt>.  In the
+                                      * first case, the function will
+                                      * not compute these values.
+                                      *
+                                      * If you need values or
+                                      * derivatives of all tensor
+                                      * product polynomials then use
+                                      * this function, rather than
+                                      * using any of the
+                                      * <tt>compute_value</tt>,
+                                      * <tt>compute_grad</tt> or
+                                      * <tt>compute_grad_grad</tt>
+                                      * functions, see below, in a
+                                      * loop over all tensor product
+                                      * polynomials.
+                                      */
     void compute (const Point<dim>            &unit_point,
                   std::vector<double>         &values,
                   std::vector<Tensor<1,dim> > &grads,
                   std::vector<Tensor<2,dim> > &grad_grads) const;
 
-				     /**
-				      * Computes the value of the
-				      * <tt>i</tt>th tensor product
-				      * polynomial at
-				      * <tt>unit_point</tt>. Here <tt>i</tt> is
-				      * given in tensor product
-				      * numbering.
-				      *
-				      * Note, that using this function
-				      * within a loop over all tensor
-				      * product polynomials is not
-				      * efficient, because then each
-				      * point value of the underlying
-				      * (one-dimensional) polynomials
-				      * is (unnecessarily) computed
-				      * several times.  Instead use
-				      * the <tt>compute</tt> function, see
-				      * above, with
-				      * <tt>values.size()==n_tensor_pols</tt>
-				      * to get the point values of all
-				      * tensor polynomials all at once
-				      * and in a much more efficient
-				      * way.
-				      */
+                                     /**
+                                      * Computes the value of the
+                                      * <tt>i</tt>th tensor product
+                                      * polynomial at
+                                      * <tt>unit_point</tt>. Here <tt>i</tt> is
+                                      * given in tensor product
+                                      * numbering.
+                                      *
+                                      * Note, that using this function
+                                      * within a loop over all tensor
+                                      * product polynomials is not
+                                      * efficient, because then each
+                                      * point value of the underlying
+                                      * (one-dimensional) polynomials
+                                      * is (unnecessarily) computed
+                                      * several times.  Instead use
+                                      * the <tt>compute</tt> function, see
+                                      * above, with
+                                      * <tt>values.size()==n_tensor_pols</tt>
+                                      * to get the point values of all
+                                      * tensor polynomials all at once
+                                      * and in a much more efficient
+                                      * way.
+                                      */
     double compute_value (const unsigned int i,
-			  const Point<dim> &p) const;
+                          const Point<dim> &p) const;
 
-				     /**
-				      * Computes the grad of the
-				      * <tt>i</tt>th tensor product
-				      * polynomial at
-				      * <tt>unit_point</tt>. Here <tt>i</tt> is
-				      * given in tensor product
-				      * numbering.
-				      *
-				      * Note, that using this function
-				      * within a loop over all tensor
-				      * product polynomials is not
-				      * efficient, because then each
-				      * derivative value of the
-				      * underlying (one-dimensional)
-				      * polynomials is (unnecessarily)
-				      * computed several times.
-				      * Instead use the <tt>compute</tt>
-				      * function, see above, with
-				      * <tt>grads.size()==n_tensor_pols</tt>
-				      * to get the point value of all
-				      * tensor polynomials all at once
-				      * and in a much more efficient
-				      * way.
-				      */
+                                     /**
+                                      * Computes the grad of the
+                                      * <tt>i</tt>th tensor product
+                                      * polynomial at
+                                      * <tt>unit_point</tt>. Here <tt>i</tt> is
+                                      * given in tensor product
+                                      * numbering.
+                                      *
+                                      * Note, that using this function
+                                      * within a loop over all tensor
+                                      * product polynomials is not
+                                      * efficient, because then each
+                                      * derivative value of the
+                                      * underlying (one-dimensional)
+                                      * polynomials is (unnecessarily)
+                                      * computed several times.
+                                      * Instead use the <tt>compute</tt>
+                                      * function, see above, with
+                                      * <tt>grads.size()==n_tensor_pols</tt>
+                                      * to get the point value of all
+                                      * tensor polynomials all at once
+                                      * and in a much more efficient
+                                      * way.
+                                      */
     Tensor<1,dim> compute_grad (const unsigned int i,
-				const Point<dim> &p) const;
+                                const Point<dim> &p) const;
 
-				     /**
-				      * Computes the second
-				      * derivative (grad_grad) of the
-				      * <tt>i</tt>th tensor product
-				      * polynomial at
-				      * <tt>unit_point</tt>. Here <tt>i</tt> is
-				      * given in tensor product
-				      * numbering.
-				      *
-				      * Note, that using this function
-				      * within a loop over all tensor
-				      * product polynomials is not
-				      * efficient, because then each
-				      * derivative value of the
-				      * underlying (one-dimensional)
-				      * polynomials is (unnecessarily)
-				      * computed several times.
-				      * Instead use the <tt>compute</tt>
-				      * function, see above, with
-				      * <tt>grad_grads.size()==n_tensor_pols</tt>
-				      * to get the point value of all
-				      * tensor polynomials all at once
-				      * and in a much more efficient
-				      * way.
-				      */
+                                     /**
+                                      * Computes the second
+                                      * derivative (grad_grad) of the
+                                      * <tt>i</tt>th tensor product
+                                      * polynomial at
+                                      * <tt>unit_point</tt>. Here <tt>i</tt> is
+                                      * given in tensor product
+                                      * numbering.
+                                      *
+                                      * Note, that using this function
+                                      * within a loop over all tensor
+                                      * product polynomials is not
+                                      * efficient, because then each
+                                      * derivative value of the
+                                      * underlying (one-dimensional)
+                                      * polynomials is (unnecessarily)
+                                      * computed several times.
+                                      * Instead use the <tt>compute</tt>
+                                      * function, see above, with
+                                      * <tt>grad_grads.size()==n_tensor_pols</tt>
+                                      * to get the point value of all
+                                      * tensor polynomials all at once
+                                      * and in a much more efficient
+                                      * way.
+                                      */
     Tensor<2,dim> compute_grad_grad (const unsigned int i,
                                      const Point<dim> &p) const;
 
-				     /**
-				      * Returns the number of tensor
-				      * product polynomials. It is the
-				      * product of the number of
-				      * polynomials in each coordinate
-				      * direction.
-				      */
+                                     /**
+                                      * Returns the number of tensor
+                                      * product polynomials. It is the
+                                      * product of the number of
+                                      * polynomials in each coordinate
+                                      * direction.
+                                      */
     unsigned int n () const;
 
   private:
-				     /**
-				      * Copy of the vector <tt>pols</tt> of
-				      * polynomials given to the
-				      * constructor.
-				      */
+                                     /**
+                                      * Copy of the vector <tt>pols</tt> of
+                                      * polynomials given to the
+                                      * constructor.
+                                      */
     std::vector<std::vector<Polynomials::Polynomial<double> > > polynomials;
 
-				     /**
-				      * Number of tensor product
-				      * polynomials. This is
-				      * <tt>Nx*Ny*Nz</tt>, or with terms
-				      * dropped if the number of space
-				      * dimensions is less than 3.
-				      */
+                                     /**
+                                      * Number of tensor product
+                                      * polynomials. This is
+                                      * <tt>Nx*Ny*Nz</tt>, or with terms
+                                      * dropped if the number of space
+                                      * dimensions is less than 3.
+                                      */
     unsigned int n_tensor_pols;
 
                                      /**
@@ -489,11 +489,11 @@ class AnisotropicPolynomials
     void compute_index (const unsigned int i,
                         unsigned int       (&indices)[dim]) const;
 
-				     /**
-				      * Given the input to the
-				      * constructor, compute
-				      * <tt>n_tensor_pols</tt>.
-				      */
+                                     /**
+                                      * Given the input to the
+                                      * constructor, compute
+                                      * <tt>n_tensor_pols</tt>.
+                                      */
     static
     unsigned int
     get_n_tensor_pols (const std::vector<std::vector<Polynomials::Polynomial<double> > > &pols);
@@ -539,16 +539,16 @@ template <int dim>
 template <class Pol>
 TensorProductPolynomials<dim>::
 TensorProductPolynomials(const std::vector<Pol> &pols)
-		:
-		polynomials (pols.begin(), pols.end()),
-		n_tensor_pols(x_to_the_dim(pols.size())),
-		index_map(n_tensor_pols),
-		index_map_inverse(n_tensor_pols)
+                :
+                polynomials (pols.begin(), pols.end()),
+                n_tensor_pols(x_to_the_dim(pols.size())),
+                index_map(n_tensor_pols),
+                index_map_inverse(n_tensor_pols)
 {
-				   // per default set this index map
-				   // to identity. This map can be
-				   // changed by the user through the
-				   // set_numbering() function
+                                   // per default set this index map
+                                   // to identity. This map can be
+                                   // changed by the user through the
+                                   // set_numbering() function
   for (unsigned int i=0; i<n_tensor_pols; ++i)
     {
       index_map[i]=i;

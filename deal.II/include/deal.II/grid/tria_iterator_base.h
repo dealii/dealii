@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,19 +25,19 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace IteratorState
 {
-  
+
 /**
  *   The three states an iterator can be in: valid, past-the-end and
  *   invalid.
  */
   enum IteratorStates
   {
-					 /// Iterator points to a valid object
-	valid,
-					 /// Iterator reached end of container
-	past_the_end,
-					 /// Iterator is invalid, probably due to an error
-	invalid
+                                         /// Iterator points to a valid object
+        valid,
+                                         /// Iterator reached end of container
+        past_the_end,
+                                         /// Iterator is invalid, probably due to an error
+        invalid
   };
 }
 

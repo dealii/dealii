@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -80,64 +80,64 @@ template <int dim>
 class Quadrature : public Subscriptor
 {
   public:
-				     /**
-				      * Define a typedef for a
-				      * quadrature that acts on an
-				      * object of one dimension
-				      * less. For cells, this would
-				      * then be a face quadrature.
-				      */
+                                     /**
+                                      * Define a typedef for a
+                                      * quadrature that acts on an
+                                      * object of one dimension
+                                      * less. For cells, this would
+                                      * then be a face quadrature.
+                                      */
     typedef Quadrature<dim-1> SubQuadrature;
 
-				     /**
-				      * Constructor.
-				      *
-				      * This constructor is marked as
-				      * explicit to avoid involuntary
-				      * accidents like in
-				      * <code>hp::QCollection@<dim@>
-				      * q_collection(3)</code> where
-				      * <code>hp::QCollection@<dim@>
-				      * q_collection(QGauss@<dim@>(3))</code>
-				      * was meant.
-				      */
+                                     /**
+                                      * Constructor.
+                                      *
+                                      * This constructor is marked as
+                                      * explicit to avoid involuntary
+                                      * accidents like in
+                                      * <code>hp::QCollection@<dim@>
+                                      * q_collection(3)</code> where
+                                      * <code>hp::QCollection@<dim@>
+                                      * q_collection(QGauss@<dim@>(3))</code>
+                                      * was meant.
+                                      */
     explicit Quadrature (const unsigned int n_quadrature_points = 0);
 
-				     /**
-				      * Build this quadrature formula
-				      * as the tensor product of a
-				      * formula in a dimension one
-				      * less than the present and a
-				      * formula in one dimension.
-				      *
-				      * <tt>SubQuadrature<dim>::type</tt>
-				      * expands to
-				      * <tt>Quadrature<dim-1></tt>.
-				      */
+                                     /**
+                                      * Build this quadrature formula
+                                      * as the tensor product of a
+                                      * formula in a dimension one
+                                      * less than the present and a
+                                      * formula in one dimension.
+                                      *
+                                      * <tt>SubQuadrature<dim>::type</tt>
+                                      * expands to
+                                      * <tt>Quadrature<dim-1></tt>.
+                                      */
     Quadrature (const SubQuadrature &,
-		const Quadrature<1> &);
+                const Quadrature<1> &);
 
-				     /**
-				      * Build this quadrature formula
-				      * as the <tt>dim</tt>-fold
-				      * tensor product of a formula in
-				      * one dimension.
-				      *
-				      * Assuming that the points in
-				      * the one-dimensional rule are in
-				      * ascending order, the points of
-				      * the resulting rule are ordered
-				      * lexicographically with
-				      * <i>x</i> running fastest.
-				      *
-				      * In order to avoid a conflict
-				      * with the copy constructor in
-				      * 1d, we let the argument be a
-				      * 0d quadrature formula for
-				      * dim==1, and a 1d quadrature
-				      * formula for all other space
-				      * dimensions.
-				      */
+                                     /**
+                                      * Build this quadrature formula
+                                      * as the <tt>dim</tt>-fold
+                                      * tensor product of a formula in
+                                      * one dimension.
+                                      *
+                                      * Assuming that the points in
+                                      * the one-dimensional rule are in
+                                      * ascending order, the points of
+                                      * the resulting rule are ordered
+                                      * lexicographically with
+                                      * <i>x</i> running fastest.
+                                      *
+                                      * In order to avoid a conflict
+                                      * with the copy constructor in
+                                      * 1d, we let the argument be a
+                                      * 0d quadrature formula for
+                                      * dim==1, and a 1d quadrature
+                                      * formula for all other space
+                                      * dimensions.
+                                      */
     explicit Quadrature (const Quadrature<dim != 1 ? 1 : 0> &quadrature_1d);
 
                                      /**
@@ -145,105 +145,105 @@ class Quadrature : public Subscriptor
                                       */
     Quadrature (const Quadrature<dim> &q);
 
-				     /**
-				      * Construct a quadrature formula
-				      * from given vectors of
-				      * quadrature points (which
-				      * should really be in the unit
-				      * cell) and the corresponding
-				      * weights. You will want to have
-				      * the weights sum up to one, but
-				      * this is not checked.
-				      */
+                                     /**
+                                      * Construct a quadrature formula
+                                      * from given vectors of
+                                      * quadrature points (which
+                                      * should really be in the unit
+                                      * cell) and the corresponding
+                                      * weights. You will want to have
+                                      * the weights sum up to one, but
+                                      * this is not checked.
+                                      */
     Quadrature (const std::vector<Point<dim> > &points,
-		const std::vector<double>      &weights);
+                const std::vector<double>      &weights);
 
-				     /**
-				      * Construct a dummy quadrature
-				      * formula from a list of points,
-				      * with weights set to
-				      * infinity. The resulting object
-				      * is therefore not meant to
-				      * actually perform integrations,
-				      * but rather to be used with
-				      * FEValues objects in
-				      * order to find the position of
-				      * some points (the quadrature
-				      * points in this object) on the
-				      * transformed cell in real
-				      * space.
-				      */
+                                     /**
+                                      * Construct a dummy quadrature
+                                      * formula from a list of points,
+                                      * with weights set to
+                                      * infinity. The resulting object
+                                      * is therefore not meant to
+                                      * actually perform integrations,
+                                      * but rather to be used with
+                                      * FEValues objects in
+                                      * order to find the position of
+                                      * some points (the quadrature
+                                      * points in this object) on the
+                                      * transformed cell in real
+                                      * space.
+                                      */
     Quadrature (const std::vector<Point<dim> > &points);
 
-				     /**
-				      * Constructor for a one-point
-				      * quadrature. Sets the weight of
-				      * this point to one.
-				      */
+                                     /**
+                                      * Constructor for a one-point
+                                      * quadrature. Sets the weight of
+                                      * this point to one.
+                                      */
     Quadrature (const Point<dim> &point);
 
-				     /**
-				      * Virtual destructor.
-				      */
+                                     /**
+                                      * Virtual destructor.
+                                      */
     virtual ~Quadrature ();
 
-				     /**
-				      * Assignment operator. Copies
-				      * contents of #weights and
-				      * #quadrature_points as well as
-				      * size.
-				      */
+                                     /**
+                                      * Assignment operator. Copies
+                                      * contents of #weights and
+                                      * #quadrature_points as well as
+                                      * size.
+                                      */
     Quadrature& operator = (const Quadrature<dim>&);
 
                      /**
-				      *  Test for equality of two quadratures.
-				      */
+                                      *  Test for equality of two quadratures.
+                                      */
     bool operator == (const Quadrature<dim> & p) const;
 
-				     /**
-				      * Set the quadrature points and
-				      * weights to the values provided
-				      * in the arguments.
-				      */
+                                     /**
+                                      * Set the quadrature points and
+                                      * weights to the values provided
+                                      * in the arguments.
+                                      */
     void initialize(const std::vector<Point<dim> > &points,
-		    const std::vector<double>      &weights);
+                    const std::vector<double>      &weights);
 
-				     /**
-				      * Number of quadrature points.
-				      */
+                                     /**
+                                      * Number of quadrature points.
+                                      */
     unsigned int size () const;
 
-				     /**
-				      * Return the <tt>i</tt>th quadrature
-				      * point.
-				      */
+                                     /**
+                                      * Return the <tt>i</tt>th quadrature
+                                      * point.
+                                      */
     const Point<dim> & point (const unsigned int i) const;
 
-				     /**
-				      * Return a reference to the
-				      * whole array of quadrature
-				      * points.
-				      */
+                                     /**
+                                      * Return a reference to the
+                                      * whole array of quadrature
+                                      * points.
+                                      */
     const std::vector<Point<dim> > & get_points () const;
 
-				     /**
-				      * Return the weight of the <tt>i</tt>th
-				      * quadrature point.
-				      */
+                                     /**
+                                      * Return the weight of the <tt>i</tt>th
+                                      * quadrature point.
+                                      */
     double weight (const unsigned int i) const;
 
-				     /**
-				      * Return a reference to the whole array
-				      * of weights.
-				      */
+                                     /**
+                                      * Return a reference to the whole array
+                                      * of weights.
+                                      */
     const std::vector<double> & get_weights () const;
 
-    				     /**
-				      * Determine an estimate for
-				      * the memory consumption (in
-				      * bytes) of this
-				      * object.
-				      */
+                                     /**
+                                      * Determine an estimate for
+                                      * the memory consumption (in
+                                      * bytes) of this
+                                      * object.
+                                      */
     std::size_t memory_consumption () const;
 
                          /**
@@ -254,19 +254,19 @@ class Quadrature : public Subscriptor
     void serialize (Archive & ar, const unsigned int version);
 
   protected:
-				     /**
-				      * List of quadrature points. To
-				      * be filled by the constructors
-				      * of derived classes.
-				      */
+                                     /**
+                                      * List of quadrature points. To
+                                      * be filled by the constructors
+                                      * of derived classes.
+                                      */
     std::vector<Point<dim> > quadrature_points;
 
-				     /**
-				      * List of weights of the
-				      * quadrature points.  To be
-				      * filled by the constructors of
-				      * derived classes.
-				      */
+                                     /**
+                                      * List of weights of the
+                                      * quadrature points.  To be
+                                      * filled by the constructors of
+                                      * derived classes.
+                                      */
     std::vector<double>      weights;
 };
 
@@ -286,28 +286,28 @@ template <int dim>
 class QAnisotropic : public Quadrature<dim>
 {
   public:
-				     /**
-				      * Constructor for a
-				      * one-dimensional formula. This
-				      * one just copies the given
-				      * quadrature rule.
-				      */
+                                     /**
+                                      * Constructor for a
+                                      * one-dimensional formula. This
+                                      * one just copies the given
+                                      * quadrature rule.
+                                      */
     QAnisotropic(const Quadrature<1>& qx);
 
-				     /**
-				      * Constructor for a
-				      * two-dimensional formula.
-				      */
+                                     /**
+                                      * Constructor for a
+                                      * two-dimensional formula.
+                                      */
     QAnisotropic(const Quadrature<1>& qx,
-		 const Quadrature<1>& qy);
+                 const Quadrature<1>& qy);
 
-				     /**
-				      * Constructor for a
-				      * three-dimensional formula.
-				      */
+                                     /**
+                                      * Constructor for a
+                                      * three-dimensional formula.
+                                      */
     QAnisotropic(const Quadrature<1>& qx,
-		 const Quadrature<1>& qy,
-		 const Quadrature<1>& qz);
+                 const Quadrature<1>& qy,
+                 const Quadrature<1>& qz);
 };
 
 
@@ -340,25 +340,25 @@ template <int dim>
 class QIterated : public Quadrature<dim>
 {
   public:
-				     /**
-				      * Constructor. Iterate the given
-				      * quadrature formula <tt>n_copies</tt> times in
-				      * each direction.
-				      */
+                                     /**
+                                      * Constructor. Iterate the given
+                                      * quadrature formula <tt>n_copies</tt> times in
+                                      * each direction.
+                                      */
     QIterated (const Quadrature<1> &base_quadrature,
-	       const unsigned int   n_copies);
+               const unsigned int   n_copies);
 
-				     /**
-				      * Exception
-				      */
+                                     /**
+                                      * Exception
+                                      */
     DeclException0 (ExcInvalidQuadratureFormula);
   private:
-				     /**
-				      * Check whether the given
-				      * quadrature formula has quadrature
-				      * points at the left and right end points
-				      * of the interval.
-				      */
+                                     /**
+                                      * Check whether the given
+                                      * quadrature formula has quadrature
+                                      * points at the left and right end points
+                                      * of the interval.
+                                      */
     static bool
     uses_both_endpoints (const Quadrature<1> &base_quadrature);
 };
@@ -443,7 +443,7 @@ template <>
 Quadrature<0>::Quadrature (const unsigned int);
 template <>
 Quadrature<0>::Quadrature (const Quadrature<-1> &,
-			   const Quadrature<1> &);
+                           const Quadrature<1> &);
 template <>
 Quadrature<0>::Quadrature (const Quadrature<1> &);
 template <>
@@ -451,7 +451,7 @@ Quadrature<0>::~Quadrature ();
 
 template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &,
-			   const Quadrature<1> &);
+                           const Quadrature<1> &);
 
 template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &);

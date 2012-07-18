@@ -1,299 +1,292 @@
+<br>
+
+<i>
+This program grew out of a student project by Sven Wetterauer at the
+University of Heidelberg, Germany. Most of the work for this program
+is by him.
+</i>
+<br>
+
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Foreword</h3>
 
-This program demonstrates a number of techniques that have not been shown in
-previous example programs. In particular, it shows how to program for
-one-dimensional problems, and some aspects of what to do with nonlinear
-problems, in particular how to transfer the solution from one grid to the next
-finer one. Apart from this, however, the program does not attempt to do much
-more than to entertain those who sometimes like to play with maths.
+This program deals with an example of a non-linear elliptic partial
+differential equation, the minimal
+surface equation. You can imagine the solution of this equation to describe
+the surface spanned by a soap film that is enclosed by a
+closed wire loop. We imagine the wire to not just be a planar loop, but in
+fact curved. The surface tension of the soap film will then reduce the surface
+to have minimal surface. The solution of the minimal surface equation
+describes this shape with the wire's vertical displacement as a boundary
+condition. For simplicity, we will here assume that the surface can be written
+as a graph $u=u(x,y)$ although it is clear that it is not very hard to
+construct cases where the wire is bent in such a way that the surface can only
+locally be constructed as a graph but not globally.
 
-The application we chose is, as you will see, not even very well suited for
-anything, since it is rather impossible to solve. When I started to write the
-program, I was not aware of this, and it only turned out later that the
-optimization problem we are looking at here is severely plagued by many,
-likely even degenerate minima, and that we cannot really hope to find a global
-one. What we do instead is to rather start the optimization from many initial
-guesses (which is cheap since the problem is 1d), and hope that we can get a
-reasonable best solution for some of them. While the whole thing, as an
-application, is not very satisfactory, keep in mind that solving particular
-applications is not the goal of the tutorial programs; rather, we would like
-to demonstrate techniques of programming with deal.II, which is indeed the
-focus here.
+Because the equation is non-linear, we can't solve it directly. Rather, we
+have to use Newton's method to compute the solution iteratively.
 
 
-<h3>The problem</h3>
 
-Now for a description of the problem.  In the book by Dacorogna on the
-Calculus of Variations, I found the following statement, which confused me
-tremendously at first (see Section 3.4.3, ``Lavrentiev Phenomenon'', very
-slightly edited):
+<h3>Classical formulation</h3>
 
-@par Theorem 4.6:
-  <em>
-  Let 
+In a classical sense, the problem is given in the following form:
+
+
+  @f{align*}
+    -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right) &= 0 \qquad
+    \qquad &&\textrm{in} ~ \Omega
+    \\
+    u&=g \qquad\qquad &&\textrm{on} ~ \partial \Omega
+  @f}
+
+$\Omega$ is the domain we get by projecting the wire's positions into $x-y$
+space. In this example, we choose $\Omega$ as the unit disk.
+
+As described above, we solve this equation using Newton's method in which we
+compute the $n$th approximate solution from the $n-1$st one, and use
+a damping parameter $\alpha^n$ to get better global convergence behavior:
+  @f{align*}
+    F'(u^{n},\delta u^{n})&=- F(u^{n})
+    \\
+    u^{n+1}&=u^{n}+\alpha^n \delta u^{n}
+  @f}
+with
   @f[
-    I(u)=\int_0^1 (x-u^3)^2 (u')^6\; dx.
+    F(u):= -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right)
   @f]
-  Let
-  @f[
-    {\cal W}_1 = \{ u\in W^{1,\infty}(0,1) : u(0)=0, u(1)=1 \}
-  @f]
-  @f[
-    {\cal W}_2 = \{ u\in W^{1,1}(0,1) : u(0)=0, u(1)=1 \}
-  @f]
-  </em>
-
-@par
-  <em>
-  Then
-  @f[
-  \inf_{u\in {\cal W}_1} I(u) \ge c_0 > 0 = \inf_{u\in {\cal W}_2} I(u).
-  @f]
-  Moreover the minimum of $I(u)$ over ${\cal W}_2$ is attained by
-  $u(x)=x^{1/3}$. 
-  </em>
-
-@par Remarks.
-  [...]
-
-@par
-  <em>
-  ii) it is interesting to note that if one uses the usual finite element
-  methods (by taking piecewise affine functions, which are in $W^{1,\infty}$)
-  one will not be able to detect the minimum of some integrals such as the one
-  in the theorem.
-  </em>
-
-In other words: minimizing the energy functional over one space
-($W^{1,\infty}$) does not give the same value as when minimizing over a larger
-space ($W^{1,1}$). Furthermore, they give a rough estimate of the value of the
-constant $c_0$, which is $c_0=\frac{7^23^5}{2^{18}5^5}\approx 1.61\cdot
-10^{-6}$ (although by their calculation it is obvious that this estimate is
-far too small, but the point of course is just to show that it is strictly
-larger than zero).
-
-While the theorem was not surprising, the remark stunned me at first. After
-all, we know that we can approximate functions in $W^{1,1}$ to arbitrary
-accuracy.  Also, although it is true that finite element functions are in
-$W^{1,\infty}$, this statement is not really accurate: if the function itself
-is bounded pointwise by, say, a constant $C$, then its gradient is bounded by
-$2C/h$, and thus $\|u_h\|_{1,\infty} \le 2C/h$. That means that we should be
-able to lift this limit just by mesh refinement. Finite element functions are
-therefore only in $W^{1,\infty}$ if one considers them on a fixed grid, not on
-a sequence of successively finer grids. (Note, we can only lift the
-boundedness in $W^{1,1}$ in the same way by considering functions that
-oscillate at cell frequency; these, however, do not converge in any reasonable
-measure.)
-
-So it took me a while to see where the problem lies. Here it is: While we are
-able to approximate functions to arbitrary accuracies in <em>Sobolev
-  norms</em>, this does not necessarily also hold with respect to the functional
-$I(u)$!  After all, this functional was made to show exactly these
-pathologies.
-
-What happens in this case is actually not so difficult to understand. Let us
-look at what happens if we plug the lowest-order (piecewise linear)
-interpolant $i_hu$ of the optimal solution $u=x^{1/3}$ into the functional
-$I(u)$: on the leftmost cell, the left end of $i_hu$ is tagged to zero by the
-boundary condition, and the right end has the value $i_hu(h)=u(h)=h^{1/3}$. So
-let us only consider the contribution of this single cell to $I(u)$:
-@f{eqnarray*}
-  \int_0^h (x-(i_hu)^3)^2 ((i_hu)')^6 dx
-  &=&
-  \int_0^h (x-(h^{1/3}x)^3)^2 ((h^{1/3}/h)')^6 dx
-  \\
-  &=&
-  h^{-4} \int_0^h (x^2-2hx^4+h^2x^6) dx
-  \\
-  &=&
-  h^{-4} (h^3/3-2h^5/5+h^9/7)
-  \\
-  &=& {\cal O}(h^{-1}).
-@f}
-Ups, even the contribution of the first cell blows up under mesh refinement,
-and we have not even summed up the contributions of the other cells!
-
-It turns out, that the other cells are not really problematic (since the
-gradient is bounded there by a constant independent of $h$), but we cannot
-really avoid the trouble with the first cell: if instead of the interpolant we
-choose some other finite element function that is closer on average to
-$x^{1/3}$ than the interpolant above, then we have to increase the slope of
-this function, since we have to obey the boundary condition at the left
-end. But then we are hit by the weight $(u')^6$. This weight is simply too
-strong!
-
-On the other hand, the interpolation of the linear function $\varphi(x)=x$
-connecting the boundary values has the finite energy $I(i_h\varphi)=1/10$,
-independent of the mesh size. Thus, $i_hx^{1/3}$ cannot be the minimizer of the
-energy as $h\rightarrow 0$. This is also easy to see by noting that 
-the minimal value of $I$ cannot increase under mesh
-refinement: if it is finite for some function on some mesh, then it must be
-smaller or equal to that value on a finer mesh, since the original function is
-still in the space spanned by the shape functions on the finer grid, as finite
-element spaces are nested. However, the computation above shows that we should
-not be surprised if the value of the functional does not converge to zero, but
-rather some finite value.
-
-There is one more conclusion to be drawn from the blow-up lesson above: we
-cannot expect the finite dimensional approximation to be close to the root
-function at the left end of the domain, for any mesh we choose! Because, if it
-would, then its energy would have to blow up. And we will see exactly this
-in the results section below.
-
-
-<h3>What to do?</h3>
-
-After this somewhat theoretical introduction, let us just once in our life
-have fun with pure mathematics, and actually see what happens in this problem
-when we run the finite element method on it. So here it goes: to find the
-minimum of $I(u)$, we have to find its stationary point. The condition for
-this reads
+and $F'(u,\delta u)$ the derivative of F in direction of $\delta u$:
 @f[
-  I'(u,\varphi) 
-  = 
-  \int_0^1 6 (x-u^3) (u')^5 \{ (x-u^3)\varphi' - u^2 u' \varphi\}\ dx,
+  F'(u,\delta u)=\lim \limits_{\epsilon \rightarrow 0}{\frac{F(u+\epsilon \delta u)-
+  F(u)}{\epsilon}}.
 @f]
-for all test functions $\varphi$ from the same space as that from which we
-take $u$, but with zero boundary conditions. If this space allows us to
-integrate by parts, then we could associate this with a two point boundary
-value problem
-@f{eqnarray*}
-  -(x-u^3) u^2(u')^6
-  - \frac{d}{dx} \left\{(x-u^3)^2 (u')^5\right\} = 0,
-  \qquad\qquad u(0)=0,
-  \quad u(1)=1.
-@f}
-Note that this equation degenerates wherever $u^3=x$, which is at least the
-case at $x\in\{0,1\}$ due to the prescribed boundary values for $u$, but
-possibly at other places as well.  However, for finite elements, we will want
-to have the equation in weak form anyway.  Since the equation is still
-nonlinear, one may be tempted to compute iterates
-$u_{k+1}=u_k+\alpha_k\delta u_k$ using a Newton method for updates $\delta
-u_k$, like in
+
+Going through the motions to find out what $F'(u,\delta u)$ is, we find that
+we have to solve a linear elliptic PDE in every Newton step, with $\delta u^n$
+as the solution of:
+
+  @f[
+  - \nabla \cdot \left( \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla
+  \delta u^{n} \right) +
+  \nabla \cdot \left( \frac{\nabla u^{n} \cdot
+  \nabla \delta u^{n}}{(1+|\nabla u^{n}|^{2})^{\frac{3}{2}}} \nabla u^{n}
+  \right)  =
+  -\left( - \nabla \cdot \left( \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}
+  \nabla u^{n} \right) \right)
+  @f]
+
+In order to solve the minimal surface equation, we have to solve this equation
+repeatedly, once per Newton step. To solve this, we have to take a look at the
+boundary condition of this problem. Assuming that $u^{n}$ already has the
+right boundary values, the Newton update $\delta u^{n}$ should have zero
+boundary conditions, in order to have the right boundary condition after
+adding both.  In the first Newton step, we are starting with the solution
+$u^{0}\equiv 0$, the Newton update still has to deliever the right boundary
+condition to the solution $u^{1}$.
+
+
+Summing up, we have to solve the PDE above with the boundary condition $\delta
+u^{0}=g$ in the first step and with $\delta u^{n}=0$ in all the following steps.
+
+
+<h3>Weak formulation of the problem</h3>
+
+Starting with the strong formulation above, we get the weak formulation by multiplying
+both sides of the PDE with a testfunction $\varphi$ and integrating by parts on both sides:
+  @f[
+  \left( \nabla \varphi , \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla
+  \delta u^{n} \right)-\left(\nabla \varphi ,\frac{\nabla u^{n} \cdot \nabla
+  \delta u^{n}}{(1+|\nabla u^{n}|^{2})^{\frac{3}{2}}}\nabla u^{n}  \right)
+  = -\left(\nabla \varphi , \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}} \nabla u^{n}
+   \right).
+  @f]
+Here the solution $\delta u^{n}$ is a function in $H^{1}(\Omega)$, subject to
+the boundary conditions discussed above.
+Reducing this space to a finite dimensional space with basis $\left\{
+\varphi_{0},\dots , \varphi_{N-1}\right\}$, we can write the solution:
+
 @f[
-  I''(u_k,\delta u_k,\varphi) 
-  = 
-  -I'(u_k, \varphi).
+  \delta u^{n}=\sum_{j=0}^{N-1} U_{j} \varphi_{j}
 @f]
-However, since $I''(u_k,\cdot,\cdot)$ may be an indefinite operator (and, as
-numerical experiments indicate, is in fact during typical computations), we
-don't want to use this. Instead, we use a gradient method, for which we
-compute updates according to the following scheme:
-@f{eqnarray*}
-  \left<\delta u_k,\varphi\right>
-  = 
-  -I'(u_k, \varphi).
-@f}
-For the scalar product on the left hand side, there are multiple valid ways;
-we choose the mesh dependent definition $\left<u,v\right> = \int_\Omega (uv +
-h(x)^2 \nabla u\cdot \nabla v)\; dx$, where the weight $h(x)^2$, i.e. using
-the local mesh width, is chosen so that the definition is dimensionally
-consistent. It also yields a matrix on the left hand side that is simple to
-invert, as it is the sum of the well-conditioned mass matrix, and a Laplace
-matrix times a factor that counters the growth of condition number of the
-Laplace matrix.
 
-The step length $\alpha_k$ is then computed using a one-dimensional line search
-finding
-@f{eqnarray*}
-  \alpha_k = \arg\min_\alpha I(u_k+\alpha\delta u_k),
-@f}
-or at least an approximation to this using a one-dimensional Newton method
-which itself has a line search. The details of this can be found in the code.
-We iterate the updates and line searches until the change in energy $I(u_k)$
-becomes too small to warrant any further iterations.
+Using the basis functions as testfunctions and defining $a_{n}:=\frac{1}
+{\sqrt{1+|\nabla u^{n}|^{2}}}$, we can rewrite the weak formualtion:
 
-The basic idea that you should get in all this is that we formulate the
-optimization method in a function space, and will only discretize each step
-separately. A number of subsequent steps will be done on the same mesh, before
-we refine it and go on to do the same on the next finer mesh.
+@f[
+  \sum_{j=0}^{N-1}\left[ \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
+  \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla
+  \varphi_{j} \right) \right] \cdot U_{j}=\left( \nabla \varphi_{i} , a_{n}
+  \nabla u^{n}\right) \qquad \forall i=0,\dots ,N-1
+@f]
 
-As for mesh refinement, it is instructional to recall how residual based error
-estimates like the one used in the Kelly et al.~error estimator are usually
-derived (the Kelly estimator is the one that we have used in most of the
-previous example programs). In a similar way, by looking at the residual of
-the strong form of the nonlinear equation we attempt here to solve, we may be
-tempted to consider the following expression for refinement of cell $K$:
-@f{eqnarray*}
-  \eta_K^2 &=&
-  h^2 \left\|
-    (x-u_h^3) (u_h')^4 \left\{ u_h^2 (u_h')^2 + 5(x-u_h^3)u_h'' + 2u_h'(1-3u_h^2u_h') \right\}
-  \right\|^2_K
-  \\
-  && +
-  h \left| (x-u_h^3)^2 [(u_h')^5] \right|^2_{\partial K},
-@f}
-where $[\cdot]$ is the jump of a quantity across an intercell boundary, and 
-$|\cdot|_{\partial K}$ is the sum of the quantity evaluated at the two end
-points of a cell. Note that in the evaluation of the jump, we have made use of
-the fact that $x-u_h^3$ is a continuous quantity, and can therefore be taken
-out of the jump operator.
+where the solution $\delta u^{n}$ is given by the coefficents $\delta U^{n}_{j}$.
+This linear system of equations can be rewritten as:
 
-All these details actually matter -- while writing the program I have played
-around with many settings and different versions of the code, and the result
-is that if you don't have a good line search, good stopping criteria, the
-right metric (scalar product) for the gradient method, good initial values,
-and a good refinement criterion, then the nonlinear solver gets stuck quite
-readily for this highly nonlinear problem. Initially, I was hardly able to
-find solutions for which the energy dropped below 0.005, while the energy
-after the final iteration of the program as it is is usually around 0.0003,
-and occasionally down to less than 3e-5.
+@f[
+  A^{n}\; \delta U^{n}=b^{n}
+@f]
 
-However, this is not enough. In the program, we start the solver on the coarse
-mesh many times, with randomly perturbed starting values, and while it
-converges it yields a different solution, with a different energy every
-time. One can therefore not say that the solver converges to a certain energy,
-and we can't answer the question what the smallest value of $I(u)$ might be in
-$W^{1,\infty}$. This is unsatisfactory, but may be expected for such a
-contrived and pathological problem. Consider it an example in programming with
-deal.II then, and not an example in solving this particular problem.
+where the entries of the matrix $A^{n}$ are given by:
+
+@f[
+  A^{n}_{ij}:= \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
+  \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla
+  \varphi_{j} \right)
+@f]
+
+and the right hand side $b^{n}$ is given by:
+
+@f[
+  b^{n}_{i}:=\left( \nabla \varphi_{i} , a_{n} \nabla u^{n}\right)
+@f]
 
 
-<h3>Implementation</h3>
+<h3> Solver issues </h3>
 
-The program implements all the steps mentioned above, and we will discuss them
-in the commented code below. In general, however, note that formulating the
-Newton method in function spaces, and only discretizing afterwards has
-consequences: we have to linearize around $u_k$ when we want to compute
-$\delta u_k$, and we have to sum up these two functions afterwards.  However,
-they may be living on different grids, if we have refined the grid before this
-step, so we will have to present a way to actually get a function from one
-grid to another. The <code>SolutionTransfer</code> class will help us here. On the
-other hand, discretizing every nonlinear step separately has the advantage
-that we can do the initial steps, when we are still far away from the
-solution, on a coarse mesh, and only go on to more expensive computations when
-we home in on an solution. We will use a
-very simplistic strategy for when we refine the mesh (every fifth nonlinear
-step), though. Realistic programs solving nonlinear problems will have to be more
-clever in this respect, but it suffices for the purposes of this program.
+The matrix that corresponds to the Newton step above can be reformulated to
+show its structure a bit better. Rewriting it slightly, we get that it has the
+form
+@f[
+  A_{ij}
+  =
+  \left(
+    \nabla \varphi_i,
+    B
+    \nabla \varphi_j
+  \right)
+@f]
+where the matrix $B$ (of size $d \times d$ in $d$ space dimensions) is given
+by the following expression:
+@f[
+  B
+  =
+  a_n \left\{
+   \mathbf I
+   -
+   a_n^2 [\nabla u_n] \otimes [\nabla u_n]
+  \right\}
+  =
+  a_n \left\{
+   \mathbf I
+   -
+  \frac{\nabla u_n}{\sqrt{1+|\nabla u^{n}|^{2}}} \otimes
+  \frac{\nabla u_n}{\sqrt{1+|\nabla u^{n}|^{2}}}
+  \right\}.
+@f]
+From this expression, it is obvious that
+$B$ is symmetric, and so $A$ is symmetric as well.
+On the other hand, $B$ is also positive definite, which confers the same
+property onto $A$. This can be seen by noting that the vector $v_1 =
+\frac{\nabla u^n}{|\nabla u^n|}$ is an eigenvector of $B$ with eigenvalue
+$\lambda_1=a_n \left(1-\frac{|\nabla u^n|^2}{1+|\nabla u^n|^2}\right) > 0$ while all vectors $v_2\ldots v_d$
+that are perpendicular to $v_1$ and each other are eigenvectors with
+eigenvalue $a_n$. Since all eigenvalues are positive, $B$ is positive definite
+and so is $A$. We can thus use the CG method for solving the Newton steps.
 
-We will show some of the things that are really simple in 1d (but sometimes
-different from what we are used to in 2d or 3d). Apart from this, the program
-does not contain much new stuff, but if it explains a few of the techniques
-that are available for nonlinear problems and in particular 1d problems, then
-this is not so bad, after all.
+It is worth noting, however, that the positive definiteness degenerates for
+problems where $\nabla u$ becomes large. In other words, if we simply multiply
+all boundary values by 2, then to first order $u$ and $\nabla u$ will also be
+multiplied by two, but as a consequence the smallest eigenvalue of $B$ will
+become smaller and the matrix will become more ill-conditioned. (More
+specifically, for $|\nabla u^n|\rightarrow\infty$ we have that
+$\lambda_1 \propto a_n \frac{1}{|\nabla u^n|^2}$ whereas
+$\lambda_2\ldots \lambda_d=a_n$; thus, the condition number of $B$,
+which is a multiplicative factor in the condition number of $A$ grows
+like ${\cal O}(|\nabla u^n|^2)$.) It is simple
+to verify with the current program that indeed multiplying the boundary values
+used in the current program by larger and larger values results in a problem
+that will ultimately no longer be solvable using the simple preconditioned CG
+method we use here.
 
-<em>Note:</em> As shown below, the program starts the nonlinear solver from 10 different
-initial values, and outputs the results. This is not actually too many, but we
-did so to keep run-time short (around 1:30 minutes on my laptop). If you want to
-increase the number of realizations, you may want to switch to optimized mode
-(by setting the ``debug-mode'' flag in the Makefile to ``off''), and increase
-the number of realizations to a larger value. On the same machine as above, I
-can compute 100 realizations in optimized mode in about 2 minutes. For
-this particular program, the difference between debug and optimized mode is
-thus about a factor of 7-8, which can be explained by the fact that we ask the
-compiler to do optimizations on the code only in the latter mode, but in most
-part due to the fact that in optimized mode all the ``Assert'' checks are
-thrown out that make sure that function arguments are correct, and that check
-the internal consistency of the library. The library contains several
-thousands of these checks, and they significantly slow down debug
-computations, but we feel that the benefit of finding programming errors
-earlier and including where the problem exactly appeared to be of significantly
-greater value than faster run-time. After all, all production runs of programs
-should be done in optimized mode anyway.
 
-A slowdown of a factor of 7-8 is unusual, however. For 2d and 3d applications,
-a typical value is around 4. 
+<h3> Choice of step length and globalization </h3>
+
+As stated above, Newton's method works by computing a direction
+$\delta u^n$ and then performing the update $u^{n+1} = u^{n}+\alpha^n
+\delta u^{n}$ with a step length $0 < \alpha^n \le 1$. It is a common
+observation that for strongly nonlinear models, Newton's method does
+not converge if we always choose $\alpha^n=1$ unless one starts with
+an initial guess $u^0$ that is sufficiently close to the solution $u$
+of the nonlinear problem. In practice, we don't always have such an
+initial guess, and consequently taking full Newton steps (i.e., using
+$\alpha=1$) does frequently not work.
+
+A common strategy therefore is to use a smaller step length for the
+first few steps while the iterate $u^n$ is still far away from the
+solution $u$ and as we get closer use larger values for $\alpha^n$
+until we can finally start to use full steps $\alpha^n=1$ as we are
+close enough to the solution. The question is of course how to choose
+$\alpha^n$. There are basically two widely used approaches: line
+search and trust region methods.
+
+In this program, we simply always choose the step length equal to
+0.1. This makes sure that for the testcase at hand we do get
+convergence although it is clear that by not eventually reverting to
+full step lengths we forego the rapid, quadratic convergence that
+makes Newton's method so appealing. Obviously, this is a point one
+eventually has to address if the program was made into one that is
+meant to solve more realistic problems. We will comment on this issue
+some more in the <a href="#Results">results section</a>.
+
+
+<h3> Summary of the algorithm and testcase </h3>
+
+Overall, the program we have here is not unlike step-6 in many regards. The
+layout of the main class is essentially the same. On the other hand, the
+driving algorithm in the <code>run()</code> function is different and works as
+follows:
+<ol>
+<li>
+  Start with the function $u^{0}\equiv 0$ and modify it in such a way
+  that the values of $u^0$ along the boundary equal the correct
+  boundary values $g$ (this happens in
+  <code>MinimalSurfaceProblem::set_boundary_values</code>). Set
+  $n=0$.
+</li>
+
+<li>
+  Compute the Newton update by solving the system $A^{n}\;\delta
+  U^{n}=b^{n}$
+  with boundary condition $\delta u^{n}=0$ on $\partial \Omega$.
+</li>
+
+<li>
+  Compute a step length $\alpha^n$. In this program, we always set
+  $\alpha^n=0.1$. To make things easier to extend later on, this
+  happens in a function of its own, namely in
+  <code>MinimalSurfaceProblem::determine_step_length</code>.
+</li>
+
+<li>
+  The new approximation of the solution is given by
+  $u^{n+1}=u^{n}+\alpha^n \delta u^{n}$.
+</li>
+
+<li>
+  If $n$ is a multiple of 5 then refine the mesh, transfer the
+  solution $u^{n+1}$ to the new mesh and set the values of $u^{n+1}$
+  in such a way that along the boundary we have
+  $u^{n+1}|_{\partial\Gamma}=g$ (again in
+  <code>MinimalSurfaceProblem::set_boundary_values</code>). Note that
+  this isn't automatically
+  guaranteed even though by construction we had that before mesh
+  refinement $u^{n+1}|_{\partial\Gamma}=g$ because mesh refinement
+  adds new nodes to the mesh where we have to interpolate the old
+  solution to the new nodes upon bringing the solution from the old to
+  the new mesh. The values we choose by interpolation may be close to
+  the exact boundary conditions but are, in general, nonetheless not
+  the correct values.
+</li>
+
+<li>
+  Set $n\leftarrow n+1$ and go to step 2.
+</li>
+</ol>
+
+The testcase we solve is chosen as follows: We seek to find the solution of
+minimal surface over the unit disk $\Omega=\{\mathbf x: \|\mathbf
+x\|<1\}\subset {\mathbb R}^2$ where the surface attains the values
+$u(x,y)|{\partial\Omega} = g(x,y):=\sin(2 \pi (x+y))$ along the boundary.

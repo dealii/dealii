@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,7 +49,7 @@ class SolverControl;
  *                        // Application of matrix to vector src.
  *                        // write result into dst
  *     void vmult (VECTOR &dst, const VECTOR &src) const;
- * 
+ *
  *                        // Application of transpose to a Vector.
  *                        // Only used by certain iterative methods.
  *     void Tvmult (VECTOR &dst, const VECTOR &src) const;
@@ -81,7 +81,7 @@ class SolverControl;
  *     void sadd (const double  a,
  *                const double  b,
  *                const VECTOR &x);
- * 
+ *
  *                        // scaled assignment of a vector
  *     void equ (const double  a,
  *               const VECTOR &x);
@@ -142,66 +142,66 @@ template <class VECTOR = Vector<double> >
 class Solver : public Subscriptor
 {
   public:
-				     /**
-				      * Constructor. Takes a control
-				      * object which evaluates the
-				      * conditions for convergence,
-				      * and an object to provide
-				      * memory.
-				      *
-				      * Of both objects, a reference is
-				      * stored, so it is the user's
-				      * responsibility to guarantee that the
-				      * lifetime of the two arguments is at
-				      * least as long as that of the solver
-				      * object.
-				      */
+                                     /**
+                                      * Constructor. Takes a control
+                                      * object which evaluates the
+                                      * conditions for convergence,
+                                      * and an object to provide
+                                      * memory.
+                                      *
+                                      * Of both objects, a reference is
+                                      * stored, so it is the user's
+                                      * responsibility to guarantee that the
+                                      * lifetime of the two arguments is at
+                                      * least as long as that of the solver
+                                      * object.
+                                      */
     Solver (SolverControl        &solver_control,
             VectorMemory<VECTOR> &vector_memory);
 
-				     /**
-				      * Constructor. Takes a control
-				      * object which evaluates the
-				      * conditions for convergence. In
-				      * contrast to the other
-				      * constructor, this constructor
-				      * denotes an internal object of
-				      * type GrowingVectorMemory to
-				      * allocate memory.
-				      *
-				      * A reference to the control
-				      * object is stored, so it is the
-				      * user's responsibility to
-				      * guarantee that the lifetime of
-				      * the two arguments is at least
-				      * as long as that of the solver
-				      * object.
-				      */
+                                     /**
+                                      * Constructor. Takes a control
+                                      * object which evaluates the
+                                      * conditions for convergence. In
+                                      * contrast to the other
+                                      * constructor, this constructor
+                                      * denotes an internal object of
+                                      * type GrowingVectorMemory to
+                                      * allocate memory.
+                                      *
+                                      * A reference to the control
+                                      * object is stored, so it is the
+                                      * user's responsibility to
+                                      * guarantee that the lifetime of
+                                      * the two arguments is at least
+                                      * as long as that of the solver
+                                      * object.
+                                      */
     Solver (SolverControl        &solver_control);
-    
-				     /**
-				      * Access to object that controls
-				      * convergence.
-				      */
+
+                                     /**
+                                      * Access to object that controls
+                                      * convergence.
+                                      */
     SolverControl & control() const;
-  
+
   protected:
-				     /**
-				      * A static vector memory object
-				      * to be used whenever no such
-				      * object has been given to the
-				      * constructor.
-				      */
+                                     /**
+                                      * A static vector memory object
+                                      * to be used whenever no such
+                                      * object has been given to the
+                                      * constructor.
+                                      */
     mutable GrowingVectorMemory<VECTOR> static_vector_memory;
-    
-				     /**
-				      * Control structure.
-				      */
+
+                                     /**
+                                      * Control structure.
+                                      */
     SolverControl &cntrl;
-    
-				     /**
-				      * Memory for auxilliary vectors.
-				      */
+
+                                     /**
+                                      * Memory for auxiliary vectors.
+                                      */
     VectorMemory<VECTOR> &memory;
 };
 
@@ -210,10 +210,10 @@ class Solver : public Subscriptor
 template<class VECTOR>
 inline
 Solver<VECTOR>::Solver (SolverControl        &solver_control,
-			VectorMemory<VECTOR> &vector_memory)
-		:
-		cntrl(solver_control),
-		memory(vector_memory)
+                        VectorMemory<VECTOR> &vector_memory)
+                :
+                cntrl(solver_control),
+                memory(vector_memory)
 {}
 
 
@@ -221,9 +221,9 @@ Solver<VECTOR>::Solver (SolverControl        &solver_control,
 template<class VECTOR>
 inline
 Solver<VECTOR>::Solver (SolverControl        &solver_control)
-		:
-		cntrl(solver_control),
-		memory(static_vector_memory)
+                :
+                cntrl(solver_control),
+                memory(static_vector_memory)
 {}
 
 

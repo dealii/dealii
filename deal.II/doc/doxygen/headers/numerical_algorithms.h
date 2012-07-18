@@ -21,7 +21,7 @@
  *
  * Some of the classes, like DerivativeApproximation, KellyErrorEstimator and
  * SolutionTransfer, act on solutions already obtained, and compute derived
- * quantities in the first two cases, or help transfering a set of vectors
+ * quantities in the first two cases, or help transferring a set of vectors
  * from one mesh to another.
  *
  * The remaining classes MatrixCreator, MatrixTools, and VectorTools provide

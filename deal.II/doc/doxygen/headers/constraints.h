@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -100,12 +100,22 @@
  * This scheme of first building a linear system and then eliminating
  * constrained degrees of freedom is inefficient, and a bottleneck if there
  * are many constraints and matrices are full, i.e. especially for 3d and/or
- * higher order or hp finite elements. We therefore offer a second way of
+ * higher order or hp finite elements. Furthermore, it is impossible to
+ * implement for %parallel computations where a process may not have access
+ * to elements of the matrix. We therefore offer a second way of
  * building linear systems, using the
  * ConstraintMatrix::add_entries_local_to_global() and
  * ConstraintMatrix::distribute_local_to_global() functions discussed
  * below. The resulting linear systems are equivalent to those one gets after
  * calling the ConstraintMatrix::condense() functions.
+ *
+ * @note While these two ways are <i>equivalent</i>, i.e., the solution of
+ * linear systems computed via either approach is the same, the linear
+ * systems themselves do not necessarily have the same matrix and right
+ * hand side vector entries. Specifically, the matrix diagonal and right hand
+ * side entries corresponding to constrained degrees of freedom may be different
+ * as a result of the way in which we compute them; they are, however, always
+ * chosen in such a way that the solution to the linear system is the same.
  *
  *
  * <h4>Condensing matrices and sparsity patterns</h4>
@@ -289,28 +299,97 @@
  * There are two ways to apply inhomogeneous constraints after creating the
  * ConstraintMatrix:
  *
- * First:
- * - Set the solution to zero in the inhomogeneous constrained components
- *   using the ConstraintMatrix::set_zero() function (or start with a solution 
- *   vector equal to zero)
+ * First approach:
  * - Apply the ConstraintMatrix::distribute_local_to_global() function to the
- *   system matrix and the right-hand-side with the parameter 
- *   use_inhomogeneities_for_rhs = false (default)
+ *   system matrix and the right-hand-side with the parameter
+ *   use_inhomogeneities_for_rhs = false (i.e., the default)
+ * - Set the solution to zero in the inhomogeneous constrained components
+ *   using the ConstraintMatrix::set_zero() function (or start with a solution
+ *   vector equal to zero)
  * - solve() the linear system
  * - Apply ConstraintMatrix::distribute() to the solution
- * 
- * Second:
- * - Set the concerning components of the solution to the inhomogeneous
- *   constrained values
- * - Use the ConstraintMatrix::distribute_local_to_global() function with the parameter 
+ *
+ * Second approach:
+ * - Use the ConstraintMatrix::distribute_local_to_global() function with the parameter
  *   use_inhomogeneities_for_rhs = true and apply it to
  *   the system matrix and the right-hand-side
+ * - Set the concerning components of the solution to the inhomogeneous
+ *   constrained values (for example using ConstraintMatrix::distribute())
  * - solve() the linear system
  * - Depending on the solver now you have to apply the ConstraintMatrix::distribute()
  *   function to the solution, because the solver could change the constrained
- *   values in the solution. For a krylov based solver this should not be the
- *   case, but it is still possible that there is a difference between the
- *   inhomogeneous value and the solution value in the order of machine precision.   
+ *   values in the solution. For a Krylov based solver this should not be strictly
+ *   necessary, but it is still possible that there is a difference between the
+ *   inhomogeneous value and the solution value in the order of machine precision,
+ *   and you may want to call ConstraintMatrix::distribute() anyway if you have
+ *   additional constraints such as from hanging nodes.
+ *
+ * Of course, both approaches lead to the same final answer but in different
+ * ways. Using approach (i.e., when using use_inhomogeneities_for_rhs = false
+ * in ConstraintMatrix::distribute_local_to_global()), the linear system we
+ * build has zero entries in the right hand side in all those places where a
+ * degree of freedom is constrained, and some positive value on the matrix
+ * diagonal of these lines. Consequently, the solution vector of the linear
+ * system will have a zero value for inhomogeneously constrained degrees of
+ * freedom and we need to call ConstraintMatrix::distribute() to give these
+ * degrees of freedom their correct nonzero values.
+ *
+ * On the other hand, in the second approach, the matrix diagonal element and
+ * corresponding right hand side entry for inhomogeneously constrained degrees
+ * of freedom are so that the solution of the linear system already has the
+ * correct value (e.g., if the constraint is that $x_{13}=42$ then row $13$ if
+ * the matrix is empty with the exception of the diagonal entry, and
+ * $b_{13}/A_{13,13}=42$ so that the solution of $Ax=b$ must satisfy
+ * $x_{13}=42$ as desired). As a consequence, we do not need to call
+ * ConstraintMatrix::distribute() after solving to fix up inhomogeneously
+ * constrained components of the solution, though there is also no harm in
+ * doing so.
+ *
+ * There remains the question of which of the approaches to take and why we
+ * need to set to zero the values of the solution vector in the first
+ * approach. The answer to both questions has to do with how iterative solvers
+ * solve the linear system. To this end, consider that we typically stop
+ * iterations when the residual has dropped below a certain fraction of the
+ * norm of the right hand side, or, alternatively, a certain fraction of the
+ * norm of the initial residual. Now consider this:
+ *
+ * - In the first approach, the right hand side entries for constrained
+ *   degrees of freedom are zero, i.e., the norm of the right hand side
+ *   really only consists of those parts that we care about. On the other
+ *   hand, if we start with a solution vector that is not zero in
+ *   constrained entries, then the initial residual is very large because
+ *   the value that is currently in the solution vector does not match the
+ *   solution of the linear system (which is zero in these components).
+ *   Thus, if we stop iterations once we have reduced the initial residual
+ *   by a certain factor, we may reach the threshold after a single
+ *   iteration because constrained degrees of freedom are resolved by
+ *   iterative solvers in just one iteration. If the initial residual
+ *   was dominated by these degrees of freedom, then we see a steep
+ *   reduction in the first step although we did not really make much
+ *   progress on the remainder of the linear system in this just one
+ *   iteration. We can avoid this problem by either stopping iterations
+ *   once the norm of the residual reaches a certain fraction of the
+ *   <i>norm of the right hand side</i>, or we can set the solution
+ *   components to zero (thus reducing the initial residual) and iterating
+ *   until we hit a certain fraction of the <i>norm of the initial
+ *   residual</i>.
+ * - In the second approach, we get the same problem if the starting vector
+ *   in the iteration is zero, since then then the residual may be
+ *   dominated by constrained degrees of freedom having values that do not
+ *   match the values we want for them at the solution. We can again
+ *   circumvent this problem by setting the corresponding elements of the
+ *   solution vector to their correct values, by calling
+ *   ConstraintMatrix::distribute() <i>before</i> solving the linear system
+ *   (and then, as necessary, a second time after solving).
+ *
+ * In addition to these considerations, consider the case where we have
+ * inhomogeneous constraints of the kind $x_{3}=\tfrac 12 x_1 + \tfrac 12$,
+ * e.g., from a hanging node constraint of the form $x_{3}=\tfrac 12 (x_1 +
+ * x_2)$ where $x_2$ is itself constrained by boundary values to $x_2=1$.
+ * In this case, the ConstraintMatrix can of course not figure out what
+ * the final value of $x_3$ should be and, consequently, can not set the
+ * solution vector's third component correctly. Thus, the second approach will
+ * not work and you should take the first.
  *
  *
  * <h3>Dealing with conflicting constraints</h3>
@@ -336,12 +415,12 @@
  *   hanging node constraints at this point and consequently would not
  *   satisfy the regularity properties of the element chosen (e.g. would not
  *   be continuous despite using a $Q_1$ element).
- * - The situation becomes completely hopeless if you consider 
+ * - The situation becomes completely hopeless if you consider
  *   curved boundaries since then the edge midpoint (i.e. the hanging node)
  *   does in general not lie on the mother edge. Consequently, the solution
  *   will not be $H^1$ conforming anyway, regardless of the priority of
  *   the two competing constraints. If the hanging node constraint wins, then
- *   the solution will be neither conforming, nor have the right boundary 
+ *   the solution will be neither conforming, nor have the right boundary
  *   values.
  * In other words, it is not entirely clear what the "correct" solution would
  * be. In most cases, it will not matter much: in either case, the error

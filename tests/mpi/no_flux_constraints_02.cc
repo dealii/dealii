@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: no_flux_constraints.cc 24175 2011-08-24 12:14:21Z kronbichler $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009, 2010 by the deal.II authors
@@ -111,7 +111,7 @@ void test()
   ConstraintMatrix constraints;
   constraints.reinit(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, constraints);
-  std::set<unsigned char> no_normal_flux_boundaries;
+  std::set<types::boundary_id_t> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (1);
   const unsigned int degree = 1;
 /*  VectorTools::compute_no_normal_flux_constraints (dofh, 0,

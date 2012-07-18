@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,7 +44,7 @@ namespace parallel
  * can be read. On the other hand, ghosted vectors are generally not writable,
  * so for calls to interpolate() or deserialize() you need to supply
  * distributed vectors without ghost elements.
- * 
+ *
  * <h3>Transfering a solution</h3>
  * Here VECTOR is your favorite vector type, e.g. PETScWrappers::MPI::Vector,
  * TrilinosWrappers::MPI::Vector, or corresponding blockvectors.
@@ -78,7 +78,7 @@ namespace parallel
  *
  * If vector has the locally relevant DoFs, serialization works as follows:
  *@verbatim
- 
+
 parallel::distributed::SolutionTransfer<dim,VECTOR> sol_trans(dof_handler);
 sol_trans.prepare_serialization (vector);
 
@@ -92,7 +92,7 @@ triangulation.load(filename);
 parallel::distributed::SolutionTransfer<dim,VECTOR> sol_trans(dof_handler);
 sol_trans.deserialize (distributed_vector);
 @endverbatim
- * 
+ *
  * @ingroup distributed
  * @author Timo Heister, 2009-2011
  */
@@ -100,160 +100,160 @@ sol_trans.deserialize (distributed_vector);
     class SolutionTransfer
     {
       public:
-					 /**
-					  * Constructor, takes the current DoFHandler
-					  * as argument.
-					  */
-	SolutionTransfer(const DH &dof);
-					 /**
-					  * Destructor.
-					  */
-	~SolutionTransfer();
+                                         /**
+                                          * Constructor, takes the current DoFHandler
+                                          * as argument.
+                                          */
+        SolutionTransfer(const DH &dof);
+                                         /**
+                                          * Destructor.
+                                          */
+        ~SolutionTransfer();
 
-					 /**
-					  * Prepares the @p SolutionTransfer for
-					  * coarsening and refinement. It
-					  * stores the dof indices of each cell and
-					  * stores the dof values of the vectors in
-					  * @p all_in in each cell that'll be coarsened.
-					  * @p all_in includes all vectors
-					  * that are to be interpolated
-					  * onto the new (refined and/or
-					  * coarsenend) grid.
-					  */
-	void prepare_for_coarsening_and_refinement (const std::vector<const VECTOR*> &all_in);
+                                         /**
+                                          * Prepares the @p SolutionTransfer for
+                                          * coarsening and refinement. It
+                                          * stores the dof indices of each cell and
+                                          * stores the dof values of the vectors in
+                                          * @p all_in in each cell that'll be coarsened.
+                                          * @p all_in includes all vectors
+                                          * that are to be interpolated
+                                          * onto the new (refined and/or
+                                          * coarsenend) grid.
+                                          */
+        void prepare_for_coarsening_and_refinement (const std::vector<const VECTOR*> &all_in);
 
-					 /**
-					  * Same as previous function
-					  * but for only one discrete function
-					  * to be interpolated.
-					  */
-	void prepare_for_coarsening_and_refinement (const VECTOR &in);
+                                         /**
+                                          * Same as previous function
+                                          * but for only one discrete function
+                                          * to be interpolated.
+                                          */
+        void prepare_for_coarsening_and_refinement (const VECTOR &in);
 
-					 /**
-					  *
-					  */
-	void interpolate (std::vector<VECTOR*> &all_out);
+                                         /**
+                                          *
+                                          */
+        void interpolate (std::vector<VECTOR*> &all_out);
 
-					 /**
-					  * Same as the previous function.
-					  * It interpolates only one function.
-					  * It assumes the vectors having the
-					  * right sizes (i.e. <tt>in.size()==n_dofs_old</tt>,
-					  * <tt>out.size()==n_dofs_refined</tt>)
-					  *
-					  * Multiple calling of this function is
-					  * NOT allowed. Interpolating
-					  * several functions can be performed
-					  * in one step by using
-					  * <tt>interpolate (all_in, all_out)</tt>
-					  */
-	void interpolate (VECTOR &out);
-
-
-					 /**
-					  * Return the size in bytes that need
-					  * to be stored per cell.
-					  */
-	unsigned int get_data_size() const;
+                                         /**
+                                          * Same as the previous function.
+                                          * It interpolates only one function.
+                                          * It assumes the vectors having the
+                                          * right sizes (i.e. <tt>in.size()==n_dofs_old</tt>,
+                                          * <tt>out.size()==n_dofs_refined</tt>)
+                                          *
+                                          * Multiple calling of this function is
+                                          * NOT allowed. Interpolating
+                                          * several functions can be performed
+                                          * in one step by using
+                                          * <tt>interpolate (all_in, all_out)</tt>
+                                          */
+        void interpolate (VECTOR &out);
 
 
-					 /**
-					 * Prepare the serialization of the
-					 * given vector. The serialization is
-					 * done by Triangulation::save(). The
-					 * given vector needs all information
-					 * on the locally active DoFs (it must
-					 * be ghosted). See documentation of
-					 * this class for more information.
-					 */
-	void prepare_serialization(const VECTOR &in);
+                                         /**
+                                          * Return the size in bytes that need
+                                          * to be stored per cell.
+                                          */
+        unsigned int get_data_size() const;
 
 
-					 /**
-					  * Same as the function above, only
-					  * for a list of vectors.
-					  */
-	void prepare_serialization(const std::vector<const VECTOR*> &all_in);
+                                         /**
+                                         * Prepare the serialization of the
+                                         * given vector. The serialization is
+                                         * done by Triangulation::save(). The
+                                         * given vector needs all information
+                                         * on the locally active DoFs (it must
+                                         * be ghosted). See documentation of
+                                         * this class for more information.
+                                         */
+        void prepare_serialization(const VECTOR &in);
 
 
-					 /**
-					  * Execute the deserialization of the
-					  * given vector. This needs to be
-					  * done after calling
-					  * Triangulation::load(). The given
-					  * vector must be a fully distributed
-					  * vector without ghost elements. See
-					  * documentation of this class for
-					  * more information.
-					  */
-	void deserialize(VECTOR &in);
+                                         /**
+                                          * Same as the function above, only
+                                          * for a list of vectors.
+                                          */
+        void prepare_serialization(const std::vector<const VECTOR*> &all_in);
 
 
-					 /**
-					  * Same as the function above, only
-					  * for a list of vectors.
-					  */
-	void deserialize(std::vector<VECTOR*> &all_in);
+                                         /**
+                                          * Execute the deserialization of the
+                                          * given vector. This needs to be
+                                          * done after calling
+                                          * Triangulation::load(). The given
+                                          * vector must be a fully distributed
+                                          * vector without ghost elements. See
+                                          * documentation of this class for
+                                          * more information.
+                                          */
+        void deserialize(VECTOR &in);
+
+
+                                         /**
+                                          * Same as the function above, only
+                                          * for a list of vectors.
+                                          */
+        void deserialize(std::vector<VECTOR*> &all_in);
 
       private:
-					 /**
-					  * Pointer to the degree of
-					  * freedom handler to work
-					  * with.
-					  */
-	SmartPointer<const DH,SolutionTransfer<dim,VECTOR,DH> > dof_handler;
+                                         /**
+                                          * Pointer to the degree of
+                                          * freedom handler to work
+                                          * with.
+                                          */
+        SmartPointer<const DH,SolutionTransfer<dim,VECTOR,DH> > dof_handler;
 
-					 /**
-					  * A vector that stores
-					  * pointers to all the
-					  * vectors we are supposed to
-					  * copy over from the old to
-					  * the new mesh.
-					  */
-	std::vector<const VECTOR*> input_vectors;
+                                         /**
+                                          * A vector that stores
+                                          * pointers to all the
+                                          * vectors we are supposed to
+                                          * copy over from the old to
+                                          * the new mesh.
+                                          */
+        std::vector<const VECTOR*> input_vectors;
 
-					 /**
-					  * The offset that the
-					  * Triangulation has assigned
-					  * to this object starting at
-					  * which we are allowed to
-					  * write.
-					  */
-	unsigned int offset;
+                                         /**
+                                          * The offset that the
+                                          * Triangulation has assigned
+                                          * to this object starting at
+                                          * which we are allowed to
+                                          * write.
+                                          */
+        unsigned int offset;
 
-					 /**
-					  * A callback function used
-					  * to pack the data on the
-					  * current mesh into objects
-					  * that can later be
-					  * retrieved after
-					  * refinement, coarsening and
-					  * repartitioning.
-					  */
-	void pack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell,
-			   const typename Triangulation<dim,dim>::CellStatus status,
-			   void* data);
+                                         /**
+                                          * A callback function used
+                                          * to pack the data on the
+                                          * current mesh into objects
+                                          * that can later be
+                                          * retrieved after
+                                          * refinement, coarsening and
+                                          * repartitioning.
+                                          */
+        void pack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell,
+                           const typename Triangulation<dim,dim>::CellStatus status,
+                           void* data);
 
-					 /**
-					  * A callback function used
-					  * to unpack the data on the
-					  * current mesh that has been
-					  * packed up previously on
-					  * the mesh before
-					  * refinement, coarsening and
-					  * repartitioning.
-					  */
-	void unpack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell,
-			     const typename Triangulation<dim,dim>::CellStatus status,
-			     const void* data,
-			     std::vector<VECTOR*> &all_out);
+                                         /**
+                                          * A callback function used
+                                          * to unpack the data on the
+                                          * current mesh that has been
+                                          * packed up previously on
+                                          * the mesh before
+                                          * refinement, coarsening and
+                                          * repartitioning.
+                                          */
+        void unpack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell,
+                             const typename Triangulation<dim,dim>::CellStatus status,
+                             const void* data,
+                             std::vector<VECTOR*> &all_out);
 
 
-	/**
-	 *
-	 */
-	void register_data_attach(const std::size_t size);
+        /**
+         *
+         */
+        void register_data_attach(const std::size_t size);
 
     };
 

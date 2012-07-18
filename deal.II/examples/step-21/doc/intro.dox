@@ -30,7 +30,7 @@ To derive the governing equations, consider two phase flow in a
 reservoir $\Omega$ under the assumption that the movement of fluids is
 dominated by viscous effects; i.e. we neglect the effects of gravity,
 compressibility, and capillary pressure. Porosity will be considered
-to be constant. We will denote variables refering to either of the two
+to be constant. We will denote variables referring to either of the two
 phases using subscripts $w$ and $o$, short for water and oil. The
 derivation of the equations holds for other pairs of fluids as well,
 however.

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,17 +32,17 @@ namespace Functions
   {
     public:
       Bessel1(const unsigned int order,
-	      const double wave_number,
-	      const Point<dim> center = Point<dim>());
+              const double wave_number,
+              const Point<dim> center = Point<dim>());
       virtual double value (const Point<dim>& points, const unsigned int component) const;
       virtual void value_list (const std::vector<Point<dim> > &points,
-			       std::vector<double>            &values,
-			       const unsigned int              component = 0) const;
+                               std::vector<double>            &values,
+                               const unsigned int              component = 0) const;
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				      const unsigned int  component = 0) const;
+                                      const unsigned int  component = 0) const;
       virtual void gradient_list (const std::vector<Point<dim> > &points,
-				  std::vector<Tensor<1,dim> >    &gradients,
-				  const unsigned int              component = 0) const;
+                                  std::vector<Tensor<1,dim> >    &gradients,
+                                  const unsigned int              component = 0) const;
     private:
       unsigned int order;
       double wave_number;

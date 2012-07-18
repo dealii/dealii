@@ -45,7 +45,7 @@ of the deal.II linear algebra classes, but instead of implementing this
 functionality themselves, they simply pass on to their corresponding PETSc
 functions. The wrappers are therefore only used to give PETSc a more modern,
 object oriented interface, and to make the use of PETSc and deal.II objects as
-interchangable as possible.
+interchangeable as possible.
 
 
 

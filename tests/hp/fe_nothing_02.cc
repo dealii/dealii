@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -95,18 +95,19 @@ void test ()
 
   for(; cell !=endc; cell++)
     {
-
-				       // attempt to reinit hp_fe_values object
-
-      hp_fe_values.reinit (cell);
-
-      const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
-      const FEValues<dim>  &fe_values    = hp_fe_values.get_present_fe_values ();
-
       deallog << "This is a "
 	      << (cell->active_fe_index() == 1 ? "FE_Nothing" : "FE_Q")
 	      << " cell"
 	      << std::endl;
+
+      if (cell->get_fe().dofs_per_cell == 0)
+	continue;
+
+				       // attempt to reinit hp_fe_values object
+      hp_fe_values.reinit (cell);
+
+      const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
+      const FEValues<dim>  &fe_values    = hp_fe_values.get_present_fe_values ();
 
       for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
 	{

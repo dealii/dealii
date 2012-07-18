@@ -512,7 +512,7 @@ the fact that we use an incomplete basis - this will increase the number of
 required iterations.
 
 BiCGStab, on the other hand, won't get slower when many iterations are needed
-(one iteration uses only results from one preceeding step and
+(one iteration uses only results from one preceding step and
 not all the steps as GMRES). Besides the fact the BiCGStab is more expensive per
 step since two matrix-vector products are needed (compared to one for
 CG or GMRES), there is one main reason which makes BiCGStab not appropriate for
@@ -753,7 +753,7 @@ interesting cases. The original motivation to write this program was for it to
 be a starting point for some geophysical flow problems, such as the
 movement of magma under places where continental plates drift apart (for
 example mid-ocean ridges). Of course, in such places, the geometry is more
-complicated than the examples shown above, but it is not hard to accomodate
+complicated than the examples shown above, but it is not hard to accommodate
 for that.
 
 For example, by using the folllowing modification of the boundary values

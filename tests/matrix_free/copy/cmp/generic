@@ -1,0 +1,49 @@
+
+DEAL:2d::Test doubles
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::
+DEAL:2d::Test floats
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::
+DEAL:2d::Test doubles
+DEAL:2d::Testing FE_Q<2>(2)
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::
+DEAL:2d::Test floats
+DEAL:2d::Testing FE_Q<2>(2)
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::Error in copied MF: 0
+DEAL:2d::
+DEAL:3d::Test doubles
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Error in copied MF: 0
+DEAL:3d::Error in copied MF: 0
+DEAL:3d::
+DEAL:3d::Test floats
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Error in copied MF: 0
+DEAL:3d::Error in copied MF: 0
+DEAL:3d::
+DEAL:3d::Test doubles
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Error in copied MF: 0
+DEAL:3d::Error in copied MF: 0
+DEAL:3d::
+DEAL:3d::Test floats
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Error in copied MF: 0
+DEAL:3d::Error in copied MF: 0
+DEAL:3d::

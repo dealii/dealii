@@ -45,13 +45,117 @@ used for boundary indicators.
 <a name="general"></a>
 <h3>General</h3>
 
+
 <ol>
+<li> Fixed: Using the SolutionTransfer class with hp::DoFHandler
+and on meshes where some cells are associated with a FE_Nothing element
+could result in an error. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2012/06/29)
+
+<li> Fixed: The MappingQ1::transform_real_to_unit_cell function as
+well as the equivalent ones in derived classes sometimes get into
+trouble if they are asked to compute the preimage of this point
+in reference cell coordinates. This is because for points outside
+the reference cell, the mapping from unit to real cell is not
+necessarily invertible, and consequently the Newton iteration to
+find the preimage did not always converge, leading to an exception.
+While this is not entirely wrong (we could, after all, not compute
+the desired quantity), not all callers of this function were prepared
+to accept this result -- in particular, the function
+CellAccessor<3>::point_inside should have really just returned false
+in such cases but instead let the exception so generated propagate
+through. This should now be fixed.
+<br>
+(Wolfgang Bangerth, Eric Heien, Sebastian Pauletti, 2012/06/27)
+
+<li> Fixed: The function VectorTools::compute_no_normal_flux_constraints had
+a bug that led to an exception whenever we were computing constraints for
+vector fields located on edges shared between two faces of a 3d cell if those
+faces were not parallel to the axes of the coordinate system. This is now fixed.
+<br>
+(Wolfgang Bangerth, Jennifer Worthen, 2012/06/27)
+
+<li>
+Fixed: Due to an apparent bug in autoconf, it was not possible to
+override the <code>F77</code> environment variable to select anything
+else than gfortran. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2012/06/08)
+
+<li>
+New: step-43 is an extension of step-21 that shows efficient methods
+to solve multi-phase flow.
+<br>
+(Chih-Che Chueh, Wolfgang Bangerth, 2012/06/06)
+
+<li>
+New: step-15 has been replaced by a program that demonstrates the
+solution of nonlinear problem (the minimal surface equation) using
+Newton's method.
+<br>
+(Sven Wetterauer, 2012/06/03)
+
+<li>
+New: step-48 demonstrates the solution of a nonlinear wave equation
+with an explicit time stepping method. The usage of Gauss-Lobatto
+elements gives diagonal mass matrices, which obviates the solution of
+linear systems of equations. The nonlinear right hand side is
+evaluated with the matrix-free framework.
+<br>
+(Katharina Kormann and Martin Kronbichler, 2012/05/05)
+
+<li>
+New: step-37 shows how the matrix-free framework can be utilized to
+efficiently solve the Poisson equation without building global
+matrices. It combines fast operator evaluation with a multigrid solver
+based on polynomial Chebyshev smoother.
+<br>
+(Katharina Kormann and Martin Kronbichler, 2012/05/05)
+
+<li>
+New: A new matrix-free interface has been implemented. The framework
+is parallelized with MPI, TBB, and explicit vectorization instructions
+(new data type VectorizedArray). The class MatrixFree caches
+cell-based data in an efficient way. Common operations can be
+implemented using the FEEvaluation class.
+<br>
+(Katharina Kormann and Martin Kronbichler, 2012/05/05)
+
+<li>
+New: step-44 demonstrates one approach to modeling large
+deformations of nearly-incompressible elastic solids. The
+elastic response is governed by a non-linear, hyperelastic
+free-energy function. The geometrical response is also
+nonlinear, i.e., the program considers finite deformations.
+<br>
+(Andrew McBride and Jean-Paul Pelteret, 2012/04/25)
+
+<li>
+Changed: The version of BOOST we ship with deal.II has been upgraded
+to 1.49.0.
+<br>
+(Martin Kronbichler, 2012/04/07)
+
+<li>
+New: We have added a brief section to the step-12 tutorial programs that
+compares the DG solution computed there with one that one would obtain by
+using a continuous finite element.
+<br>
+(Wolfgang Bangerth, 2012/03/25)
+
+<li>
+New: Added support for codimension 2, i.e. for dim-dimensional objects
+embedded into spacedim=dim+2 dimensional space.
+<br>
+(Sebastian Pauletti, 2012/03/02)
+
 <li> Changed: Material and Boundary indicators have been both of the
 type unsigned char. Throughout the library, we changed their datatype
 to <code>types::material_id_t</code>
 resp. <code>types::boundary_id_t</code>, both typedefs of unsigned
 char. Internal faces are now characterized by
-types::internal_face_boundary_id(<code>=static_cast<boundary_id_t>(-1)</code>)
+types::internal_face_boundary_id(<code>=static_cast@<boundary_id_t@>(-1)</code>)
 instead of 255, so we get rid of that mysterious number in the source
 code.  Material_ids are also assumed to lie in the range from 0 to
 types::invalid_material_id-1 (where <code>types::invalid_material_id =
@@ -59,7 +163,7 @@ static_cast<material_id_t>(-1)</code>). With this change, it is now
 much easier to extend the range of boundary or material ids, if
 needed.
 <br>
-(Wolfgang Bangerth, Christian Goll 2012/02/27)
+(Christian Goll 2012/02/27)
 
 <li> New: Functions like FEValues::get_function_values have long been
 able to extract values from pretty much any vector kind given to it (e.g.
@@ -144,7 +248,113 @@ enabled due to a missing include file in file
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
+<li> Fixed: TrilinosWrappers::VectorBase::swap() is now working as expected. (thanks Uwe Köcher)
+<br>
+(Timo Heister 2012/07/03)
+
+<li> Fixed: Some instantiations for
+DerivativeApproximation::approximate_derivative_tensor() were missing.
+<br>
+(Timo Heister 2012/06/07)
+
+<li> New: The finite element type FE_DGQArbitraryNodes is now
+working also in codimension one spaces.
+<br>
+(Luca Heltai, Andrea Mola 2012/06/06)
+
 <ol>
+<li> Fixed: Computing the $W^{1,\infty}$ norm and seminorm in
+VectorTools::integrate_difference was not implemented. This is now
+fixed.
+<br>
+(Wolfgang Bangerth 2012/06/02)
+
+<li> Fixed: A problem in MappingQ::transform_real_to_unit_cell
+that sometimes led the algorithm in this function to abort.
+<br>
+(Wolfgang Bangerth 2012/05/30)
+
+<li> New: The function DataOutInterface::write_pvd_record can be used
+to provide Paraview with metadata that describes which time in a
+simulation a particular output file corresponds to.
+<br>
+(Marco Engelhard 2012/05/30)
+
+<li> Fixed: A bug in 3d with hanging nodes in GridTools::find_cells_adjacent_to_vertex()
+that caused find_active_cell_around_point() to fail in those cases.
+<br>
+(Timo Heister, Wolfgang Bangerth 2012/05/30)
+
+<li> New: DoFTools::make_periodicity_constraints implemented which
+inserts algebraic constraints due to periodic boundary conditions
+into a ConstraintMatrix.
+<br>
+(Matthias Maier, 2012/05/22)
+
+<li> New: The GridIn::read_unv function can now read meshes generated
+by the Salome framework, see http://www.salome-platform.org/ .
+<br>
+(Valentin Zingan, 2012/04/27)
+
+<li> New: There is now a second DoFTools::map_dofs_to_support_points
+function that also works for parallel::distributed::Triangulation
+triangulations.
+<br>
+(Wolfgang Bangerth, 2012/04/26)
+
+<li> New: There is now a second DoFTools::extract_boundary_dofs
+function that also works for parallel::distributed::Triangulation
+triangulations.
+<br>
+(Wolfgang Bangerth, 2012/04/26)
+
+<li> New: The FullMatrix::extract_submatrix_from, FullMatrix::scatter_matrix_to,
+FullMatrix::set functions are new.
+<br>
+(Andrew McBride, Jean Paul Pelteret, Wolfgang Bangerth, 2012/04/24)
+
+<li> Fixed:
+The method FEValues<dim>::inverse_jacobian() previously returned the transpose of the
+inverse Jacobians instead of just the inverse Jacobian as documented. This is now fixed.
+<br>
+(Sebastian Pauletti, Katharina Kormann, Martin Kronbichler, 2012/03/11)
+
+<li> Extended:
+SolutionTransfer is now also able to transfer solutions between hp::DoFHandler where
+the finite element index changes during refinement.
+<br>
+(Katharina Kormann, Martin Kronbichler, 2012/03/10)
+
+<li> Changed:
+A new method to determine an initial guess for the Newton method was coded
+in MappingQ::transform_real_to_unit_cell.
+The code in transform_real_to_unit_cell was cleaned a little bit and a new code
+for the @<2,3@> case was added.
+<br>
+(Sebastian Pauletti, 2012/03/02)
+
+<li> Changed:
+In the context of codim@>0, Mapping::transform would require different inputs
+depending on the mapping type.
+For mapping_covariant, mapping_contravariant the input is DerivativeForm<1, dim, spacedim>
+but for mapping_covariant_gradient,  mapping_contravariant_gradient the input is Tensor<2,dim>.
+<br>
+(Sebastian Pauletti,  2012/03/02)
+
+<li> New:
+A new class DerivativeForm was added.
+This class is supposed to represent the derivatives of a mapping.
+<br>
+(Sebastian Pauletti, 2012/03/02)
+
+<li> Fixed: TrilinosWrappers::Vector::all_zero() in parallel.
+<br>
+(Timo Heister, J&ouml;rg Frohne, 2012/03/06)
+
+<li> New: GridGenerator::quarter_hyper_shell() in 3d.
+<br>
+(Thomas Geenen, 2012/03/05)
+
 <li> New: DataOut::write_vtu_in_parallel(). This routine uses MPI I/O to write
 a big vtu file in parallel.
 <br>
@@ -215,8 +425,8 @@ a valid output file.
 <li> Improved: <code>PETScWrappers::SolverXXX</code> class was
 restricted to using default solver options for the KSP only. It is now
 possible to override those by using PETSc command-line options
-<code>-ksp_*</code>; giving greater flexability in controling PETSc
-solvers. (See class documentation).
+<code>-ksp_*</code>; giving greater flexibility in controlling PETSc
+solvers. (See the class's documentation).
 <br>
 (Vijay S. Mahadevan, 2011/12/22)
 

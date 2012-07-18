@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,35 +55,35 @@ namespace Algorithms
   class Operator : public Subscriptor
   {
     public:
-				       /**
-					* The virtual destructor.
-					*/
+                                       /**
+                                        * The virtual destructor.
+                                        */
       ~Operator();
 
-				       /**
-					* The actual operation, which
-					* is implemented in a derived class.
-					*/
+                                       /**
+                                        * The actual operation, which
+                                        * is implemented in a derived class.
+                                        */
       virtual void operator() (NamedData<VECTOR*>& out, const NamedData<VECTOR*>& in) = 0;
 
-				       /**
-					* Register an event triggered
-					* by an outer iteration.
-					*/
+                                       /**
+                                        * Register an event triggered
+                                        * by an outer iteration.
+                                        */
       virtual void notify(const Event&);
-				       /**
-					* Clear all #notifications.
-					*/
+                                       /**
+                                        * Clear all #notifications.
+                                        */
       void clear_events();
     protected:
-				       /**
-					* Accumulate reasons for
-					* reassembling here. If any of
-					* those is set, the function
-					* solve() of a terminal
-					* application must take care
-					* of reassembling the matrix.
-					*/
+                                       /**
+                                        * Accumulate reasons for
+                                        * reassembling here. If any of
+                                        * those is set, the function
+                                        * solve() of a terminal
+                                        * application must take care
+                                        * of reassembling the matrix.
+                                        */
       Event notifications;
   };
 
@@ -99,26 +99,27 @@ namespace Algorithms
     OutputOperator(const OutputOperator<VECTOR>&);
     public:
     OutputOperator ();
-				       /**
-					* Empty virtual destructor.
-					*/
+                                       /**
+                                        * Empty virtual destructor.
+                                        */
       virtual ~OutputOperator();
+
       /**
-       * Set the stream #os to
+       * Set the stream @p os to
        * which data is written. If
        * no stream is selected with
        * this function, data goes
-       * to #deallog.
+       * to @p deallog.
        */
       void initialize_stream(std::ostream& stream);
-				       /**
-					* Set the current step.
-					*/
+                                       /**
+                                        * Set the current step.
+                                        */
       OutputOperator<VECTOR>& operator<< (unsigned int step);
 
-				       /**
-					* Output all the vectors in NamedData.
-					*/
+                                       /**
+                                        * Output all the vectors in NamedData.
+                                        */
       virtual OutputOperator<VECTOR>& operator<< (const NamedData<VECTOR*>& vectors);
     protected:
       unsigned int step;

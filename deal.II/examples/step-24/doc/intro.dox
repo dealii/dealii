@@ -119,7 +119,7 @@ v = \frac{\partial\bar{p}}{\partial t}
 @f]
 
 With the second variables, one then transform the forward problem into
-two seperate equations:
+two separate equations:
 @f{eqnarray*}
 \bar{p}_{t} - v & = & 0 \\
 \Delta\bar{p} - \frac{1}{c_0^2}\,v_{t} & = & f 

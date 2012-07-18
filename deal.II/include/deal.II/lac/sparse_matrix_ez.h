@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -66,7 +66,7 @@ template<typename number> class FullMatrix;
  *
  * Finally, the @p default_reserve allocates extra space at the end
  * of the data array. This space is used whenever a row must be
- * enlarged. Since @p std::vector doubles the capacity everytime it
+ * enlarged. Since @p std::vector doubles the capacity every time it
  * must increase it, this value should allow for all the growth needed.
  *
  * Suggested settings: @p default_row_length should be the length of
@@ -96,84 +96,84 @@ template <typename number>
 class SparseMatrixEZ : public Subscriptor
 {
   public:
-				     /**
-				      * The class for storing the
-				      * column number of an entry
-				      * together with its value.
-				      */
+                                     /**
+                                      * The class for storing the
+                                      * column number of an entry
+                                      * together with its value.
+                                      */
     struct Entry
     {
-					 /**
-					  * Standard constructor. Sets
-					  * @p column to
-					  * @p invalid.
-					  */
-	Entry();
+                                         /**
+                                          * Standard constructor. Sets
+                                          * @p column to
+                                          * @p invalid.
+                                          */
+        Entry();
 
-					 /**
-					  * Constructor. Fills column
-					  * and value.
-					  */
-	Entry (const unsigned int column,
-	       const number& value);
-	
-					 /**
-					  * The column number.
-					  */
-	unsigned int column;
+                                         /**
+                                          * Constructor. Fills column
+                                          * and value.
+                                          */
+        Entry (const unsigned int column,
+               const number& value);
 
-					 /**
-					  * The value there.
-					  */
-	number value;
+                                         /**
+                                          * The column number.
+                                          */
+        unsigned int column;
 
-					 /**
-					  * Non-existent column number.
-					  */
-	static const unsigned int invalid = numbers::invalid_unsigned_int;
+                                         /**
+                                          * The value there.
+                                          */
+        number value;
+
+                                         /**
+                                          * Non-existent column number.
+                                          */
+        static const unsigned int invalid = numbers::invalid_unsigned_int;
     };
 
-				     /**
-				      * Structure for storing
-				      * information on a matrix
-				      * row. One object for each row
-				      * will be stored in the matrix.
-				      */
+                                     /**
+                                      * Structure for storing
+                                      * information on a matrix
+                                      * row. One object for each row
+                                      * will be stored in the matrix.
+                                      */
     struct RowInfo
     {
-					 /**
-					  * Constructor.
-					  */
-	RowInfo (unsigned int start = Entry::invalid);
-	
-					 /**
-					  * Index of first entry of
-					  * the row in the data field.
-					  */
-	unsigned int start;
-					 /**
-					  * Number of entries in this
-					  * row.
-					  */
-	unsigned short length;
-					 /**
-					  * Position of the diagonal
-					  * element relative tor the
-					  * start index.
-					  */
-	unsigned short diagonal;
-					 /**
-					  * Value for non-existing diagonal.
-					  */
-	static const unsigned short
-	invalid_diagonal = static_cast<unsigned short>(-1);
+                                         /**
+                                          * Constructor.
+                                          */
+        RowInfo (unsigned int start = Entry::invalid);
+
+                                         /**
+                                          * Index of first entry of
+                                          * the row in the data field.
+                                          */
+        unsigned int start;
+                                         /**
+                                          * Number of entries in this
+                                          * row.
+                                          */
+        unsigned short length;
+                                         /**
+                                          * Position of the diagonal
+                                          * element relative tor the
+                                          * start index.
+                                          */
+        unsigned short diagonal;
+                                         /**
+                                          * Value for non-existing diagonal.
+                                          */
+        static const unsigned short
+        invalid_diagonal = static_cast<unsigned short>(-1);
     };
 
   public:
 
-				     /**
-				      * STL conforming iterator.
-				      */
+                                     /**
+                                      * STL conforming iterator.
+                                      */
     class const_iterator
     {
       private:
@@ -218,7 +218,7 @@ class SparseMatrixEZ : public Subscriptor
                                               * Value of this matrix entry.
                                               */
             number value() const;
-	
+
           protected:
                                              /**
                                               * The matrix accessed.
@@ -241,38 +241,38 @@ class SparseMatrixEZ : public Subscriptor
                                               */
             friend class const_iterator;
         };
-          
+
       public:
                                          /**
                                           * Constructor.
-                                          */ 
-	const_iterator(const SparseMatrixEZ<number> *matrix,
-		       const unsigned int            row,
-		       const unsigned short          index);
-	  
+                                          */
+        const_iterator(const SparseMatrixEZ<number> *matrix,
+                       const unsigned int            row,
+                       const unsigned short          index);
+
                                          /**
                                           * Prefix increment. This
                                           * always returns a valid
                                           * entry or <tt>end()</tt>.
                                           */
-	const_iterator& operator++ ();
+        const_iterator& operator++ ();
 
                                          /**
                                           * Postfix increment. This
                                           * always returns a valid
                                           * entry or <tt>end()</tt>.
                                           */
-	const_iterator& operator++ (int);
+        const_iterator& operator++ (int);
 
                                          /**
                                           * Dereferencing operator.
                                           */
-	const Accessor& operator* () const;
+        const Accessor& operator* () const;
 
                                          /**
                                           * Dereferencing operator.
                                           */
-	const Accessor* operator-> () const;
+        const Accessor* operator-> () const;
 
                                          /**
                                           * Comparison. True, if
@@ -280,11 +280,11 @@ class SparseMatrixEZ : public Subscriptor
                                           * the same matrix
                                           * position.
                                           */
-	bool operator == (const const_iterator&) const;
+        bool operator == (const const_iterator&) const;
                                          /**
                                           * Inverse of <tt>==</tt>.
                                           */
-	bool operator != (const const_iterator&) const;
+        bool operator != (const const_iterator&) const;
 
                                          /**
                                           * Comparison
@@ -295,7 +295,7 @@ class SparseMatrixEZ : public Subscriptor
                                           * equal and the first
                                           * index is smaller.
                                           */
-	bool operator < (const const_iterator&) const;
+        bool operator < (const const_iterator&) const;
 
       private:
                                          /**
@@ -304,84 +304,84 @@ class SparseMatrixEZ : public Subscriptor
                                           */
         Accessor accessor;
 
-					 /**
-					  * Make the enclosing class a
-					  * friend. This is only
-					  * necessary since icc7
-					  * otherwise wouldn't allow
-					  * us to make
-					  * const_iterator::Accessor a
-					  * friend, stating that it
-					  * can't access this class --
-					  * this is of course bogus,
-					  * since granting friendship
-					  * doesn't need access to the
-					  * class being granted
-					  * friendship...
-					  */
-#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG	
-	template <typename> friend class SparseMatrixEZ;
+                                         /**
+                                          * Make the enclosing class a
+                                          * friend. This is only
+                                          * necessary since icc7
+                                          * otherwise wouldn't allow
+                                          * us to make
+                                          * const_iterator::Accessor a
+                                          * friend, stating that it
+                                          * can't access this class --
+                                          * this is of course bogus,
+                                          * since granting friendship
+                                          * doesn't need access to the
+                                          * class being granted
+                                          * friendship...
+                                          */
+#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
+        template <typename> friend class SparseMatrixEZ;
 #endif
     };
-    
-				     /**
-				      * Type of matrix entries. In analogy to
-				      * the STL container classes.
-				      */
+
+                                     /**
+                                      * Type of matrix entries. In analogy to
+                                      * the STL container classes.
+                                      */
     typedef number value_type;
 
 /**
  * @name Constructors and initalization
  */
 //@{
-				     /**
-				      * Constructor. Initializes an
-				      * empty matrix of dimension zero
-				      * times zero.
-				      */
+                                     /**
+                                      * Constructor. Initializes an
+                                      * empty matrix of dimension zero
+                                      * times zero.
+                                      */
     SparseMatrixEZ ();
 
-				     /**
-				      * Dummy copy constructor. This
-				      * is here for use in
-				      * containers. It may only be
-				      * called for empty objects.
-				      *
-				      * If you really want to copy a whole
-				      * matrix, you can do so by using the
-				      * @p copy_from function.
-				      */
+                                     /**
+                                      * Dummy copy constructor. This
+                                      * is here for use in
+                                      * containers. It may only be
+                                      * called for empty objects.
+                                      *
+                                      * If you really want to copy a whole
+                                      * matrix, you can do so by using the
+                                      * @p copy_from function.
+                                      */
     SparseMatrixEZ (const SparseMatrixEZ &);
 
-				     /**
-				      * Constructor. Generates a
-				      * matrix of the given size,
-				      * ready to be filled. The
-				      * optional parameters
-				      * @p default_row_length and
-				      * @p default_increment allow
-				      * for preallocating
-				      * memory. Providing these
-				      * properly is essential for an
-				      * efficient assembling of the
-				      * matrix.
-				      */
+                                     /**
+                                      * Constructor. Generates a
+                                      * matrix of the given size,
+                                      * ready to be filled. The
+                                      * optional parameters
+                                      * @p default_row_length and
+                                      * @p default_increment allow
+                                      * for preallocating
+                                      * memory. Providing these
+                                      * properly is essential for an
+                                      * efficient assembling of the
+                                      * matrix.
+                                      */
     explicit SparseMatrixEZ (const unsigned int n_rows,
-			     const unsigned int n_columns,
-			     const unsigned int default_row_length = 0,
-			     const unsigned int default_increment = 1);
-    
-				     /**
-				      * Destructor. Free all memory, but do not
-				      * release the memory of the sparsity
-				      * structure.
-				      */
+                             const unsigned int n_columns,
+                             const unsigned int default_row_length = 0,
+                             const unsigned int default_increment = 1);
+
+                                     /**
+                                      * Destructor. Free all memory, but do not
+                                      * release the memory of the sparsity
+                                      * structure.
+                                      */
     ~SparseMatrixEZ ();
 
-				     /** 
-				      * Pseudo operator only copying
-				      * empty objects.
-				      */
+                                     /**
+                                      * Pseudo operator only copying
+                                      * empty objects.
+                                      */
     SparseMatrixEZ<number>& operator = (const SparseMatrixEZ<number> &);
 
                                      /**
@@ -402,61 +402,61 @@ class SparseMatrixEZ : public Subscriptor
                                       */
     SparseMatrixEZ<number>& operator = (const double d);
 
-				     /**
-				      * Reinitialize the sparse matrix
-				      * to the dimensions provided.
-				      * The matrix will have no
-				      * entries at this point. The
-				      * optional parameters
-				      * @p default_row_length,
-				      * @p default_increment and
-				      * @p reserve allow
-				      * for preallocating
-				      * memory. Providing these
-				      * properly is essential for an
-				      * efficient assembling of the
-				      * matrix.
-				      */
+                                     /**
+                                      * Reinitialize the sparse matrix
+                                      * to the dimensions provided.
+                                      * The matrix will have no
+                                      * entries at this point. The
+                                      * optional parameters
+                                      * @p default_row_length,
+                                      * @p default_increment and
+                                      * @p reserve allow
+                                      * for preallocating
+                                      * memory. Providing these
+                                      * properly is essential for an
+                                      * efficient assembling of the
+                                      * matrix.
+                                      */
     void reinit (const unsigned int n_rows,
-		 const unsigned int n_columns,
-		 unsigned int default_row_length = 0,
-		 unsigned int default_increment = 1,
-		 unsigned int reserve = 0);
+                 const unsigned int n_columns,
+                 unsigned int default_row_length = 0,
+                 unsigned int default_increment = 1,
+                 unsigned int reserve = 0);
 
-				     /**
-				      * Release all memory and return
-				      * to a state just like after
-				      * having called the default
-				      * constructor. It also forgets
-				      * its sparsity pattern.
-				      */
+                                     /**
+                                      * Release all memory and return
+                                      * to a state just like after
+                                      * having called the default
+                                      * constructor. It also forgets
+                                      * its sparsity pattern.
+                                      */
     void clear ();
 //@}
 /**
  * @name Information on the matrix
  */
 //@{
-				     /**
-				      * Return whether the object is
-				      * empty. It is empty if
-				      * both dimensions are zero.
-				      */
+                                     /**
+                                      * Return whether the object is
+                                      * empty. It is empty if
+                                      * both dimensions are zero.
+                                      */
     bool empty () const;
 
-				     /**
-				      * Return the dimension of the
-				      * image space.  To remember: the
-				      * matrix is of dimension
-				      * $m \times n$.
-				      */
+                                     /**
+                                      * Return the dimension of the
+                                      * image space.  To remember: the
+                                      * matrix is of dimension
+                                      * $m \times n$.
+                                      */
     unsigned int m () const;
-    
-				     /**
-				      * Return the dimension of the
-				      * range space.  To remember: the
-				      * matrix is of dimension
-				      * $m \times n$.
-				      */
+
+                                     /**
+                                      * Return the dimension of the
+                                      * range space.  To remember: the
+                                      * matrix is of dimension
+                                      * $m \times n$.
+                                      */
     unsigned int n () const;
 
                                      /**
@@ -468,76 +468,76 @@ class SparseMatrixEZ : public Subscriptor
                      /**
                       * Return the number of nonzero
                       * elements of this matrix.
-                      */                     
+                      */
     unsigned int n_nonzero_elements () const;
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object.
+                                      */
     std::size_t memory_consumption () const;
 
-				     /**
-				      * Print statistics. If @p full
-				      * is @p true, prints a
-				      * histogram of all existing row
-				      * lengths and allocated row
-				      * lengths. Otherwise, just the
-				      * relation of allocated and used
-				      * entries is shown.
-				      */
+                                     /**
+                                      * Print statistics. If @p full
+                                      * is @p true, prints a
+                                      * histogram of all existing row
+                                      * lengths and allocated row
+                                      * lengths. Otherwise, just the
+                                      * relation of allocated and used
+                                      * entries is shown.
+                                      */
     template <class STREAM>
     void print_statistics (STREAM& s, bool full = false);
 
-				     /**
-				      * Compute numbers of entries.
-				      *
-				      * In the first three arguments,
-				      * this function returns the
-				      * number of entries used,
-				      * allocated and reserved by this
-				      * matrix.
-				      *
-				      * If the final argument is true,
-				      * the number of entries in each
-				      * line is printed as well.
-				      */
+                                     /**
+                                      * Compute numbers of entries.
+                                      *
+                                      * In the first three arguments,
+                                      * this function returns the
+                                      * number of entries used,
+                                      * allocated and reserved by this
+                                      * matrix.
+                                      *
+                                      * If the final argument is true,
+                                      * the number of entries in each
+                                      * line is printed as well.
+                                      */
     void compute_statistics (unsigned int& used,
-			     unsigned int& allocated,
-			     unsigned int& reserved,
-			     std::vector<unsigned int>& used_by_line,
-			     const bool compute_by_line) const;
+                             unsigned int& allocated,
+                             unsigned int& reserved,
+                             std::vector<unsigned int>& used_by_line,
+                             const bool compute_by_line) const;
 //@}
 /**
  * @name Modifying entries
  */
 //@{
                      /**
-				      * Set the element <tt>(i,j)</tt> to
-				      * @p value. Allocates the entry,
-				      * if it does not exist and
-				      * @p value is non-zero.
-				      * If <tt>value</tt> is not a
-				      * finite number an exception
-				      * is thrown.
-				      */
+                                      * Set the element <tt>(i,j)</tt> to
+                                      * @p value. Allocates the entry,
+                                      * if it does not exist and
+                                      * @p value is non-zero.
+                                      * If <tt>value</tt> is not a
+                                      * finite number an exception
+                                      * is thrown.
+                                      */
     void set (const unsigned int i, const unsigned int j,
-	      const number value);
-    
-				     /**
-				      * Add @p value to the element
-				      * <tt>(i,j)</tt>. Allocates the entry
-				      * if it does not exist. Filters
-				      * out zeroes automatically.
-				      * If <tt>value</tt> is not a
-				      * finite number an exception
-				      * is thrown.
-				      */
+              const number value);
+
+                                     /**
+                                      * Add @p value to the element
+                                      * <tt>(i,j)</tt>. Allocates the entry
+                                      * if it does not exist. Filters
+                                      * out zeroes automatically.
+                                      * If <tt>value</tt> is not a
+                                      * finite number an exception
+                                      * is thrown.
+                                      */
     void add (const unsigned int i,
-	      const unsigned int j,
-	      const number value);
-    
+              const unsigned int j,
+              const number value);
+
                                        /**
                                         * Add all elements given in a
                                         * FullMatrix<double> into sparse
@@ -554,21 +554,21 @@ class SparseMatrixEZ : public Subscriptor
                                         * quadratic sparse matrix and a
                                         * quadratic full_matrix, the usual
                                         * situation in FE calculations.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be added anyway or
-					* these should be filtered away and
-					* only non-zero data is added. The
-					* default value is <tt>true</tt>,
-					* i.e., zero values won't be added
-					* into the matrix.
-					*/
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be added anyway or
+                                        * these should be filtered away and
+                                        * only non-zero data is added. The
+                                        * default value is <tt>true</tt>,
+                                        * i.e., zero values won't be added
+                                        * into the matrix.
+                                        */
     template <typename number2>
     void add (const std::vector<unsigned int> &indices,
-	      const FullMatrix<number2>       &full_matrix,
-	      const bool                       elide_zero_values = true);
+              const FullMatrix<number2>       &full_matrix,
+              const bool                       elide_zero_values = true);
 
                                        /**
                                         * Same function as before, but now
@@ -576,12 +576,12 @@ class SparseMatrixEZ : public Subscriptor
                                         * rectangular full_matrices and
                                         * different local-to-global indexing
                                         * on rows and columns, respectively.
-					*/
+                                        */
     template <typename number2>
     void add (const std::vector<unsigned int> &row_indices,
-	      const std::vector<unsigned int> &col_indices,
-	      const FullMatrix<number2>       &full_matrix,
-	      const bool                       elide_zero_values = true);
+              const std::vector<unsigned int> &col_indices,
+              const FullMatrix<number2>       &full_matrix,
+              const bool                       elide_zero_values = true);
 
                                        /**
                                         * Set several elements in the
@@ -589,22 +589,22 @@ class SparseMatrixEZ : public Subscriptor
                                         * column indices as given by
                                         * <tt>col_indices</tt> to the
                                         * respective value.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be added anyway or
-					* these should be filtered away and
-					* only non-zero data is added. The
-					* default value is <tt>true</tt>,
-					* i.e., zero values won't be added
-					* into the matrix.
-					*/
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be added anyway or
+                                        * these should be filtered away and
+                                        * only non-zero data is added. The
+                                        * default value is <tt>true</tt>,
+                                        * i.e., zero values won't be added
+                                        * into the matrix.
+                                        */
     template <typename number2>
     void add (const unsigned int               row,
-	      const std::vector<unsigned int> &col_indices,
-	      const std::vector<number2>      &values,
-	      const bool                       elide_zero_values = true);
+              const std::vector<unsigned int> &col_indices,
+              const std::vector<number2>      &values,
+              const bool                       elide_zero_values = true);
 
                                        /**
                                         * Add an array of values given by
@@ -612,462 +612,462 @@ class SparseMatrixEZ : public Subscriptor
                                         * global matrix row at columns
                                         * specified by col_indices in the
                                         * sparse matrix.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be added anyway or
-					* these should be filtered away and
-					* only non-zero data is added. The
-					* default value is <tt>true</tt>,
-					* i.e., zero values won't be added
-					* into the matrix.
-					*/
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be added anyway or
+                                        * these should be filtered away and
+                                        * only non-zero data is added. The
+                                        * default value is <tt>true</tt>,
+                                        * i.e., zero values won't be added
+                                        * into the matrix.
+                                        */
     template <typename number2>
     void add (const unsigned int  row,
-	      const unsigned int  n_cols,
-	      const unsigned int *col_indices,
-	      const number2      *values,
-	      const bool          elide_zero_values = true,
-	      const bool          col_indices_are_sorted = false);
+              const unsigned int  n_cols,
+              const unsigned int *col_indices,
+              const number2      *values,
+              const bool          elide_zero_values = true,
+              const bool          col_indices_are_sorted = false);
 
-				     /**
-				      * Copy the given matrix to this
-				      * one.  The operation throws an
-				      * error if the sparsity patterns
-				      * of the two involved matrices
-				      * do not point to the same
-				      * object, since in this case the
-				      * copy operation is
-				      * cheaper. Since this operation
-				      * is notheless not for free, we
-				      * do not make it available
-				      * through <tt>operator =</tt>, since
-				      * this may lead to unwanted
-				      * usage, e.g. in copy arguments
-				      * to functions, which should
-				      * really be arguments by
-				      * reference.
-				      *
-				      * The source matrix may be a matrix
-				      * of arbitrary type, as long as its
-				      * data type is convertible to the
-				      * data type of this matrix.
-				      *
-				      * The function returns a reference to
-				      * @p this.
-				      */
+                                     /**
+                                      * Copy the given matrix to this
+                                      * one.  The operation throws an
+                                      * error if the sparsity patterns
+                                      * of the two involved matrices
+                                      * do not point to the same
+                                      * object, since in this case the
+                                      * copy operation is
+                                      * cheaper. Since this operation
+                                      * is notheless not for free, we
+                                      * do not make it available
+                                      * through <tt>operator =</tt>, since
+                                      * this may lead to unwanted
+                                      * usage, e.g. in copy arguments
+                                      * to functions, which should
+                                      * really be arguments by
+                                      * reference.
+                                      *
+                                      * The source matrix may be a matrix
+                                      * of arbitrary type, as long as its
+                                      * data type is convertible to the
+                                      * data type of this matrix.
+                                      *
+                                      * The function returns a reference to
+                                      * @p this.
+                                      */
     template <class MATRIX>
     SparseMatrixEZ<number> &
     copy_from (const MATRIX &source);
 
-				     /**
-				      * Add @p matrix scaled by
-				      * @p factor to this matrix.
-				      *
-				      * The source matrix may be a
-				      * matrix of arbitrary type, as
-				      * long as its data type is
-				      * convertible to the data type
-				      * of this matrix and it has the
-				      * standard @p const_iterator.
-				      */
+                                     /**
+                                      * Add @p matrix scaled by
+                                      * @p factor to this matrix.
+                                      *
+                                      * The source matrix may be a
+                                      * matrix of arbitrary type, as
+                                      * long as its data type is
+                                      * convertible to the data type
+                                      * of this matrix and it has the
+                                      * standard @p const_iterator.
+                                      */
     template <class MATRIX>
     void add (const number factor,
-	      const MATRIX &matrix);
+              const MATRIX &matrix);
 //@}
 /**
  * @name Entry Access
  */
 //@{
-				     /**
-				      * Return the value of the entry
-				      * (i,j).  This may be an
-				      * expensive operation and you
-				      * should always take care where
-				      * to call this function.  In
-				      * order to avoid abuse, this
-				      * function throws an exception
-				      * if the required element does
-				      * not exist in the matrix.
-				      *
-				      * In case you want a function
-				      * that returns zero instead (for
-				      * entries that are not in the
-				      * sparsity pattern of the
-				      * matrix), use the @p el
-				      * function.
-				      */
+                                     /**
+                                      * Return the value of the entry
+                                      * (i,j).  This may be an
+                                      * expensive operation and you
+                                      * should always take care where
+                                      * to call this function.  In
+                                      * order to avoid abuse, this
+                                      * function throws an exception
+                                      * if the required element does
+                                      * not exist in the matrix.
+                                      *
+                                      * In case you want a function
+                                      * that returns zero instead (for
+                                      * entries that are not in the
+                                      * sparsity pattern of the
+                                      * matrix), use the @p el
+                                      * function.
+                                      */
     number operator () (const unsigned int i,
-			const unsigned int j) const;
+                        const unsigned int j) const;
 
-				     /**
-				      * Return the value of the entry
-				      * (i,j). Returns zero for all
-				      * non-existing entries.
-				      */
+                                     /**
+                                      * Return the value of the entry
+                                      * (i,j). Returns zero for all
+                                      * non-existing entries.
+                                      */
     number el (const unsigned int i,
-	       const unsigned int j) const;
+               const unsigned int j) const;
 //@}
 /**
  * @name Multiplications
  */
 //@{
-				     /**
-				      * Matrix-vector multiplication:
-				      * let $dst = M*src$ with $M$
-				      * being this matrix.
-				      */
+                                     /**
+                                      * Matrix-vector multiplication:
+                                      * let $dst = M*src$ with $M$
+                                      * being this matrix.
+                                      */
     template <typename somenumber>
     void vmult (Vector<somenumber>       &dst,
-		const Vector<somenumber> &src) const;
-    
-				     /**
-				      * Matrix-vector multiplication:
-				      * let $dst = M^T*src$ with $M$
-				      * being this matrix. This
-				      * function does the same as
-				      * @p vmult but takes the
-				      * transposed matrix.
-				      */
+                const Vector<somenumber> &src) const;
+
+                                     /**
+                                      * Matrix-vector multiplication:
+                                      * let $dst = M^T*src$ with $M$
+                                      * being this matrix. This
+                                      * function does the same as
+                                      * @p vmult but takes the
+                                      * transposed matrix.
+                                      */
     template <typename somenumber>
     void Tvmult (Vector<somenumber>       &dst,
-		 const Vector<somenumber> &src) const;
-  
-				     /**
-				      * Adding Matrix-vector
-				      * multiplication. Add $M*src$ on
-				      * $dst$ with $M$ being this
-				      * matrix.
-				      */
+                 const Vector<somenumber> &src) const;
+
+                                     /**
+                                      * Adding Matrix-vector
+                                      * multiplication. Add $M*src$ on
+                                      * $dst$ with $M$ being this
+                                      * matrix.
+                                      */
     template <typename somenumber>
     void vmult_add (Vector<somenumber>       &dst,
-		    const Vector<somenumber> &src) const;
-    
-				     /**
-				      * Adding Matrix-vector
-				      * multiplication. Add $M^T*src$
-				      * to $dst$ with $M$ being this
-				      * matrix. This function does the
-				      * same as @p vmult_add but takes
-				      * the transposed matrix.
-				      */
+                    const Vector<somenumber> &src) const;
+
+                                     /**
+                                      * Adding Matrix-vector
+                                      * multiplication. Add $M^T*src$
+                                      * to $dst$ with $M$ being this
+                                      * matrix. This function does the
+                                      * same as @p vmult_add but takes
+                                      * the transposed matrix.
+                                      */
     template <typename somenumber>
     void Tvmult_add (Vector<somenumber>       &dst,
-		     const Vector<somenumber> &src) const;
+                     const Vector<somenumber> &src) const;
 //@}
 /**
  * @name Matrix norms
  */
 //@{
-				     /**
-				      * Frobenius-norm of the matrix.
-				      */
+                                     /**
+                                      * Frobenius-norm of the matrix.
+                                      */
     number l2_norm () const;
 //@}
 /**
  * @name Preconditioning methods
  */
 //@{
-				     /**
-				      * Apply the Jacobi
-				      * preconditioner, which
-				      * multiplies every element of
-				      * the @p src vector by the
-				      * inverse of the respective
-				      * diagonal element and
-				      * multiplies the result with the
-				      * damping factor @p omega.
-				      */
+                                     /**
+                                      * Apply the Jacobi
+                                      * preconditioner, which
+                                      * multiplies every element of
+                                      * the @p src vector by the
+                                      * inverse of the respective
+                                      * diagonal element and
+                                      * multiplies the result with the
+                                      * damping factor @p omega.
+                                      */
     template <typename somenumber>
     void precondition_Jacobi (Vector<somenumber>       &dst,
-			      const Vector<somenumber> &src,
-			      const number              omega = 1.) const;
+                              const Vector<somenumber> &src,
+                              const number              omega = 1.) const;
 
-				     /**
-				      * Apply SSOR preconditioning to
-				      * @p src.
-				      */
+                                     /**
+                                      * Apply SSOR preconditioning to
+                                      * @p src.
+                                      */
     template <typename somenumber>
     void precondition_SSOR (Vector<somenumber>       &dst,
-			    const Vector<somenumber> &src,
-			    const number              om = 1.,
-			    const std::vector<unsigned int> &pos_right_of_diagonal = std::vector<unsigned int>()) const;
+                            const Vector<somenumber> &src,
+                            const number              om = 1.,
+                            const std::vector<unsigned int> &pos_right_of_diagonal = std::vector<unsigned int>()) const;
 
-				     /**
-				      * Apply SOR preconditioning matrix to @p src.
-				      * The result of this method is
-				      * $dst = (om D - L)^{-1} src$.
-				      */
+                                     /**
+                                      * Apply SOR preconditioning matrix to @p src.
+                                      * The result of this method is
+                                      * $dst = (om D - L)^{-1} src$.
+                                      */
     template <typename somenumber>
     void precondition_SOR (Vector<somenumber>       &dst,
-			   const Vector<somenumber> &src,
- 			   const number              om = 1.) const;
-    
-				     /**
-				      * Apply transpose SOR preconditioning matrix to @p src.
-				      * The result of this method is
-				      * $dst = (om D - U)^{-1} src$.
-				      */
+                           const Vector<somenumber> &src,
+                           const number              om = 1.) const;
+
+                                     /**
+                                      * Apply transpose SOR preconditioning matrix to @p src.
+                                      * The result of this method is
+                                      * $dst = (om D - U)^{-1} src$.
+                                      */
     template <typename somenumber>
     void precondition_TSOR (Vector<somenumber>       &dst,
-			    const Vector<somenumber> &src,
-			    const number              om = 1.) const;
+                            const Vector<somenumber> &src,
+                            const number              om = 1.) const;
 
-				     /**
-				      * Add the matrix @p A
-				      * conjugated by @p B, that is,
-				      * $B A B^T$ to this object. If
-				      * the parameter @p transpose is
-				      * true, compute $B^T A B$.
-				      *
-				      * This function requires that
-				      * @p B has a @p const_iterator
-				      * traversing all matrix entries
-				      * and that @p A has a function
-				      * <tt>el(i,j)</tt> for access to a
-				      * specific entry.
-				      */
+                                     /**
+                                      * Add the matrix @p A
+                                      * conjugated by @p B, that is,
+                                      * $B A B^T$ to this object. If
+                                      * the parameter @p transpose is
+                                      * true, compute $B^T A B$.
+                                      *
+                                      * This function requires that
+                                      * @p B has a @p const_iterator
+                                      * traversing all matrix entries
+                                      * and that @p A has a function
+                                      * <tt>el(i,j)</tt> for access to a
+                                      * specific entry.
+                                      */
     template <class MATRIXA, class MATRIXB>
     void conjugate_add (const MATRIXA& A,
-			const MATRIXB& B,
-			const bool transpose = false);
+                        const MATRIXB& B,
+                        const bool transpose = false);
 //@}
 /**
  * @name Iterators
  */
 //@{
-				     /**
-				      * STL-like iterator with the
-				      * first existing entry.
-				      */
+                                     /**
+                                      * STL-like iterator with the
+                                      * first existing entry.
+                                      */
     const_iterator begin () const;
 
-				     /**
-				      * Final iterator.
-				      */
+                                     /**
+                                      * Final iterator.
+                                      */
     const_iterator end () const;
-    
-				     /**
-				      * STL-like iterator with the
-				      * first entry of row @p r. If
-				      * this row is empty, the result
-				      * is <tt>end(r)</tt>, which does NOT
-				      * point into row @p r..
-				      */
+
+                                     /**
+                                      * STL-like iterator with the
+                                      * first entry of row @p r. If
+                                      * this row is empty, the result
+                                      * is <tt>end(r)</tt>, which does NOT
+                                      * point into row @p r..
+                                      */
     const_iterator begin (const unsigned int r) const;
 
-				     /**
-				      * Final iterator of row
-				      * @p r. The result may be
-				      * different from <tt>end()</tt>!
-				      */
+                                     /**
+                                      * Final iterator of row
+                                      * @p r. The result may be
+                                      * different from <tt>end()</tt>!
+                                      */
     const_iterator end (const unsigned int r) const;
 //@}
 /**
  * @name Input/Output
  */
 //@{
-				     /**
-				      * Print the matrix to the given
-				      * stream, using the format
-				      * <tt>(line,col) value</tt>, i.e. one
-				      * nonzero entry of the matrix
-				      * per line.
-				      */
+                                     /**
+                                      * Print the matrix to the given
+                                      * stream, using the format
+                                      * <tt>(line,col) value</tt>, i.e. one
+                                      * nonzero entry of the matrix
+                                      * per line.
+                                      */
     void print (std::ostream &out) const;
 
-				     /**
-				      * Print the matrix in the usual
-				      * format, i.e. as a matrix and
-				      * not as a list of nonzero
-				      * elements. For better
-				      * readability, elements not in
-				      * the matrix are displayed as
-				      * empty space, while matrix
-				      * elements which are explicitly
-				      * set to zero are displayed as
-				      * such.
-				      *
-				      * The parameters allow for a
-				      * flexible setting of the output
-				      * format: @p precision and
-				      * @p scientific are used to
-				      * determine the number format,
-				      * where @p scientific = @p false
-				      * means fixed point notation.  A
-				      * zero entry for @p width makes
-				      * the function compute a width,
-				      * but it may be changed to a
-				      * positive value, if output is
-				      * crude.
-				      *
-				      * Additionally, a character for
-				      * an empty value may be
-				      * specified.
-				      *
-				      * Finally, the whole matrix can
-				      * be multiplied with a common
-				      * denominator to produce more
-				      * readable output, even
-				      * integers.
-				      *
-				      * This function
-				      * may produce @em large amounts of
-				      * output if applied to a large matrix!
-				      */
+                                     /**
+                                      * Print the matrix in the usual
+                                      * format, i.e. as a matrix and
+                                      * not as a list of nonzero
+                                      * elements. For better
+                                      * readability, elements not in
+                                      * the matrix are displayed as
+                                      * empty space, while matrix
+                                      * elements which are explicitly
+                                      * set to zero are displayed as
+                                      * such.
+                                      *
+                                      * The parameters allow for a
+                                      * flexible setting of the output
+                                      * format: @p precision and
+                                      * @p scientific are used to
+                                      * determine the number format,
+                                      * where @p scientific = @p false
+                                      * means fixed point notation.  A
+                                      * zero entry for @p width makes
+                                      * the function compute a width,
+                                      * but it may be changed to a
+                                      * positive value, if output is
+                                      * crude.
+                                      *
+                                      * Additionally, a character for
+                                      * an empty value may be
+                                      * specified.
+                                      *
+                                      * Finally, the whole matrix can
+                                      * be multiplied with a common
+                                      * denominator to produce more
+                                      * readable output, even
+                                      * integers.
+                                      *
+                                      * This function
+                                      * may produce @em large amounts of
+                                      * output if applied to a large matrix!
+                                      */
     void print_formatted (std::ostream       &out,
-			  const unsigned int  precision   = 3,
-  			  const bool          scientific  = true,
-  			  const unsigned int  width       = 0,
-  			  const char         *zero_string = " ",
-  			  const double        denominator = 1.) const;
+                          const unsigned int  precision   = 3,
+                          const bool          scientific  = true,
+                          const unsigned int  width       = 0,
+                          const char         *zero_string = " ",
+                          const double        denominator = 1.) const;
 
-    				     /**
-				      * Write the data of this object
-				      * in binary mode to a file.
-				      *
-				      * Note that this binary format
-				      * is platform dependent.
-				      */
+                                     /**
+                                      * Write the data of this object
+                                      * in binary mode to a file.
+                                      *
+                                      * Note that this binary format
+                                      * is platform dependent.
+                                      */
     void block_write (std::ostream &out) const;
 
-				     /**
-				      * Read data that has previously
-				      * been written by
-				      * @p block_write.
-				      *
-				      * The object is resized on this
-				      * operation, and all previous
-				      * contents are lost.
-				      *
-				      * A primitive form of error
-				      * checking is performed which
-				      * will recognize the bluntest
-				      * attempts to interpret some
-				      * data as a vector stored
-				      * bitwise to a file, but not
-				      * more.
-				      */
+                                     /**
+                                      * Read data that has previously
+                                      * been written by
+                                      * @p block_write.
+                                      *
+                                      * The object is resized on this
+                                      * operation, and all previous
+                                      * contents are lost.
+                                      *
+                                      * A primitive form of error
+                                      * checking is performed which
+                                      * will recognize the bluntest
+                                      * attempts to interpret some
+                                      * data as a vector stored
+                                      * bitwise to a file, but not
+                                      * more.
+                                      */
     void block_read (std::istream &in);
 //@}
-    
-    				     /** @addtogroup Exceptions
-				      * @{ */
 
-				     /**
-				      * Exception for missing diagonal entry.
-				      */
+                                     /** @addtogroup Exceptions
+                                      * @{ */
+
+                                     /**
+                                      * Exception for missing diagonal entry.
+                                      */
     DeclException0(ExcNoDiagonal);
-    
-    				     /**
-				      * Exception
-				      */
+
+                                     /**
+                                      * Exception
+                                      */
     DeclException2 (ExcInvalidEntry,
-		    int, int,
-		    << "The entry with index (" << arg1 << ',' << arg2
-		    << ") does not exist.");
+                    int, int,
+                    << "The entry with index (" << arg1 << ',' << arg2
+                    << ") does not exist.");
 
     DeclException2(ExcEntryAllocationFailure,
-		   int, int,
-		   << "An entry with index (" << arg1 << ',' << arg2
-		   << ") cannot be allocated.");
-				     //@}
+                   int, int,
+                   << "An entry with index (" << arg1 << ',' << arg2
+                   << ") cannot be allocated.");
+                                     //@}
   private:
-				     /**
-				      * Find an entry and return a
-				      * const pointer. Return a
-				      * zero-pointer if the entry does
-				      * not exist.
-				      */
+                                     /**
+                                      * Find an entry and return a
+                                      * const pointer. Return a
+                                      * zero-pointer if the entry does
+                                      * not exist.
+                                      */
     const Entry* locate (const unsigned int row,
-			 const unsigned int col) const;
+                         const unsigned int col) const;
 
-				     /**
-				      * Find an entry and return a
-				      * writable pointer. Return a
-				      * zero-pointer if the entry does
-				      * not exist.
-				      */
+                                     /**
+                                      * Find an entry and return a
+                                      * writable pointer. Return a
+                                      * zero-pointer if the entry does
+                                      * not exist.
+                                      */
     Entry* locate (const unsigned int row,
-		   const unsigned int col);
+                   const unsigned int col);
 
-				     /**
-				      * Find an entry or generate it.
-				      */
+                                     /**
+                                      * Find an entry or generate it.
+                                      */
     Entry* allocate (const unsigned int row,
-		     const unsigned int col);
-    
-				     /**
-				      * Version of @p vmult which only
-				      * performs its actions on the
-				      * region defined by
-				      * <tt>[begin_row,end_row)</tt>. This
-				      * function is called by @p vmult
-				      * in the case of enabled
-				      * multithreading.
-				      */
+                     const unsigned int col);
+
+                                     /**
+                                      * Version of @p vmult which only
+                                      * performs its actions on the
+                                      * region defined by
+                                      * <tt>[begin_row,end_row)</tt>. This
+                                      * function is called by @p vmult
+                                      * in the case of enabled
+                                      * multithreading.
+                                      */
     template <typename somenumber>
     void threaded_vmult (Vector<somenumber>       &dst,
-			 const Vector<somenumber> &src,
-			 const unsigned int        begin_row,
-			 const unsigned int        end_row) const;
+                         const Vector<somenumber> &src,
+                         const unsigned int        begin_row,
+                         const unsigned int        end_row) const;
 
-				     /**
-				      * Version of
-				      * @p matrix_norm_square which
-				      * only performs its actions on
-				      * the region defined by
-				      * <tt>[begin_row,end_row)</tt>. This
-				      * function is called by
-				      * @p matrix_norm_square in the
-				      * case of enabled
-				      * multithreading.
-				      */
+                                     /**
+                                      * Version of
+                                      * @p matrix_norm_square which
+                                      * only performs its actions on
+                                      * the region defined by
+                                      * <tt>[begin_row,end_row)</tt>. This
+                                      * function is called by
+                                      * @p matrix_norm_square in the
+                                      * case of enabled
+                                      * multithreading.
+                                      */
     template <typename somenumber>
     void threaded_matrix_norm_square (const Vector<somenumber> &v,
-				      const unsigned int        begin_row,
-				      const unsigned int        end_row,
-				      somenumber               *partial_sum) const;
+                                      const unsigned int        begin_row,
+                                      const unsigned int        end_row,
+                                      somenumber               *partial_sum) const;
 
-    				     /**
-				      * Version of
-				      * @p matrix_scalar_product which
-				      * only performs its actions on
-				      * the region defined by
-				      * <tt>[begin_row,end_row)</tt>. This
-				      * function is called by
-				      * @p matrix_scalar_product in the
-				      * case of enabled
-				      * multithreading.
-				      */
+                                     /**
+                                      * Version of
+                                      * @p matrix_scalar_product which
+                                      * only performs its actions on
+                                      * the region defined by
+                                      * <tt>[begin_row,end_row)</tt>. This
+                                      * function is called by
+                                      * @p matrix_scalar_product in the
+                                      * case of enabled
+                                      * multithreading.
+                                      */
     template <typename somenumber>
     void threaded_matrix_scalar_product (const Vector<somenumber> &u,
-					 const Vector<somenumber> &v,
-					 const unsigned int        begin_row,
-					 const unsigned int        end_row,
-					 somenumber               *partial_sum) const;
+                                         const Vector<somenumber> &v,
+                                         const unsigned int        begin_row,
+                                         const unsigned int        end_row,
+                                         somenumber               *partial_sum) const;
 
-				     /**
-				      * Number of columns. This is
-				      * used to check vector
-				      * dimensions only.
-				      */
+                                     /**
+                                      * Number of columns. This is
+                                      * used to check vector
+                                      * dimensions only.
+                                      */
     unsigned int n_columns;
 
-				     /**
-				      * Info structure for each row.
-				      */
+                                     /**
+                                      * Info structure for each row.
+                                      */
     std::vector<RowInfo> row_info;
-    
-				     /**
-				      * Data storage.
-				      */
+
+                                     /**
+                                      * Data storage.
+                                      */
     std::vector<Entry> data;
 
-				     /**
-				      * Increment when a row grows.
-				      */
+                                     /**
+                                      * Increment when a row grows.
+                                      */
     unsigned int increment;
 
                                      /**
@@ -1077,7 +1077,7 @@ class SparseMatrixEZ : public Subscriptor
                                       * standard, but some compilers
                                       * require this...
                                       */
-#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG    
+#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
     friend class const_iterator;
     friend class const_iterator::Accessor;
 #endif
@@ -1089,10 +1089,10 @@ class SparseMatrixEZ : public Subscriptor
 template <typename number>
 inline
 SparseMatrixEZ<number>::Entry::Entry(unsigned int column,
-				     const number& value)
-		:
-		column(column),
-		value(value)
+                                     const number& value)
+                :
+                column(column),
+                value(value)
 {}
 
 
@@ -1100,19 +1100,19 @@ SparseMatrixEZ<number>::Entry::Entry(unsigned int column,
 template <typename number>
 inline
 SparseMatrixEZ<number>::Entry::Entry()
-		:
-		column(invalid),
-		value(0)
+                :
+                column(invalid),
+                value(0)
 {}
 
 
 template <typename number>
 inline
 SparseMatrixEZ<number>::RowInfo::RowInfo(unsigned int start)
-		:
-		start(start),
-		length(0),
-		diagonal(invalid_diagonal)
+                :
+                start(start),
+                length(0),
+                diagonal(invalid_diagonal)
 {}
 
 
@@ -1123,10 +1123,10 @@ SparseMatrixEZ<number>::const_iterator::Accessor::
 Accessor (const SparseMatrixEZ<number> *matrix,
           const unsigned int            r,
           const unsigned short          i)
-		:
-		matrix(matrix),
-		a_row(r),
-		a_index(i)
+                :
+                matrix(matrix),
+                a_row(r),
+                a_index(i)
 {}
 
 
@@ -1173,31 +1173,31 @@ SparseMatrixEZ<number>::const_iterator::
 const_iterator(const SparseMatrixEZ<number> *matrix,
                const unsigned int            r,
                const unsigned short          i)
-		:
-		accessor(matrix, r, i)
+                :
+                accessor(matrix, r, i)
 {
-				   // Finish if this is the end()
+                                   // Finish if this is the end()
   if (r==accessor.matrix->m() && i==0) return;
 
-				   // Make sure we never construct an
-				   // iterator pointing to a
-				   // non-existing entry
+                                   // Make sure we never construct an
+                                   // iterator pointing to a
+                                   // non-existing entry
 
-				   // If the index points beyond the
-				   // end of the row, try the next
-				   // row.
+                                   // If the index points beyond the
+                                   // end of the row, try the next
+                                   // row.
   if (accessor.a_index >= accessor.matrix->row_info[accessor.a_row].length)
     {
      do
-	{
-	  ++accessor.a_row;
-	}
-				      // Beware! If the next row is
-				      // empty, iterate until a
-				      // non-empty row is found or we
-				      // hit the end of the matrix.
+        {
+          ++accessor.a_row;
+        }
+                                      // Beware! If the next row is
+                                      // empty, iterate until a
+                                      // non-empty row is found or we
+                                      // hit the end of the matrix.
       while (accessor.a_row < accessor.matrix->m()
-	     && accessor.matrix->row_info[accessor.a_row].length == 0);
+             && accessor.matrix->row_info[accessor.a_row].length == 0);
     }
 }
 
@@ -1209,22 +1209,22 @@ SparseMatrixEZ<number>::const_iterator::operator++ ()
 {
   Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
 
-				   // Increment column index
+                                   // Increment column index
   ++(accessor.a_index);
-				   // If index exceeds number of
-				   // entries in this row, proceed
-				   // with next row.
+                                   // If index exceeds number of
+                                   // entries in this row, proceed
+                                   // with next row.
   if (accessor.a_index >= accessor.matrix->row_info[accessor.a_row].length)
     {
       accessor.a_index = 0;
-				       // Do this loop to avoid
-				       // elements in empty rows
+                                       // Do this loop to avoid
+                                       // elements in empty rows
       do
-	{
-	  ++accessor.a_row;
-	}
+        {
+          ++accessor.a_row;
+        }
       while (accessor.a_row < accessor.matrix->m()
-	     && accessor.matrix->row_info[accessor.a_row].length == 0);
+             && accessor.matrix->row_info[accessor.a_row].length == 0);
     }
   return *this;
 }
@@ -1276,7 +1276,7 @@ SparseMatrixEZ<number>::const_iterator::
 operator < (const const_iterator& other) const
 {
   return (accessor.row() < other.accessor.row() ||
-	  (accessor.row() == other.accessor.row() &&
+          (accessor.row() == other.accessor.row() &&
            accessor.index() < other.accessor.index()));
 }
 
@@ -1302,7 +1302,7 @@ template <typename number>
 inline
 typename SparseMatrixEZ<number>::Entry*
 SparseMatrixEZ<number>::locate (const unsigned int row,
-				const unsigned int col)
+                                const unsigned int col)
 {
   Assert (row<m(), ExcIndexRange(row,0,m()));
   Assert (col<n(), ExcIndexRange(col,0,n()));
@@ -1313,9 +1313,9 @@ SparseMatrixEZ<number>::locate (const unsigned int row,
     {
       Entry * const entry = &data[i];
       if (entry->column == col)
-	return entry;
+        return entry;
       if (entry->column == Entry::invalid)
-	return 0;
+        return 0;
     }
   return 0;
 }
@@ -1326,7 +1326,7 @@ template <typename number>
 inline
 const typename SparseMatrixEZ<number>::Entry*
 SparseMatrixEZ<number>::locate (const unsigned int row,
-				const unsigned int col) const
+                                const unsigned int col) const
 {
   SparseMatrixEZ<number>* t = const_cast<SparseMatrixEZ<number>*> (this);
   return t->locate(row,col);
@@ -1337,7 +1337,7 @@ template <typename number>
 inline
 typename SparseMatrixEZ<number>::Entry*
 SparseMatrixEZ<number>::allocate (const unsigned int row,
-				  const unsigned int col)
+                                  const unsigned int col)
 {
   Assert (row<m(), ExcIndexRange(row,0,m()));
   Assert (col<n(), ExcIndexRange(col,0,n()));
@@ -1346,62 +1346,62 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
   const unsigned int end = r.start + r.length;
 
   unsigned int i = r.start;
-				   // If diagonal exists and this
-				   // column is higher, start only
-				   // after diagonal.
+                                   // If diagonal exists and this
+                                   // column is higher, start only
+                                   // after diagonal.
   if (r.diagonal != RowInfo::invalid_diagonal && col >= row)
     i += r.diagonal;
-				   // Find position of entry
+                                   // Find position of entry
   while (i<end && data[i].column < col) ++i;
-  
-				   // entry found
+
+                                   // entry found
   if (i != end && data[i].column == col)
     return &data[i];
 
-				   // Now, we must insert the new
-				   // entry and move all successive
-				   // entries back.
-  
-				   // If no more space is available
-				   // for this row, insert new
-				   // elements into the vector.
+                                   // Now, we must insert the new
+                                   // entry and move all successive
+                                   // entries back.
+
+                                   // If no more space is available
+                                   // for this row, insert new
+                                   // elements into the vector.
 //TODO:[GK] We should not extend this row if i<end
   if (row != row_info.size()-1)
     {
       if (end >= row_info[row+1].start)
-	{
-	  // Failure if increment 0
-	  Assert(increment!=0,ExcEntryAllocationFailure(row,col));
-	  
-					   // Insert new entries
-	  data.insert(data.begin()+end, increment, Entry());
-					   // Update starts of
-					   // following rows
-	  for (unsigned int rn=row+1;rn<row_info.size();++rn)
-	    row_info[rn].start += increment;
-	}
+        {
+          // Failure if increment 0
+          Assert(increment!=0,ExcEntryAllocationFailure(row,col));
+
+                                           // Insert new entries
+          data.insert(data.begin()+end, increment, Entry());
+                                           // Update starts of
+                                           // following rows
+          for (unsigned int rn=row+1;rn<row_info.size();++rn)
+            row_info[rn].start += increment;
+        }
     }
   else
     {
       if (end >= data.size())
-	{
-					   // Here, appending a block
-					   // does not increase
-					   // performance.
-	  data.push_back(Entry());
-	}
+        {
+                                           // Here, appending a block
+                                           // does not increase
+                                           // performance.
+          data.push_back(Entry());
+        }
     }
 
   Entry* entry = &data[i];
-				   // Save original entry
+                                   // Save original entry
   Entry temp = *entry;
-				   // Insert new entry here to
-				   // make sure all entries
-				   // are ordered by column
-				   // index
+                                   // Insert new entry here to
+                                   // make sure all entries
+                                   // are ordered by column
+                                   // index
   entry->column = col;
   entry->value = 0;
-				   // Update row_info
+                                   // Update row_info
   ++r.length;
   if (col == row)
     r.diagonal = i - r.start;
@@ -1411,13 +1411,13 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 
   if (i == end)
       return entry;
-  
-				   // Move all entries in this
-				   // row up by one
+
+                                   // Move all entries in this
+                                   // row up by one
   for (unsigned int j = i+1; j < end; ++j)
     {
-				       // There should be no invalid
-				       // entry below end
+                                       // There should be no invalid
+                                       // entry below end
       Assert (data[j].column != Entry::invalid, ExcInternalError());
 
 //TODO[GK]: This could be done more efficiently by moving starting at the top rather than swapping starting at the bottom
@@ -1435,8 +1435,8 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 template <typename number>
 inline
 void SparseMatrixEZ<number>::set (const unsigned int i,
-				  const unsigned int j,
-				  const number value)
+                                  const unsigned int j,
+                                  const number value)
 {
 
   Assert (numbers::is_finite(value), ExcNumberNotFinite());
@@ -1448,7 +1448,7 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
     {
       Entry* entry = locate(i,j);
       if (entry != 0)
-	entry->value = 0.;
+        entry->value = 0.;
     }
   else
     {
@@ -1462,8 +1462,8 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
 template <typename number>
 inline
 void SparseMatrixEZ<number>::add (const unsigned int i,
-				  const unsigned int j,
-				  const number value)
+                                  const unsigned int j,
+                                  const number value)
 {
 
   Assert (numbers::is_finite(value), ExcNumberNotFinite());
@@ -1471,10 +1471,10 @@ void SparseMatrixEZ<number>::add (const unsigned int i,
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
 
-				   // ignore zero additions
+                                   // ignore zero additions
   if (value == 0)
     return;
-  
+
   Entry* entry = allocate(i,j);
   entry->value += value;
 }
@@ -1483,14 +1483,14 @@ void SparseMatrixEZ<number>::add (const unsigned int i,
 template <typename number>
 template <typename number2>
 void SparseMatrixEZ<number>::add (const std::vector<unsigned int> &indices,
-				  const FullMatrix<number2>       &full_matrix,
-				  const bool                       elide_zero_values)
+                                  const FullMatrix<number2>       &full_matrix,
+                                  const bool                       elide_zero_values)
 {
-//TODO: This function can surely be made more efficient  
+//TODO: This function can surely be made more efficient
   for (unsigned int i=0; i<indices.size(); ++i)
     for (unsigned int j=0; j<indices.size(); ++j)
       if ((full_matrix(i,j) != 0) || (elide_zero_values == false))
-	add (indices[i], indices[j], full_matrix(i,j));
+        add (indices[i], indices[j], full_matrix(i,j));
 }
 
 
@@ -1498,15 +1498,15 @@ void SparseMatrixEZ<number>::add (const std::vector<unsigned int> &indices,
 template <typename number>
 template <typename number2>
 void SparseMatrixEZ<number>::add (const std::vector<unsigned int> &row_indices,
-				  const std::vector<unsigned int> &col_indices,
-				  const FullMatrix<number2>       &full_matrix,
-				  const bool                       elide_zero_values)
+                                  const std::vector<unsigned int> &col_indices,
+                                  const FullMatrix<number2>       &full_matrix,
+                                  const bool                       elide_zero_values)
 {
-//TODO: This function can surely be made more efficient  
+//TODO: This function can surely be made more efficient
   for (unsigned int i=0; i<row_indices.size(); ++i)
     for (unsigned int j=0; j<col_indices.size(); ++j)
       if ((full_matrix(i,j) != 0) || (elide_zero_values == false))
-	add (row_indices[i], col_indices[j], full_matrix(i,j));
+        add (row_indices[i], col_indices[j], full_matrix(i,j));
 }
 
 
@@ -1515,9 +1515,9 @@ void SparseMatrixEZ<number>::add (const std::vector<unsigned int> &row_indices,
 template <typename number>
 template <typename number2>
 void SparseMatrixEZ<number>::add (const unsigned int               row,
-				  const std::vector<unsigned int> &col_indices,
-				  const std::vector<number2>      &values,
-				  const bool                       elide_zero_values)
+                                  const std::vector<unsigned int> &col_indices,
+                                  const std::vector<number2>      &values,
+                                  const bool                       elide_zero_values)
 {
 //TODO: This function can surely be made more efficient
   for (unsigned int j=0; j<col_indices.size(); ++j)
@@ -1530,11 +1530,11 @@ void SparseMatrixEZ<number>::add (const unsigned int               row,
 template <typename number>
 template <typename number2>
 void SparseMatrixEZ<number>::add (const unsigned int  row,
-				  const unsigned int  n_cols,
-				  const unsigned int *col_indices,
-				  const number2      *values,
-				  const bool          elide_zero_values,
-				  const bool          /*col_indices_are_sorted*/)
+                                  const unsigned int  n_cols,
+                                  const unsigned int *col_indices,
+                                  const number2      *values,
+                                  const bool          elide_zero_values,
+                                  const bool          /*col_indices_are_sorted*/)
 {
 //TODO: This function can surely be made more efficient
   for (unsigned int j=0; j<n_cols; ++j)
@@ -1548,7 +1548,7 @@ void SparseMatrixEZ<number>::add (const unsigned int  row,
 template <typename number>
 inline
 number SparseMatrixEZ<number>::el (const unsigned int i,
-				   const unsigned int j) const
+                                   const unsigned int j) const
 {
   const Entry* entry = locate(i,j);
   if (entry)
@@ -1561,7 +1561,7 @@ number SparseMatrixEZ<number>::el (const unsigned int i,
 template <typename number>
 inline
 number SparseMatrixEZ<number>::operator() (const unsigned int i,
-					   const unsigned int j) const
+                                           const unsigned int j) const
 {
   const Entry* entry = locate(i,j);
   if (entry)
@@ -1615,14 +1615,14 @@ SparseMatrixEZ<number>&
 SparseMatrixEZ<number>::copy_from (const MATRIX& M)
 {
   reinit(M.m(), M.n());
-  
+
   typename MATRIX::const_iterator start = M.begin();
   const typename MATRIX::const_iterator final = M.end();
 
   while (start != final)
     {
       if (start->value() != 0.)
-	set(start->row(), start->column(), start->value());
+        set(start->row(), start->column(), start->value());
       ++start;
     }
   return *this;
@@ -1633,21 +1633,21 @@ template <class MATRIX>
 inline
 void
 SparseMatrixEZ<number>::add (const number factor,
-			     const MATRIX& M)
+                             const MATRIX& M)
 {
   Assert (M.m() == m(), ExcDimensionMismatch(M.m(), m()));
   Assert (M.n() == n(), ExcDimensionMismatch(M.n(), n()));
 
   if (factor == 0.)
     return;
-  
+
   typename MATRIX::const_iterator start = M.begin();
   const typename MATRIX::const_iterator final = M.end();
 
   while (start != final)
     {
       if (start->value() != 0.)
-	add(start->row(), start->column(), factor * start->value());
+        add(start->row(), start->column(), factor * start->value());
       ++start;
     }
 }
@@ -1658,8 +1658,8 @@ template<typename number>
 template <class MATRIXA, class MATRIXB>
 inline void
 SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
-				       const MATRIXB& B,
-				       const bool transpose)
+                                       const MATRIXB& B,
+                                       const bool transpose)
 {
 // Compute the result
 // r_ij = \sum_kl b_ik b_jl a_kl
@@ -1669,100 +1669,100 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
 //    Assert (A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
 //    Assert (A.m() == B.n(), ExcDimensionMismatch(A.m(), B.n()));
 
-				   // Somehow, we have to avoid making
-				   // this an operation of complexity
-				   // n^2. For the transpose case, we
-				   // can go through the non-zero
-				   // elements of A^-1 and use the
-				   // corresponding rows of B only.
-				   // For the non-transpose case, we
-				   // must find a trick.
+                                   // Somehow, we have to avoid making
+                                   // this an operation of complexity
+                                   // n^2. For the transpose case, we
+                                   // can go through the non-zero
+                                   // elements of A^-1 and use the
+                                   // corresponding rows of B only.
+                                   // For the non-transpose case, we
+                                   // must find a trick.
   typename MATRIXB::const_iterator b1 = B.begin();
   const typename MATRIXB::const_iterator b_final = B.end();
   if (transpose)
     while (b1 != b_final)
       {
-	const unsigned int i = b1->column();
-	const unsigned int k = b1->row();
-	typename MATRIXB::const_iterator b2 = B.begin();
-	while (b2 != b_final)
-	  {
-	    const unsigned int j = b2->column();
-	    const unsigned int l = b2->row();
-	    
-	    const typename MATRIXA::value_type a = A.el(k,l);
-	    
-	    if (a != 0.)
-	      add (i, j, a * b1->value() * b2->value());
-	    ++b2;
-	  }
-	++b1;
+        const unsigned int i = b1->column();
+        const unsigned int k = b1->row();
+        typename MATRIXB::const_iterator b2 = B.begin();
+        while (b2 != b_final)
+          {
+            const unsigned int j = b2->column();
+            const unsigned int l = b2->row();
+
+            const typename MATRIXA::value_type a = A.el(k,l);
+
+            if (a != 0.)
+              add (i, j, a * b1->value() * b2->value());
+            ++b2;
+          }
+        ++b1;
       }
   else
     {
-				       // Determine minimal and
-				       // maximal row for a column in
-				       // advance.
+                                       // Determine minimal and
+                                       // maximal row for a column in
+                                       // advance.
 
       std::vector<unsigned int> minrow(B.n(), B.m());
       std::vector<unsigned int> maxrow(B.n(), 0);
       while (b1 != b_final)
-	{
-	  const unsigned int r = b1->row();
-	  if (r < minrow[b1->column()])
-	    minrow[b1->column()] = r;
-	  if (r > maxrow[b1->column()])
-	    maxrow[b1->column()] = r;
-	  ++b1;
-	}
+        {
+          const unsigned int r = b1->row();
+          if (r < minrow[b1->column()])
+            minrow[b1->column()] = r;
+          if (r > maxrow[b1->column()])
+            maxrow[b1->column()] = r;
+          ++b1;
+        }
 
       typename MATRIXA::const_iterator ai = A.begin();
       const typename MATRIXA::const_iterator ae = A.end();
 
       while (ai != ae)
-	{
-	  const typename MATRIXA::value_type a = ai->value();
-					   // Don't do anything if
-					   // this entry is zero.
-	  if (a == 0.) continue;
+        {
+          const typename MATRIXA::value_type a = ai->value();
+                                           // Don't do anything if
+                                           // this entry is zero.
+          if (a == 0.) continue;
 
-					   // Now, loop over all rows
-					   // having possibly a
-					   // nonzero entry in column
-					   // ai->row()
-	  b1 = B.begin(minrow[ai->row()]);
-	  const typename MATRIXB::const_iterator
-	    be1 = B.end(maxrow[ai->row()]);
-	  const typename MATRIXB::const_iterator
-	    be2 = B.end(maxrow[ai->column()]);
+                                           // Now, loop over all rows
+                                           // having possibly a
+                                           // nonzero entry in column
+                                           // ai->row()
+          b1 = B.begin(minrow[ai->row()]);
+          const typename MATRIXB::const_iterator
+            be1 = B.end(maxrow[ai->row()]);
+          const typename MATRIXB::const_iterator
+            be2 = B.end(maxrow[ai->column()]);
 
-	  while (b1 != be1)
-	    {
-	      const double b1v = b1->value();
-					       // We need the product
-					       // of both. If it is
-					       // zero, we can save
-					       // the work
-	      if (b1->column() == ai->row() && (b1v != 0.))
-		{
-		  const unsigned int i = b1->row();
-		  
-		  typename MATRIXB::const_iterator
-		    b2 = B.begin(minrow[ai->column()]);
-		  while (b2 != be2)
-		    {
-		      if (b2->column() == ai->column())
-			{
-			  const unsigned int j = b2->row();
-			  add (i, j, a * b1v * b2->value());
-			}
-		      ++b2;
-		    }
-		}
-	      ++b1;
-	    }
-	  ++ai;
-	}
+          while (b1 != be1)
+            {
+              const double b1v = b1->value();
+                                               // We need the product
+                                               // of both. If it is
+                                               // zero, we can save
+                                               // the work
+              if (b1->column() == ai->row() && (b1v != 0.))
+                {
+                  const unsigned int i = b1->row();
+
+                  typename MATRIXB::const_iterator
+                    b2 = B.begin(minrow[ai->column()]);
+                  while (b2 != be2)
+                    {
+                      if (b2->column() == ai->column())
+                        {
+                          const unsigned int j = b2->row();
+                          add (i, j, a * b1v * b2->value());
+                        }
+                      ++b2;
+                    }
+                }
+              ++b1;
+            }
+          ++ai;
+        }
     }
 }
 
@@ -1787,11 +1787,11 @@ SparseMatrixEZ<number>::print_statistics(STREAM& out, bool full)
   if (full)
     {
       for (unsigned int i=0; i< used_by_line.size();++i)
-	if (used_by_line[i] != 0)
-	  out << "SparseMatrixEZ:entries\t" << i
-	      << "\trows\t" << used_by_line[i]
-	      << std::endl;
-      
+        if (used_by_line[i] != 0)
+          out << "SparseMatrixEZ:entries\t" << i
+              << "\trows\t" << used_by_line[i]
+              << std::endl;
+
     }
 }
 

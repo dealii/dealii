@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,7 +52,7 @@ namespace PETScWrappers
                                         * vector as empty.
                                         */
       Vector ();
-      
+
                                        /**
                                         * Constructor. Set dimension to
                                         * @p n and initialize all
@@ -68,7 +68,7 @@ namespace PETScWrappers
                                         * length zero.
                                         */
       explicit Vector (const unsigned int n);
-    
+
                                        /**
                                         * Copy-constructor from deal.II
                                         * vectors. Sets the dimension to that
@@ -78,18 +78,18 @@ namespace PETScWrappers
       template <typename Number>
       explicit Vector (const dealii::Vector<Number> &v);
 
-				       /**
-					* Construct it from an existing PETSc
-					* Vector of type Vec. Note: this does
-					* not copy the contents and just keeps
-					* a pointer. You need to make sure the
-					* vector is not used twice at the same
-					* time or destroyed while in use. This
-					* class does not destroy the PETSc
-					* object. Handle with care!
-					*/
+                                       /**
+                                        * Construct it from an existing PETSc
+                                        * Vector of type Vec. Note: this does
+                                        * not copy the contents and just keeps
+                                        * a pointer. You need to make sure the
+                                        * vector is not used twice at the same
+                                        * time or destroyed while in use. This
+                                        * class does not destroy the PETSc
+                                        * object. Handle with care!
+                                        */
       explicit Vector (const Vec & v);
-      
+
                                        /**
                                         * Copy-constructor the values from a
                                         * PETSc wrapper vector class.
@@ -179,10 +179,10 @@ namespace PETScWrappers
                                         * filled by zeros. Otherwise, the
                                         * elements are left an unspecified
                                         * state.
-                                        */ 
+                                        */
       void reinit (const unsigned int N,
                    const bool         fast = false);
-    
+
                                        /**
                                         * Change the dimension to that of the
                                         * vector @p v. The same applies as
@@ -241,11 +241,11 @@ namespace PETScWrappers
 
   inline
   Vector::Vector (const Vec & v)
-		  :
-		  VectorBase(v)
+                  :
+                  VectorBase(v)
   {}
-  
-  
+
+
   inline
   Vector &
   Vector::operator = (const PetscScalar s)
@@ -254,7 +254,7 @@ namespace PETScWrappers
 
     return *this;
   }
-  
+
 
   inline
   Vector &
@@ -264,10 +264,10 @@ namespace PETScWrappers
                                      // then first resize the present one
     if (size() != v.size())
       reinit (v.size(), true);
-    
+
     const int ierr = VecCopy (v.vector, vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
     return *this;
   }
 
@@ -284,15 +284,15 @@ namespace PETScWrappers
                                      // generate the vector itself, so destroy
                                      // the old one first
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-	ierr = VecDestroy (vector);
+        ierr = VecDestroy (vector);
 #else
-	ierr = VecDestroy (&vector);
+        ierr = VecDestroy (&vector);
 #endif
-	AssertThrow (ierr == 0, ExcPETScError(ierr));
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
     attained_ownership = true;
-    
+
                                      // then do the gather
                                      // operation. <rant>petsc has changed its
                                      // interface again, and replaced a single
@@ -306,25 +306,25 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #else
-    
+
     VecScatter ctx;
 
     ierr = VecScatterCreateToAll (static_cast<const Vec &>(v), &ctx, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
 #if ((PETSC_VERSION_MAJOR == 2) && \
      ((PETSC_VERSION_MINOR < 3) || \
-      ((PETSC_VERSION_MINOR == 3) &&		\
+      ((PETSC_VERSION_MINOR == 3) &&            \
        (PETSC_VERSION_SUBMINOR < 3))))
     ierr = VecScatterBegin (static_cast<const Vec &>(v), vector,
                             INSERT_VALUES, SCATTER_FORWARD, ctx);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-   
+
     ierr = VecScatterEnd (static_cast<const Vec &>(v), vector,
                           INSERT_VALUES, SCATTER_FORWARD, ctx);
 
 #else
-    
+
     ierr = VecScatterBegin (ctx,static_cast<const Vec &>(v), vector,
                             INSERT_VALUES, SCATTER_FORWARD);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -332,7 +332,7 @@ namespace PETScWrappers
     ierr = VecScatterEnd (ctx, static_cast<const Vec &>(v), vector,
                           INSERT_VALUES, SCATTER_FORWARD);
 
-#endif        
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
@@ -342,7 +342,7 @@ namespace PETScWrappers
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif
-    
+
     return *this;
   }
 
@@ -351,7 +351,7 @@ namespace PETScWrappers
   template <typename number>
   inline
   Vector &
-  Vector::operator = (const dealii::Vector<number> &v) 
+  Vector::operator = (const dealii::Vector<number> &v)
   {
     reinit (v.size(), true);
                                      // the following isn't necessarily fast,

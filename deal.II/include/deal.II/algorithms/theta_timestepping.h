@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,7 +40,7 @@ namespace Algorithms
 /// The current step size times something
       double step;
   };
-  
+
 /**
  * Application class performing the theta timestepping scheme.
  *
@@ -105,7 +105,7 @@ namespace Algorithms
  * TimeStepData. Thus, we have a circular dependency of information,
  * and we include the following example for its use. It can be found
  * in <tt>examples/doxygen/theta_timestepping.cc</tt>
- * 
+ *
  * @dontinclude theta_timestepping.cc
  *
  * First, we define the two operators used by ThetaTimestepping and
@@ -168,167 +168,167 @@ namespace Algorithms
   class ThetaTimestepping : public Operator<VECTOR>
   {
     public:
-				       /**
-					* Constructor, receiving the
-					* two operators stored in
-					* #op_explicit and #op_implicit. For
-					* their meening, see the
-					* description of those variables.
-					*/
+                                       /**
+                                        * Constructor, receiving the
+                                        * two operators stored in
+                                        * #op_explicit and #op_implicit. For
+                                        * their meening, see the
+                                        * description of those variables.
+                                        */
       ThetaTimestepping (Operator<VECTOR>& op_explicit,
-			 Operator<VECTOR>& op_implicit);
+                         Operator<VECTOR>& op_implicit);
 
-      				       /**
-					* The timestepping scheme. <tt>in</tt>
-					* should contain the initial
-					* value in first position. <tt>out</tt>
-					*/
+                                       /**
+                                        * The timestepping scheme. <tt>in</tt>
+                                        * should contain the initial
+                                        * value in first position. <tt>out</tt>
+                                        */
       virtual void operator() (NamedData<VECTOR*>& out, const NamedData<VECTOR*>& in);
 
-				       /**
-					* Register an event triggered
-					* by an outer iteration.
-					*/
+                                       /**
+                                        * Register an event triggered
+                                        * by an outer iteration.
+                                        */
       virtual void notify(const Event&);
 
-				       /**
-					* Define an operator which
-					* will output the result in
-					* each step. Note that no
-					* output will be generated
-					* without this.
-					*/
+                                       /**
+                                        * Define an operator which
+                                        * will output the result in
+                                        * each step. Note that no
+                                        * output will be generated
+                                        * without this.
+                                        */
       void set_output(OutputOperator<VECTOR>& output);
-      
+
       void declare_parameters (ParameterHandler& param);
       void initialize (ParameterHandler& param);
-				       /**
-					* The current time in the
-					* timestepping scheme.
-					*/
+                                       /**
+                                        * The current time in the
+                                        * timestepping scheme.
+                                        */
       const double& current_time() const;
-				       /**
-					* The current step size.
-					*/
+                                       /**
+                                        * The current step size.
+                                        */
       const double& step_size() const;
-				       /**
-					* The weight between implicit
-					* and explicit part.
-					*/
+                                       /**
+                                        * The weight between implicit
+                                        * and explicit part.
+                                        */
       const double& theta() const;
 
-				       /**
-					* The data handed to the
-					* #op_explicit time stepping
-					* operator.
-					*
-					* The time in here is the time
-					* at the beginning of the
-					* current step, the time step
-					* is (1-#theta) times the
-					* actual time step.
-					*/
+                                       /**
+                                        * The data handed to the
+                                        * #op_explicit time stepping
+                                        * operator.
+                                        *
+                                        * The time in here is the time
+                                        * at the beginning of the
+                                        * current step, the time step
+                                        * is (1-#theta) times the
+                                        * actual time step.
+                                        */
       const TimestepData& explicit_data() const;
-      
-				       /**
-					* The data handed to the
-					* #op_implicit time stepping
-					* operator.
-					*
-					* The time in here is the time
-					* at the beginning of the
-					* current step, the time step
-					* is #theta times the
-					* actual time step.
-					*/
+
+                                       /**
+                                        * The data handed to the
+                                        * #op_implicit time stepping
+                                        * operator.
+                                        *
+                                        * The time in here is the time
+                                        * at the beginning of the
+                                        * current step, the time step
+                                        * is #theta times the
+                                        * actual time step.
+                                        */
       const TimestepData& implicit_data() const;
 
-				       /**
-					* Allow access to the control object.
-					*/
+                                       /**
+                                        * Allow access to the control object.
+                                        */
       TimestepControl& timestep_control();
-      
+
     private:
-				       /**
-					* The object controlling the
-					* time step size and computing
-					* the new time in each step.
-					*/
+                                       /**
+                                        * The object controlling the
+                                        * time step size and computing
+                                        * the new time in each step.
+                                        */
       TimestepControl control;
-      
-				       /**
-					* The control parameter theta in the
-					* range <tt>[0,1]</tt>.
-					*/
+
+                                       /**
+                                        * The control parameter theta in the
+                                        * range <tt>[0,1]</tt>.
+                                        */
       double vtheta;
-				       /**
-					* Use adaptive #theta if
-					* <tt>true</tt>.
-					*/
+                                       /**
+                                        * Use adaptive #theta if
+                                        * <tt>true</tt>.
+                                        */
       bool adaptive;
 
-				       /**
-					* The data for the explicit
-					* part of the scheme.
-					*/
+                                       /**
+                                        * The data for the explicit
+                                        * part of the scheme.
+                                        */
       TimestepData d_explicit;
-      
-				       /**
-					* The data for the implicit
-					* part of the scheme.
-					*/
+
+                                       /**
+                                        * The data for the implicit
+                                        * part of the scheme.
+                                        */
       TimestepData d_implicit;
-      
-      
-				       /**
-					* The operator computing the
-					* explicit part of the
-					* scheme. This will receive in
-					* its input data the value at
-					* the current time with name
-					* "Current time solution". It
-					* should obtain the current
-					* time and time step size from
-					* explicit_data().
-					*
-					* Its return value is
-					* <i>Mu+cAu</i>, where
-					* <i>u</i> is the current
-					* state vector, <i>M</i> the
-					* mass matrix, <i>A</i> the
-					* operator in space and
-					* <i>c</i> is the time step
-					* size in explicit_data().
-					*/
+
+
+                                       /**
+                                        * The operator computing the
+                                        * explicit part of the
+                                        * scheme. This will receive in
+                                        * its input data the value at
+                                        * the current time with name
+                                        * "Current time solution". It
+                                        * should obtain the current
+                                        * time and time step size from
+                                        * explicit_data().
+                                        *
+                                        * Its return value is
+                                        * <i>Mu+cAu</i>, where
+                                        * <i>u</i> is the current
+                                        * state vector, <i>M</i> the
+                                        * mass matrix, <i>A</i> the
+                                        * operator in space and
+                                        * <i>c</i> is the time step
+                                        * size in explicit_data().
+                                        */
       SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_explicit;
-      
-				       /**
-					* The operator solving the
-					* implicit part of the
-					* scheme. It will receive in
-					* its input data the vector
-					* "Previous time". Information on the
-					* timestep should be obtained
-					* from implicit_data().
-					*
-					* Its return value is the
-					* solution <i>u</i> of
-					* <i>Mu-cAu=f</i>, where
-					* <i>f</i> is the dual space
-					* vector found in the
-					* "Previous time" entry of the
-					* input data, <i>M</i> the
-					* mass matrix, <i>A</i> the
-					* operator in space and
-					* <i>c</i> is the time step
-					* size in explicit_data().
-					*/
+
+                                       /**
+                                        * The operator solving the
+                                        * implicit part of the
+                                        * scheme. It will receive in
+                                        * its input data the vector
+                                        * "Previous time". Information on the
+                                        * timestep should be obtained
+                                        * from implicit_data().
+                                        *
+                                        * Its return value is the
+                                        * solution <i>u</i> of
+                                        * <i>Mu-cAu=f</i>, where
+                                        * <i>f</i> is the dual space
+                                        * vector found in the
+                                        * "Previous time" entry of the
+                                        * input data, <i>M</i> the
+                                        * mass matrix, <i>A</i> the
+                                        * operator in space and
+                                        * <i>c</i> is the time step
+                                        * size in explicit_data().
+                                        */
       SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_implicit;
 
-				       /**
-					* The operator writing the
-					* output in each time step
-					*/
+                                       /**
+                                        * The operator writing the
+                                        * output in each time step
+                                        */
       SmartPointer<OutputOperator<VECTOR>, ThetaTimestepping<VECTOR> > output;
   };
 
@@ -340,7 +340,7 @@ namespace Algorithms
   {
     return d_explicit;
   }
-  
+
 
   template <class VECTOR>
   inline
@@ -349,10 +349,10 @@ namespace Algorithms
   {
     return d_implicit;
   }
-  
+
   template <class VECTOR>
   inline
-  void ThetaTimestepping<VECTOR>::set_output (OutputOperator<VECTOR>& out) 
+  void ThetaTimestepping<VECTOR>::set_output (OutputOperator<VECTOR>& out)
   {
     output = &out;
   }

@@ -38,7 +38,7 @@ void test() {
   Triangulation<dim, spacedim> tria;
   Triangulation<spacedim> volume_mesh;
   GridGenerator::half_hyper_ball(volume_mesh);
-  std::set<unsigned char> boundary_ids;
+  std::set<types::boundary_id_t> boundary_ids;
   boundary_ids.insert(0);
   
   GridTools::extract_boundary_mesh (volume_mesh, tria,boundary_ids);

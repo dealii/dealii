@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -284,7 +284,7 @@
  * CompressedSimpleSparsityPattern indicates that it should store too few rows
  * of the matrix, the program will either abort when you attempt to write into
  * matrix entries that do not exist or the matrix class will silently allocate
- * more memory to accomodate them. As a consequence, it is useful to err on
+ * more memory to accommodate them. As a consequence, it is useful to err on
  * the side of caution when indicating which constraints to store and use the
  * result of DoFTools::extract_locally_relevant_dofs() rather than
  * DoFTools::extract_locally_active_dofs() . This is also affordable since the
@@ -347,17 +347,17 @@
 
 namespace parallel
 {
-				   /**
-				    * A namespace for class and
-				    * functions that support %parallel
-				    * computing on %distributed memory
-				    * machines. See the @ref
-				    * distributed module for an
-				    * overview of the facilities this
-				    * namespace offers.
-				    *
-				    * @ingroup distributed
-				    */
+                                   /**
+                                    * A namespace for class and
+                                    * functions that support %parallel
+                                    * computing on %distributed memory
+                                    * machines. See the @ref
+                                    * distributed module for an
+                                    * overview of the facilities this
+                                    * namespace offers.
+                                    *
+                                    * @ingroup distributed
+                                    */
   namespace distributed
   {
   }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2005, 2006, 2009, 2011 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2005, 2006, 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,7 +42,7 @@ Mapping<dim,spacedim>::transform_covariant (
 template <int dim, int spacedim>
 void
 Mapping<dim, spacedim>::transform_covariant (
-    const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+    const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
     const unsigned int                 offset,
     VectorSlice<std::vector<Tensor<2,spacedim> > > output,
     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
@@ -74,7 +74,7 @@ Mapping<dim,spacedim>::transform_contravariant (
 template<int dim, int spacedim>
 void
 Mapping<dim,spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
@@ -90,10 +90,10 @@ Mapping<dim,spacedim>::transform_contravariant (
 
 template <int dim, int spacedim>
 Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
-		update_flags(update_default),
-		update_once(update_default),
-		update_each(update_default),
-		first_cell(true)
+                update_flags(update_default),
+                update_once(update_default),
+                update_each(update_default),
+                first_cell(true)
 {}
 
 

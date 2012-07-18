@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -84,180 +84,180 @@ template <int dim>
 class PolynomialSpace
 {
   public:
-				     /**
-				      * Access to the dimension of
-				      * this object, for checking and
-				      * automatic setting of dimension
-				      * in other classes.
-				      */
+                                     /**
+                                      * Access to the dimension of
+                                      * this object, for checking and
+                                      * automatic setting of dimension
+                                      * in other classes.
+                                      */
     static const unsigned int dimension = dim;
-    
-				     /**
-				      * Constructor. <tt>pols</tt> is a
-				      * vector of pointers to
-				      * one-dimensional polynomials
-				      * and will be copied into a
-				      * private member variable. The static
-				      * type of the template argument
-				      * <tt>pols</tt> needs to be
-				      * convertible to
-				      * Polynomials::Polynomial@<double@>,
-				      * i.e. should usually be a
-				      * derived class of
-				      * Polynomials::Polynomial@<double@>.
-				      */
+
+                                     /**
+                                      * Constructor. <tt>pols</tt> is a
+                                      * vector of pointers to
+                                      * one-dimensional polynomials
+                                      * and will be copied into a
+                                      * private member variable. The static
+                                      * type of the template argument
+                                      * <tt>pols</tt> needs to be
+                                      * convertible to
+                                      * Polynomials::Polynomial@<double@>,
+                                      * i.e. should usually be a
+                                      * derived class of
+                                      * Polynomials::Polynomial@<double@>.
+                                      */
     template <class Pol>
     PolynomialSpace (const std::vector<Pol> &pols);
 
-				     /**
-				      * Prints the list of the indices
-				      * to <tt>out</tt>.
-				      */
+                                     /**
+                                      * Prints the list of the indices
+                                      * to <tt>out</tt>.
+                                      */
     template <class STREAM>
     void output_indices(STREAM &out) const;
 
-				     /**
-				      * Sets the ordering of the
-				      * polynomials. Requires
-				      * <tt>renumber.size()==n()</tt>.
-				      * Stores a copy of
-				      * <tt>renumber</tt>.
-				      */
+                                     /**
+                                      * Sets the ordering of the
+                                      * polynomials. Requires
+                                      * <tt>renumber.size()==n()</tt>.
+                                      * Stores a copy of
+                                      * <tt>renumber</tt>.
+                                      */
     void set_numbering(const std::vector<unsigned int> &renumber);
-    
-				     /**
-				      * Computes the value and the
-				      * first and second derivatives
-				      * of each polynomial at
-				      * <tt>unit_point</tt>.
-				      *
-				      * The size of the vectors must
-				      * either be equal 0 or equal
-				      * n(). In the first case,
-				      * the function will not compute
-				      * these values, i.e. you
-				      * indicate what you want to have
-				      * computed by resizing those
-				      * vectors which you want filled.
-				      *
-				      * If you need values or
-				      * derivatives of all polynomials
-				      * then use this function, rather
-				      * than using any of the
-				      * compute_value(),
-				      * compute_grad() or
-				      * compute_grad_grad()
-				      * functions, see below, in a
-				      * loop over all polynomials.
-				      */
+
+                                     /**
+                                      * Computes the value and the
+                                      * first and second derivatives
+                                      * of each polynomial at
+                                      * <tt>unit_point</tt>.
+                                      *
+                                      * The size of the vectors must
+                                      * either be equal 0 or equal
+                                      * n(). In the first case,
+                                      * the function will not compute
+                                      * these values, i.e. you
+                                      * indicate what you want to have
+                                      * computed by resizing those
+                                      * vectors which you want filled.
+                                      *
+                                      * If you need values or
+                                      * derivatives of all polynomials
+                                      * then use this function, rather
+                                      * than using any of the
+                                      * compute_value(),
+                                      * compute_grad() or
+                                      * compute_grad_grad()
+                                      * functions, see below, in a
+                                      * loop over all polynomials.
+                                      */
     void compute (const Point<dim>            &unit_point,
-		  std::vector<double>         &values,
-		  std::vector<Tensor<1,dim> > &grads,
-		  std::vector<Tensor<2,dim> > &grad_grads) const;
-    
-				     /**
-				      * Computes the value of the
-				      * <tt>i</tt>th polynomial at
-				      * <tt>unit_point</tt>.
-				      *
-				      * Consider using compute() instead.
-				      */
+                  std::vector<double>         &values,
+                  std::vector<Tensor<1,dim> > &grads,
+                  std::vector<Tensor<2,dim> > &grad_grads) const;
+
+                                     /**
+                                      * Computes the value of the
+                                      * <tt>i</tt>th polynomial at
+                                      * <tt>unit_point</tt>.
+                                      *
+                                      * Consider using compute() instead.
+                                      */
     double compute_value (const unsigned int i,
-			  const Point<dim> &p) const;
+                          const Point<dim> &p) const;
 
-				     /**
-				      * Computes the gradient of the
-				      * <tt>i</tt>th polynomial at
-				      * <tt>unit_point</tt>.
-				      *
-				      * Consider using compute() instead.
-				      */
+                                     /**
+                                      * Computes the gradient of the
+                                      * <tt>i</tt>th polynomial at
+                                      * <tt>unit_point</tt>.
+                                      *
+                                      * Consider using compute() instead.
+                                      */
     Tensor<1,dim> compute_grad (const unsigned int i,
-				const Point<dim> &p) const;
+                                const Point<dim> &p) const;
 
-				     /**
-				      * Computes the second derivative
-				      * (grad_grad) of the <tt>i</tt>th
-				      * polynomial at
-				      * <tt>unit_point</tt>.
-				      *
-				      * Consider using compute() instead.
-				      */
+                                     /**
+                                      * Computes the second derivative
+                                      * (grad_grad) of the <tt>i</tt>th
+                                      * polynomial at
+                                      * <tt>unit_point</tt>.
+                                      *
+                                      * Consider using compute() instead.
+                                      */
     Tensor<2,dim> compute_grad_grad (const unsigned int i,
                                      const Point<dim> &p) const;
 
-				     /**
-				      * Return the number of
-				      * polynomials spanning the space
-				      * represented by this
-				      * class. Here, if <tt>N</tt> is the
-				      * number of one-dimensional
-				      * polynomials given, then the
-				      * result of this function is
-				      * <i>N</i> in 1d, <i>N(N+1)/2</i> in
-				      * 2d, and <i>N(N+1)(N+2)/6</i> in
-				      * 3d.
-				      */
+                                     /**
+                                      * Return the number of
+                                      * polynomials spanning the space
+                                      * represented by this
+                                      * class. Here, if <tt>N</tt> is the
+                                      * number of one-dimensional
+                                      * polynomials given, then the
+                                      * result of this function is
+                                      * <i>N</i> in 1d, <i>N(N+1)/2</i> in
+                                      * 2d, and <i>N(N+1)(N+2)/6</i> in
+                                      * 3d.
+                                      */
     unsigned int n () const;
 
-				     /**
-				      * Degree of the space. This is
-				      * by definition the number of
-				      * polynomials given to the
-				      * constructor, NOT the maximal
-				      * degree of a polynomial in this
-				      * vector. The latter value is
-				      * never checked and therefore
-				      * left to the application.
-				      */
-    unsigned int degree () const;  
-    
-				     /**
-				      * Static function used in the
-				      * constructor to compute the
-				      * number of polynomials.
-				      */
+                                     /**
+                                      * Degree of the space. This is
+                                      * by definition the number of
+                                      * polynomials given to the
+                                      * constructor, NOT the maximal
+                                      * degree of a polynomial in this
+                                      * vector. The latter value is
+                                      * never checked and therefore
+                                      * left to the application.
+                                      */
+    unsigned int degree () const;
+
+                                     /**
+                                      * Static function used in the
+                                      * constructor to compute the
+                                      * number of polynomials.
+                                      */
     static unsigned int compute_n_pols (const unsigned int n);
 
   protected:
-    
-				     /**
-				      * Compute numbers in x, y and z
-				      * direction. Given an index
-				      * <tt>n</tt> in the d-dimensional
-				      * polynomial space, compute the
-				      * indices i,j,k such that
-				      * <i>p<sub>n</sub>(x,y,z) =
-				      * p<sub>i</sub>(x)p<sub>j</sub>(y)p<sub>k</sub>(z)</i>.
-				      */
+
+                                     /**
+                                      * Compute numbers in x, y and z
+                                      * direction. Given an index
+                                      * <tt>n</tt> in the d-dimensional
+                                      * polynomial space, compute the
+                                      * indices i,j,k such that
+                                      * <i>p<sub>n</sub>(x,y,z) =
+                                      * p<sub>i</sub>(x)p<sub>j</sub>(y)p<sub>k</sub>(z)</i>.
+                                      */
     void compute_index (const unsigned int n,
                         unsigned int      (&index)[dim]) const;
 
   private:
-				     /**
-				      * Copy of the vector <tt>pols</tt> of
-				      * polynomials given to the
-				      * constructor.
-				      */
+                                     /**
+                                      * Copy of the vector <tt>pols</tt> of
+                                      * polynomials given to the
+                                      * constructor.
+                                      */
     const std::vector<Polynomials::Polynomial<double> > polynomials;
 
-				     /**
-				      * Store the precomputed value
-				      * which the <tt>n()</tt> function
-				      * returns.
-				      */
+                                     /**
+                                      * Store the precomputed value
+                                      * which the <tt>n()</tt> function
+                                      * returns.
+                                      */
     const unsigned int n_pols;
 
-				     /**
-				      * Index map for reordering the
-				      * polynomials.
-				      */
+                                     /**
+                                      * Index map for reordering the
+                                      * polynomials.
+                                      */
     std::vector<unsigned int> index_map;
 
-				     /**
-				      * Index map for reordering the
-				      * polynomials.
-				      */
+                                     /**
+                                      * Index map for reordering the
+                                      * polynomials.
+                                      */
     std::vector<unsigned int> index_map_inverse;
 };
 
@@ -281,16 +281,16 @@ void PolynomialSpace<3>::compute_index(const unsigned int n,
 template <int dim>
 template <class Pol>
 PolynomialSpace<dim>::PolynomialSpace (const std::vector<Pol> &pols)
-		:
-		polynomials (pols.begin(), pols.end()),
-		n_pols (compute_n_pols(polynomials.size())),
-		index_map(n_pols),
-		index_map_inverse(n_pols)
+                :
+                polynomials (pols.begin(), pols.end()),
+                n_pols (compute_n_pols(polynomials.size())),
+                index_map(n_pols),
+                index_map_inverse(n_pols)
 {
-				   // per default set this index map
-				   // to identity. This map can be
-				   // changed by the user through the
-				   // set_numbering function
+                                   // per default set this index map
+                                   // to identity. This map can be
+                                   // changed by the user through the
+                                   // set_numbering function
   for (unsigned int i=0; i<n_pols; ++i)
     {
       index_map[i]=i;
@@ -307,7 +307,7 @@ PolynomialSpace<dim>::n() const
   return n_pols;
 }
 
-  
+
 
 template<int dim>
 inline
@@ -329,7 +329,7 @@ PolynomialSpace<dim>::output_indices(STREAM &out) const
       compute_index(i,ix);
       out << i << "\t";
       for (unsigned int d=0; d<dim; ++d)
-	out << ix[d] << " ";
+        out << ix[d] << " ";
       out << std::endl;
     }
 }

@@ -1,7 +1,7 @@
 //----------------------------  hp_dof_levels.h  ------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2006, 2008, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,9 +41,9 @@ namespace internal
  * uses. This is done in the DoFLevel<0> class, where for each cell we
  * have an entry within the active_fe_indices field.
  *
- * 
+ *
  * <h4>Offset computations</h4>
- * 
+ *
  * For hp methods, not all cells may use the same finite element, and
  * it is consequently more complicated to determine where the DoF
  * indices for a given line, quad, or hex are stored. As described in
@@ -57,7 +57,7 @@ namespace internal
  * and hexes.dofs arrays has an associated array lines.dof_offsets,
  * quads.dof_offsets, and hexes.dof_offsets. The data corresponding to a
  * line then starts at index <code>line_dof_offsets[line_index]</code>
- * within the <code>line_dofs</code> array. 
+ * within the <code>line_dofs</code> array.
  *
  *
  * <h4>Multiple data sets per object</h4>
@@ -65,7 +65,7 @@ namespace internal
  * If an object corresponds to a cell, the global dof indices of this
  * cell are stored at the location indicated above in sequential
  * order.
- * 
+ *
  * However, if two adjacent cells use different finite elements, then
  * the face that they share needs to store DoF indices for both
  * involved finite elements. While faces therefore have to have at
@@ -95,8 +95,8 @@ namespace internal
  * list and pick out or set a DoF index given the finite element index
  * and its location within the set of DoFs corresponding to this
  * finite element.
- * 
- * 
+ *
+ *
  * @ingroup hp
  * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
  */
@@ -117,7 +117,7 @@ namespace internal
  * Storage for degrees of freedom on cells. See the documentation of
  * the DoFLevel class template for more complete information on the
  * purpose and layout of this class.
- * 
+ *
  * @ingroup hp
  * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
  */
@@ -140,7 +140,7 @@ namespace internal
                                           */
 
         std::vector<unsigned int> active_fe_indices;
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
@@ -160,14 +160,14 @@ namespace internal
     class DoFLevel<1> : public DoFLevel<0>
     {
       public:
-					 /**
-					  *  store the dof-indices and related functions of
-					  *  lines
-					  */
-	internal::hp::DoFObjects<1> lines;
+                                         /**
+                                          *  store the dof-indices and related functions of
+                                          *  lines
+                                          */
+        internal::hp::DoFObjects<1> lines;
 
-					 /**
-					  * Determine an estimate for the
+                                         /**
+                                          * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
@@ -186,13 +186,13 @@ namespace internal
     class DoFLevel<2> : public DoFLevel<0>
     {
       public:
-					 /**
-					  *  store the dof-indices and related functions of
-					  *  quads
-					  */
-	internal::hp::DoFObjects<2> quads;
+                                         /**
+                                          *  store the dof-indices and related functions of
+                                          *  quads
+                                          */
+        internal::hp::DoFObjects<2> quads;
 
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
@@ -213,13 +213,13 @@ namespace internal
     class DoFLevel<3> : public DoFLevel<0>
     {
       public:
-					 /**
-					  *  store the dof-indices and related functions of
-					  *  hexes
-					  */
-	internal::hp::DoFObjects<3> hexes;
+                                         /**
+                                          *  store the dof-indices and related functions of
+                                          *  hexes
+                                          */
+        internal::hp::DoFObjects<3> hexes;
 
-					 /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
@@ -228,7 +228,7 @@ namespace internal
     };
 
   } // namespace hp
-  
+
 } // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

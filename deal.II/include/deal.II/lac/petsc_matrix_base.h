@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -337,18 +337,18 @@ namespace PETScWrappers
                                        /**
                                         * Set the element (<i>i,j</i>) to @p
                                         * value.
-					*
-					* If the present object (from a
-					* derived class of this one) happens
-					* to be a sparse matrix, then this
-					* function adds a new entry to the
-					* matrix if it didn't exist before,
-					* very much in contrast to the
-					* SparseMatrix class which throws an
-					* error if the entry does not exist.
-					* If <tt>value</tt> is not a finite
-					* number an exception is thrown.
-					*/
+                                        *
+                                        * If the present object (from a
+                                        * derived class of this one) happens
+                                        * to be a sparse matrix, then this
+                                        * function adds a new entry to the
+                                        * matrix if it didn't exist before,
+                                        * very much in contrast to the
+                                        * SparseMatrix class which throws an
+                                        * error if the entry does not exist.
+                                        * If <tt>value</tt> is not a finite
+                                        * number an exception is thrown.
+                                        */
       void set (const unsigned int i,
                 const unsigned int j,
                 const PetscScalar value);
@@ -368,29 +368,29 @@ namespace PETScWrappers
                                         * quadratic sparse matrix and a
                                         * quadratic full_matrix, the usual
                                         * situation in FE calculations.
-					*
-					* If the present object (from a
-					* derived class of this one) happens
-					* to be a sparse matrix, then this
-					* function adds some new entries to
-					* the matrix if they didn't exist
-					* before, very much in contrast to
-					* the SparseMatrix class which
-					* throws an error if the entry does
-					* not exist.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be inserted anyway
-					* or they should be filtered
-					* away. The default value is
-					* <tt>false</tt>, i.e., even zero
-					* values are inserted/replaced.
-					*/
+                                        *
+                                        * If the present object (from a
+                                        * derived class of this one) happens
+                                        * to be a sparse matrix, then this
+                                        * function adds some new entries to
+                                        * the matrix if they didn't exist
+                                        * before, very much in contrast to
+                                        * the SparseMatrix class which
+                                        * throws an error if the entry does
+                                        * not exist.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be inserted anyway
+                                        * or they should be filtered
+                                        * away. The default value is
+                                        * <tt>false</tt>, i.e., even zero
+                                        * values are inserted/replaced.
+                                        */
       void set (const std::vector<unsigned int> &indices,
-		const FullMatrix<PetscScalar>   &full_matrix,
-		const bool                       elide_zero_values = false);
+                const FullMatrix<PetscScalar>   &full_matrix,
+                const bool                       elide_zero_values = false);
 
                                        /**
                                         * Same function as before, but now
@@ -398,11 +398,11 @@ namespace PETScWrappers
                                         * rectangular full_matrices and
                                         * different local-to-global indexing
                                         * on rows and columns, respectively.
-					*/
+                                        */
       void set (const std::vector<unsigned int> &row_indices,
-		const std::vector<unsigned int> &col_indices,
-		const FullMatrix<PetscScalar>   &full_matrix,
-		const bool                       elide_zero_values = false);
+                const std::vector<unsigned int> &col_indices,
+                const FullMatrix<PetscScalar>   &full_matrix,
+                const bool                       elide_zero_values = false);
 
                                        /**
                                         * Set several elements in the
@@ -410,30 +410,30 @@ namespace PETScWrappers
                                         * column indices as given by
                                         * <tt>col_indices</tt> to the
                                         * respective value.
-					*
-					* If the present object (from a
-					* derived class of this one) happens
-					* to be a sparse matrix, then this
-					* function adds some new entries to
-					* the matrix if they didn't exist
-					* before, very much in contrast to
-					* the SparseMatrix class which
-					* throws an error if the entry does
-					* not exist.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be inserted anyway
-					* or they should be filtered
-					* away. The default value is
-					* <tt>false</tt>, i.e., even zero
-					* values are inserted/replaced.
-					*/
+                                        *
+                                        * If the present object (from a
+                                        * derived class of this one) happens
+                                        * to be a sparse matrix, then this
+                                        * function adds some new entries to
+                                        * the matrix if they didn't exist
+                                        * before, very much in contrast to
+                                        * the SparseMatrix class which
+                                        * throws an error if the entry does
+                                        * not exist.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be inserted anyway
+                                        * or they should be filtered
+                                        * away. The default value is
+                                        * <tt>false</tt>, i.e., even zero
+                                        * values are inserted/replaced.
+                                        */
       void set (const unsigned int               row,
-		const std::vector<unsigned int> &col_indices,
-		const std::vector<PetscScalar>  &values,
-		const bool                       elide_zero_values = false);
+                const std::vector<unsigned int> &col_indices,
+                const std::vector<PetscScalar>  &values,
+                const bool                       elide_zero_values = false);
 
                                        /**
                                         * Set several elements to values
@@ -441,46 +441,46 @@ namespace PETScWrappers
                                         * given row in columns given by
                                         * col_indices into the sparse
                                         * matrix.
-					*
-					* If the present object (from a
-					* derived class of this one) happens
-					* to be a sparse matrix, then this
-					* function adds some new entries to
-					* the matrix if they didn't exist
-					* before, very much in contrast to
-					* the SparseMatrix class which
-					* throws an error if the entry does
-					* not exist.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be inserted anyway
-					* or they should be filtered
-					* away. The default value is
-					* <tt>false</tt>, i.e., even zero
-					* values are inserted/replaced.
-					*/
+                                        *
+                                        * If the present object (from a
+                                        * derived class of this one) happens
+                                        * to be a sparse matrix, then this
+                                        * function adds some new entries to
+                                        * the matrix if they didn't exist
+                                        * before, very much in contrast to
+                                        * the SparseMatrix class which
+                                        * throws an error if the entry does
+                                        * not exist.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be inserted anyway
+                                        * or they should be filtered
+                                        * away. The default value is
+                                        * <tt>false</tt>, i.e., even zero
+                                        * values are inserted/replaced.
+                                        */
       void set (const unsigned int  row,
-		const unsigned int  n_cols,
-		const unsigned int *col_indices,
-		const PetscScalar  *values,
-		const bool          elide_zero_values = false);
+                const unsigned int  n_cols,
+                const unsigned int *col_indices,
+                const PetscScalar  *values,
+                const bool          elide_zero_values = false);
 
                                        /**
                                         * Add @p value to the element
                                         * (<i>i,j</i>).
-					*
-					* If the present object (from a
-					* derived class of this one) happens
-					* to be a sparse matrix, then this
-					* function adds a new entry to the
-					* matrix if it didn't exist before,
-					* very much in contrast to the
-					* SparseMatrix class which throws an
-					* error if the entry does not exist.
-					* If <tt>value</tt> is not a finite
-					* number an exception is thrown.
+                                        *
+                                        * If the present object (from a
+                                        * derived class of this one) happens
+                                        * to be a sparse matrix, then this
+                                        * function adds a new entry to the
+                                        * matrix if it didn't exist before,
+                                        * very much in contrast to the
+                                        * SparseMatrix class which throws an
+                                        * error if the entry does not exist.
+                                        * If <tt>value</tt> is not a finite
+                                        * number an exception is thrown.
                                         */
       void add (const unsigned int i,
                 const unsigned int j,
@@ -502,30 +502,30 @@ namespace PETScWrappers
                                         * quadratic sparse matrix and a
                                         * quadratic full_matrix, the usual
                                         * situation in FE calculations.
-					*
-					* If the present object (from a
-					* derived class of this one) happens
-					* to be a sparse matrix, then this
-					* function adds some new entries to
-					* the matrix if they didn't exist
-					* before, very much in contrast to
-					* the SparseMatrix class which
-					* throws an error if the entry does
-					* not exist.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be added anyway or
-					* these should be filtered away and
-					* only non-zero data is added. The
-					* default value is <tt>true</tt>,
-					* i.e., zero values won't be added
-					* into the matrix.
-					*/
+                                        *
+                                        * If the present object (from a
+                                        * derived class of this one) happens
+                                        * to be a sparse matrix, then this
+                                        * function adds some new entries to
+                                        * the matrix if they didn't exist
+                                        * before, very much in contrast to
+                                        * the SparseMatrix class which
+                                        * throws an error if the entry does
+                                        * not exist.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be added anyway or
+                                        * these should be filtered away and
+                                        * only non-zero data is added. The
+                                        * default value is <tt>true</tt>,
+                                        * i.e., zero values won't be added
+                                        * into the matrix.
+                                        */
       void add (const std::vector<unsigned int> &indices,
-		const FullMatrix<PetscScalar>   &full_matrix,
-		const bool                       elide_zero_values = true);
+                const FullMatrix<PetscScalar>   &full_matrix,
+                const bool                       elide_zero_values = true);
 
                                        /**
                                         * Same function as before, but now
@@ -533,11 +533,11 @@ namespace PETScWrappers
                                         * rectangular full_matrices and
                                         * different local-to-global indexing
                                         * on rows and columns, respectively.
-					*/
+                                        */
       void add (const std::vector<unsigned int> &row_indices,
-		const std::vector<unsigned int> &col_indices,
-		const FullMatrix<PetscScalar>   &full_matrix,
-		const bool                       elide_zero_values = true);
+                const std::vector<unsigned int> &col_indices,
+                const FullMatrix<PetscScalar>   &full_matrix,
+                const bool                       elide_zero_values = true);
 
                                        /**
                                         * Set several elements in the
@@ -545,31 +545,31 @@ namespace PETScWrappers
                                         * column indices as given by
                                         * <tt>col_indices</tt> to the
                                         * respective value.
-					*
-					* If the present object (from a
-					* derived class of this one) happens
-					* to be a sparse matrix, then this
-					* function adds some new entries to
-					* the matrix if they didn't exist
-					* before, very much in contrast to
-					* the SparseMatrix class which
-					* throws an error if the entry does
-					* not exist.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be added anyway or
-					* these should be filtered away and
-					* only non-zero data is added. The
-					* default value is <tt>true</tt>,
-					* i.e., zero values won't be added
-					* into the matrix.
-					*/
+                                        *
+                                        * If the present object (from a
+                                        * derived class of this one) happens
+                                        * to be a sparse matrix, then this
+                                        * function adds some new entries to
+                                        * the matrix if they didn't exist
+                                        * before, very much in contrast to
+                                        * the SparseMatrix class which
+                                        * throws an error if the entry does
+                                        * not exist.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be added anyway or
+                                        * these should be filtered away and
+                                        * only non-zero data is added. The
+                                        * default value is <tt>true</tt>,
+                                        * i.e., zero values won't be added
+                                        * into the matrix.
+                                        */
       void add (const unsigned int               row,
-		const std::vector<unsigned int> &col_indices,
-		const std::vector<PetscScalar>  &values,
-		const bool                       elide_zero_values = true);
+                const std::vector<unsigned int> &col_indices,
+                const std::vector<PetscScalar>  &values,
+                const bool                       elide_zero_values = true);
 
                                        /**
                                         * Add an array of values given by
@@ -577,33 +577,33 @@ namespace PETScWrappers
                                         * global matrix row at columns
                                         * specified by col_indices in the
                                         * sparse matrix.
-					*
-					* If the present object (from a
-					* derived class of this one) happens
-					* to be a sparse matrix, then this
-					* function adds some new entries to
-					* the matrix if they didn't exist
-					* before, very much in contrast to
-					* the SparseMatrix class which
-					* throws an error if the entry does
-					* not exist.
-					*
-					* The optional parameter
-					* <tt>elide_zero_values</tt> can be
-					* used to specify whether zero
-					* values should be added anyway or
-					* these should be filtered away and
-					* only non-zero data is added. The
-					* default value is <tt>true</tt>,
-					* i.e., zero values won't be added
-					* into the matrix.
-					*/
+                                        *
+                                        * If the present object (from a
+                                        * derived class of this one) happens
+                                        * to be a sparse matrix, then this
+                                        * function adds some new entries to
+                                        * the matrix if they didn't exist
+                                        * before, very much in contrast to
+                                        * the SparseMatrix class which
+                                        * throws an error if the entry does
+                                        * not exist.
+                                        *
+                                        * The optional parameter
+                                        * <tt>elide_zero_values</tt> can be
+                                        * used to specify whether zero
+                                        * values should be added anyway or
+                                        * these should be filtered away and
+                                        * only non-zero data is added. The
+                                        * default value is <tt>true</tt>,
+                                        * i.e., zero values won't be added
+                                        * into the matrix.
+                                        */
       void add (const unsigned int  row,
-		const unsigned int  n_cols,
-		const unsigned int *col_indices,
-		const PetscScalar  *values,
-		const bool          elide_zero_values = true,
-		const bool          col_indices_are_sorted = false);
+                const unsigned int  n_cols,
+                const unsigned int *col_indices,
+                const PetscScalar  *values,
+                const bool          elide_zero_values = true,
+                const bool          col_indices_are_sorted = false);
 
                                        /**
                                         * Remove all elements from
@@ -666,10 +666,10 @@ namespace PETScWrappers
                                         * allowed. This function must
                                         * therefore be called once you have
                                         * assembled the matrix.
-					*
-					* See @ref GlossCompress "Compressing distributed objects"
-					* for more information.
-					* more information.
+                                        *
+                                        * See @ref GlossCompress "Compressing distributed objects"
+                                        * for more information.
+                                        * more information.
                                         */
       void compress ();
 
@@ -743,37 +743,37 @@ namespace PETScWrappers
                                         * this number is the same as m(),
                                         * but for parallel matrices it may be
                                         * smaller.
-					*
-					* To figure out which elements
-					* exactly are stored locally,
-					* use local_range().
+                                        *
+                                        * To figure out which elements
+                                        * exactly are stored locally,
+                                        * use local_range().
                                         */
       unsigned int local_size () const;
 
                                        /**
-					* Return a pair of indices
-					* indicating which rows of
-					* this matrix are stored
-					* locally. The first number is
-					* the index of the first
-					* row stored, the second
-					* the index of the one past
-					* the last one that is stored
-					* locally. If this is a
-					* sequential matrix, then the
-					* result will be the pair
-					* (0,m()), otherwise it will be
-					* a pair (i,i+n), where
-					* <tt>n=local_size()</tt>.
-					*/
+                                        * Return a pair of indices
+                                        * indicating which rows of
+                                        * this matrix are stored
+                                        * locally. The first number is
+                                        * the index of the first
+                                        * row stored, the second
+                                        * the index of the one past
+                                        * the last one that is stored
+                                        * locally. If this is a
+                                        * sequential matrix, then the
+                                        * result will be the pair
+                                        * (0,m()), otherwise it will be
+                                        * a pair (i,i+n), where
+                                        * <tt>n=local_size()</tt>.
+                                        */
       std::pair<unsigned int, unsigned int>
       local_range () const;
 
-				       /**
-					* Return whether @p index is
-					* in the local range or not,
-					* see also local_range().
-					*/
+                                       /**
+                                        * Return whether @p index is
+                                        * in the local range or not,
+                                        * see also local_range().
+                                        */
       bool in_local_range (const unsigned int index) const;
 
                                        /**
@@ -866,16 +866,16 @@ namespace PETScWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
-					*
-					* Note that if the current object
-					* represents a parallel distributed
-					* matrix (of type
-					* PETScWrappers::MPI::SparseMatrix),
-					* then both vectors have to be
-					* distributed vectors as
-					* well. Conversely, if the matrix is
-					* not distributed, then neither of the
-					* vectors may be.
+                                        *
+                                        * Note that if the current object
+                                        * represents a parallel distributed
+                                        * matrix (of type
+                                        * PETScWrappers::MPI::SparseMatrix),
+                                        * then both vectors have to be
+                                        * distributed vectors as
+                                        * well. Conversely, if the matrix is
+                                        * not distributed, then neither of the
+                                        * vectors may be.
                                         */
       void vmult (VectorBase       &dst,
                   const VectorBase &src) const;
@@ -889,16 +889,16 @@ namespace PETScWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
-					*
-					* Note that if the current object
-					* represents a parallel distributed
-					* matrix (of type
-					* PETScWrappers::MPI::SparseMatrix),
-					* then both vectors have to be
-					* distributed vectors as
-					* well. Conversely, if the matrix is
-					* not distributed, then neither of the
-					* vectors may be.
+                                        *
+                                        * Note that if the current object
+                                        * represents a parallel distributed
+                                        * matrix (of type
+                                        * PETScWrappers::MPI::SparseMatrix),
+                                        * then both vectors have to be
+                                        * distributed vectors as
+                                        * well. Conversely, if the matrix is
+                                        * not distributed, then neither of the
+                                        * vectors may be.
                                         */
       void Tvmult (VectorBase       &dst,
                    const VectorBase &src) const;
@@ -912,16 +912,16 @@ namespace PETScWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
-					*
-					* Note that if the current object
-					* represents a parallel distributed
-					* matrix (of type
-					* PETScWrappers::MPI::SparseMatrix),
-					* then both vectors have to be
-					* distributed vectors as
-					* well. Conversely, if the matrix is
-					* not distributed, then neither of the
-					* vectors may be.
+                                        *
+                                        * Note that if the current object
+                                        * represents a parallel distributed
+                                        * matrix (of type
+                                        * PETScWrappers::MPI::SparseMatrix),
+                                        * then both vectors have to be
+                                        * distributed vectors as
+                                        * well. Conversely, if the matrix is
+                                        * not distributed, then neither of the
+                                        * vectors may be.
                                         */
       void vmult_add (VectorBase       &dst,
                       const VectorBase &src) const;
@@ -938,16 +938,16 @@ namespace PETScWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
-					*
-					* Note that if the current object
-					* represents a parallel distributed
-					* matrix (of type
-					* PETScWrappers::MPI::SparseMatrix),
-					* then both vectors have to be
-					* distributed vectors as
-					* well. Conversely, if the matrix is
-					* not distributed, then neither of the
-					* vectors may be.
+                                        *
+                                        * Note that if the current object
+                                        * represents a parallel distributed
+                                        * matrix (of type
+                                        * PETScWrappers::MPI::SparseMatrix),
+                                        * then both vectors have to be
+                                        * distributed vectors as
+                                        * well. Conversely, if the matrix is
+                                        * not distributed, then neither of the
+                                        * vectors may be.
                                         */
       void Tvmult_add (VectorBase       &dst,
                        const VectorBase &src) const;
@@ -977,16 +977,16 @@ namespace PETScWrappers
                                         * the PETSc wrapper class) since PETSc
                                         * doesn't support this operation and
                                         * needs a temporary vector.
-					*
-					* Note that if the current object
-					* represents a parallel distributed
-					* matrix (of type
-					* PETScWrappers::MPI::SparseMatrix),
-					* then the given vector has to be
-					* a distributed vector as
-					* well. Conversely, if the matrix is
-					* not distributed, then neither
-					* may the vector be.
+                                        *
+                                        * Note that if the current object
+                                        * represents a parallel distributed
+                                        * matrix (of type
+                                        * PETScWrappers::MPI::SparseMatrix),
+                                        * then the given vector has to be
+                                        * a distributed vector as
+                                        * well. Conversely, if the matrix is
+                                        * not distributed, then neither
+                                        * may the vector be.
                                         */
       PetscScalar matrix_norm_square (const VectorBase &v) const;
 
@@ -1001,16 +1001,16 @@ namespace PETScWrappers
                                         * the PETSc wrapper class) since PETSc
                                         * doesn't support this operation and
                                         * needs a temporary vector.
-					*
-					* Note that if the current object
-					* represents a parallel distributed
-					* matrix (of type
-					* PETScWrappers::MPI::SparseMatrix),
-					* then both vectors have to be
-					* distributed vectors as
-					* well. Conversely, if the matrix is
-					* not distributed, then neither of the
-					* vectors may be.
+                                        *
+                                        * Note that if the current object
+                                        * represents a parallel distributed
+                                        * matrix (of type
+                                        * PETScWrappers::MPI::SparseMatrix),
+                                        * then both vectors have to be
+                                        * distributed vectors as
+                                        * well. Conversely, if the matrix is
+                                        * not distributed, then neither of the
+                                        * vectors may be.
                                         */
       PetscScalar matrix_scalar_product (const VectorBase &u,
                                          const VectorBase &v) const;
@@ -1029,16 +1029,16 @@ namespace PETScWrappers
                                         * Source <i>x</i> and destination
                                         * <i>dst</i> must not be the same
                                         * vector.
-					*
-					* Note that if the current object
-					* represents a parallel distributed
-					* matrix (of type
-					* PETScWrappers::MPI::SparseMatrix),
-					* then all vectors have to be
-					* distributed vectors as
-					* well. Conversely, if the matrix is
-					* not distributed, then neither of the
-					* vectors may be.
+                                        *
+                                        * Note that if the current object
+                                        * represents a parallel distributed
+                                        * matrix (of type
+                                        * PETScWrappers::MPI::SparseMatrix),
+                                        * then all vectors have to be
+                                        * distributed vectors as
+                                        * well. Conversely, if the matrix is
+                                        * not distributed, then neither of the
+                                        * vectors may be.
                                         */
       PetscScalar residual (VectorBase       &dst,
                             const VectorBase &x,
@@ -1096,55 +1096,55 @@ namespace PETScWrappers
       operator Mat () const;
 
                                         /**
-					 * Make an in-place transpose of a
-					 * matrix.
-					 */
+                                         * Make an in-place transpose of a
+                                         * matrix.
+                                         */
       void transpose ();
 
                                         /**
-					 * Test whether a matrix is
-					 * symmetric.  Default
-					 * tolerance is
-					 * $1000\times32$-bit machine
-					 * precision.
-					 */
+                                         * Test whether a matrix is
+                                         * symmetric.  Default
+                                         * tolerance is
+                                         * $1000\times32$-bit machine
+                                         * precision.
+                                         */
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-      PetscTruth 
+      PetscTruth
 #else
-	PetscBool
+        PetscBool
 #endif
-	is_symmetric (const double tolerance = 1.e-12);
+        is_symmetric (const double tolerance = 1.e-12);
 
 #if DEAL_II_PETSC_VERSION_GTE(2,3,0)
                                         /**
-					 * Test whether a matrix is
-					 * Hermitian, i.e. it is the
-					 * complex conjugate of its
-					 * transpose. Default
-					 * tolerance is
-					 * $1000\times32$-bit machine
-					 * precision.
-					 */
+                                         * Test whether a matrix is
+                                         * Hermitian, i.e. it is the
+                                         * complex conjugate of its
+                                         * transpose. Default
+                                         * tolerance is
+                                         * $1000\times32$-bit machine
+                                         * precision.
+                                         */
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-      PetscTruth 
+      PetscTruth
 #else
-	PetscBool
+        PetscBool
 #endif
-	is_hermitian (const double tolerance = 1.e-12);
+        is_hermitian (const double tolerance = 1.e-12);
 #endif
-      
+
                                         /*
-					 * Abstract PETSc object that helps view
-					 * in ASCII other PETSc objects. Currently
-					 * this function simply writes non-zero
-					 * elements of a matrix to the terminal.
-					 */
+                                         * Abstract PETSc object that helps view
+                                         * in ASCII other PETSc objects. Currently
+                                         * this function simply writes non-zero
+                                         * elements of a matrix to the terminal.
+                                         */
       void write_ascii ();
 
-				       /**
-					*  Returns the number bytes consumed
-					*  by this matrix on this CPU.
-					*/
+                                       /**
+                                        *  Returns the number bytes consumed
+                                        *  by this matrix on this CPU.
+                                        */
       std::size_t memory_consumption() const;
 
                                        /**
@@ -1153,7 +1153,7 @@ namespace PETScWrappers
       DeclException1 (ExcPETScError,
                       int,
                       << "An error with error number " << arg1
-                      << " occured while calling a PETSc function");
+                      << " occurred while calling a PETSc function");
                                        /**
                                         * Exception
                                         */
@@ -1161,20 +1161,20 @@ namespace PETScWrappers
 
       /**
         * Exception.
-	*/
+        */
       DeclException2 (ExcWrongMode,
-		      int, int,
-		      << "You tried to do a "
-		      << (arg1 == 1 ?
-			  "'set'" :
-			  (arg1 == 2 ?
-			   "'add'" : "???"))
-		      << " operation but the matrix is currently in "
-		      << (arg2 == 1 ?
-			  "'set'" :
-			  (arg2 == 2 ?
-			   "'add'" : "???"))
-		      << " mode. You first have to call 'compress()'.");
+                      int, int,
+                      << "You tried to do a "
+                      << (arg1 == 1 ?
+                          "'set'" :
+                          (arg1 == 2 ?
+                           "'add'" : "???"))
+                      << " operation but the matrix is currently in "
+                      << (arg2 == 1 ?
+                          "'set'" :
+                          (arg2 == 2 ?
+                           "'add'" : "???"))
+                      << " mode. You first have to call 'compress()'.");
 
     protected:
                                        /**
@@ -1216,18 +1216,18 @@ namespace PETScWrappers
                                         */
       LastAction::Values last_action;
 
-				       /**
-					* Ensure that the add/set mode that
-					* is required for actions following
-					* this call is compatible with the
-					* current mode.
-					* Should be called from all internal
-					* functions accessing matrix elements.
-					*/
+                                       /**
+                                        * Ensure that the add/set mode that
+                                        * is required for actions following
+                                        * this call is compatible with the
+                                        * current mode.
+                                        * Should be called from all internal
+                                        * functions accessing matrix elements.
+                                        */
       void prepare_action(const LastAction::Values new_action);
 
-				       /**
-				        * For some matrix storage
+                                       /**
+                                        * For some matrix storage
                                         * formats, in particular for the
                                         * PETSc distributed blockmatrices,
                                         * set and add operations on
@@ -1249,7 +1249,7 @@ namespace PETScWrappers
                                         * nothing.
                                         */
       void prepare_add();
-				       /**
+                                       /**
                                         * Same as prepare_add() but
                                         * prepare the matrix for setting
                                         * elements if the representation
@@ -1261,34 +1261,34 @@ namespace PETScWrappers
 
 
     private:
-				       /**
-					* An internal array of integer
-					* values that is used to store the
-					* column indices when
-					* adding/inserting local data into
-					* the (large) sparse matrix.
-					*/
+                                       /**
+                                        * An internal array of integer
+                                        * values that is used to store the
+                                        * column indices when
+                                        * adding/inserting local data into
+                                        * the (large) sparse matrix.
+                                        */
 #ifdef PETSC_USE_64BIT_INDICES
       std::vector<PetscInt> column_indices;
 #else
       std::vector<int> column_indices;
 #endif
 
-				       /**
-					* An internal array of double values
-					* that is used to store the column
-					* indices when adding/inserting
-					* local data into the (large) sparse
-					* matrix.
-					*/
+                                       /**
+                                        * An internal array of double values
+                                        * that is used to store the column
+                                        * indices when adding/inserting
+                                        * local data into the (large) sparse
+                                        * matrix.
+                                        */
       std::vector<PetscScalar> column_values;
 
 
-				       /**
-				        *  To allow calling protected
-				        *  prepare_add() and
-				        *  prepare_set().
-				        */
+                                       /**
+                                        *  To allow calling protected
+                                        *  prepare_add() and
+                                        *  prepare_set().
+                                        */
       template <class> friend class dealii::BlockMatrixBase;
   };
 
@@ -1448,18 +1448,18 @@ namespace PETScWrappers
 
 
 
-				        // Inline the set() and add()
-				        // functions, since they will be
+                                        // Inline the set() and add()
+                                        // functions, since they will be
                                         // called frequently, and the
-				        // compiler can optimize away
-				        // some unnecessary loops when
-					// the sizes are given at
-				        // compile time.
+                                        // compiler can optimize away
+                                        // some unnecessary loops when
+                                        // the sizes are given at
+                                        // compile time.
   inline
   void
   MatrixBase::set (const unsigned int i,
-		   const unsigned int j,
-		   const PetscScalar  value)
+                   const unsigned int j,
+                   const PetscScalar  value)
   {
     Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
@@ -1471,16 +1471,16 @@ namespace PETScWrappers
   inline
   void
   MatrixBase::set (const std::vector<unsigned int> &indices,
-		   const FullMatrix<PetscScalar>   &values,
-		   const bool                       elide_zero_values)
+                   const FullMatrix<PetscScalar>   &values,
+                   const bool                       elide_zero_values)
   {
     Assert (indices.size() == values.m(),
-	    ExcDimensionMismatch(indices.size(), values.m()));
+            ExcDimensionMismatch(indices.size(), values.m()));
     Assert (values.m() == values.n(), ExcNotQuadratic());
 
     for (unsigned int i=0; i<indices.size(); ++i)
       set (indices[i], indices.size(), &indices[0], &values(i,0),
-	   elide_zero_values);
+           elide_zero_values);
   }
 
 
@@ -1488,18 +1488,18 @@ namespace PETScWrappers
   inline
   void
   MatrixBase::set (const std::vector<unsigned int> &row_indices,
-		   const std::vector<unsigned int> &col_indices,
-		   const FullMatrix<PetscScalar>   &values,
-		   const bool                       elide_zero_values)
+                   const std::vector<unsigned int> &col_indices,
+                   const FullMatrix<PetscScalar>   &values,
+                   const bool                       elide_zero_values)
   {
     Assert (row_indices.size() == values.m(),
-	    ExcDimensionMismatch(row_indices.size(), values.m()));
+            ExcDimensionMismatch(row_indices.size(), values.m()));
     Assert (col_indices.size() == values.n(),
-	    ExcDimensionMismatch(col_indices.size(), values.n()));
+            ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (unsigned int i=0; i<row_indices.size(); ++i)
       set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
-	   elide_zero_values);
+           elide_zero_values);
   }
 
 
@@ -1507,15 +1507,15 @@ namespace PETScWrappers
   inline
   void
   MatrixBase::set (const unsigned int               row,
-		   const std::vector<unsigned int> &col_indices,
-		   const std::vector<PetscScalar>  &values,
-		   const bool                       elide_zero_values)
+                   const std::vector<unsigned int> &col_indices,
+                   const std::vector<PetscScalar>  &values,
+                   const bool                       elide_zero_values)
   {
     Assert (col_indices.size() == values.size(),
-	    ExcDimensionMismatch(col_indices.size(), values.size()));
+            ExcDimensionMismatch(col_indices.size(), values.size()));
 
     set (row, col_indices.size(), &col_indices[0], &values[0],
-	 elide_zero_values);
+         elide_zero_values);
   }
 
 
@@ -1523,10 +1523,10 @@ namespace PETScWrappers
   inline
   void
   MatrixBase::set (const unsigned int  row,
-		   const unsigned int  n_cols,
-		   const unsigned int *col_indices,
-		   const PetscScalar  *values,
-		   const bool          elide_zero_values)
+                   const unsigned int  n_cols,
+                   const unsigned int *col_indices,
+                   const PetscScalar  *values,
+                   const bool          elide_zero_values)
   {
     prepare_action(LastAction::insert);
 
@@ -1540,47 +1540,47 @@ namespace PETScWrappers
     PetscScalar const* col_value_ptr;
     int n_columns;
 
-				   // If we don't elide zeros, the pointers
-				   // are already available...
+                                   // If we don't elide zeros, the pointers
+                                   // are already available...
 #ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
-	col_index_ptr = (int*)col_indices;
-	col_value_ptr = values;
-	n_columns = n_cols;
+        col_index_ptr = (int*)col_indices;
+        col_value_ptr = values;
+        n_columns = n_cols;
       }
     else
 #endif
       {
-				   // Otherwise, extract nonzero values in
-				   // each row and get the respective index.
-	if (column_indices.size() < n_cols)
-	  {
-	    column_indices.resize(n_cols);
-	    column_values.resize(n_cols);
-	  }
+                                   // Otherwise, extract nonzero values in
+                                   // each row and get the respective index.
+        if (column_indices.size() < n_cols)
+          {
+            column_indices.resize(n_cols);
+            column_values.resize(n_cols);
+          }
 
-	n_columns = 0;
-	for (unsigned int j=0; j<n_cols; ++j)
-	  {
-	    const PetscScalar value = values[j];
-	    Assert (numbers::is_finite(value), ExcNumberNotFinite());
-	    if (value != PetscScalar())
-	      {
-		column_indices[n_columns] = col_indices[j];
-		column_values[n_columns] = value;
-		n_columns++;
-	      }
-	  }
-	Assert(n_columns <= (int)n_cols, ExcInternalError());
+        n_columns = 0;
+        for (unsigned int j=0; j<n_cols; ++j)
+          {
+            const PetscScalar value = values[j];
+            Assert (numbers::is_finite(value), ExcNumberNotFinite());
+            if (value != PetscScalar())
+              {
+                column_indices[n_columns] = col_indices[j];
+                column_values[n_columns] = value;
+                n_columns++;
+              }
+          }
+        Assert(n_columns <= (int)n_cols, ExcInternalError());
 
-	col_index_ptr = &column_indices[0];
-	col_value_ptr = &column_values[0];
+        col_index_ptr = &column_indices[0];
+        col_value_ptr = &column_values[0];
       }
 
     const int ierr
       = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
-		      col_value_ptr, INSERT_VALUES);
+                      col_value_ptr, INSERT_VALUES);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1589,27 +1589,27 @@ namespace PETScWrappers
   inline
   void
   MatrixBase::add (const unsigned int i,
-		   const unsigned int j,
-		   const PetscScalar  value)
+                   const unsigned int j,
+                   const PetscScalar  value)
   {
 
     Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
     if (value == PetscScalar())
       {
-				  // we have to do checkings on Insert/Add
-				  // in any case
-				  // to be consistent with the MPI
-				  // communication model (see the comments
-				  // in the documentation of
-				  // TrilinosWrappers::Vector), but we can
-				  // save some work if the addend is
-				  // zero. However, these actions are done
-				  // in case we pass on to the other
-				  // function.
-	prepare_action(LastAction::add);
+                                  // we have to do checkings on Insert/Add
+                                  // in any case
+                                  // to be consistent with the MPI
+                                  // communication model (see the comments
+                                  // in the documentation of
+                                  // TrilinosWrappers::Vector), but we can
+                                  // save some work if the addend is
+                                  // zero. However, these actions are done
+                                  // in case we pass on to the other
+                                  // function.
+        prepare_action(LastAction::add);
 
-	return;
+        return;
       }
     else
       add (i, 1, &j, &value, false);
@@ -1620,16 +1620,16 @@ namespace PETScWrappers
   inline
   void
   MatrixBase::add (const std::vector<unsigned int> &indices,
-		   const FullMatrix<PetscScalar>   &values,
-		   const bool                       elide_zero_values)
+                   const FullMatrix<PetscScalar>   &values,
+                   const bool                       elide_zero_values)
   {
     Assert (indices.size() == values.m(),
-	    ExcDimensionMismatch(indices.size(), values.m()));
+            ExcDimensionMismatch(indices.size(), values.m()));
     Assert (values.m() == values.n(), ExcNotQuadratic());
 
     for (unsigned int i=0; i<indices.size(); ++i)
       add (indices[i], indices.size(), &indices[0], &values(i,0),
-	   elide_zero_values);
+           elide_zero_values);
   }
 
 
@@ -1637,18 +1637,18 @@ namespace PETScWrappers
   inline
   void
   MatrixBase::add (const std::vector<unsigned int> &row_indices,
-		   const std::vector<unsigned int> &col_indices,
-		   const FullMatrix<PetscScalar>   &values,
-		   const bool                       elide_zero_values)
+                   const std::vector<unsigned int> &col_indices,
+                   const FullMatrix<PetscScalar>   &values,
+                   const bool                       elide_zero_values)
   {
     Assert (row_indices.size() == values.m(),
-	    ExcDimensionMismatch(row_indices.size(), values.m()));
+            ExcDimensionMismatch(row_indices.size(), values.m()));
     Assert (col_indices.size() == values.n(),
-	    ExcDimensionMismatch(col_indices.size(), values.n()));
+            ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (unsigned int i=0; i<row_indices.size(); ++i)
       add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
-	   elide_zero_values);
+           elide_zero_values);
   }
 
 
@@ -1656,15 +1656,15 @@ namespace PETScWrappers
   inline
   void
   MatrixBase::add (const unsigned int               row,
-		   const std::vector<unsigned int> &col_indices,
-		   const std::vector<PetscScalar>  &values,
-		   const bool                       elide_zero_values)
+                   const std::vector<unsigned int> &col_indices,
+                   const std::vector<PetscScalar>  &values,
+                   const bool                       elide_zero_values)
   {
     Assert (col_indices.size() == values.size(),
-	    ExcDimensionMismatch(col_indices.size(), values.size()));
+            ExcDimensionMismatch(col_indices.size(), values.size()));
 
     add (row, col_indices.size(), &col_indices[0], &values[0],
-	 elide_zero_values);
+         elide_zero_values);
   }
 
 
@@ -1672,11 +1672,11 @@ namespace PETScWrappers
   inline
   void
   MatrixBase::add (const unsigned int  row,
-		   const unsigned int  n_cols,
-		   const unsigned int *col_indices,
-		   const PetscScalar  *values,
-		   const bool          elide_zero_values,
-		   const bool          /*col_indices_are_sorted*/)
+                   const unsigned int  n_cols,
+                   const unsigned int *col_indices,
+                   const PetscScalar  *values,
+                   const bool          elide_zero_values,
+                   const bool          /*col_indices_are_sorted*/)
   {
     prepare_action(LastAction::add);
 
@@ -1690,47 +1690,47 @@ namespace PETScWrappers
     PetscScalar const* col_value_ptr;
     int n_columns;
 
-				   // If we don't elide zeros, the pointers
-				   // are already available...
+                                   // If we don't elide zeros, the pointers
+                                   // are already available...
 #ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
-	col_index_ptr = (int*)col_indices;
-	col_value_ptr = values;
-	n_columns = n_cols;
+        col_index_ptr = (int*)col_indices;
+        col_value_ptr = values;
+        n_columns = n_cols;
       }
     else
 #endif
       {
-				   // Otherwise, extract nonzero values in
-				   // each row and get the respective index.
-	if (column_indices.size() < n_cols)
-	  {
-	    column_indices.resize(n_cols);
-	    column_values.resize(n_cols);
-	  }
+                                   // Otherwise, extract nonzero values in
+                                   // each row and get the respective index.
+        if (column_indices.size() < n_cols)
+          {
+            column_indices.resize(n_cols);
+            column_values.resize(n_cols);
+          }
 
-	n_columns = 0;
-	for (unsigned int j=0; j<n_cols; ++j)
-	  {
-	    const PetscScalar value = values[j];
-	    Assert (numbers::is_finite(value), ExcNumberNotFinite());
-	    if (value != PetscScalar())
-	      {
-		column_indices[n_columns] = col_indices[j];
-		column_values[n_columns] = value;
-		n_columns++;
-	      }
-	  }
-	Assert(n_columns <= (int)n_cols, ExcInternalError());
+        n_columns = 0;
+        for (unsigned int j=0; j<n_cols; ++j)
+          {
+            const PetscScalar value = values[j];
+            Assert (numbers::is_finite(value), ExcNumberNotFinite());
+            if (value != PetscScalar())
+              {
+                column_indices[n_columns] = col_indices[j];
+                column_values[n_columns] = value;
+                n_columns++;
+              }
+          }
+        Assert(n_columns <= (int)n_cols, ExcInternalError());
 
-	col_index_ptr = &column_indices[0];
-	col_value_ptr = &column_values[0];
+        col_index_ptr = &column_indices[0];
+        col_value_ptr = &column_values[0];
       }
 
     const int ierr
       = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
-		      col_value_ptr, ADD_VALUES);
+                      col_value_ptr, ADD_VALUES);
     Assert (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1807,7 +1807,7 @@ namespace PETScWrappers
     int begin, end;
 #endif
     const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
-					   &begin, &end);
+                                           &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return ((index >= static_cast<unsigned int>(begin)) &&

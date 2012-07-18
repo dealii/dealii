@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,103 +44,103 @@ template<class VECTOR>
 class ProductMatrix : public PointerMatrixBase<VECTOR>
 {
   public:
-				     /**
-				      * Standard constructor. Matrices
-				      * and the memory pool must be
-				      * added later using
-				      * initialize().
-				      */
+                                     /**
+                                      * Standard constructor. Matrices
+                                      * and the memory pool must be
+                                      * added later using
+                                      * initialize().
+                                      */
     ProductMatrix();
-    
-				     /**
-				      * Constructor only assigning the
-				      * memory pool. Matrices must be
-				      * added by reinit() later.
-				      */
+
+                                     /**
+                                      * Constructor only assigning the
+                                      * memory pool. Matrices must be
+                                      * added by reinit() later.
+                                      */
     ProductMatrix(VectorMemory<VECTOR>& mem);
-    
-				     /**
-				      * Constructor.  Additionally to
-				      * the two constituting matrices, a
-				      * memory pool for the auxiliary
-				      * vector must be provided.
-				      */
+
+                                     /**
+                                      * Constructor.  Additionally to
+                                      * the two constituting matrices, a
+                                      * memory pool for the auxiliary
+                                      * vector must be provided.
+                                      */
     template <class MATRIX1, class MATRIX2>
     ProductMatrix(const MATRIX1& m1,
-		  const MATRIX2& m2,
-		  VectorMemory<VECTOR>& mem);
-    
-				     /**
-				      * Change the matrices.
-				      */
+                  const MATRIX2& m2,
+                  VectorMemory<VECTOR>& mem);
+
+                                     /**
+                                      * Change the matrices.
+                                      */
     template <class MATRIX1, class MATRIX2>
     void reinit(const MATRIX1& m1, const MATRIX2& m2);
-    
-				     /**
-				      * Change the matrices and memory pool.
-				      */
+
+                                     /**
+                                      * Change the matrices and memory pool.
+                                      */
     template <class MATRIX1, class MATRIX2>
     void initialize(const MATRIX1& m1, const MATRIX2& m2,
-		    VectorMemory<VECTOR>& mem);
-    
-				     /**
-				      * Destructor.
-				      */
+                    VectorMemory<VECTOR>& mem);
+
+                                     /**
+                                      * Destructor.
+                                      */
     ~ProductMatrix();
 
-				     // Doc in PointerMatrixBase
+                                     // Doc in PointerMatrixBase
     void clear();
-    
-				     /**
-				      * Matrix-vector product <i>w =
-				      * m1 * m2 * v</i>.
-				      */
+
+                                     /**
+                                      * Matrix-vector product <i>w =
+                                      * m1 * m2 * v</i>.
+                                      */
     virtual void vmult (VECTOR&       w,
-			const VECTOR& v) const;
-    
-				     /**
-				      * Tranposed matrix-vector
-				      * product <i>w = m2<sup>T</sup>
-				      * * m1<sup>T</sup> * v</i>.
-				      */
+                        const VECTOR& v) const;
+
+                                     /**
+                                      * Tranposed matrix-vector
+                                      * product <i>w = m2<sup>T</sup> *
+                                      * m1<sup>T</sup> * v</i>.
+                                      */
     virtual void Tvmult (VECTOR&       w,
-			 const VECTOR& v) const;
-    
-				     /**
-				      * Adding matrix-vector product
-				      * <i>w += m1 * m2 * v</i>
-				      */
+                         const VECTOR& v) const;
+
+                                     /**
+                                      * Adding matrix-vector product
+                                      * <i>w += m1 * m2 * v</i>
+                                      */
     virtual void vmult_add (VECTOR&       w,
-			    const VECTOR& v) const;
-    
-				     /**
-				      * Adding, tranposed
-				      * matrix-vector product <i>w +=
-				      * m2<sup>T</sup> *
-				      * m1<sup>T</sup> * v</i>.
-				      */
+                            const VECTOR& v) const;
+
+                                     /**
+                                      * Adding, tranposed
+                                      * matrix-vector product <i>w +=
+                                      * m2<sup>T</sup> *
+                                      * m1<sup>T</sup> * v</i>.
+                                      */
     virtual void Tvmult_add (VECTOR&       w,
-			     const VECTOR& v) const;
-    
+                             const VECTOR& v) const;
+
   private:
-				     /**
-				      * The left matrix of the product.
-				      */
+                                     /**
+                                      * The left matrix of the product.
+                                      */
     PointerMatrixBase<VECTOR>* m1;
-    
-				     /**
-				      * The right matrix of the product.
-				      */
+
+                                     /**
+                                      * The right matrix of the product.
+                                      */
     PointerMatrixBase<VECTOR>* m2;
-    
-				     /**
-				      * Memory for auxiliary vector.
-				      */
+
+                                     /**
+                                      * Memory for auxiliary vector.
+                                      */
     SmartPointer<VectorMemory<VECTOR>,ProductMatrix<VECTOR> > mem;
-				     /**
-				      * Return some kind of
-				      * identifier.
-				      */
+                                     /**
+                                      * Return some kind of
+                                      * identifier.
+                                      */
     virtual const void* get() const;
 };
 
@@ -157,52 +157,52 @@ template<class VECTOR>
 class ScaledMatrix : public Subscriptor
 {
   public:
-				     /**
-				      * Constructor leaving an
-				      * uninitialized object.
-				      */
+                                     /**
+                                      * Constructor leaving an
+                                      * uninitialized object.
+                                      */
     ScaledMatrix ();
-				     /**
-				      * Constructor with initialization.
-				      */
+                                     /**
+                                      * Constructor with initialization.
+                                      */
     template <class MATRIX>
     ScaledMatrix (const MATRIX& M, const double factor);
 
-				     /**
-				      * Destructor
-				      */
+                                     /**
+                                      * Destructor
+                                      */
     ~ScaledMatrix ();
-				     /**
-				      * Initialize for use with a new
-				      * matrix and factor.
-				      */
+                                     /**
+                                      * Initialize for use with a new
+                                      * matrix and factor.
+                                      */
     template <class MATRIX>
     void initialize (const MATRIX& M, const double factor);
 
-   				     /**
-				      * Delete internal matrix pointer.
-				      */
+                                     /**
+                                      * Delete internal matrix pointer.
+                                      */
     void clear ();
-    
-				     /**
-				      * Matrix-vector product.
-				      */
+
+                                     /**
+                                      * Matrix-vector product.
+                                      */
     void vmult (VECTOR& w, const VECTOR& v) const;
-    
-				     /**
-				      * Tranposed matrix-vector
-				      * product.
-				      */
+
+                                     /**
+                                      * Tranposed matrix-vector
+                                      * product.
+                                      */
     void Tvmult (VECTOR& w, const VECTOR& v) const;
-    
+
   private:
-				     /**
-				      * The matrix.
-				      */
+                                     /**
+                                      * The matrix.
+                                      */
     PointerMatrixBase<VECTOR>* m;
-				     /**
-				      * The scaling factor;
-				      */
+                                     /**
+                                      * The scaling factor;
+                                      */
     double factor;
 };
 
@@ -224,93 +224,93 @@ template<typename number, typename vector_number>
 class ProductSparseMatrix : public PointerMatrixBase<Vector<vector_number> >
 {
   public:
-				     /**
-				      * Define the type of matrices used.
-				      */
+                                     /**
+                                      * Define the type of matrices used.
+                                      */
     typedef SparseMatrix<number> MatrixType;
-    
-				     /**
-				      * Define the type of vectors we
-				      * plly this matrix to.
-				      */
-    typedef Vector<vector_number> VectorType;
-    
-				     /**
-				      * Constructor.  Additionally to
-				      * the two constituting matrices, a
-				      * memory pool for the auxiliary
-				      * vector must be provided.
-				      */
-    ProductSparseMatrix(const MatrixType& m1,
-			const MatrixType& m2,
-			VectorMemory<VectorType>& mem);
 
-				     /**
-				      * Constructor leaving an
-				      * unitialized
-				      * matrix. initialize() must be
-				      * called, before the matrix can
-				      * be used.
-				      */
+                                     /**
+                                      * Define the type of vectors we
+                                      * plly this matrix to.
+                                      */
+    typedef Vector<vector_number> VectorType;
+
+                                     /**
+                                      * Constructor.  Additionally to
+                                      * the two constituting matrices, a
+                                      * memory pool for the auxiliary
+                                      * vector must be provided.
+                                      */
+    ProductSparseMatrix(const MatrixType& m1,
+                        const MatrixType& m2,
+                        VectorMemory<VectorType>& mem);
+
+                                     /**
+                                      * Constructor leaving an
+                                      * unitialized
+                                      * matrix. initialize() must be
+                                      * called, before the matrix can
+                                      * be used.
+                                      */
     ProductSparseMatrix();
-    
+
     void initialize(const MatrixType& m1,
-		    const MatrixType& m2,
-		    VectorMemory<VectorType>& mem);
-    
-				     // Doc in PointerMatrixBase
+                    const MatrixType& m2,
+                    VectorMemory<VectorType>& mem);
+
+                                     // Doc in PointerMatrixBase
     void clear();
-    
-				     /**
-				      * Matrix-vector product <i>w =
-				      * m1 * m2 * v</i>.
-				      */
+
+                                     /**
+                                      * Matrix-vector product <i>w =
+                                      * m1 * m2 * v</i>.
+                                      */
     virtual void vmult (VectorType&       w,
-			const VectorType& v) const;
-    
-				     /**
-				      * Tranposed matrix-vector
-				      * product <i>w = m2<sup>T</sup>
-				      * * m1<sup>T</sup> * v</i>.
-				      */
+                        const VectorType& v) const;
+
+                                     /**
+                                      * Tranposed matrix-vector
+                                      * product <i>w = m2<sup>T</sup> *
+                                      * m1<sup>T</sup> * v</i>.
+                                      */
     virtual void Tvmult (VectorType&       w,
-			 const VectorType& v) const;
-    
-				     /**
-				      * Adding matrix-vector product
-				      * <i>w += m1 * m2 * v</i>
-				      */
+                         const VectorType& v) const;
+
+                                     /**
+                                      * Adding matrix-vector product
+                                      * <i>w += m1 * m2 * v</i>
+                                      */
     virtual void vmult_add (VectorType&       w,
-			    const VectorType& v) const;
-    
-				     /**
-				      * Adding, tranposed
-				      * matrix-vector product <i>w +=
-				      * m2<sup>T</sup> *
-				      * m1<sup>T</sup> * v</i>.
-				      */
+                            const VectorType& v) const;
+
+                                     /**
+                                      * Adding, tranposed
+                                      * matrix-vector product <i>w +=
+                                      * m2<sup>T</sup> *
+                                      * m1<sup>T</sup> * v</i>.
+                                      */
     virtual void Tvmult_add (VectorType&       w,
-			     const VectorType& v) const;
-    
+                             const VectorType& v) const;
+
   private:
-				     /**
-				      * The left matrix of the product.
-				      */
+                                     /**
+                                      * The left matrix of the product.
+                                      */
     SmartPointer<const MatrixType,ProductSparseMatrix<number,vector_number> > m1;
-    
-				     /**
-				      * The right matrix of the product.
-				      */
+
+                                     /**
+                                      * The right matrix of the product.
+                                      */
     SmartPointer<const MatrixType,ProductSparseMatrix<number,vector_number> > m2;
-    
-				     /**
-				      * Memory for auxiliary vector.
-				      */
+
+                                     /**
+                                      * Memory for auxiliary vector.
+                                      */
     SmartPointer<VectorMemory<VectorType>,ProductSparseMatrix<number,vector_number>  > mem;
-				     /**
-				      * Return some kind of
-				      * identifier.
-				      */
+                                     /**
+                                      * Return some kind of
+                                      * identifier.
+                                      */
     virtual const void* get() const;
 };
 
@@ -326,75 +326,75 @@ class ProductSparseMatrix : public PointerMatrixBase<Vector<vector_number> >
 class MeanValueFilter : public Subscriptor
 {
   public:
-				     /**
-				      * Constructor, optionally
-				      * selecting a component.
-				      */
+                                     /**
+                                      * Constructor, optionally
+                                      * selecting a component.
+                                      */
     MeanValueFilter(unsigned int component = numbers::invalid_unsigned_int);
 
-				     /**
-				      * Subtract mean value from @p v.
-				      */
+                                     /**
+                                      * Subtract mean value from @p v.
+                                      */
     template <typename number>
     void filter (Vector<number>& v) const;
-    
-				     /**
-				      * Subtract mean value from @p v.
-				      */
+
+                                     /**
+                                      * Subtract mean value from @p v.
+                                      */
     template <typename number>
     void filter (BlockVector<number>& v) const;
-    
-				     /**
-				      * Return the source vector with
-				      * subtracted mean value.
-				      */
+
+                                     /**
+                                      * Return the source vector with
+                                      * subtracted mean value.
+                                      */
     template <typename number>
     void vmult (Vector<number>& dst,
-		const Vector<number>& src) const;
-    
-				     /**
-				      * Add source vector with
-				      * subtracted mean value to dest.
-				      */
+                const Vector<number>& src) const;
+
+                                     /**
+                                      * Add source vector with
+                                      * subtracted mean value to dest.
+                                      */
     template <typename number>
     void vmult_add (Vector<number>& dst,
-		    const Vector<number>& src) const;
-    
-				     /**
-				      * Return the source vector with
-				      * subtracted mean value in
-				      * selected component.
-				      */
+                    const Vector<number>& src) const;
+
+                                     /**
+                                      * Return the source vector with
+                                      * subtracted mean value in
+                                      * selected component.
+                                      */
     template <typename number>
     void vmult (BlockVector<number>& dst,
-		const BlockVector<number>& src) const;
-    
-				     /**
-				      * Add a soruce to dest, where
-				      * the mean value in the selected
-				      * component is subtracted.
-				      */
+                const BlockVector<number>& src) const;
+
+                                     /**
+                                      * Add a soruce to dest, where
+                                      * the mean value in the selected
+                                      * component is subtracted.
+                                      */
     template <typename number>
     void vmult_add (BlockVector<number>& dst,
-		    const BlockVector<number>& src) const;
+                    const BlockVector<number>& src) const;
 
 
-				     /**
-				      * Not implemented.
-				      */
+                                     /**
+                                      * Not implemented.
+                                      */
     template <typename VECTOR>
     void Tvmult(VECTOR&, const VECTOR&) const;
-    
-				     /**
-				      * Not implemented.
-				      */
+
+                                     /**
+                                      * Not implemented.
+                                      */
     template <typename VECTOR>
     void Tvmult_add(VECTOR&, const VECTOR&) const;
-    
+
   private:
-				     /**
-				      * Component for filtering block vectors.
-				      */
+                                     /**
+                                      * Component for filtering block vectors.
+                                      */
     unsigned int component;
 };
 
@@ -414,83 +414,83 @@ class MeanValueFilter : public Subscriptor
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
- * 
+ *
  * @author Guido Kanschat, 2005
  */
 template<class VECTOR>
 class InverseMatrixRichardson : public Subscriptor
 {
   public:
-				     /**
-				      * Constructor, initializing the
-				      * solver with a control and
-				      * memory object. The inverted
-				      * matrix and the preconditioner
-				      * are added in initialize().
-				      */
+                                     /**
+                                      * Constructor, initializing the
+                                      * solver with a control and
+                                      * memory object. The inverted
+                                      * matrix and the preconditioner
+                                      * are added in initialize().
+                                      */
     InverseMatrixRichardson (SolverControl& control,
-			     VectorMemory<VECTOR>& mem);
-				     /**
-				      * Since we use two pointers, we
-				      * must implement a destructor.
-				      */
+                             VectorMemory<VECTOR>& mem);
+                                     /**
+                                      * Since we use two pointers, we
+                                      * must implement a destructor.
+                                      */
     ~InverseMatrixRichardson();
-    
-				     /**
-				      * Initialization
-				      * function. Provide a solver
-				      * object, a matrix, and another
-				      * preconditioner for this.
-				      */
+
+                                     /**
+                                      * Initialization
+                                      * function. Provide a solver
+                                      * object, a matrix, and another
+                                      * preconditioner for this.
+                                      */
     template <class MATRIX, class PRECONDITION>
     void initialize (const MATRIX&,
-		     const PRECONDITION&);
+                     const PRECONDITION&);
 
-				     /**
-				      * Access to the SolverControl
-				      * object used by the solver.
-				      */
+                                     /**
+                                      * Access to the SolverControl
+                                      * object used by the solver.
+                                      */
     SolverControl& control() const;
-				     /**
-				      * Execute solver.
-				      */
+                                     /**
+                                      * Execute solver.
+                                      */
     void vmult (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Execute solver.
-				      */
+                                     /**
+                                      * Execute solver.
+                                      */
     void vmult_add (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Execute transpose solver.
-				      */
+                                     /**
+                                      * Execute transpose solver.
+                                      */
     void Tvmult (VECTOR&, const VECTOR&) const;
 
-				     /**
-				      * Execute transpose solver.
-				      */
+                                     /**
+                                      * Execute transpose solver.
+                                      */
     void Tvmult_add (VECTOR&, const VECTOR&) const;
 
   private:
-				     /**
-				      * A reference to the provided
-				      * VectorMemory object.
-				      */
+                                     /**
+                                      * A reference to the provided
+                                      * VectorMemory object.
+                                      */
     VectorMemory<VECTOR> &mem;
-    
-				     /**
-				      * The solver object.
-				      */
+
+                                     /**
+                                      * The solver object.
+                                      */
     mutable SolverRichardson<VECTOR> solver;
-    
-				     /**
-				      * The matrix in use.
-				      */
+
+                                     /**
+                                      * The matrix in use.
+                                      */
     PointerMatrixBase<VECTOR>* matrix;
-    
-				     /**
-				      * The preconditioner to use.
-				      */
+
+                                     /**
+                                      * The preconditioner to use.
+                                      */
     PointerMatrixBase<VECTOR>* precondition;
 };
 
@@ -504,8 +504,8 @@ class InverseMatrixRichardson : public Subscriptor
 template<class VECTOR>
 inline
 ScaledMatrix<VECTOR>::ScaledMatrix()
-		:
-		m(0)
+                :
+                m(0)
 {}
 
 
@@ -514,9 +514,9 @@ template<class VECTOR>
 template<class MATRIX>
 inline
 ScaledMatrix<VECTOR>::ScaledMatrix(const MATRIX& mat, const double factor)
-		:
-		m(new_pointer_matrix_base(mat, VECTOR())),
-		factor(factor)
+                :
+                m(new_pointer_matrix_base(mat, VECTOR())),
+                factor(factor)
 {}
 
 
@@ -656,7 +656,7 @@ ProductMatrix<VECTOR>::vmult (VECTOR& dst, const VECTOR& src) const
   Assert (mem != 0, ExcNotInitialized());
   Assert (m1 != 0, ExcNotInitialized());
   Assert (m2 != 0, ExcNotInitialized());
-  
+
   VECTOR* v = mem->alloc();
   v->reinit(dst);
   m2->vmult (*v, src);
@@ -672,7 +672,7 @@ ProductMatrix<VECTOR>::vmult_add (VECTOR& dst, const VECTOR& src) const
   Assert (mem != 0, ExcNotInitialized());
   Assert (m1 != 0, ExcNotInitialized());
   Assert (m2 != 0, ExcNotInitialized());
-  
+
   VECTOR* v = mem->alloc();
   v->reinit(dst);
   m2->vmult (*v, src);
@@ -688,7 +688,7 @@ ProductMatrix<VECTOR>::Tvmult (VECTOR& dst, const VECTOR& src) const
   Assert (mem != 0, ExcNotInitialized());
   Assert (m1 != 0, ExcNotInitialized());
   Assert (m2 != 0, ExcNotInitialized());
-  
+
   VECTOR* v = mem->alloc();
   v->reinit(dst);
   m1->Tvmult (*v, src);
@@ -704,7 +704,7 @@ ProductMatrix<VECTOR>::Tvmult_add (VECTOR& dst, const VECTOR& src) const
   Assert (mem != 0, ExcNotInitialized());
   Assert (m1 != 0, ExcNotInitialized());
   Assert (m2 != 0, ExcNotInitialized());
-  
+
   VECTOR* v = mem->alloc();
   v->reinit(dst);
   m1->Tvmult (*v, src);

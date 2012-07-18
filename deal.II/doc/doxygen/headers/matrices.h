@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -70,27 +70,27 @@ template <class VECTOR>
 class MATRIX
 {
   public:
-				     /**
-				      * @name Solver interface
-				      */
-				     /*@{*/
-				     /**
-				      * The matrix vector product $u = Av$.
-				      */
+                                     /**
+                                      * @name Solver interface
+                                      */
+                                     /*@{*/
+                                     /**
+                                      * The matrix vector product $u = Av$.
+                                      */
     void vmult(VECTOR& u, const VECTOR& v) const;
-				     /**
-				      * The matrix vector product $u = A^Tv$.
-				      */
+                                     /**
+                                      * The matrix vector product $u = A^Tv$.
+                                      */
     void Tvmult(VECTOR& u, const VECTOR& v) const;
-				     /**
-				      * The matrix vector product $u += Av$.
-				      */
+                                     /**
+                                      * The matrix vector product $u += Av$.
+                                      */
     void vmult_add(VECTOR& u, const VECTOR& v) const;
-				     /**
-				      * The matrix vector product $u += A^Tv$.
-				      */
+                                     /**
+                                      * The matrix vector product $u += A^Tv$.
+                                      */
     void Tvmult_add(VECTOR& u, const VECTOR& v) const;
-				     /*@}*/
+                                     /*@}*/
 };
 
 /**

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,39 +62,39 @@ DEAL_II_NAMESPACE_OPEN
 class FunctionTime
 {
   public:
-				     /**
-				      * Constructor. May take an initial vakue
-				      * for the time variable, which defaults
-				      * to zero.
-				      */
+                                     /**
+                                      * Constructor. May take an initial vakue
+                                      * for the time variable, which defaults
+                                      * to zero.
+                                      */
     FunctionTime (const double initial_time = 0.0);
 
-				     /**
-				      * Virtual destructor.
-				      */
+                                     /**
+                                      * Virtual destructor.
+                                      */
     virtual ~FunctionTime();
-  
-				     /**
-				      * Return the value of the time variable/
-				      */
+
+                                     /**
+                                      * Return the value of the time variable/
+                                      */
     double get_time () const;
 
-				     /**
-				      * Set the time to <tt>new_time</tt>, overwriting
-				      * the old value.
-				      */
+                                     /**
+                                      * Set the time to <tt>new_time</tt>, overwriting
+                                      * the old value.
+                                      */
     virtual void set_time (const double new_time);
 
-				     /**
-				      * Advance the time by the given
-				      * time step <tt>delta_t</tt>.
-				      */
+                                     /**
+                                      * Advance the time by the given
+                                      * time step <tt>delta_t</tt>.
+                                      */
     virtual void advance_time (const double delta_t);
 
   private:
-				     /**
-				      * Store the present time.
-				      */
+                                     /**
+                                      * Store the present time.
+                                      */
     double time;
 };
 

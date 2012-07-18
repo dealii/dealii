@@ -1,5 +1,5 @@
 //----------------------------  petsc_solver_11.cc  ---------------------------
-//    $Id: solver_11.cc 20442 2010-01-25 10:46:00Z heister $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2004, 2005, 2010 by the deal.II authors

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,8 +18,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 FunctionTime::FunctionTime(const double initial_time)
-		:
-		time(initial_time)
+                :
+                time(initial_time)
 {}
 
 

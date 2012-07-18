@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -59,192 +59,192 @@ template<typename T, typename P = void>
 class SmartPointer
 {
   public:
-				     /**
-				      * Standard constructor for null
-				      * pointer. The id of this
-				      * pointer is set to the name of
-				      * the class P.
-				      */
+                                     /**
+                                      * Standard constructor for null
+                                      * pointer. The id of this
+                                      * pointer is set to the name of
+                                      * the class P.
+                                      */
     SmartPointer ();
 
-				     /*
-				      * Copy constructor for
-				      * SmartPointer. We do now
-				      * copy the object subscribed to
-				      * from <tt>tt</tt>, but subscribe
-				      * ourselves to it again.
-				      */
+                                     /*
+                                      * Copy constructor for
+                                      * SmartPointer. We do now
+                                      * copy the object subscribed to
+                                      * from <tt>tt</tt>, but subscribe
+                                      * ourselves to it again.
+                                      */
     template <class Q>
     SmartPointer (const SmartPointer<T,Q> &tt);
 
-				     /*
-				      * Copy constructor for
-				      * SmartPointer. We do now
-				      * copy the object subscribed to
-				      * from <tt>tt</tt>, but subscribe
-				      * ourselves to it again.
-				      */
+                                     /*
+                                      * Copy constructor for
+                                      * SmartPointer. We do now
+                                      * copy the object subscribed to
+                                      * from <tt>tt</tt>, but subscribe
+                                      * ourselves to it again.
+                                      */
     SmartPointer (const SmartPointer<T,P> &tt);
 
-				     /**
-				      * Constructor taking a normal
-				      * pointer.  If possible, i.e. if
-				      * the pointer is not a null
-				      * pointer, the constructor
-				      * subscribes to the given object
-				      * to lock it, i.e. to prevent
-				      * its destruction before the end
-				      * of its use.
-				      *
-				      * The <tt>id</tt> is used in the
-				      * call to
-				      * Subscriptor::subscribe(id) and
-				      * by ~SmartPointer() in the call
-				      * to Subscriptor::unsubscribe().
-				      */
+                                     /**
+                                      * Constructor taking a normal
+                                      * pointer.  If possible, i.e. if
+                                      * the pointer is not a null
+                                      * pointer, the constructor
+                                      * subscribes to the given object
+                                      * to lock it, i.e. to prevent
+                                      * its destruction before the end
+                                      * of its use.
+                                      *
+                                      * The <tt>id</tt> is used in the
+                                      * call to
+                                      * Subscriptor::subscribe(id) and
+                                      * by ~SmartPointer() in the call
+                                      * to Subscriptor::unsubscribe().
+                                      */
     SmartPointer (T *t, const char* id);
 
-				     /**
-				      * Constructor taking a normal
-				      * pointer.  If possible, i.e. if
-				      * the pointer is not a null
-				      * pointer, the constructor
-				      * subscribes to the given object
-				      * to lock it, i.e. to prevent
-				      * its destruction before the end
-				      * of its use. The id of this
-				      * pointer is set to the name of
-				      * the class P.
-				      */
+                                     /**
+                                      * Constructor taking a normal
+                                      * pointer.  If possible, i.e. if
+                                      * the pointer is not a null
+                                      * pointer, the constructor
+                                      * subscribes to the given object
+                                      * to lock it, i.e. to prevent
+                                      * its destruction before the end
+                                      * of its use. The id of this
+                                      * pointer is set to the name of
+                                      * the class P.
+                                      */
     SmartPointer (T *t);
 
 
-				     /**
-				      * Destructor, removing the
-				      * subscription.
-				      */
+                                     /**
+                                      * Destructor, removing the
+                                      * subscription.
+                                      */
     ~SmartPointer();
 
-				     /**
-				      * Assignment operator for normal
-				      * pointers. The pointer
-				      * subscribes to the new object
-				      * automatically and unsubscribes
-				      * to an old one if it exists. It
-				      * will not try to subscribe to a
-				      * null-pointer, but still
-				      * delete the old subscription.
-				      */
+                                     /**
+                                      * Assignment operator for normal
+                                      * pointers. The pointer
+                                      * subscribes to the new object
+                                      * automatically and unsubscribes
+                                      * to an old one if it exists. It
+                                      * will not try to subscribe to a
+                                      * null-pointer, but still
+                                      * delete the old subscription.
+                                      */
     SmartPointer<T,P> & operator= (T *tt);
 
-				     /**
-				      * Assignment operator for
-				      * SmartPointer.  The pointer
-				      * subscribes to the new object
-				      * automatically and unsubscribes
-				      * to an old one if it exists.
-				      */
+                                     /**
+                                      * Assignment operator for
+                                      * SmartPointer.  The pointer
+                                      * subscribes to the new object
+                                      * automatically and unsubscribes
+                                      * to an old one if it exists.
+                                      */
     template <class Q>
     SmartPointer<T,P> & operator= (const SmartPointer<T,Q> &tt);
 
-				     /**
-				      * Assignment operator for
-				      * SmartPointer.  The pointer
-				      * subscribes to the new object
-				      * automatically and unsubscribes
-				      * to an old one if it exists.
-				      */
+                                     /**
+                                      * Assignment operator for
+                                      * SmartPointer.  The pointer
+                                      * subscribes to the new object
+                                      * automatically and unsubscribes
+                                      * to an old one if it exists.
+                                      */
     SmartPointer<T,P> & operator= (const SmartPointer<T,P> &tt);
 
-				     /**
-				      * Delete the object pointed to
-				      * and set the pointer to zero.
-				      */
+                                     /**
+                                      * Delete the object pointed to
+                                      * and set the pointer to zero.
+                                      */
     void clear ();
 
-				     /**
-				      * Conversion to normal pointer.
-				      */
+                                     /**
+                                      * Conversion to normal pointer.
+                                      */
     operator T* () const;
 
-				     /**
-				      * Dereferencing operator. This
-				      * operator throws an
-				      * ExcNotInitialized if the
-				      * pointer is a null pointer.
-				      */
+                                     /**
+                                      * Dereferencing operator. This
+                                      * operator throws an
+                                      * ExcNotInitialized if the
+                                      * pointer is a null pointer.
+                                      */
     T& operator * () const;
 
-				     /**
-				      * Dereferencing operator. This
-				      * operator throws an
-				      * ExcNotInitialized if the
-				      * pointer is a null pointer.
-				      */
+                                     /**
+                                      * Dereferencing operator. This
+                                      * operator throws an
+                                      * ExcNotInitialized if the
+                                      * pointer is a null pointer.
+                                      */
     T * operator -> () const;
 
-				     /**
-				      * Exchange the pointers of this
-				      * object and the argument. Since
-				      * both the objects to which is
-				      * pointed are subscribed to
-				      * before and after, we do not
-				      * have to change their
-				      * subscription counters.
-				      *
-				      * Note that this function (with
-				      * two arguments) and the
-				      * respective functions where one
-				      * of the arguments is a pointer
-				      * and the other one is a C-style
-				      * pointer are implemented in
-				      * global namespace.
-				      */
+                                     /**
+                                      * Exchange the pointers of this
+                                      * object and the argument. Since
+                                      * both the objects to which is
+                                      * pointed are subscribed to
+                                      * before and after, we do not
+                                      * have to change their
+                                      * subscription counters.
+                                      *
+                                      * Note that this function (with
+                                      * two arguments) and the
+                                      * respective functions where one
+                                      * of the arguments is a pointer
+                                      * and the other one is a C-style
+                                      * pointer are implemented in
+                                      * global namespace.
+                                      */
     template <class Q>
     void swap (SmartPointer<T,Q> &tt);
 
-				     /**
-				      * Swap pointers between this
-				      * object and the pointer
-				      * given. As this releases the
-				      * object pointed to presently,
-				      * we reduce its subscription
-				      * count by one, and increase it
-				      * at the object which we will
-				      * point to in the future.
-				      *
-				      * Note that we indeed need a
-				      * reference of a pointer, as we
-				      * want to change the pointer
-				      * variable which we are given.
-				      */
+                                     /**
+                                      * Swap pointers between this
+                                      * object and the pointer
+                                      * given. As this releases the
+                                      * object pointed to presently,
+                                      * we reduce its subscription
+                                      * count by one, and increase it
+                                      * at the object which we will
+                                      * point to in the future.
+                                      *
+                                      * Note that we indeed need a
+                                      * reference of a pointer, as we
+                                      * want to change the pointer
+                                      * variable which we are given.
+                                      */
     void swap (T *&tt);
 
-				     /**
-				      * Return an estimate of the
-				      * amount of memory (in bytes)
-				      * used by this class. Note in
-				      * particular, that this only
-				      * includes the amount of memory
-				      * used by <b>this</b> object, not
-				      * by the object pointed to.
-				      */
+                                     /**
+                                      * Return an estimate of the
+                                      * amount of memory (in bytes)
+                                      * used by this class. Note in
+                                      * particular, that this only
+                                      * includes the amount of memory
+                                      * used by <b>this</b> object, not
+                                      * by the object pointed to.
+                                      */
     std::size_t memory_consumption () const;
 
   private:
-				     /**
-				      * Pointer to the object we want
-				      * to subscribt to. Since it is
-				      * often necessary to follow this
-				      * pointer when debugging, we
-				      * have deliberately chosen a
-				      * short name.
-				      */
+                                     /**
+                                      * Pointer to the object we want
+                                      * to subscribt to. Since it is
+                                      * often necessary to follow this
+                                      * pointer when debugging, we
+                                      * have deliberately chosen a
+                                      * short name.
+                                      */
     T * t;
-				     /**
-				      * The identification for the
-				      * subscriptor.
-				      */
+                                     /**
+                                      * The identification for the
+                                      * subscriptor.
+                                      */
     const char* const id;
 };
 
@@ -256,7 +256,7 @@ template <typename T, typename P>
 inline
 SmartPointer<T,P>::SmartPointer ()
                 :
-		t (0), id(typeid(P).name())
+                t (0), id(typeid(P).name())
 {}
 
 
@@ -265,7 +265,7 @@ template <typename T, typename P>
 inline
 SmartPointer<T,P>::SmartPointer (T *t)
                 :
-		t (t), id(typeid(P).name())
+                t (t), id(typeid(P).name())
 {
   if (t != 0)
     t->subscribe(id);
@@ -277,7 +277,7 @@ template <typename T, typename P>
 inline
 SmartPointer<T,P>::SmartPointer (T *t, const char* id)
                 :
-		t (t), id(id)
+                t (t), id(id)
 {
   if (t != 0)
     t->subscribe(id);
@@ -290,7 +290,7 @@ template <class Q>
 inline
 SmartPointer<T,P>::SmartPointer (const SmartPointer<T,Q> &tt)
                 :
-		t (tt.t), id(tt.id)
+                t (tt.t), id(tt.id)
 {
   if (t != 0)
     t->subscribe(id);
@@ -302,7 +302,7 @@ template <typename T, typename P>
 inline
 SmartPointer<T,P>::SmartPointer (const SmartPointer<T,P> &tt)
                 :
-		t (tt.t), id(tt.id)
+                t (tt.t), id(tt.id)
 {
   if (t != 0)
     t->subscribe(id);
@@ -339,8 +339,8 @@ template <typename T, typename P>
 inline
 SmartPointer<T,P> & SmartPointer<T,P>::operator = (T *tt)
 {
-				   // optimize if no real action is
-				   // requested
+                                   // optimize if no real action is
+                                   // requested
   if (t == tt)
     return *this;
 
@@ -360,9 +360,9 @@ inline
 SmartPointer<T,P> &
 SmartPointer<T,P>::operator = (const SmartPointer<T,Q>& tt)
 {
-				   // if objects on the left and right
-				   // hand side of the operator= are
-				   // the same, then this is a no-op
+                                   // if objects on the left and right
+                                   // hand side of the operator= are
+                                   // the same, then this is a no-op
   if (&tt == this)
     return *this;
 
@@ -381,9 +381,9 @@ inline
 SmartPointer<T,P> &
 SmartPointer<T,P>::operator = (const SmartPointer<T,P>& tt)
 {
-				   // if objects on the left and right
-				   // hand side of the operator= are
-				   // the same, then this is a no-op
+                                   // if objects on the left and right
+                                   // hand side of the operator= are
+                                   // the same, then this is a no-op
   if (&tt == this)
     return *this;
 

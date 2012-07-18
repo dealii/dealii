@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,28 +22,28 @@ for (deal_II_dimension : DIMENSIONS)
       namespace p4est
       \{
 #if     deal_II_dimension > 1
-      	template
-      	void
-      	init_quadrant_children<deal_II_dimension>
-      	(const types<deal_II_dimension>::quadrant & p4est_cell,
-       	 types<deal_II_dimension>::quadrant (&p4est_children)[GeometryInfo<deal_II_dimension>::max_children_per_cell]);
+        template
+        void
+        init_quadrant_children<deal_II_dimension>
+        (const types<deal_II_dimension>::quadrant & p4est_cell,
+         types<deal_II_dimension>::quadrant (&p4est_children)[GeometryInfo<deal_II_dimension>::max_children_per_cell]);
 
-      	template
-      	void
-      	init_coarse_quadrant<deal_II_dimension>
-      	(types<deal_II_dimension>::quadrant & quad);
+        template
+        void
+        init_coarse_quadrant<deal_II_dimension>
+        (types<deal_II_dimension>::quadrant & quad);
 
-      	template
-      	bool
-      	quadrant_is_equal<deal_II_dimension>
-      	(const types<deal_II_dimension>::quadrant & q1,
+        template
+        bool
+        quadrant_is_equal<deal_II_dimension>
+        (const types<deal_II_dimension>::quadrant & q1,
          const types<deal_II_dimension>::quadrant & q2);
 
-      	template
-      	bool
-      	quadrant_is_ancestor<deal_II_dimension>
-      	(const types<deal_II_dimension>::quadrant & q1,
-       	 const types<deal_II_dimension>::quadrant & q2);
+        template
+        bool
+        quadrant_is_ancestor<deal_II_dimension>
+        (const types<deal_II_dimension>::quadrant & q1,
+         const types<deal_II_dimension>::quadrant & q2);
 #      endif
       \}
     \}
@@ -54,9 +54,12 @@ for (deal_II_dimension : DIMENSIONS)
       namespace distributed
       \{
         template class Triangulation<deal_II_dimension>;
-#     	if deal_II_dimension < 3
-      	template class Triangulation<deal_II_dimension, deal_II_dimension+1>;
-#     	endif
+#       if deal_II_dimension < 3
+        template class Triangulation<deal_II_dimension, deal_II_dimension+1>;
+#       endif
+#       if deal_II_dimension < 2
+        template class Triangulation<deal_II_dimension, deal_II_dimension+2>;
+#       endif
       \}
     \}
 

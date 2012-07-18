@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,47 +46,47 @@ template <class VECTOR = Vector<double> >
 class SolverRelaxation : public Solver<VECTOR>
 {
   public:
-				     /**
-				      * Standardized data struct to
-				      * pipe additional data to the
-				      * solver. There is no data in
-				      * here for relaxation methods.
-				      */
+                                     /**
+                                      * Standardized data struct to
+                                      * pipe additional data to the
+                                      * solver. There is no data in
+                                      * here for relaxation methods.
+                                      */
     struct AdditionalData {};
-	
-				     /**
-				      * Constructor.
-				      */
-    SolverRelaxation (SolverControl        &cn,
-		      const AdditionalData &data=AdditionalData());
 
-				     /**
-				      * Virtual destructor.
-				      */
+                                     /**
+                                      * Constructor.
+                                      */
+    SolverRelaxation (SolverControl        &cn,
+                      const AdditionalData &data=AdditionalData());
+
+                                     /**
+                                      * Virtual destructor.
+                                      */
     virtual ~SolverRelaxation ();
-    
-				     /**
-				      * Solve the system $Ax = b$
-				      * using the relaxation method
-				      * $x_{k+1} = R(x_k,b)$. The
-				      * amtrix <i>A</i> itself is only
-				      * used to compute the residual.
-				      */
+
+                                     /**
+                                      * Solve the system $Ax = b$
+                                      * using the relaxation method
+                                      * $x_{k+1} = R(x_k,b)$. The
+                                      * amtrix <i>A</i> itself is only
+                                      * used to compute the residual.
+                                      */
     template<class MATRIX, class RELAXATION>
     void
     solve (const MATRIX& A,
-	   VECTOR& x,
-	   const VECTOR& b,
-	   const RELAXATION& R);
+           VECTOR& x,
+           const VECTOR& b,
+           const RELAXATION& R);
 };
 
 //----------------------------------------------------------------------//
 
 template <class VECTOR>
 SolverRelaxation<VECTOR>::SolverRelaxation(SolverControl &cn,
-					   const AdditionalData &)
-		:
-		Solver<VECTOR> (cn)
+                                           const AdditionalData &)
+                :
+                Solver<VECTOR> (cn)
 {}
 
 
@@ -108,31 +108,31 @@ SolverRelaxation<VECTOR>::solve (
   GrowingVectorMemory<VECTOR> mem;
   SolverControl::State conv=SolverControl::iterate;
 
-				   // Memory allocation
+                                   // Memory allocation
   typename VectorMemory<VECTOR>::Pointer Vr(mem); VECTOR& r  = *Vr; r.reinit(x);
   typename VectorMemory<VECTOR>::Pointer Vd(mem); VECTOR& d  = *Vd; d.reinit(x);
-  
-  deallog.push("Relaxation");
-  
-  try 
-    {
-				       // Main loop
-      for(int iter=0; conv==SolverControl::iterate; iter++)
-	{
-					   // Compute residual
-	  A.vmult(r,x);
-	  r.sadd(-1.,1.,b);
 
-					   // The required norm of the
-					   // (preconditioned)
-					   // residual is computed in
-					   // criterion() and stored
-					   // in res.
-	  conv = this->control().check (iter, r.l2_norm());
-	  if (conv != SolverControl::iterate)
-	    break;
-	  R.step(x,b);
-	}
+  deallog.push("Relaxation");
+
+  try
+    {
+                                       // Main loop
+      for(int iter=0; conv==SolverControl::iterate; iter++)
+        {
+                                           // Compute residual
+          A.vmult(r,x);
+          r.sadd(-1.,1.,b);
+
+                                           // The required norm of the
+                                           // (preconditioned)
+                                           // residual is computed in
+                                           // criterion() and stored
+                                           // in res.
+          conv = this->control().check (iter, r.l2_norm());
+          if (conv != SolverControl::iterate)
+            break;
+          R.step(x,b);
+        }
     }
   catch (...)
     {
@@ -141,12 +141,12 @@ SolverRelaxation<VECTOR>::solve (
     }
   deallog.pop();
 
-				   // in case of failure: throw
-				   // exception
+                                   // in case of failure: throw
+                                   // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
-					this->control().last_value());
-				   // otherwise exit as normal
+                                        this->control().last_value());
+                                   // otherwise exit as normal
 }
 
 

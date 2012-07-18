@@ -1,8 +1,7 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -195,14 +194,11 @@ test(const FiniteElement<dim>& fe)
 
 int main ()
 {
-  std::ofstream logfile ("mesh_worker_01/output");
-  logfile << std::setprecision (2);
-  logfile << std::fixed;
-  deallog << std::setprecision (2);
-  deallog << std::fixed;
+  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console (0);
-
+  
   std::vector<std_cxx1x::shared_ptr<FiniteElement<2> > > fe2;
   fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new  FE_DGP<2>(1)));
   fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));

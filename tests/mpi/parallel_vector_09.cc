@@ -38,9 +38,9 @@ void test ()
     {
       global_size += set - i;
       if (i<myid)
-	my_start += set - i;
+        my_start += set - i;
     }
-				   // each processor owns some indices and all
+                                   // each processor owns some indices and all
                                    // are ghosting elements from three
                                    // processors (the second). some entries
                                    // are right around the border between two
@@ -50,13 +50,13 @@ void test ()
   IndexSet local_relevant(global_size);
   local_relevant = local_owned;
   unsigned int ghost_indices [10] = {1, 2, 13, set-2, set-1, set, set+1, 2*set,
-				     2*set+1, 2*set+3};
+                                     2*set+1, 2*set+3};
   local_relevant.add_indices (&ghost_indices[0], &ghost_indices[0]+10);
 
   parallel::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
 
-				// check number of ghosts everywhere (counted
-				// the above)
+                                // check number of ghosts everywhere (counted
+                                // the above)
   if (myid == 0)
     {
       AssertDimension (v.n_ghost_entries(), 5);
@@ -74,8 +74,8 @@ void test ()
       AssertDimension (v.n_ghost_entries(), 10);
     }
 
-				// count that 13 is ghost only on non-owning
-				// processors
+                                // count that 13 is ghost only on non-owning
+                                // processors
   if (myid == 0)
     {
       Assert (v.is_ghost_entry (13) == false, ExcInternalError());
@@ -85,7 +85,7 @@ void test ()
       Assert (v.is_ghost_entry (13) == true, ExcInternalError());
     }
 
-				// count that 27 is ghost nowhere
+                                // count that 27 is ghost nowhere
   Assert (v.is_ghost_entry (27) == false, ExcInternalError());
   if (myid == 0)
     {
@@ -96,7 +96,7 @@ void test ()
       Assert (v.in_local_range (27) == false, ExcInternalError());
     }
 
-				// element with number set is ghost
+                                // element with number set is ghost
   if (myid == 1)
     {
       Assert (v.is_ghost_entry (set) == false, ExcInternalError());
