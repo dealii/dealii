@@ -31,10 +31,13 @@ unsigned int with default value numbers::invalid_unsigned_int. This
 should not make a difference to most users unless you specified the
 argument's default value by hand.
 <br>
+(Wolfgang Bangerth, Christian Goll 2012/02/27)
+
+<li>
 The member functions Triangulation::set_boundary and
 Triangulation::get_boundary now take a types::boundary_id_t instead of
 an unsigned int as argument. This now matches the actual data type
-used for boundary indicators.
+used to store boundary indicators internally.
 <br>
 (Wolfgang Bangerth, Christian Goll 2012/02/27)
 </ol>
@@ -47,42 +50,6 @@ used for boundary indicators.
 
 
 <ol>
-<li> Fixed: Using the SolutionTransfer class with hp::DoFHandler
-and on meshes where some cells are associated with a FE_Nothing element
-could result in an error. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2012/06/29)
-
-<li> Fixed: The MappingQ1::transform_real_to_unit_cell function as
-well as the equivalent ones in derived classes sometimes get into
-trouble if they are asked to compute the preimage of this point
-in reference cell coordinates. This is because for points outside
-the reference cell, the mapping from unit to real cell is not
-necessarily invertible, and consequently the Newton iteration to
-find the preimage did not always converge, leading to an exception.
-While this is not entirely wrong (we could, after all, not compute
-the desired quantity), not all callers of this function were prepared
-to accept this result -- in particular, the function
-CellAccessor<3>::point_inside should have really just returned false
-in such cases but instead let the exception so generated propagate
-through. This should now be fixed.
-<br>
-(Wolfgang Bangerth, Eric Heien, Sebastian Pauletti, 2012/06/27)
-
-<li> Fixed: The function VectorTools::compute_no_normal_flux_constraints had
-a bug that led to an exception whenever we were computing constraints for
-vector fields located on edges shared between two faces of a 3d cell if those
-faces were not parallel to the axes of the coordinate system. This is now fixed.
-<br>
-(Wolfgang Bangerth, Jennifer Worthen, 2012/06/27)
-
-<li>
-Fixed: Due to an apparent bug in autoconf, it was not possible to
-override the <code>F77</code> environment variable to select anything
-else than gfortran. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2012/06/08)
-
 <li>
 New: step-43 is an extension of step-21 that shows efficient methods
 to solve multi-phase flow.
@@ -197,7 +164,7 @@ and linker. This is now worked around.
 (Aron Ahmedia, Wolfgang Bangerth, 2012/02/06)
 
 <li> New: There is now a distributed deal.II vector class
-parallel::distributed::Vector<Number> that can be used with MPI. The
+parallel::distributed::Vector that can be used with MPI. The
 vector is based on a contiguous locally owned range and allows easy
 access of ghost entries from other processors. The vector interface is
 very similar to the non-distributed class Vector<Number>.
@@ -248,7 +215,44 @@ enabled due to a missing include file in file
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
-<li> Fixed: TrilinosWrappers::VectorBase::swap() is now working as expected. (thanks Uwe Köcher)
+<ol>
+<li> Fixed: Using the SolutionTransfer class with hp::DoFHandler
+and on meshes where some cells are associated with a FE_Nothing element
+could result in an error. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2012/06/29)
+
+<li> Fixed: The MappingQ1::transform_real_to_unit_cell function as
+well as the equivalent ones in derived classes sometimes get into
+trouble if they are asked to compute the preimage of this point
+in reference cell coordinates. This is because for points outside
+the reference cell, the mapping from unit to real cell is not
+necessarily invertible, and consequently the Newton iteration to
+find the preimage did not always converge, leading to an exception.
+While this is not entirely wrong (we could, after all, not compute
+the desired quantity), not all callers of this function were prepared
+to accept this result -- in particular, the function
+CellAccessor<3>::point_inside should have really just returned false
+in such cases but instead let the exception so generated propagate
+through. This should now be fixed.
+<br>
+(Wolfgang Bangerth, Eric Heien, Sebastian Pauletti, 2012/06/27)
+
+<li> Fixed: The function VectorTools::compute_no_normal_flux_constraints had
+a bug that led to an exception whenever we were computing constraints for
+vector fields located on edges shared between two faces of a 3d cell if those
+faces were not parallel to the axes of the coordinate system. This is now fixed.
+<br>
+(Wolfgang Bangerth, Jennifer Worthen, 2012/06/27)
+
+<li>
+Fixed: Due to an apparent bug in autoconf, it was not possible to
+override the <code>F77</code> environment variable to select anything
+else than gfortran. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2012/06/08)
+
+<li> Fixed: TrilinosWrappers::VectorBase::swap() is now working as expected. (thanks Uwe K&ouml;cher)
 <br>
 (Timo Heister 2012/07/03)
 
@@ -262,7 +266,6 @@ working also in codimension one spaces.
 <br>
 (Luca Heltai, Andrea Mola 2012/06/06)
 
-<ol>
 <li> Fixed: Computing the $W^{1,\infty}$ norm and seminorm in
 VectorTools::integrate_difference was not implemented. This is now
 fixed.
@@ -412,7 +415,7 @@ contained a rounding bug that often produced wrong results.
 <br>
 (Timo Heister, 2012/01/24)
 
-<li> Improved: Utilities::break_text_into_lines now also splits the string at \n.
+<li> Improved: Utilities::break_text_into_lines now also splits the string at '\\n'.
 <br>
 (Timo Heister, 2012/01/17)
 
