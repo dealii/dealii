@@ -176,8 +176,8 @@ cmake -D Trilinos_ENABLE_OPTIONAL_PACKAGES:BOOL=ON \
       -D Trilinos_EXTRA_LINK_FLAGS:STRING="-lgfortran" \
       -D CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE \
       -D Trilinos_VERBOSE_CONFIGURE:BOOL=FALSE \
-      -D TPL_ENABLE_MPI:BOOL=ON \
-      -D CMAKE_INSTALL_PREFIX:PATH=/w/bangerth/share/software/trilinos-10.10.2 \
+      -D TPL_ENABLE_MPI:BOOL=OFF \
+      -D CMAKE_INSTALL_PREFIX:PATH=/w/bangerth/share/x86_64/trilinos-10.4.2 \
       -D BUILD_SHARED_LIBS:BOOL=ON `pwd`/..
 
 make
