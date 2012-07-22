@@ -216,6 +216,10 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: GridTools::find_active_cell_around_point() works now also if the cell in which the point we look for lies is not adjacent to the closest vertex of p. The tests bits/find_cell_8 and _9 illustrate this. 
+<br>
+(Wolfgang Bangerth, Christian Goll 2012/07/22)
+
 <li> Fixed: Using the SolutionTransfer class with hp::DoFHandler
 and on meshes where some cells are associated with a FE_Nothing element
 could result in an error. This is now fixed.
