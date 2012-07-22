@@ -16,6 +16,10 @@
 #include <sstream>
 #include <iostream>
 
+//TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+//adjust_line_dof_index_for_line_orientation_table fields, and write tests
+//similar to bits/face_orientation_and_fe_q_*
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1053,7 +1057,6 @@ FE_Nedelec<dim>::initialize_restriction ()
 }
 
 
-
 template <int dim>
 std::vector<unsigned int>
 FE_Nedelec<dim>::get_dpo_vector (const unsigned int degree, bool dg)
@@ -1752,59 +1755,127 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                 lobatto_polynomials
                   = Polynomials::Lobatto::generate_complete_basis
                     (source_fe.degree);
-              const unsigned int n_edge_dofs
+              const unsigned int n_boundary_dofs
                 = GeometryInfo<dim>::lines_per_face * source_fe.degree;
               const unsigned int& n_quadrature_points = quadrature.size ();
+              FullMatrix<double>
+                system_matrix_inv (source_fe.degree * (source_fe.degree - 1),
+                                   source_fe.degree * (source_fe.degree - 1));
 
-              for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                   ++q_point)
+              {
+                FullMatrix<double>
+                  assembling_matrix (source_fe.degree * (source_fe.degree - 1),
+                                     n_quadrature_points);
+
+                for (unsigned int q_point = 0; q_point < n_quadrature_points;
+                     ++q_point)
+                  {
+                    const double weight = std::sqrt (quadrature.weight (q_point));
+
+                    for (unsigned int i = 0; i < source_fe.degree; ++i)
+                      {
+                        const double L_i = weight
+                                           * legendre_polynomials[i].value
+                                             (quadrature_points[q_point] (0));
+
+                        for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
+                          assembling_matrix (i * (source_fe.degree - 1) + j,
+                                             q_point)
+                            = L_i * lobatto_polynomials[j + 2].value
+                                    (quadrature_points[q_point] (1));
+                      }
+                  }
+
+                FullMatrix<double> system_matrix (assembling_matrix.m (),
+                                                  assembling_matrix.m ());
+
+                assembling_matrix.mTmult (system_matrix, assembling_matrix);
+                system_matrix_inv.invert (system_matrix);
+              }
+
+              FullMatrix<double> solution (system_matrix_inv.m (), 2);
+              FullMatrix<double> system_rhs (system_matrix_inv.m (), 2);
+              Vector<double> tmp (2);
+
+              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
                 {
-                  const double weight = 0.5 * quadrature.weight (q_point);
-                  const Point<dim>
-                    quadrature_point
-                    (0.5 * (quadrature_points[q_point] (0)
-                            + shifts[subface][0]),
-                     0.5 * (quadrature_points[q_point] (1)
-                            + shifts[subface][1]), 0.0);
-                  
-                  for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+                  system_rhs = 0.0;
+
+                  for (unsigned int q_point = 0;
+                       q_point < n_quadrature_points; ++q_point)
                     {
-                      const double shape_grad_0
-                        = this->shape_grad_component (this->face_to_cell_index (dof, 4),
-                                                      quadrature_point, 0)[1];
-                      const double shape_grad_1
-                        = this->shape_grad_component (this->face_to_cell_index (dof, 4),
-                                                      quadrature_point, 1)[0];
-                      const double shape_value_0
-                        = this->shape_value_component (this->face_to_cell_index (dof, 4),
-                                                       quadrature_point, 0);
-                      const double shape_value_1
-                        = this->shape_value_component (this->face_to_cell_index (dof, 4),
-                                                       quadrature_point, 1);
-                      
+                      Point<dim>
+                        quadrature_point
+                        (0.5 * (quadrature_points[q_point] (0)
+                                + shifts[subface][0]),
+                         0.5 * (quadrature_points[q_point] (1)
+                                + shifts[subface][1]), 0.0);
+                      tmp (0) = 0.5 * this->shape_value_component
+                                      (this->face_to_cell_index (dof, 4),
+                                       quadrature_point, 0);
+                      tmp (1) = 0.5 * this->shape_value_component
+                                      (this->face_to_cell_index (dof, 4),
+                                       quadrature_point, 1);
+                      quadrature_point
+                        = Point<dim> (quadrature_points[q_point] (0),
+                                      quadrature_points[q_point] (1), 0.0);
+
+                      for (unsigned int i = 0; i < 2; ++i)
+                        for (unsigned int j = 0; j < source_fe.degree; ++j)
+                          {
+                            tmp (0) -= interpolation_matrix
+                                       ((i + 2) * source_fe.degree + j, dof)
+                                    * source_fe.shape_value_component
+                                      ((i + 2) * source_fe.degree + j,
+                                       quadrature_point, 0);
+                            tmp (1) -= interpolation_matrix
+                                       (i * source_fe.degree + j, dof)
+                                    * source_fe.shape_value_component
+                                      (i * source_fe.degree + j,
+                                       quadrature_point, 1);
+                          }
+
+                      tmp *= quadrature.weight (q_point);
+
                       for (unsigned int i = 0; i < source_fe.degree; ++i)
                         {
-                          const double L_i_0
-                            = weight * legendre_polynomials[i].value (quadrature_points[q_point] (0));
-                          const double L_i_1
-                            = weight * legendre_polynomials[i].value (quadrature_points[q_point] (1));
-                          
+                          const double L_i_0 = legendre_polynomials[i].value
+                                               (quadrature_points[q_point] (0));
+                          const double L_i_1 = legendre_polynomials[i].value
+                                               (quadrature_points[q_point] (1));
+
                           for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
                             {
-                              interpolation_matrix (i * (source_fe.degree - 1) + j + n_edge_dofs, dof)
-                                += L_i_0 * (shape_grad_0
-                                            * legendre_polynomials[j + 1].value (quadrature_points[q_point] (1))
-                                            + shape_value_0
-                                            * lobatto_polynomials[j + 2].value (quadrature_points[q_point] (1)));
-                              interpolation_matrix (i + (j + source_fe.degree - 1) * source_fe.degree
-                                                      + n_edge_dofs, dof)
-                                += L_i_1 * (shape_grad_1
-                                            * legendre_polynomials[j + 1].value (quadrature_points[q_point] (0))
-                                            + shape_value_1
-                                            * lobatto_polynomials[j + 2].value (quadrature_points[q_point] (0)));
+                              system_rhs (i * (source_fe.degree - 1) + j, 0)
+                                += tmp (0) * L_i_0
+                                           * lobatto_polynomials[j + 2].value
+                                             (quadrature_points[q_point] (1));
+                              system_rhs (i * (source_fe.degree - 1) + j, 1)
+                                += tmp (1) * L_i_1
+                                           * lobatto_polynomials[j + 2].value
+                                             (quadrature_points[q_point] (0));
                             }
                         }
                     }
+
+                  system_matrix_inv.mmult (solution, system_rhs);
+
+                  for (unsigned int i = 0; i < source_fe.degree; ++i)
+                    for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
+                      {
+                        if (std::abs (solution (i * (source_fe.degree - 1) + j, 0))
+                              > 1e-14)
+                          interpolation_matrix (i * (source_fe.degree - 1)
+                                                  + j + n_boundary_dofs, dof)
+                            = solution (i * (source_fe.degree - 1) + j, 0);
+
+                        if (std::abs (solution (i * (source_fe.degree - 1) + j, 1))
+                              > 1e-14)
+                          interpolation_matrix (i + (j + source_fe.degree - 1)
+                                                  * source_fe.degree
+                                                  + n_boundary_dofs, dof)
+                            = solution (i * (source_fe.degree - 1) + j, 1);
+                      }
                 }
             }
 
@@ -1897,10 +1968,9 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                                   // to the resulting vector
                                   // only, if they are not
                                   // too small.
-              for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
-                for (unsigned int i = 0; i < this->degree; ++i)
-                  if (std::abs (local_dofs[i + e * this->degree]) < 1e-14)
-                    local_dofs[i + e * this->degree] = 0.0;
+              for (unsigned int i = 0; i < GeometryInfo<dim>::lines_per_cell * this->degree; ++i)
+                if (std::abs (local_dofs[i]) < 1e-14)
+                  local_dofs[i] = 0.0;
 
                                   // If the degree is greater
                                   // than 0, then we have still
@@ -2116,10 +2186,9 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                                   // to the resulting vector
                                   // only, if they are not
                                   // too small.
-              for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
-                for (unsigned int i = 0; i < this->degree; ++i)
-                  if (std::abs (local_dofs[i + e * this->degree]) < 1e-14)
-                    local_dofs[i + e * this->degree] = 0.0;
+              for (unsigned int i = 0; i < GeometryInfo<dim>::lines_per_cell * this->degree; ++i)
+                if (std::abs (local_dofs[i]) < 1e-14)
+                  local_dofs[i] = 0.0;
 
                                   // If the degree is greater
                                   // than 0, then we have still
@@ -3272,10 +3341,9 @@ const
                                   // to the resulting vector
                                   // only, if they are not
                                   // too small.
-          for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
-            for (unsigned int i = 0; i < this->degree; ++i)
-              if (std::abs (local_dofs[i + e * this->degree]) < 1e-14)
-                local_dofs[i + e * this->degree] = 0.0;
+          for (unsigned int i = 0; i < GeometryInfo<dim>::lines_per_cell * this->degree; ++i)
+            if (std::abs (local_dofs[i]) < 1e-14)
+              local_dofs[i] = 0.0;
 
                                   // If the degree is greater
                                   // than 0, then we have still
@@ -3477,10 +3545,9 @@ const
                                   // to the resulting vector
                                   // only, if they are not
                                   // too small.
-          for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
-            for (unsigned int i = 0; i < this->degree; ++i)
-              if (std::abs (local_dofs[i + e * this->degree]) < 1e-14)
-                local_dofs[i + e * this->degree] = 0.0;
+          for (unsigned int i = 0; i < GeometryInfo<dim>::lines_per_cell * this->degree; ++i)
+            if (std::abs (local_dofs[i]) < 1e-14)
+              local_dofs[i] = 0.0;
 
                                   // If the degree is greater
                                   // than 0, then we have still
