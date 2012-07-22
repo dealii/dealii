@@ -781,6 +781,54 @@ namespace GridTools
 
 
 
+  namespace
+  {
+	template <int dim, template<int, int> class Container, int spacedim>
+	void find_active_cell_around_point_internal(const Container<dim,spacedim>& container,
+	  std::set<typename Container<dim,spacedim>::active_cell_iterator>& searched_cells, 
+	  std::set<typename Container<dim,spacedim>::active_cell_iterator>& adjacent_cells)
+	{
+	  typedef typename Container<dim,spacedim>::active_cell_iterator cell_iterator;
+
+					// update the searched cells
+	  searched_cells.insert(adjacent_cells.begin(), adjacent_cells.end());
+					// now we to collect all neighbors
+					// of the cells in adjacent_cells we 
+					// have not yet searched.
+	  std::set<cell_iterator> adjacent_cells_new;
+		
+	  typename std::set<cell_iterator>::const_iterator
+	  cell = adjacent_cells.begin(),
+	  endc = adjacent_cells.end();
+	  for(; cell != endc; ++cell)
+	  {
+		std::vector<cell_iterator> active_neighbors;
+		get_active_neighbors<Container<dim, spacedim> >(*cell, active_neighbors);
+		for (unsigned int i=0; i<active_neighbors.size(); ++i)
+		  if(searched_cells.find(active_neighbors[i]) == searched_cells.end())
+			adjacent_cells_new.insert(active_neighbors[i]);
+	  }
+	  adjacent_cells.clear();
+	  adjacent_cells.insert(adjacent_cells_new.begin(), adjacent_cells_new.end());
+	  if (adjacent_cells.size() == 0)
+      {
+              // we haven't found any other cell that would be a
+              // neighbor of a previously found cell, but we know
+              // that we haven't checked all cells yet. that means
+              // that the domain is disconnected. in that case,
+              // choose the first previously untouched cell we
+              // can find
+        cell_iterator it = container.begin_active();
+		for ( ; it!=container.end();++it)
+		  if(searched_cells.find(it) == searched_cells.end())
+		  {
+			adjacent_cells.insert(it);
+			 break;
+		  }
+       }	  
+	}
+  }
+
   template <int dim, template<int, int> class Container, int spacedim>
   typename Container<dim,spacedim>::active_cell_iterator
   find_active_cell_around_point (const Container<dim,spacedim>  &container,
@@ -811,51 +859,83 @@ namespace GridTools
                                      // all adjacent cells
     unsigned int vertex = find_closest_vertex(container, p);
 
-    std::vector<cell_iterator> adjacent_cells =
+    std::vector<cell_iterator> adjacent_cells_tmp =
       find_cells_adjacent_to_vertex(container, vertex);
+	  
+									// Make sure that we have found
+									// at least one cell adjacent to vertex.
+	  Assert(adjacent_cells_tmp.size()>0, ExcInternalError());
 
-    typename std::vector<cell_iterator>::const_iterator
-      cell = adjacent_cells.begin(),
-      endc = adjacent_cells.end();
+									// Copy all the cells into a std::set
+	 std::set<cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(), adjacent_cells_tmp.end());
+	 std::set<cell_iterator> searched_cells;
 
-    for(; cell != endc; ++cell)
-      {
-        try
-          {
-            const Point<dim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
+									// Determine the maximal number of cells
+									// in the grid.
+									// As long as we have not found
+									// the cell and have not searched
+									// every cell in the triangulation, 
+									// we keep on looking.
+	  const unsigned int n_cells =get_tria(container).n_cells();
+	  bool found = false;
+	  unsigned int cells_searched = 0;
+	  while (!found && cells_searched < n_cells)
+	  {
+	    typename std::set<cell_iterator>::const_iterator
+		cell = adjacent_cells.begin(),
+		endc = adjacent_cells.end();
+		for(; cell != endc; ++cell)
+		  {
+			try
+			  {
+				const Point<dim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
 
-                                             // calculate the infinity norm of
-                                             // the distance vector to the unit cell.
-            const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+												// calculate the infinity norm of
+												// the distance vector to the unit cell.
+				const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
 
-                                             // We compare if the point is inside the
-                                             // unit cell (or at least not too far
-                                             // outside). If it is, it is also checked
-                                             // that the cell has a more refined state
-            if (dist < best_distance ||
-                (dist == best_distance && (*cell)->level() > best_level))
-              {
-                best_distance = dist;
-                best_level    = (*cell)->level();
-                best_cell     = std::make_pair(*cell, p_cell);
-              }
-          }
-        catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
-          {
-					     // ok, the transformation
-					     // failed presumably
-					     // because the point we
-					     // are looking for lies
-					     // outside the current
-					     // cell. this means that
-					     // the current cell can't
-					     // be the cell around the
-					     // point, so just ignore
-					     // this cell and move on
-					     // to the next
-          }
-
-      }
+												// We compare if the point is inside the
+												// unit cell (or at least not too far
+												// outside). If it is, it is also checked
+												// that the cell has a more refined state
+				if (dist < best_distance ||
+					(dist == best_distance && (*cell)->level() > best_level))
+				  {
+					found 		  = true;
+					best_distance = dist;
+					best_level    = (*cell)->level();
+					best_cell     = std::make_pair(*cell, p_cell);
+				  }
+			  }
+			catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
+			  {
+							// ok, the transformation
+							// failed presumably
+							// because the point we
+							// are looking for lies
+							// outside the current
+							// cell. this means that
+							// the current cell can't
+							// be the cell around the
+							// point, so just ignore
+							// this cell and move on
+							// to the next
+			  }
+		  }
+							//udpate the number of cells searched
+		  cells_searched += adjacent_cells.size();
+							// if we have not found the cell in 
+							// question and have not yet searched every
+							// cell, we expand our search to 
+							// all the not already searched neighbors of
+							// the cells in adjacent_cells. This is
+							// what find_active_cell_around_poin_internal
+							// is for.
+		  if(!found && cells_searched < n_cells)
+		  {
+			find_active_cell_around_point_internal(container, searched_cells, adjacent_cells);
+		  }
+	  }
 
     Assert (best_cell.first.state() == IteratorState::valid,
             ExcPointNotFound<spacedim>(p));
@@ -901,55 +981,88 @@ namespace GridTools
                                          // all adjacent cells
         unsigned int vertex = find_closest_vertex(container, p);
 
-        std::vector<cell_iterator> adjacent_cells =
-          find_cells_adjacent_to_vertex(container, vertex);
+		std::vector<cell_iterator> adjacent_cells_tmp =
+        find_cells_adjacent_to_vertex(container, vertex);
+		
+									// Make sure that we have found
+									// at least one cell adjacent to vertex.
+	  Assert(adjacent_cells_tmp.size()>0, ExcInternalError());
 
-        typename std::vector<cell_iterator>::const_iterator
-          cell = adjacent_cells.begin(),
-          endc = adjacent_cells.end();
+									// Copy all the cells into a std::set
+	 std::set<cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(), adjacent_cells_tmp.end());
+	 std::set<cell_iterator> searched_cells;
 
-        for(; cell != endc; ++cell)
-          {
-	    try
-	      {
-		const Point<dim> p_cell
-		  = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
-
-						 // calculate the infinity norm of
-						 // the distance vector to the unit cell.
-		const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
-
-						 // We compare if the point is inside the
-						 // unit cell (or at least not too far
-						 // outside). If it is, it is also checked
-						 // that the cell has a more refined state
-		if (dist < best_distance ||
-		    (dist == best_distance && (*cell)->level() > best_level))
+									// Determine the maximal number of cells
+									// in the grid.
+									// As long as we have not found
+									// the cell and have not searched
+									// every cell in the triangulation, 
+									// we keep on looking.
+	  const unsigned int n_cells =get_tria(container).n_cells();
+	  bool found = false;
+	  unsigned int cells_searched = 0;
+	  while (!found && cells_searched < n_cells)
+	  {
+	    typename std::set<cell_iterator>::const_iterator
+		cell = adjacent_cells.begin(),
+		endc = adjacent_cells.end();
+		for(; cell != endc; ++cell)
 		  {
-		    best_distance = dist;
-		    best_level    = (*cell)->level();
-		    best_cell     = std::make_pair(*cell, p_cell);
-		  }
-	      }
-	    catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
-	      {
-						 // ok, the transformation
-						 // failed presumably
-						 // because the point we
-						 // are looking for lies
-						 // outside the current
-						 // cell. this means that
-						 // the current cell can't
-						 // be the cell around the
-						 // point, so just ignore
-						 // this cell and move on
-						 // to the next
-	      }
-          }
+			try
+			  {
+				const Point<dim> p_cell = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
 
-        Assert (best_cell.first.state() == IteratorState::valid,
-                ExcPointNotFound<spacedim>(p));
-      }
+				
+				// calculate the infinity norm of
+				// the distance vector to the unit cell.
+				const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+
+												// We compare if the point is inside the
+												// unit cell (or at least not too far
+												// outside). If it is, it is also checked
+												// that the cell has a more refined state
+				if (dist < best_distance ||
+					(dist == best_distance && (*cell)->level() > best_level))
+				  {
+					found 		  = true;
+					best_distance = dist;
+					best_level    = (*cell)->level();
+					best_cell     = std::make_pair(*cell, p_cell);
+				  }
+			  }
+			catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
+			  {
+							// ok, the transformation
+							// failed presumably
+							// because the point we
+							// are looking for lies
+							// outside the current
+							// cell. this means that
+							// the current cell can't
+							// be the cell around the
+							// point, so just ignore
+							// this cell and move on
+							// to the next
+			  }
+		  }
+		  	  							//udpate the number of cells searched
+		  cells_searched += adjacent_cells.size();
+							// if we have not found the cell in 
+							// question and have not yet searched every
+							// cell, we expand our search to 
+							// all the not already searched neighbors of
+							// the cells in adjacent_cells.
+		  if(!found && cells_searched < n_cells)
+		  {
+			find_active_cell_around_point_internal(container, searched_cells, adjacent_cells);
+		  }
+
+	  }
+	  }
+
+    Assert (best_cell.first.state() == IteratorState::valid,
+            ExcPointNotFound<spacedim>(p));
+
     return best_cell;
   }
 
