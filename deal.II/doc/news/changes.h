@@ -216,9 +216,13 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
-<li> Fixed: GridTools::find_active_cell_around_point() works now also if the cell in which the point we look for lies is not adjacent to the closest vertex of p. The tests bits/find_cell_8 and _9 illustrate this. 
+<li> Fixed: DoFTools::make_zero_boundary_constraints now also works for parallel distributed triangulations.
 <br>
-(Wolfgang Bangerth, Christian Goll 2012/07/22)
+(Wolfgang Bangerth, Christian Goll 2012/07/24)
+
+<li> Fixed: GridTools::find_active_cell_around_point() works now also if the cell in which the point we look for lies is not adjacent to the closest vertex of p. The tests bits/find_cell_8 and _9 illustrate this.
+<br>
+(Wolfgang Bangerth, Christian Goll 2012/07/20)
 
 <li> Fixed: Using the SolutionTransfer class with hp::DoFHandler
 and on meshes where some cells are associated with a FE_Nothing element
