@@ -219,11 +219,15 @@ include Makefile.dep
 # If the command fails, then remove Makefile.dep again and fail
 %/Makefile.dep:
 	@echo "===================================== Remaking $@"
-	@(($D/common/scripts/make_dependencies -n $(INCLUDE) "-B\$$(LIBDIR)" \
+	@$D/common/scripts/make_dependencies -n $(INCLUDE) "-B\$$(LIBDIR)" \
 			$(filter $D/source/$(dir $@)%, $(cc-files)) \
-		| $(PERL) -pe 's!LIBDIR\)/(debug|optimized)/(.*):!LIBDIR)/$$1/$(@:%/Makefile.dep=%)_$$2:!g;' \
-	  ) > $@) \
-	 || (rm -f $@ ; false)
+	 | $(PERL) -pe 's!LIBDIR\)/(debug|optimized)/(.*):!LIBDIR)/$$1/$(@:%/Makefile.dep=%)_$$2:!g;' \
+	 > $@
+	@if test ! -s $@ ; then \
+	  echo "*** make_dependencies failed to produce a valid file $@" ; \
+	  rm $@ ; \
+	  false ; \
+	fi
 
 
 # include all the dependencies
