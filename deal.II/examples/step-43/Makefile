@@ -156,7 +156,7 @@ Makefile.dep: $(target).cc Makefile \
 	@$D/common/scripts/make_dependencies  $(INCLUDE) -B. $(target).cc \
 		> $@ \
 	  || (rm -f $@ ; false)
-	@if test -s $@ ; then : else rm $@ ; fi
+	@if test -s $@ ; then true ; else rm $@ ; false ; fi
 
 # To make the dependencies known to `make', we finally have to include
 # them:
