@@ -646,6 +646,7 @@ namespace PETScWrappers
     return *this;
   }
 
+
   VectorBase &
   VectorBase::mult (const VectorBase &v)
   {
@@ -656,6 +657,15 @@ namespace PETScWrappers
   }
 
 
+  VectorBase &
+  VectorBase::mult (const VectorBase &u,
+		    const VectorBase &v)
+  {
+    const int ierr = VecPointwiseMult (vector,u,v);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return *this;
+  }
 
   bool
   VectorBase::all_zero () const
