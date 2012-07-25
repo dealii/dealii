@@ -12,7 +12,10 @@
 //---------------------------------------------------------------------------
 
 
-// in Trilinos 10.12.1 interpolate() hangs with a small number of cells (smaller than the number of CPUs). This works fine in 10.4.2 and 10.8.5
+// In Trilinos 10.12.1 interpolate() hangs with a small number of cells (smaller than the number of CPUs). This works fine in 10.4.2 and 10.8.5
+// As it turns out, this is because vector creation after interpolate()
+// reacts differently in 10.12.1 and causes a hang. The bug is
+// that interpolate() does not call compress()!
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
