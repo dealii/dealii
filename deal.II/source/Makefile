@@ -130,12 +130,12 @@ ifneq ($(GXX-VERSION),compaq_cxx)
 
   # and p4est
   ifeq ($(USE_CONTRIB_P4EST),yes)
-    deplibs.g += $(DEAL_II_P4EST_DIR)/DEBUG/lib/libp4est$(shared-lib-suffix) \
-                 $(DEAL_II_P4EST_DIR)/DEBUG/lib/libsc$(shared-lib-suffix) \
-		 $(call DEAL_II_RPATH,$(DEAL_II_P4EST_DIR)/DEBUG/lib)
-    deplibs.o += $(DEAL_II_P4EST_DIR)/FAST/lib/libp4est$(shared-lib-suffix) \
-                 $(DEAL_II_P4EST_DIR)/FAST/lib/libsc$(shared-lib-suffix) \
-		 $(call DEAL_II_RPATH,$(DEAL_II_P4EST_DIR)/FAST/lib)
+    deplibs.g += $(DEAL_II_P4EST_DIR)/DEBUG/$(DEAL_II_P4EST_LIBDIR_NAME)/libp4est$(shared-lib-suffix) \
+                 $(DEAL_II_P4EST_DIR)/DEBUG/$(DEAL_II_P4EST_LIBDIR_NAME)/libsc$(shared-lib-suffix) \
+		 $(call DEAL_II_RPATH,$(DEAL_II_P4EST_DIR)/DEBUG/$(DEAL_II_P4EST_LIBDIR_NAME))
+    deplibs.o += $(DEAL_II_P4EST_DIR)/FAST/$(DEAL_II_P4EST_LIBDIR_NAME)/libp4est$(shared-lib-suffix) \
+                 $(DEAL_II_P4EST_DIR)/FAST/$(DEAL_II_P4EST_LIBDIR_NAME)/libsc$(shared-lib-suffix) \
+		 $(call DEAL_II_RPATH,$(DEAL_II_P4EST_DIR)/FAST/$(DEAL_II_P4EST_LIBDIR_NAME))
   endif
 
   # for cygwin and darwin, also llapack and such are necessary

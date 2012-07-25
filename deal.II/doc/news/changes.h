@@ -51,6 +51,14 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
+Fixed: On some systems, the p4est library we use for distributed
+parallel computations installs its libraries into a <code>lib64/</code>
+directory instead of the usual <code>lib/</code>. deal.II can now deal
+with this.
+<br>
+(Wolfgang Bangerth, 2012/07/25)
+
+<li>
 New: step-43 is an extension of step-21 that shows efficient methods
 to solve multi-phase flow.
 <br>

@@ -7732,6 +7732,21 @@ AC_DEFUN(DEAL_II_CONFIGURE_P4EST, dnl
 
     CXXFLAGSG="$CXXFLAGSG -I$use_p4est/DEBUG/include"
     CXXFLAGSO="$CXXFLAGSO -I$use_p4est/FAST/include"
+
+    AC_MSG_CHECKING(for p4est library directory)
+    if test -d "$use_p4est/DEBUG/lib64" -a -d "$use_p4est/FAST/lib64" ; then
+      AC_MSG_RESULT(lib64)
+      DEAL_II_P4EST_LIBDIR_NAME=lib64
+    else
+      if test -d "$use_p4est/DEBUG/lib" -a -d "$use_p4est/FAST/lib" ; then
+        AC_MSG_RESULT(lib)
+        DEAL_II_P4EST_LIBDIR_NAME=lib
+      else
+        AC_MSG_ERROR(could not determine whether p4est stores its library in lib/ or lib64/ directories)
+      fi
+    fi
+    AC_SUBST(DEAL_II_P4EST_LIBDIR_NAME)
+
   else
     AC_MSG_RESULT(no)
   fi

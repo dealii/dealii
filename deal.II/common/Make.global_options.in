@@ -97,6 +97,7 @@ USE_CONTRIB_UMFPACK  = @USE_CONTRIB_UMFPACK@
 
 USE_CONTRIB_P4EST    = @USE_CONTRIB_P4EST@
 DEAL_II_P4EST_DIR    = @DEAL_II_P4EST_DIR@
+DEAL_II_P4EST_LIBDIR_NAME = @DEAL_II_P4EST_LIBDIR_NAME@
 
 DEAL_II_USE_MPI      = @DEAL_II_USE_MPI@
 
@@ -280,7 +281,7 @@ ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
 else
   include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/include
 endif
-include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include 
+include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
 include-path-slepc-bmake     = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/include
 include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
