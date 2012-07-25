@@ -69,9 +69,10 @@ void test()
 			    LinearFunction<dim>(),
 			    interpolated);
   deallog << "after" << std::endl;
-  
+
+  double norm = interpolated.l2_norm();
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-    deallog << "norm = " << interpolated.l2_norm()
+    deallog << "norm = " << norm
 	    << std::endl;
 }
 
