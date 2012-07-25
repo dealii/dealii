@@ -759,7 +759,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl       (valid, but annoying and sometimes hard to work around)
           dnl #858: `type qualifier on return type is meaningless'
           dnl       (on conversion operators to types that are already const)
-          dnl #1565: attributes are ignored on a class declaration that is not 
+          dnl #1565: attributes are ignored on a class declaration that is not
 	  dnl        also a definition (this happens in BOOST in a number of
 	  dnl        places)
           CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858 -wd1565"
@@ -7725,10 +7725,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_P4EST, dnl
               [Defined if we are to use the p4est library to distribute
                meshes on a cluster computer.])
     USE_CONTRIB_P4EST=yes
-    export USE_CONTRIB_P4EST
+    AC_SUBST(USE_CONTRIB_P4EST)
 
     DEAL_II_P4EST_DIR=${use_p4est}
-    export DEAL_II_P4EST_DIR
+    AC_SUBST(DEAL_II_P4EST_DIR)
 
     CXXFLAGSG="$CXXFLAGSG -I$use_p4est/DEBUG/include"
     CXXFLAGSO="$CXXFLAGSO -I$use_p4est/FAST/include"
