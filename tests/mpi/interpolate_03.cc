@@ -56,7 +56,8 @@ void test()
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridGenerator::hyper_cube(tr);
-//  tr.refine_global (2);
+
+//tr.refine_global (2);
 
   const FE_Q<dim> fe(2);
   DoFHandler<dim> dofh(tr);
@@ -69,6 +70,7 @@ void test()
 			    LinearFunction<dim>(),
 			    interpolated);
   deallog << "after" << std::endl;
+  interpolated.compress();
 
   double norm = interpolated.l2_norm();
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
