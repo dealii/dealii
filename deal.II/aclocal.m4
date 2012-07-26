@@ -838,6 +838,21 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
                 ;;
           esac
 
+	  dnl Intel's MPI implementation based on ICC requires that
+	  dnl mpi.h be included *before* things like <stdio.h> or
+	  dnl <iostream>. How they envision this to work is beyond
+	  dnl me because they may be indirectly included from other
+	  dnl header files. Besides this, autoconf generates tests
+	  dnl that don't follow this rule and so fail at ./configure
+	  dnl time. There is nothing we can do about it. However,
+	  dnl there is a workaround described here:
+	  dnl   http://software.intel.com/en-us/articles/intel-mpi-library-for-linux-running-list-of-known-issues/#A3
+	  dnl We switch this on if we use Intel's ICC + MPI
+	  if test "x$DEAL_II_USE_MPI" = "xyes" ; then
+	    CXXFLAGSG="$CXXFLAGSG -DMPICH_IGNORE_CXX_SEEK"
+	    CXXFLAGSO="$CXXFLAGSO -DMPICH_IGNORE_CXX_SEEK"
+	  fi
+
           dnl Finally, see if the compiler supports C++0x
           DEAL_II_CHECK_CXX1X
           ;;

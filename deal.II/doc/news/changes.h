@@ -51,6 +51,14 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
+Fixed: The Intel compiler, when using MPI, wants that <code>mpi.h</code>
+is included before header files like <code>stdio.h</code>. This can't
+be ensured in general because the inclusion might be indirectly, but
+we now work around the problem in other ways.
+<br>
+(Timo Heister, Wolfgang Bangerth, Michael Thomadakis, 2012/07/26)
+
+<li>
 Fixed: On some systems, the p4est library we use for distributed
 parallel computations installs its libraries into a <code>lib64/</code>
 directory instead of the usual <code>lib/</code>. deal.II can now deal
