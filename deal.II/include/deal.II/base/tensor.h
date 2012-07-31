@@ -399,6 +399,7 @@ Tensor<rank_,dim,Number> &
 Tensor<rank_,dim,Number>::operator = (const Number d)
 {
   Assert (d==Number(0), ExcMessage ("Only assignment with zero is allowed"));
+  (void) d;
 
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] = 0;

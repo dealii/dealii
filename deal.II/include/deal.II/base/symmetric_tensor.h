@@ -1179,6 +1179,7 @@ SymmetricTensor<rank,dim,Number> &
 SymmetricTensor<rank,dim,Number>::operator = (const Number d)
 {
   Assert (d==0, ExcMessage ("Only assignment with zero is allowed"));
+  (void) d;
 
   data = 0;
 
