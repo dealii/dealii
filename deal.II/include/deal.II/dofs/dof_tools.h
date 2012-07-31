@@ -2424,7 +2424,9 @@ namespace DoFTools
 
                                    /**
                                     * Return a list of support
-                                    * points for all the degrees of
+                                    * points (see this
+                                    * @ref GlossSupport "glossary entry")
+                                    * for all the degrees of
                                     * freedom handled by this DoF
                                     * handler object. This function,
                                     * of course, only works if the
@@ -2466,7 +2468,8 @@ namespace DoFTools
 
   /**
    * This function is a version of the above map_dofs_to_support_points
-   * function that doesn't simply return a vector of support_points with one
+   * function that doesn't simply return a vector of support points (see
+   * this @ref GlossSupport "glossary entry") with one
    * entry for each global degree of freedom, but instead a map that
    * maps from the DoFs index to its location. The point of this
    * function is that it is also usable in cases where the DoFHandler
@@ -2511,7 +2514,9 @@ namespace DoFTools
                                     * a map where the keys are the
                                     * support points of the degrees
                                     * of freedom, while the values
-                                    * are the DoF indices.
+                                    * are the DoF indices. For a definition
+                                    * of support points, see this
+                                    * @ref GlossSupport "glossary entry".
                                     *
                                     * Since there is no natural
                                     * order in the space of points
