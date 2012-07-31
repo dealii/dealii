@@ -51,6 +51,12 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
+Fixed: On some 64-bit systems, we build deal.II with the <code>-m64</code>
+flag but forgot to build UMFPACK with this flag as well, leading to
+linker errors. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2012/07/31)
+
 Fixed: The Intel compiler, when using MPI, wants that <code>mpi.h</code>
 is included before header files like <code>stdio.h</code>. This can't
 be ensured in general because the inclusion might be indirectly, but

@@ -590,6 +590,11 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGS="$CXXFLAGS -m64"
           CXXFLAGSG="$CXXFLAGSG -m64"
           CXXFLAGSO="$CXXFLAGSO -m64"
+
+          CFLAGS="$CFLAGS -m64"
+          CFLAGSG="$CFLAGSG -m64"
+          CFLAGSO="$CFLAGSO -m64"
+
           LDFLAGS="$LDFLAGS -m64"
         fi
 
