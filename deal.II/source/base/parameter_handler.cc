@@ -559,7 +559,7 @@ namespace Patterns
   std::size_t
   List::memory_consumption () const
   {
-    return (sizeof(PatternBase) +
+    return (sizeof(*this) +
             MemoryConsumption::memory_consumption(*pattern));
   }
 
@@ -577,7 +577,7 @@ namespace Patterns
       std::string str;
       std::getline(is, str, '>');
 
-      std::auto_ptr<PatternBase> base_pattern (pattern_factory(str));
+      std_cxx1x::shared_ptr<PatternBase> base_pattern (pattern_factory(str));
 
       is.ignore(strlen(" of length "));
       if(!(is >> min_elements))
@@ -585,9 +585,186 @@ namespace Patterns
 
       is.ignore(strlen("..."));
       if(!(is >> max_elements))
-        return new List(*base_pattern);
+        return new List(*base_pattern, min_elements);
 
       return new List(*base_pattern, min_elements, max_elements);
+    }
+    else
+      return 0;
+  }
+
+
+
+  const unsigned int Map::max_int_value =
+#ifdef HAVE_STD_NUMERIC_LIMITS
+          std::numeric_limits<unsigned int>::max();
+#else
+          numbers::invalid_unsigned_int;
+#endif
+
+
+  const char* Map::description_init = "[Map";
+
+
+  Map::Map (const PatternBase  &p_key,
+            const PatternBase  &p_value,
+            const unsigned int  min_elements,
+            const unsigned int  max_elements)
+                  :
+                  key_pattern (p_key.clone()),
+                  value_pattern (p_value.clone()),
+                  min_elements (min_elements),
+                  max_elements (max_elements)
+  {
+    Assert (min_elements <= max_elements,
+            ExcInvalidRange (min_elements, max_elements));
+  }
+
+
+
+  Map::~Map ()
+  {
+    delete key_pattern;
+    key_pattern = 0;
+
+    delete value_pattern;
+    value_pattern = 0;
+  }
+
+
+
+  bool Map::match (const std::string &test_string_list) const
+  {
+    std::string tmp = test_string_list;
+    std::vector<std::string> split_list;
+    split_list.reserve (std::count (tmp.begin(), tmp.end(), ',')+1);
+
+                                     // first split the input list at comma sites
+    while (tmp.length() != 0)
+      {
+        std::string map_entry;
+        map_entry = tmp;
+
+        if (map_entry.find(",") != std::string::npos)
+          {
+            map_entry.erase (map_entry.find(","), std::string::npos);
+            tmp.erase (0, tmp.find(",")+1);
+          }
+        else
+          tmp = "";
+
+        while ((map_entry.length() != 0) &&
+               (std::isspace (map_entry[0])))
+          map_entry.erase (0,1);
+
+        while (std::isspace (map_entry[map_entry.length()-1]))
+          map_entry.erase (map_entry.length()-1, 1);
+
+        split_list.push_back (map_entry);
+      };
+
+    if ((split_list.size() < min_elements) ||
+        (split_list.size() > max_elements))
+      return false;
+
+                                     // check the different possibilities
+    for (std::vector<std::string>::const_iterator
+           test_string = split_list.begin();
+         test_string != split_list.end(); ++test_string)
+      {
+        // separate key and value from the test_string
+        if (test_string->find(":") == std::string::npos)
+          return false;
+
+        // we know now that there is a ':', so split the string there
+        // and trim spaces
+        std::string key = *test_string;
+        key.erase (key.find(":"), std::string::npos);
+        while ((key.length() > 0) && (std::isspace (key[key.length()-1])))
+          key.erase (key.length()-1, 1);
+
+        std::string value = *test_string;
+        value.erase (0, value.find(":")+1);
+        while ((value.length() > 0) && (std::isspace (value[0])))
+          value.erase (0, 1);
+
+        // then verify that the patterns are satisfied
+        if (key_pattern->match (key) == false)
+          return false;
+        if (value_pattern->match (value) == false)
+          return false;
+      }
+
+    return true;
+  }
+
+
+
+  std::string Map::description () const
+  {
+    std::ostringstream description;
+
+    description << description_init
+                << " map of <"
+                << key_pattern->description() << ":"
+                << value_pattern->description() << ">"
+                << " of length " << min_elements << "..." << max_elements
+                << " (inclusive)"
+                << "]";
+
+    return description.str();
+  }
+
+
+
+  PatternBase *
+  Map::clone () const
+  {
+    return new Map(*key_pattern, *value_pattern, min_elements, max_elements);
+  }
+
+
+  std::size_t
+  Map::memory_consumption () const
+  {
+    return (sizeof(*this) +
+            MemoryConsumption::memory_consumption (*key_pattern) +
+            MemoryConsumption::memory_consumption (*value_pattern));
+  }
+
+
+
+  Map* Map::create (const std::string& description)
+  {
+    if(description.compare(0, std::strlen(description_init), description_init) == 0)
+    {
+      int min_elements, max_elements;
+
+      std::istringstream is(description);
+      is.ignore(strlen(description_init) + strlen(" map of <"));
+
+      std::string str;
+      std::getline(is, str, '>');
+
+      // split 'str' into key and value
+      std::string key = str;
+      key.erase (key.find(":"), std::string::npos);
+
+      std::string value = str;
+      value.erase (0, value.find(":")+1);
+
+      std_cxx1x::shared_ptr<PatternBase> key_pattern (pattern_factory(key));
+      std_cxx1x::shared_ptr<PatternBase> value_pattern (pattern_factory(value));
+
+      is.ignore(strlen(" of length "));
+      if(!(is >> min_elements))
+        return new Map(*key_pattern, *value_pattern);
+
+      is.ignore(strlen("..."));
+      if(!(is >> max_elements))
+        return new Map(*key_pattern, *value_pattern, min_elements);
+
+      return new Map(*key_pattern, *value_pattern, min_elements, max_elements);
     }
     else
       return 0;
