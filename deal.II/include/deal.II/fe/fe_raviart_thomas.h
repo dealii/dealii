@@ -252,6 +252,9 @@ class FE_RaviartThomas
                                       * face support point and one
                                       * column for each degree of
                                       * freedom on the face.
+				      *
+				      * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+				      * for more information.
                                       */
     Table<2, double> boundary_weights;
                                      /**
@@ -413,6 +416,9 @@ class FE_RaviartThomasNodal
                                       * and FiniteElement<dim>::generalized_face_support_points
                                       * fields. Called from the
                                       * constructor.
+				      *
+				      * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+				      * for more information.
                                       */
     void initialize_support_points (const unsigned int rt_degree);
 };
