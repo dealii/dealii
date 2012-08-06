@@ -650,7 +650,7 @@ namespace Patterns
       const unsigned int min_elements;
 
                                        /**
-                                        * Minimum number of elements
+                                        * Maximum number of elements
                                         * the list must have.
                                         */
       const unsigned int max_elements;
@@ -660,6 +660,143 @@ namespace Patterns
                                         */
       static const char* description_init;
   };
+
+
+  /**
+   * This pattern matches a list of
+   * comma-separated values each of which
+   * denotes a pair of key and value. Both key and value
+   * have to match a pattern given to the
+   * constructor. For each entry of the map,
+   * parameters have to be entered in the form
+   * <code>key: value</code>. In other words, a
+   * map is described in the form
+   * <code>key1: value1, key2: value2, key3: value3, ...</code>.
+   *
+   * With two additional
+   * parameters, the number of elements this
+   * list has to have can be specified. If
+   * none is specified, the map may have
+   * zero or more entries.
+   */
+  class Map : public PatternBase
+  {
+  public:
+    /**
+     * Maximal integer value. If
+     * the numeric_limits class
+     * is available use this
+     * information to obtain the
+     * extremal values, otherwise
+     * set it so that this class
+     * understands that all values
+     * are allowed.
+     */
+    static const unsigned int max_int_value;
+
+    /**
+     * Constructor. Take the
+     * given parameter as the
+     * specification of valid
+     * elements of the list.
+     *
+     * The two other arguments can
+     * be used to denote minimal
+     * and maximal allowable
+     * lengths of the list.
+     */
+    Map (const PatternBase  &key_pattern,
+         const PatternBase  &value_pattern,
+         const unsigned int  min_elements = 0,
+         const unsigned int  max_elements = max_int_value);
+
+    /**
+     * Destructor.
+     */
+    virtual ~Map ();
+
+    /**
+     * Return <tt>true</tt> if the
+     * string is a comma-separated
+     * list of strings each of
+     * which match the pattern
+     * given to the constructor.
+     */
+    virtual bool match (const std::string &test_string) const;
+
+    /**
+     * Return a description of
+     * the pattern that valid
+     * strings are expected to
+     * match.
+     */
+    virtual std::string description () const;
+
+    /**
+     * Return a copy of the
+     * present object, which is
+     * newly allocated on the
+     * heap. Ownership of that
+     * object is transferred to
+     * the caller of this
+     * function.
+     */
+    virtual PatternBase * clone () const;
+
+    /**
+     * Creates new object if the start of
+     * description matches
+     * description_init.  Ownership of that
+     * object is transferred to the caller
+     * of this function.
+     */
+    static Map* create (const std::string& description);
+
+    /**
+     * Determine an estimate for
+     * the memory consumption (in
+     * bytes) of this object.
+     */
+    std::size_t memory_consumption () const;
+
+    /** @addtogroup Exceptions
+     * @{ */
+
+    /**
+     * Exception.
+     */
+    DeclException2 (ExcInvalidRange,
+        int, int,
+        << "The values " << arg1 << " and " << arg2
+        << " do not form a valid range.");
+    //@}
+  private:
+    /**
+     * Copy of the patterns that
+     * each key and each value of the map has
+     * to satisfy.
+     */
+    PatternBase *key_pattern;
+    PatternBase *value_pattern;
+
+    /**
+     * Minimum number of elements
+     * the list must have.
+     */
+    const unsigned int min_elements;
+
+    /**
+     * Maximum number of elements
+     * the list must have.
+     */
+    const unsigned int max_elements;
+
+    /**
+     * Initial part of description
+     */
+    static const char* description_init;
+  };
+
 
                                    /**
                                     * This class is much like the

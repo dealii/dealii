@@ -551,18 +551,31 @@ namespace PETScWrappers
 
                                        /**
                                         * A collective piecewise
-                                        * multiply operation. TODO:
-                                        * The model for this function
-                                        * should be similer to add ().
+                                        * multiply operation on
+                                        * <code>this</code> vector
+                                        * with itself. TODO: The model
+                                        * for this function should be
+                                        * similer to add ().
                                         */
       VectorBase & mult ();
 
                                        /**
-                                        * A collective piecewise
-                                        * multiply operation of two
-                                        * vectors.
+                                        * Same as above, but a
+                                        * collective piecewise
+                                        * multiply operation of
+                                        * <code>this</code> vector
+                                        * with \f$v\f$.
                                         */
       VectorBase & mult (const VectorBase &v);
+
+                                       /**
+                                        * Same as above, but a
+                                        * collective piecewise
+                                        * multiply operation of
+                                        * \f$u\f$ with \f$v\f$.
+                                        */
+      VectorBase & mult (const VectorBase &u,
+			 const VectorBase &v);
 
                                        /**
                                         * Return whether the vector contains

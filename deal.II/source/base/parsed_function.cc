@@ -52,7 +52,16 @@ namespace Functions {
       }
     prm.declare_entry("Variable names", vnames, Patterns::Anything(),
                       "The name of the variables as they will be used in the "
-                      "function, separated by ','.");
+                      "function, separated by commas. By default, the names of variables "
+                      "at which the function will be evaluated is `x' (in 1d), `x,y' (in 2d) or "
+                      "`x,y,z' (in 3d) for spatial coordinates and `t' for time. You can then "
+                      "use these variable names in your function expression and they will be "
+                      "replaced by the values of these variables at which the function is "
+                      "currently evaluated. However, you can also choose a different set "
+                      "of names for the independent variables at which to evaluate your function "
+                      "expression. For example, if you work in spherical coordinates, you may "
+                      "wish to set this input parameter to `r,phi,theta,t' and then use these "
+                      "variable names in your function expression.");
 
                                      // The expression of the function
     std::string expr = "0";
@@ -60,11 +69,30 @@ namespace Functions {
       expr += "; 0";
 
     prm.declare_entry("Function expression", expr, Patterns::Anything(),
-                      "Separate vector valued expressions by ';' as ',' "
-                      "is used internally by the function parser.");
+                      "The formula that denotes the function you want to evaluate for "
+                      "particular values of the independent variables. This expression "
+                      "may contain any of the usual operations such as addition or "
+                      "multiplication, as well as all of the common functions such as "
+                      "`sin' or `cos'. In addition, it may contain expressions like "
+                      "`if(x>0, 1, -1)' where the expression evaluates to the second "
+                      "argument if the first argument is true, and to the third argument "
+                      "otherwise. For a full overview of possible expressions accepted "
+                      "see the documentation of the fparser library."
+                      "\n\n"
+                      "If the function you are describing represents a vector-valued "
+                      "function with multiple components, then separate the expressions "
+                      "for individual components by a semicolon.");
     prm.declare_entry("Function constants", "", Patterns::Anything(),
-                      "Any constant used inside the function which is not "
-                      "a variable name.");
+                      "Sometimes it is convenient to use symbolic constants in the "
+                      "expression that describes the function, rather than having to "
+                      "use its numeric value everywhere the constant appears. These "
+                      "values can be defined using this parameter, in the form "
+                      "`var1=value1, var2=value2, ...'."
+                      "\n\n"
+                      "A typical example would be to set this runtime parameter to "
+                      "`pi=3.1415926536' and then use `pi' in the expression of the "
+                      "actual formula. (That said, for convenience this class actually "
+                      "defines both `pi' and `Pi' by default, but you get the idea.)");
   }
 
 
@@ -90,6 +118,8 @@ namespace Functions {
         constants[this_c[0]] = tmp;
       }
 
+    // set pi and Pi as synonyms for the corresponding value. note that
+    // this overrides any value a user may have given
     constants["pi"] = numbers::PI;
     constants["Pi"] = numbers::PI;
 

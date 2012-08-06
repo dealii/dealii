@@ -590,6 +590,11 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGS="$CXXFLAGS -m64"
           CXXFLAGSG="$CXXFLAGSG -m64"
           CXXFLAGSO="$CXXFLAGSO -m64"
+
+          CFLAGS="$CFLAGS -m64"
+          CFLAGSG="$CFLAGSG -m64"
+          CFLAGSO="$CFLAGSO -m64"
+
           LDFLAGS="$LDFLAGS -m64"
         fi
 
@@ -759,7 +764,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl       (valid, but annoying and sometimes hard to work around)
           dnl #858: `type qualifier on return type is meaningless'
           dnl       (on conversion operators to types that are already const)
-          dnl #1565: attributes are ignored on a class declaration that is not 
+          dnl #1565: attributes are ignored on a class declaration that is not
 	  dnl        also a definition (this happens in BOOST in a number of
 	  dnl        places)
           CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858 -wd1565"
@@ -837,6 +842,21 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
                 esac
                 ;;
           esac
+
+	  dnl Intel's MPI implementation based on ICC requires that
+	  dnl mpi.h be included *before* things like <stdio.h> or
+	  dnl <iostream>. How they envision this to work is beyond
+	  dnl me because they may be indirectly included from other
+	  dnl header files. Besides this, autoconf generates tests
+	  dnl that don't follow this rule and so fail at ./configure
+	  dnl time. There is nothing we can do about it. However,
+	  dnl there is a workaround described here:
+	  dnl   http://software.intel.com/en-us/articles/intel-mpi-library-for-linux-running-list-of-known-issues/#A3
+	  dnl We switch this on if we use Intel's ICC + MPI
+	  if test "x$DEAL_II_USE_MPI" = "xyes" ; then
+	    CXXFLAGSG="$CXXFLAGSG -DMPICH_IGNORE_CXX_SEEK"
+	    CXXFLAGSO="$CXXFLAGSO -DMPICH_IGNORE_CXX_SEEK"
+	  fi
 
           dnl Finally, see if the compiler supports C++0x
           DEAL_II_CHECK_CXX1X
@@ -7725,13 +7745,28 @@ AC_DEFUN(DEAL_II_CONFIGURE_P4EST, dnl
               [Defined if we are to use the p4est library to distribute
                meshes on a cluster computer.])
     USE_CONTRIB_P4EST=yes
-    export USE_CONTRIB_P4EST
+    AC_SUBST(USE_CONTRIB_P4EST)
 
     DEAL_II_P4EST_DIR=${use_p4est}
-    export DEAL_II_P4EST_DIR
+    AC_SUBST(DEAL_II_P4EST_DIR)
 
     CXXFLAGSG="$CXXFLAGSG -I$use_p4est/DEBUG/include"
     CXXFLAGSO="$CXXFLAGSO -I$use_p4est/FAST/include"
+
+    AC_MSG_CHECKING(for p4est library directory)
+    if test -d "$use_p4est/DEBUG/lib64" -a -d "$use_p4est/FAST/lib64" ; then
+      AC_MSG_RESULT(lib64)
+      DEAL_II_P4EST_LIBDIR_NAME=lib64
+    else
+      if test -d "$use_p4est/DEBUG/lib" -a -d "$use_p4est/FAST/lib" ; then
+        AC_MSG_RESULT(lib)
+        DEAL_II_P4EST_LIBDIR_NAME=lib
+      else
+        AC_MSG_ERROR(could not determine whether p4est stores its library in lib/ or lib64/ directories)
+      fi
+    fi
+    AC_SUBST(DEAL_II_P4EST_LIBDIR_NAME)
+
   else
     AC_MSG_RESULT(no)
   fi

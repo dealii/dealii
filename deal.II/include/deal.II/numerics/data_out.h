@@ -1230,7 +1230,7 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension>
                                       */
     void build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
                           internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data,
-                          DataOutBase::Patch<DH::dimension, DH::space_dimension> &patch,
+                          ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &patch,
                           const CurvedCellRegion curved_cell_region);
 };
 

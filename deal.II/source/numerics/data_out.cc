@@ -1223,7 +1223,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
                  this->dofs->get_fe(),
                  update_flags);
 
-  DataOutBase::Patch<DH::dimension, DH::space_dimension> sample_patch;
+  ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> sample_patch;
   sample_patch.n_subdivisions = n_subdivisions;
   sample_patch.data.reinit (n_datasets, patch_points.size());
 

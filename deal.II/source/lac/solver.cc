@@ -18,6 +18,8 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 
+#include <deal.II/lac/parallel_vector.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -26,9 +28,11 @@ DEAL_II_NAMESPACE_OPEN
 
 template class Solver<Vector<double> >;
 template class Solver<BlockVector<double> >;
+template class Solver<parallel::distributed::Vector<double> >;
 
 template class Solver<Vector<float> >;
 template class Solver<BlockVector<float> >;
+template class Solver<parallel::distributed::Vector<float> >;
 
 #ifdef DEAL_II_USE_PETSC
 template class Solver<PETScWrappers::Vector>;

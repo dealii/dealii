@@ -6139,46 +6139,47 @@ namespace DoFTools
       cell = dof.begin_active(),
       endc = dof.end();
     for (; cell!=endc; ++cell)
-      for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
-        {
-          const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+      if (!cell->is_artificial())
+	for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+	     ++face_no)
+	  {
+	    const FiniteElement<dim,spacedim> &fe = cell->get_fe();
 
-          typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
+	    typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
 
                                              // if face is on the boundary
-          if (face->at_boundary ())
-            {
-                                               // get indices and physical
-                                               // location on this face
-              face_dofs.resize (fe.dofs_per_face);
-              face->get_dof_indices (face_dofs, cell->active_fe_index());
+	    if (face->at_boundary ())
+	      {
+						 // get indices and physical
+						 // location on this face
+		face_dofs.resize (fe.dofs_per_face);
+		face->get_dof_indices (face_dofs, cell->active_fe_index());
 
-                                               // enter those dofs into the list
-                                               // that match the component
-                                               // signature.
-              for (unsigned int i=0; i<face_dofs.size(); ++i)
-                {
-                                                   // Find out if a dof
-                                                   // has a contribution
-                                                   // in this component,
-                                                   // and if so, add it
-                                                   // to the list
-                  const std::vector<bool> &nonzero_component_array
-                    = cell->get_fe().get_nonzero_components (i);
-                  bool nonzero = false;
-                  for (unsigned int c=0; c<n_components; ++c)
-                    if (nonzero_component_array[c] && component_mask[c])
-                      {
-                        nonzero = true;
-                        break;
-                      }
+						 // enter those dofs into the list
+						 // that match the component
+						 // signature.
+		for (unsigned int i=0; i<face_dofs.size(); ++i)
+		  {
+						     // Find out if a dof
+						     // has a contribution
+						     // in this component,
+						     // and if so, add it
+						     // to the list
+		    const std::vector<bool> &nonzero_component_array
+		      = cell->get_fe().get_nonzero_components (i);
+		    bool nonzero = false;
+		    for (unsigned int c=0; c<n_components; ++c)
+		      if (nonzero_component_array[c] && component_mask[c])
+			{
+			  nonzero = true;
+			  break;
+			}
 
-                  if (nonzero)
-                    zero_boundary_constraints.add_line (face_dofs[i]);
-                }
-            }
-        }
+		    if (nonzero)
+		      zero_boundary_constraints.add_line (face_dofs[i]);
+		  }
+	      }
+	  }
   }
 
   template <class DH, class Sparsity>

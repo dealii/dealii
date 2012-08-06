@@ -219,7 +219,7 @@ class Tensor
                                      /**
                                       * Return the square of the
                                       * Frobenius-norm of a tensor,
-                                      * i.e. the square root of the
+                                      * i.e. the
                                       * sum of squares of all entries.
                                       *
                                       * This function mainly exists
@@ -399,6 +399,7 @@ Tensor<rank_,dim,Number> &
 Tensor<rank_,dim,Number>::operator = (const Number d)
 {
   Assert (d==Number(0), ExcMessage ("Only assignment with zero is allowed"));
+  (void) d;
 
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] = 0;
@@ -687,6 +688,26 @@ operator * (const Tensor<1,dim,Number> &src1,
             const Tensor<1,dim,Number> &src2)
 {
   return contract(src1, src2);
+}
+
+
+/**
+ * Double contract two tensors of rank 2, thus computing the Frobenius
+ * inner product <tt> sum<sub>i,j</sub> src1[i][j]*src2[i][j]</tt>.
+ *
+ * @relates Tensor
+ * @author Guido Kanschat, 2000 
+ */
+template <int dim, typename Number>
+inline
+Number double_contract (const Tensor<2, dim, Number> &src1,
+			const Tensor<2, dim, Number> &src2)
+{
+  Number res = 0.;
+  for (unsigned int i=0; i<dim; ++i)
+    res += contract(src1[i],src2[i]);
+  
+  return res;
 }
 
 

@@ -641,11 +641,11 @@
  * @ref GlossLagrange "Lagrange elements". For other elements, more general
  * interpolation operators can be defined, often relying on integral values
  * or moments. Since these integral values are again computed using a
- * Quadrature rule, we consider them a generalization of support
+ * quadrature rule, we consider them a generalization of support
  * points.
  *
  * Note that there is no simple relation between
- * @ref GlossShape "shape functions" and generalized support points as for
+ * @ref GlossShape "shape functions" and generalized support points, unlike for
  * regular @ref GlossSupport "support points". Instead, FiniteElement defines
  * a couple of interpolation functions doing the actual interpolation.
  *

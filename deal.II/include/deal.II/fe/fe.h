@@ -288,6 +288,8 @@ namespace hp
  * FETools::compute_node_matrix(). It relies on the existence of
  * #generalized_support_points and implementation of interpolate()
  * with VectorSlice argument.
+ * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+ * for more information.
  *
  * The piece of code in the constructor of a finite element
  * responsible for this looks like
@@ -1755,6 +1757,9 @@ class FiniteElement : public Subscriptor,
                                      /**
                                       * Return a support point vector
                                       * for generalized interpolation.
+				      *
+				      * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+				      * for more information.
                                       */
     const std::vector<Point<dim> > &
     get_generalized_support_points () const;
@@ -1765,6 +1770,9 @@ class FiniteElement : public Subscriptor,
                                       * vectors either from
                                       * get_unit_support_points() or
                                       * get_generalized_support_points().
+				      *
+				      * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+				      * for more information.
                                       */
     bool has_generalized_support_points () const;
 

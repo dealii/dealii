@@ -163,7 +163,7 @@ Householder<number>::initialize(const FullMatrix<number2>& M)
     number2 s = (this->el(j,j) < 0) ? std::sqrt(sigma) : -std::sqrt(sigma);
                                      //
     number2 beta = std::sqrt(1./(sigma-s*this->el(j,j)));
-
+    
                                      // Make column j the Householder
                                      // vector, store first entry in
                                      // diagonal
@@ -233,6 +233,8 @@ Householder<number>::least_squares (Vector<number2>& dst,
   number2 sum = 0.;
   for (unsigned int i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
+  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  
                                    // Compute solution
   this->backward(dst, *aux);
 
@@ -276,6 +278,8 @@ Householder<number>::least_squares (BlockVector<number2>& dst,
   number2 sum = 0.;
   for (unsigned int i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
+  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  
                                    //backward works for
                                    //Vectors only, so copy
                                    //them before
