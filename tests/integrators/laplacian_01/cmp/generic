@@ -1,0 +1,49 @@
+
+DEAL::Triangulation hypercube 2D refinement 1 steps 4 active cells 5 total cells 
+DEAL::FE_DGQ<2>(1)
+DEAL::cell matrix
+DEAL::0.67    -0.17   -0.17   -0.33   
+DEAL::-0.17   0.67    -0.33   -0.17   
+DEAL::-0.17   -0.33   0.67    -0.17   
+DEAL::-0.33   -0.17   -0.17   0.67    
+DEAL::boundary_matrix 0
+DEAL::11.     0.33    5.3     0.17    
+DEAL::0.33    0       0.17    0       
+DEAL::5.3     0.17    11.     0.33    
+DEAL::0.17    0       0.33    0       
+DEAL::boundary_matrix 1
+DEAL::0       0.33    0       0.17    
+DEAL::0.33    11.     0.17    5.3     
+DEAL::0       0.17    0       0.33    
+DEAL::0.17    5.3     0.33    11.     
+DEAL::boundary_matrix 2
+DEAL::11.     5.3     0.33    0.17    
+DEAL::5.3     11.     0.17    0.33    
+DEAL::0.33    0.17    0       0       
+DEAL::0.17    0.33    0       0       
+DEAL::boundary_matrix 3
+DEAL::0       0       0.33    0.17    
+DEAL::0       0       0.17    0.33    
+DEAL::0.33    0.17    11.     5.3     
+DEAL::0.17    0.33    5.3     11.     
+DEAL::face_matrix 0
+DEAL::M11
+DEAL::0       0.17    0       0.083   
+DEAL::0.17    5.3     0.083   2.7     
+DEAL::0       0.083   0       0.17    
+DEAL::0.083   2.7     0.17    5.3     
+DEAL::M22
+DEAL::5.3     0.17    2.7     0.083   
+DEAL::0.17    0       0.083   0       
+DEAL::2.7     0.083   5.3     0.17    
+DEAL::0.083   0       0.17    0       
+DEAL::M12
+DEAL::-0.17   0       -0.083  0       
+DEAL::-5.3    -0.17   -2.7    -0.083  
+DEAL::-0.083  0       -0.17   0       
+DEAL::-2.7    -0.083  -5.3    -0.17   
+DEAL::M21
+DEAL::-0.17   -5.3    -0.083  -2.7    
+DEAL::0       -0.17   0       -0.083  
+DEAL::-0.083  -2.7    -0.17   -5.3    
+DEAL::0       -0.083  0       -0.17   
