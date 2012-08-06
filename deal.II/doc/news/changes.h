@@ -24,6 +24,18 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li> Changed/fixed: Several operations on Trilinos vectors that change the
+elements of these vectors were allowed accidentally for vectors that have
+ghost elements. This is a source of errors because a change on one
+MPI process will not show up on a different processor. Consequently, we
+intended to disallow all functions that modify vectors with ghost elements
+but this was not enforced for all of these functions. This is now fixed
+but it may lead to errors if your code relied on the existing behavior. The
+way to work around this is to only ever modify fully distributed vectors,
+and then copy it into a vector with ghost elements.
+<br>
+(Wolfgang Bangerth, 2012/08/06)
+
 <li> Changed: The argument material_id of the estimate-functions of
 the KellyErrorEstimator class is now of type types::material_id_type
 with default value types::invalid_material_id, instead of type
