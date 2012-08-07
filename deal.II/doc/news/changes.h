@@ -63,6 +63,11 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
+New: officially added support for clang 3.1 or newer.
+<br>
+(Timo Heister and Wolfgang Bangerth, 2012/08/07)
+
+<li>
 Changed: PETSc linking now prefers to use the libpetsc.so generated
 by PETSc starting from version 3.1+. This fixes the problem
 of linker errors on recent gcc/ubuntu versions.
