@@ -26,8 +26,8 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/utilities.h>
-#include <numerics/data_postprocessor.h>
-#include <grid/grid_tools.h>
+#include <deal.II/numerics/data_postprocessor.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <vector>
 #include <iostream>

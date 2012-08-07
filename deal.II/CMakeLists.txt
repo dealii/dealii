@@ -6,6 +6,7 @@ SET (CMAKE_CXX_FLAGS "-std=c++0x -D_REENTRANT -fPIC -O2 -march=native -Wall -Wfa
 
 INCLUDE_DIRECTORIES(
   "${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/include" #TODO
+  "${CMAKE_SOURCE_DIR}/contrib" #TODO
   "${CMAKE_SOURCE_DIR}/include/"
   )
 
