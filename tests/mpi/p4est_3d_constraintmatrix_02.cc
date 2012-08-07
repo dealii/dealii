@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,14 +61,14 @@ void test()
 
          tr.execute_coarsening_and_refinement ();
         }
- 
+
   DoFHandler<dim> dofh(tr);
 
   static const FE_Q<dim> fe(1);
   dofh.distribute_dofs (fe);
 
   IndexSet owned_set = dofh.locally_owned_dofs();
-  
+
   IndexSet dof_set;
   DoFTools::extract_locally_active_dofs (dofh, dof_set);
 
@@ -82,38 +82,37 @@ void test()
 
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
-  x_rel = 0;
   x_rel.compress();
-  
+
   ConstraintMatrix cm(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, cm);
   cm.close ();
-  
+
   cm.distribute(x);
   x_rel = x;
 
 				   //x.print(std::cout);
-  
+
 //  x_rel.print(std::cout);
 
   TrilinosWrappers::Vector x_dub;
   x_dub.reinit(dof_set.size());
-  
+
   x_dub = x_rel;
 
   {
 	std::stringstream out;
     out << "**** proc " << myid << std::endl;
     x_dub.print (out);
-	
+
 	if (myid==0)
 	  deallog << out.str() << std::endl;
 	else
 	  MPI_Send((void*)out.str().c_str(),out.str().size()+1, MPI_CHAR, 0, 1, MPI_COMM_WORLD);
   }
-  
+
   if (myid == 0)
-    { 
+    {
       for (unsigned int i = 1;i < numproc;++i)
         {
 		  MPI_Status status;
