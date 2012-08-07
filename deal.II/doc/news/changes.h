@@ -63,6 +63,13 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
+Changed: PETSc linking now prefers to use the libpetsc.so generated
+by PETSc starting from version 3.1+. This fixes the problem
+of linker errors on recent gcc/ubuntu versions.
+<br>
+(Timo Heister, 2012/08/07)
+
+<li>
 Fixed: On some 64-bit systems, we build deal.II with the <code>-m64</code>
 flag but forgot to build UMFPACK with this flag as well, leading to
 linker errors. This is now fixed.

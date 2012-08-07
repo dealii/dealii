@@ -157,7 +157,10 @@ endif
 # you switch from debug to optimized mode). To avoid messing with
 # -Wl,-rpath in our linker flags, we create one convenience library
 # for all PETSc libraries in our own lib directory, and have this one
-# twiddle with whatever is necessary to link in PETSc.
+# twiddle with whatever is necessary to link in PETSc. This is only
+# used for PETSc <=3.0. After this version, PETSc creates one library
+# we can link to directly. This avoids problems with recent versions
+# of gcc.
 ifeq ($(USE_CONTRIB_PETSC),yes)
   ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
     lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
@@ -167,33 +170,27 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
     lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
   endif
 
-  # First up is a twiddle for Darwin/MacOSX
-  ifeq ($(findstring darwin,$(TARGET)),)
+  ifeq ($(enable-shared),yes)
+    # Starting with PETSc versions 2.3.*:
+    ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
+      lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+      lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+    else
+      # which is the similar as for PETSc 3.0.0:
+      ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30)
+        lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
+        lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
+      else
+        # but after that (petsc-3.1++), we can use the simpler PETSc
+        # default "--with-single-library=1" like this:
+        lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
+        lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
+      endif
+    endif # if PETSC_VERSION
+  else
+    # and finally this goes for static libraries
     lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
     lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
-  else
-    ifeq ($(enable-shared),yes)
-      # Starting with PETSc versions 2.3.*:
-      ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-        lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
-        lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
-      else
-        # which is the similar as for PETSc 3.0.0:
-        ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30)
-          lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
-          lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
-        else
-          # but after that (petsc-3.1++), we can use the simpler PETSc
-          # default "--with-single-library=1" like this:
-          lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
-          lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
-        endif
-      endif # if PETSC_VERSION
-    else
-      # and finally this goes for static libraries
-      lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
-      lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
-    endif
   endif
 endif # USE_CONTRIB_PETSC
 
