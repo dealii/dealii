@@ -1,0 +1,11 @@
+INCLUDE(base/CMakeLists.txt)
+#INCLUDE(distributed/CMakeLists.txt)
+#INCLUDE(dofs/CMakeLists.txt)
+#INCLUDE(fe/CMakeLists.txt)
+#INCLUDE(grid/CMakeLists.txt)
+#INCLUDE(hp/CMakeLists.txt)
+#INCLUDE(lac/CMakeLists.txt)
+#INCLUDE(multigrid/CMakeLists.txt)
+#INCLUDE(numerics/CMakeLists.txt)
+
+ADD_LIBRARY(deal.II ${SRC_BASE})
