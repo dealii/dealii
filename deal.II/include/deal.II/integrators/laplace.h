@@ -69,6 +69,71 @@ namespace LocalIntegrators
             }
         }
     }
+
+/**
+ * Laplacian residual operator in weak form
+ *
+ * \f[
+ * -(\nabla u, \nabla v)
+ * \f]
+ */
+    template <int dim>
+    inline void
+    cell_residual  (
+      Vector<double>& result,
+      const FEValuesBase<dim>& fe,
+      const std::vector<Tensor<1,dim> >& input,
+      double factor = 1.)
+    {
+      const unsigned int nq = fe.n_quadrature_points;
+      const unsigned int n_dofs = fe.dofs_per_cell;
+      Assert(input.size() == nq, ExcDimensionMismatch(input.size(), nq));
+      Assert(result.size() == n_dofs, ExcDimensionMismatch(result.size(), n_dofs));
+      
+      for (unsigned k=0;k<nq;++k)
+	{
+	  const double dx = factor * fe.JxW(k);	      
+	  for (unsigned i=0;i<n_dofs;++i)
+	    result(i) += dx * (input[k] * fe.shape_grad(i,k));
+	}
+    }
+    
+
+/**
+ * Vector-valued Laplacian residual operator in weak form
+ *
+ * \f[
+ * -(\nabla u, \nabla v)
+ * \f]
+ */
+    template <int dim>
+    inline void
+    cell_residual  (
+      Vector<double>& result,
+      const FEValuesBase<dim>& fe,
+      const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > >& input,
+      double factor = 1.)
+    {
+      const unsigned int nq = fe.n_quadrature_points;
+      const unsigned int n_dofs = fe.dofs_per_cell;      
+      const unsigned int n_comp = fe.get_fe().n_components();
+      
+      AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
+      Assert(result.size() == n_dofs, ExcDimensionMismatch(result.size(), n_dofs));
+      
+      for (unsigned k=0;k<nq;++k)
+	{
+	  const double dx = factor * fe.JxW(k);
+	  for (unsigned i=0;i<n_dofs;++i)
+	    for (unsigned int d=0;d<n_comp;++d)
+	      {
+		
+		result(i) += dx * (input[d][k] * fe.shape_grad_component(i,k,d));
+	      }
+	}
+    }
+    
+    
 /**
  * Weak boundary condition of Nitsche type for the Laplacian, namely on the face <i>F</i> the matrix
  * @f[
@@ -174,6 +239,10 @@ namespace LocalIntegrators
  * <tt>Dinput</tt>, respectively. <i>g</i> is the inhomogeneous
  * boundary value in the argument <tt>data</tt>. $\gamma$ is the usual
  * penalty parameter.
+ *
+ * @ingroup Integrators
+ * @author Guido Kanschat
+ * @date 2008, 2009, 2010
  */
       template <int dim>
       void nitsche_residual (
@@ -291,6 +360,7 @@ namespace LocalIntegrators
  * <i>h<sub>i</sub></i> is the length of <i>Z<sub>i</sub></i>
  * orthogonal to the current face.
  *
+ * @ingroup Integrators
  * @author Guido Kanschat
  * @date 2010
  */
