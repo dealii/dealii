@@ -1,4 +1,4 @@
-set(SRC_BASE
+SET(src_base
   auto_derivative_function.cc
   boost_serialization.cc
   boost_threads.cc
@@ -48,4 +48,4 @@ set(SRC_BASE
   utilities.cc
   )
 
-add_library(OBJ_BASE OBJECT ${SRC_BASE})
+ADD_LIBRARY(obj_base OBJECT ${src_base})
