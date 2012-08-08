@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>deal.II SVN Archive</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors">
   <meta name="date" content="$Date: 2006-07-24 10:37:21 -0500 (Mon, 24 Jul 2006) $">
   <meta name="svn_id" content="$Id: writing-documentation.html 13428 2006-07-24 15:37:21Z bangerth $">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
@@ -24,7 +24,7 @@
   <ul>
     <li> <a href="http://www.dealii.org/svn/dealii/trunk/">trunk</a>:
       This is the location of the current development version; it contains the
-    directories <a href="http://www.dealii.org/svn/dealii/trunk/deal.II">deal.II</a> 
+    directories <a href="http://www.dealii.org/svn/dealii/trunk/deal.II">deal.II</a>
     with the library proper
     and <a href="http://www.dealii.org/svn/dealii/trunk/tests">tests</a>
     with the testsuite.
@@ -46,12 +46,14 @@
 
   <h2>Creating a development branch</h2>
 
-  Significant new functionality can often not be developed all at once. In a
-  case like this, one can create a development branch in the subversion
-  repository into which one can check in all necessary changes and from which
-  one can merge the final set of changes into the main development line once
-  ready. The <tt>svnmerge</tt> program can be used
-  to keep your branch up-to-date with the trunk.
+  <p>
+    Significant new functionality can often not be developed all at once. In a
+    case like this, one can create a development branch in the subversion
+    repository into which one can check in all necessary changes and from which
+    one can merge the final set of changes into the main development line once
+    ready. The <tt>svn</tt> program can be used
+    to keep your branch up-to-date with the trunk.
+  </p>
 
   <p>
     Creating a branch works through the following steps:
@@ -61,19 +63,23 @@
       <pre>
 	svn copy http://www.dealii.org/svn/dealii/trunk/ http://www.dealii.org/svn/dealii/branches/new-branch-name
       </pre>
+
     <li> Either check out the new branch or switch your working copy by
       <pre>
 	svn switch http://www.dealii.org/svn/dealii/branches/new-branch-name
       </pre>
       This command assumes you are in the top level directory, the one
       containing <tt>deal.II</tt> and <tt>tests</tt>
-    <li> Initialize the merge tracking svnmerge: in the top level directory, call
+
+    <li> After some development of the branch, if you want to merge changes
+    that have been made on mainline in the meantime, you can use this command:
       <pre>
-	svnmerge.py init
-	svn ci -F svnmerge-commit-message.txt
-	rm svnmerge-commit-message.txt
+	svn merge ^/trunk
       </pre>
-      This should be done before making any local changes!
+      This command will only run if you have no local changes in your working
+      directory for the branch, and will modify all of your files by merging
+      the changes made on mainline. If there are no conflicts that need to be
+      resolved, you can simply commit the result.
   </ol>
 </body>
 </html>
