@@ -175,59 +175,6 @@ namespace LocalIntegrators
     }
 
 /**
- * Weak boundary condition for the Laplace operator by Nitsche, vector
- * valued version, namely on the face <i>F</i>
- * the vector
- * @f[
- * \int_F \Bigl(\gamma (u-g) v - \partial_n u v - (u-g) \partial_n v\Bigr)\;ds.
- * @f]
- *
- * Here, <i>u</i> is the finite element function whose values and
- * gradient are given in the arguments <tt>input</tt> and
- * <tt>Dinput</tt>, respectively. <i>g</i> is the inhomogeneous
- * boundary value in the argument <tt>data</tt>. $\gamma$ is the usual
- * penalty parameter.
- *
- * @ingroup Integrators
- * @author Guido Kanschat
- * @date 2008, 2009, 2010
- */
-      template <int dim>
-      void nitsche_residual (
-        Vector<double>& result,
-        const FEValuesBase<dim>& fe,
-        const VectorSlice<const std::vector<std::vector<double> > >& input,
-        const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > >& Dinput,
-        const VectorSlice<const std::vector<std::vector<double> > >& data,
-        double penalty,
-        double factor = 1.)
-      {
-        const unsigned int n_dofs = fe.dofs_per_cell;
-
-        const unsigned int n_comp = fe.get_fe().n_components();
-        AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
-        AssertVectorVectorDimension(Dinput, n_comp, fe.n_quadrature_points);
-        AssertVectorVectorDimension(data, n_comp, fe.n_quadrature_points);
-
-        for (unsigned k=0;k<fe.n_quadrature_points;++k)
-          {
-            const double dx = factor * fe.JxW(k);
-            const Point<dim>& n = fe.normal_vector(k);
-            for (unsigned i=0;i<n_dofs;++i)
-              for (unsigned int d=0;d<n_comp;++d)
-                {
-                  const double dnv = fe.shape_grad_component(i,k,d) * n;
-                  const double dnu = Dinput[d][k] * n;
-                  const double v= fe.shape_value_component(i,k,d);
-                  const double u= input[d][k];
-                  const double g= data[d][k];
-
-                  result(i) += dx*(2.*penalty*(u-g)*v - dnv*(u-g) - dnu*v);
-                }
-          }
-      }
-
-/**
  * Weak boundary condition for the Laplace operator by Nitsche, scalar
  * version, namely on the face <i>F</i> the vector
  * @f[
@@ -273,6 +220,58 @@ namespace LocalIntegrators
 
                 result(i) += dx*(2.*penalty*(u-g)*v - dnv*(u-g) - dnu*v);
               }
+          }
+      }
+
+/**
+ * Weak boundary condition for the Laplace operator by Nitsche, vector
+ * valued version, namely on the face <i>F</i>
+ * the vector
+ * @f[
+ * \int_F \Bigl(\gamma (u-g) v - \partial_n u v - (u-g) \partial_n v\Bigr)\;ds.
+ * @f]
+ *
+ * Here, <i>u</i> is the finite element function whose values and
+ * gradient are given in the arguments <tt>input</tt> and
+ * <tt>Dinput</tt>, respectively. <i>g</i> is the inhomogeneous
+ * boundary value in the argument <tt>data</tt>. $\gamma$ is the usual
+ * penalty parameter.
+ *
+ * @ingroup Integrators
+ * @author Guido Kanschat
+ * @date 2008, 2009, 2010
+ */
+      template <int dim>
+      void nitsche_residual (
+        Vector<double>& result,
+        const FEValuesBase<dim>& fe,
+        const VectorSlice<const std::vector<std::vector<double> > >& input,
+        const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > >& Dinput,
+        const VectorSlice<const std::vector<std::vector<double> > >& data,
+        double penalty,
+        double factor = 1.)
+      {
+        const unsigned int n_dofs = fe.dofs_per_cell;
+        const unsigned int n_comp = fe.get_fe().n_components();
+        AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
+        AssertVectorVectorDimension(Dinput, n_comp, fe.n_quadrature_points);
+        AssertVectorVectorDimension(data, n_comp, fe.n_quadrature_points);
+
+        for (unsigned k=0;k<fe.n_quadrature_points;++k)
+          {
+            const double dx = factor * fe.JxW(k);
+            const Point<dim>& n = fe.normal_vector(k);
+            for (unsigned i=0;i<n_dofs;++i)
+              for (unsigned int d=0;d<n_comp;++d)
+                {
+                  const double dnv = fe.shape_grad_component(i,k,d) * n;
+                  const double dnu = Dinput[d][k] * n;
+                  const double v= fe.shape_value_component(i,k,d);
+                  const double u= input[d][k];
+                  const double g= data[d][k];
+
+                  result(i) += dx*(2.*penalty*(u-g)*v - dnv*(u-g) - dnu*v);
+                }
           }
       }
 
@@ -348,6 +347,136 @@ namespace LocalIntegrators
 	    }
 	}
     }
+
+/**
+ * Residual term for the symmetric interior penalty method.
+ *
+ * @ingroup Integrators
+ * @author Guido Kanschat
+ * @date 2012
+ */
+    template<int dim>
+    void
+    ip_residual(
+      Vector<double>& result1,
+      Vector<double>& result2,
+      const FEValuesBase<dim>& fe1,
+      const FEValuesBase<dim>& fe2,
+      const std::vector<double>& input1,
+      const std::vector<Tensor<1,dim> >& Dinput1,
+      const std::vector<double>& input2,
+      const std::vector<Tensor<1,dim> >& Dinput2,
+      double pen,
+      double int_factor = 1.,
+      double ext_factor = -1.)
+{
+  Assert(fe1.get_fe().n_components() == 1,
+	 ExcDimensionMismatch(fe1.get_fe().n_components(), 1));
+  Assert(fe2.get_fe().n_components() == 1,
+	 ExcDimensionMismatch(fe2.get_fe().n_components(), 1));
+
+  const double nui = int_factor;
+  const double nue = (ext_factor < 0) ? int_factor : ext_factor;
+  const double penalty = .5 * pen * (nui + nue);
+  
+  const unsigned int n_dofs = fe1.dofs_per_cell;
+  
+  for (unsigned k=0;k<fe1.n_quadrature_points;++k)
+    {
+      const double dx = fe1.JxW(k);
+      const Point<dim>& n = fe1.normal_vector(k);
+      
+      for (unsigned i=0;i<n_dofs;++i)
+	{
+	  const double vi = fe1.shape_value(i,k);
+	  const Tensor<1,dim>& Dvi = fe1.shape_grad(i,k);
+	  const double dnvi = Dvi * n;
+	  const double ve = fe2.shape_value(i,k);
+	  const Tensor<1,dim>& Dve = fe2.shape_grad(i,k);
+	  const double dnve = Dve * n;
+
+	  const double ui = input1[k];
+	  const Tensor<1,dim>& Dui = Dinput1[k];
+	  const double dnui = Dui * n;
+	  const double ue = input2[k];
+	  const Tensor<1,dim>& Due = Dinput2[k];
+	  const double dnue = Due * n;
+
+	  result1(i) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
+	  result1(i) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
+	  result2(i) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
+	  result2(i) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+penalty*ue*ve);
+	}
+    }
+}
+
+
+/**
+ * Vector-valued residual term for the symmetric interior penalty method.
+ *
+ * @ingroup Integrators
+ * @author Guido Kanschat
+ * @date 2012
+ */
+    template<int dim>
+    void
+    ip_residual(
+      Vector<double>& result1,
+      Vector<double>& result2,
+      const FEValuesBase<dim>& fe1,
+      const FEValuesBase<dim>& fe2,
+      const VectorSlice<const std::vector<std::vector<double> > >& input1,
+      const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > >& Dinput1,
+      const VectorSlice<const std::vector<std::vector<double> > >& input2,
+      const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > >& Dinput2,
+      double pen,
+      double int_factor = 1.,
+      double ext_factor = -1.)
+    {
+      const unsigned int n_comp = fe1.get_fe().n_components();
+      const unsigned int n1 = fe1.dofs_per_cell;
+      
+      AssertVectorVectorDimension(input1, n_comp, fe1.n_quadrature_points);
+      AssertVectorVectorDimension(Dinput1, n_comp, fe1.n_quadrature_points);
+      AssertVectorVectorDimension(input2, n_comp, fe2.n_quadrature_points);
+      AssertVectorVectorDimension(Dinput2, n_comp, fe2.n_quadrature_points);
+      
+      const double nui = int_factor;
+      const double nue = (ext_factor < 0) ? int_factor : ext_factor;
+      const double penalty = .5 * pen * (nui + nue);
+      
+  
+      for (unsigned k=0;k<fe1.n_quadrature_points;++k)
+	{
+	  const double dx = fe1.JxW(k);
+	  const Point<dim>& n = fe1.normal_vector(k);
+	  
+	  for (unsigned i=0;i<n1;++i)
+	    for (unsigned int d=0;d<n_comp;++d)
+	      {
+		const double vi = fe1.shape_value_component(i,k,d);
+		const Tensor<1,dim>& Dvi = fe1.shape_grad_component(i,k,d);
+		const double dnvi = Dvi * n;
+		const double ve = fe2.shape_value_component(i,k,d);
+		const Tensor<1,dim>& Dve = fe2.shape_grad_component(i,k,d);
+		const double dnve = Dve * n;
+		
+		const double ui = input1[d][k];
+		const Tensor<1,dim>& Dui = Dinput1[d][k];
+		const double dnui = Dui * n;
+		const double ue = input2[d][k];
+		const Tensor<1,dim>& Due = Dinput2[d][k];
+		const double dnue = Due * n;
+		
+		result1(i) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
+		result1(i) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
+		result2(i) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
+		result2(i) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+penalty*ue*ve);
+	      }
+	}
+    }
+    
+
     
 /**
  * Auxiliary function computing the penalty parameter for interior
