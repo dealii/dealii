@@ -40,23 +40,37 @@ template <int dim>
 void test_boundary(const FEValuesBase<dim>& fev)
 {
   const unsigned int n = fev.dofs_per_cell;
+  unsigned int d=fev.get_fe().n_components();
+  
   FullMatrix<double> M(n,n);
+  
   Vector<double> u(n), v(n), w(n);
+  std::vector<std::vector<double> >
+    uval    (d,std::vector<double>(fev.n_quadrature_points)),
+    null_val(d,std::vector<double>(fev.n_quadrature_points, 0.));
+  std::vector<std::vector<Tensor<1,dim> > >
+    ugrad   (d,std::vector<Tensor<1,dim> >(fev.n_quadrature_points));
+  
+  std::vector<unsigned int> indices(n);
+  for (unsigned int i=0;i<n;++i)
+    indices[i] = i;
   
   nitsche_matrix(M, fev, 17);
   M.print(deallog,8);
-
-  // deallog << "Residuals";
-  // for (unsigned int i=0;i<n;++i)
-  //   {
-  //     u = 0.;
-  //     u(i) = 1.;
-  //     M.vmult(v,u);
-  //     nitsche_residual(w, fev, 17);
-  //     w.add(-1., v);
-  //     deallog << ' ' << w.l2_norm();
-  //   }
-  // deallog << std::endl;
+  
+  deallog << "Residuals";
+  for (unsigned int i=0;i<n;++i)
+    {
+      u = 0.;
+      u(i) = 1.;
+      fev.get_function_values(u, indices, uval, true);
+      fev.get_function_gradients(u, indices, ugrad, true);
+      nitsche_residual(w, fev, make_slice(uval), make_slice(ugrad), make_slice(null_val), 17);
+      M.vmult(v,u);
+      w.add(-1., v);
+      deallog << ' ' << w.l2_norm();
+    }
+  deallog << std::endl;
 }
 
 
