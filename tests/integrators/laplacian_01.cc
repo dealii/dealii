@@ -28,11 +28,39 @@ template <int dim>
 void test_cell(const FEValuesBase<dim>& fev)
 {
   const unsigned int n = fev.dofs_per_cell;
+  unsigned int d=fev.get_fe().n_components();
   FullMatrix<double> M(n,n);
-//  Vector<double> u(n), v(n);
-  
   cell_matrix(M,fev);
   M.print(deallog,8);
+  
+  Vector<double> u(n), v(n), w(n);
+  std::vector<std::vector<Tensor<1,dim> > >
+    ugrad(d,std::vector<Tensor<1,dim> >(fev.n_quadrature_points));
+  
+  std::vector<unsigned int> indices(n);
+  for (unsigned int i=0;i<n;++i)
+    indices[i] = i;
+  
+  deallog << "Residuals";
+  for (unsigned int i=0;i<n;++i)
+    {
+      u = 0.;
+      u(i) = 1.;
+      w = 0.;
+      fev.get_function_gradients(u, indices, ugrad, true);
+      cell_residual(w, fev, make_slice(ugrad));
+      M.vmult(v,u);
+      w.add(-1., v);
+      deallog << ' ' << w.l2_norm();
+      if (d==1)
+	{
+	  cell_residual(w, fev, ugrad[0]);
+	  M.vmult(v,u);
+	  w.add(-1., v);
+	  deallog << " e" << w.l2_norm();	  
+	}
+    }
+  deallog << std::endl;
 }
 
 
@@ -41,8 +69,9 @@ void test_boundary(const FEValuesBase<dim>& fev)
 {
   const unsigned int n = fev.dofs_per_cell;
   unsigned int d=fev.get_fe().n_components();
-  
   FullMatrix<double> M(n,n);
+  nitsche_matrix(M, fev, 17);
+  M.print(deallog,8);
   
   Vector<double> u(n), v(n), w(n);
   std::vector<std::vector<double> >
@@ -54,9 +83,6 @@ void test_boundary(const FEValuesBase<dim>& fev)
   std::vector<unsigned int> indices(n);
   for (unsigned int i=0;i<n;++i)
     indices[i] = i;
-  
-  nitsche_matrix(M, fev, 17);
-  M.print(deallog,8);
   
   deallog << "Residuals";
   for (unsigned int i=0;i<n;++i)
@@ -150,8 +176,8 @@ test(Triangulation<dim>& tr)
 //  FE_DGQ<dim> q2(2);
 //  test_fe(tr, q2);
 
-//  FE_Nedelec<dim> n1(1);  
-//  test_fe(tr, n1);  
+ FE_Nedelec<dim> n1(1);  
+ test_fe(tr, n1);  
 }
 
 
