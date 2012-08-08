@@ -1,4 +1,4 @@
-set(SRC_GRID
+SET(src
   grid_generator.cc
   grid_in.cc
   grid_out.cc
@@ -16,4 +16,20 @@ set(SRC_GRID
   tria_objects.cc
   )
 
-add_library(OBJ_GRID OBJECT ${SRC_GRID})
+SET(inst_in_files
+  grid_generator.inst.in
+  grid_in.inst.in
+  grid_out.inst.in
+  grid_refinement.inst.in
+  grid_tools.inst.in
+  intergrid_map.inst.in
+  tria_accessor.inst.in
+  tria_boundary.inst.in
+  tria_boundary_lib.inst.in
+  tria.inst.in
+  tria_objects.inst.in
+  )
+
+ADD_LIBRARY(obj_grid OBJECT ${src})
+macro_expand_instantiations(obj_grid "${inst_in_files}")
+

@@ -1,4 +1,4 @@
-set(SRC_HP
+SET(src
   dof_faces.cc
   dof_handler.cc
   dof_levels.cc
@@ -8,4 +8,12 @@ set(SRC_HP
   mapping_collection.cc
   )
 
-add_library(OBJ_HP OBJECT ${SRC_HP})
+SET(inst_in_files
+  dof_handler.inst.in
+  fe_collection.inst.in
+  fe_values.inst.in
+  mapping_collection.inst.in
+  )
+
+ADD_LIBRARY(obj_hp OBJECT ${src})
+macro_expand_instantiations(obj_hp "${inst_in_files}")

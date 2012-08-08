@@ -1,4 +1,4 @@
-set(SRC_LAC
+SET(src
   block_matrix_array.cc
   block_sparse_matrix.cc
   block_sparse_matrix_ez.cc
@@ -58,6 +58,25 @@ set(SRC_LAC
   vector.cc
   vector_memory.cc
   vector_view.cc
-  )
+)
 
-add_library(OBJ_LAC OBJECT ${SRC_LAC})
+SET(inst_in_files
+  block_sparse_matrix.inst.in
+  block_vector.inst.in
+  chunk_sparse_matrix.inst.in
+  full_matrix.inst.in
+  operator.inst.in
+  parallel_vector.inst.in
+  precondition_block.inst.in
+  relaxation_block.inst.in
+  sparse_matrix_ez.inst.in
+  sparse_matrix.inst.in
+  trilinos_vector_base.inst.in
+  vector.inst.in
+  vector_memory.inst.in
+  vector_view.inst.in
+)
+
+ADD_LIBRARY(obj_lac OBJECT ${src})
+macro_expand_instantiations(obj_lac "${inst_in_files}")
+

@@ -1,4 +1,4 @@
-set(SRC_FE
+SET(src
   fe_abf.cc
   fe_bdm.cc
   fe.cc
@@ -29,4 +29,40 @@ set(SRC_FE
   mapping_q_eulerian.cc
   )
 
-add_library(OBJ_FE OBJECT ${SRC_FE})
+SET(inst_in_files
+  fe_abf.inst.in
+  fe_bdm.inst.in
+  fe_dgp.inst.in
+  fe_dgp_monomial.inst.in
+  fe_dgp_nonparametric.inst.in
+  fe_dgq.inst.in
+  fe_dg_vector.inst.in
+  fe_face.inst.in
+  fe.inst.in
+  fe_nedelec.inst.in
+  fe_nothing.inst.in
+  fe_poly.inst.in
+  fe_poly_tensor.inst.in
+  fe_q_hierarchical.inst.in
+  fe_q.inst.in
+  fe_raviart_thomas.inst.in
+  fe_raviart_thomas_nodal.inst.in
+  fe_system.inst.in
+  fe_tools.inst.in
+  fe_values.decl.1.inst.in
+  fe_values.decl.2.inst.in
+  fe_values.impl.1.inst.in
+  fe_values.impl.2.inst.in
+  fe_values.inst.in
+  mapping_c1.inst.in
+  mapping_cartesian.inst.in
+  mapping.inst.in
+  mapping_q1_eulerian.inst.in
+  mapping_q1.inst.in
+  mapping_q_eulerian.inst.in
+  mapping_q.inst.in
+  )
+
+ADD_LIBRARY(obj_fe OBJECT ${src})
+macro_expand_instantiations(obj_fe "${inst_in_files}")
+

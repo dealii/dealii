@@ -1,4 +1,4 @@
-set(SRC_NUMERICS
+SET(src
   data_out.cc
   data_out_faces.cc
   data_out_rotation.cc
@@ -20,4 +20,26 @@ set(SRC_NUMERICS
   vectors.cc
   )
 
-add_library(OBJ_NUMERICS OBJECT ${SRC_NUMERICS})
+SET(inst_in_files
+  data_out_faces.inst.in
+  data_out.inst.in
+  data_out_rotation.inst.in
+  data_out_stack.inst.in
+  data_postprocessor.inst.in
+  derivative_approximation.inst.in
+  error_estimator.inst.in
+  fe_field_function.inst.in
+  matrices.inst.in
+  matrix_free.inst.in
+  mesh_worker_info.inst.in
+  mesh_worker_vector_selector.inst.in
+  operator.inst.in
+  point_value_history.inst.in
+  solution_transfer.inst.in
+  time_dependent.inst.in
+  vectors.inst.in
+  )
+
+ADD_LIBRARY(obj_numerics OBJECT ${src})
+macro_expand_instantiations(obj_numerics "${inst_in_files}")
+

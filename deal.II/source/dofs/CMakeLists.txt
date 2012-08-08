@@ -1,4 +1,4 @@
-set(SRC_DOFS
+SET(src
   block_info.cc
   dof_accessor.cc
   dof_faces.cc
@@ -11,4 +11,15 @@ set(SRC_DOFS
   number_cache.cc
   )
 
-add_library(OBJ_DOFS OBJECT ${SRC_DOFS})
+SET(inst_in_files
+  block_info.inst.in
+  dof_accessor.inst.in
+  dof_handler.inst.in
+  dof_handler_policy.inst.in
+  dof_objects.inst.in
+  dof_renumbering.inst.in
+  dof_tools.inst.in
+  )
+
+ADD_LIBRARY(obj_dofs OBJECT ${src})
+macro_expand_instantiations(obj_dofs "${inst_in_files}")
