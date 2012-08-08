@@ -63,12 +63,20 @@ void test_boundary(const FEValuesBase<dim>& fev)
     {
       u = 0.;
       u(i) = 1.;
+      w = 0.;
       fev.get_function_values(u, indices, uval, true);
       fev.get_function_gradients(u, indices, ugrad, true);
       nitsche_residual(w, fev, make_slice(uval), make_slice(ugrad), make_slice(null_val), 17);
       M.vmult(v,u);
       w.add(-1., v);
       deallog << ' ' << w.l2_norm();
+      if (d==1)
+	{
+	  nitsche_residual(w, fev, uval[0], ugrad[0], null_val[0], 17);
+	  M.vmult(v,u);
+	  w.add(-1., v);
+	  deallog << " e" << w.l2_norm();	  
+	}
     }
   deallog << std::endl;
 }
