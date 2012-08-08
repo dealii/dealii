@@ -655,6 +655,10 @@ processor potentially has enough memory to hold the entries of the combined
 solution vector locally. The goal is to run this code on hundreds or maybe
 even thousands of processors, at reasonable scalability.
 
+@note Even though it has a larger number, step-40 comes logically before the
+current program. You will probably want to look at step-40 before you try to
+understand the what we do here.
+
 MPI is a rather awkward interface to program with. It is a semi-object
 oriented set of functions, and while one uses it to send data around a
 network, one needs to explicitly describe the data types because the MPI
