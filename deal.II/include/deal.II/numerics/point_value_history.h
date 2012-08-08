@@ -143,17 +143,19 @@ namespace internal
  * course at the expense of getting only an approximate result.)
  * </ol>
  *
- * When recording a new mnemonic name, the user must supply a std::vector<bool>
- * component_mask to indicate the @ref GlossComponent "(vector) components" to be 
- * extracted from the given input. If the user simply wants to extract all the components, 
- * then default parameters
- * the mask need not be explicitly supplied to the @p add_field_name method.
- * If the @p evaluate_field with a @p DataPostprocessor object is used, the component_mask
- * interpreted as the mask of the @p DataPostprocessor return vector. The size of this
- * mask can be different to that of the FE space, but must be provided when the
- * @p add_field_name method is called. One variant of the @p add_field_name method allows
- * provides an unsigned int input to construct a suitable mask, if all values from the 
- * @p DataPostprocessor are desired.
+ * When recording a new mnemonic name, the user must supply a
+ * std::vector@<bool@> component_mask (see @ref GlossComponentMask "this glossary entry")
+ * to indicate the @ref GlossComponent "(vector) components"
+ * to be extracted from the given input. If the user simply wants to extract
+ * all the components, the mask need not be explicitly supplied to the @p
+ * add_field_name method and the default value of the parameter is sufficient.
+ * If the @p evaluate_field with a @p DataPostprocessor object is used, the
+ * component_mask is interpreted as the mask of the @p DataPostprocessor
+ * return vector. The size of this mask can be different to that of the FE
+ * space, but must be provided when the @p add_field_name method is
+ * called. One variant of the @p add_field_name method allows an unsigned int
+ * input to construct a suitable mask, if all values from the @p
+ * DataPostprocessor are desired.
  *
  * The class automatically generates names for the data stored based on the mnemonics
  * supplied. The methods @p add_component_names and @p add_independent_names allow
@@ -308,7 +310,7 @@ class PointValueHistory
                                       * Put another mnemonic string (and hence
                                       * @p VECTOR) into the class. This method
                                       * adds storage space for variables equal
-                                      * to the number of true values in 
+                                      * to the number of true values in
                                       * component_mask.
                                       * This also adds extra entries for points
                                       * that are already in the class, so
@@ -334,21 +336,21 @@ class PointValueHistory
     void add_field_name(const std::string &vector_name,
                         const unsigned int n_components);
 
-                                       /**
-                                        * Provide optional names for each component
-                                        * of a field. These names will be used
-                                        * instead of names generated from the
-                                        * field name, if supplied.
-                                        */
+				     /**
+				      * Provide optional names for each component
+				      * of a field. These names will be used
+				      * instead of names generated from the
+				      * field name, if supplied.
+				      */
     void add_component_names(const std::string &vector_name,
-                        const std::vector <std::string> &component_names);
+			     const std::vector <std::string> &component_names);
 
-                                       /**
-                                        * Provide optional names for the
-                                        * independent values. These names will
-                                        * be used instead of "Indep_...", if
-                                        * supplied.
-                                        */
+				     /**
+				      * Provide optional names for the
+				      * independent values. These names will
+				      * be used instead of "Indep_...", if
+				      * supplied.
+				      */
     void add_independent_names(const std::vector <std::string> &independent_names);
 
 
@@ -369,7 +371,7 @@ class PointValueHistory
                                       */
     template <class VECTOR>
     void evaluate_field(const std::string &name,
-            const VECTOR & solution);
+			const VECTOR & solution);
 
 
                                      /**
@@ -402,9 +404,9 @@ class PointValueHistory
                                       */
     template <class VECTOR>
     void evaluate_field(const std::vector <std::string> &names,
-            const VECTOR & solution,
-            const DataPostprocessor<dim> & data_postprocessor,
-            const Quadrature<dim> & quadrature);
+			const VECTOR & solution,
+			const DataPostprocessor<dim> & data_postprocessor,
+			const Quadrature<dim> & quadrature);
 
                                      /**
                                       * Construct a std::vector <std::string>
@@ -415,9 +417,9 @@ class PointValueHistory
                                       */
     template <class VECTOR>
     void evaluate_field(const std::string &name,
-            const VECTOR & solution,
-            const DataPostprocessor<dim> & data_postprocessor,
-            const Quadrature<dim> & quadrature);
+			const VECTOR & solution,
+			const DataPostprocessor<dim> & data_postprocessor,
+			const Quadrature<dim> & quadrature);
 
 
                                      /**
@@ -443,7 +445,7 @@ class PointValueHistory
                                       */
     template <class VECTOR>
     void evaluate_field_at_requested_location(const std::string &name,
-                          const VECTOR & solution);
+					      const VECTOR & solution);
 
 
                                      /**
@@ -506,7 +508,7 @@ class PointValueHistory
                                       * locations output.
                                       */
     void write_gnuplot (const std::string &base_name,
-            const std::vector <Point <dim> > postprocessor_locations = std::vector <Point <dim> > ());
+			const std::vector <Point <dim> > postprocessor_locations = std::vector <Point <dim> > ());
 
 
                                      /**
@@ -549,8 +551,8 @@ class PointValueHistory
                                       * The function mark_support_locations replaces
                                       * it and reflects the fact that the locations
                                       * marked are actually the support points.
-                      *
-                      * @deprecated
+				      *
+				      * @deprecated
                                       */
     Vector<double> mark_locations();
 
@@ -597,7 +599,7 @@ class PointValueHistory
                                       * method.
                                       */
     void get_postprocessor_locations (const Quadrature<dim> & quadrature,
-                      std::vector<Point <dim> > & locations);
+				      std::vector<Point <dim> > & locations);
 
                                      /**
                                       * Once datasets have been added to the
@@ -741,11 +743,11 @@ class PointValueHistory
                                       */
     std::map <std::string, std::vector <std::vector <double> > > data_store;
 
-                                    /**
-                                     * Saves a component mask
-                                     * for each mnemonic.
-                                     */
-   std::map <std::string, std::vector<bool> > component_mask;
+				     /**
+				      * Saves a component mask
+				      * for each mnemonic.
+				      */
+    std::map <std::string, std::vector<bool> > component_mask;
 
 
                                      /**
@@ -811,15 +813,15 @@ class PointValueHistory
     unsigned int n_indep;
 
 
-                                       /**
-                                        *  A function that will be triggered
-                                        *  through signals whenever the
-                                        *  triangulation is modified.
-                                        *
-                                        *  It is currently used to check
-                                        *  if the triangulation has changed,
-                                        *  invalidating precomputed values.
-                                        */
+				     /**
+				      *  A function that will be triggered
+				      *  through signals whenever the
+				      *  triangulation is modified.
+				      *
+				      *  It is currently used to check
+				      *  if the triangulation has changed,
+				      *  invalidating precomputed values.
+				      */
     void tria_change_listener ();
 };
 
