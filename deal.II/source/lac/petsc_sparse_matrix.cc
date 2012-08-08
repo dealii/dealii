@@ -25,6 +25,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
+
   SparseMatrix::SparseMatrix ()
   {
     const int m=0, n=0, n_nonzero_per_row=0;
@@ -351,6 +352,23 @@ namespace PETScWrappers
   template void
   SparseMatrix::do_reinit (const CompressedSimpleSparsityPattern &,
                            const bool);
+
+  PetscScalar
+  SparseMatrix::matrix_norm_square (const VectorBase &v) const
+  {
+    Vector tmp (v.size());
+    vmult (tmp, v);
+    return tmp*v;
+  }
+
+  PetscScalar
+  SparseMatrix::matrix_scalar_product (const VectorBase &u,
+				       const VectorBase &v) const
+  {
+    Vector tmp (v.size());
+    vmult (tmp, v);
+    return u*tmp;
+  }
 }
 
 

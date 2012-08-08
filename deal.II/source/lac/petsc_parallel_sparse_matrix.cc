@@ -613,8 +613,6 @@ namespace PETScWrappers
         }
     }
 
-
-
     // explicit instantiations
     //
     template
@@ -679,6 +677,25 @@ namespace PETScWrappers
                              const std::vector<unsigned int> &,
                              const unsigned int ,
                              const bool);
+
+
+    PetscScalar
+    SparseMatrix::matrix_norm_square (const Vector &v) const
+    {
+      Vector tmp (v);
+      vmult (tmp, v);
+      return tmp*v;
+    }
+
+    PetscScalar
+    SparseMatrix::matrix_scalar_product (const Vector &u,
+					 const Vector &v) const
+    {
+      Vector tmp (v);
+      vmult (tmp, v);
+      return u*tmp;
+    }
+    
   }
 }
 

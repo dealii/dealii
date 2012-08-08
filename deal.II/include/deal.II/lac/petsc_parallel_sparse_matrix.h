@@ -18,6 +18,7 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_matrix_base.h>
+#  include <deal.II/lac/petsc_parallel_vector.h>
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -31,6 +32,8 @@ namespace PETScWrappers
 {
   namespace MPI
   {
+
+
 
 /**
  * Implementation of a parallel sparse matrix class based on PETSC, with rows
@@ -109,6 +112,7 @@ namespace PETScWrappers
     class SparseMatrix : public MatrixBase
     {
       public:
+
                                          /**
                                           * A structure that describes some of
                                           * the traits of this class in terms
@@ -381,6 +385,50 @@ namespace PETScWrappers
                         << "The number of local rows " << arg1
                         << " must be larger than the total number of rows " << arg2);
                                          //@}
+
+                                       /**
+                                        * Return the square of the norm
+                                        * of the vector $v$ with respect
+                                        * to the norm induced by this
+                                        * matrix,
+                                        * i.e. $\left(v,Mv\right)$. This
+                                        * is useful, e.g. in the finite
+                                        * element context, where the
+                                        * $L_2$ norm of a function
+                                        * equals the matrix norm with
+                                        * respect to the mass matrix of
+                                        * the vector representing the
+                                        * nodal values of the finite
+                                        * element function.
+                                        *
+                                        * Obviously, the matrix needs to
+                                        * be quadratic for this operation.
+                                        *
+                                        * The implementation of this function
+                                        * is not as efficient as the one in
+                                        * the @p MatrixBase class used in
+                                        * deal.II (i.e. the original one, not
+                                        * the PETSc wrapper class) since PETSc
+                                        * doesn't support this operation and
+                                        * needs a temporary vector.
+                                        */
+	PetscScalar matrix_norm_square (const Vector &v) const;
+
+                                       /**
+                                        * Compute the matrix scalar
+                                        * product $\left(u,Mv\right)$.
+                                        *
+                                        * The implementation of this function
+                                        * is not as efficient as the one in
+                                        * the @p MatrixBase class used in
+                                        * deal.II (i.e. the original one, not
+                                        * the PETSc wrapper class) since PETSc
+                                        * doesn't support this operation and
+                                        * needs a temporary vector.
+                                        */
+	PetscScalar matrix_scalar_product (const Vector &u,
+					   const Vector &v) const;
+
       private:
 
                                          /**
