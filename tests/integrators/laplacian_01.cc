@@ -114,11 +114,11 @@ void test_face(const FEValuesBase<dim>& fev1,
 {
   const unsigned int n1 = fev1.dofs_per_cell;
   const unsigned int n2 = fev1.dofs_per_cell;
+  unsigned int d=fev1.get_fe().n_components();
   FullMatrix<double> M11(n1,n1);
   FullMatrix<double> M12(n1,n2);
   FullMatrix<double> M21(n2,n1);
   FullMatrix<double> M22(n2,n2);
-//  Vector<double> u(n), v(n);
   
   ip_matrix(M11, M12, M21, M22, fev1, fev2, 17);
   deallog << "M11" << std::endl;
@@ -129,6 +129,55 @@ void test_face(const FEValuesBase<dim>& fev1,
   M12.print(deallog,8);
   deallog << "M21" << std::endl;
   M21.print(deallog,8);
+  
+  Vector<double> u1(n1), v1(n1), w1(n1);
+  Vector<double> u2(n2), v2(n2), w2(n2);
+  std::vector<std::vector<double> >
+    u1val (d,std::vector<double>(fev1.n_quadrature_points)),
+    u2val (d,std::vector<double>(fev2.n_quadrature_points));
+  std::vector<std::vector<Tensor<1,dim> > >
+    u1grad(d,std::vector<Tensor<1,dim> >(fev1.n_quadrature_points)),
+    u2grad(d,std::vector<Tensor<1,dim> >(fev2.n_quadrature_points));
+  
+  std::vector<unsigned int> indices1(n1), indices2(n2);
+  for (unsigned int i=0;i<n1;++i) indices1[i] = i;
+  for (unsigned int i=0;i<n2;++i) indices2[i] = i;
+  
+  deallog << "Residuals";  for (unsigned int i=0;i<n1;++i) indices1[i] = i;
+
+  for (unsigned int i1=0;i1<n1;++i1)
+    for (unsigned int i2=0;i2<n2;++i2)
+      {
+	u1 = 0.;
+	u1(i1) = 1.;
+	w1 = 0.;
+	fev1.get_function_values(u1, indices1, u1val, true);
+	fev1.get_function_gradients(u1, indices1, u1grad, true);
+	u2 = 0.;
+	u2(i2) = 1.;
+	w2 = 0.;
+	fev2.get_function_values(u2, indices2, u2val, true);
+	fev2.get_function_gradients(u2, indices2, u2grad, true);
+	ip_residual(w1, w2, fev1, fev2,
+		    make_slice(u1val), make_slice(u1grad),
+		    make_slice(u2val), make_slice(u2grad),
+		    17);
+	M11.vmult(v1,u1); w1.add(-1., v1);
+	M12.vmult(v1,u2); w1.add(-1., v1);
+	M21.vmult(v2,u1); w2.add(-1., v2);
+	M22.vmult(v2,u2); w2.add(-1., v2);
+	deallog << ' ' << w1.l2_norm() + w2.l2_norm();
+	if (d==1)
+	  {
+	    ip_residual(w1, w2, fev1, fev2, u1val[0], u1grad[0], u2val[0], u2grad[0], 17);
+	    M11.vmult(v1,u1); w1.add(-1., v1);
+	    M12.vmult(v1,u2); w1.add(-1., v1);
+	    M21.vmult(v2,u1); w2.add(-1., v2);
+	    M22.vmult(v2,u2); w2.add(-1., v2);
+	    deallog << " e" << w1.l2_norm() + w2.l2_norm();	  
+	  }
+      }
+  deallog << std::endl;
 }
 
 
@@ -160,9 +209,7 @@ test_fe(Triangulation<dim>& tr, FiniteElement<dim>& fe)
   cell1 = tr.begin(1);
   fef1.reinit(cell1, 1);
   fef2.reinit(cell2, 0);
-  test_face(fef1, fef2);
-  
-  
+  test_face(fef1, fef2);  
 }
 
 
