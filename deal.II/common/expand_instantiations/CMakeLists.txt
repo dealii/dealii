@@ -1,23 +1,6 @@
 ADD_EXECUTABLE(expand_instantiations expand_instantiations.cc)
 
-#TODO template-arguments.in
-
-MACRO(macro_expand_instantiations target inst_in_files)
-  FOREACH (inst_in_file ${inst_in_files})
-    STRING(REGEX REPLACE "\\.in$" "" inst_file "${inst_in_file}" )
-    ADD_CUSTOM_COMMAND (
-      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${inst_file}
-      DEPENDS expand_instantiations
-      COMMAND expand_instantiations
-      ARGS ${CMAKE_SOURCE_DIR}/common/expand_instantiations/template-arguments
-           < ${CMAKE_CURRENT_SOURCE_DIR}/${inst_in_file}
-           > ${CMAKE_CURRENT_BINARY_DIR}/${inst_file}
-      )
-    SET(inst_targets
-      ${CMAKE_CURRENT_BINARY_DIR}/${inst_file}
-      ${inst_targets}
-      )
-  ENDFOREACH()
-  ADD_CUSTOM_TARGET(${target}.inst ALL DEPENDS ${inst_targets})
-  ADD_DEPENDENCIES(${target} ${target}.inst)
-ENDMACRO()
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/template-arguments.in
+  ${CMAKE_BINARY_DIR}/configured/template-arguments
+  )
