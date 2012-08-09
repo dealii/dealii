@@ -7,11 +7,12 @@ SET(CMAKE_CXX_FLAGS "-std=c++0x -D_REENTRANT -fPIC -O2 -march=native") #TODO: c+
 SET(CMAKE_INCLUDE_CURRENT_DIR true)
 
 
+
 #
 # General configuration options:
 #
 
-OPTION(DEAL_II_USE_CONTRIB "Build and use contrib libraries bundled with the source tarball." OFF)
+OPTION(DEAL_II_USE_CONTRIB "Build and use contrib libraries bundled with the source tarball." ON)
 OPTION(DEAL_II_WITH_THREADS "Build deal.II with support for threads. This pulls in libtbb as a dependency." ON)
 OPTION(DEAL_II_FUNCTIONPARSER "BUild deal.II with support for functionparser" ON)
 OPTION(DEAL_II_MPI "Build deal.II with support for openmpi." OFF)
@@ -20,15 +21,22 @@ OPTION(DEAL_II_WITH_METIS "Build deal.II with support for Metis." OFF)
 # TODO: The rest ;-)
 
 
+
 #
-# Configure:
+# Now, configure and prepare a lot of things:
 #
 
 SET(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/macros/"
+  # We outsource all the gory details:
   "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
   )
+
+#
+# used as a dummy target for all the stuff that has to be done before the
+# library can be compiled:
+#
+ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 
 IF(DEAL_II_WITH_THREADS)
   INCLUDE(deal_ii_with_threads)
@@ -39,11 +47,13 @@ IF(DEAL_II_WITH_UMFPACK)
 ENDIF()
 
 
+
 #
-# Build the toolchain and contrib libraries:
+# Build the toolchain:
 #
 
 ADD_SUBDIRECTORY(common/expand_instantiations)
+
 
 
 #

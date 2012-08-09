@@ -3,7 +3,6 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_BINARY_DIR}/deal.II/base/config.h
   )
 
-
 #
 #TODO: This perl script has to die...:
 #
@@ -16,6 +15,9 @@ ADD_CUSTOM_COMMAND(
        > ${CMAKE_CURRENT_BINARY_DIR}/deal.II/lac/lapack_templates.h
   )
 
-ADD_CUSTOM_TARGET(deal_ii_target_dependencies ALL
+ADD_CUSTOM_TARGET(lapack_templates ALL
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/deal.II/lac/lapack_templates.h
   )
+
+ADD_DEPENDENCIES(deal_ii_target_dependencies lapack_templates)
+

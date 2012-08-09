@@ -8,7 +8,7 @@ ADD_SUBDIRECTORY(lac)
 ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(numerics)
 
-ADD_LIBRARY(deal_II
+ADD_LIBRARY(deal_II SHARED
  $<TARGET_OBJECTS:obj_base>
  $<TARGET_OBJECTS:obj_distributed>
  $<TARGET_OBJECTS:obj_dofs>
