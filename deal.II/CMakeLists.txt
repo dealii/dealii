@@ -11,7 +11,7 @@ SET(CMAKE_INCLUDE_CURRENT_DIR true)
 # General configuration options:
 #
 
-OPTION(DEAL_II_USE_CONTRIB "Build and use contrib libraries bundled with the source tarball." ON)
+OPTION(DEAL_II_USE_CONTRIB "Build and use contrib libraries bundled with the source tarball." OFF)
 OPTION(DEAL_II_WITH_UMFPACK "Build deal.II with support for UMFPACK, BLAS and LAPACK." ON)
 OPTION(DEAL_II_WITH_THREADS "Build deal.II with support for threads. This pulls in libtbb as a dependency." ON)
 OPTION(DEAL_II_WITH_METIS "Build deal.II with support for Metis." OFF)
