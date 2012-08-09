@@ -212,14 +212,10 @@ namespace LocalIntegrators
         }
 
 /**
- * The trace of the divergence
- * operator, namely the product
- * of the normal component of the
- * vector valued trial space and
- * the test space.
- * @f[
- * \int_F (\mathbf u\cdot \mathbf n) v \,ds
- * @f]
+ * The trace of the divergence operator, namely the product of the
+ * normal component of the vector valued trial space and the test
+ * space.
+ * @f[ \int_F (\mathbf u\cdot \mathbf n) v \,ds @f]
  */
     template<int dim>
     void
@@ -256,7 +252,7 @@ namespace LocalIntegrators
  * vector valued trial space and
  * the test space.
  * @f[
- * \int_F (\mathbf f\cdot \mathbf n) v \,ds
+ * \int_F (\mathbf u\cdot \mathbf n) v \,ds
  * @f]
  */
     template<int dim>
@@ -285,6 +281,7 @@ namespace LocalIntegrators
               result(i) += ndx[d] * fetest.shape_value(i,k) * data[d][k];
         }
     }
+
 /**
  * The trace of the divergence
  * operator, namely the product
