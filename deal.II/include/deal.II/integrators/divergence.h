@@ -102,6 +102,40 @@ namespace LocalIntegrators
             }
         }
     }
+
+/**
+ * The residual of the divergence operator in strong form.
+ * \f[
+ * \int_Z v\nabla \cdot \mathbf u \,dx
+ * \f]
+ * This is the strong divergence operator and the trial
+ * space should be at least <b>H</b><sup>div</sup>. The test functions
+ * may be discontinuous.
+ *
+ * The function cell_matrix() is the Frechet derivative of this function with respect
+ * to the test functions.
+ */
+    template <int dim>
+    void cell_residual(
+    			Vector<double>& result,
+    			const FEValuesBase<dim>& fetest,
+    			const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > >& input,
+    			const double factor = 1.)
+    {
+    	AssertDimension(fetest.get_fe().n_components(), 1);
+    	AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
+    	const unsigned int t_dofs = fetest.dofs_per_cell;
+    	Assert (result.size() == t_dofs, ExcDimensionMismatch(result.size(), t_dofs));
+
+    	for (unsigned k=0;k<fetest.n_quadrature_points;++k)
+    	    {
+    	      const double dx = factor * fetest.JxW(k);
+
+    	      for (unsigned i=0;i<t_dofs;++i)
+    		for (unsigned int d=0;d<dim;++d)
+    		  result(i) += dx * input[d][k][d] * fetest.shape_value(i,k);
+    	    }
+    }
 /**
  * Cell matrix for gradient. The derivative is on the trial
  * function.
@@ -143,6 +177,39 @@ namespace LocalIntegrators
               }
         }
     }
+
+    /**
+     * The residual of the gradient operator in strong form.
+     * \f[
+     * \int_Z \mathbf v\cdot\nabla u \,dx
+     * \f]
+     * This is the strong gradient operator and the trial
+     * space should be at least <b>H</b><sup>1</sup>. The test functions
+     * may be discontinuous.
+     *
+     * The function cell_residual() is the Frechet derivative of this function with respect to the test functions.
+     */
+        template <int dim>
+        void gradient_residual(
+        			Vector<double>& result,
+        			const FEValuesBase<dim>& fetest,
+        			const std::vector<Tensor<1,dim> >& input,
+        			const double factor = 1.)
+        {
+        	AssertDimension(fetest.get_fe().n_components(), dim);
+        	AssertDimension(input.size(), fetest.n_quadrature_points);
+        	const unsigned int t_dofs = fetest.dofs_per_cell;
+        	Assert (result.size() == t_dofs, ExcDimensionMismatch(result.size(), t_dofs));
+
+        	for (unsigned k=0;k<fetest.n_quadrature_points;++k)
+        	    {
+        	      const double dx = factor * fetest.JxW(k);
+
+        	      for (unsigned i=0;i<t_dofs;++i)
+        		for (unsigned int d=0;d<dim;++d)
+        		  result(i) += dx * input[k][d] * fetest.shape_value_component(i,k,d);
+        	    }
+        }
 
 /**
  * The trace of the divergence
