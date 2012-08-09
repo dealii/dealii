@@ -401,7 +401,7 @@ namespace internal
                         "but you can only ask for " << arg2 <<"_iterators.");
 
                                          /**
-                                          * Triangulation objacts can
+                                          * Triangulation objects can
                                           * either access a user
                                           * pointer or a user
                                           * index. What you tried to
