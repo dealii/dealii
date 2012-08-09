@@ -16,7 +16,8 @@
  * @defgroup vector_valued Handling vector valued problems
  *
  *
- * Vector-valued problems are partial differential equations in which the
+ * Vector-valued problems are systems of partial differential
+ * equations. These are problems where the
  * solution variable is not a scalar function, but a vector-valued function or
  * a set of functions. This includes, for example:
  * <ul>
@@ -36,7 +37,9 @@
  * </ul>
  *
  * This page gives an overview of how to implement such vector-valued problems
- * efficiently in deal.II.
+ * easily in deal.II. In particular, it explains the usage of the class
+ * FESystem, which allows us to write code for systems of partial
+ * differential very much like we write code for single equations.
  *
  * <table class="tutorial" width="50%">
  * <tr><th><b>%Table of contents</b></th></tr>
