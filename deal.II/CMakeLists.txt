@@ -14,7 +14,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/contrib #TODO
 
   ${CMAKE_SOURCE_DIR}/include/
-  ${CMAKE_BINARY_DIR}/configured/
+  ${CMAKE_BINARY_DIR}/include/
   )
 
 

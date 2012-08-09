@@ -7,7 +7,7 @@ MACRO(macro_expand_instantiations target inst_in_files)
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${inst_file}
       DEPENDS expand_instantiations
       COMMAND expand_instantiations
-      ARGS ${CMAKE_BINARY_DIR}/configured/template-arguments
+      ARGS ${CMAKE_BINARY_DIR}/common/expand_instantiations/template-arguments
            < ${CMAKE_CURRENT_SOURCE_DIR}/${inst_in_file}
            > ${CMAKE_CURRENT_BINARY_DIR}/${inst_file}
       )
