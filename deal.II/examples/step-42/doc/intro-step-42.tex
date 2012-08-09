@@ -111,7 +111,7 @@ $$\alpha := \sigma_0 + \dfrac{\gamma}{2\mu+\gamma}\left(\vert\tau^D\vert - \sigm
 with a further material parameter $\mu>0$ called shear modulus.\\
 So what we do is to calculate the stresses by using Hooke's law for linear elastic,  isotropic materials
 $$\sigma = C \varepsilon(u) = 2\mu \varepsilon^D(u) + \kappa tr(\varepsilon(u))I = \left[2\mu\left(\mathbb{I} -\dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I\right]\varepsilon(u)$$
-with the new material parameter $\kappa>0$ (bulk modulus). The variables $I$ and $\mathbb{I}$ denote the identity tensors of second and forth order.\\
+with the material parameter $\kappa>0$ (bulk modulus). The variables $I$ and $\mathbb{I}$ denote the identity tensors of second and forth order.\\
 In the next step we test in a pointwise sense where the deviator part of the stress in a norm is bigger as the yield stress.
 If there are such points we project the deviator stress in those points back to the yield surface. Methods of this kind
 are called projections algorithm or radial-return-algorithm.\\
@@ -138,7 +138,7 @@ Neglecting the constant terms $ a(u^i;u^i)$ and $ a'(u^i;u^i,u^i)$ we obtain the
 $$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow min,\quad u^{i+1}\in U$$
 with
 $$F(\varphi) := \left(a'(\varphi;\varphi,u^{i+1}) -  a(\varphi;u^{i+1}) \right).$$
-In the case of our constitutive law the derivitive of the semi-linearform $a(.;.)$ at the point $u^i$ is
+In the case of our constitutive law the derivative of the semi-linearform $a(.;.)$ at the point $u^i$ is
 
 $$a'(u^i;\psi,\varphi) =$$
 $$
@@ -158,9 +158,14 @@ that allows us to solve a linear system of equations finally.
 
 \section{Active Set methods to solve the saddle point problem}
 
+For this section there is nothing to be done. The linearized problem is essentially like a pure elastic problem with contact like in step-41. The only
+difference consists in the fact that the contact area adjudges at he boundary instead of in the domain. But this has no further consequence
+so that we refer to the documentation of step-41.
+
 \section{The primal-dual active set algorithm combined with the inexact semi smooth newton method}
 
-The inexact newton method works as follows:
+Now we describe an algorithm that integrates the SQP-method, which we use for the nonlinear constitutive law, with the
+inexact semismooth newton method for the contact. It works as follows:
 \begin{itemize}
  \item[(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that $\mathcal{S} = \mathcal{A}_k \cup \mathcal{F}_k$ and $\mathcal{A}_k \cap \mathcal{F}_k = \emptyset$ and set $k = 1$.
  \item[(1)] Assembel the newton matrix $a'(U^k;\varphi_i,\varphi_j)$ and the right-hand-side $F(U^k)$.
@@ -172,8 +177,8 @@ The inexact newton method works as follows:
  \end{align*}
 % Note that $\mathcal{S}$ contains only dofs related to the boundary $\Gamma_C$. So in contrast to step-41 there are much more than $\vert \mathcal{S}\vert$ equations necessary to determine $U$ and $\Lambda$.
  \item[(3)] Define the new active and inactive sets by
- $$\mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c\left(\left[BU^k\right]_i - G_i\left) < 0\rbrace,$$
- $$\mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c\left(\left[BU^k\right]_i - G_i\left) \geq 0\rbrace.$$
+ $$\mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c\left(\left[BU^k\right]_i - G_i\right) < 0\rbrace,$$
+ $$\mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c\left(\left[BU^k\right]_i - G_i\right) \geq 0\rbrace.$$
  \item[(4)] If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert F(U^{k+1}\vert < \delta$ then stop, else set $k=k+1$ and go to step (1).
 \end{itemize}
 
