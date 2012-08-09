@@ -39,7 +39,7 @@
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_dof_accessor.h>
