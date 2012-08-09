@@ -1,5 +1,5 @@
 PROJECT (deal.II)
-set (VERSION "8.0.pre")
+SET (VERSION "8.0.pre")
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8.8)
 
 
@@ -19,7 +19,7 @@ INCLUDE_DIRECTORIES(
 
 
 ADD_SUBDIRECTORY(common/expand_instantiations)
-#ADD_SUBDIRECTORY(contrib)
+ADD_SUBDIRECTORY(contrib)
 
 INCLUDE(${CMAKE_SOURCE_DIR}/contrib/cmake/macros/macro_expand_instantiations.cmake)
 
