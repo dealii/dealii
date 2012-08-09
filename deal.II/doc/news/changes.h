@@ -63,6 +63,12 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
+Changed: numerics/vectors.h is now called numerics/vector_tools.h. The old
+file is deprecated.
+<br>
+(Timo Heister 2012/08/09)
+
+<li>
 New: officially added support for clang 3.1 or newer.
 <br>
 (Timo Heister and Wolfgang Bangerth, 2012/08/07)

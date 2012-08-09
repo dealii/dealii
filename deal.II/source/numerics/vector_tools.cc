@@ -51,7 +51,7 @@ namespace VectorTools
 
 
 // ---------------------------- explicit instantiations --------------------
-#include "vectors.inst"
+#include "vector_tools.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

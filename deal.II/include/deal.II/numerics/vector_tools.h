@@ -9,8 +9,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__vectors_h
-#define __deal2__vectors_h
+#ifndef __deal2__vector_tools_h
+#define __deal2__vector_tools_h
 
 
 #include <deal.II/base/config.h>
