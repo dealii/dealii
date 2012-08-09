@@ -13,7 +13,7 @@ SET(src
   mesh_worker.cc
   mesh_worker_info.cc
   mesh_worker_vector_selector.cc
-  operator.cc
+  dof_output_operator.cc
   point_value_history.cc
   solution_transfer.cc
   time_dependent.cc
@@ -33,7 +33,7 @@ SET(inst_in_files
   matrix_free.inst.in
   mesh_worker_info.inst.in
   mesh_worker_vector_selector.inst.in
-  operator.inst.in
+  dof_output_operator.inst.in
   point_value_history.inst.in
   solution_transfer.inst.in
   time_dependent.inst.in

@@ -21,7 +21,7 @@ INCLUDE_DIRECTORIES(
 ADD_SUBDIRECTORY(common/expand_instantiations)
 #ADD_SUBDIRECTORY(contrib)
 
-INCLUDE(${CMAKE_SOURCE_DIR}/contrib/cmake/Macros/macro_expand_instantiations.cmake)
+INCLUDE(${CMAKE_SOURCE_DIR}/contrib/cmake/macros/macro_expand_instantiations.cmake)
 
 ADD_SUBDIRECTORY(include)
 ADD_SUBDIRECTORY(source)

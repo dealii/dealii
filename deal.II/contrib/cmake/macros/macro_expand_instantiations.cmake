@@ -3,7 +3,7 @@ MACRO(macro_expand_instantiations target inst_in_files)
   FOREACH (inst_in_file ${inst_in_files})
     STRING(REGEX REPLACE "\\.in$" "" inst_file "${inst_in_file}" )
 
-    ADD_CUSTOM_COMMAND (
+    ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${inst_file}
       DEPENDS expand_instantiations
               ${CMAKE_CURRENT_SOURCE_DIR}/${inst_in_file}
