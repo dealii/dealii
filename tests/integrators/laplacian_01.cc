@@ -219,12 +219,12 @@ test(Triangulation<dim>& tr)
 {
   FE_DGQ<dim> q1(1);
   test_fe(tr, q1);
-
-//  FE_DGQ<dim> q2(2);
-//  test_fe(tr, q2);
-
- FE_Nedelec<dim> n1(1);  
- test_fe(tr, n1);  
+  
+  FE_DGQ<dim> q2(2);
+  test_fe(tr, q2);
+  
+  FE_Nedelec<dim> n1(1);  
+  test_fe(tr, n1);  
 }
 
 
@@ -240,8 +240,7 @@ int main()
   TestGrids::hypercube(tr2, 1);
   test(tr2);
   
-//  Triangulation<3> tr3;
-//  TestGrids::hypercube(tr3, 1);
-//  test(tr3);
-  
+ Triangulation<3> tr3;
+ TestGrids::hypercube(tr3, 1);
+ test(tr3);  
 }

@@ -19,7 +19,8 @@ DEAL::-0.50   0.50    -0.50   0.50
 DEAL::-0.50   -0.50   0.50    0.50    
 DEAL::0.29    -0.29   -0.29   0.29    
 DEAL::0.29    -0.29   -0.29   0.29    
-DEAL::
+DEAL::Divergence-Residuals 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::Gradient-Residuals 0 0 0 0
 DEAL::boundary_matrix 0
 DEAL::-0.50   0.29    0       0       0       0       0       0       0       0       0       0       
 DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
@@ -84,7 +85,8 @@ DEAL::0.14    -0.14   0.14    -0.14
 DEAL::0       0       0       0       
 DEAL::0.14    0.14    -0.14   -0.14   
 DEAL::0       0       0       0       
-DEAL::
+DEAL::Divergence-Residuals 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::Gradient-Residuals 0 0 0 0
 DEAL::boundary_matrix 0
 DEAL::0       0       0       0       -0.33   0.58    -0.17   0.29    0.14    -0.25   0       0       
 DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
@@ -145,7 +147,8 @@ DEAL::-0.17   -0.083  0.17    0.083
 DEAL::-0.083  -0.17   0.083   0.17    
 DEAL::-0.17   -0.083  0.17    0.083   
 DEAL::-0.083  -0.17   0.083   0.17    
-DEAL::
+DEAL::Divergence-Residuals 0 0 0 0 0 0 0 0
+DEAL::Gradient-Residuals 0 0 0 0
 DEAL::boundary_matrix 0
 DEAL::-0.33   0       -0.17   0       0       0       0       0       
 DEAL::0       0       0       0       0       0       0       0       

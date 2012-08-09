@@ -10,7 +10,7 @@
 //
 //--------------------------------------------------------------------
 
-// Test the functions in integrators/laplace.h
+// Test the functions in integrators/divergence.h
 // Output matrices and assert consistency of residuals
 
 #include "../tests.h"
@@ -45,33 +45,45 @@ void test_cell(const FEValuesBase<dim>& fev, const FEValuesBase<dim>& fes)
   Mg.print(deallog,8);
 
   
-  // Vector<double> u(n), v(n), w(n);
-  // std::vector<std::vector<Tensor<1,dim> > >
-  //   ugrad(d,std::vector<Tensor<1,dim> >(fev.n_quadrature_points));
+  Vector<double> u(nv), v(ns), w(ns);
+  std::vector<std::vector<Tensor<1,dim> > >
+    ugrad(dim,std::vector<Tensor<1,dim> >(fev.n_quadrature_points));
   
-  // std::vector<unsigned int> indices(n);
-  // for (unsigned int i=0;i<n;++i)
-  //   indices[i] = i;
+  std::vector<unsigned int> indices(nv);
+  for (unsigned int i=0;i<nv;++i)
+    indices[i] = i;
   
-  // deallog << "Residuals";
-  // for (unsigned int i=0;i<n;++i)
-  //   {
-  //     u = 0.;
-  //     u(i) = 1.;
-  //     w = 0.;
-  //     fev.get_function_gradients(u, indices, ugrad, true);
-  //     cell_residual(w, fev, make_slice(ugrad));
-  //     M.vmult(v,u);
-  //     w.add(-1., v);
-  //     deallog << ' ' << w.l2_norm();
-  //     if (d==1)
-  // 	{
-  // 	  cell_residual(w, fev, ugrad[0]);
-  // 	  M.vmult(v,u);
-  // 	  w.add(-1., v);
-  // 	  deallog << " e" << w.l2_norm();	  
-  // 	}
-  //   }
+  deallog << "Divergence-Residuals";
+  for (unsigned int i=0;i<nv;++i)
+    {
+      u = 0.;
+      u(i) = 1.;
+      w = 0.;
+      fev.get_function_gradients(u, indices, ugrad, true);
+      cell_residual(w, fes, make_slice(ugrad));
+      Md.vmult(v,u);
+      w.add(-1., v);
+      deallog << ' ' << w.l2_norm();
+    }
+  deallog << std::endl;
+
+  v.reinit(nv);
+  indices.resize(ns);
+  for (unsigned int i=0;i<ns;++i)
+    indices[i] = i;
+  
+  deallog << "Gradient-Residuals";
+  for (unsigned int i=0;i<ns;++i)
+    {
+      w = 0.;
+      w(i) = 1.;
+      u = 0.;
+      fes.get_function_gradients(w, indices, ugrad[0]);
+      gradient_residual(u, fev, ugrad[0]);
+      Mg.vmult(v,w);
+      u.add(-1., v);
+      deallog << ' ' << u.l2_norm();
+    }
   deallog << std::endl;
 }
 
