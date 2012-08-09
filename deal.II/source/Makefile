@@ -138,7 +138,7 @@ ifneq ($(GXX-VERSION),compaq_cxx)
 		 $(call DEAL_II_RPATH,$(DEAL_II_P4EST_DIR)/FAST/$(DEAL_II_P4EST_LIBDIR_NAME))
   endif
 
-  # for cygwin and darwin, also llapack and such are necessary
+  # for cygwin and darwin, also lapack and such are necessary
   # we better link all libraries mentioned in $(LIBS)
   ifneq ($(findstring cygwin,$(TARGET))$(findstring darwin,$(TARGET)),)
     deplibs.g += $(LIBS)
