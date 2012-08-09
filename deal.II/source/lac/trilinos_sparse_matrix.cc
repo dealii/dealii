@@ -911,12 +911,19 @@ namespace TrilinosWrappers
   SparseMatrix::diag_element (const unsigned int i) const
   {
     Assert (m() == n(), ExcNotQuadratic());
-
+    
+#ifdef DEBUG
+				     // use operator() in debug mode because
+				     // it checks if this is a valid element
+				     // (in parallel)
+    return operator()(i,i);
+#else    
                                   // Trilinos doesn't seem to have a
                                   // more efficient way to access the
                                   // diagonal than by just using the
                                   // standard el(i,j) function.
     return el(i,i);
+#endif    
   }
 
 
