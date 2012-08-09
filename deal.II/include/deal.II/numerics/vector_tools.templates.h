@@ -51,8 +51,8 @@
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 #include <numeric>
 #include <algorithm>
