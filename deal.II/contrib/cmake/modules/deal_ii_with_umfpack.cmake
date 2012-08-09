@@ -20,3 +20,7 @@ SET(deal_ii_external_debug_libraries
   ${deal_ii_external_debug_libraries}
   ${Umfpack_LIBRARY} ${AMD_LIBRARY} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES}
   )
+
+SET(HAVE_LIBBLAS TRUE)
+SET(HAVE_LIBLAPACK TRUE)
+SET(HAVE_LIBUMFPACK TRUE)
