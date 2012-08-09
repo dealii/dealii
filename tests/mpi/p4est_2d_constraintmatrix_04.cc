@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -264,7 +264,6 @@ void test()
       trans.interpolate(x);
 
       x_rel.reinit(relevant_set, MPI_COMM_WORLD);
-      x_rel = 0;
       x_rel.compress();
 
       ConstraintMatrix cm(relevant_set);

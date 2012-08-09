@@ -549,28 +549,6 @@ namespace PETScWrappers
   }
 
 
-
-  PetscScalar
-  MatrixBase::matrix_norm_square (const VectorBase &v) const
-  {
-    Vector tmp(v.size());
-    vmult (tmp, v);
-    return tmp*v;
-  }
-
-
-
-  PetscScalar
-  MatrixBase::matrix_scalar_product (const VectorBase &u,
-                                     const VectorBase &v) const
-  {
-    Vector tmp(v.size());
-    vmult (tmp, v);
-    return u*tmp;
-  }
-
-
-
   PetscScalar
   MatrixBase::residual (VectorBase       &dst,
                         const VectorBase &x,

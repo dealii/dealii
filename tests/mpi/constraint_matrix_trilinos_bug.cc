@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -97,9 +97,9 @@ void test()
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
-  
+
   GridGenerator::hyper_cube(tr);
- 
+
   tr.refine_global (1);
   for (unsigned int step=0; step<5;++step)
         {
@@ -121,7 +121,7 @@ void test()
   dofh.distribute_dofs (fe);
 
   IndexSet owned_set = dofh.locally_owned_dofs();
-  
+
   IndexSet dof_set;
   DoFTools::extract_locally_active_dofs (dofh, dof_set);
 
@@ -135,13 +135,12 @@ void test()
 
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
-  x_rel = 0;
   x_rel.compress();
-  
+
   ConstraintMatrix cm(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, cm);
   std::vector<bool> velocity_mask (dim+1, true);
-  
+
   velocity_mask[dim] = false;
 
   VectorTools::interpolate_boundary_values (dofh,
@@ -149,17 +148,17 @@ void test()
 					    ZeroFunction<dim>(dim+1),
 					    cm,
 					    velocity_mask);
-  
+
     cm.close ();
 
     TrilinosWrappers::MPI::Vector x_test;
     x_test.reinit(x_rel);
-    
+
     x_test=x;
 
     bool throwing=false;
     try
-      {	
+      {
 	cm.distribute(x_test);
       }
     catch (ExcMessage e)
@@ -176,7 +175,7 @@ void test()
 				     //l2_norm() not possible for ghosted vectors...
     //double a=0;//x_test.l2_norm();
     //double b=0;//x_rel.l2_norm();
-    
+
 /*    if (myid==0)
       deallog << a << " vs " << b << std::endl;
 */

@@ -3,6 +3,8 @@
 
 Closed: 1
 Cleared: 0
+Triangulation_changed: 0
+Have_dof_handler: 1
 Geometric Data
 # Requested location: 1.0 0.20
 # DoF_index : Support location (for each component)
@@ -12,7 +14,8 @@ Geometric Data
 
 
 Independent value(s): 1 : 1
-Solution: 3 : 1
+Mnemonic: data set size (mask size, n true components) : n data sets
+Solution: 3 (3, 3) : 1
 
 ***end of status output***
 
@@ -20,6 +23,8 @@ Solution: 3 : 1
 
 Closed: 1
 Cleared: 0
+Triangulation_changed: 0
+Have_dof_handler: 1
 Geometric Data
 # Requested location: 0.0 0.0
 # DoF_index : Support location (for each component)
@@ -59,8 +64,9 @@ Geometric Data
 
 
 Independent value(s): 1 : 10
-Post Processed Vector: 18 : 10
-Solution: 18 : 10
+Mnemonic: data set size (mask size, n true components) : n data sets
+Post Processed Vector: 18 (3, 3) : 10
+Solution: 18 (3, 3) : 10
 
 ***end of status output***
 
@@ -68,6 +74,8 @@ Solution: 18 : 10
 
 Closed: 1
 Cleared: 0
+Triangulation_changed: 0
+Have_dof_handler: 0
 Geometric Data
 No points stored currently
 

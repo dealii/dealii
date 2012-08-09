@@ -143,14 +143,19 @@ namespace internal
  * course at the expense of getting only an approximate result.)
  * </ol>
  *
- * When recording a new mnemonic name, the user must supply a std::vector<unsigned int>
- * components that lists the @ref GlossComponent "(vector) components" to be extracted from the
- * given input. If the user simply wants to extract all the components, or the first
- * n components then default parameters and overloaded functions mean that
- * the std::vector need not be explicitly supplied to the @p add_field_name method.
- * If the @p evaluate_field with a @p DataPostprocessor object is used, the components
- * are interpreted as the component of the @p DataPostprocessor return vector. This
- * vector can be larger than the FE space.
+ * When recording a new mnemonic name, the user must supply a
+ * std::vector@<bool@> component_mask (see @ref GlossComponentMask "this glossary entry")
+ * to indicate the @ref GlossComponent "(vector) components"
+ * to be extracted from the given input. If the user simply wants to extract
+ * all the components, the mask need not be explicitly supplied to the @p
+ * add_field_name method and the default value of the parameter is sufficient.
+ * If the @p evaluate_field with a @p DataPostprocessor object is used, the
+ * component_mask is interpreted as the mask of the @p DataPostprocessor
+ * return vector. The size of this mask can be different to that of the FE
+ * space, but must be provided when the @p add_field_name method is
+ * called. One variant of the @p add_field_name method allows an unsigned int
+ * input to construct a suitable mask, if all values from the @p
+ * DataPostprocessor are desired.
  *
  * The class automatically generates names for the data stored based on the mnemonics
  * supplied. The methods @p add_component_names and @p add_independent_names allow
@@ -304,20 +309,21 @@ class PointValueHistory
                                      /**
                                       * Put another mnemonic string (and hence
                                       * @p VECTOR) into the class. This method
-                                      * adds storage space for components.size()
-                                      * variables.
+                                      * adds storage space for variables equal
+                                      * to the number of true values in
+                                      * component_mask.
                                       * This also adds extra entries for points
                                       * that are already in the class, so
                                       * @p add_field_name and @p add_points can
                                       * be called in any order.
                                       */
     void add_field_name(const std::string &vector_name,
-                        const std::vector <unsigned int> &components = std::vector <unsigned int>());
+                        const std::vector <bool> &component_mask = std::vector <bool>());
 
                                      /**
                                       * Put another mnemonic string (and hence
                                       * @p VECTOR) into the class. This method
-                                      * adds storage space for components.size()
+                                      * adds storage space for n_components
                                       * variables.
                                       * This also adds extra entries for points
                                       * that are already in the class, so
@@ -330,21 +336,21 @@ class PointValueHistory
     void add_field_name(const std::string &vector_name,
                         const unsigned int n_components);
 
-                                       /**
-                                        * Provide optional names for each component
-                                        * of a field. These names will be used
-                                        * instead of names generated from the
-                                        * field name, if supplied.
-                                        */
+				     /**
+				      * Provide optional names for each component
+				      * of a field. These names will be used
+				      * instead of names generated from the
+				      * field name, if supplied.
+				      */
     void add_component_names(const std::string &vector_name,
-                        const std::vector <std::string> &component_names);
+			     const std::vector <std::string> &component_names);
 
-                                       /**
-                                        * Provide optional names for the
-                                        * independent values. These names will
-                                        * be used instead of "Indep_...", if
-                                        * supplied.
-                                        */
+				     /**
+				      * Provide optional names for the
+				      * independent values. These names will
+				      * be used instead of "Indep_...", if
+				      * supplied.
+				      */
     void add_independent_names(const std::vector <std::string> &independent_names);
 
 
@@ -353,7 +359,7 @@ class PointValueHistory
                                       * Extract values at the stored points
                                       * from the VECTOR supplied and add them
                                       * to the new dataset in vector_name.
-                                      * The list of components supplied when the
+                                      * The component mask supplied when the
                                       * field was added is used to select
                                       * components to extract.
                                       * If a @p DoFHandler is used, one (and only
@@ -372,7 +378,7 @@ class PointValueHistory
                                       * Compute values using a @p DataPostprocessor object
                                       * with the @p VECTOR supplied and add them
                                       * to the new dataset in vector_name.
-                                      * The list of components supplied when the
+                                      * The component_mask supplied when the
                                       * field was added is used to select
                                       * components to extract from the @p DataPostprocessor
                                       * return vector.
@@ -427,7 +433,7 @@ class PointValueHistory
                                       * data. Therefore, if only this method is used,
                                       * the class is fully compatible with
                                       * adaptive refinement.
-                                      * The list of components supplied when the
+                                      * The component_mask supplied when the
                                       * field was added is used to select
                                       * components to extract. If
                                       * a @p DoFHandler is used, one (and only
@@ -649,8 +655,8 @@ class PointValueHistory
                                       * Check the internal data sizes to test
                                       * for a loss of data sync. This is often
                                       * used in @p Assert statements with the
-                                      * @p ExcDataLostSync exception. If @p
-                                      * strict is @p false this method returns
+                                      * @p ExcDataLostSync exception. If @p strict
+                                      * is @p false this method returns
                                       * @p true if all sizes are within 1 of
                                       * each other (needed to allow data to be
                                       * added), with @p strict = @p true they
@@ -695,7 +701,7 @@ class PointValueHistory
     DeclException0(ExcDoFHandlerRequired);
 
                                      /**
-                                      *    The triangulation indicated that mesh
+                                      * The triangulation indicated that mesh
                                       * has been refined in some way. This suggests
                                       * that the internal dof indices stored
                                       * are no longer meaningful.
@@ -737,12 +743,12 @@ class PointValueHistory
                                       */
     std::map <std::string, std::vector <std::vector <double> > > data_store;
 
+				     /**
+				      * Saves a component mask
+				      * for each mnemonic.
+				      */
+    std::map <std::string, std::vector<bool> > component_mask;
 
-                                     /**
-                                      * Saves a vector listing components
-                                      * associated with a mnemonic.
-                                      */
-    std::map <std::string, std::vector<unsigned int> > field_components;
 
                                      /**
                                       * Saves a vector listing component
@@ -807,15 +813,15 @@ class PointValueHistory
     unsigned int n_indep;
 
 
-                                       /**
-                                        *  A function that will be triggered
-                                        *  through signals whenever the
-                                        *  triangulation is modified.
-                                        *
-                                        *  It is currently used to check
-                                        *  if the triangulation has changed,
-                                        *  invalidating precomputed values.
-                                        */
+				     /**
+				      *  A function that will be triggered
+				      *  through signals whenever the
+				      *  triangulation is modified.
+				      *
+				      *  It is currently used to check
+				      *  if the triangulation has changed,
+				      *  invalidating precomputed values.
+				      */
     void tria_change_listener ();
 };
 

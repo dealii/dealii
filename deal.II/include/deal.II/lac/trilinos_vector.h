@@ -443,10 +443,13 @@ namespace TrilinosWrappers
                          const MPI_Comm               &communicator = MPI_COMM_WORLD);
 
                                        /**
-                                        * Reinit functionality. This
-                                        * function destroys the old vector
-                                        * content and generates a new one
-                                        * based on the input partitioning.
+                                        * Reinit functionality. This function
+                                        * destroys the old vector content and
+                                        * generates a new one based on the
+                                        * input partitioning.  The flag
+                                        * <tt>fast</tt> determines whether the
+                                        * vector should be filled with zero
+                                        * (false) or left untouched (true).
                                         */
         void reinit (const IndexSet &parallel_partitioning,
                      const MPI_Comm &communicator = MPI_COMM_WORLD,
@@ -658,19 +661,19 @@ namespace TrilinosWrappers
 
                                        /**
                                         * Initialization with an
-                                        * IndexSet. Similar to the call in
-                                        * the other class MPI::Vector, with
-                                        * the difference that now a copy on
-                                        * all processes is generated. This
+                                        * IndexSet. Similar to the call in the
+                                        * other class MPI::Vector, with the
+                                        * difference that now a copy on all
+                                        * processes is generated. This
                                         * initialization function is
-                                        * appropriate in case the data in
-                                        * the localized vector should be
-                                        * imported from a distributed vector
-                                        * that has been initialized with the
-                                        * same communicator. The variable
-                                        * <tt>fast</tt> determines whether
-                                        * the vector should be filled with
-                                        * zero or left untouched.
+                                        * appropriate in case the data in the
+                                        * localized vector should be imported
+                                        * from a distributed vector that has
+                                        * been initialized with the same
+                                        * communicator. The variable
+                                        * <tt>fast</tt> determines whether the
+                                        * vector should be filled with zero
+                                        * (false) or left untouched (true).
                                         */
       void reinit (const IndexSet   &input_map,
                    const MPI_Comm   &communicator = MPI_COMM_WORLD,
