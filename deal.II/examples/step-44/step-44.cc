@@ -49,7 +49,7 @@
 #include <deal.II/lac/sparse_direct.h>
 
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <iostream>
 #include <fstream>
