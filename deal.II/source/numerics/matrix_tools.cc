@@ -3043,7 +3043,7 @@ namespace MatrixTools
 
 
 // explicit instantiations
-#include "matrices.inst"
+#include "matrix_tools.inst"
 
 namespace MatrixTools
 {

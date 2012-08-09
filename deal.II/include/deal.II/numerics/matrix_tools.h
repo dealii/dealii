@@ -9,8 +9,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__matrices_h
-#define __deal2__matrices_h
+#ifndef __deal2__matrix_tools_h
+#define __deal2__matrix_tools_h
 
 
 #include <deal.II/base/config.h>

@@ -63,8 +63,9 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
-Changed: numerics/vectors.h is now called numerics/vector_tools.h. The old
-file is deprecated.
+Changed: numerics/vectors.h is now called numerics/vector_tools.h and
+numerics/matrices.h is now called numerics/matrix_tools.h The old files are
+deprecated.
 <br>
 (Timo Heister 2012/08/09)
 
