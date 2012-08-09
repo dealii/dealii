@@ -79,4 +79,4 @@ SET(inst_in_files
 
 ADD_LIBRARY(obj_lac OBJECT ${src})
 macro_expand_instantiations(obj_lac "${inst_in_files}")
-ADD_DEPENDENCIES(obj_lac contrib)
+ADD_DEPENDENCIES(obj_lac deal_ii_target_dependencies)

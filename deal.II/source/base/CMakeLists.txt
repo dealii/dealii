@@ -49,5 +49,5 @@ SET(src_base
   )
 
 ADD_LIBRARY(obj_base OBJECT ${src_base})
-ADD_DEPENDENCIES(obj_base contrib)
+ADD_DEPENDENCIES(obj_base deal_ii_target_dependencies)
 

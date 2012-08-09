@@ -42,4 +42,4 @@ SET(inst_in_files
 
 ADD_LIBRARY(obj_numerics OBJECT ${src})
 macro_expand_instantiations(obj_numerics "${inst_in_files}")
-ADD_DEPENDENCIES(obj_numerics contrib)
+ADD_DEPENDENCIES(obj_numerics deal_ii_target_dependencies)

@@ -12,13 +12,12 @@ SET(CMAKE_INCLUDE_CURRENT_DIR true)
 #
 
 OPTION(DEAL_II_USE_CONTRIB "Build and use contrib libraries bundled with the source tarball." OFF)
-OPTION(DEAL_II_WITH_UMFPACK "Build deal.II with support for UMFPACK, BLAS and LAPACK." ON)
 OPTION(DEAL_II_WITH_THREADS "Build deal.II with support for threads. This pulls in libtbb as a dependency." ON)
-OPTION(DEAL_II_WITH_METIS "Build deal.II with support for Metis." OFF)
-OPTION(DEAL_II_MPI "Build deal.II with support for openmpi." OFF)
 OPTION(DEAL_II_FUNCTIONPARSER "BUild deal.II with support for functionparser" ON)
+OPTION(DEAL_II_MPI "Build deal.II with support for openmpi." OFF)
+OPTION(DEAL_II_WITH_UMFPACK "Build deal.II with support for UMFPACK, BLAS and LAPACK." ON)
+OPTION(DEAL_II_WITH_METIS "Build deal.II with support for Metis." OFF)
 # TODO: The rest ;-)
-
 
 
 #
@@ -27,33 +26,17 @@ OPTION(DEAL_II_FUNCTIONPARSER "BUild deal.II with support for functionparser" ON
 
 SET(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/macros/"
   "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
   )
 
-#
-# DEAL_II_WITH_THREADS:
-#
-
 IF(DEAL_II_WITH_THREADS)
-  FIND_PACKAGE(Threads REQUIRED)
-
-  IF(DEAL_II_USE_CONTRIB)
-    # Compiles and links libtbb, exports the TBB_* variables as well:
-    ADD_SUBDIRECTORY(contrib/tbb)
-  ELSE()
-    FIND_PACKAGE(TBB REQUIRED)
-  ENDIF()
-
-  INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
-
-  SET(DEAL_II_USE_MT TRUE)
-  SET(DEAL_II_USE_MT_POSIX TRUE)
+  INCLUDE(deal_ii_with_threads)
 ENDIF()
 
-
-#
-#
-#
+IF(DEAL_II_WITH_UMFPACK)
+  INCLUDE(deal_ii_with_umfpack)
+ENDIF()
 
 
 #
@@ -69,10 +52,11 @@ ADD_SUBDIRECTORY(common/expand_instantiations)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/include/
+  ${CMAKE_SOURCE_DIR}/contrib/ #TODO
   ${CMAKE_BINARY_DIR}/include/
   )
 
-INCLUDE(${CMAKE_SOURCE_DIR}/contrib/cmake/macros/macro_expand_instantiations.cmake)
+INCLUDE(macro_expand_instantiations)
 
 ADD_SUBDIRECTORY(include)
 ADD_SUBDIRECTORY(source)

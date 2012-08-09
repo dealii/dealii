@@ -1,0 +1,14 @@
+FIND_PACKAGE(Threads REQUIRED)
+
+IF(DEAL_II_USE_CONTRIB)
+  # Compiles and links libtbb, exports the TBB_* variables as well:
+  ADD_SUBDIRECTORY(contrib/tbb)
+ELSE()
+  FIND_PACKAGE(TBB REQUIRED)
+ENDIF()
+
+INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
+# TODO: external_libraries
+
+SET(DEAL_II_USE_MT TRUE)
+SET(DEAL_II_USE_MT_POSIX TRUE)
