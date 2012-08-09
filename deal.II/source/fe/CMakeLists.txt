@@ -65,4 +65,4 @@ SET(inst_in_files
 
 ADD_LIBRARY(obj_fe OBJECT ${src})
 macro_expand_instantiations(obj_fe "${inst_in_files}")
-
+ADD_DEPENDENCIES(obj_fe contrib)

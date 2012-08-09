@@ -12,3 +12,4 @@ SET(inst_in_files
 
 ADD_LIBRARY(obj_distributed OBJECT ${src})
 macro_expand_instantiations(obj_distributed "${inst_in_files}")
+ADD_DEPENDENCIES(obj_distributed contrib)

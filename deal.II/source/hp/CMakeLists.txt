@@ -17,3 +17,4 @@ SET(inst_in_files
 
 ADD_LIBRARY(obj_hp OBJECT ${src})
 macro_expand_instantiations(obj_hp "${inst_in_files}")
+ADD_DEPENDENCIES(obj_hp contrib)

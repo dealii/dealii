@@ -23,3 +23,4 @@ SET(inst_in_files
 
 ADD_LIBRARY(obj_dofs OBJECT ${src})
 macro_expand_instantiations(obj_dofs "${inst_in_files}")
+ADD_DEPENDENCIES(obj_dofs contrib)

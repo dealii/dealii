@@ -20,4 +20,4 @@ SET(inst_in_files
 
 ADD_LIBRARY(obj_multigrid OBJECT ${src})
 macro_expand_instantiations(obj_multigrid "${inst_in_files}")
-
+ADD_DEPENDENCIES(obj_multigrid contrib)

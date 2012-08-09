@@ -49,3 +49,5 @@ SET(src_base
   )
 
 ADD_LIBRARY(obj_base OBJECT ${src_base})
+ADD_DEPENDENCIES(obj_base contrib)
+
