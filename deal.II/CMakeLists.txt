@@ -20,6 +20,7 @@ OPTION(DEAL_II_FUNCTIONPARSER "BUild deal.II with support for functionparser" ON
 # TODO: The rest ;-)
 
 
+
 #
 # Configure:
 #
@@ -28,6 +29,10 @@ SET(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
   "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
   )
+
+#
+# DEAL_II_WITH_THREADS:
+#
 
 IF(DEAL_II_WITH_THREADS)
   FIND_PACKAGE(Threads REQUIRED)
@@ -41,8 +46,14 @@ IF(DEAL_II_WITH_THREADS)
 
   INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
 
-  #TODO DEAL_II_USE_MT DEAL_II_USE_MT_POSIX DEAL_II_VOALTILE volatile
+  SET(DEAL_II_USE_MT TRUE)
+  SET(DEAL_II_USE_MT_POSIX TRUE)
 ENDIF()
+
+
+#
+#
+#
 
 
 #
