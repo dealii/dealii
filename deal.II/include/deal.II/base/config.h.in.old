@@ -1,0 +1,648 @@
+/* Define if building universal (internal helper macro) */
+#cmakedefine AC_APPLE_UNIVERSAL_BUILD
+
+/* Defined if the prototype of abort() has a no-throw exception specification.
+   */
+#cmakedefine DEAL_II_ABORT_NOTHROW_EXCEPTION
+
+/* Flag indicating whether there is a bug in the compiler that leads to bogus
+   warnings for inline class members in anonymous namespaces */
+#cmakedefine DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
+
+/* Defined if the compiler needs to see the static keyword even for functions
+   in anonymous namespaces, to avoid duplicate symbol errors when linking. For
+   the details, look at aclocal.m4 in the top-level directory. */
+#cmakedefine DEAL_II_ANON_NAMESPACE_BUG
+
+/* Another test if the compiler needs to see the static keyword even for
+   functions in anonymous namespaces, to avoid duplicate symbol errors when
+   linking. For the details, look at aclocal.m4 in the top-level directory. */
+#cmakedefine DEAL_II_ANON_NAMESPACE_LINKAGE_BUG
+
+/* Defined if the compiler has a problem with using arrays as arguments in
+   functions */
+#cmakedefine DEAL_II_ARRAY_ARG_BUG
+
+/* Defined if the compiler has a problem with assigning arrays in conditionals
+   */
+#cmakedefine DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG
+
+/* Defined if the compiler gets an internal error compiling some code that
+   involves boost::bind */
+#cmakedefine DEAL_II_BOOST_BIND_COMPILER_BUG
+
+/* Defined if the compiler gets an internal error compiling some code that
+   involves boost::graph */
+#cmakedefine DEAL_II_BOOST_GRAPH_COMPILER_BUG
+
+/* Define if the use of socket functionality leads to strange results with
+   floating point computations on cygwin systems. */
+#cmakedefine DEAL_II_BROKEN_SOCKETS
+
+/* Defined if the compiler we use supports the C++2011 standard well enough to
+   allow using the standard library classes instead of the corresponding BOOST
+   classes. */
+#cmakedefine DEAL_II_CAN_USE_CXX1X
+
+/* Backward compatibility support for functions and classes that do not take
+   an explicit mapping variable, but rather use a default Q1 mapping instead
+   */
+#cmakedefine DEAL_II_COMPAT_MAPPING
+
+/* Defined if the compiler supports including <mpi.h> */
+#cmakedefine DEAL_II_COMPILER_SUPPORTS_MPI
+
+/* Defined if the compiler can use arithmetic operations on vectorized data
+   types */
+#cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
+
+/* Equal to 0 in the generic case, equal to 1 if CPU compiled for supports
+   SSE2, equal to 2 if CPU compiled for supports AVX */
+#cmakedefine DEAL_II_COMPILER_VECTORIZATION_LEVEL
+
+/* Defined if the compiler has a bug in deducing the type of pointers to const
+   member functions. */
+#cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+
+/* disable the function parser in contrib */
+#cmakedefine DEAL_II_DISABLE_PARSER
+
+/* Defined if the compiler does not honor the explicit keyword on template
+   constructors. */
+#cmakedefine DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
+
+/* Define if we have to work around a bug where the compiler doesn't accept an
+   explicit destructor call. See the aclocal.m4 file in the top-level
+   directory for a description of this bug. */
+#cmakedefine DEAL_II_EXPLICIT_DESTRUCTOR_BUG
+
+/* Defined if the compiler needs a workaround for certain problems with taking
+   the address of template template functions. For the details, look at
+   aclocal.m4 in the top-level directory. */
+#cmakedefine DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
+
+/* Defined if the compiler has a bug with dynamic casting and dynamic
+   libraries */
+#cmakedefine DEAL_II_HAVE_DARWIN_DYNACAST_BUG
+
+/* Defined if std::isfinite is available */
+#cmakedefine DEAL_II_HAVE_ISFINITE
+
+/* Flag indicating whether the library shall be compiled to use the Tecplot
+   interface */
+#cmakedefine DEAL_II_HAVE_TECPLOT
+
+/* Defined if the compiler refuses to compile the definition of a function
+   that was previously declared abstract. */
+#cmakedefine DEAL_II_IMPLEMENTED_PURE_FUNCTION_BUG
+
+/* Define if we have to work around a bug in Sun's Forte compiler. See the
+   aclocal.m4 file in the top-level directory for a description of this bug.
+   */
+#cmakedefine DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND
+
+/* Defined if the compiler gets an internal compiler upon some code involving
+   long doubles, and with optimization. For the details, look at aclocal.m4 in
+   the top-level directory. */
+#cmakedefine DEAL_II_LONG_DOUBLE_LOOP_BUG
+
+/* Major version number of deal.II */
+#cmakedefine DEAL_II_MAJOR
+
+/* Defined if the compiler refuses to allow the explicit specialization of
+   static member arrays. For the exact failure mode, look at aclocal.m4 in the
+   top-level directory. */
+#cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
+
+/* Define if we have to work around a bug in gcc with explicitly instantiating
+   template member operators. See the aclocal.m4 file in the top-level
+   directory for a description of this bug. */
+#cmakedefine DEAL_II_MEMBER_OP_TEMPLATE_INST
+
+/* Defined if the compiler refuses to specialize an outer class template while
+   keeping a member as a template. For the exact failure mode, look at
+   aclocal.m4 in the top-level directory. */
+#cmakedefine DEAL_II_MEMBER_TEMPLATE_SPECIALIZATION_BUG
+
+/* Defined if the compiler refuses to allow the explicit specialization of
+   static member variables. For the exact failure mode, look at aclocal.m4 in
+   the top-level directory. */
+#cmakedefine DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
+
+/* Minor version number of deal.II */
+#cmakedefine DEAL_II_MINOR
+
+/* Set to the minimal number of elements a std::vector<bool> can always hold,
+   i.e. its minimal capacity. */
+#cmakedefine DEAL_II_MIN_BOOL_VECTOR_CAPACITY
+
+/* Set to the minimal number of elements a std::vector<T> can always hold,
+   i.e. its minimal capacity. */
+#cmakedefine DEAL_II_MIN_VECTOR_CAPACITY
+
+/* enable multigrid compatibility mode */
+#cmakedefine DEAL_II_MULTIGRID_COMPATIBILITY
+
+/* Define if we have to work around a bug in gcc with marking all instances of
+   a template class as friends to this class if the class is inside a
+   namespace. See the aclocal.m4 file in the top-level directory for a
+   description of this bug. */
+#cmakedefine DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+
+/* Define if we have to work around another bug in gcc with marking all
+   instances of a template class as friends to this class if the class is
+   inside a namespace. See the aclocal.m4 file in the top-level directory for
+   a description of this bug. */
+#cmakedefine DEAL_II_NAMESP_TEMPL_FRIEND_BUG2
+
+/* Defined if the compiler does not properly implement the resolution of
+   defect report #45 to the C++ standard, which makes nested types implicit
+   friends of the enclosing class. */
+#cmakedefine DEAL_II_NESTED_CLASS_FRIEND_BUG
+
+/* Defined if the compiler does not understand friend declarations for nested
+   member classes when giving a full class specification. */
+#cmakedefine DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
+
+/* Path to the deal.II directory */
+#cmakedefine DEAL_II_PATH
+
+/* Defined if the compiler does not support the
+   substitution-failure-is-not-an-error paradigm. For the details, look at
+   aclocal.m4 in the top-level directory. */
+#cmakedefine DEAL_II_SFINAE_BUG
+
+/* Define if we have to work around a bug in Sun's Forte compiler. See the
+   aclocal.m4 file in the top-level directory for a description of this bug.
+   */
+#cmakedefine DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND
+
+/* Defined if the compiler refuses to allow a typedef to a template template
+   class template parameter. For the exact failure mode, look at aclocal.m4 in
+   the top-level directory. */
+#cmakedefine DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
+
+/* Defined if the compiler requires the use of the template keyword for
+   disambiguation keyword in certain contexts in which it is not supposed to
+   do so. For the exact failure mode, look at aclocal.m4 in the top-level
+   directory. */
+#cmakedefine DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+
+/* Define if we have to work around a bug with some compilers that will not
+   allow us to specify a fully specialized class of a template as a friend.
+   See the aclocal.m4 file in the top-level directory for a description of
+   this bug. */
+#cmakedefine DEAL_II_TEMPL_SPEC_FRIEND_BUG
+
+/* Defined if an ARPACK installation was found and is going to be used */
+#cmakedefine DEAL_II_USE_ARPACK
+
+/* Define if the compiler provides a <errno.g> header file which does not
+   define all error codes such as EINTR. In that case, use the system include
+   file at /usr/include instead. There is probably a better way to do this,
+   but it is not apparent by looking at the C/C++ compatibility header
+   provided by the compiler. */
+#cmakedefine DEAL_II_USE_DIRECT_ERRNO_H
+
+/* Defined if deal.II is configured with an external Boost library */
+#cmakedefine DEAL_II_USE_EXTERNAL_BOOST
+
+/* Defined if a Metis installation was found and is going to be used */
+#cmakedefine DEAL_II_USE_METIS
+
+/* Defined if POSIX is supported but not the newer POSIX barrier functions.
+   Barriers will then not work in the library, but the other threading
+   functionality is available. */
+#cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS
+
+/* Defined if a MUMPS installation was found and is going to be used */
+#cmakedefine DEAL_II_USE_MUMPS
+
+/* Defined if we are to use the p4est library to distribute meshes on a
+   cluster computer. */
+#cmakedefine DEAL_II_USE_P4EST
+
+/* Defined if a PETSc installation was found and is going to be used */
+#cmakedefine DEAL_II_USE_PETSC
+
+/* Defined if a PETSc installation was found with complex scalar type and is
+   going to be used */
+#cmakedefine DEAL_II_USE_PETSC_COMPLEX
+
+/* Defined if a PETSc installation was found and is not a release */
+#cmakedefine DEAL_II_USE_PETSC_DEV
+
+/* Defined if a SLEPc installation was found and is going to be used */
+#cmakedefine DEAL_II_USE_SLEPC
+
+/* Defined if a Trilinos installation was found and is going to be used */
+#cmakedefine DEAL_II_USE_TRILINOS
+
+/* Define if vector iterators are just plain pointers */
+#cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER
+
+/* This error appears in the Apple edition of the gcc 3.3, which ships with
+   Darwin7.9.0 and probably previous version. It leads to problems during
+   linking. For the details, look at aclocal.m4 in the top-level directory. */
+#cmakedefine DEAL_II_WEAK_LINKAGE_BUG
+
+/* Defined if the system stores words with the most significant byte first */
+#cmakedefine DEAL_II_WORDS_BIGENDIAN
+
+/* Define to 1 if you have the <Amesos.h> header file. */
+#cmakedefine HAVE_AMESOS_H
+
+/* Define to 1 if you have the <AztecOO.h> header file. */
+#cmakedefine HAVE_AZTECOO_H
+
+/* Define to 1 if you have the <AztecOO_Operator.h> header file. */
+#cmakedefine HAVE_AZTECOO_OPERATOR_H
+
+/* Define if the compiler provides __builtin_expect */
+#cmakedefine HAVE_BUILTIN_EXPECT
+
+/* Define to 1 if you have the `daxpy_' function. */
+#cmakedefine HAVE_DAXPY_
+
+/* Define to 1 if you have the `dgeevx_' function. */
+#cmakedefine HAVE_DGEEVX_
+
+/* Define to 1 if you have the `dgeev_' function. */
+#cmakedefine HAVE_DGEEV_
+
+/* Define to 1 if you have the `dgelsd_' function. */
+#cmakedefine HAVE_DGELSD_
+
+/* Define to 1 if you have the `dgemm_' function. */
+#cmakedefine HAVE_DGEMM_
+
+/* Define to 1 if you have the `dgemv_' function. */
+#cmakedefine HAVE_DGEMV_
+
+/* Define to 1 if you have the `dgeqrf_' function. */
+#cmakedefine HAVE_DGEQRF_
+
+/* Define to 1 if you have the `dgesdd_' function. */
+#cmakedefine HAVE_DGESDD_
+
+/* Define to 1 if you have the `dgesvd_' function. */
+#cmakedefine HAVE_DGESVD_
+
+/* Define to 1 if you have the `dgetrf_' function. */
+#cmakedefine HAVE_DGETRF_
+
+/* Define to 1 if you have the `dgetri_' function. */
+#cmakedefine HAVE_DGETRI_
+
+/* Define to 1 if you have the `dgetrs_' function. */
+#cmakedefine HAVE_DGETRS_
+
+/* Define to 1 if you have the `dorgqr_' function. */
+#cmakedefine HAVE_DORGQR_
+
+/* Define to 1 if you have the `dormqr_' function. */
+#cmakedefine HAVE_DORMQR_
+
+/* Define to 1 if you have the `dstev_' function. */
+#cmakedefine HAVE_DSTEV_
+
+/* Define to 1 if you have the `dsyevx_' function. */
+#cmakedefine HAVE_DSYEVX_
+
+/* Define to 1 if you have the `dsygvx_' function. */
+#cmakedefine HAVE_DSYGVX_
+
+/* Define to 1 if you have the `dsygv_' function. */
+#cmakedefine HAVE_DSYGV_
+
+/* Define to 1 if you have the `dtrtrs_' function. */
+#cmakedefine HAVE_DTRTRS_
+
+/* Define to 1 if you have the <Epetra_CrsGraph.h> header file. */
+#cmakedefine HAVE_EPETRA_CRSGRAPH_H
+
+/* Define to 1 if you have the <Epetra_CrsMatrix.h> header file. */
+#cmakedefine HAVE_EPETRA_CRSMATRIX_H
+
+/* Define to 1 if you have the <Epetra_Import.h> header file. */
+#cmakedefine HAVE_EPETRA_IMPORT_H
+
+/* Define to 1 if you have the <Epetra_LinearProblem.h> header file. */
+#cmakedefine HAVE_EPETRA_LINEARPROBLEM_H
+
+/* Define to 1 if you have the <Epetra_Map.h> header file. */
+#cmakedefine HAVE_EPETRA_MAP_H
+
+/* Define to 1 if you have the <Epetra_MultiVector.h> header file. */
+#cmakedefine HAVE_EPETRA_MULTIVECTOR_H
+
+/* Define to 1 if you have the <Epetra_Operator.h> header file. */
+#cmakedefine HAVE_EPETRA_OPERATOR_H
+
+/* Define to 1 if you have the <Epetra_SerialComm.h> header file. */
+#cmakedefine HAVE_EPETRA_SERIALCOMM_H
+
+/* Define to 1 if you have the <Epetra_Vector.h> header file. */
+#cmakedefine HAVE_EPETRA_VECTOR_H
+
+/* Define to 1 if you have the `gethostname' function. */
+#cmakedefine HAVE_GETHOSTNAME
+
+/* Define to 1 if you have the `getpid' function. */
+#cmakedefine HAVE_GETPID
+
+/* Define if deal.II is linked against a libc that provides stacktrace debug
+   information that can be printed out in the exception class */
+#cmakedefine HAVE_GLIBC_STACKTRACE
+
+/* Availability of the MA27 algorithm from HSL */
+#cmakedefine HAVE_HSL_MA27
+
+/* Availability of the MA47 algorithm from HSL */
+#cmakedefine HAVE_HSL_MA47
+
+/* Define to 1 if you have the <Ifpack.h> header file. */
+#cmakedefine HAVE_IFPACK_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#cmakedefine HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `jn' function. */
+#cmakedefine HAVE_JN
+
+/* Define to 1 if you have the `NetCDF' library (-lnetcdf). */
+#cmakedefine HAVE_LIBNETCDF
+
+/* Define if the std c++ library provides a demangler conforming to the GCC
+   libstdc++ interface. */
+#cmakedefine HAVE_LIBSTDCXX_DEMANGLER
+
+/* "" */
+#cmakedefine HAVE_LIBZ
+
+/* Define to 1 if you have the <memory.h> header file. */
+#cmakedefine HAVE_MEMORY_H
+
+/* Define to 1 if you have the <ml_MultiLevelPreconditioner.h> header file. */
+#cmakedefine HAVE_ML_MULTILEVELPRECONDITIONER_H
+
+/* Define if you have the rand_r function */
+#cmakedefine HAVE_RAND_R
+
+/* Define to 1 if you have the <Sacado.hpp> header file. */
+#cmakedefine HAVE_SACADO_HPP
+
+/* Define to 1 if you have the `saxpy_' function. */
+#cmakedefine HAVE_SAXPY_
+
+/* Define to 1 if you have the `sgeevx_' function. */
+#cmakedefine HAVE_SGEEVX_
+
+/* Define to 1 if you have the `sgeev_' function. */
+#cmakedefine HAVE_SGEEV_
+
+/* Define to 1 if you have the `sgelsd_' function. */
+#cmakedefine HAVE_SGELSD_
+
+/* Define to 1 if you have the `sgemm_' function. */
+#cmakedefine HAVE_SGEMM_
+
+/* Define to 1 if you have the `sgemv_' function. */
+#cmakedefine HAVE_SGEMV_
+
+/* Define to 1 if you have the `sgeqrf_' function. */
+#cmakedefine HAVE_SGEQRF_
+
+/* Define to 1 if you have the `sgesdd_' function. */
+#cmakedefine HAVE_SGESDD_
+
+/* Define to 1 if you have the `sgesvd_' function. */
+#cmakedefine HAVE_SGESVD_
+
+/* Define to 1 if you have the `sgetrf_' function. */
+#cmakedefine HAVE_SGETRF_
+
+/* Define to 1 if you have the `sgetri_' function. */
+#cmakedefine HAVE_SGETRI_
+
+/* Define to 1 if you have the `sgetrs_' function. */
+#cmakedefine HAVE_SGETRS_
+
+/* Define to 1 if you have the `sorgqr_' function. */
+#cmakedefine HAVE_SORGQR_
+
+/* Define to 1 if you have the `sormqr_' function. */
+#cmakedefine HAVE_SORMQR_
+
+/* Define to 1 if you have the `sstev_' function. */
+#cmakedefine HAVE_SSTEV_
+
+/* Define to 1 if you have the `ssyevx_' function. */
+#cmakedefine HAVE_SSYEVX_
+
+/* Define to 1 if you have the `ssygvx_' function. */
+#cmakedefine HAVE_SSYGVX_
+
+/* Define to 1 if you have the `ssygv_' function. */
+#cmakedefine HAVE_SSYGV_
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#cmakedefine HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#cmakedefine HAVE_STDLIB_H
+
+/* Define if the compiler provides an <iosfwd> header file */
+#cmakedefine HAVE_STD_IOSFWD_HEADER
+
+/* Define if the compiler's library in use provides a std::iterator class
+   (early gcc versions did not) */
+#cmakedefine HAVE_STD_ITERATOR_CLASS
+
+/* Define if the compiler's library in use provides std::numeric_limits
+   classes in the appropriate header file */
+#cmakedefine HAVE_STD_NUMERIC_LIMITS
+
+/* Define if the compiler provides an <ostream> header file */
+#cmakedefine HAVE_STD_OSTREAM_HEADER
+
+/* Define if the compiler's library in use provides std::i/ostringstream
+   classes (early gcc versions did not) */
+#cmakedefine HAVE_STD_STRINGSTREAM
+
+/* Define to 1 if you have the <strings.h> header file. */
+#cmakedefine HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#cmakedefine HAVE_STRING_H
+
+/* Define to 1 if you have the `strtrs_' function. */
+#cmakedefine HAVE_STRTRS_
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#cmakedefine HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/syscall.h> header file. */
+#cmakedefine HAVE_SYS_SYSCALL_H
+
+/* Define to 1 if you have the <sys/times.h> header file. */
+#cmakedefine HAVE_SYS_TIMES_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#cmakedefine HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <Teuchos_ParameterList.hpp> header file. */
+#cmakedefine HAVE_TEUCHOS_PARAMETERLIST_HPP
+
+/* Define to 1 if you have the <Teuchos_RCP.hpp> header file. */
+#cmakedefine HAVE_TEUCHOS_RCP_HPP
+
+/* Define to 1 if you have the <Teuchos_RefCountPtr.hpp> header file. */
+#cmakedefine HAVE_TEUCHOS_REFCOUNTPTR_HPP
+
+/* Define to 1 if you have the `times' function. */
+#cmakedefine HAVE_TIMES
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#cmakedefine HAVE_UNISTD_H
+
+/* Define if the compiler provides __verbose_terminate_handler */
+#cmakedefine HAVE_VERBOSE_TERMINATE
+
+/* On SunOS 4.x, the getrusage() function exists, but is not declared in the
+   respective header file <resource.h>, as one would think when reading the
+   man pages. Then we have to declare this function ourselves in those files
+   that use this function. The question whether we have to do so is controlled
+   by the preprocessor variable. */
+#cmakedefine NO_HAVE_GETRUSAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#cmakedefine PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#cmakedefine PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#cmakedefine PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#cmakedefine PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#cmakedefine PACKAGE_URL
+
+/* Define to the version of this package. */
+#cmakedefine PACKAGE_VERSION
+
+/* Make sure PETSc doesn't re-define the underscore through the preprocessor,
+   since this interferes with boost. PETSc redefines the underscore to be
+   "__gterr =", but then forgets to undef this thing. Boost simply wants to
+   concatenate the underscore with another string to form a class name, which
+   then of course isn't valid any more. See mails in early Feb 2006. */
+#cmakedefine PETSC_SKIP_UNDERSCORE_CHKERR
+
+/* Define to 1 if you have the ANSI C header files. */
+#cmakedefine STDC_HEADERS
+
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+#  undef WORDS_BIGENDIAN
+# endif
+#endif
+
+/* If already available, do not define at all. Otherwise, define to __func__
+   if that is available. In all other cases, indicate that no information
+   about the present function is available for this compiler. */
+#cmakedefine __PRETTY_FUNCTION__
+
+
+/**
+ * A #define that indicates whether we are using the Microsoft
+ * Windows Visual C/C++ compiler. We currently do not run ./configure
+ * on MS Windows, so the detection for this compiler happens via
+ * the appropriate #ifdef, not through a configuration testcase.
+ */
+#ifdef _MSC_VER
+#  define DEAL_II_MSVC
+#endif
+
+/**
+ * Using pthreads under windows as a non-static library requires the following
+ * preprocessor switch to be undefined.
+ */
+#ifdef DEAL_II_MSVC
+#  if defined(PTW32_STATIC_LIB)
+#    undef PTW32_STATIC_LIB
+#  endif
+#endif
+
+/*
+ * There is an annoying problem in the Trilinos header ml_config.h: It
+ * #define's HAVE_INTTYPES_H but doesn't give the symbol a value. This
+ * conflicts with the result of running deal.II's ./configure which
+ * #define's it and gives it the value "1". The result is a compiler
+ * warning. So if we use Trilinos and if the symbol is already
+ * #define'd, then #cmakedefine it again here. deal.II doesn't use the
+ * #define anyway and this way if we include any of the Trilinos
+ * headers they can feel free to set it again to whatever they wish.
+ *
+ * The form of the #cmakedefine with the comment in the middle is necessary
+ * to avoid that the pattern substitution of ./configure turns the
+ * #cmakedefine into a #define again.
+ */
+#if defined(DEAL_II_USE_TRILINOS) && defined(HAVE_INTTYPES_H)
+#  undef /*   */ HAVE_INTTYPES_H
+#endif
+
+/**
+ * These macros are defined to make testing for PETSc versions within
+ * the deal.II main code as simple as possible. In brief they are used
+ * like this: (i) DEAL_II_PETSC_VERSION_LT is used to advance the
+ * PETScWrappers to newer versions of PETSc while preserving backward
+ * compatibility; and (ii) DEAL_II_PETSC_VERSION_GTE is used to add
+ * functionality to the PETScWrappers that does not exist in previous
+ * versions of PETSc.  Examples of usage can be found in
+ * lac/source/petsc_matrix_base.h.  Note: SLEPcWrappers do not need
+ * their own analogical macros, since SLEPc and PETSc must have
+ * identical version numbers anyways.
+ */
+#define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
+  ((PETSC_VERSION_MAJOR * 10000 + \
+    PETSC_VERSION_MINOR * 100 + \
+    PETSC_VERSION_SUBMINOR) \
+    <  \
+    (major)*10000 + (minor)*100 + (subminor))
+
+#define DEAL_II_PETSC_VERSION_GTE(major,minor,subminor) \
+  ((PETSC_VERSION_MAJOR * 10000 + \
+    PETSC_VERSION_MINOR * 100 + \
+    PETSC_VERSION_SUBMINOR) \
+    >=  \
+    (major)*10000 + (minor)*100 + (subminor))
+
+#include <deal.II/base/numbers.h>
+#include <deal.II/base/types.h>
+
+// Disable a bunch of warnings for Microsoft Visual C++. We should
+// work on reducing this list over time to those that are truly
+// harmless and not indicative of actual problems
+#ifdef DEAL_II_MSVC
+#  pragma warning( disable : 4244 ) // implied downcasting from double to float
+#  pragma warning( disable : 4267 ) // implied downcasting from size_t to unsigned int
+#  pragma warning( disable : 4996 ) // unsafe functions, such as strcat and sprintf
+#  pragma warning( disable : 4355 ) // 'this' : used in base member initializer list
+#  pragma warning( disable : 4661 ) // no suitable definition provided for explicit template instantiation request
+#  pragma warning( disable : 4800 ) // forcing value to bool 'true' or 'false' (performance warning)
+#  pragma warning( disable : 4146 ) // unary minus operator applied to unsigned type, result still unsigned
+#  pragma warning( disable : 4667 ) // no function template defined that matches forced instantiation
+#  pragma warning( disable : 4520 ) // multiple default constructors specified
+#  pragma warning( disable : 4700 ) // uninitialized local variable
+#  pragma warning( disable : 4789 ) // destination of memory copy is too small
+#  pragma warning( disable : 4808 ) // case 'value' is not a valid value for switch condition of type 'bool
+#endif // DEAL_II_MSVC

@@ -57,7 +57,7 @@ ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 # TODO: Version Mumbo Jumbo
 
 IF(DEAL_II_WITH_THREADS)
-  INCLUDE(preprare_threads)
+  INCLUDE(prepare_threads)
 ENDIF()
 
 IF(DEAL_II_WITH_UMFPACK)
