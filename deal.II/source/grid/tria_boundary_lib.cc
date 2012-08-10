@@ -1373,11 +1373,13 @@ TorusBoundary<2,3>::get_new_point_on_quad (const Triangulation<2,3>::quad_iterat
                                    //For instance phi0= 0, phi1= 3/2*Pi  middle has to be 7/4*Pi not 3/4*Pi
                                    //This also works for -Pi/2 + Pi + Pi- Pi/2, middle is 5/4*Pi
   for(unsigned int i=0;i<2;i++)
-    for(unsigned int j=1;j<4;j++){
-      if(std::abs(p[0](i)-p[j](i))> numbers::PI){
-        middle(i)+=2*numbers::PI;
+    for(unsigned int j=1;j<4;j++)
+      {
+	if(std::abs(p[0](i)-p[j](i))> numbers::PI)
+	  {
+	    middle(i)+=2*numbers::PI;
+	  }
       }
-    }
 
   for(unsigned int i=0;i<4;i++)
     middle+=p[i];
@@ -1429,7 +1431,7 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator &  lin
                                  std::vector< Point< 3 > > & points) const
 {
                                    //Almost the same implementation as  StraightBoundary<2,3>
-  unsigned npoints=points.size();
+  unsigned int npoints=points.size();
   if(npoints==0) return;
 
   Point<2> p[2];
@@ -1437,7 +1439,7 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator &  lin
   for(unsigned int i=0;i<2;i++)
     p[i]=get_surf_coord(line->vertex(i));
 
-  unsigned  offset[2];
+  unsigned int offset[2];
   offset[0]=0;
   offset[1]=0;
 
@@ -1446,12 +1448,14 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator &  lin
                                    //Because we dont have a symmetric interpolation (just the middle) we need to
                                    //add 2*Pi to each almost zero and negative angles.
   for(unsigned int i=0;i<2;i++)
-    for(unsigned int j=1;j<2;j++){
-      if(std::abs(p[0](i)-p[j](i))> numbers::PI){
-        offset[i]++;
-        break;
+    for(unsigned int j=1;j<2;j++)
+      {
+	if(std::abs(p[0](i)-p[j](i))> numbers::PI)
+	  {
+	    offset[i]++;
+	    break;
+	  }
       }
-    }
 
   for(unsigned int i=0;i<2;i++)
     for(unsigned int j=0;j<2;j++)
@@ -1462,10 +1466,11 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator &  lin
   double dx=1.0/(npoints+1);
   double x=dx;
   Point<2>  target;
-  for(unsigned int i=0; i<npoints;i++,x+=dx){
-    target=  (1-x)*p[0] + x*p[1];
-    points[i]=get_real_coord(target);
-  }
+  for(unsigned int i=0; i<npoints;i++,x+=dx)
+    {
+      target=  (1-x)*p[0] + x*p[1];
+      points[i]=get_real_coord(target);
+    }
 }
 
 
@@ -1491,7 +1496,7 @@ get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &qua
     p[i]=get_surf_coord(quad->vertex(i));
 
   Point<2>  target;
-  unsigned  offset[2];
+  unsigned int offset[2];
   offset[0]=0;
   offset[1]=0;
 
@@ -1500,12 +1505,14 @@ get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &qua
                                    //Because we dont have a symmetric interpolation (just the middle) we need to
                                    //add 2*Pi to each almost zero and negative angles.
   for(unsigned int i=0;i<2;i++)
-    for(unsigned int j=1;j<4;j++){
-      if(std::abs(p[0](i)-p[j](i))> numbers::PI){
-        offset[i]++;
-        break;
+    for(unsigned int j=1;j<4;j++)
+      {
+	if(std::abs(p[0](i)-p[j](i))> numbers::PI)
+	  {
+	    offset[i]++;
+	    break;
+	  }
       }
-    }
 
   for(unsigned int i=0;i<2;i++)
     for(unsigned int j=0;j<4;j++)
@@ -1515,14 +1522,15 @@ get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &qua
   for (unsigned int i=0; i<m; ++i, y+=ds)
     {
       double x=ds;
-      for (unsigned int j=0; j<m; ++j, x+=ds){
-        target=((1-x) * p[0] +
-                x     * p[1]) * (1-y) +
-               ((1-x) * p[2] +
-                x     * p[3]) * y;
+      for (unsigned int j=0; j<m; ++j, x+=ds)
+	{
+	  target=((1-x) * p[0] +
+		  x     * p[1]) * (1-y) +
+		 ((1-x) * p[2] +
+		  x     * p[3]) * y;
 
-        points[i*m+j]=get_real_coord(target);
-      }
+	  points[i*m+j]=get_real_coord(target);
+	}
     }
 }
 
