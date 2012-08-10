@@ -12,12 +12,28 @@ SET(CMAKE_INCLUDE_CURRENT_DIR true)
 # General configuration options:
 #
 
-OPTION(DEAL_II_USE_CONTRIB "Build and use contrib libraries bundled with the source tarball." ON)
-OPTION(DEAL_II_WITH_THREADS "Build deal.II with support for threads. This pulls in libtbb as a dependency." ON)
-OPTION(DEAL_II_FUNCTIONPARSER "BUild deal.II with support for functionparser" ON)
-OPTION(DEAL_II_MPI "Build deal.II with support for openmpi." OFF)
-OPTION(DEAL_II_WITH_UMFPACK "Build deal.II with support for UMFPACK, BLAS and LAPACK." ON)
-OPTION(DEAL_II_WITH_METIS "Build deal.II with support for Metis." OFF)
+OPTION(DEAL_II_USE_CONTRIB
+  "Build and use contrib libraries bundled with the source tarball."
+  ON
+  )
+OPTION(DEAL_II_WITH_THREADS
+  "Build deal.II with support for threads. This pulls in libtbb as a dependency."
+  ON
+  )
+OPTION(DEAL_II_FUNCTIONPARSER
+  "BUild deal.II with support for functionparser"
+  ON
+  )
+OPTION(DEAL_II_MPI "Build deal.II with support for openmpi."
+  OFF
+  )
+OPTION(DEAL_II_WITH_UMFPACK "Build deal.II with support for UMFPACK, BLAS and LAPACK."
+  ON
+  )
+OPTION(DEAL_II_WITH_METIS "Build deal.II with support for Metis."
+  OFF
+  )
+
 # TODO: The rest ;-)
 
 
@@ -28,7 +44,6 @@ OPTION(DEAL_II_WITH_METIS "Build deal.II with support for Metis." OFF)
 
 SET(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
-  # We outsource all the gory details:
   "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
   )
 
@@ -42,11 +57,11 @@ ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 # TODO: Version Mumbo Jumbo
 
 IF(DEAL_II_WITH_THREADS)
-  INCLUDE(deal_ii_with_threads)
+  INCLUDE(preprare_threads)
 ENDIF()
 
 IF(DEAL_II_WITH_UMFPACK)
-  INCLUDE(deal_ii_with_umfpack)
+  INCLUDE(prepare_umfpack)
 ENDIF()
 
 # TODO: The rest...
