@@ -204,9 +204,6 @@
    provided by the compiler. */
 #cmakedefine DEAL_II_USE_DIRECT_ERRNO_H
 
-/* Defined if deal.II is configured with an external Boost library */
-#cmakedefine DEAL_II_USE_EXTERNAL_BOOST
-
 /* Defined if a Metis installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_METIS
 

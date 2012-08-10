@@ -56,6 +56,8 @@ ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 
 # TODO: Version Mumbo Jumbo
 
+INCLUDE(prepare_boost)
+
 IF(DEAL_II_WITH_THREADS)
   INCLUDE(prepare_threads)
 ENDIF()
@@ -65,6 +67,8 @@ IF(DEAL_II_WITH_UMFPACK)
 ENDIF()
 
 # TODO: The rest...
+
+message( "${deal_ii_external_libraries}" )
 
 #
 # Build the toolchain:

@@ -26,7 +26,8 @@ SET(deal_ii_external_libraries
   )
 SET(deal_ii_external_debug_libraries
   ${deal_ii_external_debug_libraries}
-  ${TBB_DEBUG_LIBRARY}) #TODO
+  ${TBB_DEBUG_LIBRARY}
+  ) #TODO
 
 SET(DEAL_II_USE_MT TRUE)
 SET(DEAL_II_USE_MT_POSIX TRUE)

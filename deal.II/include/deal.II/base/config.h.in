@@ -27,6 +27,13 @@
 
 
 
+/* Configured in prepare_boost.cmake: */
+
+/* Defined if deal.II is configured with an external Boost library */
+#cmakedefine DEAL_II_USE_EXTERNAL_BOOST
+
+
+
 /* Configured in prepare_threads.cmake: */
 
 /* Flag indicating whether the library shall be compiled for multithreaded
