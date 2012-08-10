@@ -745,7 +745,7 @@ namespace GridTools
         // in 3d also loop over the edges
         if (dim >= 3)
           {
-            for (unsigned e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
+            for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
               if (cell->line(e)->has_children())
                 // the only place where this vertex could have been
                 // hiding is on the mid-edge point of the edge we

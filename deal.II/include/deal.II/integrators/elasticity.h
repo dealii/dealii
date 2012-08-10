@@ -53,11 +53,11 @@ namespace LocalIntegrators
       AssertDimension(M.m(), n_dofs);
       AssertDimension(M.n(), n_dofs);
       
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe.n_quadrature_points;++k)
 	{
 	  const double dx = factor * fe.JxW(k);
-	  for (unsigned i=0;i<n_dofs;++i)
-	    for (unsigned j=0;j<n_dofs;++j)
+	  for (unsigned int i=0;i<n_dofs;++i)
+	    for (unsigned int j=0;j<n_dofs;++j)
 	      for (unsigned int d1=0;d1<dim;++d1)
 		for (unsigned int d2=0;d2<dim;++d2)
 		  M(i,j) += dx * .25 *
@@ -85,12 +85,12 @@ namespace LocalIntegrators
       AssertDimension(M.m(), n_dofs);
       AssertDimension(M.n(), n_dofs);
       
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe.n_quadrature_points;++k)
 	{
 	  const double dx = factor * fe.JxW(k);
 	  const Point<dim>& n = fe.normal_vector(k);
-	  for (unsigned i=0;i<n_dofs;++i)
-	    for (unsigned j=0;j<n_dofs;++j)
+	  for (unsigned int i=0;i<n_dofs;++i)
+	    for (unsigned int j=0;j<n_dofs;++j)
 	      for (unsigned int d1=0;d1<dim;++d1)
 		{
 		  const double u = fe.shape_value_component(j,k,d1);
@@ -144,12 +144,12 @@ namespace LocalIntegrators
       const double nu2 = (ext_factor < 0) ? int_factor : ext_factor;
       const double penalty = .5 * pen * (nu1 + nu2);
 	
-      for (unsigned k=0;k<fe1.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe1.n_quadrature_points;++k)
 	{
 	  const double dx = fe1.JxW(k);
 	  const Point<dim>& n = fe1.normal_vector(k);
-	  for (unsigned i=0;i<n_dofs;++i)
-	    for (unsigned j=0;j<n_dofs;++j)
+	  for (unsigned int i=0;i<n_dofs;++i)
+	    for (unsigned int j=0;j<n_dofs;++j)
 	      for (unsigned int d1=0;d1<dim;++d1)
 		{
 		  const double u1 = fe1.shape_value_component(j,k,d1);

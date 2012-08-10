@@ -343,7 +343,7 @@ FESystem<dim,spacedim>::~FESystem ()
 {
                                    // delete base elements created in
                                    // the constructor
-  for (unsigned i=0; i<base_elements.size(); ++i)
+  for (unsigned int i=0; i<base_elements.size(); ++i)
     {
       base_elements[i].first->unsubscribe(typeid(*this).name());
       delete base_elements[i].first;
@@ -1513,7 +1513,7 @@ FESystem<dim,spacedim>::build_face_tables()
       {
         unsigned comp_start = 0;
         for(unsigned base = 0; base < this->n_base_elements(); ++base)
-          for (unsigned m=0; m<this->element_multiplicity(base);
+          for (unsigned int m=0; m<this->element_multiplicity(base);
                ++m, comp_start += base_element(base).n_components())
             for (unsigned local_index = 0;
                  local_index < base_element(base).dofs_per_line;
@@ -1559,7 +1559,7 @@ FESystem<dim,spacedim>::build_face_tables()
       {
         unsigned comp_start = 0;
         for(unsigned base=0; base<this->n_base_elements(); ++base)
-          for (unsigned m=0; m<this->element_multiplicity(base);
+          for (unsigned int m=0; m<this->element_multiplicity(base);
                ++m, comp_start += base_element(base).n_components())
             for (unsigned local_index = 0;
                  local_index < base_element(base).dofs_per_quad;

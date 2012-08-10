@@ -1633,8 +1633,8 @@ namespace internal
 
     template <class BlockVectorType, bool constness>
     Iterator<BlockVectorType,constness>::
-    Iterator (BlockVector    &parent,
-              const unsigned  global_index)
+    Iterator (BlockVector       &parent,
+              const unsigned int global_index)
                     :
                     parent (&parent),
                     global_index (global_index)

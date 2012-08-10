@@ -1781,7 +1781,7 @@ namespace DoFRenumbering
     Assert(new_indices.size() == n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
-    for (unsigned i=0; i<n_dofs; ++i)
+    for (unsigned int i=0; i<n_dofs; ++i)
       new_indices[i] = i;
 
     std::random_shuffle (new_indices.begin(), new_indices.end());

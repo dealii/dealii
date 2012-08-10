@@ -336,7 +336,7 @@ namespace VectorTools
                                        // left-most and right-most
                                        // vertex and query its vertex
                                        // dof indices. that's easy :-)
-      for (unsigned direction=0; direction<2; ++direction)
+      for (unsigned int direction=0; direction<2; ++direction)
         {
           dealii::DoFHandler<1>::cell_iterator
             cell = dof_handler.begin(0);
@@ -359,7 +359,7 @@ namespace VectorTools
                                        // left-most and right-most
                                        // vertex and query its vertex
                                        // dof indices. that's easy :-)
-      for (unsigned direction=0; direction<2; ++direction)
+      for (unsigned int direction=0; direction<2; ++direction)
         {
           dealii::DoFHandler<1,2>::cell_iterator
             cell = dof_handler.begin(0);

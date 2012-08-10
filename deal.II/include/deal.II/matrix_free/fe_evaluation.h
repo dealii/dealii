@@ -3084,7 +3084,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
             {
               grad_out[comp][d] = (jac[d][0] *
                                    this->gradients_quad[comp][0][q_point]);
-              for (unsigned e=1; e<dim; ++e)
+              for (unsigned int e=1; e<dim; ++e)
                 grad_out[comp][d] += (jac[d][e] *
                                       this->gradients_quad[comp][e][q_point]);
             }
@@ -3457,7 +3457,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
         for (unsigned int d=0; d<dim; ++d)
           {
             VectorizedArray<Number> new_val = jac[0][d] * grad_in[comp][0];
-            for (unsigned e=1; e<dim; ++e)
+            for (unsigned int e=1; e<dim; ++e)
               new_val += (jac[e][d] * grad_in[comp][e]);
             this->gradients_quad[comp][d][q_point] = new_val * JxW;
           }
@@ -3581,7 +3581,7 @@ FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,1,Number>
       for (unsigned int d=0; d<dim; ++d)
         {
           grad_out[d] = (jac[d][0] * this->gradients_quad[0][0][q_point]);
-          for (unsigned e=1; e<dim; ++e)
+          for (unsigned int e=1; e<dim; ++e)
             grad_out[d] += (jac[d][e] * this->gradients_quad[0][e][q_point]);
         }
     }
@@ -3697,7 +3697,7 @@ FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,1,Number>
       for (unsigned int d=0; d<dim; ++d)
         {
           VectorizedArray<Number> new_val = jac[0][d] * grad_in[0];
-          for (unsigned e=1; e<dim; ++e)
+          for (unsigned int e=1; e<dim; ++e)
             new_val += jac[e][d] * grad_in[e];
           this->gradients_quad[0][d][q_point] = new_val * JxW;
         }
@@ -3773,10 +3773,10 @@ FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,dim,Number>
         this->cell_type == internal::MatrixFreeFunctions::general ?
         this->jacobian[q_point] : this->jacobian[0];
       divergence = (jac[0][0] * this->gradients_quad[0][0][q_point]);
-      for (unsigned e=1; e<dim; ++e)
+      for (unsigned int e=1; e<dim; ++e)
         divergence += (jac[0][e] * this->gradients_quad[0][e][q_point]);
       for (unsigned int d=1; d<dim; ++d)
-        for (unsigned e=0; e<dim; ++e)
+        for (unsigned int e=0; e<dim; ++e)
           divergence += (jac[d][e] * this->gradients_quad[d][e][q_point]);
     }
   return divergence;
@@ -3944,7 +3944,7 @@ FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,dim,Number>
          this->quadrature_weights[q_point]) * div_in;
       for (unsigned int d=0; d<dim; ++d)
         {
-          for (unsigned e=0; e<dim; ++e)
+          for (unsigned int e=0; e<dim; ++e)
             this->gradients_quad[d][e][q_point] = jac[d][e] * fac;
         }
     }
@@ -4010,7 +4010,7 @@ FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,dim,Number>
         for (unsigned int d=0; d<dim; ++d)
           {
             VectorizedArray<Number> new_val = jac[0][d] * weighted[comp][0];
-            for (unsigned e=1; e<dim; ++e)
+            for (unsigned int e=1; e<dim; ++e)
               new_val += jac[e][d] * weighted[comp][e];
             this->gradients_quad[comp][d][q_point] = new_val;
           }

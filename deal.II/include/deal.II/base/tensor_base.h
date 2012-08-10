@@ -1198,7 +1198,7 @@ Tensor<1,dim,Number>::unroll (Vector<Number2> &result) const
   Assert (result.size()==dim,
           ExcDimensionMismatch(dim, result.size()));
 
-  unsigned index = 0;
+  unsigned int index = 0;
   unroll_recursion (result,index);
 }
 
@@ -1211,7 +1211,7 @@ void
 Tensor<1,dim,Number>::unroll_recursion (Vector<Number2> &result,
                                         unsigned int    &index) const
 {
-  for (unsigned i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     result(index++) = operator[](i);
 }
 

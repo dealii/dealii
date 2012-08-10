@@ -79,7 +79,7 @@ class TableIndicesBase
                                      /**
                                       * Store the indices in an array.
                                       */
-    unsigned indices[N];
+    unsigned int indices[N];
 };
 
 

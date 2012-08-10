@@ -555,7 +555,7 @@ Tensor<rank_, dim, Number>::unroll (Vector<Number2> &result) const
 {
   AssertDimension (result.size(),(Utilities::fixed_power<rank_, unsigned int>(dim)));
 
-  unsigned index = 0;
+  unsigned int index = 0;
   unroll_recursion (result, index);
 }
 
@@ -568,7 +568,7 @@ void
 Tensor<rank_, dim, Number>::unroll_recursion (Vector<Number2> &result,
                                               unsigned int    &index) const
 {
-  for (unsigned i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     {
       operator[](i).unroll_recursion(result, index);
     }
@@ -696,7 +696,7 @@ operator * (const Tensor<1,dim,Number> &src1,
  * inner product <tt> sum<sub>i,j</sub> src1[i][j]*src2[i][j]</tt>.
  *
  * @relates Tensor
- * @author Guido Kanschat, 2000 
+ * @author Guido Kanschat, 2000
  */
 template <int dim, typename Number>
 inline
@@ -706,7 +706,7 @@ Number double_contract (const Tensor<2, dim, Number> &src1,
   Number res = 0.;
   for (unsigned int i=0; i<dim; ++i)
     res += contract(src1[i],src2[i]);
-  
+
   return res;
 }
 

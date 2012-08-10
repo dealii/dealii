@@ -1410,7 +1410,7 @@ Point<dim>
 GeometryInfo<dim>::project_to_unit_cell (const Point<dim> &q)
 {
   Point<dim> p = q;
-  for(unsigned i=0; i<dim; i++)
+  for(unsigned int i=0; i<dim; i++)
     if      (p[i] < 0.)  p[i] = 0.;
     else if (p[i] > 1.)  p[i] = 1.;
 
@@ -1425,7 +1425,7 @@ GeometryInfo<dim>::distance_to_unit_cell (const Point<dim> &p)
 {
    double result = 0.0;
 
-   for(unsigned i=0; i<dim; i++)
+   for(unsigned int i=0; i<dim; i++)
       if ((-p[i]) > result)
          result = -p[i];
       else if ((p[i]-1.) > result)

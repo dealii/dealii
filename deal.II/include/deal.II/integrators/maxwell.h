@@ -184,11 +184,11 @@ namespace LocalIntegrators
                                        // all dimensions
       const unsigned int d_max = (dim==2) ? 1 : dim;
 
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe.n_quadrature_points;++k)
         {
           const double dx = factor * fe.JxW(k);
-          for (unsigned i=0;i<n_dofs;++i)
-            for (unsigned j=0;j<n_dofs;++j)
+          for (unsigned int i=0;i<n_dofs;++i)
+            for (unsigned int j=0;j<n_dofs;++j)
               for (unsigned int d=0;d<d_max;++d)
                 {
                   const unsigned int d1 = (d+1)%dim;
@@ -232,11 +232,11 @@ namespace LocalIntegrators
 
       const unsigned int d_max = (dim==2) ? 1 : dim;
 
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe.n_quadrature_points;++k)
         {
           const double dx = fe.JxW(k) * factor;
-          for (unsigned i=0;i<t_dofs;++i)
-            for (unsigned j=0;j<n_dofs;++j)
+          for (unsigned int i=0;i<t_dofs;++i)
+            for (unsigned int j=0;j<n_dofs;++j)
               for (unsigned int d=0;d<d_max;++d)
                 {
                   const unsigned int d1 = (d+1)%dim;
@@ -292,12 +292,12 @@ namespace LocalIntegrators
                                          // over all dimensions
         const unsigned int d_max = (dim==2) ? 1 : dim;
 
-        for (unsigned k=0;k<fe.n_quadrature_points;++k)
+        for (unsigned int k=0;k<fe.n_quadrature_points;++k)
           {
             const double dx = factor * fe.JxW(k);
             const Point<dim>& n = fe.normal_vector(k);
-            for (unsigned i=0;i<n_dofs;++i)
-              for (unsigned j=0;j<n_dofs;++j)
+            for (unsigned int i=0;i<n_dofs;++i)
+              for (unsigned int j=0;j<n_dofs;++j)
                 for (unsigned int d=0;d<d_max;++d)
                   {
                     const unsigned int d1 = (d+1)%dim;
@@ -347,12 +347,12 @@ namespace LocalIntegrators
                                          // over all dimensions
         const unsigned int d_max = (dim==2) ? 1 : dim;
 
-        for (unsigned k=0;k<fe.n_quadrature_points;++k)
+        for (unsigned int k=0;k<fe.n_quadrature_points;++k)
           {
             const double dx = factor * fe.JxW(k);
             const Point<dim>& n = fe.normal_vector(k);
-            for (unsigned i=0;i<n_dofs;++i)
-              for (unsigned j=0;j<n_dofs;++j)
+            for (unsigned int i=0;i<n_dofs;++i)
+              for (unsigned int j=0;j<n_dofs;++j)
                 for (unsigned int d=0;d<d_max;++d)
                   {
                     const unsigned int d1 = (d+1)%dim;
@@ -423,13 +423,13 @@ namespace LocalIntegrators
                                          // over all dimensions
         const unsigned int d_max = (dim==2) ? 1 : dim;
 
-        for (unsigned k=0;k<fe1.n_quadrature_points;++k)
+        for (unsigned int k=0;k<fe1.n_quadrature_points;++k)
           {
             const double dx = fe1.JxW(k);
             const Point<dim>& n = fe1.normal_vector(k);
-            for (unsigned i=0;i<n_dofs;++i)
-              for (unsigned j=0;j<n_dofs;++j)
-                for (unsigned d=0;d<d_max;++d)
+            for (unsigned int i=0;i<n_dofs;++i)
+              for (unsigned int j=0;j<n_dofs;++j)
+                for (unsigned int d=0;d<d_max;++d)
                   {
                     const unsigned int d1 = (d+1)%dim;
                     const unsigned int d2 = (d+2)%dim;

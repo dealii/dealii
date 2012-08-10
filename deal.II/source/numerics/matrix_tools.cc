@@ -2981,7 +2981,7 @@ namespace MatrixTools
           {
                                              // remove this row, except for the
                                              // diagonal element
-            for (unsigned j=0; j<n_local_dofs; ++j)
+            for (unsigned int j=0; j<n_local_dofs; ++j)
               if (i != j)
                 local_matrix(i,j) = 0;
 

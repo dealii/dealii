@@ -1967,7 +1967,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
                                    // Assert that we can write all
                                    // components into the result
                                    // vectors
-  for (unsigned i=0;i<values.size();++i)
+  for (unsigned int i=0;i<values.size();++i)
     Assert (values[i].size() == n_components,
             ExcDimensionMismatch(values[i].size(), n_components));
 
@@ -1981,7 +1981,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
                                    // initialize with zero
-  for (unsigned i=0;i<values.size();++i)
+  for (unsigned int i=0;i<values.size();++i)
     std::fill_n (values[i].begin(), values[i].size(), 0);
 
                                    // add up contributions of trial
@@ -2087,7 +2087,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
                                    // finite element
   const unsigned int result_components = indices.size() * n_components / dofs_per_cell;
 
-  for (unsigned i=0;i<values.size();++i)
+  for (unsigned int i=0;i<values.size();++i)
     Assert (values[i].size() == result_components,
             ExcDimensionMismatch(values[i].size(), result_components));
 
@@ -2100,7 +2100,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
 
                                    // initialize with zero
-  for (unsigned i=0;i<values.size();++i)
+  for (unsigned int i=0;i<values.size();++i)
     std::fill_n (values[i].begin(), values[i].size(), 0);
 
                                    // add up contributions of trial
@@ -2182,7 +2182,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
     {
       Assert (values.size() == result_components,
               ExcDimensionMismatch(values.size(), result_components));
-      for (unsigned i=0;i<values.size();++i)
+      for (unsigned int i=0;i<values.size();++i)
         Assert (values[i].size() == n_quadrature_points,
                 ExcDimensionMismatch(values[i].size(), n_quadrature_points));
     }
@@ -2190,7 +2190,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
     {
       Assert(values.size() == n_quadrature_points,
              ExcDimensionMismatch(values.size(), n_quadrature_points));
-      for (unsigned i=0;i<values.size();++i)
+      for (unsigned int i=0;i<values.size();++i)
         Assert (values[i].size() == result_components,
                 ExcDimensionMismatch(values[i].size(), result_components));
     }
@@ -2204,7 +2204,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
 
                                    // initialize with zero
-  for (unsigned i=0;i<values.size();++i)
+  for (unsigned int i=0;i<values.size();++i)
     std::fill_n (values[i].begin(), values[i].size(), 0);
 
                                    // add up contributions of trial
@@ -2401,7 +2401,7 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
           ExcDimensionMismatch(gradients.size(), n_quadrature_points));
 
   const unsigned int n_components = fe->n_components();
-  for (unsigned i=0; i<gradients.size(); ++i)
+  for (unsigned int i=0; i<gradients.size(); ++i)
     Assert (gradients[i].size() == n_components,
             ExcDimensionMismatch(gradients[i].size(), n_components));
 
@@ -2418,7 +2418,7 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
                                    // initialize with zero
-  for (unsigned i=0;i<gradients.size();++i)
+  for (unsigned int i=0;i<gradients.size();++i)
     std::fill_n (gradients[i].begin(), gradients[i].size(), Tensor<1,spacedim>());
 
                                    // add up contributions of trial
@@ -2498,7 +2498,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
     {
       Assert (gradients.size() == result_components,
               ExcDimensionMismatch(gradients.size(), result_components));
-      for (unsigned i=0;i<gradients.size();++i)
+      for (unsigned int i=0;i<gradients.size();++i)
         Assert (gradients[i].size() == n_quadrature_points,
                 ExcDimensionMismatch(gradients[i].size(), n_quadrature_points));
     }
@@ -2506,7 +2506,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
     {
       Assert(gradients.size() == n_quadrature_points,
              ExcDimensionMismatch(gradients.size(), n_quadrature_points));
-      for (unsigned i=0;i<gradients.size();++i)
+      for (unsigned int i=0;i<gradients.size();++i)
         Assert (gradients[i].size() == result_components,
                 ExcDimensionMismatch(gradients[i].size(), result_components));
     }
@@ -2520,7 +2520,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
   Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
 
                                    // initialize with zero
-  for (unsigned i=0;i<gradients.size();++i)
+  for (unsigned int i=0;i<gradients.size();++i)
     std::fill_n (gradients[i].begin(), gradients[i].size(), Tensor<1,spacedim>());
 
                                    // add up contributions of trial
@@ -2686,7 +2686,7 @@ get_function_hessians (const InputVector                         &fe_function,
           ExcDimensionMismatch(hessians.size(), n_quadrature_points));
 
   const unsigned int n_components = fe->n_components();
-  for (unsigned i=0;i<hessians.size();++i)
+  for (unsigned int i=0;i<hessians.size();++i)
     Assert (hessians[i].size() == n_components,
             ExcDimensionMismatch(hessians[i].size(), n_components));
 
@@ -2703,7 +2703,7 @@ get_function_hessians (const InputVector                         &fe_function,
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
                                    // initialize with zero
-  for (unsigned i=0;i<hessians.size();++i)
+  for (unsigned int i=0;i<hessians.size();++i)
     std::fill_n (hessians[i].begin(), hessians[i].size(), Tensor<2,spacedim>());
 
                                    // add up contributions of trial
@@ -2791,7 +2791,7 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
     {
       Assert (hessians.size() == result_components,
               ExcDimensionMismatch(hessians.size(), result_components));
-      for (unsigned i=0;i<hessians.size();++i)
+      for (unsigned int i=0;i<hessians.size();++i)
         Assert (hessians[i].size() == n_quadrature_points,
                 ExcDimensionMismatch(hessians[i].size(), n_quadrature_points));
     }
@@ -2799,7 +2799,7 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
     {
       Assert(hessians.size() == n_quadrature_points,
              ExcDimensionMismatch(hessians.size(), n_quadrature_points));
-      for (unsigned i=0;i<hessians.size();++i)
+      for (unsigned int i=0;i<hessians.size();++i)
         Assert (hessians[i].size() == result_components,
                 ExcDimensionMismatch(hessians[i].size(), result_components));
     }
@@ -2811,7 +2811,7 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
   const unsigned int component_multiple = result_components / n_components;
 
                                    // initialize with zero
-  for (unsigned i=0;i<hessians.size();++i)
+  for (unsigned int i=0;i<hessians.size();++i)
     std::fill_n (hessians[i].begin(), hessians[i].size(), Tensor<2,spacedim>());
 
                                    // add up contributions of trial
@@ -2992,7 +2992,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
                                    // Assert that we can write all
                                    // components into the result
                                    // vectors
-  for (unsigned i=0;i<laplacians.size();++i)
+  for (unsigned int i=0;i<laplacians.size();++i)
     Assert (laplacians[i].size() == n_components,
             ExcDimensionMismatch(laplacians[i].size(), n_components));
 
@@ -3006,7 +3006,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
                                    // initialize with zero
-  for (unsigned i=0;i<laplacians.size();++i)
+  for (unsigned int i=0;i<laplacians.size();++i)
     std::fill_n (laplacians[i].begin(), laplacians[i].size(), 0);
 
                                    // add up contributions of trial
@@ -3084,7 +3084,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
                                    // finite element
   const unsigned int result_components = indices.size() * n_components / dofs_per_cell;
 
-  for (unsigned i=0;i<laplacians.size();++i)
+  for (unsigned int i=0;i<laplacians.size();++i)
     Assert (laplacians[i].size() == result_components,
             ExcDimensionMismatch(laplacians[i].size(), result_components));
 
@@ -3097,7 +3097,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
 
                                    // initialize with zero
-  for (unsigned i=0;i<laplacians.size();++i)
+  for (unsigned int i=0;i<laplacians.size();++i)
     std::fill_n (laplacians[i].begin(), laplacians[i].size(), 0);
 
                                    // add up contributions of trial
@@ -3181,7 +3181,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
     {
       Assert (laplacians.size() == result_components,
               ExcDimensionMismatch(laplacians.size(), result_components));
-      for (unsigned i=0;i<laplacians.size();++i)
+      for (unsigned int i=0;i<laplacians.size();++i)
         Assert (laplacians[i].size() == n_quadrature_points,
                 ExcDimensionMismatch(laplacians[i].size(), n_quadrature_points));
     }
@@ -3189,7 +3189,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
     {
       Assert(laplacians.size() == n_quadrature_points,
              ExcDimensionMismatch(laplacians.size(), n_quadrature_points));
-      for (unsigned i=0;i<laplacians.size();++i)
+      for (unsigned int i=0;i<laplacians.size();++i)
         Assert (laplacians[i].size() == result_components,
                 ExcDimensionMismatch(laplacians[i].size(), result_components));
     }
@@ -3203,7 +3203,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
 
                                    // initialize with zero
-  for (unsigned i=0;i<laplacians.size();++i)
+  for (unsigned int i=0;i<laplacians.size();++i)
     std::fill_n (laplacians[i].begin(), laplacians[i].size(), 0);
 
                                    // add up contributions of trial

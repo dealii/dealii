@@ -87,14 +87,14 @@ namespace LocalIntegrators
       AssertDimension(M.m(), t_dofs);
       AssertDimension(M.n(), n_dofs);
 
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe.n_quadrature_points;++k)
         {
           const double dx = fe.JxW(k) * factor;
-          for (unsigned i=0;i<t_dofs;++i)
+          for (unsigned int i=0;i<t_dofs;++i)
             {
               const double vv = fetest.shape_value(i,k);
               for (unsigned int d=0;d<dim;++d)
-                for (unsigned j=0;j<n_dofs;++j)
+                for (unsigned int j=0;j<n_dofs;++j)
                   {
                     const double du = fe.shape_grad_component(j,k,d)[d];
                     M(i,j) += dx * du * vv;
@@ -127,11 +127,11 @@ namespace LocalIntegrators
     	const unsigned int t_dofs = fetest.dofs_per_cell;
     	Assert (result.size() == t_dofs, ExcDimensionMismatch(result.size(), t_dofs));
 
-    	for (unsigned k=0;k<fetest.n_quadrature_points;++k)
+    	for (unsigned int k=0;k<fetest.n_quadrature_points;++k)
     	    {
     	      const double dx = factor * fetest.JxW(k);
 
-    	      for (unsigned i=0;i<t_dofs;++i)
+    	      for (unsigned int i=0;i<t_dofs;++i)
     		for (unsigned int d=0;d<dim;++d)
     		  result(i) += dx * input[d][k][d] * fetest.shape_value(i,k);
     	    }
@@ -162,14 +162,14 @@ namespace LocalIntegrators
       AssertDimension(M.m(), t_dofs);
       AssertDimension(M.n(), n_dofs);
 
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe.n_quadrature_points;++k)
         {
           const double dx = fe.JxW(k) * factor;
           for (unsigned int d=0;d<dim;++d)
-            for (unsigned i=0;i<t_dofs;++i)
+            for (unsigned int i=0;i<t_dofs;++i)
               {
                 const double vv = fetest.shape_value_component(i,k,d);
-                for (unsigned j=0;j<n_dofs;++j)
+                for (unsigned int j=0;j<n_dofs;++j)
                   {
                     const Tensor<1,dim>& Du = fe.shape_grad(j,k);
                     M(i,j) += dx * vv * Du[d];
@@ -201,11 +201,11 @@ namespace LocalIntegrators
         	const unsigned int t_dofs = fetest.dofs_per_cell;
         	Assert (result.size() == t_dofs, ExcDimensionMismatch(result.size(), t_dofs));
 
-        	for (unsigned k=0;k<fetest.n_quadrature_points;++k)
+        	for (unsigned int k=0;k<fetest.n_quadrature_points;++k)
         	    {
         	      const double dx = factor * fetest.JxW(k);
 
-        	      for (unsigned i=0;i<t_dofs;++i)
+        	      for (unsigned int i=0;i<t_dofs;++i)
         		for (unsigned int d=0;d<dim;++d)
         		  result(i) += dx * input[k][d] * fetest.shape_value_component(i,k,d);
         	    }
@@ -234,11 +234,11 @@ namespace LocalIntegrators
       AssertDimension(M.m(), t_dofs);
       AssertDimension(M.n(), n_dofs);
 
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe.n_quadrature_points;++k)
         {
           const Tensor<1,dim> ndx = factor * fe.JxW(k) * fe.normal_vector(k);
-          for (unsigned i=0;i<t_dofs;++i)
-            for (unsigned j=0;j<n_dofs;++j)
+          for (unsigned int i=0;i<t_dofs;++i)
+            for (unsigned int j=0;j<n_dofs;++j)
               for (unsigned int d=0;d<dim;++d)
                 M(i,j) += ndx[d] * fe.shape_value_component(j,k,d)
                           * fetest.shape_value(i,k);
@@ -272,11 +272,11 @@ namespace LocalIntegrators
       AssertDimension(result.size(), t_dofs);
       AssertVectorVectorDimension (data, dim, fe.n_quadrature_points);
 
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe.n_quadrature_points;++k)
         {
           const Tensor<1,dim> ndx = factor * fe.normal_vector(k) * fe.JxW(k);
 
-          for (unsigned i=0;i<t_dofs;++i)
+          for (unsigned int i=0;i<t_dofs;++i)
             for (unsigned int d=0;d<dim;++d)
               result(i) += ndx[d] * fetest.shape_value(i,k) * data[d][k];
         }
@@ -321,11 +321,11 @@ namespace LocalIntegrators
       AssertDimension(M22.m(), t_dofs);
       AssertDimension(M22.n(), n_dofs);
 
-      for (unsigned k=0;k<fe1.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe1.n_quadrature_points;++k)
         {
           const double dx = factor * fe1.JxW(k);
-          for (unsigned i=0;i<t_dofs;++i)
-            for (unsigned j=0;j<n_dofs;++j)
+          for (unsigned int i=0;i<t_dofs;++i)
+            for (unsigned int j=0;j<n_dofs;++j)
               for (unsigned int d=0;d<dim;++d)
                 {
                   const double un1 = fe1.shape_value_component(j,k,d) * fe1.normal_vector(k)[d];
@@ -359,11 +359,11 @@ namespace LocalIntegrators
       AssertDimension(M.m(), n_dofs);
       AssertDimension(M.n(), n_dofs);
 
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe.n_quadrature_points;++k)
         {
           const double dx = factor * fe.JxW(k);
-          for (unsigned i=0;i<n_dofs;++i)
-            for (unsigned j=0;j<n_dofs;++j)
+          for (unsigned int i=0;i<n_dofs;++i)
+            for (unsigned int j=0;j<n_dofs;++j)
               {
                 double dv = 0.;
                 double du = 0.;
@@ -411,11 +411,11 @@ namespace LocalIntegrators
       AssertDimension(M22.m(), n_dofs);
       AssertDimension(M22.n(), n_dofs);
 
-      for (unsigned k=0;k<fe1.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe1.n_quadrature_points;++k)
         {
           const double dx = factor * fe1.JxW(k);
-          for (unsigned i=0;i<n_dofs;++i)
-            for (unsigned j=0;j<n_dofs;++j)
+          for (unsigned int i=0;i<n_dofs;++i)
+            for (unsigned int j=0;j<n_dofs;++j)
               for (unsigned int d=0;d<dim;++d)
                 {
                   const double un1 = fe1.shape_value_component(j,k,d) * fe1.normal_vector(k)[d];
@@ -441,7 +441,7 @@ namespace LocalIntegrators
       AssertVectorVectorDimension (Du, dim, fe.n_quadrature_points);
 
       double result = 0;
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+      for (unsigned int k=0;k<fe.n_quadrature_points;++k)
         {
           double div = Du[0][k][0];
           for (unsigned int d=1;d<dim;++d)

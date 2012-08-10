@@ -641,7 +641,7 @@ BlockList::local_index(unsigned int block, unsigned int index) const
 {
   AssertIndexRange(block, index_sets.size());
   const block_container& b = index_sets[block];
-  for (unsigned i=0;i<b.size();++i)
+  for (unsigned int i=0; i<b.size(); ++i)
     if (b[i] == index)
       return i;
   return numbers::invalid_unsigned_int;
