@@ -14,7 +14,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/numerics/vectors.templates.h>
+#include <deal.II/numerics/vector_tools.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
