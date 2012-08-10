@@ -403,9 +403,12 @@ a square $[-1,1]^2$ and
 	\\
 	u_1 &=& 0,
 	\\
-	g &=& \left\{\begin{matrix}\sin (4\pi t) \\ 0\end{matrix}
-	\qquad {\textrm{for}\ t\le \frac 12, x=-1, -\frac 13<y<\frac 13
-	\atop \textrm{otherwise}}
+	g &=& \left\{\begin{matrix}\sin (4\pi t)
+	&\qquad& \text{for }\ t\le \frac 12, x=-1, -\frac 13<y<\frac 13
+	\\
+	 0
+	&&\text{otherwise}
+	\end{matrix}
 	\right.
 @f}
 This corresponds to a membrane initially at rest and clamped all around, where
