@@ -1,13 +1,24 @@
 FIND_PACKAGE(Threads REQUIRED)
 
 IF(DEAL_II_USE_CONTRIB)
-  # Compiles and links libtbb, exports the TBB_* variables as well:
+  # compile and link the contrib tbb library:
   ADD_SUBDIRECTORY(contrib/tbb)
+
+  # This sets TBB_LIBRARY and TBB_DEBUG_LIBRARY to the full path of the
+  # _installed_ library location
+
 ELSE()
   FIND_PACKAGE(TBB REQUIRED)
 ENDIF()
 
 INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
+
+IF(NOT DEAL_II_USE_CONTRIB)
+  SET(deal_ii_include_paths
+    ${deal_ii_include_paths}
+    ${TBB_INCLUDE_DIR}
+    )
+ENDIF()
 
 SET(deal_ii_external_libraries
   ${deal_ii_external_libraries}

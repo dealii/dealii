@@ -14,7 +14,7 @@ SET(CMAKE_INCLUDE_CURRENT_DIR true)
 
 OPTION(DEAL_II_USE_CONTRIB
   "Build and use contrib libraries bundled with the source tarball."
-  ON
+  OFF
   )
 OPTION(DEAL_II_WITH_THREADS
   "Build deal.II with support for threads. This pulls in libtbb as a dependency."

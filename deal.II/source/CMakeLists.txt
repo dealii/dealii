@@ -18,4 +18,7 @@ ADD_LIBRARY(deal_II SHARED
  $<TARGET_OBJECTS:obj_lac>
  $<TARGET_OBJECTS:obj_multigrid>
  $<TARGET_OBJECTS:obj_numerics>
+ ${deal_ii_additional_object_files}
  )
+
+ message( "${deal_ii_additional_object_files}" )
