@@ -672,7 +672,7 @@ DerivativeApproximation::approximate (const Mapping<dim,spacedim>    &mapping,
   typename DH<dim,spacedim>::active_cell_iterator cell, endc;
   cell = endc = dof_handler.begin_active();
                                    // (static_cast to avoid warnings
-                                   // about unsigned always >=0)
+                                   // about unsigned int always >=0)
   std::advance (cell, static_cast<int>(index_interval.first));
   std::advance (endc, static_cast<int>(index_interval.second));
 

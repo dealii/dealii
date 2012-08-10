@@ -255,7 +255,7 @@ void LogStream::pop ()
 
 
 unsigned int
-LogStream::depth_console (const unsigned n)
+LogStream::depth_console (const unsigned int n)
 {
   Threads::ThreadMutex::ScopedLock lock(log_lock);
   const unsigned int h = std_depth;
@@ -265,7 +265,7 @@ LogStream::depth_console (const unsigned n)
 
 
 unsigned int
-LogStream::depth_file (const unsigned n)
+LogStream::depth_file (const unsigned int n)
 {
   Threads::ThreadMutex::ScopedLock lock(log_lock);
   const unsigned int h = file_depth;

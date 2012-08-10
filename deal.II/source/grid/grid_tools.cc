@@ -703,7 +703,7 @@ namespace GridTools
     // look at the mid-points of edges
     for (; cell != endc; ++cell)
       {
-        for (unsigned v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
           if (cell->vertex_index(v) == vertex)
             {
               // OK, we found a cell that contains
@@ -716,7 +716,7 @@ namespace GridTools
               // neighbor. if this is the case, then we need to also
               // add this neighbor
               if (dim >= 2)
-                for (unsigned vface = 0; vface < dim; vface++)
+                for (unsigned int vface = 0; vface < dim; vface++)
                   {
                     const unsigned int face =
                         GeometryInfo<dim>::vertex_to_face[v][vface];

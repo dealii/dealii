@@ -12533,7 +12533,7 @@ unsigned int Triangulation<dim, spacedim>::max_adjacent_cells () const
                                    // vertices used on level 0
   unsigned int max_vertex_index = 0;
   for (; cell!=endc; ++cell)
-    for (unsigned vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       if (cell->vertex_index(vertex) > max_vertex_index)
         max_vertex_index = cell->vertex_index(vertex);
 
@@ -12546,7 +12546,7 @@ unsigned int Triangulation<dim, spacedim>::max_adjacent_cells () const
                                    // every time we find an adjacent
                                    // element
   for (cell=begin(); cell!=endc; ++cell)
-    for (unsigned vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       ++usage_count[cell->vertex_index(vertex)];
 
   return std::max (GeometryInfo<dim>::vertices_per_cell,

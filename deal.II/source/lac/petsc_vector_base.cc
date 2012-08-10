@@ -100,7 +100,7 @@ namespace PETScWrappers
               else
                 {
                                                    //ghost entry
-                  unsigned ghostidx
+                  unsigned int ghostidx
                     = vector.ghost_indices.index_within_set(index);
 
                   Assert(ghostidx+end-begin<(unsigned int)lsize, ExcInternalError());

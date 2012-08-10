@@ -25,7 +25,7 @@ namespace
 
 
 template <int dim>
-FE_Nothing<dim>::FE_Nothing (const unsigned n_components)
+FE_Nothing<dim>::FE_Nothing (const unsigned int n_components)
                 :
                 FiniteElement<dim>
                 (FiniteElementData<dim>(std::vector<unsigned>(dim+1,0),

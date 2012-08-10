@@ -940,7 +940,7 @@ namespace internal
                                            // map the unit tangentials to the
                                            // real cell. checking for d!=dim-1
                                            // eliminates compiler warnings
-                                           // regarding unsigned expressions <
+                                           // regarding unsigned int expressions <
                                            // 0.
           for (unsigned int d=0; d!=dim-1; ++d)
             {

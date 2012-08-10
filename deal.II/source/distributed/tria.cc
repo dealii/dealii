@@ -164,7 +164,7 @@ namespace internal
                                                        long *length);
 
         static
-        unsigned (&checksum) (types<2>::forest * p4est);
+        unsigned int (&checksum) (types<2>::forest * p4est);
 
         static
         void (&vtk_write_file) (types<2>::forest * p4est,
@@ -286,7 +286,7 @@ namespace internal
                                         long *length)
     = p4est_connectivity_load;
 
-    unsigned (&functions<2>::checksum) (types<2>::forest * p4est)
+    unsigned int (&functions<2>::checksum) (types<2>::forest * p4est)
     = p4est_checksum;
 
     void (&functions<2>::vtk_write_file) (types<2>::forest * p4est,
@@ -412,7 +412,7 @@ namespace internal
                                                        long *length);
 
         static
-        unsigned (&checksum) (types<3>::forest * p8est);
+        unsigned int (&checksum) (types<3>::forest * p8est);
 
         static
         void (&vtk_write_file) (types<3>::forest * p8est,
@@ -537,7 +537,7 @@ namespace internal
                                         long *length)
     = p8est_connectivity_load;
 
-    unsigned (&functions<3>::checksum) (types<3>::forest * p8est)
+    unsigned int (&functions<3>::checksum) (types<3>::forest * p8est)
     = p8est_checksum;
 
     void (&functions<3>::vtk_write_file) (types<3>::forest * p8est,
@@ -831,7 +831,7 @@ namespace
                     if (f>cell->neighbor_of_neighbor (f))
                       smaller_idx = 1;
 
-                    unsigned larger_idx = (smaller_idx+1) % 2;
+                    unsigned int larger_idx = (smaller_idx+1) % 2;
                                                      //smaller = *_list[smaller_idx]
                                                      //larger = *_list[larger_idx]
 
