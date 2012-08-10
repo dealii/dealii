@@ -10,7 +10,7 @@
 //
 //---------------------------------------------------------------------------
 
-//this files is deprecated, use vector_tools.h instead
+//this file is deprecated, use vector_tools.h instead
 
 #ifndef __deal2__vectors_h
 #define __deal2__vectors_h
