@@ -1239,7 +1239,7 @@ namespace hp
                                         * form of a linked list, is
                                         * the same as used for the
                                         * arrays used in the
-                                        * hp::DoFLevel
+                                        * internal::hp::DoFLevel
                                         * hierarchy. Starting indices
                                         * into this array are provided
                                         * by the vertex_dofs_offsets
