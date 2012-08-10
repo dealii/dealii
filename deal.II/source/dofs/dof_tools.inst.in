@@ -763,19 +763,22 @@ template
 void
 DoFTools::count_dofs_per_block<DoFHandler<deal_II_dimension> > (
   const DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<unsigned int>&,
+  const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<hp::DoFHandler<deal_II_dimension> > (
   const hp::DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<unsigned int>&,
+  const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<MGDoFHandler<deal_II_dimension> > (
   const MGDoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<unsigned int>&,
+  const std::vector<unsigned int> &);
 
 template
 void
@@ -896,19 +899,22 @@ template
 void
 DoFTools::count_dofs_per_block<DoFHandler<deal_II_dimension,deal_II_dimension+1> > (
   const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<unsigned int>&,
+  const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > (
   const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<unsigned int>&,
+  const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<MGDoFHandler<deal_II_dimension,deal_II_dimension+1> > (
   const MGDoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<unsigned int>&,
+  const std::vector<unsigned int> &);
 
 #endif
 
@@ -926,19 +932,22 @@ template
 void
 DoFTools::count_dofs_per_block<DoFHandler<1,3> > (
   const DoFHandler<1,3>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<unsigned int>&,
+  const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<hp::DoFHandler<1,3> > (
   const hp::DoFHandler<1,3>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<unsigned int>&,
+  const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<MGDoFHandler<1,3> > (
   const MGDoFHandler<1,3>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<unsigned int>&,
+  const std::vector<unsigned int> &);
 
 #endif
 

@@ -2100,7 +2100,7 @@ namespace DoFTools
   void
   count_dofs_per_block (const DH &dof,
                         std::vector<unsigned int> &dofs_per_block,
-                        std::vector<unsigned int>  target_block
+                        const std::vector<unsigned int>  &target_block
                           = std::vector<unsigned int>());
 
                                    /**
