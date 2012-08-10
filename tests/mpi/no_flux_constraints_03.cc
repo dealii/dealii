@@ -32,7 +32,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <sstream>

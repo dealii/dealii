@@ -25,7 +25,7 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 
 

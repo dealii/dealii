@@ -6,7 +6,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 std::ofstream logfile ("project_bv_curl_conf/output");
 

@@ -25,7 +25,7 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <cmath>

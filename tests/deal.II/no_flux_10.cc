@@ -35,7 +35,7 @@
 #include <dofs/dof_handler.h>
 #include <fe/fe_system.h>
 #include <fe/mapping_q.h>
-#include <numerics/vectors.h>
+#include <numerics/vector_tools.h>
 #include <numerics/data_out.h>
 #include <base/exceptions.h>
 #include <base/function.h>

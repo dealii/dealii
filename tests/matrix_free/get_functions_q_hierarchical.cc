@@ -13,7 +13,7 @@
 
 #include "../tests.h"
 #include <deal.II/fe/fe_q_hierarchical.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/base/function.h>
 
 std::ofstream logfile("get_functions_q_hierarchical/output");

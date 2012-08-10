@@ -27,8 +27,8 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 
 #include <deal.II/lac/vector.h>

@@ -24,7 +24,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <cmath>

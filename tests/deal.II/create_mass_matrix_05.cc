@@ -33,7 +33,7 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 #include <fstream>
 

@@ -31,7 +31,7 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/base/function.h>
 

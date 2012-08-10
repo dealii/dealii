@@ -31,7 +31,7 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
                                  // We need a FESystem
 #include <deal.II/fe/fe_system.h>
