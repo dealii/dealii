@@ -3453,12 +3453,20 @@ namespace DoFTools
                                      // assignment is done by blocks, not by
                                      // components, as specified by
                                      // component_select. The additional argument
-                                     // component_select only is used for
+                                     // component_select is only used for
                                      // non-primitive FEs, where we need it since
                                      // more components couple, and no unique
                                      // component can be assigned. Then, we sort
                                      // them to the first selected component of the
                                      // vector system.
+				     //
+				     // the output array dofs_by_component
+				     // lists for each dof the corresponding
+				     // vector component. if the DoFHandler is
+				     // based on a parallel distributed
+				     // triangulation then the output array is
+				     // index by
+				     // dof.locally_owned_dofs().index_within_set(indices[i])
     template <class DH>
     inline
     void
@@ -3474,10 +3482,20 @@ namespace DoFTools
               ExcDimensionMismatch(dofs_by_component.size(),
                                    dof.n_locally_owned_dofs()));
 
-                                       // next set up a table for the
-                                       // degrees of freedom on each of
-                                       // the cells whether it is
-                                       // something interesting or not
+                                       // next set up a table for the degrees
+                                       // of freedom on each of the cells
+                                       // (regardless of the fact whether it
+                                       // is listed in the component_select
+                                       // argument or not)
+				       //
+				       // for each element 'f' of the
+				       // FECollection,
+				       // local_component_association[f][d]
+				       // then returns the vector component
+				       // that degree of freedom 'd' belongs
+				       // to (or, in the case of
+				       // sort_by_blocks, the block that it
+				       // corresponds to)
       std::vector<std::vector<unsigned char> > local_component_association
         (fe_collection.size());
       for (unsigned int f=0; f<fe_collection.size(); ++f)
@@ -3486,12 +3504,16 @@ namespace DoFTools
             fe_collection[f];
           local_component_association[f].resize(fe.dofs_per_cell);
           if (sort_by_blocks == true)
+					     // compute the block each
+					     // local dof belongs to
             {
               for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
                 local_component_association[f][i]
                   = fe.system_to_block_index(i).first;
             }
           else
+					     // compute the component each
+					     // local dof belongs to
             for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
               if (fe.is_primitive(i))
                 local_component_association[f][i] =
