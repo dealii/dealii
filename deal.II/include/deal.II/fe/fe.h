@@ -1344,12 +1344,13 @@ class FiniteElement : public Subscriptor,
                                       * system_to_component_index()
                                       * returns.
                                       *
-                                      * Only for those
-                                      * spaces that couple the
-                                      * components, for example to
-                                      * make a shape function
-                                      * divergence free, will there be
-                                      * more than one @p true entry.
+                                      * Only for those spaces that couple the
+                                      * components, for example to make a
+                                      * shape function divergence free, will
+                                      * there be more than one @p true entry.
+                                      * Elements for which this is true are
+                                      * called non-primitive (see
+				      * @ref GlossPrimitive).
                                       */
     const std::vector<bool> &
     get_nonzero_components (const unsigned int i) const;
