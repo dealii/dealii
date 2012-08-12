@@ -14,18 +14,15 @@ ENDIF()
 INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
 
 IF(NOT DEAL_II_USE_CONTRIB)
-  SET(deal_ii_include_paths
-    ${deal_ii_include_paths}
+  LIST(APPEND deal_ii_include_paths
     ${TBB_INCLUDE_DIR}
     )
 ENDIF()
 
-SET(deal_ii_external_libraries
-  ${deal_ii_external_libraries}
+LIST(APPEND deal_ii_external_libraries
   ${TBB_LIBRARY}
   )
-SET(deal_ii_external_debug_libraries
-  ${deal_ii_external_debug_libraries}
+LIST(APPEND deal_ii_external_debug_libraries
   ${TBB_DEBUG_LIBRARY}
   ) #TODO
 

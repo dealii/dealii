@@ -14,8 +14,7 @@ IF(DEAL_II_USE_CONTRIB)
     ${CMAKE_SOURCE_DIR}/contrib/umfpack/AMD/Include
     )
 
-  SET(deal_ii_additional_object_files
-    ${deal_ii_additional_object_files}
+  LIST(APPEND deal_ii_additional_object_files
     $<TARGET_OBJECTS:obj_umfpack>
     $<TARGET_OBJECTS:obj_amd>
     )
@@ -30,13 +29,11 @@ ELSE()
   # deal.II library
   #
 
-  SET(deal_ii_external_libraries
-    ${deal_ii_external_libraries}
+  LIST(APPEND deal_ii_external_libraries
     ${Umfpack_LIBRARY} ${AMD_LIBRARY} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES}
     )
 
-  SET(deal_ii_external_debug_libraries
-    ${deal_ii_external_debug_libraries}
+  LIST(APPEND deal_ii_external_debug_libraries
     ${Umfpack_LIBRARY} ${AMD_LIBRARY} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES}
     )
 ENDIF()
