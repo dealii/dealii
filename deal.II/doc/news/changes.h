@@ -63,6 +63,13 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
+Changed: Support for the METIS 4.x has been replaced with support for
+METIS 5.x. Use <code>--with-metis=path/to/metis</code> to configure
+with METIS 5.x.
+<br>
+(Stefano Zampini, Toby D. Young 2012/08/13)
+
+<li>
 Changed: numerics/vectors.h is now called numerics/vector_tools.h and
 numerics/matrices.h is now called numerics/matrix_tools.h The old files are
 deprecated.

@@ -26,42 +26,9 @@
 #endif
 
 #ifdef DEAL_II_USE_METIS
-// This is sorta stupid. what we really would like to do here is this:
-//   extern "C" {
-//   #  include <metis.h>
-//   }
-// The problem with this is that (i) metis.h declares a couple of
-// functions with different exception specifications than are
-// declared in standard header files (in particular the drand48
-// function every one who's worked with Metis seems to know about);
-// and (ii) metis.h may include <mpi.h> which if we run a C++
-// compiler may include mpicxx.h -- but that leads to trouble
-// because we have wrapped an
-//   extern "C" {...}
-// around the whole block that now also includes a C++ header :-(
-//
-// The correct solution, of course, would be if Metis would produce
-// a new dot release after 10 years that would remove the unnecessary
-// function prototypes, and that would wrap the contents into
-//   #ifdef __C_PLUSPLUS__
-//   extern "C" {
-//   #endif
-// But that appears to not be happening, and so we have to do the
-// following hack where we just forward declare everything ourselves :-(
-
 extern "C"
 {
-// the following is from Metis-4.0/Lib/struct.h:
-  typedef int idxtype;
-// and this is from proto.h
-  void
-  METIS_PartGraphKway(int *, idxtype *, idxtype *,
-                      idxtype *, idxtype *, int *,
-                      int *, int *, int *, int *, idxtype *);
-  void
-  METIS_PartGraphRecursive(int *, idxtype *, idxtype *,
-                           idxtype *, idxtype *, int *,
-                           int *, int *, int *, int *, idxtype *);
+#include <metis.h>
 }
 #endif
 
@@ -103,28 +70,33 @@ namespace SparsityTools
                                      // simple, since METIS wants exactly our
                                      // compressed row storage format. we only
                                      // have to set up a few auxiliary arrays
-    int
-      n = static_cast<signed int>(sparsity_pattern.n_rows()),
-      wgtflag = 0,                          // no weights on nodes or edges
-      numflag = 0,                          // C-style 0-based numbering
+    idx_t
+      n       = static_cast<signed int>(sparsity_pattern.n_rows()),
+      ncon    = 1,                              // number of balancing constraints (should be >0)
+      wgtflag = 0,                              // no weights on nodes or edges
+      numflag = 0,                              // C-style 0-based numbering
       nparts  = static_cast<int>(n_partitions), // number of subdomains to create
-      dummy;                                // the numbers of edges cut by the
-                                     //   resulting partition
+      dummy;                                    // the numbers of edges cut by the
+				                // resulting partition
 
                                      // use default options for METIS
-    int options[5] = { 0,0,0,0,0 };
+    idx_t options[METIS_NOPTIONS];
+    METIS_SetDefaultOptions (options);
 
                                      // one more nuisance: we have to copy our
                                      // own data to arrays that store signed
                                      // integers :-(
-    std::vector<idxtype> int_rowstart (sparsity_pattern.get_rowstart_indices(),
-                                       sparsity_pattern.get_rowstart_indices() +
-                                       sparsity_pattern.n_rows()+1);
-    std::vector<idxtype> int_colnums (sparsity_pattern.get_column_numbers(),
-                                      sparsity_pattern.get_column_numbers()+
-                                      int_rowstart[sparsity_pattern.n_rows()]);
+    std::vector<idx_t> int_rowstart (sparsity_pattern.get_rowstart_indices(),
+				     sparsity_pattern.get_rowstart_indices() +
+				     sparsity_pattern.n_rows()+1);
+    std::vector<idx_t> int_colnums (sparsity_pattern.get_column_numbers(),
+				    sparsity_pattern.get_column_numbers()+
+				    int_rowstart[sparsity_pattern.n_rows()]);
 
-    std::vector<idxtype> int_partition_indices (sparsity_pattern.n_rows());
+    std::vector<idx_t> int_partition_indices (sparsity_pattern.n_rows());
+
+                                     // Make use of METIS' error code.
+    int ierr;
 
                                      // Select which type of partitioning to
                                      // create
@@ -132,17 +104,23 @@ namespace SparsityTools
                                      // Use recursive if the number of
                                      // partitions is less than or equal to 8
     if (n_partitions <= 8)
-      METIS_PartGraphRecursive(&n, &int_rowstart[0], &int_colnums[0],
-                               NULL, NULL,
-                               &wgtflag, &numflag, &nparts, &options[0],
-                               &dummy, &int_partition_indices[0]);
+      ierr = METIS_PartGraphRecursive(&n, &ncon, &int_rowstart[0], &int_colnums[0], 
+				      NULL, NULL, NULL,
+				      &nparts,NULL,NULL,&options[0],
+				      &dummy,&int_partition_indices[0]);
 
-                                     // Otherwise  use kway
+                                     // Otherwise use kway
     else
-      METIS_PartGraphKway(&n, &int_rowstart[0], &int_colnums[0],
-                          NULL, NULL,
-                          &wgtflag, &numflag, &nparts, &options[0],
-                          &dummy, &int_partition_indices[0]);
+      ierr = METIS_PartGraphKway(&n, &ncon, &int_rowstart[0], &int_colnums[0],
+				 NULL, NULL, NULL,
+				 &nparts,NULL,NULL,&options[0],
+				 &dummy,&int_partition_indices[0]);
+
+                                     // If metis returns normally, an
+                                     // error code METIS_OK=1 is
+                                     // returned from the above
+                                     // functions (see metish.h)
+    AssertThrow (ierr == 1, ExcMETISError (ierr));
 
                                      // now copy back generated indices into the
                                      // output array
