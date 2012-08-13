@@ -1197,7 +1197,7 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
     return (GeometryInfo<dim>::is_inside_unit_cell
              (StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell_iterator, p)));
   }
-  catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &e)
+  catch (const Mapping<dim,spacedim>::ExcTransformationFailed &e)
   {
     return false;
   }
