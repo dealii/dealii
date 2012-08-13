@@ -116,6 +116,11 @@ namespace hp
                                         * this collection.  This number must
                                         * be the same for all elements in the
                                         * collection.
+					*
+					* This function calls
+					* FiniteElement::n_components.  See
+					* @ref GlossComponent "the glossary"
+					* for more information.
                                         */
       unsigned int n_components () const;
 
@@ -236,6 +241,15 @@ namespace hp
   FECollection<dim,spacedim>::n_components () const
   {
     Assert (finite_elements.size () > 0, ExcNoFiniteElements());
+
+				     // note that there is no need
+				     // here to enforce that indeed
+				     // all elements have the same
+				     // number of components since we
+				     // have already done this when
+				     // adding a new element to the
+				     // collection.
+
     return finite_elements[0]->n_components ();
   }
 
