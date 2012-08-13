@@ -259,7 +259,7 @@ clean:
 # In other words, the testsuite has to be run with -j1, however long
 # that may take.
 #
-# When all of these programs have been run, the do
+# When all of these programs have been run, then do
 #   cd source
 #   make coverage
 # This may take a long time: both running lcov and, in particular,
@@ -283,7 +283,7 @@ coverage:
 	lcov --base-directory . --directory . -c -o d2.info
 	lcov --remove d2.info "/usr*" -o d2.info
 	rm -rf ../coverage
-	genhtml -o ../coverage -t "deal.II test coverage" --num-spaces 8 d2.info
+	genhtml --no-branch-coverage -o ../coverage -t "deal.II test coverage" --num-spaces 8 d2.info
 
 
 ###################
