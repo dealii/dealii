@@ -532,7 +532,7 @@ class FiniteElementData
     unsigned int n_blocks () const;
 
                                      /**
-                                      * Detailed infromation on block sizes.
+                                      * Detailed information on block sizes.
                                       */
     const BlockIndices& block_indices() const;
 
