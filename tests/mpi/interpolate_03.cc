@@ -68,11 +68,9 @@ void test()
   
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
 					     MPI_COMM_WORLD);
-  deallog << "before" << std::endl;
   VectorTools::interpolate (dofh,
 			    LinearFunction<dim>(),
 			    interpolated);
-  deallog << "after" << std::endl;
   interpolated.compress();
 
   double norm = interpolated.l2_norm();
