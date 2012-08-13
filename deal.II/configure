@@ -620,7 +620,9 @@ DEAL_II_USE_LAPACK
 USE_CONTRIB_UMFPACK
 UMFPACK_INCLUDE_DIR
 UMFPACK_LIB
+DEAL_II_METIS_INCDIR
 DEAL_II_METIS_LIBDIR
+DEAL_II_METIS_DIR
 USE_CONTRIB_METIS
 TECPLOT_INCLUDE_DIR
 USE_CONTRIB_HSL
@@ -12693,16 +12695,24 @@ fi
 # Check whether --with-metis was given.
 if test "${with_metis+set}" = set; then :
   withval=$with_metis;
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for METIS library directory" >&5
+$as_echo_n "checking for METIS library directory... " >&6; }
         USE_CONTRIB_METIS=yes
         DEAL_II_METIS_DIR="$withval"
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEAL_II_METIS_DIR" >&5
 $as_echo "$DEAL_II_METIS_DIR" >&6; }
 
-                if test ! -d $DEAL_II_METIS_DIR/Lib ; then
+                if test ! -d $DEAL_II_METIS_DIR/lib ; then
           as_fn_error $? "Path to Metis specified with --with-metis does not point to a complete Metis installation" "$LINENO" 5
         fi
 
-        DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
+        DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/lib"
+
+        if test ! -d $DEAL_II_METIS_DIR/include ; then
+          as_fn_error $? "Path to Metis specified with --with-metis does not point to a complete Metis installation" "$LINENO" 5
+        fi
+
+        DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
 
 else
 
@@ -12712,7 +12722,7 @@ else
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEAL_II_METIS_DIR" >&5
 $as_echo "$DEAL_II_METIS_DIR" >&6; }
 
-                    if test ! -d $DEAL_II_METIS_DIR/Lib ; then
+                    if test ! -d $DEAL_II_METIS_DIR/lib ; then
             as_fn_error $? "The path to Metis specified in the METIS_DIR environment variable does not point to a complete Metis installation" "$LINENO" 5
           fi
           DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
@@ -12728,6 +12738,9 @@ fi
 # Check whether --with-metis-libs was given.
 if test "${with_metis_libs+set}" = set; then :
   withval=$with_metis_libs;
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for METIS library directory" >&5
+$as_echo_n "checking for METIS library directory... " >&6; }
         USE_CONTRIB_METIS=yes
         DEAL_II_METIS_LIBDIR="$withval"
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEAL_II_METIS_LIBDIR" >&5
@@ -12765,6 +12778,8 @@ $as_echo "#define DEAL_II_USE_METIS 1" >>confdefs.h
     LDFLAGS="$LDFLAGS -L$DEAL_II_METIS_LIBDIR -lmetis"
 
               fi
+
+
 
 
 

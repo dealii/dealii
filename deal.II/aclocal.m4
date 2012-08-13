@@ -7195,18 +7195,25 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 
   AC_ARG_WITH(metis,
               [AS_HELP_STRING([--with-metis=/path/to/metis],
-              [Specify the path to the Metis installation, of which the include and library directories are   subdirs; use this if you want to override the METIS_DIR environment variable.])],
+              [Specify the path to the Metis installation, of which the include and library directories are subdirs; use this if you want to override the METIS_DIR environment variable.])],
      [
+        AC_MSG_CHECKING([for METIS library directory])
         USE_CONTRIB_METIS=yes
         DEAL_II_METIS_DIR="$withval"
         AC_MSG_RESULT($DEAL_II_METIS_DIR)
 
         dnl Make sure that what was specified is actually correct
-        if test ! -d $DEAL_II_METIS_DIR/Lib ; then
+        if test ! -d $DEAL_II_METIS_DIR/lib ; then
           AC_MSG_ERROR([Path to Metis specified with --with-metis does not point to a complete Metis installation])
         fi
 
-        DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
+        DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/lib"
+
+        if test ! -d $DEAL_II_METIS_DIR/include ; then
+          AC_MSG_ERROR([Path to Metis specified with --with-metis does not point to a complete Metis installation])
+        fi
+
+        DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
      ],
      [
         dnl Take something from the environment variables, if it is there
@@ -7216,7 +7223,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
           AC_MSG_RESULT($DEAL_II_METIS_DIR)
 
           dnl Make sure that what this is actually correct
-          if test ! -d $DEAL_II_METIS_DIR/Lib ; then
+          if test ! -d $DEAL_II_METIS_DIR/lib ; then
             AC_MSG_ERROR([The path to Metis specified in the METIS_DIR environment variable does not point to a complete Metis installation])
           fi
           DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
@@ -7230,6 +7237,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
               [AS_HELP_STRING([--with-metis-libs=/path/to/metis],
               [Specify the path to the METIS libraries; use this if you want to override the METIS_LIBDIR environment variable.])],
      [
+
+        AC_MSG_CHECKING([for METIS library directory])
         USE_CONTRIB_METIS=yes
         DEAL_II_METIS_LIBDIR="$withval"
         AC_MSG_RESULT($DEAL_II_METIS_LIBDIR)
