@@ -1978,6 +1978,7 @@ AC_DEFUN(DEAL_II_CHECK_DYNAMIC_CAST_BUG,
   AC_MSG_CHECKING(for dynamic_cast problem with shared libs)
 
   if (cd contrib/config/tests/darwin-dynamic-cast ; \
+      echo $CXX > compile_line; \
       $CXX -dynamiclib BaseClass.cpp -o libDynamicCastTestLib.dylib ; \
       $CXX -L. -lDynamicCastTestLib main.cc -o main ; \
       ./main) ; then
@@ -1987,9 +1988,11 @@ AC_DEFUN(DEAL_II_CHECK_DYNAMIC_CAST_BUG,
     AC_DEFINE(DEAL_II_HAVE_DARWIN_DYNACAST_BUG, 1,
               [Defined if the compiler has a bug with dynamic casting
                and dynamic libraries])
-    CXXFLAGSG="$CXXFLAGSG -mmacosx-version-min=`sw_vers -productVersion`"
-    CXXFLAGSO="$CXXFLAGSO -mmacosx-version-min=`sw_vers -productVersion`"
-    LDFLAGS="$LDFLAGS -mmacosx-version-min=`sw_vers -productVersion`"
+    if(test "`sw_vers -productVersion`" != "10.8");then 
+	CXXFLAGSG="$CXXFLAGSG -mmacosx-version-min=10.4"
+	CXXFLAGSO="$CXXFLAGSO -mmacosx-version-min=10.4"
+	LDFLAGS="$LDFLAGS -mmacosx-version-min=10.4"
+    fi
   fi
   rm -f contrib/config/tests/darwin-dynamic-cast/libDynamicCastTestLib.dylib
   rm -f contrib/config/tests/darwin-dynamic-cast/main.o
