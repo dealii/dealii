@@ -90,7 +90,9 @@ DEAL_II_ARPACK_DIR  = @DEAL_II_ARPACK_DIR@
 DEAL_II_ARPACK_ARCH = @DEAL_II_ARPACK_ARCH@
 
 USE_CONTRIB_METIS    = @USE_CONTRIB_METIS@
+DEAL_II_METIS_DIR = @DEAL_II_METIS_DIR@
 DEAL_II_METIS_LIBDIR = @DEAL_II_METIS_LIBDIR@
+DEAL_II_METIS_INCDIR = @DEAL_II_METIS_INCDIR@
 
 USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
 USE_CONTRIB_UMFPACK  = @USE_CONTRIB_UMFPACK@
@@ -200,7 +202,7 @@ endif
 
 # same for metis, except that there is only one library in that case
 ifeq ($(USE_CONTRIB_METIS),yes)
-  lib-contrib-metis = $(DEAL_II_METIS_LIBDIR)/libmetis.a
+  lib-contrib-metis = $(DEAL_II_METIS_LIBDIR)/libmetis$(lib-suffix)
 endif
 
 # List all trilinos libraries that we want to link with. These must be sorted
@@ -283,6 +285,7 @@ include-path-slepc-bmake     = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/includ
 include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
 include-path-mumps           = $(DEAL_II_MUMPS_DIR)/include
+include-path-metis           = $(DEAL_II_METIS_INCDIR)
 
 # include paths as command line flags. while compilers allow a space between
 # the '-I' and the actual path, we also send these flags to the
@@ -325,6 +328,10 @@ endif
 
 ifeq ($(USE_CONTRIB_MUMPS),yes)
   INCLUDE += -I$(include-path-mumps)
+endif
+
+ifeq ($(USE_CONTRIB_METIS),yes)
+  INCLUDE += -I$(include-path-metis)
 endif
 
 ifeq ($(enable-threads),yes)
