@@ -2054,7 +2054,7 @@ namespace DoFTools
                                     * target_component. If this is
                                     * not the case, an assertion is
                                     * thrown. The indices not
-                                    * targetted by target_components
+                                    * targeted by target_components
                                     * are left untouched.
                                     */
   template <class DH>
