@@ -1039,11 +1039,65 @@ namespace DoFRenumbering
 
   template <class DH>
   void
+  sort_selected_dofs_back (DH&                      dof_handler,
+                           const std::vector<bool>& selected_dofs,
+                           const unsigned int       level)
+  {
+    std::vector<unsigned int> renumbering(dof_handler.n_dofs(level),
+                                          DH::invalid_dof_index);
+    compute_sort_selected_dofs_back(renumbering, dof_handler, selected_dofs, level);
+
+    dof_handler.renumber_dofs(level, renumbering);
+  }
+
+
+
+  template <class DH>
+  void
   compute_sort_selected_dofs_back (std::vector<unsigned int>& new_indices,
                                    const DH&                  dof_handler,
                                    const std::vector<bool>&   selected_dofs)
   {
     const unsigned int n_dofs = dof_handler.n_dofs();
+    Assert (selected_dofs.size() == n_dofs,
+            ExcDimensionMismatch (selected_dofs.size(), n_dofs));
+
+                                     // re-sort the dofs according to
+                                     // their selection state
+    Assert (new_indices.size() == n_dofs,
+            ExcDimensionMismatch(new_indices.size(), n_dofs));
+
+    const unsigned int   n_selected_dofs = std::count (selected_dofs.begin(),
+                                                       selected_dofs.end(),
+                                                       false);
+
+    unsigned int next_unselected = 0;
+    unsigned int next_selected   = n_selected_dofs;
+    for (unsigned int i=0; i<n_dofs; ++i)
+      if (selected_dofs[i] == false)
+        {
+          new_indices[i] = next_unselected;
+          ++next_unselected;
+        }
+      else
+        {
+          new_indices[i] = next_selected;
+          ++next_selected;
+        };
+    Assert (next_unselected == n_selected_dofs, ExcInternalError());
+    Assert (next_selected == n_dofs, ExcInternalError());
+  }
+
+
+
+  template <class DH>
+  void
+  compute_sort_selected_dofs_back (std::vector<unsigned int>& new_indices,
+                                   const DH&                  dof_handler,
+                                   const std::vector<bool>&   selected_dofs,
+                                   const unsigned int         level)
+  {
+    const unsigned int n_dofs = dof_handler.n_dofs(level);
     Assert (selected_dofs.size() == n_dofs,
             ExcDimensionMismatch (selected_dofs.size(), n_dofs));
 
