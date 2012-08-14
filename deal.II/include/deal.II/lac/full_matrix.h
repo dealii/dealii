@@ -290,7 +290,7 @@ class FullMatrix : public Table<2,number>
                                       * FullMatrix<double> M(IdentityMatrix(n));
                                       * @endverbatim
                                       */
-    explicit FullMatrix (const IdentityMatrix &id);
+    FullMatrix (const IdentityMatrix &id);
     /**
      * @}
      */
@@ -921,10 +921,12 @@ class FullMatrix : public Table<2,number>
                const unsigned int src_offset_j = 0);
 
                                      /**
-                                      * Adda single element at the
+                                      * Add a single element at the
                                       * given position.
                                       */
-    void add(const unsigned int row, const unsigned int column, const number value);
+    void add (const unsigned int row,
+	      const unsigned int column,
+	      const number value);
 
                                        /**
                                         * Add an array of values given by

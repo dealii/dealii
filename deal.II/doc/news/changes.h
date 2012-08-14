@@ -276,6 +276,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The copy constructor of FullMatrix from IdentityMatrix
+used to be explicit, but that didn't appear to be necessary in hindsight.
+Consequently, it is now a regular copy constructor.
+<br>
+(Wolfgang Bangerth, 2012/08/14)
+
 <li> New: The Patterns::Map pattern allows to describe maps from keys
 to values in input files.
 <br>
