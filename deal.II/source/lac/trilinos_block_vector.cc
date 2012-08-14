@@ -174,15 +174,6 @@ namespace TrilinosWrappers
 
 
 
-    void
-    BlockVector::compress (const Epetra_CombineMode last_action)
-    {
-      for (unsigned int i=0; i<n_blocks(); ++i)
-        components[i].compress(last_action);
-    }
-
-
-
     void BlockVector::print (std::ostream       &out,
                              const unsigned int  precision,
                              const bool          scientific,

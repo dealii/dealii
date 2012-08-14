@@ -65,6 +65,21 @@ template <typename> class VectorView;
  *@{
  */
 
+/**
+ * This enum keeps track of the current operation in parallel linear algebra
+ * objects like Vectors and Matrices.
+ *
+ * It is used in the various compress() functions. They also exist in serial
+ * codes for compatibility and are empty there.
+ *
+ * See @ref GlossCompress "Compressing distributed objects" for more
+ * information.
+ */
+struct VectorOperation
+{
+    enum values { unknown, insert, add };
+};
+
 
 /**
  * Numerical vector of data.  For this class there are different types
@@ -297,7 +312,8 @@ class Vector : public Subscriptor
                                       * this class, it is immaterial and thus
                                       * an empty function.
                                       */
-    void compress () const;
+    void compress (::dealii::VectorOperation::values operation
+		   =::dealii::VectorOperation::unknown) const;
 
                                      /**
                                       * Change the dimension of the vector to
@@ -1495,7 +1511,7 @@ Vector<Number>::operator != (const Vector<Number2>& v) const
 template <typename Number>
 inline
 void
-Vector<Number>::compress () const
+Vector<Number>::compress (::dealii::VectorOperation::values) const
 {}
 
 

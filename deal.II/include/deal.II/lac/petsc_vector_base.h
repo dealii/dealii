@@ -19,6 +19,7 @@
 
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/vector.h>
 
 #  include <vector>
 #  include <utility>
@@ -294,9 +295,9 @@ namespace PETScWrappers
                                         *
                                         * See @ref GlossCompress "Compressing distributed objects"
                                         * for more information.
-                                        * more information.
                                         */
-      void compress ();
+      void compress (::dealii::VectorOperation::values operation
+		     =::dealii::VectorOperation::unknown);
 
                                        /**
                                         * Set all components of the vector to
@@ -824,33 +825,6 @@ namespace PETScWrappers
       IndexSet ghost_indices;
 
                                        /**
-                                        * PETSc doesn't allow to mix additions
-                                        * to matrix entries and overwriting
-                                        * them (to make synchronisation of
-                                        * parallel computations
-                                        * simpler). Since the interface of the
-                                        * existing classes don't support the
-                                        * notion of not interleaving things,
-                                        * we have to emulate this
-                                        * ourselves. The way we do it is to,
-                                        * for each access operation, store
-                                        * whether it is an insertion or an
-                                        * addition. If the previous one was of
-                                        * different type, then we first have
-                                        * to flush the PETSc buffers;
-                                        * otherwise, we can simply go on.
-                                        *
-                                        * The following structure and variable
-                                        * declare and store the previous
-                                        * state.
-                                        */
-      struct LastAction
-      {
-          enum Values { none, insert, add };
-      };
-
-
-                                       /**
                                         * Store whether the last action was a
                                         * write or add operation. This
                                         * variable is @p mutable so that the
@@ -858,7 +832,7 @@ namespace PETScWrappers
                                         * even though the vector object they
                                         * refer to is constant.
                                         */
-      mutable LastAction::Values last_action;
+      mutable ::dealii::VectorOperation::values last_action;
 
                                        /**
                                         * Make the reference class a friend.
@@ -954,10 +928,10 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator = (const PetscScalar &value) const
     {
-      Assert ((vector.last_action == VectorBase::LastAction::insert)
+      Assert ((vector.last_action == VectorOperation::insert)
               ||
-              (vector.last_action == VectorBase::LastAction::none),
-              ExcWrongMode (VectorBase::LastAction::insert,
+              (vector.last_action == VectorOperation::unknown),
+              ExcWrongMode (VectorOperation::insert,
                             vector.last_action));
 
 #ifdef PETSC_USE_64BIT_INDICES
@@ -970,7 +944,7 @@ namespace PETScWrappers
         = VecSetValues (vector, 1, &petsc_i, &value, INSERT_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      vector.last_action = VectorBase::LastAction::insert;
+      vector.last_action = VectorOperation::insert;
 
       return *this;
     }
@@ -981,13 +955,13 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator += (const PetscScalar &value) const
     {
-      Assert ((vector.last_action == VectorBase::LastAction::add)
+      Assert ((vector.last_action == VectorOperation::add)
               ||
-              (vector.last_action == VectorBase::LastAction::none),
-              ExcWrongMode (VectorBase::LastAction::add,
+              (vector.last_action == VectorOperation::unknown),
+              ExcWrongMode (VectorOperation::add,
                             vector.last_action));
 
-      vector.last_action = VectorBase::LastAction::add;
+      vector.last_action = VectorOperation::add;
 
                                        // we have to do above actions in any
                                        // case to be consistent with the MPI
@@ -1019,13 +993,13 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator -= (const PetscScalar &value) const
     {
-      Assert ((vector.last_action == VectorBase::LastAction::add)
+      Assert ((vector.last_action == VectorOperation::add)
               ||
-              (vector.last_action == VectorBase::LastAction::none),
-              ExcWrongMode (VectorBase::LastAction::add,
+              (vector.last_action == VectorOperation::unknown),
+              ExcWrongMode (VectorOperation::add,
                             vector.last_action));
 
-      vector.last_action = VectorBase::LastAction::add;
+      vector.last_action = VectorOperation::add;
 
                                        // we have to do above actions in any
                                        // case to be consistent with the MPI
@@ -1058,13 +1032,13 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator *= (const PetscScalar &value) const
     {
-      Assert ((vector.last_action == VectorBase::LastAction::insert)
+      Assert ((vector.last_action == VectorOperation::insert)
               ||
-              (vector.last_action == VectorBase::LastAction::none),
-              ExcWrongMode (VectorBase::LastAction::insert,
+              (vector.last_action == VectorOperation::unknown),
+              ExcWrongMode (VectorOperation::insert,
                             vector.last_action));
 
-      vector.last_action = VectorBase::LastAction::insert;
+      vector.last_action = VectorOperation::insert;
 
                                        // we have to do above actions in any
                                        // case to be consistent with the MPI
@@ -1098,13 +1072,13 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator /= (const PetscScalar &value) const
     {
-      Assert ((vector.last_action == VectorBase::LastAction::insert)
+      Assert ((vector.last_action == VectorOperation::insert)
               ||
-              (vector.last_action == VectorBase::LastAction::none),
-              ExcWrongMode (VectorBase::LastAction::insert,
+              (vector.last_action == VectorOperation::unknown),
+              ExcWrongMode (VectorOperation::insert,
                             vector.last_action));
 
-      vector.last_action = VectorBase::LastAction::insert;
+      vector.last_action = VectorOperation::insert;
 
                                        // we have to do above actions in any
                                        // case to be consistent with the MPI

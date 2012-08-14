@@ -52,6 +52,10 @@
  * too many details. All the algorithms described below are implement in
  * classes and functions in namespace parallel::distributed.
  *
+ * One important aspect in parallel computations using MPI is that write
+ * access to matrix and vector elements requires a call to compress() after
+ * the operation is finished and before the object is used (for example read
+ * from). Also see @ref GlossCompress.
  *
  * <h4>Other resources</h4>
  *

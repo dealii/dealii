@@ -20,6 +20,7 @@
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/vector.h>
 
 #  include <petscmat.h>
 #  include <deal.II/base/std_cxx1x/shared_ptr.h>
@@ -671,8 +672,8 @@ namespace PETScWrappers
                                         * for more information.
                                         * more information.
                                         */
-      void compress ();
-
+      void compress (::dealii::VectorOperation::values operation
+		     =::dealii::VectorOperation::unknown);
                                        /**
                                         * Return the value of the entry
                                         * (<i>i,j</i>).  This may be an

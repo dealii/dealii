@@ -1,3 +1,4 @@
+
 //-------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
@@ -356,8 +357,8 @@
  * ways:
  *
  * - You tell the object that you want to compress what operation is
- *   intended. The TrilinosWrappers::VectorBase::compress() can take
- *   such an additional argument.
+ *   intended. This can be done using the VectorOperation argument in
+ *   the various compress() functions.
  * - You do a fake addition or set operation on the object in question. For
  *   example, you can add a zero to an element of the matrix or vector,
  *   which has no effect other than telling the object that the next

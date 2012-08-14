@@ -186,6 +186,22 @@ namespace TrilinosWrappers
                                         */
       ~BlockVector ();
 
+				       /**
+					* use compress(VectorOperation) instead
+					*
+					* @deprecated
+					*
+					* See @ref GlossCompress "Compressing
+					* distributed objects" for more
+					* information.
+					*/
+      void compress (const Epetra_CombineMode last_action);
+      
+					 /**
+					  * so it is not hidden
+					  */
+      using BlockVectorBase<Vector>::compress;
+
                                        /**
                                         * Copy operator: fill all
                                         * components of the vector that
@@ -502,6 +518,21 @@ namespace TrilinosWrappers
       this->components[i] = v.components[i];
   }
 
+
+  inline
+  void
+  BlockVector::compress (const Epetra_CombineMode last_action)
+  {
+    ::dealii::VectorOperation::values last_action_;
+    if (last_action == Add)
+      last_action_ = ::dealii::VectorOperation::add;
+    else if (last_action == Insert)
+      last_action_ = ::dealii::VectorOperation::insert;
+    else
+      AssertThrow(false, ExcNotImplemented());
+
+    this->compress(last_action_);
+  }
 
   inline
   void

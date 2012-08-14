@@ -1922,7 +1922,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
                                    // constraints, so we need to explicitly
                                    // state, that the others are doing an
                                    // insert here:
-  vec.compress (Insert);
+  vec.compress (::dealii::VectorOperation::insert);
 }
 
 
@@ -2016,7 +2016,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
                           it->entries[i].second);
           vec(it->line) = new_value;
         }
-      vec.block(block).compress(Insert);
+      vec.block(block).compress(::dealii::VectorOperation::insert);
     }
 }
 

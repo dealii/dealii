@@ -275,7 +275,7 @@ namespace PETScWrappers
 
 
   void
-  MatrixBase::compress ()
+  MatrixBase::compress (::dealii::VectorOperation::values operation)
   {
                                      // flush buffers
     int ierr;

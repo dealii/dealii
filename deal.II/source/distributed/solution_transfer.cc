@@ -40,41 +40,6 @@ namespace parallel
   namespace distributed
   {
 
-    namespace
-    {
-      template <class VECTOR>
-      void compress_vector_insert(VECTOR & vec)
-      {
-        vec.compress();
-      }
-
-#ifdef DEAL_II_USE_TRILINOS
-      void compress_vector_insert(TrilinosWrappers::Vector & vec)
-      {
-        vec.compress(Insert);
-      }
-
-      void compress_vector_insert(TrilinosWrappers::BlockVector & vec)
-      {
-        for (unsigned int i=0;i<vec.n_blocks();++i)
-          vec.block(i).compress(Insert);
-      }
-
-      void compress_vector_insert(TrilinosWrappers::MPI::Vector & vec)
-      {
-        vec.compress(Insert);
-      }
-
-      void compress_vector_insert(TrilinosWrappers::MPI::BlockVector & vec)
-      {
-        for (unsigned int i=0;i<vec.n_blocks();++i)
-          vec.block(i).compress(Insert);
-      }
-#endif
-    }
-
-
-
     template<int dim, typename VECTOR, class DH>
     SolutionTransfer<dim, VECTOR, DH>::SolutionTransfer(const DH &dof)
                     :
@@ -206,10 +171,11 @@ namespace parallel
                                                    std_cxx1x::_3,
                                                    std_cxx1x::ref(all_out)));
 
+      
       for (typename std::vector<VECTOR*>::iterator it=all_out.begin();
            it !=all_out.end();
            ++it)
-        compress_vector_insert(*(*it));
+	(*it)->compress(::dealii::VectorOperation::insert);
 
       input_vectors.clear();
     }

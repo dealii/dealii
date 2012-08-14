@@ -306,36 +306,23 @@ namespace TrilinosWrappers
         void import_nonlocal_data_for_fe (const TrilinosWrappers::BlockSparseMatrix &m,
                                           const BlockVector                         &v);
 
-                                         /**
-                                          * Compress the underlying
-                                          * representation of the Trilinos
-                                          * object, i.e. flush the buffers
-                                          * of the vector object if it has
-                                          * any. This function is
-                                          * necessary after writing into a
-                                          * vector element-by-element and
-                                          * before anything else can be
-                                          * done on it.
-                                          *
-                                          * The (defaulted) argument can
-                                          * be used to specify the
-                                          * compress mode
-                                          * (<code>Add</code> or
-                                          * <code>Insert</code>) in case
-                                          * the vector has not been
-                                          * written to since the last
-                                          * time this function was
-                                          * called. The argument is
-                                          * ignored if the vector has
-                                          * been added or written to
-                                          * since the last time
-                                          * compress() was called.
-                                          *
-                                          * See @ref GlossCompress "Compressing distributed objects"
-                                          * for more information.
-                                          * more information.
-                                          */
-        void compress (const Epetra_CombineMode last_action = Zero);
+
+					 /**
+					  * use compress(VectorOperation) instead
+					  *
+					  * @deprecated
+					  *
+					  * See @ref GlossCompress "Compressing
+					  * distributed objects" for more
+					  * information.
+					  */
+	void compress (const Epetra_CombineMode last_action);
+	
+					 /**
+					  * so it is not hidden
+					  */
+	using BlockVectorBase<Vector>::compress;
+
 
                                          /**
                                           * Returns the state of the
@@ -470,6 +457,23 @@ namespace TrilinosWrappers
     }
 
 
+
+    inline
+    void
+    BlockVector::compress (const Epetra_CombineMode last_action)
+    {
+      ::dealii::VectorOperation::values last_action_;
+      if (last_action == Add)
+	last_action_ = ::dealii::VectorOperation::add;
+      else if (last_action == Insert)
+	last_action_ = ::dealii::VectorOperation::insert;
+      else
+	AssertThrow(false, ExcNotImplemented());
+      
+      this->compress(last_action_);
+    }
+
+    
 
     template <typename Number>
     BlockVector &

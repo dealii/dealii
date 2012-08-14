@@ -177,7 +177,7 @@ namespace PETScWrappers
   VectorBase::VectorBase ()
                   :
                   ghosted(false),
-                  last_action (LastAction::none),
+                  last_action (::dealii::VectorOperation::unknown),
                   attained_ownership(true)
   {}
 
@@ -188,7 +188,7 @@ namespace PETScWrappers
                   Subscriptor (),
                   ghosted(v.ghosted),
                   ghost_indices(v.ghost_indices),
-                  last_action (LastAction::none),
+                  last_action (::dealii::VectorOperation::unknown),
                   attained_ownership(true)
   {
     int ierr = VecDuplicate (v.vector, &vector);
@@ -205,7 +205,7 @@ namespace PETScWrappers
                   Subscriptor (),
                   vector(v),
                   ghosted(false),
-                  last_action (LastAction::none),
+                  last_action (::dealii::VectorOperation::unknown),
                   attained_ownership(false)
   {}
 
@@ -405,15 +405,14 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::compress ()
+  VectorBase::compress (::dealii::VectorOperation::values operation)
   {
     // note that one may think that we only need to do something
-    // if in fact the state is anything but LastAction::none. but
+    // if in fact the state is anything but last_action::unknown. but
     // that's not true: one frequently gets into situations where
     // only one processor (or a subset of processors) actually writes
     // something into a vector, but we still need to call
-    // VecAssemblyBegin/End on all processors, even those that are
-    // still in LastAction::none state
+    // VecAssemblyBegin/End on all processors.
     int ierr;
     ierr = VecAssemblyBegin(vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -422,7 +421,7 @@ namespace PETScWrappers
 
     // reset the last action field to indicate that we're back to
     // a pristine state
-    last_action = VectorBase::LastAction::none;
+    last_action = ::dealii::VectorOperation::unknown;
   }
 
 
@@ -1120,7 +1119,7 @@ namespace PETScWrappers
   std::size_t
   VectorBase::memory_consumption () const
   {
-    std::size_t mem = sizeof(Vec)+sizeof(LastAction::Values)
+    std::size_t mem = sizeof(Vec)+sizeof(last_action)
       +MemoryConsumption::memory_consumption(ghosted)
       +MemoryConsumption::memory_consumption(ghost_indices);
 
@@ -1145,14 +1144,13 @@ namespace PETScWrappers
                                     const PetscScalar  *values,
                                     const bool          add_values)
   {
-    Assert ((last_action == (add_values ?
-                             LastAction::add :
-                             LastAction::insert))
+    ::dealii::VectorOperation::values action = (add_values ?
+						::dealii::VectorOperation::add :
+						::dealii::VectorOperation::insert);
+    Assert ((last_action == action)
             ||
-            (last_action == LastAction::none),
-            internal::VectorReference::ExcWrongMode ((add_values ?
-                                                      LastAction::add :
-                                                      LastAction::insert),
+            (last_action == ::dealii::VectorOperation::unknown),
+            internal::VectorReference::ExcWrongMode (action,
                                                      last_action));
 
                                      // VecSetValues complains if we
@@ -1181,9 +1179,7 @@ namespace PETScWrappers
 
     // set the mode here, independent of whether we have actually
     // written elements or whether the list was empty
-    last_action = (add_values ?
-                   VectorBase::LastAction::add :
-                   VectorBase::LastAction::insert);
+    last_action = action;
   }
 
 

@@ -285,25 +285,17 @@ namespace parallel
                                          /**
                                           * This function copies the data that has
                                           * accumulated in the data buffer for ghost
-                                          * indices to the owning processor. If the
-                                          * optional argument @p add_ghost_data is set
-                                          * to true, the data is added into the
-                                          * respective positions of the owning
-                                          * processor, otherwise the new data
-                                          * overwrites the old content in the host
-                                          * vector. In that case, data coming from
-                                          * different processor to the same target
-                                          * entry should be identical. However, no
-                                          * checking is performed, so it is the user's
-                                          * responsibility to ensure consistency of
-                                          * data.
+                                          * indices to the owning processor. 
                                           *
-                                          * For the meaning of this argument, see the
-                                          * entry on
-                                          * @ref GlossCompress "Compressing distributed vectors and matrices"
+                                          * For the meaning of this argument,
+                                          * see the entry on @ref
+                                          * GlossCompress "Compressing
+                                          * distributed vectors and matrices"
                                           * in the glossary.
                                           */
-        void compress (const bool add_ghost_data = true);
+	void compress (::dealii::VectorOperation::values operation
+		       =::dealii::VectorOperation::unknown);
+
 
                                          /**
                                           * Fills the data field for ghost indices with
@@ -1137,10 +1129,13 @@ namespace parallel
     template <typename Number>
     inline
     void
-    Vector<Number>::compress (const bool add_ghost_data)
+    Vector<Number>::compress (::dealii::VectorOperation::values operation)
     {
       compress_start ();
-      compress_finish (add_ghost_data);
+      if (operation == ::dealii::VectorOperation::insert)
+	compress_finish (false);
+      else
+	compress_finish (true);
     }
 
 

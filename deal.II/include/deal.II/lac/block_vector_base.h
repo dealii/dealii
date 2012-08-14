@@ -787,8 +787,19 @@ class BlockVectorBase : public Subscriptor
                                      /**
                                       * Call the compress() function on all
                                       * the subblocks of the matrix.
+				      *
+				      * This functionality only needs to be
+				      * called if using MPI based vectors and
+				      * exists in other objects for
+				      * compatibility.
+				      *
+				      * See @ref GlossCompress "Compressing
+				      * distributed objects" for more
+				      * information.
                                       */
-    void compress ();
+    void compress (::dealii::VectorOperation::values operation
+		     =::dealii::VectorOperation::unknown);
+    
 
                                      /**
                                       * Access to a single block.
@@ -1824,10 +1835,10 @@ BlockVectorBase<VectorType>::collect_sizes ()
 template <class VectorType>
 inline
 void
-BlockVectorBase<VectorType>::compress ()
+BlockVectorBase<VectorType>::compress (::dealii::VectorOperation::values operation)
 {
   for (unsigned int i=0; i<n_blocks(); ++i)
-    block(i).compress ();
+    block(i).compress (operation);
 }
 
 

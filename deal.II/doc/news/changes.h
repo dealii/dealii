@@ -63,6 +63,14 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
+Changed: unify the concept of compress() for all linear algebra
+objects. Introduce type VectorOperation to decide between
+add and insert. Implement also for serial vectors. Note:
+this breaks distributed::vector::compress(bool).
+<br>
+(Timo Heister, 2012/08/13)
+
+<li>
 Changed: Support for the METIS 4.x has been replaced with support for
 METIS 5.x. Use <code>--with-metis=path/to/metis</code> to configure
 with METIS 5.x.

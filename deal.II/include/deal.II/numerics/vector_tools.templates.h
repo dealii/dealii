@@ -259,6 +259,7 @@ namespace VectorTools
                   = function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]];
             }
         }
+    vec.compress(::dealii::VectorOperation::insert);    
   }
 
 

@@ -22,6 +22,7 @@
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/matrix_iterator.h>
+#include <deal.II/lac/vector.h>
 
 #include <cmath>
 
@@ -736,8 +737,14 @@ class BlockMatrixBase : public Subscriptor
                                      /**
                                       * Call the compress() function on all
                                       * the subblocks of the matrix.
+				      *
+				      *
+				      * See @ref GlossCompress "Compressing
+				      * distributed objects" for more
+				      * information.
                                       */
-    void compress ();
+    void compress (::dealii::VectorOperation::values operation
+		   =::dealii::VectorOperation::unknown);
 
                                      /**
                                       * Multiply the entire matrix by a
@@ -2316,11 +2323,11 @@ BlockMatrixBase<MatrixType>::diag_element (const unsigned int i) const
 template <class MatrixType>
 inline
 void
-BlockMatrixBase<MatrixType>::compress ()
+BlockMatrixBase<MatrixType>::compress (::dealii::VectorOperation::values operation)
 {
   for (unsigned int r=0; r<n_block_rows(); ++r)
     for (unsigned int c=0; c<n_block_cols(); ++c)
-      block(r,c).compress ();
+      block(r,c).compress (operation);
 }
 
 
