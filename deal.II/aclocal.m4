@@ -6071,12 +6071,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
     dnl from time-to-time; so make sure that what was specified is
     dnl actually correct.
     case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-      2.3*) dnl
-        if test ! -d $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH \
-           ; then
-          AC_MSG_ERROR([PETSc has not been compiled for the architecture specified with --with-petsc-arch])
-        fi
-        ;;
       3.*) dnl
         if test ! -d $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib \
            ; then
@@ -6152,18 +6146,6 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
   dnl
   dnl Like always, we have to cake care of version control!
     case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-      2.3.*) dnl
-        AC_TRY_COMPILE(
-        [#include "$DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf.h"
-        ],
-        [#ifdef PETSC_HAVE_MPIUNI
-           compile error;
-         #endif
-        ],
-        [AC_MSG_RESULT(yes)],
-        [AC_MSG_ERROR([PETSc was not built for MPI, but deal.II is!]
-        )])
-      ;;
       3.*) dnl
         AC_TRY_COMPILE(
         [#include "$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h"
@@ -6182,18 +6164,6 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
     esac
   else
     case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-      2.3*) dnl
-        AC_TRY_COMPILE(
-        [#include "$DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf.h"
-        ],
-        [#ifndef PETSC_HAVE_MPIUNI
-           compile error;
-         #endif
-        ],
-        [AC_MSG_RESULT(yes)],
-        [AC_MSG_ERROR([PETSc was built for MPI, but deal.II is not!]
-        )])
-      ;;
       3.*) dnl
         AC_TRY_COMPILE(
         [#include "$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h"
@@ -6226,11 +6196,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
 [
   AC_MSG_CHECKING([for PETSc libmpiuni library])
   case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-    2.3*) dnl
-      if test -f $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a ; then
-        DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a"
-      fi
-      ;;
     3.*) dnl
       if test -f $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a ; then
         DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a"
@@ -6262,7 +6227,7 @@ dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_PETSC_COMPLEX, dnl
 [
   case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-    3.1*)
+    3.3*)
       AC_MSG_CHECKING([for PETSc scalar complex])
       DEAL_II_PETSC_COMPLEX=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h \
                                | grep "#define PETSC_USE_COMPLEX" \
