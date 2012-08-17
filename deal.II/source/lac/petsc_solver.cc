@@ -644,8 +644,8 @@ namespace PETScWrappers
 
 /* ---------------------- SparseDirectMUMPS------------------------ */
 
-  SparseDirectMUMPS::SparseDirectMUMPS (SolverControl		&cn,
-                                       const MPI_Comm		&mpi_communicator,
+  SparseDirectMUMPS::SparseDirectMUMPS (SolverControl	    &cn,
+                                       const MPI_Comm       &mpi_communicator,
                                        const AdditionalData &data)
                       :
                       SolverBase (cn, mpi_communicator),
@@ -695,9 +695,9 @@ namespace PETScWrappers
   }
 
   void
-  SparseDirectMUMPS::solve (const MatrixBase	&A,
-                            VectorBase          &x,
-                            const VectorBase    &b)
+  SparseDirectMUMPS::solve (const MatrixBase &A,
+                            VectorBase       &x,
+                            const VectorBase &b)
   {
 #ifdef PETSC_HAVE_MUMPS
 				/**
@@ -744,7 +744,7 @@ namespace PETScWrappers
 				 */
     if (solver_data.get() == 0)
     {
-      solver_data.reset (new SolverDataMUMPS());
+      solver_data.reset (new SolverDataMUMPS ());
 
 				/**
 				 * creates the default KSP
@@ -761,7 +761,7 @@ namespace PETScWrappers
 				 * only once anyway
 				 */
       ierr = KSPSetOperators (solver_data->ksp, A, A,
-				DIFFERENT_NONZERO_PATTERN);
+			      DIFFERENT_NONZERO_PATTERN);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 				/**
@@ -794,11 +794,11 @@ namespace PETScWrappers
 				 */
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
       KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
-				reinterpret_cast<void *>(&solver_control));
+			     reinterpret_cast<void *>(&solver_control));
 #else
       KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
-				reinterpret_cast<void *>(&solver_control),
-				PETSC_NULL);
+			     reinterpret_cast<void *>(&solver_control),
+			     PETSC_NULL);
 #endif
 
 				/**
@@ -851,6 +851,7 @@ namespace PETScWrappers
     else
     {
       PetscPrintf(PETSC_COMM_WORLD, "Success.  MUMPS has solved.\n");
+
                                 /**
                                  * obtain convergence 
                                  * information. obtain
@@ -874,6 +875,10 @@ namespace PETScWrappers
   Assert (false,
 	  ExcMessage ("Your PETSc installation does not include a copy of "
 		      "MUMPS package necessary for this solver"));
+
+                                // Cast to void to silence compiler
+                                // warnings
+  (void) A; (void) x; (void) b;
 #endif
      
   }
