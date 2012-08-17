@@ -402,7 +402,7 @@ namespace IteratorFilters
  * Since comparison between filtered and unfiltered iterators is
  * defined, we could as well have let the @p endc variable in the
  * last example be of type
- * <code>Triangulation@<dim@>::active_cell_iterator</code> since it is unchanged
+ * Triangulation::active_cell_iterator since it is unchanged
  * and its value does not depend on the filter.
  *
  * @ingroup grid

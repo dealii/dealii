@@ -565,7 +565,7 @@ namespace PETScWrappers
                                         * collective piecewise
                                         * multiply operation of
                                         * <code>this</code> vector
-                                        * with \f$v\f$.
+                                        * with <b>v</b>.
                                         */
       VectorBase & mult (const VectorBase &v);
 
@@ -573,7 +573,7 @@ namespace PETScWrappers
                                         * Same as above, but a
                                         * collective piecewise
                                         * multiply operation of
-                                        * \f$u\f$ with \f$v\f$.
+                                        * <b>u</b> with <b>v</b>.
                                         */
       VectorBase & mult (const VectorBase &u,
 			 const VectorBase &v);

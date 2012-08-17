@@ -715,7 +715,7 @@ namespace internal
                                         * would like to have code like
                                         * <code>switch
                                         * (subface_case)... case
-                                        * SubfaceCase@<dim@>::case_x:
+                                        * SubfaceCase::case_x:
                                         * ... </code>, which can be
                                         * written as <code>switch
                                         * (static_cast@<unsigned
@@ -1598,7 +1598,7 @@ struct GeometryInfo
                                       * area(=1) of the face.
                                       *
                                       * E.g. for
-                                      * <code>internal::SubfaceCase@<3@>::cut_xy</code>
+                                      * internal::SubfaceCase::cut_xy
                                       * the ratio is 1/4 for each of
                                       * the subfaces.
                                       */
