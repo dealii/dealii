@@ -238,12 +238,7 @@ namespace PETScWrappers
                                      // (see test bits/petsc_65)
     compress ();
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const int ierr = VecSet (&s, vector);
-#else
     const int ierr = VecSet (vector, s);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -407,20 +402,29 @@ namespace PETScWrappers
   void
   VectorBase::compress (::dealii::VectorOperation::values operation)
   {
-    // note that one may think that we only need to do something
-    // if in fact the state is anything but last_action::unknown. but
-    // that's not true: one frequently gets into situations where
-    // only one processor (or a subset of processors) actually writes
-    // something into a vector, but we still need to call
-    // VecAssemblyBegin/End on all processors.
+                                     // note that one may think that
+                                     // we only need to do something
+                                     // if in fact the state is
+                                     // anything but
+                                     // last_action::unknown. but
+                                     // that's not true: one
+                                     // frequently gets into
+                                     // situations where only one
+                                     // processor (or a subset of
+                                     // processors) actually writes
+                                     // something into a vector, but
+                                     // we still need to call
+                                     // VecAssemblyBegin/End on all
+                                     // processors.
     int ierr;
     ierr = VecAssemblyBegin(vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     ierr = VecAssemblyEnd(vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-    // reset the last action field to indicate that we're back to
-    // a pristine state
+                                     // reset the last action field to
+                                     // indicate that we're back to a
+                                     // pristine state
     last_action = ::dealii::VectorOperation::unknown;
   }
 
@@ -757,12 +761,7 @@ namespace PETScWrappers
 
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const int ierr = VecScale (&a, vector);
-#else
     const int ierr = VecScale (vector, a);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -777,15 +776,9 @@ namespace PETScWrappers
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
     const PetscScalar factor = 1./a;
-
     Assert (numbers::is_finite(factor), ExcNumberNotFinite());
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const int ierr = VecScale (&factor, vector);
-#else
     const int ierr = VecScale (vector, factor);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -796,13 +789,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator += (const VectorBase &v)
   {
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const PetscScalar one = 1.0;
-    const int ierr = VecAXPY (&one, v, vector);
-#else
     const int ierr = VecAXPY (vector, 1, v);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -813,13 +800,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator -= (const VectorBase &v)
   {
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const PetscScalar minus_one = -1.0;
-    const int ierr = VecAXPY (&minus_one, v, vector);
-#else
     const int ierr = VecAXPY (vector, -1, v);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -830,15 +811,9 @@ namespace PETScWrappers
   void
   VectorBase::add (const PetscScalar s)
   {
-
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const int ierr = VecShift (&s, vector);
-#else
     const int ierr = VecShift (vector, s);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -856,15 +831,9 @@ namespace PETScWrappers
   VectorBase::add (const PetscScalar a,
                    const VectorBase     &v)
   {
-
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const int ierr = VecAXPY (&a, v, vector);
-#else
     const int ierr = VecAXPY (vector, a, v);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -876,19 +845,13 @@ namespace PETScWrappers
                    const PetscScalar b,
                    const VectorBase &w)
   {
-
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
     const PetscScalar weights[2] = {a,b};
     Vec               addends[2] = {v.vector, w.vector};
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const int ierr = VecMAXPY (2, weights, vector, addends);
-#else
     const int ierr = VecMAXPY (vector, 2, weights, addends);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -898,15 +861,9 @@ namespace PETScWrappers
   VectorBase::sadd (const PetscScalar s,
                     const VectorBase &v)
   {
-
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const int ierr = VecAYPX (&s, v, vector);
-#else
     const int ierr = VecAYPX (vector, s, v);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -937,7 +894,6 @@ namespace PETScWrappers
                     const PetscScalar b,
                     const VectorBase     &w)
   {
-
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
@@ -949,12 +905,7 @@ namespace PETScWrappers
     const PetscScalar weights[2] = {a,b};
     Vec               addends[2] = {v.vector,w.vector};
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const int ierr = VecMAXPY (2, weights, vector, addends);
-#else
     const int ierr = VecMAXPY (vector, 2, weights, addends);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -982,12 +933,7 @@ namespace PETScWrappers
     const PetscScalar weights[3] = {a,b,c};
     Vec               addends[3] = {v.vector, w.vector, x.vector};
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const int ierr = VecMAXPY (3, weights, vector, addends);
-#else
     const int ierr = VecMAXPY (vector, 3, weights, addends);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1052,12 +998,7 @@ namespace PETScWrappers
   VectorBase::ratio (const VectorBase &a,
                      const VectorBase &b)
   {
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    const int ierr = VecPointwiseDivide (a, b, vector);
-#else
     const int ierr = VecPointwiseDivide (vector, a, b);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
