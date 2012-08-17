@@ -1732,8 +1732,8 @@ namespace TrilinosWrappers
                                      // if we have ghost values, do not allow
                                      // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (size() == v.size(),
-            ExcDimensionMismatch(size(), v.size()));
+    Assert (local_size() == v.local_size(),
+            ExcDimensionMismatch(local_size(), v.local_size()));
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
