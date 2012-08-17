@@ -337,11 +337,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // then set flags
-#if DEAL_II_PETSC_VERSION_LT(2,3,1)
-    PCICCSetLevels (pc, additional_data.levels);
-#else
     PCFactorSetLevels (pc, additional_data.levels);
-#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
@@ -386,11 +382,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // then set flags
-#if DEAL_II_PETSC_VERSION_LT(2,3,1)
-    PCILUSetLevels (pc, additional_data.levels);
-#else
     PCFactorSetLevels (pc, additional_data.levels);
-#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
@@ -529,26 +521,17 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // set flags as given
-#if DEAL_II_PETSC_VERSION_LT(2,3,1)
-    ierr = PCLUSetPivoting (pc, additional_data.pivoting);
-#elif DEAL_II_PETSC_VERSION_LT(3,0,1)
+#if DEAL_II_PETSC_VERSION_LT(3,0,1)
     ierr = PCFactorSetPivoting (pc, additional_data.pivoting);
 #else
     ierr = PCFactorSetColumnPivot (pc, additional_data.pivoting);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    ierr = PCLUSetZeroPivot (pc, additional_data.zero_pivot);
-#else
     ierr = PCFactorSetZeroPivot (pc, additional_data.zero_pivot);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-#if DEAL_II_PETSC_VERSION_LT(2,3,0)
-    ierr = PCLUSetDamping (pc, additional_data.damping);
-#elif DEAL_II_PETSC_VERSION_LT(3,0,1)
+#if DEAL_II_PETSC_VERSION_LT(3,0,1)
     ierr = PCFactorSetShiftNonzero (pc, additional_data.damping);
 #else
     ierr = PCFactorSetShiftAmount (pc, additional_data.damping);
@@ -561,7 +544,6 @@ namespace PETScWrappers
     ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
-
 
 }
 

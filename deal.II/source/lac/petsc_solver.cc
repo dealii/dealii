@@ -21,9 +21,6 @@
 #  include <deal.II/lac/petsc_precondition.h>
 #  include <cmath>
 
-#if DEAL_II_PETSC_VERSION_LT(2,2,0)
-#include <petscsles.h>
-#endif
 #include <petscversion.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -41,13 +38,6 @@ namespace PETScWrappers
 #endif
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-                                     // and destroy the solver object if we
-                                     // are in old PETSc mode
-#if DEAL_II_PETSC_VERSION_LT(2,2,0)
-    ierr = SLESDestroy (sles);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-#endif
   }
 
 
