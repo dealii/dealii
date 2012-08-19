@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,11 @@ void test()
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
-  int int_sum, uint_sum, double_sum, float_sum;
+  int int_sum;
+  unsigned int uint_sum;
+  double double_sum;
+  float float_sum;
+
   int_sum
     =
     Utilities::MPI::sum<int>(myid+1,
