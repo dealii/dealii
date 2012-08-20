@@ -1680,7 +1680,7 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 
       clang)
           CFLAGS="$CFLAGS -g"
-          CFLAGSO="$CFLAGS -fast -O2"
+          CFLAGSO="$CFLAGS -O2"
           CFLAGSPIC="-fPIC"
           ;;
 
@@ -1988,7 +1988,7 @@ AC_DEFUN(DEAL_II_CHECK_DYNAMIC_CAST_BUG,
     AC_DEFINE(DEAL_II_HAVE_DARWIN_DYNACAST_BUG, 1,
               [Defined if the compiler has a bug with dynamic casting
                and dynamic libraries])
-    if(test "`sw_vers -productVersion`" != "10.8");then 
+    if(test "`sw_vers -productVersion`" != "10.8");then
 	CXXFLAGSG="$CXXFLAGSG -mmacosx-version-min=10.4"
 	CXXFLAGSO="$CXXFLAGSO -mmacosx-version-min=10.4"
 	LDFLAGS="$LDFLAGS -mmacosx-version-min=10.4"

@@ -5820,7 +5820,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
       clang)
           CFLAGS="$CFLAGS -g"
-          CFLAGSO="$CFLAGS -fast -O2"
+          CFLAGSO="$CFLAGS -O2"
           CFLAGSPIC="-fPIC"
           ;;
 
