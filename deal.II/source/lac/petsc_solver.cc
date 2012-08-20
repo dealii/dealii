@@ -267,7 +267,7 @@ namespace PETScWrappers
                                      // set the type of solver. 
     int ierr;
 
-#ifdef DEAL_II_PETSC_VERSION_LT(3,3,0)
+#if DEAL_II_PETSC_VERSION_LT(3,3,0)
     ierr = KSPSetType (ksp, const_cast<char *>(KSPCHEBYCHEV));
 #else
     ierr = KSPSetType (ksp, const_cast<char *>(KSPCHEBYSHEV));
