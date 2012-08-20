@@ -62,39 +62,42 @@ vanishes, because we consider a frictionless situation and the normal stress is 
 As a starting point we want to minimise an energy functional:
 $$E(\tau) := \dfrac{1}{2}\int\limits_{\Omega}\tau A \tau d\tau,\quad \tau\in \Pi W^{div}$$
 with
-$$W^{div}:=\lbrace \tau\in L^2(\Omega,\mathbb{R}^{dim\times\dim}_{sym}),div(\tau)\in L^2(\Omega,\mathbb{R}^{dim})\rbrace$$
-and
+$$W^{div}:=\lbrace \tau\in
+L^2(\Omega,\mathbb{R}^{dim\times\dim}_{sym}):div(\tau)\in L^2(\Omega,\mathbb{R}^{dim})\rbrace$$ and
 $$\Pi \Sigma:=\lbrace \tau\in \Sigma, \mathcal{F}(\tau)\leq 0\rbrace$$
 as the set of admissible stresses which is defined
 by a continious, convex flow function $\mathcal{F}$.
 
 With the goal to derive the dual formulation of the minimisation problem, we define a lagrange function:
-$$L(\tau,\varphi) := E(\tau) + (\varphi, div(\tau)),\quad \lbrace\tau,\varphi\rbrace\in\Pi W^{div}\times U$$
-with $U := \lbrace u\in H^1(\Omega), u = g \text{ on } \Gamma_D,u_n\leq 0 \text{ on } \Gamma_C \rbrace$.\\
+$$L(\tau,\varphi) := E(\tau) + (\varphi, div(\tau)),\quad \lbrace\tau,\varphi\rbrace\in\Pi W^{div}\times V^+$$
+with
+$$V^+ := \lbrace u\in V: u_n\leq g \text{ on } \Gamma_C \rbrace$$
+$$V:=\left[ H_0^1 \right]^{dim}:=\lbrace u\in \left[H^1(\Omega)\right]^{dim}: u
+= 0 \text{ on } \Gamma_D\rbrace$$
 By building the fr\'echet derivatives of $L$ for both components we obtain the dual formulation for the stationary case
 which is known as \textbf{Hencky-Type-Model}:\\
-Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times U$ with
+Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times V^+$ with
 $$\left(A\sigma,\tau - \sigma\right) + \left(u, div(\tau) - div(\sigma)\right) \geq 0,\quad \forall \tau\in \Pi W^{div}$$
-$$-\left(div(\sigma),\varphi - u\right) \geq 0,\quad \forall \varphi\in U.$$
+$$-\left(div(\sigma),\varphi - u\right) \geq 0,\quad \forall \varphi\in V^+.$$
 By integrating by parts and multiplying the first inequality by $C=A^{-1}$  we achieve the primal-mixed version of our problem:\\
-Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times U$ with
+Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times V^+$ with
 $$\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) \geq 0,\quad \forall \tau\in \Pi W$$
-$$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in U.$$
+$$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+.$$
 Therein $\varepsilon$ denotes the linearised deformation tensor with $\varepsilon(u) := \dfrac{1}{2}\left(\nabla u + \nabla u^T\right)$ for small deformations.\\
 Most materials - especially metals - have the property that they show some hardening effects during the forming process.
 There are different constitutive laws to describe those material behaviour. The most simple one is called linear isotropic hardening
 with the flow function $\mathcal{F}(\tau,\eta) = \vert\tau^D\vert - (\sigma_0 + \gamma\eta)$.
 It can be considered by establishing an additional term in our primal-mixed formulation:\\
-Find a pair $\lbrace(\sigma,\xi),u\rbrace\in \Pi (W\times L^2(\Omega,\mathbb{R}))\times U$ with
+Find a pair $\lbrace(\sigma,\xi),u\rbrace\in \Pi (W\times L^2(\Omega,\mathbb{R}))\times V^+$ with
 $$\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) + \gamma\left( \xi, \eta - \xi\right) \geq 0,\quad \forall (\tau,\eta)\in \Pi (W,L^2(\Omega,\mathbb{R}))$$
-$$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in U,$$
+$$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+,$$
 with the hardening parameter $\gamma > 0$.\\
 Now we want to derive a primal problem which only depends on the displacement $u$. For that purpose we
 set $\eta = \xi$ and eliminate the stress $\sigma$ by applying the projection theorem on\\
 $$\left(\sigma - C\varepsilon(u), \tau - \sigma\right) \geq 0,\quad \forall \tau\in \Pi W,$$
 which yields with the second inequality:\\
-Find the displacement $u\in U$ with
-$$\left(P_{\Pi}(C\varepsilon(u)),\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in U,$$
+Find the displacement $u\in V^+$ with
+$$\left(P_{\Pi}(C\varepsilon(u)),\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+,$$
 with the projection:
 $$P_{\Pi}(\tau):=\begin{cases}
 			\tau, & \text{if }\vert\tau^D\vert \leq \sigma_0 +  \gamma\xi,\\
@@ -126,16 +129,16 @@ method - inexact since we use an iterative solver for the linearised problems in
 
 For the newton method we have to linearise the following semi-linearform
 $$a(\psi;\varphi) := \left(P_{\Pi}(C\varepsilon(\varphi)),\varepsilon(\varphi)\right).$$
-Becaus we have to find the solution $u$ in the convex set $U$, we have to apply an SQP-method (SQP: sequential quadratic
+Becaus we have to find the solution $u$ in the convex set $V^+$, we have to apply an SQP-method (SQP: sequential quadratic
 programming). That means we have to solve a minimisation problem for a known $u^i$ in every SQP-step of the form
 \begin{eqnarray*}
  & & a(u^{i};u^{i+1} - u^i) + \dfrac{1}{2}a'(u^i;u^{i+1} - u^i,u^{i+1} - u^i)\\
  &=&  a(u^i;u^{i+1}) -  a(u^i;u^i) +\\
  & & \dfrac{1}{2}\left( a'(u^i;u^{i+1},u^{i+1}) - 2a'(u^i;u^i,u^{i+1}) - a'(u^i;u^i,u^i)\right)\\
- &\rightarrow& min,\quad u^{i+1}\in U.
+ &\rightarrow& min,\quad u^{i+1}\in V^+.
 \end{eqnarray*}
 Neglecting the constant terms $ a(u^i;u^i)$ and $ a'(u^i;u^i,u^i)$ we obtain the following minimisation problem
-$$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow min,\quad u^{i+1}\in U$$
+$$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow min,\quad u^{i+1}\in V^+$$
 with
 $$F(\varphi) := \left(a'(\varphi;\varphi,u^{i+1}) -  a(\varphi;u^{i+1}) \right).$$
 In the case of our constitutive law the derivative of the semi-linearform $a(.;.)$ at the point $u^i$ is
@@ -143,8 +146,11 @@ In the case of our constitutive law the derivative of the semi-linearform $a(.;.
 $$a'(u^i;\psi,\varphi) =$$
 $$
 \begin{cases}
-\left(\left[2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I\right]\varepsilon(\psi),\varepsilon(\varphi)\right), & \quad  \vert\tau^D\vert \leq \sigma_0\\
-\left(\left[\dfrac{\alpha}{\vert\tau^D\vert}2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I - \dfrac{\tau^D\otimes\tau^D}{\vert\tau^D\vert}\right) + \kappa I\otimes I\right]\varepsilon(\psi),\varepsilon(\varphi) \right), & \quad \vert\tau^D\vert > \sigma_0
+\left(\left[2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I\right]\varepsilon(\psi),\varepsilon(\varphi)\right), & \quad
+      \vert \tau^D \vert \leq \sigma_0\\
+\left(\left[\dfrac{\alpha}{\vert\tau^D\vert}2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I - \dfrac{\tau^D\otimes\tau^D}{\vert\tau^D\vert}\right) +
+      \kappa I\otimes I\right]\varepsilon(\psi),\varepsilon(\varphi) \right), &
+ \quad \vert \tau^D \vert > \sigma_0
 \end{cases}
 $$
 with
@@ -154,18 +160,59 @@ Again the first case is for elastic and the second for plastic deformation.
 \section{Formulation as a saddle point problem}
 
 On the line of step-41 we compose a saddle point problem out of the minimisation problem. Again we do so to gain a formulation
-that allows us to solve a linear system of equations finally.
+that allows us to solve a linear system of equations finally.\\
+We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset W'$,
+$W'$ dual space of the trace space $W$ of $V$ restricted to $\Gamma_C$,
+$$K:=\{\mu\in W':\mu_T = 0,\quad\langle\mu n,v\rangle_{\Gamma_C}\geq 0,\quad
+\forall v\in W, v \ge 0\text{ on }\Gamma_C \}$$
+of Lagrange multipliers, where $\langle\cdot,\cdot\rangle$
+denotes the duality pairing between $W'$ and $W$. Intuitively, $K$ is the cone
+of all "non-positive functions", except that $ K\subset
+\left( \left[ H_0^{\frac{1}{2}} \right]^{dim} \right)' $ and so contains other
+objects besides regular functions as well. This yields:\\
+
+\noindent
+\textit{Find $u\in V$ and $\lambda\in K$ such that}
+\begin{align*}
+ \hat{a}(u,v) + b(v,\lambda) &= f(v),\quad &&v\in V\\
+ b(u,\mu - \lambda) &\leq \langle g,(\mu -
+ \lambda)n\rangle_{\Gamma_C},\quad&&\mu\in K,
+\end{align*}
+\textit{with}
+\begin{align*}
+ \hat{a}(u,v) &:= a'(u^i;u,v)\\
+ b(u,\mu) &:= \langle un,\mu n\rangle_{\Gamma_C},\quad &&u\in V,\quad\mu\in W'.
+\end{align*}
+As in the section before $u^i$ denotes the linearization point for the
+semi-linearform $a(.;.)$. In contrast to step-41 we directly consider $\lambda$
+as the additional, positive force $\sigma(u)n$ that the obstacle
+exerts on the boundary $\Gamma_C$ of the body.\\
+
+\noindent
+The existence and uniqueness of $(u,\lambda)\in V\times K$ of this saddle point
+problem has been stated in Glowinski, Lions and Tr\'{e}moli\`{e}res: Numerical
+Analysis of Variational Inequalities, North-Holland, 1981.\\
+
+\noindent
+NOTE: In this example as well as in the further documentation we make the
+assumption that the normal vector $n$ equals to $(0,0,1)$. This comes up with
+the starting condition of our deformable body.
 
 \section{Active Set methods to solve the saddle point problem}
 
-For this section there is nothing to be done. The linearized problem is essentially like a pure elastic problem with contact like in step-41. The only
-difference consists in the fact that the contact area adjudges at he boundary instead of in the domain. But this has no further consequence
-so that we refer to the documentation of step-41.
+The linearized problem is essentially like a pure elastic problem with contact like
+in step-41. The only difference consists in the fact that the contact area
+adjudges at the boundary instead of in the domain. But this has no further consequence
+so that we refer to the documentation of step-41 with the only hint that
+$\mathcal{S}$ containts all the vertices at the contact boundary $\Gamma_C$ this
+time.
 
-\section{The primal-dual active set algorithm combined with the inexact semi smooth newton method}
+\section{The primal-dual active set algorithm combined with the inexact semi smooth
+newton method}
 
-Now we describe an algorithm that integrates the SQP-method, which we use for the nonlinear constitutive law, with the
-inexact semismooth newton method for the contact. It works as follows:
+Now we describe an algorithm that combines the newton-method, which we use for
+the nonlinear constitutive law, with the semismooth newton method for the contact. It
+works as follows:
 \begin{itemize}
  \item[(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that $\mathcal{S} = \mathcal{A}_k \cup \mathcal{F}_k$ and $\mathcal{A}_k \cap \mathcal{F}_k = \emptyset$ and set $k = 1$.
  \item[(1)] Assembel the newton matrix $a'(U^k;\varphi_i,\varphi_j)$ and the right-hand-side $F(U^k)$.
@@ -177,9 +224,13 @@ inexact semismooth newton method for the contact. It works as follows:
  \end{align*}
 % Note that $\mathcal{S}$ contains only dofs related to the boundary $\Gamma_C$. So in contrast to step-41 there are much more than $\vert \mathcal{S}\vert$ equations necessary to determine $U$ and $\Lambda$.
  \item[(3)] Define the new active and inactive sets by
- $$\mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c\left(\left[BU^k\right]_i - G_i\right) < 0\rbrace,$$
- $$\mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c\left(\left[BU^k\right]_i - G_i\right) \geq 0\rbrace.$$
- \item[(4)] If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert F(U^{k+1}\vert < \delta$ then stop, else set $k=k+1$ and go to step (1).
+ $$\mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
+ c\left(\left[BU^k\right]_i - G_i\right) > 0\rbrace,$$
+ $$\mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
+ c\left(\left[BU^k\right]_i - G_i\right) \leq 0\rbrace.$$
+ \item[(4)] If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert
+ F\left(U^{k+1}\right) \vert < \delta$ then stop, else set $k=k+1$ and go to
+ step (1).
 \end{itemize}
 
 \section{Implementation}
