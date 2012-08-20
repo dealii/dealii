@@ -16,13 +16,8 @@
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
-#ifdef DEAL_PREFER_MATRIX_EZ
-#  include <deal.II/lac/sparse_matrix_ez.h>
-#  include <deal.II/lac/block_sparse_matrix_ez.h>
-#else
-#  include <deal.II/lac/sparsity_pattern.h>
-#  include <deal.II/lac/block_sparsity_pattern.h>
-#endif
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/multigrid/mg_base.h>
