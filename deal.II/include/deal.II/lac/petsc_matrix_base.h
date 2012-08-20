@@ -1054,7 +1054,6 @@ namespace PETScWrappers
 #endif
         is_symmetric (const double tolerance = 1.e-12);
 
-#if DEAL_II_PETSC_VERSION_GTE(2,3,0)
                                         /**
                                          * Test whether a matrix is
                                          * Hermitian, i.e. it is the
@@ -1070,9 +1069,8 @@ namespace PETScWrappers
         PetscBool
 #endif
         is_hermitian (const double tolerance = 1.e-12);
-#endif
 
-                                        /*
+                                        /**
                                          * Abstract PETSc object that helps view
                                          * in ASCII other PETSc objects. Currently
                                          * this function simply writes non-zero

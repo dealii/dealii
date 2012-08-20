@@ -270,12 +270,6 @@ namespace PETScWrappers
                                             */
           ~SolverData ();
 
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
-                                           /**
-                                            * A PETSc solver object.
-                                            */
-          SLES sles;
-#endif
                                            /**
                                             * Objects for Krylov subspace
                                             * solvers and preconditioners.

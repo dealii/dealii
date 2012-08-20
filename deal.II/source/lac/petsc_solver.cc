@@ -94,15 +94,9 @@ namespace PETScWrappers
                                          // checks with the solver_control
                                          // object we have in this object for
                                          // convergence
-#if DEAL_II_PETSC_VERSION_LT(3,0,0)
-        KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
-                               reinterpret_cast<void *>(&solver_control));
-#else
         KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
                                reinterpret_cast<void *>(&solver_control),
                                PETSC_NULL);
-#endif
-
       }
 
                                      // set the command line option prefix name
@@ -274,13 +268,7 @@ namespace PETScWrappers
                                      // problem in PETSc 2.1.6, where it asks
                                      // for a char*, even though KSPXXXX is of
                                      // type const char*
-    int ierr;
-
-#if DEAL_II_PETSC_VERSION_LT(3,3,0)
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPCHEBYCHEV));
-#else
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPCHEBYSHEV));
-#endif
+    int ierr = KSPSetType (ksp, const_cast<char *>(KSPCHEBYSHEV));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in the deal.II solvers, we always
@@ -792,14 +780,9 @@ namespace PETScWrappers
 				 * that checks with the solver_control
 				 * object for convergence
 				 */
-#if DEAL_II_PETSC_VERSION_LT(3,0,0)
-      KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
-			     reinterpret_cast<void *>(&solver_control));
-#else
       KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
 			     reinterpret_cast<void *>(&solver_control),
 			     PETSC_NULL);
-#endif
 
 				/**
 				 * set the software that is to be
