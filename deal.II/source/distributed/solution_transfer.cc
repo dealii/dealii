@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: solution_transfer.cc 23752 2011-05-30 00:16:00Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009, 2010, 2011, 2012 by the deal.II authors
