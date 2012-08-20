@@ -1149,6 +1149,11 @@ namespace DoFRenumbering
                                     * preserved, as is the relative
                                     * order within the untagged
                                     * ones.
+                                    *
+                                    * @precondition The @p selected_dofs
+                                    * array must have as many elements as
+                                    * the @p dof_handler has degrees of
+                                    * freedom.
                                     */
   template <class DH>
   void
@@ -1168,6 +1173,11 @@ namespace DoFRenumbering
                                     * preserved, as is the relative
                                     * order within the untagged
                                     * ones.
+                                    *
+                                    * @precondition The @p selected_dofs
+                                    * array must have as many elements as
+                                    * the @p dof_handler has degrees of
+                                    * freedom on the given level.
                                     */
   template <class DH>
   void
@@ -1183,6 +1193,11 @@ namespace DoFRenumbering
                                     * renumbering on the DoFHandler
                                     * dofs but returns the
                                     * renumbering vector.
+                                    *
+                                    * @precondition The @p selected_dofs
+                                    * array must have as many elements as
+                                    * the @p dof_handler has degrees of
+                                    * freedom.
                                     */
   template <class DH>
   void
@@ -1199,6 +1214,11 @@ namespace DoFRenumbering
                                     * renumbering on the MGDoFHandler
                                     * dofs but returns the
                                     * renumbering vector.
+                                    *
+                                    * @precondition The @p selected_dofs
+                                    * array must have as many elements as
+                                    * the @p dof_handler has degrees of
+                                    * freedom on the given level.
                                     */
   template <class DH>
   void
