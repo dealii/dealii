@@ -157,7 +157,7 @@ This yields:
 <i>with</i>
 @f{align*}
  a(u,v) &:= \left(\nabla u, \nabla v\right),\quad &&u,v\in V\\
- b(u,\mu) &:= \langle g-u,\mu\rangle,\quad &&u\in V,\quad\mu\in V'.
+ b(u,\mu) &:= \langle u,\mu\rangle,\quad &&u\in V,\quad\mu\in V'.
 @f}
 In other words, we can consider $\lambda$ as the negative of the additional, positive force that the
 obstacle exerts on the membrane. The inequality in the second line of the
