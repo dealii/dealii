@@ -164,31 +164,20 @@ endif
 # we can link to directly. This avoids problems with recent versions
 # of gcc.
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-    lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
-    lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
-  else
-    lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
-    lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
-  endif
+  lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
+  lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
 
   ifeq ($(enable-shared),yes)
-    # Starting with PETSc versions 2.3.*:
-    ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-      lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
-      lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+    # Starting with PETSc versions 3.0.0:
+    ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30)
+      lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
+      lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
     else
-      # which is the similar as for PETSc 3.0.0:
-      ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30)
-        lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
-        lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
-      else
-        # but after that (petsc-3.1++), we can use the simpler PETSc
-        # default "--with-single-library=1" like this:
-        lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
-        lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
-      endif
-    endif # if PETSC_VERSION
+      # but after that (petsc-3.1++), we can use the simpler PETSc
+      # default "--with-single-library=1" like this:
+      lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
+      lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
+    endif
   else
     # and finally this goes for static libraries
     lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
@@ -275,11 +264,7 @@ lib-deal2.g     = $(LIBDIR)/libdeal_II.g$(lib-suffix) \
 # environment variable, since the compiler will evaluate the value of
 # that anyway at compile time
 include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
-ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-  include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
-else
-  include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/include
-endif
+include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/include
 include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
 include-path-slepc-bmake     = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/include
 include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
@@ -308,9 +293,6 @@ INCLUDE = -I$D/include \
 #
 # also, note that this only works for PETSc before 2.3 :-]
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),22)
-    include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
-  endif
   INCLUDE += -I$(include-path-petsc) \
              -I$(include-path-petsc-bmake) \
                $(MPI_INCLUDE)
@@ -360,20 +342,14 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   # set PETSC_DIR and PETSC_ARCH to be used in variables file
   PETSC_DIR  = $(DEAL_II_PETSC_DIR)
   PETSC_ARCH = $(DEAL_II_PETSC_ARCH)
-  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-    ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
-      include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/variables
-    else
-      include $(DEAL_II_PETSC_DIR)/bmake/common/variables
-    endif
-  else
-    # PETSC's $(PETSC_ARCH)/conf/petscvariables include file happens
-    # to have a variable $(CXX) of itself. we need to save our own
-    # variable and restore it later. this isn't pretty :-(
-    SAVE_CXX := $(CXX)
-    include $(DEAL_II_PETSC_DIR)/conf/variables
-    CXX := $(SAVE_CXX)
-  endif
+
+  # PETSC's $(PETSC_ARCH)/conf/petscvariables include file happens
+  # to have a variable $(CXX) of itself. we need to save our own
+  # variable and restore it later. this isn't pretty :-(
+  SAVE_CXX := $(CXX)
+  include $(DEAL_II_PETSC_DIR)/conf/variables
+  CXX := $(SAVE_CXX)
+
   CXXFLAGS.g += $(GCXX_PETSCFLAGS)
   CXXFLAGS.o += $(OCXX_PETSCFLAGS)
 endif
