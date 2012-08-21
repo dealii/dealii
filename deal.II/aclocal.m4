@@ -7247,7 +7247,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 
     if test "x$DEAL_II_LD_UNDERSTANDS_RPATH" = "xyes" ; then
       LDFLAGS="$LDFLAGS $LD_PATH_OPTION$DEAL_II_METIS_LIBDIR"
-    end
+    fi
 
     dnl AC_MSG_CHECKING(for Metis version)
     dnl DEAL_II_METIS_VERSION=`cat $DEAL_II_METIS_DIR/VERSION`

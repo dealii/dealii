@@ -12728,7 +12728,7 @@ $as_echo "#define DEAL_II_USE_METIS 1" >>confdefs.h
 
     if test "x$DEAL_II_LD_UNDERSTANDS_RPATH" = "xyes" ; then
       LDFLAGS="$LDFLAGS $LD_PATH_OPTION$DEAL_II_METIS_LIBDIR"
-    end
+    fi
 
               fi
 
