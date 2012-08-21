@@ -2182,15 +2182,22 @@ namespace VectorTools
                                     *
                                     * Apart from the vector @p v to operate
                                     * on, this function takes a boolean mask
-                                    * that has a true entry for
-                                    * every component for which the mean
-                                    * value shall be computed and later
+                                    * that has a true entry for every element
+                                    * of the vector for which the mean value
+                                    * shall be computed and later
                                     * subtracted. The argument is used to
-                                    * denote which components of the
-                                    * solution vector correspond to the
-                                    * pressure, and avoid touching all other
-                                    * components of the vector, such as the
-                                    * velocity components.
+                                    * denote which components of the solution
+                                    * vector correspond to the pressure, and
+                                    * avoid touching all other components of
+                                    * the vector, such as the velocity
+                                    * components. (Note, however, that the
+                                    * mask is not a @ref GlossComponentMask
+                                    * operating on the vector components of
+                                    * the finite element the solution vector
+                                    * @p v may be associated with; rather, it
+                                    * is a mask on the entire vector, without
+                                    * reference to what the vector elements
+                                    * mean.)
                                     *
                                     * @note In the context of using this
                                     * function to filter out the kernel of
