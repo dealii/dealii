@@ -12673,7 +12673,8 @@ $as_echo "$DEAL_II_METIS_DIR" >&6; }
                     if test ! -d $DEAL_II_METIS_DIR/lib ; then
             as_fn_error $? "The path to Metis specified in the METIS_DIR environment variable does not point to a complete Metis installation" "$LINENO" 5
           fi
-          DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
+          DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/lib"
+          DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
         else
           USE_CONTRIB_METIS=no
           DEAL_II_METIS_DIR=""
