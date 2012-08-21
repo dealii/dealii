@@ -420,6 +420,24 @@ namespace PETScWrappers
   }
 
 
+  PetscScalar
+  MatrixBase::matrix_norm_square (const VectorBase &v) const
+  {
+    Vector tmp(v.size());
+    vmult (tmp, v);
+    return tmp*v;
+  }
+
+  
+  PetscScalar
+  MatrixBase::matrix_scalar_product (const VectorBase &u,
+				     const VectorBase &v) const
+  {
+    Vector tmp(v.size());
+    vmult (tmp, v);
+    return u*tmp;
+  }
+
 
 #if DEAL_II_PETSC_VERSION_GTE(3,1,0)
   PetscReal
