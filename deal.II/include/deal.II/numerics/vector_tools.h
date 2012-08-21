@@ -1917,15 +1917,15 @@ namespace VectorTools
                                     * Vector<float>.
                                     */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void integrate_difference (const Mapping<dim,spacedim>    &mapping,
-                             const DoFHandler<dim,spacedim> &dof,
-                             const InVector        &fe_function,
-                             const Function<spacedim>   &exact_solution,
-                             OutVector             &difference,
-                             const Quadrature<dim> &q,
-                             const NormType        &norm,
-                             const Function<spacedim>   *weight=0,
-                             const double exponent = 2.);
+    void integrate_difference (const Mapping<dim,spacedim>    &mapping,
+			       const DoFHandler<dim,spacedim> &dof,
+			       const InVector                 &fe_function,
+			       const Function<spacedim>       &exact_solution,
+			       OutVector                      &difference,
+			       const Quadrature<dim>          &q,
+			       const NormType                 &norm,
+			       const Function<spacedim>       *weight = 0,
+			       const double exponent = 2.);
 
                                    /**
                                     * Calls the integrate_difference()
@@ -1933,41 +1933,44 @@ namespace VectorTools
                                     * <tt>mapping=MappingQ1@<dim@>()</tt>.
                                     */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void integrate_difference (const DoFHandler<dim,spacedim> &dof,
-                             const InVector        &fe_function,
-                             const Function<spacedim>   &exact_solution,
-                             OutVector             &difference,
-                             const Quadrature<dim> &q,
-                             const NormType        &norm,
-                             const Function<spacedim>   *weight=0,
-                             const double exponent = 2.);
+    void integrate_difference (const DoFHandler<dim,spacedim> &dof,
+			       const InVector                 &fe_function,
+			       const Function<spacedim>       &exact_solution,
+			       OutVector                      &difference,
+			       const Quadrature<dim>          &q,
+			       const NormType                 &norm,
+			       const Function<spacedim>       *weight = 0,
+			       const double exponent = 2.);
 
+                                   /**
+				    * Same as above for hp.
+				    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void integrate_difference (const hp::MappingCollection<dim,spacedim>    &mapping,
-                             const hp::DoFHandler<dim,spacedim> &dof,
-                             const InVector        &fe_function,
-                             const Function<spacedim>   &exact_solution,
-                             OutVector             &difference,
-                             const hp::QCollection<dim> &q,
-                             const NormType        &norm,
-                             const Function<spacedim>   *weight=0,
-                             const double exponent = 2.);
-
+    void integrate_difference (const hp::MappingCollection<dim,spacedim> &mapping,
+			       const hp::DoFHandler<dim,spacedim>        &dof,
+			       const InVector                            &fe_function,
+			       const Function<spacedim>                  &exact_solution,
+			       OutVector                                 &difference,
+			       const hp::QCollection<dim>                &q,
+			       const NormType                            &norm,
+			       const Function<spacedim>                  *weight = 0,
+			       const double exponent = 2.);
+  
                                    /**
                                     * Calls the integrate_difference()
                                     * function, see above, with
                                     * <tt>mapping=MappingQ1@<dim@>()</tt>.
                                     */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void integrate_difference (const hp::DoFHandler<dim,spacedim> &dof,
-                             const InVector        &fe_function,
-                             const Function<spacedim>   &exact_solution,
-                             OutVector             &difference,
-                             const hp::QCollection<dim> &q,
-                             const NormType        &norm,
-                             const Function<spacedim>   *weight=0,
-                             const double exponent = 2.);
-
+    void integrate_difference (const hp::DoFHandler<dim,spacedim> &dof,
+			       const InVector                     &fe_function,
+			       const Function<spacedim>           &exact_solution,
+			       OutVector                          &difference,
+			       const hp::QCollection<dim>         &q,
+			       const NormType                     &norm,
+			       const Function<spacedim>           *weight = 0,
+			       const double exponent = 2.);
+  
                                    /**
                                     * Point error evaluation. Find
                                     * the first cell containing the
@@ -1985,11 +1988,11 @@ namespace VectorTools
                                     * point_difference() function.
                                     */
   template <int dim, class InVector, int spacedim>
-  void point_difference (const DoFHandler<dim,spacedim>& dof,
-                         const InVector&        fe_function,
-                         const Function<spacedim>&   exact_solution,
-                         Vector<double>&        difference,
-                         const Point<spacedim>&      point);
+    void point_difference (const DoFHandler<dim,spacedim> &dof,
+			   const InVector                 &fe_function,
+			   const Function<spacedim>       &exact_solution,
+			   Vector<double>                 &difference,
+			   const Point<spacedim>          &point);
 
                                    /**
                                     * Point error evaluation. Find
@@ -2009,12 +2012,12 @@ namespace VectorTools
                                     * the difference.
                                     */
   template <int dim, class InVector, int spacedim>
-  void point_difference (const Mapping<dim, spacedim>    &mapping,
-                         const DoFHandler<dim,spacedim>& dof,
-                         const InVector&        fe_function,
-                         const Function<spacedim>&   exact_solution,
-                         Vector<double>&        difference,
-                         const Point<spacedim>&      point);
+    void point_difference (const Mapping<dim, spacedim>   &mapping,
+			   const DoFHandler<dim,spacedim> &dof,
+			   const InVector                 &fe_function,
+			   const Function<spacedim>       &exact_solution,
+			   Vector<double>                 &difference,
+			   const Point<spacedim>          &point);
 
                                    /**
                                     * Evaluate a possibly
@@ -2032,23 +2035,21 @@ namespace VectorTools
                                     * point_difference() function.
                                     */
   template <int dim, class InVector, int spacedim>
-  void
-  point_value (const DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point,
-               Vector<double>        &value);
-
-  /**
-   * Same as above for hp.
-   */
-
+    void
+    point_value (const DoFHandler<dim,spacedim> &dof,
+		 const InVector                 &fe_function,
+		 const Point<spacedim>          &point,
+		 Vector<double>                 &value);
+  
+                                   /**
+				    * Same as above for hp.
+				    */
   template <int dim, class InVector, int spacedim>
-  void
-  point_value (const hp::DoFHandler<dim,spacedim> &dof,
-         const InVector        &fe_function,
-         const Point<spacedim>      &point,
-         Vector<double>        &value);
-
+    void
+    point_value (const hp::DoFHandler<dim,spacedim> &dof,
+		 const InVector                     &fe_function,
+		 const Point<spacedim>              &point,
+		 Vector<double>                     &value);
 
                                    /**
                                     * Evaluate a scalar finite
@@ -2069,21 +2070,20 @@ namespace VectorTools
                                     * "step-3".
                                     */
   template <int dim, class InVector, int spacedim>
-  double
-  point_value (const DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point);
+    double
+    point_value (const DoFHandler<dim,spacedim> &dof,
+		 const InVector                 &fe_function,
+		 const Point<spacedim>          &point);
 
-  /**
-   * Same as above for hp.
-   */
-
+                                   /**
+				    * Same as above for hp.
+				    */
   template <int dim, class InVector, int spacedim>
-  double
-  point_value (const hp::DoFHandler<dim,spacedim> &dof,
-         const InVector        &fe_function,
-         const Point<spacedim>      &point);
-
+    double
+    point_value (const hp::DoFHandler<dim,spacedim> &dof,
+		 const InVector                     &fe_function,
+		 const Point<spacedim>              &point);
+  
                                    /**
                                     * Evaluate a possibly
                                     * vector-valued finite element
@@ -2100,24 +2100,23 @@ namespace VectorTools
                                     * mapping to evaluate the difference.
                                     */
   template <int dim, class InVector, int spacedim>
-  void
-  point_value (const Mapping<dim, spacedim>    &mapping,
-               const DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point,
-               Vector<double>        &value);
+    void
+    point_value (const Mapping<dim, spacedim>   &mapping,
+		 const DoFHandler<dim,spacedim> &dof,
+		 const InVector                 &fe_function,
+		 const Point<spacedim>          &point,
+		 Vector<double>                 &value);
 
-  /**
-   * Same as above for hp.
-   */
-
+                                   /**
+				    * Same as above for hp.
+				    */
   template <int dim, class InVector, int spacedim>
-  void
-  point_value (const hp::MappingCollection<dim, spacedim>    &mapping,
-         const hp::DoFHandler<dim,spacedim> &dof,
-         const InVector        &fe_function,
-         const Point<spacedim>      &point,
-         Vector<double>        &value);
+    void
+    point_value (const hp::MappingCollection<dim, spacedim> &mapping,
+		 const hp::DoFHandler<dim,spacedim>         &dof,
+		 const InVector                             &fe_function,
+		 const Point<spacedim>                      &point,
+		 Vector<double>                             &value);
 
                                    /**
                                     * Evaluate a scalar finite
@@ -2133,22 +2132,21 @@ namespace VectorTools
                                     * mapping to evaluate the difference.
                                     */
   template <int dim, class InVector, int spacedim>
-  double
-  point_value (const Mapping<dim,spacedim>    &mapping,
-               const DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point);
+    double
+    point_value (const Mapping<dim,spacedim>    &mapping,
+		 const DoFHandler<dim,spacedim> &dof,
+		 const InVector                 &fe_function,
+		 const Point<spacedim>          &point);
 
-  /**
-   * Same as above for hp.
-   */
-
+                                   /**
+				    * Same as above for hp.
+				    */
   template <int dim, class InVector, int spacedim>
-  double
-  point_value (const hp::MappingCollection<dim,spacedim>    &mapping,
-         const hp::DoFHandler<dim,spacedim> &dof,
-         const InVector        &fe_function,
-         const Point<spacedim>      &point);
+    double
+    point_value (const hp::MappingCollection<dim,spacedim> &mapping,
+		 const hp::DoFHandler<dim,spacedim>        &dof,
+		 const InVector                            &fe_function,
+		 const Point<spacedim>                     &point);
 
                                    //@}
                                    /**
@@ -2270,11 +2268,11 @@ namespace VectorTools
                                     * evaluation routine.
                                     */
   template <int dim, class InVector, int spacedim>
-  double compute_mean_value (const Mapping<dim, spacedim>    &mapping,
-                             const DoFHandler<dim,spacedim> &dof,
-                             const Quadrature<dim> &quadrature,
-                             const InVector        &v,
-                             const unsigned int     component);
+    double compute_mean_value (const Mapping<dim, spacedim>   &mapping,
+			       const DoFHandler<dim,spacedim> &dof,
+			       const Quadrature<dim>          &quadrature,
+			       const InVector                 &v,
+			       const unsigned int              component);
 
                                    /**
                                     * Calls the other compute_mean_value()
@@ -2282,20 +2280,22 @@ namespace VectorTools
                                     * <tt>mapping=MappingQ1@<dim@>()</tt>.
                                     */
   template <int dim, class InVector, int spacedim>
-  double compute_mean_value (const DoFHandler<dim,spacedim> &dof,
-                             const Quadrature<dim> &quadrature,
-                             const InVector        &v,
-                             const unsigned int     component);
+    double compute_mean_value (const DoFHandler<dim,spacedim> &dof,
+			       const Quadrature<dim>          &quadrature,
+			       const InVector                 &v,
+			       const unsigned int              component);
                                    //@}
 
                                    /**
                                     * Exception
                                     */
   DeclException0 (ExcInvalidBoundaryIndicator);
+
                                    /**
                                     * Exception
                                     */
   DeclException0 (ExcNonInterpolatingFE);
+
                                    /**
                                     * Exception
                                     */
