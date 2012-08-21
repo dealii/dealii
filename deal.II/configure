@@ -12663,6 +12663,8 @@ $as_echo "$DEAL_II_METIS_DIR" >&6; }
 else
 
                 if test "x$METIS_DIR" != "x" ; then
+          { $as_echo "$as_me:${as_lineno-$LINENO}: checking for METIS from the environment" >&5
+$as_echo_n "checking for METIS from the environment... " >&6; }
           USE_CONTRIB_METIS=yes
           DEAL_II_METIS_DIR="$METIS_DIR"
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEAL_II_METIS_DIR" >&5

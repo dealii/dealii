@@ -7186,6 +7186,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
      [
         dnl Take something from the environment variables, if it is there
         if test "x$METIS_DIR" != "x" ; then
+          AC_MSG_CHECKING([for METIS from the environment])
           USE_CONTRIB_METIS=yes
           DEAL_II_METIS_DIR="$METIS_DIR"
           AC_MSG_RESULT($DEAL_II_METIS_DIR)
