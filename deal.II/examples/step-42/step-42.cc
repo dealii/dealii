@@ -12,11 +12,8 @@
 
                                  // @sect3{Include files}
 
-				 // The first few (many?) include
-				 // files have already been used in
-				 // the previous example, so we will
-				 // not explain their meaning here
-				 // again.
+				 // We are using the the same
+                                 // include files as in step-42:
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -72,7 +69,30 @@ namespace Step42
 
                                    // @sect3{The <code>PlasticityContactProblem</code> class template}
 
+                                   // This class provides an interface
+                                   // for a constitutive law. In this
+                                   // example we are using an elastic
+                                   // plastic material with linear,
+                                   // isotropic hardening.
+
   template <int dim> class ConstitutiveLaw;
+
+                                   // @sect3{The <code>PlasticityContactProblem</code> class template}
+
+                                   // This class supplies all function
+                                   // and variables needed to describe
+                                   // the nonlinear contact problem. It is
+                                   // close to step-41 but with some additional
+                                   // features like: handling hanging nodes,
+                                   // a newton method, using Trilinos and p4est
+                                   // for parallel distributed computing.
+                                   // To deal with hanging nodes makes
+                                   // life a bit more complicated since
+                                   // we need an other ConstraintMatrix now.
+                                   // We create a newton method for the
+                                   // active set method for the contact
+                                   // situation and to handle the nonlinear
+                                   // operator for the constitutive law.
 
   template <int dim>
   class PlasticityContactProblem
@@ -84,10 +104,9 @@ namespace Step42
   private:
     void make_grid ();
     void setup_system();
-    void assemble_mass_matrix ();
     void assemble_nl_system (TrilinosWrappers::MPI::Vector &u);
-    void residual_nl_system (TrilinosWrappers::MPI::Vector &u,
-                             Vector<double>                &sigma_eff_vector);
+    void residual_nl_system (TrilinosWrappers::MPI::Vector &u);
+    void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
     void update_solution_and_constraints ();
     void dirichlet_constraints ();
     void solve ();
@@ -95,7 +114,6 @@ namespace Step42
     void output_results (const std::string& title) const;
     void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
     void output_results (TrilinosWrappers::MPI::Vector vector, const std::string& title) const;
-    void output_results (Vector<double> vector, const std::string& title) const;
 
     int                  n_refinements_global;
     int                  n_refinements_local;
@@ -118,7 +136,6 @@ namespace Step42
     ConstraintMatrix     constraints_dirichlet_hanging_nodes;
 
     TrilinosWrappers::SparseMatrix system_matrix_newton;
-    TrilinosWrappers::SparseMatrix mass_matrix;
 
     TrilinosWrappers::MPI::Vector       solution;
     TrilinosWrappers::MPI::Vector       old_solution;
@@ -139,21 +156,23 @@ namespace Step42
     double gamma;      // Parameter for the linear isotropic hardening
     double e_modul;    // E-Modul
     double nu;         // Poisson ratio
-
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>  Mp_preconditioner;
   };
 
   template <int dim>
   class ConstitutiveLaw
   {
   public:
-    ConstitutiveLaw (double _E, double _nu, double _sigma_0, double _gamma, MPI_Comm _mpi_communicator, ConditionalOStream _pcout);
-    //     ConstitutiveLaw (double mu, double kappa);
+    ConstitutiveLaw (double _E,
+                     double _nu,
+                     double _sigma_0,
+                     double _gamma,
+                     MPI_Comm _mpi_communicator,
+                     ConditionalOStream _pcout);
+
     void plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor,
                                  SymmetricTensor<2,dim>  &strain_tensor,
-                                 unsigned int 	       &elast_points,
-                                 unsigned int 	       &plast_points,
-                                 double                  &sigma_eff,
+                                 unsigned int 	         &elast_points,
+                                 unsigned int 	         &plast_points,
                                  double                  &yield);
     void linearized_plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor_linearized,
                                             SymmetricTensor<4,dim>  &stress_strain_tensor,
@@ -210,7 +229,6 @@ namespace Step42
                                                      SymmetricTensor<2,dim>  &strain_tensor,
                                                      unsigned int            &elast_points,
                                                      unsigned int            &plast_points,
-                                                     double                  &sigma_eff,
                                                      double                  &yield)
   {
     if (dim == 3)
@@ -236,10 +254,7 @@ namespace Step42
       else
         elast_points += 1;
 
-  //     std::cout<< beta <<std::endl;
       stress_strain_tensor += stress_strain_tensor_kappa;
-
-      sigma_eff = beta * deviator_stress_tensor_norm;
     }
   }
 
@@ -422,8 +437,6 @@ namespace Step42
           //   return_value = 1e+5;
         }
       return return_value;
-
-      // return 1e+10;//0.98;
     }
 
     template <int dim>
@@ -563,7 +576,6 @@ namespace Step42
 
     // setup hanging nodes and dirichlet constraints
     {
-      // constraints_hanging_nodes.clear ();
       constraints_hanging_nodes.reinit (locally_relevant_dofs);
       DoFTools::make_hanging_node_constraints (dof_handler,
                                                constraints_hanging_nodes);
@@ -604,65 +616,18 @@ namespace Step42
 
       system_matrix_newton.reinit (sp);
 
+      TrilinosWrappers::SparseMatrix mass_matrix;
       mass_matrix.reinit (sp);
+      assemble_mass_matrix_diagonal (mass_matrix);
+      const unsigned int
+        start = (system_rhs_newton.local_range().first),
+        end   = (system_rhs_newton.local_range().second);
+      for (unsigned int j=start; j<end; j++)
+        diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
+      number_iterations = 0;
+
+      diag_mass_matrix_vector.compress ();
     }
-
-    assemble_mass_matrix ();
-    const unsigned int
-      start = (system_rhs_newton.local_range().first),
-      end   = (system_rhs_newton.local_range().second);
-    for (unsigned int j=start; j<end; j++)
-      diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
-    number_iterations = 0;
-
-    diag_mass_matrix_vector.compress ();
-  }
-
-  template <int dim>
-  void PlasticityContactProblem<dim>::assemble_mass_matrix ()
-  {
-    QTrapez<dim-1>  face_quadrature_formula;
-
-    FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula,
-                                        update_values   | update_quadrature_points | update_JxW_values);
-
-    const unsigned int   dofs_per_cell      = fe.dofs_per_cell;
-    const unsigned int   dofs_per_face      = fe.dofs_per_face;
-    const unsigned int   n_face_q_points    = face_quadrature_formula.size();
-
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-    const FEValuesExtractors::Vector displacement (0);
-
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-
-    for (; cell!=endc; ++cell)
-      if (cell->is_locally_owned())
-        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-          if (cell->face (face)->at_boundary()
-              && cell->face (face)->boundary_indicator () == 9)
-            {
-              fe_values_face.reinit (cell, face);
-              cell_matrix = 0;
-
-              for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
-                for (unsigned int i=0; i<dofs_per_cell; ++i)
-                  cell_matrix(i,i) += (fe_values_face[displacement].value (i, q_point) *
-                                       fe_values_face[displacement].value (i, q_point) *
-                                       fe_values_face.JxW (q_point));
-
-              cell->get_dof_indices (local_dof_indices);
-
-              constraints_dirichlet_hanging_nodes.distribute_local_to_global (cell_matrix,
-                                                                              local_dof_indices,
-                                                                              mass_matrix);
-            }
-
-    mass_matrix.compress ();
   }
 
   template <int dim>
@@ -792,8 +757,7 @@ namespace Step42
   }
 
   template <int dim>
-  void PlasticityContactProblem<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u,
-                                       Vector<double>                &sigma_eff_vector)
+  void PlasticityContactProblem<dim>::residual_nl_system (TrilinosWrappers::MPI::Vector &u)
   {
     QGauss<dim>  quadrature_formula(2);
     QGauss<dim-1> face_quadrature_formula(2);
@@ -819,7 +783,6 @@ namespace Step42
                                                               Vector<double>(dim));
 
     Vector<double>       cell_rhs (dofs_per_cell);
-    Vector<double>       cell_sigma_eff (dofs_per_cell);
 
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
@@ -830,7 +793,6 @@ namespace Step42
 
     unsigned int elast_points = 0;
     unsigned int plast_points = 0;
-    double       sigma_eff = 0;
     double       yield = 0;
     unsigned int cell_number = 0;
     for (; cell!=endc; ++cell)
@@ -851,13 +813,8 @@ namespace Step42
               SymmetricTensor<2,dim> stress_tensor;
 
               plast_lin_hard->plast_linear_hardening (stress_strain_tensor, strain_tensor[q_point],
-                                                      elast_points, plast_points, sigma_eff, yield);
+                                                      elast_points, plast_points, yield);
 
-              // sigma_eff_vector (cell_number) += sigma_eff;
-              sigma_eff_vector (cell_number) += yield;
-
-              /*	if (q_point == 0)
-                  std::cout<< stress_strain_tensor <<std::endl;*/
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   cell_rhs(i) -= (strain_tensor[q_point] * stress_strain_tensor * //(stress_tensor) *
@@ -899,7 +856,6 @@ namespace Step42
                                                                           local_dof_indices,
                                                                           system_rhs_newton);
 
-          sigma_eff_vector(cell_number) /= n_q_points;
           cell_number += 1;
         };
 
@@ -909,6 +865,54 @@ namespace Step42
     unsigned int sum_plast_points = Utilities::MPI::sum(plast_points, mpi_communicator);
     pcout<< "Elast-Points = " << sum_elast_points <<std::endl;
     pcout<< "Plast-Points = " << sum_plast_points <<std::endl;
+  }
+
+  template <int dim>
+  void PlasticityContactProblem<dim>::assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix)
+  {
+    QTrapez<dim-1>  face_quadrature_formula;
+
+    FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula,
+                                      update_values   |
+                                      update_quadrature_points |
+                                      update_JxW_values);
+
+    const unsigned int   dofs_per_cell      = fe.dofs_per_cell;
+    const unsigned int   n_face_q_points    = face_quadrature_formula.size();
+
+    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+
+    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+    const FEValuesExtractors::Vector displacement (0);
+
+    typename DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
+
+    for (; cell!=endc; ++cell)
+      if (cell->is_locally_owned())
+        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+          if (cell->face (face)->at_boundary()
+              && cell->face (face)->boundary_indicator () == 9)
+            {
+              fe_values_face.reinit (cell, face);
+              cell_matrix = 0;
+
+              for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+                for (unsigned int i=0; i<dofs_per_cell; ++i)
+                  cell_matrix(i,i) += (fe_values_face[displacement].value (i, q_point) *
+                                       fe_values_face[displacement].value (i, q_point) *
+                                       fe_values_face.JxW (q_point));
+
+              cell->get_dof_indices (local_dof_indices);
+
+              constraints_dirichlet_hanging_nodes.distribute_local_to_global (cell_matrix,
+                                                                              local_dof_indices,
+                                                                              mass_matrix);
+            }
+
+    mass_matrix.compress ();
   }
 
                                    // @sect4{PlasticityContactProblem::update_solution_and_constraints}
@@ -1125,8 +1129,6 @@ namespace Step42
     additional_data.aggregation_threshold = 1e-2;
 
     IndexSet                            active_set_old (active_set);
-    Vector<double>                      sigma_eff_vector;
-    sigma_eff_vector.reinit (triangulation.n_active_cells());
     unsigned int j = 0;
     unsigned int number_assemble_system = 0;
     for (; j<=100;j++)
@@ -1181,9 +1183,8 @@ namespace Step42
             MPI_Barrier (mpi_communicator);
             t.restart();
             system_rhs_newton = 0;
-            sigma_eff_vector = 0;
             solution = old_solution;
-            residual_nl_system (solution, sigma_eff_vector);
+            residual_nl_system (solution);
             res = system_rhs_newton;
 
             const unsigned int
@@ -1238,7 +1239,6 @@ namespace Step42
     // filename_solution << "solution_";
     // filename_solution << k;
     output_results (filename_solution.str ());
-    // output_results (sigma_eff_vector, "sigma_eff");
     MPI_Barrier (mpi_communicator);
     t.stop();
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
@@ -1363,22 +1363,6 @@ namespace Step42
   }
 
   template <int dim>
-  void PlasticityContactProblem<dim>::output_results (Vector<double> vector, const std::string& title) const
-  {
-    DataOut<dim> data_out;
-
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (vector, "vector_to_plot");
-
-    data_out.build_patches ();
-
-    std::ofstream output_vtk (dim == 2 ?
-                              (title + ".vtk").c_str () :
-                              (title + ".vtk").c_str ());
-    data_out.write_vtk (output_vtk);
-  }
-
-  template <int dim>
   void PlasticityContactProblem<dim>::run ()
   {
     pcout << "Solving problem in " << dim << " space dimensions." << std::endl;
@@ -1402,79 +1386,6 @@ namespace Step42
 
                                  // @sect3{The <code>main</code> function}
 
-                                 // And this is the main function. It also
-                                 // looks mostly like in step-3, but if you
-                                 // look at the code below, note how we first
-                                 // create a variable of type
-                                 // <code>PlasticityContactProblem@<2@></code> (forcing
-                                 // the compiler to compile the class template
-                                 // with <code>dim</code> replaced by
-                                 // <code>2</code>) and run a 2d simulation,
-                                 // and then we do the whole thing over in 3d.
-                                 //
-                                 // In practice, this is probably not what you
-                                 // would do very frequently (you probably
-                                 // either want to solve a 2d problem, or one
-                                 // in 3d, but not both at the same
-                                 // time). However, it demonstrates the
-                                 // mechanism by which we can simply change
-                                 // which dimension we want in a single place,
-                                 // and thereby force the compiler to
-                                 // recompile the dimension independent class
-                                 // templates for the dimension we
-                                 // request. The emphasis here lies on the
-                                 // fact that we only need to change a single
-                                 // place. This makes it rather trivial to
-                                 // debug the program in 2d where computations
-                                 // are fast, and then switch a single place
-                                 // to a 3 to run the much more computing
-                                 // intensive program in 3d for `real'
-                                 // computations.
-                                 //
-                                 // Each of the two blocks is enclosed in
-                                 // braces to make sure that the
-                                 // <code>laplace_problem_2d</code> variable
-                                 // goes out of scope (and releases the memory
-                                 // it holds) before we move on to allocate
-                                 // memory for the 3d case. Without the
-                                 // additional braces, the
-                                 // <code>laplace_problem_2d</code> variable
-                                 // would only be destroyed at the end of the
-                                 // function, i.e. after running the 3d
-                                 // problem, and would needlessly hog memory
-                                 // while the 3d run could actually use it.
-                                 //
-                                 // Finally, the first line of the function is
-                                 // used to suppress some output.  Remember
-                                 // that in the previous example, we had the
-                                 // output from the linear solvers about the
-                                 // starting residual and the number of the
-                                 // iteration where convergence was
-                                 // detected. This can be suppressed through
-                                 // the <code>deallog.depth_console(0)</code>
-                                 // call.
-                                 //
-                                 // The rationale here is the following: the
-                                 // deallog (i.e. deal-log, not de-allog)
-                                 // variable represents a stream to which some
-                                 // parts of the library write output. It
-                                 // redirects this output to the console and
-                                 // if required to a file. The output is
-                                 // nested in a way so that each function can
-                                 // use a prefix string (separated by colons)
-                                 // for each line of output; if it calls
-                                 // another function, that may also use its
-                                 // prefix which is then printed after the one
-                                 // of the calling function. Since output from
-                                 // functions which are nested deep below is
-                                 // usually not as important as top-level
-                                 // output, you can give the deallog variable
-                                 // a maximal depth of nested output for
-                                 // output to console and file. The depth zero
-                                 // which we gave here means that no output is
-                                 // written. By changing it you can get more
-                                 // information about the innards of the
-                                 // library.
 int main (int argc, char *argv[])
 {
   using namespace dealii;
