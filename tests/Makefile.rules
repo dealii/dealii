@@ -27,8 +27,11 @@ PLATFORM-HIERARCHY = $(shell $(PERL) ../hierarchy.pl $(PLATFORM))
 ID = `id -un`"@"`hostname`
 
 ############################################################
-# First how to create executables, including all necessary
-# flags:
+# First how to create object files, including all necessary
+# flags. Before we start the compilation, write the status
+# of the next operation into the test/status file. If these
+# are MPI tests, also remove all status files from the
+# test/ncpus_*/ directories
 ############################################################
 
 flags     = $(CXXFLAGS.g)
@@ -40,11 +43,13 @@ endif
 %/obj.g.$(OBJEXT) : %.cc
 	@echo =====debug========= $<
 	@echo Compiling > $(dir $@)/status
+	@-rm -f $(dir $@)/ncpu*/status
 	@$(CXX) $(flags) -c $< -o $@
 
 %/obj.$(OBJEXT) : %.cc
 	@echo =====optimized===== $<
 	@echo Compiling > $(dir $@)/status
+	@-rm -f $(dir $@)/ncpu*/status
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 ######################################################################
