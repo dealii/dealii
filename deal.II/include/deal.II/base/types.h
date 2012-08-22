@@ -32,6 +32,12 @@ namespace types
                                     */
   typedef unsigned int subdomain_id;
 
+				   /**
+				    * Old name for the typedef above.
+				    * @deprecated
+				    */
+  typedef subdomain_id subdomain_id_t;
+
                                    /**
                                     * A special id for an invalid
                                     * subdomain id. This value may not
@@ -84,6 +90,12 @@ namespace types
            */
   typedef unsigned char boundary_id;
 
+				   /**
+				    * Old name for the typedef above.
+				    * @deprecated
+				    */
+  typedef boundary_id boundary_id_t;
+
           /**
            * The number which we reserve for internal faces.
            * We assume that all boundary_ids lie in the range [0, internal_face_boundary_id).
@@ -95,6 +107,12 @@ namespace types
            * cell.
            */
   typedef unsigned char material_id;
+
+				   /**
+				    * Old name for the typedef above.
+				    * @deprecated
+				    */
+  typedef material_id material_id_t;
 
           /**
            * Invalid material_id which we need in several places as a default value.
