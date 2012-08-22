@@ -54,7 +54,7 @@ void test ()
                                 // compress (no addition)
   if (myid > 0)
     v(1) = 7;
-  v.compress(/* add_ghost_data = */ false);
+  v.compress(VectorOperation::insert);
 
   if (myid == 0)
     {
