@@ -75,7 +75,7 @@ void test ()
   
   deallog << v_tmp.has_ghost_elements() << std::endl;
 
-  if (myid)
+  if (myid==0)
     deallog << "OK" << std::endl;
 }
 
