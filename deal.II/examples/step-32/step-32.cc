@@ -2554,7 +2554,7 @@ namespace Step32
 						stokes_constraints,
 						velocity_mask);
 
-      std::set<types::boundary_id_t> no_normal_flux_boundaries;
+      std::set<types::boundary_id> no_normal_flux_boundaries;
       no_normal_flux_boundaries.insert (1);
       VectorTools::compute_no_normal_flux_constraints (stokes_dof_handler, 0,
                                                        no_normal_flux_boundaries,

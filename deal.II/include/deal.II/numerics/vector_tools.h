@@ -194,7 +194,7 @@ class ConstraintMatrix;
  *   of boundary nodes and their values. You can get such a list by interpolation
  *   of a boundary function using the interpolate_boundary_values() function.
  *   To use it, you have to
- *   specify a list of pairs of boundary indicators (of type <tt>types::boundary_id_t</tt>;
+ *   specify a list of pairs of boundary indicators (of type <tt>types::boundary_id</tt>;
  *   see the section in the documentation of the Triangulation class for more
  *   details) and the according functions denoting the dirichlet boundary values
  *   of the nodes on boundary faces with this boundary indicator.
@@ -767,7 +767,7 @@ namespace VectorTools
   void
   interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension>            &mapping,
                                const DH                 &dof,
-                               const types::boundary_id_t            boundary_component,
+                               const types::boundary_id            boundary_component,
                                const Function<DH::space_dimension>           &boundary_function,
                                std::map<unsigned int,double> &boundary_values,
                                const std::vector<bool>       &component_mask = std::vector<bool>());
@@ -781,7 +781,7 @@ namespace VectorTools
   template <class DH>
   void
   interpolate_boundary_values (const DH        &dof,
-                               const types::boundary_id_t            boundary_component,
+                               const types::boundary_id            boundary_component,
                                const Function<DH::space_dimension>           &boundary_function,
                                std::map<unsigned int,double> &boundary_values,
                                const std::vector<bool>       &component_mask = std::vector<bool>());
@@ -908,7 +908,7 @@ namespace VectorTools
   void
   interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension> &mapping,
                                const DH                            &dof,
-                               const types::boundary_id_t                  boundary_component,
+                               const types::boundary_id                  boundary_component,
                                const Function<DH::space_dimension> &boundary_function,
                                ConstraintMatrix                    &constraints,
                                const std::vector<bool>             &component_mask = std::vector<bool>());
@@ -924,7 +924,7 @@ namespace VectorTools
   template <class DH>
   void
   interpolate_boundary_values (const DH                            &dof,
-                               const types::boundary_id_t                  boundary_component,
+                               const types::boundary_id                  boundary_component,
                                const Function<DH::space_dimension> &boundary_function,
                                ConstraintMatrix                    &constraints,
                                const std::vector<bool>             &component_mask = std::vector<bool>());
@@ -1179,7 +1179,7 @@ namespace VectorTools
   void project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                                                 const unsigned int first_vector_component,
                                                 const Function<dim>& boundary_function,
-                                                const types::boundary_id_t boundary_component,
+                                                const types::boundary_id boundary_component,
                                                 ConstraintMatrix& constraints,
                                                 const Mapping<dim>& mapping = StaticMappingQ1<dim>::mapping);
 
@@ -1192,7 +1192,7 @@ namespace VectorTools
   void project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                                                 const unsigned int first_vector_component,
                                                 const Function<dim>& boundary_function,
-                                                const types::boundary_id_t boundary_component,
+                                                const types::boundary_id boundary_component,
                                                 ConstraintMatrix& constraints,
                                                 const hp::MappingCollection<dim, dim>& mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
 
@@ -1265,7 +1265,7 @@ namespace VectorTools
   void project_boundary_values_div_conforming (const DoFHandler<dim>& dof_handler,
                                                const unsigned int first_vector_component,
                                                const Function<dim>& boundary_function,
-                                               const types::boundary_id_t boundary_component,
+                                               const types::boundary_id boundary_component,
                                                ConstraintMatrix& constraints,
                                                const Mapping<dim>& mapping = StaticMappingQ1<dim>::mapping);
 
@@ -1278,7 +1278,7 @@ namespace VectorTools
   void project_boundary_values_div_conforming (const hp::DoFHandler<dim>& dof_handler,
                                                const unsigned int first_vector_component,
                                                const Function<dim>& boundary_function,
-                                               const types::boundary_id_t boundary_component,
+                                               const types::boundary_id boundary_component,
                                                ConstraintMatrix& constraints,
                                                const hp::MappingCollection<dim, dim>& mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
 
@@ -1603,7 +1603,7 @@ namespace VectorTools
   void
   compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
                                       const unsigned int     first_vector_component,
-                                      const std::set<types::boundary_id_t> &boundary_ids,
+                                      const std::set<types::boundary_id> &boundary_ids,
                                       ConstraintMatrix      &constraints,
                                       const Mapping<dim, spacedim>    &mapping = StaticMappingQ1<dim>::mapping);
 
@@ -1786,7 +1786,7 @@ namespace VectorTools
                                         const Quadrature<dim-1> &q,
                                         const Function<spacedim>     &rhs,
                                         Vector<double>          &rhs_vector,
-                                        const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
+                                        const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
 
                                    /**
                                     * Calls the
@@ -1799,7 +1799,7 @@ namespace VectorTools
                                         const Quadrature<dim-1> &q,
                                         const Function<spacedim>     &rhs,
                                         Vector<double>          &rhs_vector,
-                                        const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
+                                        const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
 
                                    /**
                                     * Same as the set of functions above,
@@ -1811,7 +1811,7 @@ namespace VectorTools
                                         const hp::QCollection<dim-1> &q,
                                         const Function<spacedim>     &rhs,
                                         Vector<double>          &rhs_vector,
-                                        const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
+                                        const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
 
                                    /**
                                     * Calls the
@@ -1828,7 +1828,7 @@ namespace VectorTools
                                         const hp::QCollection<dim-1> &q,
                                         const Function<spacedim>     &rhs,
                                         Vector<double>          &rhs_vector,
-                                        const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
+                                        const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
 
                                    //@}
                                    /**

@@ -1023,7 +1023,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * then this object is in the
                                       * interior of the domain.
                                       */
-    types::boundary_id_t boundary_indicator () const;
+    types::boundary_id boundary_indicator () const;
 
                                      /**
                                       * Set the boundary indicator.
@@ -1069,7 +1069,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       *
                                       * @ingroup boundary
                                       */
-    void set_boundary_indicator (const types::boundary_id_t) const;
+    void set_boundary_indicator (const types::boundary_id) const;
 
                                      /**
                                       * Do as set_boundary_indicator()
@@ -1089,7 +1089,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       *
                                       * @ingroup boundary
                                       */
-    void set_all_boundary_indicators (const types::boundary_id_t) const;
+    void set_all_boundary_indicators (const types::boundary_id) const;
 
                                      /**
                                       * Return whether this object is at the
@@ -1934,7 +1934,7 @@ class TriaAccessor<0, 1, spacedim>
                                       * then this object is in the
                                       * interior of the domain.
                                       */
-    types::boundary_id_t boundary_indicator () const;
+    types::boundary_id boundary_indicator () const;
 
                                      /**
                                       *  @name Orientation of sub-objects
@@ -2072,7 +2072,7 @@ class TriaAccessor<0, 1, spacedim>
                                       * @ingroup boundary
                                       */
     void
-    set_boundary_indicator (const types::boundary_id_t);
+    set_boundary_indicator (const types::boundary_id);
 
                                      /**
                                       * Since this object only represents a
@@ -2083,7 +2083,7 @@ class TriaAccessor<0, 1, spacedim>
                                       * @ingroup boundary
                                       */
     void
-    set_all_boundary_indicators (const types::boundary_id_t);
+    set_all_boundary_indicators (const types::boundary_id);
                                      /**
                                       * @}
                                       */
@@ -2621,7 +2621,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * "glossary" for more
                                       * information.
                                       */
-    types::material_id_t material_id () const;
+    types::material_id material_id () const;
 
                                      /**
                                       * Set the material id of this
@@ -2635,7 +2635,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * "glossary" for more
                                       * information.
                                       */
-    void set_material_id (const types::material_id_t new_material_id) const;
+    void set_material_id (const types::material_id new_material_id) const;
 
                                      /**
                                       * Set the material id of this
@@ -2647,7 +2647,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * "glossary" for more
                                       * information.
                                       */
-    void recursively_set_material_id (const types::material_id_t new_material_id) const;
+    void recursively_set_material_id (const types::material_id new_material_id) const;
                                      /**
                                       * @}
                                       */
@@ -2671,7 +2671,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * parallel::distributed::Triangulation
                                       * object.
                                       */
-    types::subdomain_id_t subdomain_id () const;
+    types::subdomain_id subdomain_id () const;
 
                                      /**
                                       * Set the subdomain id of this
@@ -2685,7 +2685,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * parallel::distributed::Triangulation
                                       * object.
                                       */
-    void set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const;
+    void set_subdomain_id (const types::subdomain_id new_subdomain_id) const;
 
                                      /**
                                       * Set the subdomain id of this
@@ -2701,7 +2701,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * parallel::distributed::Triangulation
                                       * object.
                                       */
-    void recursively_set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const;
+    void recursively_set_subdomain_id (const types::subdomain_id new_subdomain_id) const;
                                      /**
                                       * @}
                                       */

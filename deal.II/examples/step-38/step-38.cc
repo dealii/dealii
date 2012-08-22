@@ -381,7 +381,7 @@ namespace Step38
       Triangulation<spacedim> volume_mesh;
       GridGenerator::half_hyper_ball(volume_mesh);
 
-      std::set<types::boundary_id_t> boundary_ids;
+      std::set<types::boundary_id> boundary_ids;
       boundary_ids.insert (0);
 
       GridTools::extract_boundary_mesh (volume_mesh, triangulation,

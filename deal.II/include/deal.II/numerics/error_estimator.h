@@ -348,8 +348,8 @@ class KellyErrorEstimator
                           const std::vector<bool> &component_mask = std::vector<bool>(),
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = numbers::invalid_unsigned_int,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t       material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id       material_id = types::invalid_material_id);
 
                                      /**
                                       * Calls the @p estimate
@@ -365,8 +365,8 @@ class KellyErrorEstimator
                           const std::vector<bool> &component_mask = std::vector<bool>(),
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t       material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id       material_id = types::invalid_material_id);
 
                                      /**
                                       * Same function as above, but
@@ -405,8 +405,8 @@ class KellyErrorEstimator
                           const std::vector<bool>     &component_mask = std::vector<bool>(),
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t           material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id           material_id = types::invalid_material_id);
 
                                      /**
                                       * Calls the @p estimate
@@ -422,8 +422,8 @@ class KellyErrorEstimator
                           const std::vector<bool>     &component_mask = std::vector<bool>(),
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t          material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id          material_id = types::invalid_material_id);
 
 
                                      /**
@@ -442,8 +442,8 @@ class KellyErrorEstimator
                           const std::vector<bool> &component_mask = std::vector<bool>(),
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t       material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id       material_id = types::invalid_material_id);
 
 
                                      /**
@@ -461,8 +461,8 @@ class KellyErrorEstimator
                           const std::vector<bool> &component_mask = std::vector<bool>(),
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t       material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id       material_id = types::invalid_material_id);
 
 
                                      /**
@@ -481,8 +481,8 @@ class KellyErrorEstimator
                           const std::vector<bool>     &component_mask = std::vector<bool>(),
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t           material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id           material_id = types::invalid_material_id);
 
 
                                      /**
@@ -500,8 +500,8 @@ class KellyErrorEstimator
                           const std::vector<bool>     &component_mask = std::vector<bool>(),
                           const Function<spacedim>*    coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t           material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id           material_id = types::invalid_material_id);
 
 
                                      /**
@@ -611,8 +611,8 @@ class KellyErrorEstimator<1,spacedim>
                           const std::vector<bool> &component_mask = std::vector<bool>(),
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t       material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id       material_id = types::invalid_material_id);
 
                                      /**
                                       * Calls the @p estimate
@@ -628,8 +628,8 @@ class KellyErrorEstimator<1,spacedim>
                           const std::vector<bool> &component_mask = std::vector<bool>(),
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t       material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id       material_id = types::invalid_material_id);
 
                                      /**
                                       * Same function as above, but
@@ -668,8 +668,8 @@ class KellyErrorEstimator<1,spacedim>
                           const std::vector<bool>     &component_mask = std::vector<bool>(),
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t           material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id           material_id = types::invalid_material_id);
 
                                      /**
                                       * Calls the @p estimate
@@ -685,8 +685,8 @@ class KellyErrorEstimator<1,spacedim>
                           const std::vector<bool>     &component_mask = std::vector<bool>(),
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t           material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id           material_id = types::invalid_material_id);
 
 
                                      /**
@@ -705,8 +705,8 @@ class KellyErrorEstimator<1,spacedim>
                           const std::vector<bool> &component_mask = std::vector<bool>(),
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t       material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id       material_id = types::invalid_material_id);
 
 
                                      /**
@@ -724,8 +724,8 @@ class KellyErrorEstimator<1,spacedim>
                           const std::vector<bool> &component_mask = std::vector<bool>(),
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t       material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id       material_id = types::invalid_material_id);
 
 
                                      /**
@@ -744,8 +744,8 @@ class KellyErrorEstimator<1,spacedim>
                           const std::vector<bool>     &component_mask = std::vector<bool>(),
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t           material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id           material_id = types::invalid_material_id);
 
 
                                      /**
@@ -763,8 +763,8 @@ class KellyErrorEstimator<1,spacedim>
                           const std::vector<bool>     &component_mask = std::vector<bool>(),
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id_t           material_id = types::invalid_material_id);
+                          const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                          const types::material_id           material_id = types::invalid_material_id);
 
                                      /**
                                       * Exception

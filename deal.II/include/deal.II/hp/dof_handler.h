@@ -863,7 +863,7 @@ namespace hp
                                         * consideration.
                                         */
       unsigned int
-      n_boundary_dofs (const std::set<types::boundary_id_t> &boundary_indicators) const;
+      n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const;
 
                                        /**
                                         * Return the number of

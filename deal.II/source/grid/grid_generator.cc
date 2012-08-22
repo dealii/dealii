@@ -891,7 +891,7 @@ GridGenerator::subdivided_hyper_rectangle (
   Triangulation<1>&                             tria,
   const std::vector< std::vector<double> >&     spacing,
   const Point<1>&                               p,
-  const Table<1,types::material_id_t>&                 material_id,
+  const Table<1,types::material_id>&                 material_id,
   const bool                                    colorize)
 {
                                    // contributed by Yaqi Wang 2006
@@ -950,7 +950,7 @@ GridGenerator::subdivided_hyper_rectangle (
   Triangulation<2>&                         tria,
   const std::vector< std::vector<double> >&     spacing,
   const Point<2>&                               p,
-  const Table<2,types::material_id_t>&          material_id,
+  const Table<2,types::material_id>&          material_id,
   const bool                                    colorize)
 {
                                    // contributed by Yaqi Wang 2006
@@ -1048,7 +1048,7 @@ GridGenerator::subdivided_hyper_rectangle (
   Triangulation<3>&                           tria,
   const std::vector< std::vector<double> >&     spacing,
   const Point<3>&                             p,
-  const Table<3,types::material_id_t>&               material_id,
+  const Table<3,types::material_id>&               material_id,
   const bool                                    colorize)
 {
                                    // contributed by Yaqi Wang 2006
@@ -1382,7 +1382,7 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<2> &tria,
     for (unsigned int i1=0;i1<4;++i1)
       vertices[k++] = Point<2>(coords[i1], coords[i0]);
 
-  const types::material_id_t materials[9] = { 5, 4, 6,
+  const types::material_id materials[9] = { 5, 4, 6,
                                        1, 0, 2,
                                        9, 8,10
   };
@@ -2012,7 +2012,7 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<3> &tria,
       for (unsigned int x=0;x<4;++x)
         vertices[k++] = Point<3>(coords[x], coords[y], coords[z]);
 
-  const types::material_id_t materials[27] = {
+  const types::material_id materials[27] = {
         21,20,22,
         17,16,18,
         25,24,26,

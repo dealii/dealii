@@ -962,7 +962,7 @@ namespace
                           const typename Triangulation<dim,spacedim>::cell_iterator     &dealii_cell,
                           const typename internal::p4est::types<dim>::quadrant &p4est_cell,
                           const typename internal::p4est::types<dim>::forest   &forest,
-                          const types::subdomain_id_t                           my_subdomain)
+                          const types::subdomain_id                           my_subdomain)
   {
                                      // check if this cell exists in
                                      // the local p4est cell
@@ -1394,7 +1394,7 @@ namespace
     public:
       RefineAndCoarsenList (const Triangulation<dim,spacedim> &triangulation,
                             const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
-                            const types::subdomain_id_t                   my_subdomain,
+                            const types::subdomain_id                   my_subdomain,
                             typename internal::p4est::types<dim>::forest &forest);
 
                                        /**
@@ -1468,7 +1468,7 @@ namespace
   RefineAndCoarsenList<dim,spacedim>::
   RefineAndCoarsenList (const Triangulation<dim,spacedim>            &triangulation,
                         const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
-                        const types::subdomain_id_t                   my_subdomain,
+                        const types::subdomain_id                   my_subdomain,
                         typename internal::p4est::types<dim>::forest &forest)
                   :
                   forest(forest)
@@ -1554,7 +1554,7 @@ namespace
   RefineAndCoarsenList<dim,spacedim>::
   build_lists (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
                const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-               const types::subdomain_id_t my_subdomain)
+               const types::subdomain_id my_subdomain)
   {
     if (!cell->has_children())
       {
@@ -2821,7 +2821,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    types::subdomain_id_t
+    types::subdomain_id
     Triangulation<dim,spacedim>::locally_owned_subdomain () const
     {
       Assert (dim > 1, ExcNotImplemented());
@@ -3082,7 +3082,7 @@ namespace parallel
 
 
     template <>
-    types::subdomain_id_t
+    types::subdomain_id
     Triangulation<1,1>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());
@@ -3131,7 +3131,7 @@ namespace parallel
 
 
     template <>
-    types::subdomain_id_t
+    types::subdomain_id
     Triangulation<1,2>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());
@@ -3172,7 +3172,7 @@ namespace parallel
 
 
     template <>
-    types::subdomain_id_t
+    types::subdomain_id
     Triangulation<1,3>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());
@@ -3221,7 +3221,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    types::subdomain_id_t
+    types::subdomain_id
     Triangulation<dim,spacedim>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());

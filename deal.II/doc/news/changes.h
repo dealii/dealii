@@ -37,7 +37,7 @@ and then copy it into a vector with ghost elements.
 (Wolfgang Bangerth, 2012/08/06)
 
 <li> Changed: The argument material_id of the estimate-functions of
-the KellyErrorEstimator class is now of type types::material_id_type
+the KellyErrorEstimator class is now of type types::material_id
 with default value types::invalid_material_id, instead of type
 unsigned int with default value numbers::invalid_unsigned_int. This
 should not make a difference to most users unless you specified the
@@ -47,7 +47,7 @@ argument's default value by hand.
 
 <li>
 The member functions Triangulation::set_boundary and
-Triangulation::get_boundary now take a types::boundary_id_t instead of
+Triangulation::get_boundary now take a types::boundary_id instead of
 an unsigned int as argument. This now matches the actual data type
 used to store boundary indicators internally.
 <br>
@@ -63,10 +63,19 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
-Changed: unify the concept of compress() for all linear algebra
+Changed: To make the naming of types defined in namespace types
+consistent, we have renamed types::subdomain_id_t to
+types::subdomain_id. The old name has been retained as a typedef
+but is now deprecated.
+<br>
+(Wolfgang Bangerth, 2012/08/22)
+
+<li>
+Changed: Unify the concept of compress() for all linear algebra
 objects. Introduce type VectorOperation to decide between
 add and insert. Implement also for serial vectors. Note:
-this breaks distributed::vector::compress(bool).
+this breaks distributed::vector::compress(bool). See
+@ref GlossCompress for more information.
 <br>
 (Timo Heister, 2012/08/13)
 
@@ -187,14 +196,14 @@ embedded into spacedim=dim+2 dimensional space.
 
 <li> Changed: Material and Boundary indicators have been both of the
 type unsigned char. Throughout the library, we changed their datatype
-to <code>types::material_id_t</code>
-resp. <code>types::boundary_id_t</code>, both typedefs of unsigned
+to <code>types::material_id</code>
+resp. <code>types::boundary_id</code>, both typedefs of unsigned
 char. Internal faces are now characterized by
-types::internal_face_boundary_id(<code>=static_cast@<boundary_id_t@>(-1)</code>)
+types::internal_face_boundary_id(<code>=static_cast@<types::boundary_id@>(-1)</code>)
 instead of 255, so we get rid of that mysterious number in the source
 code.  Material_ids are also assumed to lie in the range from 0 to
 types::invalid_material_id-1 (where <code>types::invalid_material_id =
-static_cast<material_id_t>(-1)</code>). With this change, it is now
+static_cast<types::material_id>(-1)</code>). With this change, it is now
 much easier to extend the range of boundary or material ids, if
 needed.
 <br>

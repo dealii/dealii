@@ -110,8 +110,8 @@ struct CellData
                                       */
     union
     {
-        types::boundary_id_t boundary_id;
-        types::material_id_t material_id;
+        types::boundary_id boundary_id;
+        types::material_id material_id;
     };
 };
 
@@ -1805,7 +1805,7 @@ class Triangulation : public Subscriptor
                                       * boundary, for instance the material id
                                       * in a UCD input file. They are not
                                       * necessarily consecutive but must be in
-                                      * the range 0-(types::boundary_id_t-1).
+                                      * the range 0-(types::boundary_id-1).
                                       * Material IDs on boundaries are also
                                       * called boundary indicators and are
                                       * accessed with accessor functions
@@ -1834,7 +1834,7 @@ class Triangulation : public Subscriptor
 				      *
 				      * @ingroup boundary
                                       */
-    void set_boundary (const types::boundary_id_t   number,
+    void set_boundary (const types::boundary_id   number,
                        const Boundary<dim,spacedim> &boundary_object);
 
                                      /**
@@ -1848,7 +1848,7 @@ class Triangulation : public Subscriptor
 				      *
 				      * @ingroup boundary
                                       */
-    void set_boundary (const types::boundary_id_t number);
+    void set_boundary (const types::boundary_id number);
 
                                      /**
                                       * Return a constant reference to
@@ -1859,7 +1859,7 @@ class Triangulation : public Subscriptor
 				      *
 				      * @ingroup boundary
                                       */
-    const Boundary<dim,spacedim> & get_boundary (const types::boundary_id_t number) const;
+    const Boundary<dim,spacedim> & get_boundary (const types::boundary_id number) const;
 
                                      /**
                                       * Returns a vector containing
@@ -1876,7 +1876,7 @@ class Triangulation : public Subscriptor
 				      *
 				      * @ingroup boundary
                                       */
-    std::vector<types::boundary_id_t> get_boundary_indicators() const;
+    std::vector<types::boundary_id> get_boundary_indicators() const;
 
                                      /**
                                       *  Copy a triangulation. This
@@ -3505,7 +3505,7 @@ class Triangulation : public Subscriptor
                                       * of those cells that are owned
                                       * by the current processor.
                                       */
-    virtual types::subdomain_id_t locally_owned_subdomain () const;
+    virtual types::subdomain_id locally_owned_subdomain () const;
                                      /*@}*/
 
                                      /**
@@ -3765,7 +3765,7 @@ class Triangulation : public Subscriptor
                                       *  objects, which are not
                                       *  of type StraightBoundary.
                                       */
-    std::map<types::boundary_id_t, SmartPointer<const Boundary<dim, spacedim> , Triangulation<dim, spacedim> > >  boundary;
+    std::map<types::boundary_id, SmartPointer<const Boundary<dim, spacedim> , Triangulation<dim, spacedim> > >  boundary;
 
                                      /**
                                       * Flag indicating whether
@@ -3824,7 +3824,7 @@ class Triangulation : public Subscriptor
                                       * TriaAccessor::set_boundary_indicator)
                                       * were not a pointer.
                                       */
-    std::map<unsigned int, types::boundary_id_t> *vertex_to_boundary_id_map_1d;
+    std::map<unsigned int, types::boundary_id> *vertex_to_boundary_id_map_1d;
 
     /**
      * A map that correlates each refinement listener that has been added

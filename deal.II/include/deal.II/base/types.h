@@ -30,7 +30,7 @@ namespace types
                                     * See the @ref GlossSubdomainId
                                     * "glossary" for more information.
                                     */
-  typedef unsigned int subdomain_id_t;
+  typedef unsigned int subdomain_id;
 
                                    /**
                                     * A special id for an invalid
@@ -44,7 +44,7 @@ namespace types
                                     * See the @ref GlossSubdomainId
                                     * "glossary" for more information.
                                     */
-  const unsigned int invalid_subdomain_id = static_cast<subdomain_id_t>(-1);
+  const unsigned int invalid_subdomain_id = static_cast<subdomain_id>(-1);
 
                                    /**
                                     * The subdomain id assigned to a
@@ -63,7 +63,7 @@ namespace types
                                     * the @ref distributed module for
                                     * more information.
                                     */
-  const unsigned int artificial_subdomain_id = static_cast<subdomain_id_t>(-2);
+  const unsigned int artificial_subdomain_id = static_cast<subdomain_id>(-2);
 
                                    /**
                                     * The type used to denote global dof
@@ -82,25 +82,25 @@ namespace types
            * piece of the boundary and, in the case of meshes that describe
            * manifolds in higher dimensions, associated with every cell.
            */
-  typedef unsigned char boundary_id_t;
+  typedef unsigned char boundary_id;
 
           /**
            * The number which we reserve for internal faces.
            * We assume that all boundary_ids lie in the range [0, internal_face_boundary_id).
            */
-  const boundary_id_t internal_face_boundary_id = static_cast<boundary_id_t>(-1);
+  const boundary_id internal_face_boundary_id = static_cast<boundary_id>(-1);
 
           /**
            * The type used to denote material indicators associated with every
            * cell.
            */
-  typedef unsigned char material_id_t;
+  typedef unsigned char material_id;
 
           /**
            * Invalid material_id which we need in several places as a default value.
            * We assume that all material_ids lie in the range [0, invalid_material_id).
            */
-  const material_id_t invalid_material_id = static_cast<material_id_t>(-1);
+  const material_id invalid_material_id = static_cast<material_id>(-1);
 
 }
 

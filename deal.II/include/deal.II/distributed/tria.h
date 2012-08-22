@@ -356,7 +356,7 @@ namespace parallel
                                           * children that only exist
                                           * on other processors.
                                           */
-        types::subdomain_id_t locally_owned_subdomain () const;
+        types::subdomain_id locally_owned_subdomain () const;
 
                                          /**
                                           * Return the number of
@@ -575,7 +575,7 @@ namespace parallel
                                           * used for the current
                                           * processor.
                                           */
-        types::subdomain_id_t my_subdomain;
+        types::subdomain_id my_subdomain;
 
                                          /**
                                           * A flag that indicates whether the
@@ -813,7 +813,7 @@ namespace parallel
                                           * children that only exist
                                           * on other processors.
                                           */
-        types::subdomain_id_t locally_owned_subdomain () const;
+        types::subdomain_id locally_owned_subdomain () const;
 
                                          /**
                                           * Dummy arrays. This class
@@ -878,7 +878,7 @@ namespace parallel
                                           * children that only exist
                                           * on other processors.
                                           */
-        types::subdomain_id_t locally_owned_subdomain () const;
+        types::subdomain_id locally_owned_subdomain () const;
 
                                          /**
                                           * Return the MPI

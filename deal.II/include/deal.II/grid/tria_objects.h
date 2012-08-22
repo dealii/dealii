@@ -141,8 +141,8 @@ namespace internal
         {
             union
             {
-                types::boundary_id_t boundary_id;
-                types::material_id_t material_id;
+                types::boundary_id boundary_id;
+                types::material_id material_id;
             };
 
 

@@ -1162,7 +1162,7 @@ void GridOut::write_xfig (
           {
             Triangulation<dim>::face_iterator
               face = cell->face(face_reorder[f]);
-            const types::boundary_id_t bi = face->boundary_indicator();
+            const types::boundary_id bi = face->boundary_indicator();
             if (bi != types::internal_face_boundary_id)
               {
                                                  // Code for polyline

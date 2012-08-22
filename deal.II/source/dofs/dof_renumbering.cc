@@ -849,7 +849,7 @@ namespace DoFRenumbering
         for (unsigned int c=0; c<n_buckets; ++c)
           {
             shifts[c]=cumulated;
-            for (types::subdomain_id_t i=0; i<tria->locally_owned_subdomain(); ++i)
+            for (types::subdomain_id i=0; i<tria->locally_owned_subdomain(); ++i)
               shifts[c] += all_dof_counts[c+n_buckets*i];
             for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (tria->get_communicator()); ++i)
               cumulated += all_dof_counts[c+n_buckets*i];
@@ -1868,7 +1868,7 @@ namespace DoFRenumbering
                                      // first get the association of each dof
                                      // with a subdomain and determine the total
                                      // number of subdomain ids used
-    std::vector<types::subdomain_id_t> subdomain_association (n_dofs);
+    std::vector<types::subdomain_id> subdomain_association (n_dofs);
     DoFTools::get_subdomain_association (dof_handler,
                                          subdomain_association);
     const unsigned int n_subdomains

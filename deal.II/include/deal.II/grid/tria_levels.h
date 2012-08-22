@@ -138,7 +138,7 @@ namespace internal
                                           * cells with a given subdomain
                                           * number.
                                           */
-        std::vector<types::subdomain_id_t> subdomain_ids;
+        std::vector<types::subdomain_id> subdomain_ids;
 
                                          /**
                                           * One integer for every consecutive
@@ -242,7 +242,7 @@ namespace internal
         std::vector<unsigned char> refine_flags;
         std::vector<bool> coarsen_flags;
         std::vector<std::pair<int,int> > neighbors;
-        std::vector<types::subdomain_id_t> subdomain_ids;
+        std::vector<types::subdomain_id> subdomain_ids;
         std::vector<int> parents;
 
                                          // The following is not used

@@ -1350,7 +1350,7 @@ namespace FETools
                                    // we can only interpolate u1 on
                                    // a cell, which this processor owns,
                                    // so we have to know the subdomain_id
-    const types::subdomain_id_t subdomain_id =
+    const types::subdomain_id subdomain_id =
       dof1.get_tria().locally_owned_subdomain();
 
     for (; cell1!=endc1; ++cell1, ++cell2)
@@ -1498,7 +1498,7 @@ namespace FETools
     Vector<typename OutVector::value_type> u1_local(dofs_per_cell1);
     Vector<typename OutVector::value_type> u1_int_local(dofs_per_cell1);
 
-    const types::subdomain_id_t subdomain_id =
+    const types::subdomain_id subdomain_id =
       dof1.get_tria().locally_owned_subdomain();
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof1.begin_active(),
@@ -1568,7 +1568,7 @@ namespace FETools
     Vector<typename OutVector::value_type> u1_local(DoFTools::max_dofs_per_cell(dof1));
     Vector<typename OutVector::value_type> u1_int_local(DoFTools::max_dofs_per_cell(dof1));
 
-    const types::subdomain_id_t subdomain_id =
+    const types::subdomain_id subdomain_id =
       dof1.get_tria().locally_owned_subdomain();
 
     typename DH<dim>::active_cell_iterator cell = dof1.begin_active(),
@@ -1744,7 +1744,7 @@ namespace FETools
     Vector<typename OutVector::value_type> u1_local(dofs_per_cell);
     Vector<typename OutVector::value_type> u1_diff_local(dofs_per_cell);
 
-    const types::subdomain_id_t subdomain_id =
+    const types::subdomain_id subdomain_id =
       dof1.get_tria().locally_owned_subdomain();
 
     FullMatrix<double> difference_matrix(dofs_per_cell, dofs_per_cell);
