@@ -7170,12 +7170,22 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
         DEAL_II_METIS_DIR="$withval"
         AC_MSG_RESULT($DEAL_II_METIS_DIR)
 
-        dnl Make sure that what was specified is actually correct
-        if test ! -d $DEAL_II_METIS_DIR/lib ; then
+        dnl Make sure that what was specified is actually correct. The
+        dnl libraries could be in either $DEAL_II_METIS_DIR/lib (metis was
+        dnl make installed) or $DEAL_II_METIS_DIR/libmetis (metis was make
+        dnl only and PETSc).
+        if test ! -d $DEAL_II_METIS_DIR/lib \
+           && test ! -d $DEAL_II_METIS_DIR/libmetis ; then
           AC_MSG_ERROR([Path to Metis specified with --with-metis does not point to a complete Metis installation])
         fi
 
-        DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/lib"
+        dnl If lib is not found, we must have libraries in libmetis
+        dnl (which was found above).
+        if test -d $DEAL_II_METIS_DIR/lib ; then
+          DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/lib"
+        else
+          DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/libmetis"
+        fi
 
         if test ! -d $DEAL_II_METIS_DIR/include ; then
           AC_MSG_ERROR([Path to Metis specified with --with-metis does not point to a complete Metis installation])
@@ -7191,12 +7201,20 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
           DEAL_II_METIS_DIR="$METIS_DIR"
           AC_MSG_RESULT($DEAL_II_METIS_DIR)
 
-          dnl Make sure that what this is actually correct
-          if test ! -d $DEAL_II_METIS_DIR/lib ; then
+          dnl Make sure that what this is actually correct (see notes above).
+          if test ! -d $DEAL_II_METIS_DIR/lib \
+             && test ! -d $DEAL_II_METIS_DIR/libmetis ; then
             AC_MSG_ERROR([The path to Metis specified in the METIS_DIR environment variable does not point to a complete Metis installation])
           fi
-          DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/lib"
+
+          if test -d $DEAL_II_METIS_DIR/lib ; then
+            DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/lib"
+          else
+            DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/libmetis"
+          fi
+
           DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
+
         else
           USE_CONTRIB_METIS=no
           DEAL_II_METIS_DIR=""
