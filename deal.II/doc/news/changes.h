@@ -293,6 +293,13 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: To support Trilinos version 10.12.x we need to cache the
+result of has_ghost_elements() in parallel vectors at construction time
+of the vector. Starting from 10.12 Trilinos will communicate in this
+call, which therefore only works if called from all CPUs.
+<br>
+(Timo Heister, 2012/08/22)
+
 <li> New: The copy constructor of FullMatrix from IdentityMatrix
 used to be explicit, but that didn't appear to be necessary in hindsight.
 Consequently, it is now a regular copy constructor.

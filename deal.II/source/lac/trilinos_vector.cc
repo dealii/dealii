@@ -61,6 +61,7 @@ namespace TrilinosWrappers
     {
       last_action = Zero;
       vector.reset (new Epetra_FEVector(*v.vector));
+      has_ghosts = v.has_ghosts;
     }
 
 
@@ -124,6 +125,7 @@ namespace TrilinosWrappers
           Assert (ierr == 0, ExcTrilinosError(ierr));
         }
 
+      has_ghosts = vector->Map().UniqueGIDs()==false;
       last_action = Zero;
     }
 
@@ -158,6 +160,7 @@ namespace TrilinosWrappers
           if (vector->Map().SameAs(v.vector->Map()) == false)
             {
               vector.reset (new Epetra_FEVector(v.vector->Map()));
+              has_ghosts = v.has_ghosts;
               last_action = Zero;
             }
           else if (fast == false)
@@ -306,6 +309,7 @@ namespace TrilinosWrappers
         {
           vector.reset (new Epetra_FEVector(*v.vector));
           last_action = Zero;
+          has_ghosts = v.has_ghosts;
         }
 
       return *this;

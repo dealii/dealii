@@ -494,7 +494,9 @@ namespace TrilinosWrappers
 
                                        /**
                                         * Return if the vector contains ghost
-                                        * elements.
+                                        * elements. This answer is true if there
+                                        * are ghost elements on at least one
+                                        * process.
                                         */
       bool has_ghost_elements() const;
 
@@ -1011,6 +1013,13 @@ namespace TrilinosWrappers
                                         */
       bool compressed;
 
+      /**
+       * Whether this vector has ghost elements. This is true
+       * on all processors even if only one of them has any
+       * ghost elements.
+       */
+      bool has_ghosts;
+
                                        /**
                                         * An Epetra distibuted vector
                                         * type. Requires an existing
@@ -1165,7 +1174,7 @@ namespace TrilinosWrappers
   bool
   VectorBase::has_ghost_elements() const
   {
-    return vector->Map().UniqueGIDs()==false;
+    return has_ghosts;
   }
 
 
