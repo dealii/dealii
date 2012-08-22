@@ -92,13 +92,13 @@ void test()
   constraints.close();
 
   std::string base = output_file_for_mpi("no_flux_constraints_03");
-  
+
   MPI_Barrier(MPI_COMM_WORLD);
-  
+
   { //write the constraintmatrix to a file on each cpu
-	std::string fname = base+"cm_" + Utilities::int_to_string(numprocs) + "_" + Utilities::int_to_string(myid) + ".dot";
-	std::ofstream file(fname.c_str());
-	constraints.print(file);
+    std::string fname = base+"cm_" + Utilities::int_to_string(myid) + ".dot";
+    std::ofstream file(fname.c_str());
+    constraints.print(file);
   }
   MPI_Barrier(MPI_COMM_WORLD);
   sleep(1);
@@ -106,16 +106,18 @@ void test()
   {
 	//sort and merge the constraint matrices on proc 0, generate a checksum
 	//and output that into the deallog
-	system((std::string("cat ") + base+"cm_" +Utilities::int_to_string(numprocs)+ "_?.dot|sort -n|uniq|md5sum >" + base+Utilities::int_to_string(numprocs)+"cm.check").c_str());
-	{
-	  std::ifstream file((base+Utilities::int_to_string(numprocs)+"cm.check").c_str());
-	  std::string str;
-	  while (!file.eof())
-	  {
-		std::getline(file, str);
-		deallog << str << std::endl;
-	  }
-	}
+        system((std::string("cat ") + base+"cm_?.dot|sort -n|uniq >" + base+"cm").c_str());
+        system((std::string("md5sum ") + base + "cm >" + base + "cm.check").c_str());
+        {
+          std::ifstream file((base+"cm.check").c_str());
+          std::string str;
+          while (!file.eof())
+            {
+              std::getline(file, str);
+              deallog << str << std::endl;
+            }
+        }
+
   }
 
 				// print the number of constraints. since
