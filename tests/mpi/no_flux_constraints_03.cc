@@ -98,7 +98,6 @@ void test()
   { //write the constraintmatrix to a file on each cpu
 	std::string fname = base+"cm_" + Utilities::int_to_string(numprocs) + "_" + Utilities::int_to_string(myid) + ".dot";
 	std::ofstream file(fname.c_str());
-	std::ofstream file(fname);
 	constraints.print(file);
   }
   MPI_Barrier(MPI_COMM_WORLD);
