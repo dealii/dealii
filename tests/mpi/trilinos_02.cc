@@ -63,6 +63,12 @@ void test ()
   TrilinosWrappers::MPI::Vector v4=v2;
   check(v4, true);
 
+  v4 = v;
+  check(v4, true); //this only copies contents!
+
+  v4 = v2;
+  check(v4, true);
+
   TrilinosWrappers::MPI::Vector v5(v2);
   check(v5, true);
 
