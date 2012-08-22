@@ -16,7 +16,7 @@
 
 // check
 //   DoFTools::map_dof_to_boundary_indices(const DoFHandler<int>     &,
-//                                         const std::set<types::boundary_id_t> &,
+//                                         const std::set<types::boundary_id> &,
 //                                         std::vector<unsigned int> &)
 
 
@@ -28,7 +28,7 @@ void
 check_this (const DoFHandler<dim> &dof_handler)
 {
   std::vector<unsigned int> map(dof_handler.n_dofs());
-  std::set<types::boundary_id_t> boundary_ids;
+  std::set<types::boundary_id> boundary_ids;
 
                                    // check for boundary id 0 alone
   boundary_ids.insert (0);

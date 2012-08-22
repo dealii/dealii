@@ -44,7 +44,7 @@ int main ()
       cell = volume_mesh.begin_active();
 
     cell->face(0)->set_all_boundary_indicators (1);
-    std::set<types::boundary_id_t> boundary_ids;
+    std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert(0);
     GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh, boundary_ids);
   }

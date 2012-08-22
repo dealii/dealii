@@ -31,7 +31,7 @@ void test ()
   GridGenerator::hyper_cube (tria);
   tria.refine_global (2);
 
-  std::vector<types::boundary_id_t>
+  std::vector<types::boundary_id>
     boundary_ids = tria.get_boundary_indicators ();
 
   for (unsigned int i=0; i<boundary_ids.size(); ++i)
