@@ -54,6 +54,7 @@
 #include <deal.II/distributed/grid_refinement.h>
 
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/error_estimator.h>
 #include <deal.II/base/timer.h>
 #include <fstream>
 #include <iostream>
@@ -111,9 +112,9 @@ namespace Step42
     void dirichlet_constraints ();
     void solve ();
     void solve_newton ();
-    void output_results (const std::string& title) const;
+    void refine_grid ();
     void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
-    void output_results (TrilinosWrappers::MPI::Vector vector, const std::string& title) const;
+    void output_results (const std::string& title) const;
 
     int                  n_refinements_global;
     int                  n_refinements_local;
@@ -518,47 +519,47 @@ namespace Step42
     triangulation.refine_global (n_refinements_global);
 
     // Lokale Verfeinerung des Gitters
-    for (int step=0; step<n_refinements_local; ++step)
-      {
-        cell = triangulation.begin_active();  // Iterator ueber alle Zellen
-
-        for (; cell!=endc; ++cell)
-           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-           {
-  // 	   if (cell->face (face)->at_boundary()
-  // 	       && cell->face (face)->boundary_indicator () == 9)
-  // 	     {
-  // 	       cell->set_refine_flag ();
-  // 	       break;
-  // 	     }
-  // 	   else if (cell->level () == n_refinements + n_refinements_local - 1)
-  // 	     {
-  // 	       cell->set_refine_flag ();
-  // 	       break;
-  // 	     }
-
-  // 	   if (cell->face (face)->at_boundary()
-  // 	       && cell->face (face)->boundary_indicator () == 9)
-  // 	     {
-  // 	       if (cell->face (face)->vertex (0)(0) <= 0.7 &&
-  // 	           cell->face (face)->vertex (1)(0) >= 0.3 &&
-  // 		   cell->face (face)->vertex (0)(1) <= 0.875 &&
-  // 	           cell->face (face)->vertex (2)(1) >= 0.125)
-  //  	         {
-  // 	           cell->set_refine_flag ();
-  // 	           break;
-  // 	         }
-  // 	     }
-
-              if (step == 0 &&
-                  cell->center ()(2) < n_refinements_local*9.0/64.0)
-               {
-                 cell->set_refine_flag ();
-                 break;
-               }
-          };
-        triangulation.execute_coarsening_and_refinement ();
-      };
+//    for (int step=0; step<n_refinements_local; ++step)
+//      {
+//        cell = triangulation.begin_active();  // Iterator ueber alle Zellen
+//
+//        for (; cell!=endc; ++cell)
+//           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+//           {
+//  // 	   if (cell->face (face)->at_boundary()
+//  // 	       && cell->face (face)->boundary_indicator () == 9)
+//  // 	     {
+//  // 	       cell->set_refine_flag ();
+//  // 	       break;
+//  // 	     }
+//  // 	   else if (cell->level () == n_refinements + n_refinements_local - 1)
+//  // 	     {
+//  // 	       cell->set_refine_flag ();
+//  // 	       break;
+//  // 	     }
+//
+//  // 	   if (cell->face (face)->at_boundary()
+//  // 	       && cell->face (face)->boundary_indicator () == 9)
+//  // 	     {
+//  // 	       if (cell->face (face)->vertex (0)(0) <= 0.7 &&
+//  // 	           cell->face (face)->vertex (1)(0) >= 0.3 &&
+//  // 		   cell->face (face)->vertex (0)(1) <= 0.875 &&
+//  // 	           cell->face (face)->vertex (2)(1) >= 0.125)
+//  //  	         {
+//  // 	           cell->set_refine_flag ();
+//  // 	           break;
+//  // 	         }
+//  // 	     }
+//
+//              if (step == 0 &&
+//                  cell->center ()(2) < n_refinements_local*9.0/64.0)
+//               {
+//                 cell->set_refine_flag ();
+//                 break;
+//               }
+//          };
+//        triangulation.execute_coarsening_and_refinement ();
+//      };
   }
 
   template <int dim>
@@ -576,6 +577,7 @@ namespace Step42
 
     // setup hanging nodes and dirichlet constraints
     {
+      constraints_hanging_nodes.clear ();
       constraints_hanging_nodes.reinit (locally_relevant_dofs);
       DoFTools::make_hanging_node_constraints (dof_handler,
                                                constraints_hanging_nodes);
@@ -601,6 +603,7 @@ namespace Step42
       old_solution.reinit (system_rhs_newton);
       resid_vector.reinit (system_rhs_newton);
       diag_mass_matrix_vector.reinit (system_rhs_newton);
+      active_set.clear ();
       active_set.set_size (locally_relevant_dofs.size ());
     }
 
@@ -1230,20 +1233,6 @@ namespace Step42
         active_set_old = active_set;
       } // End of active-set-loop
 
-
-    pcout<< "Creating output." <<std::endl;
-    MPI_Barrier (mpi_communicator);
-    t.restart();
-    std::ostringstream filename_solution;
-    filename_solution << "solution";
-    // filename_solution << "solution_";
-    // filename_solution << k;
-    output_results (filename_solution.str ());
-    MPI_Barrier (mpi_communicator);
-    t.stop();
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      run_time[4] += t.wall_time();
-
     pcout<< "Number of Solver-Iterations = " << number_iterations <<std::endl;
 
     pcout<< "%%%%%% Rechenzeit make grid and setup = " << run_time[0] <<std::endl;
@@ -1254,6 +1243,54 @@ namespace Step42
     pcout<< "%%%%%% Rechenzeit solve with CG = " << run_time[7] <<std::endl;
     pcout<< "%%%%%% Rechenzeit error and lambda = " << run_time[3] <<std::endl;
     pcout<< "%%%%%% Rechenzeit output = " << run_time[4] <<std::endl;
+  }
+
+  template <int dim>
+  void PlasticityContactProblem<dim>::refine_grid ()
+  {
+    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+    KellyErrorEstimator<dim>::estimate (dof_handler,
+                                             QGauss<dim-1>(3),
+                                             typename FunctionMap<dim>::type(),
+                                             solution,
+                                             estimated_error_per_cell);
+    parallel::distributed::GridRefinement::
+      refine_and_coarsen_fixed_number (triangulation,
+                                       estimated_error_per_cell,
+                                       0.3, 0.03);
+    triangulation.execute_coarsening_and_refinement ();
+
+  }
+
+  template <int dim>
+  void PlasticityContactProblem<dim>::move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const
+  {
+    pcout<< "Moving mesh." <<std::endl;
+
+    std::vector<bool> vertex_touched (triangulation.n_vertices(),
+                                      false);
+
+    for (typename DoFHandler<dim>::active_cell_iterator
+           cell = dof_handler.begin_active ();
+         cell != dof_handler.end(); ++cell)
+      if (cell->is_locally_owned())
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          {
+            if (vertex_touched[cell->vertex_index(v)] == false)
+              {
+                vertex_touched[cell->vertex_index(v)] = true;
+
+                Point<dim> vertex_displacement;
+                for (unsigned int d=0; d<dim; ++d)
+                  {
+                    if (_complete_displacement(cell->vertex_dof_index(v,d)) != 0)
+                      vertex_displacement[d]
+                        = _complete_displacement(cell->vertex_dof_index(v,d));
+                  }
+
+                cell->vertex(v) += vertex_displacement;
+              }
+          }
   }
 
   template <int dim>
@@ -1315,72 +1352,48 @@ namespace Step42
   }
 
   template <int dim>
-  void PlasticityContactProblem<dim>::move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const
-  {
-    pcout<< "Moving mesh." <<std::endl;
-
-    std::vector<bool> vertex_touched (triangulation.n_vertices(),
-                                      false);
-
-    for (typename DoFHandler<dim>::active_cell_iterator
-           cell = dof_handler.begin_active ();
-         cell != dof_handler.end(); ++cell)
-      if (cell->is_locally_owned())
-        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-          {
-            if (vertex_touched[cell->vertex_index(v)] == false)
-              {
-                vertex_touched[cell->vertex_index(v)] = true;
-
-                Point<dim> vertex_displacement;
-                for (unsigned int d=0; d<dim; ++d)
-                  {
-                    if (_complete_displacement(cell->vertex_dof_index(v,d)) != 0)
-                      vertex_displacement[d]
-                        = _complete_displacement(cell->vertex_dof_index(v,d));
-                  }
-
-                cell->vertex(v) += vertex_displacement;
-              }
-          }
-  }
-
-  template <int dim>
-  void PlasticityContactProblem<dim>::output_results (TrilinosWrappers::MPI::Vector vector,
-                                   const std::string& title) const
-  {
-    DataOut<dim> data_out;
-
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (vector, "vector_to_plot");
-
-    data_out.build_patches ();
-
-    std::ofstream output_vtk (dim == 2 ?
-                              (title + ".vtk").c_str () :
-                              (title + ".vtk").c_str ());
-    data_out.write_vtk (output_vtk);
-  }
-
-  template <int dim>
   void PlasticityContactProblem<dim>::run ()
   {
     pcout << "Solving problem in " << dim << " space dimensions." << std::endl;
   
+    Timer                          t;
     run_time.resize (8);
-  
-    clock_t     start, end;
-  
-    start = clock();
-    make_grid();
-    //  mesh_surface ();
 
-    setup_system ();
-    
-    end = clock();
-    run_time[0] = (double)(end-start)/CLOCKS_PER_SEC;
+    const unsigned int n_cycles = 5;
+    for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
+      {
+        pcout << "Cycle " << cycle << ':' << std::endl;
 
-    solve_newton ();
+        MPI_Barrier (mpi_communicator);
+        t.restart();
+
+        if (cycle == 0)
+          {
+            make_grid();
+          }
+        else
+          refine_grid ();
+
+        setup_system ();
+
+        MPI_Barrier (mpi_communicator);
+        t.stop();
+        run_time[0] += t.wall_time();;
+
+        solve_newton ();
+
+        pcout<< "Creating output." <<std::endl;
+        MPI_Barrier (mpi_communicator);
+        t.restart();
+        std::ostringstream filename_solution;
+        filename_solution << "solution_";
+        filename_solution << cycle;
+        output_results (filename_solution.str ());
+        MPI_Barrier (mpi_communicator);
+        t.stop();
+        if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+          run_time[4] += t.wall_time();
+      }
   }
 }
 
@@ -1399,7 +1412,7 @@ int main (int argc, char *argv[])
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
   {
-    int _n_refinements_global = 4;
+    int _n_refinements_global = 2;
     int _n_refinements_local = 1;
 
     if (argc == 3)
