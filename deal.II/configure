@@ -805,7 +805,6 @@ with_netcdf
 with_netcdf_include
 with_netcdf_libs
 with_metis
-with_metis_libs
 with_umfpack
 with_umfpack_include
 with_umfpack_libs
@@ -1538,10 +1537,6 @@ Optional Packages:
                           the include and library directories are subdirs; use
                           this if you want to override the METIS_DIR
                           environment variable.
-  --with-metis-libs=/path/to/metis
-                          Specify the path to the METIS libraries; use this if
-                          you want to override the METIS_LIBDIR environment
-                          variable.
   --with-umfpack=umfpack-root-directory
                           Use installed UMFPack version.
                           'umfpack-root-directory' should be the directory
@@ -12691,43 +12686,6 @@ $as_echo "$DEAL_II_METIS_DIR" >&6; }
         else
           USE_CONTRIB_METIS=no
           DEAL_II_METIS_DIR=""
-        fi
-
-fi
-
-
-
-# Check whether --with-metis-libs was given.
-if test "${with_metis_libs+set}" = set; then :
-  withval=$with_metis_libs;
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for METIS library directory" >&5
-$as_echo_n "checking for METIS library directory... " >&6; }
-        USE_CONTRIB_METIS=yes
-        DEAL_II_METIS_LIBDIR="$withval"
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEAL_II_METIS_LIBDIR" >&5
-$as_echo "$DEAL_II_METIS_LIBDIR" >&6; }
-
-                if test ! -d $DEAL_II_METIS_LIBDIR ; then
-          as_fn_error $? "Path to Metis specified with --with-metis does not point to a complete Metis installation" "$LINENO" 5
-        fi
-
-else
-
-                if test "x$METIS_LIBDIR" != "x" ; then
-          USE_CONTRIB_METIS=yes
-          DEAL_II_METIS_LIBDIR="$METIS_LIBDIR"
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEAL_II_METIS_LIBDIR" >&5
-$as_echo "$DEAL_II_METIS_LIBDIR" >&6; }
-
-                    if test ! -d $DEAL_II_METIS_LIBDIR ; then
-            as_fn_error $? "The path to Metis specified in the METIS_DIR environment variable does not point to a complete Metis installation" "$LINENO" 5
-          fi
-        else
-                              if test "x$USE_CONTRIB_METIS" != "xyes" ; then
-            USE_CONTRIB_METIS=no
-            DEAL_II_METIS_LIBDIR=""
-          fi
         fi
 
 fi

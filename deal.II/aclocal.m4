@@ -7221,42 +7221,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
         fi
      ])
 
-  AC_ARG_WITH(metis-libs,
-              [AS_HELP_STRING([--with-metis-libs=/path/to/metis],
-              [Specify the path to the METIS libraries; use this if you want to override the METIS_LIBDIR environment variable.])],
-     [
-
-        AC_MSG_CHECKING([for METIS library directory])
-        USE_CONTRIB_METIS=yes
-        DEAL_II_METIS_LIBDIR="$withval"
-        AC_MSG_RESULT($DEAL_II_METIS_LIBDIR)
-
-        dnl Make sure that what was specified is actually correct
-        if test ! -d $DEAL_II_METIS_LIBDIR ; then
-          AC_MSG_ERROR([Path to Metis specified with --with-metis does not point to a complete Metis installation])
-        fi
-     ],
-     [
-        dnl Take something from the environment variables, if it is there
-        if test "x$METIS_LIBDIR" != "x" ; then
-          USE_CONTRIB_METIS=yes
-          DEAL_II_METIS_LIBDIR="$METIS_LIBDIR"
-          AC_MSG_RESULT($DEAL_II_METIS_LIBDIR)
-
-          dnl Make sure that what this is actually correct
-          if test ! -d $DEAL_II_METIS_LIBDIR ; then
-            AC_MSG_ERROR([The path to Metis specified in the METIS_DIR environment variable does not point to a complete Metis installation])
-          fi
-        else
-          dnl Unless --with-metis has been set before, declare that METIS
-          dnl is not desired.
-          if test "x$USE_CONTRIB_METIS" != "xyes" ; then
-            USE_CONTRIB_METIS=no
-            DEAL_II_METIS_LIBDIR=""
-          fi
-        fi
-     ])
-
   if test "x$USE_CONTRIB_METIS" = "xyes" ; then
     AC_DEFINE(DEAL_II_USE_METIS, 1,
               [Defined if a Metis installation was found and is going
