@@ -1,0 +1,10 @@
+
+DEAL::Constant dim 2	16.0000 compare 16
+DEAL::Constant dim 3	36.0000 compare 36
+DEAL::Constant dim 4	64.0000 compare 64
+DEAL::Equal    dim 2	14.0000 compare 14
+DEAL::Equal    dim 3	204.000 compare 204
+DEAL::Equal    dim 4	1240.00 compare 1240
+DEAL::Unequal  dim 2	13.0000 compare 13
+DEAL::Unequal  dim 3	180.000 compare 180
+DEAL::Unequal  dim 4	1060.00 compare 1060
