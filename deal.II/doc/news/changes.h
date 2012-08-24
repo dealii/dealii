@@ -63,6 +63,12 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
+New: we are now compatible with Trilinos 10.4.2, 10.8.5, and 10.12.2. See the
+readme for more information.
+<br>
+(Timo Heister, 2012/08/24)
+
+<li>
 Changed: To make the naming of types defined in namespace types
 consistent, we have renamed types::subdomain_id_t to
 types::subdomain_id. The old name has been retained as a typedef
