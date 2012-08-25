@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,7 +38,8 @@ check_this (const DoFHandler<dim> &dof_handler)
 				   // which sometimes rounds to 0.38 and
 				   // sometimes to 0.37, depending on how
 				   // intermediate errors have accumulated)
-  deallog.get_file_stream().precision (5);
+  deallog << std::setprecision (5);
+  
                                    // don't run this test if hanging
                                    // nodes are not implemented
   if (dof_handler.get_fe().constraints_are_implemented() == false)
