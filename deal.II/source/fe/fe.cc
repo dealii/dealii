@@ -130,6 +130,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
                                    // assume that all entries were
                                    // supposed to be equal.
 
+//TODO: Do the following in a better way by expanding these arrays in the member initializer section above
                                    // Normally, we should be careful
                                    // with const_cast, but since this
                                    // is the constructor and we do it
