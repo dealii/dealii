@@ -734,7 +734,7 @@ namespace GridTools
                         // (if the cell was already in the list then
                         // the std::set makes sure that we get it only
                         // once)
-                        adjacent_cells.insert (neighbor);
+                        adjacent_cells.insert (cell->neighbor(face));
                         goto next_cell;
                       }
                   }
