@@ -82,9 +82,9 @@ namespace internals
  * <h3>Description of constraints</h3>
  *
  * Each "line" in objects of this class corresponds to one constrained degree
- * of freedom, with the number of the line being <i>i</i><sub>1</sub>, and the entries in
+ * of freedom, with the number of the line being <i>i</i>, and the entries in
  * this line being pairs
- * (<i>i<sub>j</sub></i>,<i>a<sub>i<sub>j</sub></sub></i>).
+ * (<i>j<sub>i</sub></i>,<i>a<sub>ij<sub>i</sub></sub></i>).
  * Note that the constraints are linear
  * in the <i>x<sub>i</sub></i>, and that there might be a constant (non-homogeneous) term in
  * the constraint. This is exactly the form we need for hanging node
