@@ -68,8 +68,8 @@ namespace internals
  * constraints is extensively described in the @ref constraints module. The
  * class is meant to deal with a limited number of constraints relative to the
  * total number of degrees of freedom, for example a few per cent up to maybe
- * 30 per cent; and with a linear combination of $M$ other degrees of freedom
- * where $M$ is also relatively small (no larger than at most around the
+ * 30 per cent; and with a linear combination of <i>M</i> other degrees of freedom
+ * where <i>M</i> is also relatively small (no larger than at most around the
  * average number of entries per row of a linear system). It is <em>not</em>
  * meant to describe full rank linear systems.
  *
@@ -82,18 +82,20 @@ namespace internals
  * <h3>Description of constraints</h3>
  *
  * Each "line" in objects of this class corresponds to one constrained degree
- * of freedom, with the number of the line being $i_1$, and the entries in
- * this line being pairs $(i_j,a_{i_j})$. Note that the constraints are linear
- * in the $x_i$, and that there might be a constant (non-homogeneous) term in
+ * of freedom, with the number of the line being <i>i</i><sub>1</sub>, and the entries in
+ * this line being pairs
+ * (<i>i<sub>j</sub></i>,<i>a<sub>i<sub>j</sub></sub></i>).
+ * Note that the constraints are linear
+ * in the <i>x<sub>i</sub></i>, and that there might be a constant (non-homogeneous) term in
  * the constraint. This is exactly the form we need for hanging node
  * constraints, where we need to constrain one degree of freedom in terms of
  * others. There are other conditions of this form possible, for example for
  * implementing mean value conditions as is done in the step-11
  * tutorial program. The name of the class stems from the fact that these
- * constraints can be represented in matrix form as $X x = b$, and this object
- * then describes the matrix $X$ (as well as, incidentally, the vector $b$ --
+ * constraints can be represented in matrix form as <b>X</b> <i>x</i> = <i>b</i>, and this object
+ * then describes the matrix <b>X</b> (and the vector <i>b</i>;
  * originally, the ConstraintMatrix class was only meant to handle homogenous
- * constraints where $b=0$, thus the name). The most frequent way to
+ * constraints where <i>b</i>=0, thus the name). The most frequent way to
  * create/fill objects of this type is using the
  * DoFTools::make_hanging_node_constraints() function. The use of these
  * objects is first explained in step-6.
@@ -264,8 +266,8 @@ class ConstraintMatrix : public Subscriptor
                                       *
                                       * This function essentially exists to
                                       * allow adding several constraints of
-                                      * the form $x_i=0$ all at once, where
-                                      * the set of indices $i$ for which these
+                                      * the form <i>x<sub>i</sub></i>=0 all at once, where
+                                      * the set of indices <i>i</i> for which these
                                       * constraints should be added are given
                                       * by the argument of this function. On
                                       * the other hand, just as if the
@@ -286,8 +288,8 @@ class ConstraintMatrix : public Subscriptor
                                       *
                                       * This function essentially exists to
                                       * allow adding several constraints of
-                                      * the form $x_i=0$ all at once, where
-                                      * the set of indices $i$ for which these
+                                      * the form <i>x<sub>i</sub></i>=0 all at once, where
+                                      * the set of indices <i>i</i> for which these
                                       * constraints should be added are given
                                       * by the argument of this function. On
                                       * the other hand, just as if the
@@ -308,8 +310,8 @@ class ConstraintMatrix : public Subscriptor
                                       *
                                       * This function essentially exists to
                                       * allow adding several constraints of
-                                      * the form $x_i=0$ all at once, where
-                                      * the set of indices $i$ for which these
+                                      * the form <i>x<sub>i</sub></i>=0 all at once, where
+                                      * the set of indices <i>i</i> for which these
                                       * constraints should be added are given
                                       * by the argument of this function. On
                                       * the other hand, just as if the
@@ -393,16 +395,16 @@ class ConstraintMatrix : public Subscriptor
                                       * This function also resolves chains
                                       * of constraints. For example, degree
                                       * of freedom 13 may be constrained to
-                                      * $u_{13}=u_3/2+u_7/2$ while degree of
+                                      * <i>u</i><sub>13</sub>=<i>u</i><sub>3</sub>/2+<i>u</i><sub>7</sub>/2 while degree of
                                       * freedom 7 is itself constrained as
-                                      * $u_7=u_2/2+u_4/2$. Then, the
+                                      * <i>u</i><sub>7</sub>=<i>u</i><sub>2</sub>/2+<i>u</i><sub>4</sub>/2. Then, the
                                       * resolution will be that
-                                      * $u_{13}=u_3/2+u_2/4+u_4/4$. Note,
+                                      * <i>u</i><sub>13</sub>=<i>u</i><sub>3</sub>/2+<i>u</i><sub>2</sub>/4+<i>u</i><sub>4</sub>/4. Note,
                                       * however, that cycles in this graph
                                       * of constraints are not allowed,
-                                      * i.e. for example $u_4$ may not be
+                                      * i.e. for example <i>u</i><sub>4</sub> may not be
                                       * constrained, directly or indirectly,
-                                      * to $u_{13}$ again.
+                                      * to <i>u</i><sub>13</sub> again.
                                       */
     void close ();
 
@@ -412,7 +414,7 @@ class ConstraintMatrix : public Subscriptor
                                       * the constraints represented by this
                                       * object. Both objects may or may not
                                       * be closed (by having their function
-                                      * @p close called before). If this
+                                      * close() called before). If this
                                       * object was closed before, then it
                                       * will be closed afterwards as
                                       * well. Note, however, that if the
@@ -443,7 +445,7 @@ class ConstraintMatrix : public Subscriptor
                                       *
                                       * This function is useful if you are
                                       * building block matrices, where all
-                                      * blocks are built by the same @p
+                                      * blocks are built by the same
                                       * DoFHandler object, i.e. the matrix
                                       * size is larger than the number of
                                       * degrees of freedom. Since several
@@ -451,7 +453,7 @@ class ConstraintMatrix : public Subscriptor
                                       * to the same degrees of freedom,
                                       * you'd generate several constraint
                                       * objects, then shift them, and
-                                      * finally @p merge them together
+                                      * finally merge() them together
                                       * again.
                                       */
     void shift (const unsigned int offset);
@@ -489,12 +491,12 @@ class ConstraintMatrix : public Subscriptor
                                       * with number @p index is a
                                       * constrained one.
                                       *
-                                      * Note that if @p close was called
+                                      * Note that if close() was called
                                       * before, then this function is
                                       * significantly faster, since then the
                                       * constrained degrees of freedom are
                                       * sorted and we can do a binary
-                                      * search, while before @p close was
+                                      * search, while before close() was
                                       * called, we have to perform a linear
                                       * search through all entries.
                                       */
@@ -527,7 +529,7 @@ class ConstraintMatrix : public Subscriptor
                                       * to. For example, in 2d a hanging
                                       * node is constrained only to its two
                                       * neighbors, so the returned value
-                                      * would be @p 2. However, for higher
+                                      * would be 2. However, for higher
                                       * order elements and/or higher
                                       * dimensions, or other types of
                                       * constraints, this number is no more
@@ -1384,7 +1386,7 @@ class ConstraintMatrix : public Subscriptor
                                       * any other type having the same
                                       * interface.
                                       *
-                                      * Note that if called with a @p
+                                      * Note that if called with a
                                       * TrilinosWrappers::MPI::Vector it may
                                       * not contain ghost elements.
                                       */
@@ -1566,11 +1568,12 @@ class ConstraintMatrix : public Subscriptor
                                       * A list of unsigned integers that
                                       * contains the position of the
                                       * ConstraintLine of a constrained degree
-                                      * of freedom, or @p
+                                      * of freedom, or
                                       * numbers::invalid_unsigned_int if the
                                       * degree of freedom is not
-                                      * constrained. The @p invalid_unsigned
-                                      * int return value returns thus whether
+                                      * constrained. The
+                                      * numbers::invalid_unsigned_int
+				      * return value returns thus whether
                                       * there is a constraint line for a given
                                       * degree of freedom index. Note that
                                       * this class has no notion of how many
@@ -1737,7 +1740,7 @@ class ConstraintMatrix : public Subscriptor
                                       * Creates a list of affected rows for
                                       * distribution without any additional
                                       * information, otherwise similar to the
-                                      * other @p make_sorted_row_list
+                                      * other make_sorted_row_list()
                                       * function.
                                       */
     void
