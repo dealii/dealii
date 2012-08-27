@@ -2589,7 +2589,7 @@ namespace TrilinosWrappers
 
   inline
   void
-  SparseMatrix::compress (::dealii::VectorOperation::values operation)
+  SparseMatrix::compress (::dealii::VectorOperation::values /*operation*/)
   {
                                   // flush buffers
     int ierr;
