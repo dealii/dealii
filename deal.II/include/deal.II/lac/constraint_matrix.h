@@ -82,9 +82,23 @@ namespace internals
  * <h3>Description of constraints</h3>
  *
  * Each "line" in objects of this class corresponds to one constrained degree
- * of freedom, with the number of the line being <i>i</i>, and the entries in
- * this line being pairs
- * (<i>j<sub>i</sub></i>,<i>a<sub>ij<sub>i</sub></sub></i>).
+ * of freedom, with the number of the line being <i>i</i>, entered by
+ * using add_line() or add_lines(). The entries in
+ * this line are pairs of the form
+ * (<i>j</i>,<i>a<sub>ij</sub></i>), which are added by add_entry() or
+ * add_entries(). The organization is essentially a
+ * SparsityPattern, but with only a few lines containing nonzero
+ * elements, and  therefore no data wasted on the others. For each
+ * line, which has been added by the mechanism above, an elimination
+ * of the constrained degree of freedom of the form
+ * @f[
+ *  x_i = \sum_j a_{ij} x_j + b_i
+ * @f]
+ * is performed, where <i>b<sub>i</sub></i> is optional and set by
+ * set_inhomogeneity(). Thus, if a constraint is formulated for
+ * instance as a zero mean value of several degrees of freedom, one of
+ * the degrees has to be chosen to be eliminated.
+ *
  * Note that the constraints are linear
  * in the <i>x<sub>i</sub></i>, and that there might be a constant (non-homogeneous) term in
  * the constraint. This is exactly the form we need for hanging node
