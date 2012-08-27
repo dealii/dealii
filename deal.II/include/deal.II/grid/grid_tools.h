@@ -266,6 +266,19 @@ namespace GridTools
                        const Point<spacedim>     &p);
 
                                    /**
+				    * @deprecated This function might
+                                    * be acceptable to find a patch
+                                    * around a single vertex, but it
+                                    * wastes resources creating
+                                    * patches around all vertices. The
+                                    * function mail fail on
+                                    * anisotropic meshes, and an easy
+                                    * fix is not obvious. Therefore,
+                                    * it should be replaced by a
+                                    * function which computes all
+                                    * active vertex patches by looping
+                                    * over cells.
+				    *
                                     * Find and return a vector of
                                     * iterators to active cells that
                                     * surround a given vertex @p vertex.
