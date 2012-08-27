@@ -1564,7 +1564,14 @@ struct GeometryInfo
                                       * The first index in this 2D-array
                                       * runs over all vertices, the second
                                       * index over @p dim faces to which
-                                      * the vertex belongs
+                                      * the vertex belongs.
+				      *
+				      * The order of the faces for
+				      * each vertex is such that the
+				      * first listed face bounds the
+				      * reference cell in <i>x</i>
+				      * direction, the second in
+				      * <i>y</i> direction, and so on.
                                       */
     static const unsigned int vertex_to_face[vertices_per_cell][dim];
 
