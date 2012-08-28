@@ -1,5 +1,15 @@
-// internals.cc,v 1.12 2003/04/09 15:49:55 wolf Exp
-// (c) Guido Kanschat
+//----------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2007, 2008, 2010, 2012 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------------------------------------------------
 //
 // Compute support points
 
@@ -59,17 +69,17 @@ check_support (const FiniteElement<dim>& finel, const char* name)
   dof.distribute_dofs (finel);
 
   deallog << name << '<' << dim << '>' << " cell support points" << std::endl;
-  
+
   const std::vector<Point<dim> > &cell_points = finel.get_unit_support_points ();
 
   for (unsigned int k=0;k<cell_points.size();++k)
     deallog << std::setprecision(3) << cell_points[k] << std::endl;
-  
+
   const std::vector<Point<dim-1> > &face_points = finel.get_unit_face_support_points ();
   const std::vector<double> dummy_weights (face_points.size());
-  
+
   Quadrature<dim-1> q(face_points, dummy_weights);
-  
+
   for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
     {
       std::vector<Point<dim> > q_points (q.get_points().size());
@@ -77,7 +87,7 @@ check_support (const FiniteElement<dim>& finel, const char* name)
       Quadrature<dim> qp(q_points);
       deallog << name << '<' << dim << '>' << " face " << i
 		<< " support points" << std::endl;
-        
+
       for (unsigned int k=0; k<face_points.size(); ++k)
 	deallog << std::setprecision(3) << qp.point(k)
 		<< std::endl;
@@ -95,10 +105,10 @@ check_matrices (FiniteElement<dim>& fe, const char* name)
     {
       deallog << name << '<' << dim << '>' << " restriction " << i << std::endl;
       if (fe.isotropic_restriction_is_implemented())
-	print_formatted (fe.get_restriction_matrix(i), 3, 6);
+	print_formatted (fe.get_restriction_matrix(i), 4, 6);
       deallog << name << '<' << dim << '>' << " embedding " << i << std::endl;
       if (fe.isotropic_prolongation_is_implemented())
-	print_formatted (fe.get_prolongation_matrix(i), 3, 6);
+	print_formatted (fe.get_prolongation_matrix(i), 4, 6);
     }
 }
 
@@ -166,15 +176,15 @@ main()
   CHECK_ALL(Nedelec, 0, 3);
   CHECK_ALL(Nedelec, 1, 2);
   CHECK_ALL(Nedelec, 1, 3);
-  
+
   CHECK_ALL(RaviartThomas, 0, 2);
   CHECK_ALL(RaviartThomas, 0, 3);
   CHECK_ALL(RaviartThomas, 1, 2);
   CHECK_ALL(RaviartThomas, 1, 3);
-  
+
   CHECK_ALL(BDM, 1, 2);
   CHECK_ALL(BDM, 2, 2);
-  
+
   CHECK_SYS1(FE_Q<2>(1),3,2);
   CHECK_SYS1(FE_DGQ<2>(2),2,2);
 //  CHECK_SYS1(FE_DGP<2>(3),1,2);
@@ -187,7 +197,7 @@ main()
   CHECK_SYS3(FE_DGQ<2>(2),2,FE_DGQ<2>(2),2,FE_Q<2>(3),3,2);
 //   CHECK_SYS3(FE_DGP<2>(3),1,FE_DGP<2>(3),1,FE_Q<2>(2),3,2);
 
-				   // systems of systems  
+				   // systems of systems
   CHECK_SYS3((FESystem<2>(FE_Q<2>(1),3)), 3,
 	     FE_DGQ<2>(3), 1,
 	     FE_Q<2>(1), 3,
@@ -215,6 +225,6 @@ main()
  	     FESystem<2>(FE_Q<2>(2),3,
  			 FE_Nedelec<2>(1),2),2,
  	     2);
-  
+
   return 0;
 }
