@@ -30,11 +30,26 @@ namespace MeshWorker
 
 /**
  * A class that, instead of assembling into a matrix or vector,
- * outputs the results on a cell to a gnuplot patch. This works only
- * for elements with support points. The first dim data vectors will
- * be the coordinates, the following are the data.
+ * outputs the results on a cell to a gnuplot patch.
+ *
+ * This assembler expects that LocalResults contains quadrature values
+ * set with LocalResults::quadrature_value(). When it is initialized
+ * with the number of quadrature points in a single (!) space
+ * direction and the number of data fields to be displayed, it
+ * initializes LocalResults automatically. The number of data fields
+ * in local results will be increased by dim in order to accommodate
+ * for the coordinates of the data points.
+ *
+ * While data slots for the space coordinates are allocated
+ * automatically, these coordinates are not entered. It is up to the
+ * user to enter the coordinates in the first dim data entries at
+ * every point. This adds the flexibility to output transformed
+ * coordinates or even something completely different.
  *
  * @note In the current implementation, only cell data can be written.
+ *
+ * @author Guido Kanschat
+ * @date 2011, 2012
  */
     class GnuplotPatch
     {
@@ -56,10 +71,13 @@ namespace MeshWorker
                                           * actual Quadrature used to
                                           * create the patches. The
                                           * total number of data
-                                          * vectors produced is n+dim
-                                          * and the first dim will be
+                                          * vectors produced is <tt>n+dim</tt>
+                                          * and the first dim should be
                                           * the space coordinates of
-                                          * the points.
+                                          * the points. Nevertheless,
+                                          * it is up to the user to
+                                          * set these values to
+                                          * whatever is desired.
                                           */
         void initialize (const unsigned int n_points,
                          const unsigned int n_vectors);
@@ -90,15 +108,14 @@ namespace MeshWorker
         void initialize_info(DoFInfo<dim>& info, bool face);
 
                                          /**
-                                          * Assemble the local values
-                                          * into the global vectors.
+                                          * Write the patch to the
+                                          * output stream.
                                           */
         template<int dim>
         void assemble(const DoFInfo<dim>& info);
 
                                          /**
-                                          * Assemble both local values
-                                          * into the global vectors.
+                                          * @warning Not implemented yet
                                           */
         template<int dim>
         void assemble(const DoFInfo<dim>& info1,
@@ -107,7 +124,7 @@ namespace MeshWorker
       private:
                                          /**
                                           * Write the object T either
-                                          * to the stream #os, if initialize_stream
+                                          * to the stream #os, if initialize_stream()
                                           * has been called, or to
                                           * @p deallog if no pointer has
                                           * been set.
