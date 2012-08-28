@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,7 +51,7 @@ void test (const Triangulation<dim>& tr,
   Vector<double> fe_function(dof.n_dofs());
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     fe_function(i) = i+1;
-  
+
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
 			   update_values | update_gradients | update_hessians);
@@ -63,17 +63,21 @@ void test (const Triangulation<dim>& tr,
 		   std::vector<Tensor<2,dim> >(fe.n_components()));
 
   fe_values.get_function_hessians (fe_function, vector_values);
-  
+
   for (unsigned int c=0; c<fe.n_components(); ++c)
     {
       FEValuesExtractors::Scalar single_component (c);
       fe_values[single_component].get_function_hessians (fe_function,
 							 scalar_values);
       deallog << "component=" << c << std::endl;
-      
+
       for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
 	{
-	  deallog << scalar_values[q] << std::endl;
+	  for (unsigned int d=0; d<dim; ++d)
+	    for (unsigned int e=0; e<dim; ++e)
+	      deallog << scalar_values[q][d][e] << (d<dim-1 || e<dim-1 ? " " : "");
+	  deallog << std::endl;
+
 	  Assert ((scalar_values[q] - vector_values[q][c]).norm()
 		  <= 1e-12 * scalar_values[q].norm(),
 		  ExcInternalError());
