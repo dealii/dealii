@@ -112,7 +112,7 @@ int main()
 
   deallog.attach(logfile);
   deallog.depth_console (0);
-  deallog.threshold_double(1.e-6);
+  deallog.threshold_double(1.e-5);
 
   test_hyper_sphere<2>();
   test_hyper_sphere<3>();
