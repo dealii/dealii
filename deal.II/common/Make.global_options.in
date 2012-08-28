@@ -76,6 +76,13 @@ DEAL_II_TRILINOS_VERSION_MINOR    = @DEAL_II_TRILINOS_VERSION_MINOR@
 DEAL_II_TRILINOS_VERSION_SUBMINOR = @DEAL_II_TRILINOS_VERSION_SUBMINOR@
 DEAL_II_TRILINOS_LIBPREFIX = @DEAL_II_TRILINOS_LIBPREFIX@
 
+USE_CONTRIB_HDF5 = @USE_CONTRIB_HDF5@
+DEAL_II_HDF5_VERSION = @DEAL_II_HDF5_VERSION@
+DEAL_II_HDF5_CFLAGS = @DEAL_II_HDF5_CFLAGS@
+DEAL_II_HDF5_CPPFLAGS = @DEAL_II_HDF5_CPPFLAGS@
+DEAL_II_HDF5_LDFLAGS = @DEAL_II_HDF5_LDFLAGS@
+DEAL_II_HDF5_INCDIR = @DEAL_II_HDF5_INCDIR@
+
 USE_CONTRIB_BLAS   = @USE_CONTRIB_BLAS@
 USE_CONTRIB_LAPACK = @USE_CONTRIB_LAPACK@
 
@@ -271,6 +278,8 @@ include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
 include-path-mumps           = $(DEAL_II_MUMPS_DIR)/include
 include-path-metis           = $(DEAL_II_METIS_INCDIR)
+include-path-hdf5            = $(DEAL_II_HDF5_INCDIR)
+
 
 # include paths as command line flags. while compilers allow a space between
 # the '-I' and the actual path, we also send these flags to the
@@ -316,6 +325,11 @@ ifeq ($(USE_CONTRIB_METIS),yes)
   INCLUDE += -I$(include-path-metis)
 endif
 
+ifeq ($(USE_CONTRIB_HDF5),yes)
+  INCLUDE += -I$(include-path-hdf5)
+endif
+
+
 ifeq ($(enable-threads),yes)
   INCLUDE += -I$(shell echo $D/contrib/tbb/tbb*/include)
 endif
@@ -352,6 +366,13 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
 
   CXXFLAGS.g += $(GCXX_PETSCFLAGS)
   CXXFLAGS.o += $(OCXX_PETSCFLAGS)
+endif
+
+ifeq ($(USE_CONTRIB_HDF5),yes)
+  CFLAGS.g += $(DEAL_II_HDF5_CFLAGS)
+  CFLAGS.o += $(DEAL_II_HDF5_CFLAGS)
+  CXXFLAGS.g += $(DEAL_II_HDF5_CXXFLAGS)
+  CXXFLAGS.o += $(DEAL_II_HDF5_CXXFLAGS)
 endif
 
 ifneq ($(enable-threads),no)

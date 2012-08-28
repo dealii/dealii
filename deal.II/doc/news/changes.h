@@ -63,6 +63,11 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
+New: we now support parallel output using HDF5/xdmf.
+<br>
+(Eric Heien, Timo Heister, 2012/08/28)
+
+<li>
 New: we are now compatible with Trilinos 10.4.2, 10.8.5, and 10.12.2. See the
 readme for more information.
 <br>

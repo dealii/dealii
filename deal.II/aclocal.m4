@@ -7054,6 +7054,245 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
   CXXFLAGS="${OLD_CXXFLAGS}"
 ])
 
+dnl ===========================================================================
+dnl        http://www.gnu.org/software/autoconf-archive/ax_lib_hdf5.html
+dnl ===========================================================================
+dnl
+dnl SYNOPSIS
+dnl
+dnl   AX_LIB_HDF5([serial/parallel])
+dnl
+dnl DESCRIPTION
+dnl
+dnl   This macro provides tests of the availability of HDF5 library.
+dnl
+dnl   The optional macro argument should be either 'serial' or 'parallel'. The
+dnl   former only looks for serial HDF5 installations via h5cc. The latter
+dnl   only looks for parallel HDF5 installations via h5pcc. If the optional
+dnl   argument is omitted, serial installations will be preferred over
+dnl   parallel ones.
+dnl
+dnl   The macro adds a --with-hdf5 option accepting one of three values:
+dnl
+dnl     no   - do not check for the HDF5 library.
+dnl     yes  - do check for HDF5 library in standard locations.
+dnl     path - complete path to where lib/libhdf5* libraries and
+dnl            include/H5* include files reside.
+dnl
+dnl   If HDF5 is successfully found, this macro calls
+dnl
+dnl     AC_SUBST(DEAL_II_HDF5_VERSION)
+dnl     AC_SUBST(DEAL_II_HDF5_CFLAGS)
+dnl     AC_SUBST(DEAL_II_HDF5_CPPFLAGS)
+dnl     AC_SUBST(DEAL_II_HDF5_LDFLAGS)
+dnl     AC_SUBST(DEAL_II_HDF5_INCDIR)
+dnl     AC_DEFINE(DEAL_II_HAVE_HDF5)
+dnl
+dnl   and sets with_hdf5="yes".
+dnl
+dnl   If HDF5 is disabled or not found, this macros sets with_hdf5="no".
+dnl
+dnl   Your configuration script can test $with_hdf to take any further
+dnl   actions. HDF5_{C,CPP,LD}FLAGS may be used when building with C or C++.
+dnl
+dnl LICENSE
+dnl
+dnl   Copyright (c) 2009 Timothy Brown <tbrown@freeshell.org>
+dnl   Copyright (c) 2010 Rhys Ulerich <rhys.ulerich@gmail.com>
+dnl
+dnl   Copying and distribution of this file, with or without modification, are
+dnl   permitted in any medium without royalty provided the copyright notice
+dnl   and this notice are preserved. This file is offered as-is, without any
+dnl   warranty.
+
+AC_DEFUN(DEAL_II_CONFIGURE_HDF5, dnl
+[
+
+AC_REQUIRE([AC_PROG_SED])
+AC_REQUIRE([AC_PROG_AWK])
+AC_REQUIRE([AC_PROG_GREP])
+
+dnl Add a default --with-hdf5 configuration option.
+AC_ARG_WITH([hdf5],
+  AS_HELP_STRING(
+    [--with-hdf5=[yes/no/PATH]],
+    m4_case(m4_normalize([$1]),
+            [serial],   [location of h5cc for serial HDF5 configuration],
+            [parallel], [location of h5pcc for parallel HDF5 configuration],
+            [location of h5cc or h5pcc for HDF5 configuration])
+  ),
+  [if test "$withval" = "no"; then
+     with_hdf5="no"
+   elif test "$withval" = "yes"; then
+     with_hdf5="yes"
+   else
+     with_hdf5="yes"
+     H5CC="$withval"
+   fi],
+   [with_hdf5="yes"]
+)
+
+dnl Set defaults to blank
+USE_CONTRIB_HDF5=no
+DEAL_II_HDF5_VERSION=""
+DEAL_II_HDF5_CFLAGS=""
+DEAL_II_HDF5_CPPFLAGS=""
+DEAL_II_HDF5_LDFLAGS=""
+DEAL_II_HDF5_INCDIR=""
+
+dnl Try and find hdf5 compiler tools and options.
+if test "$with_hdf5" = "yes"; then
+    if test -z "$H5CC"; then
+        dnl Check to see if H5CC is in the path.
+        AC_PATH_PROGS(
+            [H5CC],
+            m4_case(m4_normalize([$1]),
+                [serial],   [h5cc],
+                [parallel], [h5pcc],
+                [h5cc h5pcc]),
+            [])
+    else
+        AC_MSG_CHECKING([Using provided HDF5 C wrapper])
+        AC_MSG_RESULT([$H5CC])
+    fi
+    AC_MSG_CHECKING([for HDF5 libraries])
+    if test ! -x "$H5CC"; then
+        AC_MSG_RESULT([no])
+        AC_MSG_WARN(m4_case(m4_normalize([$1]),
+            [serial],  [
+Unable to locate serial HDF5 compilation helper script 'h5cc'.
+Please specify --with-hdf5=<LOCATION> as the full path to h5cc.
+HDF5 support is being disabled (equivalent to --with-hdf5=no).
+],            [parallel],[
+Unable to locate parallel HDF5 compilation helper script 'h5pcc'.
+Please specify --with-hdf5=<LOCATION> as the full path to h5pcc.
+HDF5 support is being disabled (equivalent to --with-hdf5=no).
+],            [
+Unable to locate HDF5 compilation helper scripts 'h5cc' or 'h5pcc'.
+Please specify --with-hdf5=<LOCATION> as the full path to h5cc or h5pcc.
+HDF5 support is being disabled (equivalent to --with-hdf5=no).
+]))
+        with_hdf5="no"
+    else
+        dnl h5cc provides both AM_ and non-AM_ options
+        dnl depending on how it was compiled either one of
+        dnl these are empty. Lets roll them both into one.
+
+        dnl Look for "HDF5 Version: X.Y.Z"
+        DEAL_II_HDF5_VERSION=$(eval $H5CC -showconfig | grep 'HDF5 Version:' \
+            | $AWK '{print $[]3}')
+
+dnl A ideal situation would be where everything we needed was
+dnl in the AM_* variables. However most systems are not like this
+dnl and seem to have the values in the non-AM variables.
+dnl
+dnl We try the following to find the flags:
+dnl (1) Look for "NAME:" tags
+dnl (2) Look for "NAME/H5_NAME:" tags
+dnl (3) Look for "AM_NAME:" tags
+dnl
+        dnl (1)
+        dnl Look for "CFLAGS: "
+        DEAL_II_HDF5_CFLAGS=$(eval $H5CC -showconfig | grep '\bCFLAGS:'   \
+            | $AWK -F: '{print $[]2}')
+        dnl Look for "CPPFLAGS"
+        DEAL_II_HDF5_CPPFLAGS=$(eval $H5CC -showconfig | grep '\bCPPFLAGS:' \
+            | $AWK -F: '{print $[]2}')
+        dnl Look for "LD_FLAGS"
+        DEAL_II_HDF5_LDFLAGS=$(eval $H5CC -showconfig | grep '\bLDFLAGS:'   \
+            | $AWK -F: '{print $[]2}')
+
+        dnl (2)
+        dnl CFLAGS/H5_CFLAGS: .../....
+        dnl We could use $SED with something like the following
+        dnl 's/CFLAGS.*\/H5_CFLAGS.*[:]\(.*\)\/\(.*\)/\1/p'
+        if test -z "$DEAL_II_HDF5_CFLAGS"; then
+            DEAL_II_HDF5_CFLAGS=$(eval $H5CC -showconfig \
+                | $SED -n 's/CFLAGS.*[:]\(.*\)\/\(.*\)/\1/p')
+        fi
+        dnl Look for "CPPFLAGS"
+        if test -z "$DEAL_II_HDF5_CPPFLAGS"; then
+            DEAL_II_HDF5_CPPFLAGS=$(eval $H5CC -showconfig \
+                | $SED -n 's/CPPFLAGS.*[:]\(.*\)\/\(.*\)/\1/p')
+        fi
+        dnl Look for "LD_FLAGS"
+        if test -z "$DEAL_II_HDF5_LDFLAGS"; then
+            DEAL_II_HDF5_LDFLAGS=$(eval $H5CC -showconfig \
+                | $SED -n 's/LDFLAGS.*[:]\(.*\)\/\(.*\)/\1/p')
+        fi
+
+        dnl (3)
+        dnl Check to see if these are not empty strings. If so
+        dnl find the AM_ versions and use them.
+        if test -z "$DEAL_II_HDF5_CFLAGS"; then
+            DEAL_II_HDF5_CFLAGS=$(eval $H5CC -showconfig \
+                | grep '\bAM_CFLAGS:' | $AWK -F: '{print $[]2}')
+        fi
+        if test -z "$DEAL_II_HDF5_CPPFLAGS"; then
+            DEAL_II_HDF5_CPPFLAGS=$(eval $H5CC -showconfig \
+                | grep '\bAM_CPPFLAGS:' | $AWK -F: '{print $[]2}')
+        fi
+        if test -z "$DEAL_II_HDF5_LDFLAGS"; then
+            DEAL_II_HDF5_LDFLAGS=$(eval $H5CC -showconfig \
+                | grep '\bAM_LDFLAGS:' | $AWK -F: '{print $[]2}')
+        fi
+
+        dnl Frustratingly, the necessary -Idir,-Ldir still may not be found!
+        dnl Attempt to pry any more required include directories from wrapper.
+        for arg in `$H5CC -c -show`
+        do
+          case "$arg" in #(
+            -I*) echo $DEAL_II_HDF5_CPPFLAGS | $GREP -e "$arg" 2>&1 >/dev/null \
+                  || DEAL_II_HDF5_CPPFLAGS="$arg $DEAL_II_HDF5_CPPFLAGS"
+              ;;
+          esac
+        done
+        for arg in `$H5CC -show`
+        do
+          case "$arg" in #(
+            -L*) echo $DEAL_II_HDF5_LDFLAGS | $GREP -e "$arg" 2>&1 >/dev/null \
+                  || DEAL_II_HDF5_LDFLAGS="$arg $DEAL_II_HDF5_LDFLAGS"
+              ;;
+          esac
+        done
+
+        AC_MSG_RESULT([yes (version $[DEAL_II_HDF5_VERSION])])
+
+        dnl Look for any extra libraries also needed to link properly
+        EXTRA_LIBS=$(eval $H5CC -showconfig | grep 'Extra libraries:'\
+            | $AWK -F: '{print $[]2}')
+
+        dnl Look for HDF5's high level library
+        ax_lib_hdf5_save_LDFLAGS=$LDFLAGS
+        ax_lib_hdf5_save_LIBS=$LIBS
+        LDFLAGS=$DEAL_II_HDF5_LDFLAGS
+        AC_HAVE_LIBRARY([hdf5_hl],
+                        [DEAL_II_HDF5_LDFLAGS="$DEAL_II_HDF5_LDFLAGS -lhdf5_hl"],
+                        [],
+                        [-lhdf5 $EXTRA_LIBS])
+        LIBS=$ax_lib_hdf5_save_LIBS
+        LDFLAGS=$ax_lib_hdf5_save_LDFLAGS
+
+        dnl Add the HDF5 library itself
+        DEAL_II_HDF5_LDFLAGS="$DEAL_II_HDF5_LDFLAGS -lhdf5"
+
+        dnl Add any EXTRA_LIBS afterwards
+        if test "$EXTRA_LIBS"; then
+            DEAL_II_HDF5_LDFLAGS="$DEAL_II_HDF5_LDFLAGS $EXTRA_LIBS"
+        fi
+
+	dnl remove "-I" from cpp flags to get include path
+	DEAL_II_HDF5_INCDIR=$(eval echo $DEAL_II_HDF5_CPPFLAGS | cut -c 3-)
+
+        LDFLAGS="$LDFLAGS $DEAL_II_HDF5_LDFLAGS"
+        USE_CONTRIB_HDF5=yes
+	AC_DEFINE([DEAL_II_HAVE_HDF5], [1], [Defined if you have HDF5 support])
+    fi
+fi
+])
+
+
+
 
 
 dnl ------------------------------------------------------------

@@ -131,6 +131,9 @@
    libraries */
 #undef DEAL_II_HAVE_DARWIN_DYNACAST_BUG
 
+/* Defined if you have HDF5 support */
+#undef DEAL_II_HAVE_HDF5
+
 /* Defined if std::isfinite is available */
 #undef DEAL_II_HAVE_ISFINITE
 

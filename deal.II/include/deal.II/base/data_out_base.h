@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 class ParameterHandler;
-
+class XDMFEntry;
 
 /**
  * This is a base class for output of data on meshes of very general
@@ -1407,7 +1407,13 @@ class DataOutBase
                                             * Output in deal.II
                                             * intermediate format.
                                             */
-          deal_II_intermediate
+          deal_II_intermediate,
+        
+                                           /**
+                                            * Output in
+                                            * HDF5 format.
+                                            */
+          hdf5
     };
 
 
@@ -1808,7 +1814,29 @@ class DataOutBase
       const Deal_II_IntermediateFlags         &flags,
       std::ostream                            &out);
 
+    template <int dim, int spacedim>
+    static void write_hdf5_parallel (
+     const std::vector<Patch<dim,spacedim> > &patches,
+     const std::vector<std::string>          &data_names,
+     const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+     const char* filename,
+     MPI_Comm comm);
+    
+    template <int dim, int spacedim>
+    static XDMFEntry create_xdmf_entry (const std::vector<Patch<dim,spacedim> > &patches,
+     const std::vector<std::string>          &data_names,
+     const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+     const char* h5_filename,
+     const double cur_time,
+     MPI_Comm comm);
 
+    template <int dim, int spacedim>
+    static void write_xdmf_file (
+     const std::vector<Patch<dim,spacedim> > &patches,
+     const std::vector<XDMFEntry> &entries,
+     const char *filename,
+     MPI_Comm comm);
+    
                                      /**
                                       * Given an input stream that contains
                                       * data written by
@@ -2462,6 +2490,15 @@ class DataOutInterface : private DataOutBase
                                       */
     void write_deal_II_intermediate (std::ostream &out) const;
 
+    XDMFEntry create_xdmf_entry (const char *h5_filename,
+                                 const double cur_time,
+                                 MPI_Comm comm) const;
+
+    void write_xdmf_file (const std::vector<XDMFEntry> &entries,
+                          const char *filename,
+                          MPI_Comm comm) const;
+    
+    void write_hdf5_parallel (const char* filename, MPI_Comm comm) const;
                                      /**
                                       * Write data and grid to <tt>out</tt>
                                       * according to the given data
@@ -3009,6 +3046,45 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
     vector_data_ranges;
 };
 
+
+
+
+// A class to store relevant data to use when writing the light data XDMF file
+// This should only contain valid data on the root node which writes the files,
+// the rest of the nodes will have valid set to false
+class XDMFEntry {
+private:
+    // Whether this entry is valid and contains data to be written
+    bool                                valid;
+    // The name of the HDF5 heavy data file this entry references
+    std::string                         h5_filename;
+    // The simulation time associated with this entry
+    double                              entry_time;
+    // The number of nodes, cells and dimensionality associated with the data
+    unsigned int                        num_nodes, num_cells, dimension;
+    // The attributes associated with this entry and their dimension
+    std::map<std::string, unsigned int> attribute_dims;
+    
+    // Small function to create indentation for XML file
+    std::string indent(const unsigned int indent_level) const {
+        std::string res = "";
+        for (unsigned int i=0;i<indent_level;++i) res += "  ";
+        return res;
+    }
+    
+public:
+    XDMFEntry(void) : valid(false) {};
+    XDMFEntry(const std::string filename, const double time, const unsigned int nodes, const unsigned int cells, const unsigned int dim) : valid(true), h5_filename(filename), entry_time(time), num_nodes(nodes), num_cells(cells), dimension(dim) {};
+    
+    // Record an attribute and associated dimensionality
+    void add_attribute(const std::string &attr_name, const unsigned int dimension) {
+        attribute_dims[attr_name] = dimension;
+    }
+    
+    // Get the XDMF content associated with this entry
+    // If the entry is not valid, this returns false
+    std::string get_xdmf_content(const unsigned int indent_level) const;
+};
 
 
 
