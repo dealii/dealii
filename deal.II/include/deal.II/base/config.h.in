@@ -105,6 +105,11 @@
    member functions. */
 #undef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
 
+/* If the compiler supports this, then this variable is defined to a string
+   that when written after a function name makes the compiler emit a warning
+   whenever this function is used somewhere that its use is deprecated. */
+#undef DEAL_II_DEPRECATED
+
 /* disable the function parser in contrib */
 #undef DEAL_II_DISABLE_PARSER
 

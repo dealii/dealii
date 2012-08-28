@@ -4515,6 +4515,82 @@ $as_echo "no" >&6; }
   fi
 
 
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compiler has attributes to deprecate functions" >&5
+$as_echo_n "checking whether compiler has attributes to deprecate functions... " >&6; }
+
+
+  OLD_CXXFLAGS="$CXXFLAGS"
+  CXXFLAGS=""
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+          int old_fn () __attribute__((deprecated));
+          int old_fn ();
+          int (*fn_ptr)() = old_fn;
+
+int
+main ()
+{
+;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+       test1=yes
+
+else
+
+       test1=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    CXXFLAGS=-Werror
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+          int old_fn () __attribute__((deprecated));
+          int old_fn ();
+          int (*fn_ptr)() = old_fn;
+
+int
+main ()
+{
+;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+       test2=yes
+
+else
+
+       test2=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CXXFLAGS="${OLD_CXXFLAGS}"
+
+  if test "$test1$test2" = "yesno" ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define DEAL_II_DEPRECATED __attribute__((deprecated))" >>confdefs.h
+
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+$as_echo "#define DEAL_II_DEPRECATED /**/" >>confdefs.h
+
+  fi
+
+
 
                     CXXFLAGS="-Wreturn-type -Werror"
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether qualifiers in return types lead to a warning" >&5

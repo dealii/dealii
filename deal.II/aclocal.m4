@@ -435,8 +435,10 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
-    dnl See whether the gcc we use already has a flag for C++2011 features.
+    dnl See whether the gcc we use already has a flag for C++2011 features
+    dnl and whether we can mark functions as deprecated with an attributed
     DEAL_II_CHECK_CXX1X
+    DEAL_II_CHECK_DEPRECATED
 
 
     dnl On some gcc 4.3 snapshots, a 'const' qualifier on a return type triggers a
@@ -1334,6 +1336,74 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
     fi
   fi
 ])
+
+
+
+dnl -------------------------------------------------------------
+dnl See if the compiler understands the attribute to mark functions
+dnl as deprecated.
+dnl
+dnl Usage: DEAL_II_CHECK_DEPRECATED
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_DEPRECATED, dnl
+[
+  AC_MSG_CHECKING(whether compiler has attributes to deprecate functions)
+
+
+  OLD_CXXFLAGS="$CXXFLAGS"
+  CXXFLAGS=""
+
+  dnl First see if the following compiles without error (it should
+  dnl produce a warning but we don't care about this
+  AC_TRY_COMPILE(
+     [
+          int old_fn () __attribute__((deprecated));
+          int old_fn ();
+          int (*fn_ptr)() = old_fn;
+     ],
+     [;],
+     [
+       test1=yes
+     ],
+     [
+       test1=no
+     ])
+
+  dnl Now try this again with -Werror. It should now fail
+  CXXFLAGS=-Werror
+  AC_TRY_COMPILE(
+     [
+          int old_fn () __attribute__((deprecated));
+          int old_fn ();
+          int (*fn_ptr)() = old_fn;
+     ],
+     [;],
+     [
+       test2=yes
+     ],
+     [
+       test2=no
+     ])
+  CXXFLAGS="${OLD_CXXFLAGS}"
+
+  if test "$test1$test2" = "yesno" ; then
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(DEAL_II_DEPRECATED, [__attribute__((deprecated))],
+              [If the compiler supports this, then this variable is
+	       defined to a string that when written after a function
+	       name makes the compiler emit a warning whenever this
+	       function is used somewhere that its use is deprecated.])
+  else
+    AC_MSG_RESULT(no)
+    AC_DEFINE(DEAL_II_DEPRECATED, [],
+              [If the compiler supports this, then this variable is
+	       defined to a string that when written after a function
+	       name makes the compiler emit a warning whenever this
+	       function is used somewhere that its use is deprecated.])
+  fi
+])
+
 
 
 dnl -------------------------------------------------------------
