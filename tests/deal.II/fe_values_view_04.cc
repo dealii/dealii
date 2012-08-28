@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,7 +52,7 @@ void test (const Triangulation<dim>& tr,
 	 cell = dof.begin_active(); cell != dof.end(); ++cell)
     {
       fe_values.reinit (cell);
-  
+
       for (unsigned int c=0; c<fe.n_components(); ++c)
 					 // use a vector extractor if there
 					 // are sufficiently many components
@@ -98,7 +98,7 @@ void test (const Triangulation<dim>& tr,
 			      (fe_values[vec_components].gradient(i,q) +
 			       transpose(fe_values[vec_components].gradient(i,q)))/2,
 			      ExcInternalError());
-		      
+
 		      Assert (fe_values[vec_components].hessian (i,q)[d]
 			      ==
 			      fe_values.shape_hessian_component (i,q,c+d),
@@ -134,7 +134,7 @@ int main()
 
   deallog.attach(logfile);
   deallog.depth_console (0);
-  deallog.threshold_double(1.e-12);
+  deallog.threshold_double(1.e-7);
 
   test_hyper_sphere<2>();
   test_hyper_sphere<3>();
