@@ -1156,7 +1156,7 @@ dnl -------------------------------------------------------------
 dnl Given the command line flag specified as argument to this macro,
 dnl test whether all components that we need from the C++1X
 dnl standard are actually available. If so, add the flag to
-dnl CXXFLAGS.g and CXXFLAGS.o, and set a flag in config.h
+dnl CXXFLAGSG and CXXFLAGSO, and set a flag in config.h
 dnl
 dnl Usage: DEAL_II_CHECK_CXX1X_COMPONENTS(cxxflag)
 dnl
