@@ -5946,9 +5946,17 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
     AssertThrow(cell_dataspace >= 0, ExcIO());
     
     // Create the dataset for the nodes and cells
+#if H5Gcreate_vers == 1
+    node_dataset = H5Dcreate(h5_file_id, "nodes", H5T_NATIVE_DOUBLE, node_dataspace, H5P_DEFAULT);
+#else
     node_dataset = H5Dcreate(h5_file_id, "nodes", H5T_NATIVE_DOUBLE, node_dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+#endif
     AssertThrow(node_dataset >= 0, ExcIO());
+#if H5Gcreate_vers == 1
+    cell_dataset = H5Dcreate(h5_file_id, "cells", H5T_NATIVE_UINT, cell_dataspace, H5P_DEFAULT);
+#else
     cell_dataset = H5Dcreate(h5_file_id, "cells", H5T_NATIVE_UINT, cell_dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+#endif
     AssertThrow(cell_dataset >= 0, ExcIO());
     
     // Close the node and cell dataspaces since we're done with them
@@ -6056,7 +6064,11 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
         pt_data_dataspace = H5Screate_simple(2, node_ds_dim, NULL);
         AssertThrow(pt_data_dataspace >= 0, ExcIO());
         
+#if H5Gcreate_vers == 1
+        pt_data_dataset = H5Dcreate(h5_file_id, vector_name.c_str(), H5T_NATIVE_DOUBLE, pt_data_dataspace, H5P_DEFAULT);
+#else
         pt_data_dataset = H5Dcreate(h5_file_id, vector_name.c_str(), H5T_NATIVE_DOUBLE, pt_data_dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+#endif
         AssertThrow(pt_data_dataset >= 0, ExcIO());
         
         // Create the data subset we'll use to read from memory

@@ -7125,7 +7125,12 @@ AC_ARG_WITH([hdf5],
      with_hdf5="no"
    elif test "$withval" = "yes"; then
      with_hdf5="yes"
+     warn_if_cannot_find_hdf5="yes"
+   elif test -z "$withval"; then
+     with_hdf5="yes"
+     H5CC="$withval"
    else
+     warn_if_cannot_find_hdf5="yes"
      with_hdf5="yes"
      H5CC="$withval"
    fi],
@@ -7158,20 +7163,22 @@ if test "$with_hdf5" = "yes"; then
     AC_MSG_CHECKING([for HDF5 libraries])
     if test ! -x "$H5CC"; then
         AC_MSG_RESULT([no])
-        AC_MSG_WARN(m4_case(m4_normalize([$1]),
-            [serial],  [
+        if test "$warn_if_cannot_find_hdf5" = "yes"; then
+            AC_MSG_WARN(m4_case(m4_normalize([$1]),
+                [serial],  [
 Unable to locate serial HDF5 compilation helper script 'h5cc'.
 Please specify --with-hdf5=<LOCATION> as the full path to h5cc.
 HDF5 support is being disabled (equivalent to --with-hdf5=no).
-],            [parallel],[
+],                [parallel],[
 Unable to locate parallel HDF5 compilation helper script 'h5pcc'.
 Please specify --with-hdf5=<LOCATION> as the full path to h5pcc.
 HDF5 support is being disabled (equivalent to --with-hdf5=no).
-],            [
+],                [
 Unable to locate HDF5 compilation helper scripts 'h5cc' or 'h5pcc'.
 Please specify --with-hdf5=<LOCATION> as the full path to h5cc or h5pcc.
 HDF5 support is being disabled (equivalent to --with-hdf5=no).
 ]))
+        fi
         with_hdf5="no"
     else
         dnl h5cc provides both AM_ and non-AM_ options
