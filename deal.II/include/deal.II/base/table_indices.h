@@ -147,7 +147,8 @@ class TableIndices<1> : public TableIndicesBase<1>
     TableIndices (const unsigned int index1);
 };
 
-
+//TODO: Remove the default arguments and trickery below and put all
+//the constructors into the class demplate
 
 /**
  * Array of indices of fixed size used for the TableBase
