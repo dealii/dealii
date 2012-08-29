@@ -99,7 +99,7 @@ class TableIndicesBase
  * @author Wolfgang Bangerth, 2002
  */
 template <int N>
-class TableIndices
+class TableIndices : public TableIndicesBase<N>
 {
                                      /**
                                       * Standard constructor, setting
