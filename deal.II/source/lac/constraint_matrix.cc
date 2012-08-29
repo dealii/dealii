@@ -238,6 +238,25 @@ void ConstraintMatrix::close ()
                                          &check_zero_weight),
                          line->entries.end());
 
+
+
+#ifdef DEBUG
+  // In debug mode we are computing an estimate for the maximum number
+  // of constraints so that we can bail out if there is a cycle in the
+  // constraints (which is easier than searching for cycles in the graph).
+  //
+  // Let us figure out the largest dof index first
+  unsigned int largest_idx = 0;
+  for (std::vector<ConstraintLine>::iterator line = lines.begin();
+             line!=lines.end(); ++line)
+    {
+      for (ConstraintLine::Entries::iterator it = line->entries.begin();it!=line->entries.end();++it)
+        {
+          largest_idx=std::max(largest_idx, it->first);
+        }
+    }
+#endif
+
                                    // replace references to dofs that
                                    // are themselves constrained. note
                                    // that because we may replace
@@ -289,6 +308,10 @@ void ConstraintMatrix::close ()
                 &&
                 is_constrained (line->entries[entry].first))
               {
+                // if we have more than 2*the largest index entries in a constrained line,
+                // we have hit a cycle for sure.
+                Assert(line->entries.size()/2<largest_idx, ExcMessage("Cycle found in constraints!"));
+
                                                  // ok, this entry is
                                                  // further
                                                  // constrained:
