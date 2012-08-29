@@ -9,7 +9,9 @@
 
 
 #include <deal.II/base/job_identifier.h>
+#include <deal.II/lac/constraint_matrix.h>
 
+#include <vector>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -18,7 +20,6 @@ using namespace dealii;
 
 
 
-template <int dim>
 void
 run()
 {
