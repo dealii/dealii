@@ -33,41 +33,17 @@ namespace types
   typedef unsigned int subdomain_id;
 
 				   /**
-				    * Old name for the typedef above.
-				    * @deprecated
+				    * @deprecated Old name for the typedef above.
 				    */
   typedef subdomain_id subdomain_id_t;
 
                                    /**
-                                    * A special id for an invalid
-                                    * subdomain id. This value may not
-                                    * be used as a valid id but is
-                                    * used, for example, for default
-                                    * arguments to indicate a
-                                    * subdomain id that is not to be
-                                    * used.
-                                    *
-                                    * See the @ref GlossSubdomainId
-                                    * "glossary" for more information.
+				    * @deprecated Use numbers::invalid_subdomain_id
                                     */
   const unsigned int invalid_subdomain_id = static_cast<subdomain_id>(-1);
 
                                    /**
-                                    * The subdomain id assigned to a
-                                    * cell whose true subdomain id we
-                                    * don't know, for example because
-                                    * it resides on a different
-                                    * processor on a mesh that is kept
-                                    * distributed on many
-                                    * processors. Such cells are
-                                    * called "artificial".
-                                    *
-                                    * See the glossary entries on @ref
-                                    * GlossSubdomainId "subdomain ids"
-                                    * and @ref GlossArtificialCell
-                                    * "artificial cells" as well as
-                                    * the @ref distributed module for
-                                    * more information.
+                                    * @deprecated Use numbers::artificial_subdomain_id
                                     */
   const unsigned int artificial_subdomain_id = static_cast<subdomain_id>(-2);
 
@@ -78,8 +54,7 @@ namespace types
   typedef unsigned int global_dof_index;
 
                                    /**
-                                    * An invalid value for indices of degrees
-                                    * of freedom.
+				    *  @deprecated Use numbers::invalid_dof_index
                                     */
   const global_dof_index invalid_dof_index = static_cast<global_dof_index>(-1);
 
@@ -91,14 +66,12 @@ namespace types
   typedef unsigned char boundary_id;
 
 				   /**
-				    * Old name for the typedef above.
-				    * @deprecated
+				    * @deprecated Old name for the typedef above.
 				    */
   typedef boundary_id boundary_id_t;
 
           /**
-           * The number which we reserve for internal faces.
-           * We assume that all boundary_ids lie in the range [0, internal_face_boundary_id).
+           * @deprecated Use numbers::internal_face_boundary_id
            */
   const boundary_id internal_face_boundary_id = static_cast<boundary_id>(-1);
 
@@ -109,14 +82,12 @@ namespace types
   typedef unsigned char material_id;
 
 				   /**
-				    * Old name for the typedef above.
-				    * @deprecated
+				    * @deprecated Old name for the typedef above.
 				    */
   typedef material_id material_id_t;
 
           /**
-           * Invalid material_id which we need in several places as a default value.
-           * We assume that all material_ids lie in the range [0, invalid_material_id).
+	   * @deprecated Use numbers::invalid_material_id
            */
   const material_id invalid_material_id = static_cast<material_id>(-1);
 
