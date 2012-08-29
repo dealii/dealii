@@ -386,6 +386,8 @@ void ConstraintMatrix::close ()
                     // there are constraints or dofs in our system, we must have a cycle.
                     ++n_replacements;
                     Assert(n_replacements/2<largest_idx, ExcMessage("Cycle in constraints detected!"));
+                    if (n_replacements/2>=largest_idx)
+                      return; // this enables us to test for this Exception.
 #endif
                   }
                 else
