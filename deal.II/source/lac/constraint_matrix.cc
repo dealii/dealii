@@ -245,7 +245,9 @@ void ConstraintMatrix::close ()
   // of constraints so that we can bail out if there is a cycle in the
   // constraints (which is easier than searching for cycles in the graph).
   //
-  // Let us figure out the largest dof index first
+  // Let us figure out the largest dof index. This is an upper bound for the
+  // number of constraints because it is an approximation for the number of dofs
+  // in our system.
   unsigned int largest_idx = 0;
   for (std::vector<ConstraintLine>::iterator line = lines.begin();
              line!=lines.end(); ++line)
@@ -290,6 +292,14 @@ void ConstraintMatrix::close ()
       for (std::vector<ConstraintLine>::iterator line = lines.begin();
            line!=lines.end(); ++line)
         {
+#ifdef DEBUG
+          // we need to keep track of how many replacements we do in this line, because we can
+          // end up in a cycle A->B->C->A without the number of entries growing.
+          unsigned int n_replacements = 0;
+#endif
+
+
+
                                            // loop over all entries of
                                            // this line (including
                                            // ones that we have
@@ -308,10 +318,6 @@ void ConstraintMatrix::close ()
                 &&
                 is_constrained (line->entries[entry].first))
               {
-                // if we have more than 2*the largest index entries in a constrained line,
-                // we have hit a cycle for sure.
-                Assert(line->entries.size()/2<largest_idx, ExcMessage("Cycle found in constraints!"));
-
                                                  // ok, this entry is
                                                  // further
                                                  // constrained:
@@ -374,6 +380,13 @@ void ConstraintMatrix::close ()
                         .push_back (std::make_pair (constrained_line->entries[i].first,
                                                     constrained_line->entries[i].second *
                                                     weight));
+
+#ifdef DEBUG
+                    // keep track of how many entries we replace in this line. If we do more than
+                    // there are constraints or dofs in our system, we must have a cycle.
+                    ++n_replacements;
+                    Assert(n_replacements/2<largest_idx, ExcMessage("Cycle in constraints detected!"));
+#endif
                   }
                 else
                                                    // the DoF that we
