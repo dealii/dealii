@@ -8,6 +8,8 @@
 // H2-elements implemented through constraints on the degrees of
 // freedom. After adding all constrained lines, the program hangs in
 // constraints.close().
+// This is because it contains a cycle. The test now checks that this
+// is detected.
 
 
 #include <deal.II/base/job_identifier.h>
@@ -123,6 +125,7 @@ setup_constraints(const DoFHandler<dim>& dof_handler)
     }
 
   deallog << "Closing" << std::endl;
+  deal_II_exceptions::disable_abort_on_exception();
   constraints.close();
   deallog << "Closed" << std::endl;
 }
