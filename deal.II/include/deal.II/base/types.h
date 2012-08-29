@@ -29,6 +29,11 @@ namespace types
                                     *
                                     * See the @ref GlossSubdomainId
                                     * "glossary" for more information.
+				    *
+				    * There is a special value,
+				    * numbers::invalid_subdomain_id
+				    * that is used to indicate an
+				    * invalid value of this type.
                                     */
   typedef unsigned int subdomain_id;
 
@@ -62,6 +67,12 @@ namespace types
            * The type used to denote boundary indicators associated with every
            * piece of the boundary and, in the case of meshes that describe
            * manifolds in higher dimensions, associated with every cell.
+	   *
+	   * There is a special value, numbers::internal_face_boundary_id
+	   * that is used to indicate an invalid value of this type and that
+	   * is used as the boundary indicator for faces that are in the interior
+	   * of the domain and therefore not part of any addressable boundary
+	   * component.
            */
   typedef unsigned char boundary_id;
 
@@ -71,13 +82,11 @@ namespace types
   typedef boundary_id boundary_id_t;
 
           /**
-           * @deprecated Use numbers::internal_face_boundary_id
-           */
-  const boundary_id internal_face_boundary_id = static_cast<boundary_id>(-1);
-
-          /**
            * The type used to denote material indicators associated with every
            * cell.
+	   *
+	   * There is a special value, numbers::invalid_material_id
+	   * that is used to indicate an invalid value of this type.
            */
   typedef unsigned char material_id;
 
@@ -85,11 +94,6 @@ namespace types
 				    * @deprecated Old name for the typedef above.
 				    */
   typedef material_id material_id_t;
-
-          /**
-	   * @deprecated Use numbers::invalid_material_id
-           */
-  const material_id invalid_material_id = static_cast<material_id>(-1);
 
 }
 

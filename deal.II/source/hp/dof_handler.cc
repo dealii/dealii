@@ -2869,7 +2869,7 @@ template <>
   DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
-    Assert (boundary_indicators.find(types::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_indicators.find(numbers::internal_face_boundary_id) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
 
                                      // same as above, but with
@@ -2905,7 +2905,7 @@ template <>
   DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
-    Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
 
                                      // same as above, but with

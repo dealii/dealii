@@ -1019,7 +1019,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * object.
                                       *
                                       * If the return value is the special
-                                      * value types::internal_face_boundary_id,
+                                      * value numbers::internal_face_boundary_id,
                                       * then this object is in the
                                       * interior of the domain.
                                       */
@@ -1052,14 +1052,14 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * (a face not at the boundary of the
                                       * domain), or set set the boundary
                                       * indicator of an exterior face to
-                                      * types::internal_face_boundary_id
+                                      * numbers::internal_face_boundary_id
                                       * (this value is reserved for another
                                       * purpose). Algorithms may not work or
                                       * produce very confusing results if
                                       * boundary cells have a boundary
-                                      * indicator of types::internal_face_boundary_id
+                                      * indicator of numbers::internal_face_boundary_id
                                       * or if interior cells have boundary
-                                      * indicators other than types::internal_face_boundary_id.
+                                      * indicators other than numbers::internal_face_boundary_id.
                                       * Unfortunately, the current object
                                       * has no means of finding out whether it
                                       * really is at the boundary of the
@@ -1930,7 +1930,7 @@ class TriaAccessor<0, 1, spacedim>
                                       * boundary indicator one.
                                       *
                                       * If the return value is the special
-                                      * value types::internal_face_boundary_id,
+                                      * value numbers::internal_face_boundary_id,
                                       * then this object is in the
                                       * interior of the domain.
                                       */
@@ -2054,14 +2054,14 @@ class TriaAccessor<0, 1, spacedim>
                                       * (a face not at the boundary of the
                                       * domain), or set set the boundary
                                       * indicator of an exterior face to
-                                      *  types::internal_face_boundary_id
+                                      *  numbers::internal_face_boundary_id
                                       * (this value is reserved for another
                                       * purpose). Algorithms may not work or
                                       * produce very confusing results if
                                       * boundary cells have a boundary
-                                      * indicator of types::internal_face_boundary_id
+                                      * indicator of numbers::internal_face_boundary_id
                                       * or if interior cells have boundary
-                                      * indicators other than types::internal_face_boundary_id.
+                                      * indicators other than numbers::internal_face_boundary_id.
                                       * Unfortunately, the current object
                                       * has no means of finding out whether it
                                       * really is at the boundary of the

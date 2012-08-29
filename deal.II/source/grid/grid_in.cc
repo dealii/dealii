@@ -357,9 +357,9 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
           // to make sure that the cast wont fail
     Assert(material_id<= std::numeric_limits<types::material_id>::max(),
         ExcIndexRange(material_id,0,std::numeric_limits<types::material_id>::max()));
-    // we use only material_ids in the range from 0 to types::invalid_material_id-1
-    Assert(material_id < types::invalid_material_id,
-        ExcIndexRange(material_id,0,types::invalid_material_id));
+    // we use only material_ids in the range from 0 to numbers::invalid_material_id-1
+    Assert(material_id < numbers::invalid_material_id,
+        ExcIndexRange(material_id,0,numbers::invalid_material_id));
 
           cells.back().material_id = static_cast<types::material_id>(material_id);
 
@@ -387,9 +387,9 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
             // to make sure that the cast wont fail
             Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
                 ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
-            // we use only boundary_ids in the range from 0 to types::internal_face_boundary_id-1
-            Assert(material_id < types::internal_face_boundary_id,
-                ExcIndexRange(material_id,0,types::internal_face_boundary_id));
+            // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
+            Assert(material_id < numbers::internal_face_boundary_id,
+                ExcIndexRange(material_id,0,numbers::internal_face_boundary_id));
 
             subcelldata.boundary_lines.back().boundary_id
                 = static_cast<types::boundary_id>(material_id);
@@ -425,9 +425,9 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
               // to make sure that the cast wont fail
               Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
                   ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
-              // we use only boundary_ids in the range from 0 to types::internal_face_boundary_id-1
-              Assert(material_id < types::internal_face_boundary_id,
-                  ExcIndexRange(material_id,0,types::internal_face_boundary_id));
+              // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
+              Assert(material_id < numbers::internal_face_boundary_id,
+                  ExcIndexRange(material_id,0,numbers::internal_face_boundary_id));
 
               subcelldata.boundary_quads.back().boundary_id
                   = static_cast<types::boundary_id>(material_id);
@@ -1000,9 +1000,9 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
     // to make sure that the cast wont fail
     Assert(material_id<= std::numeric_limits<types::material_id>::max(),
         ExcIndexRange(material_id,0,std::numeric_limits<types::material_id>::max()));
-    // we use only material_ids in the range from 0 to types::invalid_material_id-1
-    Assert(material_id < types::invalid_material_id,
-        ExcIndexRange(material_id,0,types::invalid_material_id));
+    // we use only material_ids in the range from 0 to numbers::invalid_material_id-1
+    Assert(material_id < numbers::invalid_material_id,
+        ExcIndexRange(material_id,0,numbers::invalid_material_id));
 
           cells.back().material_id = static_cast<types::material_id>(material_id);
 
@@ -1029,9 +1029,9 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
       // to make sure that the cast wont fail
       Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
           ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
-      // we use only boundary_ids in the range from 0 to types::internal_face_boundary_id-1
-      Assert(material_id < types::internal_face_boundary_id,
-          ExcIndexRange(material_id,0,types::internal_face_boundary_id));
+      // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
+      Assert(material_id < numbers::internal_face_boundary_id,
+          ExcIndexRange(material_id,0,numbers::internal_face_boundary_id));
 
             subcelldata.boundary_lines.back().boundary_id
                 = static_cast<types::boundary_id>(material_id);
@@ -1067,9 +1067,9 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
               // to make sure that the cast wont fail
               Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
                   ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
-              // we use only boundary_ids in the range from 0 to types::internal_face_boundary_id-1
-              Assert(material_id < types::internal_face_boundary_id,
-                  ExcIndexRange(material_id,0,types::internal_face_boundary_id));
+              // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
+              Assert(material_id < numbers::internal_face_boundary_id,
+                  ExcIndexRange(material_id,0,numbers::internal_face_boundary_id));
 
               subcelldata.boundary_quads.back().boundary_id
                   = static_cast<types::boundary_id>(material_id);
@@ -1618,10 +1618,10 @@ void GridIn<3>::read_netcdf (const std::string &filename)
                                    // we only handle boundary
                                    // indicators that fit into an
                                    // types::boundary_id. Also, we don't
-                                   // take types::internal_face_boundary_id
+                                   // take numbers::internal_face_boundary_id
            // as it denotes an internal face
   for (unsigned int i=0; i<bmarker.size(); ++i)
-    Assert(0<=bmarker[i] && bmarker[i]<types::internal_face_boundary_id, ExcIO());
+    Assert(0<=bmarker[i] && bmarker[i]<numbers::internal_face_boundary_id, ExcIO());
 
                                    // finally we setup the boundary
                                    // information

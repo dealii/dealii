@@ -38,7 +38,7 @@ and then copy it into a vector with ghost elements.
 
 <li> Changed: The argument material_id of the estimate-functions of
 the KellyErrorEstimator class is now of type types::material_id
-with default value types::invalid_material_id, instead of type
+with default value numbers::invalid_material_id, instead of type
 unsigned int with default value numbers::invalid_unsigned_int. This
 should not make a difference to most users unless you specified the
 argument's default value by hand.
@@ -63,12 +63,12 @@ used to store boundary indicators internally.
 
 <ol>
 <li>
-New: we now support parallel output using HDF5/xdmf.
+New: We now support parallel output using HDF5/xdmf.
 <br>
 (Eric Heien, Timo Heister, 2012/08/28)
 
 <li>
-New: we are now compatible with Trilinos 10.4.2, 10.8.5, and 10.12.2. See the
+New: We are now compatible with Trilinos 10.4.2, 10.8.5, and 10.12.2. See the
 readme for more information.
 <br>
 (Timo Heister, 2012/08/24)
@@ -210,10 +210,10 @@ type unsigned char. Throughout the library, we changed their datatype
 to <code>types::material_id</code>
 resp. <code>types::boundary_id</code>, both typedefs of unsigned
 char. Internal faces are now characterized by
-types::internal_face_boundary_id(<code>=static_cast@<types::boundary_id@>(-1)</code>)
+numbers::internal_face_boundary_id(<code>=static_cast@<types::boundary_id@>(-1)</code>)
 instead of 255, so we get rid of that mysterious number in the source
 code.  Material_ids are also assumed to lie in the range from 0 to
-types::invalid_material_id-1 (where <code>types::invalid_material_id =
+numbers::invalid_material_id-1 (where <code>numbers::invalid_material_id =
 static_cast<types::material_id>(-1)</code>). With this change, it is now
 much easier to extend the range of boundary or material ids, if
 needed.

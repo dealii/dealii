@@ -1789,8 +1789,8 @@ namespace internal
                 if (n_adj_cells == 1)
                   line->set_boundary_indicator (0);
                 else
-                                                   // interior line -> types::internal_face_boundary_id
-                  line->set_boundary_indicator (types::internal_face_boundary_id);
+                                                   // interior line -> numbers::internal_face_boundary_id
+                  line->set_boundary_indicator (numbers::internal_face_boundary_id);
               }
 
                                              // set boundary indicators where
@@ -1824,13 +1824,13 @@ namespace internal
                                                  // assert that we only set
                                                  // boundary info once
                 AssertThrow (! (line->boundary_indicator() != 0 &&
-                                line->boundary_indicator() != types::internal_face_boundary_id),
+                                line->boundary_indicator() != numbers::internal_face_boundary_id),
                              ExcMultiplySetLineInfoOfLine(line_vertices.first,
                                                           line_vertices.second));
 
                                                  // Assert that only exterior lines
                                                  // are given a boundary indicator
-                AssertThrow (! (line->boundary_indicator() == types::internal_face_boundary_id),
+                AssertThrow (! (line->boundary_indicator() == numbers::internal_face_boundary_id),
                              ExcInteriorLineCantBeBoundary());
 
                 line->set_boundary_indicator (boundary_line->boundary_id);
@@ -2509,8 +2509,8 @@ namespace internal
                 if (n_adj_cells == 1)
                   quad->set_boundary_indicator (0);
                 else
-                                                   // interior quad -> types::internal_face_boundary_id
-                  quad->set_boundary_indicator (types::internal_face_boundary_id);
+                                                   // interior quad -> numbers::internal_face_boundary_id
+                  quad->set_boundary_indicator (numbers::internal_face_boundary_id);
               }
 
                                              /////////////////////////////////////////
@@ -2522,7 +2522,7 @@ namespace internal
                                              // as interior
             for (typename Triangulation<dim,spacedim>::line_iterator
                    line=triangulation.begin_line(); line!=triangulation.end_line(); ++line)
-              line->set_boundary_indicator (types::internal_face_boundary_id);
+              line->set_boundary_indicator (numbers::internal_face_boundary_id);
                                              // next reset all lines bounding
                                              // boundary quads as on the
                                              // boundary also. note that since
@@ -4117,7 +4117,7 @@ namespace internal
                 new_lines[l]->clear_user_data();
                 new_lines[l]->clear_children();
                                                  // interior line
-                new_lines[l]->set_boundary_indicator(types::internal_face_boundary_id);
+                new_lines[l]->set_boundary_indicator(numbers::internal_face_boundary_id);
               }
 
                                              // Now add the four (two)
@@ -6375,7 +6375,7 @@ namespace internal
                           new_lines[i]->clear_user_data();
                           new_lines[i]->clear_children();
                                                            // interior line
-                          new_lines[i]->set_boundary_indicator(types::internal_face_boundary_id);
+                          new_lines[i]->set_boundary_indicator(numbers::internal_face_boundary_id);
                         }
 
                                                        // find some space for the newly to
@@ -6394,7 +6394,7 @@ namespace internal
                           new_quads[i]->clear_user_data();
                           new_quads[i]->clear_children();
                                                            // interior quad
-                          new_quads[i]->set_boundary_indicator (types::internal_face_boundary_id);
+                          new_quads[i]->set_boundary_indicator (numbers::internal_face_boundary_id);
                                                            // set all line orientation
                                                            // flags to true by default,
                                                            // change this afterwards, if
@@ -9472,7 +9472,7 @@ void
 Triangulation<dim, spacedim>::set_boundary (const types::boundary_id number,
                                             const Boundary<dim, spacedim>& boundary_object)
 {
-  Assert(number < types::internal_face_boundary_id, ExcIndexRange(number,0,types::internal_face_boundary_id));
+  Assert(number < numbers::internal_face_boundary_id, ExcIndexRange(number,0,numbers::internal_face_boundary_id));
 
   boundary[number] = &boundary_object;
 }
@@ -9483,7 +9483,7 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::set_boundary (const types::boundary_id number)
 {
-  Assert(number < types::internal_face_boundary_id, ExcIndexRange(number,0,types::internal_face_boundary_id));
+  Assert(number < numbers::internal_face_boundary_id, ExcIndexRange(number,0,numbers::internal_face_boundary_id));
 
   //delete the entry located at number.
   boundary.erase(number);
@@ -9495,7 +9495,7 @@ template <int dim, int spacedim>
 const Boundary<dim, spacedim> &
 Triangulation<dim, spacedim>::get_boundary (const types::boundary_id number) const
 {
-  Assert(number<types::internal_face_boundary_id, ExcIndexRange(number,0,types::internal_face_boundary_id));
+  Assert(number<numbers::internal_face_boundary_id, ExcIndexRange(number,0,numbers::internal_face_boundary_id));
 
   //look, if there is a boundary stored at
   //boundary_id number.
@@ -9539,7 +9539,7 @@ Triangulation<dim, spacedim>::get_boundary_indicators () const
     {
 //TODO: if boundary_id_t is a real integer type, this might become
 //a humongously large array...
-      std::vector<bool> bi_exists(types::internal_face_boundary_id, false);
+      std::vector<bool> bi_exists(numbers::internal_face_boundary_id, false);
       active_cell_iterator cell=begin_active();
       for (; cell!=end(); ++cell)
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)

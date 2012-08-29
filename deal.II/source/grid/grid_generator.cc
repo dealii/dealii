@@ -920,12 +920,12 @@ GridGenerator::subdivided_hyper_rectangle (
                                    // create the cells
   unsigned int n_val_cells = 0;
   for (unsigned int i=0; i<n_cells; i++)
-    if (material_id[i]!=types::invalid_material_id) n_val_cells++;
+    if (material_id[i]!=numbers::invalid_material_id) n_val_cells++;
 
   std::vector<CellData<1> > cells(n_val_cells);
   unsigned int id = 0;
   for (unsigned int x=0; x<n_cells; ++x)
-    if (material_id[x] != types::invalid_material_id)
+    if (material_id[x] != numbers::invalid_material_id)
       {
         cells[id].vertices[0] = x;
         cells[id].vertices[1] = x+1;
@@ -993,14 +993,14 @@ GridGenerator::subdivided_hyper_rectangle (
   unsigned int n_val_cells = 0;
   for (unsigned int i=0; i<material_id.size(0); i++)
     for (unsigned int j=0; j<material_id.size(1); j++)
-      if (material_id[i][j] != types::invalid_material_id)
+      if (material_id[i][j] != numbers::invalid_material_id)
         n_val_cells++;
 
   std::vector<CellData<2> > cells(n_val_cells);
   unsigned int id = 0;
   for (unsigned int y=0; y<repetitions[1]; ++y)
     for (unsigned int x=0; x<repetitions[0]; ++x)
-      if (material_id[x][y]!=types::invalid_material_id)
+      if (material_id[x][y]!=numbers::invalid_material_id)
         {
           cells[id].vertices[0] = y*(repetitions[0]+1)+x;
           cells[id].vertices[1] = y*(repetitions[0]+1)+x+1;
@@ -1100,7 +1100,7 @@ GridGenerator::subdivided_hyper_rectangle (
   for (unsigned int i=0; i<material_id.size(0); i++)
     for (unsigned int j=0; j<material_id.size(1); j++)
       for (unsigned int k=0; k<material_id.size(2); k++)
-        if (material_id[i][j][k]!=types::invalid_material_id)
+        if (material_id[i][j][k]!=numbers::invalid_material_id)
           n_val_cells++;
 
   std::vector<CellData<dim> > cells(n_val_cells);
@@ -1110,7 +1110,7 @@ GridGenerator::subdivided_hyper_rectangle (
   for (unsigned int z=0; z<repetitions[2]; ++z)
     for (unsigned int y=0; y<repetitions[1]; ++y)
       for (unsigned int x=0; x<repetitions[0]; ++x)
-        if (material_id[x][y][z]!=types::invalid_material_id)
+        if (material_id[x][y][z]!=numbers::invalid_material_id)
           {
             cells[id].vertices[0] = z*n_xy + y*n_x + x;
             cells[id].vertices[1] = z*n_xy + y*n_x + x+1;
@@ -1751,7 +1751,7 @@ GridGenerator::half_hyper_ball (Triangulation<2> &tria,
     {
         for (unsigned int i=0;i<GeometryInfo<2>::faces_per_cell;++i)
         {
-            if (cell->face(i)->boundary_indicator() == types::internal_face_boundary_id)
+            if (cell->face(i)->boundary_indicator() == numbers::internal_face_boundary_id)
                 continue;
 
             // If x is zero, then this is part of the plane

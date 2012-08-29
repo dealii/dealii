@@ -136,8 +136,8 @@ struct CellData
  *  number describing the boundary condition to hold on this part of the
  *  boundary. The triangulation creation function gives lines not in this
  *  list either the boundary indicator zero (if on the boundary) or
- *  types::internal_face_boundary_id (if in the interior). Explicitely giving a
- *  line the indicator types::internal_face_boundary_id will result in an error, as well as giving
+ *  numbers::internal_face_boundary_id (if in the interior). Explicitely giving a
+ *  line the indicator numbers::internal_face_boundary_id will result in an error, as well as giving
  *  an interior line a boundary indicator.
  *
  * @ingroup grid
@@ -783,12 +783,12 @@ namespace internal
  *   use is like the material id of cells).
 
  *   Boundary indicators may be in the range from zero to
- *   types::internal_face_boundary_id-1. The value
- *   types::internal_face_boundary_id is reserved to denote interior lines (in 2D)
+ *   numbers::internal_face_boundary_id-1. The value
+ *   numbers::internal_face_boundary_id is reserved to denote interior lines (in 2D)
  *   and interior lines and quads (in 3D), which do not have a
  *   boundary indicator. This way, a program can easily
  *   determine, whether such an object is at the boundary or not.
- *   Material indicators may be in the range from zero to types::invalid_material_id-1.
+ *   Material indicators may be in the range from zero to numbers::invalid_material_id-1.
  *
  *   Lines in two dimensions and quads in three dimensions inherit their
  *   boundary indicator to their children upon refinement. You should therefore

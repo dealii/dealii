@@ -174,7 +174,7 @@ namespace internal
                                           * example, in one dimension, this field
                                           * stores the material id of a line, which
                                           * is a number between 0 and
-                                          * types::invalid_material_id-1. In more
+                                          * numbers::invalid_material_id-1. In more
                                           * than one dimension, lines have no
                                           * material id, but they may be at the
                                           * boundary; then, we store the
@@ -184,8 +184,8 @@ namespace internal
                                           * boundary conditions hold on this
                                           * part. The boundary indicator also
                                           * is a number between zero and
-                                          * types::internal_face_boundary_id-1;
-                                          * the id types::internal_face_boundary_id
+                                          * numbers::internal_face_boundary_id-1;
+                                          * the id numbers::internal_face_boundary_id
                                           * is reserved for lines
                                           * in the interior and may be used
                                           * to check whether a line is at the
@@ -712,7 +712,7 @@ namespace internal
     inline
     TriaObjects<G>::BoundaryOrMaterialId::BoundaryOrMaterialId ()
     {
-      material_id = types::invalid_material_id;
+      material_id = numbers::invalid_material_id;
     }
 
 

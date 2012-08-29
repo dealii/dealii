@@ -907,7 +907,7 @@ namespace internal
                     ||
                     (cell->subdomain_id() == subdomain_id))
                    &&
-                   ((material_id == types::invalid_material_id)
+                   ((material_id == numbers::invalid_material_id)
                     ||
                     (cell->material_id() == material_id))) )
             {
@@ -927,7 +927,7 @@ namespace internal
                                  &&
                                  ((cell->neighbor(face_no)->material_id()
                                    == material_id) ||
-                                  (material_id == types::invalid_material_id));
+                                  (material_id == numbers::invalid_material_id));
               else
                 {
                   for (unsigned int sf=0; sf<face->n_children(); ++sf)
@@ -935,7 +935,7 @@ namespace internal
                           ->subdomain_id() == subdomain_id)
                          &&
                          (material_id ==
-                          types::invalid_material_id))
+                          numbers::invalid_material_id))
                         ||
                         ((cell->neighbor_child_on_subface(face_no,sf)
                           ->material_id() == material_id)
@@ -1207,7 +1207,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   const unsigned int n_solution_vectors = solutions.size();
 
                                    // sanity checks
-  Assert (neumann_bc.find(types::internal_face_boundary_id) == neumann_bc.end(),
+  Assert (neumann_bc.find(numbers::internal_face_boundary_id) == neumann_bc.end(),
           ExcInvalidBoundaryIndicator());
 
   for (typename FunctionMap<spacedim>::type::const_iterator i=neumann_bc.begin();
@@ -1305,7 +1305,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
          ||
          (cell->subdomain_id() == subdomain_id))
         &&
-        ((material_id == types::invalid_material_id)
+        ((material_id == numbers::invalid_material_id)
          ||
          (cell->material_id() == material_id)))
       {
@@ -1668,7 +1668,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           ||
           (cell->subdomain_id() == subdomain_id))
          &&
-         ((material_id == types::invalid_material_id)
+         ((material_id == numbers::invalid_material_id)
           ||
           (cell->material_id() == material_id)))
       {

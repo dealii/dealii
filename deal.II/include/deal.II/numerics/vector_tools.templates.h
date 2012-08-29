@@ -308,7 +308,7 @@ namespace VectorTools
 
                                              // count, how often we have
                                              // added to this dof
-            Assert (touch_count[local_dof_indices[j]] < types::internal_face_boundary_id,
+            Assert (touch_count[local_dof_indices[j]] < numbers::internal_face_boundary_id,
                     ExcInternalError());
             ++touch_count[local_dof_indices[j]];
           };
@@ -571,7 +571,7 @@ namespace VectorTools
                                            // function to hold on
                                            // all parts of the boundary
           typename FunctionMap<spacedim>::type boundary_functions;
-          for (types::boundary_id c=0; c<types::internal_face_boundary_id; ++c)
+          for (types::boundary_id c=0; c<numbers::internal_face_boundary_id; ++c)
             boundary_functions[c] = &function;
           project_boundary_values (dof, boundary_functions, q_boundary,
                                    boundary_values);
@@ -1588,7 +1588,7 @@ namespace VectorTools
       if (function_map.size() == 0)
         return;
 
-      Assert (function_map.find(types::internal_face_boundary_id) == function_map.end(),
+      Assert (function_map.find(numbers::internal_face_boundary_id) == function_map.end(),
               ExcInvalidBoundaryIndicator());
 
       const unsigned int        n_components = DoFTools::n_components(dof);

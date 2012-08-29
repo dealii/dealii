@@ -121,8 +121,8 @@ class ConstraintMatrix;
  *   the trace of the function to the boundary is done with the
  *   VectorTools::project_boundary_values() (see below) function,
  *   which is called with a map of boundary functions FunctioMap in
- *   which all boundary indicators from zero to types::internal_face_boundary_id-1
- *   (types::internal_face_boundary_id is used for other purposes,
+ *   which all boundary indicators from zero to numbers::internal_face_boundary_id-1
+ *   (numbers::internal_face_boundary_id is used for other purposes,
  *   see the Triangulation class documentation) point
  *   to the function to be projected. The projection to the boundary
  *   takes place using a second quadrature formula on the boundary
@@ -694,7 +694,7 @@ namespace VectorTools
                                     * keys of this map
                                     * correspond to the number
                                     * @p boundary_indicator of the
-                                    * face.  types::internal_face_boundary_id
+                                    * face.  numbers::internal_face_boundary_id
                                     * is an illegal value for this key since
                                     * it is reserved for interior faces.
                                     *
@@ -841,7 +841,7 @@ namespace VectorTools
                                     * The parameter @p boundary_component
                                     * corresponds to the number @p
                                     * boundary_indicator of the face.
-                                    * types::internal_face_boundary_id
+                                    * numbers::internal_face_boundary_id
                                     * is an illegal value, since it is
                                     * reserved for interior faces.
                                     *
@@ -1147,7 +1147,7 @@ namespace VectorTools
                                     * The parameter @p boundary_component
                                     * corresponds to the number
                                     * @p boundary_indicator of the face.
-                                    * types::internal_face_boundary_id
+                                    * numbers::internal_face_boundary_id
                                     * is an illegal value, since it is
                                     * reserved for interior faces.
                                     *
@@ -1242,7 +1242,7 @@ namespace VectorTools
                                     * The parameter @p boundary_component
                                     * corresponds to the number
                                     * @p boundary_indicator of the face.
-                                    *  types::internal_face_boundary_id
+                                    *  numbers::internal_face_boundary_id
                                     * is an illegal value, since it is
                                     * reserved for interior faces.
                                     *

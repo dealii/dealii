@@ -300,7 +300,7 @@ class KellyErrorEstimator
                                       *
                                       * The @p material_id parameter has a similar
                                       * meaning: if not set to its default value
-                                      * (which is types::invalid_material_id),
+                                      * (which is numbers::invalid_material_id),
                                       * it means that indicators will only be
                                       * computed for cells with this particular
                                       * material id.
@@ -349,7 +349,7 @@ class KellyErrorEstimator
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = numbers::invalid_unsigned_int,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id       material_id = types::invalid_material_id);
+                          const types::material_id       material_id = numbers::invalid_material_id);
 
                                      /**
                                       * Calls the @p estimate
@@ -366,7 +366,7 @@ class KellyErrorEstimator
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id       material_id = types::invalid_material_id);
+                          const types::material_id       material_id = numbers::invalid_material_id);
 
                                      /**
                                       * Same function as above, but
@@ -406,7 +406,7 @@ class KellyErrorEstimator
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id           material_id = types::invalid_material_id);
+                          const types::material_id           material_id = numbers::invalid_material_id);
 
                                      /**
                                       * Calls the @p estimate
@@ -423,7 +423,7 @@ class KellyErrorEstimator
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id          material_id = types::invalid_material_id);
+                          const types::material_id          material_id = numbers::invalid_material_id);
 
 
                                      /**
@@ -443,7 +443,7 @@ class KellyErrorEstimator
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id       material_id = types::invalid_material_id);
+                          const types::material_id       material_id = numbers::invalid_material_id);
 
 
                                      /**
@@ -462,7 +462,7 @@ class KellyErrorEstimator
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id       material_id = types::invalid_material_id);
+                          const types::material_id       material_id = numbers::invalid_material_id);
 
 
                                      /**
@@ -482,7 +482,7 @@ class KellyErrorEstimator
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id           material_id = types::invalid_material_id);
+                          const types::material_id           material_id = numbers::invalid_material_id);
 
 
                                      /**
@@ -501,7 +501,7 @@ class KellyErrorEstimator
                           const Function<spacedim>*    coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id           material_id = types::invalid_material_id);
+                          const types::material_id           material_id = numbers::invalid_material_id);
 
 
                                      /**
@@ -612,7 +612,7 @@ class KellyErrorEstimator<1,spacedim>
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id       material_id = types::invalid_material_id);
+                          const types::material_id       material_id = numbers::invalid_material_id);
 
                                      /**
                                       * Calls the @p estimate
@@ -629,7 +629,7 @@ class KellyErrorEstimator<1,spacedim>
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id       material_id = types::invalid_material_id);
+                          const types::material_id       material_id = numbers::invalid_material_id);
 
                                      /**
                                       * Same function as above, but
@@ -669,7 +669,7 @@ class KellyErrorEstimator<1,spacedim>
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id           material_id = types::invalid_material_id);
+                          const types::material_id           material_id = numbers::invalid_material_id);
 
                                      /**
                                       * Calls the @p estimate
@@ -686,7 +686,7 @@ class KellyErrorEstimator<1,spacedim>
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id           material_id = types::invalid_material_id);
+                          const types::material_id           material_id = numbers::invalid_material_id);
 
 
                                      /**
@@ -706,7 +706,7 @@ class KellyErrorEstimator<1,spacedim>
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id       material_id = types::invalid_material_id);
+                          const types::material_id       material_id = numbers::invalid_material_id);
 
 
                                      /**
@@ -725,7 +725,7 @@ class KellyErrorEstimator<1,spacedim>
                           const Function<spacedim>     *coefficients   = 0,
                           const unsigned int       n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id       material_id = types::invalid_material_id);
+                          const types::material_id       material_id = numbers::invalid_material_id);
 
 
                                      /**
@@ -745,7 +745,7 @@ class KellyErrorEstimator<1,spacedim>
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id           material_id = types::invalid_material_id);
+                          const types::material_id           material_id = numbers::invalid_material_id);
 
 
                                      /**
@@ -764,7 +764,7 @@ class KellyErrorEstimator<1,spacedim>
                           const Function<spacedim>         *coefficients   = 0,
                           const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
-                          const types::material_id           material_id = types::invalid_material_id);
+                          const types::material_id           material_id = numbers::invalid_material_id);
 
                                      /**
                                       * Exception

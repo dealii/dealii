@@ -1878,7 +1878,7 @@ TriaAccessor<structdim, dim, spacedim>::at_boundary () const
 {
                                    // error checking is done
                                    // in boundary_indicator()
-  return (boundary_indicator() != types::internal_face_boundary_id);
+  return (boundary_indicator() != numbers::internal_face_boundary_id);
 }
 
 
@@ -2252,7 +2252,7 @@ TriaAccessor<0, 1, spacedim>::boundary_indicator () const
       }
 
       default:
-            return types::internal_face_boundary_id;
+            return numbers::internal_face_boundary_id;
     }
 
 }

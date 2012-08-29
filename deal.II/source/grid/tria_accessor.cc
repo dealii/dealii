@@ -1285,7 +1285,7 @@ template <int dim, int spacedim>
 void CellAccessor<dim, spacedim>::set_material_id (const types::material_id mat_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert ( mat_id < types::invalid_material_id, ExcIndexRange(mat_id,0,types::invalid_material_id));
+  Assert ( mat_id < numbers::invalid_material_id, ExcIndexRange(mat_id,0,numbers::invalid_material_id));
   this->tria->levels[this->present_level]->cells.boundary_or_material_id[this->present_index].material_id = mat_id;
 }
 

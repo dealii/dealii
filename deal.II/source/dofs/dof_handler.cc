@@ -1579,7 +1579,7 @@ template<int dim, int spacedim>
 unsigned int
 DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
 {
-  Assert (boundary_indicators.find(types::internal_face_boundary_id) == boundary_indicators.end(),
+  Assert (boundary_indicators.find(numbers::internal_face_boundary_id) == boundary_indicators.end(),
           ExcInvalidBoundaryIndicator());
 
   std::set<int> boundary_dofs;
@@ -1605,7 +1605,7 @@ template<int dim, int spacedim>
 unsigned int
 DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
 {
-  Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
+  Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
           ExcInvalidBoundaryIndicator());
 
   std::set<int> boundary_dofs;
