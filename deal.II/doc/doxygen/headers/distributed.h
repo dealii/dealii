@@ -230,6 +230,33 @@
  * information is provided by the
  * DoFTools::extract_locally_relevant_dofs() function.
  *
+ * <h5>Vectors with Ghost-elements</h5>
+ * 
+ * A typical parallel application is dealing with two different kinds
+ * of parallel vectors: vectors with ghost elements (also called
+ * ghosted vectors) and vectors without ghost elements.  Of course
+ * these might be different flavours (BlockVector, Vector; using
+ * Trilinos or PETSc, etc.).
+ * 
+ * In vectors without ghost elements knowledge about a single entry i
+ * in the vector is only known to a single processor. They are
+ * constructed with an IndexSet reflecting the
+ * locally_owned_dofs(). There is no overlap in the IndexSets.
+ * Ghosted vectors are typically created using locally_active or
+ * locally_relevant IndexSets and contain elements on processors that
+ * are owned by a different processor.
+ *
+ * One important aspect is that we forbid any modification of ghosted
+ * vectors. This is because it would create subtle bugs if elements
+ * are edited on one processor but do not immediately transfer to the
+ * ghosted entries on the other processors.
+ *
+ * The usage is typically split up in the following way: ghosted
+ * vectors are used for data output, postprocessing, error estimation,
+ * input in integration. Vectors without ghost entries are used in all
+ * other places like assembling, solving, or any other form of
+ * manipulation. You can copy between vectors with and without ghost
+ * elements (you can see this in step-40 and step-32) using operator=.
  *
  * <h5>Sparsity patterns</h5>
  *
