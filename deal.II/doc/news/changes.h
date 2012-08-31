@@ -328,7 +328,6 @@ to values in input files.
 <br>
 (Wolfgang Bangerth, 2012/08/01)
 
-<ol>
 <li> Fixed: DoFTools::make_zero_boundary_constraints now also works for parallel distributed triangulations.
 <br>
 (Wolfgang Bangerth, 2012/07/24)
