@@ -180,7 +180,7 @@ $(LIBDIR)/libdeal_II.g$(shared-lib-suffix): $(go-files) $(extra-g.o-files)
 
 $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files) $(extra-o-files)
 	@echo "=====deal.II==========optimized==$(MT)== Linking library:   $(@F)"
-	@rm -f $@ $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II.g)
+	@rm -f $@ $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II)
 	@WORKFILE=`mktemp $${TMPDIR:-/tmp}/tmpo.XXXXXXXXXX` && \
 		$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $$WORKFILE $(call DEAL_II_ADD_SONAME,deal_II) $(o-files) $(extra-o-files) $(deplibs.o) && \
 		mv $$WORKFILE $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II)
