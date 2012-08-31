@@ -187,6 +187,12 @@ nonlinear, i.e., the program considers finite deformations.
 (Andrew McBride and Jean-Paul Pelteret, 2012/04/25)
 
 <li>
+New: step-41 demonstrates solving the obstacle problem,
+a variational inequality.
+<br>
+(Joerg Frohne, 2012/04/22)
+
+<li>
 Changed: The version of BOOST we ship with deal.II has been upgraded
 to 1.49.0.
 <br>
