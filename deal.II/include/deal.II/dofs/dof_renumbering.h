@@ -1150,7 +1150,7 @@ namespace DoFRenumbering
                                     * order within the untagged
                                     * ones.
                                     *
-                                    * @precondition The @p selected_dofs
+                                    * @pre The @p selected_dofs
                                     * array must have as many elements as
                                     * the @p dof_handler has degrees of
                                     * freedom.
