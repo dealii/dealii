@@ -1107,7 +1107,7 @@ namespace hp
                                         *  Create default tables for
                                         *  the active_fe_indices in
                                         *  the
-                                        *  dealii::internal::hp::DoFLevels. They
+                                        *  dealii::internal::hp::DoFLevel. They
                                         *  are initialized with the a
                                         *  zero indicator, meaning
                                         *  that fe[0] is going to be
