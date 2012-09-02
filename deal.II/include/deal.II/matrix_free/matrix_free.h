@@ -753,7 +753,7 @@ public:
                                  * store arrays of data for all cells
                                  * to be worked on. This number is
                                  * approximately
-                                 * n_physical_cells()/VectorizedArray@<Number@>::n_array_elements
+                                 * n_physical_cells()/VectorizedArray::n_array_elements
                                  * (depending on how many cell chunks
                                  * that do not get filled up
                                  * completely).
@@ -1370,7 +1370,7 @@ MatrixFree<dim,Number>::create_cell_subrange_hp
         return std::pair<unsigned int,unsigned int> (range.second,range.second);
     }
 
-  const unsigned int fe_index = 
+  const unsigned int fe_index =
     dof_info[vector_component].fe_index_from_degree(degree);
   if (fe_index >= dof_info[vector_component].max_fe_index)
     return std::pair<unsigned int,unsigned int>(range.second, range.second);
@@ -2395,18 +2395,18 @@ MatrixFree<dim, Number>::cell_loop
       if(task_info.use_partition_partition == true)
         {
           internal::update_ghost_values_start(src);
-          tbb::empty_task* root = new( tbb::task::allocate_root() ) 
+          tbb::empty_task* root = new( tbb::task::allocate_root() )
             tbb::empty_task;
           unsigned int evens = task_info.evens;
           unsigned int odds  = task_info.odds;
           root->set_ref_count(evens+1);
           unsigned int n_blocked_workers = task_info.n_blocked_workers;
           unsigned int n_workers = task_info.n_workers;
-          std::vector<internal::partition::PartitionWork<Worker,false>*> 
+          std::vector<internal::partition::PartitionWork<Worker,false>*>
             worker(n_workers);
-          std::vector<internal::partition::PartitionWork<Worker,true>*> 
+          std::vector<internal::partition::PartitionWork<Worker,true>*>
             blocked_worker(n_blocked_workers);
-          internal::MPIComCompress<OutVector> *worker_compr = 
+          internal::MPIComCompress<OutVector> *worker_compr =
             new(root->allocate_child())
             internal::MPIComCompress<OutVector>(dst);
           worker_compr->set_ref_count(1);
