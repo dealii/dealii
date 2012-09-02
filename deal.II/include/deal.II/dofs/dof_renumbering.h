@@ -1164,7 +1164,7 @@ namespace DoFRenumbering
                                     * Sort those degrees of freedom
                                     * which are tagged with @p true
                                     * in the @p selected_dofs array
-                                    * on the level @level
+                                    * on the level #level
                                     * to the back of the DoF
                                     * numbers. The sorting is
                                     * stable, i.e. the relative
