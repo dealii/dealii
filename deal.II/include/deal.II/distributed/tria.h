@@ -174,6 +174,42 @@ namespace parallel
  * it relies on the p4est library that does not support this. Attempts
  * to refine cells anisotropically will result in errors.
  *
+ *
+ * <h3> Interaction with boundary description </h3>
+ *
+ * Refining and coarsening a distributed triangulation is a complicated
+ * process because cells may have to be migrated from one processor to
+ * another. On a single processor, materializing that part of the global
+ * mesh that we want to store here from what we have stored before therefore
+ * may involve several cycles of refining and coarsening the locally stored
+ * set of cells until we have finally gotten from the previous to the next
+ * triangulation. (This process is described in more detail in the
+ * @ref distributed_paper.) Unfortunately, in this process, some information
+ * can get lost relating to flags that are set by user code and that are
+ * inherited from mother to child cell but that are not moved along with
+ * a cell if that cell is migrated from one processor to another.
+ *
+ * An example are boundary indicators. Assume, for example, that you start
+ * with a single cell that is refined once globally, yielding four children.
+ * If you have four processors, each one owns one cell. Assume now that processor
+ * 1 sets the boundary indicators of the external boundaries of the cell it owns
+ * to 42. Since processor 0 does not own this cell, it doesn't set the boundary
+ * indicators of its ghost cell copy of this cell. Now, assume we do several mesh
+ * refinement cycles and end up with a configuration where suddenly finds itself
+ * as the owner of this cell. If boundary indicator 42 means that we need to
+ * integrate Neumann boundary conditions along this boundary, then processor 0
+ * will forget to do so because it has never set the boundary indicator along
+ * this cell's boundary to 42.
+ *
+ * The way to avoid this dilemma is to make sure that things like setting
+ * boundary indicators or material ids is done immediately
+ * every time a parallel triangulation is refined. This is not necessary
+ * for sequential triangulations because, there, these flags are inherited
+ * from mother to child cell and remain with a cell even if it is refined
+ * and the children are later coarsened again, but this does not hold for
+ * distributed triangulations.
+ *
+ *
  * @author Wolfgang Bangerth, Timo Heister 2008, 2009, 2010, 2011
  * @ingroup distributed
  */
