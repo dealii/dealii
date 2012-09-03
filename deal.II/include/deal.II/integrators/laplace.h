@@ -319,7 +319,8 @@ namespace LocalIntegrators
 
       const double nui = factor1;
       const double nue = (factor2 < 0) ? factor1 : factor2;
-
+      const double nu = .5*(nui+nue);
+      
       for (unsigned int k=0;k<fe1.n_quadrature_points;++k)
 	{
 	  const double dx = fe1.JxW(k);
@@ -338,10 +339,10 @@ namespace LocalIntegrators
 		      const double dnui = n * fe1.shape_grad_component(j,k,d);
 		      const double ue = fe2.shape_value_component(j,k,d);
 		      const double dnue = n * fe2.shape_grad_component(j,k,d);
-		      M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
-		      M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
-		      M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
-		      M22(i,j) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+penalty*ue*ve);
+		      M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+nu*penalty*ui*vi);
+		      M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-nu*penalty*vi*ue);
+		      M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-nu*penalty*ui*ve);
+		      M22(i,j) += dx*( .5*nue*dnve*ue+.5*nue*dnue*ve+nu*penalty*ue*ve);
 		    }
 		}
 	    }
