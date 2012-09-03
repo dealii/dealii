@@ -24,7 +24,12 @@ inconvenience this causes.
 </p>
 
 <ol>
-<li> Nothing so far.
+<li> Changed: the optional argument offset got removed from
+DoFHandler and MGDoFHandler::distribute_dofs() because it was
+never working correctly and it is not used.
+<br>
+(Timo Heister, 2012/09/03)
+
 </ol>
 
 

@@ -1972,8 +1972,7 @@ set_dof_index (const unsigned int obj_level,
 
 
 template <int dim, int spacedim>
-void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &fe,
-                                         const unsigned int        offset)
+void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &fe)
 {
                                    // first distribute global dofs
   DoFHandler<dim,spacedim>::distribute_dofs (fe);
@@ -1999,7 +1998,7 @@ void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spaced
                                    // separately
   for (unsigned int level=0; level<this->get_tria().n_levels(); ++level)
     {
-      unsigned int next_free_dof = offset;
+      unsigned int next_free_dof = 0;
       cell_iterator cell = begin(level),
                     endc = end(level);
 

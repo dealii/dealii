@@ -293,18 +293,6 @@ class DoFHandler  :  public Subscriptor
                                       * is first discussed in the introduction
                                       * to the step-2 tutorial program.
                                       *
-                                      * The additional optional
-                                      * parameter @p offset allows you
-                                      * to reserve space for a finite
-                                      * number of additional vector
-                                      * entries in the beginning of
-                                      * all discretization vectors, by
-                                      * starting the enumeration of
-                                      * degrees of freedom on the grid
-                                      * at a nonzero value. By
-                                      * default, this value is of
-                                      * course zero.
-                                      *
                                       * A pointer of the transferred
                                       * finite element is
                                       * stored. Therefore, the
@@ -317,8 +305,7 @@ class DoFHandler  :  public Subscriptor
                                       * releases the lock of this
                                       * object to the finite element.
                                       */
-    virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe,
-                                  const unsigned int        offset = 0);
+    virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe);
 
                                      /**
                                       * After distribute_dofs() with

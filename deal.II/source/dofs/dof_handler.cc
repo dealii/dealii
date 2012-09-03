@@ -1651,8 +1651,7 @@ DoFHandler<dim,spacedim>::memory_consumption () const
 
 template<int dim, int spacedim>
 void DoFHandler<dim,spacedim>::
-distribute_dofs (const FiniteElement<dim,spacedim> &ff,
-                 const unsigned int                 offset)
+distribute_dofs (const FiniteElement<dim,spacedim> &ff)
 {
   selected_fe = &ff;
 
@@ -1676,8 +1675,7 @@ distribute_dofs (const FiniteElement<dim,spacedim> &ff,
   internal::DoFHandler::Implementation::reserve_space (*this);
 
                                    // hand things off to the policy
-  number_cache = policy->distribute_dofs (offset,
-                                          *this);
+  number_cache = policy->distribute_dofs (*this);
 
                                    // initialize the block info object
                                    // only if this is a sequential

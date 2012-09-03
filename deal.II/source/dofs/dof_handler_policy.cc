@@ -492,11 +492,10 @@ namespace internal
       template <int dim, int spacedim>
       NumberCache
       Sequential<dim,spacedim>::
-      distribute_dofs (const unsigned int        offset,
-                       DoFHandler<dim,spacedim> &dof_handler) const
+      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler) const
       {
         const unsigned int n_dofs =
-          Implementation::distribute_dofs (offset,
+          Implementation::distribute_dofs (0,
                                            types::invalid_subdomain_id,
                                            dof_handler);
 
@@ -1049,10 +1048,8 @@ namespace internal
       template <int dim, int spacedim>
       NumberCache
       ParallelDistributed<dim, spacedim>::
-      distribute_dofs (const unsigned int        offset,
-                       DoFHandler<dim,spacedim> &dof_handler) const
+      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler) const
       {
-        Assert(offset==0, ExcNotImplemented());
         NumberCache number_cache;
 
 #ifndef DEAL_II_USE_P4EST
