@@ -384,8 +384,7 @@ endif
 
 ifeq ($(BUILDTEST),yes)
 print-summary:
-	@echo "dealii-feature: revision=`svn info .. | grep Revision | sed 's/Revision: //'`"
-	@echo "dealii-feature: URL=`svn info .. | grep URL | sed 's/URL: //'`"
+	@svn info .. | perl -ne 'print "dealii-feature: revision=$$_\n" if s/Revision: //; print "dealii-feature: branch=$$1\n" if m/svn\/dealii\/(.+)\/deal.II/;'
 	@echo "dealii-feature: user=$(USER)"
 	@echo "dealii-feature: host=`hostname`"
 	@echo "dealii-feature: target=$(TARGET)"
