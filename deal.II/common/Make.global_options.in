@@ -385,14 +385,13 @@ endif
 ifeq ($(BUILDTEST),yes)
 print-summary:
 	@echo "dealii-feature: revision=`svn info .. | grep Revision | sed 's/Revision: //'`"
-	@echo "dealii-feature: URL=`svn info .. | grep URL
+	@echo "dealii-feature: URL=`svn info .. | grep URL | sed 's/URL: //'`"
 	@echo "dealii-feature: user=$(USER)"
 	@echo "dealii-feature: host=`hostname`"
 	@echo "dealii-feature: target=$(TARGET)"
 	@echo "dealii-feature: compiler=$(GXX-VERSION-DETAILED)"
 	@echo "dealii-feature: multithreading=$(enable-threads)"
 	@echo "dealii-feature: shared_libs=$(enable-shared)"
-	@echo "dealii-feature: parser=$(subst no,,$(enable-parser))"
 	@echo "dealii-feature: METIS=$(subst no,,$(USE_CONTRIB_METIS))"
 	@cd $D/common/scripts ; make report_features && ./report_features
 endif
