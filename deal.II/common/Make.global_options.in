@@ -385,6 +385,7 @@ endif
 ifeq ($(BUILDTEST),yes)
 print-summary:
 	@echo "dealii-feature: revision=`svn info .. | grep Revision | sed 's/Revision: //'`"
+	@echo "dealii-feature: URL=`svn info .. | grep URL
 	@echo "dealii-feature: user=$(USER)"
 	@echo "dealii-feature: host=`hostname`"
 	@echo "dealii-feature: target=$(TARGET)"
