@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,7 +62,7 @@ int main()
 
 #if defined(DEAL_II_COMPILER_SUPPORTS_MPI)
 #  ifdef OMPI_MAJOR_VERSION
-  std::cout << "dealii-feature: MPI=OpenMPI<br>"
+  std::cout << "dealii-feature: MPI=OpenMPI "
 	    << OMPI_MAJOR_VERSION << '.'
 	    << OMPI_MINOR_VERSION << '.'
 	    << OMPI_RELEASE_VERSION << std::endl;
@@ -116,4 +116,31 @@ int main()
 #endif
   std::cout << std::endl;
 #endif
+
+#ifdef DEAL_II_USE_P4EST
+  std::cout << "dealii-feature: P4est=yes" << std::endl;
+#endif
+
+#ifdef DEAL_II_HAVE_HDF5
+   std::cout << "dealii-feature: HDF5=yes" << std::endl;
+#endif
+
+#ifdef DEAL_II_HAVE_TECPLOT
+   std::cout << "dealii-feature: Tecplot=yes" << std::endl;
+#endif
+   
+#ifdef HAVE_LIBNETCDF
+  std::cout << "dealii-feature: NetCDF=yes" << std::endl;
+#endif
+
+#ifdef HAVE_LIBZ
+  std::cout << "dealii-feature: LibZ=yes" << std::endl;
+#endif
+
+#ifdef DEAL_II_DISABLE_PARSER
+  std::cout << "dealii-feature: parser=no" << std::endl;
+#else
+  std::cout << "dealii-feature: parser=yes" << std::endl;
+#endif
+  
 }
