@@ -154,12 +154,12 @@ endif
 # rules for static libraries
 $(LIBDIR)/libdeal_II.g$(static-lib-suffix): $(go-files) $(extra-g.o-files)
 	@echo "=====deal.II==========debug======$(MT)== Linking library:   $(@F)"
-	@rm $@
+	@rm -f $@
 	@$(AR) r $@ $(go-files) $(extra-g.o-files)
 	@$(RANLIB) $@
 $(LIBDIR)/libdeal_II$(static-lib-suffix): $(o-files) $(extra-o-files)
 	@echo "=====deal.II==========optimized==$(MT)== Linking library:   $(@F)"
-	@rm $@
+	@rm -f $@
 	@$(AR) r $@ $(o-files) $(extra-o-files)
 	@$(RANLIB) $@
 
