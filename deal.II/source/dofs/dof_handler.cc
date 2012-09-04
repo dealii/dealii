@@ -271,7 +271,7 @@ namespace internal
                 dof_handler.levels
                   .push_back (new internal::DoFHandler::DoFLevel<1>);
 
-                dof_handler.levels.back()->lines.dofs
+                dof_handler.levels.back()->dof_object.dofs
                   .resize (dof_handler.tria->n_raw_lines(i) *
                            dof_handler.selected_fe->dofs_per_line,
                            DoFHandler<1,spacedim>::invalid_dof_index);
@@ -297,7 +297,7 @@ namespace internal
               {
                 dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
-                dof_handler.levels.back()->quads.dofs
+                dof_handler.levels.back()->dof_object.dofs
                   .resize (dof_handler.tria->n_raw_quads(i) *
                            dof_handler.selected_fe->dofs_per_quad,
                            DoFHandler<2,spacedim>::invalid_dof_index);
@@ -329,7 +329,7 @@ namespace internal
               {
                 dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
-                dof_handler.levels.back()->hexes.dofs
+                dof_handler.levels.back()->dof_object.dofs
                   .resize (dof_handler.tria->n_raw_hexs(i) *
                            dof_handler.selected_fe->dofs_per_hex,
                            DoFHandler<3,spacedim>::invalid_dof_index);

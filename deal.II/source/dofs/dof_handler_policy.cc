@@ -326,8 +326,8 @@ namespace internal
 
               for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
                 for (std::vector<unsigned int>::iterator
-                       i=dof_handler.levels[level]->lines.dofs.begin();
-                     i!=dof_handler.levels[level]->lines.dofs.end(); ++i)
+                       i=dof_handler.levels[level]->dof_object.dofs.begin();
+                     i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
                   if (*i != DoFHandler<1,spacedim>::invalid_dof_index)
                     *i = new_numbers[*i];
 
@@ -388,8 +388,8 @@ namespace internal
               for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
                 {
                   for (std::vector<unsigned int>::iterator
-                         i=dof_handler.levels[level]->quads.dofs.begin();
-                       i!=dof_handler.levels[level]->quads.dofs.end(); ++i)
+                         i=dof_handler.levels[level]->dof_object.dofs.begin();
+                       i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
                     if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
                       *i = ((indices.n_elements() == 0) ?
                             new_numbers[*i] :
@@ -459,8 +459,8 @@ namespace internal
               for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
                 {
                   for (std::vector<unsigned int>::iterator
-                         i=dof_handler.levels[level]->hexes.dofs.begin();
-                       i!=dof_handler.levels[level]->hexes.dofs.end(); ++i)
+                         i=dof_handler.levels[level]->dof_object.dofs.begin();
+                       i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
                     if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
                       *i = ((indices.n_elements() == 0) ?
                             new_numbers[*i] :
