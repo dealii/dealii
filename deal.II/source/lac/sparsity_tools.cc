@@ -507,7 +507,7 @@ namespace SparsityTools
                   ptr++;
                 }
             }
-          Assert(ptr-1==end, ExcInternalError());
+          Assert(ptr==end, ExcInternalError());
 
         }
     }
