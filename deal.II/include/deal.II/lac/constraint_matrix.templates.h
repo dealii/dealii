@@ -1455,7 +1455,7 @@ namespace internals
                                      // check whether the
                                      // constraints are really empty.
     const unsigned int length = size();
-#ifdef DEBUG
+
                                      // make sure that we are in the
                                      // range of the vector
     AssertIndexRange (length, total_row_indices.size()+1);
@@ -1463,7 +1463,6 @@ namespace internals
       Assert (total_row_indices[i].constraint_position ==
               numbers::invalid_unsigned_int,
               ExcInternalError());
-#endif
 
     step = length/2;
     while (step > 0)
@@ -1757,25 +1756,20 @@ namespace internals
 
     AssertIndexRange (column_end-1, global_rows.size());
     const SparsityPattern & sparsity = sparse_matrix->get_sparsity_pattern();
-#ifndef DEBUG
+
     if (sparsity.n_nonzero_elements() == 0)
       return;
-#endif
+
     const std::size_t * row_start = sparsity.get_rowstart_indices();
     const unsigned int * sparsity_struct = sparsity.get_column_numbers();
 
     const unsigned int row = global_rows.global_row(i);
     const unsigned int loc_row = global_rows.local_row(i);
 
-#ifdef DEBUG
     const unsigned int * col_ptr = sparsity.row_length(row) == 0 ? 0 :
                                    &sparsity_struct[row_start[row]];
     number * val_ptr = sparsity.row_length(row) == 0 ? 0 :
                        &sparse_matrix->global_entry (row_start[row]);
-#else
-    const unsigned int * col_ptr = &sparsity_struct[row_start[row]];
-    number * val_ptr = &sparse_matrix->global_entry (row_start[row]);
-#endif
     const bool optimize_diagonal = sparsity.optimize_diagonal();
     unsigned int counter = optimize_diagonal;
 
