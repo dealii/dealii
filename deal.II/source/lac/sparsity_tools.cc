@@ -104,7 +104,7 @@ namespace SparsityTools
                                      // Use recursive if the number of
                                      // partitions is less than or equal to 8
     if (n_partitions <= 8)
-      ierr = METIS_PartGraphRecursive(&n, &ncon, &int_rowstart[0], &int_colnums[0], 
+      ierr = METIS_PartGraphRecursive(&n, &ncon, &int_rowstart[0], &int_colnums[0],
 				      NULL, NULL, NULL,
 				      &nparts,NULL,NULL,&options[0],
 				      &dummy,&int_partition_indices[0]);
@@ -495,9 +495,9 @@ namespace SparsityTools
           MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
                    status.MPI_TAG, mpi_comm, &status);
 
-          unsigned int *ptr=&recv_buf[0];
-          unsigned int *end=&*(--recv_buf.end());
-          while (ptr<end)
+          std::vector<unsigned int>::const_iterator ptr = recv_buf.begin();
+          std::vector<unsigned int>::const_iterator end = recv_buf.end();
+          while (ptr+1<end)
             {
               unsigned int num=*(ptr++);
               unsigned int row=*(ptr++);
