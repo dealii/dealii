@@ -270,6 +270,26 @@
     tests nightly through a cron-job with this command, to have
     regular test runs.
     </p>
+    
+    <p>
+    To get a quick overview you can run
+    <pre>
+      make report+summary
+    </pre>
+    instead. This runs all the tests and outputs a table in the following format
+    at the end:
+    <pre>
+                Compiling Linking Running   Check      OK     all
+         a-framework	1	1	1	1	1	5	
+                base	0	0	0	2	185	187	
+                 lac	0	0	0	0	117	117	
+                  fe	0	0	0	4	114	118	
+             deal.II	0	0	0	2	291	293	
+         integrators	0	0	0	0	15	15	
+           multigrid	0	0	0	0	35	35	      
+		 ...
+    </pre>
+    </p>
 
     <p>
     If a test failed, you have to find out what exactly went

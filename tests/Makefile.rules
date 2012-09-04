@@ -187,6 +187,36 @@ report:
 	done
 
 
+status=Compiling Linking Running Checking diff all
+
+summary:
+	@for curstatus in $(status) ; do \
+	  counter=0 ; \
+	  all=0 ; \
+	  for test in $(sort $(tests)) ; do \
+	     case $$test in \
+               *ncpu_*) \
+	         if test -f $$test/status ; then \
+                   file=$$test/status ; \
+                 else \
+		   file=`echo $$test | $(PERL) -pi -e 's/ncpu_\d+//g;'`/status ; \
+		fi ; \
+		;; \
+	    *) \
+		file=$$test/status ; \
+		;; \
+	  esac ; \
+	  curcount=`if test -f $$file ; then grep -c $$curstatus $$file;else echo 0;fi;`; \
+	  all=$$(($$all+1));\
+	  counter=$$(($$counter+$$curcount)); \
+	done; \
+	if test "$$curstatus" = "all"; then printf "%s\t" $$all; \
+	else if test "$$curstatus" = "diff"; then printf "%s\t" $$counter; \
+	else if test "$$counter" != "0"; then printf "%s\t" $$counter; \
+	else printf "%s\t" $$counter ; fi;fi;fi;\
+	done;\
+	printf "\n";
+
 report+mail:
 	@$(MAKE) report | tee testresults
 	@cat testresults | $(MAIL) regression-tests@dealii.org
@@ -280,5 +310,5 @@ Makefile.tests: Makefile $(shell echo *.cc)
 		> $@
 
 
-.PHONY: report show-tests clean distclean %/ref
+.PHONY: report show-tests clean distclean summary %/ref
 
