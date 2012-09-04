@@ -1,0 +1,35 @@
+
+DEAL::Solid FE Space: FESystem<2>[FE_Q<2>(2)^2-FE_Q<2>(2)^2-FE_Nothing<2>()^2-FE_Nothing<2>()-FE_Nothing<2>()^2]
+DEAL::Fluid/Mesh FE Space: FESystem<2>[FE_Nothing<2>()^2-FE_Nothing<2>()^2-FE_Q<2>(2)^2-FE_Q<2>(1)-FE_Q<2>(2)^2]
+DEAL::---------------Coupled dofs---------------
+DEAL::solid dof: 6, fluid dof: 36
+DEAL::solid dof: 7, fluid dof: 37
+DEAL::solid dof: 14, fluid dof: 42
+DEAL::solid dof: 15, fluid dof: 43
+DEAL::solid dof: 22, fluid dof: 48
+DEAL::solid dof: 23, fluid dof: 49
+DEAL::solid dof: 10, fluid dof: 58
+DEAL::solid dof: 11, fluid dof: 59
+DEAL::solid dof: 14, fluid dof: 42
+DEAL::solid dof: 15, fluid dof: 43
+DEAL::solid dof: 30, fluid dof: 71
+DEAL::solid dof: 31, fluid dof: 72
+DEAL::solid dof: 4, mesh dof: 86
+DEAL::solid dof: 5, mesh dof: 87
+DEAL::solid dof: 12, mesh dof: 90
+DEAL::solid dof: 13, mesh dof: 91
+DEAL::solid dof: 20, mesh dof: 94
+DEAL::solid dof: 21, mesh dof: 95
+DEAL::solid dof: 8, mesh dof: 104
+DEAL::solid dof: 9, mesh dof: 105
+DEAL::solid dof: 12, mesh dof: 90
+DEAL::solid dof: 13, mesh dof: 91
+DEAL::solid dof: 28, mesh dof: 114
+DEAL::solid dof: 29, mesh dof: 115
+DEAL::------------------------------------------
+DEAL::I am about to distribute cell: 1.1
+DEAL::Cell: 1.1 has it's center at 0.75 0.25
+DEAL::I am about to distribute cell: 1.2
+DEAL::Cell: 1.2 has it's center at 0.25 0.75
+DEAL::I am about to distribute cell: 1.3
+DEAL::Cell: 1.3 has it's center at 0.75 0.75

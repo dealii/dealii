@@ -3739,7 +3739,6 @@ namespace Threads
 
     template <typename> struct TaskDescriptor;
 
-
                                      /**
                                       * The task class for TBB that is
                                       * used by the TaskDescriptor
@@ -3910,7 +3909,7 @@ namespace Threads
 
 
         template <typename> friend struct TaskEntryPoint;
-        template <typename> friend struct Task;
+        friend class dealii::Threads::Task<RT>;
     };
 
 

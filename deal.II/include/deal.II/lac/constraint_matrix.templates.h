@@ -1768,9 +1768,9 @@ namespace internals
     const unsigned int loc_row = global_rows.local_row(i);
 
 #ifdef DEBUG
-    const unsigned int * col_ptr = sparsity.n_nonzero_elements() == 0 ? 0 :
+    const unsigned int * col_ptr = sparsity.row_length(row) == 0 ? 0 :
                                    &sparsity_struct[row_start[row]];
-    number * val_ptr = sparsity.n_nonzero_elements() == 0 ? 0 :
+    number * val_ptr = sparsity.row_length(row) == 0 ? 0 :
                        &sparse_matrix->global_entry (row_start[row]);
 #else
     const unsigned int * col_ptr = &sparsity_struct[row_start[row]];

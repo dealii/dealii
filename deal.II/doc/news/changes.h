@@ -50,7 +50,11 @@ never working correctly and it is not used.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> Nothing so far.
+<li> Fixed: When applying a ConstraintMatrix to a block matrix
+where the last few rows are empty, we ran into an unrelated assertion.
+This is now fixed.
+<br>
+(Jason Sheldon, Wolfgang Bangerth, 2012/09/04)
 </ol>
 
 
