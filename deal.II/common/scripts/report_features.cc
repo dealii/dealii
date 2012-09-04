@@ -42,6 +42,12 @@ extern "C" {
 #  include <slepcversion.h>
 #endif
 
+// Output configuration options from config.h.
+// The format of each line is
+//
+// deal-feature: FEATURE=value
+//
+// no spaces in any token!
 
 int main()
 {
@@ -62,7 +68,7 @@ int main()
 
 #if defined(DEAL_II_COMPILER_SUPPORTS_MPI)
 #  ifdef OMPI_MAJOR_VERSION
-  std::cout << "dealii-feature: MPI=OpenMPI "
+  std::cout << "dealii-feature: MPI=OpenMPI-"
 	    << OMPI_MAJOR_VERSION << '.'
 	    << OMPI_MINOR_VERSION << '.'
 	    << OMPI_RELEASE_VERSION << std::endl;
