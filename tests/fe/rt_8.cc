@@ -2,7 +2,7 @@
 //    rt_8.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,7 +72,7 @@ test (const unsigned int degree)
                 fe.JxW(q_point));
   for (unsigned int i=0; i<dofs_per_cell; ++i)
     for (unsigned int j=0; j<dofs_per_cell; ++j)
-      if (std::fabs(mass_matrix(i,j)) < 1e-16)
+      if (std::fabs(mass_matrix(i,j)) < 1e-14)
 	mass_matrix(i,j) = 0;
   mass_matrix.print_formatted (logfile, 3, false, 0, " ", 1);
 
