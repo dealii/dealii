@@ -50,6 +50,12 @@ never working correctly and it is not used.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The Clang C++ compiler had some trouble dealing with obtaining
+the return value of a Threads::Task object, due to a compiler bug in
+dealing with friend declarations. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2012/09/04)
+
 <li> Fixed: When applying a ConstraintMatrix to a block matrix
 where the last few rows are empty, we ran into an unrelated assertion.
 This is now fixed.
