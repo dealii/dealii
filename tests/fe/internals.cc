@@ -105,10 +105,10 @@ check_matrices (FiniteElement<dim>& fe, const char* name)
     {
       deallog << name << '<' << dim << '>' << " restriction " << i << std::endl;
       if (fe.isotropic_restriction_is_implemented())
-	print_formatted (fe.get_restriction_matrix(i), 4, 6);
+	print_formatted (fe.get_restriction_matrix(i), 5, 7);
       deallog << name << '<' << dim << '>' << " embedding " << i << std::endl;
       if (fe.isotropic_prolongation_is_implemented())
-	print_formatted (fe.get_prolongation_matrix(i), 4, 6);
+	print_formatted (fe.get_prolongation_matrix(i), 5, 7);
     }
 }
 
