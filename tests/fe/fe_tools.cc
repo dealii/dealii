@@ -1,8 +1,8 @@
 //--------------------------------------------------------------------------
 //    fe_tools.cc,v 1.1 2003/11/28 15:03:26 guido Exp
-//    Version: 
+//    Version:
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,10 +54,10 @@ void print_formatted (const FullMatrix<number> &A,
 
 template<int dim>
 void test_embedding (const FiniteElement<dim>& fe)
-{  
+{
   const unsigned int n = fe.dofs_per_cell;
   const unsigned int nc= GeometryInfo<dim>::max_children_per_cell;
-  
+
   std::vector<std::vector<FullMatrix<double> > > P;
 
   P.resize(RefinementCase<dim>::isotropic_refinement);
@@ -73,7 +73,7 @@ void test_embedding (const FiniteElement<dim>& fe)
 
 
   FETools::compute_embedding_matrices(fe, P);
-  
+
   for (unsigned int i=0;i<nc;++i)
     {
       deallog << fe.get_name() << " embedding " << i << std::endl;
@@ -81,7 +81,7 @@ void test_embedding (const FiniteElement<dim>& fe)
     }
 }
 
-  
+
 template<int dim>
 void test_projection (const FiniteElement<dim>& fe1,
 		      const FiniteElement<dim>& fe2,
@@ -89,17 +89,21 @@ void test_projection (const FiniteElement<dim>& fe1,
 {
   out << fe1.get_name() << " -> "
       << fe2.get_name() << std::endl;
-  
+
   const unsigned int n1 = fe1.dofs_per_cell;
   const unsigned int n2 = fe2.dofs_per_cell;
 
   FullMatrix<double> P(n2,n1);
 
   FETools::get_projection_matrix(fe1, fe2, P);
+  for (unsigned int i=0; i<P.m(); ++i)
+    for (unsigned int j=0; j<P.n(); ++j)
+      if (std::fabs (P(i,j)) < 1e-14)
+	P(i,j) = 0;
   P.print_formatted(out, 3, false, 5);
 }
 
-  
+
 template<int dim>
 void test_projection (std::ostream& out)
 {
@@ -122,7 +126,7 @@ void test_projection (std::ostream& out)
   test_embedding(p1);
   test_embedding(p2);
   test_embedding(p3);
-  
+
   test_projection(p1,p0, out);
   test_projection(p0,p1, out);
   test_projection(p2,p1, out);
@@ -164,7 +168,7 @@ void test_renumbering(const FiniteElement<dim>& fe)
 	deallog << ' ' << start[i][j];
       deallog << std::endl;
     }
-  
+
 }
 
 
@@ -172,11 +176,11 @@ template<int dim>
 void test_renumbering()
 {
   deallog.push("Renumber");
-  
+
   FE_Q<dim> q1(1);
   FE_Q<dim> q3(3);
 //Todo:[GK] Test Raviart-Thomas and Nedelec?
-  
+
   FESystem<dim> q1_3(q1,3);
   test_renumbering(q1_3);
   FESystem<dim> q3_3(q3,3);
@@ -194,11 +198,11 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test_projection<1>(logfile);
   test_projection<2>(logfile);
   test_projection<3>(logfile);
-  
+
   test_renumbering<1>();
   test_renumbering<2>();
   test_renumbering<3>();
