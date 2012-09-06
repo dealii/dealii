@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,82 +19,86 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
-template <int dim, int spacedim>
-bool operator == (const Triangulation<dim,spacedim> &t1,
-		  const Triangulation<dim,spacedim> &t2)
+namespace dealii
 {
-				   // test a few attributes, though we can't
-				   // test everything unfortunately...
-  if (t1.n_active_cells() != t2.n_active_cells())
-    return false;
-  
-  if (t1.n_cells() != t2.n_cells())
-    return false;
-
-  if (t1.n_faces() != t2.n_faces())
-    return false;
-
-  typename Triangulation<dim,spacedim>::cell_iterator
-    c1 = t1.begin(),
-    c2 = t2.begin();
-  for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
-    {
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	{
-	  if (c1->vertex(v) != c2->vertex(v))
-	    return false;
-	  if (c1->vertex_index(v) != c2->vertex_index(v))
-	    return false;
-	}
-
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	{
-	  if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
-	    return false;
-
-	  if (c1->face(f)->at_boundary())
-	    {
-	      if (c1->face(f)->boundary_indicator() !=
-		  c2->face(f)->boundary_indicator())
-		return false;
-	    }
-	  else
-	    {
-	      if (c1->neighbor(f)->level() != c2->neighbor(f)->level())
-		return false;
-	      if (c1->neighbor(f)->index() != c2->neighbor(f)->index())
-		return false;
-	    }    
-	}
-      
-      if (c1->subdomain_id() != c2->subdomain_id())
-	return false;
-      
-      if (c1->material_id() != c2->material_id())
-	return false;
-
-      if (c1->user_index() != c2->user_index())
-	return false;
-
-      if (c1->user_flag_set() != c2->user_flag_set())
-	return false;
-    }
-
-  // also check the order of raw iterators as they contain
-  // something about the history of the triangulation
-  typename Triangulation<dim,spacedim>::cell_iterator
-    r1 = t1.begin_raw(),
-    r2 = t2.begin_raw();
-  for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
+  template <int dim, int spacedim>
+  bool operator == (const Triangulation<dim,spacedim> &t1,
+		    const Triangulation<dim,spacedim> &t2)
   {
-    if (r1->level() != r2->level())
+				     // test a few attributes, though we can't
+				     // test everything unfortunately...
+    if (t1.n_active_cells() != t2.n_active_cells())
       return false;
-    if (r1->index() != r2->index())
-      return false;
-  }
 
-  return true;
+    if (t1.n_cells() != t2.n_cells())
+      return false;
+
+    if (t1.n_faces() != t2.n_faces())
+      return false;
+
+    typename Triangulation<dim,spacedim>::cell_iterator
+      c1 = t1.begin(),
+      c2 = t2.begin();
+    for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
+      {
+	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	  {
+	    if (c1->vertex(v) != c2->vertex(v))
+	      return false;
+	    if (c1->vertex_index(v) != c2->vertex_index(v))
+	      return false;
+	  }
+
+	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	  {
+	    if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
+	      return false;
+
+	    if (c1->face(f)->at_boundary())
+	      {
+		if (c1->face(f)->boundary_indicator() !=
+		    c2->face(f)->boundary_indicator())
+		  return false;
+	      }
+	    else
+	      {
+		if (c1->neighbor(f)->level() != c2->neighbor(f)->level())
+		  return false;
+		if (c1->neighbor(f)->index() != c2->neighbor(f)->index())
+		  return false;
+	      }
+	  }
+
+	if (c1->subdomain_id() != c2->subdomain_id())
+	  return false;
+
+	if (c1->material_id() != c2->material_id())
+	  return false;
+
+	if (c1->user_index() != c2->user_index())
+	  return false;
+
+	if (c1->user_flag_set() != c2->user_flag_set())
+	  return false;
+      }
+
+				     // also check the order of raw iterators as they contain
+				     // something about the history of the triangulation
+    typename Triangulation<dim,spacedim>::cell_iterator
+      r1 = t1.begin_raw(),
+      r2 = t2.begin_raw();
+    for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
+      {
+	if (r1->level() != r2->level())
+	  return false;
+	if (r1->index() != r2->index())
+	  return false;
+      }
+
+    return true;
+  }
 }
+
 
 template <int dim, int spacedim>
 void do_boundary (Triangulation<dim,spacedim> &t1)
@@ -127,7 +131,7 @@ void test ()
   tria_1.begin_active()->set_refine_flag (RefinementCase<dim>::cut_x);
 
   do_boundary (tria_1);
-  
+
   verify (tria_1, tria_2);
 }
 
@@ -145,6 +149,6 @@ int main ()
   test<2,2> ();
   test<2,3> ();
   test<3,3> ();
-    
+
   deallog << "OK" << std::endl;
 }
