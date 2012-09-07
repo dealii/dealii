@@ -377,7 +377,7 @@ void TableHandler::write_text(std::ostream &out,
         {
           // print column key with column number. enumerate
           // columns starting with 1
-          out << "# " << j+1 << ": " << key << std::endl;
+          out << "# " << j+1 << ": " << key << '\n';
           break;
         }
 
@@ -432,8 +432,9 @@ void TableHandler::write_text(std::ostream &out,
                                            // pad after this column
           out << " ";
         }
-      out << std::endl;
+      out << '\n';
     }
+  out << std::flush;
 }
 
 
