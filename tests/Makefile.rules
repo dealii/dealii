@@ -121,9 +121,9 @@ endif
 	    if test -f $$testname/cmp/$$i ; then \
 		cmpfile_found=yes ; \
 		if test "x$(verbose)" = "xon" ; then \
-			cmd="diff $(DIFFOPT) -w $< $$testname/cmp/$$i" ; \
+			cmd="diff $(DIFFOPT) $< $$testname/cmp/$$i" ; \
 		 else \
-			cmd="diff -w $< $$testname/cmp/$$i > /dev/null" ; \
+			cmd="diff $< $$testname/cmp/$$i > /dev/null" ; \
 		 fi ; \
 		 if eval $$cmd ; then \
 			echo '=====OK============' $@ ; \
@@ -239,7 +239,7 @@ report+mail:
 	@for i in $(PLATFORM-HIERARCHY) ; do \
 	    testname=$(<:%/output=%) ; \
 	    if test -f $$testname/cmp/$$i ; then \
-	        cmd="diff -w $< $$testname/cmp/$$i > /dev/null" ; \
+	        cmd="diff $< $$testname/cmp/$$i > /dev/null" ; \
 		if eval ! $$cmd ; then \
 		    echo '=====Creating======' $$testname/cmp/$(PLATFORM) ; \
 		    cp $$testname/output $$testname/cmp/$(PLATFORM); \
