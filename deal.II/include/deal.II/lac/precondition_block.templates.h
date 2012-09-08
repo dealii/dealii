@@ -561,23 +561,6 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
             const Vector<number2> &src,
             bool adding) const
 {
-                                   // introduce the following typedef
-                                   // since in the use of exceptions,
-                                   // strict C++ requires us to
-                                   // specify them fully as they are
-                                   // from a template dependent base
-                                   // class. thus, we'd have to write
-                                   // PreconditionBlock<number,inverse_type>::ExcNoMatrixGivenToUse,
-                                   // which is lengthy, but also poses
-                                   // some problems to the
-                                   // preprocessor due to the comma in
-                                   // the template arg list. we could
-                                   // then wrap the whole thing into
-                                   // parentheses, but that creates a
-                                   // parse error for gcc for the
-                                   // exceptions that do not take
-                                   // args...
-  typedef PreconditionBlock<MATRIX,inverse_type> BaseClass;
   Assert(this->A!=0, ExcNotInitialized());
 
   const MATRIX &M=*this->A;
@@ -741,24 +724,6 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::forward (
   const bool transpose_diagonal,
   const bool) const
 {
-                                   // introduce the following typedef
-                                   // since in the use of exceptions,
-                                   // strict C++ requires us to
-                                   // specify them fully as they are
-                                   // from a template dependent base
-                                   // class. thus, we'd have to write
-                                   // PreconditionBlock<number,inverse_type>::ExcNoMatrixGivenToUse,
-                                   // which is lengthy, but also poses
-                                   // some problems to the
-                                   // preprocessor due to the comma in
-                                   // the template arg list. we could
-                                   // then wrap the whole thing into
-                                   // parentheses, but that creates a
-                                   // parse error for gcc for the
-                                   // exceptions that do not take
-                                   // args...
-  typedef PreconditionBlock<MATRIX,inverse_type> BaseClass;
-
   Assert (this->A!=0, ExcNotInitialized());
 
   const MATRIX &M=*this->A;
@@ -849,24 +814,6 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::backward (
   const bool transpose_diagonal,
   const bool) const
 {
-                                   // introduce the following typedef
-                                   // since in the use of exceptions,
-                                   // strict C++ requires us to
-                                   // specify them fully as they are
-                                   // from a template dependent base
-                                   // class. thus, we'd have to write
-                                   // PreconditionBlock<number,inverse_type>::ExcNoMatrixGivenToUse,
-                                   // which is lengthy, but also poses
-                                   // some problems to the
-                                   // preprocessor due to the comma in
-                                   // the template arg list. we could
-                                   // then wrap the whole thing into
-                                   // parentheses, but that creates a
-                                   // parse error for gcc for the
-                                   // exceptions that do not take
-                                   // args...
-  typedef PreconditionBlock<MATRIX,inverse_type> BaseClass;
-
   Assert (this->A!=0, ExcNotInitialized());
 
   const MATRIX &M=*this->A;
