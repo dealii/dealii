@@ -435,6 +435,27 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
+    dnl Newer versions have a flag -Wunused-local-typedefs that, though in principle
+    dnl a good idea, triggers a lot in BOOST in various places. Unfortunately,
+    dnl this warning is included in -W/-Wall, so disable it if the compiler
+    dnl supports it.
+    CXXFLAGS="-Wunused-local-typedefs"
+    AC_MSG_CHECKING(whether the compiler supports the -Wunused-local-typedefs flag)
+    AC_TRY_COMPILE(
+          [
+          ],
+          [;],
+          [
+            AC_MSG_RESULT(yes)
+            CXXFLAGSG="$CXXFLAGSG -Wno-unused-local-typedefs"
+          ],
+          [
+            AC_MSG_RESULT(no)
+            dnl Nothing to do here then. We can't disable it if the
+	    dnl flag doesn't exist
+          ])
+
+
     dnl See whether the gcc we use already has a flag for C++2011 features
     dnl and whether we can mark functions as deprecated with an attributed
     DEAL_II_CHECK_CXX1X
