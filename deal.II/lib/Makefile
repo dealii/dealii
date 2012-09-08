@@ -37,25 +37,8 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   # There is one gotcha: PETSc has a habit of making incompatible changes by
   # simply changing the names of libraries between different versions. That
   # really is too bad, so we have to conditionalize things.
-ifeq ($(DEAL_II_PETSC_VERSION_MINOR),1)
-  xlib-ksp=libpetscsles
-else
-  xlib-ksp=libpetscksp
-endif
-  # This is how it is done. Starting with PETSc versions 2.3.*:
-ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-  xlib.g = $(lib-contrib-petsc-path.g)/libpetscksp$(lib-suffix) \
-           $(lib-contrib-petsc-path.g)/libpetscdm$(lib-suffix)  \
-           $(lib-contrib-petsc-path.g)/libpetscmat$(lib-suffix) \
-           $(lib-contrib-petsc-path.g)/libpetscvec$(lib-suffix) \
-           $(lib-contrib-petsc-path.g)/libpetsc$(lib-suffix)
-  xlib.o = $(lib-contrib-petsc-path.o)/libpetscksp$(lib-suffix) \
-           $(lib-contrib-petsc-path.o)/libpetscdm$(lib-suffix)  \
-           $(lib-contrib-petsc-path.o)/libpetscmat$(lib-suffix) \
-           $(lib-contrib-petsc-path.o)/libpetscvec$(lib-suffix) \
-           $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
-else
-  # which is the same for PETSc 3.0.0:
+  #
+  # This is how it is done. Starting with PETSc version 3.0.0:
   ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30)
     xlib.g = $(lib-contrib-petsc-path.g)/libpetscksp$(lib-suffix) \
              $(lib-contrib-petsc-path.g)/libpetscdm$(lib-suffix)  \
@@ -67,40 +50,35 @@ else
              $(lib-contrib-petsc-path.o)/libpetscmat$(lib-suffix) \
              $(lib-contrib-petsc-path.o)/libpetscvec$(lib-suffix) \
              $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
-  else
-    # but after that (petsc-3.1++), we can use the simpler PETSc
-    # default "--with-single-library=1" like this:
-    xlib.g = $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
-    xlib.o = $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
-  endif
-endif
 
-ifeq ($(enable-shared),yes)
+    # deal with shared libraries:
+    ifeq ($(enable-shared),yes)
 
-  external-links-petsc: libpetscall.g$(shared-lib-suffix) libpetscall$(shared-lib-suffix)
+      external-links-petsc: libpetscall.g$(shared-lib-suffix) libpetscall$(shared-lib-suffix)
 
-  libpetscall.g$(shared-lib-suffix): $(xlib.g)
+      libpetscall.g$(shared-lib-suffix): $(xlib.g)
 	@echo "======================debug============= Linking library:   libpetscall.g$(shared-lib-suffix)"
 	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,petscall.g) $(call DEAL_II_ADD_SONAME,petscall.g) $(xlib.g)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,petscall.g) $@
 
-  libpetscall$(shared-lib-suffix): $(xlib.o)
+      libpetscall$(shared-lib-suffix): $(xlib.o)
 	@echo "======================optimized========= Linking library:   libpetscall$(shared-lib-suffix)"
 	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,petscall) $(call DEAL_II_ADD_SONAME,petscall)  $(xlib.o)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,petscall) $@
 
-else
+    # and then static libraries:
+    else
 
-  # make static libraries. ensure that they are built one after the other because
-  # both create temporary files with the same name
-  external-links-petsc:
+      # make static libraries. ensure that they are built one after the other because
+      # both create temporary files with the same name
+      external-links-petsc:
 	@$(MAKE) libpetscall.g$(static-lib-suffix)
 	@$(MAKE) libpetscall$(static-lib-suffix)
 
-  # As I don't know how to merge archives, here's a workaround: Extract each of
-  # the archives and append the object files to the libpetsc archive. Do the
-  # same for debug and optimized mode.
-  libpetscall.g$(static-lib-suffix): $(xlib.g)
+      # As I don't know how to merge archives, here's a workaround: Extract each of
+      # the archives and append the object files to the libpetsc archive. Do the
+      # same for debug and optimized mode.
+      libpetscall.g$(static-lib-suffix): $(xlib.g)
 	@echo "======================debug============= Linking library:   libpetscall.g$(static-lib-suffix)"
 	@rm -f $@
 	@rm -rf .ar_tmp
@@ -114,7 +92,7 @@ else
 	@rm -r .ar_tmp
 	@$(RANLIB) libpetscall.g$(static-lib-suffix)
 
-  libpetscall$(static-lib-suffix): $(xlib.o)
+      libpetscall$(static-lib-suffix): $(xlib.o)
 	@echo "======================optimized========= Linking library:   libpetscall$(static-lib-suffix)"
 	@rm -f $@
 	@rm -rf .ar_tmp
@@ -127,13 +105,16 @@ else
 	@cd ..
 	@rm -r .ar_tmp
 	@$(RANLIB) libpetscall$(static-lib-suffix)
-endif
+    endif
 
+  # and this is how it is done with PETSc version >= 3.1.0:
+  else
+    external-links-petsc: # do nothing.
+  endif
 
 else
   external-links-petsc:
 endif
-
 
 
 ######################### CLEAN TARGETS ###################
@@ -143,7 +124,6 @@ clean: clean-objects
 # only clean object files, not libraries and executables
 clean-objects:  clean-debug clean-optimized \
 		clean-contrib
-
 
 # clean targets for the individual subdirectories. remove
 # object files and template instantiation files.
