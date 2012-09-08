@@ -968,8 +968,8 @@ namespace
       std::vector<double>  vertices;
       std::vector<int32_t> cells;
   };
-    
-    
+
+
     class HDF5MemStream
     {
     public:
@@ -979,21 +979,21 @@ namespace
          * later use.
          */
         HDF5MemStream (const unsigned int local_points_cell_count[2], const unsigned int global_points_cell_offsets[2], const unsigned int dim);
-        
+
         /**
          * Output operator for points.
          */
         template <int dim>
         void write_point (const unsigned int index,
                           const Point<dim>&);
-        
+
         /**
          * Do whatever is necessary to
          * terminate the list of points.
          * In this case, nothing.
          */
         void flush_points () {};
-        
+
         /**
          * Write dim-dimensional cell
          * with first vertex at
@@ -1017,17 +1017,17 @@ namespace
                         const unsigned int x_offset,
                         const unsigned int y_offset,
                         const unsigned int z_offset);
-        
+
         /**
          * Do whatever is necessary to
          * terminate the list of cells.
          * In this case, nothing.
          */
         void flush_cells () {};
-        
+
         const double *node_data(void) const { return &vertices[0]; };
         const unsigned int *cell_data(void) const { return &cells[0]; };
-        
+
     private:
         /**
          * A list of vertices and
@@ -1537,12 +1537,12 @@ namespace
 
     HDF5MemStream::HDF5MemStream(const unsigned int local_points_cell_count[2], const unsigned int global_points_cell_offsets[2], const unsigned int dim) {
         unsigned int entries_per_cell = (2 << (dim-1));
-        
+
         vertices.resize(local_points_cell_count[0]*dim);
         cells.resize(local_points_cell_count[1]*entries_per_cell);
         cell_offset = global_points_cell_offsets[1]*entries_per_cell;
     }
-    
+
     template<int dim>
     void
     HDF5MemStream::write_point (const unsigned int index,
@@ -1550,7 +1550,7 @@ namespace
     {
         for (int i=0;i<dim;++i) vertices[index*dim+i] = p(i);
     }
-    
+
     template<int dim>
     void
     HDF5MemStream::write_cell(
@@ -1576,7 +1576,7 @@ namespace
             }
         }
     }
-    
+
   template <typename T>
   std::ostream&
   DXStream::operator<< (const T& t)
@@ -2267,7 +2267,7 @@ parse_output_format (const std::string &format_name)
 
   if (format_name == "deal.II intermediate")
     return deal_II_intermediate;
-    
+
     if (format_name == "hdf5")
         return hdf5;
 
@@ -5694,14 +5694,23 @@ XDMFEntry DataOutBase::create_xdmf_entry (const std::vector<Patch<dim,spacedim> 
     unsigned int    local_node_cell_count[2], global_node_cell_count[2];
     const unsigned int n_data_sets = data_names.size();
     int             myrank;
-    
+
 #ifndef DEAL_II_HAVE_HDF5
+				     // throw an exception, but first make
+				     // sure the compiler does not warn about
+				     // the now unused function arguments
+    (void)patches;
+    (void)data_names;
+    (void)vector_data_ranges;
+    (void)h5_filename;
+    (void)cur_time;
+    (void)comm;
     AssertThrow(false, ExcMessage ("XDMF support requires HDF5 to be turned on."));
 #endif
     AssertThrow(dim == 2 || dim == 3, ExcMessage ("XDMF only supports 2 or 3 dimensions."));
-    
+
     compute_sizes<dim,spacedim>(patches, local_node_cell_count[0], local_node_cell_count[1]);
-    
+
     // And compute the global total
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     MPI_Comm_rank(comm, &myrank);
@@ -5711,29 +5720,29 @@ XDMFEntry DataOutBase::create_xdmf_entry (const std::vector<Patch<dim,spacedim> 
     global_node_cell_count[0] = local_node_cell_count[0];
     global_node_cell_count[1] = local_node_cell_count[1];
 #endif
-    
+
     // Output the XDMF file only on the root process
     if (myrank == 0) {
         XDMFEntry       entry(h5_filename, cur_time, global_node_cell_count[0], global_node_cell_count[1], dim);
-        
+
         // The vector names generated here must match those generated in the HDF5 file
         unsigned int    i, n_th_vector, data_set, pt_data_vector_dim;
         std::string     vector_name;
         for (n_th_vector=0,data_set=0;data_set<n_data_sets;) {
             // Advance n_th_vector to at least the current data set we are on
             while (n_th_vector < vector_data_ranges.size() && std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) < data_set) n_th_vector++;
-            
+
             // Determine whether the data is multiple dimensions or one
             if (std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) == data_set) {
                 // Multiple dimensions
                 pt_data_vector_dim = std_cxx1x::get<1>(vector_data_ranges[n_th_vector]) - std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+1;
-                
+
                 // Ensure the dimensionality of the data is correct
                 AssertThrow (std_cxx1x::get<1>(vector_data_ranges[n_th_vector]) >= std_cxx1x::get<0>(vector_data_ranges[n_th_vector]),
                              ExcLowerRange (std_cxx1x::get<1>(vector_data_ranges[n_th_vector]), std_cxx1x::get<0>(vector_data_ranges[n_th_vector])));
                 AssertThrow (std_cxx1x::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
                              ExcIndexRange (std_cxx1x::get<1>(vector_data_ranges[n_th_vector]), 0, n_data_sets));
-                
+
                 // Determine the vector name
                 // Concatenate all the
                 // component names with double
@@ -5752,13 +5761,13 @@ XDMFEntry DataOutBase::create_xdmf_entry (const std::vector<Patch<dim,spacedim> 
                 pt_data_vector_dim = 1;
                 vector_name = data_names[data_set];
             }
-            
+
             entry.add_attribute(vector_name, pt_data_vector_dim);
-            
+
             // Advance the current data set
             data_set += pt_data_vector_dim;
         }
-        
+
         return entry;
     } else {
         return XDMFEntry();
@@ -5767,57 +5776,64 @@ XDMFEntry DataOutBase::create_xdmf_entry (const std::vector<Patch<dim,spacedim> 
 
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
-write_xdmf_file (const std::vector<XDMFEntry> &entries, const char *filename, MPI_Comm comm) const
+write_xdmf_file (const std::vector<XDMFEntry> &entries,
+		 const char *filename,
+		 MPI_Comm comm) const
 {
     DataOutBase::write_xdmf_file(get_patches(), entries, filename, comm);
 }
 
+
+
 template <int dim, int spacedim>
-void DataOutBase::write_xdmf_file (const std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_xdmf_file (const std::vector<Patch<dim,spacedim> > &,
                                    const std::vector<XDMFEntry> &entries,
                                    const char *filename,
                                    MPI_Comm comm)
 {
     int             myrank;
-    
+
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     MPI_Comm_rank(comm, &myrank);
 #else
+    (void)comm;
     myrank = 0;
 #endif
-    
+
     // Only rank 0 process writes the XDMF file
-    if (myrank == 0) {
+    if (myrank == 0)
+      {
         std::ofstream                               xdmf_file(filename);
         std::vector<XDMFEntry>::const_iterator      it;
-        
+
         xdmf_file << "<?xml version=\"1.0\" ?>\n";
         xdmf_file << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
         xdmf_file << "<Xdmf Version=\"2.0\">\n";
         xdmf_file << "  <Domain>\n";
         xdmf_file << "    <Grid Name=\"CellTime\" GridType=\"Collection\" CollectionType=\"Temporal\">\n";
-        
+
         // Write out all the entries indented
         for (it=entries.begin();it!=entries.end();++it)
           xdmf_file << it->get_xdmf_content(3);
-        
+
         xdmf_file << "    </Grid>\n";
         xdmf_file << "  </Domain>\n";
         xdmf_file << "</Xdmf>\n";
-        
+
         xdmf_file.close();
     }
 }
 
+
 // Get the XDMF content associated with this entry
 // If the entry is not valid, this returns false
-std::string XDMFEntry::get_xdmf_content(const unsigned int indent_level) const {
+std::string XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
+{
     std::stringstream   ss;
-    unsigned int        i;
     std::map<std::string, unsigned int>::const_iterator     it;
-    
+
     if (!valid) return "";
-    
+
     ss << indent(indent_level+0) << "<Grid Name=\"mesh\" GridType=\"Uniform\">\n";
     ss << indent(indent_level+1) << "<Time Value=\"" << entry_time << "\"/>\n";
     ss << indent(indent_level+1) << "<Geometry GeometryType=\"" << (dimension == 2 ? "XY" : "XYZ" ) << "\">\n";
@@ -5837,7 +5853,7 @@ std::string XDMFEntry::get_xdmf_content(const unsigned int indent_level) const {
         ss << indent(indent_level+1) << "<Topology TopologyType=\"Polyvertex\" NumberOfElements=\"" << num_nodes << "\">\n";
         ss << indent(indent_level+1) << "</Topology>\n";
     }
-    
+
     for (it=attribute_dims.begin();it!=attribute_dims.end();++it) {
         ss << indent(indent_level+1) << "<Attribute Name=\"" << it->first << "\" AttributeType=\"" << (it->second > 1 ? "Vector" : "Scalar") << "\" Center=\"Node\">\n";
         // Vectors must have 3 elements even for 2D models
@@ -5846,9 +5862,9 @@ std::string XDMFEntry::get_xdmf_content(const unsigned int indent_level) const {
         ss << indent(indent_level+2) << "</DataItem>\n";
         ss << indent(indent_level+1) << "</Attribute>\n";
     }
-    
+
     ss << indent(indent_level+0) << "</Grid>\n";
-    
+
     return ss.str();
 }
 
@@ -5872,6 +5888,14 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
                                        MPI_Comm comm)
 {
 #ifndef DEAL_II_HAVE_HDF5
+				     // throw an exception, but first make
+				     // sure the compiler does not warn about
+				     // the now unused function arguments
+    (void)patches;
+    (void)data_names;
+    (void)vector_data_ranges;
+    (void)filename;
+    (void)comm;
     AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
 #else
     int             world_size;
@@ -5883,7 +5907,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
     unsigned int    local_node_cell_count[2], global_node_cell_count[2], global_node_cell_offsets[2];
     hsize_t         count[2], offset[2], node_ds_dim[2], cell_ds_dim[2];
     const unsigned int n_data_sets = data_names.size();
-    
+
     // If HDF5 is not parallel and we're using multiple processes, abort
 #ifndef H5_HAVE_PARALLEL
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
@@ -5892,13 +5916,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
                  ExcMessage ("Serial HDF5 output on multiple processes is not yet supported."));
 #endif
 #endif
-    
+
     compute_sizes<dim,spacedim>(patches, local_node_cell_count[0], local_node_cell_count[1]);
-    
+
     Table<2,double> data_vectors (n_data_sets, local_node_cell_count[0]);
     void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &, Table<2,double> &) = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
     Threads::Task<> reorder_task = Threads::new_task (fun_ptr, patches, data_vectors);
-    
+
     // Create file access properties
     plist_id = H5Pcreate(H5P_FILE_ACCESS);
     AssertThrow(plist_id != -1, ExcIO());
@@ -5910,13 +5934,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
     AssertThrow(status >= 0, ExcIO());
 #endif
 #endif
-    
+
     // Overwrite any existing files (change this to an option?) and close the property list
     h5_file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
     AssertThrow(h5_file_id >= 0, ExcIO());
     status = H5Pclose(plist_id);
     AssertThrow(status >= 0, ExcIO());
-    
+
     // Compute the global total number of nodes/cells
     // And determine the offset of the data for this process
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
@@ -5927,24 +5951,24 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 #else
     global_node_cell_offsets[0] = global_node_cell_offsets[1] = 0;
 #endif
-    
+
     // Write the nodes/cells to the HDF5 "stream" object. Record the process offset
     // so that node reference indices are correctly calculated
     HDF5MemStream   hdf5_data(local_node_cell_count, global_node_cell_offsets, dim);
     write_nodes(patches, hdf5_data);
     write_cells(patches, hdf5_data);
-    
+
     // Create the dataspace for the nodes and cells
     node_ds_dim[0] = global_node_cell_count[0];
     node_ds_dim[1] = dim;
     node_dataspace = H5Screate_simple(2, node_ds_dim, NULL);
     AssertThrow(node_dataspace >= 0, ExcIO());
-    
+
     cell_ds_dim[0] = global_node_cell_count[1];
     cell_ds_dim[1] = GeometryInfo<dim>::vertices_per_cell;
     cell_dataspace = H5Screate_simple(2, cell_ds_dim, NULL);
     AssertThrow(cell_dataspace >= 0, ExcIO());
-    
+
     // Create the dataset for the nodes and cells
 #if H5Gcreate_vers == 1
     node_dataset = H5Dcreate(h5_file_id, "nodes", H5T_NATIVE_DOUBLE, node_dataspace, H5P_DEFAULT);
@@ -5958,13 +5982,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
     cell_dataset = H5Dcreate(h5_file_id, "cells", H5T_NATIVE_UINT, cell_dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 #endif
     AssertThrow(cell_dataset >= 0, ExcIO());
-    
+
     // Close the node and cell dataspaces since we're done with them
     status = H5Sclose(node_dataspace);
     AssertThrow(status >= 0, ExcIO());
     status = H5Sclose(cell_dataspace);
     AssertThrow(status >= 0, ExcIO());
-    
+
     // Create the data subset we'll use to read from memory
     count[0] = local_node_cell_count[0];
     count[1] = dim;
@@ -5972,13 +5996,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
     offset[1] = 0;
     node_memory_dataspace = H5Screate_simple(2, count, NULL);
     AssertThrow(node_memory_dataspace >= 0, ExcIO());
-    
+
     // Select the hyperslab in the file
     node_file_dataspace = H5Dget_space(node_dataset);
     AssertThrow(node_file_dataspace >= 0, ExcIO());
     status = H5Sselect_hyperslab(node_file_dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
     AssertThrow(status >= 0, ExcIO());
-    
+
     // And repeat for cells
     count[0] = local_node_cell_count[1];
     count[1] = GeometryInfo<dim>::vertices_per_cell;
@@ -5991,7 +6015,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
     AssertThrow(cell_file_dataspace >= 0, ExcIO());
     status = H5Sselect_hyperslab(cell_file_dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
     AssertThrow(status >= 0, ExcIO());
-    
+
     // Create the property list for a collective write
     plist_id = H5Pcreate(H5P_DATASET_XFER);
     AssertThrow(plist_id >= 0, ExcIO());
@@ -6001,17 +6025,17 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
     AssertThrow(status >= 0, ExcIO());
 #endif
 #endif
-    
+
     // And finally, write the node data
     status = H5Dwrite(node_dataset, H5T_NATIVE_DOUBLE, node_memory_dataspace, node_file_dataspace, plist_id, hdf5_data.node_data());
     AssertThrow(status >= 0, ExcIO());
-    
+
     // And the cell data
     status = H5Dwrite(cell_dataset, H5T_NATIVE_UINT, cell_memory_dataspace, cell_file_dataspace, plist_id, hdf5_data.cell_data());
     AssertThrow(status >= 0, ExcIO());
 
     reorder_task.join ();
-    
+
     // when writing, first write out
     // all vector data, then handle the
     // scalar data sets that have been
@@ -6022,18 +6046,18 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
     for (n_th_vector=0,data_set=0;data_set<n_data_sets;) {
         // Advance n_th_vector to at least the current data set we are on
         while (n_th_vector < vector_data_ranges.size() && std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) < data_set) n_th_vector++;
-        
+
         // Determine the dimension of this data
         if (std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) == data_set) {
             // Multiple dimensions
             pt_data_vector_dim = std_cxx1x::get<1>(vector_data_ranges[n_th_vector]) - std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+1;
-            
+
             // Ensure the dimensionality of the data is correct
             AssertThrow (std_cxx1x::get<1>(vector_data_ranges[n_th_vector]) >= std_cxx1x::get<0>(vector_data_ranges[n_th_vector]),
                          ExcLowerRange (std_cxx1x::get<1>(vector_data_ranges[n_th_vector]), std_cxx1x::get<0>(vector_data_ranges[n_th_vector])));
             AssertThrow (std_cxx1x::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
                          ExcIndexRange (std_cxx1x::get<1>(vector_data_ranges[n_th_vector]), 0, n_data_sets));
-            
+
             // Determine the vector name
             // Concatenate all the
             // component names with double
@@ -6052,25 +6076,25 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
             pt_data_vector_dim = 1;
             vector_name = data_names[data_set];
         }
-        
+
         // Allocate space for the point data
         // Must be either 1D or 3D
         mem_vector_dim = (pt_data_vector_dim>1?3:1);
         pt_data = new double[local_node_cell_count[0]*mem_vector_dim];
-        
+
         // Create the dataspace for the point data
         node_ds_dim[0] = global_node_cell_count[0];
         node_ds_dim[1] = mem_vector_dim;
         pt_data_dataspace = H5Screate_simple(2, node_ds_dim, NULL);
         AssertThrow(pt_data_dataspace >= 0, ExcIO());
-        
+
 #if H5Gcreate_vers == 1
         pt_data_dataset = H5Dcreate(h5_file_id, vector_name.c_str(), H5T_NATIVE_DOUBLE, pt_data_dataspace, H5P_DEFAULT);
 #else
         pt_data_dataset = H5Dcreate(h5_file_id, vector_name.c_str(), H5T_NATIVE_DOUBLE, pt_data_dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 #endif
         AssertThrow(pt_data_dataset >= 0, ExcIO());
-        
+
         // Create the data subset we'll use to read from memory
         count[0] = local_node_cell_count[0];
         count[1] = mem_vector_dim;
@@ -6078,13 +6102,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
         offset[1] = 0;
         pt_data_memory_dataspace = H5Screate_simple(2, count, NULL);
         AssertThrow(pt_data_memory_dataspace >= 0, ExcIO());
-        
+
         // Select the hyperslab in the file
         pt_data_file_dataspace = H5Dget_space(pt_data_dataset);
         AssertThrow(pt_data_file_dataspace >= 0, ExcIO());
         status = H5Sselect_hyperslab(pt_data_file_dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
         AssertThrow(status >= 0, ExcIO());
-        
+
         // Write point data to the memory array
         r = 0;
         for (i=0;i<local_node_cell_count[0];++i) {
@@ -6095,13 +6119,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
             // Write 0 for the remainder of entries in 2D
             for (;n<mem_vector_dim;++n) pt_data[r++] = 0;
         }
-        
+
         // And finally, write the data
         status = H5Dwrite(pt_data_dataset, H5T_NATIVE_DOUBLE, pt_data_memory_dataspace, pt_data_file_dataspace, plist_id, pt_data);
         AssertThrow(status >= 0, ExcIO());
-        
+
         delete pt_data;
-        
+
         // Close the dataspaces
         status = H5Sclose(pt_data_dataspace);
         AssertThrow(status >= 0, ExcIO());
@@ -6112,33 +6136,33 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
         // Close the dataset
         status = H5Dclose(pt_data_dataset);
         AssertThrow(status >= 0, ExcIO());
-        
+
         // Advance the current data set
         data_set += pt_data_vector_dim;
     }
-    
+
     // Close the file dataspaces
     status = H5Sclose(node_file_dataspace);
     AssertThrow(status >= 0, ExcIO());
     status = H5Sclose(cell_file_dataspace);
     AssertThrow(status >= 0, ExcIO());
-    
+
     // Close the memory dataspaces
     status = H5Sclose(node_memory_dataspace);
     AssertThrow(status >= 0, ExcIO());
     status = H5Sclose(cell_memory_dataspace);
     AssertThrow(status >= 0, ExcIO());
-    
+
     // Close the datasets
     status = H5Dclose(node_dataset);
     AssertThrow(status >= 0, ExcIO());
     status = H5Dclose(cell_dataset);
     AssertThrow(status >= 0, ExcIO());
-    
+
     // Close the parallel access
     status = H5Pclose(plist_id);
     AssertThrow(status >= 0, ExcIO());
-    
+
     // Close the file
     status = H5Fclose(h5_file_id);
     AssertThrow(status >= 0, ExcIO());
