@@ -14727,13 +14727,5 @@ Triangulation<dim, spacedim>::remove_refinement_listener (RefinementListener &li
 // explicit instantiations
 #include "tria.inst"
 
-// this is a hack: we need to instantiate this one function because
-// TriaAccessor<1,1,3> uses it. We could instead instantiate
-// Triangulation<1,3>, but that requires a lot more specializations of
-// functions that currently only exist for <1,1> and <1,2>
-// template
-// const Boundary<1,3> &
-// Triangulation<1,3>::get_boundary (const types::boundary_id number) const;
-
 DEAL_II_NAMESPACE_CLOSE
 
