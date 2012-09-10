@@ -15,8 +15,10 @@ IF(DEAL_II_USE_CONTRIB)
     )
 
   LIST(APPEND deal_ii_additional_object_files
-    $<TARGET_OBJECTS:obj_umfpack>
-    $<TARGET_OBJECTS:obj_amd>
+    ${obj_umfpack_object_files}
+    $<TARGET_OBJECTS:obj_amd_int>
+    $<TARGET_OBJECTS:obj_amd_long>
+    $<TARGET_OBJECTS:obj_amd_global>
     )
 ELSE()
   FIND_PACKAGE(Umfpack REQUIRED)
