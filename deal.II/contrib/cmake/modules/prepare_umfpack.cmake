@@ -6,13 +6,13 @@ IF(DEAL_II_USE_CONTRIB)
   # Add umfpack and amd directly to the object files of deal.II
   #
 
-  ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/umfpack/UMFPACK/Source)
-  ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/umfpack/AMD/Source)
-
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/umfpack/UMFPACK/Include
     ${CMAKE_SOURCE_DIR}/contrib/umfpack/AMD/Include
     )
+
+  ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/umfpack/UMFPACK/Source)
+  ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/umfpack/AMD/Source)
 
   LIST(APPEND deal_ii_additional_object_files
     ${obj_umfpack_object_files}
