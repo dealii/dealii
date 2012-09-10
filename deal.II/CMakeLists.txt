@@ -36,6 +36,7 @@ SET(CMAKE_MODULE_PATH
 
 #TODO:
 SET(CMAKE_CXX_FLAGS "-std=c++0x -Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native") #TODO: c++0x Features umschalten
+SET(CMAKE_C_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native") #TODO: c++0x Features umschalten
 
 OPTION(DEAL_II_WITH_THREADS
   "Build deal.II with support for threads. This pulls in libtbb as a dependency."

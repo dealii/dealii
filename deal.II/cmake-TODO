@@ -3,8 +3,6 @@ Next steps:
 - convert as much of the config.h.in so that the library can be build in
   the current state with cmake
 
-- Solve the Umfpack and AMD regression with the bundled libraries
-
 - Add the version configuration to cmake
 
 - And lots of the other stuff...
