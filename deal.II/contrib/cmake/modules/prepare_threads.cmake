@@ -8,6 +8,7 @@ IF(DEAL_II_USE_CONTRIB)
   # _installed_ library location
 
 ELSE()
+
   FIND_PACKAGE(TBB REQUIRED)
 ENDIF()
 
@@ -24,7 +25,7 @@ LIST(APPEND deal_ii_external_libraries
   )
 LIST(APPEND deal_ii_external_debug_libraries
   ${TBB_DEBUG_LIBRARY}
-  ) #TODO
+  )
 
 SET(DEAL_II_USE_MT TRUE)
 SET(DEAL_II_USE_MT_POSIX TRUE)
