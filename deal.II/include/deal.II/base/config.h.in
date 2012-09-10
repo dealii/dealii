@@ -46,7 +46,7 @@
 
 
 /*
- * Configured in prepare_boost.cmake:
+ * Configured in configure_boost.cmake:
  */
 
 
@@ -57,7 +57,7 @@
 
 
 /*
- * Configured in prepare_threads.cmake:
+ * Configured in configure_threads.cmake:
  */
 
 
@@ -91,7 +91,7 @@
 
 
 /*
- * Configured in prepare_umfpack.cmake:
+ * Configured in configure_umfpack.cmake:
  */
 
 

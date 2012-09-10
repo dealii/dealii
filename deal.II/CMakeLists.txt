@@ -71,7 +71,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
 
 
 #
-# Now, configure and prepare a lot of things:
+# Now, configure and configure a lot of things:
 #
 
 # used as a dummy target for all the stuff that has to be done before the
@@ -92,14 +92,14 @@ INCLUDE(check_cxx_features)
 # Feature configuration:
 #
 
-INCLUDE(prepare_boost)
+INCLUDE(configure_boost)
 
 IF(DEAL_II_WITH_THREADS)
-  INCLUDE(prepare_threads)
+  INCLUDE(configure_threads)
 ENDIF()
 
 IF(DEAL_II_WITH_UMFPACK)
-  INCLUDE(prepare_umfpack)
+  INCLUDE(configure_umfpack)
 ENDIF()
 
 
