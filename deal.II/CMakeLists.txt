@@ -1,16 +1,32 @@
 PROJECT(deal.II)
+
 SET(VERSION "8.0.pre")
+
+
+
+#
+# General configuration for cmake:
+#
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
-#TODO:
-SET(CMAKE_CXX_FLAGS "-std=c++0x -D_REENTRANT -fPIC -O2 -march=native") #TODO: c++0x Features umschalten
 SET(CMAKE_INCLUDE_CURRENT_DIR true)
+
+SET(CMAKE_MODULE_PATH
+  ${CMAKE_MODULE_PATH}
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/macros/"
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/tests/"
+  )
 
 
 
 #
 # General configuration options:
 #
+
+#TODO:
+SET(CMAKE_CXX_FLAGS "-std=c++0x -Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native") #TODO: c++0x Features umschalten
 
 OPTION(DEAL_II_WITH_THREADS
   "Build deal.II with support for threads. This pulls in libtbb as a dependency."
@@ -31,9 +47,6 @@ OPTION(DEAL_II_WITH_UMFPACK
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
   OFF)
-
-# TODO: The rest ;-)
-
 
 OPTION(DEAL_II_ALLOW_CONTRIB
   "Allow the use of contrib libraries bundled with the source tarball.
@@ -56,23 +69,28 @@ OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
   OFF)
 
 
+
 #
 # Now, configure and prepare a lot of things:
 #
 
-SET(CMAKE_MODULE_PATH
-  ${CMAKE_MODULE_PATH}
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
-  )
-
-#
 # used as a dummy target for all the stuff that has to be done before the
 # library can be compiled:
-#
 ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 
 
-# TODO: Version Mumbo Jumbo
+
+#
+# Platform checks:
+#
+
+INCLUDE(check_cxx_features)
+
+
+
+#
+# Feature configuration:
+#
 
 INCLUDE(prepare_boost)
 
@@ -84,8 +102,6 @@ IF(DEAL_II_WITH_UMFPACK)
   INCLUDE(prepare_umfpack)
 ENDIF()
 
-# TODO: The rest...
-
 
 
 #
@@ -93,6 +109,7 @@ ENDIF()
 #
 
 ADD_SUBDIRECTORY(common/expand_instantiations)
+
 
 
 #

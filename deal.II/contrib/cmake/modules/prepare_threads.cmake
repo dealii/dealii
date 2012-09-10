@@ -30,5 +30,6 @@ LIST(APPEND deal_ii_external_debug_libraries
   ${TBB_DEBUG_LIBRARY}
   )
 
+# TODO: Renaming!
 SET(DEAL_II_USE_MT TRUE)
 SET(DEAL_II_USE_MT_POSIX TRUE)

@@ -452,20 +452,12 @@
 /* Define if the compiler provides an <iosfwd> header file */
 #cmakedefine HAVE_STD_IOSFWD_HEADER
 
-/* Define if the compiler's library in use provides a std::iterator class
-   (early gcc versions did not) */
-#cmakedefine HAVE_STD_ITERATOR_CLASS
-
 /* Define if the compiler's library in use provides std::numeric_limits
    classes in the appropriate header file */
 #cmakedefine HAVE_STD_NUMERIC_LIMITS
 
 /* Define if the compiler provides an <ostream> header file */
 #cmakedefine HAVE_STD_OSTREAM_HEADER
-
-/* Define if the compiler's library in use provides std::i/ostringstream
-   classes (early gcc versions did not) */
-#cmakedefine HAVE_STD_STRINGSTREAM
 
 /* Define to 1 if you have the <strings.h> header file. */
 #cmakedefine HAVE_STRINGS_H

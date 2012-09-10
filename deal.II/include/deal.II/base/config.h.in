@@ -27,14 +27,39 @@
 
 
 
-/* Configured in prepare_boost.cmake: */
+
+/*
+ * Configured in check_cxx_features:
+ */
+
+
+/* Defined if the compiler's library in use provides a std::iterator class
+   (early gcc versions did not) */
+#cmakedefine HAVE_STD_ITERATOR_CLASS 1
+
+/* Defined if the compiler's library in use provides std::i/ostringstream
+   classes (early gcc versions did not) */
+#cmakedefine HAVE_STD_STRINGSTREAM 1
+
+
+
+
+
+/*
+ * Configured in prepare_boost.cmake:
+ */
+
 
 /* Defined if deal.II is configured with an external Boost library */
 #cmakedefine DEAL_II_USE_EXTERNAL_BOOST
 
 
 
-/* Configured in prepare_threads.cmake: */
+
+/*
+ * Configured in prepare_threads.cmake:
+ */
+
 
 /* Flag indicating whether the library shall be compiled for multithreaded
  * applications. If so, then it is set to one, otherwise to zero.
@@ -64,7 +89,11 @@
 
 
 
-/* Configured in prepare_umfpack.cmake: */
+
+/*
+ * Configured in prepare_umfpack.cmake:
+ */
+
 
 /* Defined if deal.II was configured with UMFPACK support */
 #cmakedefine HAVE_LIBUMFPACK
