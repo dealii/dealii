@@ -84,7 +84,7 @@ ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 # Platform checks:
 #
 
-INCLUDE(check_cxx_features)
+INCLUDE(check_for_cxx_features)
 
 
 
