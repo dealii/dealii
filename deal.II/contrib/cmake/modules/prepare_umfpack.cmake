@@ -1,7 +1,22 @@
 FIND_PACKAGE(LAPACK REQUIRED)
 FIND_PACKAGE(BLAS REQUIRED)
 
-IF(DEAL_II_USE_CONTRIB)
+IF(DEAL_II_ALLOW_CONTRIB)
+  FIND_PACKAGE(Umfpack)
+  FIND_PACKAGE(AMD)
+ELSE()
+  FIND_PACKAGE(Umfpack REQUIRED)
+  FIND_PACKAGE(AMD REQUIRED)
+ENDIF()
+
+IF(UMFPACK_FOUND AND AMD_FOUND)
+  SET(UmfpackAMD_FOUND TRUE)
+ELSE()
+  SET(UmfpackAMD_FOUND FALSE)
+ENDIF()
+
+
+IF(DEAL_II_FORCE_CONTRIB_UMFPACK OR NOT UmfpackAMD_FOUND)
   #
   # Add umfpack and amd directly to the object files of deal.II
   #
@@ -21,15 +36,8 @@ IF(DEAL_II_USE_CONTRIB)
     $<TARGET_OBJECTS:obj_amd_global>
     )
 ELSE()
-  FIND_PACKAGE(Umfpack REQUIRED)
-  FIND_PACKAGE(AMD REQUIRED)
 
   INCLUDE_DIRECTORIES(${Umfpack_INCLUDE_DIR} ${AMD_INCLUDE_DIR})
-
-  #
-  # We skip *_INCLUDE_DIR because it is not needed for the use of the
-  # deal.II library
-  #
 
   LIST(APPEND deal_ii_external_libraries
     ${Umfpack_LIBRARY} ${AMD_LIBRARY} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES}

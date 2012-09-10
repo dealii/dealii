@@ -12,30 +12,48 @@ SET(CMAKE_INCLUDE_CURRENT_DIR true)
 # General configuration options:
 #
 
-OPTION(DEAL_II_USE_CONTRIB
-  "Build and use contrib libraries bundled with the source tarball."
-  ON
-  )
+OPTION(DEAL_II_ALLOW_CONTRIB
+  "Allow the use of contrib libraries bundled with the source tarball.
+  Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
+  packages, so to ensure that only external libraries are used
+  DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
+  OFF"
+  ON)
+
 OPTION(DEAL_II_WITH_THREADS
   "Build deal.II with support for threads. This pulls in libtbb as a dependency."
-  ON
-  )
+  ON)
+
 OPTION(DEAL_II_FUNCTIONPARSER
-  "BUild deal.II with support for functionparser"
-  ON
-  )
-OPTION(DEAL_II_MPI "Build deal.II with support for openmpi."
-  OFF
-  )
-OPTION(DEAL_II_WITH_UMFPACK "Build deal.II with support for UMFPACK, BLAS and LAPACK."
-  ON
-  )
-OPTION(DEAL_II_WITH_METIS "Build deal.II with support for Metis."
-  OFF
-  )
+  "Build deal.II with support for functionparser"
+  ON)
+
+OPTION(DEAL_II_MPI
+  "Build deal.II with support for openmpi."
+  OFF)
+
+OPTION(DEAL_II_WITH_UMFPACK
+  "Build deal.II with support for UMFPACK, BLAS and LAPACK."
+  ON)
+
+OPTION(DEAL_II_WITH_METIS
+  "Build deal.II with support for Metis."
+  OFF)
 
 # TODO: The rest ;-)
 
+
+OPTION(DEAL_II_FORCE_CONTRIB_BOOST
+  "Always use the bundled boost library instead of an external one."
+  OFF)
+
+OPTION(DEAL_II_FORCE_CONTRIB_TBB
+  "Always use the bundled tbb library instead of an external one."
+  OFF)
+
+OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
+  "Always use the bundled umfpack library instead of an external one."
+  OFF)
 
 
 #
@@ -68,14 +86,13 @@ ENDIF()
 
 # TODO: The rest...
 
-message( "${deal_ii_external_libraries}" )
+
 
 #
 # Build the toolchain:
 #
 
 ADD_SUBDIRECTORY(common/expand_instantiations)
-
 
 
 #
@@ -91,4 +108,5 @@ INCLUDE_DIRECTORIES(
 INCLUDE(macro_expand_instantiations)
 
 ADD_SUBDIRECTORY(include)
+
 ADD_SUBDIRECTORY(source)
