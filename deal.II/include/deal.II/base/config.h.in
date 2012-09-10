@@ -11,12 +11,10 @@
 //
 //----------------------------  config.h  ---------------------------
 
-/*
- * TODO: Migrate all definitions from config.h.in.old to this file.
- */
-
 #ifndef __deal2__config_h
 #define __deal2__config_h
+
+
 
 /**
  * Two macro names that we put at the top and bottom of all deal.II files
@@ -24,6 +22,24 @@
  */
 #define DEAL_II_NAMESPACE_OPEN namespace dealii {
 #define DEAL_II_NAMESPACE_CLOSE }
+
+/* Define to the full name of this package. */
+#cmakedefine DEAL_II_PACKAGE_NAME "@DEAL_II_PACKAGE_NAME@"
+
+/* Define to the one symbol short name of this package. */
+#cmakedefine DEAL_II_PACKAGE_TARNAME "@DEAL_II_PACKAGE_TARNAME@"
+
+/* Define to the version of this package. */
+#cmakedefine DEAL_II_PACKAGE_VERSION "@DEAL_II_PACKAGE_VERSION@"
+
+/* Define to the full name and version of this package. */
+#cmakedefine DEAL_II_PACKAGE_STRING "@DEAL_II_PACKAGE_STRING@"
+
+/* Define to the address where bug reports for this package should be sent. */
+#cmakedefine DEAL_II_PACKAGE_BUGREPORT "@DEAL_II_PACKAGE_BUGREPORT@"
+
+/* Define to the home page for this package. */
+#cmakedefine DEAL_II_PACKAGE_URL "@DEAL_II_PACKAGE_URL@"
 
 
 

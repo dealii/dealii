@@ -2,6 +2,14 @@ PROJECT(deal.II)
 
 SET(VERSION "8.0.pre")
 
+SET(DEAL_II_PACKAGE_BUGREPORT "dealii@dealii.org")
+SET(DEAL_II_PACKAGE_NAME "deal.II")
+SET(DEAL_II_PACKAGE_TARNAME ${DEAL_II_PACKAGE_NAME})
+SET(DEAL_II_PACKAGE_VERSION ${VERSION})
+SET(DEAL_II_PACKAGE_STRING "${DEAL_II_PACKAGE_NAME} ${DEAL_II_PACKAGE_VERSION}")
+SET(DEAL_II_PACKAGE_URL "")
+
+
 
 
 #
@@ -18,6 +26,7 @@ SET(CMAKE_MODULE_PATH
   "${CMAKE_SOURCE_DIR}/contrib/cmake/macros/"
   "${CMAKE_SOURCE_DIR}/contrib/cmake/tests/"
   )
+
 
 
 
@@ -70,6 +79,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
 
 
 
+
 #
 # Now, configure and configure a lot of things:
 #
@@ -80,11 +90,13 @@ ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 
 
 
+
 #
 # Platform checks:
 #
 
 INCLUDE(check_for_cxx_features)
+
 
 
 
@@ -104,11 +116,13 @@ ENDIF()
 
 
 
+
 #
 # Build the toolchain:
 #
 
 ADD_SUBDIRECTORY(common/expand_instantiations)
+
 
 
 
