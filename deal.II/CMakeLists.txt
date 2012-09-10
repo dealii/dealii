@@ -12,20 +12,12 @@ SET(CMAKE_INCLUDE_CURRENT_DIR true)
 # General configuration options:
 #
 
-OPTION(DEAL_II_ALLOW_CONTRIB
-  "Allow the use of contrib libraries bundled with the source tarball.
-  Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
-  packages, so to ensure that only external libraries are used
-  DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
-  OFF"
-  ON)
-
 OPTION(DEAL_II_WITH_THREADS
   "Build deal.II with support for threads. This pulls in libtbb as a dependency."
   ON)
 
 OPTION(DEAL_II_FUNCTIONPARSER
-  "Build deal.II with support for functionparser"
+  "Build deal.II with support for functionparser."
   ON)
 
 OPTION(DEAL_II_MPI
@@ -42,6 +34,14 @@ OPTION(DEAL_II_WITH_METIS
 
 # TODO: The rest ;-)
 
+
+OPTION(DEAL_II_ALLOW_CONTRIB
+  "Allow the use of contrib libraries bundled with the source tarball.
+  Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
+  packages, so to ensure that only external libraries are used
+  DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
+  OFF"
+  ON)
 
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
