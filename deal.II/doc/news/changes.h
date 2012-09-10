@@ -50,6 +50,11 @@ never working correctly and it is not used.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: TableHandler TextOutputFormat::simple_table_with_separate_column_description
+that skips aligning the columns for increased performance.
+<br>
+(Timo Heister, 2012/09/10)
+
 <li> Fixed: The Clang C++ compiler had some trouble dealing with obtaining
 the return value of a Threads::Task object, due to a compiler bug in
 dealing with friend declarations. This is now fixed.
