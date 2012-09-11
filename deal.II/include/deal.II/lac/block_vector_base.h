@@ -280,12 +280,8 @@ namespace internal
                                       */
     template <class BlockVectorType, bool constness>
     class Iterator :
-#ifdef HAVE_STD_ITERATOR_CLASS
         public std::iterator<std::random_access_iterator_tag,
                              typename Types<BlockVectorType,constness>::value_type>
-#else
-    random_access_iterator<typename Types<BlockVectorType,constness>::value_type,int>
-#endif
     {
       private:
                                          /**
@@ -799,7 +795,7 @@ class BlockVectorBase : public Subscriptor
                                       */
     void compress (::dealii::VectorOperation::values operation
 		     =::dealii::VectorOperation::unknown);
-    
+
 
                                      /**
                                       * Access to a single block.

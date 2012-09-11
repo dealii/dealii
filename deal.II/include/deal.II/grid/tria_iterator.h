@@ -231,12 +231,7 @@ template <typename> class TriaActiveIterator;
  * @author documentation update Guido Kanschat, 2004
  */
 template <typename Accessor>
-class TriaRawIterator :
-#ifdef HAVE_STD_ITERATOR_CLASS
-               public std::iterator<std::bidirectional_iterator_tag,Accessor>
-#else
-               public bidirectional_iterator<Accessor,int>
-#endif
+class TriaRawIterator : public std::iterator<std::bidirectional_iterator_tag,Accessor>
 {
   public:
                                      /**
