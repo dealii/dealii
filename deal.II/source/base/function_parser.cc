@@ -16,7 +16,7 @@
 #include <deal.II/lac/vector.h>
 
 #ifdef HAVE_FUNCTIONPARSER
-#  include <functionparser/fparser.h>
+#  include <fparser.h>
 #else
 
 namespace fparser
