@@ -6877,31 +6877,6 @@ AC_DEFUN(DEAL_II_CHECK_BLAS_FRAMEWORK, dnl
 ])
 
 
-dnl --------------------------------------------------
-dnl Include the GSL library
-dnl --------------------------------------------------
-AC_DEFUN(DEAL_II_WITH_ZLIB, dnl
-[
-  if test "x$1" != "xyes" ; then
-    zlib=$1
-  else
-    zlib=z
-  fi
-
-  dnl See if we can find the function crc32 in libz.so
-  AC_CHECK_LIB($zlib, crc32,
-    [
-      dnl Yes, we can. Now also check whether we can do
-      dnl #include <zlib.h>
-      AC_CHECK_HEADER(zlib.h,
-        [
-          DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$zlib)
-          AC_DEFINE(HAVE_LIBZ,[],"")
-        ])
-    ])
-])
-
-
 
 
 dnl ------------------------------------------------------------

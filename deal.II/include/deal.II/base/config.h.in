@@ -147,6 +147,17 @@
 
 
 /*
+ * Configured in configure_umfpack.cmake:
+ */
+
+
+/* Defined if deal.II was configure with zlib support */
+#cmakedefine HAVE_LIBZ 1
+
+
+
+
+/*
  * Configured in check_for_cxx_features:
  */
 

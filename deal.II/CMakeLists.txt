@@ -57,7 +57,7 @@ OPTION(DEAL_II_WITH_FUNCTIONPARSER
 
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_MPI
   "Build deal.II with support for mpi."
@@ -73,6 +73,10 @@ OPTION(DEAL_II_WITH_THREADS
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK, BLAS and LAPACK."
+  ON)
+
+OPTION(DEAL_II_WITH_ZLIB
+  "Build deal.II with support for zlib."
   ON)
 
 
@@ -144,6 +148,10 @@ ENDIF()
 
 IF(DEAL_II_WITH_UMFPACK)
   INCLUDE(configure_umfpack)
+ENDIF()
+
+IF(DEAL_II_WITH_ZLIB)
+  INCLUDE(configure_zlib)
 ENDIF()
 
 

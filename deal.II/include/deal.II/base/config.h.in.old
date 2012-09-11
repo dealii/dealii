@@ -343,8 +343,6 @@
    libstdc++ interface. */
 #cmakedefine HAVE_LIBSTDCXX_DEMANGLER
 
-/* "" */
-#cmakedefine HAVE_LIBZ
 
 /* Define to 1 if you have the <memory.h> header file. */
 #cmakedefine HAVE_MEMORY_H
