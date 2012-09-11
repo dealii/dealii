@@ -5,19 +5,19 @@ SET(src
   data_out_stack.cc
   data_postprocessor.cc
   derivative_approximation.cc
+  dof_output_operator.cc
   error_estimator.cc
   fe_field_function.cc
   histogram.cc
-  matrices.cc
   matrix_free.cc
+  matrix_tools.cc
   mesh_worker.cc
   mesh_worker_info.cc
   mesh_worker_vector_selector.cc
-  dof_output_operator.cc
   point_value_history.cc
   solution_transfer.cc
   time_dependent.cc
-  vectors.cc
+  vector_tools.cc
   )
 
 SET(inst_in_files
@@ -27,17 +27,17 @@ SET(inst_in_files
   data_out_stack.inst.in
   data_postprocessor.inst.in
   derivative_approximation.inst.in
+  dof_output_operator.inst.in
   error_estimator.inst.in
   fe_field_function.inst.in
-  matrices.inst.in
   matrix_free.inst.in
+  matrix_tools.inst.in
   mesh_worker_info.inst.in
   mesh_worker_vector_selector.inst.in
-  dof_output_operator.inst.in
   point_value_history.inst.in
   solution_transfer.inst.in
   time_dependent.inst.in
-  vectors.inst.in
+  vector_tools.inst.in
   )
 
 ADD_LIBRARY(obj_numerics OBJECT ${src})
