@@ -60,7 +60,7 @@ OPTION(DEAL_II_WITH_METIS
   OFF)
 
 OPTION(DEAL_II_WITH_MPI
-  "Build deal.II with support for openmpi."
+  "Build deal.II with support for mpi."
   ON)
 
 OPTION(DEAL_II_WITH_NETCDF

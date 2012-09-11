@@ -61,9 +61,6 @@
    member functions. */
 #cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG
 
-/* disable the function parser in contrib */
-#cmakedefine DEAL_II_DISABLE_PARSER
-
 /* Defined if the compiler does not honor the explicit keyword on template
    constructors. */
 #cmakedefine DEAL_II_EXPLICIT_CONSTRUCTOR_BUG

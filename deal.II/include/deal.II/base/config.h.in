@@ -64,6 +64,16 @@
 
 
 /*
+ * Configured in configure_functionparser.cmake:
+ */
+
+/* Defined to 1 if you have the `functionparser' library */
+#cmakedefine HAVE_FUNCTIONPARSER 1
+
+
+
+
+/*
  * Configured in configure_mpi.cmake:
  */
 

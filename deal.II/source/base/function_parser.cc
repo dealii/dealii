@@ -15,7 +15,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 
-#ifndef DEAL_II_DISABLE_PARSER
+#ifdef HAVE_FUNCTIONPARSER
 #  include <functionparser/fparser.h>
 #else
 
@@ -50,7 +50,7 @@ FunctionParser<dim>::~FunctionParser()
 }
 
 
-#ifndef DEAL_II_DISABLE_PARSER
+#ifdef HAVE_FUNCTIONPARSER
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string                   &variables,
                       const std::vector<std::string>      &expressions,
