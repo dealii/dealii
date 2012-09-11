@@ -2,9 +2,9 @@ Next steps:
 
 * Add compiler dependend configuration
 
-* Add Bugs, Regressions and Feature tests.
-
 * Add the CFLAGS and CXXFLAGS magic. (With an option to overwrite for distribution packaging.)
+
+* Add Bugs, Regressions and Feature tests.
 
 * PETSC
 
