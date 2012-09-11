@@ -15,10 +15,12 @@ SET(CMAKE_INCLUDE_CURRENT_DIR true)
 
 SET(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/check/"
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/configure/"
   "${CMAKE_SOURCE_DIR}/contrib/cmake/macros/"
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/tests/"
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
   )
+
 
 
 
@@ -38,34 +40,42 @@ SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
 
 
 
+#TODO:
+SET(CMAKE_CXX_FLAGS "-std=c++0x -Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
+SET(CMAKE_C_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
+
+
+
 
 #
 # General configuration options:
 #
 
-#TODO:
-SET(CMAKE_CXX_FLAGS "-std=c++0x -Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
-SET(CMAKE_C_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
-
-OPTION(DEAL_II_WITH_THREADS
-  "Build deal.II with support for threads. This pulls in libtbb as a dependency."
-  ON)
-
-OPTION(DEAL_II_FUNCTIONPARSER
+OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
-  ON)
-
-OPTION(DEAL_II_MPI
-  "Build deal.II with support for openmpi."
-  OFF)
-
-OPTION(DEAL_II_WITH_UMFPACK
-  "Build deal.II with support for UMFPACK, BLAS and LAPACK."
   ON)
 
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
   OFF)
+
+OPTION(DEAL_II_WITH_MPI
+  "Build deal.II with support for openmpi."
+  ON)
+
+OPTION(DEAL_II_WITH_NETCDF
+  "Build deal.II with support for netcdf."
+  ON)
+
+OPTION(DEAL_II_WITH_THREADS
+  "Build deal.II with support for threads. This pulls in libtbb as a dependency."
+  ON)
+
+OPTION(DEAL_II_WITH_UMFPACK
+  "Build deal.II with support for UMFPACK, BLAS and LAPACK."
+  ON)
+
+
 
 OPTION(DEAL_II_ALLOW_CONTRIB
   "Allow the use of contrib libraries bundled with the source tarball.
@@ -74,6 +84,10 @@ OPTION(DEAL_II_ALLOW_CONTRIB
   DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
   OFF"
   ON)
+
+OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
+  "Always use the bundled functionparser library instead of an external one."
+  OFF)
 
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
@@ -98,10 +112,10 @@ OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
 # library can be compiled:
 ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 
-# used to keep track of external libraries and necessary linker flags
+# used to keep track of external libraries and necessary link flags
 SET(deal_ii_external_libraries "")
 SET(deal_ii_external_debug_libraries "")
-SET(deal_ii_required_linker_flags "")
+SET(deal_ii_required_link_flags "")
 
 
 
@@ -112,6 +126,18 @@ SET(deal_ii_required_linker_flags "")
 
 INCLUDE(configure_boost)
 
+IF(DEAL_II_WITH_FUNCTIONPARSER)
+  INCLUDE(configure_functionparser)
+ENDIF()
+
+IF(DEAL_II_WITH_MPI)
+  INCLUDE(configure_mpi)
+ENDIF()
+
+IF(DEAL_II_WITH_NETCDF)
+  INCLUDE(configure_netcdf)
+ENDIF()
+
 IF(DEAL_II_WITH_THREADS)
   INCLUDE(configure_threads)
 ENDIF()
@@ -119,6 +145,7 @@ ENDIF()
 IF(DEAL_II_WITH_UMFPACK)
   INCLUDE(configure_umfpack)
 ENDIF()
+
 
 
 

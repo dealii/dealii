@@ -1,0 +1,23 @@
+# Try to find Netcdf
+
+INCLUDE(FindPackageHandleStandardArgs)
+
+FIND_PATH(Netcdf_INCLUDE_DIR netcdf.hh
+  HINTS
+  $ENV{NETCDF_INCLUDE_DIR}
+  ${NETCDF_INCLUDE_DIR}
+)
+
+FIND_LIBRARY(Netcdf_LIBRARY
+  NAMES libnetcdf_c++.so libnetcdf_cpp.so
+  PATHS
+  $ENV{NETCDF_LIBRARY_DIR}
+  PATH_SUFFIXES lib64 lib
+)
+
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(Netcdf DEFAULT_MSG Netcdf_LIBRARY Netcdf_INCLUDE_DIR)
+
+MARK_AS_ADVANCED(
+  Netcdf_LIBRARY
+  Netcdf_INCLUDE_DIR
+)

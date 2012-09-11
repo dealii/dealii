@@ -2,7 +2,7 @@ INCLUDE(CheckCXXSourceCompiles)
 
 FIND_PACKAGE(Threads REQUIRED)
 
-LIST(APPEND deal_ii_required_flags ${CMAKE_THREAD_LIBS_INIT})
+LIST(APPEND deal_ii_required_link_flags ${CMAKE_THREAD_LIBS_INIT})
 
 IF(DEAL_II_ALLOW_CONTRIB)
   FIND_PACKAGE(TBB)

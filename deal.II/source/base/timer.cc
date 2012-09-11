@@ -168,7 +168,7 @@ double Timer::stop ()
       double time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
                               - start_wall_time;
 #endif
-#ifdef DEAL_II_COMPILER_USE_MPI
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       if (sync_wall_time && Utilities::System::job_supports_mpi())
         {
           this->mpi_data

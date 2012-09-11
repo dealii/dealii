@@ -58,7 +58,29 @@
 
 
 /* Defined if deal.II is configured with an external Boost library */
-#cmakedefine DEAL_II_USE_EXTERNAL_BOOST
+#cmakedefine DEAL_II_USE_EXTERNAL_BOOST 1
+
+
+
+
+/*
+ * Configured in configure_mpi.cmake:
+ */
+
+
+/* Defined if the compiler supports mpi */
+#cmakedefine DEAL_II_COMPILER_SUPPORTS_MPI 1
+
+
+
+
+/*
+ * Configured in configure_netcdf.cmake:
+ */
+
+
+/* Defined to 1 if you have the `NetCDF' library */
+#cmakedefine HAVE_LIBNETCDF 1
 
 
 

@@ -49,9 +49,6 @@
    */
 #cmakedefine DEAL_II_COMPAT_MAPPING
 
-/* Defined if the compiler supports including <mpi.h> */
-#cmakedefine DEAL_II_COMPILER_SUPPORTS_MPI
-
 /* Defined if the compiler can use arithmetic operations on vectorized data
    types */
 #cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -344,9 +341,6 @@
 
 /* Define to 1 if you have the `jn' function. */
 #cmakedefine HAVE_JN
-
-/* Define to 1 if you have the `NetCDF' library (-lnetcdf). */
-#cmakedefine HAVE_LIBNETCDF
 
 /* Define if the std c++ library provides a demangler conforming to the GCC
    libstdc++ interface. */

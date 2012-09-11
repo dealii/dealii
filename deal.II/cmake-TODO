@@ -6,12 +6,14 @@ Next steps:
 
 * Add the CFLAGS and CXXFLAGS magic. (With an option to overwrite for distribution packaging.)
 
-* MPI
-
 * PETSC
 
 * TRILINOS
 
 * P4EST
 
-* ...
+* MUMPS
+
+* ARPACK
+
+* METIS
