@@ -17,9 +17,6 @@ ENDIF()
 
 
 IF(DEAL_II_FORCE_CONTRIB_UMFPACK OR NOT UmfpackAMD_FOUND)
-  #
-  # Add umfpack and amd directly to the object files of deal.II
-  #
 
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/umfpack/UMFPACK/Include
@@ -29,12 +26,16 @@ IF(DEAL_II_FORCE_CONTRIB_UMFPACK OR NOT UmfpackAMD_FOUND)
   ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/umfpack/UMFPACK/Source)
   ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/umfpack/AMD/Source)
 
+  #
+  # Add umfpack and amd directly to the object files of deal.II
+  #
   LIST(APPEND deal_ii_additional_object_files
     ${obj_umfpack_object_files}
     $<TARGET_OBJECTS:obj_amd_int>
     $<TARGET_OBJECTS:obj_amd_long>
     $<TARGET_OBJECTS:obj_amd_global>
     )
+
 ELSE()
 
   INCLUDE_DIRECTORIES(${Umfpack_INCLUDE_DIR} ${AMD_INCLUDE_DIR})

@@ -44,8 +44,8 @@ SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
 #
 
 #TODO:
-SET(CMAKE_CXX_FLAGS "-std=c++0x -Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native") #TODO: c++0x Features umschalten
-SET(CMAKE_C_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native") #TODO: c++0x Features umschalten
+SET(CMAKE_CXX_FLAGS "-std=c++0x -Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
+SET(CMAKE_C_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
 
 OPTION(DEAL_II_WITH_THREADS
   "Build deal.II with support for threads. This pulls in libtbb as a dependency."
@@ -98,16 +98,10 @@ OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
 # library can be compiled:
 ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 
-
-
-
-#
-# Platform checks:
-#
-
-INCLUDE(check_for_cxx_features)
-
-INCLUDE(check_for_compiler_bugs)
+# used to keep track of external libraries and necessary linker flags
+SET(deal_ii_external_libraries "")
+SET(deal_ii_external_debug_libraries "")
+SET(deal_ii_required_linker_flags "")
 
 
 
@@ -130,6 +124,17 @@ ENDIF()
 
 
 #
+# Platform checks:
+#
+
+INCLUDE(check_for_cxx_features)
+
+INCLUDE(check_for_compiler_bugs)
+
+
+
+
+#
 # Build the toolchain:
 #
 
@@ -144,7 +149,7 @@ ADD_SUBDIRECTORY(common/expand_instantiations)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/include/
-  ${CMAKE_SOURCE_DIR}/contrib/ #TODO
+  # ${CMAKE_SOURCE_DIR}/contrib/ #TODO
   ${CMAKE_BINARY_DIR}/include/
   )
 
@@ -153,3 +158,4 @@ INCLUDE(macro_expand_instantiations)
 ADD_SUBDIRECTORY(include)
 
 ADD_SUBDIRECTORY(source)
+

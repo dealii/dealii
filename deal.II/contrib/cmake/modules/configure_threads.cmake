@@ -2,8 +2,7 @@ INCLUDE(CheckCXXSourceCompiles)
 
 FIND_PACKAGE(Threads REQUIRED)
 
-# TODO: Necessary linker flags for threads? Or are they set automatically
-# by the package?
+LIST(APPEND deal_ii_required_flags ${CMAKE_THREAD_LIBS_INIT})
 
 IF(DEAL_II_ALLOW_CONTRIB)
   FIND_PACKAGE(TBB)
@@ -38,12 +37,12 @@ LIST(APPEND deal_ii_external_debug_libraries
 
 SET(DEAL_II_USE_MT TRUE)
 
-
 IF(CMAKE_USE_PTHREADS_INIT)
   SET(DEAL_II_USE_MT_POSIX TRUE)
 
   # Check whether posix thread barriers are available:
 
+  SET(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
   CHECK_CXX_SOURCE_COMPILES(
   "
   #include <pthread.h>
@@ -57,6 +56,8 @@ IF(CMAKE_USE_PTHREADS_INIT)
   }
   "
   DEAL_II_HAVE_MT_POSIX_BARRIERS)
+
+  SET(CMAKE_REQUIRED_FLAGS "")
 
   IF(NOT DEAL_II_HAVE_MT_POSIX_BARRIERS)
     SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
