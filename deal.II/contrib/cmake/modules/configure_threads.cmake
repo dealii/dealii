@@ -44,5 +44,23 @@ IF(CMAKE_USE_PTHREADS_INIT)
 
   # Check whether posix thread barriers are available:
 
+  CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <pthread.h>
+  int main()
+  {
+    pthread_barrier_t pb;
+    pthread_barrier_init (&pb, 0, 1);
+    pthread_barrier_wait (&pb);
+    pthread_barrier_destroy (&pb);
+    return 0;
+  }
+  "
+  DEAL_II_HAVE_MT_POSIX_BARRIERS)
+
+  IF(NOT DEAL_II_HAVE_MT_POSIX_BARRIERS)
+    SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
+  ENDIF()
+
 ENDIF()
 

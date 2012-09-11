@@ -81,7 +81,7 @@
  * Barriers will then not work in the library, but the other threading
  * functionality is available.
  */
-#cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS
+#cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS 1
 
 /**
  * Depending on the use of threads, we will have to make some variables

@@ -193,11 +193,6 @@
 /* Defined if a Metis installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_METIS
 
-/* Defined if POSIX is supported but not the newer POSIX barrier functions.
-   Barriers will then not work in the library, but the other threading
-   functionality is available. */
-#cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS
-
 /* Defined if a MUMPS installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_MUMPS
 
