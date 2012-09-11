@@ -21,7 +21,7 @@
 #include <deal.II/base/std_cxx1x/shared_ptr.h>
 #include <deal.II/base/std_cxx1x/bind.h>
 
-#if (DEAL_II_USE_MT == 1)
+#if DEAL_II_USE_MT
 #  include <deal.II/base/std_cxx1x/thread.h>
 #  include <deal.II/base/std_cxx1x/mutex.h>
 #  include <deal.II/base/std_cxx1x/condition_variable.h>
@@ -33,7 +33,7 @@
 #include <utility>
 
 
-#if DEAL_II_USE_MT == 1
+#if DEAL_II_USE_MT
 #  if defined(DEAL_II_USE_MT_POSIX)
 #    include <pthread.h>
 #  endif
@@ -273,7 +273,7 @@ namespace Threads
   };
 
 
-#if DEAL_II_USE_MT == 1
+#if DEAL_II_USE_MT
 
                                    /**
                                     * Class implementing a
@@ -1229,7 +1229,7 @@ namespace Threads
 
   namespace internal
   {
-#if (DEAL_II_USE_MT == 1)
+#if DEAL_II_USE_MT
 
                                      /**
                                       * A class that represents threads. For
@@ -3735,7 +3735,7 @@ namespace Threads
 
   namespace internal
   {
-#if (DEAL_II_USE_MT == 1)
+#if DEAL_II_USE_MT
 
     template <typename> struct TaskDescriptor;
 

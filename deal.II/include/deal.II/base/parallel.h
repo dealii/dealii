@@ -24,7 +24,7 @@
 
 #include <cstddef>
 
-#if DEAL_II_USE_MT == 1
+#if DEAL_II_USE_MT
 #  include <tbb/parallel_for.h>
 #  include <tbb/parallel_reduce.h>
 #  include <tbb/partitioner.h>
@@ -176,7 +176,7 @@ namespace parallel
                   Predicate           &predicate,
                   const unsigned int   grainsize)
   {
-#if DEAL_II_USE_MT == 0
+#ifndef DEAL_II_USE_MT
                                      // make sure we don't get compiler
                                      // warnings about unused arguments
     (void) grainsize;
@@ -244,7 +244,7 @@ namespace parallel
                   Predicate            &predicate,
                   const unsigned int    grainsize)
   {
-#if DEAL_II_USE_MT == 0
+#ifndef DEAL_II_USE_MT
                                      // make sure we don't get compiler
                                      // warnings about unused arguments
     (void) grainsize;
@@ -314,7 +314,7 @@ namespace parallel
                   Predicate            &predicate,
                   const unsigned int    grainsize)
   {
-#if DEAL_II_USE_MT == 0
+#ifndef DEAL_II_USE_MT
                                      // make sure we don't get compiler
                                      // warnings about unused arguments
     (void) grainsize;
@@ -340,7 +340,7 @@ namespace parallel
 
   namespace internal
   {
-#if DEAL_II_USE_MT == 1
+#if DEAL_II_USE_MT
                                      /**
                                       * Take a range argument and call the
                                       * given function with its begin and end.
@@ -461,7 +461,7 @@ namespace parallel
                            const Function                           &f,
                            const unsigned int                        grainsize)
   {
-#if DEAL_II_USE_MT == 0
+#ifndef DEAL_II_USE_MT
                                      // make sure we don't get compiler
                                      // warnings about unused arguments
     (void) grainsize;
@@ -546,7 +546,7 @@ namespace parallel
 
   namespace internal
   {
-#if DEAL_II_USE_MT == 1
+#if DEAL_II_USE_MT
                                      /**
                                       * A class that conforms to the Body
                                       * requirements of the TBB
@@ -741,7 +741,7 @@ namespace parallel
                                         const typename identity<RangeType>::type &end,
                                         const unsigned int grainsize)
   {
-#if DEAL_II_USE_MT == 0
+#ifndef DEAL_II_USE_MT
                                      // make sure we don't get compiler
                                      // warnings about unused arguments
     (void) grainsize;
@@ -813,7 +813,7 @@ namespace internal
 namespace parallel
 {
 
-#if DEAL_II_USE_MT == 1
+#if DEAL_II_USE_MT
 
   namespace internal
   {

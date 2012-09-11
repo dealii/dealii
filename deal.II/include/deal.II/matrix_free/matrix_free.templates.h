@@ -139,7 +139,7 @@ internal_reinit(const Mapping<dim>                         &mapping,
                                 // initialize the basic multithreading
                                 // information that needs to be passed to the
                                 // DoFInfo structure
-#if DEAL_II_USE_MT == 1
+#if DEAL_II_USE_MT
       if (additional_data.tasks_parallel_scheme != AdditionalData::none)
         {
           task_info.use_multithreading = true;
@@ -242,7 +242,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
                                 // initialize the basic multithreading
                                 // information that needs to be passed to the
                                 // DoFInfo structure
-#if DEAL_II_USE_MT == 1
+#if DEAL_II_USE_MT
       if (additional_data.tasks_parallel_scheme != AdditionalData::none)
         {
           task_info.use_multithreading = true;

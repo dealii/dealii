@@ -58,7 +58,7 @@
 
 
 /* Defined if deal.II is configured with an external Boost library */
-#cmakedefine DEAL_II_USE_EXTERNAL_BOOST 1
+#cmakedefine DEAL_II_USE_EXTERNAL_BOOST
 
 
 
@@ -67,8 +67,8 @@
  * Configured in configure_functionparser.cmake:
  */
 
-/* Defined to 1 if you have the `functionparser' library */
-#cmakedefine HAVE_FUNCTIONPARSER 1
+/* Defined if you have the `functionparser' library */
+#cmakedefine HAVE_FUNCTIONPARSER
 
 
 
@@ -79,7 +79,7 @@
 
 
 /* Defined if the compiler supports mpi */
-#cmakedefine DEAL_II_COMPILER_SUPPORTS_MPI 1
+#cmakedefine DEAL_II_COMPILER_SUPPORTS_MPI
 
 
 
@@ -89,8 +89,8 @@
  */
 
 
-/* Defined to 1 if you have the `NetCDF' library */
-#cmakedefine HAVE_LIBNETCDF 1
+/* Defined if you have the `NetCDF' library */
+#cmakedefine HAVE_LIBNETCDF
 
 
 
@@ -103,7 +103,7 @@
 /* Flag indicating whether the library shall be compiled for multithreaded
  * applications. If so, then it is set to one, otherwise to zero.
  */
-#cmakedefine DEAL_II_USE_MT 1
+#cmakedefine DEAL_II_USE_MT
 
 /* Defined if multi-threading is to be achieved by using the POSIX functions
  */
@@ -113,14 +113,14 @@
  * Barriers will then not work in the library, but the other threading
  * functionality is available.
  */
-#cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS 1
+#cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS
 
 /**
  * Depending on the use of threads, we will have to make some variables
  * volatile. We do this here in a very old-fashioned C-style, but still
  * convenient way.
  */
-#if DEAL_II_USE_MT != 0
+#if DEAL_II_USE_MT
 #  define DEAL_VOLATILE volatile
 #else
 #  define DEAL_VOLATILE
@@ -152,7 +152,7 @@
 
 
 /* Defined if deal.II was configure with zlib support */
-#cmakedefine HAVE_LIBZ 1
+#cmakedefine HAVE_LIBZ
 
 
 
@@ -162,53 +162,41 @@
  */
 
 
-/* Defined if the compiler's library in use provides a std::iterator class
-   (early gcc versions did not) */
-#cmakedefine HAVE_STD_ITERATOR_CLASS 1
-
-/* Defined if the compiler's library in use provides std::i/ostringstream
-   classes (early gcc versions did not) */
-#cmakedefine HAVE_STD_STRINGSTREAM 1
-
-/* Defined if the compiler's library in use provides std::numeric_limits
-   classes in the appropriate header file */
-#cmakedefine HAVE_STD_NUMERIC_LIMITS 1
-
 /* Defined if vector iterators are just plain pointers */
-#cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER 1
+#cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER
 
 /* Defined if the compiler provides an <ostream> header file */
-#cmakedefine HAVE_STD_OSTREAM_HEADER 1
+#cmakedefine HAVE_STD_OSTREAM_HEADER
 
 /* Defined if the compiler provides an <iosfwd> header file */
-#cmakedefine HAVE_STD_IOSFWD_HEADER 1
+#cmakedefine HAVE_STD_IOSFWD_HEADER
 
-/* Defined to 1 if you have the <stdint.h> header file. */
-#cmakedefine HAVE_STDINT_H 1
+/* Defined if you have the <stdint.h> header file. */
+#cmakedefine HAVE_STDINT_H
 
-/* Defined to 1 if you have the <stdlib.h> header file. */
-#cmakedefine HAVE_STDLIB_H 1
+/* Defined if you have the <stdlib.h> header file. */
+#cmakedefine HAVE_STDLIB_H
 
-/* Defined to 1 if you have the <strings.h> header file. */
-#cmakedefine HAVE_STRINGS_H 1
+/* Defined if you have the <strings.h> header file. */
+#cmakedefine HAVE_STRINGS_H
 
-/* Defined to 1 if you have the <string.h> header file. */
-#cmakedefine HAVE_STRING_H 1
+/* Defined if you have the <string.h> header file. */
+#cmakedefine HAVE_STRING_H
 
-/* Defined to 1 if you have the <sys/stat.h> header file. */
-#cmakedefine HAVE_SYS_STAT_H 1
+/* Defined if you have the <sys/stat.h> header file. */
+#cmakedefine HAVE_SYS_STAT_H
 
-/* Defined to 1 if you have the <sys/syscall.h> header file. */
-#cmakedefine HAVE_SYS_SYSCALL_H 1
+/* Defined if you have the <sys/syscall.h> header file. */
+#cmakedefine HAVE_SYS_SYSCALL_H
 
-/* Defined to 1 if you have the <sys/times.h> header file. */
-#cmakedefine HAVE_SYS_TIMES_H 1
+/* Defined if you have the <sys/times.h> header file. */
+#cmakedefine HAVE_SYS_TIMES_H
 
-/* Defined to 1 if you have the <sys/types.h> header file. */
-#cmakedefine HAVE_SYS_TYPES_H 1
+/* Defined if you have the <sys/types.h> header file. */
+#cmakedefine HAVE_SYS_TYPES_H
 
-/* Defined to 1 if you have the `strtrs_' function. */
-#cmakedefine HAVE_STRTRS_ 1
+/* Defined if you have the `strtrs_' function. */
+#cmakedefine HAVE_STRTRS_ /* TODO */
 
 
 

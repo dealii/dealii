@@ -164,7 +164,7 @@ namespace Threads
 
 
 
-#if DEAL_II_USE_MT != 1
+#ifndef DEAL_II_USE_MT
   DummyBarrier::DummyBarrier (const unsigned int  count,
                               const char         *,
                               void               *)

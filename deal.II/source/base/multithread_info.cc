@@ -36,7 +36,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#if DEAL_II_USE_MT == 1
+#if DEAL_II_USE_MT
 
 /* Detecting how many processors a given machine has is something that
    varies greatly between operating systems. For a few operating

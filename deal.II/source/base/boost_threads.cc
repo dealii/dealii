@@ -13,7 +13,7 @@
 
 #include <deal.II/base/config.h>
 
-#if (DEAL_II_USE_MT == 1) && !defined(DEAL_II_CAN_USE_CXX1X) && !defined(DEAL_II_USE_EXTERNAL_BOOST)
+#if DEAL_II_USE_MT && !defined(DEAL_II_CAN_USE_CXX1X) && !defined(DEAL_II_USE_EXTERNAL_BOOST)
 
 // if the C++ compiler doesn't completely support the C++1x standard (and
 // consequently we can't use std::thread, std::mutex, etc), then include all

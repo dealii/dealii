@@ -33,7 +33,7 @@
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/mapping_info.h>
 
-#if DEAL_II_USE_MT==1
+#if DEAL_II_USE_MT
 #include <tbb/task.h>
 #include <tbb/task_scheduler_init.h>
 #include <tbb/parallel_for.h>
@@ -2101,7 +2101,7 @@ namespace internal
   }
 
 
-#if DEAL_II_USE_MT==1
+#if DEAL_II_USE_MT
 
   // This defines the TBB data structures that
   // are needed to schedule the
@@ -2353,7 +2353,7 @@ namespace internal
     VectorStruct &dst;
   };
 
-#endif // #if DEAL_II_USE_MT==1
+#endif // #if DEAL_II_USE_MT
 
 } // end of namespace internal
 
@@ -2372,7 +2372,7 @@ MatrixFree<dim, Number>::cell_loop
  OutVector       &dst,
  const InVector  &src) const
 {
-#if DEAL_II_USE_MT==1
+#if DEAL_II_USE_MT
 
                                 // Use multithreading if so requested and if
                                 // there is enough work to do in parallel (the
