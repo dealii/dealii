@@ -29,7 +29,7 @@
 #include <deal.II/grid/geometry_info.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -2981,7 +2981,7 @@ namespace MatrixTools
           {
                                              // remove this row, except for the
                                              // diagonal element
-            for (unsigned j=0; j<n_local_dofs; ++j)
+            for (unsigned int j=0; j<n_local_dofs; ++j)
               if (i != j)
                 local_matrix(i,j) = 0;
 
@@ -3043,7 +3043,7 @@ namespace MatrixTools
 
 
 // explicit instantiations
-#include "matrices.inst"
+#include "matrix_tools.inst"
 
 namespace MatrixTools
 {

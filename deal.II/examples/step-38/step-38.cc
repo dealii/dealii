@@ -36,8 +36,8 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 #include <fstream>
 #include <iostream>
@@ -381,7 +381,7 @@ namespace Step38
       Triangulation<spacedim> volume_mesh;
       GridGenerator::half_hyper_ball(volume_mesh);
 
-      std::set<types::boundary_id_t> boundary_ids;
+      std::set<types::boundary_id> boundary_ids;
       boundary_ids.insert (0);
 
       GridTools::extract_boundary_mesh (volume_mesh, triangulation,

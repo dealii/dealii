@@ -238,6 +238,27 @@ void ConstraintMatrix::close ()
                                          &check_zero_weight),
                          line->entries.end());
 
+
+
+#ifdef DEBUG
+  // In debug mode we are computing an estimate for the maximum number
+  // of constraints so that we can bail out if there is a cycle in the
+  // constraints (which is easier than searching for cycles in the graph).
+  //
+  // Let us figure out the largest dof index. This is an upper bound for the
+  // number of constraints because it is an approximation for the number of dofs
+  // in our system.
+  unsigned int largest_idx = 0;
+  for (std::vector<ConstraintLine>::iterator line = lines.begin();
+             line!=lines.end(); ++line)
+    {
+      for (ConstraintLine::Entries::iterator it = line->entries.begin();it!=line->entries.end();++it)
+        {
+          largest_idx=std::max(largest_idx, it->first);
+        }
+    }
+#endif
+
                                    // replace references to dofs that
                                    // are themselves constrained. note
                                    // that because we may replace
@@ -271,6 +292,14 @@ void ConstraintMatrix::close ()
       for (std::vector<ConstraintLine>::iterator line = lines.begin();
            line!=lines.end(); ++line)
         {
+#ifdef DEBUG
+          // we need to keep track of how many replacements we do in this line, because we can
+          // end up in a cycle A->B->C->A without the number of entries growing.
+          unsigned int n_replacements = 0;
+#endif
+
+
+
                                            // loop over all entries of
                                            // this line (including
                                            // ones that we have
@@ -351,6 +380,15 @@ void ConstraintMatrix::close ()
                         .push_back (std::make_pair (constrained_line->entries[i].first,
                                                     constrained_line->entries[i].second *
                                                     weight));
+
+#ifdef DEBUG
+                    // keep track of how many entries we replace in this line. If we do more than
+                    // there are constraints or dofs in our system, we must have a cycle.
+                    ++n_replacements;
+                    Assert(n_replacements/2<largest_idx, ExcMessage("Cycle in constraints detected!"));
+                    if (n_replacements/2>=largest_idx)
+                      return; // this enables us to test for this Exception.
+#endif
                   }
                 else
                                                    // the DoF that we
@@ -1922,7 +1960,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
                                    // constraints, so we need to explicitly
                                    // state, that the others are doing an
                                    // insert here:
-  vec.compress (Insert);
+  vec.compress (::dealii::VectorOperation::insert);
 }
 
 
@@ -2016,7 +2054,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
                           it->entries[i].second);
           vec(it->line) = new_value;
         }
-      vec.block(block).compress(Insert);
+      vec.block(block).compress(::dealii::VectorOperation::insert);
     }
 }
 

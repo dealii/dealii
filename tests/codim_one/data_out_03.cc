@@ -31,7 +31,7 @@
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/fe/mapping_q.h>
 
 std::ofstream logfile("data_out_03/output");
@@ -88,7 +88,7 @@ int main ()
   tria.set_boundary (1, surface_description);
   tria.set_boundary (0, surface_description);
 
-  std::set<types::boundary_id_t> boundary_ids;
+  std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
 
   GridTools::extract_boundary_mesh (volume_mesh, tria,

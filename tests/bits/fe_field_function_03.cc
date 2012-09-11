@@ -26,7 +26,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 template <int dim>
 void test() {

@@ -543,7 +543,7 @@ namespace PETScWrappers
       for (unsigned int i=0; i<v.size(); ++i)
         (*this)(i) = v(i);
 
-      compress ();
+      compress (::dealii::VectorOperation::insert);
 
       return *this;
     }

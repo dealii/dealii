@@ -57,6 +57,7 @@ namespace TrilinosWrappers
                         :
                         last_action (Zero),
                         compressed  (true),
+                        has_ghosts  (false),
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
                         vector(new Epetra_FEVector(
                                  Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF))))
@@ -73,6 +74,7 @@ namespace TrilinosWrappers
                         Subscriptor(),
                         last_action (Zero),
                         compressed (true),
+                        has_ghosts  (v.has_ghosts),
                         vector(new Epetra_FEVector(*v.vector))
   {}
 
@@ -95,6 +97,7 @@ namespace TrilinosWrappers
     Epetra_Map map (0, 0, Epetra_SerialComm());
 #endif
 
+    has_ghosts = false;
     vector.reset (new Epetra_FEVector(map));
     last_action = Zero;
   }
@@ -111,6 +114,7 @@ namespace TrilinosWrappers
       {
         last_action = Zero;
         vector.reset (new Epetra_FEVector(*v.vector));
+        has_ghosts = v.has_ghosts;
       }
     else
       {

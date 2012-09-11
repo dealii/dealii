@@ -247,20 +247,6 @@ namespace TrilinosWrappers
                    const double                               drop_tolerance=1e-13);
 
                                        /**
-                                        * This function calls the compress()
-                                        * command of all matrices after
-                                        * the assembly is
-                                        * completed. Note that all MPI
-                                        * processes need to call this
-                                        * command (whereas the individual
-                                        * assembly routines will most probably
-                                        * only be called on each processor
-                                        * individually) before any
-                                        * can complete it.
-                                        */
-      void compress ();
-
-                                       /**
                                         * Returns the state of the
                                         * matrix, i.e., whether
                                         * compress() needs to be called

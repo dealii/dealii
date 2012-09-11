@@ -39,8 +39,8 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
 #include <fstream>

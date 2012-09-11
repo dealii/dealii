@@ -22,10 +22,11 @@
 
 int main ()
 {
-  std::ofstream logfile("tensor_05/output");
-  deallog << std::setprecision(3);
+  std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog << std::setprecision(3);
   deallog.threshold_double(1.e-10);
 
   double a[3][3] = {{1, 2, 3}, {3, 4, 5}, {6, 7, 8}};

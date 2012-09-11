@@ -1273,7 +1273,7 @@ bool CellAccessor<dim, spacedim>::at_boundary () const
 
 
 template <int dim, int spacedim>
-types::material_id_t CellAccessor<dim, spacedim>::material_id () const
+types::material_id CellAccessor<dim, spacedim>::material_id () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->cells.boundary_or_material_id[this->present_index].material_id;
@@ -1282,17 +1282,17 @@ types::material_id_t CellAccessor<dim, spacedim>::material_id () const
 
 
 template <int dim, int spacedim>
-void CellAccessor<dim, spacedim>::set_material_id (const types::material_id_t mat_id) const
+void CellAccessor<dim, spacedim>::set_material_id (const types::material_id mat_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert ( mat_id < types::invalid_material_id, ExcIndexRange(mat_id,0,types::invalid_material_id));
+  Assert ( mat_id < numbers::invalid_material_id, ExcIndexRange(mat_id,0,numbers::invalid_material_id));
   this->tria->levels[this->present_level]->cells.boundary_or_material_id[this->present_index].material_id = mat_id;
 }
 
 
 
 template <int dim, int spacedim>
-void CellAccessor<dim, spacedim>::recursively_set_material_id (const types::material_id_t mat_id) const
+void CellAccessor<dim, spacedim>::recursively_set_material_id (const types::material_id mat_id) const
 {
   set_material_id (mat_id);
 
@@ -1304,7 +1304,7 @@ void CellAccessor<dim, spacedim>::recursively_set_material_id (const types::mate
 
 
 template <int dim, int spacedim>
-types::subdomain_id_t CellAccessor<dim, spacedim>::subdomain_id () const
+types::subdomain_id CellAccessor<dim, spacedim>::subdomain_id () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->subdomain_ids[this->present_index];
@@ -1314,7 +1314,7 @@ types::subdomain_id_t CellAccessor<dim, spacedim>::subdomain_id () const
 
 template <int dim, int spacedim>
 void
-CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const
+CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id new_subdomain_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->tria->levels[this->present_level]->subdomain_ids[this->present_index]
@@ -1366,7 +1366,7 @@ CellAccessor<dim, spacedim>::parent () const
 template <int dim, int spacedim>
 void
 CellAccessor<dim, spacedim>::
-recursively_set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const
+recursively_set_subdomain_id (const types::subdomain_id new_subdomain_id) const
 {
   set_subdomain_id (new_subdomain_id);
 

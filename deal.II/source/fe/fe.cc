@@ -130,6 +130,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
                                    // assume that all entries were
                                    // supposed to be equal.
 
+//TODO: Do the following in a better way by expanding these arrays in the member initializer section above
                                    // Normally, we should be careful
                                    // with const_cast, but since this
                                    // is the constructor and we do it
@@ -756,7 +757,7 @@ FiniteElement<dim,spacedim>::has_generalized_support_points () const
 
 template <int dim, int spacedim>
 Point<dim>
-FiniteElement<dim,spacedim>::unit_support_point (const unsigned index) const
+FiniteElement<dim,spacedim>::unit_support_point (const unsigned int index) const
 {
   Assert (index < this->dofs_per_cell,
           ExcIndexRange (index, 0, this->dofs_per_cell));
@@ -818,7 +819,7 @@ FiniteElement<dim,spacedim>::has_generalized_face_support_points () const
 
 template <int dim, int spacedim>
 Point<dim-1>
-FiniteElement<dim,spacedim>::unit_face_support_point (const unsigned index) const
+FiniteElement<dim,spacedim>::unit_face_support_point (const unsigned int index) const
 {
   Assert (index < this->dofs_per_face,
           ExcIndexRange (index, 0, this->dofs_per_face));
@@ -1159,7 +1160,7 @@ FiniteElement<dim,spacedim>::get_subface_data (const UpdateFlags        flags,
 
 template <int dim, int spacedim>
 const FiniteElement<dim,spacedim>&
-FiniteElement<dim,spacedim>::base_element(const unsigned index) const
+FiniteElement<dim,spacedim>::base_element(const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index,0,1));
                                    // This function should not be

@@ -55,8 +55,8 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_system.h>
 
-#include <deal.II/numerics/matrices.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 
 #include <fstream>
@@ -433,7 +433,7 @@ namespace Step35
 
       EquationData::Velocity<dim>       vel_exact;
       std::map<unsigned int, double>    boundary_values;
-      std::vector<types::boundary_id_t> boundary_indicators;
+      std::vector<types::boundary_id> boundary_indicators;
 
       Triangulation<dim> triangulation;
 
@@ -1118,7 +1118,7 @@ namespace Step35
 
         vel_exact.set_component(d);
         boundary_values.clear();
-        for (std::vector<types::boundary_id_t>::const_iterator
+        for (std::vector<types::boundary_id>::const_iterator
                boundaries = boundary_indicators.begin();
              boundaries != boundary_indicators.end();
              ++boundaries)

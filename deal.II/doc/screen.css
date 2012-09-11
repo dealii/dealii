@@ -205,6 +205,7 @@ code.global { color: #005030; }
 td.build {
 	text-align: center;
 	vertical-align: middle;
+	font-size: small;
 }
 
 

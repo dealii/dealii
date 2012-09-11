@@ -29,7 +29,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 #include <vector>
 #include <fstream>

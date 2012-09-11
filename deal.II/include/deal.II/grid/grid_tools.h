@@ -266,6 +266,19 @@ namespace GridTools
                        const Point<spacedim>     &p);
 
                                    /**
+				    * @deprecated This function might
+                                    * be acceptable to find a patch
+                                    * around a single vertex, but it
+                                    * wastes resources creating
+                                    * patches around all vertices. The
+                                    * function mail fail on
+                                    * anisotropic meshes, and an easy
+                                    * fix is not obvious. Therefore,
+                                    * it should be replaced by a
+                                    * function which computes all
+                                    * active vertex patches by looping
+                                    * over cells.
+				    *
                                     * Find and return a vector of
                                     * iterators to active cells that
                                     * surround a given vertex @p vertex.
@@ -575,7 +588,7 @@ namespace GridTools
   template <int dim, int spacedim>
   void
   get_subdomain_association (const Triangulation<dim, spacedim>  &triangulation,
-                             std::vector<types::subdomain_id_t> &subdomain);
+                             std::vector<types::subdomain_id> &subdomain);
 
                                    /**
                                     * Count how many cells are uniquely
@@ -602,7 +615,7 @@ namespace GridTools
   template <int dim, int spacedim>
   unsigned int
   count_cells_with_subdomain_association (const Triangulation<dim, spacedim> &triangulation,
-                                          const types::subdomain_id_t         subdomain);
+                                          const types::subdomain_id         subdomain);
 
                                    /**
                                     * Given two mesh containers
@@ -897,8 +910,8 @@ namespace GridTools
            typename Container<dim,spacedim>::face_iterator>
   extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
                          Container<dim-1,spacedim>     &surface_mesh,
-                         const std::set<types::boundary_id_t> &boundary_ids
-                         = std::set<types::boundary_id_t>());
+                         const std::set<types::boundary_id> &boundary_ids
+                         = std::set<types::boundary_id>());
 
 
                                    /**
@@ -945,7 +958,7 @@ namespace GridTools
   std::map<CellIterator, CellIterator>
   collect_periodic_cell_pairs (const CellIterator                          &begin,
                                const typename identity<CellIterator>::type &end,
-                               const types::boundary_id_t                  boundary_component,
+                               const types::boundary_id                  boundary_component,
                                int                                         direction,
                                const dealii::Tensor<1,CellIterator::AccessorType::space_dimension>
                                  &offset = dealii::Tensor<1,CellIterator::AccessorType::space_dimension>());
@@ -962,7 +975,7 @@ namespace GridTools
   template<typename DH>
   std::map<typename DH::cell_iterator, typename DH::cell_iterator>
   collect_periodic_cell_pairs (const DH                   &dof_handler,
-                               const types::boundary_id_t boundary_component,
+                               const types::boundary_id boundary_component,
                                int                        direction,
                                const dealii::Tensor<1,DH::space_dimension>
                                  &offset = Tensor<1,DH::space_dimension>());

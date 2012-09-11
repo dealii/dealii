@@ -57,8 +57,8 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
 
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/solution_transfer.h>
@@ -2554,7 +2554,7 @@ namespace Step32
 						stokes_constraints,
 						velocity_mask);
 
-      std::set<types::boundary_id_t> no_normal_flux_boundaries;
+      std::set<types::boundary_id> no_normal_flux_boundaries;
       no_normal_flux_boundaries.insert (1);
       VectorTools::compute_no_normal_flux_constraints (stokes_dof_handler, 0,
                                                        no_normal_flux_boundaries,
@@ -4343,11 +4343,25 @@ namespace Step32
         old_temperature_solution     = temperature_solution;
         if (old_time_step > 0)
           {
-            stokes_solution.sadd (1.+time_step/old_time_step, -time_step/old_time_step,
-                                  old_old_stokes_solution);
-            temperature_solution.sadd (1.+time_step/old_time_step,
-                                       -time_step/old_time_step,
-                                       old_old_temperature_solution);
+            //Trilinos sadd does not like ghost vectors even as input. Copy into distributed vectors for now:
+            {
+              TrilinosWrappers::MPI::BlockVector distr_solution (stokes_rhs);
+              distr_solution = stokes_solution;
+              TrilinosWrappers::MPI::BlockVector distr_old_solution (stokes_rhs);
+              distr_old_solution = old_old_stokes_solution;
+              distr_solution .sadd (1.+time_step/old_time_step, -time_step/old_time_step,
+                  distr_old_solution);
+              stokes_solution = distr_solution;
+            }
+            {
+              TrilinosWrappers::MPI::Vector distr_solution (temperature_rhs);
+              distr_solution = temperature_solution;
+              TrilinosWrappers::MPI::Vector distr_old_solution (temperature_rhs);
+              distr_old_solution = old_old_temperature_solution;
+              distr_solution .sadd (1.+time_step/old_time_step, -time_step/old_time_step,
+                  distr_old_solution);
+              temperature_solution = distr_solution;
+            }
           }
 
         if ((timestep_number > 0) && (timestep_number % 100 == 0))

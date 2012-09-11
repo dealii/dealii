@@ -26,7 +26,7 @@ namespace internal
     DoFLevel<1>::memory_consumption () const
     {
       return (DoFLevel<0>::memory_consumption() +
-              MemoryConsumption::memory_consumption (lines));
+              MemoryConsumption::memory_consumption (dof_object));
     }
 
 
@@ -35,7 +35,7 @@ namespace internal
     DoFLevel<2>::memory_consumption () const
     {
       return (DoFLevel<0>::memory_consumption () +
-              MemoryConsumption::memory_consumption (quads));
+              MemoryConsumption::memory_consumption (dof_object));
     }
 
 
@@ -44,7 +44,7 @@ namespace internal
     DoFLevel<3>::memory_consumption () const
     {
       return (DoFLevel<0>::memory_consumption () +
-              MemoryConsumption::memory_consumption (hexes));
+              MemoryConsumption::memory_consumption (dof_object));
     }
 
 

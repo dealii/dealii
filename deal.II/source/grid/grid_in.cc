@@ -355,13 +355,13 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
             in >> cells.back().vertices[i];
 
           // to make sure that the cast wont fail
-    Assert(material_id<= std::numeric_limits<types::material_id_t>::max(),
-        ExcIndexRange(material_id,0,std::numeric_limits<types::material_id_t>::max()));
-    // we use only material_ids in the range from 0 to types::invalid_material_id-1
-    Assert(material_id < types::invalid_material_id,
-        ExcIndexRange(material_id,0,types::invalid_material_id));
+    Assert(material_id<= std::numeric_limits<types::material_id>::max(),
+        ExcIndexRange(material_id,0,std::numeric_limits<types::material_id>::max()));
+    // we use only material_ids in the range from 0 to numbers::invalid_material_id-1
+    Assert(material_id < numbers::invalid_material_id,
+        ExcIndexRange(material_id,0,numbers::invalid_material_id));
 
-          cells.back().material_id = static_cast<types::material_id_t>(material_id);
+          cells.back().material_id = static_cast<types::material_id>(material_id);
 
                                            // transform from ucd to
                                            // consecutive numbering
@@ -385,14 +385,14 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
                >> subcelldata.boundary_lines.back().vertices[1];
 
             // to make sure that the cast wont fail
-            Assert(material_id<= std::numeric_limits<types::boundary_id_t>::max(),
-                ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id_t>::max()));
-            // we use only boundary_ids in the range from 0 to types::internal_face_boundary_id-1
-            Assert(material_id < types::internal_face_boundary_id,
-                ExcIndexRange(material_id,0,types::internal_face_boundary_id));
+            Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
+                ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
+            // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
+            Assert(material_id < numbers::internal_face_boundary_id,
+                ExcIndexRange(material_id,0,numbers::internal_face_boundary_id));
 
             subcelldata.boundary_lines.back().boundary_id
-                = static_cast<types::boundary_id_t>(material_id);
+                = static_cast<types::boundary_id>(material_id);
 
                                              // transform from ucd to
                                              // consecutive numbering
@@ -423,14 +423,14 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
                  >> subcelldata.boundary_quads.back().vertices[3];
 
               // to make sure that the cast wont fail
-              Assert(material_id<= std::numeric_limits<types::boundary_id_t>::max(),
-                  ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id_t>::max()));
-              // we use only boundary_ids in the range from 0 to types::internal_face_boundary_id-1
-              Assert(material_id < types::internal_face_boundary_id,
-                  ExcIndexRange(material_id,0,types::internal_face_boundary_id));
+              Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
+                  ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
+              // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
+              Assert(material_id < numbers::internal_face_boundary_id,
+                  ExcIndexRange(material_id,0,numbers::internal_face_boundary_id));
 
               subcelldata.boundary_quads.back().boundary_id
-                  = static_cast<types::boundary_id_t>(material_id);
+                  = static_cast<types::boundary_id>(material_id);
 
                                                // transform from ucd to
                                                // consecutive numbering
@@ -998,13 +998,13 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
             in >> cells.back().vertices[i];
 
     // to make sure that the cast wont fail
-    Assert(material_id<= std::numeric_limits<types::material_id_t>::max(),
-        ExcIndexRange(material_id,0,std::numeric_limits<types::material_id_t>::max()));
-    // we use only material_ids in the range from 0 to types::invalid_material_id-1
-    Assert(material_id < types::invalid_material_id,
-        ExcIndexRange(material_id,0,types::invalid_material_id));
+    Assert(material_id<= std::numeric_limits<types::material_id>::max(),
+        ExcIndexRange(material_id,0,std::numeric_limits<types::material_id>::max()));
+    // we use only material_ids in the range from 0 to numbers::invalid_material_id-1
+    Assert(material_id < numbers::invalid_material_id,
+        ExcIndexRange(material_id,0,numbers::invalid_material_id));
 
-          cells.back().material_id = static_cast<types::material_id_t>(material_id);
+          cells.back().material_id = static_cast<types::material_id>(material_id);
 
                                            // transform from ucd to
                                            // consecutive numbering
@@ -1027,14 +1027,14 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
                >> subcelldata.boundary_lines.back().vertices[1];
 
       // to make sure that the cast wont fail
-      Assert(material_id<= std::numeric_limits<types::boundary_id_t>::max(),
-          ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id_t>::max()));
-      // we use only boundary_ids in the range from 0 to types::internal_face_boundary_id-1
-      Assert(material_id < types::internal_face_boundary_id,
-          ExcIndexRange(material_id,0,types::internal_face_boundary_id));
+      Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
+          ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
+      // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
+      Assert(material_id < numbers::internal_face_boundary_id,
+          ExcIndexRange(material_id,0,numbers::internal_face_boundary_id));
 
             subcelldata.boundary_lines.back().boundary_id
-                = static_cast<types::boundary_id_t>(material_id);
+                = static_cast<types::boundary_id>(material_id);
 
                                              // transform from ucd to
                                              // consecutive numbering
@@ -1065,14 +1065,14 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
                  >> subcelldata.boundary_quads.back().vertices[3];
 
               // to make sure that the cast wont fail
-              Assert(material_id<= std::numeric_limits<types::boundary_id_t>::max(),
-                  ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id_t>::max()));
-              // we use only boundary_ids in the range from 0 to types::internal_face_boundary_id-1
-              Assert(material_id < types::internal_face_boundary_id,
-                  ExcIndexRange(material_id,0,types::internal_face_boundary_id));
+              Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
+                  ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
+              // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
+              Assert(material_id < numbers::internal_face_boundary_id,
+                  ExcIndexRange(material_id,0,numbers::internal_face_boundary_id));
 
               subcelldata.boundary_quads.back().boundary_id
-                  = static_cast<types::boundary_id_t>(material_id);
+                  = static_cast<types::boundary_id>(material_id);
 
                                                // transform from gmsh to
                                                // consecutive numbering
@@ -1617,11 +1617,11 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   bmarker_var->get(&*bmarker.begin(), n_bquads);
                                    // we only handle boundary
                                    // indicators that fit into an
-                                   // types::boundary_id_t. Also, we don't
-                                   // take types::internal_face_boundary_id
+                                   // types::boundary_id. Also, we don't
+                                   // take numbers::internal_face_boundary_id
            // as it denotes an internal face
   for (unsigned int i=0; i<bmarker.size(); ++i)
-    Assert(0<=bmarker[i] && bmarker[i]<types::internal_face_boundary_id, ExcIO());
+    Assert(0<=bmarker[i] && bmarker[i]<numbers::internal_face_boundary_id, ExcIO());
 
                                    // finally we setup the boundary
                                    // information
@@ -1633,7 +1633,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
         subcelldata.boundary_quads[i].vertices[v]=bvertex_indices[
           i*GeometryInfo<dim>::vertices_per_face+v];
       subcelldata.boundary_quads[i].boundary_id
-      = static_cast<types::boundary_id_t>(bmarker[i]);
+      = static_cast<types::boundary_id>(bmarker[i]);
     }
 
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);

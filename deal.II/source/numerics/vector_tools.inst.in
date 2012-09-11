@@ -298,7 +298,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         void interpolate_boundary_values
         (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
          const DH<deal_II_dimension,deal_II_space_dimension> &,
-         const types::boundary_id_t,
+         const types::boundary_id,
          const Function<deal_II_space_dimension>   &,
          std::map<unsigned int,double>       &,
          const std::vector<bool>    &);
@@ -306,7 +306,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       template
         void interpolate_boundary_values (
           const DH<deal_II_dimension,deal_II_space_dimension> &,
-          const types::boundary_id_t,
+          const types::boundary_id,
           const Function<deal_II_space_dimension>   &,
           std::map<unsigned int,double>       &,
           const std::vector<bool>    &);
@@ -330,7 +330,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         void interpolate_boundary_values
         (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
          const DH<deal_II_dimension,deal_II_space_dimension> &,
-         const types::boundary_id_t,
+         const types::boundary_id,
          const Function<deal_II_space_dimension>   &,
          ConstraintMatrix                    &,
          const std::vector<bool>             &);
@@ -338,7 +338,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       template
         void interpolate_boundary_values (
           const DH<deal_II_dimension,deal_II_space_dimension> &,
-          const types::boundary_id_t,
+          const types::boundary_id,
           const Function<deal_II_space_dimension>   &,
           ConstraintMatrix                    &,
           const std::vector<bool>    &);
@@ -459,7 +459,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
          const Quadrature<deal_II_dimension-1> &,
          const Function<deal_II_dimension>   &,
          Vector<double>                      &,
-         const std::set<types::boundary_id_t> &);
+         const std::set<types::boundary_id> &);
 #endif
 
       template
@@ -469,7 +469,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
          const Quadrature<deal_II_dimension-1> &,
          const Function<deal_II_dimension>   &,
          Vector<double>                      &,
-         const std::set<types::boundary_id_t> &);
+         const std::set<types::boundary_id> &);
 
 #if deal_II_dimension > 1
       template
@@ -480,7 +480,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
          const hp::QCollection<deal_II_dimension-1> &,
          const Function<deal_II_dimension>   &,
          Vector<double>                      &,
-         const std::set<types::boundary_id_t> &);
+         const std::set<types::boundary_id> &);
 #endif
 
       template
@@ -490,7 +490,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
          const hp::QCollection<deal_II_dimension-1> &,
          const Function<deal_II_dimension>   &,
          Vector<double>                      &,
-         const std::set<types::boundary_id_t> &);
+         const std::set<types::boundary_id> &);
 
 
 
@@ -536,7 +536,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
         (const DoFHandler<deal_II_dimension>&,
          const unsigned int,
          const Function<deal_II_dimension>&,
-         const types::boundary_id_t,
+         const types::boundary_id,
          ConstraintMatrix&,
          const Mapping<deal_II_dimension>&);
       template
@@ -544,7 +544,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
         (const hp::DoFHandler<deal_II_dimension>&,
          const unsigned int,
          const Function<deal_II_dimension>&,
-         const types::boundary_id_t,
+         const types::boundary_id,
          ConstraintMatrix&,
          const hp::MappingCollection<deal_II_dimension>&);
       template
@@ -552,7 +552,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
         (const DoFHandler<deal_II_dimension>&,
          const unsigned int,
          const Function<deal_II_dimension>&,
-         const types::boundary_id_t,
+         const types::boundary_id,
          ConstraintMatrix&,
          const Mapping<deal_II_dimension>&);
       template
@@ -560,21 +560,21 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
         (const hp::DoFHandler<deal_II_dimension>&,
          const unsigned int,
          const Function<deal_II_dimension>&,
-         const types::boundary_id_t,
+         const types::boundary_id,
          ConstraintMatrix&,
          const hp::MappingCollection<deal_II_dimension>&);
       template
         void
         compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
                                             const unsigned int     first_vector_component,
-                                            const std::set<types::boundary_id_t> &boundary_ids,
+                                            const std::set<types::boundary_id> &boundary_ids,
                                             ConstraintMatrix      &constraints,
                                             const Mapping<deal_II_dimension>    &mapping);
       template
         void
         compute_no_normal_flux_constraints (const hp::DoFHandler<deal_II_dimension> &dof_handler,
                                             const unsigned int     first_vector_component,
-                                            const std::set<types::boundary_id_t> &boundary_ids,
+                                            const std::set<types::boundary_id> &boundary_ids,
                                             ConstraintMatrix      &constraints,
                                             const Mapping<deal_II_dimension>    &mapping);
 #endif

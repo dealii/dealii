@@ -20,6 +20,7 @@
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/vector.h>
 
 #  include <petscmat.h>
 #  include <deal.II/base/std_cxx1x/shared_ptr.h>
@@ -671,8 +672,8 @@ namespace PETScWrappers
                                         * for more information.
                                         * more information.
                                         */
-      void compress ();
-
+      void compress (::dealii::VectorOperation::values operation
+		     =::dealii::VectorOperation::unknown);
                                        /**
                                         * Return the value of the entry
                                         * (<i>i,j</i>).  This may be an
@@ -836,6 +837,72 @@ namespace PETScWrappers
                                         * matrix.
                                         */
       PetscReal frobenius_norm () const;
+
+
+                                       /**
+                                        * Return the square of the norm
+                                        * of the vector $v$ with respect
+                                        * to the norm induced by this
+                                        * matrix,
+                                        * i.e. $\left(v,Mv\right)$. This
+                                        * is useful, e.g. in the finite
+                                        * element context, where the
+                                        * $L_2$ norm of a function
+                                        * equals the matrix norm with
+                                        * respect to the mass matrix of
+                                        * the vector representing the
+                                        * nodal values of the finite
+                                        * element function.
+                                        *
+                                        * Obviously, the matrix needs to
+                                        * be quadratic for this operation.
+                                        *
+                                        * The implementation of this function
+                                        * is not as efficient as the one in
+                                        * the @p MatrixBase class used in
+                                        * deal.II (i.e. the original one, not
+                                        * the PETSc wrapper class) since PETSc
+                                        * doesn't support this operation and
+                                        * needs a temporary vector.
+                                        *
+                                        * Note that if the current object
+                                        * represents a parallel distributed
+                                        * matrix (of type
+                                        * PETScWrappers::MPI::SparseMatrix),
+                                        * then the given vector has to be
+                                        * a distributed vector as
+                                        * well. Conversely, if the matrix is
+                                        * not distributed, then neither
+                                        * may the vector be.
+                                        */
+      PetscScalar matrix_norm_square (const VectorBase &v) const;
+
+
+                                       /**
+                                        * Compute the matrix scalar
+                                        * product $\left(u,Mv\right)$.
+                                        *
+                                        * The implementation of this function
+                                        * is not as efficient as the one in
+                                        * the @p MatrixBase class used in
+                                        * deal.II (i.e. the original one, not
+                                        * the PETSc wrapper class) since PETSc
+                                        * doesn't support this operation and
+                                        * needs a temporary vector.
+                                        *
+                                        * Note that if the current object
+                                        * represents a parallel distributed
+                                        * matrix (of type
+                                        * PETScWrappers::MPI::SparseMatrix),
+                                        * then both vectors have to be
+                                        * distributed vectors as
+                                        * well. Conversely, if the matrix is
+                                        * not distributed, then neither of the
+                                        * vectors may be.
+                                        */
+      PetscScalar matrix_scalar_product (const VectorBase &u,
+					 const VectorBase &v) const;
+
 
 #if DEAL_II_PETSC_VERSION_GTE(3,1,0)
                                        /**
@@ -1053,7 +1120,6 @@ namespace PETScWrappers
 #endif
         is_symmetric (const double tolerance = 1.e-12);
 
-#if DEAL_II_PETSC_VERSION_GTE(2,3,0)
                                         /**
                                          * Test whether a matrix is
                                          * Hermitian, i.e. it is the
@@ -1069,9 +1135,8 @@ namespace PETScWrappers
         PetscBool
 #endif
         is_hermitian (const double tolerance = 1.e-12);
-#endif
 
-                                        /*
+                                        /**
                                          * Abstract PETSc object that helps view
                                          * in ASCII other PETSc objects. Currently
                                          * this function simply writes non-zero

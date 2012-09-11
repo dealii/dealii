@@ -42,7 +42,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/solution_transfer.h>
@@ -1085,7 +1085,7 @@ namespace Step31
       stokes_constraints.clear ();
       DoFTools::make_hanging_node_constraints (stokes_dof_handler,
                                                stokes_constraints);
-      std::set<types::boundary_id_t> no_normal_flux_boundaries;
+      std::set<types::boundary_id> no_normal_flux_boundaries;
       no_normal_flux_boundaries.insert (0);
       VectorTools::compute_no_normal_flux_constraints (stokes_dof_handler, 0,
                                                        no_normal_flux_boundaries,

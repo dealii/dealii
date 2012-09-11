@@ -46,7 +46,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 
 #include <fstream>

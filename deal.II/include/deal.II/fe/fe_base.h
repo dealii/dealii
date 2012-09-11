@@ -518,17 +518,21 @@ class FiniteElementData
     unsigned int n_dofs_per_object () const;
 
                                      /**
-                                      * Number of components.
+                                      * Number of components. See
+				      * @ref GlossComponent "the glossary"
+				      * for more information.
                                       */
     unsigned int n_components () const;
 
                                      /**
-                                      * Number of blocks.
+                                      * Number of blocks. See
+				      * @ref GlossBlock "the glossary"
+				      * for more information.
                                       */
     unsigned int n_blocks () const;
 
                                      /**
-                                      * Detailed infromation on block sizes.
+                                      * Detailed information on block sizes.
                                       */
     const BlockIndices& block_indices() const;
 

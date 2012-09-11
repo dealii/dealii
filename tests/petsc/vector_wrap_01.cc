@@ -61,7 +61,13 @@ int main (int argc, char **argv)
         PETScWrappers::Vector w (100);
         test (v,w);
       }
-      ierr = VecDestroy(vpetsc);
+
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      ierr = VecDestroy (vpetsc);
+#else
+      ierr = VecDestroy (&vpetsc);
+#endif
+
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       PetscFinalize();

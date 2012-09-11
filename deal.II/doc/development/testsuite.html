@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>The deal.II Testsuite</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="svn_id" content="$Id$">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
@@ -269,6 +269,26 @@
     get an overview of what tests fail. You may even consider running
     tests nightly through a cron-job with this command, to have
     regular test runs.
+    </p>
+    
+    <p>
+    To get a quick overview you can run
+    <pre>
+      make report+summary
+    </pre>
+    instead. This runs all the tests and outputs a table in the following format
+    at the end:
+    <pre>
+                Compiling Linking Running   Check      OK     all
+         a-framework	1	1	1	1	1	5	
+                base	0	0	0	2	185	187	
+                 lac	0	0	0	0	117	117	
+                  fe	0	0	0	4	114	118	
+             deal.II	0	0	0	2	291	293	
+         integrators	0	0	0	0	15	15	
+           multigrid	0	0	0	0	35	35	      
+		 ...
+    </pre>
     </p>
 
     <p>
@@ -562,15 +582,15 @@ testname/cmp/generic
     </p>
 
     <p>
-    If you don't have subversion write access, talk to us on the mailing
-    list; writing testcases is a worthy and laudable task, and we would
+    If you don't have subversion write access, talk to us in the discussion group;
+    writing testcases is a worthy and laudable task, and we would
     like to encourage it by giving people the opportunity to
     contribute!
     </p>
 
 
     <address>
-      <a href="../mail.html">The deal.II mailing list</a></address>
+      <a href="../mail.html">The deal.II Group</a></address>
 <div class="right">
   <p>
     <a href="http://validator.w3.org/check?uri=referer"><img border="0"

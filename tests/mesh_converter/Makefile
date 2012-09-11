@@ -89,5 +89,7 @@ clean:
 	-rm -f Makefile.dep *.$(OBJEXT) \
                *.g.$(OBJEXT) *.output *~ *.OK *.cc *.ucd *.log
 
+summary:
+	@printf "not implemented\n"
 
-.PHONY: report clean distclean all default report report+mail
+.PHONY: report clean distclean all default report report+mail summary

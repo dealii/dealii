@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,101 +24,104 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
-template <int dim, int spacedim>
-bool operator == (const DoFHandler<dim,spacedim> &t1,
-		  const DoFHandler<dim,spacedim> &t2)
+namespace dealii
 {
-				   // test a few attributes, though we can't
-				   // test everything unfortunately...
-  typename DoFHandler<dim,spacedim>::cell_iterator
-    c1 = t1.begin(),
-    c2 = t2.begin();
-  for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
-    {
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	{
-	  if (c1->vertex(v) != c2->vertex(v))
-	    return false;
-	  if (c1->vertex_index(v) != c2->vertex_index(v))
-	    return false;
-	}
-
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	{
-	  if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
-	    return false;
-
-	  if (c1->face(f)->at_boundary())
-	    {
-	      if (c1->face(f)->boundary_indicator() !=
-		  c2->face(f)->boundary_indicator())
-		return false;
-	    }
-	  else
-	    {
-	      if (c1->neighbor(f)->level() != c2->neighbor(f)->level())
-		return false;
-	      if (c1->neighbor(f)->index() != c2->neighbor(f)->index())
-		return false;
-	    }
-	}
-
-      if (c1->subdomain_id() != c2->subdomain_id())
-	return false;
-
-      if (c1->material_id() != c2->material_id())
-	return false;
-
-      if (c1->user_index() != c2->user_index())
-	return false;
-
-      if (c1->user_flag_set() != c2->user_flag_set())
-	return false;
-
-      if (c1->get_fe().get_name() != c2->get_fe().get_name())
-	return false;
-
-      if (c1->active_fe_index() != c2->active_fe_index())
-	return false;
-
-      // compare dofs on this cell and then on the faces
-      if (c1->has_children() == false)
+  template <int dim, int spacedim>
+  bool operator == (const DoFHandler<dim,spacedim> &t1,
+		    const DoFHandler<dim,spacedim> &t2)
+  {
+				     // test a few attributes, though we can't
+				     // test everything unfortunately...
+    typename DoFHandler<dim,spacedim>::cell_iterator
+      c1 = t1.begin(),
+      c2 = t2.begin();
+    for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
-	std::vector<unsigned int> local_dofs_1 (c1->get_fe().dofs_per_cell);
-	std::vector<unsigned int> local_dofs_2 (c2->get_fe().dofs_per_cell);
-
-	c1->get_dof_indices (local_dofs_1);
-	c2->get_dof_indices (local_dofs_2);
-	if (local_dofs_1 != local_dofs_2)
-	  return false;
+	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	  {
+	    if (c1->vertex(v) != c2->vertex(v))
+	      return false;
+	    if (c1->vertex_index(v) != c2->vertex_index(v))
+	      return false;
+	  }
 
 	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	{
-	  std::vector<unsigned int> local_dofs_1 (c1->get_fe().dofs_per_face);
-	  std::vector<unsigned int> local_dofs_2 (c2->get_fe().dofs_per_face);
+	  {
+	    if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
+	      return false;
 
-	  c1->face(f)->get_dof_indices (local_dofs_1);
-	  c2->face(f)->get_dof_indices (local_dofs_2);
-	  if (local_dofs_1 != local_dofs_2)
-	    return false;
-	}
+	    if (c1->face(f)->at_boundary())
+	      {
+		if (c1->face(f)->boundary_indicator() !=
+		    c2->face(f)->boundary_indicator())
+		  return false;
+	      }
+	    else
+	      {
+		if (c1->neighbor(f)->level() != c2->neighbor(f)->level())
+		  return false;
+		if (c1->neighbor(f)->index() != c2->neighbor(f)->index())
+		  return false;
+	      }
+	  }
+
+	if (c1->subdomain_id() != c2->subdomain_id())
+	  return false;
+
+	if (c1->material_id() != c2->material_id())
+	  return false;
+
+	if (c1->user_index() != c2->user_index())
+	  return false;
+
+	if (c1->user_flag_set() != c2->user_flag_set())
+	  return false;
+
+	if (c1->get_fe().get_name() != c2->get_fe().get_name())
+	  return false;
+
+	if (c1->active_fe_index() != c2->active_fe_index())
+	  return false;
+
+					 // compare dofs on this cell and then on the faces
+	if (c1->has_children() == false)
+	  {
+	    std::vector<unsigned int> local_dofs_1 (c1->get_fe().dofs_per_cell);
+	    std::vector<unsigned int> local_dofs_2 (c2->get_fe().dofs_per_cell);
+
+	    c1->get_dof_indices (local_dofs_1);
+	    c2->get_dof_indices (local_dofs_2);
+	    if (local_dofs_1 != local_dofs_2)
+	      return false;
+
+	    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	      {
+		std::vector<unsigned int> local_dofs_1 (c1->get_fe().dofs_per_face);
+		std::vector<unsigned int> local_dofs_2 (c2->get_fe().dofs_per_face);
+
+		c1->face(f)->get_dof_indices (local_dofs_1);
+		c2->face(f)->get_dof_indices (local_dofs_2);
+		if (local_dofs_1 != local_dofs_2)
+		  return false;
+	      }
+	  }
       }
-    }
 
-  // also check the order of raw iterators as they contain
-  // something about the history of the triangulation
-  typename DoFHandler<dim,spacedim>::cell_iterator
-    r1 = t1.begin_raw(),
-    r2 = t2.begin_raw();
-  for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
-  {
-    if (r1->level() != r2->level())
-      return false;
-    if (r1->index() != r2->index())
-      return false;
+				     // also check the order of raw iterators as they contain
+				     // something about the history of the triangulation
+    typename DoFHandler<dim,spacedim>::cell_iterator
+      r1 = t1.begin_raw(),
+      r2 = t2.begin_raw();
+    for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
+      {
+	if (r1->level() != r2->level())
+	  return false;
+	if (r1->index() != r2->index())
+	  return false;
+      }
+
+    return true;
   }
-
-  return true;
 }
 
 template <int dim, int spacedim>

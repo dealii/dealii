@@ -226,7 +226,7 @@ namespace internal
                        const unsigned int                      local_index,
                        dealii::internal::int2type<1>)
           {
-            return dof_handler.levels[obj_level]->lines.
+            return dof_handler.levels[obj_level]->dof_object.
               get_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -245,7 +245,7 @@ namespace internal
                        dealii::internal::int2type<1>,
                        const unsigned int              global_index)
           {
-            dof_handler.levels[obj_level]->lines.
+            dof_handler.levels[obj_level]->dof_object.
               set_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -306,7 +306,7 @@ namespace internal
                        const unsigned int              local_index,
                        dealii::internal::int2type<2>)
           {
-            return dof_handler.levels[obj_level]->quads.
+            return dof_handler.levels[obj_level]->dof_object.
               get_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -325,7 +325,7 @@ namespace internal
                        dealii::internal::int2type<2>,
                        const unsigned int              global_index)
           {
-            dof_handler.levels[obj_level]->quads.
+            dof_handler.levels[obj_level]->dof_object.
               set_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -430,7 +430,7 @@ namespace internal
                        const unsigned int              local_index,
                        dealii::internal::int2type<3>)
           {
-            return dof_handler.levels[obj_level]->hexes.
+            return dof_handler.levels[obj_level]->dof_object.
               get_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -449,7 +449,7 @@ namespace internal
                        dealii::internal::int2type<3>,
                        const unsigned int              global_index)
           {
-            dof_handler.levels[obj_level]->hexes.
+            dof_handler.levels[obj_level]->dof_object.
               set_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -468,7 +468,7 @@ namespace internal
                        const unsigned int       local_index,
                        const dealii::internal::int2type<1> &)
           {
-            return dof_handler.levels[obj_level]->lines.
+            return dof_handler.levels[obj_level]->dof_object.
               get_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -488,7 +488,7 @@ namespace internal
                        const dealii::internal::int2type<1> &,
                        const unsigned int       global_index)
           {
-            dof_handler.levels[obj_level]->lines.
+            dof_handler.levels[obj_level]->dof_object.
               set_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -548,7 +548,7 @@ namespace internal
                        const unsigned int       local_index,
                        const dealii::internal::int2type<2> &)
           {
-            return dof_handler.levels[obj_level]->quads.
+            return dof_handler.levels[obj_level]->dof_object.
               get_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -568,7 +568,7 @@ namespace internal
                        const dealii::internal::int2type<2> &,
                        const unsigned int       global_index)
           {
-            dof_handler.levels[obj_level]->quads.
+            dof_handler.levels[obj_level]->dof_object.
               set_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -668,7 +668,7 @@ namespace internal
                        const unsigned int       local_index,
                        const dealii::internal::int2type<3> &)
           {
-            return dof_handler.levels[obj_level]->hexes.
+            return dof_handler.levels[obj_level]->dof_object.
               get_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -688,7 +688,7 @@ namespace internal
                        const dealii::internal::int2type<3> &,
                        const unsigned int       global_index)
           {
-            dof_handler.levels[obj_level]->hexes.
+            dof_handler.levels[obj_level]->dof_object.
               set_dof_index (dof_handler,
                              obj_index,
                              fe_index,
@@ -821,7 +821,7 @@ namespace internal
                             const unsigned int fe_index,
                             const dealii::internal::int2type<1> &)
           {
-            return dof_handler.levels[obj_level]->lines.fe_index_is_active(dof_handler,
+            return dof_handler.levels[obj_level]->dof_object.fe_index_is_active(dof_handler,
                                                                            obj_index,
                                                                            fe_index,
                                                                            obj_level);
@@ -836,7 +836,7 @@ namespace internal
                              const unsigned int obj_index,
                              const dealii::internal::int2type<1> &)
           {
-            return dof_handler.levels[obj_level]->lines.n_active_fe_indices (dof_handler,
+            return dof_handler.levels[obj_level]->dof_object.n_active_fe_indices (dof_handler,
                                                                              obj_index);
           }
 
@@ -851,7 +851,7 @@ namespace internal
                              const unsigned int n,
                              const dealii::internal::int2type<1> &)
           {
-            return dof_handler.levels[obj_level]->lines.nth_active_fe_index (dof_handler,
+            return dof_handler.levels[obj_level]->dof_object.nth_active_fe_index (dof_handler,
                                                                              obj_level,
                                                                              obj_index,
                                                                              n);
@@ -913,7 +913,7 @@ namespace internal
                             const unsigned int fe_index,
                             const dealii::internal::int2type<2> &)
           {
-            return dof_handler.levels[obj_level]->quads.fe_index_is_active(dof_handler,
+            return dof_handler.levels[obj_level]->dof_object.fe_index_is_active(dof_handler,
                                                                            obj_index,
                                                                            fe_index,
                                                                            obj_level);
@@ -928,7 +928,7 @@ namespace internal
                              const unsigned int obj_index,
                              const dealii::internal::int2type<2> &)
           {
-            return dof_handler.levels[obj_level]->quads.n_active_fe_indices (dof_handler,
+            return dof_handler.levels[obj_level]->dof_object.n_active_fe_indices (dof_handler,
                                                                              obj_index);
           }
 
@@ -943,7 +943,7 @@ namespace internal
                              const unsigned int n,
                              const dealii::internal::int2type<2> &)
           {
-            return dof_handler.levels[obj_level]->quads.nth_active_fe_index (dof_handler,
+            return dof_handler.levels[obj_level]->dof_object.nth_active_fe_index (dof_handler,
                                                                              obj_level,
                                                                              obj_index,
                                                                              n);
@@ -1022,7 +1022,7 @@ namespace internal
                             const unsigned int fe_index,
                             const dealii::internal::int2type<3> &)
           {
-            return dof_handler.levels[obj_level]->hexes.fe_index_is_active(dof_handler,
+            return dof_handler.levels[obj_level]->dof_object.fe_index_is_active(dof_handler,
                                                                            obj_index,
                                                                            fe_index,
                                                                            obj_level);
@@ -1068,7 +1068,7 @@ namespace internal
                              const unsigned int obj_index,
                              const dealii::internal::int2type<3> &)
           {
-            return dof_handler.levels[obj_level]->hexes.n_active_fe_indices (dof_handler,
+            return dof_handler.levels[obj_level]->dof_object.n_active_fe_indices (dof_handler,
                                                                              obj_index);
           }
 
@@ -1083,7 +1083,7 @@ namespace internal
                              const unsigned int n,
                              const dealii::internal::int2type<3> &)
           {
-            return dof_handler.levels[obj_level]->hexes.nth_active_fe_index (dof_handler,
+            return dof_handler.levels[obj_level]->dof_object.nth_active_fe_index (dof_handler,
                                                                              obj_level,
                                                                              obj_index,
                                                                              n);

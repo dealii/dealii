@@ -164,7 +164,7 @@ namespace internal
                                                        long *length);
 
         static
-        unsigned (&checksum) (types<2>::forest * p4est);
+        unsigned int (&checksum) (types<2>::forest * p4est);
 
         static
         void (&vtk_write_file) (types<2>::forest * p4est,
@@ -286,7 +286,7 @@ namespace internal
                                         long *length)
     = p4est_connectivity_load;
 
-    unsigned (&functions<2>::checksum) (types<2>::forest * p4est)
+    unsigned int (&functions<2>::checksum) (types<2>::forest * p4est)
     = p4est_checksum;
 
     void (&functions<2>::vtk_write_file) (types<2>::forest * p4est,
@@ -412,7 +412,7 @@ namespace internal
                                                        long *length);
 
         static
-        unsigned (&checksum) (types<3>::forest * p8est);
+        unsigned int (&checksum) (types<3>::forest * p8est);
 
         static
         void (&vtk_write_file) (types<3>::forest * p8est,
@@ -537,7 +537,7 @@ namespace internal
                                         long *length)
     = p8est_connectivity_load;
 
-    unsigned (&functions<3>::checksum) (types<3>::forest * p8est)
+    unsigned int (&functions<3>::checksum) (types<3>::forest * p8est)
     = p8est_checksum;
 
     void (&functions<3>::vtk_write_file) (types<3>::forest * p8est,
@@ -831,7 +831,7 @@ namespace
                     if (f>cell->neighbor_of_neighbor (f))
                       smaller_idx = 1;
 
-                    unsigned larger_idx = (smaller_idx+1) % 2;
+                    unsigned int larger_idx = (smaller_idx+1) % 2;
                                                      //smaller = *_list[smaller_idx]
                                                      //larger = *_list[larger_idx]
 
@@ -962,7 +962,7 @@ namespace
                           const typename Triangulation<dim,spacedim>::cell_iterator     &dealii_cell,
                           const typename internal::p4est::types<dim>::quadrant &p4est_cell,
                           const typename internal::p4est::types<dim>::forest   &forest,
-                          const types::subdomain_id_t                           my_subdomain)
+                          const types::subdomain_id                           my_subdomain)
   {
                                      // check if this cell exists in
                                      // the local p4est cell
@@ -1394,7 +1394,7 @@ namespace
     public:
       RefineAndCoarsenList (const Triangulation<dim,spacedim> &triangulation,
                             const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
-                            const types::subdomain_id_t                   my_subdomain,
+                            const types::subdomain_id                   my_subdomain,
                             typename internal::p4est::types<dim>::forest &forest);
 
                                        /**
@@ -1468,7 +1468,7 @@ namespace
   RefineAndCoarsenList<dim,spacedim>::
   RefineAndCoarsenList (const Triangulation<dim,spacedim>            &triangulation,
                         const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
-                        const types::subdomain_id_t                   my_subdomain,
+                        const types::subdomain_id                   my_subdomain,
                         typename internal::p4est::types<dim>::forest &forest)
                   :
                   forest(forest)
@@ -1554,7 +1554,7 @@ namespace
   RefineAndCoarsenList<dim,spacedim>::
   build_lists (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
                const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-               const types::subdomain_id_t my_subdomain)
+               const types::subdomain_id my_subdomain)
   {
     if (!cell->has_children())
       {
@@ -2821,7 +2821,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    types::subdomain_id_t
+    types::subdomain_id
     Triangulation<dim,spacedim>::locally_owned_subdomain () const
     {
       Assert (dim > 1, ExcNotImplemented());
@@ -3082,7 +3082,7 @@ namespace parallel
 
 
     template <>
-    types::subdomain_id_t
+    types::subdomain_id
     Triangulation<1,1>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());
@@ -3131,7 +3131,7 @@ namespace parallel
 
 
     template <>
-    types::subdomain_id_t
+    types::subdomain_id
     Triangulation<1,2>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());
@@ -3172,7 +3172,7 @@ namespace parallel
 
 
     template <>
-    types::subdomain_id_t
+    types::subdomain_id
     Triangulation<1,3>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());
@@ -3221,7 +3221,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    types::subdomain_id_t
+    types::subdomain_id
     Triangulation<dim,spacedim>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());

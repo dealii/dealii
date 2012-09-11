@@ -38,8 +38,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 template <int dim, typename MATRIX, typename VECTOR>
 void assemble_laplace (MATRIX &B, VECTOR &bb, DoFHandler<dim> &dof_handler, FiniteElement<dim> &fe)

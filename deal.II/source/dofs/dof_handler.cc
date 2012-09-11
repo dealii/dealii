@@ -271,7 +271,7 @@ namespace internal
                 dof_handler.levels
                   .push_back (new internal::DoFHandler::DoFLevel<1>);
 
-                dof_handler.levels.back()->lines.dofs
+                dof_handler.levels.back()->dof_object.dofs
                   .resize (dof_handler.tria->n_raw_lines(i) *
                            dof_handler.selected_fe->dofs_per_line,
                            DoFHandler<1,spacedim>::invalid_dof_index);
@@ -297,7 +297,7 @@ namespace internal
               {
                 dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
-                dof_handler.levels.back()->quads.dofs
+                dof_handler.levels.back()->dof_object.dofs
                   .resize (dof_handler.tria->n_raw_quads(i) *
                            dof_handler.selected_fe->dofs_per_quad,
                            DoFHandler<2,spacedim>::invalid_dof_index);
@@ -329,7 +329,7 @@ namespace internal
               {
                 dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
-                dof_handler.levels.back()->hexes.dofs
+                dof_handler.levels.back()->dof_object.dofs
                   .resize (dof_handler.tria->n_raw_hexs(i) *
                            dof_handler.selected_fe->dofs_per_hex,
                            DoFHandler<3,spacedim>::invalid_dof_index);
@@ -1489,12 +1489,12 @@ unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_indicat
 
 
 template <>
-unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id_t> &boundary_indicators) const
+unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
 {
                                    // check that only boundary
                                    // indicators 0 and 1 are allowed
                                    // in 1d
-  for (std::set<types::boundary_id_t>::const_iterator i=boundary_indicators.begin();
+  for (std::set<types::boundary_id>::const_iterator i=boundary_indicators.begin();
        i!=boundary_indicators.end(); ++i)
     Assert ((*i == 0) || (*i == 1),
             ExcInvalidBoundaryIndicator());
@@ -1528,12 +1528,12 @@ unsigned int DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &boundary_indic
 
 
 template <>
-unsigned int DoFHandler<1,2>::n_boundary_dofs (const std::set<types::boundary_id_t> &boundary_indicators) const
+unsigned int DoFHandler<1,2>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
 {
                                    // check that only boundary
                                    // indicators 0 and 1 are allowed
                                    // in 1d
-  for (std::set<types::boundary_id_t>::const_iterator i=boundary_indicators.begin();
+  for (std::set<types::boundary_id>::const_iterator i=boundary_indicators.begin();
        i!=boundary_indicators.end(); ++i)
     Assert ((*i == 0) || (*i == 1),
             ExcInvalidBoundaryIndicator());
@@ -1579,7 +1579,7 @@ template<int dim, int spacedim>
 unsigned int
 DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
 {
-  Assert (boundary_indicators.find(types::internal_face_boundary_id) == boundary_indicators.end(),
+  Assert (boundary_indicators.find(numbers::internal_face_boundary_id) == boundary_indicators.end(),
           ExcInvalidBoundaryIndicator());
 
   std::set<int> boundary_dofs;
@@ -1603,9 +1603,9 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicator
 
 template<int dim, int spacedim>
 unsigned int
-DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id_t> &boundary_indicators) const
+DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
 {
-  Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
+  Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
           ExcInvalidBoundaryIndicator());
 
   std::set<int> boundary_dofs;
@@ -1651,8 +1651,7 @@ DoFHandler<dim,spacedim>::memory_consumption () const
 
 template<int dim, int spacedim>
 void DoFHandler<dim,spacedim>::
-distribute_dofs (const FiniteElement<dim,spacedim> &ff,
-                 const unsigned int                 offset)
+distribute_dofs (const FiniteElement<dim,spacedim> &ff)
 {
   selected_fe = &ff;
 
@@ -1676,8 +1675,7 @@ distribute_dofs (const FiniteElement<dim,spacedim> &ff,
   internal::DoFHandler::Implementation::reserve_space (*this);
 
                                    // hand things off to the policy
-  number_cache = policy->distribute_dofs (offset,
-                                          *this);
+  number_cache = policy->distribute_dofs (*this);
 
                                    // initialize the block info object
                                    // only if this is a sequential

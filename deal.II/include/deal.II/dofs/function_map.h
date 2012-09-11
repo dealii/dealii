@@ -48,7 +48,7 @@ struct FunctionMap
                                       * name it in the fashion of the
                                       * STL local typedefs.
                                       */
-    typedef std::map<types::boundary_id_t, const Function<dim>*> type;
+    typedef std::map<types::boundary_id, const Function<dim>*> type;
 };
 
 DEAL_II_NAMESPACE_CLOSE

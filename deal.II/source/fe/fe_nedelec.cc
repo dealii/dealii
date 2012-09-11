@@ -3258,7 +3258,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                                                                    * n_edge_points],
                                   1);
 
-                    for (unsigned i = 0; i < this->degree; ++i)
+                    for (unsigned int i = 0; i < this->degree; ++i)
                       for (unsigned int j = 0; j < this->degree-1; ++j)
                         system_rhs (i * (this->degree-1) + j)
                           += reference_quadrature.weight (q_point) * tmp
@@ -3578,7 +3578,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                                                                                * n_edge_points],
                                               2);
 
-                                for (unsigned i = 0; i < this->degree; ++i)
+                                for (unsigned int i = 0; i < this->degree; ++i)
                                   for (unsigned int j = 0; j < this->degree-1; ++j)
                                     system_rhs (i * (this->degree-1) + j)
                                       += boundary_weights
@@ -3686,7 +3686,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                                                                                + n_face_points],
                                               2);
 
-                                for (unsigned i = 0; i <= deg; ++i)
+                                for (unsigned int i = 0; i <= deg; ++i)
                                   for (unsigned int j = 0; j < deg; ++j)
                                     system_rhs (i * deg + j)
                                       += boundary_weights
@@ -3742,7 +3742,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                                                                                 * n_face_points],
                                                2);
 
-                                    for (unsigned i = 0; i <= deg; ++i)
+                                    for (unsigned int i = 0; i <= deg; ++i)
                                       for (unsigned int j = 0; j < deg; ++j)
                                         system_rhs (i * deg + j)
                                           += boundary_weights
@@ -3850,7 +3850,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                                                                                 * n_face_points],
                                                2);
 
-                                    for (unsigned i = 0; i <= deg; ++i)
+                                    for (unsigned int i = 0; i <= deg; ++i)
                                       for (unsigned int j = 0; j < deg; ++j)
                                         system_rhs (i * deg + j)
                                           += boundary_weights
@@ -4013,7 +4013,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                                                                                    * n_face_points],
                                                   1);
 
-                                    for (unsigned i = 0; i <= deg; ++i)
+                                    for (unsigned int i = 0; i <= deg; ++i)
                                       for (unsigned int j = 0; j < deg; ++j)
                                         system_rhs (i * deg + j)
                                           += boundary_weights
@@ -4125,7 +4125,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                                                                                  * n_face_points],
                                                 1);
 
-                                  for (unsigned i = 0; i <= deg; ++i)
+                                  for (unsigned int i = 0; i <= deg; ++i)
                                     for (unsigned int j = 0; j < deg; ++j)
                                       system_rhs (i * deg + j)
                                         += boundary_weights
@@ -4794,7 +4794,7 @@ const
                                                                  * n_edge_points],
                                 1);
 
-                  for (unsigned i = 0; i <= deg; ++i)
+                  for (unsigned int i = 0; i <= deg; ++i)
                     for (unsigned int j = 0; j < deg; ++j)
                       system_rhs (i * deg + j)
                         += reference_quadrature.weight (q_point) * tmp
@@ -5074,7 +5074,7 @@ const
                                                                      * n_edge_points],
                                     face_coordinates[face][1]);
 
-                      for (unsigned i = 0; i <= deg; ++i)
+                      for (unsigned int i = 0; i <= deg; ++i)
                         for (unsigned int j = 0; j < deg; ++j)
                           system_rhs (i * deg + j)
                             += boundary_weights (q_point + n_edge_points,

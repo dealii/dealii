@@ -24,7 +24,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out_stack.h>
 #include <fstream>
 #include <iomanip>

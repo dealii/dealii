@@ -280,12 +280,8 @@ namespace internal
                                       */
     template <class BlockVectorType, bool constness>
     class Iterator :
-#ifdef HAVE_STD_ITERATOR_CLASS
         public std::iterator<std::random_access_iterator_tag,
                              typename Types<BlockVectorType,constness>::value_type>
-#else
-    random_access_iterator<typename Types<BlockVectorType,constness>::value_type,int>
-#endif
     {
       private:
                                          /**
@@ -787,8 +783,19 @@ class BlockVectorBase : public Subscriptor
                                      /**
                                       * Call the compress() function on all
                                       * the subblocks of the matrix.
+				      *
+				      * This functionality only needs to be
+				      * called if using MPI based vectors and
+				      * exists in other objects for
+				      * compatibility.
+				      *
+				      * See @ref GlossCompress "Compressing
+				      * distributed objects" for more
+				      * information.
                                       */
-    void compress ();
+    void compress (::dealii::VectorOperation::values operation
+		     =::dealii::VectorOperation::unknown);
+
 
                                      /**
                                       * Access to a single block.
@@ -1633,8 +1640,8 @@ namespace internal
 
     template <class BlockVectorType, bool constness>
     Iterator<BlockVectorType,constness>::
-    Iterator (BlockVector    &parent,
-              const unsigned  global_index)
+    Iterator (BlockVector       &parent,
+              const unsigned int global_index)
                     :
                     parent (&parent),
                     global_index (global_index)
@@ -1824,10 +1831,10 @@ BlockVectorBase<VectorType>::collect_sizes ()
 template <class VectorType>
 inline
 void
-BlockVectorBase<VectorType>::compress ()
+BlockVectorBase<VectorType>::compress (::dealii::VectorOperation::values operation)
 {
   for (unsigned int i=0; i<n_blocks(); ++i)
-    block(i).compress ();
+    block(i).compress (operation);
 }
 
 

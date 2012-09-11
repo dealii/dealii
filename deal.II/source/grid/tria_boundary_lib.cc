@@ -1344,7 +1344,7 @@ TorusBoundary<2,3>::get_new_point_on_line (const Triangulation<2,3>::line_iterat
                                    //Take care for periodic conditions,
                                    //For instance phi0= 0, phi1= 3/2*Pi  middle has to be 7/4*Pi not 3/4*Pi
                                    //This also works for -Pi/2 + Pi, middle is 5/4*Pi
-  for(unsigned i=0; i<2;i++)
+  for(unsigned int i=0; i<2;i++)
     if(std::abs(p0(i)-p1(i))> numbers::PI)
       middle(i)=2*numbers::PI;
 
@@ -1364,7 +1364,7 @@ TorusBoundary<2,3>::get_new_point_on_quad (const Triangulation<2,3>::quad_iterat
                                    //Just get the average
   Point<2> p[4];
 
-  for(unsigned i=0;i<4;i++)
+  for(unsigned int i=0;i<4;i++)
     p[i]=get_surf_coord(quad->vertex(i));
 
   Point<2>  middle(0,0);
@@ -1372,14 +1372,16 @@ TorusBoundary<2,3>::get_new_point_on_quad (const Triangulation<2,3>::quad_iterat
                                    //Take care for periodic conditions, see get_new_point_on_line() above
                                    //For instance phi0= 0, phi1= 3/2*Pi  middle has to be 7/4*Pi not 3/4*Pi
                                    //This also works for -Pi/2 + Pi + Pi- Pi/2, middle is 5/4*Pi
-  for(unsigned i=0;i<2;i++)
-    for(unsigned j=1;j<4;j++){
-      if(std::abs(p[0](i)-p[j](i))> numbers::PI){
-        middle(i)+=2*numbers::PI;
+  for(unsigned int i=0;i<2;i++)
+    for(unsigned int j=1;j<4;j++)
+      {
+	if(std::abs(p[0](i)-p[j](i))> numbers::PI)
+	  {
+	    middle(i)+=2*numbers::PI;
+	  }
       }
-    }
 
-  for(unsigned i=0;i<4;i++)
+  for(unsigned int i=0;i<4;i++)
     middle+=p[i];
 
   middle*= 0.25;
@@ -1429,15 +1431,15 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator &  lin
                                  std::vector< Point< 3 > > & points) const
 {
                                    //Almost the same implementation as  StraightBoundary<2,3>
-  unsigned npoints=points.size();
+  unsigned int npoints=points.size();
   if(npoints==0) return;
 
   Point<2> p[2];
 
-  for(unsigned i=0;i<2;i++)
+  for(unsigned int i=0;i<2;i++)
     p[i]=get_surf_coord(line->vertex(i));
 
-  unsigned  offset[2];
+  unsigned int offset[2];
   offset[0]=0;
   offset[1]=0;
 
@@ -1445,16 +1447,18 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator &  lin
                                    //see get_new_point_on_line() above
                                    //Because we dont have a symmetric interpolation (just the middle) we need to
                                    //add 2*Pi to each almost zero and negative angles.
-  for(unsigned i=0;i<2;i++)
-    for(unsigned j=1;j<2;j++){
-      if(std::abs(p[0](i)-p[j](i))> numbers::PI){
-        offset[i]++;
-        break;
+  for(unsigned int i=0;i<2;i++)
+    for(unsigned int j=1;j<2;j++)
+      {
+	if(std::abs(p[0](i)-p[j](i))> numbers::PI)
+	  {
+	    offset[i]++;
+	    break;
+	  }
       }
-    }
 
-  for(unsigned  i=0;i<2;i++)
-    for(unsigned  j=0;j<2;j++)
+  for(unsigned int i=0;i<2;i++)
+    for(unsigned int j=0;j<2;j++)
       if(p[j](i)<1.E-12 ) //Take care for periodic conditions & negative angles
         p[j](i)+=2*numbers::PI*offset[i];
 
@@ -1462,10 +1466,11 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator &  lin
   double dx=1.0/(npoints+1);
   double x=dx;
   Point<2>  target;
-  for(unsigned i=0; i<npoints;i++,x+=dx){
-    target=  (1-x)*p[0] + x*p[1];
-    points[i]=get_real_coord(target);
-  }
+  for(unsigned int i=0; i<npoints;i++,x+=dx)
+    {
+      target=  (1-x)*p[0] + x*p[1];
+      points[i]=get_real_coord(target);
+    }
 }
 
 
@@ -1487,11 +1492,11 @@ get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &qua
 
   Point<2>  p[4];
 
-  for(unsigned  i=0;i<4;i++)
+  for(unsigned int i=0;i<4;i++)
     p[i]=get_surf_coord(quad->vertex(i));
 
   Point<2>  target;
-  unsigned  offset[2];
+  unsigned int offset[2];
   offset[0]=0;
   offset[1]=0;
 
@@ -1499,30 +1504,33 @@ get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &qua
                                    //see get_new_point_on_line() above
                                    //Because we dont have a symmetric interpolation (just the middle) we need to
                                    //add 2*Pi to each almost zero and negative angles.
-  for(unsigned  i=0;i<2;i++)
-    for(unsigned  j=1;j<4;j++){
-      if(std::abs(p[0](i)-p[j](i))> numbers::PI){
-        offset[i]++;
-        break;
+  for(unsigned int i=0;i<2;i++)
+    for(unsigned int j=1;j<4;j++)
+      {
+	if(std::abs(p[0](i)-p[j](i))> numbers::PI)
+	  {
+	    offset[i]++;
+	    break;
+	  }
       }
-    }
 
-  for(unsigned  i=0;i<2;i++)
-    for(unsigned  j=0;j<4;j++)
+  for(unsigned int i=0;i<2;i++)
+    for(unsigned int j=0;j<4;j++)
       if(p[j](i)<1.E-12 ) //Take care for periodic conditions & negative angles
         p[j](i)+=2*numbers::PI*offset[i];
 
-  for (unsigned  i=0; i<m; ++i, y+=ds)
+  for (unsigned int i=0; i<m; ++i, y+=ds)
     {
       double x=ds;
-      for (unsigned  j=0; j<m; ++j, x+=ds){
-        target=((1-x) * p[0] +
-                x     * p[1]) * (1-y) +
-               ((1-x) * p[2] +
-                x     * p[3]) * y;
+      for (unsigned int j=0; j<m; ++j, x+=ds)
+	{
+	  target=((1-x) * p[0] +
+		  x     * p[1]) * (1-y) +
+		 ((1-x) * p[2] +
+		  x     * p[3]) * y;
 
-        points[i*m+j]=get_real_coord(target);
-      }
+	  points[i*m+j]=get_real_coord(target);
+	}
     }
 }
 
@@ -1534,7 +1542,7 @@ TorusBoundary<2,3>::
 get_normals_at_vertices (const Triangulation<2,3 >::face_iterator &face,
                          Boundary<2,3>::FaceVertexNormals &face_vertex_normals) const
 {
-  for(unsigned i=0; i<GeometryInfo<2>::vertices_per_face; i++)
+  for(unsigned int i=0; i<GeometryInfo<2>::vertices_per_face; i++)
     face_vertex_normals[i]=get_surf_norm(face->vertex(i));
 }
 

@@ -39,7 +39,7 @@ namespace hp
  *
  * The way the difference quotients are computed on cell $K$ is the
  * following (here described for the approximation of the gradient of
- * a finite element field, but see below for higher derivatived): let
+ * a finite element field, but see below for higher derivatives): let
  * $K'$ be a neighboring cell, and let $y_{K'}=x_{K'}-x_K$ be the
  * distance vector between the centers of the two cells, then
  *   $ \frac{u_h(x_{K'}) - u_h(x_K)}{ \|y_{K'}\| }$

@@ -141,7 +141,7 @@ namespace internal
                                           * The object containing dof-indices
                                           * and related access-functions
                                           */
-        DoFObjects<1> lines;
+        DoFObjects<1> dof_object;
 
                                          /**
                                           * Determine an estimate for the
@@ -174,7 +174,7 @@ namespace internal
                                           * The object containing dof-indices
                                           * and related access-functions
                                           */
-        internal::DoFHandler::DoFObjects<2> quads;
+        internal::DoFHandler::DoFObjects<2> dof_object;
 
                                          /**
                                           * Determine an estimate for the
@@ -207,7 +207,7 @@ namespace internal
                                           * The object containing dof-indices
                                           * and related access-functions
                                           */
-        internal::DoFHandler::DoFObjects<3> hexes;
+        internal::DoFHandler::DoFObjects<3> dof_object;
 
                                          /**
                                           * Determine an estimate for the
@@ -241,7 +241,7 @@ namespace internal
                                  const unsigned int version)
     {
       this->DoFLevel<0>::serialize (ar, version);
-      ar & lines;
+      ar & dof_object;
     }
 
 
@@ -250,7 +250,7 @@ namespace internal
                                  const unsigned int version)
     {
       this->DoFLevel<0>::serialize (ar, version);
-      ar & quads;
+      ar & dof_object;
     }
 
 
@@ -259,7 +259,7 @@ namespace internal
                                  const unsigned int version)
     {
       this->DoFLevel<0>::serialize (ar, version);
-      ar & hexes;
+      ar & dof_object;
     }
   }
 }

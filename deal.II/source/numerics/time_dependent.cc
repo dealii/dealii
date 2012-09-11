@@ -270,7 +270,7 @@ TimeStepBase::~TimeStepBase ()
 
 
 void
-TimeStepBase::wake_up (const unsigned )
+TimeStepBase::wake_up (const unsigned int )
 {}
 
 
@@ -454,7 +454,7 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria ()
 
 template <int dim>
 void
-TimeStepBase_Tria<dim>::wake_up (const unsigned wakeup_level)
+TimeStepBase_Tria<dim>::wake_up (const unsigned int wakeup_level)
 {
   TimeStepBase::wake_up (wakeup_level);
 
@@ -467,7 +467,7 @@ TimeStepBase_Tria<dim>::wake_up (const unsigned wakeup_level)
 
 template <int dim>
 void
-TimeStepBase_Tria<dim>::sleep (const unsigned sleep_level)
+TimeStepBase_Tria<dim>::sleep (const unsigned int sleep_level)
 {
   if (sleep_level == flags.sleep_level_to_delete_grid)
     {

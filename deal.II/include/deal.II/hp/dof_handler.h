@@ -863,7 +863,7 @@ namespace hp
                                         * consideration.
                                         */
       unsigned int
-      n_boundary_dofs (const std::set<types::boundary_id_t> &boundary_indicators) const;
+      n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const;
 
                                        /**
                                         * Return the number of
@@ -1107,7 +1107,7 @@ namespace hp
                                         *  Create default tables for
                                         *  the active_fe_indices in
                                         *  the
-                                        *  dealii::internal::hp::DoFLevels. They
+                                        *  dealii::internal::hp::DoFLevel. They
                                         *  are initialized with the a
                                         *  zero indicator, meaning
                                         *  that fe[0] is going to be
@@ -1239,7 +1239,7 @@ namespace hp
                                         * form of a linked list, is
                                         * the same as used for the
                                         * arrays used in the
-                                        * hp::DoFLevel
+                                        * internal::hp::DoFLevel
                                         * hierarchy. Starting indices
                                         * into this array are provided
                                         * by the vertex_dofs_offsets

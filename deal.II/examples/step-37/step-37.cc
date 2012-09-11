@@ -41,7 +41,7 @@
 #include <deal.II/multigrid/mg_matrix.h>
 
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
                                 // This includes the data structures for the
                                 // efficient implementation of matrix-free

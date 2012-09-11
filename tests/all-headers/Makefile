@@ -90,5 +90,7 @@ clean:
 	-rm -f Makefile.dep *.$(OBJEXT) \
                *.g.$(OBJEXT) *.output *~ *.OK *.cc
 
+summary:
+	@echo "not implemented"
 
-.PHONY: report clean distclean all default report report+mail
+.PHONY: report clean distclean all default report report+mail summary

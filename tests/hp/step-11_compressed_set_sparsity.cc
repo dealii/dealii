@@ -44,8 +44,8 @@ std::ofstream logfile("step-11_compressed_set_sparsity/output");
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 #include <deal.II/lac/compressed_set_sparsity_pattern.h>
 

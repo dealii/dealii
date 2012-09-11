@@ -293,18 +293,6 @@ class DoFHandler  :  public Subscriptor
                                       * is first discussed in the introduction
                                       * to the step-2 tutorial program.
                                       *
-                                      * The additional optional
-                                      * parameter @p offset allows you
-                                      * to reserve space for a finite
-                                      * number of additional vector
-                                      * entries in the beginning of
-                                      * all discretization vectors, by
-                                      * starting the enumeration of
-                                      * degrees of freedom on the grid
-                                      * at a nonzero value. By
-                                      * default, this value is of
-                                      * course zero.
-                                      *
                                       * A pointer of the transferred
                                       * finite element is
                                       * stored. Therefore, the
@@ -317,8 +305,7 @@ class DoFHandler  :  public Subscriptor
                                       * releases the lock of this
                                       * object to the finite element.
                                       */
-    virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe,
-                                  const unsigned int        offset = 0);
+    virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe);
 
                                      /**
                                       * After distribute_dofs() with
@@ -1073,7 +1060,7 @@ class DoFHandler  :  public Subscriptor
                                       * consideration.
                                       */
     unsigned int
-    n_boundary_dofs (const std::set<types::boundary_id_t> &boundary_indicators) const;
+    n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const;
 
                                      /**
                                       * Access to an object informing
@@ -1419,7 +1406,7 @@ class DoFHandler  :  public Subscriptor
 
 template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
 template <> unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
-template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id_t> &) const;
+template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &) const;
 
 
 /* ----------------------- Inline functions ---------------------------------- */

@@ -1149,11 +1149,41 @@ namespace DoFRenumbering
                                     * preserved, as is the relative
                                     * order within the untagged
                                     * ones.
+                                    *
+                                    * @pre The @p selected_dofs
+                                    * array must have as many elements as
+                                    * the @p dof_handler has degrees of
+                                    * freedom.
                                     */
   template <class DH>
   void
   sort_selected_dofs_back (DH&                      dof_handler,
                            const std::vector<bool>& selected_dofs);
+
+                                   /**
+                                    * Sort those degrees of freedom
+                                    * which are tagged with @p true
+                                    * in the @p selected_dofs array
+                                    * on the level #level
+                                    * to the back of the DoF
+                                    * numbers. The sorting is
+                                    * stable, i.e. the relative
+                                    * order within the tagged
+                                    * degrees of freedom is
+                                    * preserved, as is the relative
+                                    * order within the untagged
+                                    * ones.
+                                    *
+                                    * @pre The @p selected_dofs
+                                    * array must have as many elements as
+                                    * the @p dof_handler has degrees of
+                                    * freedom on the given level.
+                                    */
+  template <class DH>
+  void
+  sort_selected_dofs_back (DH&                      dof_handler,
+                           const std::vector<bool>& selected_dofs,
+                           const unsigned int       level);
 
                                    /**
                                     * Computes the renumbering
@@ -1163,12 +1193,39 @@ namespace DoFRenumbering
                                     * renumbering on the DoFHandler
                                     * dofs but returns the
                                     * renumbering vector.
+                                    *
+                                    * @pre The @p selected_dofs
+                                    * array must have as many elements as
+                                    * the @p dof_handler has degrees of
+                                    * freedom.
                                     */
   template <class DH>
   void
   compute_sort_selected_dofs_back (std::vector<unsigned int>& new_dof_indices,
                                    const DH&                  dof_handler,
                                    const std::vector<bool>&   selected_dofs);
+
+                                   /**
+                                    * Computes the renumbering
+                                    * vector on each level
+                                    * needed by the
+                                    * sort_selected_dofs_back()
+                                    * function. Does not perform the
+                                    * renumbering on the MGDoFHandler
+                                    * dofs but returns the
+                                    * renumbering vector.
+                                    *
+                                    * @pre The @p selected_dofs
+                                    * array must have as many elements as
+                                    * the @p dof_handler has degrees of
+                                    * freedom on the given level.
+                                    */
+  template <class DH>
+  void
+  compute_sort_selected_dofs_back (std::vector<unsigned int>& new_dof_indices,
+                                   const DH&                  dof_handler,
+                                   const std::vector<bool>&   selected_dofs,
+                                   const unsigned int         level);
 
                                    /**
                                     * Renumber the degrees of

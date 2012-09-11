@@ -1545,7 +1545,7 @@ class GridOut
                                       * these faces are explicitly printed
                                       * in the <tt>write_*</tt> functions;
                                       * all faces with indicator
-                                      * types::internal_face_boundary_id are
+                                      * numbers::internal_face_boundary_id are
                                       * interior ones and an indicator with
                                       * value zero for faces at the boundary
                                       * are considered default.
@@ -1580,7 +1580,7 @@ class GridOut
                                       * these lines are explicitly printed
                                       * in the <tt>write_*</tt> functions;
                                       * all lines with indicator
-                                      * types::internal_face_boundary_id are
+                                      * numbers::internal_face_boundary_id are
                                       * interior ones and an indicator with
                                       * value zero for faces at the boundary
                                       * are considered default.

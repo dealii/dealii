@@ -68,7 +68,7 @@
                                  // code. However, we're too lazy to
                                  // do that here, so simply use a
                                  // library function:
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
                                  // In a very similar vein, we are
                                  // also too lazy to write the code to
@@ -84,7 +84,7 @@
                                  // and
                                  // MatrixTools::create_laplace_matrix
                                  // functions. They are declared here:
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/matrix_tools.h>
 
                                  // Finally, here is an include file
                                  // that contains all sorts of tool

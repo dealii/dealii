@@ -36,7 +36,7 @@ char logname[] = "face_orientation_and_fe_q_02/output";
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/fe/fe_q.h>
 
 #include <fstream>

@@ -15,7 +15,7 @@
 // we used to get this crash:
 //
 // An error occurred in line <4646> of file </w/heister/deal-trunk/deal.II/include/deal.II/numerics/vectors.templates.h> in function
-//     static void dealii::VectorTools::compute_no_normal_flux_constraints(const DH<dim, spacedim>&, unsigned int, const std::set<types::boundary_id_t>&, dealii::ConstraintMatrix&, const dealii::Mapping<dim, spacedim>&) [with int dim = 3, DH = dealii::DoFHandler, int spacedim = 3]
+//     static void dealii::VectorTools::compute_no_normal_flux_constraints(const DH<dim, spacedim>&, unsigned int, const std::set<types::boundary_id>&, dealii::ConstraintMatrix&, const dealii::Mapping<dim, spacedim>&) [with int dim = 3, DH = dealii::DoFHandler, int spacedim = 3]
 // The violated condition was:
 //     std::fabs (tangent.norm()-1) < 1e-12
 // The name and call sequence of the exception was:
@@ -34,7 +34,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 
 template <int dim>
@@ -55,7 +55,7 @@ check ()
 
   dofh.distribute_dofs (fe);
 
-  std::set<types::boundary_id_t> no_normal_flux_boundaries;
+  std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (0);
   VectorTools::compute_no_normal_flux_constraints (dofh, 0, no_normal_flux_boundaries, cm, mapping);
 

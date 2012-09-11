@@ -27,39 +27,39 @@
 #include <iomanip>
 
 
-template <int dim> Table<dim,types::material_id_t> material_ids();
+template <int dim> Table<dim,types::material_id> material_ids();
 
-template <> Table<1,types::material_id_t> material_ids<1>()
+template <> Table<1,types::material_id> material_ids<1>()
 {
-  Table<1,types::material_id_t> t(2);
+  Table<1,types::material_id> t(2);
   for (unsigned int i=0; i<2; ++i)
     t[i] = 1;
   return t;
 }
 
 
-template <> Table<2,types::material_id_t> material_ids<2>()
+template <> Table<2,types::material_id> material_ids<2>()
 {
-  Table<2,types::material_id_t> t(2,3);
+  Table<2,types::material_id> t(2,3);
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<3; ++j)
       t[i][j] = 1;
 				   // produce a hole in the middle
-  t[1][1] = (types::material_id_t)(-1);
+  t[1][1] = (types::material_id)(-1);
   return t;
 }
 
 
-template <> Table<3,types::material_id_t> material_ids<3>()
+template <> Table<3,types::material_id> material_ids<3>()
 {
-  Table<3,types::material_id_t> t(2,3,4);
+  Table<3,types::material_id> t(2,3,4);
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<3; ++j)
       for (unsigned int k=0; k<4; ++k)
 	t[i][j][k] = 1;
 				   // produce a hole in the middle
-  t[1][1][1] = (types::material_id_t)(-1);
-  t[1][1][2] = (types::material_id_t)(-1);
+  t[1][1][1] = (types::material_id)(-1);
+  t[1][1][2] = (types::material_id)(-1);
   return t;
 }
 

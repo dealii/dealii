@@ -119,8 +119,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
                                       * A copy of the transferred
                                       * finite element is stored.
                                       */
-    virtual void distribute_dofs (const FiniteElement<dim,spacedim> &,
-                                  const unsigned int offset = 0);
+    virtual void distribute_dofs (const FiniteElement<dim,spacedim> &);
 
                                      /**
                                       * Clear all data of this object

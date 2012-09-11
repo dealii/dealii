@@ -76,6 +76,13 @@ DEAL_II_TRILINOS_VERSION_MINOR    = @DEAL_II_TRILINOS_VERSION_MINOR@
 DEAL_II_TRILINOS_VERSION_SUBMINOR = @DEAL_II_TRILINOS_VERSION_SUBMINOR@
 DEAL_II_TRILINOS_LIBPREFIX = @DEAL_II_TRILINOS_LIBPREFIX@
 
+USE_CONTRIB_HDF5 = @USE_CONTRIB_HDF5@
+DEAL_II_HDF5_VERSION = @DEAL_II_HDF5_VERSION@
+DEAL_II_HDF5_CFLAGS = @DEAL_II_HDF5_CFLAGS@
+DEAL_II_HDF5_CPPFLAGS = @DEAL_II_HDF5_CPPFLAGS@
+DEAL_II_HDF5_LDFLAGS = @DEAL_II_HDF5_LDFLAGS@
+DEAL_II_HDF5_INCDIR = @DEAL_II_HDF5_INCDIR@
+
 USE_CONTRIB_BLAS   = @USE_CONTRIB_BLAS@
 USE_CONTRIB_LAPACK = @USE_CONTRIB_LAPACK@
 
@@ -90,7 +97,9 @@ DEAL_II_ARPACK_DIR  = @DEAL_II_ARPACK_DIR@
 DEAL_II_ARPACK_ARCH = @DEAL_II_ARPACK_ARCH@
 
 USE_CONTRIB_METIS    = @USE_CONTRIB_METIS@
+DEAL_II_METIS_DIR = @DEAL_II_METIS_DIR@
 DEAL_II_METIS_LIBDIR = @DEAL_II_METIS_LIBDIR@
+DEAL_II_METIS_INCDIR = @DEAL_II_METIS_INCDIR@
 
 USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
 USE_CONTRIB_UMFPACK  = @USE_CONTRIB_UMFPACK@
@@ -162,31 +171,20 @@ endif
 # we can link to directly. This avoids problems with recent versions
 # of gcc.
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-    lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
-    lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
-  else
-    lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
-    lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
-  endif
+  lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
+  lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
 
   ifeq ($(enable-shared),yes)
-    # Starting with PETSc versions 2.3.*:
-    ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-      lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
-      lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+    # Starting with PETSc versions 3.0.0:
+    ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30)
+      lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
+      lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
     else
-      # which is the similar as for PETSc 3.0.0:
-      ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30)
-        lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
-        lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
-      else
-        # but after that (petsc-3.1++), we can use the simpler PETSc
-        # default "--with-single-library=1" like this:
-        lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
-        lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
-      endif
-    endif # if PETSC_VERSION
+      # but after that (petsc-3.1++), we can use the simpler PETSc
+      # default "--with-single-library=1" like this:
+      lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
+      lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
+    endif
   else
     # and finally this goes for static libraries
     lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
@@ -200,7 +198,7 @@ endif
 
 # same for metis, except that there is only one library in that case
 ifeq ($(USE_CONTRIB_METIS),yes)
-  lib-contrib-metis = $(DEAL_II_METIS_LIBDIR)/libmetis.a
+  lib-contrib-metis = $(DEAL_II_METIS_LIBDIR)/libmetis$(lib-suffix)
 endif
 
 # List all trilinos libraries that we want to link with. These must be sorted
@@ -273,16 +271,15 @@ lib-deal2.g     = $(LIBDIR)/libdeal_II.g$(lib-suffix) \
 # environment variable, since the compiler will evaluate the value of
 # that anyway at compile time
 include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
-ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-  include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
-else
-  include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/include
-endif
+include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/include
 include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
 include-path-slepc-bmake     = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/include
 include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
 include-path-mumps           = $(DEAL_II_MUMPS_DIR)/include
+include-path-metis           = $(DEAL_II_METIS_INCDIR)
+include-path-hdf5            = $(DEAL_II_HDF5_INCDIR)
+
 
 # include paths as command line flags. while compilers allow a space between
 # the '-I' and the actual path, we also send these flags to the
@@ -305,9 +302,6 @@ INCLUDE = -I$D/include \
 #
 # also, note that this only works for PETSc before 2.3 :-]
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),22)
-    include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
-  endif
   INCLUDE += -I$(include-path-petsc) \
              -I$(include-path-petsc-bmake) \
                $(MPI_INCLUDE)
@@ -326,6 +320,15 @@ endif
 ifeq ($(USE_CONTRIB_MUMPS),yes)
   INCLUDE += -I$(include-path-mumps)
 endif
+
+ifeq ($(USE_CONTRIB_METIS),yes)
+  INCLUDE += -I$(include-path-metis)
+endif
+
+ifeq ($(USE_CONTRIB_HDF5),yes)
+  INCLUDE += -I$(include-path-hdf5)
+endif
+
 
 ifeq ($(enable-threads),yes)
   INCLUDE += -I$(shell echo $D/contrib/tbb/tbb*/include)
@@ -353,22 +356,23 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   # set PETSC_DIR and PETSC_ARCH to be used in variables file
   PETSC_DIR  = $(DEAL_II_PETSC_DIR)
   PETSC_ARCH = $(DEAL_II_PETSC_ARCH)
-  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-    ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
-      include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/variables
-    else
-      include $(DEAL_II_PETSC_DIR)/bmake/common/variables
-    endif
-  else
-    # PETSC's $(PETSC_ARCH)/conf/petscvariables include file happens
-    # to have a variable $(CXX) of itself. we need to save our own
-    # variable and restore it later. this isn't pretty :-(
-    SAVE_CXX := $(CXX)
-    include $(DEAL_II_PETSC_DIR)/conf/variables
-    CXX := $(SAVE_CXX)
-  endif
+
+  # PETSC's $(PETSC_ARCH)/conf/petscvariables include file happens
+  # to have a variable $(CXX) of itself. we need to save our own
+  # variable and restore it later. this isn't pretty :-(
+  SAVE_CXX := $(CXX)
+  include $(DEAL_II_PETSC_DIR)/conf/variables
+  CXX := $(SAVE_CXX)
+
   CXXFLAGS.g += $(GCXX_PETSCFLAGS)
   CXXFLAGS.o += $(OCXX_PETSCFLAGS)
+endif
+
+ifeq ($(USE_CONTRIB_HDF5),yes)
+  CFLAGS.g += $(DEAL_II_HDF5_CFLAGS)
+  CFLAGS.o += $(DEAL_II_HDF5_CFLAGS)
+  CXXFLAGS.g += $(DEAL_II_HDF5_CXXFLAGS)
+  CXXFLAGS.o += $(DEAL_II_HDF5_CXXFLAGS)
 endif
 
 ifneq ($(enable-threads),no)
@@ -380,15 +384,13 @@ endif
 
 ifeq ($(BUILDTEST),yes)
 print-summary:
-	@echo "dealii-feature: revision=`svn info .. | grep Revision | sed 's/Revision: //'`"
+	@svn info .. | perl -ne 'print "dealii-feature: revision=$$_\n" if s/Revision: //; print "dealii-feature: branch=$$1\n" if m/svn\/dealii\/(.+)\/deal.II/;'
 	@echo "dealii-feature: user=$(USER)"
 	@echo "dealii-feature: host=`hostname`"
 	@echo "dealii-feature: target=$(TARGET)"
 	@echo "dealii-feature: compiler=$(GXX-VERSION-DETAILED)"
 	@echo "dealii-feature: multithreading=$(enable-threads)"
 	@echo "dealii-feature: shared_libs=$(enable-shared)"
-	@echo "dealii-feature: parser=$(subst no,,$(enable-parser))"
-	@echo "dealii-feature: PETSc=$(subst ..,,$(DEAL_II_PETSC_VERSION_MAJOR).$(DEAL_II_PETSC_VERSION_MINOR).$(DEAL_II_PETSC_VERSION_SUBMINOR))"
 	@echo "dealii-feature: METIS=$(subst no,,$(USE_CONTRIB_METIS))"
 	@cd $D/common/scripts ; make report_features && ./report_features
 endif

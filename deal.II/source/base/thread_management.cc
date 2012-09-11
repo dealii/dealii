@@ -154,7 +154,7 @@ namespace Threads
     const pid_t this_id = getpid();
 #else
 #  ifdef DEAL_II_MSVC
-    const unsigned this_id = 0;
+    const unsigned int this_id = 0;
 #  else
     const pid_t this_id = 0;
 #  endif

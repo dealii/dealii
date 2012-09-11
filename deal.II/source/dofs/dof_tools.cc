@@ -39,7 +39,7 @@
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_dof_accessor.h>
@@ -60,7 +60,7 @@ namespace DoFTools
                          SparsityPattern        &sparsity,
                          const ConstraintMatrix &constraints,
                          const bool              keep_constrained_dofs,
-                         const types::subdomain_id_t subdomain_id)
+                         const types::subdomain_id subdomain_id)
   {
     const unsigned int n_dofs = dof.n_dofs();
 
@@ -123,7 +123,7 @@ namespace DoFTools
                          SparsityPattern         &sparsity,
                          const ConstraintMatrix  &constraints,
                          const bool               keep_constrained_dofs,
-                         const types::subdomain_id_t subdomain_id)
+                         const types::subdomain_id subdomain_id)
   {
     const unsigned int n_dofs = dof.n_dofs();
 
@@ -472,7 +472,7 @@ namespace DoFTools
     const unsigned int n_dofs = dof.n_dofs();
 
     AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
-    Assert (boundary_indicators.find(types::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_indicators.find(numbers::internal_face_boundary_id) == boundary_indicators.end(),
             typename DH::ExcInvalidBoundaryIndicator());
     Assert (sparsity.n_rows() == dof.n_boundary_dofs (boundary_indicators),
             ExcDimensionMismatch (sparsity.n_rows(), dof.n_boundary_dofs (boundary_indicators)));
@@ -521,7 +521,7 @@ namespace DoFTools
                               SparsityPattern &sparsity,
                               const ConstraintMatrix &constraints,
                               const bool              keep_constrained_dofs,
-                              const types::subdomain_id_t subdomain_id)
+                              const types::subdomain_id subdomain_id)
   {
     const unsigned int n_dofs = dof.n_dofs();
 
@@ -3378,7 +3378,7 @@ namespace DoFTools
   template<typename DH>
   void
   make_periodicity_constraints (const DH                       &dof_handler,
-                                const types::boundary_id_t     boundary_component,
+                                const types::boundary_id     boundary_component,
                                 const int                      direction,
                                 dealii::ConstraintMatrix       &constraint_matrix,
                                 const std::vector<bool>        &component_mask)
@@ -3396,7 +3396,7 @@ namespace DoFTools
   template<typename DH>
   void
   make_periodicity_constraints (const DH                       &dof_handler,
-                                const types::boundary_id_t     boundary_component,
+                                const types::boundary_id     boundary_component,
                                 const int                      direction,
                                 dealii::Tensor<1,DH::space_dimension>
                                                                &offset,
@@ -3453,12 +3453,20 @@ namespace DoFTools
                                      // assignment is done by blocks, not by
                                      // components, as specified by
                                      // component_select. The additional argument
-                                     // component_select only is used for
+                                     // component_select is only used for
                                      // non-primitive FEs, where we need it since
                                      // more components couple, and no unique
                                      // component can be assigned. Then, we sort
                                      // them to the first selected component of the
                                      // vector system.
+				     //
+				     // the output array dofs_by_component
+				     // lists for each dof the corresponding
+				     // vector component. if the DoFHandler is
+				     // based on a parallel distributed
+				     // triangulation then the output array is
+				     // index by
+				     // dof.locally_owned_dofs().index_within_set(indices[i])
     template <class DH>
     inline
     void
@@ -3474,10 +3482,20 @@ namespace DoFTools
               ExcDimensionMismatch(dofs_by_component.size(),
                                    dof.n_locally_owned_dofs()));
 
-                                       // next set up a table for the
-                                       // degrees of freedom on each of
-                                       // the cells whether it is
-                                       // something interesting or not
+                                       // next set up a table for the degrees
+                                       // of freedom on each of the cells
+                                       // (regardless of the fact whether it
+                                       // is listed in the component_select
+                                       // argument or not)
+				       //
+				       // for each element 'f' of the
+				       // FECollection,
+				       // local_component_association[f][d]
+				       // then returns the vector component
+				       // that degree of freedom 'd' belongs
+				       // to (or, in the case of
+				       // sort_by_blocks, the block that it
+				       // corresponds to)
       std::vector<std::vector<unsigned char> > local_component_association
         (fe_collection.size());
       for (unsigned int f=0; f<fe_collection.size(); ++f)
@@ -3486,12 +3504,16 @@ namespace DoFTools
             fe_collection[f];
           local_component_association[f].resize(fe.dofs_per_cell);
           if (sort_by_blocks == true)
+					     // compute the block each
+					     // local dof belongs to
             {
               for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
                 local_component_association[f][i]
                   = fe.system_to_block_index(i).first;
             }
           else
+					     // compute the component each
+					     // local dof belongs to
             for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
               if (fe.is_primitive(i))
                 local_component_association[f][i] =
@@ -3896,7 +3918,7 @@ namespace DoFTools
   extract_boundary_dofs (const DH                      &dof_handler,
                          const std::vector<bool>       &component_select,
                          std::vector<bool>             &selected_dofs,
-                         const std::set<types::boundary_id_t> &boundary_indicators)
+                         const std::set<types::boundary_id> &boundary_indicators)
   {
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
              (&dof_handler.get_tria())
@@ -3923,10 +3945,10 @@ namespace DoFTools
   extract_boundary_dofs (const DH                      &dof_handler,
                          const std::vector<bool>       &component_select,
                          IndexSet             &selected_dofs,
-                         const std::set<types::boundary_id_t> &boundary_indicators)
+                         const std::set<types::boundary_id> &boundary_indicators)
   {
     AssertDimension (component_select.size(), n_components(dof_handler));
-    Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
     const unsigned int dim=DH::dimension;
 
@@ -4051,10 +4073,10 @@ namespace DoFTools
   extract_dofs_with_support_on_boundary (const DH                      &dof_handler,
                                          const std::vector<bool>       &component_select,
                                          std::vector<bool>             &selected_dofs,
-                                         const std::set<types::boundary_id_t> &boundary_indicators)
+                                         const std::set<types::boundary_id> &boundary_indicators)
   {
     AssertDimension (component_select.size(), n_components(dof_handler));
-    Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
 
                                      // let's see whether we have to
@@ -4284,7 +4306,7 @@ namespace DoFTools
   template <class DH>
   void
   extract_subdomain_dofs (const DH                   &dof_handler,
-                          const types::subdomain_id_t subdomain_id,
+                          const types::subdomain_id subdomain_id,
                           std::vector<bool>          &selected_dofs)
   {
     Assert(selected_dofs.size() == dof_handler.n_dofs(),
@@ -4469,7 +4491,7 @@ namespace DoFTools
   template <class DH>
   void
   get_subdomain_association (const DH                  &dof_handler,
-                             std::vector<types::subdomain_id_t> &subdomain_association)
+                             std::vector<types::subdomain_id> &subdomain_association)
   {
                                      // if the Triangulation is distributed, the
                                      // only thing we can usefully ask is for
@@ -4511,7 +4533,7 @@ namespace DoFTools
                 ExcMessage ("You can't call this function for meshes that "
                             "have artificial cells."));
 
-        const types::subdomain_id_t subdomain_id = cell->subdomain_id();
+        const types::subdomain_id subdomain_id = cell->subdomain_id();
         const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
         local_dof_indices.resize (dofs_per_cell);
         cell->get_dof_indices (local_dof_indices);
@@ -4550,9 +4572,9 @@ namespace DoFTools
   template <class DH>
   unsigned int
   count_dofs_with_subdomain_association (const DH           &dof_handler,
-                                         const types::subdomain_id_t subdomain)
+                                         const types::subdomain_id subdomain)
   {
-    std::vector<types::subdomain_id_t> subdomain_association (dof_handler.n_dofs());
+    std::vector<types::subdomain_id> subdomain_association (dof_handler.n_dofs());
     get_subdomain_association (dof_handler, subdomain_association);
 
     return std::count (subdomain_association.begin(),
@@ -4565,7 +4587,7 @@ namespace DoFTools
   template <class DH>
   IndexSet
   dof_indices_with_subdomain_association (const DH           &dof_handler,
-                                          const types::subdomain_id_t subdomain)
+                                          const types::subdomain_id subdomain)
   {
 
                                      // If we have a distributed::Triangulation only
@@ -4626,7 +4648,7 @@ namespace DoFTools
   template <class DH>
   void
   count_dofs_with_subdomain_association (const DH           &dof_handler,
-                                         const types::subdomain_id_t subdomain,
+                                         const types::subdomain_id subdomain,
                                          std::vector<unsigned int> &n_dofs_on_subdomain)
   {
     Assert (n_dofs_on_subdomain.size() == dof_handler.get_fe().n_components(),
@@ -4653,7 +4675,7 @@ namespace DoFTools
     }
 #endif
 
-    std::vector<types::subdomain_id_t> subdomain_association (dof_handler.n_dofs());
+    std::vector<types::subdomain_id> subdomain_association (dof_handler.n_dofs());
     get_subdomain_association (dof_handler, subdomain_association);
 
     std::vector<unsigned char> component_association (dof_handler.n_dofs());
@@ -4872,8 +4894,10 @@ namespace DoFTools
   void
   count_dofs_per_block (const DH &dof_handler,
                         std::vector<unsigned int> &dofs_per_block,
-                        std::vector<unsigned int>  target_block)
+                        const std::vector<unsigned int>  &target_block_)
   {
+    std::vector<unsigned int>  target_block = target_block_;
+
     const dealii::hp::FECollection<DH::dimension,DH::space_dimension>
       fe_collection (dof_handler.get_fe());
     Assert (fe_collection.size() < 256, ExcNotImplemented());
@@ -5847,11 +5871,11 @@ namespace DoFTools
   template <class DH>
   void map_dof_to_boundary_indices (
     const DH                      &dof_handler,
-    const std::set<types::boundary_id_t> &boundary_indicators,
+    const std::set<types::boundary_id> &boundary_indicators,
     std::vector<unsigned int>     &mapping)
   {
     Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
-    Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
 
     mapping.clear ();

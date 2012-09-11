@@ -254,6 +254,15 @@ namespace SparsityTools
                   int,
                   << "The number of partitions you gave is " << arg1
                   << ", but must be greater than zero.");
+
+                                   /**
+                                    * Exception
+                                    */
+  DeclException1 (ExcMETISError,
+		  int,
+		  << "    An error with error number " << arg1
+		  << " occurred while calling a METIS function");
+
                                    /**
                                     * Exception
                                     */

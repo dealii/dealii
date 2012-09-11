@@ -484,8 +484,8 @@ FE_RaviartThomas<dim>::interpolate(
                          * values[face*n_face_points+k](GeometryInfo<dim>::unit_normal_direction[face]+offset);
       }
 
-  const unsigned start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
-  const unsigned start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
+  const unsigned int start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
+  const unsigned int start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
 
   for (unsigned int k=0;k<interior_weights.size(0);++k)
     for (unsigned int i=0;i<interior_weights.size(1);++i)
@@ -518,8 +518,8 @@ FE_RaviartThomas<dim>::interpolate(
                          * values[GeometryInfo<dim>::unit_normal_direction[face]][face*n_face_points+k];
       }
 
-  const unsigned start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
-  const unsigned start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
+  const unsigned int start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
+  const unsigned int start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
 
   for (unsigned int k=0;k<interior_weights.size(0);++k)
     for (unsigned int i=0;i<interior_weights.size(1);++i)

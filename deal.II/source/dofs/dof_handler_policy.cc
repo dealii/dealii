@@ -226,7 +226,7 @@ namespace internal
           static
           unsigned int
           distribute_dofs (const unsigned int        offset,
-                           const types::subdomain_id_t subdomain_id,
+                           const types::subdomain_id subdomain_id,
                            DoFHandler<dim,spacedim> &dof_handler)
             {
               const dealii::Triangulation<dim,spacedim> & tria
@@ -326,8 +326,8 @@ namespace internal
 
               for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
                 for (std::vector<unsigned int>::iterator
-                       i=dof_handler.levels[level]->lines.dofs.begin();
-                     i!=dof_handler.levels[level]->lines.dofs.end(); ++i)
+                       i=dof_handler.levels[level]->dof_object.dofs.begin();
+                     i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
                   if (*i != DoFHandler<1,spacedim>::invalid_dof_index)
                     *i = new_numbers[*i];
 
@@ -388,8 +388,8 @@ namespace internal
               for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
                 {
                   for (std::vector<unsigned int>::iterator
-                         i=dof_handler.levels[level]->quads.dofs.begin();
-                       i!=dof_handler.levels[level]->quads.dofs.end(); ++i)
+                         i=dof_handler.levels[level]->dof_object.dofs.begin();
+                       i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
                     if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
                       *i = ((indices.n_elements() == 0) ?
                             new_numbers[*i] :
@@ -459,8 +459,8 @@ namespace internal
               for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
                 {
                   for (std::vector<unsigned int>::iterator
-                         i=dof_handler.levels[level]->hexes.dofs.begin();
-                       i!=dof_handler.levels[level]->hexes.dofs.end(); ++i)
+                         i=dof_handler.levels[level]->dof_object.dofs.begin();
+                       i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
                     if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
                       *i = ((indices.n_elements() == 0) ?
                             new_numbers[*i] :
@@ -492,11 +492,10 @@ namespace internal
       template <int dim, int spacedim>
       NumberCache
       Sequential<dim,spacedim>::
-      distribute_dofs (const unsigned int        offset,
-                       DoFHandler<dim,spacedim> &dof_handler) const
+      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler) const
       {
         const unsigned int n_dofs =
-          Implementation::distribute_dofs (offset,
+          Implementation::distribute_dofs (0,
                                            types::invalid_subdomain_id,
                                            dof_handler);
 
@@ -637,8 +636,8 @@ namespace internal
                                      const unsigned int tree_index,
                                      const typename DoFHandler<dim,spacedim>::cell_iterator &dealii_cell,
                                      const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
-                                     const std::map<unsigned int, std::set<dealii::types::subdomain_id_t> > &vertices_with_ghost_neighbors,
-                                     std::map<dealii::types::subdomain_id_t, typename types<dim>::cellinfo> &needs_to_get_cell)
+                                     const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &vertices_with_ghost_neighbors,
+                                     std::map<dealii::types::subdomain_id, typename types<dim>::cellinfo> &needs_to_get_cell)
         {
                                            // see if we have to
                                            // recurse...
@@ -671,10 +670,10 @@ namespace internal
                                                // check each vertex if
                                                // it is interesting and
                                                // push dofindices if yes
-              std::set<dealii::types::subdomain_id_t> send_to;
+              std::set<dealii::types::subdomain_id> send_to;
               for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
                 {
-                  const std::map<unsigned int, std::set<dealii::types::subdomain_id_t> >::const_iterator
+                  const std::map<unsigned int, std::set<dealii::types::subdomain_id> >::const_iterator
                     neighbor_subdomains_of_vertex
                     = vertices_with_ghost_neighbors.find (dealii_cell->vertex_index(v));
 
@@ -698,10 +697,10 @@ namespace internal
                     local_dof_indices (dealii_cell->get_fe().dofs_per_cell);
                   dealii_cell->get_dof_indices (local_dof_indices);
 
-                  for (std::set<dealii::types::subdomain_id_t>::iterator it=send_to.begin();
+                  for (std::set<dealii::types::subdomain_id>::iterator it=send_to.begin();
                        it!=send_to.end();++it)
                     {
-                      const dealii::types::subdomain_id_t subdomain = *it;
+                      const dealii::types::subdomain_id subdomain = *it;
 
                                                        // get an iterator
                                                        // to what needs to
@@ -710,7 +709,7 @@ namespace internal
                                                        // already exists),
                                                        // or create such
                                                        // an object
-                      typename std::map<dealii::types::subdomain_id_t, typename types<dim>::cellinfo>::iterator
+                      typename std::map<dealii::types::subdomain_id, typename types<dim>::cellinfo>::iterator
                         p
                         = needs_to_get_cell.insert (std::make_pair(subdomain,
                                                                    typename types<dim>::cellinfo()))
@@ -825,7 +824,7 @@ namespace internal
         void
         communicate_dof_indices_on_marked_cells
         (const DoFHandler<1,spacedim> &,
-         const std::map<unsigned int, std::set<dealii::types::subdomain_id_t> > &,
+         const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &,
          const std::vector<unsigned int> &,
          const std::vector<unsigned int> &)
         {
@@ -838,7 +837,7 @@ namespace internal
         void
         communicate_dof_indices_on_marked_cells
         (const DoFHandler<dim,spacedim> &dof_handler,
-         const std::map<unsigned int, std::set<dealii::types::subdomain_id_t> > &vertices_with_ghost_neighbors,
+         const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &vertices_with_ghost_neighbors,
          const std::vector<unsigned int> &coarse_cell_to_p4est_tree_permutation,
          const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation)
         {
@@ -856,7 +855,7 @@ namespace internal
                                            // dof_indices for the
                                            // interested neighbors
           typedef
-            std::map<dealii::types::subdomain_id_t, typename types<dim>::cellinfo>
+            std::map<dealii::types::subdomain_id, typename types<dim>::cellinfo>
             cellmap_t;
           cellmap_t needs_to_get_cells;
 
@@ -912,7 +911,7 @@ namespace internal
                                            // mark all own cells, that miss some
                                            // dof_data and collect the neighbors
                                            // that are going to send stuff to us
-          std::set<dealii::types::subdomain_id_t> senders;
+          std::set<dealii::types::subdomain_id> senders;
           {
             std::vector<unsigned int> local_dof_indices;
             typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -1049,10 +1048,8 @@ namespace internal
       template <int dim, int spacedim>
       NumberCache
       ParallelDistributed<dim, spacedim>::
-      distribute_dofs (const unsigned int        offset,
-                       DoFHandler<dim,spacedim> &dof_handler) const
+      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler) const
       {
-        Assert(offset==0, ExcNotImplemented());
         NumberCache number_cache;
 
 #ifndef DEAL_II_USE_P4EST
@@ -1219,7 +1216,7 @@ namespace internal
                                          // subdomain to the vertex and
                                          // keep track of interesting
                                          // neighbors
-        std::map<unsigned int, std::set<dealii::types::subdomain_id_t> >
+        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
           vertices_with_ghost_neighbors;
         for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                cell = dof_handler.begin_active();
@@ -1464,7 +1461,7 @@ namespace internal
                                            // subdomain to the vertex and
                                            // keep track of interesting
                                            // neighbors
-          std::map<unsigned int, std::set<dealii::types::subdomain_id_t> >
+          std::map<unsigned int, std::set<dealii::types::subdomain_id> >
             vertices_with_ghost_neighbors;
           for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                  cell = dof_handler.begin_active();

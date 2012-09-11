@@ -287,7 +287,7 @@ template <int dim, int spacedim> class Triangulation;
  *            TimeDependent::TimeSteppingData (0,1),
  *            TimeDependent::forward);
  * @endverbatim
- * TimeStepBase_Wave()@p ::refine_grid is a function taking an argument, unlike
+ * TimeStepBase_Wave::refine_grid is a function taking an argument, unlike
  * all the other functions used above within the loops. However, in this special
  * case the parameter was the same for all timesteps and known before the loop
  * was started, so we fixed it and made a function object which to the outside

@@ -496,7 +496,7 @@ namespace DoFTools
                          SparsityPattern        &sparsity_pattern,
                          const ConstraintMatrix &constraints = ConstraintMatrix(),
                          const bool              keep_constrained_dofs = true,
-                         const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id);
+                         const types::subdomain_id subdomain_id = types::invalid_subdomain_id);
 
                                    /**
                                     * Locate non-zero entries for
@@ -658,7 +658,7 @@ namespace DoFTools
                          SparsityPattern          &sparsity_pattern,
                          const ConstraintMatrix   &constraints = ConstraintMatrix(),
                          const bool                keep_constrained_dofs = true,
-                         const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id);
+                         const types::subdomain_id subdomain_id = types::invalid_subdomain_id);
 
                                    /**
                                     * @deprecated This is the old
@@ -815,7 +815,7 @@ namespace DoFTools
                               SparsityPattern &sparsity_pattern,
                               const ConstraintMatrix   &constraints,
                               const bool                keep_constrained_dofs = true,
-                              const types::subdomain_id_t  subdomain_id = numbers::invalid_unsigned_int);
+                              const types::subdomain_id  subdomain_id = numbers::invalid_unsigned_int);
 
                                    /**
                                     * This function does the same as
@@ -1084,7 +1084,7 @@ namespace DoFTools
   template<typename DH>
   void
   make_periodicity_constraints (const DH                   &dof_handler,
-                                const types::boundary_id_t boundary_component,
+                                const types::boundary_id boundary_component,
                                 const int                  direction,
                                 dealii::ConstraintMatrix   &constraint_matrix,
                                 const std::vector<bool>    &component_mask = std::vector<bool>());
@@ -1104,7 +1104,7 @@ namespace DoFTools
   template<typename DH>
   void
   make_periodicity_constraints (const DH                       &dof_handler,
-                                const types::boundary_id_t     boundary_component,
+                                const types::boundary_id     boundary_component,
                                 const int                      direction,
                                 dealii::Tensor<1,DH::space_dimension>
                                                                &offset,
@@ -1335,7 +1335,7 @@ namespace DoFTools
   extract_boundary_dofs (const DH                   &dof_handler,
                          const std::vector<bool>    &component_mask,
                          std::vector<bool>          &selected_dofs,
-                         const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
+                         const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
 
   /**
    * This function does the same as the previous one but it
@@ -1371,7 +1371,7 @@ namespace DoFTools
   extract_boundary_dofs (const DH                   &dof_handler,
                          const std::vector<bool>    &component_mask,
                          IndexSet                    &selected_dofs,
-                         const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
+                         const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
 
                                    /**
                                     * This function is similar to
@@ -1408,7 +1408,7 @@ namespace DoFTools
   extract_dofs_with_support_on_boundary (const DH                   &dof_handler,
                                          const std::vector<bool>    &component_mask,
                                          std::vector<bool>          &selected_dofs,
-                                         const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
+                                         const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
 
                                    /**
                                     * @name Hanging Nodes
@@ -1458,7 +1458,7 @@ namespace DoFTools
   template <class DH>
   void
   extract_subdomain_dofs (const DH           &dof_handler,
-                          const types::subdomain_id_t subdomain_id,
+                          const types::subdomain_id subdomain_id,
                           std::vector<bool>  &selected_dofs);
 
 
@@ -1589,7 +1589,7 @@ namespace DoFTools
   template <class DH>
   void
   get_subdomain_association (const DH                  &dof_handler,
-                             std::vector<types::subdomain_id_t> &subdomain);
+                             std::vector<types::subdomain_id> &subdomain);
 
                                    /**
                                     * Count how many degrees of freedom are
@@ -1633,7 +1633,7 @@ namespace DoFTools
   template <class DH>
   unsigned int
   count_dofs_with_subdomain_association (const DH           &dof_handler,
-                                         const types::subdomain_id_t subdomain);
+                                         const types::subdomain_id subdomain);
 
                                    /**
                                     * Count how many degrees of freedom are
@@ -1670,7 +1670,7 @@ namespace DoFTools
   template <class DH>
   void
   count_dofs_with_subdomain_association (const DH           &dof_handler,
-                                         const types::subdomain_id_t subdomain,
+                                         const types::subdomain_id subdomain,
                                          std::vector<unsigned int> &n_dofs_on_subdomain);
 
                                    /**
@@ -1712,7 +1712,7 @@ namespace DoFTools
   template <class DH>
   IndexSet
   dof_indices_with_subdomain_association (const DH           &dof_handler,
-                                          const types::subdomain_id_t subdomain);
+                                          const types::subdomain_id subdomain);
 
                                    // @}
                                    /**
@@ -2054,7 +2054,7 @@ namespace DoFTools
                                     * target_component. If this is
                                     * not the case, an assertion is
                                     * thrown. The indices not
-                                    * targetted by target_components
+                                    * targeted by target_components
                                     * are left untouched.
                                     */
   template <class DH>
@@ -2100,7 +2100,7 @@ namespace DoFTools
   void
   count_dofs_per_block (const DH &dof,
                         std::vector<unsigned int> &dofs_per_block,
-                        std::vector<unsigned int>  target_block
+                        const std::vector<unsigned int>  &target_block
                           = std::vector<unsigned int>());
 
                                    /**
@@ -2419,7 +2419,7 @@ namespace DoFTools
   template <class DH>
   void
   map_dof_to_boundary_indices (const DH                      &dof_handler,
-                               const std::set<types::boundary_id_t> &boundary_indicators,
+                               const std::set<types::boundary_id> &boundary_indicators,
                                std::vector<unsigned int>     &mapping);
 
                                    /**

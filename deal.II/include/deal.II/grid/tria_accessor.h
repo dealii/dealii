@@ -1019,11 +1019,11 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * object.
                                       *
                                       * If the return value is the special
-                                      * value types::internal_face_boundary_id,
+                                      * value numbers::internal_face_boundary_id,
                                       * then this object is in the
                                       * interior of the domain.
                                       */
-    types::boundary_id_t boundary_indicator () const;
+    types::boundary_id boundary_indicator () const;
 
                                      /**
                                       * Set the boundary indicator.
@@ -1052,14 +1052,14 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * (a face not at the boundary of the
                                       * domain), or set set the boundary
                                       * indicator of an exterior face to
-                                      * types::internal_face_boundary_id
+                                      * numbers::internal_face_boundary_id
                                       * (this value is reserved for another
                                       * purpose). Algorithms may not work or
                                       * produce very confusing results if
                                       * boundary cells have a boundary
-                                      * indicator of types::internal_face_boundary_id
+                                      * indicator of numbers::internal_face_boundary_id
                                       * or if interior cells have boundary
-                                      * indicators other than types::internal_face_boundary_id.
+                                      * indicators other than numbers::internal_face_boundary_id.
                                       * Unfortunately, the current object
                                       * has no means of finding out whether it
                                       * really is at the boundary of the
@@ -1069,7 +1069,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       *
                                       * @ingroup boundary
                                       */
-    void set_boundary_indicator (const types::boundary_id_t) const;
+    void set_boundary_indicator (const types::boundary_id) const;
 
                                      /**
                                       * Do as set_boundary_indicator()
@@ -1089,7 +1089,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       *
                                       * @ingroup boundary
                                       */
-    void set_all_boundary_indicators (const types::boundary_id_t) const;
+    void set_all_boundary_indicators (const types::boundary_id) const;
 
                                      /**
                                       * Return whether this object is at the
@@ -1930,11 +1930,11 @@ class TriaAccessor<0, 1, spacedim>
                                       * boundary indicator one.
                                       *
                                       * If the return value is the special
-                                      * value types::internal_face_boundary_id,
+                                      * value numbers::internal_face_boundary_id,
                                       * then this object is in the
                                       * interior of the domain.
                                       */
-    types::boundary_id_t boundary_indicator () const;
+    types::boundary_id boundary_indicator () const;
 
                                      /**
                                       *  @name Orientation of sub-objects
@@ -2054,14 +2054,14 @@ class TriaAccessor<0, 1, spacedim>
                                       * (a face not at the boundary of the
                                       * domain), or set set the boundary
                                       * indicator of an exterior face to
-                                      *  types::internal_face_boundary_id
+                                      *  numbers::internal_face_boundary_id
                                       * (this value is reserved for another
                                       * purpose). Algorithms may not work or
                                       * produce very confusing results if
                                       * boundary cells have a boundary
-                                      * indicator of types::internal_face_boundary_id
+                                      * indicator of numbers::internal_face_boundary_id
                                       * or if interior cells have boundary
-                                      * indicators other than types::internal_face_boundary_id.
+                                      * indicators other than numbers::internal_face_boundary_id.
                                       * Unfortunately, the current object
                                       * has no means of finding out whether it
                                       * really is at the boundary of the
@@ -2072,7 +2072,7 @@ class TriaAccessor<0, 1, spacedim>
                                       * @ingroup boundary
                                       */
     void
-    set_boundary_indicator (const types::boundary_id_t);
+    set_boundary_indicator (const types::boundary_id);
 
                                      /**
                                       * Since this object only represents a
@@ -2083,7 +2083,7 @@ class TriaAccessor<0, 1, spacedim>
                                       * @ingroup boundary
                                       */
     void
-    set_all_boundary_indicators (const types::boundary_id_t);
+    set_all_boundary_indicators (const types::boundary_id);
                                      /**
                                       * @}
                                       */
@@ -2621,7 +2621,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * "glossary" for more
                                       * information.
                                       */
-    types::material_id_t material_id () const;
+    types::material_id material_id () const;
 
                                      /**
                                       * Set the material id of this
@@ -2635,7 +2635,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * "glossary" for more
                                       * information.
                                       */
-    void set_material_id (const types::material_id_t new_material_id) const;
+    void set_material_id (const types::material_id new_material_id) const;
 
                                      /**
                                       * Set the material id of this
@@ -2647,7 +2647,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * "glossary" for more
                                       * information.
                                       */
-    void recursively_set_material_id (const types::material_id_t new_material_id) const;
+    void recursively_set_material_id (const types::material_id new_material_id) const;
                                      /**
                                       * @}
                                       */
@@ -2671,7 +2671,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * parallel::distributed::Triangulation
                                       * object.
                                       */
-    types::subdomain_id_t subdomain_id () const;
+    types::subdomain_id subdomain_id () const;
 
                                      /**
                                       * Set the subdomain id of this
@@ -2685,7 +2685,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * parallel::distributed::Triangulation
                                       * object.
                                       */
-    void set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const;
+    void set_subdomain_id (const types::subdomain_id new_subdomain_id) const;
 
                                      /**
                                       * Set the subdomain id of this
@@ -2701,7 +2701,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       * parallel::distributed::Triangulation
                                       * object.
                                       */
-    void recursively_set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const;
+    void recursively_set_subdomain_id (const types::subdomain_id new_subdomain_id) const;
                                      /**
                                       * @}
                                       */

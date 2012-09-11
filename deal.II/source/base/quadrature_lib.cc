@@ -14,11 +14,9 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/geometry_info.h>
-#include <cmath>
 
-#ifdef HAVE_STD_NUMERIC_LIMITS
-#  include <limits>
-#endif
+#include <cmath>
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -110,15 +108,9 @@ QGauss<1>::QGauss (const unsigned int n)
                                    // emulator only supports 64 bit
                                    // arithmetic, even for 80 bit long
                                    // doubles.
-#ifdef HAVE_STD_NUMERIC_LIMITS
   const long double
     long_double_eps = static_cast<long double>(std::numeric_limits<long double>::epsilon()),
     double_eps      = static_cast<long double>(std::numeric_limits<double>::epsilon());
-#else
-  const long double
-    long_double_eps = 1.09-19L,
-    double_eps      = 2.23-16;
-#endif
 
                                    // now check whether long double is more
                                    // accurate than double, and set
@@ -210,15 +202,9 @@ compute_quadrature_points(const unsigned int q,
 
                                    // Set tolerance. See class QGauss
                                    // for detailed explanation.
-#ifdef HAVE_STD_NUMERIC_LIMITS
   const long double
     long_double_eps = static_cast<long double>(std::numeric_limits<long double>::epsilon()),
     double_eps      = static_cast<long double>(std::numeric_limits<double>::epsilon());
-#else
-  const long double
-    long_double_eps = 1.09-19L,
-    double_eps      = 2.23-16;
-#endif
 
                                    // check whether long double is
                                    // more accurate than double, and

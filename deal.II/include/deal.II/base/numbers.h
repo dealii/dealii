@@ -14,6 +14,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/types.h>
 #include <complex>
 
 DEAL_II_NAMESPACE_OPEN
@@ -35,24 +36,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace numbers
 {
-                                   /**
-                                    * Representation of the
-                                    * largest number that
-                                    * can be put into an
-                                    * unsigned integer. This
-                                    * value is widely used
-                                    * throughout the library
-                                    * as a marker for an
-                                    * invalid unsigned
-                                    * integer value, such as
-                                    * an invalid array
-                                    * index, an invalid
-                                    * array size, and the
-                                    * like.
-                                    */
-  static const unsigned int
-  invalid_unsigned_int = static_cast<unsigned int> (-1);
-
                                    /**
                                     * e
                                     */

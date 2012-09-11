@@ -68,7 +68,7 @@ int main ()
   triangulation.set_boundary (1, surface_description);
   triangulation.set_boundary (0, surface_description);
   
-  std::set<types::boundary_id_t> boundary_ids;
+  std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
   
   GridTools::extract_boundary_mesh (volume_mesh, triangulation,

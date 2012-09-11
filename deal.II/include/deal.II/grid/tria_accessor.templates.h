@@ -1820,7 +1820,7 @@ TriaAccessor<structdim, dim, spacedim>::number_of_children () const
 
 
 template <int structdim, int dim, int spacedim>
-types::boundary_id_t
+types::boundary_id
 TriaAccessor<structdim, dim, spacedim>::boundary_indicator () const
 {
   Assert (structdim<dim, ExcImpossibleInDim(dim));
@@ -1834,7 +1834,7 @@ TriaAccessor<structdim, dim, spacedim>::boundary_indicator () const
 template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::
-set_boundary_indicator (const types::boundary_id_t boundary_ind) const
+set_boundary_indicator (const types::boundary_id boundary_ind) const
 {
   Assert (structdim<dim, ExcImpossibleInDim(dim));
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
@@ -1847,7 +1847,7 @@ set_boundary_indicator (const types::boundary_id_t boundary_ind) const
 template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::
-set_all_boundary_indicators (const types::boundary_id_t boundary_ind) const
+set_all_boundary_indicators (const types::boundary_id boundary_ind) const
 {
   set_boundary_indicator (boundary_ind);
 
@@ -1878,7 +1878,7 @@ TriaAccessor<structdim, dim, spacedim>::at_boundary () const
 {
                                    // error checking is done
                                    // in boundary_indicator()
-  return (boundary_indicator() != types::internal_face_boundary_id);
+  return (boundary_indicator() != numbers::internal_face_boundary_id);
 }
 
 
@@ -2236,7 +2236,7 @@ TriaAccessor<0, 1, spacedim>::at_boundary () const
 
 template <int spacedim>
 inline
-types::boundary_id_t
+types::boundary_id
 TriaAccessor<0, 1, spacedim>::boundary_indicator () const
 {
   switch (vertex_kind)
@@ -2252,7 +2252,7 @@ TriaAccessor<0, 1, spacedim>::boundary_indicator () const
       }
 
       default:
-            return types::internal_face_boundary_id;
+            return numbers::internal_face_boundary_id;
     }
 
 }
@@ -2373,7 +2373,7 @@ int TriaAccessor<0, 1, spacedim>::isotropic_child_index (const unsigned int)
 template <int spacedim>
 inline
 void
-TriaAccessor<0, 1, spacedim>::set_boundary_indicator (const types::boundary_id_t b)
+TriaAccessor<0, 1, spacedim>::set_boundary_indicator (const types::boundary_id b)
 {
   Assert (tria->vertex_to_boundary_id_map_1d->find (this->vertex_index())
           != tria->vertex_to_boundary_id_map_1d->end(),
@@ -2386,7 +2386,7 @@ TriaAccessor<0, 1, spacedim>::set_boundary_indicator (const types::boundary_id_t
 
 template <int spacedim>
 inline
-void TriaAccessor<0, 1, spacedim>::set_all_boundary_indicators (const types::boundary_id_t b)
+void TriaAccessor<0, 1, spacedim>::set_all_boundary_indicators (const types::boundary_id b)
 {
   set_boundary_indicator (b);
 }
@@ -2856,7 +2856,7 @@ CellAccessor<dim,spacedim>::is_locally_owned () const
 #ifndef DEAL_II_USE_P4EST
   return true;
 #else
-  const types::subdomain_id_t subdomain = this->subdomain_id();
+  const types::subdomain_id subdomain = this->subdomain_id();
   if (subdomain == types::artificial_subdomain_id)
     return false;
 
@@ -2879,7 +2879,7 @@ CellAccessor<dim,spacedim>::is_ghost () const
 #ifndef DEAL_II_USE_P4EST
   return false;
 #else
-  const types::subdomain_id_t subdomain = this->subdomain_id();
+  const types::subdomain_id subdomain = this->subdomain_id();
   if (subdomain == types::artificial_subdomain_id)
     return false;
 

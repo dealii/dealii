@@ -508,6 +508,8 @@ namespace TrilinosWrappers
       if (vector.get() != 0 && vector->Map().SameAs(parallel_partitioner))
         vector.reset (new Epetra_FEVector(parallel_partitioner));
 
+      has_ghosts = vector->Map().UniqueGIDs()==false;
+
       const int size = parallel_partitioner.NumMyElements();
 
                                    // Need to copy out values, since the

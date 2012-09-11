@@ -2866,7 +2866,7 @@ ParameterHandler::load (Archive & ar, const unsigned int)
 
   patterns.clear ();
   for (unsigned int j=0; j<descriptions.size(); ++j)
-    patterns.push_back (std_cxx1x::shared_ptr<Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
+    patterns.push_back (std_cxx1x::shared_ptr<const Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
 }
 
 

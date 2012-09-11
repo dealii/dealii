@@ -46,6 +46,18 @@ report:
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
 
+report+summary:
+	-@$(MAKE) -k nofail
+	@for i in $(nofail-dirs) fail all-headers ; do \
+		echo =======Report: $$i ======= ; \
+		cd $$i ; $(MAKE) report ; cd .. ; \
+	 done
+	@echo "                Compiling Linking Running   Check      OK     all"
+	@for i in $(nofail-dirs) fail all-headers ; do \
+		printf "%20s\t" "$$i"; \
+		cd $$i ; $(MAKE) -s summary ; cd .. ; \
+	 done
+
 report+mail:
 	-@$(MAKE) -k nofail
 	@for i in $(nofail-dirs) fail all-headers ; do \

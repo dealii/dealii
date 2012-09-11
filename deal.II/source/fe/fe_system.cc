@@ -343,7 +343,7 @@ FESystem<dim,spacedim>::~FESystem ()
 {
                                    // delete base elements created in
                                    // the constructor
-  for (unsigned i=0; i<base_elements.size(); ++i)
+  for (unsigned int i=0; i<base_elements.size(); ++i)
     {
       base_elements[i].first->unsubscribe(typeid(*this).name());
       delete base_elements[i].first;
@@ -1242,7 +1242,7 @@ FESystem<dim,spacedim>::build_cell_tables()
   this->system_to_component_table.resize(this->dofs_per_cell);
   this->face_system_to_component_table.resize(this->dofs_per_face);
 
-  unsigned total_index = 0;
+  unsigned int total_index = 0;
   this->block_indices_data.reinit(0,0);
 
   for (unsigned int base=0; base < this->n_base_elements(); ++base)
@@ -1275,7 +1275,7 @@ FESystem<dim,spacedim>::build_cell_tables()
        vertex_number<GeometryInfo<dim>::vertices_per_cell;
        ++vertex_number)
     {
-      unsigned comp_start = 0;
+      unsigned int comp_start = 0;
       for(unsigned int base=0; base<this->n_base_elements(); ++base)
         for (unsigned int m=0; m<this->element_multiplicity(base);
              ++m, comp_start+=base_element(base).n_components())
@@ -1312,7 +1312,7 @@ FESystem<dim,spacedim>::build_cell_tables()
          line_number != GeometryInfo<dim>::lines_per_cell;
          ++line_number)
       {
-        unsigned comp_start = 0;
+        unsigned int comp_start = 0;
         for (unsigned int base=0; base<this->n_base_elements(); ++base)
           for (unsigned int m=0; m<this->element_multiplicity(base);
                ++m, comp_start+=base_element(base).n_components())
@@ -1507,15 +1507,15 @@ FESystem<dim,spacedim>::build_face_tables()
 
                                    // 2. Lines
   if (GeometryInfo<dim>::lines_per_face > 0)
-    for (unsigned line_number= 0;
+    for (unsigned int line_number= 0;
          line_number != GeometryInfo<dim>::lines_per_face;
          ++line_number)
       {
-        unsigned comp_start = 0;
-        for(unsigned base = 0; base < this->n_base_elements(); ++base)
-          for (unsigned m=0; m<this->element_multiplicity(base);
+        unsigned int comp_start = 0;
+        for(unsigned int base = 0; base < this->n_base_elements(); ++base)
+          for (unsigned int m=0; m<this->element_multiplicity(base);
                ++m, comp_start += base_element(base).n_components())
-            for (unsigned local_index = 0;
+            for (unsigned int local_index = 0;
                  local_index < base_element(base).dofs_per_line;
                  ++local_index, ++total_index)
               {
@@ -1553,15 +1553,15 @@ FESystem<dim,spacedim>::build_face_tables()
 
                                    // 3. Quads
   if (GeometryInfo<dim>::quads_per_face > 0)
-    for (unsigned quad_number= 0;
+    for (unsigned int quad_number= 0;
          quad_number != GeometryInfo<dim>::quads_per_face;
          ++quad_number)
       {
-        unsigned comp_start = 0;
-        for(unsigned base=0; base<this->n_base_elements(); ++base)
-          for (unsigned m=0; m<this->element_multiplicity(base);
+        unsigned int comp_start = 0;
+        for(unsigned int base=0; base<this->n_base_elements(); ++base)
+          for (unsigned int m=0; m<this->element_multiplicity(base);
                ++m, comp_start += base_element(base).n_components())
-            for (unsigned local_index = 0;
+            for (unsigned int local_index = 0;
                  local_index < base_element(base).dofs_per_quad;
                  ++local_index, ++total_index)
               {
@@ -3294,7 +3294,7 @@ compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*
        vertex_number<GeometryInfo<dim>::vertices_per_cell;
        ++vertex_number)
     {
-      unsigned comp_start = 0;
+      unsigned int comp_start = 0;
       for(unsigned int base=0; base<fes.size(); ++base)
         for (unsigned int m=0; m<multiplicities[base];
              ++m, comp_start+=fes[base]->n_components())
@@ -3327,7 +3327,7 @@ compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*
          line_number != GeometryInfo<dim>::lines_per_cell;
          ++line_number)
       {
-        unsigned comp_start = 0;
+        unsigned int comp_start = 0;
         for (unsigned int base=0; base<fes.size(); ++base)
           for (unsigned int m=0; m<multiplicities[base];
                ++m, comp_start+=fes[base]->n_components())
@@ -3456,7 +3456,7 @@ FESystem<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
 
 template <int dim, int spacedim>
 Point<dim>
-FESystem<dim,spacedim>::unit_support_point (const unsigned index) const
+FESystem<dim,spacedim>::unit_support_point (const unsigned int index) const
 {
   Assert (index < this->dofs_per_cell,
           ExcIndexRange (index, 0, this->dofs_per_cell));
@@ -3481,7 +3481,7 @@ FESystem<dim,spacedim>::unit_support_point (const unsigned index) const
 
 template <int dim, int spacedim>
 Point<dim-1>
-FESystem<dim,spacedim>::unit_face_support_point (const unsigned index) const
+FESystem<dim,spacedim>::unit_face_support_point (const unsigned int index) const
 {
   Assert (index < this->dofs_per_face,
           ExcIndexRange (index, 0, this->dofs_per_face));

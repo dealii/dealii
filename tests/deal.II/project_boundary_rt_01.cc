@@ -21,7 +21,7 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 
 #include <fstream>
@@ -134,7 +134,7 @@ void test_projection (const Triangulation<dim>& tr,
   TestFunction<dim> f(degree-1);
   std::map<unsigned int, double> boundary_constraints;
   typename FunctionMap<dim>::type boundary_map;
-  for (types::boundary_id_t i=0;i<255;++i)
+  for (types::boundary_id i=0;i<255;++i)
     boundary_map[i] = &f;
   VectorTools::project_boundary_values(mapping, dof, boundary_map, quadrature,
 				       boundary_constraints);

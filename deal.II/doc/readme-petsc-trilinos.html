@@ -80,17 +80,6 @@
       </p>
 
       <p>
-      Note that in order to use PETSc with <acronym>deal.II</acronym>
-      with the current release version of <acronym>deal.II</acronym>
-      you will need to have at least PETSc version 2.3.0 installed,
-      earlier releases are no longer supported. There is no
-      correlation between <acronym>deal.II</acronym> version numbers
-      and PETSc version numbers. <acronym>deal.II</acronym> version
-      7.0 has been tested up to PETSc release 3.1.0-p8, and newer version up
-      to at least PETSc release 3.2.
-      </p>
-
-      <p>
       There is an additional caveat: PETSc appears not to co-operate
       well when using threads and some programs crash when deal.II is
       compiled in its usual mode supporting multithreading. If you see
@@ -148,9 +137,10 @@
       <h5>Trilinos starting with version 10.0</h5>
 
       <p style="color: red">
-      Note: Trilinos versions 10.6.x, 10.8.0, 10.8.1, and 10.10.2 are not compatible with
+      Note: Trilinos versions 10.6.x, 10.8.0, 10.8.1, 10.10.2, 10.12.1 are not compatible with
       deal.II. They contain subtle bugs related to (parallel) matrices and vectors.
-      We recommend staying with 10.4.2 for the time being.
+      Versions tested to work are 10.4.2, 10.8.5, and 10.12.2. We recommend only using
+      one of the tested versions for the time being.
       </p>
 
       <p>
@@ -274,7 +264,7 @@ configure: error: *** Your Trilinos installation is not compatible with the C++ 
     <hr>
 
     <address>
-      <a href="mail.html" target="body">The deal.II mailing list</a>
+      <a href="mail.html" target="body">The deal.II Group</a>
       $Date: 2008-10-14 05:36:48 -0500 (Tue, 14 Oct 2008) $
     </address>
   </body>

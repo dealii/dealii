@@ -29,7 +29,7 @@
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/polynomial.h>
 
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/dof_handler.h>

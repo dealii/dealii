@@ -7,6 +7,7 @@ This material is based upon work partly supported by ThyssenKrupp Steel Europe.
 </i>
 
 
+<a name="Intro"></a>
 <h3>Introduction</h3>
 
 This example is based on the Laplace equation in 2d and deals with the
@@ -91,7 +92,7 @@ obstacle).
 
 An obvious way to obtain the variational formulation of the obstacle problem is to consider the total potential energy:
 @f{equation*}
- E(u):=\dfrac{1}{2}\int\limits_{\Omega} \nabla u \cdot \nabla - \int\limits_{\Omega} fu.
+ E(u):=\dfrac{1}{2}\int\limits_{\Omega} \nabla u \cdot \nabla u - \int\limits_{\Omega} fu.
 @f}
 We have to find a solution $u\in G$ of the following minimization problem:
 @f{equation*}
@@ -157,7 +158,7 @@ This yields:
 <i>with</i>
 @f{align*}
  a(u,v) &:= \left(\nabla u, \nabla v\right),\quad &&u,v\in V\\
- b(u,\mu) &:= \langle g-u,\mu\rangle,\quad &&u\in V,\quad\mu\in V'.
+ b(u,\mu) &:= \langle u,\mu\rangle,\quad &&u\in V,\quad\mu\in V'.
 @f}
 In other words, we can consider $\lambda$ as the negative of the additional, positive force that the
 obstacle exerts on the membrane. The inequality in the second line of the
@@ -165,9 +166,8 @@ statement above only appears to have the wrong sign because we have
 $\mu-\lambda<0$ at points where $\lambda=0$, given the definition of $K$.
 
 The existence and uniqueness of $(u,\lambda)\in V\times K$ of this saddle
-point problem has been stated in Grossmann and Roos: Numerical treatment of
-partial differential equations, Springer-Verlag, Heidelberg-Berlin, 2007, 596
-pages, ISBN 978-3-540-71582-5.
+point problem has been stated in Glowinski, Lions and Tr\'{e}moli\`{e}res: Numerical Analysis of Variational
+Inequalities, North-Holland, 1981.
 
 
 

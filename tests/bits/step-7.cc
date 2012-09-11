@@ -41,13 +41,13 @@ std::ofstream logfile("step-7/output");
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/data_out.h>
 
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/base/smartpointer.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/hp/fe_values.h>
 

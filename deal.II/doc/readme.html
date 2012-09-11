@@ -533,6 +533,11 @@
       at the command line, or, <a href="readme-petsc-trilinos.html"
       target="body">here</a>.
       </p>
+
+      <p>
+	(<acronym>deal.II</acronym>) version 7.2 (and higher) support
+	PETSc 3.x.x only; earlier releases are no longer supported.
+      </p>
     </dd>
 
     <a name="slepc"></a>
@@ -556,59 +561,50 @@
     <dt>Trilinos</dt>
     <dd>
       <p>
-      <acronym>deal.II</acronym> can also interface to <a
-      href="http://trilinos.sandia.gov" target="_top">Trilinos</a>. The
+      <acronym>deal.II</acronym> can also interface
+      to <a href="http://trilinos.sandia.gov" target="_top">Trilinos</a>. The
       simplest way to use these interfaces is to
       pass <code>--with-trilinos=/path/to/trilinos</code>
-      to <acronym>deal.II</acronym>'s <code>./configure</code> script. More
-      configuration options can be found <a href="readme-petsc-trilinos.html"
+      to <acronym>deal.II</acronym>'s <code>./configure</code> script.  Note
+      that not all versions of Trilinos are compatible
+      with <acronym>deal.II</acronym>.  More details about compatibility and
+      configuration can be found <a href="readme-petsc-trilinos.html"
       target="body">here</a>.
       </p>
     </dd>
-
 
     <a name="metis"></a>
     <dt>Metis</dt>
     <dd>
       <p>
-      In order to generate partitionings of triangulations, we have
-      functions that
-      call <a href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
-      target="_top">METIS</a> library. METIS is a library that
-      provides various methods to partition graphs, which we use to
-      define which cell belongs to which part of a triangulation. The
-      main point in using METIS is to generate partitions so that the
-      interfaces between cell blocks are as small as possible. This
-      data can, in turn, be used to distribute degrees of freedom onto
-      different processors when using PETSc and/or SLEPc in parallel
-      mode.
+	In order to generate partitionings of triangulations, we have
+	functions that
+	call <a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview"
+	target="_top">METIS</a> library. METIS is a library that
+	provides various methods to partition graphs, which we use to
+	define which cell belongs to which part of a
+	triangulation. The main point in using METIS is to generate
+	partitions so that the interfaces between cell blocks are as
+	small as possible. This data can, in turn, be used to
+	distribute degrees of freedom onto different processors when
+	using PETSc and/or SLEPc in parallel mode.
       </p>
 
       <p>
-      As with PETSc and SLEPc, the use of METIS is optional. If you
-      wish to use it, you can do so by having a METIS installation
-      around at the time of calling
-      <code>./configure</code> by either
-      setting the <code>METIS_DIR</code> environment
-      variable denoting the path to the METIS library, or using the
-      <code>--with-metis</code> flag. If METIS was installed as part
-      of <code>/usr</code> or <code>/opt</code>, instead of local directories
-      in a home directory for example, you can use configure
-      switches <code>--with-metis-include, --with-metis-libs</code>.
+	As with PETSc and SLEPc, the use of METIS is optional.  If you
+	wish to use it, you can do so by having a METIS installation
+	around at the time of calling
+	<code>./configure</code> by either setting
+	the <code>METIS_DIR</code> environment variable denoting the
+	path to the METIS library, or using the
+	<code>--with-metis</code> flag.
       </p>
 
       <p>
-	On some systems, when using shared libraries for deal.II, you may get
-	warnings of the kind <code>libmetis.a(pmetis.o): relocation R_X86_64_32
-	  against `a local symbol' can not be used when making a shared
-	  object; recompile with -fPIC</code> when linking. This can be
-	avoided by recompiling METIS with <code>-fPIC</code> as a compiler
-	flag.
-      </p>
-
-      <p>
-	METIS is not needed when using <code>p4est</code> to parallelize
-	programs, see below.
+	(<acronym>deal.II</acronym>) version 7.2 (and higher) support
+	METIS 5.x.x only; earlier releases are no longer
+	supported.  <br>METIS is not needed when
+	using <code>p4est</code> to parallelize programs, see below.
       </p>
     </dd>
 
@@ -734,7 +730,18 @@
       <a href="external-libs/arpack.html" target="body">this page</a>.
     </dd>
 
-
+    <a name="HDF5"></a>
+    <dt>HDF5</dt>
+    <dd>
+      This adds HDF5/XDMF graphical output capabilities to deal.II. You need to
+      install the <a href="http://www.hdfgroup.org/HDF5/">HDF5 library</a>
+      separately. Configure with <code>--with-hdf5=</code> and point it to
+      the h5pcc or h5cc script inside your hdf5 installation.
+      
+      For a detailed description of how to compile HDF5 and linking with
+      deal.II, see <a href="external-libs/hdf5.html" target="body">this
+      page</a>.
+    </dd>
 
     </dl>
 
@@ -823,7 +830,7 @@
     <hr>
 
     <address>
-      <a href="mail.html" target="body">The deal.II mailing list</a>
+      <a href="mail.html" target="body">The deal.II Group</a>
       $Date$
     </address>
   </body>

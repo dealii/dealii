@@ -79,7 +79,7 @@ class TableIndicesBase
                                      /**
                                       * Store the indices in an array.
                                       */
-    unsigned indices[N];
+    unsigned int indices[N];
 };
 
 
@@ -99,7 +99,7 @@ class TableIndicesBase
  * @author Wolfgang Bangerth, 2002
  */
 template <int N>
-class TableIndices
+class TableIndices : public TableIndicesBase<N>
 {
                                      /**
                                       * Standard constructor, setting
@@ -147,7 +147,8 @@ class TableIndices<1> : public TableIndicesBase<1>
     TableIndices (const unsigned int index1);
 };
 
-
+//TODO: Remove the default arguments and trickery below and put all
+//the constructors into the class demplate
 
 /**
  * Array of indices of fixed size used for the TableBase

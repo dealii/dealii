@@ -1163,7 +1163,8 @@ namespace TrilinosWrappers
                                         * See @ref GlossCompress "Compressing distributed objects"
                                         * for more information.
                                         */
-      void compress ();
+      void compress (::dealii::VectorOperation::values operation
+		     =::dealii::VectorOperation::unknown);
 
                                        /**
                                         * Set the element (<i>i,j</i>)
@@ -2588,7 +2589,7 @@ namespace TrilinosWrappers
 
   inline
   void
-  SparseMatrix::compress ()
+  SparseMatrix::compress (::dealii::VectorOperation::values /*operation*/)
   {
                                   // flush buffers
     int ierr;

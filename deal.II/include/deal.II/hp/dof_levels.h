@@ -164,7 +164,7 @@ namespace internal
                                           *  store the dof-indices and related functions of
                                           *  lines
                                           */
-        internal::hp::DoFObjects<1> lines;
+        internal::hp::DoFObjects<1> dof_object;
 
                                          /**
                                           * Determine an estimate for the
@@ -190,7 +190,7 @@ namespace internal
                                           *  store the dof-indices and related functions of
                                           *  quads
                                           */
-        internal::hp::DoFObjects<2> quads;
+        internal::hp::DoFObjects<2> dof_object;
 
                                          /**
                                           * Determine an estimate for the
@@ -217,7 +217,7 @@ namespace internal
                                           *  store the dof-indices and related functions of
                                           *  hexes
                                           */
-        internal::hp::DoFObjects<3> hexes;
+        internal::hp::DoFObjects<3> dof_object;
 
                                          /**
                                           * Determine an estimate for the

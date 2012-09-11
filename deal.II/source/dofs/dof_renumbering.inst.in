@@ -346,11 +346,25 @@ namespace DoFRenumbering
        const std::vector<bool> &);
 
     template
+      void sort_selected_dofs_back<MGDoFHandler<deal_II_dimension> >
+      (MGDoFHandler<deal_II_dimension> &,
+       const std::vector<bool> &,
+       const unsigned int);
+
+    template
       void
       compute_sort_selected_dofs_back<DoFHandler<deal_II_dimension> >
       (std::vector<unsigned int>&,
        const DoFHandler<deal_II_dimension> &,
        const std::vector<bool> &);
+
+    template
+      void
+      compute_sort_selected_dofs_back<MGDoFHandler<deal_II_dimension> >
+      (std::vector<unsigned int>&,
+       const MGDoFHandler<deal_II_dimension> &,
+       const std::vector<bool> &,
+       const unsigned int);
 
     template
       void random<hp::DoFHandler<deal_II_dimension> >

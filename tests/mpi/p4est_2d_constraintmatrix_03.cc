@@ -21,7 +21,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/function.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/grid/filtered_iterator.h>
 
 #include <deal.II/grid/tria.h>
@@ -161,7 +161,7 @@ void test()
 					      cm,
 					      velocity_mask);
 
-    std::set<types::boundary_id_t> no_normal_flux_boundaries;
+    std::set<types::boundary_id> no_normal_flux_boundaries;
     no_normal_flux_boundaries.insert (1);
 
 

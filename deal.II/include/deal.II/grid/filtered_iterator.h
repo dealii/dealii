@@ -169,7 +169,7 @@ namespace IteratorFilters
                                         * shall have to be evaluated
                                         * to true.
                                         */
-      SubdomainEqualTo (const types::subdomain_id_t subdomain_id);
+      SubdomainEqualTo (const types::subdomain_id subdomain_id);
 
                                        /**
                                         * Evaluation operator. Returns
@@ -187,7 +187,7 @@ namespace IteratorFilters
                                         * Stored value to compare the
                                         * subdomain with.
                                         */
-      const types::subdomain_id_t subdomain_id;
+      const types::subdomain_id subdomain_id;
   };
 
 
@@ -296,7 +296,7 @@ namespace IteratorFilters
  *   class SubdomainEqualTo
  *   {
  *     public:
- *       SubdomainEqualTo (const types::subdomain_id_t subdomain_id)
+ *       SubdomainEqualTo (const types::subdomain_id subdomain_id)
  *                   : subdomain_id (subdomain_id) {};
  *
  *       template <class Iterator>
@@ -305,7 +305,7 @@ namespace IteratorFilters
  *       }
  *
  *     private:
- *       const types::subdomain_id_t subdomain_id;
+ *       const types::subdomain_id subdomain_id;
  *   };
  * @endcode
  * Objects like <code>SubdomainEqualTo(3)</code> can then be used as predicates.
@@ -402,7 +402,7 @@ namespace IteratorFilters
  * Since comparison between filtered and unfiltered iterators is
  * defined, we could as well have let the @p endc variable in the
  * last example be of type
- * <code>Triangulation@<dim@>::active_cell_iterator</code> since it is unchanged
+ * Triangulation::active_cell_iterator since it is unchanged
  * and its value does not depend on the filter.
  *
  * @ingroup grid
@@ -1124,7 +1124,7 @@ namespace IteratorFilters
 
 // ---------------- IteratorFilters::SubdomainEqualTo ---------
   inline
-  SubdomainEqualTo::SubdomainEqualTo (const types::subdomain_id_t subdomain_id)
+  SubdomainEqualTo::SubdomainEqualTo (const types::subdomain_id subdomain_id)
                   :
                   subdomain_id (subdomain_id)
   {}

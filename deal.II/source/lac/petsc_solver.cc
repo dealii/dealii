@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-
+#include <deal.II/base/logstream.h>
 #include <deal.II/lac/petsc_solver.h>
 
 #ifdef DEAL_II_USE_PETSC
@@ -21,9 +21,6 @@
 #  include <deal.II/lac/petsc_precondition.h>
 #  include <cmath>
 
-#if DEAL_II_PETSC_VERSION_LT(2,2,0)
-#include <petscsles.h>
-#endif
 #include <petscversion.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -41,13 +38,6 @@ namespace PETScWrappers
 #endif
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-                                     // and destroy the solver object if we
-                                     // are in old PETSc mode
-#if DEAL_II_PETSC_VERSION_LT(2,2,0)
-    ierr = SLESDestroy (sles);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-#endif
   }
 
 
@@ -104,15 +94,9 @@ namespace PETScWrappers
                                          // checks with the solver_control
                                          // object we have in this object for
                                          // convergence
-#if DEAL_II_PETSC_VERSION_LT(3,0,0)
-        KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
-                               reinterpret_cast<void *>(&solver_control));
-#else
         KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
                                reinterpret_cast<void *>(&solver_control),
                                PETSC_NULL);
-#endif
-
       }
 
                                      // set the command line option prefix name
@@ -231,12 +215,8 @@ namespace PETScWrappers
   void
   SolverRichardson::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPRICHARDSON));
+    ierr = KSPSetType (ksp, KSPRICHARDSON);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // set the damping factor from the data
@@ -280,16 +260,16 @@ namespace PETScWrappers
   void
   SolverChebychev::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
+                                     // set the type of solver. note the
+                                     // completely pointless change in
+                                     // spelling Chebyshev between PETSc 3.2
+                                     // and 3.3...
     int ierr;
 
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPCHEBYCHEV));
+    ierr = KSPSetType (ksp, KSPCHEBYCHEV);
 #else
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPCHEBYSHEV));
+    ierr = KSPSetType (ksp, KSPCHEBYSHEV);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -314,12 +294,8 @@ namespace PETScWrappers
   void
   SolverCG::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPCG));
+    ierr = KSPSetType (ksp, KSPCG);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in the deal.II solvers, we always
@@ -343,12 +319,8 @@ namespace PETScWrappers
   void
   SolverBiCG::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPBICG));
+    ierr = KSPSetType (ksp, KSPBICG);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in the deal.II solvers, we always
@@ -382,12 +354,8 @@ namespace PETScWrappers
   void
   SolverGMRES::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPGMRES));
+    ierr = KSPSetType (ksp, KSPGMRES);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // set the restart parameter from the
@@ -453,12 +421,8 @@ namespace PETScWrappers
   void
   SolverBicgstab::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPBCGS));
+    ierr = KSPSetType (ksp, KSPBCGS);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in the deal.II solvers, we always
@@ -482,12 +446,8 @@ namespace PETScWrappers
   void
   SolverCGS::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPCGS));
+    ierr = KSPSetType (ksp, KSPCGS);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in the deal.II solvers, we always
@@ -511,12 +471,8 @@ namespace PETScWrappers
   void
   SolverTFQMR::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPTFQMR));
+    ierr = KSPSetType (ksp, KSPTFQMR);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in the deal.II solvers, we always
@@ -540,12 +496,8 @@ namespace PETScWrappers
   void
   SolverTCQMR::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPTCQMR));
+    ierr = KSPSetType (ksp, KSPTCQMR);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in the deal.II solvers, we always
@@ -569,12 +521,8 @@ namespace PETScWrappers
   void
   SolverCR::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPCR));
+    ierr = KSPSetType (ksp, KSPCR);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in the deal.II solvers, we always
@@ -598,12 +546,8 @@ namespace PETScWrappers
   void
   SolverLSQR::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPLSQR));
+    ierr = KSPSetType (ksp, KSPLSQR);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in the deal.II solvers, we always
@@ -627,12 +571,8 @@ namespace PETScWrappers
   void
   SolverPreOnly::set_solver_type (KSP &ksp) const
   {
-                                     // set the type of solver. work around a
-                                     // problem in PETSc 2.1.6, where it asks
-                                     // for a char*, even though KSPXXXX is of
-                                     // type const char*
     int ierr;
-    ierr = KSPSetType (ksp, const_cast<char *>(KSPPREONLY));
+    ierr = KSPSetType (ksp, KSPPREONLY);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // The KSPPREONLY solver of
@@ -649,6 +589,277 @@ namespace PETScWrappers
                                      // a nonzero initial guess leads
                                      // PETSc to produce some error messages.
     KSPSetInitialGuessNonzero (ksp, PETSC_FALSE);
+  }
+
+
+/* ---------------------- SparseDirectMUMPS------------------------ */
+
+  SparseDirectMUMPS::SparseDirectMUMPS (SolverControl	    &cn,
+                                       const MPI_Comm       &mpi_communicator,
+                                       const AdditionalData &data)
+                      :
+                      SolverBase (cn, mpi_communicator),
+                      additional_data (data)
+  {}
+
+
+  void
+  SparseDirectMUMPS::set_solver_type (KSP &ksp) const
+  {
+  				/**
+				 * KSPPREONLY implements a stub
+				 * method that applies only the
+				 * preconditioner.  Its use is due
+				 * to SparseDirectMUMPS being
+				 * a direct (rather than iterative)
+				 * solver
+				 */
+    int ierr;
+    ierr = KSPSetType (ksp, KSPPREONLY);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+				/**
+				 * The KSPPREONLY solver of
+				 * PETSc never calls the convergence
+				 * monitor, which leads to failure
+				 * even when everything was ok.
+				 * Therefore, the SolverControl
+				 * status is set to some nice
+				 * values, which guarantee a nice
+				 * result at the end of the solution
+				 * process.
+				 */
+    solver_control.check (1, 0.0);
+
+				/**
+				 * Using a PREONLY solver with a
+				 * nonzero initial guess leads PETSc
+				 * to produce some error messages.
+				 */
+    KSPSetInitialGuessNonzero (ksp, PETSC_FALSE);
+  }
+
+  void
+  SparseDirectMUMPS::solve (const MatrixBase &A,
+                            VectorBase       &x,
+                            const VectorBase &b)
+  {
+#ifdef PETSC_HAVE_MUMPS
+				/**
+				 * had some trouble with the
+				 * deallog printing to console
+				 * the outcome of the solve function
+				 * for every process. Brought
+				 * down the depth level to zero
+				 * to alleviate this
+				 */
+    deallog.depth_console (0);
+    int ierr;
+
+				/**
+				 * factorization matrix to be
+				 * obtained from MUMPS
+				 */
+    Mat F;
+
+				/**
+				 * setting MUMPS integer control
+				 * parameters ICNTL to be passed
+				 * to MUMPS.  Setting
+				 * entry 7 of MUMPS ICNTL array
+				 * (of size 40) to a value of 2.
+				 * This sets use of Approximate
+				 * Minimum Fill (AMF)
+				 */
+    PetscInt ival=2, icntl=7;
+				/**
+				 * number of iterations to
+				 * solution (should be 1)
+				 * for a direct solver
+				 */
+    PetscInt its;
+				/**
+				 * norm of residual
+				 */
+    PetscReal rnorm;
+
+				/**
+				 * creating a solver object
+				 * if this is necessary
+				 */
+    if (solver_data.get() == 0)
+    {
+      solver_data.reset (new SolverDataMUMPS ());
+
+				/**
+				 * creates the default KSP
+				 * context and puts it in
+				 * the location solver_data->ksp
+				 */
+      ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+				/**
+				 * set the matrices involved.
+				 * the last argument is irrelevant
+				 * here, since we use the solver
+				 * only once anyway
+				 */
+      ierr = KSPSetOperators (solver_data->ksp, A, A,
+			      DIFFERENT_NONZERO_PATTERN);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+				/**
+				 * setting the solver type
+				 */
+      set_solver_type (solver_data->ksp);
+
+      				/**
+				 * getting the associated
+				 * preconditioner context
+				 */
+      ierr = KSPGetPC (solver_data->ksp, & solver_data->pc);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+				/**
+				 * build PETSc PC for particular
+				 * PCLU preconditioner
+				 * (note: if the matrix is
+				 *  symmetric, then a cholesky
+				 *  decomposition PCCHOLESKY
+				 *  could be used)
+                                 */
+      ierr = PCSetType (solver_data->pc, PCLU);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+				/**
+				 * convergence monitor function
+				 * that checks with the solver_control
+				 * object for convergence
+				 */
+      KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
+			     reinterpret_cast<void *>(&solver_control),
+			     PETSC_NULL);
+
+				/**
+				 * set the software that is to be
+				 * used to perform the lu factorization
+				 * here we start to see differences
+				 * with the base class solve function
+				 */
+      ierr = PCFactorSetMatSolverPackage (solver_data->pc, MATSOLVERMUMPS);
+      AssertThrow (ierr == 0, ExcPETScError (ierr));
+
+				/**
+				 * set up the package to call
+				 * for the factorization
+				 */
+      ierr = PCFactorSetUpMatSolverPackage (solver_data->pc);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+				/**
+				 * get the factored matrix F from the
+				 * preconditioner context.  This routine
+				 * is valid only for LU, ILU, Cholesky,
+				 * and imcomplete Cholesky
+				 */
+      ierr = PCFactorGetMatrix(solver_data->pc, &F);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+				/**
+				 * Passing the control parameters
+				 * to MUMPS
+				 */
+      ierr = MatMumpsSetIcntl (F, icntl, ival);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    }
+
+				/**
+				 * solve the linear system
+				 */
+    ierr = KSPSolve (solver_data->ksp, b, x);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    				/**
+				 * in case of failure
+				 * throw exception
+				 */
+    if (solver_control.last_check() != SolverControl::success)
+      throw SolverControl::NoConvergence (solver_control.last_step(),
+					  solver_control.last_value());
+    else
+    {
+      PetscPrintf(PETSC_COMM_WORLD, "Success.  MUMPS has solved.\n");
+
+                                /**
+                                 * obtain convergence
+                                 * information. obtain
+                                 * the number of iterations
+                                 * and residual norm
+                                 */
+      ierr = KSPGetIterationNumber (solver_data->ksp, &its);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      ierr = KSPGetResidualNorm (solver_data->ksp, &rnorm);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                /**
+                                 * print the convergence
+                                 * information
+                                 */
+      PetscPrintf(PETSC_COMM_WORLD, "Norm of residual is %G in %D iteration(s)\n",
+                        rnorm, its);
+    }
+
+#else  // PETSC_HAVE_MUMPS
+  Assert (false,
+	  ExcMessage ("Your PETSc installation does not include a copy of "
+		      "MUMPS package necessary for this solver"));
+
+                                // Cast to void to silence compiler
+                                // warnings
+  (void) A; (void) x; (void) b;
+#endif
+
+  }
+
+  int SparseDirectMUMPS::convergence_test (KSP          	/*ksp*/,
+#ifdef PETSC_USE_64BIT_INDICES
+                                           const PetscInt       iteration,
+#else
+                                           const int            iteration,
+#endif
+                                           const PetscReal      residual_norm,
+                                           KSPConvergedReason   *reason,
+                                           void                 *solver_control_x)
+  {
+    SolverControl &solver_control = *reinterpret_cast<SolverControl*>(solver_control_x);
+
+    const SolverControl::State state
+      = solver_control.check (iteration, residual_norm);
+
+    switch (state)
+    {
+      case ::dealii::SolverControl::iterate:
+            *reason = KSP_CONVERGED_ITERATING;
+            break;
+
+      case ::dealii::SolverControl::success:
+            *reason = static_cast<KSPConvergedReason>(1);
+            break;
+
+      case ::dealii::SolverControl::failure:
+            if (solver_control.last_step() > solver_control.max_steps())
+              *reason = KSP_DIVERGED_ITS;
+            else
+              *reason = KSP_DIVERGED_DTOL;
+            break;
+
+      default:
+            Assert (false, ExcNotImplemented());
+    }
+
+    return 0;
   }
 
 }

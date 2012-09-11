@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------
-//    $Id: cochain_01.cc 25686 2012-07-04 14:18:43Z bangerth $
+//    $Id$
 //
 //    Copyright (C) 2012 by the deal.II authors
 //
@@ -219,12 +219,21 @@ test(Triangulation<dim>& tr)
 {
   FE_DGQ<dim> q1(1);
   test_fe(tr, q1);
+<<<<<<< HEAD
 
 //  FE_DGQ<dim> q2(2);
 //  test_fe(tr, q2);
 
  FE_Nedelec<dim> n1(1);  
  test_fe(tr, n1);  
+=======
+  
+  FE_DGQ<dim> q2(2);
+  test_fe(tr, q2);
+  
+  FE_Nedelec<dim> n1(1);  
+  test_fe(tr, n1);  
+>>>>>>> trunk
 }
 
 
@@ -240,8 +249,14 @@ int main()
   TestGrids::hypercube(tr2, 1);
   test(tr2);
   
+<<<<<<< HEAD
 //  Triangulation<3> tr3;
 //  TestGrids::hypercube(tr3, 1);
 //  test(tr3);
   
+=======
+ Triangulation<3> tr3;
+ TestGrids::hypercube(tr3, 1);
+ test(tr3);  
+>>>>>>> trunk
 }

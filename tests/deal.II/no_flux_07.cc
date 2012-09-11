@@ -35,7 +35,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 
@@ -47,7 +47,7 @@ void test (const Triangulation<dim>& tr,
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
-  std::set<types::boundary_id_t> boundary_ids;
+  std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert (0);
 
   ConstraintMatrix cm;

@@ -36,13 +36,7 @@
 #include <sys/types.h>
 #include <sstream>
 #include <iostream>
-
-#ifdef HAVE_STD_NUMERIC_LIMITS
-#  include <limits>
-#else
-#  include <limits.h>
-#endif
-
+#include <limits>
 
 #ifdef DEAL_II_USE_TRILINOS
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
@@ -145,16 +139,11 @@ namespace Utilities
   {
     std::istringstream ss(s);
 
-#ifdef HAVE_STD_NUMERIC_LIMITS
-    static const int max_int = std::numeric_limits<int>::max();
-#else
-    static const int max_int = INT_MAX;
-#endif
-
-    int i = max_int;
+    int i = std::numeric_limits<int>::max();
     ss >> i;
                                      // check for errors
-    AssertThrow (i != max_int, ExcCantConvertString (s));
+    AssertThrow (i != std::numeric_limits<int>::max(),
+		 ExcCantConvertString (s));
 
 //TODO: The test for errors above doesn't work, as can easily be
 //verified. furthermore, it doesn't catch cases like when calling
@@ -182,17 +171,12 @@ namespace Utilities
   {
     std::istringstream ss(s);
 
-#ifdef HAVE_STD_NUMERIC_LIMITS
-    static const double max_double = std::numeric_limits<double>::max();
-#else
-    static const double max_double = DBL_MAX;
-#endif
-
-    double i = max_double;
+    double i = std::numeric_limits<double>::max();
     ss >> i;
 
                                      // check for errors
-    AssertThrow (i != max_double, ExcCantConvertString (s));
+    AssertThrow (i != std::numeric_limits<double>::max(),
+		 ExcCantConvertString (s));
 
 //TODO: The test for errors above doesn't work, as can easily be
 //verified. furthermore, it doesn't catch cases like when calling

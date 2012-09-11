@@ -1204,7 +1204,7 @@ namespace MGTools
                 {
                   const typename MGDoFHandler<dim,spacedim>::face_iterator
                     face = cell->face(face_no);
-                  const types::boundary_id_t bi = face->boundary_indicator();
+                  const types::boundary_id bi = face->boundary_indicator();
                                                    // Face is listed in
                                                    // boundary map
                   if (function_map.find(bi) != function_map.end())
@@ -1259,7 +1259,7 @@ namespace MGTools
                 }
 
               typename MGDoFHandler<dim,spacedim>::face_iterator face = cell->face(face_no);
-              const types::boundary_id_t boundary_component = face->boundary_indicator();
+              const types::boundary_id boundary_component = face->boundary_indicator();
               if (function_map.find(boundary_component) != function_map.end())
                                                  // face is of the right component
                 {

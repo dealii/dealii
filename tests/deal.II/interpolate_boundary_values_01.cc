@@ -28,7 +28,7 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
                                  // We need a FESystem
 #include <deal.II/fe/fe_system.h>
@@ -148,7 +148,7 @@ void FindBug<dim>::dirichlet_conditions ()
 
 
   std::vector<bool> fixed_dofs (dof_handler.n_dofs());
-  std::set<types::boundary_id_t> boundary_indicators;
+  std::set<types::boundary_id> boundary_indicators;
   boundary_indicators.insert (0);
 
                                    // get a list of those boundary DoFs which

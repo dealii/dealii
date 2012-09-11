@@ -27,10 +27,8 @@ namespace PETScWrappers
     {}
 
 
-
     BlockSparseMatrix::~BlockSparseMatrix ()
     {}
-
 
 
     BlockSparseMatrix &

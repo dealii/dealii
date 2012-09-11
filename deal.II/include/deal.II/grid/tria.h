@@ -110,8 +110,8 @@ struct CellData
                                       */
     union
     {
-        types::boundary_id_t boundary_id;
-        types::material_id_t material_id;
+        types::boundary_id boundary_id;
+        types::material_id material_id;
     };
 };
 
@@ -136,8 +136,8 @@ struct CellData
  *  number describing the boundary condition to hold on this part of the
  *  boundary. The triangulation creation function gives lines not in this
  *  list either the boundary indicator zero (if on the boundary) or
- *  types::internal_face_boundary_id (if in the interior). Explicitely giving a
- *  line the indicator types::internal_face_boundary_id will result in an error, as well as giving
+ *  numbers::internal_face_boundary_id (if in the interior). Explicitely giving a
+ *  line the indicator numbers::internal_face_boundary_id will result in an error, as well as giving
  *  an interior line a boundary indicator.
  *
  * @ingroup grid
@@ -440,57 +440,41 @@ namespace internal
  *  data is spread over quite a lot of arrays and other places. However,
  *  there are ways powerful enough to work on these data structures
  *  without knowing their exact relations. This is done through the
- *  concept of iterators (see the STL documentation and TriaRawIterator).
+ *  concept of iterators (see the STL documentation and TriaIterator).
  *  In order to make things as easy and dimension independent as possible,
  *  use of class local typedefs is made, see below.
  *
  *  The Triangulation class provides iterator which enable looping over all
- *  lines, cells, etc without knowing the exact representation used to
+ *  cells without knowing the exact representation used to
  *  describe them. Their names are typedefs imported from the Iterators
  *  class (thus making them local types to this class) and are as follows:
  *
  *  <ul>
- *  <li> @p raw_line_iterator: loop over all lines, used or not (declared for
- *  all dimensions).
- *
- *  <li> @p line_iterator: loop over all used lines (declared for all dimensions).
- *
- *  <li> @p active_line_iterator: loop over all active lines (declared for all
- *  dimensions).
- *
- *  <li> @p raw_quad_iterator: loop over all quads, used or not (declared only
- *  for <tt>dim>=2</tt>).
- *
- *  <li> @p quad_iterator: loop over all quads (declared only for @p dim>=2).
- *
- *  <li> @p active_quad_iterator: loop over all active quads (declared only for
- *  @p dim>=2).
+ *  <li> <tt>cell_iterator</tt>: loop over all cells used in the Triangulation
+ *  <li> <tt>active_cell_iterator</tt>: loop over all active cells
  *  </ul>
  *
- *  Additionaly, for @p dim==1, the following identities hold:
+ *  For <tt>dim==1</tt>, these iterators are mapped as follows:
  *  @verbatim
- *    typedef raw_line_iterator    raw_cell_iterator;
  *    typedef line_iterator        cell_iterator;
  *    typedef active_line_iterator active_cell_iterator;
  *  @endverbatim
- *  while for @p dim==2
+ *  while for @p dim==2 we have the additional face iterator:
  *  @verbatim
- *    typedef quad_line_iterator   raw_cell_iterator;
  *    typedef quad_iterator        cell_iterator;
  *    typedef active_quad_iterator active_cell_iterator;
  *
- *    typedef raw_line_iterator    raw_face_iterator;
- *    typedef line_iterator        face_iterator;
+*    typedef line_iterator        face_iterator;
  *    typedef active_line_iterator active_face_iterator;
  *  @endverbatim
  *
- *  By using the cell iterators, you can write code nearly independent of
+ *  By using the cell iterators, you can write code independent of
  *  the spatial dimension. The same applies for substructure iterators,
  *  where a substructure is defined as a face of a cell. The face of a
  *  cell is a vertex in 1D and a line in 2D; however, vertices are
  *  handled in a different way and therefore lines have no faces.
  *
- *  The Triangulation class offers functions like @p begin_active which gives
+ *  The Triangulation class offers functions like begin_active() which gives
  *  you an iterator to the first active cell. There are quite a lot of functions
  *  returning iterators. Take a look at the class doc to get an overview.
  *
@@ -600,7 +584,7 @@ namespace internal
  *        more information. The mentioned class uses the interface described
  *        directly below to transfer the data into the triangulation.
  *
- *     <li> Explicitely creating a triangulation: you can create a triangulation
+ *     <li> Explicitly creating a triangulation: you can create a triangulation
  *        by providing a list of vertices and a list of cells. Each such cell
  *        consists of a vector storing the indices of the vertices of this cell
  *        in the vertex list. To see how this works, you can take a look at the
@@ -612,7 +596,7 @@ namespace internal
  *        quite a complex task.  For example in 2D, we have to create
  *        lines between vertices (but only once, though there are two
  *        cells which link these two vertices) and we have to create
- *        neighborship information. Grids being read in should
+ *        neighborhood information. Grids being read in should
  *        therefore not be too large, reading refined grids would be
  *        inefficient (although there is technically no problem in
  *        reading grids with several 10.000 or 100.000 cells; the
@@ -627,7 +611,7 @@ namespace internal
  *        vertex indices for each cell have to be in a defined order, see the
  *        documentation of GeometryInfo<dim>. In one dimension, the first vertex
  *        index must refer to that vertex with the lower coordinate value. In 2D
- *        and 3D, the correspondoing conditions are not easy to verify and no
+ *        and 3D, the corresponding conditions are not easy to verify and no
  *        full attempt to do so is made.
  *        If you violate this condition, you may end up with matrix entries
  *        having the wrong sign (clockwise vertex numbering, which results in
@@ -638,9 +622,8 @@ namespace internal
  *        There are more subtle conditions which must be imposed upon
  *        the vertex numbering within cells. They do not only hold for
  *        the data read from an UCD or any other input file, but also
- *        for the data passed to the
- *        <tt>Triangulation<dim,spacedim>::create_triangulation ()</tt>
- *        function. See the documentation for the GridIn class
+ *        for the data passed to create_triangulation().
+ *        See the documentation for the GridIn class
  *        for more details on this, and above all to the
  *        GridReordering class that explains many of the
  *        problems and an algorithm to reorder cells such that they
@@ -657,13 +640,13 @@ namespace internal
  *        parallel. It may be conceivable to implement a clean-up in the copy
  *        operation, which eliminates holes of unused memory, re-joins
  *        scattered data and so on. In principle this would be a useful
- *        operation but guaranteeing some parallelity in the two triangulations
+ *        operation but guaranteeing some parallelism in the two triangulations
  *        seems more important since usually data will have to be transferred
  *        between the grids.
  *   </ul>
  *
  *   Finally, there is a special function for folks who like bad grids:
- *   <tt>Triangulation<dim,spacedim>::distort_random</tt>. It moves all the vertices in the
+ *   distort_random(). It moves all the vertices in the
  *   grid a bit around by a random value, leaving behind a distorted mesh.
  *   Note that you should apply this function to the final mesh, since
  *   refinement smoothes the mesh a bit.
@@ -693,8 +676,8 @@ namespace internal
  *   function call <tt>i->set_refine_flag()</tt> marks the respective cell for
  *   refinement. Marking non-active cells results in an error.
  *
- *   After all the cells you wanted to mark for refinement, call the
- *   @p execute_coarsening_and_refinement function to actually perform
+ *   After all the cells you wanted to mark for refinement, call
+ *   execute_coarsening_and_refinement() to actually perform
  *   the refinement. This function itself first calls the
  *   @p prepare_coarsening_and_refinement function to regularize the resulting
  *   triangulation: since a face between two adjacent cells may only
@@ -709,7 +692,7 @@ namespace internal
  *   step than one needed by the finite element method.
  *
  *   To coarsen a grid, the same way as above is possible by using
- *   <tt>i->set_coarsen_flag</tt> and calling @p execute_coarsening_and_refinement.
+ *   <tt>i->set_coarsen_flag</tt> and calling execute_coarsening_and_refinement().
  *
  *   The reason for first coarsening, then refining is that the
  *   refinement usually adds some additional cells to keep the triangulation
@@ -725,20 +708,20 @@ namespace internal
  *   towards the boundary or always at the center (see the example programs,
  *   they do exactly these things). There are more advanced functions,
  *   however, which are more suitable for automatic generation of hierarchical
- *   grids in the context of a-posteriori error estimation and adaptive finite
+ *   grids in the context of a posteriori error estimation and adaptive finite
  *   elements. These functions can be found in the GridRefinement class.
  *
  *
  *   <h3>Smoothing of a triangulation</h3>
  *
  *   Some degradation of approximation properties has been observed
- *   for grids which are too unstructured. Therefore, the
- *   @p prepare_coarsening_and_refinement function which is automatically called
- *   by the @p execute_coarsening_and_refinement function can do some
+ *   for grids which are too unstructured. Therefore,
+ *   prepare_coarsening_and_refinement() which is automatically called
+ *   by execute_coarsening_and_refinement() can do some
  *   smoothing of the triangulation. Note that mesh smoothing is only
  *   done for two or more space dimensions, no smoothing is available
  *   at present for one spatial dimension. In the following, let
- *   <tt>execute_*</tt> stand for @p execute_coarsening_and_refinement.
+ *   <tt>execute_*</tt> stand for execute_coarsening_and_refinement().
  *
  *   For the purpose of smoothing, the
  *   Triangulation constructor takes an argument specifying whether a
@@ -755,188 +738,11 @@ namespace internal
  *   and once with smoothing, since then in some refinement steps would need
  *   to be refined twice.
  *
- *   The parameter taken by the constructor is an integer which may be composed
- *   bitwise by the constants defined in the <tt>enum MeshSmoothing</tt>. The meaning
- *   of these constants is explained in the following:
- *   <ul>
- *   <li> @p limit_level_difference_at_vertices:
- *     It can be shown, that degradation of approximation occurs if the
- *     triangulation contains vertices which are member of cells with levels
- *     differing by more than one. One such example is the following:
+ *   The parameter taken by the constructor is an integer which may be
+ *   composed bitwise by the constants defined in the enum
+ *   #MeshSmoothing (see there for the possibilities).
  *
- *     @image html limit_level_difference_at_vertices.png ""
- *
- *     It would seem that in two space dimensions, the maximum jump in levels
- *     between cells sharing a common vertex is two (as in the example
- *     above). However, this is not true if more than four cells meet at a
- *     vertex. It is not uncommon that a coarse (initial) mesh contains
- *     vertices at which six or even eight cells meet, when small features of
- *     the domain have to be resolved even on the coarsest mesh. In that case,
- *     the maximum difference in levels is three or four, respectively. The
- *     problem gets even worse in three space dimensions.
- *
- *     Looking at an interpolation of the second derivative of the finite
- *     element solution (assuming bilinear finite elements), one sees that the
- *     numerical solution is almost totally wrong, compared with the true
- *     second derivative. Indeed, on regular meshes, there exist sharp
- *     estimations that the $H^2$-error is only $O(1)$, so we should not be
- *     surprised; however, the numerical solution may show a value for the
- *     second derivative which may be a factor of ten away from the true
- *     value. These problems are located on the small cell adjacent to the
- *     center vertex, where cells of non-subsequent levels meet, as well as on
- *     the upper and right neighbor of this cell (but with a less degree of
- *     deviation from the true value).
- *
- *     If the smoothing indicator given to the constructor contains the bit for
- *     @p limit_level_difference_at_vertices, situations as the above one are
- *     eliminated by also marking the lower left cell for refinement.
- *
- *     In case of anisotropic refinement, the level of a cell is not linked to
- *     the refinement of a cell as directly as in case of isotropic
- *     refinement. Furthermore, a cell can be strongly refined in one
- *     direction and not or at least much less refined in another. Therefore,
- *     it is very difficult to decide, which cases should be excluded from the
- *     refinement process. As a consequence, when using anisotropic
- *     refinement, the @p limit_level_difference_at_vertices flag must not be
- *     set. On the other hand, the implementation of multigrid methods in
- *     deal.II requires that this bit be set.
- *
- *   <li> @p eliminate_unrefined_islands:
- *     Single cells which are not refined and are surrounded by cells which are
- *     refined usually also lead to a sharp decline in approximation properties
- *     locally. The reason is that the nodes on the faces between unrefined and
- *     refined cells are not real degrees of freedom but carry constraints. The
- *     patch without additional degrees of freedom is thus significantly larger
- *     then the unrefined cell itself. If in the parameter passed to the
- *     constructor the bit for @p eliminate_unrefined_islands is set, all cells
- *     which are not flagged for refinement but which are surrounded by more
- *     refined cells than unrefined cells are flagged for refinement. Cells
- *     which are not yet refined but flagged for that are accounted for the
- *     number of refined neighbors. Cells on the boundary are not accounted for
- *     at all. An unrefined island is, by this definition
- *     also a cell which (in 2D) is surrounded by three refined cells and one
- *     unrefined one, or one surrounded by two refined cells, one unrefined one
- *     and is at the boundary on one side. It is thus not a true island, as the
- *     name of the flag may indicate. However, no better name came to mind to
- *     the author by now.
- *
- *   <li> <tt>eliminate_refined_*_islands</tt>:
- *     This algorithm seeks for isolated cells which are refined or flagged
- *     for refinement. This definition is unlike that for
- *     @p eliminate_unrefined_islands, which would mean that an island is
- *     defined as a cell which
- *     is refined but more of its neighbors are not refined than are refined.
- *     For example, in 2D, a cell's refinement would be reverted if at most
- *     one of its neighbors is also refined (or refined but flagged for
- *     coarsening).
- *
- *     The reason for the change in definition of an island is, that this
- *     option would be a bit dangerous, since if you consider a
- *     chain of refined cells (e.g. along a kink in the solution), the cells
- *     at the two ends would be coarsened, after which the next outermost cells
- *     would need to be coarsened. Therefore, only one loop of flagging cells
- *     like this could be done to avoid eating up the whole chain of refined
- *     cells (`chain reaction'...).
- *
- *     This algorithm also takes into account cells which are not actually
- *     refined but are flagged for refinement. If necessary, it takes away the
- *     refinement flag.
- *
- *     Actually there are two versions of this flag,
- *     @p eliminate_refined_inner_islands and @p eliminate_refined_boundary_islands.
- *     There first eliminates islands defined by the definition above which are
- *     in the interior of the domain, while the second eliminates only those
- *     islands if the cell is at the boundary. The reason for this split of
- *     flags is that one often wants to eliminate such islands in the interior
- *     while those at the boundary may well be wanted, for example if one
- *     refines the mesh according to a criterion associated with a boundary
- *     integral or if one has rough boundary data.
- *
- *   <li> @p do_not_produce_unrefined_islands:
- *     This flag prevents the occurrence of unrefined islands. In more detail:
- *     It prohibits the coarsening of a cell if 'most of the neighbors' will
- *     be refined after the step.
- *
- *   <li> @p patch_level_1:
- *     A triangulation of patch level 1 consists of patches, i.e. of
- *     cells that are refined once. This flag ensures that a mesh of
- *     patch level 1 is still of patch level 1 after coarsening and
- *     refinement. It is, however, the user's responsibility to ensure
- *     that the mesh is of patch level 1 before calling
- *     execute_coarsening_and_refinement the first time. The easiest
- *     way to achieve this is by calling global_refine(1) straight
- *     after creation of the triangulation.  It follows that if at
- *     least one of the children of a cell is or will be refined than
- *     all children need to be refined. If the @p patch_level_1 flag
- *     is set, than the flags @p eliminate_unrefined_islands, @p
- *     eliminate_refined_inner_islands and @p
- *     eliminate_refined_boundary_islands will be ignored as they will
- *     be fulfilled automatically.
- *
- *   <li> @p coarsest_level_1:
- *     Each coarse grid cell is refined at least once, i.e. the
- *     triangulation might have active cells on level 1 but not on
- *     level 0. This flag ensures that a mesh which has
- *     coarsest_level_1 has still coarsest_level_1 after coarsening
- *     and refinement. It is, however, the user's responsibility to
- *     ensure that the mesh has coarsest_level_1 before calling
- *     execute_coarsening_and_refinement the first time. The easiest
- *     way to achieve this is by calling global_refine(1) straight
- *     after creation of the triangulation. It follows that active
- *     cells on level 1 may not be coarsenend.
- *
- *     The main use of this flag is to ensure that each cell has at least one
- *     neighbor in each coordinate direction (i.e. each cell has at least a
- *     left or right, and at least an upper or lower neighbor in 2d). This is
- *     a necessary precondition for some algorihms that compute finite
- *     differences between cells. The DerivativeApproximation class is one of
- *     these algorithms that require that a triangulation is coarsest_level_1
- *     unless all cells already have at least one neighbor in each coordinate
- *     direction on the coarsest level.
- *
- *   <li> @p smoothing_on_refinement:
- *     This flag sums up all smoothing algorithms which may be performed upon
- *     refinement by flagging some more cells for refinement.
- *
- *   <li> @p smoothing_on_coarsening:
- *     This flag sums up all smoothing algorithms which may be performed upon
- *     coarsening by flagging some more cells for coarsening.
- *
- *   <li> @p maximum_smoothing:
- *     This flag includes all the above ones and therefore combines all
- *     smoothing algorithms implemented.
- *
- *   <li> @p allow_anisotropic_smoothing:
- *     This flag is not included in @p maximum_smoothing. The flag is
- *     concerned with the following case: consider the case that an
- *     unrefined and a refined cell share a common face and that one
- *     of the children of the refined cell along the common face is
- *     flagged for further refinement. In that case, the resulting
- *     mesh would have more than one hanging node along one or more of
- *     the edges of the triangulation, a situation that is not
- *     allowed. Consequently, in order to perform the refinement, the
- *     coarser of the two original cells is also going to be refined.
- *
- *     However, in many cases it is sufficient to refine the coarser
- *     of the two original cells in an anisotropic way to avoid the
- *     case of multiple hanging vertices on a single edge. Doing only
- *     the minimal anisotropic refinement can save cells and degrees
- *     of freedom. By specifying this flag, the library can produce
- *     these anisotropic refinements.
- *
- *     The flag is not included by default since it may lead to
- *     anisotropically refined meshes even though no cell has ever
- *     been refined anisotropically explicitly by a user command. This
- *     surprising fact may lead to programs that do the wrong thing
- *     since they are not written for the additional cases that can
- *     happen with anisotropic meshes, see the discussion in the
- *     introduction to step-30.
- *
- *   <li> @p none:
- *     Select no smoothing at all.
- *   </ul>
- *
- *   @note While it is possible to pass all of the flags discussed above to
+ *   @note While it is possible to pass all of the flags in #MeshSmoothing to
  *   objects of type parallel::distributed::Triangulation, it is not always
  *   possible to honor all of these smoothing options if they would require
  *   knowledge of refinement/coarsening flags on cells not locally owned by
@@ -977,12 +783,12 @@ namespace internal
  *   use is like the material id of cells).
 
  *   Boundary indicators may be in the range from zero to
- *   types::internal_face_boundary_id-1. The value
- *   types::internal_face_boundary_id is reserved to denote interior lines (in 2D)
+ *   numbers::internal_face_boundary_id-1. The value
+ *   numbers::internal_face_boundary_id is reserved to denote interior lines (in 2D)
  *   and interior lines and quads (in 3D), which do not have a
  *   boundary indicator. This way, a program can easily
  *   determine, whether such an object is at the boundary or not.
- *   Material indicators may be in the range from zero to types::invalid_material_id-1.
+ *   Material indicators may be in the range from zero to numbers::invalid_material_id-1.
  *
  *   Lines in two dimensions and quads in three dimensions inherit their
  *   boundary indicator to their children upon refinement. You should therefore
@@ -1458,45 +1264,238 @@ class Triangulation : public Subscriptor
                                       */
     enum MeshSmoothing
     {
+/**
+ * No mesh smoothing at all, except that meshes have to remain one-irregular.
+ */
           none                               = 0x0,
+/**
+ *     It can be shown, that degradation of approximation occurs if the
+ *     triangulation contains vertices which are member of cells with levels
+ *     differing by more than one. One such example is the following:
+ *
+ *     @image html limit_level_difference_at_vertices.png ""
+ *
+ *     It would seem that in two space dimensions, the maximum jump in levels
+ *     between cells sharing a common vertex is two (as in the example
+ *     above). However, this is not true if more than four cells meet at a
+ *     vertex. It is not uncommon that a coarse (initial) mesh contains
+ *     vertices at which six or even eight cells meet, when small features of
+ *     the domain have to be resolved even on the coarsest mesh. In that case,
+ *     the maximum difference in levels is three or four, respectively. The
+ *     problem gets even worse in three space dimensions.
+ *
+ *     Looking at an interpolation of the second derivative of the finite
+ *     element solution (assuming bilinear finite elements), one sees that the
+ *     numerical solution is almost totally wrong, compared with the true
+ *     second derivative. Indeed, on regular meshes, there exist sharp
+ *     estimations that the H<sup>2</sup>-error is only of order one, so we should not be
+ *     surprised; however, the numerical solution may show a value for the
+ *     second derivative which may be a factor of ten away from the true
+ *     value. These problems are located on the small cell adjacent to the
+ *     center vertex, where cells of non-subsequent levels meet, as well as on
+ *     the upper and right neighbor of this cell (but with a less degree of
+ *     deviation from the true value).
+ *
+ *     If the smoothing indicator given to the constructor contains the bit for
+ *     #limit_level_difference_at_vertices, situations as the above one are
+ *     eliminated by also marking the lower left cell for refinement.
+ *
+ *     In case of anisotropic refinement, the level of a cell is not linked to
+ *     the refinement of a cell as directly as in case of isotropic
+ *     refinement. Furthermore, a cell can be strongly refined in one
+ *     direction and not or at least much less refined in another. Therefore,
+ *     it is very difficult to decide, which cases should be excluded from the
+ *     refinement process. As a consequence, when using anisotropic
+ *     refinement, the #limit_level_difference_at_vertices flag must not be
+ *     set. On the other hand, the implementation of multigrid methods in
+ *     deal.II requires that this bit be set.
+ */
           limit_level_difference_at_vertices = 0x1,
-          eliminate_unrefined_islands        = 0x2,
+/**
+ *     Single cells which are not refined and are surrounded by cells which are
+ *     refined usually also lead to a sharp decline in approximation properties
+ *     locally. The reason is that the nodes on the faces between unrefined and
+ *     refined cells are not real degrees of freedom but carry constraints. The
+ *     patch without additional degrees of freedom is thus significantly larger
+ *     then the unrefined cell itself. If in the parameter passed to the
+ *     constructor the bit for #eliminate_unrefined_islands is set, all cells
+ *     which are not flagged for refinement but which are surrounded by more
+ *     refined cells than unrefined cells are flagged for refinement. Cells
+ *     which are not yet refined but flagged for that are accounted for the
+ *     number of refined neighbors. Cells on the boundary are not accounted for
+ *     at all. An unrefined island is, by this definition
+ *     also a cell which (in 2D) is surrounded by three refined cells and one
+ *     unrefined one, or one surrounded by two refined cells, one unrefined one
+ *     and is at the boundary on one side. It is thus not a true island, as the
+ *     name of the flag may indicate. However, no better name came to mind to
+ *     the author by now.
+  */
+	  eliminate_unrefined_islands        = 0x2,
+/**
+ *     A triangulation of patch level 1 consists of patches, i.e. of
+ *     cells that are refined once. This flag ensures that a mesh of
+ *     patch level 1 is still of patch level 1 after coarsening and
+ *     refinement. It is, however, the user's responsibility to ensure
+ *     that the mesh is of patch level 1 before calling
+ *     Triangulation::execute_coarsening_and_refinement() the first time. The easiest
+ *     way to achieve this is by calling global_refine(1) straight
+ *     after creation of the triangulation.  It follows that if at
+ *     least one of the children of a cell is or will be refined than
+ *     all children need to be refined. If the #patch_level_1 flag
+ *     is set, than the flags #eliminate_unrefined_islands,
+ *     #eliminate_refined_inner_islands and
+ *     #eliminate_refined_boundary_islands will be ignored as they will
+ *     be fulfilled automatically.
+ */
           patch_level_1                      = 0x4,
+/**
+ *     Each coarse grid cell is refined at least once, i.e. the
+ *     triangulation might have active cells on level 1 but not on
+ *     level 0. This flag ensures that a mesh which has
+ *     coarsest_level_1 has still coarsest_level_1 after coarsening
+ *     and refinement. It is, however, the user's responsibility to
+ *     ensure that the mesh has coarsest_level_1 before calling
+ *     execute_coarsening_and_refinement the first time. The easiest
+ *     way to achieve this is by calling global_refine(1) straight
+ *     after creation of the triangulation. It follows that active
+ *     cells on level 1 may not be coarsenend.
+ *
+ *     The main use of this flag is to ensure that each cell has at least one
+ *     neighbor in each coordinate direction (i.e. each cell has at least a
+ *     left or right, and at least an upper or lower neighbor in 2d). This is
+ *     a necessary precondition for some algorihms that compute finite
+ *     differences between cells. The DerivativeApproximation class is one of
+ *     these algorithms that require that a triangulation is coarsest_level_1
+ *     unless all cells already have at least one neighbor in each coordinate
+ *     direction on the coarsest level.
+ */
           coarsest_level_1                   = 0x8,
-
+/**
+ *     This flag is not included in @p maximum_smoothing. The flag is
+ *     concerned with the following case: consider the case that an
+ *     unrefined and a refined cell share a common face and that one
+ *     of the children of the refined cell along the common face is
+ *     flagged for further refinement. In that case, the resulting
+ *     mesh would have more than one hanging node along one or more of
+ *     the edges of the triangulation, a situation that is not
+ *     allowed. Consequently, in order to perform the refinement, the
+ *     coarser of the two original cells is also going to be refined.
+ *
+ *     However, in many cases it is sufficient to refine the coarser
+ *     of the two original cells in an anisotropic way to avoid the
+ *     case of multiple hanging vertices on a single edge. Doing only
+ *     the minimal anisotropic refinement can save cells and degrees
+ *     of freedom. By specifying this flag, the library can produce
+ *     these anisotropic refinements.
+ *
+ *     The flag is not included by default since it may lead to
+ *     anisotropically refined meshes even though no cell has ever
+ *     been refined anisotropically explicitly by a user command. This
+ *     surprising fact may lead to programs that do the wrong thing
+ *     since they are not written for the additional cases that can
+ *     happen with anisotropic meshes, see the discussion in the
+ *     introduction to step-30.
+ */
           allow_anisotropic_smoothing        = 0x10,
-
+/**
+ *     This algorithm seeks for isolated cells which are refined or flagged
+ *     for refinement. This definition is unlike that for
+ *     #eliminate_unrefined_islands, which would mean that an island is
+ *     defined as a cell which
+ *     is refined but more of its neighbors are not refined than are refined.
+ *     For example, in 2D, a cell's refinement would be reverted if at most
+ *     one of its neighbors is also refined (or refined but flagged for
+ *     coarsening).
+ *
+ *     The reason for the change in definition of an island is, that this
+ *     option would be a bit dangerous, since if you consider a
+ *     chain of refined cells (e.g. along a kink in the solution), the cells
+ *     at the two ends would be coarsened, after which the next outermost cells
+ *     would need to be coarsened. Therefore, only one loop of flagging cells
+ *     like this could be done to avoid eating up the whole chain of refined
+ *     cells (`chain reaction'...).
+ *
+ *     This algorithm also takes into account cells which are not actually
+ *     refined but are flagged for refinement. If necessary, it takes away the
+ *     refinement flag.
+ *
+ *     Actually there are two versions of this flag,
+ *     #eliminate_refined_inner_islands and #eliminate_refined_boundary_islands.
+ *     There first eliminates islands defined by the definition above which are
+ *     in the interior of the domain, while the second eliminates only those
+ *     islands if the cell is at the boundary. The reason for this split of
+ *     flags is that one often wants to eliminate such islands in the interior
+ *     while those at the boundary may well be wanted, for example if one
+ *     refines the mesh according to a criterion associated with a boundary
+ *     integral or if one has rough boundary data.
+ */
           eliminate_refined_inner_islands    = 0x100,
+/**
+ * The result of this flag is very similar to
+ * #eliminate_refined_inner_islands. See the documentation there.
+ */
           eliminate_refined_boundary_islands = 0x200,
+/**
+ *     This flag prevents the occurrence of unrefined islands. In more detail:
+ *     It prohibits the coarsening of a cell if 'most of the neighbors' will
+ *     be refined after the step.
+ */
           do_not_produce_unrefined_islands   = 0x400,
 
+/**
+ *     This flag sums up all smoothing algorithms which may be performed upon
+ *     refinement by flagging some more cells for refinement.
+ */
           smoothing_on_refinement            = (limit_level_difference_at_vertices |
                                                 eliminate_unrefined_islands),
+/**
+ *     This flag sums up all smoothing algorithms which may be performed upon
+ *     coarsening by flagging some more cells for coarsening.
+ */
           smoothing_on_coarsening            = (eliminate_refined_inner_islands |
                                                 eliminate_refined_boundary_islands |
                                                 do_not_produce_unrefined_islands),
 
+/**
+ *     This flag includes all the above ones and therefore combines all
+ *     smoothing algorithms implemented with the exception of
+ *     anisotropic smoothening.
+ */
           maximum_smoothing                  = 0xffff ^ allow_anisotropic_smoothing
     };
 
-
+    /**
+     *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+     */
     typedef TriaRawIterator   <CellAccessor<dim,spacedim>         > raw_cell_iterator;
     typedef TriaIterator      <CellAccessor<dim,spacedim>         > cell_iterator;
     typedef TriaActiveIterator<CellAccessor<dim,spacedim>         > active_cell_iterator;
 
+    /**
+     *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+     */
     typedef TriaRawIterator   <TriaAccessor<dim-1, dim, spacedim> > raw_face_iterator;
     typedef TriaIterator      <TriaAccessor<dim-1, dim, spacedim> > face_iterator;
     typedef TriaActiveIterator<TriaAccessor<dim-1, dim, spacedim> > active_face_iterator;
 
+    /**
+     *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+     */
     typedef typename IteratorSelector::raw_line_iterator    raw_line_iterator;
     typedef typename IteratorSelector::line_iterator        line_iterator;
     typedef typename IteratorSelector::active_line_iterator active_line_iterator;
 
+    /**
+     *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+     */
     typedef typename IteratorSelector::raw_quad_iterator    raw_quad_iterator;
     typedef typename IteratorSelector::quad_iterator        quad_iterator;
     typedef typename IteratorSelector::active_quad_iterator active_quad_iterator;
 
-    typedef typename IteratorSelector::raw_hex_iterator    raw_hex_iterator;
+    /**
+     *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+     */
+   typedef typename IteratorSelector::raw_hex_iterator    raw_hex_iterator;
     typedef typename IteratorSelector::hex_iterator        hex_iterator;
     typedef typename IteratorSelector::active_hex_iterator active_hex_iterator;
 
@@ -1806,7 +1805,7 @@ class Triangulation : public Subscriptor
                                       * boundary, for instance the material id
                                       * in a UCD input file. They are not
                                       * necessarily consecutive but must be in
-                                      * the range 0-(types::boundary_id_t-1).
+                                      * the range 0-(types::boundary_id-1).
                                       * Material IDs on boundaries are also
                                       * called boundary indicators and are
                                       * accessed with accessor functions
@@ -1835,7 +1834,7 @@ class Triangulation : public Subscriptor
 				      *
 				      * @ingroup boundary
                                       */
-    void set_boundary (const types::boundary_id_t   number,
+    void set_boundary (const types::boundary_id   number,
                        const Boundary<dim,spacedim> &boundary_object);
 
                                      /**
@@ -1849,7 +1848,7 @@ class Triangulation : public Subscriptor
 				      *
 				      * @ingroup boundary
                                       */
-    void set_boundary (const types::boundary_id_t number);
+    void set_boundary (const types::boundary_id number);
 
                                      /**
                                       * Return a constant reference to
@@ -1860,7 +1859,7 @@ class Triangulation : public Subscriptor
 				      *
 				      * @ingroup boundary
                                       */
-    const Boundary<dim,spacedim> & get_boundary (const types::boundary_id_t number) const;
+    const Boundary<dim,spacedim> & get_boundary (const types::boundary_id number) const;
 
                                      /**
                                       * Returns a vector containing
@@ -1877,7 +1876,7 @@ class Triangulation : public Subscriptor
 				      *
 				      * @ingroup boundary
                                       */
-    std::vector<types::boundary_id_t> get_boundary_indicators() const;
+    std::vector<types::boundary_id> get_boundary_indicators() const;
 
                                      /**
                                       *  Copy a triangulation. This
@@ -2605,6 +2604,8 @@ class Triangulation : public Subscriptor
                                       */
                                      /*@{*/
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Iterator to the first cell, used
                                       *  or not, on level @p level. If a level
                                       *  has no cells, a past-the-end iterator
@@ -2654,6 +2655,8 @@ class Triangulation : public Subscriptor
     cell_iterator        end (const unsigned int level) const;
 
                                      /**
+                                       *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Return a raw iterator which is the first
                                       * iterator not on level. If @p level is
                                       * the last level, then this returns
@@ -2671,6 +2674,8 @@ class Triangulation : public Subscriptor
 
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Return an iterator pointing to the
                                       *  last cell, used or not.
                                       *
@@ -2680,6 +2685,8 @@ class Triangulation : public Subscriptor
     raw_cell_iterator    last_raw () const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Return an iterator pointing to the
                                       *  last cell of the level @p level, used
                                       *  or not.
@@ -2735,6 +2742,8 @@ class Triangulation : public Subscriptor
                                       */
                                      /*@{*/
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Iterator to the first face, used
                                       *  or not. As faces have no level,
                                       *  no argument can be given.
@@ -2774,6 +2783,8 @@ class Triangulation : public Subscriptor
     raw_face_iterator    end_face () const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Return a raw iterator which is past
                                       * the end.  This is the same as
                                       * <tt>end()</tt> and is only for
@@ -2790,6 +2801,8 @@ class Triangulation : public Subscriptor
     active_face_iterator end_active_face () const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Return an iterator pointing to the
                                       *  last face, used or not.
                                       *
@@ -2827,6 +2840,8 @@ class Triangulation : public Subscriptor
                                       */
                                      /*@{*/
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Iterator to the first line, used or
                                       *  not, on level @p level. If a level
                                       *  has no lines, a past-the-end iterator
@@ -2871,6 +2886,8 @@ class Triangulation : public Subscriptor
     line_iterator        end_line (const unsigned int level) const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Return a raw iterator which is the
                                       * first iterator not on level. If @p
                                       * level is the last level, then this
@@ -2887,6 +2904,8 @@ class Triangulation : public Subscriptor
     active_line_iterator end_active_line (const unsigned int level) const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Return an iterator pointing to the
                                       *  last line, used or not.
                                       */
@@ -2894,6 +2913,8 @@ class Triangulation : public Subscriptor
     last_raw_line () const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Return an iterator pointing to the
                                       *  last line of the level @p level, used
                                       *  or not.
@@ -2938,6 +2959,8 @@ class Triangulation : public Subscriptor
                                      /*@{
                                       */
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Iterator to the first quad, used or
                                       *  not, on the given level. If a level
                                       *  has no quads, a past-the-end iterator
@@ -2980,6 +3003,8 @@ class Triangulation : public Subscriptor
     quad_iterator        end_quad (const unsigned int level) const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Return a raw iterator which is the
                                       * first iterator not on level. If @p
                                       * level is the last level, then this
@@ -2996,6 +3021,8 @@ class Triangulation : public Subscriptor
     active_quad_iterator end_active_quad (const unsigned int level) const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Return an iterator pointing to the
                                       *  last quad, used or not.
                                       */
@@ -3003,6 +3030,8 @@ class Triangulation : public Subscriptor
     last_raw_quad () const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Return an iterator pointing to the
                                       *  last quad of the level @p level, used
                                       *  or not.
@@ -3048,6 +3077,8 @@ class Triangulation : public Subscriptor
                                      /*@{
                                       */
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Iterator to the first hex, used
                                       *  or not, on level @p level. If a level
                                       *  has no hexs, a past-the-end iterator
@@ -3087,6 +3118,8 @@ class Triangulation : public Subscriptor
     hex_iterator        end_hex (const unsigned int level) const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Return a raw iterator which is the first
                                       * iterator not on level. If @p level is
                                       * the last level, then this returns
@@ -3103,12 +3136,16 @@ class Triangulation : public Subscriptor
     active_hex_iterator end_active_hex (const unsigned int level) const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Return an iterator pointing to the
                                       *  last hex, used or not.
                                       */
     raw_hex_iterator    last_raw_hex () const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Return an iterator pointing to the
                                       *  last hex of the level @p level, used
                                       *  or not.
@@ -3171,12 +3208,16 @@ class Triangulation : public Subscriptor
                                       */
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Total Number of lines, used or
                                       * unused.
                                       */
     unsigned int n_raw_lines () const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Number of lines, used or
                                       * unused, on the given level.
                                       */
@@ -3206,12 +3247,16 @@ class Triangulation : public Subscriptor
     unsigned int n_active_lines (const unsigned int level) const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Total number of quads, used or
                                       * unused.
                                       */
     unsigned int n_raw_quads () const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Number of quads, used or
                                       * unused, on the given level.
                                       */
@@ -3242,12 +3287,16 @@ class Triangulation : public Subscriptor
     unsigned int n_active_quads (const unsigned int level) const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Total number of hexs, used or
                                       * unused.
                                       */
     unsigned int n_raw_hexs () const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Number of hexs, used or
                                       * unused, on the given level.
                                       */
@@ -3280,6 +3329,8 @@ class Triangulation : public Subscriptor
     unsigned int n_active_hexs(const unsigned int level) const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       * Number of cells, used or
                                       * unused, on the given level.
                                       */
@@ -3317,6 +3368,8 @@ class Triangulation : public Subscriptor
     unsigned int n_active_cells (const unsigned int level) const;
 
                                      /**
+                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
+                                      *
                                       *  Return total number of faces,
                                       *  used or not. In 2d, the result
                                       *  equals n_raw_lines(), while in 3d it
@@ -3452,7 +3505,7 @@ class Triangulation : public Subscriptor
                                       * of those cells that are owned
                                       * by the current processor.
                                       */
-    virtual types::subdomain_id_t locally_owned_subdomain () const;
+    virtual types::subdomain_id locally_owned_subdomain () const;
                                      /*@}*/
 
                                      /**
@@ -3712,7 +3765,7 @@ class Triangulation : public Subscriptor
                                       *  objects, which are not
                                       *  of type StraightBoundary.
                                       */
-    std::map<types::boundary_id_t, SmartPointer<const Boundary<dim, spacedim> , Triangulation<dim, spacedim> > >  boundary;
+    std::map<types::boundary_id, SmartPointer<const Boundary<dim, spacedim> , Triangulation<dim, spacedim> > >  boundary;
 
                                      /**
                                       * Flag indicating whether
@@ -3771,7 +3824,7 @@ class Triangulation : public Subscriptor
                                       * TriaAccessor::set_boundary_indicator)
                                       * were not a pointer.
                                       */
-    std::map<unsigned int, types::boundary_id_t> *vertex_to_boundary_id_map_1d;
+    std::map<unsigned int, types::boundary_id> *vertex_to_boundary_id_map_1d;
 
     /**
      * A map that correlates each refinement listener that has been added

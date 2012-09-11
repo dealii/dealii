@@ -435,8 +435,31 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
-    dnl See whether the gcc we use already has a flag for C++2011 features.
+    dnl Newer versions have a flag -Wunused-local-typedefs that, though in principle
+    dnl a good idea, triggers a lot in BOOST in various places. Unfortunately,
+    dnl this warning is included in -W/-Wall, so disable it if the compiler
+    dnl supports it.
+    CXXFLAGS="-Wunused-local-typedefs"
+    AC_MSG_CHECKING(whether the compiler supports the -Wunused-local-typedefs flag)
+    AC_TRY_COMPILE(
+          [
+          ],
+          [;],
+          [
+            AC_MSG_RESULT(yes)
+            CXXFLAGSG="$CXXFLAGSG -Wno-unused-local-typedefs"
+          ],
+          [
+            AC_MSG_RESULT(no)
+            dnl Nothing to do here then. We can't disable it if the
+	    dnl flag doesn't exist
+          ])
+
+
+    dnl See whether the gcc we use already has a flag for C++2011 features
+    dnl and whether we can mark functions as deprecated with an attributed
     DEAL_II_CHECK_CXX1X
+    DEAL_II_CHECK_DEPRECATED
 
 
     dnl On some gcc 4.3 snapshots, a 'const' qualifier on a return type triggers a
@@ -977,8 +1000,12 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl       somewhere in BOOST with BOOST_ASSERT. I have no idea
           dnl       what happens here
           dnl #284: "NULL references not allowed"
-          CXXFLAGSG="$CXXFLAGSG -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
-          CXXFLAGSO="$CXXFLAGSO -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
+          dnl #497: "declaration of "dim" hides template parameter" (while
+	  dnl       theoretically useful, pgCC unfortunately gets this one
+	  dnl       wrong on legitimate code where no such parameter is
+	  dnl       hidden, see the email by ayaydemir on 9/3/2012)
+          CXXFLAGSG="$CXXFLAGSG -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284 --diag_suppress 497"
+          CXXFLAGSO="$CXXFLAGSO -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284 --diag_suppress 497"
           CXXFLAGSPIC="-Kpic"
 
           dnl pgCC can't (as of writing this, with version 12.5 in mid-2012) compile a part of BOOST.
@@ -1156,7 +1183,7 @@ dnl -------------------------------------------------------------
 dnl Given the command line flag specified as argument to this macro,
 dnl test whether all components that we need from the C++1X
 dnl standard are actually available. If so, add the flag to
-dnl CXXFLAGS.g and CXXFLAGS.o, and set a flag in config.h
+dnl CXXFLAGSG and CXXFLAGSO, and set a flag in config.h
 dnl
 dnl Usage: DEAL_II_CHECK_CXX1X_COMPONENTS(cxxflag)
 dnl
@@ -1334,6 +1361,74 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
     fi
   fi
 ])
+
+
+
+dnl -------------------------------------------------------------
+dnl See if the compiler understands the attribute to mark functions
+dnl as deprecated.
+dnl
+dnl Usage: DEAL_II_CHECK_DEPRECATED
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_DEPRECATED, dnl
+[
+  AC_MSG_CHECKING(whether compiler has attributes to deprecate functions)
+
+
+  OLD_CXXFLAGS="$CXXFLAGS"
+  CXXFLAGS=""
+
+  dnl First see if the following compiles without error (it should
+  dnl produce a warning but we don't care about this
+  AC_TRY_COMPILE(
+     [
+          int old_fn () __attribute__((deprecated));
+          int old_fn ();
+          int (*fn_ptr)() = old_fn;
+     ],
+     [;],
+     [
+       test1=yes
+     ],
+     [
+       test1=no
+     ])
+
+  dnl Now try this again with -Werror. It should now fail
+  CXXFLAGS=-Werror
+  AC_TRY_COMPILE(
+     [
+          int old_fn () __attribute__((deprecated));
+          int old_fn ();
+          int (*fn_ptr)() = old_fn;
+     ],
+     [;],
+     [
+       test2=yes
+     ],
+     [
+       test2=no
+     ])
+  CXXFLAGS="${OLD_CXXFLAGS}"
+
+  if test "$test1$test2" = "yesno" ; then
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(DEAL_II_DEPRECATED, [__attribute__((deprecated))],
+              [If the compiler supports this, then this variable is
+	       defined to a string that when written after a function
+	       name makes the compiler emit a warning whenever this
+	       function is used somewhere that its use is deprecated.])
+  else
+    AC_MSG_RESULT(no)
+    AC_DEFINE(DEAL_II_DEPRECATED, [],
+              [If the compiler supports this, then this variable is
+	       defined to a string that when written after a function
+	       name makes the compiler emit a warning whenever this
+	       function is used somewhere that its use is deprecated.])
+  fi
+])
+
 
 
 dnl -------------------------------------------------------------
@@ -1680,7 +1775,7 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 
       clang)
           CFLAGS="$CFLAGS -g"
-          CFLAGSO="$CFLAGS -fast -O2"
+          CFLAGSO="$CFLAGS -O2"
           CFLAGSPIC="-fPIC"
           ;;
 
@@ -1978,6 +2073,7 @@ AC_DEFUN(DEAL_II_CHECK_DYNAMIC_CAST_BUG,
   AC_MSG_CHECKING(for dynamic_cast problem with shared libs)
 
   if (cd contrib/config/tests/darwin-dynamic-cast ; \
+      echo $CXX > compile_line; \
       $CXX -dynamiclib BaseClass.cpp -o libDynamicCastTestLib.dylib ; \
       $CXX -L. -lDynamicCastTestLib main.cc -o main ; \
       ./main) ; then
@@ -1987,9 +2083,11 @@ AC_DEFUN(DEAL_II_CHECK_DYNAMIC_CAST_BUG,
     AC_DEFINE(DEAL_II_HAVE_DARWIN_DYNACAST_BUG, 1,
               [Defined if the compiler has a bug with dynamic casting
                and dynamic libraries])
-    CXXFLAGSG="$CXXFLAGSG -mmacosx-version-min=10.4"
-    CXXFLAGSO="$CXXFLAGSO -mmacosx-version-min=10.4"
-    LDFLAGS="$LDFLAGS -mmacosx-version-min=10.4"
+    if(test "`sw_vers -productVersion`" != "10.8");then
+	CXXFLAGSG="$CXXFLAGSG -mmacosx-version-min=10.4"
+	CXXFLAGSO="$CXXFLAGSO -mmacosx-version-min=10.4"
+	LDFLAGS="$LDFLAGS -mmacosx-version-min=10.4"
+    fi
   fi
   rm -f contrib/config/tests/darwin-dynamic-cast/libDynamicCastTestLib.dylib
   rm -f contrib/config/tests/darwin-dynamic-cast/main.o
@@ -5602,12 +5700,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
     dnl from time-to-time; so make sure that what was specified is
     dnl actually correct.
     case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-      2.3*) dnl
-        if test ! -d $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH \
-           ; then
-          AC_MSG_ERROR([PETSc has not been compiled for the architecture specified with --with-petsc-arch])
-        fi
-        ;;
       3.*) dnl
         if test ! -d $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib \
            ; then
@@ -5683,18 +5775,6 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
   dnl
   dnl Like always, we have to cake care of version control!
     case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-      2.3.*) dnl
-        AC_TRY_COMPILE(
-        [#include "$DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf.h"
-        ],
-        [#ifdef PETSC_HAVE_MPIUNI
-           compile error;
-         #endif
-        ],
-        [AC_MSG_RESULT(yes)],
-        [AC_MSG_ERROR([PETSc was not built for MPI, but deal.II is!]
-        )])
-      ;;
       3.*) dnl
         AC_TRY_COMPILE(
         [#include "$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h"
@@ -5713,18 +5793,6 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
     esac
   else
     case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-      2.3*) dnl
-        AC_TRY_COMPILE(
-        [#include "$DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf.h"
-        ],
-        [#ifndef PETSC_HAVE_MPIUNI
-           compile error;
-         #endif
-        ],
-        [AC_MSG_RESULT(yes)],
-        [AC_MSG_ERROR([PETSc was built for MPI, but deal.II is not!]
-        )])
-      ;;
       3.*) dnl
         AC_TRY_COMPILE(
         [#include "$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h"
@@ -5757,11 +5825,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
 [
   AC_MSG_CHECKING([for PETSc libmpiuni library])
   case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-    2.3*) dnl
-      if test -f $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a ; then
-        DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a"
-      fi
-      ;;
     3.*) dnl
       if test -f $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a ; then
         DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a"
@@ -5793,7 +5856,7 @@ dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_PETSC_COMPLEX, dnl
 [
   case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-    3.1*)
+    3.3*)
       AC_MSG_CHECKING([for PETSc scalar complex])
       DEAL_II_PETSC_COMPLEX=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h \
                                | grep "#define PETSC_USE_COMPLEX" \
@@ -6550,6 +6613,252 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
   CXXFLAGS="${OLD_CXXFLAGS}"
 ])
 
+dnl ===========================================================================
+dnl        http://www.gnu.org/software/autoconf-archive/ax_lib_hdf5.html
+dnl ===========================================================================
+dnl
+dnl SYNOPSIS
+dnl
+dnl   AX_LIB_HDF5([serial/parallel])
+dnl
+dnl DESCRIPTION
+dnl
+dnl   This macro provides tests of the availability of HDF5 library.
+dnl
+dnl   The optional macro argument should be either 'serial' or 'parallel'. The
+dnl   former only looks for serial HDF5 installations via h5cc. The latter
+dnl   only looks for parallel HDF5 installations via h5pcc. If the optional
+dnl   argument is omitted, serial installations will be preferred over
+dnl   parallel ones.
+dnl
+dnl   The macro adds a --with-hdf5 option accepting one of three values:
+dnl
+dnl     no   - do not check for the HDF5 library.
+dnl     yes  - do check for HDF5 library in standard locations.
+dnl     path - complete path to where lib/libhdf5* libraries and
+dnl            include/H5* include files reside.
+dnl
+dnl   If HDF5 is successfully found, this macro calls
+dnl
+dnl     AC_SUBST(DEAL_II_HDF5_VERSION)
+dnl     AC_SUBST(DEAL_II_HDF5_CFLAGS)
+dnl     AC_SUBST(DEAL_II_HDF5_CPPFLAGS)
+dnl     AC_SUBST(DEAL_II_HDF5_LDFLAGS)
+dnl     AC_SUBST(DEAL_II_HDF5_INCDIR)
+dnl     AC_DEFINE(DEAL_II_HAVE_HDF5)
+dnl
+dnl   and sets with_hdf5="yes".
+dnl
+dnl   If HDF5 is disabled or not found, this macros sets with_hdf5="no".
+dnl
+dnl   Your configuration script can test $with_hdf to take any further
+dnl   actions. HDF5_{C,CPP,LD}FLAGS may be used when building with C or C++.
+dnl
+dnl LICENSE
+dnl
+dnl   Copyright (c) 2009 Timothy Brown <tbrown@freeshell.org>
+dnl   Copyright (c) 2010 Rhys Ulerich <rhys.ulerich@gmail.com>
+dnl
+dnl   Copying and distribution of this file, with or without modification, are
+dnl   permitted in any medium without royalty provided the copyright notice
+dnl   and this notice are preserved. This file is offered as-is, without any
+dnl   warranty.
+
+AC_DEFUN(DEAL_II_CONFIGURE_HDF5, dnl
+[
+
+AC_REQUIRE([AC_PROG_SED])
+AC_REQUIRE([AC_PROG_AWK])
+AC_REQUIRE([AC_PROG_GREP])
+
+dnl Add a default --with-hdf5 configuration option.
+AC_ARG_WITH([hdf5],
+  AS_HELP_STRING(
+    [--with-hdf5=[yes/no/PATH]],
+    m4_case(m4_normalize([$1]),
+            [serial],   [location of h5cc for serial HDF5 configuration],
+            [parallel], [location of h5pcc for parallel HDF5 configuration],
+            [location of h5cc or h5pcc for HDF5 configuration])
+  ),
+  [if test "$withval" = "no"; then
+     with_hdf5="no"
+   elif test "$withval" = "yes"; then
+     with_hdf5="yes"
+     warn_if_cannot_find_hdf5="yes"
+   elif test -z "$withval"; then
+     with_hdf5="yes"
+     H5CC="$withval"
+   else
+     warn_if_cannot_find_hdf5="yes"
+     with_hdf5="yes"
+     H5CC="$withval"
+   fi],
+   [with_hdf5="yes"]
+)
+
+dnl Set defaults to blank
+USE_CONTRIB_HDF5=no
+DEAL_II_HDF5_VERSION=""
+DEAL_II_HDF5_CFLAGS=""
+DEAL_II_HDF5_CPPFLAGS=""
+DEAL_II_HDF5_LDFLAGS=""
+DEAL_II_HDF5_INCDIR=""
+
+dnl Try and find hdf5 compiler tools and options.
+if test "$with_hdf5" = "yes"; then
+    if test -z "$H5CC"; then
+        dnl Check to see if H5CC is in the path.
+        AC_PATH_PROGS(
+            [H5CC],
+            m4_case(m4_normalize([$1]),
+                [serial],   [h5cc],
+                [parallel], [h5pcc],
+                [h5cc h5pcc]),
+            [])
+    else
+        AC_MSG_CHECKING([Using provided HDF5 C wrapper])
+        AC_MSG_RESULT([$H5CC])
+    fi
+    AC_MSG_CHECKING([for HDF5 libraries])
+    if test ! -x "$H5CC"; then
+        AC_MSG_RESULT([no])
+        if test "$warn_if_cannot_find_hdf5" = "yes"; then
+            AC_MSG_WARN(m4_case(m4_normalize([$1]),
+                [serial],  [
+Unable to locate serial HDF5 compilation helper script 'h5cc'.
+Please specify --with-hdf5=<LOCATION> as the full path to h5cc.
+HDF5 support is being disabled (equivalent to --with-hdf5=no).
+],                [parallel],[
+Unable to locate parallel HDF5 compilation helper script 'h5pcc'.
+Please specify --with-hdf5=<LOCATION> as the full path to h5pcc.
+HDF5 support is being disabled (equivalent to --with-hdf5=no).
+],                [
+Unable to locate HDF5 compilation helper scripts 'h5cc' or 'h5pcc'.
+Please specify --with-hdf5=<LOCATION> as the full path to h5cc or h5pcc.
+HDF5 support is being disabled (equivalent to --with-hdf5=no).
+]))
+        fi
+        with_hdf5="no"
+    else
+        dnl h5cc provides both AM_ and non-AM_ options
+        dnl depending on how it was compiled either one of
+        dnl these are empty. Lets roll them both into one.
+
+        dnl Look for "HDF5 Version: X.Y.Z"
+        DEAL_II_HDF5_VERSION=$(eval $H5CC -showconfig | grep 'HDF5 Version:' \
+            | $AWK '{print $[]3}')
+
+dnl A ideal situation would be where everything we needed was
+dnl in the AM_* variables. However most systems are not like this
+dnl and seem to have the values in the non-AM variables.
+dnl
+dnl We try the following to find the flags:
+dnl (1) Look for "NAME:" tags
+dnl (2) Look for "NAME/H5_NAME:" tags
+dnl (3) Look for "AM_NAME:" tags
+dnl
+        dnl (1)
+        dnl Look for "CFLAGS: "
+        DEAL_II_HDF5_CFLAGS=$(eval $H5CC -showconfig | grep '\bCFLAGS:'   \
+            | $AWK -F: '{print $[]2}')
+        dnl Look for "CPPFLAGS"
+        DEAL_II_HDF5_CPPFLAGS=$(eval $H5CC -showconfig | grep '\bCPPFLAGS:' \
+            | $AWK -F: '{print $[]2}')
+        dnl Look for "LD_FLAGS"
+        DEAL_II_HDF5_LDFLAGS=$(eval $H5CC -showconfig | grep '\bLDFLAGS:'   \
+            | $AWK -F: '{print $[]2}')
+
+        dnl (2)
+        dnl CFLAGS/H5_CFLAGS: .../....
+        dnl We could use $SED with something like the following
+        dnl 's/CFLAGS.*\/H5_CFLAGS.*[:]\(.*\)\/\(.*\)/\1/p'
+        if test -z "$DEAL_II_HDF5_CFLAGS"; then
+            DEAL_II_HDF5_CFLAGS=$(eval $H5CC -showconfig \
+                | $SED -n 's/CFLAGS.*[:]\(.*\)\/\(.*\)/\1/p')
+        fi
+        dnl Look for "CPPFLAGS"
+        if test -z "$DEAL_II_HDF5_CPPFLAGS"; then
+            DEAL_II_HDF5_CPPFLAGS=$(eval $H5CC -showconfig \
+                | $SED -n 's/CPPFLAGS.*[:]\(.*\)\/\(.*\)/\1/p')
+        fi
+        dnl Look for "LD_FLAGS"
+        if test -z "$DEAL_II_HDF5_LDFLAGS"; then
+            DEAL_II_HDF5_LDFLAGS=$(eval $H5CC -showconfig \
+                | $SED -n 's/LDFLAGS.*[:]\(.*\)\/\(.*\)/\1/p')
+        fi
+
+        dnl (3)
+        dnl Check to see if these are not empty strings. If so
+        dnl find the AM_ versions and use them.
+        if test -z "$DEAL_II_HDF5_CFLAGS"; then
+            DEAL_II_HDF5_CFLAGS=$(eval $H5CC -showconfig \
+                | grep '\bAM_CFLAGS:' | $AWK -F: '{print $[]2}')
+        fi
+        if test -z "$DEAL_II_HDF5_CPPFLAGS"; then
+            DEAL_II_HDF5_CPPFLAGS=$(eval $H5CC -showconfig \
+                | grep '\bAM_CPPFLAGS:' | $AWK -F: '{print $[]2}')
+        fi
+        if test -z "$DEAL_II_HDF5_LDFLAGS"; then
+            DEAL_II_HDF5_LDFLAGS=$(eval $H5CC -showconfig \
+                | grep '\bAM_LDFLAGS:' | $AWK -F: '{print $[]2}')
+        fi
+
+        dnl Frustratingly, the necessary -Idir,-Ldir still may not be found!
+        dnl Attempt to pry any more required include directories from wrapper.
+        for arg in `$H5CC -c -show`
+        do
+          case "$arg" in #(
+            -I*) echo $DEAL_II_HDF5_CPPFLAGS | $GREP -e "$arg" 2>&1 >/dev/null \
+                  || DEAL_II_HDF5_CPPFLAGS="$arg $DEAL_II_HDF5_CPPFLAGS"
+              ;;
+          esac
+        done
+        for arg in `$H5CC -show`
+        do
+          case "$arg" in #(
+            -L*) echo $DEAL_II_HDF5_LDFLAGS | $GREP -e "$arg" 2>&1 >/dev/null \
+                  || DEAL_II_HDF5_LDFLAGS="$arg $DEAL_II_HDF5_LDFLAGS"
+              ;;
+          esac
+        done
+
+        AC_MSG_RESULT([yes (version $[DEAL_II_HDF5_VERSION])])
+
+        dnl Look for any extra libraries also needed to link properly
+        EXTRA_LIBS=$(eval $H5CC -showconfig | grep 'Extra libraries:'\
+            | $AWK -F: '{print $[]2}')
+
+        dnl Look for HDF5's high level library
+        ax_lib_hdf5_save_LDFLAGS=$LDFLAGS
+        ax_lib_hdf5_save_LIBS=$LIBS
+        LDFLAGS=$DEAL_II_HDF5_LDFLAGS
+        AC_HAVE_LIBRARY([hdf5_hl],
+                        [DEAL_II_HDF5_LDFLAGS="$DEAL_II_HDF5_LDFLAGS -lhdf5_hl"],
+                        [],
+                        [-lhdf5 $EXTRA_LIBS])
+        LIBS=$ax_lib_hdf5_save_LIBS
+        LDFLAGS=$ax_lib_hdf5_save_LDFLAGS
+
+        dnl Add the HDF5 library itself
+        DEAL_II_HDF5_LDFLAGS="$DEAL_II_HDF5_LDFLAGS -lhdf5"
+
+        dnl Add any EXTRA_LIBS afterwards
+        if test "$EXTRA_LIBS"; then
+            DEAL_II_HDF5_LDFLAGS="$DEAL_II_HDF5_LDFLAGS $EXTRA_LIBS"
+        fi
+
+	dnl remove "-I" from cpp flags to get include path
+	DEAL_II_HDF5_INCDIR=$(eval echo $DEAL_II_HDF5_CPPFLAGS | cut -c 3-)
+
+        LDFLAGS="$LDFLAGS $DEAL_II_HDF5_LDFLAGS"
+        USE_CONTRIB_HDF5=yes
+	AC_DEFINE([DEAL_II_HAVE_HDF5], [1], [Defined if you have HDF5 support])
+    fi
+fi
+])
+
+
+
 
 
 dnl ------------------------------------------------------------
@@ -6729,68 +7038,61 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 
   AC_ARG_WITH(metis,
               [AS_HELP_STRING([--with-metis=/path/to/metis],
-              [Specify the path to the Metis installation, of which the include and library directories are   subdirs; use this if you want to override the METIS_DIR environment variable.])],
+              [Specify the path to the Metis installation, of which the include and library directories are subdirs; use this if you want to override the METIS_DIR environment variable.])],
      [
+        AC_MSG_CHECKING([for METIS library directory])
         USE_CONTRIB_METIS=yes
         DEAL_II_METIS_DIR="$withval"
         AC_MSG_RESULT($DEAL_II_METIS_DIR)
 
-        dnl Make sure that what was specified is actually correct
-        if test ! -d $DEAL_II_METIS_DIR/Lib ; then
+        dnl Make sure that what was specified is actually correct. The
+        dnl libraries could be in either $DEAL_II_METIS_DIR/lib (metis was
+        dnl make installed) or $DEAL_II_METIS_DIR/libmetis (metis was make
+        dnl only and PETSc).
+        if test ! -d $DEAL_II_METIS_DIR/lib \
+           && test ! -d $DEAL_II_METIS_DIR/libmetis ; then
           AC_MSG_ERROR([Path to Metis specified with --with-metis does not point to a complete Metis installation])
         fi
 
-        DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
+        dnl If lib is not found, we must have libraries in libmetis
+        dnl (which was found above).
+        if test -d $DEAL_II_METIS_DIR/lib ; then
+          DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/lib"
+        else
+          DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/libmetis"
+        fi
+
+        if test ! -d $DEAL_II_METIS_DIR/include ; then
+          AC_MSG_ERROR([Path to Metis specified with --with-metis does not point to a complete Metis installation])
+        fi
+
+        DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
      ],
      [
         dnl Take something from the environment variables, if it is there
         if test "x$METIS_DIR" != "x" ; then
+          AC_MSG_CHECKING([for METIS from the environment])
           USE_CONTRIB_METIS=yes
           DEAL_II_METIS_DIR="$METIS_DIR"
           AC_MSG_RESULT($DEAL_II_METIS_DIR)
 
-          dnl Make sure that what this is actually correct
-          if test ! -d $DEAL_II_METIS_DIR/Lib ; then
+          dnl Make sure that what this is actually correct (see notes above).
+          if test ! -d $DEAL_II_METIS_DIR/lib \
+             && test ! -d $DEAL_II_METIS_DIR/libmetis ; then
             AC_MSG_ERROR([The path to Metis specified in the METIS_DIR environment variable does not point to a complete Metis installation])
           fi
-          DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
+
+          if test -d $DEAL_II_METIS_DIR/lib ; then
+            DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/lib"
+          else
+            DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/libmetis"
+          fi
+
+          DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
+
         else
           USE_CONTRIB_METIS=no
           DEAL_II_METIS_DIR=""
-        fi
-     ])
-
-  AC_ARG_WITH(metis-libs,
-              [AS_HELP_STRING([--with-metis-libs=/path/to/metis],
-              [Specify the path to the METIS libraries; use this if you want to override the METIS_LIBDIR environment variable.])],
-     [
-        USE_CONTRIB_METIS=yes
-        DEAL_II_METIS_LIBDIR="$withval"
-        AC_MSG_RESULT($DEAL_II_METIS_LIBDIR)
-
-        dnl Make sure that what was specified is actually correct
-        if test ! -d $DEAL_II_METIS_LIBDIR ; then
-          AC_MSG_ERROR([Path to Metis specified with --with-metis does not point to a complete Metis installation])
-        fi
-     ],
-     [
-        dnl Take something from the environment variables, if it is there
-        if test "x$METIS_LIBDIR" != "x" ; then
-          USE_CONTRIB_METIS=yes
-          DEAL_II_METIS_LIBDIR="$METIS_LIBDIR"
-          AC_MSG_RESULT($DEAL_II_METIS_LIBDIR)
-
-          dnl Make sure that what this is actually correct
-          if test ! -d $DEAL_II_METIS_LIBDIR ; then
-            AC_MSG_ERROR([The path to Metis specified in the METIS_DIR environment variable does not point to a complete Metis installation])
-          fi
-        else
-          dnl Unless --with-metis has been set before, declare that METIS
-          dnl is not desired.
-          if test "x$USE_CONTRIB_METIS" != "xyes" ; then
-            USE_CONTRIB_METIS=no
-            DEAL_II_METIS_LIBDIR=""
-          fi
         fi
      ])
 
@@ -6799,6 +7101,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
               [Defined if a Metis installation was found and is going
                to be used])
     LDFLAGS="$LDFLAGS -L$DEAL_II_METIS_LIBDIR -lmetis"
+
+    if test "x$DEAL_II_LD_UNDERSTANDS_RPATH" = "xyes" ; then
+      LDFLAGS="$LDFLAGS $LD_PATH_OPTION$DEAL_II_METIS_LIBDIR"
+    fi
 
     dnl AC_MSG_CHECKING(for Metis version)
     dnl DEAL_II_METIS_VERSION=`cat $DEAL_II_METIS_DIR/VERSION`

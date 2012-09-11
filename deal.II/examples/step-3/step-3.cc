@@ -58,8 +58,8 @@
                                  // we need for the treatment of
                                  // boundary values:
 #include <deal.II/base/function.h>
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
 
                                  // We're now almost to the end. The second to
                                  // last group of include files is for the

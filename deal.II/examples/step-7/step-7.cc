@@ -34,7 +34,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/data_out.h>
 
@@ -61,7 +61,7 @@
                                  // collects all important data during a run
                                  // and prints it at the end as a table. These
                                  // comes from the following two files:
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/base/convergence_table.h>
                                  // And finally, we need to use the
                                  // FEFaceValues class, which is

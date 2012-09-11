@@ -27,8 +27,11 @@ PLATFORM-HIERARCHY = $(shell $(PERL) ../hierarchy.pl $(PLATFORM))
 ID = `id -un`"@"`hostname`
 
 ############################################################
-# First how to create executables, including all necessary
-# flags:
+# First how to create object files, including all necessary
+# flags. Before we start the compilation, write the status
+# of the next operation into the test/status file. If these
+# are MPI tests, also remove all status files from the
+# test/ncpus_*/ directories
 ############################################################
 
 flags     = $(CXXFLAGS.g)
@@ -40,11 +43,13 @@ endif
 %/obj.g.$(OBJEXT) : %.cc
 	@echo =====debug========= $<
 	@echo Compiling > $(dir $@)/status
+	@-rm -f $(dir $@)/ncpu*/status
 	@$(CXX) $(flags) -c $< -o $@
 
 %/obj.$(OBJEXT) : %.cc
 	@echo =====optimized===== $<
 	@echo Compiling > $(dir $@)/status
+	@-rm -f $(dir $@)/ncpu*/status
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 ######################################################################
@@ -116,9 +121,9 @@ endif
 	    if test -f $$testname/cmp/$$i ; then \
 		cmpfile_found=yes ; \
 		if test "x$(verbose)" = "xon" ; then \
-			cmd="diff $(DIFFOPT) -w $< $$testname/cmp/$$i" ; \
+			cmd="diff $(DIFFOPT) $< $$testname/cmp/$$i" ; \
 		 else \
-			cmd="diff -w $< $$testname/cmp/$$i > /dev/null" ; \
+			cmd="diff $< $$testname/cmp/$$i > /dev/null" ; \
 		 fi ; \
 		 if eval $$cmd ; then \
 			echo '=====OK============' $@ ; \
@@ -182,6 +187,36 @@ report:
 	done
 
 
+status=Compiling Linking Running Checking diff all
+
+summary:
+	@for curstatus in $(status) ; do \
+	  counter=0 ; \
+	  all=0 ; \
+	  for test in $(sort $(tests)) ; do \
+	     case $$test in \
+               *ncpu_*) \
+	         if test -f $$test/status ; then \
+                   file=$$test/status ; \
+                 else \
+		   file=`echo $$test | $(PERL) -pi -e 's/ncpu_\d+//g;'`/status ; \
+		fi ; \
+		;; \
+	    *) \
+		file=$$test/status ; \
+		;; \
+	  esac ; \
+	  curcount=`if test -f $$file ; then grep -c $$curstatus $$file;else echo 0;fi;`; \
+	  all=$$(($$all+1));\
+	  counter=$$(($$counter+$$curcount)); \
+	done; \
+	if test "$$curstatus" = "all"; then printf "%s\t" $$all; \
+	else if test "$$curstatus" = "diff"; then printf "%s\t" $$counter; \
+	else if test "$$counter" != "0"; then printf "%s\t" $$counter; \
+	else printf "%s\t" $$counter ; fi;fi;fi;\
+	done;\
+	printf "\n";
+
 report+mail:
 	@$(MAKE) report | tee testresults
 	@cat testresults | $(MAIL) regression-tests@dealii.org
@@ -204,7 +239,7 @@ report+mail:
 	@for i in $(PLATFORM-HIERARCHY) ; do \
 	    testname=$(<:%/output=%) ; \
 	    if test -f $$testname/cmp/$$i ; then \
-	        cmd="diff -w $< $$testname/cmp/$$i > /dev/null" ; \
+	        cmd="diff $< $$testname/cmp/$$i > /dev/null" ; \
 		if eval ! $$cmd ; then \
 		    echo '=====Creating======' $$testname/cmp/$(PLATFORM) ; \
 		    cp $$testname/output $$testname/cmp/$(PLATFORM); \
@@ -247,7 +282,8 @@ update: $(tests:%=%/update)
 clean:
 	-rm -f Makefile.depend Makefile.*tests */obj.$(OBJEXT) \
 		*/obj.g.$(OBJEXT) */output *~ */*.vtu */*.pvtu */*visit \
-		*/status */OK
+		*/status */OK \
+		*/ncpu*/status
 
 distclean: clean
 	-rm -f */exe *.testcase *.gpl *.eps *.gnuplot
@@ -274,5 +310,5 @@ Makefile.tests: Makefile $(shell echo *.cc)
 		> $@
 
 
-.PHONY: report show-tests clean distclean %/ref
+.PHONY: report show-tests clean distclean summary %/ref
 

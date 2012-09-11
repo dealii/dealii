@@ -25,12 +25,7 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_tools.h>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
-
+#include <sstream>
 #include <iostream>
 
 //TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
@@ -118,17 +113,10 @@ FE_ABF<dim>::get_name () const
                                    // this function returns, so they
                                    // have to be kept in synch
 
-#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream namebuf;
-#else
-  std::ostrstream namebuf;
-#endif
 
   namebuf << "FE_ABF<" << dim << ">(" << rt_order << ")";
 
-#ifndef HAVE_STD_STRINGSTREAM
-  namebuf << std::ends;
-#endif
   return namebuf.str();
 }
 
@@ -590,15 +578,15 @@ FE_ABF<dim>::interpolate(
                          * values[face*n_face_points+k](GeometryInfo<dim>::unit_normal_direction[face]+offset);
       }
 
-  const unsigned start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
-  const unsigned start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
+  const unsigned int start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
+  const unsigned int start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
 
   for (unsigned int k=0;k<interior_weights.size(0);++k)
     for (unsigned int i=0;i<interior_weights.size(1);++i)
       for (unsigned int d=0;d<dim;++d)
         local_dofs[start_cell_dofs+i*dim+d] += interior_weights(k,i,d) * values[k+start_cell_points](d+offset);
 
-  const unsigned start_abf_dofs = start_cell_dofs + interior_weights.size(1) * dim;
+  const unsigned int start_abf_dofs = start_cell_dofs + interior_weights.size(1) * dim;
 
   // Cell integral of ABF terms
   for (unsigned int k=0;k<interior_weights_abf.size(0);++k)
@@ -650,15 +638,15 @@ FE_ABF<dim>::interpolate(
                          * values[GeometryInfo<dim>::unit_normal_direction[face]][face*n_face_points+k];
       }
 
-  const unsigned start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
-  const unsigned start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
+  const unsigned int start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
+  const unsigned int start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
 
   for (unsigned int k=0;k<interior_weights.size(0);++k)
     for (unsigned int i=0;i<interior_weights.size(1);++i)
       for (unsigned int d=0;d<dim;++d)
         local_dofs[start_cell_dofs+i*dim+d] += interior_weights(k,i,d) * values[d][k+start_cell_points];
 
-  const unsigned start_abf_dofs = start_cell_dofs + interior_weights.size(1) * dim;
+  const unsigned int start_abf_dofs = start_cell_dofs + interior_weights.size(1) * dim;
 
   // Cell integral of ABF terms
   for (unsigned int k=0;k<interior_weights_abf.size(0);++k)

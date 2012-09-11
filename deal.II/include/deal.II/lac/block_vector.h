@@ -195,6 +195,22 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
     ~BlockVector ();
 
                                      /**
+                                      * Call the compress() function on all
+                                      * the subblocks.
+				      *
+				      * This functionality only needs to be
+				      * called if using MPI based vectors and
+				      * exists in other objects for
+				      * compatibility.
+				      *
+				      * See @ref GlossCompress "Compressing
+				      * distributed objects" for more
+				      * information.
+                                      */
+    void compress (::dealii::VectorOperation::values operation
+		   =::dealii::VectorOperation::unknown);
+
+                                     /**
                                       * Copy operator: fill all components of
                                       * the vector with the given scalar
                                       * value.
@@ -521,6 +537,14 @@ BlockVector<Number>::operator = (const BlockVector<Number2> &v)
   reinit (v, true);
   BaseClass::operator = (v);
   return *this;
+}
+
+template <typename Number>
+inline
+void BlockVector<Number>::compress (::dealii::VectorOperation::values operation)
+{
+  for (unsigned int i=0; i<this->n_blocks();++i)
+    this->components[i].compress(operation);
 }
 
 

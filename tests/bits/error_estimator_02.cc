@@ -28,7 +28,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/error_estimator.h>
 
 #include <fstream>
@@ -130,7 +130,7 @@ check ()
   MappingQ<dim> mapping(3);
   Quadrature<dim-1> &q_face = get_q_face(function);
 
-  std::map<types::boundary_id_t,const Function<dim>*> neumann_bc;
+  std::map<types::boundary_id,const Function<dim>*> neumann_bc;
   neumann_bc[0] = &function;
   
   Vector<double> v (dof.n_dofs());

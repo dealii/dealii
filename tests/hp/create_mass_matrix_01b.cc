@@ -45,7 +45,7 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/q_collection.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 #include <fstream>
 

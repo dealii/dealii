@@ -280,11 +280,26 @@ class TableHandler
      *     2 13 a
      *     1 0  ""
      *   @endcode
+     * - <code>simple_table_with_separate_column_description</code>: This format
+     *   is very similar to <code>table_with_separate_column_description</code>,
+     *   but it skips aligning the columns with additional white space. This
+     *   increases the performance o fwrite_text() for large tables. Example output:
+     *   @code
+     *     # 1: key1
+     *     # 2: key2
+     *     # 3: key3
+     *     0 0 ""
+     *     1 0 ""
+     *     2 13 a
+     *     1 0 ""
+     *   @endcode
+     *
      **/
     enum TextOutputFormat
     {
       table_with_headers,
-      table_with_separate_column_description
+      table_with_separate_column_description,
+      simple_table_with_separate_column_description,
     };
 
                                      /**

@@ -117,7 +117,7 @@ int main ()
     boundary_mesh.set_boundary (1, surface_description);
     boundary_mesh.set_boundary (0, surface_description);
 
-    set<types::boundary_id_t> boundary_ids;
+    set<types::boundary_id> boundary_ids;
     boundary_ids.insert(1);
 
     surface_to_volume_mapping

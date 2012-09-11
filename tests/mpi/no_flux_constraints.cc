@@ -31,7 +31,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <sstream>
@@ -106,7 +106,7 @@ void test()
   ConstraintMatrix constraints;
   constraints.reinit(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, constraints);
-  std::set<types::boundary_id_t> no_normal_flux_boundaries;
+  std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (1);
   const unsigned int degree = 1;
   VectorTools::compute_no_normal_flux_constraints (dofh, 0,

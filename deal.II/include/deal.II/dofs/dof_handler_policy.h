@@ -65,8 +65,7 @@ namespace internal
                                             */
           virtual
           NumberCache
-          distribute_dofs (const unsigned int        offset,
-                           dealii::DoFHandler<dim,spacedim> &dof_handler) const = 0;
+          distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const = 0;
 
                                            /**
                                             * Renumber degrees of freedom as
@@ -95,8 +94,7 @@ namespace internal
                                             */
           virtual
           NumberCache
-          distribute_dofs (const unsigned int        offset,
-                           dealii::DoFHandler<dim,spacedim> &dof_handler) const;
+          distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const;
 
                                            /**
                                             * Renumber degrees of freedom as
@@ -126,8 +124,7 @@ namespace internal
                                             */
           virtual
           NumberCache
-          distribute_dofs (const unsigned int        offset,
-                           dealii::DoFHandler<dim,spacedim> &dof_handler) const;
+          distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const;
 
                                            /**
                                             * Renumber degrees of freedom as

@@ -32,7 +32,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <sstream>
@@ -82,7 +82,7 @@ void test()
   ConstraintMatrix constraints;
   constraints.reinit(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, constraints);
-  std::set<types::boundary_id_t> no_normal_flux_boundaries;
+  std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (0);
   const unsigned int degree = 1;
   VectorTools::compute_no_normal_flux_constraints (dofh, 0,
@@ -91,16 +91,14 @@ void test()
 						   MappingQ<dim>(degree));
   constraints.close();
 
-  if (myid==0)
-	system("rm -rf no_flux_constraints_03/cm_?.dot");
-  
+  std::string base = output_file_for_mpi("no_flux_constraints_03");
+
   MPI_Barrier(MPI_COMM_WORLD);
-  
+
   { //write the constraintmatrix to a file on each cpu
-	char fname[] = "no_flux_constraints_03/cm_0.dot";
-	fname[26]+=myid;
-	std::ofstream file(fname);
-	constraints.print(file);
+    std::string fname = base+"cm_" + Utilities::int_to_string(myid) + ".dot";
+    std::ofstream file(fname.c_str());
+    constraints.print(file);
   }
   MPI_Barrier(MPI_COMM_WORLD);
   sleep(1);
@@ -108,17 +106,18 @@ void test()
   {
 	//sort and merge the constraint matrices on proc 0, generate a checksum
 	//and output that into the deallog
-	system("cat no_flux_constraints_03/cm_?.dot|sort -n|uniq >no_flux_constraints_03/cm");
-	system("md5sum no_flux_constraints_03/cm >no_flux_constraints_03/cm.check");
-	{
-	  std::ifstream file("no_flux_constraints_03/cm.check");
-	  std::string str;
-	  while (!file.eof())
-	  {
-		std::getline(file, str);
-		deallog << str << std::endl;
-	  }
-	}
+        system((std::string("cat ") + base+"cm_?.dot|sort -n|uniq >" + base+"cm").c_str());
+        system((std::string("md5sum ") + base + "cm >" + base + "cm.check").c_str());
+        {
+          std::ifstream file((base+"cm.check").c_str());
+          std::string str;
+          while (!file.eof())
+            {
+              std::getline(file, str);
+              deallog << str << std::endl;
+            }
+        }
+
   }
 
 				// print the number of constraints. since

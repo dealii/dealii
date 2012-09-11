@@ -51,7 +51,7 @@ check_this (const DoFHandler<dim> &dof_handler)
                                    // third further restrict to
                                    // boundary indicator 0
   {
-    std::set<types::boundary_id_t> boundary_ids;
+    std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert (0);
     DoFTools::extract_dofs_with_support_on_boundary (dof_handler,
                                      component_select,

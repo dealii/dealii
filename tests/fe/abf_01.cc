@@ -30,8 +30,8 @@
 
 #include <deal.II/fe/mapping_q.h>
 
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/solver_cg.h>
@@ -493,7 +493,7 @@ void project (const Mapping<dim>       &mapping,
 					 // @p{function} to hold on all parts of the
 					 // boundary
 	typename FunctionMap<dim>::type boundary_functions;
-	for (types::boundary_id_t c=0; c<255; ++c)
+	for (types::boundary_id c=0; c<255; ++c)
 	  boundary_functions[c] = &function;
 	project_boundary_values (dof, boundary_functions, q_boundary,
 				 boundary_values);

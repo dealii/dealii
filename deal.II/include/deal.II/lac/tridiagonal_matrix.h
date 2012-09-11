@@ -294,7 +294,7 @@ class TridiagonalMatrix
                                       * compute_eigenvalues(), you can
                                       * access each eigenvalue here.
                                       */
-    number eigenvalue(const unsigned i) const;
+    number eigenvalue(const unsigned int i) const;
 //@}
 ///@name Miscellanea
 //@{

@@ -25,7 +25,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <string>
 
@@ -38,7 +38,7 @@ void test() {
   Triangulation<dim, spacedim> tria;
   Triangulation<spacedim> volume_mesh;
   GridGenerator::half_hyper_ball(volume_mesh);
-  std::set<types::boundary_id_t> boundary_ids;
+  std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
   
   GridTools::extract_boundary_mesh (volume_mesh, tria,boundary_ids);

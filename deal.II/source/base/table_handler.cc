@@ -290,9 +290,60 @@ void TableHandler::write_text(std::ostream &out,
   const unsigned int nrows  = n_rows();
   const unsigned int n_cols = sel_columns.size();
 
+  // handle the simple format separately first
+  if (format==simple_table_with_separate_column_description)
+    {
+      // write the captions
+      for (unsigned int j=0; j<column_order.size(); ++j)
+        {
+          const std::string & key = column_order[j];
+          out << "# " << j+1 << ": " << key << '\n';
+        }
+
+      // cache the columns
+      std::vector<const Column*> cols;
+      for (unsigned int j=0; j<n_cols; ++j)
+        {
+          std::string key=sel_columns[j];
+          const std::map<std::string, Column>::const_iterator
+          col_iter=columns.find(key);
+          Assert(col_iter!=columns.end(), ExcInternalError());
+          cols.push_back(&(col_iter->second));
+        }
+
+      // write the body
+      for (unsigned int i=0; i<nrows; ++i)
+        {
+          for (unsigned int j=0; j<n_cols; ++j)
+            {
+              const Column &column=*(cols[j]);
+
+              out << std::setprecision(column.precision);
+
+              if (column.scientific)
+                out.setf(std::ios::scientific, std::ios::floatfield);
+              else
+                out.setf(std::ios::fixed, std::ios::floatfield);
+
+              // write "" instead of an empty string
+              const std::string * val = boost::get<std::string>(&(column.entries[i].value));
+              if (val!=NULL && val->length()==0)
+                out << "\"\"";
+              else
+                out << column.entries[i].value;
+
+              out << ' ';
+            }
+          out << '\n';
+        }
+
+      out << std::flush;
+      return;
+    }
+
                                    // first compute the widths of each
                                    // entry of the table, in order to
-                                   // have a nicer alignement
+                                   // have a nicer alignment
   Table<2,unsigned int> entry_widths (nrows, n_cols);
   for (unsigned int i=0; i<nrows; ++i)
     for (unsigned int j=0; j<n_cols; ++j)
@@ -377,7 +428,7 @@ void TableHandler::write_text(std::ostream &out,
         {
           // print column key with column number. enumerate
           // columns starting with 1
-          out << "# " << j+1 << ": " << key << std::endl;
+          out << "# " << j+1 << ": " << key << '\n';
           break;
         }
 
@@ -386,7 +437,7 @@ void TableHandler::write_text(std::ostream &out,
       }
     }
   if (format == table_with_headers)
-    out << std::endl;
+    out << '\n';
 
   for (unsigned int i=0; i<nrows; ++i)
     {
@@ -432,8 +483,9 @@ void TableHandler::write_text(std::ostream &out,
                                            // pad after this column
           out << " ";
         }
-      out << std::endl;
+      out << '\n';
     }
+  out << std::flush;
 }
 
 

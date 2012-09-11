@@ -270,12 +270,6 @@ namespace PETScWrappers
                                             */
           ~SolverData ();
 
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
-                                           /**
-                                            * A PETSc solver object.
-                                            */
-          SLES sles;
-#endif
                                            /**
                                             * Objects for Krylov subspace
                                             * solvers and preconditioners.
@@ -1148,6 +1142,91 @@ namespace PETScWrappers
       virtual void set_solver_type (KSP &ksp) const;
   };
 
+/**
+ * An implementation of the solver interface using the MUMPS lu solver 
+ * through PETSc.
+ *
+ * @ingroup PETScWrappers
+ * @author Daniel Brauss, 2012
+ */
+  class SparseDirectMUMPS : public SolverBase
+  {
+    public:
+				/**
+				 * Standardized data structure
+				 * to pipe additional data to 
+				 * the solver.
+				 */
+      struct AdditionalData
+      {};
+				/**
+				 * constructor
+				 */
+      SparseDirectMUMPS (SolverControl        &cn,
+                         const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+                         const AdditionalData &data = AdditionalData());
+
+				/**
+				 * the method to solve the 
+				 * linear system. SolverBase has a method
+				 * with this name already. However, the
+				 * different function calls and objects used here 
+				 * were not easily incorporated
+				 */
+      void solve (const MatrixBase &A,
+                  VectorBase       &x,
+                  const VectorBase &b);
+
+    protected:
+				/**
+				 * Store a copy of flags for this
+				 * particular solver.
+				 */
+      const AdditionalData additional_data;
+
+      virtual void set_solver_type (KSP &ksp) const;
+
+    private:
+				/**
+				 * A function that is used in PETSc 
+				 * as a callback to check convergence.
+				 * It takes the information provided
+				 * from PETSc and checks it against
+				 * deal.II's own SolverControl objects
+				 * to see if convergence has been reached.
+				 */
+      static
+#ifdef PETSC_USE_64BIT_INDICES
+      PetscErrorCode
+#else
+      int
+#endif
+      convergence_test (KSP	               ksp,
+#ifdef PETSC_USE_64BIT_INDICES
+                        const PetscInt     iteration,
+#else
+                        const int          iteration,
+#endif
+                        const PetscReal    residual_norm,
+                        KSPConvergedReason *reason,
+                        void               *solver_control);
+				/**
+				 * A structure that contains the 
+				 * PETSc solver and preconditioner
+				 * objects.  Since the solve member
+				 * function in the base is not used
+				 * here, the private SolverData struct
+				 * located in the base could not be used 
+				 * either
+				 */
+      struct SolverDataMUMPS
+      {
+	    KSP ksp;
+	    PC  pc;
+      };
+
+      std_cxx1x::shared_ptr<SolverDataMUMPS> solver_data;
+  };
 }
 
 DEAL_II_NAMESPACE_CLOSE

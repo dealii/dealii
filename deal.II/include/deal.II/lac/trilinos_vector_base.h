@@ -344,9 +344,14 @@ namespace TrilinosWrappers
                                         *
                                         * See @ref GlossCompress "Compressing distributed objects"
                                         * for more information.
-                                        * more information.
                                         */
-      void compress (const Epetra_CombineMode last_action = Zero);
+      void compress (::dealii::VectorOperation::values operation
+		     =::dealii::VectorOperation::unknown);
+
+				       /**
+					* @deprecated
+					*/
+      void compress (const Epetra_CombineMode last_action);
 
                                        /**
                                         * Returns the state of the
@@ -456,6 +461,10 @@ namespace TrilinosWrappers
                                         * To figure out which elements
                                         * exactly are stored locally,
                                         * use local_range().
+                                        *
+                                        * If the vector contains ghost
+                                        * elements, they are included in
+                                        * this number.
                                         */
       unsigned int local_size () const;
 
@@ -485,7 +494,9 @@ namespace TrilinosWrappers
 
                                        /**
                                         * Return if the vector contains ghost
-                                        * elements.
+                                        * elements. This answer is true if there
+                                        * are ghost elements on at least one
+                                        * process.
                                         */
       bool has_ghost_elements() const;
 
@@ -1002,6 +1013,13 @@ namespace TrilinosWrappers
                                         */
       bool compressed;
 
+      /**
+       * Whether this vector has ghost elements. This is true
+       * on all processors even if only one of them has any
+       * ghost elements.
+       */
+      bool has_ghosts;
+
                                        /**
                                         * An Epetra distibuted vector
                                         * type. Requires an existing
@@ -1156,7 +1174,7 @@ namespace TrilinosWrappers
   bool
   VectorBase::has_ghost_elements() const
   {
-    return vector->Map().UniqueGIDs()==false;
+    return has_ghosts;
   }
 
 
@@ -1204,10 +1222,42 @@ namespace TrilinosWrappers
 
   inline
   void
-  VectorBase::compress (const Epetra_CombineMode given_last_action)
+  VectorBase::compress (const Epetra_CombineMode last_action)
   {
-    Epetra_CombineMode mode = (last_action != Zero) ?
-                              last_action : given_last_action;
+    ::dealii::VectorOperation::values last_action_;
+    if (last_action == Add)
+      last_action_ = ::dealii::VectorOperation::add;
+    else if (last_action == Insert)
+      last_action_ = ::dealii::VectorOperation::insert;
+    else
+      AssertThrow(false, ExcNotImplemented());
+
+    compress(last_action_);
+  }
+  
+
+
+  inline
+  void
+  VectorBase::compress (::dealii::VectorOperation::values given_last_action)
+  {
+				     //Select which mode to send to
+				     //Trilinos. Note that we use last_action
+				     //if available and ignore what the user
+				     //tells us to detect wrongly mixed
+				     //operations. Typically given_last_action
+				     //is only used on machines that do not
+				     //execute an operation (because they have
+				     //no own cells for example).
+    Epetra_CombineMode mode = last_action;
+    if (last_action == Zero)
+      {
+	if (given_last_action==::dealii::VectorOperation::add)
+	  mode = Add;
+	else if (given_last_action==::dealii::VectorOperation::insert)
+	  mode = Insert;
+      }
+
 #ifdef DEBUG
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
                                      // check that every process has decided

@@ -36,7 +36,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 
@@ -68,11 +68,9 @@ void test()
   
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
 					     MPI_COMM_WORLD);
-  deallog << "before" << std::endl;
   VectorTools::interpolate (dofh,
 			    LinearFunction<dim>(),
 			    interpolated);
-  deallog << "after" << std::endl;
   interpolated.compress();
 
   double norm = interpolated.l2_norm();

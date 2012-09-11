@@ -32,7 +32,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 
 
 template <int dim>
@@ -53,7 +53,7 @@ check ()
 
   dofh.distribute_dofs (fe);
 
-  std::set<types::boundary_id_t> no_normal_flux_boundaries;
+  std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (1);
   //  no_normal_flux_boundaries.insert (2); // not required for the crash for now, please test with it later!
   no_normal_flux_boundaries.insert (3);

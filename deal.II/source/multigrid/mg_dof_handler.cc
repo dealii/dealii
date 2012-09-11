@@ -254,7 +254,7 @@ namespace internal
                        const unsigned int       local_index,
                        const int2type<1>)
           {
-            return mg_level.lines.
+            return mg_level.dof_object.
               get_dof_index (mg_dof_handler,
                              obj_index,
                              fe_index,
@@ -274,7 +274,7 @@ namespace internal
                        const unsigned int       global_index,
                        const int2type<1>)
           {
-            mg_level.lines.
+            mg_level.dof_object.
               set_dof_index (mg_dof_handler,
                              obj_index,
                              fe_index,
@@ -336,7 +336,7 @@ namespace internal
                        const unsigned int       local_index,
                        const int2type<2>)
           {
-            return mg_level.quads.
+            return mg_level.dof_object.
               get_dof_index (mg_dof_handler,
                              obj_index,
                              fe_index,
@@ -356,7 +356,7 @@ namespace internal
                        const unsigned int       global_index,
                        const int2type<2>)
           {
-            mg_level.quads.
+            mg_level.dof_object.
               set_dof_index (mg_dof_handler,
                              obj_index,
                              fe_index,
@@ -437,7 +437,7 @@ namespace internal
                        const unsigned int       local_index,
                        const int2type<3>)
           {
-            return mg_level.hexes.
+            return mg_level.dof_object.
               get_dof_index (mg_dof_handler,
                              obj_index,
                              fe_index,
@@ -479,7 +479,7 @@ namespace internal
                        const unsigned int       global_index,
                        const int2type<3>)
           {
-            mg_level.hexes.
+            mg_level.dof_object.
               set_dof_index (mg_dof_handler,
                              obj_index,
                              fe_index,
@@ -513,7 +513,7 @@ namespace internal
               {
                 mg_dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
 
-                mg_dof_handler.mg_levels.back()->lines.dofs = std::vector<unsigned int>(mg_dof_handler.get_tria().n_raw_lines(i) *
+                mg_dof_handler.mg_levels.back()->dof_object.dofs = std::vector<unsigned int>(mg_dof_handler.get_tria().n_raw_lines(i) *
                                                                                         mg_dof_handler.get_fe().dofs_per_line,
                                                                                         DoFHandler<1>::invalid_dof_index);
               }
@@ -592,7 +592,7 @@ namespace internal
               {
                 mg_dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
-                mg_dof_handler.mg_levels.back()->quads.dofs = std::vector<unsigned int> (mg_dof_handler.get_tria().n_raw_quads(i) *
+                mg_dof_handler.mg_levels.back()->dof_object.dofs = std::vector<unsigned int> (mg_dof_handler.get_tria().n_raw_quads(i) *
                                                                                          mg_dof_handler.get_fe().dofs_per_quad,
                                                                                          DoFHandler<2>::invalid_dof_index);
               }
@@ -682,7 +682,7 @@ namespace internal
               {
                 mg_dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
-                mg_dof_handler.mg_levels.back()->hexes.dofs
+                mg_dof_handler.mg_levels.back()->dof_object.dofs
                   = std::vector<unsigned int> (mg_dof_handler.get_tria().n_raw_hexs(i) *
                                                mg_dof_handler.get_fe().dofs_per_hex,
                                                DoFHandler<3>::invalid_dof_index);
@@ -1972,8 +1972,7 @@ set_dof_index (const unsigned int obj_level,
 
 
 template <int dim, int spacedim>
-void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &fe,
-                                         const unsigned int        offset)
+void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &fe)
 {
                                    // first distribute global dofs
   DoFHandler<dim,spacedim>::distribute_dofs (fe);
@@ -1999,7 +1998,7 @@ void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spaced
                                    // separately
   for (unsigned int level=0; level<this->get_tria().n_levels(); ++level)
     {
-      unsigned int next_free_dof = offset;
+      unsigned int next_free_dof = 0;
       cell_iterator cell = begin(level),
                     endc = end(level);
 
@@ -2063,8 +2062,8 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
                       new_numbers[i->get_index (level, d,
                                                 this->get_fe().dofs_per_vertex)]);
 
-  for (std::vector<unsigned int>::iterator i=mg_levels[level]->lines.dofs.begin();
-       i!=mg_levels[level]->lines.dofs.end(); ++i)
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->dof_object.dofs.begin();
+       i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
       if (*i != DoFHandler<1>::invalid_dof_index)
         {
@@ -2124,8 +2123,8 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
       const_cast<Triangulation<2> &>(this->get_tria()).load_user_flags (user_flags);
     }
 
-  for (std::vector<unsigned int>::iterator i=mg_levels[level]->quads.dofs.begin();
-       i!=mg_levels[level]->quads.dofs.end(); ++i)
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->dof_object.dofs.begin();
+       i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
       if (*i != DoFHandler<2>::invalid_dof_index)
         {
@@ -2221,8 +2220,8 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
     }
 
                                    //HEX DoFs
-  for (std::vector<unsigned int>::iterator i=mg_levels[level]->hexes.dofs.begin();
-       i!=mg_levels[level]->hexes.dofs.end(); ++i)
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->dof_object.dofs.begin();
+       i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
       if (*i != DoFHandler<3>::invalid_dof_index)
         {

@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -48,7 +48,7 @@ void test (const Triangulation<dim>& tr,
   Vector<double> fe_function(dof.n_dofs());
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     fe_function(i) = i+1;
-  
+
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
 			   update_values | update_gradients | update_hessians);
@@ -60,7 +60,7 @@ void test (const Triangulation<dim>& tr,
 		   std::vector<Tensor<2,dim> >(fe.n_components()));
 
   fe_values.get_function_hessians (fe_function, vector_values);
-  
+
   for (unsigned int c=0; c<fe.n_components(); ++c)
 				     // use a vector extractor if there
 				     // are sufficiently many components
@@ -72,11 +72,14 @@ void test (const Triangulation<dim>& tr,
 	fe_values[vector_components].get_function_hessians (fe_function,
 							   selected_vector_values);
 	deallog << "component=" << c << std::endl;
-      
+
 	for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
 	  for (unsigned int d=0; d<dim; ++d)
 	    {
-	      deallog << selected_vector_values[q][d] << std::endl;
+	      for (unsigned int e=0; e<dim; ++e)
+		for (unsigned int f=0; f<dim; ++f)
+		  deallog << selected_vector_values[q][d][e][f] << (e<dim-1 && f<dim-1 ? " " : "");
+	      deallog << std::endl;
 	      Assert ((selected_vector_values[q][d] - vector_values[q][c+d]).norm()
 		      <= 1e-12 * selected_vector_values[q][d].norm(),
 		      ExcInternalError());
@@ -109,7 +112,7 @@ int main()
 
   deallog.attach(logfile);
   deallog.depth_console (0);
-  deallog.threshold_double(1.e-7);
+  deallog.threshold_double(1.e-5);
 
   test_hyper_sphere<2>();
   test_hyper_sphere<3>();

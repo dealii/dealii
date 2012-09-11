@@ -204,7 +204,7 @@ gradient_list (const std::vector<Point<dim> > &points,
       case UpwindEuler:
       {
         Point<dim> q1;
-        for (unsigned p=0; p<points.size(); ++p)
+        for (unsigned int p=0; p<points.size(); ++p)
           for (unsigned int i=0; i<dim; ++i)
             {
               q1=points[p]-ht[i];
@@ -216,7 +216,7 @@ gradient_list (const std::vector<Point<dim> > &points,
       case Euler:
       {
         Point<dim> q1, q2;
-        for (unsigned p=0; p<points.size(); ++p)
+        for (unsigned int p=0; p<points.size(); ++p)
           for (unsigned int i=0; i<dim; ++i)
             {
               q1=points[p]+ht[i];
@@ -229,7 +229,7 @@ gradient_list (const std::vector<Point<dim> > &points,
       case FourthOrder:
       {
         Point<dim> q1, q2, q3, q4;
-        for (unsigned p=0; p<points.size(); ++p)
+        for (unsigned int p=0; p<points.size(); ++p)
           for (unsigned int i=0; i<dim; ++i)
             {
               q2=points[p]+ht[i];
@@ -259,7 +259,7 @@ vector_gradient_list (const std::vector<Point<dim> >            &points,
 {
   Assert (gradients.size() == points.size(),
           ExcDimensionMismatch(gradients.size(), points.size()));
-  for (unsigned p=0; p<points.size(); ++p)
+  for (unsigned int p=0; p<points.size(); ++p)
     Assert (gradients[p].size() == this->n_components,
             ExcDimensionMismatch(gradients.size(), this->n_components));
 
@@ -268,7 +268,7 @@ vector_gradient_list (const std::vector<Point<dim> >            &points,
       case UpwindEuler:
       {
         Point<dim> q1;
-        for (unsigned p=0; p<points.size(); ++p)
+        for (unsigned int p=0; p<points.size(); ++p)
           for (unsigned int i=0; i<dim; ++i)
             {
               q1=points[p]-ht[i];
@@ -281,7 +281,7 @@ vector_gradient_list (const std::vector<Point<dim> >            &points,
       case Euler:
       {
         Point<dim> q1, q2;
-        for (unsigned p=0; p<points.size(); ++p)
+        for (unsigned int p=0; p<points.size(); ++p)
           for (unsigned int i=0; i<dim; ++i)
             {
               q1=points[p]+ht[i];
@@ -296,7 +296,7 @@ vector_gradient_list (const std::vector<Point<dim> >            &points,
       case FourthOrder:
       {
         Point<dim> q1, q2, q3, q4;
-        for (unsigned p=0; p<points.size(); ++p)
+        for (unsigned int p=0; p<points.size(); ++p)
           for (unsigned int i=0; i<dim; ++i)
             {
               q2=points[p]+ht[i];

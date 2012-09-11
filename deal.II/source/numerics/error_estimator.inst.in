@@ -39,7 +39,7 @@ estimate<InputVector,DH<deal_II_dimension> > (const Mapping<deal_II_dimension, d
           const Function<deal_II_dimension>     *,    \
           const unsigned int       , \
           const unsigned int       , \
-          const types::material_id_t);    \
+          const types::material_id);    \
     \
 template    \
 void    \
@@ -53,7 +53,7 @@ estimate<InputVector,DH<deal_II_dimension> > (const DH<deal_II_dimension>   &,  
           const Function<deal_II_dimension>     *,    \
           const unsigned int       , \
           const unsigned int       , \
-          const types::material_id_t);    \
+          const types::material_id);    \
         \
 template    \
 void    \
@@ -68,7 +68,7 @@ estimate<InputVector,DH<deal_II_dimension> > (const Mapping<deal_II_dimension, d
           const Function<deal_II_dimension>         *,    \
           const unsigned int           , \
           const unsigned int           , \
-          const types::material_id_t);    \
+          const types::material_id);    \
     \
 template    \
 void    \
@@ -82,7 +82,7 @@ estimate<InputVector,DH<deal_II_dimension> > (const DH<deal_II_dimension>       
           const Function<deal_II_dimension>         *,    \
           const unsigned int           , \
           const unsigned int           , \
-          const types::material_id_t);\
+          const types::material_id);\
 
 #if deal_II_dimension == 2 || deal_II_dimension == 1
 
@@ -100,7 +100,7 @@ estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const Mapping<
           const Function<deal_II_dimension+1>     *,    \
           const unsigned int       , \
           const unsigned int       , \
-          const types::material_id_t);    \
+          const types::material_id);    \
     \
 template    \
 void    \
@@ -114,7 +114,7 @@ estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const DH<deal_
           const Function<deal_II_dimension+1>     *,    \
           const unsigned int       , \
           const unsigned int       , \
-          const types::material_id_t);    \
+          const types::material_id);    \
         \
 template    \
 void    \
@@ -129,7 +129,7 @@ estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const Mapping<
           const Function<deal_II_dimension+1>         *,    \
           const unsigned int           , \
           const unsigned int           , \
-          const types::material_id_t);    \
+          const types::material_id);    \
     \
 template    \
 void    \
@@ -143,7 +143,7 @@ estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const DH<deal_
           const Function<deal_II_dimension+1>         *,    \
           const unsigned int           , \
           const unsigned int           , \
-          const types::material_id_t);\
+          const types::material_id);\
 
 #else
 #define INSTANTIATE_CODIM(InputVector,DH,Q)

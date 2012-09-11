@@ -281,7 +281,7 @@ struct FE_Q<xdim,xspacedim>::Implementation
           .TableBase<2,double>::reinit (fe.interface_constraints_size());
 
         for (unsigned int i=0; i<constraint_points.size(); ++i)
-          for (unsigned j=0; j<fe.degree+1; ++j)
+          for (unsigned int j=0; j<fe.degree+1; ++j)
             {
               fe.interface_constraints(i,j) =
                 polynomials[fe.face_index_map[j]].value (constraint_points[i](0));
@@ -484,7 +484,7 @@ struct FE_Q<xdim,xspacedim>::Implementation
                   constraint_point(k) = 1.0 - constraint_point(k);
               }
 
-            for (unsigned j=0; j<pnts; ++j)
+            for (unsigned int j=0; j<pnts; ++j)
               {
                 unsigned int indices[2]
                   = { fe.face_index_map[j] % (fe.degree + 1),

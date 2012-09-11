@@ -1,0 +1,196 @@
+
+DEAL::Triangulation hypercube 2D refinement 1 steps 4 active cells 5 total cells 
+DEAL::FE_RaviartThomas<2>(1) x FE_DGQ<2>(1)
+DEAL::cell matrix
+DEAL::-0.50   0.29    0       0       -0.50   0.29    0       0       0.50    0.50    -0.29   -0.29   
+DEAL::0       0       0.50    -0.29   -0.50   -0.29   0       0       -0.50   0.50    0.29    0.29    
+DEAL::-0.50   -0.29   0       0       0       0       0.50    -0.29   0.50    -0.50   0.29    0.29    
+DEAL::0       0       0.50    0.29    0       0       0.50    0.29    -0.50   -0.50   -0.29   -0.29   
+DEAL::gradient_matrix
+DEAL::0       0       0       0       
+DEAL::0       0       0       0       
+DEAL::0       0       0       0       
+DEAL::0       0       0       0       
+DEAL::0       0       0       0       
+DEAL::0       0       0       0       
+DEAL::0       0       0       0       
+DEAL::0       0       0       0       
+DEAL::-0.50   0.50    -0.50   0.50    
+DEAL::-0.50   -0.50   0.50    0.50    
+DEAL::0.29    -0.29   -0.29   0.29    
+DEAL::0.29    -0.29   -0.29   0.29    
+DEAL::Divergence-Residuals 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::Gradient-Residuals 0 0 0 0
+DEAL::boundary_matrix 0
+DEAL::-0.50   0.29    0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::-0.50   -0.29   0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::boundary_matrix 1
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0.50    -0.29   0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0.50    0.29    0       0       0       0       0       0       0       0       
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::boundary_matrix 2
+DEAL::0       0       0       0       -0.50   0.29    0       0       0       0       0       0       
+DEAL::0       0       0       0       -0.50   -0.29   0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::boundary_matrix 3
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0.50    -0.29   0       0       0       0       
+DEAL::0       0       0       0       0       0       0.50    0.29    0       0       0       0       
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::face_matrix 0
+DEAL::M11
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0.25    -0.14   0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0.25    0.14    0       0       0       0       0       0       0       0       
+DEAL::M22
+DEAL::-0.25   0.14    0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::-0.25   -0.14   0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::M12
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::-0.25   0.14    0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::-0.25   -0.14   0       0       0       0       0       0       0       0       0       0       
+DEAL::M21
+DEAL::0       0       0.25    -0.14   0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0.25    0.14    0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::FE_Nedelec<2>(1) x FE_DGQ<2>(1)
+DEAL::cell matrix
+DEAL::0       0.58    0       0.29    0       0.58    0       0.29    0       -0.25   0       -0.25   
+DEAL::0       0.29    0       0.58    0       0.58    0       0.29    0       -0.25   0       -0.25   
+DEAL::0       0.58    0       0.29    0       0.29    0       0.58    0       -0.25   0       -0.25   
+DEAL::0       0.29    0       0.58    0       0.29    0       0.58    0       -0.25   0       -0.25   
+DEAL::gradient_matrix
+DEAL::-0.33   -0.17   0.33    0.17    
+DEAL::0       0       0       0       
+DEAL::-0.17   -0.33   0.17    0.33    
+DEAL::0       0       0       0       
+DEAL::-0.33   0.33    -0.17   0.17    
+DEAL::0       0       0       0       
+DEAL::-0.17   0.17    -0.33   0.33    
+DEAL::0       0       0       0       
+DEAL::0.14    -0.14   0.14    -0.14   
+DEAL::0       0       0       0       
+DEAL::0.14    0.14    -0.14   -0.14   
+DEAL::0       0       0       0       
+DEAL::Divergence-Residuals 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::Gradient-Residuals 0 0 0 0
+DEAL::boundary_matrix 0
+DEAL::0       0       0       0       -0.33   0.58    -0.17   0.29    0.14    -0.25   0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       -0.17   0.29    -0.33   0.58    0.14    -0.25   0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::boundary_matrix 1
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0.33    0.58    0.17    0.29    -0.14   -0.25   0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0.17    0.29    0.33    0.58    -0.14   -0.25   0       0       
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::boundary_matrix 2
+DEAL::-0.33   0.58    -0.17   0.29    0       0       0       0       0       0       0.14    -0.25   
+DEAL::-0.17   0.29    -0.33   0.58    0       0       0       0       0       0       0.14    -0.25   
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::boundary_matrix 3
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0.33    0.58    0.17    0.29    0       0       0       0       0       0       -0.14   -0.25   
+DEAL::0.17    0.29    0.33    0.58    0       0       0       0       0       0       -0.14   -0.25   
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL::face_matrix 0
+DEAL::M11
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0.17    0.29    0.083   0.14    -0.072  -0.12   0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0.083   0.14    0.17    0.29    -0.072  -0.12   0       0       
+DEAL::M22
+DEAL::0       0       0       0       -0.17   0.29    -0.083  0.14    0.072   -0.12   0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       -0.083  0.14    -0.17   0.29    0.072   -0.12   0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::M12
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       -0.17   0.29    -0.083  0.14    0.072   -0.12   0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       -0.083  0.14    -0.17   0.29    0.072   -0.12   0       0       
+DEAL::M21
+DEAL::0       0       0       0       0.17    0.29    0.083   0.14    -0.072  -0.12   0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0.083   0.14    0.17    0.29    -0.072  -0.12   0       0       
+DEAL::0       0       0       0       0       0       0       0       0       0       0       0       
+DEAL::FESystem<2>[FE_DGQ<2>(1)^2] x FE_DGQ<2>(1)
+DEAL::cell matrix
+DEAL::-0.17   0.17    -0.083  0.083   -0.17   -0.083  0.17    0.083   
+DEAL::-0.17   0.17    -0.083  0.083   -0.083  -0.17   0.083   0.17    
+DEAL::-0.083  0.083   -0.17   0.17    -0.17   -0.083  0.17    0.083   
+DEAL::-0.083  0.083   -0.17   0.17    -0.083  -0.17   0.083   0.17    
+DEAL::gradient_matrix
+DEAL::-0.17   0.17    -0.083  0.083   
+DEAL::-0.17   0.17    -0.083  0.083   
+DEAL::-0.083  0.083   -0.17   0.17    
+DEAL::-0.083  0.083   -0.17   0.17    
+DEAL::-0.17   -0.083  0.17    0.083   
+DEAL::-0.083  -0.17   0.083   0.17    
+DEAL::-0.17   -0.083  0.17    0.083   
+DEAL::-0.083  -0.17   0.083   0.17    
+DEAL::Divergence-Residuals 0 0 0 0 0 0 0 0
+DEAL::Gradient-Residuals 0 0 0 0
+DEAL::boundary_matrix 0
+DEAL::-0.33   0       -0.17   0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::-0.17   0       -0.33   0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0
+DEAL::boundary_matrix 1
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::0       0.33    0       0.17    0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::0       0.17    0       0.33    0       0       0       0       
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0
+DEAL::boundary_matrix 2
+DEAL::0       0       0       0       -0.33   -0.17   0       0       
+DEAL::0       0       0       0       -0.17   -0.33   0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0
+DEAL::boundary_matrix 3
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0.33    0.17    
+DEAL::0       0       0       0       0       0       0.17    0.33    
+DEAL::Residuals u dot n 0 0 0 0 0 0 0 0
+DEAL::face_matrix 0
+DEAL::M11
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::0       0.17    0       0.083   0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::0       0.083   0       0.17    0       0       0       0       
+DEAL::M22
+DEAL::-0.17   0       -0.083  0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::-0.083  0       -0.17   0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::M12
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::-0.17   0       -0.083  0       0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::-0.083  0       -0.17   0       0       0       0       0       
+DEAL::M21
+DEAL::0       0.17    0       0.083   0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       
+DEAL::0       0.083   0       0.17    0       0       0       0       
+DEAL::0       0       0       0       0       0       0       0       

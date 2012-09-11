@@ -141,7 +141,7 @@ void MatrixIntegrator<dim>::cell(
   L2::cell_matrix(dinfo.matrix(2,false).matrix, info.fe_values(1));
 }
  * @endcode
- * See step-42 for a worked out example of this code.
+ * See step-39 for a worked out example of this code.
  *
  * @ingroup Integrators
  */

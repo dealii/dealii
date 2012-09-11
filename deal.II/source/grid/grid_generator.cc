@@ -33,7 +33,7 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 #include <iostream>
 #include <cmath>
@@ -891,7 +891,7 @@ GridGenerator::subdivided_hyper_rectangle (
   Triangulation<1>&                             tria,
   const std::vector< std::vector<double> >&     spacing,
   const Point<1>&                               p,
-  const Table<1,types::material_id_t>&                 material_id,
+  const Table<1,types::material_id>&                 material_id,
   const bool                                    colorize)
 {
                                    // contributed by Yaqi Wang 2006
@@ -920,12 +920,12 @@ GridGenerator::subdivided_hyper_rectangle (
                                    // create the cells
   unsigned int n_val_cells = 0;
   for (unsigned int i=0; i<n_cells; i++)
-    if (material_id[i]!=types::invalid_material_id) n_val_cells++;
+    if (material_id[i]!=numbers::invalid_material_id) n_val_cells++;
 
   std::vector<CellData<1> > cells(n_val_cells);
   unsigned int id = 0;
   for (unsigned int x=0; x<n_cells; ++x)
-    if (material_id[x] != types::invalid_material_id)
+    if (material_id[x] != numbers::invalid_material_id)
       {
         cells[id].vertices[0] = x;
         cells[id].vertices[1] = x+1;
@@ -950,7 +950,7 @@ GridGenerator::subdivided_hyper_rectangle (
   Triangulation<2>&                         tria,
   const std::vector< std::vector<double> >&     spacing,
   const Point<2>&                               p,
-  const Table<2,types::material_id_t>&          material_id,
+  const Table<2,types::material_id>&          material_id,
   const bool                                    colorize)
 {
                                    // contributed by Yaqi Wang 2006
@@ -993,14 +993,14 @@ GridGenerator::subdivided_hyper_rectangle (
   unsigned int n_val_cells = 0;
   for (unsigned int i=0; i<material_id.size(0); i++)
     for (unsigned int j=0; j<material_id.size(1); j++)
-      if (material_id[i][j] != types::invalid_material_id)
+      if (material_id[i][j] != numbers::invalid_material_id)
         n_val_cells++;
 
   std::vector<CellData<2> > cells(n_val_cells);
   unsigned int id = 0;
   for (unsigned int y=0; y<repetitions[1]; ++y)
     for (unsigned int x=0; x<repetitions[0]; ++x)
-      if (material_id[x][y]!=types::invalid_material_id)
+      if (material_id[x][y]!=numbers::invalid_material_id)
         {
           cells[id].vertices[0] = y*(repetitions[0]+1)+x;
           cells[id].vertices[1] = y*(repetitions[0]+1)+x+1;
@@ -1048,7 +1048,7 @@ GridGenerator::subdivided_hyper_rectangle (
   Triangulation<3>&                           tria,
   const std::vector< std::vector<double> >&     spacing,
   const Point<3>&                             p,
-  const Table<3,types::material_id_t>&               material_id,
+  const Table<3,types::material_id>&               material_id,
   const bool                                    colorize)
 {
                                    // contributed by Yaqi Wang 2006
@@ -1100,7 +1100,7 @@ GridGenerator::subdivided_hyper_rectangle (
   for (unsigned int i=0; i<material_id.size(0); i++)
     for (unsigned int j=0; j<material_id.size(1); j++)
       for (unsigned int k=0; k<material_id.size(2); k++)
-        if (material_id[i][j][k]!=types::invalid_material_id)
+        if (material_id[i][j][k]!=numbers::invalid_material_id)
           n_val_cells++;
 
   std::vector<CellData<dim> > cells(n_val_cells);
@@ -1110,7 +1110,7 @@ GridGenerator::subdivided_hyper_rectangle (
   for (unsigned int z=0; z<repetitions[2]; ++z)
     for (unsigned int y=0; y<repetitions[1]; ++y)
       for (unsigned int x=0; x<repetitions[0]; ++x)
-        if (material_id[x][y][z]!=types::invalid_material_id)
+        if (material_id[x][y][z]!=numbers::invalid_material_id)
           {
             cells[id].vertices[0] = z*n_xy + y*n_x + x;
             cells[id].vertices[1] = z*n_xy + y*n_x + x+1;
@@ -1382,7 +1382,7 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<2> &tria,
     for (unsigned int i1=0;i1<4;++i1)
       vertices[k++] = Point<2>(coords[i1], coords[i0]);
 
-  const types::material_id_t materials[9] = { 5, 4, 6,
+  const types::material_id materials[9] = { 5, 4, 6,
                                        1, 0, 2,
                                        9, 8,10
   };
@@ -1751,7 +1751,7 @@ GridGenerator::half_hyper_ball (Triangulation<2> &tria,
     {
         for (unsigned int i=0;i<GeometryInfo<2>::faces_per_cell;++i)
         {
-            if (cell->face(i)->boundary_indicator() == types::internal_face_boundary_id)
+            if (cell->face(i)->boundary_indicator() == numbers::internal_face_boundary_id)
                 continue;
 
             // If x is zero, then this is part of the plane
@@ -2012,7 +2012,7 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<3> &tria,
       for (unsigned int x=0;x<4;++x)
         vertices[k++] = Point<3>(coords[x], coords[y], coords[z]);
 
-  const types::material_id_t materials[27] = {
+  const types::material_id materials[27] = {
         21,20,22,
         17,16,18,
         25,24,26,

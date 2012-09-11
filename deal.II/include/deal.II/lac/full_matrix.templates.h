@@ -397,7 +397,7 @@ void FullMatrix<number>::add_row (const unsigned int i,
   Assert (!this->empty(), ExcEmptyMatrix());
 
   const unsigned int size_m = m();
-  for (unsigned l=0; l<size_m; ++l)
+  for (unsigned int l=0; l<size_m; ++l)
     (*this)(i,l) += s*(*this)(j,l) + t*(*this)(k,l);
 }
 

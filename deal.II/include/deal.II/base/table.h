@@ -2055,7 +2055,7 @@ inline
 unsigned int
 TableBase<N,T>::n_elements () const
 {
-  unsigned s = 1;
+  unsigned int s = 1;
   for (unsigned int n=0; n<N; ++n)
     s *= table_size[n];
   return s;

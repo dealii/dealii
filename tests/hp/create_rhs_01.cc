@@ -28,7 +28,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -72,8 +72,8 @@ void test ()
   Vector<double> rhs_vector(hp_dof_handler.n_dofs());
   Vector<double> rhs_vector2(hp_dof_handler2.n_dofs());
 
-  types::boundary_id_t myints[1];
-  std::set<types::boundary_id_t> boundary_indicators  (myints,myints+1);  
+  types::boundary_id myints[1];
+  std::set<types::boundary_id> boundary_indicators  (myints,myints+1);  
   myints[0]=0;
   hp::QCollection<1>   quadrature;
   quadrature.push_back (QGauss<1>(1));

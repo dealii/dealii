@@ -165,7 +165,7 @@ int main ()
     save_mesh(volume_mesh);
 
     Triangulation<dim-1,dim> boundary_mesh;
-    set<types::boundary_id_t> boundary_ids;
+    set<types::boundary_id> boundary_ids;
     boundary_ids.insert(0);
 
     surface_to_volume_mapping
