@@ -25,12 +25,7 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_tools.h>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
-
+#include <sstream>
 #include <iostream>
 
 //TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
@@ -118,17 +113,10 @@ FE_ABF<dim>::get_name () const
                                    // this function returns, so they
                                    // have to be kept in synch
 
-#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream namebuf;
-#else
-  std::ostrstream namebuf;
-#endif
 
   namebuf << "FE_ABF<" << dim << ">(" << rt_order << ")";
 
-#ifndef HAVE_STD_STRINGSTREAM
-  namebuf << std::ends;
-#endif
   return namebuf.str();
 }
 
