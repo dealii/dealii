@@ -29,10 +29,8 @@
 #include <list>
 #include <sstream>
 #include <cctype>
+#include <limits>
 
-#ifdef HAVE_STD_NUMERIC_LIMITS
-#  include <limits>
-#endif
 
 #ifdef DEAL_II_MSVC
 // on Windows systems with MS Visual C/C++, there is a
@@ -148,20 +146,8 @@ namespace Patterns
 
 
 
-  const int Integer::min_int_value =
-#ifdef HAVE_STD_NUMERIC_LIMITS
-          std::numeric_limits<int>::min();
-#else
-          1;
-#endif
-
-  const int Integer::max_int_value =
-#ifdef HAVE_STD_NUMERIC_LIMITS
-          std::numeric_limits<int>::max();
-#else
-          0;
-#endif
-
+  const int Integer::min_int_value = std::numeric_limits<int>::min();
+  const int Integer::max_int_value = std::numeric_limits<int>::max();
 
   const char* Integer::description_init = "[Integer";
 
@@ -259,19 +245,8 @@ namespace Patterns
 
 
 
-  const double Double::min_double_value =
-#ifdef HAVE_STD_NUMERIC_LIMITS
-          -std::numeric_limits<double>::max();
-#else
-          1;
-#endif
-
-  const double Double::max_double_value =
-#ifdef HAVE_STD_NUMERIC_LIMITS
-          std::numeric_limits<double>::max();
-#else
-          0;
-#endif
+  const double Double::min_double_value = -std::numeric_limits<double>::max();
+  const double Double::max_double_value = std::numeric_limits<double>::max();
 
   const char* Double::description_init = "[Double";
 
@@ -455,13 +430,8 @@ namespace Patterns
 
 
 
-  const unsigned int List::max_int_value =
-#ifdef HAVE_STD_NUMERIC_LIMITS
-          std::numeric_limits<unsigned int>::max();
-#else
-          numbers::invalid_unsigned_int;
-#endif
-
+  const unsigned int List::max_int_value
+  = std::numeric_limits<unsigned int>::max();
 
   const char* List::description_init = "[List";
 
@@ -595,13 +565,8 @@ namespace Patterns
 
 
 
-  const unsigned int Map::max_int_value =
-#ifdef HAVE_STD_NUMERIC_LIMITS
-          std::numeric_limits<unsigned int>::max();
-#else
-          numbers::invalid_unsigned_int;
-#endif
-
+  const unsigned int Map::max_int_value
+  = std::numeric_limits<unsigned int>::max();
 
   const char* Map::description_init = "[Map";
 
