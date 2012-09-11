@@ -5661,7 +5661,7 @@ namespace VectorTools
             }
         }
 
-#if DEAL_II_USE_P4EST
+#ifdef DEAL_II_USE_P4EST
                                      // if this was a distributed
                                      // DoFHandler, we need to do the
                                      // reduction over the entire domain

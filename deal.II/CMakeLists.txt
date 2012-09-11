@@ -162,6 +162,8 @@ ENDIF()
 # Platform checks:
 #
 
+INCLUDE(check_for_compiler_features)
+
 INCLUDE(check_for_cxx_features)
 
 INCLUDE(check_for_compiler_bugs)

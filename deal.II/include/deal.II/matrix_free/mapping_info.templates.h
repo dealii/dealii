@@ -947,7 +947,7 @@ namespace MatrixFreeFunctions
                                 // global communication, so we can
                                 // disable the check here only if no
                                 // processor has any such data
-#if DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     unsigned int general_size_glob = 0, general_size_loc = jacobians.size();
     MPI_Allreduce (&general_size_loc, &general_size_glob, 1, MPI_UNSIGNED,
                    MPI_MAX, size_info.communicator);
@@ -966,7 +966,7 @@ namespace MatrixFreeFunctions
            MemoryConsumption::memory_consumption (jacobians_grad_upper));
       }
 
-#if DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     unsigned int quad_size_glob = 0, quad_size_loc = quadrature_points.size();
     MPI_Allreduce (&quad_size_loc, &quad_size_glob, 1, MPI_UNSIGNED,
                    MPI_MAX, size_info.communicator);
