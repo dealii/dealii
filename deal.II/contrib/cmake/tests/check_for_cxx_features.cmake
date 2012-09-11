@@ -2,7 +2,7 @@ INCLUDE(CheckCXXSourceCompiles)
 INCLUDE(CheckIncludeFiles)
 
 #
-# Check for various CXX Features.
+# Check for various CXX features.
 #
 
 
@@ -80,5 +80,3 @@ CHECK_INCLUDE_FILES("sys/syscall.h" HAVE_SYS_SYSCALL_H)
 CHECK_INCLUDE_FILES("sys/times.h" HAVE_SYS_TIMES_H)
 CHECK_INCLUDE_FILES("sys/types.h" HAVE_SYS_TYPES_H)
 
-
-# /* Defined to 1 if you have the `strtrs_' function. */HAVE_STRTRS_ 1

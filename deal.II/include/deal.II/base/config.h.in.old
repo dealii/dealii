@@ -111,11 +111,6 @@
    top-level directory. */
 #cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
 
-/* Define if we have to work around a bug in gcc with explicitly instantiating
-   template member operators. See the aclocal.m4 file in the top-level
-   directory for a description of this bug. */
-#cmakedefine DEAL_II_MEMBER_OP_TEMPLATE_INST
-
 /* Defined if the compiler refuses to specialize an outer class template while
    keeping a member as a template. For the exact failure mode, look at
    aclocal.m4 in the top-level directory. */

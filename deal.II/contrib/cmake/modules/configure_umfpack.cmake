@@ -39,6 +39,8 @@ ELSE()
 
   INCLUDE_DIRECTORIES(${Umfpack_INCLUDE_DIR} ${AMD_INCLUDE_DIR})
 
+  # TODO: Set necessary linker flags...
+
   LIST(APPEND deal_ii_external_libraries
     ${Umfpack_LIBRARY} ${AMD_LIBRARY} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES}
     )

@@ -1,6 +1,8 @@
+INCLUDE(CheckCXXSourceCompiles)
+
 FIND_PACKAGE(Threads REQUIRED)
 
-# TODO: Necessary link commands for threads? Or are they set automatically
+# TODO: Necessary linker flags for threads? Or are they set automatically
 # by the package?
 
 IF(DEAL_II_ALLOW_CONTRIB)
@@ -33,6 +35,14 @@ LIST(APPEND deal_ii_external_debug_libraries
   ${TBB_DEBUG_LIBRARY}
   )
 
-# TODO: Renaming!
+
 SET(DEAL_II_USE_MT TRUE)
-SET(DEAL_II_USE_MT_POSIX TRUE)
+
+
+IF(CMAKE_USE_PTHREADS_INIT)
+  SET(DEAL_II_USE_MT_POSIX TRUE)
+
+  # Check whether posix thread barriers are available:
+
+ENDIF()
+

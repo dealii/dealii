@@ -1,15 +1,17 @@
 Next steps:
 
-- convert as much of the config.h.in so that the library can be build in
-  the current state with cmake
+* Add compiler dependend configuration
 
-- Add the version configuration to cmake
+* Add Bugs, Regressions and Feature tests.
 
-- And lots of the other stuff...
+* Add the CFLAGS and CXXFLAGS magic. (With an option to overwrite for distribution packaging.)
 
-
-
+* MPI
 
 * PETSC
+
 * TRILINOS
+
+* P4EST
+
 * ...
