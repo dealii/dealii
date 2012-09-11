@@ -106,9 +106,6 @@
    the top-level directory. */
 #cmakedefine DEAL_II_LONG_DOUBLE_LOOP_BUG
 
-/* Major version number of deal.II */
-#cmakedefine DEAL_II_MAJOR
-
 /* Defined if the compiler refuses to allow the explicit specialization of
    static member arrays. For the exact failure mode, look at aclocal.m4 in the
    top-level directory. */
@@ -128,9 +125,6 @@
    static member variables. For the exact failure mode, look at aclocal.m4 in
    the top-level directory. */
 #cmakedefine DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-
-/* Minor version number of deal.II */
-#cmakedefine DEAL_II_MINOR
 
 /* Set to the minimal number of elements a std::vector<bool> can always hold,
    i.e. its minimal capacity. */
@@ -163,9 +157,6 @@
 /* Defined if the compiler does not understand friend declarations for nested
    member classes when giving a full class specification. */
 #cmakedefine DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
-
-/* Path to the deal.II directory */
-#cmakedefine DEAL_II_PATH
 
 /* Defined if the compiler does not support the
    substitution-failure-is-not-an-error paradigm. For the details, look at
@@ -234,9 +225,6 @@
 
 /* Defined if a Trilinos installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_TRILINOS
-
-/* Define if vector iterators are just plain pointers */
-#cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER
 
 /* This error appears in the Apple edition of the gcc 3.3, which ships with
    Darwin7.9.0 and probably previous version. It leads to problems during
@@ -442,43 +430,6 @@
 
 /* Define to 1 if you have the `ssygv_' function. */
 #cmakedefine HAVE_SSYGV_
-
-/* Define to 1 if you have the <stdint.h> header file. */
-#cmakedefine HAVE_STDINT_H
-
-/* Define to 1 if you have the <stdlib.h> header file. */
-#cmakedefine HAVE_STDLIB_H
-
-/* Define if the compiler provides an <iosfwd> header file */
-#cmakedefine HAVE_STD_IOSFWD_HEADER
-
-/* Define if the compiler's library in use provides std::numeric_limits
-   classes in the appropriate header file */
-#cmakedefine HAVE_STD_NUMERIC_LIMITS
-
-/* Define if the compiler provides an <ostream> header file */
-#cmakedefine HAVE_STD_OSTREAM_HEADER
-
-/* Define to 1 if you have the <strings.h> header file. */
-#cmakedefine HAVE_STRINGS_H
-
-/* Define to 1 if you have the <string.h> header file. */
-#cmakedefine HAVE_STRING_H
-
-/* Define to 1 if you have the `strtrs_' function. */
-#cmakedefine HAVE_STRTRS_
-
-/* Define to 1 if you have the <sys/stat.h> header file. */
-#cmakedefine HAVE_SYS_STAT_H
-
-/* Define to 1 if you have the <sys/syscall.h> header file. */
-#cmakedefine HAVE_SYS_SYSCALL_H
-
-/* Define to 1 if you have the <sys/times.h> header file. */
-#cmakedefine HAVE_SYS_TIMES_H
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-#cmakedefine HAVE_SYS_TYPES_H
 
 /* Define to 1 if you have the <Teuchos_ParameterList.hpp> header file. */
 #cmakedefine HAVE_TEUCHOS_PARAMETERLIST_HPP

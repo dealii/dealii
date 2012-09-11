@@ -1,5 +1,8 @@
 FIND_PACKAGE(Threads REQUIRED)
 
+# TODO: Necessary link commands for threads? Or are they set automatically
+# by the package?
+
 IF(DEAL_II_ALLOW_CONTRIB)
   FIND_PACKAGE(TBB)
 ELSE()

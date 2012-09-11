@@ -2,13 +2,6 @@ PROJECT(deal.II)
 
 SET(VERSION "8.0.pre")
 
-SET(DEAL_II_PACKAGE_BUGREPORT "dealii@dealii.org")
-SET(DEAL_II_PACKAGE_NAME "deal.II")
-SET(DEAL_II_PACKAGE_TARNAME ${DEAL_II_PACKAGE_NAME})
-SET(DEAL_II_PACKAGE_VERSION ${VERSION})
-SET(DEAL_II_PACKAGE_STRING "${DEAL_II_PACKAGE_NAME} ${DEAL_II_PACKAGE_VERSION}")
-SET(DEAL_II_PACKAGE_URL "")
-
 
 
 
@@ -26,6 +19,22 @@ SET(CMAKE_MODULE_PATH
   "${CMAKE_SOURCE_DIR}/contrib/cmake/macros/"
   "${CMAKE_SOURCE_DIR}/contrib/cmake/tests/"
   )
+
+
+
+#
+# Set up deal.II specific variables
+#
+
+SET(DEAL_II_PACKAGE_BUGREPORT "dealii@dealii.org")
+SET(DEAL_II_PACKAGE_NAME "deal.II")
+SET(DEAL_II_PACKAGE_TARNAME ${DEAL_II_PACKAGE_NAME})
+SET(DEAL_II_PACKAGE_VERSION ${VERSION})
+SET(DEAL_II_PACKAGE_STRING "${DEAL_II_PACKAGE_NAME} ${DEAL_II_PACKAGE_VERSION}")
+SET(DEAL_II_PACKAGE_URL "")
+STRING(REGEX REPLACE "^([0-9]+)\\..*" "\\1" DEAL_II_MAJOR "${VERSION}")
+STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_MINOR "${VERSION}")
+SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
 
 
 
@@ -82,7 +91,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
 
 
 #
-# Now, configure and configure a lot of things:
+# Now, configure a lot of things:
 #
 
 # used as a dummy target for all the stuff that has to be done before the
