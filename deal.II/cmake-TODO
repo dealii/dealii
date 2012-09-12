@@ -6,6 +6,8 @@ Next steps:
 
 * Sanitize the building of the shared library. (At least for Linux...)
 
+* Migrate the build of TBB to a cmake.
+
 * Add Bug tests.
 
 * HDF5
