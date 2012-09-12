@@ -149,10 +149,6 @@ SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
 
 
 
-#TODO:
-SET(CMAKE_CXX_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
-SET(CMAKE_C_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
-
 
 #
 # Now, configure a lot of things:
@@ -173,6 +169,8 @@ SET(deal_ii_required_linker_flags "")
 #
 # Feature configuration:
 #
+
+INCLUDE(configure_compiler_flags)
 
 INCLUDE(configure_boost)
 

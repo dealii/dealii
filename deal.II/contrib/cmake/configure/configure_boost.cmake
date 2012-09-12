@@ -22,7 +22,10 @@ IF(NOT DEAL_II_FORCE_CONTRIB_BOOST)
     SET(DEAL_II_USE_EXTERNAL_BOOST TRUE)
   ENDIF()
 
-ENDIF()
+ELSE()
 
-# ELSE() nothing to do. We compile the necessary boost source files
-# directly if DEAL_II_USE_EXTERNAL_BOOST is not set.
+  # compile the necessary parts of boost out of ./contrib
+
+  ADD_DEFINITIONS("-DBOOST_NO_HASH" "-DBOOST_NO_SLIST")
+
+ENDIF()
