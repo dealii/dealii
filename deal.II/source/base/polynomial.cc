@@ -1323,9 +1323,61 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
         return v;
       }
   }
+
+// ------------------ HermiteInterpolation --------------- //
+  
+  HermiteInterpolation::HermiteInterpolation (const unsigned int p)
+		  :
+		  Polynomial<double>((p<4) ? 3 : p+1)
+  {
+    if (p==0)
+      {
+	this->coefficients[0] = 1.;
+	this->coefficients[2] = -3.;
+	this->coefficients[3] = 2.;
+      }
+    else if (p==1)
+      {
+	this->coefficients[2] = 3.;
+	this->coefficients[3] = -2.;
+      }
+    else if (p==2)
+      {
+	this->coefficients[1] = 1.;
+	this->coefficients[2] = -2.;
+	this->coefficients[3] = 1.;
+      }
+    else if (p==3)
+      {
+	this->coefficients[2] = -1.;
+	this->coefficients[3] = 1.;
+      }
+    else
+      {
+	this->coefficients[4] = 16.;
+	this->coefficients[3] = -32.;
+	this->coefficients[2] = 16.;
+	
+	if (p>4)
+	  {
+	    Legendre legendre(p-4);
+	    (*this) *= legendre;
+	  }
+      } 
+  }
+
+
+  std::vector<Polynomial<double> >
+  HermiteInterpolation::generate_complete_basis (const unsigned int n)
+  {
+    std::vector<Polynomial<double> > basis (n + 1);
+    
+    for (unsigned int i = 0; i <= n; ++i)
+      basis[i] = HermiteInterpolation (i);
+    
+    return basis;
+  }
 }
-
-
 
 // ------------------ explicit instantiations --------------- //
 
