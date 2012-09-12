@@ -214,6 +214,11 @@ INCLUDE(check_for_compiler_bugs)
 
 ADD_SUBDIRECTORY(common)
 
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/Version.in
+  ${CMAKE_CURRENT_BINARY_DIR}/Version
+  )
+
 
 
 
