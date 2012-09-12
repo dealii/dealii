@@ -29,105 +29,10 @@ namespace internal
 {
   namespace Triangulation
   {
-    template<>
-    void
-    TriaObjects<TriaObject<1> >::reserve_space (const unsigned int new_lines_in_pairs,
-                                      const unsigned int new_lines_single)
-    {
-      Assert(new_lines_in_pairs%2==0, ExcInternalError());
-
-      next_free_single=0;
-      next_free_pair=0;
-      reverse_order_next_free_single=false;
-
-                                       // count the number of lines, of
-                                       // unused single lines and of
-                                       // unused pairs of lines
-      unsigned int n_lines=0;
-      unsigned int n_unused_pairs=0;
-      unsigned int n_unused_singles=0;
-      for (unsigned int i=0; i<used.size(); ++i)
-        {
-          if (used[i])
-            ++n_lines;
-          else if (i+1<used.size())
-            {
-              if (used[i+1])
-                {
-                  ++n_unused_singles;
-                  if (next_free_single==0)
-                    next_free_single=i;
-                }
-              else
-                {
-                  ++n_unused_pairs;
-                  if (next_free_pair==0)
-                    next_free_pair=i;
-                  ++i;
-                }
-            }
-          else
-            ++n_unused_singles;
-        }
-      Assert(n_lines+2*n_unused_pairs+n_unused_singles==used.size(),
-             ExcInternalError());
-
-                                       // how many single lines are needed in
-                                       // addition to n_unused_singles?
-      const int additional_single_lines=
-        new_lines_single-n_unused_singles;
-
-      unsigned int new_size=
-        used.size() + new_lines_in_pairs - 2*n_unused_pairs;
-      if (additional_single_lines>0)
-        new_size+=additional_single_lines;
-
-                                       // only allocate space if necessary
-      if (new_size>cells.size())
-        {
-          cells.reserve (new_size);
-          cells.insert (cells.end(),
-                        new_size-cells.size(),
-                        TriaObject<1> ());
-
-          used.reserve (new_size);
-          used.insert (used.end(),
-                       new_size-used.size(),
-                       false);
-
-          user_flags.reserve (new_size);
-          user_flags.insert (user_flags.end(),
-                             new_size-user_flags.size(),
-                             false);
-
-          children.reserve (new_size);
-          children.insert (children.end(),
-                           new_size-children.size(),
-                           -1);
-
-          boundary_or_material_id.reserve (new_size);
-          boundary_or_material_id.insert (boundary_or_material_id.end(),
-                              new_size-boundary_or_material_id.size(),
-                              BoundaryOrMaterialId());
-
-          user_data.reserve (new_size);
-          user_data.insert (user_data.end(),
-                            new_size-user_data.size(),
-                            UserData());
-        }
-
-      if (n_unused_singles==0)
-        {
-          next_free_single=new_size-1;
-          reverse_order_next_free_single=true;
-        }
-    }
-
-
-    template <>
+    template <class G>
     template <int dim, int spacedim>
-    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
-    TriaObjects<TriaObject<1> >::next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria)
+    dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
+    TriaObjects<G>::next_free_single_object (const dealii::Triangulation<dim,spacedim> &tria)
     {
                                        // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
@@ -166,19 +71,19 @@ namespace internal
           if (pos>0)
             next_free_single=pos-1;
           else
-                                             // no valid single line anymore
-            return tria.end_line();
+                                             // no valid single object anymore
+            return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, -1, -1);
         }
 
-      return typename dealii::Triangulation<dim,spacedim>::raw_line_iterator(&tria,0,pos);
+      return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, 0, pos);
     }
 
 
 
-    template <>
+    template <class G>
     template <int dim, int spacedim>
-    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
-    TriaObjects<TriaObject<1> >::next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria)
+    dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
+    TriaObjects<G>::next_free_pair_object (const dealii::Triangulation<dim,spacedim> &tria)
     {
                                        // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
@@ -194,58 +99,35 @@ namespace internal
             }
       if (pos>=last)
                                          // no free slot
-        return tria.end_line();
+        return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, -1, -1);
       else
         next_free_pair=pos+2;
 
-      return typename dealii::Triangulation<dim,spacedim>::raw_line_iterator(&tria,0,pos);
+      return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, 0, pos);
     }
 
 
-
-    template <>
-    template <int dim, int spacedim>
-    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
-    TriaObjects<TriaObject<1> >::next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria)
-    {
-      Assert(false, ExcWrongIterator("quad","line"));
-      return tria.end_quad();
-    }
-
-
-
-    template <>
-    template <int dim, int spacedim>
-    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
-    TriaObjects<TriaObject<1> >::next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria)
-    {
-      Assert(false, ExcWrongIterator("quad","line"));
-      return tria.end_quad();
-    }
-
-
-
-    template<>
+    template<class G>
     void
-    TriaObjects<TriaObject<2> >::reserve_space (const unsigned int new_quads_in_pairs,
-                                      const unsigned int new_quads_single)
+    TriaObjects<G>::reserve_space (const unsigned int new_objects_in_pairs,
+				   const unsigned int new_objects_single)
     {
-      Assert(new_quads_in_pairs%2==0, ExcInternalError());
+      Assert(new_objects_in_pairs%2==0, ExcInternalError());
 
       next_free_single=0;
       next_free_pair=0;
       reverse_order_next_free_single=false;
 
-                                       // count the number of lines, of
-                                       // unused single lines and of
-                                       // unused pairs of lines
-      unsigned int n_quads=0;
+                                       // count the number of objects, of
+                                       // unused single objects and of
+                                       // unused pairs of objects
+      unsigned int n_objects=0;
       unsigned int n_unused_pairs=0;
       unsigned int n_unused_singles=0;
       for (unsigned int i=0; i<used.size(); ++i)
         {
           if (used[i])
-            ++n_quads;
+            ++n_objects;
           else if (i+1<used.size())
             {
               if (used[i+1])
@@ -265,18 +147,18 @@ namespace internal
           else
             ++n_unused_singles;
         }
-      Assert(n_quads+2*n_unused_pairs+n_unused_singles==used.size(),
+      Assert(n_objects+2*n_unused_pairs+n_unused_singles==used.size(),
              ExcInternalError());
 
-                                       // how many single quads are needed in
-                                       // addition to n_unused_quads?
-      const int additional_single_quads=
-        new_quads_single-n_unused_singles;
+                                       // how many single objects are needed in
+                                       // addition to n_unused_objects?
+      const int additional_single_objects=
+        new_objects_single-n_unused_singles;
 
       unsigned int new_size=
-        used.size() + new_quads_in_pairs - 2*n_unused_pairs;
-      if (additional_single_quads>0)
-        new_size+=additional_single_quads;
+        used.size() + new_objects_in_pairs - 2*n_unused_pairs;
+      if (additional_single_objects>0)
+        new_size+=additional_single_objects;
 
                                        // only allocate space if necessary
       if (new_size>cells.size())
@@ -284,7 +166,7 @@ namespace internal
           cells.reserve (new_size);
           cells.insert (cells.end(),
                         new_size-cells.size(),
-                        TriaObject<2> ());
+                        G ());
 
           used.reserve (new_size);
           used.insert (used.end(),
@@ -296,16 +178,19 @@ namespace internal
                              new_size-user_flags.size(),
                              false);
 
-          children.reserve (2*new_size);
+	  const unsigned int factor = GeometryInfo<G::dimension>::max_children_per_cell / 2;
+          children.reserve (factor*new_size);
           children.insert (children.end(),
-                           2*new_size-children.size(),
+                           factor*new_size-children.size(),
                            -1);
 
-          refinement_cases.reserve (new_size);
-          refinement_cases.insert (refinement_cases.end(),
-                               new_size - refinement_cases.size(),
-                               RefinementCase<2>::no_refinement);
-
+	  if (G::dimension > 1)
+	    {
+	      refinement_cases.reserve (new_size);
+	      refinement_cases.insert (refinement_cases.end(),
+				       new_size - refinement_cases.size(),
+				       RefinementCase<G::dimension>::no_refinement);
+	    }
 
           boundary_or_material_id.reserve (new_size);
           boundary_or_material_id.insert (boundary_or_material_id.end(),
@@ -324,109 +209,6 @@ namespace internal
           reverse_order_next_free_single=true;
         }
     }
-
-
-
-
-    template <>
-    template <int dim, int spacedim>
-    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
-    TriaObjects<TriaObject<2> >::next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria)
-    {
-                                       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
-
-      int pos=next_free_single,
-         last=used.size()-1;
-      if (!reverse_order_next_free_single)
-        {
-                                           // first sweep forward, only use
-                                           // really single slots, do not use
-                                           // pair slots
-          for (; pos<last; ++pos)
-            if (!used[pos])
-              if (used[++pos])
-                {
-                                                   // this was a single slot
-                  pos-=1;
-                  break;
-                }
-          if (pos>=last)
-            {
-              reverse_order_next_free_single=true;
-              next_free_single=used.size()-1;
-              pos=used.size()-1;
-            }
-          else
-            next_free_single=pos+1;
-        }
-
-      if(reverse_order_next_free_single)
-        {
-                                           // second sweep, use all slots, even
-                                           // in pairs
-          for(;pos>=0;--pos)
-            if (!used[pos])
-              break;
-          if (pos>0)
-            next_free_single=pos-1;
-          else
-                                             // no valid single quad anymore
-            return tria.end_quad();
-        }
-
-      return typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator(&tria,0,pos);
-    }
-
-
-
-    template <>
-    template <int dim, int spacedim>
-    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
-    TriaObjects<TriaObject<2> >::next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria)
-    {
-                                       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
-
-      int pos=next_free_pair,
-         last=used.size()-1;
-      for (; pos<last; ++pos)
-        if (!used[pos])
-          if (!used[++pos])
-            {
-                                               // this was a pair slot
-              pos-=1;
-              break;
-            }
-      if (pos>=last)
-                                         // no free slot
-        return tria.end_quad();
-      else
-        next_free_pair=pos+2;
-
-      return typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator(&tria,0,pos);
-    }
-
-
-    template <>
-    template <int dim, int spacedim>
-    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
-    TriaObjects<TriaObject<2> >::next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria)
-    {
-      Assert(false, ExcWrongIterator("line","quad"));
-      return tria.end_line();
-    }
-
-
-
-    template <>
-    template <int dim, int spacedim>
-    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
-    TriaObjects<TriaObject<2> >::next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria)
-    {
-      Assert(false, ExcWrongIterator("line","quad"));
-      return tria.end_line();
-    }
-
-
 
 
     template <>
@@ -536,9 +318,9 @@ namespace internal
       next_free_pair=0;
       reverse_order_next_free_single=false;
 
-                                       // count the number of lines, of unused
-                                       // single lines and of unused pairs of
-                                       // lines
+                                       // count the number of objects, of unused
+                                       // single objects and of unused pairs of
+                                       // objects
       unsigned int n_quads=0;
       unsigned int n_unused_pairs=0;
       unsigned int n_unused_singles=0;
