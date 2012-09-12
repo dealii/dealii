@@ -7,13 +7,6 @@ INCLUDE(CheckIncludeFiles)
 #
 
 
-CHECK_CXX_SOURCE_COMPILES( # TODO: Phase out
-  "
-  #include <ostream>
-  int main(){return 0;}
-  "
-  HAVE_STD_OSTREAM_HEADER)
-
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <iosfwd>

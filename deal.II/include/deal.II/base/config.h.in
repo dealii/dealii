@@ -191,9 +191,6 @@
    classes. */
 #cmakedefine DEAL_II_CAN_USE_CXX1X
 
-/* Defined if the compiler provides an <ostream> header file */
-#cmakedefine HAVE_STD_OSTREAM_HEADER
-
 /* Defined if the compiler provides an <iosfwd> header file */
 #cmakedefine HAVE_STD_IOSFWD_HEADER
 
