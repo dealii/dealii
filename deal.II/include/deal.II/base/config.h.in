@@ -165,6 +165,20 @@
 /* Defined if vector iterators are just plain pointers */
 #cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER
 
+/* Define if the compiler provides __builtin_expect */
+#cmakedefine HAVE_BUILTIN_EXPECT
+
+/* Define if the compiler provides __verbose_terminate_handler */
+#cmakedefine HAVE_VERBOSE_TERMINATE
+
+/* Define if deal.II is linked against a libc that provides stacktrace debug
+   information that can be printed out in the exception class */
+#cmakedefine HAVE_GLIBC_STACKTRACE
+
+/* Defined if the std c++ library provides a demangler conforming to the GCC
+   libstdc++ interface. */
+#cmakedefine HAVE_LIBSTDCXX_DEMANGLER
+
 
 
 

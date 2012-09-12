@@ -222,9 +222,6 @@
 /* Define to 1 if you have the <AztecOO_Operator.h> header file. */
 #cmakedefine HAVE_AZTECOO_OPERATOR_H
 
-/* Define if the compiler provides __builtin_expect */
-#cmakedefine HAVE_BUILTIN_EXPECT
-
 /* Define to 1 if you have the `daxpy_' function. */
 #cmakedefine HAVE_DAXPY_
 
@@ -315,10 +312,6 @@
 /* Define to 1 if you have the `getpid' function. */
 #cmakedefine HAVE_GETPID
 
-/* Define if deal.II is linked against a libc that provides stacktrace debug
-   information that can be printed out in the exception class */
-#cmakedefine HAVE_GLIBC_STACKTRACE
-
 /* Availability of the MA27 algorithm from HSL */
 #cmakedefine HAVE_HSL_MA27
 
@@ -333,11 +326,6 @@
 
 /* Define to 1 if you have the `jn' function. */
 #cmakedefine HAVE_JN
-
-/* Define if the std c++ library provides a demangler conforming to the GCC
-   libstdc++ interface. */
-#cmakedefine HAVE_LIBSTDCXX_DEMANGLER
-
 
 /* Define to 1 if you have the <memory.h> header file. */
 #cmakedefine HAVE_MEMORY_H
@@ -419,9 +407,6 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #cmakedefine HAVE_UNISTD_H
-
-/* Define if the compiler provides __verbose_terminate_handler */
-#cmakedefine HAVE_VERBOSE_TERMINATE
 
 /* On SunOS 4.x, the getrusage() function exists, but is not declared in the
    respective header file <resource.h>, as one would think when reading the
