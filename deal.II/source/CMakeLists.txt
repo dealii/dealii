@@ -35,9 +35,14 @@ ADD_LIBRARY(deal_II SHARED
  )
 
 #
-# Link all external libraries into the target:
-# TODO: toggle for as-needed
+# Sonaming: Well... we just use the version number. No point to wrack
+# one's brain over the question whether a C++ library is still ABI
+# backwards compatible.
 #
+SET_TARGET_PROPERTIES(deal_II PROPERTIES
+  VERSION ${VERSION}
+  SOVERSION ${VERSION}
+  )
 
 IF (CMAKE_BUILD_TYPE MATCHES "debug")
   TARGET_LINK_LIBRARIES(deal_II ${deal_ii_required_linker_flags} ${deal_ii_external_debug_libraries})

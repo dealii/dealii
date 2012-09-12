@@ -56,7 +56,7 @@ OPTION(DEAL_II_WITH_METIS
 
 OPTION(DEAL_II_WITH_MPI
   "Build deal.II with support for mpi."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_NETCDF
   "Build deal.II with support for netcdf."
@@ -101,14 +101,6 @@ OPTION(DEAL_II_FORCE_CONTRIB_TBB
 OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
-
-#
-# Configuration options regarding linkage:
-#
-
-#OPTION(DEAL_II_SET_SONAME
-#  "Set the soname."
-#  ON)
 
 #
 # Compatibility support:
