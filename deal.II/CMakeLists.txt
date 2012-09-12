@@ -132,7 +132,6 @@ SET(CMAKE_MODULE_PATH
 
 
 
-
 #
 # Set up deal.II specific variables
 #
@@ -146,7 +145,6 @@ SET(DEAL_II_PACKAGE_URL "")
 STRING(REGEX REPLACE "^([0-9]+)\\..*" "\\1" DEAL_II_MAJOR "${VERSION}")
 STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_MINOR "${VERSION}")
 SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
-
 
 
 
@@ -206,6 +204,7 @@ IF(DEAL_II_WITH_ZLIB)
 ENDIF()
 
 
+
 # And finally convert deal_ii_required_linker_flags from a list into a
 # string *sigh*
 # TODO: Encapsulate in a macro...
@@ -214,6 +213,7 @@ SET(deal_ii_required_linker_flags "")
 FOREACH (arg ${deal_ii_required_linker_flags_list})
   SET(deal_ii_required_linker_flags "${deal_ii_required_linker_flags} ${arg}")
 ENDFOREACH()
+
 
 
 #
@@ -226,7 +226,6 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/Version.in
   ${CMAKE_CURRENT_BINARY_DIR}/Version
   )
-
 
 
 

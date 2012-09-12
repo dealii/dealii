@@ -4,11 +4,9 @@ Next steps:
 
 * DEAL_II_DEPRECATED is not used at all...
 
-* Sanitize the building of the shared library. (At least for Linux...)
+* Migrate the build of TBB to cmake.
 
-* Migrate the build of TBB to a cmake.
-
-* Add Bug tests.
+* Add Bug tests
 
 * HDF5
 
