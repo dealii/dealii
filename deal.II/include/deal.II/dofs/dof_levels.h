@@ -15,6 +15,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
 #include <deal.II/dofs/dof_objects.h>
 #include <vector>
 
@@ -32,16 +33,11 @@ namespace internal
 
 
 /**
+ * Structure for storing degree of freedom information for cells,
+ * organized by levels.
  *
- * <h4>DoFLevel@<0@></h4>
- *
- * This class is the common base class for all the DoFLevel
- * classes. We here store information that is associated with
- * (logical) cells, rather than concrete objects such as lines, quads,
- * or hexes.
- *
- * At present, all we store are cached values for the DoF indices on
- * each cell, since this is a frequently requested operation. The
+ * We store are cached values for the DoF indices on
+ * each cell in#cell_dof_indices_cache, since this is a frequently requested operation. The
  * values are set by DoFCellAccessor::update_cell_dof_indices_cache
  * and are used by DoFCellAccessor::get_dof_indices.
  *
@@ -58,15 +54,7 @@ namespace internal
  * degrees of freedom located on these objects are stored in separate
  * classes, namely the <tt>DoFFaces</tt> classes.
  *
- *
- * <h4>DoFLevel@<1@>, DoFLevel@<2@>, and DoFLevel@<3@> </h4>
- *
- * These classes are used, respectively, to store the indices located
- * on lines, quads, and hexes. The storage format is as laid out
- * above, and data is stored in objects lines, quads, and
- * hexes, which are all instantiations of <tt>DoFObjects</tt>.
- * However, it isn't usually directly accessed. Rather,
- * except for some access from the DoFHandler class, access is usually
+ * Access to this object is usually
  * through the DoFAccessor::set_dof_index() and
  * DoFAccessor::dof_index() functions or similar functions of derived
  * classes that in turn access the member variables using the
@@ -75,29 +63,10 @@ namespace internal
  * encapsulated to the present hierarchy of classes as well as the
  * dealii::DoFHandler class.
  *
- * @author Wolfgang Bangerth, 1998, 2006
+ * @author Wolfgang Bangerth, 1998, 2006, Guido Kanschat, 2012
  */
-    template <int N>
+    template <int dim>
     class DoFLevel
-    {
-      private:
-                                         /**
-                                          * Make the constructor private
-                                          * to avoid that someone uses
-                                          * this class.
-                                          */
-        DoFLevel ();
-    };
-
-
-
-/**
- * Storage for degrees of freedom on cells. See the documentation of
- * the DoFLevel class template for more complete information on the
- * purpose and layout of this class.
- */
-    template <>
-    class DoFLevel<0>
     {
       public:
                                          /**
@@ -110,6 +79,12 @@ namespace internal
                                           */
         std::vector<unsigned int> cell_dof_indices_cache;
 
+					 /**
+					  * The object containing dof-indices
+					  * and related access-functions
+					  */
+        DoFObjects<dim> dof_object;
+
 
                                          /**
                                           * Determine an estimate for the
@@ -126,139 +101,26 @@ namespace internal
         void serialize(Archive & ar,
                        const unsigned int version);
     };
-
-/**
- * Store the indices of the degrees of freedom which are located on
- * lines. See the general template DoFLevel for more information.
- *
- * @author Wolfgang Bangerth, 1998, 2006
- */
-    template <>
-    class DoFLevel<1> : public DoFLevel<0>
+    
+    
+    template <int dim>
+    inline
+    std::size_t
+    DoFLevel<dim>::memory_consumption () const
     {
-      public:
-                                         /**
-                                          * The object containing dof-indices
-                                          * and related access-functions
-                                          */
-        DoFObjects<1> dof_object;
+      return (MemoryConsumption::memory_consumption (cell_dof_indices_cache) +
+              MemoryConsumption::memory_consumption (dof_object));
+    }
 
-                                         /**
-                                          * Determine an estimate for the
-                                          * memory consumption (in bytes)
-                                          * of this object.
-                                          */
-        std::size_t memory_consumption () const;
-
-        /**
-         * Read or write the data of this object to or
-         * from a stream for the purpose of serialization
-         */
-        template <class Archive>
-        void serialize(Archive & ar,
-                       const unsigned int version);
-    };
-
-
-/**
- * Store the indices of the degrees of freedom which are located on
- * quads. See the general template DoFLevel for more information.
- *
- * @author Wolfgang Bangerth, 1998, 2006
- */
-    template <>
-    class DoFLevel<2> : public DoFLevel<0>
-    {
-      public:
-                                         /**
-                                          * The object containing dof-indices
-                                          * and related access-functions
-                                          */
-        internal::DoFHandler::DoFObjects<2> dof_object;
-
-                                         /**
-                                          * Determine an estimate for the
-                                          * memory consumption (in bytes)
-                                          * of this object.
-                                          */
-        std::size_t memory_consumption () const;
-
-        /**
-         * Read or write the data of this object to or
-         * from a stream for the purpose of serialization
-         */
-        template <class Archive>
-        void serialize(Archive & ar,
-                       const unsigned int version);
-    };
-
-
-/**
- * Store the indices of the degrees of freedom which are located on
- * hexhedra. See the general template DoFLevel for more information.
- *
- * @author Wolfgang Bangerth, 1998, 2006
- */
-    template <>
-    class DoFLevel<3> : public DoFLevel<0>
-    {
-      public:
-                                         /**
-                                          * The object containing dof-indices
-                                          * and related access-functions
-                                          */
-        internal::DoFHandler::DoFObjects<3> dof_object;
-
-                                         /**
-                                          * Determine an estimate for the
-                                          * memory consumption (in bytes)
-                                          * of this object.
-                                          */
-        std::size_t memory_consumption () const;
-
-        /**
-         * Read or write the data of this object to or
-         * from a stream for the purpose of serialization
-         */
-        template <class Archive>
-        void serialize(Archive & ar,
-                       const unsigned int version);
-    };
-
-
-
+    
+    template <int dim>
     template <class Archive>
-    void DoFLevel<0>::serialize (Archive &ar,
-                                 const unsigned int)
+    inline
+    void
+    DoFLevel<dim>::serialize (Archive &ar,
+			      const unsigned int version)
     {
       ar & cell_dof_indices_cache;
-    }
-
-
-
-    template <class Archive>
-    void DoFLevel<1>::serialize (Archive &ar,
-                                 const unsigned int version)
-    {
-      this->DoFLevel<0>::serialize (ar, version);
-      ar & dof_object;
-    }
-
-
-    template <class Archive>
-    void DoFLevel<2>::serialize (Archive &ar,
-                                 const unsigned int version)
-    {
-      this->DoFLevel<0>::serialize (ar, version);
-      ar & dof_object;
-    }
-
-
-    template <class Archive>
-    void DoFLevel<3>::serialize (Archive &ar,
-                                 const unsigned int version)
-    {
-      this->DoFLevel<0>::serialize (ar, version);
       ar & dof_object;
     }
   }
