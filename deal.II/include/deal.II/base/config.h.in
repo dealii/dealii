@@ -51,6 +51,13 @@
 
 
 
+/* Backward compatibility support for functions and classes that do not take
+   an explicit mapping variable, but rather use a default Q1 mapping instead
+   */
+#cmakedefine DEAL_II_COMPAT_MAPPING
+
+
+
 
 /*
  * Configured in configure_boost.cmake:
@@ -178,8 +185,6 @@
 /* Defined if the std c++ library provides a demangler conforming to the GCC
    libstdc++ interface. */
 #cmakedefine HAVE_LIBSTDCXX_DEMANGLER
-
-  SET(DEAL_II_DEPRECATED TRUE)
 
 /* Equal to 0 in the generic case, equal to 1 if CPU compiled for supports
    SSE2, equal to 2 if CPU compiled for supports AVX */

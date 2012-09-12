@@ -2,7 +2,7 @@ FIND_PACKAGE(MPI REQUIRED CXX)
 
 INCLUDE_DIRECTORIES(${MPI_CXX_INCLUDE_PATH})
 
-LIST(APPEND deal_II_required_linker_flags ${MPI_CXX_LINK_FLAGS})
+# LIST(APPEND deal_ii_required_linker_flags ${MPI_CXX_LINK_FLAGS}) # TODO
 LIST(APPEND deal_ii_external_libraries ${MPI_CXX_LIBRARIES})
 LIST(APPEND deal_ii_external_debug_libraries ${MPI_CXX_LIBRARIES})
 

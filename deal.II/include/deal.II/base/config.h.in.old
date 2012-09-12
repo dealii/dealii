@@ -46,11 +46,6 @@
    provided by the compiler. */
 #cmakedefine DEAL_II_USE_DIRECT_ERRNO_H
 
-/* Backward compatibility support for functions and classes that do not take
-   an explicit mapping variable, but rather use a default Q1 mapping instead
-   */
-#cmakedefine DEAL_II_COMPAT_MAPPING
-
 /* Defined if the compiler has a bug in deducing the type of pointers to const
    member functions. */
 #cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG

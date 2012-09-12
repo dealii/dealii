@@ -2,6 +2,10 @@ Next steps:
 
 * Add the CFLAGS and CXXFLAGS magic. (With an option to overwrite for distribution packaging.)
 
+* DEAL_II_DEPRECATED is not used at all...
+
+* Sanitize the building of the shared library. (At least for Linux...)
+
 * Add Bug tests.
 
 * HDF5

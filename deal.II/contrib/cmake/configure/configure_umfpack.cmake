@@ -40,7 +40,7 @@ ELSE()
 
   INCLUDE_DIRECTORIES(${Umfpack_INCLUDE_DIR} ${AMD_INCLUDE_DIR})
 
-  LIST(APPEND deal_II_required_linker_flags
+  LIST(APPEND deal_ii_required_linker_flags
     ${BLAS_LINKER_FLAGS} ${LAPACK_LINKER_FLAGS}
     )
 

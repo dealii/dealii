@@ -42,6 +42,83 @@ SET(VERSION "8.0.pre")
 #
 #
 
+#
+# General configuration options:
+#
+
+OPTION(DEAL_II_WITH_FUNCTIONPARSER
+  "Build deal.II with support for functionparser."
+  ON)
+
+OPTION(DEAL_II_WITH_METIS
+  "Build deal.II with support for Metis."
+  ON)
+
+OPTION(DEAL_II_WITH_MPI
+  "Build deal.II with support for mpi."
+  ON)
+
+OPTION(DEAL_II_WITH_NETCDF
+  "Build deal.II with support for netcdf."
+  ON)
+
+OPTION(DEAL_II_WITH_THREADS
+  "Build deal.II with support for threads. This pulls in libtbb as a dependency."
+  ON)
+
+OPTION(DEAL_II_WITH_UMFPACK
+  "Build deal.II with support for UMFPACK, BLAS and LAPACK."
+  ON)
+
+OPTION(DEAL_II_WITH_ZLIB
+  "Build deal.II with support for zlib."
+  ON)
+
+#
+# Options for library selection:
+#
+
+OPTION(DEAL_II_ALLOW_CONTRIB
+  "Allow the use of contrib libraries bundled with the source tarball.
+  Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
+  packages, so to ensure that only external libraries are used
+  DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
+  OFF"
+  ON)
+
+OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
+  "Always use the bundled functionparser library instead of an external one."
+  OFF)
+
+OPTION(DEAL_II_FORCE_CONTRIB_BOOST
+  "Always use the bundled boost library instead of an external one."
+  OFF)
+
+OPTION(DEAL_II_FORCE_CONTRIB_TBB
+  "Always use the bundled tbb library instead of an external one."
+  OFF)
+
+OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
+  "Always use the bundled umfpack library instead of an external one."
+  OFF)
+
+#
+# Configuration options regarding linkage:
+#
+
+#OPTION(DEAL_II_SET_SONAME
+#  "Set the soname."
+#  ON)
+
+#
+# Compatibility support:
+#
+
+OPTION(DEAL_II_COMPAT_MAPPING
+  "Backward compatibility support for functions and classes that do not
+  take an explicit mapping variable, but rather use a default Q1 mapping
+  instead."
+  ON)
 
 
 
@@ -85,67 +162,6 @@ SET(CMAKE_CXX_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
 SET(CMAKE_C_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
 
 
-
-
-#
-# General configuration options:
-#
-
-OPTION(DEAL_II_WITH_FUNCTIONPARSER
-  "Build deal.II with support for functionparser."
-  ON)
-
-OPTION(DEAL_II_WITH_METIS
-  "Build deal.II with support for Metis."
-  ON)
-
-OPTION(DEAL_II_WITH_MPI
-  "Build deal.II with support for mpi."
-  ON)
-
-OPTION(DEAL_II_WITH_NETCDF
-  "Build deal.II with support for netcdf."
-  ON)
-
-OPTION(DEAL_II_WITH_THREADS
-  "Build deal.II with support for threads. This pulls in libtbb as a dependency."
-  ON)
-
-OPTION(DEAL_II_WITH_UMFPACK
-  "Build deal.II with support for UMFPACK, BLAS and LAPACK."
-  ON)
-
-OPTION(DEAL_II_WITH_ZLIB
-  "Build deal.II with support for zlib."
-  ON)
-
-OPTION(DEAL_II_ALLOW_CONTRIB
-  "Allow the use of contrib libraries bundled with the source tarball.
-  Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
-  packages, so to ensure that only external libraries are used
-  DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
-  OFF"
-  ON)
-
-OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
-  "Always use the bundled functionparser library instead of an external one."
-  OFF)
-
-OPTION(DEAL_II_FORCE_CONTRIB_BOOST
-  "Always use the bundled boost library instead of an external one."
-  OFF)
-
-OPTION(DEAL_II_FORCE_CONTRIB_TBB
-  "Always use the bundled tbb library instead of an external one."
-  OFF)
-
-OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
-  "Always use the bundled umfpack library instead of an external one."
-  OFF)
-
-
-
-
 #
 # Now, configure a lot of things:
 #
@@ -157,7 +173,7 @@ ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 # used to keep track of external libraries and necessary linker flags
 SET(deal_ii_external_libraries "")
 SET(deal_ii_external_debug_libraries "")
-SET(deal_II_required_linker_flags "")
+SET(deal_ii_required_linker_flags "")
 
 
 
@@ -236,4 +252,3 @@ INCLUDE(macro_expand_instantiations)
 ADD_SUBDIRECTORY(include)
 
 ADD_SUBDIRECTORY(source)
-
