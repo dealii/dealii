@@ -34,15 +34,16 @@ LIST(APPEND deal_ii_external_debug_libraries
   ${TBB_DEBUG_LIBRARY}
   )
 
-
 SET(DEAL_II_USE_MT TRUE)
 
+# Set up some posix threads specific configuration toggles:
 IF(CMAKE_USE_PTHREADS_INIT)
   SET(DEAL_II_USE_MT_POSIX TRUE)
 
   # Check whether posix thread barriers are available:
 
-  SET(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+  LIST(APPEND CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+
   CHECK_CXX_SOURCE_COMPILES(
   "
   #include <pthread.h>
@@ -57,11 +58,34 @@ IF(CMAKE_USE_PTHREADS_INIT)
   "
   DEAL_II_HAVE_MT_POSIX_BARRIERS)
 
-  SET(CMAKE_REQUIRED_FLAGS "")
+  LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
 
   IF(NOT DEAL_II_HAVE_MT_POSIX_BARRIERS)
     SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
   ENDIF()
-
 ENDIF()
 
+
+
+#
+#
+# In some cases, -threads (or whatever else command line option)
+# switches on some preprocessor flags. If this is not the case,
+# then define them explicitely.
+#
+
+LIST(APPEND CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #if !defined (_REENTRANT) && !defined (_THREAD_SAFE)
+  # error Neither _REENTRANT nor _THREAD_SAFE were defined.
+    nonsense
+  #endif
+  int main(){ return 0; }
+  "
+  DEAL_II_HAVE_SANE_MT_DEFINITIONS)
+LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+
+IF(NOT DEAL_II_HAVE_SANE_MT_DEFINITIONS)
+  ADD_DEFINITIONS("-D_REENTRANT" "-D_THREAD_SAFE")
+ENDIF()
