@@ -179,6 +179,21 @@
    libstdc++ interface. */
 #cmakedefine HAVE_LIBSTDCXX_DEMANGLER
 
+  SET(DEAL_II_DEPRECATED TRUE)
+
+/* Equal to 0 in the generic case, equal to 1 if CPU compiled for supports
+   SSE2, equal to 2 if CPU compiled for supports AVX */
+#define DEAL_II_COMPILER_VECTORIZATION_LEVEL @DEAL_II_COMPILER_VECTORIZATION_LEVEL@
+
+/* Defined if the compiler can use arithmetic operations on vectorized data
+   types */
+#cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
+
+/* If already available, do not define at all. Otherwise, define to __func__
+   if that is available. In all other cases, indicate that no information
+   about the present function is available for this compiler. */
+#cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
+
 
 
 

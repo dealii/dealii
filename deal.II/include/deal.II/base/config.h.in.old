@@ -39,18 +39,17 @@
    floating point computations on cygwin systems. */
 #cmakedefine DEAL_II_BROKEN_SOCKETS
 
+/* Define if the compiler provides a <errno.g> header file which does not
+   define all error codes such as EINTR. In that case, use the system include
+   file at /usr/include instead. There is probably a better way to do this,
+   but it is not apparent by looking at the C/C++ compatibility header
+   provided by the compiler. */
+#cmakedefine DEAL_II_USE_DIRECT_ERRNO_H
+
 /* Backward compatibility support for functions and classes that do not take
    an explicit mapping variable, but rather use a default Q1 mapping instead
    */
 #cmakedefine DEAL_II_COMPAT_MAPPING
-
-/* Defined if the compiler can use arithmetic operations on vectorized data
-   types */
-#cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
-
-/* Equal to 0 in the generic case, equal to 1 if CPU compiled for supports
-   SSE2, equal to 2 if CPU compiled for supports AVX */
-#cmakedefine DEAL_II_COMPILER_VECTORIZATION_LEVEL
 
 /* Defined if the compiler has a bug in deducing the type of pointers to const
    member functions. */
@@ -171,13 +170,6 @@
 
 /* Defined if an ARPACK installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_ARPACK
-
-/* Define if the compiler provides a <errno.g> header file which does not
-   define all error codes such as EINTR. In that case, use the system include
-   file at /usr/include instead. There is probably a better way to do this,
-   but it is not apparent by looking at the C/C++ compatibility header
-   provided by the compiler. */
-#cmakedefine DEAL_II_USE_DIRECT_ERRNO_H
 
 /* Defined if a Metis installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_METIS
@@ -436,12 +428,6 @@
 #  undef WORDS_BIGENDIAN
 # endif
 #endif
-
-/* If already available, do not define at all. Otherwise, define to __func__
-   if that is available. In all other cases, indicate that no information
-   about the present function is available for this compiler. */
-#cmakedefine __PRETTY_FUNCTION__
-
 
 /**
  * A #define that indicates whether we are using the Microsoft
