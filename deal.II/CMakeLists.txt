@@ -175,7 +175,7 @@ INCLUDE(check_for_compiler_bugs)
 # Build the toolchain:
 #
 
-ADD_SUBDIRECTORY(common/expand_instantiations)
+ADD_SUBDIRECTORY(common)
 
 
 
