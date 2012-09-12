@@ -3289,7 +3289,7 @@ namespace VectorTools
         case 2:
         {
           for (; cell != dof_handler.end (); ++cell)
-            if (cell->at_boundary ())
+            if (cell->at_boundary () && cell->is_locally_owned ())
               for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
                 if (cell->face (face)->boundary_indicator () == boundary_component)
                   {
@@ -3337,7 +3337,8 @@ namespace VectorTools
                     const double tol = 1e-13;
 
                     for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
-                      if (!(constraints.is_constrained (face_dof_indices[dof])))
+                      if (constraints.can_store_line (face_dof_indices[dof])
+                            && !(constraints.is_constrained (face_dof_indices[dof])))
                         {
                           constraints.add_line (face_dof_indices[dof]);
 
@@ -3378,7 +3379,7 @@ namespace VectorTools
           }
 
           for (; cell != dof_handler.end (); ++cell)
-            if (cell->at_boundary ())
+            if (cell->at_boundary () && cell->is_locally_owned ())
               for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
                 if (cell->face (face)->boundary_indicator () == boundary_component)
                   {
@@ -3502,7 +3503,8 @@ namespace VectorTools
                                            // the degree of freedom is not
                                            // already constrained.
           for (unsigned int dof = 0; dof < n_dofs; ++dof)
-            if ((projected_dofs[dof] != -1) && !(constraints.is_constrained (dof)))
+            if ((projected_dofs[dof] != -1) && constraints.can_store_line (dof)
+                                            && !(constraints.is_constrained (dof)))
               {
                 constraints.add_line (dof);
                 constraints.set_inhomogeneity (dof, computed_constraints[dof]);
@@ -3556,7 +3558,7 @@ namespace VectorTools
         case 2:
         {
           for (; cell != dof_handler.end (); ++cell)
-            if (cell->at_boundary ())
+            if (cell->at_boundary () && cell->is_locally_owned ())
               for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
                 if (cell->face (face)->boundary_indicator () == boundary_component)
                   {
@@ -3600,7 +3602,8 @@ namespace VectorTools
                     const double tol = 0.5 * cell->get_fe ().degree * 1e-13  / cell->face (face)->diameter ();
 
                     for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
-                      if (!(constraints.is_constrained (face_dof_indices[dof])))
+                      if (constraints.can_store_line (face_dof_indices[dof])
+                            && !(constraints.is_constrained (face_dof_indices[dof])))
                         {
                           constraints.add_line (face_dof_indices[dof]);
 
@@ -3645,7 +3648,7 @@ namespace VectorTools
           }
 
           for (; cell != dof_handler.end (); ++cell)
-            if (cell->at_boundary ())
+            if (cell->at_boundary () && cell->is_locally_owned ())
               for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
                 if (cell->face (face)->boundary_indicator () == boundary_component)
                   {
@@ -3729,7 +3732,8 @@ namespace VectorTools
                   }
 
           for (unsigned int dof = 0; dof < n_dofs; ++dof)
-            if ((projected_dofs[dof] != -1) && !(constraints.is_constrained (dof)))
+            if ((projected_dofs[dof] != -1) && constraints.can_store_line (dof)
+                                            && !(constraints.is_constrained (dof)))
               {
                 constraints.add_line (dof);
                 constraints.set_inhomogeneity (dof, computed_constraints[dof]);
