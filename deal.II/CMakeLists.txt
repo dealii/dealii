@@ -81,7 +81,7 @@ SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
 
 
 #TODO:
-SET(CMAKE_CXX_FLAGS "-std=c++0x -Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
+SET(CMAKE_CXX_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
 SET(CMAKE_C_FLAGS "-Wfatal-errors -D_REENTRANT -fPIC -O2 -march=native")
 
 
