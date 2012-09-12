@@ -1,7 +1,5 @@
 SET(src_base
   auto_derivative_function.cc
-  boost_serialization.cc
-  boost_threads.cc
   conditional_ostream.cc
   config.cc
   convergence_table.cc

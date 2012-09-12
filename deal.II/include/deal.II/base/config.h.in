@@ -60,17 +60,6 @@
 
 
 /*
- * Configured in configure_boost.cmake:
- */
-
-
-/* Defined if deal.II is configured with an external Boost library */
-#cmakedefine DEAL_II_USE_EXTERNAL_BOOST
-
-
-
-
-/*
  * Configured in configure_functionparser.cmake:
  */
 

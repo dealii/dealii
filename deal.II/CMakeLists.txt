@@ -48,11 +48,11 @@ SET(VERSION "8.0.pre")
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_MPI
   "Build deal.II with support for mpi."
@@ -60,7 +60,7 @@ OPTION(DEAL_II_WITH_MPI
 
 OPTION(DEAL_II_WITH_NETCDF
   "Build deal.II with support for netcdf."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_THREADS
   "Build deal.II with support for threads. This pulls in libtbb as a dependency."
@@ -68,11 +68,11 @@ OPTION(DEAL_II_WITH_THREADS
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK, BLAS and LAPACK."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_ZLIB
   "Build deal.II with support for zlib."
-  ON)
+  OFF)
 
 #
 # Options for library selection:
@@ -92,7 +92,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
 
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_FORCE_CONTRIB_TBB
   "Always use the bundled tbb library instead of an external one."
@@ -163,16 +163,21 @@ SET(deal_ii_external_libraries "")
 SET(deal_ii_external_debug_libraries "")
 SET(deal_ii_required_linker_flags "")
 
+#
+# Platform checks:
+#
 
+INCLUDE(check_for_compiler_features)
 
+INCLUDE(check_for_cxx_features)
+
+INCLUDE(check_for_compiler_bugs)
 
 #
 # Feature configuration:
 #
 
 INCLUDE(configure_compiler_flags)
-
-INCLUDE(configure_boost)
 
 IF(DEAL_II_WITH_FUNCTIONPARSER)
   INCLUDE(configure_functionparser)
@@ -190,6 +195,9 @@ IF(DEAL_II_WITH_THREADS)
   INCLUDE(configure_threads)
 ENDIF()
 
+# Boost depends on configuration variables set in configure_threads.cmake
+INCLUDE(configure_boost)
+
 IF(DEAL_II_WITH_UMFPACK)
   INCLUDE(configure_umfpack)
 ENDIF()
@@ -197,19 +205,6 @@ ENDIF()
 IF(DEAL_II_WITH_ZLIB)
   INCLUDE(configure_zlib)
 ENDIF()
-
-
-
-
-#
-# Platform checks:
-#
-
-INCLUDE(check_for_compiler_features)
-
-INCLUDE(check_for_cxx_features)
-
-INCLUDE(check_for_compiler_bugs)
 
 
 

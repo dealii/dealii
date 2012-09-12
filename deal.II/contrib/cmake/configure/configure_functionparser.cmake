@@ -26,7 +26,6 @@ ELSE()
   INCLUDE_DIRECTORIES(${Functionparser_INCLUDE_DIR})
 
   LIST(APPEND deal_ii_external_libraries ${Functionparser_LIBRARY})
-  LIST(APPEND deal_ii_external_debug_libraries ${Functionparser_LIBRARY})
 
 ENDIF()
 

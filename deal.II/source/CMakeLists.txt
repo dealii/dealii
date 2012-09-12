@@ -44,8 +44,5 @@ SET_TARGET_PROPERTIES(deal_II PROPERTIES
   SOVERSION ${VERSION}
   )
 
-IF (CMAKE_BUILD_TYPE MATCHES "debug")
-  TARGET_LINK_LIBRARIES(deal_II ${deal_ii_required_linker_flags} ${deal_ii_external_debug_libraries})
-ELSE()
-  TARGET_LINK_LIBRARIES(deal_II ${deal_ii_required_linker_flags} ${deal_ii_external_libraries})
-ENDIF()
+TARGET_LINK_LIBRARIES(deal_II ${deal_ii_required_linker_flags} ${deal_ii_external_libraries}) # TODO
+

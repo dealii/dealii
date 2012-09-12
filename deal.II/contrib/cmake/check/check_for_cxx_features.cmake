@@ -189,6 +189,8 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     ENDIF()
   ENDIF()
 
+ELSE()
+    MESSAGE(STATUS "Insufficient C++0x support. Disabling -std=c++0x.")
 ENDIF()
 
 LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "-std=c++0x")
