@@ -56,7 +56,7 @@ OPTION(DEAL_II_WITH_METIS
 
 OPTION(DEAL_II_WITH_MPI
   "Build deal.II with support for mpi."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_NETCDF
   "Build deal.II with support for netcdf."
@@ -154,13 +154,12 @@ SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
 # Now, configure a lot of things:
 #
 
-# used as a dummy target for all the stuff that has to be done before the
+# Used as a dummy target for all the stuff that has to be done before the
 # library can be compiled:
 ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 
-# used to keep track of external libraries and necessary linker flags
+# Used to keep track of external libraries and necessary linker flags
 SET(deal_ii_external_libraries "")
-SET(deal_ii_external_debug_libraries "")
 SET(deal_ii_required_linker_flags "")
 
 #
@@ -207,6 +206,14 @@ IF(DEAL_II_WITH_ZLIB)
 ENDIF()
 
 
+# And finally convert deal_ii_required_linker_flags from a list into a
+# string *sigh*
+# TODO: Encapsulate in a macro...
+SET(deal_ii_required_linker_flags_list ${deal_ii_required_linker_flags})
+SET(deal_ii_required_linker_flags "")
+FOREACH (arg ${deal_ii_required_linker_flags_list})
+  SET(deal_ii_required_linker_flags "${deal_ii_required_linker_flags} ${arg}")
+ENDFOREACH()
 
 
 #
