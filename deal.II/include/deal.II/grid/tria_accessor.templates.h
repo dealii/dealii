@@ -2418,8 +2418,7 @@ CellAccessor (const Triangulation<dim,spacedim> *parent,
 
 template <int dim, int spacedim>
 inline
-CellAccessor<dim,spacedim>::
-CellAccessor (const CellAccessor &cell_accessor)
+  CellAccessor<dim,spacedim>::CellAccessor (const TriaAccessor<dim,dim,spacedim>& cell_accessor)
                 :
                 TriaAccessor<dim, dim, spacedim> (static_cast<const TriaAccessor<dim, dim, spacedim>&>(cell_accessor))
 {}
