@@ -2,6 +2,46 @@ PROJECT(deal.II)
 
 SET(VERSION "8.0.pre")
 
+#
+#
+# This is the main CMakeLists.txt file for the deal.II project
+#
+# The main purpose of this file is to set all the configuration toggles and
+# then call a lot of modules residing under ./contrib/cmake/*/ that do the
+# hard work.
+#
+# The first bunch of options of type DEAL_II_WITH_<feature> are for
+# configuration of the various features of the deal.II library.
+# An enabled feature will usually add one ore more dependencies to external
+# or 'contrib' (i.e. bundled with deal.II and residing under ./contrib/)
+# libraries.
+#
+# The option DEAL_II_ALLOW_CONTRIB determines the behaviour of the
+# dependency resolution:
+#
+# - If set to ON external libraries still have precedence. But if there is
+#   no external library the bundled contrib library will be used.
+#
+# - If set to OFF the contrib libraries will not be used and the dependency
+#   resolution will fail if there is no external library. EXCEPT (there is
+#   always an exception, isn't it?) DEAL_II_FORCE_CONTRIB_<library> forces
+#   the use of the bundled contrib library.
+#
+# The option DEAL_II_FORCE_CONTRIB_<library> forces the use of the bundled
+# contrib library regardless whether DEAL_II_ALLOW_CONTRIB is set to OFF or
+# an external library is found.
+#
+# REMARKS:
+#
+# - To ensure that no bundled library is used at all DEAL_II_ALLOW_CONTRIB,
+#   as well as every DEAL_II_FORCE_CONTRIB_<library> have to be set to OFF.
+#
+# - DEAL_II_FORCE_CONTRIB_<library>=ON will _not_ automatically enable the
+#   corresponding DEAL_II_WITH_<feature> toggle. This has to be set
+#   separately.
+#
+#
+
 
 
 
@@ -79,8 +119,6 @@ OPTION(DEAL_II_WITH_ZLIB
   "Build deal.II with support for zlib."
   ON)
 
-
-
 OPTION(DEAL_II_ALLOW_CONTRIB
   "Allow the use of contrib libraries bundled with the source tarball.
   Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
@@ -157,7 +195,6 @@ ENDIF()
 
 
 
-
 #
 # Platform checks:
 #
@@ -186,7 +223,6 @@ ADD_SUBDIRECTORY(common)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/include/
-  # ${CMAKE_SOURCE_DIR}/contrib/ #TODO
   ${CMAKE_BINARY_DIR}/include/
   )
 
