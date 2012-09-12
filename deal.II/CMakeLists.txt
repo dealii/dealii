@@ -157,7 +157,8 @@ ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 # used to keep track of external libraries and necessary link flags
 SET(deal_ii_external_libraries "")
 SET(deal_ii_external_debug_libraries "")
-SET(deal_ii_required_libraries "")
+SET(deal_ii_required_libraries "") # TODO
+SET(deal_II_required_link_flags "")
 
 
 
