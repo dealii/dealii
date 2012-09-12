@@ -4866,12 +4866,16 @@ void DataOutBase::write_vtu_header (std::ostream &out)
   out << '\n';
 }
 
+
+
 void DataOutBase::write_vtu_footer (std::ostream &out)
 {
   AssertThrow (out, ExcIO());
   out << " </UnstructuredGrid>\n";
   out << "</VTKFile>\n";
 }
+
+
 
 template <int dim, int spacedim>
 void
@@ -4884,6 +4888,8 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
   write_vtu_header(out);
   write_vtu_main (patches, data_names, vector_data_ranges, flags, out);
   write_vtu_footer(out);
+
+  out << std::flush;
 }
 
 
@@ -4961,10 +4967,10 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
                 << "\"></DataArray>\n";
           }
 
-      out << "</PointData>\n";
+      out << "  </PointData>\n";
+      out << "</Piece>\n";
 
-      out
-          << "</Piece>" << std::endl;
+      out << std::flush;
 
       return;
     }
@@ -5658,9 +5664,11 @@ void
 DataOutInterface<dim,spacedim>::write_visit_record (std::ostream &out,
                                                    const std::vector<std::string> &piece_names) const
 {
-  out << "!NBLOCKS " << piece_names.size() << std::endl;
+  out << "!NBLOCKS " << piece_names.size() << '\n';
   for (unsigned int i=0; i<piece_names.size(); ++i)
-    out << piece_names[i] << std::endl;
+    out << piece_names[i] << '\n';
+
+  out << std::flush;
 }
 
 
