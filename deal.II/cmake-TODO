@@ -6,6 +6,8 @@ Next steps:
 
 * Add Bugs, Regressions and Feature tests.
 
+* HDF5
+
 * PETSC
 
 * TRILINOS
@@ -17,3 +19,5 @@ Next steps:
 * ARPACK
 
 * METIS
+
+* HSL ???

@@ -1,7 +1,9 @@
-IF(DEAL_II_ALLOW_CONTRIB)
-  # TODO: Write a module to search for functionparser
-ELSE()
-  MESSAGE(FATAL_ERROR "FindFunctionparser.cmake not written, yet. :-[")
+IF(NOT DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER)
+  IF(DEAL_II_ALLOW_CONTRIB)
+    # TODO: Write a module to search for functionparser
+  ELSE()
+    MESSAGE(FATAL_ERROR "FindFunctionparser.cmake not written, yet. :-[")
+  ENDIF()
 ENDIF()
 
 IF(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER OR NOT Functionparser_FOUND)
