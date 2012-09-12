@@ -220,6 +220,15 @@
    classes. */
 #cmakedefine DEAL_II_CAN_USE_CXX1X
 
+/* Defined if isnan is available */
+#cmakedefine HAVE_ISNAN
+
+/* Defined if _isnan is available */
+#cmakedefine HAVE_UNDERSCORE_ISNAN
+
+/* Defined if std::isfinite is available */
+#cmakedefine DEAL_II_HAVE_ISFINITE
+
 /* Defined if you have the <stdint.h> header file. */
 #cmakedefine HAVE_STDINT_H
 
@@ -243,10 +252,6 @@
 
 /* Defined if you have the <sys/types.h> header file. */
 #cmakedefine HAVE_SYS_TYPES_H
-
-/* Defined if you have the `strtrs_' function. */
-#cmakedefine HAVE_STRTRS_ /* TODO */
-
 
 
 

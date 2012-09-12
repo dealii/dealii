@@ -195,8 +195,31 @@ LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "-std=c++0x")
 
 
 
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <cmath>
+  int main(){ double d=0; isnan (d); return 0; }
+  "
+  HAVE_ISNAN)
+
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <cmath>
+  int main(){ double d=0; _isnan (d); return 0; }
+  "
+  HAVE_UNDERSCORE_ISNAN)
+
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <cmath>
+  int main(){ double d=0; std::isfinite (d); return 0; }
+  "
+  DEAL_II_HAVE_ISFINITE)
+
+
+
 #
-# Checks for various header files:
+# Checks for various header files: # TODO: Obsolete?
 #
 
 CHECK_INCLUDE_FILES("stdint.h" HAVE_STDINT_H)
@@ -207,7 +230,3 @@ CHECK_INCLUDE_FILES("sys/stat.h" HAVE_SYS_STAT_H)
 CHECK_INCLUDE_FILES("sys/syscall.h" HAVE_SYS_SYSCALL_H)
 CHECK_INCLUDE_FILES("sys/times.h" HAVE_SYS_TIMES_H)
 CHECK_INCLUDE_FILES("sys/types.h" HAVE_SYS_TYPES_H)
-
-
-
-

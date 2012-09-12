@@ -73,9 +73,6 @@
    libraries */
 #cmakedefine DEAL_II_HAVE_DARWIN_DYNACAST_BUG
 
-/* Defined if std::isfinite is available */
-#cmakedefine DEAL_II_HAVE_ISFINITE
-
 /* Flag indicating whether the library shall be compiled to use the Tecplot
    interface */
 #cmakedefine DEAL_II_HAVE_TECPLOT
@@ -513,3 +510,7 @@
 #  pragma warning( disable : 4789 ) // destination of memory copy is too small
 #  pragma warning( disable : 4808 ) // case 'value' is not a valid value for switch condition of type 'bool
 #endif // DEAL_II_MSVC
+
+
+/* Defined if you have the `strtrs_' function. */
+#cmakedefine HAVE_STRTRS_ /* TODO */
