@@ -82,7 +82,7 @@ OPTION(DEAL_II_WITH_NETCDF
 
 OPTION(DEAL_II_WITH_THREADS
   "Build deal.II with support for threads. This pulls in libtbb as a dependency."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK, BLAS and LAPACK."
@@ -110,7 +110,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
 
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_FORCE_CONTRIB_TBB
   "Always use the bundled tbb library instead of an external one."
@@ -176,17 +176,42 @@ SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
 
 
 
+
 #
 # Now, configure a lot of things:
 #
 
-# Used as a dummy target for all the stuff that has to be done before the
-# library can be compiled:
-ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 
-# Used to keep track of external libraries and necessary linker flags
-SET(deal_ii_external_libraries "")
-SET(deal_ii_required_linker_flags "")
+###########################################################################
+#                                                                         #
+#                               FAT NOTE:                                 #
+#                                                                         #
+###########################################################################
+
+#
+# To keep things clean, only the following cmake variables should be
+# altered (beside setting a lot of DEAL_II_* definitions...)
+#
+# CMAKE_SHARED_LINKER_FLAGS
+#
+#   for setting necessary linker flags for the deal.II library.
+#
+# CMAKE_C_FLAGS and CMAKE_CXX_FLAGS (uncached)
+#
+#   for setting necessary compiler flags, e.g. -std=c++0x (if available).
+#   Note: Uncached variables are not visible to the user, and cannot be
+#   altered.
+#
+ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
+#
+#   Used as a dummy target for all the stuff that has to be done before the
+#   library can be compiled.
+#
+SET(deal_ii_external_libraries)
+#
+#   Used to keep track of external libraries, against which the deal.II
+#   library will be linked.
+#
 
 #
 # Platform checks:
@@ -230,17 +255,6 @@ ENDIF()
 IF(DEAL_II_WITH_ZLIB)
   INCLUDE(configure_zlib)
 ENDIF()
-
-
-
-# And finally convert deal_ii_required_linker_flags from a list into a
-# string *sigh*
-# TODO: Encapsulate in a macro...
-SET(deal_ii_required_linker_flags_list ${deal_ii_required_linker_flags})
-SET(deal_ii_required_linker_flags "")
-FOREACH (arg ${deal_ii_required_linker_flags_list})
-  SET(deal_ii_required_linker_flags "${deal_ii_required_linker_flags} ${arg}")
-ENDFOREACH()
 
 
 

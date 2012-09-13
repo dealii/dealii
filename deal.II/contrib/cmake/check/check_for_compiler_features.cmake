@@ -1,4 +1,5 @@
 INCLUDE(CheckCXXSourceCompiles)
+INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(CheckCXXSourceRuns)
 
 
@@ -11,6 +12,7 @@ INCLUDE(CheckCXXSourceRuns)
 #
 # Check whether the std::vector::iterator is just a plain pointer
 #
+# TODO: Get rid of this negation!
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <vector>
@@ -102,15 +104,9 @@ CHECK_CXX_SOURCE_COMPILES(
 
 IF(HAVE_GLIBC_STACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
 
-  LIST(APPEND CMAKE_REQUIRED_FLAGS "-rdynamic")
-
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    int main() { return 0; }
-    "
+  CHECK_CXX_COMPILER_FLAG(
+    "-rdynamic"
     DEAL_II_COMPILER_HAS_RDYNAMIC)
-
-  LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "-rdynamic")
 
   IF(DEAL_II_COMPILER_HAS_RDYNAMIC)
     SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic")
@@ -375,4 +371,18 @@ IF(NOT DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION)
     SET(__PRETTY_FUNCTION__ "(not available)")
   ENDIF()
 
+ENDIF()
+
+
+
+#
+# Check whether the -as-needed flag is available. If so set it to compile
+# the deal.II library
+#
+CHECK_CXX_COMPILER_FLAG(
+  "-Wl,-as-needed"
+  DEAL_II_COMPILER_HAS_AS_NEEDED)
+
+IF(DEAL_II_COMPILER_HAS_AS_NEEDED)
+  SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-as-needed")
 ENDIF()

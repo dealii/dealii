@@ -1,4 +1,5 @@
 INCLUDE(CheckCXXSourceCompiles)
+INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(CheckCXXSourceRuns)
 INCLUDE(CheckIncludeFiles)
 
@@ -24,19 +25,15 @@ CHECK_CXX_SOURCE_COMPILES(
 
 # See if there is a compiler flag to enable C++0x features
 # (Only test for -std=c++0x for the moment.)
-
-# Set CMAKE_REQUIRED_FLAGS for the unit tests
-LIST(APPEND CMAKE_REQUIRED_FLAGS "-std=c++0x")
-
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int main(){ return 0; }
-  "
+CHECK_CXX_COMPILER_FLAG(
+  "-std=c++0x"
   DEAL_II_HAVE_CXX0X_FLAG)
 
 
-
 IF(DEAL_II_HAVE_CXX0X_FLAG)
+
+  # Set CMAKE_REQUIRED_FLAGS for the unit tests
+  LIST(APPEND CMAKE_REQUIRED_FLAGS "-std=c++0x")
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -189,11 +186,11 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     ENDIF()
   ENDIF()
 
+  LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "-std=c++0x")
+
 ELSE()
     MESSAGE(STATUS "Insufficient C++0x support. Disabling -std=c++0x.")
 ENDIF()
-
-LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "-std=c++0x")
 
 
 
