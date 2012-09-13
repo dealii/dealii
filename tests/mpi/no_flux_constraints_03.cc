@@ -118,12 +118,12 @@ void test()
             }
         }
 
+	std::remove ((base + "cm").c_str());
+	std::remove ((base + "cm.check").c_str());
   }
 
 				   // remove tmp files again
   std::remove ((base + "cm_" + Utilities::int_to_string(myid) + ".dot").c_str());
-  std::remove ((base + "cm").c_str());
-  std::remove ((base + "cm.check").c_str());
 
 
 				// print the number of constraints. since
