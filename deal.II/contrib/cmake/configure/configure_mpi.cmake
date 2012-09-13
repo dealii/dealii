@@ -1,5 +1,7 @@
 FIND_PACKAGE(MPI REQUIRED CXX)
 
+# TODO: A deal.II specific error message if mpi is not found
+
 INCLUDE_DIRECTORIES(${MPI_CXX_INCLUDE_PATH})
 
 LIST(APPEND deal_ii_required_linker_flags ${MPI_CXX_LINK_FLAGS})

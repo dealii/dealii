@@ -1,11 +1,11 @@
-FIND_PACKAGE(Netcdf)
+FIND_PACKAGE(NETCDF)
 
-  IF(NOT DEAL_II_ALLOW_CONTRIB AND NOT TBB_FOUND)
-    macro_warning_not_found("TBB")
-  ENDIF()
+IF(NOT NETCDF_FOUND)
+  macro_message_not_found("netcdf" "NETCDF")
+ENDIF()
 
-INCLUDE_DIRECTORIES(${Netcdf_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${NETCDF_INCLUDE_DIR})
 
-LIST(APPEND deal_ii_external_libraries ${Netcdf_LIBRARY})
+LIST(APPEND deal_ii_external_libraries ${NETCDF_LIBRARY})
 
 SET(HAVE_LIBNETCDF TRUE)

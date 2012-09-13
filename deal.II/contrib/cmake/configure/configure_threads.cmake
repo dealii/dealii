@@ -74,10 +74,11 @@ ENDIF()
 
 
 IF(NOT DEAL_II_FORCE_CONTRIB_TBB)
-  IF(DEAL_II_ALLOW_CONTRIB)
-    FIND_PACKAGE(TBB)
-  ELSE()
-    FIND_PACKAGE(TBB REQUIRED)
+
+  FIND_PACKAGE(TBB)
+
+  IF(NOT DEAL_II_ALLOW_CONTRIB AND NOT TBB_FOUND)
+    macro_message_not_found("tbb" "TBB")
   ENDIF()
 
   # In case we don't have a debug library:

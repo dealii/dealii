@@ -196,6 +196,8 @@ INCLUDE(check_for_compiler_bugs)
 # Feature configuration:
 #
 
+INCLUDE(macro_message_not_found)
+
 IF(DEAL_II_WITH_FUNCTIONPARSER)
   INCLUDE(configure_functionparser)
 ENDIF()
