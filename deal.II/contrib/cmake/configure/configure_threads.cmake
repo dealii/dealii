@@ -88,19 +88,20 @@ ENDIF()
 
 IF(DEAL_II_FORCE_CONTRIB_TBB OR NOT TBB_FOUND)
 
-  # TODO: The same as with everything else...
+  #
+  # Add tbb directly to the object files of deal.II
+  #
 
-  SET(libtbb_directory "tbb30_104oss")
+  INCLUDE_DIRECTORIES(
+    ${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/include
+    )
 
-  # compile and link the contrib tbb library:
-  ADD_SUBDIRECTORY(contrib/tbb)
+  ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/src)
 
-  # set TBB_LIBRARY and TBB_DEBUG_LIBRARY to the full path of the
-  # _installed_ library location:
+  LIST(APPEND deal_ii_additional_object_files
+    $<TARGET_OBJECTS:obj_tbb>
+    )
 
-  SET(TBB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/contrib/tbb/${libtbb_directory}/include)
-  SET(TBB_LIBRARY ${CMAKE_INSTALL_PREFIX}/lib/libtbb.so)
-  SET(TBB_DEBUG_LIBRARY ${CMAKE_INSTALL_PREFIX}/lib/libtbb_debug.so)
 ENDIF()
 
 INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
