@@ -1,5 +1,3 @@
-PROJECT(deal.II)
-
 SET(VERSION "8.0.pre")
 
 #
@@ -40,6 +38,13 @@ SET(VERSION "8.0.pre")
 #   corresponding DEAL_II_WITH_<feature> toggle. This has to be set
 #   separately.
 #
+#
+# And, last but not least, CMAKE_BUILD_TYPES:
+#
+# We support the "Debug" and "Release" build types. Default is the
+# "Release" target.
+#
+# TODO: Explanation
 #
 
 #
@@ -130,6 +135,17 @@ SET(CMAKE_MODULE_PATH
   "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
   )
 
+# We have to initialize this cached variable before PROJECT is called:
+IF(CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING
+    "Choose the type of build, options are: Debug Release.")
+ELSE()
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING
+    "Choose the type of build, options are: Debug Release.")
+ENDIF()
+
+PROJECT(deal.II)
+
 
 
 #
@@ -161,6 +177,12 @@ SET(deal_ii_external_libraries "")
 SET(deal_ii_required_linker_flags "")
 
 #
+# Configuration for CMAKE_BUILD_TYPES (CFLAGS, CXXFLAGS, ..)
+#
+
+INCLUDE(configure_build)
+
+#
 # Platform checks:
 #
 
@@ -173,8 +195,6 @@ INCLUDE(check_for_compiler_bugs)
 #
 # Feature configuration:
 #
-
-INCLUDE(configure_compiler_flags)
 
 IF(DEAL_II_WITH_FUNCTIONPARSER)
   INCLUDE(configure_functionparser)
