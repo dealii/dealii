@@ -3,7 +3,7 @@ IF(NOT DEAL_II_FORCE_CONTRIB_BOOST)
   FIND_PACKAGE (Boost COMPONENTS serialization thread)
 
   IF(NOT DEAL_II_ALLOW_CONTRIB)
-    IF(NOT Boost_THREAD_FOUND OR NOT Boost_Serialization_FOUND)
+    IF(NOT Boost_THREAD_FOUND OR NOT Boost_SERIALIZATION_FOUND)
       macro_message_not_found("boost" "Boost")
     ENDIF()
   ELSE()
