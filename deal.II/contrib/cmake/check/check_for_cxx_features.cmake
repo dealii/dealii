@@ -155,9 +155,9 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
 
   IF(DEAL_II_CAN_USE_CXX1X)
     #
-    # Also test for a couple C++0x things that we don't use in the library
-    # but that users may want to use in their applications and that we
-    # might want to test in the testsuite
+    # Also test for a couple of C++0x things that we don't use in the
+    # library but that users may want to use in their applications and that
+    # we might want to test in the testsuite
     #
 
     CHECK_CXX_SOURCE_COMPILES(
