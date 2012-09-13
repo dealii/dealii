@@ -105,7 +105,7 @@ ENDIF()
 
 INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
 
-IF (CMAKE_BUILD_TYPE MATCHES "debug")
+IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   LIST(APPEND deal_ii_external_libraries ${TBB_DEBUG_LIBRARY})
 ELSE()
   LIST(APPEND deal_ii_external_libraries ${TBB_LIBRARY})
