@@ -101,14 +101,6 @@
    the top-level directory. */
 #cmakedefine DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 
-/* Set to the minimal number of elements a std::vector<bool> can always hold,
-   i.e. its minimal capacity. */
-#cmakedefine DEAL_II_MIN_BOOL_VECTOR_CAPACITY
-
-/* Set to the minimal number of elements a std::vector<T> can always hold,
-   i.e. its minimal capacity. */
-#cmakedefine DEAL_II_MIN_VECTOR_CAPACITY
-
 /* enable multigrid compatibility mode */
 #cmakedefine DEAL_II_MULTIGRID_COMPATIBILITY
 

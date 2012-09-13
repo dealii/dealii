@@ -386,3 +386,57 @@ CHECK_CXX_COMPILER_FLAG(
 IF(DEAL_II_COMPILER_HAS_AS_NEEDED)
   SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-as-needed")
 ENDIF()
+
+
+
+#
+# Check for minimal vector capacity
+#
+GET_CXX_SOURCE_RETURN_VALUE(
+  "
+  #include <vector>
+  int main () {
+    std::vector<int> v(1);
+    v.reserve (1);
+    v.resize (1);
+    return v.capacity();
+  }
+  "
+  DEAL_II_MIN_VECTOR_CAPACITY
+  DEAL_II_MIN_VECTOR_CAPACITY_RETURN_VALUE)
+
+IF(NOT DEAL_II_MIN_VECTOR_CAPACITY)
+  # We have a problem...
+  MESSAGE(WARNING
+    "Could not determine DEAL_II_MIN_VECTOR_CAPACITY, source might not compile..."
+    )
+ELSE()
+  SET(DEAL_II_MIN_VECTOR_CAPACITY ${DEAL_II_MIN_VECTOR_CAPACITY_RETURN_VALUE})
+ENDIF()
+
+
+
+#
+# Do same thing with std::vector<bool>
+#
+GET_CXX_SOURCE_RETURN_VALUE(
+  "
+  #include <vector>
+  int main () {
+    std::vector<bool> v(1);
+    v.reserve (1);
+    v.resize (1);
+    return v.capacity();
+  }
+  "
+  DEAL_II_MIN_BOOL_VECTOR_CAPACITY
+  DEAL_II_MIN_BOOL_VECTOR_CAPACITY_RETURN_VALUE)
+
+IF(NOT DEAL_II_MIN_BOOL_VECTOR_CAPACITY)
+  # We have a problem...
+  MESSAGE(WARNING
+    "Could not determine DEAL_II_MIN_VECTOR_CAPACITY, source might not compile..."
+    )
+ELSE()
+  SET(DEAL_II_MIN_BOOL_VECTOR_CAPACITY ${DEAL_II_MIN_BOOL_VECTOR_CAPACITY_RETURN_VALUE})
+ENDIF()

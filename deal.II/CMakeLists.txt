@@ -85,7 +85,7 @@ OPTION(DEAL_II_WITH_NETCDF
 
 OPTION(DEAL_II_WITH_THREADS
   "Build deal.II with support for threads. This pulls in libtbb as a dependency."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK, BLAS and LAPACK."

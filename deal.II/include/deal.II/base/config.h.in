@@ -66,9 +66,6 @@
 /* Defined if you have the `functionparser' library */
 #cmakedefine HAVE_FUNCTIONPARSER
 
-
-
-
 /*
  * Configured in configure_mpi.cmake:
  */
@@ -78,8 +75,6 @@
 #cmakedefine DEAL_II_COMPILER_SUPPORTS_MPI
 
 
-
-
 /*
  * Configured in configure_netcdf.cmake:
  */
@@ -87,8 +82,6 @@
 
 /* Defined if you have the `NetCDF' library */
 #cmakedefine HAVE_LIBNETCDF
-
-
 
 
 /*
@@ -123,8 +116,6 @@
 #endif
 
 
-
-
 /*
  * Configured in configure_umfpack.cmake:
  */
@@ -138,8 +129,6 @@
 
 /* Defined if deal.II was configured with LAPACK support */
 #cmakedefine HAVE_LIBLAPACK
-
-
 
 
 /*
@@ -187,6 +176,14 @@
    if that is available. In all other cases, indicate that no information
    about the present function is available for this compiler. */
 #cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
+
+/* Set to the minimal number of elements a std::vector<T> can always hold,
+   i.e. its minimal capacity. */
+#define DEAL_II_MIN_VECTOR_CAPACITY @DEAL_II_MIN_VECTOR_CAPACITY@
+
+/* Set to the minimal number of elements a std::vector<bool> can always hold,
+   i.e. its minimal capacity. */
+#define DEAL_II_MIN_BOOL_VECTOR_CAPACITY @DEAL_II_MIN_BOOL_VECTOR_CAPACITY@
 
 
 
