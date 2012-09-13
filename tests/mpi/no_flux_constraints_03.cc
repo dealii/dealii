@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -71,7 +71,7 @@ void test()
   DoFHandler<dim> dofh(triangulation);
   dofh.distribute_dofs (fe);
   DoFRenumbering::hierarchical(dofh);
-  
+
   if (myid == 0)
     deallog <<  "#dofs = " << dofh.locally_owned_dofs().size()
 	    << std::endl;
@@ -96,7 +96,7 @@ void test()
   MPI_Barrier(MPI_COMM_WORLD);
 
   { //write the constraintmatrix to a file on each cpu
-    std::string fname = base+"cm_" + Utilities::int_to_string(myid) + ".dot";
+    std::string fname = base + "cm_" + Utilities::int_to_string(myid) + ".dot";
     std::ofstream file(fname.c_str());
     constraints.print(file);
   }
@@ -106,8 +106,8 @@ void test()
   {
 	//sort and merge the constraint matrices on proc 0, generate a checksum
 	//and output that into the deallog
-        system((std::string("cat ") + base+"cm_?.dot|sort -n|uniq >" + base+"cm").c_str());
-        system((std::string("md5sum ") + base + "cm >" + base + "cm.check").c_str());
+        system((std::string("cat ") + base + "cm_*.dot | sort -n | uniq > " + base + "cm").c_str());
+        system((std::string("md5sum ") + base + "cm > " + base + "cm.check").c_str());
         {
           std::ifstream file((base+"cm.check").c_str());
           std::string str;
@@ -119,6 +119,12 @@ void test()
         }
 
   }
+
+				   // remove tmp files again
+  std::remove ((base + "cm_" + Utilities::int_to_string(myid) + ".dot").c_str());
+  std::remove ((base + "cm").c_str());
+  std::remove ((base + "cm.check").c_str());
+
 
 				// print the number of constraints. since
 				// processors might write info in different
