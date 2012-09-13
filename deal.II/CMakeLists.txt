@@ -89,7 +89,7 @@ OPTION(DEAL_II_WITH_THREADS
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK, BLAS and LAPACK."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_ZLIB
   "Build deal.II with support for zlib."
@@ -121,7 +121,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_TBB
 
 OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
-  OFF)
+  ON)
 
 #
 # Compatibility support:
