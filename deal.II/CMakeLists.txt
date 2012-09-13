@@ -1,7 +1,6 @@
 SET(VERSION "8.0.pre")
 
 #
-#
 # This is the main CMakeLists.txt file for the deal.II project
 #
 # The main purpose of this file is to set all the configuration toggles and
@@ -60,9 +59,13 @@ SET(VERSION "8.0.pre")
 #
 
 
-#
-# General configuration options:
-#
+
+
+###########################################################################
+#                                                                         #
+#                     General configuration options:                      #
+#                                                                         #
+###########################################################################
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
@@ -132,6 +135,14 @@ OPTION(DEAL_II_COMPAT_MAPPING
 
 
 
+
+###########################################################################
+#                                                                         #
+#                             Configuration:                              #
+#                                                                         #
+###########################################################################
+
+
 #
 # General configuration for cmake:
 #
@@ -140,13 +151,21 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
 SET(CMAKE_INCLUDE_CURRENT_DIR true)
 
+#
+# Load all macros:
+#
+FILE(GLOB macro_files "contrib/cmake/macros/*.cmake")
+FOREACH(file ${macro_files})
+  MESSAGE(STATUS "Include ${file}")
+  INCLUDE(${file})
+ENDFOREACH()
+
 SET(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/check/"
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/configure/"
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/macros/"
   "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/configure/"
   )
+
 
 #
 # We have to initialize some cached variable before PROJECT is called, so
@@ -156,41 +175,21 @@ SET(CMAKE_MODULE_PATH
 INCLUDE(configure_build)
 
 #
-# Now, set the project:
+# Now, set the project and configure some deal_II specific variables:
 #
 PROJECT(deal.II)
 
-#
-# Set up deal.II specific variables
-#
-
-SET(DEAL_II_PACKAGE_BUGREPORT "dealii@dealii.org")
-SET(DEAL_II_PACKAGE_NAME "deal.II")
-SET(DEAL_II_PACKAGE_TARNAME ${DEAL_II_PACKAGE_NAME})
-SET(DEAL_II_PACKAGE_VERSION ${VERSION})
-SET(DEAL_II_PACKAGE_STRING "${DEAL_II_PACKAGE_NAME} ${DEAL_II_PACKAGE_VERSION}")
-SET(DEAL_II_PACKAGE_URL "")
-STRING(REGEX REPLACE "^([0-9]+)\\..*" "\\1" DEAL_II_MAJOR "${VERSION}")
-STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_MINOR "${VERSION}")
-SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
-
-
+INCLUDE(configure_deal_ii)
 
 
 #
-# Now, configure a lot of things:
-#
-
-
-###########################################################################
-#                                                                         #
-#                               FAT NOTE:                                 #
-#                                                                         #
-###########################################################################
-
+#   ####################
+#   #     FAT NOTE:    #
+#   ####################
 #
 # To keep things clean, only the following cmake variables should be
-# altered (beside setting a lot of DEAL_II_* definitions...)
+# altered in the platform checks and features configuration
+# (beside setting a lot of DEAL_II_* definitions...):
 #
 # CMAKE_SHARED_LINKER_FLAGS
 #
@@ -213,49 +212,51 @@ SET(deal_ii_external_libraries)
 #   library will be linked.
 #
 
+
 #
-# Platform checks:
+# Run all system checks:
 #
 
-INCLUDE(check_for_compiler_features)
+FILE(GLOB macro_files "contrib/cmake/check/*.cmake")
+FOREACH(file ${macro_files})
+  MESSAGE(STATUS "Include ${file}")
+  INCLUDE(${file})
+ENDFOREACH()
 
-INCLUDE(check_for_cxx_features)
-
-INCLUDE(check_for_compiler_bugs)
 
 #
 # Feature configuration:
 #
 
-INCLUDE(macro_message_not_found)
-
 IF(DEAL_II_WITH_FUNCTIONPARSER)
   INCLUDE(configure_functionparser)
 ENDIF()
-
 IF(DEAL_II_WITH_MPI)
   INCLUDE(configure_mpi)
 ENDIF()
-
 IF(DEAL_II_WITH_NETCDF)
   INCLUDE(configure_netcdf)
 ENDIF()
-
 IF(DEAL_II_WITH_THREADS)
   INCLUDE(configure_threads)
 ENDIF()
-
 # Boost depends on configuration variables set in configure_threads.cmake
 INCLUDE(configure_boost)
-
 IF(DEAL_II_WITH_UMFPACK)
   INCLUDE(configure_umfpack)
 ENDIF()
-
 IF(DEAL_II_WITH_ZLIB)
   INCLUDE(configure_zlib)
 ENDIF()
 
+
+
+
+###########################################################################
+#                                                                         #
+#                          Compile the library:                           #
+#                                                                         #
+###########################################################################
 
 
 #
@@ -270,7 +271,6 @@ CONFIGURE_FILE(
   )
 
 
-
 #
 # Compile the library:
 #
@@ -279,8 +279,6 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/include/
   ${CMAKE_BINARY_DIR}/include/
   )
-
-INCLUDE(macro_expand_instantiations)
 
 ADD_SUBDIRECTORY(include)
 
