@@ -61,7 +61,7 @@ OPTION(DEAL_II_WITH_METIS
 
 OPTION(DEAL_II_WITH_MPI
   "Build deal.II with support for mpi."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_NETCDF
   "Build deal.II with support for netcdf."
@@ -89,7 +89,7 @@ OPTION(DEAL_II_ALLOW_CONTRIB
   packages, so to ensure that only external libraries are used
   DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
   OFF"
-  ON)
+  OFF)
 
 OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
   "Always use the bundled functionparser library instead of an external one."
