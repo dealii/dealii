@@ -44,8 +44,21 @@ SET(VERSION "8.0.pre")
 # We support the "Debug" and "Release" build types. Default is the
 # "Release" target.
 #
-# TODO: Explanation
+# Debug will enable a lot of debug code paths and Assertions, as well as
+# compiling the library with a suitable set of debug compiler flags.
 #
+# Release will chose a suitable set of optimizing flags.
+#
+# The default CXXFLAGS (and CFLAGS) are stored in the following cached
+# variables (as is common practise for cmake):
+#
+#   CMAKE_CXX_FLAGS         -  used during all builds
+#   CMAKE_CXX_FLAGS_DEBUG   -  additional flags used during debug builds
+#   CMAKE_CXX_FLAGS_RELEASE -  additional flags used during release builds
+#
+#   (same for CMAKE_C_...)
+#
+
 
 #
 # General configuration options:
@@ -135,18 +148,17 @@ SET(CMAKE_MODULE_PATH
   "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
   )
 
-# We have to initialize this cached variable before PROJECT is called:
-IF(CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING
-    "Choose the type of build, options are: Debug Release.")
-ELSE()
-  SET(CMAKE_BUILD_TYPE Release CACHE STRING
-    "Choose the type of build, options are: Debug Release.")
-ENDIF()
+#
+# We have to initialize some cached variable before PROJECT is called, so
+# configure the cached, user editable CMAKE_BUILD_TYPES, CMAKE_CXX_FLAGS,
+# etc. variables at this point:
+#
+INCLUDE(configure_build)
 
+#
+# Now, set the project:
+#
 PROJECT(deal.II)
-
-
 
 #
 # Set up deal.II specific variables
@@ -175,12 +187,6 @@ ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 # Used to keep track of external libraries and necessary linker flags
 SET(deal_ii_external_libraries "")
 SET(deal_ii_required_linker_flags "")
-
-#
-# Configuration for CMAKE_BUILD_TYPES (CFLAGS, CXXFLAGS, ..)
-#
-
-INCLUDE(configure_build)
 
 #
 # Platform checks:
