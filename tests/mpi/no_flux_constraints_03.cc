@@ -118,11 +118,16 @@ void test()
             }
         }
 
+					 // delete the files created
+					 // by processor 0
 	std::remove ((base + "cm").c_str());
 	std::remove ((base + "cm.check").c_str());
   }
 
-				   // remove tmp files again
+				   // remove tmp files again. wait
+				   // till processor 0 has done its
+				   // job with them
+  MPI_Barrier(MPI_COMM_WORLD);
   std::remove ((base + "cm_" + Utilities::int_to_string(myid) + ".dot").c_str());
 
 
