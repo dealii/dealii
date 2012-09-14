@@ -1,0 +1,11 @@
+
+DEAL::BDM1<2> cell support points
+DEAL::BDM1<2> face 0 support points
+DEAL::BDM1<2> face 1 support points
+DEAL::BDM1<2> face 2 support points
+DEAL::BDM1<2> face 3 support points
+DEAL::BDM2<2> cell support points
+DEAL::BDM2<2> face 0 support points
+DEAL::BDM2<2> face 1 support points
+DEAL::BDM2<2> face 2 support points
+DEAL::BDM2<2> face 3 support points
