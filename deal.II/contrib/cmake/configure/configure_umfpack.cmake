@@ -2,7 +2,6 @@
 # Configuration for the umfpack and amd libraries:
 #
 
-# TODO: Implement the dependency on BLAS and LAPACK
 
 MACRO(FIND_FEATURE_UMFPACK_EXTERNAL var)
 
@@ -78,5 +77,20 @@ by setting DEAL_II_ALLOW_CONTRIB=on or DEAL_II_FORCE_CONTRIB_UMFPACK=on.
 ")
 ENDMACRO()
 
-
-CONFIGURE_FEATURE(UMFPACK)
+#
+# UMFPACK needs BLAS and LAPACK to be configured:
+#
+IF(DEAL_II_WITH_BLAS AND DEAL_II_WITH_LAPACK)
+  CONFIGURE_FEATURE(UMFPACK)
+ELSE()
+  IF(DEAL_II_FEATURE_AUTODETECT)
+    MESSAGE(STATUS
+      "DEAL_II_WITH_UMFPACK has unmet configuration requirements: Both, DEAL_II_WITH_BLAS and DEAL_II_WITH_LAPACK have to be set."
+      )
+    SET_CACHED_OPTION(DEAL_II_WITH_UMFPACK OFF)
+  ELSE()
+    MESSAGE(SEND_ERROR
+      "DEAL_II_WITH_UMFPACK has unmet configuration requirements: Both, DEAL_II_WITH_BLAS and DEAL_II_WITH_LAPACK have to be set."
+      )
+  ENDIF()
+ENDIF()
