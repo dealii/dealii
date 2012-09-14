@@ -40,7 +40,10 @@ never working correctly and it is not used.
 
 
 <ol>
-<li> Nothing so far.
+<li> Simplifications of the internal structures of Triangulation and
+DoFHandler, in particular removal of specializations.
+<br>
+(Guido Kanschat, 2012/09/13)
 </ol>
 
 
@@ -50,6 +53,11 @@ never working correctly and it is not used.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New MeshWorker::LocalIntegrator and integration_loop() provide a
+less confusing interface to MeshWorker loops.
+<br>
+(Guido Kanschat, 2012/09/13)
+
 <li> New: TableHandler TextOutputFormat::simple_table_with_separate_column_description
 that skips aligning the columns for increased performance.
 <br>
