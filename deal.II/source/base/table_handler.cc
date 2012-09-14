@@ -70,6 +70,29 @@ namespace internal
     return 0;
   }
 
+  void TableEntry::cache_string(bool scientific, unsigned int precision) const
+  {
+    std::ostringstream ss;
+
+    ss << std::setprecision(precision);
+
+    if (scientific)
+      ss.setf(std::ios::scientific, std::ios::floatfield);
+    else
+      ss.setf(std::ios::fixed, std::ios::floatfield);
+
+    ss << value;
+
+    cached_value = ss.str();
+    if (cached_value.size()==0)
+      cached_value = "\"\"";
+  }
+
+  const std::string & TableEntry::get_cached_string() const
+  {
+    return cached_value;
+  }
+
 
   namespace Local
   {
@@ -104,7 +127,8 @@ TableHandler::Column::Column(const std::string &tex_caption)
                 tex_format("c"),
                 precision(4),
                 scientific(0),
-                flag(0)
+                flag(0),
+                max_length(0)
 {}
 
 
@@ -115,7 +139,8 @@ TableHandler::Column::Column()
                 tex_format("c"),
                 precision(4),
                 scientific(0),
-                flag(0)
+                flag(0),
+                max_length(0)
 {}
 
 
@@ -129,7 +154,25 @@ TableHandler::Column::pad_column_below (const unsigned int size)
 
   // add as many elements as necessary
   while (entries.size() < size)
-    entries.push_back (entries.back().get_default_constructed_copy());
+    {
+      entries.push_back (entries.back().get_default_constructed_copy());
+      internal::TableEntry & entry = entries.back();
+      entry.cache_string(scientific, precision);
+      max_length = std::max(max_length, static_cast<unsigned int>(entry.get_cached_string().length()));
+    }
+}
+
+
+void
+TableHandler::Column::invalidate_cache()
+{
+  max_length = 0;
+
+  for (std::vector<dealii::internal::TableEntry>::iterator it=entries.begin();it!=entries.end();++it)
+    {
+      it->cache_string(this->scientific, this->precision);
+      max_length = std::max(max_length, static_cast<unsigned int>(it->get_cached_string().length()));
+    }
 }
 
 
@@ -254,7 +297,11 @@ void TableHandler::set_precision (const std::string &key,
                                   const unsigned int precision)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
-  columns[key].precision=precision;
+  if (columns[key].precision!=precision)
+    {
+      columns[key].precision = precision;
+      columns[key].invalidate_cache();
+    }
 }
 
 
@@ -262,7 +309,11 @@ void TableHandler::set_scientific (const std::string &key,
                                    const bool scientific)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
-  columns[key].scientific=scientific;
+  if (columns[key].scientific!=scientific)
+    {
+      columns[key].scientific = scientific;
+      columns[key].invalidate_cache();
+    }
 }
 
 
@@ -318,20 +369,7 @@ void TableHandler::write_text(std::ostream &out,
             {
               const Column &column=*(cols[j]);
 
-              out << std::setprecision(column.precision);
-
-              if (column.scientific)
-                out.setf(std::ios::scientific, std::ios::floatfield);
-              else
-                out.setf(std::ios::fixed, std::ios::floatfield);
-
-              // write "" instead of an empty string
-              const std::string * val = boost::get<std::string>(&(column.entries[i].value));
-              if (val!=NULL && val->length()==0)
-                out << "\"\"";
-              else
-                out << column.entries[i].value;
-
+              out << column.entries[i].get_cached_string();
               out << ' ';
             }
           out << '\n';
@@ -341,59 +379,29 @@ void TableHandler::write_text(std::ostream &out,
       return;
     }
 
-                                   // first compute the widths of each
-                                   // entry of the table, in order to
-                                   // have a nicer alignment
-  Table<2,unsigned int> entry_widths (nrows, n_cols);
-  for (unsigned int i=0; i<nrows; ++i)
-    for (unsigned int j=0; j<n_cols; ++j)
-      {
-                                         // get key and entry here
-        std::string key = sel_columns[j];
-        const std::map<std::string, Column>::const_iterator
-          col_iter = columns.find(key);
-        Assert(col_iter!=columns.end(), ExcInternalError());
-
-        const Column & column = col_iter->second;
-
-                                         // write it into a dummy
-                                         // stream, just to get its
-                                         // size upon output
-        std::ostringstream dummy_out;
-
-        dummy_out << std::setprecision(column.precision);
-
-        if (col_iter->second.scientific)
-          dummy_out.setf (std::ios::scientific, std::ios::floatfield);
-        else
-          dummy_out.setf (std::ios::fixed, std::ios::floatfield);
-
-        dummy_out << column.entries[i].value;
-
-                                         // get size. as a side note, if the
-                                         // text printed is in fact the empty
-                                         // string, then we get into a bit of
-                                         // trouble since readers would skip
-                                         // over the resulting whitespaces. as
-                                         // a consequence, we'll print ""
-                                         // instead in that case.
-        const unsigned int size = dummy_out.str().length();
-        if (size > 0)
-          entry_widths[i][j] = size;
-        else
-          entry_widths[i][j] = 2;
-      }
-
-                                   // next compute the width each row
-                                   // has to have to suit all entries
+  // cache the columns and compute the widths of each column for alignment
+  std::vector<const Column*> cols;
   std::vector<unsigned int> column_widths (n_cols, 0);
-  for (unsigned int i=0; i<nrows; ++i)
-    for (unsigned int j=0; j<n_cols; ++j)
-      column_widths[j] = std::max(entry_widths[i][j],
-                                  column_widths[j]);
+  for (unsigned int j=0; j<n_cols; ++j)
+    {
+      std::string key=sel_columns[j];
+      const std::map<std::string, Column>::const_iterator
+        col_iter=columns.find(key);
+      Assert(col_iter!=columns.end(), ExcInternalError());
+      cols.push_back(&(col_iter->second));
+
+      switch (format)
+            {
+              case table_with_headers:
+                column_widths[j] = std::max(col_iter->second.max_length, static_cast<unsigned int>(key.length()));
+                break;
+              default:
+                column_widths[j] = col_iter->second.max_length;
+            }
+    }
 
                                    // write the captions
-  for (unsigned int j=0; j<column_order.size(); ++j)
+  for (unsigned int j=0; j<n_cols; ++j)
     {
       const std::string & key = column_order[j];
 
@@ -401,12 +409,6 @@ void TableHandler::write_text(std::ostream &out,
       {
         case table_with_headers:
         {
-          // if the key of this column is
-          // wider than the widest entry,
-          // then adjust
-          if (key.length() > column_widths[j])
-            column_widths[j] = key.length();
-
           // now write key. try to center
           // it somehow
           const unsigned int front_padding = (column_widths[j]-key.length())/2,
@@ -420,7 +422,6 @@ void TableHandler::write_text(std::ostream &out,
 
           // finally column break
           out << ' ';
-
           break;
         }
 
@@ -443,45 +444,12 @@ void TableHandler::write_text(std::ostream &out,
     {
       for (unsigned int j=0; j<n_cols; ++j)
         {
-          std::string key=sel_columns[j];
-          const std::map<std::string, Column>::const_iterator
-            col_iter=columns.find(key);
-          Assert(col_iter!=columns.end(), ExcInternalError());
-
-          const Column &column=col_iter->second;
-
-          out << std::setprecision(column.precision);
-
-          if (col_iter->second.scientific)
-            out.setf(std::ios::scientific, std::ios::floatfield);
-          else
-            out.setf(std::ios::fixed, std::ios::floatfield);
+          const Column &column=*(cols[j]);
           out << std::setw(column_widths[j]);
+          out << column.entries[i].get_cached_string();
 
-                                           // get the string to write into the
-                                           // table. we could simply << it
-                                           // into the stream but we have to
-                                           // be a bit careful about the case
-                                           // where the string may be empty,
-                                           // in which case we'll print it as
-                                           // "". note that ultimately we
-                                           // still just << it into the stream
-                                           // since we want to use the flags
-                                           // of that stream, and the first
-                                           // test is only used to determine
-                                           // whether the size of the string
-                                           // representation is zero
-          {
-            std::ostringstream text;
-            text << column.entries[i].value;
-            if (text.str().size() > 0)
-              out << column.entries[i].value;
-            else
-              out << "\"\"";
-          }
-
-                                           // pad after this column
-          out << " ";
+          // pad after this column
+          out << ' ';
         }
       out << '\n';
     }
@@ -491,6 +459,8 @@ void TableHandler::write_text(std::ostream &out,
 
 void TableHandler::write_tex (std::ostream &out, const bool with_header) const
 {
+				   //TODO[TH]: update code similar to
+				   //write_text() to use the cache
   AssertThrow (out, ExcIO());
   if (with_header)
     out << "\\documentclass[10pt]{report}" << std::endl
