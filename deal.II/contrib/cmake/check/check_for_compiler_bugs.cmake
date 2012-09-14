@@ -46,3 +46,38 @@ IF(DEAL_II_MEMBER_OP_TEMPLATE_INST_OK)
 ELSE()
   SET(DEAL_II_MEMBER_OP_TEMPLATE_INST "template")
 ENDIF()
+
+
+
+#
+# Some compiler versions, notably ICC, have trouble with the
+# following code in which we explicitly call a destructor.
+# This has to be worked around with a typedef. The problem is
+# that the workaround fails with some other compilers, so that
+# we can not unconditionally use the workaround...
+#
+CHECK_CXX_COMPILER_BUG(
+  "
+  namespace dealii
+  {
+    namespace FEValuesViews
+    {
+      template <int dim, int spacedim> struct Scalar {};
+    }
+
+    template <int dim, int spacedim>
+    struct X
+    {
+        FEValuesViews::Scalar<dim,spacedim> scalars[dim*spacedim];
+
+        void f()
+          {
+            scalars[0].dealii::FEValuesViews::Scalar<dim,spacedim>::~Scalar ();
+          }
+    };
+
+    template struct X<2,2>;
+  }
+  int main() { return 0; }
+  "
+  DEAL_II_EXPLICIT_DESTRUCTOR_BUG)
