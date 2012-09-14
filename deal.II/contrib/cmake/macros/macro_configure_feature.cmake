@@ -8,31 +8,31 @@
 # This macro assumes the following macros and variables to be defined:
 #
 #
-# HAVE_CONTRIB_FEATURE_${feature_name}
+# HAVE_CONTRIB_FEATURE_${feature_name}  (variable)
 #
-#   - which is either set to TRUE if all necessary libraries of the
+#   - Which is either set to TRUE if all necessary libraries of the
 #     features comes bundled with deal.II and hence can be supported
-#     without external dependencies
+#     without external dependencies, or unset.
 #
-# CONFIGURE_FEATURE_${feature_name}_CONTRIB(var)
+# CONFIGURE_FEATURE_${feature_name}_CONTRIB(var)  (macro)
 #
 #   - which shall setup all necessary configuration for the feature with
 #     contrib source dependencies. var set to TRUE shall indicate success.
 #
 #
-# FIND_FEATURE_${feature_name}_EXTERNAL(var)
+# FIND_FEATURE_${feature_name}_EXTERNAL(var)  (macro)
 #
 #   - which shall set var to TRUE if all dependencies for the feature are
 #     fullfilled. In this case all necessary variables for
 #     CONFIGURE_FEATURE_${feature_name}_EXTERNAL shall be set. Otherwise
 #     var should remain unset.
 #
-# CONFIGURE_FEATURE_${feature_name}_EXTERNAL(var)
+# CONFIGURE_FEATURE_${feature_name}_EXTERNAL(var)  (macro)
 #
 #   - which shall setup all necessary configuration for the feature with
 #     external dependencies. var set to TRUE shall indicate success.
 #
-# CONFIGURE_FEATURE_${feature_name}_ERROR_MESSAGE()
+# CONFIGURE_FEATURE_${feature_name}_ERROR_MESSAGE()  (macro)
 #
 #   - which shall print a meaningfull error message if case no external
 #     library is found (and contrib is not allowed to be used.)
@@ -60,8 +60,8 @@ ENDMACRO()
 #
 # A small macro to set the DEAL_II_WITH_${feature} variables:
 #
-MACRO(SET_CACHED_OPTION feature value)
-  SET(DEAL_II_WITH_${feature}
+MACRO(SET_CACHED_OPTION str value)
+  SET(${str}
     ${value}
     CACHE STRING
     "Automatically set due to DEAL_II_FEATURE_AUTODETECTION"
@@ -92,7 +92,7 @@ MACRO(CONFIGURE_FEATURE feature)
             "DEAL_II_WITH_${feature} successfully set up with contrib packages."
             )
           IF(DEAL_II_FEATURE_AUTODETECTION)
-            SET_CACHED_OPTION(DEAL_II_WITH_${feature} on)
+            SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
           ENDIF()
         ELSE()
           # This should not happen. So give an error
@@ -134,7 +134,7 @@ MACRO(CONFIGURE_FEATURE feature)
             "DEAL_II_WITH_${feature} successfully set up with external dependencies."
             )
           IF(DEAL_II_FEATURE_AUTODETECTION)
-            SET_CACHED_OPTION(DEAL_II_WITH_${feature} on)
+            SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
           ENDIF()
         ELSE()
           # This should not happen. So give an error
@@ -162,7 +162,7 @@ MACRO(CONFIGURE_FEATURE feature)
               "DEAL_II_WITH_${feature} successfully set up with contrib packages."
               )
             IF(DEAL_II_FEATURE_AUTODETECTION)
-              SET_CACHED_OPTION(DEAL_II_WITH_${feature} on)
+              SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
             ENDIF()
           ELSE()
             # This should not happen. So give an error
@@ -172,7 +172,7 @@ MACRO(CONFIGURE_FEATURE feature)
           ENDIF()
         ELSE()
             IF(DEAL_II_FEATURE_AUTODETECTION)
-              SET_CACHED_OPTION(DEAL_II_WITH_${feature} on)
+              SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
             ELSE()
               RUN_COMMAND(
                 "CONFIGURE_FEATURE_${feature}_ERROR_MESSAGE()"
