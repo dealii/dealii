@@ -198,63 +198,6 @@
 /* Define to 1 if you have the <AztecOO_Operator.h> header file. */
 #cmakedefine HAVE_AZTECOO_OPERATOR_H
 
-/* Define to 1 if you have the `daxpy_' function. */
-#cmakedefine HAVE_DAXPY_
-
-/* Define to 1 if you have the `dgeevx_' function. */
-#cmakedefine HAVE_DGEEVX_
-
-/* Define to 1 if you have the `dgeev_' function. */
-#cmakedefine HAVE_DGEEV_
-
-/* Define to 1 if you have the `dgelsd_' function. */
-#cmakedefine HAVE_DGELSD_
-
-/* Define to 1 if you have the `dgemm_' function. */
-#cmakedefine HAVE_DGEMM_
-
-/* Define to 1 if you have the `dgemv_' function. */
-#cmakedefine HAVE_DGEMV_
-
-/* Define to 1 if you have the `dgeqrf_' function. */
-#cmakedefine HAVE_DGEQRF_
-
-/* Define to 1 if you have the `dgesdd_' function. */
-#cmakedefine HAVE_DGESDD_
-
-/* Define to 1 if you have the `dgesvd_' function. */
-#cmakedefine HAVE_DGESVD_
-
-/* Define to 1 if you have the `dgetrf_' function. */
-#cmakedefine HAVE_DGETRF_
-
-/* Define to 1 if you have the `dgetri_' function. */
-#cmakedefine HAVE_DGETRI_
-
-/* Define to 1 if you have the `dgetrs_' function. */
-#cmakedefine HAVE_DGETRS_
-
-/* Define to 1 if you have the `dorgqr_' function. */
-#cmakedefine HAVE_DORGQR_
-
-/* Define to 1 if you have the `dormqr_' function. */
-#cmakedefine HAVE_DORMQR_
-
-/* Define to 1 if you have the `dstev_' function. */
-#cmakedefine HAVE_DSTEV_
-
-/* Define to 1 if you have the `dsyevx_' function. */
-#cmakedefine HAVE_DSYEVX_
-
-/* Define to 1 if you have the `dsygvx_' function. */
-#cmakedefine HAVE_DSYGVX_
-
-/* Define to 1 if you have the `dsygv_' function. */
-#cmakedefine HAVE_DSYGV_
-
-/* Define to 1 if you have the `dtrtrs_' function. */
-#cmakedefine HAVE_DTRTRS_
-
 /* Define to 1 if you have the <Epetra_CrsGraph.h> header file. */
 #cmakedefine HAVE_EPETRA_CRSGRAPH_H
 

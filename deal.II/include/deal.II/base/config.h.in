@@ -51,43 +51,98 @@
 
 
 
-/* Backward compatibility support for functions and classes that do not take
-   an explicit mapping variable, but rather use a default Q1 mapping instead
-   */
+/* Backward compatibility support for functions and classes that do not
+ * take an explicit mapping variable, but rather use a default Q1 mapping
+ * instead
+ */
 #cmakedefine DEAL_II_COMPAT_MAPPING
 
 
 
 
-/*
- * Configured in configure_functionparser.cmake:
- */
+/***************************************
+ * Configured in configure_blas.cmake: *
+ ***************************************/
+
+/* Define to 1 if you have the `daxpy_' function. */
+#cmakedefine HAVE_DAXPY_
+
+/* Define to 1 if you have the `dgeevx_' function. */
+#cmakedefine HAVE_DGEEVX_
+
+/* Define to 1 if you have the `dgeev_' function. */
+#cmakedefine HAVE_DGEEV_
+
+/* Define to 1 if you have the `dgelsd_' function. */
+#cmakedefine HAVE_DGELSD_
+
+/* Define to 1 if you have the `dgemm_' function. */
+#cmakedefine HAVE_DGEMM_
+
+/* Define to 1 if you have the `dgemv_' function. */
+#cmakedefine HAVE_DGEMV_
+
+/* Define to 1 if you have the `dgeqrf_' function. */
+#cmakedefine HAVE_DGEQRF_
+
+/* Define to 1 if you have the `dgesdd_' function. */
+#cmakedefine HAVE_DGESDD_
+
+/* Define to 1 if you have the `dgesvd_' function. */
+#cmakedefine HAVE_DGESVD_
+
+/* Define to 1 if you have the `dgetrf_' function. */
+#cmakedefine HAVE_DGETRF_
+
+/* Define to 1 if you have the `dgetri_' function. */
+#cmakedefine HAVE_DGETRI_
+
+/* Define to 1 if you have the `dgetrs_' function. */
+#cmakedefine HAVE_DGETRS_
+
+/* Define to 1 if you have the `dorgqr_' function. */
+#cmakedefine HAVE_DORGQR_
+
+/* Define to 1 if you have the `dormqr_' function. */
+#cmakedefine HAVE_DORMQR_
+
+/* Define to 1 if you have the `dstev_' function. */
+#cmakedefine HAVE_DSTEV_
+
+/* Define to 1 if you have the `dsyevx_' function. */
+#cmakedefine HAVE_DSYEVX_
+
+/* Define to 1 if you have the `dsygvx_' function. */
+#cmakedefine HAVE_DSYGVX_
+
+
+/*************************************************
+ * Configured in configure_functionparser.cmake: *
+ *************************************************/
 
 /* Defined if you have the `functionparser' library */
 #cmakedefine HAVE_FUNCTIONPARSER
 
-/*
- * Configured in configure_mpi.cmake:
- */
 
+/**************************************
+ * Configured in configure_mpi.cmake: *
+ **************************************/
 
 /* Defined if the compiler supports mpi */
 #cmakedefine DEAL_II_COMPILER_SUPPORTS_MPI
 
 
-/*
- * Configured in configure_netcdf.cmake:
- */
-
+/*****************************************
+ * Configured in configure_netcdf.cmake: *
+ *****************************************/
 
 /* Defined if you have the `NetCDF' library */
 #cmakedefine HAVE_LIBNETCDF
 
 
-/*
- * Configured in configure_threads.cmake:
- */
-
+/******************************************
+ * Configured in configure_threads.cmake: *
+ ******************************************/
 
 /* Flag indicating whether the library shall be compiled for multithreaded
  * applications. If so, then it is set to one, otherwise to zero.
@@ -116,10 +171,9 @@
 #endif
 
 
-/*
- * Configured in configure_umfpack.cmake:
- */
-
+/******************************************
+ * Configured in configure_umfpack.cmake: *
+ ******************************************/
 
 /* Defined if deal.II was configured with UMFPACK support */
 #cmakedefine HAVE_LIBUMFPACK
@@ -131,10 +185,9 @@
 #cmakedefine HAVE_LIBLAPACK
 
 
-/*
- * Configured in configure_umfpack.cmake:
- */
-
+/***************************************
+ * Configured in configure_zlib.cmake: *
+ ***************************************/
 
 /* Defined if deal.II was configure with zlib support */
 #cmakedefine HAVE_LIBZ
@@ -142,10 +195,9 @@
 
 
 
-/*
- * Configured in check_for_compiler_features
- */
-
+/**********************************************
+ * Configured in check_for_compiler_features: *
+ **********************************************/
 
 /* Defined if vector iterators are just plain pointers */
 #cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER
@@ -156,59 +208,66 @@
 /* Define if the compiler provides __verbose_terminate_handler */
 #cmakedefine HAVE_VERBOSE_TERMINATE
 
-/* Define if deal.II is linked against a libc that provides stacktrace debug
-   information that can be printed out in the exception class */
+/* Define if deal.II is linked against a libc that provides stacktrace
+ * debug information that can be printed out in the exception class
+ * */
 #cmakedefine HAVE_GLIBC_STACKTRACE
 
-/* Defined if the std c++ library provides a demangler conforming to the GCC
-   libstdc++ interface. */
+/* Defined if the std c++ library provides a demangler conforming to the
+ * GCC libstdc++ interface.
+ */
 #cmakedefine HAVE_LIBSTDCXX_DEMANGLER
 
 /* Equal to 0 in the generic case, equal to 1 if CPU compiled for supports
-   SSE2, equal to 2 if CPU compiled for supports AVX */
+ * SSE2, equal to 2 if CPU compiled for supports AVX
+ */
 #define DEAL_II_COMPILER_VECTORIZATION_LEVEL @DEAL_II_COMPILER_VECTORIZATION_LEVEL@
 
 /* Defined if the compiler can use arithmetic operations on vectorized data
-   types */
+ * types
+ */
 #cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
 
-/* If already available, do not define at all. Otherwise, define to __func__
-   if that is available. In all other cases, indicate that no information
-   about the present function is available for this compiler. */
+/* If already available, do not define at all. Otherwise, define to
+ * __func__ if that is available. In all other cases, indicate that no
+ * information about the present function is available for this compiler.
+ */
 #cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
 
 /* Set to the minimal number of elements a std::vector<T> can always hold,
-   i.e. its minimal capacity. */
+ * i.e. its minimal capacity.
+ */
 #define DEAL_II_MIN_VECTOR_CAPACITY @DEAL_II_MIN_VECTOR_CAPACITY@
 
-/* Set to the minimal number of elements a std::vector<bool> can always hold,
-   i.e. its minimal capacity. */
+/* Set to the minimal number of elements a std::vector<bool> can always
+ * hold, i.e. its minimal capacity.
+ */
 #define DEAL_II_MIN_BOOL_VECTOR_CAPACITY @DEAL_II_MIN_BOOL_VECTOR_CAPACITY@
 
 
 
 
-/*
- * Configured in check_for_compiler_bugs:
+/******************************************
+ * Configured in check_for_compiler_bugs: *
+ ******************************************/
+
+/* Define if we have to work around a bug in gcc with explicitly
+ * instantiating template member operators. See the aclocal.m4 file in the
+ * top-level directory for a description of this bug.
  */
-
-
-/* Define if we have to work around a bug in gcc with explicitly instantiating
-   template member operators. See the aclocal.m4 file in the top-level
-   directory for a description of this bug. */
 #define DEAL_II_MEMBER_OP_TEMPLATE_INST @DEAL_II_MEMBER_OP_TEMPLATE_INST@
 
 
 
 
-/*
- * Configured in check_for_cxx_features:
+/*****************************************
+ * Configured in check_for_cxx_features: *
+ *****************************************/
+
+/* Defined if the compiler we use supports the C++2011 standard well enough
+ * to allow using the standard library classes instead of the corresponding
+ * BOOST classes.
  */
-
-
-/* Defined if the compiler we use supports the C++2011 standard well enough to
-   allow using the standard library classes instead of the corresponding BOOST
-   classes. */
 #cmakedefine DEAL_II_CAN_USE_CXX1X
 
 /* Defined if isnan is available */
@@ -243,6 +302,7 @@
 
 /* Defined if you have the <sys/types.h> header file. */
 #cmakedefine HAVE_SYS_TYPES_H
+
 
 
 
