@@ -1,12 +1,17 @@
-IF(NOT DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER)
+MACRO(FIND_FEATURE_FUNCTIONPARSER_EXTERNAL var)
+ENDMACRO()
 
-  IF(NOT DEAL_II_ALLOW_CONTRIB)
-    MESSAGE(FATAL_ERROR "FindFunctionparser.cmake not written, yet. :-[")
-  ENDIF()
 
-ENDIF()
+MACRO(CONFIGURE_FEATURE_FUNCTIONPARSER_EXTERNAL var)
+ENDMACRO()
 
-IF(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER OR NOT Functionparser_FOUND)
+
+SET(HAVE_CONTRIB_FEATURE_FUNCTIONPARSER TRUE)
+
+
+MACRO(CONFIGURE_FEATURE_FUNCTIONPARSER_CONTRIB var)
+
+  # compile the necessary parts of functionparser out of ./contrib
 
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/functionparser/
@@ -21,12 +26,24 @@ IF(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER OR NOT Functionparser_FOUND)
     $<TARGET_OBJECTS:obj_functionparser>
     )
 
-ELSE()
+  SET(HAVE_FUNCTIONPARSER TRUE)
 
-  INCLUDE_DIRECTORIES(${Functionparser_INCLUDE_DIR})
+  SET(${var} TRUE)
+ENDMACRO()
 
-  LIST(APPEND deal_ii_external_libraries ${Functionparser_LIBRARY})
 
-ENDIF()
+MACRO(CONFIGURE_FEATURE_FUNCTIONPARSER_ERROR_MESSAGE)
+    MESSAGE(SEND_ERROR "
+Could not find the functionparser library!
 
-SET(HAVE_FUNCTIONPARSER TRUE)
+Module not written, yet...
+
+You may want to choose to compile the bundled contrib library of
+functionparser by setting DEAL_II_ALLOW_CONTRIB=on or
+DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER=on.
+
+")
+ENDMACRO()
+
+
+CONFIGURE_FEATURE(FUNCTIONPARSER)

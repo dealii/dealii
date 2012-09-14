@@ -24,6 +24,15 @@ SET(VERSION "8.0.pre")
 #   always an exception, isn't it?) DEAL_II_FORCE_CONTRIB_<library> forces
 #   the use of the bundled contrib library.
 #
+#
+# Autoconfiguration: If the option DEAL_II_FEATURE_AUTODETECTION is enabled
+# the DEAL_II_WITH_<feature> toggles will be automatically set (overwriting
+# any previous configuration) depending on whether they can be supported or
+# not.
+# (Note: DEAL_II_FEATURE_AUTODETECTION will respect DEAL_II_ALLOW_CONTRIB
+# and DEAL_II_FORCE_CONTRIB_<library>)
+#
+#
 # The option DEAL_II_FORCE_CONTRIB_<library> forces the use of the bundled
 # contrib library regardless whether DEAL_II_ALLOW_CONTRIB is set to OFF or
 # an external library is found.
@@ -67,8 +76,26 @@ SET(VERSION "8.0.pre")
 #                                                                         #
 ###########################################################################
 
+#
+# Feature selection:
+#
+
+OPTION(DEAL_II_FEATURE_AUTODETECTION
+  "Enables feature autodetection. This will automatically overwrite all
+  DEAL_II_WITH_<...> toggles depending on whether they can be supported or
+  not."
+  OFF)
+
+OPTION(DEAL_II_WITH_BLAS
+  "Build deal.II with support for BLAS."
+  ON)
+
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
+  OFF)
+
+OPTION(DEAL_II_WITH_LAPACK
+  "Build deal.II with support for LAPACK."
   ON)
 
 OPTION(DEAL_II_WITH_METIS
@@ -83,12 +110,12 @@ OPTION(DEAL_II_WITH_NETCDF
   "Build deal.II with support for netcdf."
   OFF)
 
-OPTION(DEAL_II_WITH_THREADS
-  "Build deal.II with support for threads. This pulls in libtbb as a dependency."
+OPTION(DEAL_II_WITH_TBB
+  "Build deal.II with support for tbb. This will enable thread support in deal.II."
   ON)
 
 OPTION(DEAL_II_WITH_UMFPACK
-  "Build deal.II with support for UMFPACK, BLAS and LAPACK."
+  "Build deal.II with support for UMFPACK."
   ON)
 
 OPTION(DEAL_II_WITH_ZLIB
@@ -105,11 +132,11 @@ OPTION(DEAL_II_ALLOW_CONTRIB
   packages, so to ensure that only external libraries are used
   DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
   OFF"
-  OFF)
+  ON)
 
 OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
   "Always use the bundled functionparser library instead of an external one."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
@@ -117,11 +144,11 @@ OPTION(DEAL_II_FORCE_CONTRIB_BOOST
 
 OPTION(DEAL_II_FORCE_CONTRIB_TBB
   "Always use the bundled tbb library instead of an external one."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
-  ON)
+  OFF)
 
 #
 # Compatibility support:
@@ -217,38 +244,34 @@ SET(deal_ii_external_libraries)
 # Run all system checks:
 #
 
-FILE(GLOB macro_files "contrib/cmake/check/*.cmake")
-FOREACH(file ${macro_files})
-  MESSAGE(STATUS "Include ${file}")
-  INCLUDE(${file})
-ENDFOREACH()
+#FILE(GLOB check_files "contrib/cmake/check/*.cmake")
+#FOREACH(file ${check_files})
+#  MESSAGE(STATUS "Include ${file}")
+#  INCLUDE(${file})
+#ENDFOREACH()
 
 
 #
 # Feature configuration:
 #
 
-IF(DEAL_II_WITH_FUNCTIONPARSER)
-  INCLUDE(configure_functionparser)
-ENDIF()
-IF(DEAL_II_WITH_MPI)
-  INCLUDE(configure_mpi)
-ENDIF()
-IF(DEAL_II_WITH_NETCDF)
-  INCLUDE(configure_netcdf)
-ENDIF()
-IF(DEAL_II_WITH_THREADS)
-  INCLUDE(configure_threads)
-ENDIF()
-# Boost depends on configuration variables set in configure_threads.cmake
-INCLUDE(configure_boost)
-IF(DEAL_II_WITH_UMFPACK)
-  INCLUDE(configure_umfpack)
-ENDIF()
-IF(DEAL_II_WITH_ZLIB)
-  INCLUDE(configure_zlib)
-ENDIF()
+INCLUDE(configure_blas)
+INCLUDE(configure_lapack)
+INCLUDE(configure_umfpack)
 
+INCLUDE(configure_functionparser)
+
+INCLUDE(configure_mpi)
+
+INCLUDE(configure_netcdf)
+
+INCLUDE(configure_tbb)
+
+# Boost has to be incluted after threads because it depends on the thread
+# configuration
+INCLUDE(configure_boost)
+
+INCLUDE(configure_zlib)
 
 
 
@@ -283,3 +306,11 @@ INCLUDE_DIRECTORIES(
 ADD_SUBDIRECTORY(include)
 
 ADD_SUBDIRECTORY(source)
+
+MESSAGE(STATUS "Configured features:")
+GET_CMAKE_PROPERTY(res VARIABLES)
+FOREACH(var ${res})
+  IF(var MATCHES "DEAL_II_WITH")
+    MESSAGE(STATUS "${var} : ${${var}}")
+  ENDIF()
+ENDFOREACH()

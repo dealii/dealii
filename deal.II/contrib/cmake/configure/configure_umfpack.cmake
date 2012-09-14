@@ -1,39 +1,40 @@
-FIND_PACKAGE(LAPACK REQUIRED)
-FIND_PACKAGE(BLAS REQUIRED)
+#
+# Configuration for the umfpack and amd libraries:
+#
 
-SET(CMAKE_SHARED_LINKER_FLAGS
-  "${CMAKE_SHARED_LINKER_FLAGS} ${LAPACK_LINKER_FLAGS} ${BLAS_LINKER_FLAGS}"
-  )
+# TODO: Implement the dependency on BLAS and LAPACK
 
-LIST(APPEND deal_ii_external_libraries
-  ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES}
-  )
-
-# TODO: A deal.II specific error message if blas or lapack is not found
-
-
-IF(NOT DEAL_II_FORCE_CONTRIB_UMFPACK)
+MACRO(FIND_FEATURE_UMFPACK_EXTERNAL var)
 
   FIND_PACKAGE(UMFPACK)
   FIND_PACKAGE(AMD)
 
-  IF(NOT DEAL_II_ALLOW_CONTRIB)
-    IF(NOT UMFPACK_FOUND)
-      macro_message_not_found("umfpack" "UMFPACK")
-    ENDIF()
-    IF(NOT AMD_FOUND)
-      macro_message_not_found("amd" "AMD")
-    ENDIF()
+  IF(UMFPACK_FOUND AND AMD_FOUND)
+    SET(${var} TRUE)
   ENDIF()
 
-ENDIF()
+ENDMACRO()
 
-IF(UMFPACK_FOUND AND AMD_FOUND) # TODO
-  SET(UMFPACKAMD_FOUND TRUE)
-ELSE()
-  SET(UMFPACKAMD_FOUND FALSE)
-ENDIF()
-IF(DEAL_II_FORCE_CONTRIB_UMFPACK OR NOT UMFPACKAMD_FOUND)
+
+MACRO(CONFIGURE_FEATURE_UMFPACK_EXTERNAL var)
+
+  INCLUDE_DIRECTORIES(${UMFPACK_INCLUDE_DIR} ${AMD_INCLUDE_DIR})
+
+  LIST(APPEND deal_ii_external_libraries
+    ${UMFPACK_LIBRARY} ${AMD_LIBRARY}
+    )
+
+  SET(HAVE_LIBUMFPACK TRUE)
+
+  SET(${var} TRUE)
+
+ENDMACRO()
+
+
+SET(HAVE_CONTRIB_FEATURE_UMFPACK TRUE)
+
+
+MACRO(CONFIGURE_FEATURE_UMFPACK_CONTRIB var)
 
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/umfpack/UMFPACK/Include
@@ -53,17 +54,29 @@ IF(DEAL_II_FORCE_CONTRIB_UMFPACK OR NOT UMFPACKAMD_FOUND)
     $<TARGET_OBJECTS:obj_amd_global>
     )
 
-ELSE()
+  SET(HAVE_LIBUMFPACK TRUE)
 
-  INCLUDE_DIRECTORIES(${UMFPACK_INCLUDE_DIR} ${AMD_INCLUDE_DIR})
+  SET(${var} TRUE)
 
-  LIST(APPEND deal_ii_external_libraries
-    ${UMFPACK_LIBRARY} ${AMD_LIBRARY}
-    )
-
-ENDIF()
+ENDMACRO()
 
 
-SET(HAVE_LIBBLAS TRUE)
-SET(HAVE_LIBLAPACK TRUE)
-SET(HAVE_LIBUMFPACK TRUE)
+MACRO(CONFIGURE_FEATURE_BOOST_ERROR_MESSAGE)
+  MESSAGE(SEND_ERROR "
+Could not find the umfpack and amd libraries!
+
+Please ensure that the libraries are installed on your computer.
+If the libraries are not at a default location, either provide some hints
+via environment variables:
+UMFPACK_LIBRARY_DIR UMFPACK_INCLUDE_DIR
+AMD_LIBRARY_DIR AMD_INCLUDE_DIR
+Or set the relevant variables by hand in ccmake.
+
+Alternatively you may choose to compile the bundled contrib libraries
+by setting DEAL_II_ALLOW_CONTRIB=on or DEAL_II_FORCE_CONTRIB_UMFPACK=on.
+
+")
+ENDMACRO()
+
+
+CONFIGURE_FEATURE(UMFPACK)
