@@ -163,43 +163,6 @@ CHECK_CXX_SOURCE_COMPILES(
 
 
 #
-# See if the compiler understands the attribute to mark functions
-# as deprecated.
-#
-
-#
-# First see if the following compiles without error (it should
-# produce a warning but we don't care about this)
-
-
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int old_fn () __attribute__((deprecated));
-  int old_fn () {};
-  int (*fn_ptr)() = old_fn;
-  int main() { return 0; }
-  "
-  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
-
-LIST(APPEND CMAKE_REQUIRED_FLAGS "-Werror")
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int old_fn () __attribute__((deprecated));
-  int old_fn () {};
-  int (*fn_ptr)() = old_fn;
-  int main() { return 0; }
-  "
-  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED_SHOULD_FAIL)
-LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "-Werror")
-
-IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED AND NOT
-    DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED_SHOULD_FAIL)
-  SET(DEAL_II_DEPRECATED TRUE)
-ENDIF()
-
-
-
-#
 # Check whether the compiler allows for vectorization and that
 # vectorization actually works. For this test, we use compiler
 # intrinsics similar to what is used in the deal.II library and
