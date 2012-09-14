@@ -69,7 +69,7 @@ SET(VERSION "8.0.pre")
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
@@ -109,11 +109,11 @@ OPTION(DEAL_II_ALLOW_CONTRIB
 
 OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
   "Always use the bundled functionparser library instead of an external one."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_FORCE_CONTRIB_TBB
   "Always use the bundled tbb library instead of an external one."
