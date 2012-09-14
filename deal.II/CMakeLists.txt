@@ -84,7 +84,7 @@ OPTION(DEAL_II_FEATURE_AUTODETECTION
   "Enables feature autodetection. This will automatically overwrite all
   DEAL_II_WITH_<...> toggles depending on whether they can be supported or
   not."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
