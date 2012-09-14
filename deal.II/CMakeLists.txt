@@ -88,7 +88,7 @@ OPTION(DEAL_II_FEATURE_AUTODETECTION
 
 OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
@@ -96,7 +96,7 @@ OPTION(DEAL_II_WITH_FUNCTIONPARSER
 
 OPTION(DEAL_II_WITH_LAPACK
   "Build deal.II with support for LAPACK."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
@@ -112,11 +112,11 @@ OPTION(DEAL_II_WITH_NETCDF
 
 OPTION(DEAL_II_WITH_TBB
   "Build deal.II with support for tbb. This will enable thread support in deal.II."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_ZLIB
   "Build deal.II with support for zlib."
@@ -140,7 +140,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
 
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_FORCE_CONTRIB_TBB
   "Always use the bundled tbb library instead of an external one."
@@ -244,11 +244,11 @@ SET(deal_ii_external_libraries)
 # Run all system checks:
 #
 
-#FILE(GLOB check_files "contrib/cmake/check/*.cmake")
-#FOREACH(file ${check_files})
-#  MESSAGE(STATUS "Include ${file}")
-#  INCLUDE(${file})
-#ENDFOREACH()
+FILE(GLOB check_files "contrib/cmake/check/*.cmake")
+FOREACH(file ${check_files})
+  MESSAGE(STATUS "Include ${file}")
+  INCLUDE(${file})
+ENDFOREACH()
 
 
 #
@@ -257,6 +257,8 @@ SET(deal_ii_external_libraries)
 
 INCLUDE(configure_blas)
 INCLUDE(configure_lapack)
+
+# configure_boost depends on configure_blas and configure_lapack
 INCLUDE(configure_umfpack)
 
 INCLUDE(configure_functionparser)
@@ -267,8 +269,7 @@ INCLUDE(configure_netcdf)
 
 INCLUDE(configure_tbb)
 
-# Boost has to be incluted after threads because it depends on the thread
-# configuration
+# configure_boost depends on configure_tbb
 INCLUDE(configure_boost)
 
 INCLUDE(configure_zlib)

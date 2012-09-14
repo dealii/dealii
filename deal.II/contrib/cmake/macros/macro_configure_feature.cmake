@@ -141,9 +141,6 @@ MACRO(CONFIGURE_FEATURE feature)
           MESSAGE(SEND_ERROR
             "Failed to set up DEAL_II_WITH_${feature} with contrib packages."
             )
-          RUN_COMMAND(
-            "CONFIGURE_FEATURE_${feature}_ERROR_MESSAGE()"
-            )
         ENDIF()
       ELSE()
         # TODO: Opt out!

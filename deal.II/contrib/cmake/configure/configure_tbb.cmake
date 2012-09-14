@@ -94,7 +94,7 @@ MACRO(FIND_FEATURE_TBB_EXTERNAL var)
   ENDIF()
 
   IF(TBB_FOUND)
-    SET(${var} TRUE)
+    #SET(${var} TRUE)
   ENDIF()
 
 ENDMACRO()
@@ -118,7 +118,7 @@ ENDMACRO()
 SET(HAVE_CONTRIB_FEATURE_TBB TRUE)
 
 
-MACRO(CONFIGURE_FEATURE_BOOST_CONTRIB var)
+MACRO(CONFIGURE_FEATURE_TBB_CONTRIB var)
   #
   # Add tbb directly to the object files of deal.II
   #
@@ -135,6 +135,24 @@ MACRO(CONFIGURE_FEATURE_BOOST_CONTRIB var)
 
   # Setup threading and if successfull return TRUE:
   SETUP_THREADING(${var})
+ENDMACRO()
+
+
+MACRO(CONFIGURE_FEATURE_TBB_ERROR_MESSAGE)
+    MESSAGE(SEND_ERROR "
+Could not find the tbb library!
+
+Please ensure that the tbb library is installed on your computer.
+If the library is not at a default location, either provide some hints
+via environment variables:
+TBB_LIBRARY_DIR TBB_INCLUDE_DIR
+Or set the relevant variables by hand in ccmake.
+
+Alternatively you may choose to compile the bundled contrib library of
+boost by setting DEAL_II_ALLOW_CONTRIB=on or
+DEAL_II_FORCE_CONTRIB_TBB=on.
+
+")
 ENDMACRO()
 
 
