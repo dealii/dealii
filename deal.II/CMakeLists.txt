@@ -224,7 +224,7 @@ INCLUDE(configure_deal_ii)
 #
 # CMAKE_C_FLAGS and CMAKE_CXX_FLAGS (uncached)
 #
-#   for setting necessary compiler flags, e.g. -std=c++0x (if available).
+#   for setting necessary compiler flags, e.g. -std=c++11 (if available).
 #   Note: Uncached variables are not visible to the user, and cannot be
 #   altered.
 #
