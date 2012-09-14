@@ -123,6 +123,10 @@ MACRO(CONFIGURE_FEATURE_TBB_CONTRIB var)
   # Add tbb directly to the object files of deal.II
   #
 
+  # Setup threading (before configurating our build...)
+  # and if successfull return TRUE:
+  SETUP_THREADING(${var})
+
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/include
     )
@@ -132,9 +136,6 @@ MACRO(CONFIGURE_FEATURE_TBB_CONTRIB var)
   LIST(APPEND deal_ii_additional_object_files
     $<TARGET_OBJECTS:obj_tbb>
     )
-
-  # Setup threading and if successfull return TRUE:
-  SETUP_THREADING(${var})
 ENDMACRO()
 
 
