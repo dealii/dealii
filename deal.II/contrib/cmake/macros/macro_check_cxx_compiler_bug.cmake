@@ -14,7 +14,7 @@ MACRO(CHECK_CXX_COMPILER_BUG source var)
   IF(${var}_OK)
     MESSAGE(STATUS "Test successful, do not define ${var}")
   ELSE()
-    MESSAGE(STATUS "Test unsuccessful, definig ${var}")
+    MESSAGE(STATUS "Test unsuccessful, define ${var}")
     SET(${var} 1)
   ENDIF()
 

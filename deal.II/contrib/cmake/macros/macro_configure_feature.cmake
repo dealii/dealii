@@ -71,7 +71,7 @@ ENDMACRO()
 
 MACRO(CONFIGURE_FEATURE feature)
 
-  # Only (try) to configure ${feature} if we have to:
+  # Only try to configure ${feature} if we have to:
   IF(DEAL_II_FEATURE_AUTODETECTION OR DEAL_II_WITH_${feature})
 
     #
@@ -106,7 +106,7 @@ MACRO(CONFIGURE_FEATURE feature)
           )
       ENDIF()
 
-    ELSE()
+    ELSE(DEAL_II_FORCE_CONTRIB_${feature})
 
       #
       # Second case: We are allowed to search for an external library:
@@ -181,7 +181,7 @@ MACRO(CONFIGURE_FEATURE feature)
         ENDIF()
 
       ENDIF()
-    ENDIF()
+    ENDIF(DEAL_II_FORCE_CONTRIB_${feature})
 
   ENDIF()
 ENDMACRO()
