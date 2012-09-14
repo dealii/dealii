@@ -11,6 +11,7 @@
 //---------------------------------------------------------------------------
 
 #include <deal.II/meshworker/local_results.h>
+#include <deal.II/meshworker/local_integrator.h>
 #include <deal.II/lac/block_indices.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -51,6 +52,30 @@ namespace MeshWorker
 
   template class LocalResults<float>;
   template class LocalResults<double>;
+
+  template <int dim, int spacedim, typename number>
+  LocalIntegrator<dim, spacedim, number>::LocalIntegrator ()
+		  :
+		  use_cell(true), use_boundary(true), use_face(true)
+  {}
+
+  
+  template <int dim, int spacedim, typename number>
+  LocalIntegrator<dim, spacedim, number>::~LocalIntegrator ()
+  {}
+  
+  template class LocalIntegrator<1,1,float>;
+  template class LocalIntegrator<1,1,double>;
+  template class LocalIntegrator<1,2,float>;
+  template class LocalIntegrator<1,2,double>;
+  template class LocalIntegrator<1,3,float>;
+  template class LocalIntegrator<1,3,double>;
+  template class LocalIntegrator<2,2,float>;
+  template class LocalIntegrator<2,2,double>;
+  template class LocalIntegrator<2,3,float>;
+  template class LocalIntegrator<2,3,double>;
+  template class LocalIntegrator<3,3,float>;
+  template class LocalIntegrator<3,3,double>;
 }
 
 

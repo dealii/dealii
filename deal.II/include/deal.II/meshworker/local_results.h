@@ -31,7 +31,10 @@ template<int,int> class MGDoFHandler;
  * an ubiquitous part of each finite element program.
  *
  * The workhorse of this namespace is the loop() function, which implements a
- * completely generic loop over all mesh cells.
+ * completely generic loop over all mesh cells. Since the calls to
+ * loop() are error-prone due to its generality, for many applications
+ * it is advisable to derive a class from MeshWorker::LocalIntegrator
+ * and use the less general integration_loop() instead.
  *
  * The loop() depends on certain objects handed to it as
  * arguments. These objects are of two types, info objects like
