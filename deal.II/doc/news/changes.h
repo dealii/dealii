@@ -53,6 +53,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: Due to incompatibilties with some hdf5 packages installed from
+repositories we disable auto-detection of hdf5. Use --with-hdf if you need it.
+<br>
+(Timo Heister, 2012/09/14)
+
 <li> New MeshWorker::LocalIntegrator and integration_loop() provide a
 less confusing interface to MeshWorker loops.
 <br>
