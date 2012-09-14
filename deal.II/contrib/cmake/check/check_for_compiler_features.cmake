@@ -12,8 +12,7 @@ INCLUDE(CheckCXXSourceRuns)
 #
 # Check whether the std::vector::iterator is just a plain pointer
 #
-# TODO: Get rid of this negation!
-CHECK_CXX_SOURCE_COMPILES(
+CHECK_CXX_COMPILER_BUG( # Yes. It is not a bug. But the logic is the same.
   "
   #include <vector>
   template <typename T> void f(T) {}
@@ -21,11 +20,7 @@ CHECK_CXX_SOURCE_COMPILES(
   template void f(std::vector<int>::iterator);
   int main(){return 0;}
   "
-  DEAL_II_VECTOR_ITERATOR_IS_NOT_POINTER)
-
-IF(NOT DEAL_II_VECTOR_ITERATOR_IS_NOT_POINTER)
-  SET(DEAL_II_VECTOR_ITERATOR_IS_POINTER TRUE)
-ENDIF()
+  DEAL_II_VECTOR_ITERATOR_IS_POINTER)
 
 
 
