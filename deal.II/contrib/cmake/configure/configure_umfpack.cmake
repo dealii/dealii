@@ -80,6 +80,9 @@ ENDMACRO()
 #
 # UMFPACK needs BLAS and LAPACK to be configured:
 #
+# TODO: Encapsulate this in a depend logic and migrate this check into the
+# macro
+
 IF(DEAL_II_WITH_BLAS AND DEAL_II_WITH_LAPACK)
   CONFIGURE_FEATURE(UMFPACK)
 ELSE()
@@ -89,8 +92,10 @@ ELSE()
       )
     SET_CACHED_OPTION(DEAL_II_WITH_UMFPACK OFF)
   ELSE()
-    MESSAGE(SEND_ERROR
-      "DEAL_II_WITH_UMFPACK has unmet configuration requirements: Both, DEAL_II_WITH_BLAS and DEAL_II_WITH_LAPACK have to be set."
-      )
+    IF(DEA_II_WITH_UMFPACK)
+      MESSAGE(SEND_ERROR
+        "DEAL_II_WITH_UMFPACK has unmet configuration requirements: Both, DEAL_II_WITH_BLAS and DEAL_II_WITH_LAPACK have to be set."
+        )
+    ENDIF()
   ENDIF()
 ENDIF()
