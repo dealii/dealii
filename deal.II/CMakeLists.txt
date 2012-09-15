@@ -77,13 +77,22 @@ SET(VERSION "8.0.pre")
 ###########################################################################
 
 #
-# Feature selection:
+# Feature selection: external libraries and where to take them (if there
+# is a choice, e.g. from contrib vs external)
 #
 
 OPTION(DEAL_II_FEATURE_AUTODETECTION
   "Enables feature autodetection. This will automatically overwrite all
   DEAL_II_WITH_<...> toggles depending on whether they can be supported or
   not."
+  ON)
+
+OPTION(DEAL_II_ALLOW_CONTRIB
+  "Allow the use of contrib libraries bundled with the source tarball.
+  Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
+  packages, so to ensure that only external libraries are used
+  DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
+  OFF"
   ON)
 
 OPTION(DEAL_II_WITH_BLAS
@@ -93,6 +102,10 @@ OPTION(DEAL_II_WITH_BLAS
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
   OFF)
+OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
+  "Always use the bundled functionparser library instead of an external one."
+  ON)
+
 
 OPTION(DEAL_II_WITH_LAPACK
   "Build deal.II with support for LAPACK."
@@ -113,42 +126,25 @@ OPTION(DEAL_II_WITH_NETCDF
 OPTION(DEAL_II_WITH_TBB
   "Build deal.II with support for tbb. This will enable thread support in deal.II."
   OFF)
+OPTION(DEAL_II_FORCE_CONTRIB_TBB
+  "Always use the bundled tbb library instead of an external one."
+  ON)
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK."
   OFF)
+OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
+  "Always use the bundled umfpack library instead of an external one."
+  ON)
 
 OPTION(DEAL_II_WITH_ZLIB
   "Build deal.II with support for zlib."
   OFF)
 
-#
-# Options for library selection:
-#
-
-OPTION(DEAL_II_ALLOW_CONTRIB
-  "Allow the use of contrib libraries bundled with the source tarball.
-  Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
-  packages, so to ensure that only external libraries are used
-  DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
-  OFF"
-  ON)
-
-OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
-  "Always use the bundled functionparser library instead of an external one."
-  ON)
-
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
   ON)
 
-OPTION(DEAL_II_FORCE_CONTRIB_TBB
-  "Always use the bundled tbb library instead of an external one."
-  ON)
-
-OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
-  "Always use the bundled umfpack library instead of an external one."
-  ON)
 
 #
 # Compatibility support:
