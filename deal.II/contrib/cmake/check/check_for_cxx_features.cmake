@@ -19,12 +19,14 @@ CHECK_CXX_SOURCE_COMPILES(
 
 
 #
-# C++0x Support:
+# C++11 Support:
 #
 
 
-# See if there is a compiler flag to enable C++0x features
+# See if there is a compiler flag to enable C++11 features
 # (Only test for -std=c++0x for the moment.)
+#
+# TODO: We should also check for -std=c++11.
 CHECK_CXX_COMPILER_FLAG(
   "-std=c++0x"
   DEAL_II_HAVE_CXX0X_FLAG)
@@ -142,7 +144,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
       DEAL_II_HAVE_CXX0X_TUPLE AND
       DEAL_II_HAVE_CXX0X_TYPE_TRAITS )
 
-    MESSAGE(STATUS "Sufficient C++0x support. Enabling -std=c++0x.")
+    MESSAGE(STATUS "Sufficient C++11 support. Enabling -std=c++0x.")
 
     SET(DEAL_II_CAN_USE_CXX1X TRUE)
 
@@ -150,12 +152,12 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
 
   ELSE()
 
-    MESSAGE(STATUS "Insufficient C++0x support. Disabling -std=c++0x.")
+    MESSAGE(STATUS "Insufficient C++11 support. Disabling -std=c++0x.")
   ENDIF()
 
   IF(DEAL_II_CAN_USE_CXX1X)
     #
-    # Also test for a couple of C++0x things that we don't use in the
+    # Also test for a couple of C++11 things that we don't use in the
     # library but that users may want to use in their applications and that
     # we might want to test in the testsuite
     #
@@ -179,7 +181,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     IF( DEAL_II_HAVE_CXX0X_AUTO_TYPE AND
         DEAL_II_HAVE_CXX0X_RANGE_BASED_FOR )
 
-      MESSAGE(STATUS "Additional C++0x support available.")
+      MESSAGE(STATUS "Additional C++11 support available.")
 
       SET(DEAL_II_CAN_USE_ADDITIONAL_CXX1X_FEATURES)
 
@@ -189,7 +191,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
   LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "-std=c++0x")
 
 ELSE()
-    MESSAGE(STATUS "Insufficient C++0x support. Disabling -std=c++0x.")
+    MESSAGE(STATUS "Insufficient C++11 support. Disabling -std=c++0x.")
 ENDIF()
 
 
