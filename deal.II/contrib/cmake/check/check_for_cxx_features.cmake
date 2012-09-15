@@ -29,10 +29,10 @@ CHECK_CXX_SOURCE_COMPILES(
 # TODO: We should also check for -std=c++11.
 CHECK_CXX_COMPILER_FLAG(
   "-std=c++0x"
-  DEAL_II_HAVE_CXX0X_FLAG)
+  DEAL_II_HAVE_CXX11_FLAG)
 
 
-IF(DEAL_II_HAVE_CXX0X_FLAG)
+IF(DEAL_II_HAVE_CXX11_FLAG)
 
   # Set CMAKE_REQUIRED_FLAGS for the unit tests
   LIST(APPEND CMAKE_REQUIRED_FLAGS "-std=c++0x")
@@ -43,7 +43,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     std::array<int,3> p;
     int main(){  p[0]; return 0; }
     "
-    DEAL_II_HAVE_CXX0X_ARRAY)
+    DEAL_II_HAVE_CXX11_ARRAY)
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -51,7 +51,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     std::condition_variable c;
     int main(){ c.notify_all(); return 0; }
     "
-    DEAL_II_HAVE_CXX0X_CONDITION_VARIABLE)
+    DEAL_II_HAVE_CXX11_CONDITION_VARIABLE)
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -60,7 +60,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     std::function<void (int)> g = std::bind (f, std::placeholders::_1,1.1);
     int main(){ return 0; }
     "
-    DEAL_II_HAVE_CXX0X_FUNCTIONAL)
+    DEAL_II_HAVE_CXX11_FUNCTIONAL)
 
   # Make sure we don't run into GCC bug 35569
   CHECK_CXX_SOURCE_COMPILES(
@@ -71,7 +71,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     using namespace std::placeholders;
     int main(){ bind(multiplies<int>(),4,_1)(5); return 0; }
     "
-    DEAL_II_HAVE_CXX0X_FUNCTIONAL_GCCBUG35569_OK)
+    DEAL_II_HAVE_CXX11_FUNCTIONAL_GCCBUG35569_OK)
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -79,7 +79,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     std::shared_ptr<int> p(new int(3));
     int main(){ return 0; }
     "
-    DEAL_II_HAVE_CXX0X_SHARED_PTR)
+    DEAL_II_HAVE_CXX11_SHARED_PTR)
 
   LIST(APPEND CMAKE_REQUIRED_FLAGS "-lpthreads")
 
@@ -89,7 +89,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     void f(int){}
     int main(){ std::thread t(f,1); t.join(); return 0; }
     "
-    DEAL_II_HAVE_CXX0X_THREAD)
+    DEAL_II_HAVE_CXX11_THREAD)
 
   #On some systems with gcc 4.5.0, we can compile the code
   #above but it will throw an exception when run. So test
@@ -103,7 +103,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     void f(int){}
     int main(){ std::thread t(f,1); t.join(); return 0; }
     "
-    DEAL_II_HAVE_CXX0X_THREAD_RUN_OK)
+    DEAL_II_HAVE_CXX11_THREAD_RUN_OK)
 
   LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "-lpthreads")
 
@@ -113,7 +113,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     std::mutex m;
     int main(){ m.lock(); return 0; }
     "
-    DEAL_II_HAVE_CXX0X_MUTEX)
+    DEAL_II_HAVE_CXX11_MUTEX)
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -121,7 +121,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     std::tuple<int,double,char> p(1,1.1,'a');
     int main(){ return 0; }
     "
-    DEAL_II_HAVE_CXX0X_TUPLE)
+    DEAL_II_HAVE_CXX11_TUPLE)
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -131,18 +131,18 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
     const bool m2 = std::is_pod<double>::value;
     int main(){ return 0; }
     "
-    DEAL_II_HAVE_CXX0X_TYPE_TRAITS)
+    DEAL_II_HAVE_CXX11_TYPE_TRAITS)
 
-  IF( DEAL_II_HAVE_CXX0X_ARRAY AND
-      DEAL_II_HAVE_CXX0X_CONDITION_VARIABLE AND
-      DEAL_II_HAVE_CXX0X_FUNCTIONAL AND
-      DEAL_II_HAVE_CXX0X_FUNCTIONAL_GCCBUG35569_OK AND
-      DEAL_II_HAVE_CXX0X_SHARED_PTR AND
-      DEAL_II_HAVE_CXX0X_THREAD AND
-      DEAL_II_HAVE_CXX0X_THREAD_RUN_OK AND
-      DEAL_II_HAVE_CXX0X_MUTEX AND
-      DEAL_II_HAVE_CXX0X_TUPLE AND
-      DEAL_II_HAVE_CXX0X_TYPE_TRAITS )
+  IF( DEAL_II_HAVE_CXX11_ARRAY AND
+      DEAL_II_HAVE_CXX11_CONDITION_VARIABLE AND
+      DEAL_II_HAVE_CXX11_FUNCTIONAL AND
+      DEAL_II_HAVE_CXX11_FUNCTIONAL_GCCBUG35569_OK AND
+      DEAL_II_HAVE_CXX11_SHARED_PTR AND
+      DEAL_II_HAVE_CXX11_THREAD AND
+      DEAL_II_HAVE_CXX11_THREAD_RUN_OK AND
+      DEAL_II_HAVE_CXX11_MUTEX AND
+      DEAL_II_HAVE_CXX11_TUPLE AND
+      DEAL_II_HAVE_CXX11_TYPE_TRAITS )
 
     MESSAGE(STATUS "Sufficient C++11 support. Enabling -std=c++0x.")
 
@@ -168,7 +168,7 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
       std::vector<int> v;
       int main(){ auto i = v.begin(); *i; return 0;}
       "
-      DEAL_II_HAVE_CXX0X_AUTO_TYPE)
+      DEAL_II_HAVE_CXX11_AUTO_TYPE)
 
     CHECK_CXX_SOURCE_COMPILES(
       "
@@ -176,10 +176,10 @@ IF(DEAL_II_HAVE_CXX0X_FLAG)
       std::vector<int> v;
       int main(){ for (std::vector<int>::iterator i : v) *i; return 0;}
       "
-      DEAL_II_HAVE_CXX0X_RANGE_BASED_FOR)
+      DEAL_II_HAVE_CXX11_RANGE_BASED_FOR)
 
-    IF( DEAL_II_HAVE_CXX0X_AUTO_TYPE AND
-        DEAL_II_HAVE_CXX0X_RANGE_BASED_FOR )
+    IF( DEAL_II_HAVE_CXX11_AUTO_TYPE AND
+        DEAL_II_HAVE_CXX11_RANGE_BASED_FOR )
 
       MESSAGE(STATUS "Additional C++11 support available.")
 
