@@ -94,7 +94,7 @@ MACRO(FIND_FEATURE_TBB_EXTERNAL var)
   ENDIF()
 
   IF(TBB_FOUND)
-    #SET(${var} TRUE)
+    SET(${var} TRUE)
   ENDIF()
 
 ENDMACRO()
