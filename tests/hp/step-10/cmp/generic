@@ -1943,7 +1943,7 @@ DEAL::
 DEAL::Computation of Pi by the area:
 DEAL::==============================
 DEAL::Degree = 1
-cells      eval.pi         error    
+cells      eval.pi            error      
 5     1.9999999999999993 1.1416e+00 -    
 20    2.8284271247461894 3.1317e-01 1.87 
 80    3.0614674589207178 8.0125e-02 1.97 
@@ -1952,7 +1952,7 @@ cells      eval.pi         error
 5120  3.1403311569547534 1.2615e-03 2.00 
 DEAL::
 DEAL::Degree = 2
-cells      eval.pi         error    
+cells      eval.pi            error      
 5     3.1045694996615865 3.7023e-02 -    
 20    3.1391475703122271 2.4451e-03 3.92 
 80    3.1414377167038303 1.5494e-04 3.98 
@@ -1961,7 +1961,7 @@ cells      eval.pi         error
 5120  3.1415926155921139 3.7998e-08 4.00 
 DEAL::
 DEAL::Degree = 3
-cells      eval.pi         error    
+cells      eval.pi            error      
 5     3.1465390309173462 4.9464e-03 -    
 20    3.1419461263297381 3.5347e-04 3.81 
 80    3.1416154689089395 2.2815e-05 3.95 
@@ -1970,7 +1970,7 @@ cells      eval.pi         error
 5120  3.1415926592185532 5.6288e-09 4.00 
 DEAL::
 DEAL::Degree = 4
-cells      eval.pi         error    
+cells      eval.pi            error      
 5     3.1418185737114031 2.2592e-04 -    
 20    3.1415963919525285 3.7384e-06 5.92 
 80    3.1415927128398162 5.9250e-08 5.98 
@@ -1981,7 +1981,7 @@ DEAL::
 DEAL::Computation of Pi by the perimeter:
 DEAL::===================================
 DEAL::Degree = 1
-cells      eval.pi         error    
+cells      eval.pi            error      
 5     2.8284271247461898 3.1317e-01 -    
 20    3.0614674589207178 8.0125e-02 1.97 
 80    3.1214451522580520 2.0148e-02 1.99 
@@ -1990,7 +1990,7 @@ cells      eval.pi         error
 5120  3.1412772509327729 3.1540e-04 2.00 
 DEAL::
 DEAL::Degree = 2
-cells      eval.pi         error    
+cells      eval.pi            error      
 5     3.1248930668550594 1.6700e-02 -    
 20    3.1404050605605449 1.1876e-03 3.81 
 80    3.1415157631807014 7.6890e-05 3.95 
@@ -1999,7 +1999,7 @@ cells      eval.pi         error
 5120  3.1415926345932004 1.8997e-08 4.00 
 DEAL::
 DEAL::Degree = 3
-cells      eval.pi         error    
+cells      eval.pi            error      
 5     3.1442603311164290 2.6677e-03 -    
 20    3.1417729561193593 1.8030e-04 3.89 
 80    3.1416041192612361 1.1466e-05 3.98 
@@ -2008,7 +2008,7 @@ cells      eval.pi         error
 5120  3.1415926564043968 2.8146e-09 4.00 
 DEAL::
 DEAL::Degree = 4
-cells      eval.pi         error    
+cells      eval.pi            error      
 5     3.1417078926581148 1.1524e-04 -    
 20    3.1415945317216059 1.8781e-06 5.94 
 80    3.1415926832497778 2.9660e-08 5.98 
