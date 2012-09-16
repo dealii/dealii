@@ -123,6 +123,13 @@
 /* Defined if you have the `functionparser' library */
 #cmakedefine HAVE_FUNCTIONPARSER
 
+/****************************************
+ * Configured in configure_metis.cmake: *
+ ****************************************/
+
+/* Defined if a Metis installation was found and is going to be used */
+#cmakedefine DEAL_II_USE_METIS
+
 
 /**************************************
  * Configured in configure_mpi.cmake: *

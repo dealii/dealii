@@ -9,7 +9,7 @@ FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh
 )
 
 FIND_LIBRARY(NETCDF_LIBRARY
-  NAMES libnetcdf_c++.so libnetcdf_cpp.so
+  NAMES netcdf_c++ netcdf_cpp
   PATHS
   $ENV{NETCDF_LIBRARY_DIR}
   ${NETCDF_LIBRARY_DIR}

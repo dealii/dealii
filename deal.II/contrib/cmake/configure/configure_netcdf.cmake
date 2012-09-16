@@ -30,7 +30,9 @@ Could not find the netcdf library!
 
 Please ensure that the netcdf library is installed on your computer.
 If the library is not at a default location, either provide some hints
-for the autodetection, or set the relevant variables by hand in ccmake.
+via environment variables:
+NETCDF_LIBRARY_DIR NETCDF_INCLUDE_DIR
+Or set the relevant variables by hand in ccmake.
 
 ")
 

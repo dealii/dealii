@@ -113,7 +113,7 @@ OPTION(DEAL_II_WITH_LAPACK
 
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_MPI
   "Build deal.II with support for mpi."
@@ -121,7 +121,7 @@ OPTION(DEAL_II_WITH_MPI
 
 OPTION(DEAL_II_WITH_NETCDF
   "Build deal.II with support for netcdf."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_TBB
   "Build deal.II with support for tbb. This will enable thread support in deal.II."
@@ -132,7 +132,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_TBB
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK."
-  ON)
+  OFF)
 OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
@@ -143,7 +143,7 @@ OPTION(DEAL_II_WITH_ZLIB
 
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
-  ON)
+  OFF)
 
 
 #
@@ -258,6 +258,8 @@ INCLUDE(configure_lapack)
 INCLUDE(configure_umfpack)
 
 INCLUDE(configure_functionparser)
+
+INCLUDE(configure_metis)
 
 INCLUDE(configure_mpi)
 
