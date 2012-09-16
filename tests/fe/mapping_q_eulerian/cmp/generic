@@ -1,6 +1,6 @@
 
 DEAL::.... Q1 Mapping ....
-cells dofs    area      error    
+cells dofs    area         error      
 1     8    2.00000000 3.6338e-01 -    
 4     18   2.82842712 9.9684e-02 1.87 
 16    50   3.06146746 2.5505e-02 1.97 
@@ -8,7 +8,7 @@ cells dofs    area      error
 256   578  3.13654849 1.6056e-03 2.00 
 DEAL::
 DEAL::.... Q2 Mapping ....
-cells dofs    area      error    
+cells dofs    area         error      
 1     18   3.10456950 1.1785e-02 -    
 4     50   3.13914757 7.7829e-04 3.92 
 16    162  3.14143772 4.9318e-05 3.98 
@@ -16,7 +16,7 @@ cells dofs    area      error
 256   2178 3.14159205 1.9348e-07 4.00 
 DEAL::
 DEAL::.... Q3 Mapping ....
-cells dofs    area      error    
+cells dofs    area         error      
 1     32   3.14653903 1.5745e-03 -    
 4     98   3.14194613 1.1251e-04 3.81 
 16    338  3.14161547 7.2623e-06 3.95 
@@ -24,7 +24,7 @@ cells dofs    area      error
 256   4802 3.14159274 2.8653e-08 4.00 
 DEAL::
 DEAL::.... Q4 Mapping ....
-cells dofs    area      error    
+cells dofs    area         error      
 1     50   3.14181857 7.1913e-05 -    
 4     162  3.14159639 1.1900e-06 5.92 
 16    578  3.14159271 1.8860e-08 5.98 
