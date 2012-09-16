@@ -53,6 +53,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: output of super-columns in TableHandler::write_text()
+was inconsistent. This is now fixed.
+<br>
+(Timo Heister, 2012/09/16)
+
 <li> Changed: Due to incompatibilties with some hdf5 packages installed from
 repositories we disable auto-detection of hdf5. Use --with-hdf if you need it.
 <br>

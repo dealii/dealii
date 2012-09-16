@@ -345,9 +345,9 @@ void TableHandler::write_text(std::ostream &out,
   if (format==simple_table_with_separate_column_description)
     {
       // write the captions
-      for (unsigned int j=0; j<column_order.size(); ++j)
+      for (unsigned int j=0; j<n_cols; ++j)
         {
-          const std::string & key = column_order[j];
+          const std::string & key = sel_columns[j];
           out << "# " << j+1 << ": " << key << '\n';
         }
 
@@ -390,56 +390,99 @@ void TableHandler::write_text(std::ostream &out,
       Assert(col_iter!=columns.end(), ExcInternalError());
       cols.push_back(&(col_iter->second));
 
-      switch (format)
-            {
-              case table_with_headers:
-                column_widths[j] = std::max(col_iter->second.max_length, static_cast<unsigned int>(key.length()));
-                break;
-              default:
-                column_widths[j] = col_iter->second.max_length;
-            }
+      column_widths[j] = col_iter->second.max_length;
     }
 
-                                   // write the captions
-  for (unsigned int j=0; j<n_cols; ++j)
+  // writing the captions for table_with_separate_column_description
+  // means that we ignore supercolumns and output the column
+  // header for each column. enumerate columns starting with 1
+  if (format == table_with_separate_column_description)
     {
-      const std::string & key = sel_columns[j];
-
-      switch (format)
-      {
-        case table_with_headers:
+      for (unsigned int j=0; j<n_cols; ++j)
         {
-          // now write key. try to center
-          // it somehow
-          const unsigned int front_padding = (column_widths[j]-key.length())/2,
-                             rear_padding  = (column_widths[j]-key.length()) -
-                                              front_padding;
+          std::string key=sel_columns[j];
+          out << "# " << j+1 << ": " << key << '\n';
+        }
+    }
+  else if (format == table_with_headers)
+    {
+      // This format output supercolumn headers and aligns them centered
+      // over all the columns that belong to it.
+      for (unsigned int j=0; j<column_order.size(); ++j)
+        {
+          const std::string & key = column_order[j];
+          unsigned int width=0;
+          { // compute the width of this column or supercolumn
+            const std::map<std::string, std::vector<std::string> >::const_iterator
+            super_iter=supercolumns.find(key);
+            if (super_iter!=supercolumns.end())
+              {
+                const unsigned int n_subcolumns=super_iter->second.size();
+                for (unsigned int k=0; k<n_subcolumns; ++k)
+                  {
+                    const std::map<std::string, Column>::const_iterator
+                    col_iter=columns.find(super_iter->second[k]);
+                    Assert(col_iter!=columns.end(), ExcInternalError());
+
+                    width += col_iter->second.max_length;
+                  }
+                width += n_subcolumns - 1; // separators between subcolumns
+              }
+            else
+              {
+                const std::map<std::string, Column>::const_iterator
+                                col_iter=columns.find(key);
+
+                width = col_iter->second.max_length;
+              }
+          }
+
+          // header is longer than the column(s) under it
+          if (width<key.length())
+            {
+              // make the column or the last column in this
+              // supercolumn wide enough
+              std::string colname;
+
+              const std::map<std::string, std::vector<std::string> >::const_iterator
+                          super_iter=supercolumns.find(key);
+              if (super_iter!=supercolumns.end())
+                  colname = super_iter->second.back();
+              else
+                colname = key;
+
+              // find column and change output width
+              for (unsigned int i=0;i<n_cols;++i)
+                {
+                  if (sel_columns[i]==colname)
+                    {
+                      column_widths[i] += key.length() - width;
+                      break;
+                    }
+                }
+
+              width=key.length();
+            }
+
+          // now write key. try to center it somehow
+          const unsigned int front_padding = (width-key.length())/2,
+              rear_padding  = (width-key.length()) -
+              front_padding;
           for (unsigned int i=0; i<front_padding; ++i)
             out << ' ';
           out << key;
           for (unsigned int i=0; i<rear_padding; ++i)
             out << ' ';
 
-          // finally column break
           out << ' ';
-          break;
         }
-
-        case table_with_separate_column_description:
-        {
-          // print column key with column number. enumerate
-          // columns starting with 1
-          out << "# " << j+1 << ": " << key << '\n';
-          break;
-        }
-
-        default:
-          Assert (false, ExcInternalError());
-      }
+        out << '\n';
     }
-  if (format == table_with_headers)
-    out << '\n';
+  else
+    Assert (false, ExcInternalError());
 
+
+  // finally output the data itself
   for (unsigned int i=0; i<nrows; ++i)
     {
       for (unsigned int j=0; j<n_cols; ++j)
