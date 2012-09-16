@@ -51,7 +51,9 @@ int main ()
 
   table.write_text(deallog.get_file_stream(),
 		   TableHandler::table_with_separate_column_description);
-
+  
+  deallog << std::endl;
+  
   table.write_text(deallog.get_file_stream(),
 		   TableHandler::table_with_headers);  
 }
