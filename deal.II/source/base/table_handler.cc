@@ -403,7 +403,7 @@ void TableHandler::write_text(std::ostream &out,
                                    // write the captions
   for (unsigned int j=0; j<n_cols; ++j)
     {
-      const std::string & key = column_order[j];
+      const std::string & key = sel_columns[j];
 
       switch (format)
       {
