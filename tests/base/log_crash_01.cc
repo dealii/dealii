@@ -26,13 +26,5 @@ int main()
 {
   std::ofstream logfile("log_crash_01/output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
-
-  deallog.push("1");
-  {
-  deallog.threshold_double(1.e-10);
-  deallog.push("2");
   deallog << "no newline here!";
-  deallog.pop();
-  }
 }
