@@ -583,7 +583,10 @@ class TableHandler
                                           * the purpose of serialization.
                                           */
         template <class Archive>
-        void serialize(Archive & ar, const unsigned int version);
+        void save(Archive & ar, const unsigned int version) const;
+        template<class Archive>
+        void load(Archive & ar, const unsigned int version);
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 
         /**
@@ -905,18 +908,28 @@ void TableHandler::add_value (const std::string &key,
 }
 
 
-
 template <class Archive>
 void
-TableHandler::Column::serialize(Archive & ar,
-                                const unsigned int)
+TableHandler::Column::save(Archive & ar, const unsigned int version) const
 {
-  ar & entries & tex_caption
-    & tex_format & precision
-    & scientific
-    & flag;
+    ar & entries & tex_caption
+      & tex_format & precision
+      & scientific
+      & flag
+      & max_length;
 }
 
+template<class Archive>
+void
+TableHandler::Column::load(Archive & ar, const unsigned int version)
+{
+    ar & entries & tex_caption
+      & tex_format & precision
+      & scientific
+      & flag
+      & max_length;
+    invalidate_cache();
+}
 
 
 template <class Archive>
