@@ -7,6 +7,10 @@
 #
 # This macro assumes the following macros and variables to be defined:
 #
+# FEATURE_${feature_name}_DEPENDS (variable)
+#
+#  - A variable which contains an optional list of features this feature
+#    depends on (and which have to be enbled for this feature to work.)
 #
 # HAVE_CONTRIB_FEATURE_${feature_name}  (variable)
 #
@@ -75,81 +79,36 @@ MACRO(CONFIGURE_FEATURE feature)
   IF(DEAL_II_FEATURE_AUTODETECTION OR DEAL_II_WITH_${feature})
 
     #
-    # First case: DEAL_II_FORCE_CONTRIB_${feature} is defined:
+    # Are all dependencies fullfilled?
     #
-    IF(DEAL_II_FORCE_CONTRIB_${feature})
+    SET(macro_dependencies_ok TRUE)
 
-      IF(HAVE_CONTRIB_FEATURE_${feature})
-        RUN_COMMAND(
-          "
-          CONFIGURE_FEATURE_${feature}_CONTRIB(
-            FEATURE_${feature}_CONTRIB_CONFIGURED
-            )
-          "
-          )
-        IF(FEATURE_${feature}_CONTRIB_CONFIGURED)
+    FOREACH(macro_dependency ${FEATURE_${feature}_DEPENDS})
+      IF(NOT ${macro_dependency})
+
+        IF(DEAL_II_FEATURE_AUTODETECTION)
           MESSAGE(STATUS
-            "DEAL_II_WITH_${feature} successfully set up with contrib packages."
+            "DEAL_II_WITH_${feature} has unmet configuration requirements: ${macro_dependency} has to be set to \"ON\"."
             )
-          IF(DEAL_II_FEATURE_AUTODETECTION)
-            SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
-          ENDIF()
+          SET_CACHED_OPTION(DEAL_II_WITH_${feature} OFF)
         ELSE()
-          # This should not happen. So give an error
           MESSAGE(SEND_ERROR
-            "Failed to set up DEAL_II_WITH_${feature} with contrib packages."
+            "DEAL_II_WITH_${feature} has unmet configuration requirements: ${macro_dependency} has to be set to \"ON\"."
             )
         ENDIF()
-      ELSE()
-        MESSAGE(FATAL_ERROR
-          "Internal build system error: DEAL_II_FORCE_CONTRIB_${feature} defined, but HAVE_CONTRIB_FEATURE_${feature} not present."
-          )
+
+        SET(macro_dependencies_ok FALSE)
       ENDIF()
+    ENDFOREACH()
 
-    ELSE(DEAL_II_FORCE_CONTRIB_${feature})
 
+    IF(macro_dependencies_ok)
       #
-      # Second case: We are allowed to search for an external library:
+      # First case: DEAL_II_FORCE_CONTRIB_${feature} is defined:
       #
-      RUN_COMMAND(
-        "FIND_FEATURE_${feature}_EXTERNAL(FEATURE_${feature}_EXTERNAL_FOUND)"
-        )
+      IF(DEAL_II_FORCE_CONTRIB_${feature})
 
-      IF(FEATURE_${feature}_EXTERNAL_FOUND)
-
-        MESSAGE(STATUS
-          "All external dependencies for DEAL_II_WITH_${feature} are fullfilled."
-          )
-
-        RUN_COMMAND(
-          "
-          CONFIGURE_FEATURE_${feature}_EXTERNAL(
-            FEATURE_${feature}_EXTERNAL_CONFIGURED
-            )
-          "
-          )
-
-        IF(FEATURE_${feature}_EXTERNAL_CONFIGURED)
-          MESSAGE(STATUS
-            "DEAL_II_WITH_${feature} successfully set up with external dependencies."
-            )
-          IF(DEAL_II_FEATURE_AUTODETECTION)
-            SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
-          ENDIF()
-        ELSE()
-          # This should not happen. So give an error
-          MESSAGE(SEND_ERROR
-            "Failed to set up DEAL_II_WITH_${feature} with external dependencies."
-            )
-        ENDIF()
-
-      ELSE()
-
-        MESSAGE(STATUS
-          "DEAL_II_WITH_${feature} has unmet external dependencies."
-          )
-
-        IF(HAVE_CONTRIB_FEATURE_${feature} AND DEAL_II_ALLOW_CONTRIB)
+        IF(HAVE_CONTRIB_FEATURE_${feature})
           RUN_COMMAND(
             "
             CONFIGURE_FEATURE_${feature}_CONTRIB(
@@ -171,17 +130,88 @@ MACRO(CONFIGURE_FEATURE feature)
               )
           ENDIF()
         ELSE()
-            IF(DEAL_II_FEATURE_AUTODETECTION)
-              SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
-            ELSE()
-              RUN_COMMAND(
-                "CONFIGURE_FEATURE_${feature}_ERROR_MESSAGE()"
-                )
-            ENDIF()
+          MESSAGE(FATAL_ERROR
+            "Internal build system error: DEAL_II_FORCE_CONTRIB_${feature} defined, but HAVE_CONTRIB_FEATURE_${feature} not present."
+            )
         ENDIF()
 
-      ENDIF()
-    ENDIF(DEAL_II_FORCE_CONTRIB_${feature})
+      ELSE(DEAL_II_FORCE_CONTRIB_${feature})
+
+        #
+        # Second case: We are allowed to search for an external library:
+        #
+        RUN_COMMAND(
+          "FIND_FEATURE_${feature}_EXTERNAL(FEATURE_${feature}_EXTERNAL_FOUND)"
+          )
+
+        IF(FEATURE_${feature}_EXTERNAL_FOUND)
+
+          MESSAGE(STATUS
+            "All external dependencies for DEAL_II_WITH_${feature} are fullfilled."
+            )
+
+          RUN_COMMAND(
+            "
+            CONFIGURE_FEATURE_${feature}_EXTERNAL(
+              FEATURE_${feature}_EXTERNAL_CONFIGURED
+              )
+            "
+            )
+
+          IF(FEATURE_${feature}_EXTERNAL_CONFIGURED)
+            MESSAGE(STATUS
+              "DEAL_II_WITH_${feature} successfully set up with external dependencies."
+              )
+            IF(DEAL_II_FEATURE_AUTODETECTION)
+              SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
+            ENDIF()
+          ELSE()
+            # This should not happen. So give an error
+            MESSAGE(SEND_ERROR
+              "Failed to set up DEAL_II_WITH_${feature} with external dependencies."
+              )
+          ENDIF()
+
+        ELSE()
+
+          MESSAGE(STATUS
+            "DEAL_II_WITH_${feature} has unmet external dependencies."
+            )
+
+          IF(HAVE_CONTRIB_FEATURE_${feature} AND DEAL_II_ALLOW_CONTRIB)
+            RUN_COMMAND(
+              "
+              CONFIGURE_FEATURE_${feature}_CONTRIB(
+                FEATURE_${feature}_CONTRIB_CONFIGURED
+                )
+              "
+              )
+            IF(FEATURE_${feature}_CONTRIB_CONFIGURED)
+              MESSAGE(STATUS
+                "DEAL_II_WITH_${feature} successfully set up with contrib packages."
+                )
+              IF(DEAL_II_FEATURE_AUTODETECTION)
+                SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
+              ENDIF()
+            ELSE()
+              # This should not happen. So give an error
+              MESSAGE(SEND_ERROR
+                "Failed to set up DEAL_II_WITH_${feature} with contrib packages."
+                )
+            ENDIF()
+          ELSE()
+              IF(DEAL_II_FEATURE_AUTODETECTION)
+                SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
+              ELSE()
+                RUN_COMMAND(
+                  "CONFIGURE_FEATURE_${feature}_ERROR_MESSAGE()"
+                  )
+              ENDIF()
+          ENDIF()
+        ENDIF()
+      ENDIF(DEAL_II_FORCE_CONTRIB_${feature})
+
+    ENDIF()
 
   ENDIF()
 ENDMACRO()

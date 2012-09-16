@@ -3,6 +3,12 @@
 #
 
 
+SET(FEATURE_UMFPACK_DEPENDS
+  DEAL_II_WITH_BLAS
+  DEAL_II_WITH_LAPACK
+  )
+
+
 MACRO(FIND_FEATURE_UMFPACK_EXTERNAL var)
 
   FIND_PACKAGE(UMFPACK)
@@ -77,25 +83,5 @@ by setting DEAL_II_ALLOW_CONTRIB=on or DEAL_II_FORCE_CONTRIB_UMFPACK=on.
 ")
 ENDMACRO()
 
-#
-# UMFPACK needs BLAS and LAPACK to be configured:
-#
-# TODO: Encapsulate this in a depend logic and migrate this check into the
-# macro
 
-IF(DEAL_II_WITH_BLAS AND DEAL_II_WITH_LAPACK)
-  CONFIGURE_FEATURE(UMFPACK)
-ELSE()
-  IF(DEAL_II_FEATURE_AUTODETECT)
-    MESSAGE(STATUS
-      "DEAL_II_WITH_UMFPACK has unmet configuration requirements: Both, DEAL_II_WITH_BLAS and DEAL_II_WITH_LAPACK have to be set."
-      )
-    SET_CACHED_OPTION(DEAL_II_WITH_UMFPACK OFF)
-  ELSE()
-    IF(DEA_II_WITH_UMFPACK)
-      MESSAGE(SEND_ERROR
-        "DEAL_II_WITH_UMFPACK has unmet configuration requirements: Both, DEAL_II_WITH_BLAS and DEAL_II_WITH_LAPACK have to be set."
-        )
-    ENDIF()
-  ENDIF()
-ENDIF()
+CONFIGURE_FEATURE(UMFPACK)

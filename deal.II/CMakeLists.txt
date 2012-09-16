@@ -85,7 +85,7 @@ OPTION(DEAL_II_FEATURE_AUTODETECTION
   "Enables feature autodetection. This will automatically overwrite all
   DEAL_II_WITH_<...> toggles depending on whether they can be supported or
   not."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_ALLOW_CONTRIB
   "Allow the use of contrib libraries bundled with the source tarball.
@@ -93,7 +93,7 @@ OPTION(DEAL_II_ALLOW_CONTRIB
   packages, so to ensure that only external libraries are used
   DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
   OFF"
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
@@ -128,14 +128,14 @@ OPTION(DEAL_II_WITH_TBB
   OFF)
 OPTION(DEAL_II_FORCE_CONTRIB_TBB
   "Always use the bundled tbb library instead of an external one."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK."
-  OFF)
+  ON)
 OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_ZLIB
   "Build deal.II with support for zlib."
