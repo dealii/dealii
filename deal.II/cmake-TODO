@@ -1,10 +1,6 @@
 Next steps:
 
-* Add the CFLAGS and CXXFLAGS magic. (With an option to overwrite for distribution packaging.)
-
-* DEAL_II_DEPRECATED is not used at all...
-
-* Migrate the build of TBB to cmake.
+* Add the compiler dependent CFLAGS and CXXFLAGS magic.
 
 * Add Bug tests
 

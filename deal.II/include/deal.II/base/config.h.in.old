@@ -250,60 +250,6 @@
 /* Define to 1 if you have the <Sacado.hpp> header file. */
 #cmakedefine HAVE_SACADO_HPP
 
-/* Define to 1 if you have the `saxpy_' function. */
-#cmakedefine HAVE_SAXPY_
-
-/* Define to 1 if you have the `sgeevx_' function. */
-#cmakedefine HAVE_SGEEVX_
-
-/* Define to 1 if you have the `sgeev_' function. */
-#cmakedefine HAVE_SGEEV_
-
-/* Define to 1 if you have the `sgelsd_' function. */
-#cmakedefine HAVE_SGELSD_
-
-/* Define to 1 if you have the `sgemm_' function. */
-#cmakedefine HAVE_SGEMM_
-
-/* Define to 1 if you have the `sgemv_' function. */
-#cmakedefine HAVE_SGEMV_
-
-/* Define to 1 if you have the `sgeqrf_' function. */
-#cmakedefine HAVE_SGEQRF_
-
-/* Define to 1 if you have the `sgesdd_' function. */
-#cmakedefine HAVE_SGESDD_
-
-/* Define to 1 if you have the `sgesvd_' function. */
-#cmakedefine HAVE_SGESVD_
-
-/* Define to 1 if you have the `sgetrf_' function. */
-#cmakedefine HAVE_SGETRF_
-
-/* Define to 1 if you have the `sgetri_' function. */
-#cmakedefine HAVE_SGETRI_
-
-/* Define to 1 if you have the `sgetrs_' function. */
-#cmakedefine HAVE_SGETRS_
-
-/* Define to 1 if you have the `sorgqr_' function. */
-#cmakedefine HAVE_SORGQR_
-
-/* Define to 1 if you have the `sormqr_' function. */
-#cmakedefine HAVE_SORMQR_
-
-/* Define to 1 if you have the `sstev_' function. */
-#cmakedefine HAVE_SSTEV_
-
-/* Define to 1 if you have the `ssyevx_' function. */
-#cmakedefine HAVE_SSYEVX_
-
-/* Define to 1 if you have the `ssygvx_' function. */
-#cmakedefine HAVE_SSYGVX_
-
-/* Define to 1 if you have the `ssygv_' function. */
-#cmakedefine HAVE_SSYGV_
-
 /* Define to 1 if you have the <Teuchos_ParameterList.hpp> header file. */
 #cmakedefine HAVE_TEUCHOS_PARAMETERLIST_HPP
 
@@ -432,7 +378,3 @@
 #  pragma warning( disable : 4789 ) // destination of memory copy is too small
 #  pragma warning( disable : 4808 ) // case 'value' is not a valid value for switch condition of type 'bool
 #endif // DEAL_II_MSVC
-
-
-/* Defined if you have the `strtrs_' function. */
-#cmakedefine HAVE_STRTRS_ /* TODO */

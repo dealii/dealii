@@ -64,6 +64,9 @@
  * Configured in configure_blas.cmake: *
  ***************************************/
 
+/* Defined if deal.II was configured with BLAS support */
+#cmakedefine HAVE_LIBBLAS
+
 /* Define to 1 if you have the `daxpy_' function. */
 #cmakedefine HAVE_DAXPY_
 
@@ -122,6 +125,67 @@
 
 /* Defined if you have the `functionparser' library */
 #cmakedefine HAVE_FUNCTIONPARSER
+
+
+/*****************************************
+ * Configured in configure_lapack.cmake: *
+ *****************************************/
+
+/* Defined if deal.II was configured with LAPACK support */
+#cmakedefine HAVE_LIBLAPACK
+
+/* Define to 1 if you have the `sgeevx_' function. */
+#cmakedefine HAVE_SGEEVX_
+
+/* Define to 1 if you have the `sgeev_' function. */
+#cmakedefine HAVE_SGEEV_
+
+/* Define to 1 if you have the `sgelsd_' function. */
+#cmakedefine HAVE_SGELSD_
+
+/* Define to 1 if you have the `sgemm_' function. */
+#cmakedefine HAVE_SGEMM_
+
+/* Define to 1 if you have the `sgemv_' function. */
+#cmakedefine HAVE_SGEMV_
+
+/* Define to 1 if you have the `sgeqrf_' function. */
+#cmakedefine HAVE_SGEQRF_
+
+/* Define to 1 if you have the `sgesdd_' function. */
+#cmakedefine HAVE_SGESDD_
+
+/* Define to 1 if you have the `sgesvd_' function. */
+#cmakedefine HAVE_SGESVD_
+
+/* Define to 1 if you have the `sgetrf_' function. */
+#cmakedefine HAVE_SGETRF_
+
+/* Define to 1 if you have the `sgetri_' function. */
+#cmakedefine HAVE_SGETRI_
+
+/* Define to 1 if you have the `sgetrs_' function. */
+#cmakedefine HAVE_SGETRS_
+
+/* Define to 1 if you have the `sorgqr_' function. */
+#cmakedefine HAVE_SORGQR_
+
+/* Define to 1 if you have the `sormqr_' function. */
+#cmakedefine HAVE_SORMQR_
+
+/* Define to 1 if you have the `sstev_' function. */
+#cmakedefine HAVE_SSTEV_
+
+/* Define to 1 if you have the `ssyevx_' function. */
+#cmakedefine HAVE_SSYEVX_
+
+/* Define to 1 if you have the `ssygvx_' function. */
+#cmakedefine HAVE_SSYGVX_
+
+/* Defined if you have the `strtrs_' function. */
+#cmakedefine HAVE_STRTRS_
+
+
 
 /****************************************
  * Configured in configure_metis.cmake: *
@@ -184,12 +248,6 @@
 
 /* Defined if deal.II was configured with UMFPACK support */
 #cmakedefine HAVE_LIBUMFPACK
-
-/* Defined if deal.II was configured with BLAS support */
-#cmakedefine HAVE_LIBBLAS
-
-/* Defined if deal.II was configured with LAPACK support */
-#cmakedefine HAVE_LIBLAPACK
 
 
 /***************************************

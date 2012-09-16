@@ -97,23 +97,23 @@ OPTION(DEAL_II_ALLOW_CONTRIB
 
 OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
   OFF)
 OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
   "Always use the bundled functionparser library instead of an external one."
-  ON)
+  OFF)
 
 
 OPTION(DEAL_II_WITH_LAPACK
   "Build deal.II with support for LAPACK."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_MPI
   "Build deal.II with support for mpi."
@@ -121,7 +121,7 @@ OPTION(DEAL_II_WITH_MPI
 
 OPTION(DEAL_II_WITH_NETCDF
   "Build deal.II with support for netcdf."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_TBB
   "Build deal.II with support for tbb. This will enable thread support in deal.II."
