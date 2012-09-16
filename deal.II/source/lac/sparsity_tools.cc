@@ -28,7 +28,7 @@
 #ifdef DEAL_II_USE_METIS
 extern "C"
 {
-#include <metis/metis.h>
+#include <metis.h>
 }
 #endif
 
