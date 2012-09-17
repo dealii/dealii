@@ -84,7 +84,7 @@ ENDMACRO()
 # Set up the tbb library:
 #
 
-MACRO(FIND_FEATURE_TBB_EXTERNAL var)
+MACRO(FEATURE_TBB_FIND_EXTERNAL var)
 
   FIND_PACKAGE(TBB)
 
@@ -100,7 +100,7 @@ MACRO(FIND_FEATURE_TBB_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(CONFIGURE_FEATURE_TBB_EXTERNAL var)
+MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
 
   INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
 
@@ -115,10 +115,10 @@ MACRO(CONFIGURE_FEATURE_TBB_EXTERNAL var)
 ENDMACRO()
 
 
-SET(HAVE_CONTRIB_FEATURE_TBB TRUE)
+SET(FEATURE_TBB_HAVE_CONTRIB TRUE)
 
 
-MACRO(CONFIGURE_FEATURE_TBB_CONTRIB var)
+MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
   #
   # Add tbb directly to the object files of deal.II
   #
@@ -136,24 +136,6 @@ MACRO(CONFIGURE_FEATURE_TBB_CONTRIB var)
   LIST(APPEND deal_ii_additional_object_files
     $<TARGET_OBJECTS:obj_tbb>
     )
-ENDMACRO()
-
-
-MACRO(CONFIGURE_FEATURE_TBB_ERROR_MESSAGE)
-    MESSAGE(SEND_ERROR "
-Could not find the tbb library!
-
-Please ensure that the tbb library is installed on your computer.
-If the library is not at a default location, either provide some hints
-via environment variables:
-TBB_LIBRARY_DIR TBB_INCLUDE_DIR
-Or set the relevant variables by hand in ccmake.
-
-Alternatively you may choose to compile the bundled contrib library of
-boost by setting DEAL_II_ALLOW_CONTRIB=on or
-DEAL_II_FORCE_CONTRIB_TBB=on.
-
-")
 ENDMACRO()
 
 

@@ -8,7 +8,7 @@ SET(DEAL_II_WITH_BOOST "ON"
   )
 
 
-MACRO(FIND_FEATURE_BOOST_EXTERNAL var)
+MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
 
   FIND_PACKAGE (Boost COMPONENTS serialization thread)
 
@@ -22,7 +22,7 @@ MACRO(FIND_FEATURE_BOOST_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(CONFIGURE_FEATURE_BOOST_EXTERNAL var)
+MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL var)
 
   INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIR})
 
@@ -40,10 +40,10 @@ MACRO(CONFIGURE_FEATURE_BOOST_EXTERNAL var)
 ENDMACRO()
 
 
-SET(HAVE_CONTRIB_FEATURE_BOOST TRUE)
+SET(FEATURE_BOOST_HAVE_CONTRIB TRUE)
 
 
-MACRO(CONFIGURE_FEATURE_BOOST_CONTRIB var)
+MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
 
   # compile the necessary parts of boost out of ./contrib
 
@@ -76,22 +76,6 @@ MACRO(CONFIGURE_FEATURE_BOOST_CONTRIB var)
   ENDIF()
 
   SET(${var} TRUE)
-ENDMACRO()
-
-
-MACRO(CONFIGURE_FEATURE_BOOST_ERROR_MESSAGE)
-    MESSAGE(SEND_ERROR "
-Could not find the boost library!
-
-Please ensure that the boost library is installed on your computer.
-If the library is not at a default location, either provide some hints
-for the autodetection, or set the relevant variables by hand in ccmake.
-
-Alternatively you may choose to compile the bundled contrib library of
-boost by setting DEAL_II_ALLOW_CONTRIB=on or
-DEAL_II_FORCE_CONTRIB_BOOST=on.
-
-")
 ENDMACRO()
 
 

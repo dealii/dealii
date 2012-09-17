@@ -3,43 +3,52 @@
 #
 # Usage:
 #
-# CONFIGURE_FEATURE(feature_name)
+# CONFIGURE_FEATURE(feature)
+#
 #
 # This macro assumes the following macros and variables to be defined:
 #
-# FEATURE_${feature_name}_DEPENDS (variable)
+# FEATURE_${feature}_DEPENDS (variable, optional)
 #
-#  - A variable which contains an optional list of features this feature
+#    a variable which contains an optional list of features this feature
 #    depends on (and which have to be enbled for this feature to work.)
 #
-# HAVE_CONTRIB_FEATURE_${feature_name}  (variable)
 #
-#   - Which is either set to TRUE if all necessary libraries of the
-#     features comes bundled with deal.II and hence can be supported
-#     without external dependencies, or unset.
+# FEATURE_${feature}_HAVE_CONTRIB  (variable, optional)
 #
-# CONFIGURE_FEATURE_${feature_name}_CONTRIB(var)  (macro)
+#    which shall either be set to TRUE if all necessary libraries of the
+#    features comes bundled with deal.II and hence can be supported
+#    without external dependencies, or unset.
 #
-#   - which shall setup all necessary configuration for the feature with
-#     contrib source dependencies. var set to TRUE shall indicate success.
+# FEATURE_${feature}_CONFIGURE_CONTRIB(var)  (macro, optional)
+#
+#    which shall setup all necessary configuration for the feature with
+#    contrib source dependencies. var set to TRUE shall indicate success.
 #
 #
-# FIND_FEATURE_${feature_name}_EXTERNAL(var)  (macro)
+# FEATURE_${feature}_FIND_EXTERNAL(var)  (macro)
 #
-#   - which shall set var to TRUE if all dependencies for the feature are
-#     fullfilled. In this case all necessary variables for
-#     CONFIGURE_FEATURE_${feature_name}_EXTERNAL shall be set. Otherwise
-#     var should remain unset.
+#    which shall set var to TRUE if all dependencies for the feature are
+#    fullfilled. In this case all necessary variables for
+#    FEATURE_${feature}_CONFIGURE_EXTERNAL must be set. Otherwise
+#    var should remain unset.
 #
-# CONFIGURE_FEATURE_${feature_name}_EXTERNAL(var)  (macro)
+# FEATURE_${feature}_CONFIGURE_EXTERNAL(var)  (macro)
 #
-#   - which shall setup all necessary configuration for the feature with
-#     external dependencies. var set to TRUE shall indicate success.
+#    which shall setup all necessary configuration for the feature with
+#    external dependencies. var set to TRUE shall indicate success.
 #
-# CONFIGURE_FEATURE_${feature_name}_ERROR_MESSAGE()  (macro)
 #
-#   - which shall print a meaningfull error message if case no external
-#     library is found (and contrib is not allowed to be used.)
+# FEATURE_${feature}_CUSTOM_ERROR_MESSAGE() (variable, optional)
+#
+#    which shall either be set to TRUE if FEATURE_${feature}_ERROR_MESSAGE
+#    is set up, or be undefined.
+#
+# FEATURE_${feature}_ERROR_MESSAGE()  (macro, optional)
+#
+#    which shall print a meaningfull error message if case no external
+#    library is found (and contrib is not allowed to be used.)
+#    If not defined, a suitable default error message will be printed.
 #
 #
 
@@ -70,6 +79,37 @@ MACRO(SET_CACHED_OPTION str value)
     CACHE STRING
     "Automatically set due to DEAL_II_FEATURE_AUTODETECTION"
     FORCE)
+ENDMACRO()
+
+
+#
+# A small macro to post an error message:
+#
+MACRO(FEATURE_ERROR_MESSAGE feature)
+  STRING(TOLOWER ${feature} feature_lowercase)
+  IF(FEATURE_${feature}_HAVE_CONTRIB)
+    MESSAGE(SEND_ERROR "
+Could not find the ${feature_lowercase} library!
+
+Please ensure that the ${feature_lowercase} library is installed on your computer.
+If the library is not at a default location, either provide some hints
+for the autodetection, or set the relevant variables by hand in ccmake.
+
+Alternatively you may choose to compile the bundled contrib library of
+${feature_lowercase} by setting DEAL_II_ALLOW_CONTRIB=on or
+DEAL_II_FORCE_CONTRIB_${feature}=on.
+
+")
+ ELSE()
+    MESSAGE(SEND_ERROR "
+Could not find the ${feature_lowercase} library!
+
+Please ensure that the ${feature_lowercase} library is installed on your computer.
+If the library is not at a default location, either provide some hints
+for the autodetection, or set the relevant variables by hand in ccmake.
+
+")
+  ENDIF()
 ENDMACRO()
 
 
@@ -108,10 +148,10 @@ MACRO(CONFIGURE_FEATURE feature)
       #
       IF(DEAL_II_FORCE_CONTRIB_${feature})
 
-        IF(HAVE_CONTRIB_FEATURE_${feature})
+        IF(FEATURE_${feature}_HAVE_CONTRIB)
           RUN_COMMAND(
             "
-            CONFIGURE_FEATURE_${feature}_CONTRIB(
+            FEATURE_${feature}_CONFIGURE_CONTRIB(
               FEATURE_${feature}_CONTRIB_CONFIGURED
               )
             "
@@ -131,7 +171,7 @@ MACRO(CONFIGURE_FEATURE feature)
           ENDIF()
         ELSE()
           MESSAGE(FATAL_ERROR
-            "Internal build system error: DEAL_II_FORCE_CONTRIB_${feature} defined, but HAVE_CONTRIB_FEATURE_${feature} not present."
+            "Internal build system error: DEAL_II_FORCE_CONTRIB_${feature} defined, but FEATURE_${feature}_HAVE_CONTRIB not present."
             )
         ENDIF()
 
@@ -141,7 +181,7 @@ MACRO(CONFIGURE_FEATURE feature)
         # Second case: We are allowed to search for an external library:
         #
         RUN_COMMAND(
-          "FIND_FEATURE_${feature}_EXTERNAL(FEATURE_${feature}_EXTERNAL_FOUND)"
+          "FEATURE_${feature}_FIND_EXTERNAL(FEATURE_${feature}_EXTERNAL_FOUND)"
           )
 
         IF(FEATURE_${feature}_EXTERNAL_FOUND)
@@ -152,7 +192,7 @@ MACRO(CONFIGURE_FEATURE feature)
 
           RUN_COMMAND(
             "
-            CONFIGURE_FEATURE_${feature}_EXTERNAL(
+            FEATURE_${feature}_CONFIGURE_EXTERNAL(
               FEATURE_${feature}_EXTERNAL_CONFIGURED
               )
             "
@@ -178,10 +218,10 @@ MACRO(CONFIGURE_FEATURE feature)
             "DEAL_II_WITH_${feature} has unmet external dependencies."
             )
 
-          IF(HAVE_CONTRIB_FEATURE_${feature} AND DEAL_II_ALLOW_CONTRIB)
+          IF(FEATURE_${feature}_HAVE_CONTRIB AND DEAL_II_ALLOW_CONTRIB)
             RUN_COMMAND(
               "
-              CONFIGURE_FEATURE_${feature}_CONTRIB(
+              FEATURE_${feature}_CONFIGURE_CONTRIB(
                 FEATURE_${feature}_CONTRIB_CONFIGURED
                 )
               "
@@ -203,9 +243,15 @@ MACRO(CONFIGURE_FEATURE feature)
               IF(DEAL_II_FEATURE_AUTODETECTION)
                 SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
               ELSE()
-                RUN_COMMAND(
-                  "CONFIGURE_FEATURE_${feature}_ERROR_MESSAGE()"
-                  )
+                IF(FEATURE_${feature}_CUSTOM_ERROR_MESSAGE)
+                  RUN_COMMAND(
+                    "
+                    FEATURE_${feature}_ERROR_MESSAGE()
+                    "
+                    )
+                ELSE()
+                  FEATURE_ERROR_MESSAGE(${feature})
+                ENDIF()
               ENDIF()
           ENDIF()
         ENDIF()

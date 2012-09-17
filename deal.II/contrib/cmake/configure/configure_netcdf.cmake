@@ -2,7 +2,7 @@
 # Configuration for the netcdf library:
 #
 
-MACRO(FIND_FEATURE_NETCDF_EXTERNAL var)
+MACRO(FEATURE_NETCDF_FIND_EXTERNAL var)
 
   FIND_PACKAGE(NETCDF)
 
@@ -13,29 +13,13 @@ MACRO(FIND_FEATURE_NETCDF_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(CONFIGURE_FEATURE_NETCDF_EXTERNAL var)
+MACRO(FEATURE_NETCDF_CONFIGURE_EXTERNAL var)
 
   INCLUDE_DIRECTORIES(${NETCDF_INCLUDE_DIR})
   LIST(APPEND deal_ii_external_libraries ${NETCDF_LIBRARY})
   SET(HAVE_LIBNETCDF TRUE)
 
   SET(${var} TRUE)
-ENDMACRO()
-
-
-MACRO(CONFIGURE_FEATURE_NETCDF_ERROR_MESSAGE)
-
-  MESSAGE(SEND_ERROR "
-Could not find the netcdf library!
-
-Please ensure that the netcdf library is installed on your computer.
-If the library is not at a default location, either provide some hints
-via environment variables:
-NETCDF_LIBRARY_DIR NETCDF_INCLUDE_DIR
-Or set the relevant variables by hand in ccmake.
-
-")
-
 ENDMACRO()
 
 

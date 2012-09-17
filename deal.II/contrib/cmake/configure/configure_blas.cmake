@@ -4,7 +4,7 @@
 
 INCLUDE(CheckFunctionExists)
 
-MACRO(FIND_FEATURE_BLAS_EXTERNAL var)
+MACRO(FEATURE_BLAS_FIND_EXTERNAL var)
 
   FIND_PACKAGE(BLAS)
 
@@ -15,7 +15,7 @@ MACRO(FIND_FEATURE_BLAS_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(CONFIGURE_FEATURE_BLAS_EXTERNAL var)
+MACRO(FEATURE_BLAS_CONFIGURE_EXTERNAL var)
 
   SET(CMAKE_SHARED_LINKER_FLAGS
     "${CMAKE_SHARED_LINKER_FLAGS} ${BLAS_LINKER_FLAGS}"
@@ -55,18 +55,6 @@ MACRO(CONFIGURE_FEATURE_BLAS_EXTERNAL var)
   SET(HAVE_LIBBLAS TRUE)
 
   SET(${var} TRUE)
-ENDMACRO()
-
-
-MACRO(CONFIGURE_FEATURE_BLAS_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "
-Could not find the blas library!
-
-Please ensure that the blas library is installed on your computer.
-If the library is not at a default location, either provide some hints
-for the autodetection, or set the relevant variables by hand in ccmake.
-
-")
 ENDMACRO()
 
 

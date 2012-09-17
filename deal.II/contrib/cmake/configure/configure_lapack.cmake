@@ -2,7 +2,7 @@
 # Configuration for the lapack library:
 #
 
-MACRO(FIND_FEATURE_LAPACK_EXTERNAL var)
+MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
 
   FIND_PACKAGE(LAPACK)
 
@@ -13,7 +13,7 @@ MACRO(FIND_FEATURE_LAPACK_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(CONFIGURE_FEATURE_LAPACK_EXTERNAL var)
+MACRO(FEATURE_LAPACK_CONFIGURE_EXTERNAL var)
 
   SET(CMAKE_SHARED_LINKER_FLAGS
     "${CMAKE_SHARED_LINKER_FLAGS} ${LAPACK_LINKER_FLAGS}"
@@ -55,18 +55,6 @@ MACRO(CONFIGURE_FEATURE_LAPACK_EXTERNAL var)
 
   SET(${var} TRUE)
 
-ENDMACRO()
-
-
-MACRO(CONFIGURE_FEATURE_BLAS_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "
-Could not find the lapack library!
-
-Please ensure that the lapack library is installed on your computer.
-If the library is not at a default location, either provide some hints
-for the autodetection, or set the relevant variables by hand in ccmake.
-
-")
 ENDMACRO()
 
 

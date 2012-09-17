@@ -132,7 +132,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_TBB
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK."
-  OFF)
+  ON)
 OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
