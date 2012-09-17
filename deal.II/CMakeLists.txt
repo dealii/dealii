@@ -176,10 +176,9 @@ SET(CMAKE_INCLUDE_CURRENT_DIR true)
 
 SET(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/"
   "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/configure/"
   )
-
 
 #
 # Load all macros:
@@ -189,6 +188,8 @@ FOREACH(file ${macro_files})
   MESSAGE(STATUS "Include ${file}")
   INCLUDE(${file})
 ENDFOREACH()
+
+INCLUDE(setup_external_macros)
 
 
 #

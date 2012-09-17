@@ -1,8 +1,3 @@
-INCLUDE(CheckCXXSourceCompiles)
-INCLUDE(CheckCXXCompilerFlag)
-INCLUDE(CheckCXXSourceRuns)
-INCLUDE(CheckIncludeFiles)
-
 #
 # Check for various C++ language features
 #

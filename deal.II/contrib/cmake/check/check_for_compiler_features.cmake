@@ -1,8 +1,3 @@
-INCLUDE(CheckCXXSourceCompiles)
-INCLUDE(CheckCXXCompilerFlag)
-INCLUDE(CheckCXXSourceRuns)
-
-
 #
 # Check for various compiler features.
 #

@@ -2,8 +2,6 @@
 # Configuration for the blas library:
 #
 
-INCLUDE(CheckFunctionExists)
-
 MACRO(FEATURE_BLAS_FIND_EXTERNAL var)
 
   FIND_PACKAGE(BLAS)

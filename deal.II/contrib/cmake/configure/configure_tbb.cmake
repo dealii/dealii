@@ -2,7 +2,6 @@
 # Configuration for the tbb library:
 #
 
-INCLUDE(CheckCXXSourceCompiles)
 
 #
 # Set up genereal threading. The macro will be included in

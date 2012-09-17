@@ -2,9 +2,6 @@
 # Configuration for the trilinos library:
 #
 
-INCLUDE(CheckCXXSourceCompiles)
-INCLUDE(CheckIncludeFile)
-
 
 MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
 
