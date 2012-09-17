@@ -36,15 +36,15 @@ SERIAL_VECTORS := { Vector<double>;
 		    @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
                   }
 
-EXTERNAL_SEQUENTIAL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_VECTOR@
-                                 @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@
-                                 @DEAL_II_EXPAND_PETSC_VECTOR@
+EXTERNAL_SEQUENTIAL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_VECTOR@;
+                                 @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
+                                 @DEAL_II_EXPAND_PETSC_VECTOR@;
                                  @DEAL_II_EXPAND_PETSC_BLOCKVECTOR@
                                }
 
-EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@
-                               @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@
-                               @DEAL_II_EXPAND_PETSC_MPI_VECTOR@
+EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
+                               @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
+                               @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
                                @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@
                              }
 
