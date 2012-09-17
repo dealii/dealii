@@ -67,6 +67,22 @@
 /* Defined if deal.II was configured with BLAS support */
 #cmakedefine HAVE_LIBBLAS
 
+
+/*************************************************
+ * Configured in configure_functionparser.cmake: *
+ *************************************************/
+
+/* Defined if you have the `functionparser' library */
+#cmakedefine HAVE_FUNCTIONPARSER
+
+
+/*****************************************
+ * Configured in configure_lapack.cmake: *
+ *****************************************/
+
+/* Defined if deal.II was configured with LAPACK support */
+#cmakedefine HAVE_LIBLAPACK
+
 /* Define to 1 if you have the `daxpy_' function. */
 #cmakedefine HAVE_DAXPY_
 
@@ -117,22 +133,6 @@
 
 /* Define to 1 if you have the `dsygvx_' function. */
 #cmakedefine HAVE_DSYGVX_
-
-
-/*************************************************
- * Configured in configure_functionparser.cmake: *
- *************************************************/
-
-/* Defined if you have the `functionparser' library */
-#cmakedefine HAVE_FUNCTIONPARSER
-
-
-/*****************************************
- * Configured in configure_lapack.cmake: *
- *****************************************/
-
-/* Defined if deal.II was configured with LAPACK support */
-#cmakedefine HAVE_LIBLAPACK
 
 /* Define to 1 if you have the `sgeevx_' function. */
 #cmakedefine HAVE_SGEEVX_
