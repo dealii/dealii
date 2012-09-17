@@ -18,6 +18,39 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
 
 
     #
+    # Check whether all required modules of trilinos are installed:
+    #
+    MESSAGE(STATUS
+      "Check whether the found trilinos package contains all required modules:"
+      )
+
+    SET(macro_modules_list amesos epetra ifpack aztecoo sacado teuchos)
+
+    FOREACH(macro_module ${macro_modules_list})
+      LIST_CONTAINS(macro_module_found ${macro_module} ${Trilinos_LIBRARIES})
+      IF(macro_module_found)
+        MESSAGE(STATUS "Found ${macro_module}")
+      ELSE()
+        MESSAGE(WARNING "Module ${macro_module} not found!")
+        LIST(APPEND macro_modules_missing ${macro_module})
+        SET(${var} FALSE)
+      ENDIF()
+    ENDFOREACH()
+
+    IF(NOT ${var})
+      MESSAGE(WARNING "
+The Trilinos installation is missing one or modules necessary for
+the deal.II Trilinos interfaces:
+${macro_modules_missing}
+
+Please re-install Trilinos with the missing Trilinos subpackages enabled.
+
+")
+    ENDIF()
+
+
+
+    #
     # Trilinos 10.6 had quite a number of bugs we ran into, see
     # for example
     #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5062
@@ -32,6 +65,7 @@ it incompatible with deal.II. Please use versions before 10.6 or after
 ")
       SET(${var} FALSE)
     ENDIF()
+
 
 
     #
@@ -51,6 +85,7 @@ it incompatible with deal.II. Please use versions before 10.6 or after
     ENDIF()
 
 
+
     #
     # Trilinos has to be configured with the same MPI configuration as
     # deal.II. So check this:
@@ -68,6 +103,7 @@ Trilinos has to be configured with the same MPI configuration as deal.II.
 ")
       SET(${var} FALSE)
     ENDIF()
+
 
 
     #
@@ -93,62 +129,6 @@ See the deal.II FAQ page for a solution.
 
 ")
       SET(${var} FALSE)
-    ENDIF()
-
-
-    #
-    # Check whether we can find all header files used in deal.II:
-    #
-    LIST(APPEND CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIR})
-    CHECK_INCLUDE_FILE("Amesos.h" TRILINOS_HAVE_AMESOS_H)
-    CHECK_INCLUDE_FILE("Epetra_CrsGraph.h" TRILINOS_HAVE_EPETRA_CRSGRAPH_H)
-    CHECK_INCLUDE_FILE("Epetra_CrsMatrix.h" TRILINOS_HAVE_EPETRA_CRSMATRIX_H)
-    CHECK_INCLUDE_FILE("Epetra_Import.h" TRILINOS_HAVE_EPETRA_H)
-    CHECK_INCLUDE_FILE("Epetra_LinearProblem.h" TRILINOS_HAVE_EPETRA_H)
-    CHECK_INCLUDE_FILE("Epetra_Map.h" TRILINOS_HAVE_EPETRA_H)
-    CHECK_INCLUDE_FILE("Epetra_MultiVector.h" TRILINOS_HAVE_EPETRA_H)
-    CHECK_INCLUDE_FILE("Epetra_Operator.h" TRILINOS_HAVE_EPETRA_H)
-    CHECK_INCLUDE_FILE("Epetra_SerialComm.h" TRILINOS_HAVE_EPETRA_H)
-    CHECK_INCLUDE_FILE("Epetra_Vector.h" TRILINOS_HAVE_EPETRA_H)
-    CHECK_INCLUDE_FILE("Ifpack.h" TRILINOS_HAVE_IFPACK_H)
-    CHECK_INCLUDE_FILE("ml_MultiLevelPreconditioner.h" TRILINOS_HAVE_ML_MULTILEVELPRECONDITIONER_H)
-    CHECK_INCLUDE_FILE("AztecOO.h" TRILINOS_HAVE_AZTECOO_H)
-    CHECK_INCLUDE_FILE("AztecOO_Operator.h" TRILINOS_HAVE_AZTECOO_OPERATOR_H)
-    CHECK_INCLUDE_FILE("Sacado.hpp" TRILINOS_HAVE_SACADO_HPP)
-    CHECK_INCLUDE_FILE("Teuchos_ParameterList.hpp" TRILINOS_HAVE_TEUCHOS_PARAMETERLIST_HPP)
-    CHECK_INCLUDE_FILE("Teuchos_RCP.hpp" TRILINOS_HAVE_TEUCHOS_RCP_HPP)
-    CHECK_INCLUDE_FILE("Teuchos_RefCountPtr.hpp" TRILINOS_HAVE_TEUCHOS_REFCOUNTPTR_HPP)
-    LIST(REMOVE_ITEM CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIR})
-
-    #
-    # TODO:
-    #
-    IF(NOT
-        (TRILINOS_HAVE_AMESOS_H AND
-        TRILINOS_HAVE_EPETRA_CRSGRAPH_H AND
-        TRILINOS_HAVE_EPETRA_CRSMATRIX_H AND
-        TRILINOS_HAVE_EPETRA_H AND
-        TRILINOS_HAVE_EPETRA_H AND
-        TRILINOS_HAVE_EPETRA_H AND
-        TRILINOS_HAVE_EPETRA_H AND
-        TRILINOS_HAVE_EPETRA_H AND
-        TRILINOS_HAVE_EPETRA_H AND
-        TRILINOS_HAVE_EPETRA_H AND
-        TRILINOS_HAVE_IFPACK_H AND
-        TRILINOS_HAVE_ML_MULTILEVELPRECONDITIONER_H AND
-        TRILINOS_HAVE_AZTECOO_H AND
-        TRILINOS_HAVE_AZTECOO_OPERATOR_H AND
-        TRILINOS_HAVE_SACADO_HPP AND
-        TRILINOS_HAVE_TEUCHOS_PARAMETERLIST_HPP AND
-        TRILINOS_HAVE_TEUCHOS_RCP_HPP AND
-        TRILINOS_HAVE_TEUCHOS_REFCOUNTPTR_HPP))
-#      MESSAGE(WARNING "
-#The Trilinos installation is missing one or more header files necessary for
-#the deal.II Trilinos interfaces. Please re-install Trilinos with the missing
-#Trilinos subpackages enabled.
-#
-#")
-#     SET(${var} FALSE)
     ENDIF()
 
   ENDIF(TRILINOS_FOUND)
