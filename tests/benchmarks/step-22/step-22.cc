@@ -51,6 +51,7 @@
 				 // Then we need to include the header file
 				 // for the sparse direct solver UMFPACK:
 #include <deal.II/lac/sparse_direct.h>
+#include <deal.II/base/timer.h>
 
 				 // This includes the library for the
 				 // incomplete LU factorization that will
@@ -167,6 +168,8 @@ namespace Step22
                                        // dangling pointer to an already
                                        // destroyed object:
       std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
+
+      TimerOutput timer;
   };
 
                                    // @sect3{Boundary values and right hand side}
@@ -463,7 +466,8 @@ namespace Step22
                   triangulation (Triangulation<dim>::maximum_smoothing),
                   fe (FE_Q<dim>(degree+1), dim,
                       FE_Q<dim>(degree), 1),
-                  dof_handler (triangulation)
+                  dof_handler (triangulation),
+		  timer (std::cout, TimerOutput::summary, TimerOutput::cpu_times)
   {}
 
 
@@ -1296,20 +1300,34 @@ namespace Step22
         std::cout << "Refinement cycle " << refinement_cycle << std::endl;
 
         if (refinement_cycle > 0)
-          refine_mesh ();
+	  {
+	    timer.enter_section("refine");
+	    refine_mesh ();
+	    timer.exit_section("refine");
+	  }
 
+	timer.enter_section("setup");
         setup_dofs ();
+	timer.exit_section("setup");
 
         std::cout << "   Assembling..." << std::endl << std::flush;
+	timer.enter_section("assembly");
         assemble_system ();
+	timer.exit_section("assembly");
 
         std::cout << "   Solving..." << std::flush;
+	timer.enter_section("solver");
         solve ();
+	timer.exit_section("solver");
 
+	timer.enter_section("results");
         output_results (refinement_cycle);
+	timer.enter_section("results");
 
         std::cout << std::endl;
       }
+
+    timer.print_summary();
   }
 }
 
