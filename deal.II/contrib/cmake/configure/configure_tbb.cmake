@@ -128,7 +128,7 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
   # Add tbb directly to the object files of deal.II
   #
 
-  # Setup threading (before configurating our build...)
+  # Setup threading (before configuring our build...)
   # and if successfull return TRUE:
   SETUP_THREADING(${var})
 

@@ -110,7 +110,6 @@ OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
   "Always use the bundled functionparser library instead of an external one."
   OFF)
 
-
 OPTION(DEAL_II_WITH_LAPACK
   "Build deal.II with support for LAPACK."
   OFF)
@@ -175,6 +174,13 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
 SET(CMAKE_INCLUDE_CURRENT_DIR true)
 
+SET(CMAKE_MODULE_PATH
+  ${CMAKE_MODULE_PATH}
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
+  "${CMAKE_SOURCE_DIR}/contrib/cmake/configure/"
+  )
+
+
 #
 # Load all macros:
 #
@@ -184,26 +190,19 @@ FOREACH(file ${macro_files})
   INCLUDE(${file})
 ENDFOREACH()
 
-SET(CMAKE_MODULE_PATH
-  ${CMAKE_MODULE_PATH}
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/configure/"
-  )
-
 
 #
 # We have to initialize some cached variable before PROJECT is called, so
 # configure the cached, user editable CMAKE_BUILD_TYPES, CMAKE_CXX_FLAGS,
 # etc. variables at this point:
 #
-INCLUDE(configure_cached_variables)
+INCLUDE(setup_cached_variables)
 
 #
 # Now, set the project and configure some deal_II specific variables:
 #
 PROJECT(deal.II)
-
-INCLUDE(configure_deal_ii)
+INCLUDE(setup_deal_ii)
 
 
 #
@@ -251,24 +250,17 @@ ENDFOREACH()
 #
 # Feature configuration:
 #
+FILE(GLOB configure_files "contrib/cmake/configure/configure_*.cmake")
 
-#
-# TODO: Resolve this boost dependency so that we can automatically include
-# configure_[...] files
-#
-INCLUDE(configure_arpack)
-INCLUDE(configure_blas)
-INCLUDE(configure_lapack)
-INCLUDE(configure_functionparser)
-INCLUDE(configure_metis)
-INCLUDE(configure_mpi)
-INCLUDE(configure_netcdf)
-INCLUDE(configure_p4est)
-INCLUDE(configure_tbb)
-INCLUDE(configure_boost) # depends on variables defined in configure_tbb
-INCLUDE(configure_trilinos)
-INCLUDE(configure_umfpack)
-INCLUDE(configure_zlib)
+# Make sure configure_boost.cmake comes after configure_tbb.cmake:
+LIST(SORT configure_files)
+LIST(REVERSE configure_files) # :-]
+
+FOREACH(file ${configure_files})
+  MESSAGE(STATUS "Include ${file}")
+  INCLUDE(${file})
+ENDFOREACH()
+
 
 
 
@@ -285,10 +277,11 @@ INCLUDE(configure_zlib)
 
 ADD_SUBDIRECTORY(common)
 
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/Version.in
-  ${CMAKE_CURRENT_BINARY_DIR}/Version
-  )
+# TODO
+# CONFIGURE_FILE(
+#   ${CMAKE_CURRENT_SOURCE_DIR}/Version.in
+#   ${CMAKE_CURRENT_BINARY_DIR}/Version
+#   )
 
 
 #
