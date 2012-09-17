@@ -95,6 +95,10 @@ OPTION(DEAL_II_ALLOW_CONTRIB
   OFF"
   OFF)
 
+OPTION(DEAL_II_WITH_ARPACK
+  "Build deal.II with support for ARPACK."
+  ON)
+
 OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
   OFF)
@@ -248,29 +252,22 @@ ENDFOREACH()
 # Feature configuration:
 #
 
+#
+# TODO: Resolve this boost dependency so that we can automatically include
+# configure_[...] files
+#
+INCLUDE(configure_arpack)
 INCLUDE(configure_blas)
 INCLUDE(configure_lapack)
-
-# configure_boost depends on configure_blas and configure_lapack
-INCLUDE(configure_umfpack)
-
 INCLUDE(configure_functionparser)
-
 INCLUDE(configure_metis)
-
 INCLUDE(configure_mpi)
-
 INCLUDE(configure_netcdf)
-
 INCLUDE(configure_p4est)
-
 INCLUDE(configure_tbb)
-
+INCLUDE(configure_boost) # depends on variables defined in configure_tbb
 INCLUDE(configure_trilinos)
-
-# configure_boost depends on configure_tbb
-INCLUDE(configure_boost)
-
+INCLUDE(configure_umfpack)
 INCLUDE(configure_zlib)
 
 
