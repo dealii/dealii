@@ -170,9 +170,6 @@
 /* Defined if a SLEPc installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_SLEPC
 
-/* Defined if a Trilinos installation was found and is going to be used */
-#cmakedefine DEAL_II_USE_TRILINOS
-
 /* This error appears in the Apple edition of the gcc 3.3, which ships with
    Darwin7.9.0 and probably previous version. It leads to problems during
    linking. For the details, look at aclocal.m4 in the top-level directory. */

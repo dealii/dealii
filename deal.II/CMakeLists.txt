@@ -97,7 +97,7 @@ OPTION(DEAL_II_ALLOW_CONTRIB
 
 OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
@@ -109,7 +109,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
 
 OPTION(DEAL_II_WITH_LAPACK
   "Build deal.II with support for LAPACK."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
@@ -130,9 +130,13 @@ OPTION(DEAL_II_FORCE_CONTRIB_TBB
   "Always use the bundled tbb library instead of an external one."
   OFF)
 
+OPTION(DEAL_II_WITH_TRILINOS
+  "Build deal.II with support for trilinos."
+  ON)
+
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK."
-  ON)
+  OFF)
 OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
@@ -266,6 +270,8 @@ INCLUDE(configure_mpi)
 INCLUDE(configure_netcdf)
 
 INCLUDE(configure_tbb)
+
+INCLUDE(configure_trilinos)
 
 # configure_boost depends on configure_tbb
 INCLUDE(configure_boost)

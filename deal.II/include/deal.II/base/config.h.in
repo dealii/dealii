@@ -211,9 +211,9 @@
 #cmakedefine HAVE_LIBNETCDF
 
 
-/******************************************
- * Configured in configure_threads.cmake: *
- ******************************************/
+/**************************************
+ * Configured in configure_tbb.cmake: *
+ **************************************/
 
 /* Flag indicating whether the library shall be compiled for multithreaded
  * applications. If so, then it is set to one, otherwise to zero.
@@ -240,6 +240,14 @@
 #else
 #  define DEAL_VOLATILE
 #endif
+
+
+/*******************************************
+ * Configured in configure_trilinos.cmake: *
+ *******************************************/
+
+/* Defined if a Trilinos installation was found and is going to be used */
+#cmakedefine DEAL_II_USE_TRILINOS
 
 
 /******************************************

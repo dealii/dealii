@@ -4,12 +4,12 @@ INCLUDE(FindPackageHandleStandardArgs)
 
 FIND_PATH(METIS_INCLUDE_DIR metis.h
   PATH_SUFFIXES metis
-)
+  )
 
 FIND_LIBRARY(METIS_LIBRARY
   NAMES metis
   PATH_SUFFIXES lib64 lib
-)
+  )
 
 #
 # Extract the version number out of metis.h

@@ -13,11 +13,6 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
 Could not find a sufficient modern metis installation:
 Version 5.x required!
 
-Please ensure that a sufficiently modern version of metis is installed on
-your computer. If the library is not at a default location, either provide
-some hints for the autodetection, or set the relevant variables by hand in
-ccmake.
-
 "
       )
   ENDIF()
