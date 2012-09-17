@@ -253,9 +253,8 @@ ENDFOREACH()
 #
 FILE(GLOB configure_files "contrib/cmake/configure/configure_*.cmake")
 
-# Make sure configure_boost.cmake comes after configure_tbb.cmake:
+# Make sure the configure_*.cmake files are included in alphabetical order:
 LIST(SORT configure_files)
-LIST(REVERSE configure_files) # :-]
 
 FOREACH(file ${configure_files})
   MESSAGE(STATUS "Include ${file}")

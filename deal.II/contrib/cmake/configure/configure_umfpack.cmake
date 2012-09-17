@@ -8,6 +8,12 @@ SET(FEATURE_UMFPACK_DEPENDS
   DEAL_II_WITH_LAPACK
   )
 
+#
+# This configure script has to be included after configure_blas and
+# configure_lapack.
+#
+# TODO: Write a check for this
+
 
 MACRO(FEATURE_UMFPACK_FIND_EXTERNAL var)
 
