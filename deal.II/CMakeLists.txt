@@ -195,7 +195,7 @@ SET(CMAKE_MODULE_PATH
 # configure the cached, user editable CMAKE_BUILD_TYPES, CMAKE_CXX_FLAGS,
 # etc. variables at this point:
 #
-INCLUDE(configure_build)
+INCLUDE(configure_cached_variables)
 
 #
 # Now, set the project and configure some deal_II specific variables:
