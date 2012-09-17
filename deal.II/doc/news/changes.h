@@ -53,7 +53,15 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> Fixed: output of super-columns in TableHandler::write_text()
+<li> Fixed: The use of TableHandler::set_precision affected not only the
+precision with which elements of a table were printed, but also the
+precision carried by the output stream after writing the table was
+finished. It thus affected the precision
+with which later output was produced. This is now fixed.
+<br>
+(Timo Heister, 2012/09/16)
+
+<li> Fixed: Output of super-columns in TableHandler::write_text()
 was inconsistent. This is now fixed.
 <br>
 (Timo Heister, 2012/09/16)
