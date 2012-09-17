@@ -1,5 +1,11 @@
 Next steps:
 
+* The original decision to have a dedicated p4est/FAST and p4est/DEBUG
+  structure is a bit unfortunate and therefor replaced by a FindP4EST
+  module that searches libp4est.so and treats this as FAST and
+  libp4est_debug.so or libp4est.g.so and treats this as debug library.
+  TODO: Update the p4est-setup.sh script...
+
 * Add the compiler dependent CFLAGS and CXXFLAGS magic.
 
 * Add Bug tests
@@ -8,12 +14,8 @@ Next steps:
 
 * PETSC
 
-* P4EST
-
 * MUMPS
 
 * ARPACK
-
-* METIS
 
 * HSL ???
