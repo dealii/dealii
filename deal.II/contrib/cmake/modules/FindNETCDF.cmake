@@ -3,14 +3,10 @@
 INCLUDE(FindPackageHandleStandardArgs)
 
 FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh
-  HINTS
-  $ENV{NETCDF_INCLUDE_DIR}
 )
 
 FIND_LIBRARY(NETCDF_LIBRARY
   NAMES netcdf_c++ netcdf_cpp
-  PATHS
-  $ENV{NETCDF_LIBRARY_DIR}
   PATH_SUFFIXES lib64 lib
 )
 
