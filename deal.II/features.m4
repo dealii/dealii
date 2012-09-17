@@ -741,18 +741,3 @@ AC_DEFUN(DEAL_II_CONFIGURE_ARPACK, dnl
      AC_MSG_RESULT([no])
     ])
 ])
-
-
-dnl ------------------------------------------------------------
-dnl Check whether P4EST is to be used to parallelize meshes
-dnl
-dnl Usage: DEAL_II_CONFIGURE_P4EST
-dnl
-dnl ------------------------------------------------------------
-    dnl Verify that the p4est files are actually there
-
-    dnl Make sure that we have also enabled MPI
-
-    if test "x${DEAL_II_COMPILER_SUPPORTS_MPI}" != "x1" ; then
-      AC_MSG_ERROR([When using p4est you also need to enable MPI.])
-    fi
