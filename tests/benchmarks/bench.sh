@@ -16,6 +16,11 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
   pause
   cd deal.II
   svn up deal.II -r$NEXTREVISION
+  if test -z "`svn diff -r$PREVREVISION:$NEXTREVISION . tests`" ; then
+      echo "Skipping revision $NEXTREVISION" ;
+      continue ;
+  fi
+
   echo "configure"
   ./configure --disable-threads --with-petsc=no >/dev/null
   echo "compiling" 
