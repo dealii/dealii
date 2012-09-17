@@ -89,7 +89,7 @@ it incompatible with deal.II. Please use versions before 10.6 or after
     #
     # TODO: Refine this check...
     #
-    IF("${TRILINOS_MPI_LIBRARIES}" EQUAL "")
+    IF(NOT "${Trilinos_MPI_EXEC}" EQUAL "")
       SET(TRILINOS_USE_MPI TRUE)
     ENDIF()
     IF( (TRILINOS_USE_MPI AND NOT DEAL_II_COMPILER_SUPPORTS_MPI) OR
