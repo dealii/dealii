@@ -64,6 +64,7 @@ SET(inst_in_files
   block_sparse_matrix.inst.in
   block_vector.inst.in
   chunk_sparse_matrix.inst.in
+  constraint_matrix.inst.in
   full_matrix.inst.in
   operator.inst.in
   parallel_vector.inst.in
