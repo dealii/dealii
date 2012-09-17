@@ -88,11 +88,6 @@ MACRO(FEATURE_TBB_FIND_EXTERNAL var)
 
   FIND_PACKAGE(TBB)
 
-  # In case we don't have a debug library:
-  IF(NOT TBB_DEBUG_FOUND)
-    SET(TBB_DEBUG_LIBRARY ${TBB_LIBRARY})
-  ENDIF()
-
   IF(TBB_FOUND)
     SET(${var} TRUE)
   ENDIF()
@@ -105,7 +100,17 @@ MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
   INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-    LIST(APPEND deal_ii_external_libraries ${TBB_DEBUG_LIBRARY})
+    IF(TBB_DEBUG_FOUND)
+      LIST(APPEND deal_ii_external_libraries ${TBB_DEBUG_LIBRARY})
+    ELSE()
+      MESSAGE(WARNING "
+deal.II was configured with CMAKE_BUILD_TYPE=Debug but no debug tbb
+library was found. The regular tbb library will be used instead.
+
+")
+      LIST(APPEND deal_ii_external_libraries ${TBB_LIBRARY})
+    ENDIF()
+
   ELSE()
     LIST(APPEND deal_ii_external_libraries ${TBB_LIBRARY})
   ENDIF()

@@ -123,6 +123,10 @@ OPTION(DEAL_II_WITH_NETCDF
   "Build deal.II with support for netcdf."
   OFF)
 
+OPTION(DEAL_II_WITH_P4EST
+  "Build deal.II with support for P4EST."
+  OFF)
+
 OPTION(DEAL_II_WITH_TBB
   "Build deal.II with support for tbb. This will enable thread support in deal.II."
   OFF)
@@ -132,7 +136,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_TBB
 
 OPTION(DEAL_II_WITH_TRILINOS
   "Build deal.II with support for trilinos."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK."
@@ -268,6 +272,8 @@ INCLUDE(configure_metis)
 INCLUDE(configure_mpi)
 
 INCLUDE(configure_netcdf)
+
+INCLUDE(configure_p4est)
 
 INCLUDE(configure_tbb)
 

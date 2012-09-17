@@ -211,6 +211,15 @@
 #cmakedefine HAVE_LIBNETCDF
 
 
+/*****************************************
+ * Configured in configure_p4est.cmake: *
+ *****************************************/
+
+/* Defined if we are to use the p4est library to distribute meshes on a
+   cluster computer. */
+#cmakedefine DEAL_II_USE_P4EST
+
+
 /**************************************
  * Configured in configure_tbb.cmake: *
  **************************************/

@@ -749,63 +749,10 @@ dnl
 dnl Usage: DEAL_II_CONFIGURE_P4EST
 dnl
 dnl ------------------------------------------------------------
-AC_DEFUN(DEAL_II_CONFIGURE_P4EST, dnl
-[
-  AC_MSG_CHECKING(whether p4est will be used)
-
-  AC_ARG_WITH(p4est,
-             [AS_HELP_STRING([--with-p4est=/path/to/p4est],
-             [Specify the path to the p4est installation; use this to distribute meshes on a cluster computer.])],
-              use_p4est=$withval,
-              use_p4est=no)
-
-  if test "x$use_p4est" != "xno" ; then
-    AC_MSG_RESULT(yes)
-
     dnl Verify that the p4est files are actually there
-    if test ! -d "${use_p4est}/DEBUG" -o ! -d "${use_p4est}/FAST" ; then
-      AC_MSG_ERROR([p4est directories $use_p4est/DEBUG or $use_p4est/FAST not found])
-    fi
 
     dnl Make sure that we have also enabled MPI
+
     if test "x${DEAL_II_COMPILER_SUPPORTS_MPI}" != "x1" ; then
       AC_MSG_ERROR([When using p4est you also need to enable MPI.])
     fi
-
-    dnl Right now, we always build p4est as shared lib, so make sure we
-    dnl have built deal.II as a shared lib as well
-    if test "x$enableshared" != "xyes" ; then
-      AC_MSG_ERROR([When using p4est with shared libraries, you need to build
-                    deal.II with shared libraries as well.])
-    fi
-
-    AC_DEFINE(DEAL_II_USE_P4EST, 1,
-              [Defined if we are to use the p4est library to distribute
-               meshes on a cluster computer.])
-    USE_CONTRIB_P4EST=yes
-    AC_SUBST(USE_CONTRIB_P4EST)
-
-    DEAL_II_P4EST_DIR=${use_p4est}
-    AC_SUBST(DEAL_II_P4EST_DIR)
-
-    CXXFLAGSG="$CXXFLAGSG -I$use_p4est/DEBUG/include"
-    CXXFLAGSO="$CXXFLAGSO -I$use_p4est/FAST/include"
-
-    AC_MSG_CHECKING(for p4est library directory)
-    if test -d "$use_p4est/DEBUG/lib64" -a -d "$use_p4est/FAST/lib64" ; then
-      AC_MSG_RESULT(lib64)
-      DEAL_II_P4EST_LIBDIR_NAME=lib64
-    else
-      if test -d "$use_p4est/DEBUG/lib" -a -d "$use_p4est/FAST/lib" ; then
-        AC_MSG_RESULT(lib)
-        DEAL_II_P4EST_LIBDIR_NAME=lib
-      else
-        AC_MSG_ERROR(could not determine whether p4est stores its library in lib/ or lib64/ directories)
-      fi
-    fi
-    AC_SUBST(DEAL_II_P4EST_LIBDIR_NAME)
-
-  else
-    AC_MSG_RESULT(no)
-  fi
-])
