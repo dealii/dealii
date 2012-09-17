@@ -1043,7 +1043,6 @@ estimate (const DH   &dof_handler,
           const types::subdomain_id subdomain_id,
           const types::material_id       material_id)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
            error, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
@@ -1065,7 +1064,6 @@ estimate (const DH   &dof_handler,
           const types::subdomain_id subdomain_id,
           const types::material_id       material_id)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
            errors, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
@@ -1111,7 +1109,6 @@ estimate (const DH   &dof_handler,
           const types::subdomain_id subdomain_id,
           const types::material_id       material_id)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
            error, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
@@ -1133,7 +1130,6 @@ estimate (const DH   &dof_handler,
           const types::subdomain_id subdomain_id,
           const types::material_id       material_id)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
            errors, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
@@ -1469,7 +1465,6 @@ estimate (const DH                &dof_handler,
           const types::subdomain_id subdomain_id,
           const types::material_id       material_id)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<dim,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
            error, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
@@ -1515,7 +1510,6 @@ estimate (const DH                &dof_handler,
           const types::subdomain_id subdomain_id,
           const types::material_id       material_id)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
            error, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
@@ -1739,7 +1733,6 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
                                          const types::subdomain_id subdomain_id,
                                          const types::material_id       material_id)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
            errors, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
@@ -1760,7 +1753,6 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
                                          const types::subdomain_id subdomain_id,
                                          const types::material_id       material_id)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
            errors, component_mask, coefficients, n_threads,
            subdomain_id, material_id);

@@ -154,17 +154,6 @@ OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   OFF)
 
 
-#
-# Compatibility support:
-#
-
-OPTION(DEAL_II_COMPAT_MAPPING
-  "Backward compatibility support for functions and classes that do not
-  take an explicit mapping variable, but rather use a default Q1 mapping
-  instead."
-  ON)
-
-
 
 
 ###########################################################################

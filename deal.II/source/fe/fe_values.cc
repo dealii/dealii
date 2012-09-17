@@ -3500,7 +3500,6 @@ FEValues<dim,spacedim>::FEValues (const FiniteElement<dim,spacedim> &fe,
                                             fe),
                 quadrature (q)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   initialize (update_flags);
 }
 
@@ -3787,7 +3786,6 @@ FEFaceValues<dim,spacedim>::FEFaceValues (const FiniteElement<dim,spacedim> &fe,
                                                 StaticMappingQ1<dim,spacedim>::mapping,
                                                 fe, quadrature)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   initialize (update_flags);
 }
 
@@ -4018,7 +4016,6 @@ FESubfaceValues<dim,spacedim>::FESubfaceValues (const FiniteElement<dim,spacedim
                                                 StaticMappingQ1<dim,spacedim>::mapping,
                                                 fe, quadrature)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   initialize (update_flags);
 }
 
