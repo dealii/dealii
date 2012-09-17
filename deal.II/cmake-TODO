@@ -1,5 +1,9 @@
 Next steps:
 
+* BUGFIXES: The perl-instantiation scripts are a major headache. Port
+  constraint_matrix.inst.in and lapack_templates.inst.in back to the old
+  mechanism!
+
 * Add the compiler dependent CFLAGS and CXXFLAGS magic.
 
 * Add Bug tests
