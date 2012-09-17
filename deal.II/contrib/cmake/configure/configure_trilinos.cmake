@@ -32,14 +32,14 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         MESSAGE(STATUS "Found ${macro_module}")
       ELSE()
         MESSAGE(WARNING "Module ${macro_module} not found!")
-        LIST(APPEND macro_modules_missing ${macro_module})
+        SET(macro_modules_missing "${macro_modules_missing} ${macro_module}")
         SET(${var} FALSE)
       ENDIF()
     ENDFOREACH()
 
     IF(NOT ${var})
       MESSAGE(WARNING "
-The Trilinos installation is missing one or modules necessary for
+The Trilinos installation is missing one or more  modules necessary for
 the deal.II Trilinos interfaces:
 ${macro_modules_missing}
 
