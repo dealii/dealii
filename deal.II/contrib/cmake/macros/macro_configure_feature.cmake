@@ -241,7 +241,7 @@ MACRO(CONFIGURE_FEATURE feature)
             ENDIF()
           ELSE()
               IF(DEAL_II_FEATURE_AUTODETECTION)
-                SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
+                SET_CACHED_OPTION(DEAL_II_WITH_${feature} OFF)
               ELSE()
                 IF(FEATURE_${feature}_CUSTOM_ERROR_MESSAGE)
                   RUN_COMMAND(
