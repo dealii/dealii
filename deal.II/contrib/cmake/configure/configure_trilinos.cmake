@@ -35,14 +35,12 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDFOREACH()
 
     IF(NOT ${var})
-      MESSAGE(WARNING "
-The Trilinos installation is missing one or more  modules necessary for
-the deal.II Trilinos interfaces:
-${macro_modules_missing}
-
-Please re-install Trilinos with the missing Trilinos subpackages enabled.
-
-")
+      MESSAGE(WARNING "\n"
+        "The Trilinos installation is missing one or more  modules necessary for\n"
+        "the deal.II Trilinos interfaces:\n"
+        "${macro_modules_missing}\n\n"
+        "Please re-install Trilinos with the missing Trilinos subpackages enabled.\n\n"
+        )
     ENDIF()
 
 
@@ -54,12 +52,11 @@ Please re-install Trilinos with the missing Trilinos subpackages enabled.
     #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5319
     #
     IF(TRILINOS_MAJOR EQUAL 10 AND TRILINOS_MINOR EQUAL 6)
-      MESSAGE(WARNING "
-Trilinos versions ${TRILINOS_MAJOR}.${TRILINOS_MINOR}.x have bugs that make
-it incompatible with deal.II. Please use versions before 10.6 or after
-10.8.1.
-
-")
+      MESSAGE(WARNING "\n"
+        "Trilinos versions ${TRILINOS_MAJOR}.${TRILINOS_MINOR}.x have bugs that make\n"
+        "it incompatible with deal.II. Please use versions before 10.6 or after\n"
+        "10.8.1.\n\n"
+        )
       SET(${var} FALSE)
     ENDIF()
 
@@ -72,12 +69,11 @@ it incompatible with deal.II. Please use versions before 10.6 or after
     IF( TRILINOS_MAJOR EQUAL 10 AND
         TRILINOS_MINOR EQUAL 8 AND
         TRILINOS_SUBMINOR LESS 2 )
-      MESSAGE(WARNING "
-Trilinos versions 10.8.0 and 10.8.1 have bugs that make
-it incompatible with deal.II. Please use versions before 10.6 or after
-10.8.1.
-
-")
+      MESSAGE(WARNING "\n"
+        "Trilinos versions 10.8.0 and 10.8.1 have bugs that make\n"
+        "it incompatible with deal.II. Please use versions before 10.6 or after\n"
+        "10.8.1.\n\n"
+        )
       SET(${var} FALSE)
     ENDIF()
 
@@ -100,10 +96,9 @@ it incompatible with deal.II. Please use versions before 10.6 or after
     IF( (TRILINOS_HAVE_EPETRA_MPICOMM_H AND NOT DEAL_II_COMPILER_SUPPORTS_MPI)
          OR
          (NOT TRILINOS_HAVE_EPETRA_MPICOMM_H AND DEAL_II_COMPILER_SUPPORTS_MPI))
-      MESSAGE(WARNING "
-Trilinos has to be configured with the same MPI configuration as deal.II.
-
-")
+      MESSAGE(WARNING "\n"
+        "Trilinos has to be configured with the same MPI configuration as deal.II.\n\n"
+        )
       SET(${var} FALSE)
     ENDIF()
 
@@ -126,11 +121,10 @@ Trilinos has to be configured with the same MPI configuration as deal.II.
     LIST(REMOVE_ITEM CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIR})
 
     IF(DEAL_II_CAN_USE_CXX11 AND NOT TRILINOS_SUPPORTS_CPP11)
-      MESSAGE(WARNING "
-Your Trilinos installation is not compatible with the C++ standard selected for this compiler.
-See the deal.II FAQ page for a solution.
-
-")
+      MESSAGE(WARNING "\n"
+        "Your Trilinos installation is not compatible with the C++ standard selected for\n"
+        "this compiler. See the deal.II FAQ page for a solution.\n\n"
+        )
       SET(${var} FALSE)
     ENDIF()
 

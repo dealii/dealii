@@ -13,6 +13,10 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
   FIND_PACKAGE(P4EST)
   FIND_PACKAGE(SC)
 
+  #
+  # TODO: Check for mpi consistency...
+  #
+
   IF(P4EST_FOUND AND SC_FOUND)
     SET(${var} TRUE)
   ENDIF()
@@ -30,12 +34,11 @@ MACRO(FEATURE_P4EST_CONFIGURE_EXTERNAL var)
         ${P4EST_DEBUG_LIBRARY} ${SC_DEBUG_LIBRARY}
         )
     ELSE()
-      MESSAGE(WARNING "
-deal.II was configured with CMAKE_BUILD_TYPE=Debug but no debug p4est and
-sc libraries were found. The regular p4est and sc libraries will be used
-instead.
-
-")
+      MESSAGE(WARNING "\n"
+        "deal.II was configured with CMAKE_BUILD_TYPE=Debug but no debug p4est and\n"
+        "sc libraries were found. The regular p4est and sc libraries will be used\n"
+        "instead.\n\n"
+        )
       LIST(APPEND deal_ii_external_libraries
         ${P4EST_LIBRARY} ${SC_LIBRARY}
         )
@@ -57,14 +60,12 @@ SET(FEATURE_P4EST_CUSTOM_ERROR_MESSAGE TRUE)
 
 
 MACRO(FEATURE_P4EST_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "
-Could not find the p4est and sc libraries!
-
-Please ensure that the libraries are installed on your computer.
-If the libraries are not at a default location, either provide some hints
-for the autodetection, or set the relevant variables by hand in ccmake.
-
-")
+  MESSAGE(SEND_ERROR "\n"
+    "Could not find the p4est and sc libraries!\n\n"
+    "Please ensure that the libraries are installed on your computer.\n"
+    "If the libraries are not at a default location, either provide some hints\n"
+    "for the autodetection, or set the relevant variables by hand in ccmake.\n\n"
+    )
 ENDMACRO()
 
 

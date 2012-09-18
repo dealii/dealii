@@ -17,15 +17,15 @@ MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL var)
 
   INCLUDE_DIRECTORIES(${MPI_CXX_INCLUDE_PATH})
   SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
+  # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
   LIST(APPEND deal_ii_external_libraries ${MPI_CXX_LIBRARIES})
 
   SET(DEAL_II_COMPILER_SUPPORTS_MPI TRUE)
 
 
-  # TODO: Set up the rest:
+  # TODO: (Maybe) set up the rest:
 
   #MPI_CXX_COMPILER        MPI Compiler wrapper for CXX
-  #MPI_CXX_COMPILE_FLAGS   Compilation flags for MPI programs
 
 
   #MPIEXEC                    Executable for running MPI programs
@@ -41,14 +41,12 @@ ENDMACRO()
 SET(FEATURE_MPI_CUSTOM_ERROR_MESSAGE TRUE)
 
 MACRO(FEATURE_MPI_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "
-Could not find any suitable mpi library!
-
-Please ensure that an mpi library is installed on your computer.
-If the library is not at a default location, either provide some hints
-for the autodetection, or set the relevant variables by hand in ccmake.
-
-")
+  MESSAGE(SEND_ERROR "\n"
+    "Could not find any suitable mpi library!\n\n"
+    "Please ensure that an mpi library is installed on your computer.\n"
+    "If the library is not at a default location, either provide some hints\n"
+    "for the autodetection, or set the relevant variables by hand in ccmake.\n"
+    )
 ENDMACRO()
 
 

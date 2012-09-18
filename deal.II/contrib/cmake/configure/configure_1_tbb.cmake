@@ -102,11 +102,10 @@ MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
     IF(TBB_DEBUG_FOUND)
       LIST(APPEND deal_ii_external_libraries ${TBB_DEBUG_LIBRARY})
     ELSE()
-      MESSAGE(WARNING "
-deal.II was configured with CMAKE_BUILD_TYPE=Debug but no debug tbb
-library was found. The regular tbb library will be used instead.
-
-")
+      MESSAGE(WARNING "\n"
+        "deal.II was configured with CMAKE_BUILD_TYPE=Debug but no debug tbb\n"
+        "library was found. The regular tbb library will be used instead.\n\n"
+        )
       LIST(APPEND deal_ii_external_libraries ${TBB_LIBRARY})
     ENDIF()
 

@@ -88,27 +88,22 @@ ENDMACRO()
 MACRO(FEATURE_ERROR_MESSAGE feature)
   STRING(TOLOWER ${feature} feature_lowercase)
   IF(FEATURE_${feature}_HAVE_CONTRIB)
-    MESSAGE(SEND_ERROR "
-Could not find the ${feature_lowercase} library!
-
-Please ensure that the ${feature_lowercase} library is installed on your computer.
-If the library is not at a default location, either provide some hints
-for the autodetection, or set the relevant variables by hand in ccmake.
-
-Alternatively you may choose to compile the bundled contrib library of
-${feature_lowercase} by setting DEAL_II_ALLOW_CONTRIB=on or
-DEAL_II_FORCE_CONTRIB_${feature}=on.
-
-")
+    MESSAGE(SEND_ERROR "\n"
+      "Could not find the ${feature_lowercase} library!\n\n"
+      "Please ensure that the ${feature_lowercase} library is installed on your computer.\n"
+      "If the library is not at a default location, either provide some hints\n"
+      "for the autodetection, or set the relevant variables by hand in ccmake.\n\n"
+      "Alternatively you may choose to compile the bundled contrib library of\n"
+      "${feature_lowercase} by setting DEAL_II_ALLOW_CONTRIB=on or\n"
+      "DEAL_II_FORCE_CONTRIB_${feature}=on.\n\n"
+      )
  ELSE()
-    MESSAGE(SEND_ERROR "
-Could not find the ${feature_lowercase} library!
-
-Please ensure that the ${feature_lowercase} library is installed on your computer.
-If the library is not at a default location, either provide some hints
-for the autodetection, or set the relevant variables by hand in ccmake.
-
-")
+    MESSAGE(SEND_ERROR "\n"
+      "Could not find the ${feature_lowercase} library!\n\n"
+      "Please ensure that the ${feature_lowercase} library is installed on your computer.\n"
+      "If the library is not at a default location, either provide some hints\n"
+      "for the autodetection, or set the relevant variables by hand in ccmake.\n\n"
+      )
   ENDIF()
 ENDMACRO()
 
@@ -128,12 +123,14 @@ MACRO(CONFIGURE_FEATURE feature)
 
         IF(DEAL_II_FEATURE_AUTODETECTION)
           MESSAGE(STATUS
-            "DEAL_II_WITH_${feature} has unmet configuration requirements: ${macro_dependency} has to be set to \"ON\"."
+            "DEAL_II_WITH_${feature} has unmet configuration requirements: "
+            "${macro_dependency} has to be set to \"ON\"."
             )
           SET_CACHED_OPTION(DEAL_II_WITH_${feature} OFF)
         ELSE()
           MESSAGE(SEND_ERROR
-            "DEAL_II_WITH_${feature} has unmet configuration requirements: ${macro_dependency} has to be set to \"ON\"."
+            "DEAL_II_WITH_${feature} has unmet configuration requirements: "
+            "${macro_dependency} has to be set to \"ON\"."
             )
         ENDIF()
 
@@ -171,7 +168,8 @@ MACRO(CONFIGURE_FEATURE feature)
           ENDIF()
         ELSE()
           MESSAGE(FATAL_ERROR
-            "Internal build system error: DEAL_II_FORCE_CONTRIB_${feature} defined, but FEATURE_${feature}_HAVE_CONTRIB not present."
+            "Internal build system error: DEAL_II_FORCE_CONTRIB_${feature} "
+            "defined, but FEATURE_${feature}_HAVE_CONTRIB not present."
             )
         ENDIF()
 
