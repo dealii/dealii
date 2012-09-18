@@ -65,6 +65,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unneeded-internal-declaration")
   ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-function")
   ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-variable")
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-long-long")
 ENDIF()
 
 
