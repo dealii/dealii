@@ -1,113 +1,62 @@
 #
 # Setup default compiler flags:
 #
-# FAT NOTE:
-#
-# TODO
-#
-
-#
-# TODO: For the moment assume that CC and CXX are the same compilers...
+# This file sets up sensible default compiler flags for the various
+# platforms, compilers and build targets supported by the deal.II
+# library.
 #
 
+#
+#   ####################
+#   #     FAT NOTE:    #
+#   ####################
+#
+# As a rule of thumb: All configuration in setup_compiler_flags.cmake and
+# setup_compiler_flags_<compiler>.cmake shall ONLY consist of CFLAGS,
+# CXXFLAGS and LINKER_FLAGS being set.
+#
+# Checks for compiler features (such as C++11 support) and compiler
+# specific bugs that set up further configuration (such as definitions)
+# belong to
+#
+# ./check/check_for_compiler_features.cmake
+# ./check/check_for_compiler_bugs.cmake
+# ./check/check_for_cxx_features.cmake
+#
+# TODO: There is a bit of ambiguity. Clarify with Wolfgang.
+#
 
 
+#
+# For the moment we assume that CC and CXX are the same compilers.
+# (We only need CC for the compilation of the bundled umfpack library.)
+# So, give a prominent error message in case CC and CXX differ:
+#
+IF(NOT ( ${CMAKE_C_COMPILER_ID} STREQUAL ${CMAKE_CXX_COMPILER_ID} AND
+         ${CMAKE_C_COMPILER_VERSION} STREQUAL ${CMAKE_CXX_COMPILER_VERSION} ) )
+    MESSAGE(SEND_ERROR "\n"
+      "Configuration error: The specified C and CXX compiler have to be the "
+      "same, but found:\n"
+      "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}\n"
+      "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}\n"
+      )
+ENDIF()
 
-#######################################################
-#                                                     #
-#    General setup for GCC and GCC like compilers:    #
-#                                                     #
-#######################################################
+
+#
+# General setup for GCC and compilers sufficiently close to GCC:
+#
 
 IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
     CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
+  INCLUDE(setup_compiler_flags_gnu)
+  SET(DEAL_II_KNOWN_COMPILER TRUE)
+ENDIF()
 
-  ########################
-  #                      #
-  #    General setup:    #
-  #                      #
-  ########################
 
-  #
-  # Set the pic flag.
-  # On some systems, -fpic/PIC is implied, so don't set anything to avoid
-  # a warning. (TODO)
-  #
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-fpic")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-fpic")
-
-  #
-  # Check whether the -as-needed flag is available. If so set it to link
-  # the deal.II library with it.
-  #
-  ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS "-Wl,-as-needed")
-
-  #
-  # Set -pedantic if the compiler supports it.
-  # Do not enable -pedantic for gcc-4.4, though...
-  #
-  IF(NOT ( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_CXX_COMPILER_VERSION MATCHES "4.4." ))
-    ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-pedantic")
-    ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-pedantic")
-  ENDIF()
-
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wall")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wall")
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wpointer-arith")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wpointer-arith")
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wwrite-strings")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wwrite-strings")
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wsynth")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wsynth")
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wsign-compare")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wsign-compare")
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wswitch")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wswitch")
-
-  #################################
-  #                               #
-  #    For the Release target:    #
-  #                               #
-  #################################
-
-  #
-  # General optimization flags:
-  #
-  ADD_FLAGS(CMAKE_C_FLAGS_RELEASE "-O2")
-  ADD_FLAGS(CMAKE_CXX_FLAGS_RELEASE "-O2")
-
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_RELEASE "-funroll-loops")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-funroll-loops")
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_RELEASE "-fstrict-aliasing")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-fstrict-aliasing")
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_RELEASE "-felide-constructors")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-felide-constructors")
-
-  ###############################
-  #                             #
-  #    For the Debug target:    #
-  #                             #
-  ###############################
-
-  IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-    ADD_DEFINITIONS("-DDEBUG")
-  ENDIF()
-
-  ADD_FLAGS(CMAKE_C_FLAGS_DEBUG "-O0")
-  ADD_FLAGS(CMAKE_CXX_FLAGS_DEBUG "-O0")
-
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_DEBUG "-ggdb")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_DEBUG "-ggdb")
-  ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS "-ggdb")
-  IF(NOT DEAL_II_HAVE_FLAG_-ggdb)
-    # If -ggdb is not available, fall back to -g:
-    ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_DEBUG "-g")
-    ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_DEBUG "-g")
-    ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS "-g")
-  ENDIF()
-
-ELSE()
-
-  MESSAGE(WARNING "Unrecognized compiler. Please set the relevant compiler options by hand.")
+IF(NOT DEAL_II_KNOWN_COMPILER)
+  MESSAGE(WARNING "\n"
+    "Unrecognized compiler!\n\n"
+    "Please set the relevant compiler options by hand.\n")
 ENDIF()
 
