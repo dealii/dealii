@@ -10,13 +10,15 @@ ENDFOREACH()
 #
 MESSAGE("
 
-*                                        *
-*    deal.II successfully configured!    *
-*                                        *
+    *                                        *
+    *    deal.II successfully configured!    *
+    *                                        *
 
 
     CMAKE_BUILD_TYPE:     ${CMAKE_BUILD_TYPE}
     CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}
+    CMAKE_SOURCE_DIR:     ${CMAKE_SOURCE_DIR}
+    CMAKE_BINARY_DIR:     ${CMAKE_BINARY_DIR}
 
 General compiler flags (used by all build targets):
 
@@ -46,7 +48,7 @@ MESSAGE("
 (Note: Flags set with ccmake or the command line will be appended at the end of the default configuration)
 
 
-Configured Features:
+Configured Features (DEAL_II_FEATURE_AUTODETECTION = ${DEAL_II_FEATURE_AUTODETECTION}):
 ")
 
 GET_CMAKE_PROPERTY(res VARIABLES)
