@@ -1,13 +1,17 @@
 #
-# Append the saved cache variable ${flags}_SAVED at the end of ${flags}
+# Append the saved initial (cached) variables ${flags}_SAVED at the end of
+# ${flags}, see setup_cached_compiler_flags.cmake and the main
+# CMakeLists.txt for details.
 #
 FOREACH(flags ${deal_ii_used_flags})
   SET(${flags} "${${flags}} ${${flags}_SAVED}")
 ENDFOREACH()
 
+
 #
 # And print out a nice configuration summary:
 #
+
 MESSAGE("
 
     *                                        *

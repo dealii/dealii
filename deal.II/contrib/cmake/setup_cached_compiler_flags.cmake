@@ -12,15 +12,23 @@
 # process CMAKE_{C|CXX}_FLAGS are already set to stupid default values.
 # (And _cannot_ be sanely set from this script afterwards...)
 #
-# To mitigate this problem, we do the following: We set cached
-# CMAKE_{C|CXX}_FLAGS variables with empty strings prior to initializing
-# the compiler, so that no default values are set.
+# To mitigate this problem, we do the following:
 #
-# The compiler-flag setup in setup_compiler_flags.cmake later adds our
-# (target and platform dependend) default choice of flags.
+#   - We initialize the cached CMAKE_{C|CXX}_FLAGS variables with empty
+#     strings prior to initializing the compiler, so that no default values
+#     are set.
 #
-# We add the cached variables _to the end_ of this default choice to allow
-# the user to overwrite our choice of compiler flags.
+#   - We save the cached variables (possibly altered by the user via command
+#     line or ccmake) in <variable>_SAVED and set <variable> to an empty
+#     string.
+#
+#   - This way we can happily set our default flags in
+#     setup_compiler_flags.cmake (if the user lets us, see
+#     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+#
+#   - At the end of the configuration step we add <variables>_SAVED
+#     _AT THE END_ of the respective <variable> allowing the user to
+#     effectively overwrite our default setting.
 #
 
 
@@ -35,9 +43,11 @@ SET(CMAKE_BUILD_TYPE
 
 IF( NOT CMAKE_BUILD_TYPE MATCHES "Release" AND
     NOT CMAKE_BUILD_TYPE MATCHES "Debug" )
-
+  #
+  # This is cruel, I know. But it is better to only have a known number of
+  # options for CMAKE_BUILD_TYPE...
+  #
   MESSAGE(FATAL_ERROR "CMAKE_BUILD_TYPE does neither match Release, nor Debug.")
-
 ENDIF()
 
 
@@ -55,16 +65,19 @@ SET(deal_ii_used_flags
   )
 
 FOREACH(flags ${deal_ii_used_flags})
+  # "CACHE" ensures that we only set the variable if it is not already set
+  # as a  cached variable, effectively we're setting a default value:
   SET(${flags} "" CACHE STRING
    "The user supplied cache variable will be appended _at the end_ of the auto generated ${flags} variable"
    )
 
- #
- # Save the cached variable at this point and clear it.
- # ${flags}_SAVED will be appended to ${flags} in
- # setup_cached_compiler_flags_finalize.cmake (called at the end of the
- # main CMakeLists.txt file).
- #
- SET(${flags}_SAVED "${${flags}}")
- SET(${flags} "")
+  #
+  # Save the initial (cached) variable at this point and clear it.
+  # ${flags}_SAVED will be appended to ${flags} in
+  # setup_cached_compiler_flags_finalize.cmake (called at the end of the
+  # main CMakeLists.txt file).
+  #
+  SET(${flags}_SAVED "${${flags}}")
+  SET(${flags} "")
 ENDFOREACH()
+
