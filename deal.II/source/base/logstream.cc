@@ -81,7 +81,54 @@ LogStream::~LogStream()
         (*outstreams[id] != 0)
         &&
         (outstreams[id]->str().length() > 0))
-      *this << std::endl;
+      {
+					 // except the situation is
+					 // not quite that simple. if
+					 // this object is the
+					 // 'deallog' object, then it
+					 // is destroyed upon exit of
+					 // the program. since it's
+					 // defined in a shared
+					 // library that depends on
+					 // libstdc++.so, destruction
+					 // happens before destruction
+					 // of std::cout/cerr, but
+					 // after all file variables
+					 // defined in user programs
+					 // have been destroyed. in
+					 // other words, if we get
+					 // here and the object being
+					 // destroyed is 'deallog' and
+					 // if 'deallog' is associated
+					 // with a file stream, then
+					 // we're in trouble: we'll
+					 // try to write to a file
+					 // that doesn't exist any
+					 // more, and we're likely
+					 // going to crash (this is
+					 // tested by
+					 // base/log_crash_01). rather
+					 // than letting it come to
+					 // this, print a message to
+					 // the screen (note that we
+					 // can't issue an assertion
+					 // here either since Assert
+					 // may want to write to
+					 // 'deallog' itself, and
+					 // AssertThrow will throw an
+					 // exception that can't be
+					 // caught)
+	if ((this == &deallog) && file)
+	  std::cerr << ("You still have content that was written to 'deallog' "
+			"but not flushed to the screen or a file while the "
+			"program is being terminated. This would lead to a "
+			"segmentation fault. Make sure you flush the "
+			"content of the 'deallog' object using 'std::endl' "
+			"before the end of the program.")
+		    << std::endl;
+	else
+	  *this << std::endl;
+      }
   }
 
   if (old_cerr)

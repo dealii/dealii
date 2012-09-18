@@ -1,8 +1,8 @@
 //----------------------------  logtest.cc  ---------------------------
 //    $Id: logtest.cc 23710 2011-05-17 04:50:10Z bangerth $
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,11 @@
 
 int main()
 {
+  deal_II_exceptions::disable_abort_on_exception ();
+
   std::ofstream logfile("log_crash_01/output");
   deallog.attach(logfile);
+  deallog << "OK" << std::endl;
+
   deallog << "no newline here!";
 }

@@ -53,6 +53,14 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: If you pipe content into the deallog object and there
+is no end-line or flush after this content, and if a file stream
+is associated to this object, and if that happens at the end of
+the lifetime of the program, then the program would crash.
+This is now fixed.
+<br>
+(Timo Heister, Wolfgang Bangerth, 2012/09/17)
+
 <li> Fixed: The use of TableHandler::set_precision affected not only the
 precision with which elements of a table were printed, but also the
 precision carried by the output stream after writing the table was
