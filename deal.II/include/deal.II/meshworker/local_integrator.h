@@ -14,6 +14,7 @@
 #define __deal2__mesh_worker_local_integrator_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/std_cxx1x/function.h>
 
 DEAL_II_NAMESPACE_OPEN
