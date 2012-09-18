@@ -53,6 +53,14 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: One can compile deal.II with MPI support but run programs
+that aren't intended to use parallel communications and that, in fact,
+do not call <code>MPI_Init</code> at all. They are nevertheless supposed
+to work but previously the TimerOutput would crash under these conditions.
+This is now fixed.
+<br>
+(Timo Heister, Wolfgang Bangerth, 2012/09/18)
+
 <li> Fixed: If you pipe content into the deallog object and there
 is no end-line or flush after this content, and if a file stream
 is associated to this object, and if that happens at the end of

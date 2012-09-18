@@ -94,11 +94,11 @@ namespace
     {
       FILETIME cpuTime, sysTime, createTime, exitTime;
       if (GetProcessTimes(GetCurrentProcess(),  &createTime,
-			  &exitTime, &sysTime, &cpuTime))
-	{
-	  return (double)(((unsigned long long)cpuTime.dwHighDateTime << 32)
-			  | cpuTime.dwLowDateTime) / 1e6;
-	}
+                          &exitTime, &sysTime, &cpuTime))
+        {
+          return (double)(((unsigned long long)cpuTime.dwHighDateTime << 32)
+                          | cpuTime.dwLowDateTime) / 1e6;
+        }
       return 0;
     }
   }
@@ -239,9 +239,9 @@ double Timer::wall_time () const
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
       return (wall_timer.tv_sec
-	      + 1.e-6 * wall_timer.tv_usec
-	      - start_wall_time
-	      + cumulative_wall_time);
+              + 1.e-6 * wall_timer.tv_usec
+              - start_wall_time
+              + cumulative_wall_time);
 #endif
     }
   else
@@ -394,7 +394,11 @@ TimerOutput::leave_subsection (const std::string &section_name)
                                        // the Timers here according to that
   double cpu_time = sections[actual_section_name].timer();
   sections[actual_section_name].total_cpu_time
-    += Utilities::MPI::sum (cpu_time, mpi_communicator);
+    += (Utilities::System::job_supports_mpi()
+        ?
+        Utilities::MPI::sum (cpu_time, mpi_communicator)
+        :
+        cpu_time);
 
                                    // in case we have to print out
                                    // something, do that here...
@@ -438,8 +442,12 @@ TimerOutput::print_summary () const
                                    // in case we want to write CPU times
   if (output_type != wall_times)
     {
-      double total_cpu_time = Utilities::MPI::sum (timer_all(),
-                                                   mpi_communicator);
+      double total_cpu_time = (Utilities::System::job_supports_mpi()
+                               ?
+			       Utilities::MPI::sum (timer_all(),
+						    mpi_communicator)
+			       :
+			       timer_all());
 
                                        // check that the sum of all times is
                                        // less or equal than the total
