@@ -18,6 +18,13 @@
 
 #if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
 #  include <mpi.h>
+                                 // Check whether <mpi.h> is a suitable
+                                 // include for us (if MPI_SEEK_SET is not
+                                 // defined, we'll die anyway):
+#  ifndef MPI_SEEK_SET
+#    error "The buildsystem included an insufficient mpi.h header that does not export MPI_SEEK_SET"
+#  endif
+
 #else
                                  // without MPI, we would still like to use
                                  // some constructs with MPI data
