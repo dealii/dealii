@@ -17,7 +17,6 @@
 # TODO: On some systems, -fpic/PIC is implied, so don't set anything to
 # avoid a warning.
 #
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-fpic")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-fpic")
 
 #
@@ -30,23 +29,16 @@ ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS "-Wl,-as-needed")
 #
 # Set -pedantic if the compiler supports it.
 #
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-pedantic")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-pedantic")
 
 #
 # Setup various warnings:
 #
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wall")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wall")
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wpointer-arith")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wpointer-arith")
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wwrite-strings")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wwrite-strings")
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wsynth")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wsynth")
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wsign-compare")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wsign-compare")
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wswitch")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wswitch")
 
 #
@@ -57,6 +49,23 @@ ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wswitch")
 #
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
 
+IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  #
+  # Like many other compilers, clang produces warnings for array
+  # accesses out of bounds, even if they are in code that's dead
+  # for this dimension. Suppress this.
+  #
+  # There are a number of other warnings we get that can't easily
+  # be worked around and that are definitely not useful. Suppress
+  # those too.
+  #
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-array-bounds")
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-parentheses")
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-delete-non-virtual-dtor")
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unneeded-internal-declaration")
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-function")
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-variable")
+ENDIF()
 
 
 
@@ -69,14 +78,10 @@ ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
 #
 # General optimization flags:
 #
-ADD_FLAGS(CMAKE_C_FLAGS_RELEASE "-O2")
 ADD_FLAGS(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_RELEASE "-funroll-loops")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-funroll-loops")
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_RELEASE "-fstrict-aliasing")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-fstrict-aliasing")
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_RELEASE "-felide-constructors")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-felide-constructors")
 
 #
@@ -100,17 +105,14 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   ADD_DEFINITIONS("-DDEBUG")
 ENDIF()
 
-ADD_FLAGS(CMAKE_C_FLAGS_DEBUG "-O0")
 ADD_FLAGS(CMAKE_CXX_FLAGS_DEBUG "-O0")
 
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_DEBUG "-ggdb")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_DEBUG "-ggdb")
 ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS "-ggdb")
 #
 # If -ggdb is not available, fall back to -g:
 #
 IF(NOT DEAL_II_HAVE_FLAG_-ggdb)
-  ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_DEBUG "-g")
   ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_DEBUG "-g")
   ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS "-g")
 ENDIF()
