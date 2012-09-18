@@ -1,15 +1,21 @@
 #
+# I'm sure we will have to split this file in various sensible pieces...
+#
+
+
+#
 # Check for various compiler bugs:
 #
 
 
+
 #
+# TODO: Obsolete. Remove and clean source.
 # Versions of GCC before 3.0 had a problem with the explicit
 # instantiation of member templates when the member was in fact
 # an operator. In that case, they needed the "template" keyword,
 # which is actually not allowed at this place. Test case is
 #
-# /* ----------------------------------------------- */
 # struct X
 # {
 #     template <typename T2>
@@ -17,7 +23,6 @@
 # };
 #
 # template X X::operator=<float> (float &);
-# /* ---------------------------------------------------------- */
 #
 # The compiler only groks this if the "operator=" is prepended
 # by "template". We detect this, and either set the
@@ -79,28 +84,21 @@ CHECK_CXX_COMPILER_BUG(
   DEAL_II_EXPLICIT_DESTRUCTOR_BUG)
 
 
-#
-# TODO:
-# On Cygwin, when using shared libraries, there might occur
-# difficulties when linking libraries for several dimensions,
-# as some symbols are defined in all of them. This leads to a
-# linker error. We force the linker to ignore multiple symbols,
-# but of course this might lead to strange program behaviour if
-# you accidentally defined one symbol multiple times...
-# (added 2005/07/13, Ralf B. Schulz)
-# (modified 2005/12/20, Ralf B. Schulz)
-#
 
-#        CXXFLAGSPIC=
-#        LDFLAGS="$LDFLAGS -Xlinker --allow-multiple-definition"
-#        SHLIBFLAGS="$SHLIBFLAGS -Xlinker --allow-multiple-definition"
-#        ;;
 #
-#      *)
-#        CXXFLAGSPIC="-fPIC"
-#        LDFLAGSPIC="-fPIC"
-#        ;;
-#    esac
+# gcc 4.4 has an interesting problem in that it doesn't
+# care for one of BOOST signals2's header files and produces
+# dozens of pages of error messages of the form
+#   warning: invoking macro BOOST_PP_CAT argument 1: \
+#   empty macro arguments are undefined in ISO C90 and ISO C++98
+# This can be avoided by not using -pedantic for this compiler.
+# For all other versions, we use this flag, however.
+#
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
+   CMAKE_CXX_COMPILER_VERSION MATCHES "4.4.")
+  STRIP_FLAG(CMAKE_C_FLAGS "-pedantic")
+  STRIP_FLAG(CMAKE_CXX_FLAGS "-pedantic")
+ENDIF()
 
 
 

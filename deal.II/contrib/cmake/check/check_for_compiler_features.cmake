@@ -3,7 +3,6 @@
 #
 
 
-
 #
 # Check whether the std::vector::iterator is just a plain pointer
 #
@@ -384,3 +383,22 @@ ELSE()
   SET(DEAL_II_MIN_BOOL_VECTOR_CAPACITY
     ${DEAL_II_MIN_BOOL_VECTOR_CAPACITY_RETURN_VALUE})
 ENDIF()
+
+
+
+#
+# Newer versions of gcc can pass a flag to the assembler to
+# compress debug sections. At the time of writing this test,
+# this can save around 230 MB of disk space on the object
+# files we produce (810MB down to 570MB for the debug versions
+# of object files). Unfortunately, the sections have to be
+# unpacked again when they are put into the shared libs, so
+# no savings there.
+#
+# TODO:
+# The flag also doesn't appear to be working on Cygwin, as
+# per email by John Fowkes on the mailing list in Feb 2012,
+# so don't run the test on cygwin.
+#
+ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wa,--compress-debug-sections")
+ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS "-Wa,--compress-debug-sections")

@@ -86,12 +86,14 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     "
     DEAL_II_HAVE_CXX11_THREAD)
 
+  #
   #On some systems with gcc 4.5.0, we can compile the code
   #above but it will throw an exception when run. So test
   #that as well. The test will only be successful if we have
   #libpthread available, so link it in for this test. If
   #multithreading is requested, it will be added to CXXFLAGS
   #later on so there is no need to do this here.
+  #
   CHECK_CXX_SOURCE_RUNS(
     "
     #include <thread>

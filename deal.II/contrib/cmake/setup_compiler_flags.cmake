@@ -11,16 +11,23 @@
 #   #     FAT NOTE:    #
 #   ####################
 #
-# As a rule of thumb: All configuration in setup_compiler_flags.cmake and
+# All configuration in setup_compiler_flags.cmake and
 # setup_compiler_flags_<compiler>.cmake shall ONLY consist of CFLAGS,
 # CXXFLAGS and LINKER_FLAGS being set.
 #
 # Checks for compiler features (such as C++11 support) and compiler
-# specific bugs that set up further configuration (such as definitions)
+# specific bugs that
+#   - usually set up further configuration (such as definitions)
+#   - disable a specific flag for a specific compiler version.
+#
 # belong to
 #
 # ./check/check_for_compiler_features.cmake
+#
 # ./check/check_for_compiler_bugs.cmake
+#
+# and enable language features:
+#
 # ./check/check_for_cxx_features.cmake
 #
 # TODO: There is a bit of ambiguity. Clarify with Wolfgang.
