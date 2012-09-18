@@ -97,7 +97,7 @@ OPTION(DEAL_II_ALLOW_CONTRIB
 
 OPTION(DEAL_II_WITH_ARPACK
   "Build deal.II with support for ARPACK."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."

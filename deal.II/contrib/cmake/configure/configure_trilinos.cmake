@@ -85,15 +85,21 @@ it incompatible with deal.II. Please use versions before 10.6 or after
 
     #
     # Trilinos has to be configured with the same MPI configuration as
-    # deal.II. So check this:
+    # deal.II. TODO: Refine this check...
     #
-    # TODO: Refine this check...
+
     #
-    IF(NOT "${Trilinos_MPI_EXEC}" EQUAL "")
-      SET(TRILINOS_USE_MPI TRUE)
-    ENDIF()
-    IF( (TRILINOS_USE_MPI AND NOT DEAL_II_COMPILER_SUPPORTS_MPI) OR
-        (NOT TRILINOS_USE_MPI AND DEAL_II_COMPILER_SUPPORTS_MPI))
+    # Epetra installs Epetra_MpiComm.h if configured trilinos was
+    # configured with mpi. We use this as a check for the mpi configuration
+    # of Epetra.
+    #
+    LIST(APPEND CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIR})
+    CHECK_INCLUDE_FILE_CXX("Epetra_MpiComm.h" TRILINOS_HAVE_EPETRA_MPICOMM_H)
+    LIST(REMOVE_ITEM CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIR})
+
+    IF( (TRILINOS_HAVE_EPETRA_MPICOMM_H AND NOT DEAL_II_COMPILER_SUPPORTS_MPI)
+         OR
+         (NOT TRILINOS_HAVE_EPETRA_MPICOMM_H AND DEAL_II_COMPILER_SUPPORTS_MPI))
       MESSAGE(WARNING "
 Trilinos has to be configured with the same MPI configuration as deal.II.
 
