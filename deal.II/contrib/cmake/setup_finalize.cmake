@@ -19,23 +19,26 @@ MESSAGE("
     *                                        *
 
 
-    CMAKE_BUILD_TYPE:     ${CMAKE_BUILD_TYPE}
-    CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}
-    CMAKE_SOURCE_DIR:     ${CMAKE_SOURCE_DIR}
-    CMAKE_BINARY_DIR:     ${CMAKE_BINARY_DIR}
+      CMAKE_BUILD_TYPE:     ${CMAKE_BUILD_TYPE}
+      CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}
+      CMAKE_SOURCE_DIR:     ${CMAKE_SOURCE_DIR}
+      CMAKE_BINARY_DIR:     ${CMAKE_BINARY_DIR}
+
+      CMAKE_CXX_COMPILER:   ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}
+    ( CMAKE_C_COMPILER:     ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION} )
 
 General compiler flags (used by all build targets):
 
-    CMAKE_C_FLAGS:       ${CMAKE_C_FLAGS}
-    CMAKE_CXX_FLAGS:     ${CMAKE_CXX_FLAGS}
+      CMAKE_CXX_FLAGS:     ${CMAKE_CXX_FLAGS}
+    ( CMAKE_C_FLAGS:       ${CMAKE_C_FLAGS} )
 ")
 
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
   MESSAGE("
 Additional compiler flags used for the Release target:
 
-    CMAKE_C_FLAGS_RELEASE:   ${CMAKE_C_FLAGS_RELEASE}
-    CMAKE_CXX_FLAGS_RELEASE: ${CMAKE_CXX_FLAGS_RELEASE}
+      CMAKE_CXX_FLAGS_RELEASE: ${CMAKE_CXX_FLAGS_RELEASE}
+    ( CMAKE_C_FLAGS_RELEASE:   ${CMAKE_C_FLAGS_RELEASE} )
 ")
 ENDIF()
 
@@ -43,13 +46,15 @@ IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   MESSAGE("
 Additional compiler flags used for the Debug target:
 
-    CMAKE_C_FLAGS_DEBUG:   ${CMAKE_C_FLAGS_DEBUG}
-    CMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG}
+      CMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG}
+    ( CMAKE_C_FLAGS_DEBUG:   ${CMAKE_C_FLAGS_DEBUG} )
 ")
 ENDIF()
 
 MESSAGE("
-(Note: Flags set with ccmake or the command line will be appended at the end of the default configuration)
+Configured linker flags:
+
+      CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}
 
 
 Configured Features (DEAL_II_FEATURE_AUTODETECTION = ${DEAL_II_FEATURE_AUTODETECTION}):
