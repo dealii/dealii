@@ -79,6 +79,16 @@ ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-fstrict-aliasing")
 ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_RELEASE "-felide-constructors")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-felide-constructors")
 
+#
+# TODO: Migrate this toggle to the boost objects, if possible.
+# Newer versions have a flag -Wunused-local-typedefs that, though in principle
+# a good idea, triggers a lot in BOOST in various places. Unfortunately,
+# this warning is included in -W/-Wall, so disable it if the compiler
+# supports it.
+#
+ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
+
+
 
 ###############################
 #                             #

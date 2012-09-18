@@ -1,6 +1,6 @@
 MACRO(FEATURE_FUNCTIONPARSER_FIND_EXTERNAL var)
   MESSAGE(WARNING "\n"
-    "Module for finding functionparser not written, yet!\n\n"
+    "No module available for finding functionparser externally.\n\n"
     )
 ENDMACRO()
 

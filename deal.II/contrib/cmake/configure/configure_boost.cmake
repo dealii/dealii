@@ -61,17 +61,9 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
 
   # compile the necessary parts of boost out of ./contrib
 
-  # We need some definitions to use the headers of the bundled boost
+  # We need to set some definitions to use the headers of the bundled boost
   # library:
   ADD_DEFINITIONS("-DBOOST_NO_HASH" "-DBOOST_NO_SLIST")
-
-  #
-  # Newer versions have a flag -Wunused-local-typedefs that, though in principle
-  # a good idea, triggers a lot in BOOST in various places. Unfortunately,
-  # this warning is included in -W/-Wall, so disable it if the compiler
-  # supports it.
-  #
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
 
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/boost-1.49.0/include
