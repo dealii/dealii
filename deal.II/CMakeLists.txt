@@ -314,28 +314,16 @@ INCLUDE(setup_finalize)
 
 
 #
-# Build the toolchain:
+# Build the toolchain and prepare the includes:
 #
 
-ADD_SUBDIRECTORY(common)
-
-# TODO
-# CONFIGURE_FILE(
-#   ${CMAKE_CURRENT_SOURCE_DIR}/Version.in
-#   ${CMAKE_CURRENT_BINARY_DIR}/Version
-#   )
-
+ADD_SUBDIRECTORY(contrib/config)
+ADD_SUBDIRECTORY(contrib/expand_instantiations)
+ADD_SUBDIRECTORY(include)
 
 #
 # Compile the library:
 #
-
-INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}/include/
-  ${CMAKE_BINARY_DIR}/include/
-  )
-
-ADD_SUBDIRECTORY(include)
 
 ADD_SUBDIRECTORY(source)
 

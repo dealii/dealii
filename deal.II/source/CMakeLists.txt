@@ -3,6 +3,12 @@
 #
 
 
+INCLUDE_DIRECTORIES(
+  ${CMAKE_SOURCE_DIR}/include/
+  ${CMAKE_BINARY_DIR}/include/
+  )
+
+
 #
 # Each subdirectory specifies an OBJECT target:
 #
@@ -39,8 +45,8 @@ ADD_LIBRARY(deal_II SHARED
 
 #
 # Sonaming: Well... we just use the version number.
-# No point to wrack one's brain over the question whether a C++ library is
-# still ABI backwards compatible.
+# No point to wrack one's brain over the question whether a new version of
+# a C++ library is still ABI backwards compatible :-]
 #
 SET_TARGET_PROPERTIES(deal_II PROPERTIES
   VERSION ${VERSION}
