@@ -3,15 +3,23 @@ SET(VERSION "8.0.pre")
 #
 # This is the main CMakeLists.txt file for the deal.II project
 #
-# The main purpose of this file is to set all the configuration toggles and
+# The main purpose of this file is to set all the configuration options and
 # then call a lot of modules residing under ./contrib/cmake/*/ that do the
 # hard work.
+#
+#
+# Note: All further explained options can be either set via ccmake or at
+# the promp via:
+#
+#  $ cmake -D<OPTION>=<VALUE> [...] path/to/source/tree
+#
 #
 # The first bunch of options of type DEAL_II_WITH_<feature> are for
 # configuration of the various features of the deal.II library.
 # An enabled feature will usually add one ore more dependencies to external
 # or 'contrib' (i.e. bundled with deal.II and residing under ./contrib/)
 # libraries.
+#
 #
 # The option DEAL_II_ALLOW_CONTRIB determines the behaviour of the
 # dependency resolution:
@@ -49,22 +57,38 @@ SET(VERSION "8.0.pre")
 #
 # And, last but not least, CMAKE_BUILD_TYPES:
 #
-# We support the "Debug" and "Release" build types. Default is the
+# We support the "Debug" and "Release" build targets. Default is the
 # "Release" target.
 #
-# Debug will enable a lot of debug code paths and Assertions, as well as
-# compiling the library with a suitable set of debug compiler flags.
+# - Debug will enable a lot of debug code paths and Assertions, as well as
+#   compiling the library with a suitable set of debug compiler flags.
 #
-# Release will chose a suitable set of optimizing flags.
+# - Release will chose a suitable set of optimizing flags.
 #
-# The default CXXFLAGS (and CFLAGS) are stored in the following cached
-# variables (as is common practise for cmake):
 #
-#   CMAKE_CXX_FLAGS         -  used during all builds
-#   CMAKE_CXX_FLAGS_DEBUG   -  additional flags used during debug builds
-#   CMAKE_CXX_FLAGS_RELEASE -  additional flags used during release builds
+# deal.II will configure sensible default CFLAGS and CXXFLAGS depending on
+# platform, compiler and build target. There are two options, if this is
+# not desired:
 #
-#   (same for CMAKE_C_...)
+# - Option 1: Disable the configuration completely by setting
+#   DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS to OFF.
+#   Beware of the fact that certain features may still pull in necessary
+#   compiler flags.
+#
+# - Option 2: Overwrite the default configuration by setting the following
+#   cached variables:
+#
+#     CMAKE_CXX_FLAGS         -  used during all builds
+#     CMAKE_CXX_FLAGS_DEBUG   -  additional flags used during debug builds
+#     CMAKE_CXX_FLAGS_RELEASE -  additional flags used during release builds
+#     (same for CMAKE_C_...)
+#
+#  The content of the cached variables will be preserved and added
+#  *_TO THE END_* of the default compiler flags, hence giving a possibility
+#  for overwriting a flag. E.g.: -Wsign-compare, set by the build system,
+#  can be overwritten by specifying:
+#
+#  $ cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" <...>
 #
 
 
@@ -156,6 +180,21 @@ OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
   ON)
 
+#
+# Build configuration: Configuration options regarding compilation and
+# installation of the deal.II library
+#
+
+OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
+  "configure sensible default CFLAGS and CXXFLAGS depending on platform,
+  compiler and build target. Disabling this option will turn off almost all
+  compiler flag setup."
+  ON)
+
+OPTION(DEAL_II_BUILD_SHARED_LIBRARY
+  "Build deal.II as a shared library."
+  ON) # TODO: Implement an archive target ...
+
 
 
 
@@ -176,8 +215,8 @@ SET(CMAKE_INCLUDE_CURRENT_DIR true)
 
 SET(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/"
-  "${CMAKE_SOURCE_DIR}/contrib/cmake/modules/"
+  ${CMAKE_SOURCE_DIR}/contrib/cmake/
+  ${CMAKE_SOURCE_DIR}/contrib/cmake/modules/
   )
 
 #
@@ -219,29 +258,24 @@ INCLUDE(setup_compiler_flags)
 # (beside setting a lot of DEAL_II_* definitions...):
 #
 # CMAKE_SHARED_LINKER_FLAGS
-#
-#   for setting necessary linker flags for the deal.II library.
+#     for setting necessary linker flags for the deal.II library.
 #
 # CMAKE_C_FLAGS and CMAKE_CXX_FLAGS (<...>_RELEASE, <...>_DEBUG)
+#     for setting necessary compiler flags, e.g. -std=c++11 (if available).
 #
-#   for setting necessary compiler flags, e.g. -std=c++11 (if available).
+  ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
+#     Used as a dummy target for all the stuff that has to be done before the
+#     library can be compiled.
 #
-ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
-#
-#   Used as a dummy target for all the stuff that has to be done before the
-#   library can be compiled.
-#
-SET(deal_ii_external_libraries)
-#
-#   Used to keep track of external libraries, against which the deal.II
-#   library will be linked.
+  SET(deal_ii_external_libraries)
+#     Used to keep track of external libraries, against which the deal.II
+#     library (and user programs) will be linked.
 #
 
 
 #
 # Run all system checks:
 #
-
 FILE(GLOB check_files "contrib/cmake/check/*.cmake")
 FOREACH(file ${check_files})
   MESSAGE(STATUS "Include ${file}")
@@ -254,7 +288,8 @@ ENDFOREACH()
 #
 FILE(GLOB configure_files "contrib/cmake/configure/configure_*.cmake")
 
-# Make sure the configure_*.cmake files are included in alphabetical order:
+# Make sure the configure_*.cmake files are included in alphabetical order
+# to fullfill some dependencies...
 LIST(SORT configure_files)
 
 FOREACH(file ${configure_files})
