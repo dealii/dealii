@@ -93,7 +93,7 @@ OPTION(DEAL_II_ALLOW_CONTRIB
   packages, so to ensure that only external libraries are used
   DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
   OFF"
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_ARPACK
   "Build deal.II with support for ARPACK."
@@ -101,18 +101,18 @@ OPTION(DEAL_II_WITH_ARPACK
 
 OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
-  OFF)
+  ON)
 OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
   "Always use the bundled functionparser library instead of an external one."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_LAPACK
   "Build deal.II with support for LAPACK."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
@@ -132,10 +132,10 @@ OPTION(DEAL_II_WITH_P4EST
 
 OPTION(DEAL_II_WITH_TBB
   "Build deal.II with support for tbb. This will enable thread support in deal.II."
-  OFF)
+  ON)
 OPTION(DEAL_II_FORCE_CONTRIB_TBB
   "Always use the bundled tbb library instead of an external one."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_TRILINOS
   "Build deal.II with support for trilinos."
@@ -154,7 +154,7 @@ OPTION(DEAL_II_WITH_ZLIB
 
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
-  OFF)
+  ON)
 
 
 
@@ -197,13 +197,16 @@ INCLUDE(setup_external_macros)
 # configure the cached, user editable CMAKE_BUILD_TYPES, CMAKE_CXX_FLAGS,
 # etc. variables at this point:
 #
-INCLUDE(setup_cached_variables)
+INCLUDE(setup_cached_compiler_flags)
 
 #
-# Now, set the project and configure some deal_II specific variables:
+# Now, set the project and setup the rest:
 #
 PROJECT(deal.II)
+
 INCLUDE(setup_deal_ii)
+
+INCLUDE(setup_compiler_flags)
 
 
 #
@@ -219,11 +222,9 @@ INCLUDE(setup_deal_ii)
 #
 #   for setting necessary linker flags for the deal.II library.
 #
-# CMAKE_C_FLAGS and CMAKE_CXX_FLAGS (uncached)
+# CMAKE_C_FLAGS and CMAKE_CXX_FLAGS (<...>_RELEASE, <...>_DEBUG)
 #
 #   for setting necessary compiler flags, e.g. -std=c++11 (if available).
-#   Note: Uncached variables are not visible to the user, and cannot be
-#   altered.
 #
 ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 #
@@ -262,6 +263,12 @@ FOREACH(file ${configure_files})
 ENDFOREACH()
 
 
+#
+# Finalize the configuration:
+#
+INCLUDE(setup_finalize)
+
+
 
 
 ###########################################################################
@@ -297,10 +304,3 @@ ADD_SUBDIRECTORY(include)
 
 ADD_SUBDIRECTORY(source)
 
-MESSAGE(STATUS "Configured features:")
-GET_CMAKE_PROPERTY(res VARIABLES)
-FOREACH(var ${res})
-  IF(var MATCHES "DEAL_II_WITH")
-    MESSAGE(STATUS "${var} : ${${var}}")
-  ENDIF()
-ENDFOREACH()

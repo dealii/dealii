@@ -77,3 +77,30 @@ CHECK_CXX_COMPILER_BUG(
   int main() { return 0; }
   "
   DEAL_II_EXPLICIT_DESTRUCTOR_BUG)
+
+
+#
+# TODO:
+# On Cygwin, when using shared libraries, there might occur
+# difficulties when linking libraries for several dimensions,
+# as some symbols are defined in all of them. This leads to a
+# linker error. We force the linker to ignore multiple symbols,
+# but of course this might lead to strange program behaviour if
+# you accidentally defined one symbol multiple times...
+# (added 2005/07/13, Ralf B. Schulz)
+# (modified 2005/12/20, Ralf B. Schulz)
+#
+
+#        CXXFLAGSPIC=
+#        LDFLAGS="$LDFLAGS -Xlinker --allow-multiple-definition"
+#        SHLIBFLAGS="$SHLIBFLAGS -Xlinker --allow-multiple-definition"
+#        ;;
+#
+#      *)
+#        CXXFLAGSPIC="-fPIC"
+#        LDFLAGSPIC="-fPIC"
+#        ;;
+#    esac
+
+
+

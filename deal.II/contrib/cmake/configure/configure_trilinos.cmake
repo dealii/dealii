@@ -158,30 +158,10 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL var)
   #  else and we better disable some of the warnings to enable us
   #  to see through the clutter.
   #
-  CHECK_CXX_COMPILER_FLAG(
-    "-Wno-unused"
-    DEAL_II_HAVE_WNO_UNUSED_FLAG
-    )
-  IF(DEAL_II_HAVE_WNO_UNUSED_FLAG)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused")
-  ENDIF()
 
-  CHECK_CXX_COMPILER_FLAG(
-    "-Wno-overloaded-virtual"
-    DEAL_II_HAVE_WNO_OVERLOADED_VIRTUAL_FLAG
-    )
-  IF(DEAL_II_HAVE_WNO_OVERLOADED_VIRTUAL_FLAG)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overloaded-virtual")
-  ENDIF()
-
-  CHECK_CXX_COMPILER_FLAG(
-    "-Wno-extra"
-    DEAL_II_HAVE_WNO_EXTRA_FLAG
-    )
-  IF(DEAL_II_HAVE_WNO_EXTRA_FLAG)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-extra")
-  ENDIF()
-
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused")
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-extra")
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-overloaded-virtual")
 
   SET(${var} TRUE)
 

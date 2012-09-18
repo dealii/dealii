@@ -17,7 +17,7 @@ MACRO(SETUP_THREADING var)
     # We support threading. Go on and configure the rest:
     #
 
-    SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
+    ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
 
     SET(DEAL_II_USE_MT TRUE)
 
@@ -130,6 +130,9 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
   # and if successfull return TRUE:
   SETUP_THREADING(${var})
 
+  # We have to disable a bunch of warnings:
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-long-long")
+
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/include
     )
@@ -139,6 +142,8 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
   LIST(APPEND deal_ii_additional_object_files
     $<TARGET_OBJECTS:obj_tbb>
     )
+
+
 ENDMACRO()
 
 

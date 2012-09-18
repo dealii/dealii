@@ -329,22 +329,6 @@ ENDIF()
 
 
 #
-# Check whether the -as-needed flag is available. If so set it to compile
-# the deal.II library
-#
-CHECK_CXX_COMPILER_FLAG(
-  "-Wl,-as-needed"
-  DEAL_II_COMPILER_HAS_AS_NEEDED)
-
-IF(DEAL_II_COMPILER_HAS_AS_NEEDED)
-  SET(CMAKE_SHARED_LINKER_FLAGS
-    "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-as-needed"
-    )
-ENDIF()
-
-
-
-#
 # Check for minimal vector capacity
 #
 GET_CXX_SOURCE_RETURN_VALUE(
