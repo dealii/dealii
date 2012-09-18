@@ -1,4 +1,4 @@
-Next steps:
+TODO:
 
 * The original decision to have a dedicated p4est/FAST and p4est/DEBUG
   structure is a bit unfortunate and therefor replaced by a FindP4EST
@@ -6,18 +6,22 @@ Next steps:
   libp4est_debug.so or libp4est.g.so and treats this as debug library.
   TODO: Update the p4est-setup.sh script...
 
+* trilinos build with mpi support includes an mpi.h header. This is a
+  problem because we -I the full include path of trilinos (and trilinos
+  does -by default- not install their headers in a subdirectory.)
+  So instead of including the system header with #include <mpi.h> we
+  include the broken trilinos header and fail badly during compilation.
+
+* Check whether p4est mpi support matches the deal.II mpi support.
+
 * Add the compiler dependent CFLAGS and CXXFLAGS magic.
 
-* Add Bug tests
+* Add the Bug tests
 
-* HDF5
-
-* PETSC
-
-* MUMPS
-
-* SLEPC
-
-* HSL ???
-
-* TECPLOT ???
+* The following features have to be written:
+    * HDF5
+    * PETSC
+    * MUMPS
+    * SLEPC
+    * HSL
+    * TECPLOT
