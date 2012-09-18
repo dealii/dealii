@@ -5698,8 +5698,8 @@ namespace DoFTools
               const std::map<unsigned int,float>::const_iterator
                 j = weights[row].find(col);
               if ((j != weights[row].end()) && (j->second != 0))
-                constraint_line.push_back (std::make_pair(representants[row],
-                                                          j->second));
+                constraint_line.push_back (std::pair<unsigned int,double>(representants[row],
+									  j->second));
             };
 
           constraints.add_entries (global_dof, constraint_line);
