@@ -14,6 +14,8 @@ TODO:
 
 * Check whether p4est mpi support matches the deal.II mpi support.
 
+* Reenable support for metis versions 4.x ?!
+
 * Add the compiler dependent CFLAGS and CXXFLAGS magic.
 
 * Add the Bug tests
