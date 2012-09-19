@@ -2,12 +2,10 @@
 # Compile the deal.II library
 #
 
-
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/include/
   ${CMAKE_BINARY_DIR}/include/
   )
-
 
 #
 # Each subdirectory specifies an OBJECT target:
@@ -22,8 +20,10 @@ ADD_SUBDIRECTORY(lac)
 ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(numerics)
 
-
-ADD_LIBRARY(deal_II #whether SHARED or STATIC is set by BUILD_SHARED_LIBS#
+#
+# Combine all OBJECT targets to a library:
+#
+ADD_LIBRARY(deal_II
   $<TARGET_OBJECTS:obj_base>
   $<TARGET_OBJECTS:obj_distributed>
   $<TARGET_OBJECTS:obj_dofs>
@@ -54,3 +54,13 @@ SET_TARGET_PROPERTIES(deal_II PROPERTIES
   )
 
 TARGET_LINK_LIBRARIES(deal_II ${deal_ii_external_libraries})
+
+
+#
+# Finally, add a rule how to install the library:
+#
+INSTALL(TARGETS deal_II
+  LIBRARY
+  DESTINATION lib${LIB_SUFFIX}
+  COMPONENT library
+  )

@@ -302,7 +302,7 @@ INCLUDE(setup_finalize)
 
 ###########################################################################
 #                                                                         #
-#                          Compile the library:                           #
+#                    Compile and install the library:                     #
 #                                                                         #
 ###########################################################################
 
@@ -310,14 +310,19 @@ INCLUDE(setup_finalize)
 #
 # Build the toolchain and prepare the includes:
 #
-
 ADD_SUBDIRECTORY(contrib/config)
 ADD_SUBDIRECTORY(contrib/expand_instantiations)
 ADD_SUBDIRECTORY(include)
 
+
+#
+# Prepare the examples:
+#
+ADD_SUBDIRECTORY(examples)
+
+
 #
 # Compile the library:
 #
-
 ADD_SUBDIRECTORY(source)
 
