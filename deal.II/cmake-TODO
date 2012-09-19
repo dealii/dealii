@@ -1,5 +1,7 @@
 TODO:
 
+* Think once more about the correct place for ./scripts ...
+
 * Add build and installation of the documentation
 
 * The original decision to have a dedicated p4est/FAST and p4est/DEBUG
