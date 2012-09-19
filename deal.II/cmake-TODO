@@ -16,8 +16,6 @@ TODO:
 
 * Reenable support for metis versions 4.x ?!
 
-* Add the compiler dependent CFLAGS and CXXFLAGS magic.
-
 * Add the Bug tests
 
 * The following features have to be written:
