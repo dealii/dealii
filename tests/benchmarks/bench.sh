@@ -4,7 +4,7 @@ TESTS="step-22 tablehandler"
 
 PREVREVISION="`svn info deal.II | grep Revision | sed s/Revision://`"
 HEADREVISION="`svn info http://www.dealii.org/svn/dealii | grep Revision | sed s/Revision://`"
-MAKECMD="make -j10"
+MAKECMD="make -j6"
 
 echo "previous $PREVREVISION"
 echo "HEAD: $HEADREVISION"
@@ -32,8 +32,8 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
       echo "** working on $test"
       make clean
       make run | grep "|" > temp.txt
-      cat temp.txt >>datatable.$test
-      #./your_code $NEXTREVISION >>datatable.$test
+      cat temp.txt >>../datatable.$test
+      #./your_code $NEXTREVISION >>../datatable.$test
       # collect info
       cd ..      
   
