@@ -23,25 +23,20 @@ ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(numerics)
 
 
-#
-# Combine all OBJECT targets to a shared library:
-#
+ADD_LIBRARY(deal_II #whether SHARED or STATIC is set by BUILD_SHARED_LIBS#
+  $<TARGET_OBJECTS:obj_base>
+  $<TARGET_OBJECTS:obj_distributed>
+  $<TARGET_OBJECTS:obj_dofs>
+  $<TARGET_OBJECTS:obj_fe>
+  $<TARGET_OBJECTS:obj_grid>
+  $<TARGET_OBJECTS:obj_hp>
+  $<TARGET_OBJECTS:obj_lac>
+  $<TARGET_OBJECTS:obj_multigrid>
+  $<TARGET_OBJECTS:obj_numerics>
 
-ADD_LIBRARY(deal_II SHARED
- $<TARGET_OBJECTS:obj_base>
- $<TARGET_OBJECTS:obj_distributed>
- $<TARGET_OBJECTS:obj_dofs>
- $<TARGET_OBJECTS:obj_fe>
- $<TARGET_OBJECTS:obj_grid>
- $<TARGET_OBJECTS:obj_hp>
- $<TARGET_OBJECTS:obj_lac>
- $<TARGET_OBJECTS:obj_multigrid>
- $<TARGET_OBJECTS:obj_numerics>
-
- # for contrib stuff:
- ${deal_ii_additional_object_files}
- )
-
+  # for contrib stuff:
+  ${deal_ii_additional_object_files}
+  )
 
 #
 # Sonaming: Well... we just use the version number.
@@ -54,10 +49,8 @@ SET_TARGET_PROPERTIES(deal_II PROPERTIES
   DEBUG_POSTFIX ".g"
   )
 
-
 SET_TARGET_PROPERTIES(deal_II PROPERTIES
   LINK_FLAGS "${deal_ii_required_linker_flags}"
   )
-
 
 TARGET_LINK_LIBRARIES(deal_II ${deal_ii_external_libraries})

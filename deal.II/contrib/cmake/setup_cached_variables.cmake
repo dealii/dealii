@@ -50,6 +50,10 @@ IF( NOT CMAKE_BUILD_TYPE MATCHES "Release" AND
   MESSAGE(FATAL_ERROR "CMAKE_BUILD_TYPE does neither match Release, nor Debug.")
 ENDIF()
 
+#
+# Set BUILD_SHARED_LIBS to default to ON:
+#
+SET(BUILD_SHARED_LIBS TRUE CACHE BOOL "Build a shared library")
 
 #
 # Set cached compiler flags to an empty string:

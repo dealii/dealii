@@ -35,7 +35,6 @@
 
 
 #
-#
 #   ######################
 #   #     FAT NOTE 2:    #
 #   ######################
@@ -53,10 +52,9 @@ IF(NOT ( ${CMAKE_C_COMPILER_ID} STREQUAL ${CMAKE_CXX_COMPILER_ID} AND
       "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}\n"
       )
 ENDIF()
+
 #
-# ... and that we can set the same _default_ flags for both,
-# so we can just set all C-Flags to the corrersponding CXX-Flags at the end
-# of this script.
+# Setup CMAKE_CXX_FLAGS<_RELEASE|_DEBUG>:
 #
 
 IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
@@ -85,10 +83,23 @@ ELSE(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
     )
 ENDIF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
+
+#
+# Setup CMAKE_C_FLAGS<_RELEASE|_DEBUG>:
+#
+
 #
 # For the moment we assume that CC and CXX are the same compiler and that
-# we can set the same _default_ flags for both.
+# we can set (almost) the same default flags for both.
 #
+
 SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
 SET(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 SET(CMAKE_C_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+
+#
+# Strip some CXX-only flags
+#
+
+STRIP_FLAG(CMAKE_C_FLAGS "-Wsynth")
+STRIP_FLAG(CMAKE_C_FLAGS_RELEASE "-felide-constructors")

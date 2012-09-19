@@ -90,6 +90,7 @@ SET(VERSION "8.0.pre")
 #
 #  $ cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" <...>
 #
+#
 
 
 
@@ -191,12 +192,6 @@ OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
   compiler flag setup."
   ON)
 
-OPTION(DEAL_II_BUILD_SHARED_LIBRARY
-  "Build deal.II as a shared library."
-  ON) # TODO: Implement an archive target ...
-
-
-
 
 ###########################################################################
 #                                                                         #
@@ -232,11 +227,10 @@ INCLUDE(setup_external_macros)
 
 
 #
-# We have to initialize some cached variable before PROJECT is called, so
-# configure the cached, user editable CMAKE_BUILD_TYPES, CMAKE_CXX_FLAGS,
-# etc. variables at this point:
+# We have to initialize some cached variables before PROJECT is called, so
+# go it at this point:
 #
-INCLUDE(setup_cached_compiler_flags)
+INCLUDE(setup_cached_variables)
 
 #
 # Now, set the project and setup the rest:

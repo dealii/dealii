@@ -114,6 +114,8 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-funroll-loops")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-fstrict-aliasing")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-felide-constructors")
 
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-Wno-unused")
+
 
 
 ###############################
