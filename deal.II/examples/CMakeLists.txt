@@ -41,9 +41,13 @@ IF(DEAL_II_INSTALL_EXAMPLES)
   #
   # ... therefore, create a symlink if DEAL_II_COMPAT_FILES is set:
   #
-  IF(DEAL_II_COMPAT_FILES)
+  IF(DEAL_II_INSTALL_COMPAT_FILES)
     INSTALL(
-      CODE "COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/usr/share/doc/deal.II/examples ${CMAKE_INSTALL_PREFIX}/examples"
+      CODE
+        "EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E create_symlink
+          ${CMAKE_INSTALL_PREFIX}/usr/share/doc/deal.II/examples
+          ${CMAKE_INSTALL_PREFIX}/examples
+          )"
       COMPONENT compat_files
       )
 
