@@ -9,15 +9,16 @@ SET(DEAL_II_WITH_BOOST "ON"
   CACHE STRING "Build deal.II with support for boost." FORCE
   )
 
+
 #
 # This configure script has to be included after configure_tbb.
 # We need some of the variables defined in SETUP_THREADING for
 # the setup of the contrib boost library (if used)
 #
-IF(NOT FEATURE_TBB_HAVE_CONTRIB)
-  MESSAGE(FATAL_ERROR
-    "Internal build system error: configure_boost.cmake included "
-    "before configure_tbb.cmake"
+IF(NOT FEATURE_TBB_PROCESSED)
+  MESSAGE(FATAL_ERROR "\n"
+    "Internal build system error:\n"
+    "configure_boost.cmake included before configure_tbb.cmake\n\n"
     )
 ENDIF()
 

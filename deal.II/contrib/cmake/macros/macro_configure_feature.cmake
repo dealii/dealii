@@ -110,6 +110,24 @@ ENDMACRO()
 
 MACRO(CONFIGURE_FEATURE feature)
 
+  #
+  # Check for correct include order of the configure_*.cmake files:
+  # If feature B depends on feature A, configure_A.cmake has to be
+  # included before configure_B.cmake:
+  #
+  FOREACH(macro_dependency ${FEATURE_${feature}_DEPENDS})
+    STRING(REGEX REPLACE "^DEAL_II_WITH_" "" macro_dependency ${macro_dependency})
+    MESSAGE("${macro_dependency}")
+    IF(NOT FEATURE_${macro_dependency}_PROCESSED)
+      MESSAGE(FATAL_ERROR "\n"
+        "Internal build system error:\nDEAL_II_WITH_${feature} depends on "
+        "DEAL_II_WITH_${macro_dependency},\nbut CONFIGURE_FEATURE(${feature}) "
+        "was called before CONFIGURE_FEATURE(${macro_dependency}).\n\n"
+        )
+    ENDIF()
+  ENDFOREACH()
+
+
   # Only try to configure ${feature} if we have to:
   IF(DEAL_II_FEATURE_AUTODETECTION OR DEAL_II_WITH_${feature})
 
@@ -258,4 +276,7 @@ MACRO(CONFIGURE_FEATURE feature)
     ENDIF()
 
   ENDIF()
+
+  SET(FEATURE_${feature}_PROCESSED TRUE)
+
 ENDMACRO()
