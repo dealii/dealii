@@ -33,7 +33,8 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
       cd $test
       echo "** working on $test"
 
-      make run
+      make run | grep "|" > temp.txt
+      ./your_code >>datatable
       # collect info
       cd ..      
   
