@@ -40,7 +40,7 @@
 #   #     FAT NOTE 2:    #
 #   ######################
 #
-# For the moment we assume that CC and CXX are the same compilers.
+# For the moment we assume that CC and CXX are the same compiler.
 # (We only need CC for the compilation of the bundled umfpack library.)
 # So, give a prominent error message in case CC and CXX differ:
 #
@@ -54,32 +54,39 @@ IF(NOT ( ${CMAKE_C_COMPILER_ID} STREQUAL ${CMAKE_CXX_COMPILER_ID} AND
       )
 ENDIF()
 #
-# ... and that we can set the same _default_ flags for both.
-#
-# So at the end of the default compiler flags setup, we just set all
-# C-Flags to the corersponding CXX-Flags:
-#
-
-
-#
-# General setup for GCC and compilers sufficiently close to GCC:
+# ... and that we can set the same _default_ flags for both,
+# so we can just set all C-Flags to the corrersponding CXX-Flags at the end
+# of this script.
 #
 
-IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
-    CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-  INCLUDE(setup_compiler_flags_gnu)
-  SET(DEAL_II_KNOWN_COMPILER TRUE)
-ENDIF()
+IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+  MESSAGE(STATUS "Set up default compiler flags.")
+
+  #
+  # General setup for GCC and compilers sufficiently close to GCC:
+  #
+  IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
+      CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
+    INCLUDE(setup_compiler_flags_gnu)
+    SET(DEAL_II_KNOWN_COMPILER TRUE)
+  ENDIF()
 
 
-IF(NOT DEAL_II_KNOWN_COMPILER)
-  MESSAGE(WARNING "\n"
-    "Unrecognized compiler!\n\n"
-    "Please set the relevant compiler options by hand.\n")
-ENDIF()
+  IF(NOT DEAL_II_KNOWN_COMPILER)
+    MESSAGE(WARNING "\n"
+      "Unrecognized compiler!\n\n"
+      "Please set the relevant compiler options by hand.\n")
+  ENDIF()
+
+ELSE(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+  MESSAGE(STATUS
+    "Skipped setting up default compiler flags "
+    "(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF)"
+    )
+ENDIF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
 #
-# For the moment we assume that CC and CXX are the same compilers and that
+# For the moment we assume that CC and CXX are the same compiler and that
 # we can set the same _default_ flags for both.
 #
 SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
