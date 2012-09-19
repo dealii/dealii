@@ -1323,12 +1323,11 @@ namespace Step22
 
 	timer.enter_section("results");
         output_results (refinement_cycle);
-	timer.enter_section("results");
+	timer.exit_section("results");
 
         std::cout << std::endl;
       }
 
-    timer.print_summary();
   }
 }
 

@@ -14,7 +14,7 @@ target = step-22
 # run-time checking of parameters and internal states is performed, so
 # you should set this value to `on' while you develop your program,
 # and to `off' when running production computations.
-debug-mode = off
+debug-mode = on
 
 
 # As third field, we need to give the path to the top-level deal.II
@@ -23,7 +23,7 @@ debug-mode = off
 # designated by a single-character variable, since that can be
 # reference using $D only, i.e. without the parentheses that are
 # required for most other parameters, as e.g. in $(target).
-D = ../deal.II
+D = ../../deal.II
 
 
 # The last field specifies the names of data and other files that
