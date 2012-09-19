@@ -109,7 +109,7 @@ OPTION(DEAL_II_FEATURE_AUTODETECTION
   "Enables feature autodetection. This will automatically overwrite all
   DEAL_II_WITH_<...> toggles depending on whether they can be supported or
   not."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_ALLOW_CONTRIB
   "Allow the use of contrib libraries bundled with the source tarball.
@@ -125,18 +125,18 @@ OPTION(DEAL_II_WITH_ARPACK
 
 OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
-  ON)
+  OFF)
 OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
   "Always use the bundled functionparser library instead of an external one."
   ON)
 
 OPTION(DEAL_II_WITH_LAPACK
   "Build deal.II with support for LAPACK."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_METIS
   "Build deal.II with support for Metis."
@@ -156,7 +156,7 @@ OPTION(DEAL_II_WITH_P4EST
 
 OPTION(DEAL_II_WITH_TBB
   "Build deal.II with support for tbb. This will enable thread support in deal.II."
-  ON)
+  OFF)
 OPTION(DEAL_II_FORCE_CONTRIB_TBB
   "Always use the bundled tbb library instead of an external one."
   ON)
@@ -170,7 +170,7 @@ OPTION(DEAL_II_WITH_UMFPACK
   OFF)
 OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
-  OFF)
+  ON)
 
 OPTION(DEAL_II_WITH_ZLIB
   "Build deal.II with support for zlib."
