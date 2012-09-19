@@ -26,11 +26,7 @@
 #
 # ./check/check_for_compiler_bugs.cmake
 #
-# and enable language features:
-#
 # ./check/check_for_cxx_features.cmake
-#
-# TODO: There is a bit of ambiguity. Clarify with Wolfgang.
 #
 
 
@@ -40,7 +36,7 @@
 #   ######################
 #
 # For the moment we assume that CC and CXX are the same compiler.
-# (We only need CC for the compilation of the bundled umfpack library.)
+# We need CC for the compilation of the bundled umfpack library only...
 # So, give a prominent error message in case CC and CXX differ:
 #
 IF(NOT ( ${CMAKE_C_COMPILER_ID} STREQUAL ${CMAKE_CXX_COMPILER_ID} AND
@@ -52,6 +48,8 @@ IF(NOT ( ${CMAKE_C_COMPILER_ID} STREQUAL ${CMAKE_CXX_COMPILER_ID} AND
       "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}\n"
       )
 ENDIF()
+
+
 
 #
 # Setup CMAKE_CXX_FLAGS<_RELEASE|_DEBUG>:
@@ -84,6 +82,7 @@ ELSE(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 ENDIF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
 
+
 #
 # Setup CMAKE_C_FLAGS<_RELEASE|_DEBUG>:
 #
@@ -98,8 +97,10 @@ SET(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 SET(CMAKE_C_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
 
 #
-# Strip some CXX-only flags
+# Strip some -W* flags and all CXX-only flags.
+# This is mainly to silence the build of contrib UMFPACK.
 #
-
+STRIP_FLAG(CMAKE_C_FLAGS "-Wall")
 STRIP_FLAG(CMAKE_C_FLAGS "-Wsynth")
+STRIP_FLAG(CMAKE_C_FLAGS "-Wsign-compare")
 STRIP_FLAG(CMAKE_C_FLAGS_RELEASE "-felide-constructors")
