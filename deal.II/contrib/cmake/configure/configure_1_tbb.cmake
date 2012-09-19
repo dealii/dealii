@@ -130,6 +130,14 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
   # and if successfull return TRUE:
   SETUP_THREADING(${var})
 
+
+  #
+  # We have to disable a bunch of warnings:
+  #
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-parentheses")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
+
+
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/include
     )
