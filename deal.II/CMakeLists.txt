@@ -132,7 +132,7 @@ OPTION(DEAL_II_ALLOW_CONTRIB
   packages, so to ensure that only external libraries are used
   DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
   OFF"
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_ARPACK
   "Build deal.II with support for ARPACK."
@@ -145,7 +145,7 @@ OPTION(DEAL_II_WITH_BLAS
 OPTION(DEAL_II_WITH_DOXYGEN
   "Enable the generation and installation of the documentation via doxygen.
   This feature adds a COMPONENT \"documentation\" to the build system."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
@@ -179,7 +179,7 @@ OPTION(DEAL_II_WITH_TBB
   OFF)
 OPTION(DEAL_II_FORCE_CONTRIB_TBB
   "Always use the bundled tbb library instead of an external one."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_TRILINOS
   "Build deal.II with support for trilinos."
@@ -190,7 +190,7 @@ OPTION(DEAL_II_WITH_UMFPACK
   OFF)
 OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_ZLIB
   "Build deal.II with support for zlib."
@@ -198,7 +198,7 @@ OPTION(DEAL_II_WITH_ZLIB
 
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
-  ON)
+  OFF)
 
 #
 # Build configuration: configuration options regarding compilation and

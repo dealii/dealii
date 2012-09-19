@@ -36,7 +36,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
 
     IF(NOT ${var})
       MESSAGE(WARNING "\n"
-        "The Trilinos installation is missing one or more  modules necessary for\n"
+        "The Trilinos installation is missing one or more modules necessary for\n"
         "the deal.II Trilinos interfaces:\n"
         "${macro_modules_missing}\n\n"
         "Please re-install Trilinos with the missing Trilinos subpackages enabled.\n\n"
@@ -89,9 +89,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # configured with mpi. We use this as a check for the mpi configuration
     # of Epetra.
     #
-    LIST(APPEND CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIR})
-    CHECK_INCLUDE_FILE_CXX("Epetra_MpiComm.h" TRILINOS_HAVE_EPETRA_MPICOMM_H)
-    LIST(REMOVE_ITEM CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIR})
+    IF(EXISTS "${TRILINOS_INCLUDE_DIR}/Epetra_MpiComm.h")
+      SET(TRILINOS_HAVE_EPETRA_MPICOMM_H TRUE)
+    ENDIF()
 
     IF( (TRILINOS_HAVE_EPETRA_MPICOMM_H AND NOT DEAL_II_COMPILER_SUPPORTS_MPI)
          OR
