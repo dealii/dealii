@@ -76,6 +76,7 @@ Configured Features (DEAL_II_FEATURE_AUTODETECTION = ${DEAL_II_FEATURE_AUTODETEC
 
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
+
   IF(var MATCHES "DEAL_II_WITH")
     IF(${${var}})
       # FEATURE is enabled
@@ -90,6 +91,20 @@ FOREACH(var ${res})
       ENDIF()
     ELSE()
       # FEATURE is disabled
+      MESSAGE("    ( ${var} = ${${var}} )")
+    ENDIF()
+  ENDIF()
+
+ENDFOREACH()
+MESSAGE("
+Further configuration:
+")
+
+FOREACH(var ${res})
+  IF(var MATCHES "DEAL_II_INSTALL")
+    IF(${${var}})
+      MESSAGE("      ${var} = ${${var}}")
+    ELSE()
       MESSAGE("    ( ${var} = ${${var}} )")
     ENDIF()
   ENDIF()
