@@ -81,7 +81,7 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 ENDIF()
 
 
-IF(CMAKE_SYSTEM_NAME MATCHES "Linux") # TODO: Check for correct name
+IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN") # TODO: Check for correct name
   #
   # TODO: Is this flag still necessary? Sound pretty invasive...
   #
