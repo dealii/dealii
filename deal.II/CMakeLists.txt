@@ -345,8 +345,9 @@ ADD_SUBDIRECTORY(include)
 
 
 #
-# Prepare the examples:
+# Prepare some directories for installation:
 #
+ADD_SUBDIRECTORY(scripts)
 ADD_SUBDIRECTORY(examples)
 
 
