@@ -14,7 +14,7 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
   NEXTREVISION=`expr $PREVREVISION "+" 100`
   echo "Updating from $PREVREVISION to $NEXTREVISION"
   cd deal.II
-  svn up -r$NEXTREVISION
+  svn up -r$NEXTREVISION >/dev/null
   if test -z "`svn diff -r$PREVREVISION:$NEXTREVISION .`" ; then
       echo "Skipping revision $NEXTREVISION" ;
       continue ;
@@ -23,14 +23,14 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
   echo "configure"
   ./configure --disable-threads --with-petsc=no >/dev/null
   echo "compiling" 
-  nice make optimized -j 10>/dev/null
+  $(MAKECMD) optimized>/dev/null
   
   cd ..
 
   for test in $TESTS ; do
       cd $test
       echo "** working on $test"
-      make clean
+      make clean >/dev/null
       make run | grep "|" > temp.txt
       cat temp.txt >>../datatable.$test
       #./your_code $NEXTREVISION >>../datatable.$test
