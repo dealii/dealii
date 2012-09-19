@@ -5,6 +5,7 @@ TESTS="step-22 tablehandler"
 PREVREVISION="`svn info deal.II | grep Revision | sed s/Revision://`"
 HEADREVISION="`svn info http://www.dealii.org/svn/dealii | grep Revision | sed s/Revision://`"
 MAKECMD="make -j6"
+export MAKECMD
 
 echo "previous $PREVREVISION"
 echo "HEAD: $HEADREVISION"
