@@ -85,12 +85,13 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   HAVE_GLIBC_STACKTRACE)
 
+#
 # On Mac OS X, -rdynamic is accepted by the compiler (i.e.
 # it doesn't produce an error) but we always get a warning
 # that it isn't supported. That's pretty stupid because
 # we can't test for it. Consequently, only run the test
 # if not on OS X.
-
+#
 IF(HAVE_GLIBC_STACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
 
   CHECK_CXX_COMPILER_FLAG(
@@ -395,10 +396,11 @@ ENDIF()
 # unpacked again when they are put into the shared libs, so
 # no savings there.
 #
-# TODO:
 # The flag also doesn't appear to be working on Cygwin, as
 # per email by John Fowkes on the mailing list in Feb 2012,
 # so don't run the test on cygwin.
 #
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
-ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS_DEBUG "-Wa,--compress-debug-sections")
+IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
+  ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS_DEBUG "-Wa,--compress-debug-sections")
+ENDIF()

@@ -57,6 +57,8 @@ ENDIF()
 # that the workaround fails with some other compilers, so that
 # we can not unconditionally use the workaround...
 #
+# - maier, rewritten 2012
+#
 CHECK_CXX_COMPILER_BUG(
   "
   namespace dealii
@@ -91,6 +93,8 @@ CHECK_CXX_COMPILER_BUG(
 # in some of our template trickery with iterator classes. If necessary,
 # do not use the relevant warning flag
 #
+# - maier, rewritten 2012
+#
 LIST(APPEND CMAKE_REQUIRED_FLAGS "-Wreturn-type -Werror")
 CHECK_CXX_COMPILER_BUG(
   "
@@ -116,6 +120,8 @@ ENDIF()
 # This can be avoided by not using -pedantic for this compiler.
 # For all other versions, we use this flag, however.
 #
+# - maier, rewritten 2012
+#
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
    CMAKE_CXX_COMPILER_VERSION MATCHES "4.4.")
   STRIP_FLAG(CMAKE_CXX_FLAGS "-pedantic")
@@ -130,6 +136,8 @@ ENDIF()
 # occasionally from within the standard library, so we can't prevent the
 # warning messages. Since this is annoying, switch of the flag -W which
 # causes this.
+#
+# - maier, rewritten 2012
 #
 
 # TODO: We use the mpi.h header file for this check. We should test this
