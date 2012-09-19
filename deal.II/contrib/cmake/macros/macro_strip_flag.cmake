@@ -1,5 +1,7 @@
 
 MACRO(STRIP_FLAG variable flag)
-  STRING(REGEX REPLACE " ${flag}" "" ${variable} ${${variable}})
+  IF(NOT "${variable}" STREQUAL "")
+    STRING(REGEX REPLACE " ${flag}" "" ${variable} ${${variable}})
+  ENDIF()
 ENDMACRO()
 
