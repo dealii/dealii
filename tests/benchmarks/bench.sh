@@ -24,7 +24,7 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
   echo "configure"
   ./configure --disable-threads --with-petsc=no >/dev/null
   echo "compiling" 
-  $(MAKECMD) optimized>/dev/null
+  $MAKECMD optimized>/dev/null
   
   cd ..
 
