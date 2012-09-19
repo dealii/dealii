@@ -97,10 +97,14 @@ SET(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 SET(CMAKE_C_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
 
 #
-# Strip some -W* flags and all CXX-only flags.
-# This is mainly to silence the build of contrib UMFPACK.
+# Strip flags not supported by a C target:
 #
-STRIP_FLAG(CMAKE_C_FLAGS "-Wall")
 STRIP_FLAG(CMAKE_C_FLAGS "-Wsynth")
-STRIP_FLAG(CMAKE_C_FLAGS "-Wsign-compare")
 STRIP_FLAG(CMAKE_C_FLAGS_RELEASE "-felide-constructors")
+
+#
+# Disable some warnings:
+#
+STRIP_FLAG(CMAKE_C_FLAGS "-Wall") # There is no other way to disable -Wunknown-pragma atm...
+STRIP_FLAG(CMAKE_C_FLAGS "-Wsign-compare")
+STRIP_FLAG(CMAKE_C_FLAGS "-Wwrite-strings")
