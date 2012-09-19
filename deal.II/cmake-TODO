@@ -2,6 +2,8 @@ TODO:
 
 * Add build and installation of the documentation
 
+* Write the compatibility_files COMPONENT.
+
 * The original decision to have a dedicated p4est/FAST and p4est/DEBUG
   structure is a bit unfortunate and therefor replaced by a FindP4EST
   module that searches libp4est.so and treats this as FAST and
