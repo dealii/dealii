@@ -11,7 +11,7 @@ SET(VERSION "8.0.pre")
 # Note: All further explained options can be either set via ccmake or at
 # the promp via:
 #
-#  $ cmake -D<OPTION>=<VALUE> [...] path/to/source/tree
+#   $ cmake -D<OPTION>=<VALUE> [...] path/to/source/tree
 #
 #
 # The first bunch of options of type DEAL_II_WITH_<feature> are for
@@ -83,13 +83,24 @@ SET(VERSION "8.0.pre")
 #     CMAKE_CXX_FLAGS_RELEASE -  additional flags used during release builds
 #     (same for CMAKE_C_...)
 #
-#  The content of the cached variables will be preserved and added
-#  *_TO THE END_* of the default compiler flags, hence giving a possibility
-#  for overwriting a flag. E.g.: -Wsign-compare, set by the build system,
-#  can be overwritten by specifying:
+# The content of the cached variables will be preserved and added
+# *_TO THE END_* of the default compiler flags, hence giving a possibility
+# for overwriting a flag. E.g.: -Wsign-compare, set by the build system,
+# can be overwritten by specifying:
 #
-#  $ cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" <...>
+#   $ cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" <...>
 #
+#
+# Build optoins: TODO
+#
+# - BUILD_SHARED_LIBS and DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
+#
+# Installation: TODO
+#
+# - Explain Components and Options...
+# - Explain how to build and install only a specific component:
+#
+#   $ cmake -DCOMPONENT=<component> -P build/cmake_install.cmake
 #
 
 
@@ -105,6 +116,9 @@ SET(VERSION "8.0.pre")
 # Feature selection: external libraries and where to take them (if there
 # is a choice, e.g. from contrib vs external)
 #
+
+# TODO: Some of the description strings span over multiple lines. Fix
+# this somehow.
 
 OPTION(DEAL_II_FEATURE_AUTODETECTION
   "Enables feature autodetection. This will automatically overwrite all
@@ -127,6 +141,11 @@ OPTION(DEAL_II_WITH_ARPACK
 OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
   OFF)
+
+OPTION(DEAL_II_WITH_DOXYGEN
+  "Enable the generation and installation of the documentation via doxygen.
+  This feature adds a COMPONENT \"documentation\" to the build system."
+  ON)
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
@@ -182,7 +201,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   ON)
 
 #
-# Build configuration: Configuration options regarding compilation and
+# Build configuration: configuration options regarding compilation and
 # installation of the deal.II library
 #
 
@@ -190,6 +209,16 @@ OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
   "configure sensible default CFLAGS and CXXFLAGS depending on platform,
   compiler and build target. Disabling this option will turn off almost all
   compiler flag setup."
+  ON)
+
+OPTION(DEAL_II_INSTALL_EXAMPLES
+  "Enable the installation of the example steps.
+  This feature adds a COMPONENT \"examples\" to the build system."
+  ON)
+
+OPTION(DEAL_II_INSTALL_COMPATIBILITY_FILES
+  "Enable the installation of the example steps.
+  This feature adds a COMPONENT \"compatibility_files\" to the build system."
   ON)
 
 
