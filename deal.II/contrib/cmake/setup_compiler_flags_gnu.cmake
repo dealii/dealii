@@ -17,29 +17,29 @@
 # TODO: On some systems, -fpic/PIC is implied, so don't set anything to
 # avoid a warning.
 #
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-fpic")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 
 #
 # Check whether the -as-needed flag is available. If so set it to link
 # the deal.II library with it.
 #
-ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS "-Wl,-as-needed")
+ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-Wl,-as-needed")
 
 
 #
 # Set -pedantic if the compiler supports it.
 #
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-pedantic")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-pedantic")
 
 #
 # Setup various warnings:
 #
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wall")
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wpointer-arith")
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wwrite-strings")
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wsynth")
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wsign-compare")
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wswitch")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wall")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wpointer-arith")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wwrite-strings")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wsynth")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wsign-compare")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wswitch")
 
 
 #
@@ -48,7 +48,7 @@ ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wswitch")
 # Unfortunately, this warning is included in -W/-Wall, so disable it if the
 # compiler supports it.
 #
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
 
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -61,13 +61,13 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # be worked around and that are definitely not useful. Suppress
   # those too.
   #
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-array-bounds")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-parentheses")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-delete-non-virtual-dtor")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unneeded-internal-declaration")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-function")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-variable")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-long-long")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-array-bounds")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-parentheses")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-delete-non-virtual-dtor")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unneeded-internal-declaration")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-function")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-variable")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
 ENDIF()
 
 
@@ -77,7 +77,7 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
   # warnings. However, newer gccs on that platform do not have
   # this flag any more, so check whether we can indeed do this
   #
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-long-double")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-double")
 ENDIF()
 
 
@@ -93,7 +93,7 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Linux") # TODO: Check for correct name
   # you accidentally defined one symbol multiple times...
   # (added 2005/07/13, Ralf B. Schulz)
   # (modified 2005/12/20, Ralf B. Schulz)
-  ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS
+  ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS
     "-Xlinker --allow-multiple-definition")
 ENDIF()
 
@@ -110,9 +110,9 @@ ENDIF()
 #
 ADD_FLAGS(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-funroll-loops")
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-fstrict-aliasing")
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-felide-constructors")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-funroll-loops")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-fstrict-aliasing")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-felide-constructors")
 
 
 
@@ -128,13 +128,13 @@ ENDIF()
 
 ADD_FLAGS(CMAKE_CXX_FLAGS_DEBUG "-O0")
 
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_DEBUG "-ggdb")
-ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS "-ggdb")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_DEBUG "-ggdb")
+ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-ggdb")
 #
 # If -ggdb is not available, fall back to -g:
 #
 IF(NOT DEAL_II_HAVE_FLAG_-ggdb)
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_DEBUG "-g")
-  ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS "-g")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_DEBUG "-g")
+  ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-g")
 ENDIF()
 

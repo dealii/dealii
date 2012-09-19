@@ -1,4 +1,4 @@
-MACRO(ENABLE_IF_AVAILABLE variable flag)
+MACRO(ENABLE_IF_SUPPORTED variable flag)
   CHECK_CXX_COMPILER_FLAG(
     "${flag}"
     DEAL_II_HAVE_FLAG_${flag})

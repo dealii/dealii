@@ -400,5 +400,5 @@ ENDIF()
 # per email by John Fowkes on the mailing list in Feb 2012,
 # so don't run the test on cygwin.
 #
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
-ENABLE_IF_AVAILABLE(CMAKE_C_FLAGS_DEBUG "-Wa,--compress-debug-sections")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
+ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS_DEBUG "-Wa,--compress-debug-sections")

@@ -159,9 +159,9 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL var)
   #  to see through the clutter.
   #
 
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-extra")
-  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-overloaded-virtual")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-extra")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-overloaded-virtual")
 
   SET(${var} TRUE)
 
