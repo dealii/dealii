@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TESTS=step-22
+TESTS=step-22 tablehandler
 
 PREVREVISION="`svn info deal.II | grep Revision | sed s/Revision://`"
 HEADREVISION="`svn info http://www.dealii.org/svn/dealii | grep Revision | sed s/Revision://`"
@@ -32,9 +32,9 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
   for test in $TESTS ; do
       cd $test
       echo "** working on $test"
-
+      make clean
       make run | grep "|" > temp.txt
-      ./your_code >>datatable
+      ./your_code $NEXTREVISION >>datatable.$test
       # collect info
       cd ..      
   
