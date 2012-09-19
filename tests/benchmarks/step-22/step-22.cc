@@ -90,7 +90,8 @@ namespace Step22
   template <>
   struct InnerPreconditioner<2>
   {
-      typedef SparseDirectUMFPACK type;
+      typedef SparseILU<double> type;
+//      typedef SparseDirectUMFPACK type;
   };
 
                                    // And the ILU preconditioning in 3D, called
