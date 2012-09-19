@@ -41,13 +41,15 @@ ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wsynth")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wsign-compare")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wswitch")
 
+
 #
-# Newer versions have a flag -Wunused-local-typedefs that, though in principle
-# a good idea, triggers a lot in BOOST in various places. Unfortunately,
-# this warning is included in -W/-Wall, so disable it if the compiler
-# supports it.
+# Newer versions of gcc have a flag -Wunused-local-typedefs that, though in
+# principle a good idea, triggers a lot in BOOST in various places.
+# Unfortunately, this warning is included in -W/-Wall, so disable it if the
+# compiler supports it.
 #
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
+
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
@@ -69,6 +71,33 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 ENDIF()
 
 
+IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  #
+  # Use -Wno-long-long on Apple Darwin to avoid some unnecessary
+  # warnings. However, newer gccs on that platform do not have
+  # this flag any more, so check whether we can indeed do this
+  #
+  ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-long-double")
+ENDIF()
+
+
+IF(CMAKE_SYSTEM_NAME MATCHES "Linux") # TODO: Check for correct name
+  #
+  # TODO: Is this flag still necessary? Sound pretty invasive...
+  #
+  # On Cygwin, when using shared libraries, there might occur
+  # difficulties when linking libraries for several dimensions,
+  # as some symbols are defined in all of them. This leads to a
+  # linker error. We force the linker to ignore multiple symbols,
+  # but of course this might lead to strange program behaviour if
+  # you accidentally defined one symbol multiple times...
+  # (added 2005/07/13, Ralf B. Schulz)
+  # (modified 2005/12/20, Ralf B. Schulz)
+  ENABLE_IF_AVAILABLE(CMAKE_SHARED_LINKER_FLAGS
+    "-Xlinker --allow-multiple-definition")
+ENDIF()
+
+
 
 #################################
 #                               #
@@ -84,15 +113,6 @@ ADD_FLAGS(CMAKE_CXX_FLAGS_RELEASE "-O2")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-funroll-loops")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-fstrict-aliasing")
 ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS_RELEASE "-felide-constructors")
-
-#
-# TODO: Migrate this toggle to the boost objects, if possible.
-# Newer versions have a flag -Wunused-local-typedefs that, though in principle
-# a good idea, triggers a lot in BOOST in various places. Unfortunately,
-# this warning is included in -W/-Wall, so disable it if the compiler
-# supports it.
-#
-ENABLE_IF_AVAILABLE(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
 
 
 
