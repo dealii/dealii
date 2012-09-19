@@ -216,9 +216,9 @@ OPTION(DEAL_II_INSTALL_EXAMPLES
   This feature adds a COMPONENT \"examples\" to the build system."
   ON)
 
-OPTION(DEAL_II_INSTALL_COMPATIBILITY_FILES
+OPTION(DEAL_II_INSTALL_COMPAT_FILES
   "Enable the installation of the example steps.
-  This feature adds a COMPONENT \"compatibility_files\" to the build system."
+  This feature adds a COMPONENT \"compat_files\" to the build system."
   ON)
 
 
