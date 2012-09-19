@@ -23,6 +23,12 @@ IF(DEAL_II_INSTALL_EXAMPLES)
     step-42 step-43 step-44 step-45 step-46 step-47 step-48
     )
 
+
+  #
+  # We install the examples to usr/share/doc/deal.II
+  # a path expected by the majority of distributions, but a bit
+  # inconvenient...
+  #
   FOREACH(step ${deal_ii_examples})
     INSTALL(DIRECTORY ${step}
       DESTINATION usr/share/doc/deal.II/examples
@@ -30,5 +36,17 @@ IF(DEAL_II_INSTALL_EXAMPLES)
       PATTERN "doc" EXCLUDE
       )
   ENDFOREACH()
+
+
+  #
+  # ... therefore, create a symlink if DEAL_II_COMPAT_FILES is set:
+  #
+  IF(DEAL_II_COMPAT_FILES)
+    INSTALL(
+      CODE "COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/usr/share/doc/deal.II/examples ${CMAKE_INSTALL_PREFIX}/examples"
+      COMPONENT compat_files
+      )
+
+  ENDIF()
 
 ENDIF()
