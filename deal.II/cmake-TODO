@@ -10,12 +10,6 @@ TODO:
   libp4est_debug.so or libp4est.g.so and treats this as debug library.
   TODO: Update the p4est-setup.sh script...
 
-* trilinos build with mpi support includes an mpi.h header. This is a
-  problem because we -I the full include path of trilinos (and trilinos
-  does -by default- not install their headers in a subdirectory.)
-  So instead of including the system header with #include <mpi.h> we
-  include the broken trilinos header and fail badly during compilation.
-
 * Check whether p4est mpi support matches the deal.II mpi support.
 
 * Reenable support for metis versions 4.x ?!
