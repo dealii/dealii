@@ -1,8 +1,8 @@
 #
 # General setup for GCC and compilers sufficiently close to GCC
 #
-# Please read the fat note in setup_compiler_flags.cmake prior to editing
-# this file.
+# Please read the fat note in setup_compiler_flags.cmake prior to
+# editing this file.
 #
 
 
@@ -98,7 +98,6 @@ IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN") # TODO: Check for correct name
 ENDIF()
 
 
-
 #################################
 #                               #
 #    For the Release target:    #
@@ -140,3 +139,32 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
     ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-g")
   ENDIF()
 ENDIF()
+
+
+###############################################
+#                                             #
+#    Set up CMAKE_C_FLAGS<_RELEASE|_DEBUG>    #
+#                                             #
+###############################################
+
+#
+# For the moment we assume that CC and CXX are the same compiler and that
+# we can set (almost) the same default flags for both:
+#
+SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
+SET(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+SET(CMAKE_C_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+
+#
+# OK, touché, touché. We have to strip flags not supported by a C target:
+#
+STRIP_FLAG(CMAKE_C_FLAGS "-Wsynth")
+STRIP_FLAG(CMAKE_C_FLAGS_RELEASE "-felide-constructors")
+
+#
+# and disable some warnings:
+#
+STRIP_FLAG(CMAKE_C_FLAGS "-Wall") # There is no other way to disable -Wunknown-pragma atm...
+STRIP_FLAG(CMAKE_C_FLAGS "-Wsign-compare")
+STRIP_FLAG(CMAKE_C_FLAGS "-Wwrite-strings")
+

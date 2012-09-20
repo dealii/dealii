@@ -1,4 +1,6 @@
-# Try to find UMFPACK
+#
+# Try to find the UMFPACK library
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
@@ -18,3 +20,4 @@ IF(UMFPACK_FOUND)
     UMFPACK_INCLUDE_DIR
   )
 ENDIF()
+

@@ -1,4 +1,6 @@
-# Try to find AMD
+#
+# Try to find the AMD library
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
@@ -18,3 +20,4 @@ IF(AMD_FOUND)
     AMD_INCLUDE_DIR
   )
 ENDIF()
+

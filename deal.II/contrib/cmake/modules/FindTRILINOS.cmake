@@ -1,4 +1,6 @@
-# Try to find the Trilinos
+#
+# Try to find the Trilinos library
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
@@ -12,6 +14,9 @@ find_package(TRILINOS
   PATH_PREFIXES lib64/cmake/Trilinos lib/cmake/Trilinos
   )
 
+#
+# Extract the major and minor version numbers:
+#
 STRING(REGEX REPLACE
   "^([0-9]+).*$" "\\1"
   TRILINOS_MAJOR "${Trilinos_VERSION}")
@@ -25,7 +30,6 @@ STRING(REGEX REPLACE
   TRILINOS_SUBMINOR "${Trilinos_VERSION}")
 
 
-# TODO: Trilinos may export more than one include dir.
 FIND_PATH(TRILINOS_INCLUDE_DIR Trilinos_version.h
   HINTS ${Trilinos_INCLUDE_DIRS}
   )
@@ -59,3 +63,4 @@ IF(TRILINOS_FOUND)
     TRILINOS_LIBRARIES
     )
 ENDIF()
+

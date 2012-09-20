@@ -1,4 +1,6 @@
-# Try to find ARPACK
+#
+# Try to find the ARPACK library
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
@@ -14,3 +16,4 @@ IF(ARPACK_FOUND)
     ARPACK_LIBRARY
   )
 ENDIF()
+

@@ -1,11 +1,11 @@
 #
-# Configuration for the tbb library:
+# Configuration for tbb support:
 #
 
 
 #
-# Set up genereal threading. The macro will be included in
-# CONFIGURE_FEATURE_TBB_EXTERNAL/CONTRIB:
+# Set up genereal threading:
+# The macro will be included in CONFIGURE_FEATURE_TBB_EXTERNAL/CONTRIB.
 #
 MACRO(SETUP_THREADING var)
   FIND_PACKAGE(Threads)
@@ -16,9 +16,7 @@ MACRO(SETUP_THREADING var)
     #
     # We support threading. Go on and configure the rest:
     #
-
     ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-
     SET(DEAL_II_USE_MT TRUE)
 
     #
@@ -27,10 +25,10 @@ MACRO(SETUP_THREADING var)
     IF(CMAKE_USE_PTHREADS_INIT)
       SET(DEAL_II_USE_MT_POSIX TRUE)
 
+      #
       # Check whether posix thread barriers are available:
-
+      #
       LIST(APPEND CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-
       CHECK_CXX_SOURCE_COMPILES(
       "
       #include <pthread.h>
@@ -44,12 +42,12 @@ MACRO(SETUP_THREADING var)
       }
       "
       DEAL_II_HAVE_MT_POSIX_BARRIERS)
-
       LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
 
       IF(NOT DEAL_II_HAVE_MT_POSIX_BARRIERS)
         SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
       ENDIF()
+
     ENDIF()
 
     #
@@ -57,7 +55,6 @@ MACRO(SETUP_THREADING var)
     # switches on some preprocessor flags. If this is not the case,
     # then define them explicitely.
     #
-
     LIST(APPEND CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
     CHECK_CXX_SOURCE_COMPILES(
       "
@@ -84,13 +81,11 @@ ENDMACRO()
 #
 
 MACRO(FEATURE_TBB_FIND_EXTERNAL var)
-
   FIND_PACKAGE(TBB)
 
   IF(TBB_FOUND)
     SET(${var} TRUE)
   ENDIF()
-
 ENDMACRO()
 
 
@@ -126,17 +121,17 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
   # Add tbb directly to the object files of deal.II
   #
 
+  #
   # Setup threading (before configuring our build...)
   # and if successfull return TRUE:
+  #
   SETUP_THREADING(${var})
-
 
   #
   # We have to disable a bunch of warnings:
   #
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-parentheses")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
-
 
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/include
@@ -148,8 +143,8 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
     $<TARGET_OBJECTS:obj_tbb>
     )
 
-
 ENDMACRO()
 
 
 CONFIGURE_FEATURE(TBB)
+

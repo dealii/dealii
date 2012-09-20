@@ -1,5 +1,6 @@
 #
-# FAT NOTE:
+# Setup cached variables prior to the PROJECT(deal.II) call
+#
 #
 # We have a problem: We would like to setup our choice of C_FLAGS and
 # CXX_FLAGS but let the user overwrite it (if desired).
@@ -8,13 +9,14 @@
 #
 # We have to call PROJECT(deal.II) in order to set up the project and run
 # the C- and CXX-compiler detection and configuration. (Otherwise we cannot
-# compile anything and have no idea which compiler is selected.) In this
-# process CMAKE_{C|CXX}_FLAGS are already set to stupid default values.
+# compile anything and, furthermore,  have no idea which compiler is
+# selected.) In this process CMAKE_CXX_FLAGS[...] are already set to stupid
+# default values.
 # (And _cannot_ be sanely set from this script afterwards...)
 #
 # To mitigate this problem, we do the following:
 #
-#   - We initialize the cached CMAKE_{C|CXX}_FLAGS variables with empty
+#   - We initialize the cached CMAKE_CXX_FLAGS[...] variables with empty
 #     strings prior to initializing the compiler, so that no default values
 #     are set.
 #
@@ -28,37 +30,38 @@
 #
 #   - At the end of the configuration step we add <variables>_SAVED
 #     _AT THE END_ of the respective <variable> allowing the user to
-#     effectively overwrite our default setting.
+#     effectively overwrite our default settings.
 #
 
 
 #
 # Setup CMAKE_BUILD_TYPE:
 #
-
 SET(CMAKE_BUILD_TYPE
   "Release"
   CACHE STRING
   "Choose the type of build, options are: Debug Release.")
 
+
+#
+# This is cruel, I know. But it is better to only have a known number of
+# options for CMAKE_BUILD_TYPE...
+#
 IF( NOT CMAKE_BUILD_TYPE MATCHES "Release" AND
     NOT CMAKE_BUILD_TYPE MATCHES "Debug" )
-  #
-  # This is cruel, I know. But it is better to only have a known number of
-  # options for CMAKE_BUILD_TYPE...
-  #
   MESSAGE(FATAL_ERROR "CMAKE_BUILD_TYPE does neither match Release, nor Debug.")
 ENDIF()
+
 
 #
 # Set BUILD_SHARED_LIBS to default to ON:
 #
-SET(BUILD_SHARED_LIBS TRUE CACHE BOOL "Build a shared library")
+SET(BUILD_SHARED_LIBS ON CACHE OPTION "Build a shared library")
+
 
 #
 # Set cached compiler flags to an empty string:
 #
-
 SET(deal_ii_used_flags
   CMAKE_C_FLAGS
   CMAKE_CXX_FLAGS
@@ -67,8 +70,8 @@ SET(deal_ii_used_flags
   CMAKE_C_FLAGS_DEBUG
   CMAKE_CXX_FLAGS_DEBUG
   )
-
 FOREACH(flags ${deal_ii_used_flags})
+
   # "CACHE" ensures that we only set the variable if it is not already set
   # as a  cached variable, effectively we're setting a default value:
   SET(${flags} "" CACHE STRING
@@ -83,5 +86,6 @@ FOREACH(flags ${deal_ii_used_flags})
   #
   SET(${flags}_SAVED "${${flags}}")
   SET(${flags} "")
+
 ENDFOREACH()
 

@@ -1,4 +1,6 @@
-# Try to find the Threading Building Blocks-library
+#
+# Try to find the Threading Building Blocks library
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
@@ -25,3 +27,4 @@ IF(TBB_FOUND)
     TBB_INCLUDE_DIR
   )
 ENDIF()
+

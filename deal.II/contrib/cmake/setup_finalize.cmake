@@ -1,4 +1,8 @@
 #
+# Finalize the configuration:
+#
+
+#
 # Append the saved initial (cached) variables ${flags}_SAVED at the end of
 # ${flags}, see setup_cached_compiler_flags.cmake and the main
 # CMakeLists.txt for details.
@@ -11,7 +15,6 @@ ENDFOREACH()
 #
 # And print out a nice configuration summary:
 #
-
 MESSAGE("
 
    *                                    *

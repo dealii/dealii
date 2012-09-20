@@ -1,15 +1,12 @@
 #
-# Setup default compiler flags:
+# Setup default compiler flags: This file sets up sensible default compiler
+# flags for the various platforms, compilers and build targets supported by
+# the deal.II library.
 #
-# This file sets up sensible default compiler flags for the various
-# platforms, compilers and build targets supported by the deal.II
-# library.
 #
-
-#
-#   ####################
-#   #     FAT NOTE:    #
-#   ####################
+# ####################
+# #     FAT NOTE:    #
+# ####################
 #
 # All configuration in setup_compiler_flags.cmake and
 # setup_compiler_flags_<compiler>.cmake shall ONLY consist of CFLAGS,
@@ -31,12 +28,12 @@
 
 
 #
-#   ######################
-#   #     FAT NOTE 2:    #
-#   ######################
+# We need a C compiler only for the compilation of the bundled umfpack
+# library, so we don't make much fuss about configuration and setup of the
+# C compiler and assume that CC and CXX are the same compiler brand, hence
+# supporting almost the same compiler flags.
+# (See setup in setup_compiler_flags_*.cmake)
 #
-# For the moment we assume that CC and CXX are the same compiler.
-# We need CC for the compilation of the bundled umfpack library only...
 # So, give a prominent error message in case CC and CXX differ:
 #
 IF(NOT ( ${CMAKE_C_COMPILER_ID} STREQUAL ${CMAKE_CXX_COMPILER_ID} AND
@@ -50,12 +47,10 @@ IF(NOT ( ${CMAKE_C_COMPILER_ID} STREQUAL ${CMAKE_CXX_COMPILER_ID} AND
 ENDIF()
 
 
-
-#
-# Setup CMAKE_CXX_FLAGS<_RELEASE|_DEBUG>:
-#
-
 IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+  #
+  # *Hooray* We are allowed to set compiler flags :-]
+  #
   MESSAGE(STATUS "Set up default compiler flags.")
 
   #
@@ -67,44 +62,25 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
     SET(DEAL_II_KNOWN_COMPILER TRUE)
   ENDIF()
 
+  #
+  # Setup for ICC compiler:
+  #
+  IF( CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    INCLUDE(setup_compiler_flags_intel)
+    SET(DEAL_II_KNOWN_COMPILER TRUE)
+  ENDIF()
+
 
   IF(NOT DEAL_II_KNOWN_COMPILER)
     MESSAGE(WARNING "\n"
-      "Unrecognized compiler!\n\n"
+      "Unrecognized compiler!\n"
       "Please set the relevant compiler options by hand.\n")
   ENDIF()
 
 ELSE(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   MESSAGE(STATUS
-    "Skipped setting up default compiler flags "
+    "Skipped setup of default compiler flags "
     "(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF)"
     )
 ENDIF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
-
-
-#
-# Setup CMAKE_C_FLAGS<_RELEASE|_DEBUG>:
-#
-
-#
-# For the moment we assume that CC and CXX are the same compiler and that
-# we can set (almost) the same default flags for both.
-#
-
-SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
-SET(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-SET(CMAKE_C_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-
-#
-# Strip flags not supported by a C target:
-#
-STRIP_FLAG(CMAKE_C_FLAGS "-Wsynth")
-STRIP_FLAG(CMAKE_C_FLAGS_RELEASE "-felide-constructors")
-
-#
-# Disable some warnings:
-#
-STRIP_FLAG(CMAKE_C_FLAGS "-Wall") # There is no other way to disable -Wunknown-pragma atm...
-STRIP_FLAG(CMAKE_C_FLAGS "-Wsign-compare")
-STRIP_FLAG(CMAKE_C_FLAGS "-Wwrite-strings")

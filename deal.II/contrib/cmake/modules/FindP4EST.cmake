@@ -1,4 +1,6 @@
-# Try to find P4EST
+#
+# Try to find the P4EST library
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
@@ -24,3 +26,4 @@ IF(P4EST_FOUND)
     P4EST_INCLUDE_DIR
   )
 ENDIF()
+

@@ -3,13 +3,11 @@
 #
 
 MACRO(FEATURE_MPI_FIND_EXTERNAL var)
-
   FIND_PACKAGE(MPI)
 
   IF(MPI_CXX_FOUND)
     SET(${var} TRUE)
   ENDIF()
-
 ENDMACRO()
 
 
@@ -22,18 +20,12 @@ MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL var)
 
   SET(DEAL_II_COMPILER_SUPPORTS_MPI TRUE)
 
-
   # TODO: (Maybe) set up the rest:
-
   #MPI_CXX_COMPILER        MPI Compiler wrapper for CXX
-
-
-  #MPIEXEC                    Executable for running MPI programs
-  #MPIEXEC_NUMPROC_FLAG       Flag to pass to MPIEXEC before giving
-  #                           it the number of processors to run on
-  #MPIEXEC_PREFLAGS           Flags to pass to MPIEXEC directly
-  #                           before the executable to run.
-  #MPIEXEC_POSTFLAGS          Flags to pass to MPIEXEC after other flags
+  #MPIEXEC                 Executable for running MPI programs
+  #MPIEXEC_NUMPROC_FLAG    Flag to pass to MPIEXEC before giving it the number of processors to run on
+  #MPIEXEC_PREFLAGS        Flags to pass to MPIEXEC directly before the executable to run.
+  #MPIEXEC_POSTFLAGS       Flags to pass to MPIEXEC after other flags
 
   SET(${var} TRUE)
 ENDMACRO()
@@ -51,3 +43,4 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(MPI)
+

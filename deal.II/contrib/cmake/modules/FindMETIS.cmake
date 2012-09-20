@@ -1,4 +1,6 @@
-# Try to find METIS
+#
+# Try to find the METIS library
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
@@ -14,7 +16,6 @@ FIND_LIBRARY(METIS_LIBRARY
 #
 # Extract the version number out of metis.h
 #
-
 FILE(STRINGS "${METIS_INCLUDE_DIR}/metis.h" METIS_MAJOR_STRING
   REGEX "METIS_VER_MAJOR")
 STRING(REGEX REPLACE "^.*METIS_VER_MAJOR.* ([0-9]+).*" "\\1" METIS_MAJOR "${METIS_MAJOR_STRING}")
@@ -32,3 +33,4 @@ IF(METIS_FOUND)
     METIS_INCLUDE_DIR
   )
 ENDIF()
+

@@ -4,14 +4,13 @@
 
 
 MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
-
   FIND_PACKAGE(TRILINOS)
 
   IF(TRILINOS_FOUND)
-    SET(${var} TRUE)
     #
     # So, we have a library. Let's see whether we can use it:
     #
+    SET(${var} TRUE)
 
 
     #
@@ -44,7 +43,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
 
-
     #
     # Trilinos 10.6 had quite a number of bugs we ran into, see
     # for example
@@ -59,7 +57,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
-
 
 
     #
@@ -78,12 +75,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
 
-
     #
     # Trilinos has to be configured with the same MPI configuration as
-    # deal.II. TODO: Refine this check...
-    #
-
+    # deal.II.
     #
     # Epetra installs Epetra_MpiComm.h if configured trilinos was
     # configured with mpi. We use this as a check for the mpi configuration
@@ -101,7 +95,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
-
 
 
     #
@@ -129,12 +122,10 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
   ENDIF(TRILINOS_FOUND)
-
 ENDMACRO()
 
 
 MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL var)
-
   INCLUDE_DIRECTORIES(${TRILINOS_INCLUDE_DIR})
 
   LIST(APPEND deal_ii_external_libraries
@@ -158,14 +149,13 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL var)
   #  else and we better disable some of the warnings to enable us
   #  to see through the clutter.
   #
-
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-extra")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-overloaded-virtual")
 
   SET(${var} TRUE)
-
 ENDMACRO()
 
 
 CONFIGURE_FEATURE(TRILINOS)
+

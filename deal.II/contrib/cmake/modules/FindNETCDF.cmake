@@ -1,4 +1,6 @@
-# Try to find NETCDF
+#
+# Try to find the NETCDF library
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
@@ -18,3 +20,4 @@ IF(NETCDF_FOUND)
     NETCDF_INCLUDE_DIR
   )
 ENDIF()
+
