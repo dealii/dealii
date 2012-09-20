@@ -9,7 +9,8 @@ MACRO(FEATURE_DOXYGEN_FIND_EXTERNAL var)
   # We use doxygen and dot:
   #
   IF(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
-    SET(${var} TRUE)
+    # Disable doxygen for the moment
+    #    SET(${var} TRUE)
   ENDIF()
 ENDMACRO()
 
