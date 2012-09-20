@@ -110,16 +110,32 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       int main(){ return 0; }
       "
       TRILINOS_SUPPORTS_CPP11)
-    STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-std=c++0x")
-    LIST(REMOVE_ITEM CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIR})
 
     IF(DEAL_II_CAN_USE_CXX11 AND NOT TRILINOS_SUPPORTS_CPP11)
-      MESSAGE(WARNING "\n"
-        "Your Trilinos installation is not compatible with the C++ standard selected for\n"
-        "this compiler. See the deal.II FAQ page for a solution.\n\n"
-        )
-      SET(${var} FALSE)
+      #
+      # Try whether exporting HAS_C99_TR1_CMATH helps:
+      #
+      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-DHAS_C99_TR1_CMATH")
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <Sacado_cmath.hpp>
+        int main(){ return 0; }
+        "
+        TRILINOS_HAS_C99_TR1_WORKAROUND)
+      STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-DHAS_C99_TR1_CMATH")
+
+      IF(TRILINOS_HAS_C99_TR1_WORKAROUND)
+        ADD_DEFINITIONS("-DHAS_C99_TR1_CMATH")
+      ELSE()
+        MESSAGE(WARNING "\n"
+          "Your Trilinos installation is not compatible with the C++ standard selected for\n"
+          "this compiler. See the deal.II FAQ page for a solution.\n\n"
+          )
+        SET(${var} FALSE)
+      ENDIF()
     ENDIF()
+    STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-std=c++0x")
+    LIST(REMOVE_ITEM CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIR})
 
   ENDIF(TRILINOS_FOUND)
 ENDMACRO()
