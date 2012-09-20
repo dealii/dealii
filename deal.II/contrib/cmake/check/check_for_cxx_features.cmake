@@ -30,7 +30,7 @@ CHECK_CXX_COMPILER_FLAG(
 IF(DEAL_II_HAVE_CXX11_FLAG)
 
   # Set CMAKE_REQUIRED_FLAGS for the unit tests
-  LIST(APPEND CMAKE_REQUIRED_FLAGS "-std=c++0x")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-std=c++0x")
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -76,8 +76,6 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     "
     DEAL_II_HAVE_CXX11_SHARED_PTR)
 
-  LIST(APPEND CMAKE_REQUIRED_FLAGS "-lpthreads")
-
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <thread>
@@ -87,13 +85,14 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     DEAL_II_HAVE_CXX11_THREAD)
 
   #
-  #On some systems with gcc 4.5.0, we can compile the code
-  #above but it will throw an exception when run. So test
-  #that as well. The test will only be successful if we have
-  #libpthread available, so link it in for this test. If
-  #multithreading is requested, it will be added to CXXFLAGS
-  #later on so there is no need to do this here.
+  # On some systems with gcc 4.5.0, we can compile the code
+  # above but it will throw an exception when run. So test
+  # that as well. The test will only be successful if we have
+  # libpthread available, so link it in for this test. If
+  # multithreading is requested, it will be added to CXXFLAGS
+  # later on so there is no need to do this here.
   #
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-lpthread")
   CHECK_CXX_SOURCE_RUNS(
     "
     #include <thread>
@@ -101,8 +100,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     int main(){ std::thread t(f,1); t.join(); return 0; }
     "
     DEAL_II_HAVE_CXX11_THREAD_RUN_OK)
-
-  LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "-lpthreads")
+  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-lpthread")
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -186,7 +184,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     ENDIF()
   ENDIF()
 
-  LIST(REMOVE_ITEM CMAKE_REQUIRED_FLAGS "-std=c++0x")
+  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-std=c++0x")
 
 ELSE()
     MESSAGE(STATUS "Insufficient C++11 support. Disabling -std=c++0x.")
