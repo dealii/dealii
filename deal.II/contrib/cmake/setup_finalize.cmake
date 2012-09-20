@@ -15,11 +15,13 @@ ENDFOREACH()
 #
 # And print out a nice configuration summary:
 #
+
+
 MESSAGE("
 
-   *                                    *
-   *  deal.II successfully configured!  *
-   *                                    *
+*     *                                    *     *
+*     *  deal.II successfully configured!  *     *
+*     *                                    *     *
 
 
       CMAKE_BUILD_TYPE:     ${CMAKE_BUILD_TYPE}
@@ -27,36 +29,22 @@ MESSAGE("
       CMAKE_SOURCE_DIR:     ${CMAKE_SOURCE_DIR}
       CMAKE_BINARY_DIR:     ${CMAKE_BINARY_DIR}
 
-      CMAKE_CXX_COMPILER:   ${CMAKE_CXX_COMPILER_ID} "
-"${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME}
+      CMAKE_CXX_COMPILER:   ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME}
 
-General compiler flags (used by all build targets):
-
-      CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}
-")
-
+Compiler flags used for this build:
+      CMAKE_CXX_FLAGS:           ${CMAKE_CXX_FLAGS}")
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  MESSAGE("Additional compiler flags used for the Release target:
-
-      CMAKE_CXX_FLAGS_RELEASE: ${CMAKE_CXX_FLAGS_RELEASE}
-")
+  MESSAGE("      CMAKE_CXX_FLAGS_RELEASE:   ${CMAKE_CXX_FLAGS_RELEASE}")
 ENDIF()
-
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  MESSAGE("Additional compiler flags used for the Debug target:
-
-      CMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG}
-")
+  MESSAGE("      CMAKE_CXX_FLAGS_DEBUG:     ${CMAKE_CXX_FLAGS_DEBUG}")
 ENDIF()
+MESSAGE("      CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
 
-MESSAGE("Configured linker flags:
-
-      CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}
-")
 
 IF(FEATURE_UMFPACK_CONTRIB_CONFIGURED)
-  MESSAGE("The contrib UMFPACK library will be compiled with the following C compiler:
-
+  MESSAGE("
+The contrib UMFPACK library will be compiled with the following C compiler:
       CMAKE_C_COMPILER:       ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
       CMAKE_C_FLAGS:         ${CMAKE_C_FLAGS}")
   IF(CMAKE_BUILD_TYPE MATCHES "Release")
@@ -65,21 +53,19 @@ IF(FEATURE_UMFPACK_CONTRIB_CONFIGURED)
   IF(CMAKE_BUILD_TYPE MATCHES "Debug")
     MESSAGE("      CMAKE_C_FLAGS_DEBUG:   ${CMAKE_C_FLAGS_DEBUG}")
   ENDIF()
-  MESSAGE("
-  ")
 ENDIF()
+
 
 IF(NOT DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-  MESSAGE("WARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n\n")
+  MESSAGE("\n
+WARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n")
 ENDIF()
 
-MESSAGE("
-Configured Features (DEAL_II_FEATURE_AUTODETECTION = ${DEAL_II_FEATURE_AUTODETECTION}):
-")
 
+MESSAGE("
+Configured Features (DEAL_II_FEATURE_AUTODETECTION = ${DEAL_II_FEATURE_AUTODETECTION}):")
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
-
   IF(var MATCHES "DEAL_II_WITH")
     IF(${${var}})
       # FEATURE is enabled
@@ -97,12 +83,11 @@ FOREACH(var ${res})
       MESSAGE("    ( ${var} = ${${var}} )")
     ENDIF()
   ENDIF()
-
 ENDFOREACH()
-MESSAGE("
-Further configuration:
-")
 
+
+MESSAGE("
+Further configuration:")
 FOREACH(var ${res})
   IF(var MATCHES "DEAL_II_INSTALL")
     IF(${${var}})
@@ -113,6 +98,5 @@ FOREACH(var ${res})
   ENDIF()
 ENDFOREACH()
 
-MESSAGE("
 
-")
+MESSAGE("\n")
