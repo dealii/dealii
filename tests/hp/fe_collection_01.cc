@@ -1,8 +1,8 @@
 //----------------------------  fe_collection_01.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,7 @@
 //----------------------------  fe_collection_01.cc  ---------------------------
 
 
-// test that QCollection objects are copyable without running into
+// test that FECollection objects are copyable without running into
 // troubles when the copy is destroyed earlier than the original
 // object
 
@@ -46,14 +46,14 @@ int main ()
 {
   std::ofstream logfile("fe_collection_01/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }
