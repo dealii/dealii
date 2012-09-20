@@ -53,6 +53,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now a function hp::FECollection::n_blocks() in analogy to
+the existing function hp::FECollection::n_components().
+<br>
+(Wolfgang Bangerth, 2012/09/20)
+
 <li> Changed: step-8 now outputs data in VTK format, rather than GMV.
 GMV has long been dead.
 <br>
