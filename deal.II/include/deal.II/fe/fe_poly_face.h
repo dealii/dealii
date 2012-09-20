@@ -40,8 +40,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This class is not a fully implemented FiniteElement class. Instead there
  * are several pure virtual functions declared in the FiniteElement class
- * which cannot implemented by this class but are left for implementation in
- * derived classes.
+ * which cannot be implemented by this class but are left for implementation
+ * in derived classes.
  *
  * Furthermore, this class assumes that shape functions of the
  * FiniteElement under consideration do <em>not</em> depend on the
