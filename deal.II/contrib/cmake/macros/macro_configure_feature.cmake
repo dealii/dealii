@@ -123,7 +123,6 @@ MACRO(CONFIGURE_FEATURE feature)
   #
   FOREACH(macro_dependency ${FEATURE_${feature}_DEPENDS})
     STRING(REGEX REPLACE "^DEAL_II_WITH_" "" macro_dependency ${macro_dependency})
-    MESSAGE("${macro_dependency}")
     IF(NOT FEATURE_${macro_dependency}_PROCESSED)
       MESSAGE(FATAL_ERROR "\n"
         "Internal build system error:\nDEAL_II_WITH_${feature} depends on "
