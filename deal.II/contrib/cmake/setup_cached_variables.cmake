@@ -56,7 +56,7 @@ ENDIF()
 #
 # Set BUILD_SHARED_LIBS to default to ON:
 #
-SET(BUILD_SHARED_LIBS ON CACHE OPTION "Build a shared library")
+SET(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build a shared library")
 
 
 #

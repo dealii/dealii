@@ -2,13 +2,6 @@
 # Configuration for the boost library:
 #
 
-#
-# Always true. We need it :-]
-#
-SET(DEAL_II_WITH_BOOST "ON"
-  CACHE STRING "Build deal.II with support for boost." FORCE
-  )
-
 
 #
 # This configure script has to be included after configure_tbb.

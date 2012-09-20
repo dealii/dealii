@@ -142,6 +142,13 @@ OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
   OFF)
 
+SET(DEAL_II_WITH_BOOST "ON"
+  CACHE BOOL "Build deal.II with support for boost." FORCE
+  ) # Always true. We need it :-]
+OPTION(DEAL_II_FORCE_CONTRIB_BOOST
+  "Always use the bundled boost library instead of an external one."
+  ON)
+
 OPTION(DEAL_II_WITH_DOXYGEN
   "Enable the generation and installation of the documentation via doxygen.
   This feature adds a COMPONENT \"documentation\" to the build system."
@@ -194,10 +201,6 @@ OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
 
 OPTION(DEAL_II_WITH_ZLIB
   "Build deal.II with support for zlib."
-  OFF)
-
-OPTION(DEAL_II_FORCE_CONTRIB_BOOST
-  "Always use the bundled boost library instead of an external one."
   OFF)
 
 #
