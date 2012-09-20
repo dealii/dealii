@@ -9,7 +9,7 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
     SET(${var} TRUE)
   ELSE()
     MESSAGE(WARNING "\n"
-      "Could not find a sufficient modern metis installation:"
+      "Could not find a sufficient modern metis installation: "
       "Version 5.x required!"
       )
   ENDIF()

@@ -5,8 +5,9 @@ IF(DEAL_II_INSTALL_COMPAT_FILES)
   #
 
   ADD_EXECUTABLE(make_dependencies make_dependencies.cc)
+  ADD_EXECUTABLE(report_features report_features.cc)
 
-  INSTALL(TARGETS make_dependencies
+  INSTALL(TARGETS make_dependencies report_features
     RUNTIME
     DESTINATION common/scripts
     COMPONENT compat_files
