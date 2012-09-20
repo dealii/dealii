@@ -5,6 +5,16 @@
 
 IF(DEAL_II_WITH_DOXYGEN)
 
+  #
+  # Generate the documentation via doxygen:
+  #
+  ADD_SUBDIRECTORY(doxygen)
+
+
+  #
+  # Install the homepage:
+  #
+
   IF(DEAL_II_INSTALL_COMPAT_FILES)
     #
     # The good, old directory where the documentation gets installed to:
@@ -21,32 +31,18 @@ IF(DEAL_II_WITH_DOXYGEN)
   INSTALL(DIRECTORY .
     DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}
     COMPONENT documentation
-    FILES_MATCHING REGEX "^.*(html|css|136|eps|fig|png)$"  # TODO! cmapx, dot
+    FILES_MATCHING REGEX "^.*(html|css|eps|fig|png)$"  # TODO! cmapx, dot
     )
 
-  SET(doc_files_to_configure
-    title.html.in
-    doxygen/tutorial/toc.html.in
-    doxygen/header.136.in
-    doxygen/header.tex.in
-    doxygen/options.dox.in
-    doxygen/Makefile.in
-    doxygen/options.136.in
-    doxygen/header.html.in
+  CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/title.html.in
+    ${CMAKE_CURRENT_BINARY_DIR}/title.html
     )
-
-  FOREACH(infile ${doc_files_to_configure})
-    STRING(REGEX REPLACE "\\.in$" "" outfile "${infile}" )
-    CONFIGURE_FILE(
-      ${CMAKE_CURRENT_SOURCE_DIR}/${infile}
-      ${CMAKE_CURRENT_BINARY_DIR}/${outfile}
-      )
-    INSTALL(FILES
-      ${CMAKE_CURRENT_BINARY_DIR}/${outfile}
-      DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}
-      COMPONENT documentation
-      )
-  ENDFOREACH()
+  INSTALL(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/title.html
+    DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}
+    COMPONENT documentation
+    )
 
 ENDIF(DEAL_II_WITH_DOXYGEN)
 

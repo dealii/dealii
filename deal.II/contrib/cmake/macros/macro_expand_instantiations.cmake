@@ -30,10 +30,7 @@ MACRO(macro_expand_instantiations target inst_in_files)
            > ${CMAKE_CURRENT_BINARY_DIR}/${inst_file}
       )
 
-    SET(inst_targets
-      ${CMAKE_CURRENT_BINARY_DIR}/${inst_file}
-      ${inst_targets}
-      )
+    LIST(APPEND inst_targets ${CMAKE_CURRENT_BINARY_DIR}/${inst_file})
   ENDFOREACH()
 
   #

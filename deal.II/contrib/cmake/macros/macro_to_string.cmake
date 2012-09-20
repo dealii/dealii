@@ -1,0 +1,7 @@
+MACRO(TO_STRING variable)
+  SET(variable_tmp ${${variable}})
+  SET(${variable} "")
+  FOREACH(var ${variable_tmp})
+    SET(${variable} "${${variable}} ${var}")
+  ENDFOREACH()
+ENDMACRO()

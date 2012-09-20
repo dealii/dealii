@@ -12,7 +12,7 @@
 
 <body class="title">
   <div class="fixedhead">
-    <h1 class="head">deal.II @PACKAGE_VERSION@ Documentation</h1>
+    <h1 class="head">deal.II @DEAL_II_PACKAGE_VERSION@ Documentation</h1>
   </div>
 </body>
 </html>
