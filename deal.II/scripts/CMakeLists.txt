@@ -4,6 +4,11 @@ IF(DEAL_II_INSTALL_COMPAT_FILES)
   # Build and install the old dependency_resolution executable:
   #
 
+  INCLUDE_DIRECTORIES(
+    ${CMAKE_SOURCE_DIR}/include/
+    ${CMAKE_BINARY_DIR}/include/
+    )
+
   ADD_EXECUTABLE(make_dependencies make_dependencies.cc)
   ADD_EXECUTABLE(report_features report_features.cc)
 
