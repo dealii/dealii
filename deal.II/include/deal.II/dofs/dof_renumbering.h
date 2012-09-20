@@ -849,6 +849,24 @@ namespace DoFRenumbering
                                     * Sort the degrees of freedom by
                                     * block. It does the same
                                     * thing as the above function.
+				    *
+				    * This function only succeeds if each of
+				    * the elements in the hp::FECollection
+				    * attached to the hp::DoFHandler argument
+				    * has exactly the same number of blocks
+				    * (see @ref GlossBlock "the glossary" for
+				    * more information). Note that this is not
+				    * always given: while the hp::FECollection
+				    * class ensures that all of its elements
+				    * have the same number of vector
+				    * components, they need not have the same
+				    * number of blocks. At the same time, this
+				    * function here needs to match individual
+				    * blocks across elements and therefore
+				    * requires that elements have the same
+				    * number of blocks and that subsequent
+				    * blocks in one element have the same
+				    * meaning as in another element.
                                     */
   template <int dim>
   void
