@@ -1,5 +1,8 @@
 TODO:
 
+* What to do with ./lib/meshes ? I have moved it to ./contrib/meshes for
+  the time being...
+
 * Think once more about the correct place for ./scripts ...
 
 * Add build and installation of the documentation
