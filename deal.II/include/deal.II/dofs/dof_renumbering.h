@@ -669,6 +669,11 @@ namespace DoFRenumbering
                  const bool                  reversed_numbering = false,
                  const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int> ());
 
+  /**
+   * @name Component-wise numberings
+   * @{
+   */
+
                                    /**
                                     * Sort the degrees of freedom by
                                     * vector component. The
@@ -790,13 +795,22 @@ namespace DoFRenumbering
                           const ENDITERATOR& end,
                           const std::vector<unsigned int> &target_component);
 
+  /**
+   * @}
+   */
+
+  /**
+   * @name Various cell-wise numberings
+   * @{
+   */
+
                                    /**
-                                        * Renumber the degrees cell by cell in hierarchical order
-                                        * (also known as z-order). The main usage is that this
-                                        * guarantees the same ordering independent of the
-                                        * number of processors involved in a parallel
-                                        * distributed computation.
-                                        */
+                                    * Renumber the degrees cell by cell in hierarchical order
+                                    * (also known as z-order). The main usage is that this
+                                    * guarantees the same ordering independent of the
+                                    * number of processors involved in a parallel
+                                    * distributed computation.
+                                    */
   template <int dim>
   void
   hierarchical (DoFHandler<dim> &dof_handler);
@@ -927,6 +941,14 @@ namespace DoFRenumbering
                      const unsigned int         level,
                      const std::vector<typename MGDoFHandler<dim>::cell_iterator>& cell_order);
 
+  /**
+   * @}
+   */
+
+  /**
+   * @name Directional numberings
+   * @{
+   */
 
                                    /**
                                     * Downstream numbering with respect to a
@@ -1137,6 +1159,15 @@ namespace DoFRenumbering
                         const Point<dim>&          center,
                         const bool                 counter);
 
+  /**
+   * @}
+   */
+
+  /**
+   * @name Selective and random numberings
+   * @{
+   */
+
                                    /**
                                     * Sort those degrees of freedom
                                     * which are tagged with @p true
@@ -1248,6 +1279,15 @@ namespace DoFRenumbering
   compute_random (std::vector<unsigned int> &new_dof_indices,
                   const DH& dof_handler);
 
+  /**
+   * @}
+   */
+
+  /**
+   * @name Numberings based on cell attributes
+   * @{
+   */
+
                                    /**
                                     * Renumber the degrees of
                                     * freedom such that they are
@@ -1300,6 +1340,10 @@ namespace DoFRenumbering
   void
   compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
                           const DH                  &dof_handler);
+
+  /**
+   * @}
+   */
 
                                    /**
                                     * Exception
