@@ -98,7 +98,7 @@ template<int,int> class MGDoFHandler;
  * INTEGRATIONINFO and ASSEMBLER are needed.
  *
  * DOFINFO objects are gathered in a DoFInfoBox. In those objects, we
- * store the results of local operations on each cel and its
+ * store the results of local operations on each cell and its
  * faces. Once all this information has been gathered, an ASSEMBLER is
  * used to assemble it into golbal data.
  *
@@ -178,7 +178,7 @@ namespace MeshWorker
 {
 /**
  * The class providing the scrapbook to fill with results of local
- * integration. Depending on the tesk the mesh worker loop is
+ * integration. Depending on the task the mesh worker loop is
  * performing, local results can be of different types. They have
  * in common that they are the result of local integration over a cell
  * or face. Their actual type is determined by the Assember using

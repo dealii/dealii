@@ -38,7 +38,7 @@ namespace MeshWorker
  * In addition to the information on degrees of freedom stored in this
  * class, it also provides the local computation space for the worker
  * object operating on it in LocalResults. This base class will automatically
- * reinitialized on each cell, but initial setup is up to the user and
+ * be reinitialized on each cell, but initial setup is up to the user and
  * should be done when initialize() for this class is called.
  *
  * This class operates in two different modes, corresponding to the

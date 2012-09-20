@@ -24,7 +24,7 @@ DEAL_II_NAMESPACE_OPEN
  * @warning This class is not sufficiently tested yet!
  *
  * This class gives a unified framework for the implementation of
- * FiniteElement classes only located on faces of the mesh. Theu are
+ * FiniteElement classes only located on faces of the mesh. They are
  * based on polynomial spaces like the TensorProductPolynomials or a
  * PolynomialSpace classes.
  *
@@ -38,10 +38,9 @@ DEAL_II_NAMESPACE_OPEN
  * Example classes are TensorProductPolynomials, PolynomialSpace or
  * PolynomialsP.
  *
- * This class is not a fully implemented FiniteElement class. Instead
- * there are several pure virtual functions declared in the
- * FiniteElement and FiniteElement classes which cannot
- * implemented by this class but are left for implementation in
+ * This class is not a fully implemented FiniteElement class. Instead there
+ * are several pure virtual functions declared in the FiniteElement class
+ * which cannot implemented by this class but are left for implementation in
  * derived classes.
  *
  * Furthermore, this class assumes that shape functions of the

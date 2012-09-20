@@ -1659,7 +1659,7 @@ class FiniteElement : public Subscriptor,
                                       * FESystem class overloads
                                       * it so that it can return the
                                       * support points of individual
-                                      * base elements, of not all the
+                                      * base elements, if not all the
                                       * base elements define support
                                       * points. In this way, you can
                                       * still ask for certain support
