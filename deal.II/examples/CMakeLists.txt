@@ -24,33 +24,27 @@ IF(DEAL_II_INSTALL_EXAMPLES)
     )
 
 
-  #
-  # We install the examples to usr/share/doc/deal.II
-  # a path expected by the majority of distributions, but a bit
-  # inconvenient...
-  #
+  IF(DEAL_II_INSTALL_COMPAT_FILES)
+    #
+    # The good, old directory where examples get installed to:
+    #
+    SET(DEAL_II_EXAMPLES_RELDIR "examples")
+  ELSE()
+    #
+    # IF DEAL_II_INSTALL_COMPAT_FILES is not set, we assume that we have to
+    # obey the file system standard, so install to usr/share/doc/deal.II.
+    # (A path expected by the majority of distributions, but a bit
+    # inconvenient...)
+    #
+    SET(DEAL_II_EXAMPLES_RELDIR "usr/share/doc/deal.II/examples")
+  ENDIF()
+
   FOREACH(step ${deal_ii_examples})
     INSTALL(DIRECTORY ${step}
-      DESTINATION usr/share/doc/deal.II/examples
+      DESTINATION ${DEAL_II_EXAMPLES_RELDIR}
       COMPONENT examples
       PATTERN "doc" EXCLUDE
       )
   ENDFOREACH()
-
-
-  #
-  # ... therefore, create a symlink if DEAL_II_COMPAT_FILES is set:
-  #
-  IF(DEAL_II_INSTALL_COMPAT_FILES)
-    INSTALL(
-      CODE
-        "EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E create_symlink
-          ${CMAKE_INSTALL_PREFIX}/usr/share/doc/deal.II/examples
-          ${CMAKE_INSTALL_PREFIX}/examples
-          )"
-      COMPONENT compat_files
-      )
-
-  ENDIF()
 
 ENDIF()
