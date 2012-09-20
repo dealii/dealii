@@ -350,6 +350,7 @@ ADD_SUBDIRECTORY(include)
 #
 # Prepare some directories for installation:
 #
+ADD_SUBDIRECTORY(doc)
 ADD_SUBDIRECTORY(scripts)
 ADD_SUBDIRECTORY(examples)
 
