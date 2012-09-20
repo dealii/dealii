@@ -937,7 +937,7 @@ namespace Step8
     filename += ('0' + cycle);
     Assert (cycle < 10, ExcInternalError());
 
-    filename += ".gmv";
+    filename += ".vtk";
     std::ofstream output (filename.c_str());
 
     DataOut<dim> data_out;
@@ -1024,7 +1024,7 @@ namespace Step8
                                      // that to the other function.
     data_out.add_data_vector (solution, solution_names);
     data_out.build_patches ();
-    data_out.write_gmv (output);
+    data_out.write_vtk (output);
   }
 
 

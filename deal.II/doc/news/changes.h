@@ -53,6 +53,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: step-8 now outputs data in VTK format, rather than GMV.
+GMV has long been dead.
+<br>
+(Wolfgang Bangerth, 2012/09/19)
+
 <li> Fixed: One can compile deal.II with MPI support but run programs
 that aren't intended to use parallel communications and that, in fact,
 do not call <code>MPI_Init</code> at all. They are nevertheless supposed
