@@ -1,12 +1,15 @@
-INCLUDE(CheckCXXSourceCompiles)
+#
+# Check for a compiler bug.
+#
+# Usage:
+#     CHECK_CXX_COMPILER_BUG(source var)
+#
+# where source is a snipped of source code and var is a variable that will
+# be set to true if source could not be compiled and linked successfully.
+# (This just inverts the logic of CHECK_CXX_SOURCE_COMPILES.)
+#
 
 MACRO(CHECK_CXX_COMPILER_BUG source var)
-
-  #
-  # Check for a compiler bug, i.e. if source does not compile, define var
-  # This just inverts the logic of CHECK_CXX_SOURCE_COMPILES.
-  #
-
   CHECK_CXX_SOURCE_COMPILES(
     "${source}"
     ${var}_OK)
@@ -17,5 +20,5 @@ MACRO(CHECK_CXX_COMPILER_BUG source var)
     MESSAGE(STATUS "Test unsuccessful, define ${var}")
     SET(${var} 1)
   ENDIF()
-
 ENDMACRO()
+

@@ -1,3 +1,6 @@
+#
+# TODO: Description...
+#
 MACRO(GET_CXX_SOURCE_RETURN_VALUE SOURCE VAR EXIT_CODE)
 
   #

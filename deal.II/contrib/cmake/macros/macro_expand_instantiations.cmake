@@ -1,9 +1,8 @@
 #
-# A macro for the inst.in file expansion:
+# A macro for the inst.in file expansion
 #
 # Usage:
-#
-# macro_expand_instantiations(target inst_in_files)
+#     macro_expand_instantiations(target inst_in_files)
 #
 # Options:
 #
@@ -18,7 +17,6 @@
 #
 
 MACRO(macro_expand_instantiations target inst_in_files)
-
   FOREACH (inst_in_file ${inst_in_files})
     STRING(REGEX REPLACE "\\.in$" "" inst_file "${inst_in_file}" )
 
@@ -49,5 +47,5 @@ MACRO(macro_expand_instantiations target inst_in_files)
   # before target will be processed.
   #
   ADD_DEPENDENCIES(${target} ${target}.inst)
-
 ENDMACRO()
+

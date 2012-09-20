@@ -3,10 +3,12 @@
 #
 
 
+
 #
 # Check whether the std::vector::iterator is just a plain pointer
 #
-CHECK_CXX_COMPILER_BUG( # Yes. It is not a bug. But the logic is the same.
+# (Yes. It is not a bug. But the logic is the same.)
+CHECK_CXX_COMPILER_BUG(
   "
   #include <vector>
   template <typename T> void f(T) {}
@@ -398,3 +400,4 @@ IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
   ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS_DEBUG "-Wa,--compress-debug-sections")
 ENDIF()
+
