@@ -2,6 +2,9 @@ TODO:
 
 * Implement cmake packaging
 
+* The Find modules under contrib/cmake/modules export <...>_LIBRARY and
+  <...>_INCLUDE_DIR, wheras the convention is nowadays _LIBRARIES and
+  _INCLUDE_DIRS, fix this.
 
 * Make Make.global_options work...
 

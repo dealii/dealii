@@ -13,19 +13,24 @@ ENDMACRO()
 
 MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL var)
 
-  INCLUDE_DIRECTORIES(${MPI_CXX_INCLUDE_PATH})
   ADD_FLAGS(CMAKE_CXX_FLAGS "${MPI_CXX_COMPILE_FLAGS}")
   ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${MPI_CXX_LINK_FLAGS}")
+
   LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${MPI_CXX_LIBRARIES})
+  INCLUDE_DIRECTORIES(${MPI_CXX_INCLUDE_PATH})
 
-  SET(DEAL_II_COMPILER_SUPPORTS_MPI TRUE)
+  # The user has to know the location of the mpi headers as well:
+  LIST(APPEND DEAL_II_EXTERNAL_INCLUDE_DIRS ${MPI_CXX_INCLUDE_PATH})
 
-  # TODO: (Maybe) set up the rest:
+  # TODO: Set up the rest:
+
   #MPI_CXX_COMPILER        MPI Compiler wrapper for CXX
   #MPIEXEC                 Executable for running MPI programs
   #MPIEXEC_NUMPROC_FLAG    Flag to pass to MPIEXEC before giving it the number of processors to run on
   #MPIEXEC_PREFLAGS        Flags to pass to MPIEXEC directly before the executable to run.
   #MPIEXEC_POSTFLAGS       Flags to pass to MPIEXEC after other flags
+
+  SET(DEAL_II_COMPILER_SUPPORTS_MPI TRUE)
 
   SET(${var} TRUE)
 ENDMACRO()
