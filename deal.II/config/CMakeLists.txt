@@ -63,6 +63,19 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     ${DEAL_II_INCLUDE_DIRS}
     )
 
+
+  #
+  # Add an rpath directive so that libraries outside of the default search
+  # directories will be found by the runtime dynamic linker:
+  #
+  FOREACH(lib ${DEAL_II_EXTERNAL_LIBRARIES} ${DEAL_II_LIBRARIES})
+    GET_FILENAME_COMPONENT(path ${lib} PATH)
+    LIST(APPEND MAKEFILE_LDFLAGS "-Wl,-rpath  -Wl,${path}")
+  ENDFOREACH()
+  LIST(REMOVE_DUPLICATES MAKEFILE_LDFLAGS)
+  TO_STRING(MAKEFILE_LDFLAGS ${MAKEFILE_LDFLAGS})
+  SET(MAKEFILE_LDFLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MAKEFILE_LDFLAGS}")
+
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in
     ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options.${CMAKE_BUILD_TYPE}

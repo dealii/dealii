@@ -1,13 +1,13 @@
 
 
 
-            ==============================================
+          ==================================================
 
             The cmake build system for the deal.II project
 
-            ==============================================
+          ==================================================
 
-            Author: maier, 2012
+          Author: Matthias Maier, University Heidelberg 2012
 
 
 
@@ -58,7 +58,6 @@ Quick start
       $ mkdir build
       $ cd build
       $ cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../
-      $ make
       $ make install
 
 
@@ -78,10 +77,16 @@ Useful bits
     ( $ cd build )
       $ cmake -D<OPTION>=<VALUE> [...] path/to/source/tree
 
+* Configure with autodetection, afterwards disable a feature:
+
+    ( $ cd build )
+      $ cmake -DDEAL_II_FEATURE_AUTODETECTION=ON ../
+      $ cmake -DDEAL_II_FEATURE_AUTODETECTION=OFF -DDEAL_II_WITH_METIS=OFF ../
+      $ make install
 
 * Build and install only a specific component:
 
-      $ cd build
+    ( $ cd build )
       $ make <component>
       $ cmake -DCOMPONENT=<component> -P build/cmake_install.cmake
 

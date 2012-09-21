@@ -29,7 +29,7 @@ CC-ID                = @CMAKE_C_COMPILER_ID@
 CC-VERSION           = @CMAKE_C_COMPILER_VERSION@
 AR                   = @CMAKE_AR@
 RANLIB               = @CMAKE_RANLIB@
-LDFLAGS              = @CMAKE_SHARED_LINKER_FLAGS@
+LDFLAGS              = @MAKEFILE_LDFLAGS@
 
 #LIBS                 = @LIBS@ # TODO
 

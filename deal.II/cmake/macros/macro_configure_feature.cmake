@@ -76,7 +76,7 @@ ENDMACRO()
 MACRO(SET_CACHED_OPTION str value)
   SET(${str}
     ${value}
-    CACHE STRING
+    CACHE BOOL
     "Automatically set due to DEAL_II_FEATURE_AUTODETECTION"
     FORCE)
 ENDMACRO()

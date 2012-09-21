@@ -11,11 +11,15 @@ MACRO(SETUP_THREADING var)
   FIND_PACKAGE(Threads)
 
   IF(Threads_FOUND)
+    MARK_AS_ADVANCED(
+      pthread_LIBRARY
+      )
     SET(${var} TRUE)
 
     #
     # We support threading. Go on and configure the rest:
     #
+
     ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
     SET(DEAL_II_USE_MT TRUE)
 

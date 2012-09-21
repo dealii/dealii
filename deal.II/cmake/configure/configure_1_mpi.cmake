@@ -6,6 +6,12 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   FIND_PACKAGE(MPI)
 
   IF(MPI_CXX_FOUND)
+    # Hide some variables:
+    MARK_AS_ADVANCED(
+      MPI_EXTRA_LIBRARY
+      MPI_LIBRARY
+      )
+
     SET(${var} TRUE)
   ENDIF()
 ENDMACRO()

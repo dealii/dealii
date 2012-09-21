@@ -6,6 +6,11 @@ MACRO(FEATURE_BLAS_FIND_EXTERNAL var)
   FIND_PACKAGE(BLAS)
 
   IF(BLAS_FOUND)
+    MARK_AS_ADVANCED(
+      atlas_LIBRARY
+      blas_LIBRARY
+      cblas_LIBRARY
+      )
     SET(${var} TRUE)
   ENDIF()
 ENDMACRO()
