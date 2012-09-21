@@ -4,6 +4,21 @@
 
 
 #
+# Dependency check:
+# DEAL_II_COMPONENT_DOCUMENTATION needs DEAL_II_WITH_DOXYGEN.
+# TODO: It is a bit sloppy to test this here. But this is the only
+# dependency of this kind atm.
+#
+IF(DEAL_II_COMPONENT_DOCUMENTATION AND NOT DEAL_II_WITH_DOXYGEN)
+  MESSAGE(SEND_ERROR "\n"
+    "DEAL_II_COMPONENT_DOCUMENTATION has unmet configuration requirements: "
+    "DEAL_II_WITH_DOXYGEN has to be set to \"ON\".\n\n"
+    )
+ENDIF()
+
+
+
+#
 # Append the saved initial (cached) variables ${flags}_SAVED at the end of
 # ${flags}, see setup_cached_compiler_flags.cmake and the main
 # CMakeLists.txt for details.
@@ -11,6 +26,7 @@
 FOREACH(flags ${deal_ii_used_flags})
   SET(${flags} "${${flags}} ${${flags}_SAVED}")
 ENDFOREACH()
+
 
 
 #
