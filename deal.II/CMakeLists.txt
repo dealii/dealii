@@ -4,7 +4,7 @@ SET(VERSION "8.0.pre")
 # This is the main CMakeLists.txt file for the deal.II project
 #
 # The main purpose of this file is to set all the configuration options and
-# then call a lot of modules residing under ./contrib/cmake/*/ that do the
+# then call a lot of modules residing under ./cmake/*/ that do the
 # hard work.
 #
 #
@@ -250,14 +250,14 @@ SET(CMAKE_INCLUDE_CURRENT_DIR true)
 
 SET(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
-  ${CMAKE_SOURCE_DIR}/contrib/cmake/
-  ${CMAKE_SOURCE_DIR}/contrib/cmake/modules/
+  ${CMAKE_SOURCE_DIR}/cmake/
+  ${CMAKE_SOURCE_DIR}/cmake/modules/
   )
 
 #
 # Load all macros:
 #
-FILE(GLOB macro_files "contrib/cmake/macros/*.cmake")
+FILE(GLOB macro_files "cmake/macros/*.cmake")
 FOREACH(file ${macro_files})
   MESSAGE(STATUS "Include ${file}")
   INCLUDE(${file})
@@ -329,7 +329,7 @@ SET(  DEAL_II_EXTERNAL_LIBRARIES)
 #
 # Run all system checks:
 #
-FILE(GLOB check_files "contrib/cmake/check/*.cmake")
+FILE(GLOB check_files "cmake/check/*.cmake")
 FOREACH(file ${check_files})
   MESSAGE(STATUS "Include ${file}")
   INCLUDE(${file})
@@ -339,7 +339,7 @@ ENDFOREACH()
 #
 # Feature configuration:
 #
-FILE(GLOB configure_files "contrib/cmake/configure/configure_*.cmake")
+FILE(GLOB configure_files "cmake/configure/configure_*.cmake")
 # Make sure the configure_*.cmake files are included in alphabetical order
 # to fullfill some dependencies...
 LIST(SORT configure_files)
@@ -367,7 +367,7 @@ INCLUDE(setup_finalize)
 #
 # Build the toolchain and prepare the includes:
 #
-ADD_SUBDIRECTORY(contrib/expand_instantiations)
+ADD_SUBDIRECTORY(scripts)
 ADD_SUBDIRECTORY(include)
 
 #
@@ -393,8 +393,7 @@ LIST(APPEND DEAL_II_INCLUDE_DIRS
 # Prepare some directories for installation (include them after
 # DEAL_II_LIBRARIES and DEAL_II_INCLUDE_DIRS is set)
 #
-ADD_SUBDIRECTORY(contrib/config)
+ADD_SUBDIRECTORY(config)
 ADD_SUBDIRECTORY(doc)
 ADD_SUBDIRECTORY(examples)
-ADD_SUBDIRECTORY(scripts)
 

@@ -1,7 +1,12 @@
+
+ADD_EXECUTABLE(expand_instantiations expand_instantiations.cc)
+
+
 IF(DEAL_II_INSTALL_COMPAT_FILES)
 
   #
-  # Build and install the old dependency_resolution executable:
+  # Build and install the old dependency_resolution and report_features
+  # executables:
   #
 
   INCLUDE_DIRECTORIES(
@@ -16,10 +21,11 @@ IF(DEAL_II_INSTALL_COMPAT_FILES)
 
   ADD_DEPENDENCIES(report_features deal_ii_target_dependencies)
 
-  INSTALL(TARGETS make_dependencies report_features
+  INSTALL(TARGETS make_dependencies report_features expand_instantiations
     RUNTIME
     DESTINATION common/scripts
     COMPONENT compat_files
     )
 
 ENDIF()
+
