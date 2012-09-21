@@ -1,6 +1,7 @@
 
 MACRO(SET_IF_EMPTY variable value)
-  IF(NOT ${${variable}} STREQUAL "")
+  IF("${${variable}}" STREQUAL "")
     SET(${variable} ${value})
+  ENDIF()
 ENDMACRO()
 
