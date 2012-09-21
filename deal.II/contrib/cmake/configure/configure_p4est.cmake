@@ -48,7 +48,7 @@ MACRO(FEATURE_P4EST_CONFIGURE_EXTERNAL var)
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
     IF(P4EST_DEBUG_FOUND AND SC_DEBUG_FOUND)
-      LIST(APPEND deal_ii_external_libraries
+      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
         ${P4EST_DEBUG_LIBRARY} ${SC_DEBUG_LIBRARY}
         )
     ELSE()
@@ -57,12 +57,12 @@ MACRO(FEATURE_P4EST_CONFIGURE_EXTERNAL var)
         "sc libraries were found. The regular p4est and sc libraries will be used\n"
         "instead.\n\n"
         )
-      LIST(APPEND deal_ii_external_libraries
+      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
         ${P4EST_LIBRARY} ${SC_LIBRARY}
         )
     ENDIF()
   ELSE()
-    LIST(APPEND deal_ii_external_libraries
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
       ${P4EST_LIBRARY} ${SC_LIBRARY}
       )
   ENDIF()

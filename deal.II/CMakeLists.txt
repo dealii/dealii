@@ -283,9 +283,9 @@ INCLUDE(setup_deal_ii)
 INCLUDE(setup_compiler_flags)
 
 
-#                       ####################
-#                       #     FAT NOTE:    #
-#                       ####################
+###########################################################################
+#
+#                             FAT NOTE:
 #
 # To keep things clean, only the following cmake variables should be
 # altered in the platform checks and features configuration
@@ -300,14 +300,14 @@ INCLUDE(setup_compiler_flags)
 #         for setting necessary compiler flags, e.g. -std=c++11 (if
 #         available).
 #
-      ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
+ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 #         Used as a dummy target for all the stuff that has to be done
 #         before the library can be compiled.
 #
 #
 # For internal and external use:
 #
-      SET(deal_ii_external_libraries)
+SET(  DEAL_II_EXTERNAL_LIBRARIES)
 #         Used to keep track of external libraries, the deal.II library and
 #         user programs have to be linked against.
 #
@@ -318,6 +318,7 @@ INCLUDE(setup_compiler_flags)
 #         Used to keep track of external include dirs, necessary for the
 #         compilation of user programs.
 #
+###########################################################################
 
 
 #

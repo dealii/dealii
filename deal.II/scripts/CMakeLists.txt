@@ -12,7 +12,7 @@ IF(DEAL_II_INSTALL_COMPAT_FILES)
   ADD_EXECUTABLE(make_dependencies make_dependencies.cc)
 
   ADD_EXECUTABLE(report_features report_features.cc)
-  TARGET_LINK_LIBRARIES(report_features ${deal_ii_external_libraries})
+  TARGET_LINK_LIBRARIES(report_features ${DEAL_II_EXTERNAL_LIBRARIES})
 
   ADD_DEPENDENCIES(report_features deal_ii_target_dependencies)
 
