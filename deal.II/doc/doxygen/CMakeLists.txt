@@ -71,9 +71,10 @@ ADD_CUSTOM_TARGET(doxygen ALL # TODO: Really all?
   DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/deal.II
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
-    ${CMAKE_CURRENT_BINARY_DIR}/header.html
-    ${CMAKE_CURRENT_BINARY_DIR}/footer.html
-    ${CMAKE_CURRENT_BINARY_DIR}/filter
+    #already generated at configuration time:
+    #${CMAKE_CURRENT_BINARY_DIR}/header.html
+    #${CMAKE_CURRENT_BINARY_DIR}/footer.html
+    #${CMAKE_CURRENT_BINARY_DIR}/filter
     #${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
     #${CMAKE_BINARY_DIR}/include/deal.II/lac/lapack_templates.h
   COMMENT "Generating documentation via doxygen"
