@@ -1,13 +1,3 @@
-IF(DEAL_II_WITH_DOXYGEN)
-  #
-  # Generate the documentation via doxygen:
-  #
-
-  # TODO
-
-ENDIF(DEAL_II_WITH_DOXYGEN)
-
-
 
 IF(DEAL_II_INSTALL_EXAMPLES)
   #
@@ -22,22 +12,6 @@ IF(DEAL_II_INSTALL_EXAMPLES)
     step-34 step-35 step-36 step-37 step-38 step-39 step-40 step-41
     step-42 step-43 step-44 step-45 step-46 step-47 step-48
     )
-
-
-  IF(DEAL_II_INSTALL_COMPAT_FILES)
-    #
-    # The good, old directory where examples get installed to:
-    #
-    SET(DEAL_II_EXAMPLES_RELDIR "examples")
-  ELSE()
-    #
-    # IF DEAL_II_INSTALL_COMPAT_FILES is not set, we assume that we have to
-    # obey the file system standard, so install to usr/share/doc/deal.II.
-    # (A path expected by the majority of distributions, but a bit
-    # inconvenient...)
-    #
-    SET(DEAL_II_EXAMPLES_RELDIR "usr/share/doc/deal.II/examples")
-  ENDIF()
 
   FOREACH(step ${deal_ii_examples})
     INSTALL(DIRECTORY ${step}

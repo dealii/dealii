@@ -31,7 +31,7 @@ ADD_DEPENDENCIES(deal_ii_target_dependencies lapack_templates)
 #
 
 INSTALL(DIRECTORY deal.II
-  DESTINATION include
+  DESTINATION ${DEAL_II_INCLUDE_RELDIR}
   COMPONENT library
   FILES_MATCHING PATTERN "*.h"
   )
@@ -40,7 +40,7 @@ INSTALL(DIRECTORY deal.II
 # and don't forget to install all generated header files, too:
 #
 INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/deal.II
-  DESTINATION include
+  DESTINATION ${DEAL_II_INCLUDE_RELDIR}
   COMPONENT library
   FILES_MATCHING PATTERN "*.h"
   )

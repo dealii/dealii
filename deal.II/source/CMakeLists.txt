@@ -61,7 +61,7 @@ TARGET_LINK_LIBRARIES(deal_II ${deal_ii_external_libraries})
 #
 INSTALL(TARGETS deal_II
   LIBRARY
-  DESTINATION lib${LIB_SUFFIX}
+  DESTINATION ${DEAL_II_LIBRARY_RELDIR}
   COMPONENT library
   )
 
