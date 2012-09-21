@@ -1,0 +1,16 @@
+# $Id$
+
+#
+# Compatibility Make.global_options stub file
+#
+
+#
+# Include the correct configuration depending on whether debug-mode is
+# selected, or not:
+#
+
+ifeq ($(debug-mode),on)
+  include Make.global_options.Debug
+else
+  include Make.global_options.Release
+endif

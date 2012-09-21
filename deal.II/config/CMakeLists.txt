@@ -10,28 +10,28 @@ IF(DEAL_II_COMPONENT_PROJECT_CONFIG)
   #
 
   CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/deal.IIConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/deal.IIConfig.cmake
+    ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_BASE_NAME}Config.cmake
     )
 
   GET_CMAKE_PROPERTY(res VARIABLES)
   FOREACH(var ${res})
     IF(var MATCHES "DEAL_II_WITH")
-      FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/deal.IIConfig.cmake
+      FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_BASE_NAME}Config.cmake
         "SET(${var} ${${var}})\n"
         )
     ENDIF()
   ENDFOREACH()
 
   CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/deal.IIConfigVersion.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/deal.IIConfigVersion.cmake
+    ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_BASE_NAME}ConfigVersion.cmake
     @ONLY
     )
 
   INSTALL(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/deal.IIConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/deal.IIConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_BASE_NAME}Config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_BASE_NAME}ConfigVersion.cmake
     DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
     COMPONENT project_config
     )
@@ -65,8 +65,13 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
 
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in
-    ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
+    ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options.${CMAKE_BUILD_TYPE}
     )
+
+  CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.stub
+    ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
+    COPYONLY)
 
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/Version.in
@@ -75,6 +80,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
 
   INSTALL(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/template-arguments
+    ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options.${CMAKE_BUILD_TYPE}
     ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
     DESTINATION common
     COMPONENT compat_files

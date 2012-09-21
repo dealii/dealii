@@ -43,10 +43,9 @@ ADD_LIBRARY(deal_II
 # No point to wrack one's brain over the question whether a new version of
 # a C++ library is still ABI backwards compatible :-]
 #
-SET_TARGET_PROPERTIES(deal_II PROPERTIES
+SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME} PROPERTIES
   VERSION ${VERSION}
   SOVERSION ${VERSION}
-  DEBUG_POSTFIX ".g"
   )
 
 SET_TARGET_PROPERTIES(deal_II PROPERTIES
