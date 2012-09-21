@@ -65,7 +65,7 @@ SET(DEAL_II_WITH_BOOST "ON"
   ) # Always true. We need it :-]
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
-  ON)
+  OFF)
 
 OPTION(DEAL_II_WITH_DOXYGEN
   "Enable the generation and installation of the documentation via doxygen.
