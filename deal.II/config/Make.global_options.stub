@@ -10,7 +10,7 @@
 #
 
 ifeq ($(debug-mode),on)
-  include Make.global_options.Debug
+  include $D/common/Make.global_options.Debug
 else
-  include Make.global_options.Release
+  include $D/common/Make.global_options.Release
 endif
