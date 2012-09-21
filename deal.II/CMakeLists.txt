@@ -295,7 +295,7 @@ INCLUDE(setup_compiler_flags)
 #                             FAT NOTE:
 #
 # To keep things clean, only the following cmake variables should be
-# altered in the platform checks and features configuration
+# altered in the platform checks and feature configuration
 # (beside setting a lot of DEAL_II_* definitions...):
 #
 #
@@ -312,6 +312,10 @@ INCLUDE(setup_compiler_flags)
 #         For setting necessary include dirs for the compilation of the
 #         deal.II library.
 #
+#     ADD_DEFINITIONS()
+#         For setting necessary preprocessor definitions ("-D<...>") for
+#         the compilation of the deal.II library
+#
 ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 #         Used as a dummy target for all the stuff that has to be done
 #         before the library can be compiled.
@@ -319,14 +323,19 @@ ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
 #
 # For internal and external use:
 #
-SET(  DEAL_II_EXTERNAL_LIBRARIES)
+#     DEAL_II_EXTERNAL_LIBRARIES
 #         Used to keep track of external libraries, the deal.II library
 #         and user programs have to be linked against.
 #
 #
 # For external use:
 #
-#     CMAKE_EXTERNAL_INCLUDE_DIRS
+#     DEAL_II_EXTERNAL_DEFINITIONS
+#         Used to keep track of external preprocessor definitions,
+#         necessary for the compilation of user programs.
+#
+#
+#     DEAL_II_EXTERNAL_INCLUDE_DIRS
 #         Used to keep track of external include dirs, necessary for the
 #         compilation of user programs.
 #
@@ -374,6 +383,7 @@ INCLUDE(setup_finalize)
 #
 # Build the toolchain and prepare the includes:
 #
+ADD_SUBDIRECTORY(config)
 ADD_SUBDIRECTORY(scripts)
 ADD_SUBDIRECTORY(include)
 
@@ -384,27 +394,12 @@ ADD_SUBDIRECTORY(source)
 
 
 #
-# Set DEAL_II_LIBRARIES and DEAL_II_INCLUDE_DIRS at this point...
+# Prepare some directories for installation
 #
-GET_TARGET_PROPERTY(deal_II_NAME deal_II LOCATION)
-GET_FILENAME_COMPONENT(deal_II_NAME ${deal_II_NAME} NAME)
-LIST(APPEND DEAL_II_LIBRARIES
-  "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}/${deal_II_NAME}"
-  )
-LIST(APPEND DEAL_II_INCLUDE_DIRS
-  "${CMAKE_INSTALL_PREFIX}/${DEAL_II_INCLUDE_RELDIR}"
-  )
-
-
-#
-# Prepare some directories for installation (include them after
-# DEAL_II_LIBRARIES and DEAL_II_INCLUDE_DIRS is set)
-#
-ADD_SUBDIRECTORY(config)
 ADD_SUBDIRECTORY(doc)
 ADD_SUBDIRECTORY(examples)
 
 #
-# Define some convencience custom targets for easy use:
+# Define some custom targets for convenience
 #
 INCLUDE(setup_custom_targets)

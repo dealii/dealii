@@ -125,7 +125,12 @@ ENDIF()
 ###############################
 
 IF (CMAKE_BUILD_TYPE MATCHES "Debug")
+
+  #
+  # Define the DEBUG preprocessor macro globally:
+  #
   ADD_DEFINITIONS("-DDEBUG")
+  LIST(APPEND CMAKE_EXTERNAL_DEFINTIONS "-DDEBUG")
 
   ADD_FLAGS(CMAKE_CXX_FLAGS_DEBUG "-O0")
 

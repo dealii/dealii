@@ -126,6 +126,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
 
       IF(TRILINOS_HAS_C99_TR1_WORKAROUND)
         ADD_DEFINITIONS("-DHAS_C99_TR1_CMATH")
+        LIST(APPEND DEAL_II_EXTERNAL_DEFINITIONS "-DHAS_C99_TR1_CMATH")
       ELSE()
         MESSAGE(WARNING "\n"
           "Your Trilinos installation is not compatible with the C++ standard selected for\n"
