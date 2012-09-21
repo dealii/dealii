@@ -1,15 +1,15 @@
 
 #
-# A small macro used for converting a cmake list <list> into a space
-# separated <string>:
+# A small macro used for converting a list into a space
+# separated string:
 #
 # Usage:
-#     TO_STRING(string list)
+#     TO_STRING(string ${list1} ${list2} ...)
 #
 
-MACRO(TO_STRING variable list)
+MACRO(TO_STRING variable)
   SET(${variable} "")
-  FOREACH(var ${${list}})
+  FOREACH(var  ${ARGN})
     SET(${variable} "${${variable}} ${var}")
   ENDFOREACH()
   STRING(STRIP "${${variable}}" ${variable})

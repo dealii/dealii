@@ -1,6 +1,6 @@
 
 #
-# A suggested by the cmake documentation
+# As suggested by the cmake documentation
 #
 
 set(PACKAGE_VERSION "@DEAL_II_MAJOR@.@DEAL_II_MINOR@")
