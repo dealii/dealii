@@ -100,6 +100,7 @@ SET(VERSION "8.0.pre")
 # - Explain Components and Options...
 # - Explain how to build and install only a specific component:
 #
+#   $ make <component>
 #   $ cmake -DCOMPONENT=<component> -P build/cmake_install.cmake
 #
 
@@ -224,6 +225,13 @@ OPTION(DEAL_II_INSTALL_COMPAT_FILES
   This feature adds a COMPONENT \"compat_files\" to the build system."
   ON)
 
+OPTION(DEAL_II_INSTALL_PROJECT_CONFIG
+  "Enable the installation of a cmake project config. Useful for
+  autodetection ( FIND_PACKAGE(DEAL_II) ) of the deal.II library out of
+  cmake build systems.
+  This feature adds a COMPONENT \"project_config\" to the build system."
+  ON)
+
 
 ###########################################################################
 #                                                                         #
@@ -260,9 +268,10 @@ INCLUDE(setup_external_macros)
 
 #
 # We have to initialize some cached variables before PROJECT is called, so
-# go it at this point:
+# do it at this point:
 #
 INCLUDE(setup_cached_variables)
+
 
 #
 # Now, set the project and setup the rest:
@@ -274,28 +283,40 @@ INCLUDE(setup_deal_ii)
 INCLUDE(setup_compiler_flags)
 
 
-#
-#   ####################
-#   #     FAT NOTE:    #
-#   ####################
+#                       ####################
+#                       #     FAT NOTE:    #
+#                       ####################
 #
 # To keep things clean, only the following cmake variables should be
 # altered in the platform checks and features configuration
 # (beside setting a lot of DEAL_II_* definitions...):
 #
-# CMAKE_SHARED_LINKER_FLAGS
-#     for setting necessary linker flags for the deal.II library.
+# For internal use:
 #
-# CMAKE_C_FLAGS and CMAKE_CXX_FLAGS (<...>_RELEASE, <...>_DEBUG)
-#     for setting necessary compiler flags, e.g. -std=c++11 (if available).
+#     CMAKE_SHARED_LINKER_FLAGS
+#         for setting necessary linker flags for the deal.II library.
 #
-  ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
-#     Used as a dummy target for all the stuff that has to be done before the
-#     library can be compiled.
+#     CMAKE_CXX_FLAGS (and CMAKE_C_FLAGS)
+#         for setting necessary compiler flags, e.g. -std=c++11 (if
+#         available).
 #
-  SET(deal_ii_external_libraries)
-#     Used to keep track of external libraries, against which the deal.II
-#     library (and user programs) will be linked.
+      ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
+#         Used as a dummy target for all the stuff that has to be done
+#         before the library can be compiled.
+#
+#
+# For internal and external use:
+#
+      SET(deal_ii_external_libraries)
+#         Used to keep track of external libraries, the deal.II library and
+#         user programs have to be linked against.
+#
+#
+# For external use:
+#
+#     CMAKE_EXTERNAL_INCLUDE_DIRS
+#         Used to keep track of external include dirs, necessary for the
+#         compilation of user programs.
 #
 
 
@@ -313,11 +334,9 @@ ENDFOREACH()
 # Feature configuration:
 #
 FILE(GLOB configure_files "contrib/cmake/configure/configure_*.cmake")
-
 # Make sure the configure_*.cmake files are included in alphabetical order
 # to fullfill some dependencies...
 LIST(SORT configure_files)
-
 FOREACH(file ${configure_files})
   MESSAGE(STATUS "Include ${file}")
   INCLUDE(${file})
@@ -342,21 +361,21 @@ INCLUDE(setup_finalize)
 #
 # Build the toolchain and prepare the includes:
 #
-ADD_SUBDIRECTORY(contrib/config)
 ADD_SUBDIRECTORY(contrib/expand_instantiations)
 ADD_SUBDIRECTORY(include)
+
+#
+# Compile and install the library:
+#
+ADD_SUBDIRECTORY(source)
 
 
 #
 # Prepare some directories for installation:
 #
+ADD_SUBDIRECTORY(contrib/config) # has to be included after source
 ADD_SUBDIRECTORY(doc)
-ADD_SUBDIRECTORY(scripts)
 ADD_SUBDIRECTORY(examples)
+ADD_SUBDIRECTORY(scripts)
 
-
-#
-# Compile the library:
-#
-ADD_SUBDIRECTORY(source)
 
