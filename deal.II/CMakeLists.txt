@@ -8,21 +8,15 @@
 ###########################################################################
 
 
-
-
-SET(VERSION "8.0.pre")
-
-
-
-
 #
 # This is the main CMakeLists.txt file for the deal.II project
-# ============================================================
 #
 # The main purpose of this file is to set all the configuration options and
 # then call a lot of modules residing under ./cmake/*/ that do the
 # hard work.
 #
+
+SET(VERSION "8.0.pre")
 
 
 
@@ -34,12 +28,15 @@ SET(VERSION "8.0.pre")
 ###########################################################################
 
 #
+# TODO: Some of the description strings span over multiple lines. Fix
+# this.
+#
+
+#
 # Feature selection: external libraries and where to take them (if there
 # is a choice, e.g. from contrib vs external)
 #
 
-# TODO: Some of the description strings span over multiple lines. Fix
-# this somehow.
 
 OPTION(DEAL_II_FEATURE_AUTODETECTION
   "Enables feature autodetection. This will automatically overwrite all
@@ -215,56 +212,11 @@ INCLUDE(setup_deal_ii)
 INCLUDE(setup_compiler_flags)
 
 
-##########################################################################
 #
-#                             FAT NOTE:
-#
-# To keep things clean, only the following cmake variables should be
-# altered in the platform checks and feature configuration
-# (beside setting a lot of DEAL_II_* definitions...):
-#
-#
-# For internal use:
-#
-#     CMAKE_SHARED_LINKER_FLAGS
-#         for setting necessary linker flags for the deal.II library.
-#
-#     CMAKE_CXX_FLAGS (and CMAKE_C_FLAGS)
-#         for setting necessary compiler flags, e.g. -std=c++11 (if
-#         available).
-#
-#     INCLUDE_DIRECTORIES()
-#         For setting necessary include dirs for the compilation of the
-#         deal.II library.
-#
-#     ADD_DEFINITIONS()
-#         For setting necessary preprocessor definitions ("-D<...>") for
-#         the compilation of the deal.II library
+# A custom target for all the target dependencies that have to be
+# build/prepared before the deal.II library can be compiled
 #
 ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
-#         Used as a dummy target for all the stuff that has to be done
-#         before the library can be compiled.
-#
-#
-# For internal and external use:
-#
-#     DEAL_II_EXTERNAL_LIBRARIES
-#         Used to keep track of external libraries, the deal.II library
-#         and user programs have to be linked against.
-#
-#
-# For external use:
-#
-#     DEAL_II_EXTERNAL_DEFINITIONS
-#         Used to keep track of external preprocessor definitions,
-#         necessary for the compilation of user programs.
-#
-#
-#     DEAL_II_EXTERNAL_INCLUDE_DIRS
-#         Used to keep track of external include dirs, necessary for the
-#         compilation of user programs.
-#
-##########################################################################
 
 
 #

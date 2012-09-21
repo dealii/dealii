@@ -29,6 +29,12 @@ Installation
 
 Component selection
 
+Fat note regarding platform checks and feature configuration
+
+Writing platform checks
+
+Writing features
+
 
 
 
@@ -37,6 +43,8 @@ The philosophy
 
         »I need a new keyboard, my CAPS-KEY is stuck because of writing all
          this cmake script...«
+
+TODO
 
 
 
@@ -245,4 +253,77 @@ directories can be overwritten by
 
 
 
+
+Fat note regarding platform checks and feature configuration
+============================================================
+
+
+                          ============
+
+                            FAT NOTE
+
+                          ============
+
+
+To keep things clean, only the following cmake variables should be
+altered in the platform checks and feature configuration
+(beside setting a lot of DEAL_II_* definitions...):
+
+
+For internal use:
+
+    CMAKE_SHARED_LINKER_FLAGS
+        for setting necessary linker flags for the deal.II library.
+
+    CMAKE_CXX_FLAGS (and CMAKE_C_FLAGS)
+        for setting necessary compiler flags, e.g. -std=c++11 (if
+        available).
+
+    INCLUDE_DIRECTORIES(...)
+        For setting necessary include dirs for the compilation of the
+        deal.II library.
+
+    ADD_DEFINITIONS(...)
+        For setting necessary preprocessor definitions ("-D<...>") for
+        the compilation of the deal.II library
+
+    ADD_DEPENDENCIES(deal_ii_target_dependencies ...)
+        Used as a dummy target for all the stuff that has to be done
+        before the library can be compiled.
+
+
+For internal and external use:
+
+    DEAL_II_EXTERNAL_LIBRARIES
+        Used to keep track of external libraries, the deal.II library
+        and user programs have to be linked against.
+
+
+For external use:
+
+    DEAL_II_EXTERNAL_DEFINITIONS
+        Used to keep track of external preprocessor definitions,
+        necessary for the compilation of user programs.
+
+
+    DEAL_II_EXTERNAL_INCLUDE_DIRS
+        Used to keep track of external include dirs, necessary for the
+        compilation of user programs.
+
+
+
+
+Writing platform checks
+=======================
+
+
+TODO
+
+
+
+
+Writing features
+================
+
+TODO
 
