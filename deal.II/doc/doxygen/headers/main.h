@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -253,4 +253,18 @@
  * the menu bar at the top of this page, and are also grouped into
  * modules of their own (see the <a href="modules.html">Modules linke</a>
  * at the top of this page).
+ *
+ * We provide the Doxygen tag file for those of you who would like to directly link the
+ * documentation of application programs to the deal.II online documentation. The tag file
+ * is at <a href="../deal.tag"><code>deal.tag</code></a>. For each release of deal.II,
+ * it resides in the directory right above the Doxygen reference documentation. In order
+ * to use the tag file, you have to download it into a place where Doxygen can find it.
+ * After that, find the key <code>TAGFILES</code> in your Doxygen options file and write something like
+ * <pre>
+ * TAGFILES = deal.tag=http://www.dealii.org/X.Y.Z/doxygen/deal.II
+ *</pre>
+ * where <code>X.Y.Z</code> refers to the release you want to link to. Be sure you use
+ * the matching tag file. In theorey, you can also link against the developing revisions
+ * of deal.II, but then you have to fear that your links may become invalid if
+ * the deal.II structure changes.
  */
