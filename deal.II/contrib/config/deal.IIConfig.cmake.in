@@ -50,7 +50,7 @@ SET(DEAL_II_AR "${CMAKE_AR}")
 
 
 #
-# Information on how to find and use the deal.II installation
+# Information on where to find the deal.II library and headers
 #
 
 SET(DEAL_II_INCLUDE_DIRS "${DEAL_II_INCLUDE_DIRS}")

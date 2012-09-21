@@ -65,21 +65,3 @@ INSTALL(TARGETS deal_II
   COMPONENT library
   )
 
-
-IF(DEAL_II_INSTALL_COMPAT_FILES)
-  #
-  # If ${LIB_SUFFIX} is not empty, create a symlink from lib to
-  # lib${LIB_SUFFIX} to ensure compatibility with the old build system:
-  #
-  IF(NOT "${LIB_SUFFIX}" STREQUAL "")
-    INSTALL(
-      CODE
-        "EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E create_symlink
-          ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}
-          ${CMAKE_INSTALL_PREFIX}/lib
-          )"
-      COMPONENT compat_files
-      )
-  ENDIF()
-ENDIF()
-

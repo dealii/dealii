@@ -377,11 +377,24 @@ ADD_SUBDIRECTORY(source)
 
 
 #
-# Prepare some directories for installation:
+# Set DEAL_II_LIBRARIES and DEAL_II_INCLUDE_DIRS at this point...
 #
-ADD_SUBDIRECTORY(contrib/config) # has to be included after source
+GET_TARGET_PROPERTY(deal_II_NAME deal_II LOCATION)
+GET_FILENAME_COMPONENT(deal_II_NAME ${deal_II_NAME} NAME)
+LIST(APPEND DEAL_II_LIBRARIES
+  "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}/${deal_II_NAME}"
+  )
+LIST(APPEND DEAL_II_INCLUDE_DIRS
+  "${CMAKE_INSTALL_PREFIX}/${DEAL_II_INCLUDE_RELDIR}"
+  )
+
+
+#
+# Prepare some directories for installation (include them after
+# DEAL_II_LIBRARIES and DEAL_II_INCLUDE_DIRS is set)
+#
+ADD_SUBDIRECTORY(contrib/config)
 ADD_SUBDIRECTORY(doc)
 ADD_SUBDIRECTORY(examples)
 ADD_SUBDIRECTORY(scripts)
-
 
