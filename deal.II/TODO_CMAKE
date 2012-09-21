@@ -1,17 +1,9 @@
-TODO:
+Major:
 
-* Implement cmake packaging
+* Implement the documentation component. (I don't grok what's going on in
+  this makefiles. There is a rudimentary doxygen call, though.)
 
-* The Find modules under contrib/cmake/modules export <...>_LIBRARY and
-  <...>_INCLUDE_DIR, wheras the convention is nowadays _LIBRARIES and
-  _INCLUDE_DIRS, fix this.
-
-* Make Make.global_options work...
-
-
-* The documentation...
-
-* Add the Bug tests
+* Add the rest of the Bug tests
 
 * The following features have to be written:
     * HDF5
@@ -21,12 +13,31 @@ TODO:
     * HSL
     * TECPLOT
 
+* Write a wrapper around cmake. Something like
+    $ make config
+    $ make
+    ...
 
+* Update the online documentation on
+
+    - How to install deal.II
+
+    - How to interface with external libraries (Unify this...)
+
+* Port the testsuite to cmake
+
+
+Minor:
+
+* There is still a perl script for generating lapack_templates.h. Is this
+  necessary.
+
+* The Find modules under contrib/cmake/modules export <...>_LIBRARY and
+  <...>_INCLUDE_DIR, wheras the convention is nowadays _LIBRARIES and
+  _INCLUDE_DIRS, fix this.
 
 * What to do with ./lib/meshes ? I have moved it to ./contrib/meshes for
   the time being...
-
-* Think once more about the correct place for ./scripts ...
 
 * The original decision to have a dedicated p4est/FAST and p4est/DEBUG
   structure is a bit unfortunate and therefor replaced by a FindP4EST
