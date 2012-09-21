@@ -91,11 +91,16 @@ SET(VERSION "8.0.pre")
 #   $ cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" <...>
 #
 #
-# Build optoins: TODO
+# Build options:
 #
-# - BUILD_SHARED_LIBS and DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
+# - BUILD_SHARED_LIBS and
+# - DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
 #
-# Installation: TODO
+# Installation:
+#
+# - DEAL_II_INSTALL_EXAMPLES
+# - DEAL_II_INSTALL_COMPAT_FILES
+# - DEAL_II_INSTALL_PROJECT_CONFIG
 #
 # - Explain Components and Options...
 # - Explain how to build and install only a specific component:
@@ -231,6 +236,8 @@ OPTION(DEAL_II_INSTALL_PROJECT_CONFIG
   cmake build systems.
   This feature adds a COMPONENT \"project_config\" to the build system."
   ON)
+
+
 
 
 ###########################################################################
@@ -397,3 +404,7 @@ ADD_SUBDIRECTORY(config)
 ADD_SUBDIRECTORY(doc)
 ADD_SUBDIRECTORY(examples)
 
+#
+# Define some convencience custom targets for easy use:
+#
+INCLUDE(setup_custom_targets)
