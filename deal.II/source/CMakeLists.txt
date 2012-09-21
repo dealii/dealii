@@ -53,7 +53,7 @@ SET_TARGET_PROPERTIES(deal_II PROPERTIES
   LINK_FLAGS "${deal_ii_required_linker_flags}"
   )
 
-TARGET_LINK_LIBRARIES(deal_II ${deal_ii_external_libraries})
+TARGET_LINK_LIBRARIES(deal_II ${DEAL_II_EXTERNAL_LIBRARIES})
 
 
 #

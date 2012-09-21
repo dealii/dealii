@@ -1,0 +1,248 @@
+
+
+
+            ==============================================
+
+            The cmake build system for the deal.II project
+
+            ==============================================
+
+            Author: maier, 2012
+
+
+
+
+Table of contents
+=================
+
+The philosophy
+
+Quick start
+
+Useful bits
+
+Feature configuration
+
+Build configuration
+
+Installation
+
+Component selection
+
+
+
+
+The philosophy
+==============
+
+        »I need a new keyboard, my CAPS-KEY is stuck because of writing all
+         this cmake script...«
+
+
+
+
+Quick start
+===========
+
+
+* Make a build directory, configure, compile and install:
+
+      $ mkdir build
+      $ cd build
+      $ cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../
+      $ make
+      $ make install
+
+
+
+
+Useful bits
+===========
+
+
+* All cached variables can be either set via
+
+    ( $ cd build )
+      $ ccmake
+
+  or at the prompt via:
+
+    ( $ cd build )
+      $ cmake -D<OPTION>=<VALUE> [...] path/to/source/tree
+
+
+* Build and install only a specific component:
+
+      $ cd build
+      $ make <component>
+      $ cmake -DCOMPONENT=<component> -P build/cmake_install.cmake
+
+
+
+
+Feature configuration
+=====================
+
+TODO: Reformulate
+
+The first bunch of options of type DEAL_II_WITH_<feature> are for
+configuration of the various features of the deal.II library.
+An enabled feature will usually add one ore more dependencies to external
+or 'contrib' (i.e. bundled with deal.II and residing under ./contrib/)
+libraries.
+
+
+The option DEAL_II_ALLOW_CONTRIB determines the behaviour of the
+dependency resolution:
+
+- If set to ON external libraries still have precedence. But if there is
+  no external library the bundled contrib library will be used.
+
+- If set to OFF the contrib libraries will not be used and the dependency
+  resolution will fail if there is no external library. EXCEPT (there is
+  always an exception, isn't it?) DEAL_II_FORCE_CONTRIB_<library> forces
+  the use of the bundled contrib library.
+
+
+Autoconfiguration: If the option DEAL_II_FEATURE_AUTODETECTION is enabled
+the DEAL_II_WITH_<feature> toggles will be automatically set (overwriting
+any previous configuration) depending on whether they can be supported or
+not.
+(Note: DEAL_II_FEATURE_AUTODETECTION will respect DEAL_II_ALLOW_CONTRIB
+and DEAL_II_FORCE_CONTRIB_<feature>)
+
+
+The option DEAL_II_FORCE_CONTRIB_<library> forces the use of the bundled
+contrib library regardless whether DEAL_II_ALLOW_CONTRIB is set to OFF or
+an external library is found.
+
+REMARKS:
+
+- To ensure that no bundled library is used at all DEAL_II_ALLOW_CONTRIB,
+  as well as every DEAL_II_FORCE_CONTRIB_<library> have to be set to OFF.
+
+- DEAL_II_FORCE_CONTRIB_<library>=ON will _not_ automatically enable the
+  corresponding DEAL_II_WITH_<feature> toggle. This has to be set
+  separately.
+
+TODO: A list of all DEAL_II_WITH_* options
+
+
+
+
+Build configuration
+===================
+
+
+CMAKE_BUILD_TYPES: We support the "Debug" and "Release" build targets.
+Default is the "Release" target.
+
+- Debug will enable a lot of debug code paths and Assertions, as well as
+  compiling the library with a suitable set of debug compiler flags.
+
+- Release will chose a suitable set of optimizing flags.
+
+
+deal.II will configure sensible default CFLAGS and CXXFLAGS depending on
+platform, compiler and build target. There are two options, if this is
+not desired:
+
+- Option 1: Disable the configuration completely by setting
+  DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS to OFF.
+  Beware of the fact that certain features may still pull in necessary
+  compiler flags.
+
+- Option 2: Overwrite the default configuration by setting the following
+  cached variables:
+
+    CMAKE_CXX_FLAGS         -  used during all builds
+    CMAKE_CXX_FLAGS_DEBUG   -  additional flags used during debug builds
+    CMAKE_CXX_FLAGS_RELEASE -  additional flags used during release builds
+    (same for CMAKE_C_...)
+
+The content of the cached variables will be preserved and added
+*_TO THE END_* of the default compiler flags, hence giving a possibility
+for overwriting a flag. E.g.: -Wsign-compare, set by the build system,
+can be overwritten by specifying:
+
+  $ cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" <...>
+
+
+The build can be further controlled by the following variables:
+
+- BUILD_SHARED_LIBS: If set, deal.II will be linked as a shared library
+
+- CMAKE_INSTALL_RPATH_USE_LINK_PATH: If set, the deal.II library will be
+  installed with its rpath value set to point to all libraries outside of
+  the system search pathes.
+
+
+
+
+Component selection
+===================
+
+
+The following options control which components of the deal.II shall be
+configured, build and installed:
+
+- DEAL_II_COMPONENT_EXAMPLES:
+  Enable configuration and installation of the example steps.
+  This adds a COMPONENT "examples" to the build system.
+
+- DEAL_II_COMPONENT_DOCUMENTATION:
+  Enable configuration, build and installation of the documentation.
+  This adds a COMPONENT "documentation" to the build system.
+
+- DEAL_II_COMPONENT_COMPAT_FILES:
+  Enable installation of legacy files and tools for compatibility with
+  the old build system
+  This adds a COMPONENT "compat_files" to the build system.
+
+- DEAL_II_COMPONENT_PROJECT_CONFIG:
+  Enable configuration and installation of a cmake project config. Useful
+  for finding ( FIND_PACKAGE(DEAL_II) ) the deal.II library out of cmake
+  build systems. This adds a COMPONENT "project_config" to the build
+  system.
+
+
+
+
+Installation
+============
+
+CMAKE_INSTALL_PREFIX determines the location, where the deal.II library
+will be installed.
+
+Please note that depending on whether DEAL_II_COMPONENT_COMPAT_FILES is
+set, there will be different folder structures:
+
+With DEAL_II_COMPONENT_COMPAT_FILES=ON:
+
+${CMAKE_INSTALL_PREFIX}/
+    common
+    common/scripts
+    doc
+    examples
+    include
+    lib
+
+With DEAL_II_COMPONENT_COMPAT_FILES=OFF:
+
+${CMAKE_INSTALL_PREFIX}/
+    include
+    lib${LIB_SUFFIX}
+    /share/doc/deal.II/examples
+    /share/doc/deal.II/html
+
+If DEAL_II_COMPONENT_COMPAT_FILES is set to OFF, the individual target
+directories can be overwritten by
+    DEAL_II_DOCUMENTATION_RELDIR
+    DEAL_II_EXAMPLES_RELDIR
+    DEAL_II_INCLUDE_RELDIR
+    DEAL_II_LIBRARY_RELDIR
+    DEAL_II_PROJECT_CONFIG_RELDIR
+
+
+
+

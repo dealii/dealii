@@ -1,5 +1,5 @@
 
-IF(DEAL_II_INSTALL_EXAMPLES)
+IF(DEAL_II_COMPONENT_EXAMPLES)
   #
   # Add a rule on how to install the examples:
   #

@@ -88,6 +88,18 @@ ENDFOREACH()
 
 
 MESSAGE("
+Component configuration:")
+FOREACH(var ${res})
+  IF(var MATCHES "DEAL_II_COMPONENT")
+    IF(${${var}})
+      MESSAGE("      ${var} = ${${var}}")
+    ELSE()
+      MESSAGE("    ( ${var} = ${${var}} )")
+    ENDIF()
+  ENDIF()
+ENDFOREACH()
+
+MESSAGE("
 Further configuration:")
 FOREACH(var ${res})
   IF(var MATCHES "DEAL_II_INSTALL")

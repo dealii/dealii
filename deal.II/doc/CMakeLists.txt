@@ -3,7 +3,7 @@
 # Set up all necessary bits for the documentation
 #
 
-IF(DEAL_II_WITH_DOXYGEN)
+IF(DEAL_II_COMPONENT_DOCUMENTATION)
 
   #
   # Generate the documentation via doxygen:
@@ -31,5 +31,5 @@ IF(DEAL_II_WITH_DOXYGEN)
     COMPONENT documentation
     )
 
-ENDIF(DEAL_II_WITH_DOXYGEN)
+ENDIF(DEAL_II_COMPONENT_DOCUMENTATION)
 

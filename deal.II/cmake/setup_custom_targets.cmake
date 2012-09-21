@@ -13,7 +13,7 @@ ADD_CUSTOM_TARGET(library)
 ADD_DEPENDENCIES(library deal_II)
 
 
-IF(DEAL_II_WITH_DOXYGEN)
+IF(DEAL_II_COMPONENT_DOCUMENTATION)
 
   ADD_CUSTOM_TARGET(documentation)
   ADD_DEPENDENCIES(documentation doxygen)
@@ -21,14 +21,19 @@ IF(DEAL_II_WITH_DOXYGEN)
 ENDIF()
 
 
-IF(DEAL_II_INSTALL_COMPAT_FILES)
+IF(DEAL_II_COMPONENT_COMPAT_FILES)
 
   ADD_CUSTOM_TARGET(compat_files)
+  ADD_DEPENDENCIES(compat_files
+    expand_instantiations
+    make_dependencies
+    report_features
+    )
 
 ENDIF()
 
 
-IF(DEAL_II_INSTALL_PROJECT_CONFIG)
+IF(DEAL_II_COMPONENT_PROJECT_CONFIG)
 
   ADD_CUSTOM_TARGET(project_config)
 

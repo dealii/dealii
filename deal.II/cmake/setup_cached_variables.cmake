@@ -56,7 +56,17 @@ ENDIF()
 #
 # Set BUILD_SHARED_LIBS to default to ON:
 #
-SET(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build a shared library")
+SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
+  "Build a shared library"
+  )
+
+
+#
+# Set CMAKE_INSTALL_RPATH_USE_LINK_PATH to default to ON:
+#
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
+  "Set the rpath of the library to the external link pathes on installation
+  ")
 
 
 #

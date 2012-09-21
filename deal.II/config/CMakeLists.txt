@@ -4,7 +4,7 @@ CONFIGURE_FILE(
   )
 
 
-IF(DEAL_II_INSTALL_PROJECT_CONFIG)
+IF(DEAL_II_COMPONENT_PROJECT_CONFIG)
   #
   # Configure and install the cmake project configuration:
   #
@@ -38,7 +38,7 @@ IF(DEAL_II_INSTALL_PROJECT_CONFIG)
 ENDIF()
 
 
-IF(DEAL_II_INSTALL_COMPAT_FILES)
+IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
   # Configure and install the old Makefile configuration:
   #

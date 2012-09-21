@@ -1,112 +1,27 @@
+
+
+###########################################################################
+##                                                                       ##
+##  See README.cmake for further details on how to use the cmake build   ##
+##  system of deal.II.                                                   ##
+##                                                                       ##
+###########################################################################
+
+
+
+
 SET(VERSION "8.0.pre")
+
+
+
 
 #
 # This is the main CMakeLists.txt file for the deal.II project
+# ============================================================
 #
 # The main purpose of this file is to set all the configuration options and
 # then call a lot of modules residing under ./cmake/*/ that do the
 # hard work.
-#
-#
-# Note: All further explained options can be either set via ccmake or at
-# the promp via:
-#
-#   $ cmake -D<OPTION>=<VALUE> [...] path/to/source/tree
-#
-#
-# The first bunch of options of type DEAL_II_WITH_<feature> are for
-# configuration of the various features of the deal.II library.
-# An enabled feature will usually add one ore more dependencies to external
-# or 'contrib' (i.e. bundled with deal.II and residing under ./contrib/)
-# libraries.
-#
-#
-# The option DEAL_II_ALLOW_CONTRIB determines the behaviour of the
-# dependency resolution:
-#
-# - If set to ON external libraries still have precedence. But if there is
-#   no external library the bundled contrib library will be used.
-#
-# - If set to OFF the contrib libraries will not be used and the dependency
-#   resolution will fail if there is no external library. EXCEPT (there is
-#   always an exception, isn't it?) DEAL_II_FORCE_CONTRIB_<library> forces
-#   the use of the bundled contrib library.
-#
-#
-# Autoconfiguration: If the option DEAL_II_FEATURE_AUTODETECTION is enabled
-# the DEAL_II_WITH_<feature> toggles will be automatically set (overwriting
-# any previous configuration) depending on whether they can be supported or
-# not.
-# (Note: DEAL_II_FEATURE_AUTODETECTION will respect DEAL_II_ALLOW_CONTRIB
-# and DEAL_II_FORCE_CONTRIB_<library>)
-#
-#
-# The option DEAL_II_FORCE_CONTRIB_<library> forces the use of the bundled
-# contrib library regardless whether DEAL_II_ALLOW_CONTRIB is set to OFF or
-# an external library is found.
-#
-# REMARKS:
-#
-# - To ensure that no bundled library is used at all DEAL_II_ALLOW_CONTRIB,
-#   as well as every DEAL_II_FORCE_CONTRIB_<library> have to be set to OFF.
-#
-# - DEAL_II_FORCE_CONTRIB_<library>=ON will _not_ automatically enable the
-#   corresponding DEAL_II_WITH_<feature> toggle. This has to be set
-#   separately.
-#
-#
-# And, last but not least, CMAKE_BUILD_TYPES:
-#
-# We support the "Debug" and "Release" build targets. Default is the
-# "Release" target.
-#
-# - Debug will enable a lot of debug code paths and Assertions, as well as
-#   compiling the library with a suitable set of debug compiler flags.
-#
-# - Release will chose a suitable set of optimizing flags.
-#
-#
-# deal.II will configure sensible default CFLAGS and CXXFLAGS depending on
-# platform, compiler and build target. There are two options, if this is
-# not desired:
-#
-# - Option 1: Disable the configuration completely by setting
-#   DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS to OFF.
-#   Beware of the fact that certain features may still pull in necessary
-#   compiler flags.
-#
-# - Option 2: Overwrite the default configuration by setting the following
-#   cached variables:
-#
-#     CMAKE_CXX_FLAGS         -  used during all builds
-#     CMAKE_CXX_FLAGS_DEBUG   -  additional flags used during debug builds
-#     CMAKE_CXX_FLAGS_RELEASE -  additional flags used during release builds
-#     (same for CMAKE_C_...)
-#
-# The content of the cached variables will be preserved and added
-# *_TO THE END_* of the default compiler flags, hence giving a possibility
-# for overwriting a flag. E.g.: -Wsign-compare, set by the build system,
-# can be overwritten by specifying:
-#
-#   $ cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" <...>
-#
-#
-# Build options:
-#
-# - BUILD_SHARED_LIBS and
-# - DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
-#
-# Installation:
-#
-# - DEAL_II_INSTALL_EXAMPLES
-# - DEAL_II_INSTALL_COMPAT_FILES
-# - DEAL_II_INSTALL_PROJECT_CONFIG
-#
-# - Explain Components and Options...
-# - Explain how to build and install only a specific component:
-#
-#   $ make <component>
-#   $ cmake -DCOMPONENT=<component> -P build/cmake_install.cmake
 #
 
 
@@ -220,21 +135,31 @@ OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
   compiler flag setup."
   ON)
 
-OPTION(DEAL_II_INSTALL_EXAMPLES
-  "Enable the installation of the example steps.
-  This feature adds a COMPONENT \"examples\" to the build system."
+#
+# Component selection: configuration options regarding the setup of
+# different components of the deal.II library
+#
+
+OPTION(DEAL_II_COMPONENT_EXAMPLES
+  "Enable configuration and installation of the example steps.
+  This adds a COMPONENT \"examples\" to the build system."
   ON)
 
-OPTION(DEAL_II_INSTALL_COMPAT_FILES
-  "Enable the installation of the example steps.
-  This feature adds a COMPONENT \"compat_files\" to the build system."
+OPTION(DEAL_II_COMPONENT_DOCUMENTATION
+  "Enable configuration, build and installation of the documentation.
+  This adds a COMPONENT \"documentation\" to the build system."
+  OFF)
+
+OPTION(DEAL_II_COMPONENT_COMPAT_FILES
+  "Enable installation of the example steps.
+  This adds a COMPONENT \"compat_files\" to the build system."
   ON)
 
-OPTION(DEAL_II_INSTALL_PROJECT_CONFIG
-  "Enable the installation of a cmake project config. Useful for
+OPTION(DEAL_II_COMPONENT_PROJECT_CONFIG
+  "Enable configuration and installation of a cmake project config. Useful for
   autodetection ( FIND_PACKAGE(DEAL_II) ) of the deal.II library out of
   cmake build systems.
-  This feature adds a COMPONENT \"project_config\" to the build system."
+  This adds a COMPONENT \"project_config\" to the build system."
   ON)
 
 

@@ -19,7 +19,7 @@ STRING(REGEX REPLACE
 
 SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
 
-IF(DEAL_II_INSTALL_COMPAT_FILES)
+IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
   # The good, old directory structure:
   #
@@ -31,7 +31,7 @@ IF(DEAL_II_INSTALL_COMPAT_FILES)
 
 ELSE()
   #
-  # IF DEAL_II_INSTALL_COMPAT_FILES is not set, we assume that we have to
+  # IF DEAL_II_COMPONENT_COMPAT_FILES is not set, we assume that we have to
   # obey the FSHS...
   #
   SET_IF_EMPTY(DEAL_II_DOCUMENTATION_RELDIR "share/doc/deal.II/html")

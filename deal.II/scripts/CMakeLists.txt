@@ -2,7 +2,7 @@
 ADD_EXECUTABLE(expand_instantiations expand_instantiations.cc)
 
 
-IF(DEAL_II_INSTALL_COMPAT_FILES)
+IF(DEAL_II_COMPONENT_COMPAT_FILES)
 
   #
   # Build and install the old dependency_resolution and report_features
