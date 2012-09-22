@@ -101,6 +101,29 @@ INTRODUCTION
         $ make <component>
         $ cmake -DCOMPONENT=<component> -P build/cmake_install.cmake
 
+  * The build system cmake generates allows fine grained control. It is
+    e.g. possible to only compile a single file:
+
+        $ cd source/dofs
+        $ make obj_dofs.inst
+        [  0%] Building CXX object scripts/CMakeFiles/expand_instantiations.dir/expand_instantiations.cc.o
+        Linking CXX executable expand_instantiations
+        [  0%] Built target expand_instantiations
+        [ 33%] Generating block_info.inst
+        [ 33%] Generating dof_accessor.inst
+        [ 33%] Generating dof_handler.inst
+        [ 66%] Generating dof_handler_policy.inst
+        [ 66%] Generating dof_objects.inst
+        [ 66%] Generating dof_renumbering.inst
+        [100%] Generating dof_tools.inst
+        [100%] Built target obj_dofs.inst
+        $ make dof_handler.o
+        Building CXX object source/dofs/CMakeFiles/obj_dofs.dir/dof_handler.cc.o
+
+    For a list of valid targets of a given folder just type
+
+        $ make help
+
 
 
 
