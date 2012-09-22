@@ -136,18 +136,8 @@ TARGET               = # TODO: Well, yes.
 ######################################################
 # now configuration for compiler flags, paths, etc
 
-# path for libraries
-
-LIBPATH    += $(addprefix -L,$(LIBDIR))
-
-
-# add search path for libraries to make dependencies
-vpath %@CMAKE_STATIC_LIBRARY_SUFFIX@ $(LIBDIR)
-vpath %@CMAKE_SHARED_LIBRARY_SUFFIX@ $(LIBDIR)
-
 OBJEXT     = o # TODO: @CMAKE_CXX_OUTPUT_EXTENSION@ :-*
 EXEEXT     = # TODO
-
 
 
 # set paths to all the libraries we need:
