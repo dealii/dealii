@@ -48,34 +48,37 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   # actually understands:
   #
 
-  TO_STRING(MAKEFILE_LIBRARIES
-    ${DEAL_II_EXTERNAL_LIBRARIES}
-    ${DEAL_II_LIBRARIES}
-    )
-
   TO_STRING(MAKEFILE_DEFINITIONS
     ${DEAL_II_EXTERNAL_DEFINITIONS}
     )
 
-  TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS
-    "${CMAKE_INCLUDE_FLAG_C}"
+  TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_C}"
     ${DEAL_II_EXTERNAL_INCLUDE_DIRS}
     ${DEAL_II_INCLUDE_DIRS}
     )
 
-
   #
-  # Add an rpath directive so that libraries outside of the default search
-  # directories will be found by the runtime dynamic linker:
+  # Add an rpath directive inf front of each library, so that libraries
+  # outside of the default search directories will be found by the runtime
+  # dynamic linker:
   #
   FOREACH(lib ${DEAL_II_EXTERNAL_LIBRARIES} ${DEAL_II_LIBRARIES})
     GET_FILENAME_COMPONENT(path ${lib} PATH)
-    LIST(APPEND MAKEFILE_RPATHFLAGS "-Wl,-rpath  -Wl,${path}")
+    LIST(APPEND MAKEFILE_LIBS "-Wl,-rpath  -Wl,${path}")
+    #
+    # Change this into the canonical -L -l format:
+    #
+    LIST(APPEND MAKEFILE_LIBS ${lib})
   ENDFOREACH()
-  LIST(REMOVE_DUPLICATES MAKEFILE_RPATHFLAGS)
-  TO_STRING(MAKEFILE_RPATHFLAGS ${MAKEFILE_RPATHFLAGS})
+  TO_STRING(MAKEFILE_LIBS ${MAKEFILE_LIBS})
 
-  SET(MAKEFILE_LDFLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
+  #
+  # Put our linker flags directly in front of this string:
+  #
+  SET(MAKEFILE_LIBS
+    "${CMAKE_SHARED_LINKER_FLAGS} ${MAKEFILE_LIBS}"
+    )
+
 
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in

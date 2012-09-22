@@ -101,6 +101,7 @@ MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
     IF(TBB_DEBUG_FOUND)
       LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${TBB_DEBUG_LIBRARY})
+      ADD_DEFINITIONS("-DTBB_USE_DEBUG=1" "-DTBB_DO_ASSERT=1")
     ELSE()
       MESSAGE(WARNING "\n"
         "deal.II was configured with CMAKE_BUILD_TYPE=Debug but no debug tbb\n"
@@ -137,6 +138,13 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
   #
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-parentheses")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
+
+  #
+  # Add some definitions to use the header files in debug mode:
+  #
+  IF (CMAKE_BUILD_TYPE MATCHES "Debug")
+    ADD_DEFINITIONS("-DTBB_DO_DEBUG=1" "-DTBB_DO_ASSERT=1")
+  ENDIF()
 
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/include
