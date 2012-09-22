@@ -23,7 +23,7 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 # Check whether the -as-needed flag is available. If so set it to link
 # the deal.II library with it.
 #
-ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
+ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
 
 
 #
@@ -93,8 +93,9 @@ IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN") # TODO: Check for correct name
   # you accidentally defined one symbol multiple times...
   # (added 2005/07/13, Ralf B. Schulz)
   # (modified 2005/12/20, Ralf B. Schulz)
-  ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS
-    "-Xlinker --allow-multiple-definition")
+  ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS
+    "-Xlinker --allow-multiple-definition"
+    )
 ENDIF()
 
 
