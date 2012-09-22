@@ -7,7 +7,6 @@
 ##                                                                       ##
 ###########################################################################
 
-
 #
 # This is the main CMakeLists.txt file for the deal.II project
 #
@@ -28,28 +27,27 @@ SET(VERSION "8.0.pre")
 ###########################################################################
 
 #
-# TODO: Some of the description strings span over multiple lines. Fix
-# this.
-#
-
-#
 # Feature selection: external libraries and where to take them (if there
 # is a choice, e.g. from contrib vs external)
 #
 
 
 OPTION(DEAL_II_FEATURE_AUTODETECTION
-  "Enables feature autodetection. This will automatically overwrite all
-  DEAL_II_WITH_<...> toggles depending on whether they can be supported or
-  not."
+# Enables feature autodetection. This will automatically overwrite all
+# DEAL_II_WITH_<...> toggles depending on whether they can be supported or
+# not.
+# Short description:
+  "Enables feature autodetection. This will automatically set DEAL_II_WITH_<...> options."
   ON)
 
 OPTION(DEAL_II_ALLOW_CONTRIB
-  "Allow the use of contrib libraries bundled with the source tarball.
-  Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
-  packages, so to ensure that only external libraries are used
-  DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
-  OFF"
+#  Allow the use of contrib libraries bundled with the source tarball.
+#  Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
+#  packages, so to ensure that only external libraries are used
+#  DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
+#  OFF
+# Short description:
+  "Allow the use of contrib libraries bundled with the source tarball. (DEAL_II_FORCE_CONTRIB* will overwrite this option.)"
   OFF)
 
 OPTION(DEAL_II_WITH_ARPACK
@@ -60,9 +58,11 @@ OPTION(DEAL_II_WITH_BLAS
   "Build deal.II with support for BLAS."
   OFF)
 
-SET(DEAL_II_WITH_BOOST "ON"
+SET(DEAL_II_WITH_BOOST
+  # Always true. We need it :-]
+  ON
   CACHE BOOL "Build deal.II with support for boost." FORCE
-  ) # Always true. We need it :-]
+  )
 OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   "Always use the bundled boost library instead of an external one."
   OFF)
@@ -137,25 +137,22 @@ OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
 #
 
 OPTION(DEAL_II_COMPONENT_EXAMPLES
-  "Enable configuration and installation of the example steps.
-  This adds a COMPONENT \"examples\" to the build system."
+  "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
   ON)
 
 OPTION(DEAL_II_COMPONENT_DOCUMENTATION
-  "Enable configuration, build and installation of the documentation.
-  This adds a COMPONENT \"documentation\" to the build system."
+  "Enable configuration, build and installation of the documentation. This adds a COMPONENT \"documentation\" to the build system."
   OFF)
 
 OPTION(DEAL_II_COMPONENT_COMPAT_FILES
-  "Enable installation of the example steps.
-  This adds a COMPONENT \"compat_files\" to the build system."
+  "Enable installation of the example steps. This adds a COMPONENT \"compat_files\" to the build system."
   ON)
 
 OPTION(DEAL_II_COMPONENT_PROJECT_CONFIG
-  "Enable configuration and installation of a cmake project config. Useful for
-  autodetection ( FIND_PACKAGE(DEAL_II) ) of the deal.II library out of
-  cmake build systems.
-  This adds a COMPONENT \"project_config\" to the build system."
+  # Enable configuration and installation of a cmake project config.
+  # Useful for autodetection ( FIND_PACKAGE(DEAL_II) ) of the deal.II
+  # library out of cmake build systems.
+  "Enable configuration and installation of a cmake project config. This adds a COMPONENT \"project_config\" to the build system."
   ON)
 
 
@@ -167,11 +164,9 @@ OPTION(DEAL_II_COMPONENT_PROJECT_CONFIG
 #                                                                         #
 ###########################################################################
 
-
 #
 # General configuration for cmake:
 #
-
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
 SET(CMAKE_INCLUDE_CURRENT_DIR true)
@@ -248,13 +243,11 @@ INCLUDE(setup_finalize)
 
 
 
-
 ###########################################################################
 #                                                                         #
 #                    Compile and install the library:                     #
 #                                                                         #
 ###########################################################################
-
 
 #
 # Build the toolchain and prepare the includes:
@@ -262,6 +255,7 @@ INCLUDE(setup_finalize)
 ADD_SUBDIRECTORY(config)
 ADD_SUBDIRECTORY(scripts)
 ADD_SUBDIRECTORY(include)
+
 
 #
 # Compile and install the library:
@@ -275,7 +269,9 @@ ADD_SUBDIRECTORY(source)
 ADD_SUBDIRECTORY(doc)
 ADD_SUBDIRECTORY(examples)
 
+
 #
 # Define some custom targets for convenience
 #
 INCLUDE(setup_custom_targets)
+
