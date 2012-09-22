@@ -49,9 +49,12 @@ LIST(APPEND DEAL_II_INCLUDE_DIRS
   "${CMAKE_INSTALL_PREFIX}/${DEAL_II_INCLUDE_RELDIR}"
   )
 
+#
+# Set the library and project name depending on build type:
+#
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   SET(DEAL_II_BASE_NAME "deal_II.g")
-  SET(DEAL_II_PROJECT_NAME "deal.II.g")
+  SET(DEAL_II_PROJECT_NAME "deal.II_DEBUG")
 ELSE()
   SET(DEAL_II_BASE_NAME "deal_II")
   SET(DEAL_II_PROJECT_NAME "deal.II")
