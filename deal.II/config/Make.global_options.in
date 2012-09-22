@@ -15,9 +15,9 @@
 #   path, so we just use the latter mechanism and leave LIBS empty for now.
 #
 # - The link line "$(CXX) -o $@ <libraries> $(LIBS) $(LDFLAGS)"
-#   of the examples is broken. LDFLAGS should be in front. As a workaround,
-#   we have to specify the rpath flags ${MAKEFILE_RPATHFLAGS} directly in
-#   front of the libraries.
+#   of the examples is broken. LDFLAGS should be in front.
+#
+#   TODO: Move all the target libraries to the LIBS variable.
 #
 # TODO: Set up the other configuration variables that are currently
 # removed...
@@ -33,8 +33,7 @@ CC-ID                = @CMAKE_C_COMPILER_ID@
 CC-VERSION           = @CMAKE_C_COMPILER_VERSION@
 AR                   = @CMAKE_AR@
 RANLIB               = @CMAKE_RANLIB@
-LDFLAGS              = @MAKEFILE_LDFLAGS@
-
+LDFLAGS              = @MAKEFILE_LDFLAGS@ @MAKEFILE_RPATHFLAGS@
 LIBS                 = #Empty
 
 LIBDIR               = @CMAKE_INSTALL_PREFIX@/@DEAL_II_LIBRARY_RELDIR@
@@ -76,8 +75,8 @@ EXEEXT     = @EXEEXT@ # TODO
 
 
 # set paths to all the libraries we need:
-lib-deal2.o     = ${MAKEFILE_RPATHFLAGS} ${MAKEFILE_LIBRARIES}
-lib-deal2.g     = ${MAKEFILE_RPATHFLAGS} ${MAKEFILE_LIBRARIES}
+lib-deal2.o     = ${MAKEFILE_LIBRARIES}
+lib-deal2.g     = ${MAKEFILE_LIBRARIES}
 
 
 # necessary includes:
