@@ -5,14 +5,25 @@
 
 #
 # Dependency check:
-# DEAL_II_COMPONENT_DOCUMENTATION needs DEAL_II_WITH_DOXYGEN.
+#
+# - DEAL_II_COMPONENT_DOCUMENTATION needs DEAL_II_WITH_DOXYGEN.
+#
+# - DEAL_II_WITH_BOOST has to be enabled.
+#
 # TODO: It is a bit sloppy to test this here. But this is the only
 # dependency of this kind atm.
 #
 IF(DEAL_II_COMPONENT_DOCUMENTATION AND NOT DEAL_II_WITH_DOXYGEN)
   MESSAGE(SEND_ERROR "\n"
     "DEAL_II_COMPONENT_DOCUMENTATION has unmet configuration requirements: "
-    "DEAL_II_WITH_DOXYGEN has to be set to \"ON\".\n\n"
+    "DEAL_II_WITH_DOXYGEN required, but set to OFF!\n\n"
+    )
+ENDIF()
+
+IF(NOT DEAL_II_WITH_BOOST)
+  MESSAGE(SEND_ERROR "\n"
+    "Unmet configuration requirements: "
+    "DEAL_II_WITH_BOOST required, but set to OFF!.\n\n"
     )
 ENDIF()
 
@@ -37,7 +48,7 @@ ENDFOREACH()
 MESSAGE("
 
 *     *                                    *     *
-*     *  deal.II successfully configured!  *     *
+*     *       deal.II configuration:       *     *
 *     *                                    *     *
 
 
