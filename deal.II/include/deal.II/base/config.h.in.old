@@ -269,9 +269,6 @@
    then of course isn't valid any more. See mails in early Feb 2006. */
 #cmakedefine PETSC_SKIP_UNDERSCORE_CHKERR
 
-/* Define to 1 if you have the ANSI C header files. */
-#cmakedefine STDC_HEADERS
-
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */
 #if defined AC_APPLE_UNIVERSAL_BUILD
@@ -302,24 +299,6 @@
 #  if defined(PTW32_STATIC_LIB)
 #    undef PTW32_STATIC_LIB
 #  endif
-#endif
-
-/*
- * There is an annoying problem in the Trilinos header ml_config.h: It
- * #define's HAVE_INTTYPES_H but doesn't give the symbol a value. This
- * conflicts with the result of running deal.II's ./configure which
- * #define's it and gives it the value "1". The result is a compiler
- * warning. So if we use Trilinos and if the symbol is already
- * #define'd, then #cmakedefine it again here. deal.II doesn't use the
- * #define anyway and this way if we include any of the Trilinos
- * headers they can feel free to set it again to whatever they wish.
- *
- * The form of the #cmakedefine with the comment in the middle is necessary
- * to avoid that the pattern substitution of ./configure turns the
- * #cmakedefine into a #define again.
- */
-#if defined(DEAL_II_USE_TRILINOS) && defined(HAVE_INTTYPES_H)
-#  undef /*   */ HAVE_INTTYPES_H
 #endif
 
 /**

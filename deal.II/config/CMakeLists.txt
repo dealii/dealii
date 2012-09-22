@@ -71,7 +71,6 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     LIST(APPEND MAKEFILE_LIBS ${lib})
   ENDFOREACH()
   TO_STRING(MAKEFILE_LIBS ${MAKEFILE_LIBS})
-
   #
   # Put our linker flags directly in front of this string:
   #
@@ -79,6 +78,15 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     "${CMAKE_SHARED_LINKER_FLAGS} ${MAKEFILE_LIBS}"
     )
 
+  IF(DEAL_II_WITH_TBB)
+    SET(MAKEFILE_enablethreads "yes")
+  ENDIF()
+  IF(DEAL_II_WITH_FUNCTIONPARSER)
+    SET(MAKEFILE_enableparser "yes")
+  ENDIF()
+  IF(BUILD_SHARED_LIBS)
+    SET(MAKEFILE_enableshared "yes")
+  ENDIF()
 
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in
