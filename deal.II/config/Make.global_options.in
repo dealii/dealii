@@ -4,21 +4,25 @@
 # Compatibility Make.global_options file
 #
 
-# TODO: Update this comment:
-###############################################################################
-## Please note:
-##   The ./configure script generates Make.global_options from
-##   Make.global_options.in, so if you want to change something,
-##   then do it in the latter file and re-run ./configure in the
-##   top level directory
-##
-##
-##   This file exports several variables. They are documented in
-##   the file  doc/development/makefiles.html. If you add a new
-##   variable, make sure it is documented in
-##   doc/development/makefiles.1.html and listed in
-##   doc/development/Makefile.
-###############################################################################
+# TODO: Update the old comment and put it back again
+#
+# - Setup OBJEXT and EXEEXT in a way this makefile expects them
+#
+# ***   ISSUES   ***
+#
+# - What is LIBS for? There is this other mechanism for specifying
+#   full paths of necessary libraries. We know all the libraries with full
+#   path, so we just use the latter mechanism and leave LIBS empty for now.
+#
+# - The link line "$(CXX) -o $@ <libraries> $(LIBS) $(LDFLAGS)"
+#   of the examples is broken. LDFLAGS should be in front. As a workaround,
+#   we have to specify the rpath flags ${MAKEFILE_RPATHFLAGS} directly in
+#   front of the libraries.
+#
+# TODO: Set up the other configuration variables that are currently
+# removed...
+#
+
 
 D                    = @CMAKE_INSTALL_PREFIX@
 CXX                  = @CMAKE_CXX_COMPILER@
@@ -31,7 +35,7 @@ AR                   = @CMAKE_AR@
 RANLIB               = @CMAKE_RANLIB@
 LDFLAGS              = @MAKEFILE_LDFLAGS@
 
-#LIBS                 = @LIBS@ # TODO
+LIBS                 = #Empty
 
 LIBDIR               = @CMAKE_INSTALL_PREFIX@/@DEAL_II_LIBRARY_RELDIR@
 
@@ -42,7 +46,7 @@ DEAL_II_VERSION      = @VERSION@
 DEAL_II_MAJOR        = @DEAL_II_MAJOR@
 DEAL_II_MINOR        = @DEAL_II_MINOR@
 
-DEAL_II_USE_MPI      = @DEAL_II_USE_MPI@
+DEAL_II_USE_MPI      = @DEAL_II_WITH_MPI@
 
 #TARGET               = @target@ # TODO
 
@@ -72,8 +76,8 @@ EXEEXT     = @EXEEXT@ # TODO
 
 
 # set paths to all the libraries we need:
-lib-deal2.o     = ${MAKEFILE_LIBRARIES}
-lib-deal2.g     = ${MAKEFILE_LIBRARIES}
+lib-deal2.o     = ${MAKEFILE_RPATHFLAGS} ${MAKEFILE_LIBRARIES}
+lib-deal2.g     = ${MAKEFILE_RPATHFLAGS} ${MAKEFILE_LIBRARIES}
 
 
 # necessary includes:
