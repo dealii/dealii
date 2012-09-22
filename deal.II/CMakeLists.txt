@@ -68,8 +68,7 @@ OPTION(DEAL_II_FORCE_CONTRIB_BOOST
   OFF)
 
 OPTION(DEAL_II_WITH_DOXYGEN
-  "Enable the generation and installation of the documentation via doxygen.
-  This feature adds a COMPONENT \"documentation\" to the build system."
+  "Build deal.II with support for doxygen and dot."
   OFF)
 
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
