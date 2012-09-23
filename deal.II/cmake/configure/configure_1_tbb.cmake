@@ -103,9 +103,9 @@ MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
       LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${TBB_DEBUG_LIBRARY})
       ADD_DEFINITIONS("-DTBB_USE_DEBUG=1" "-DTBB_DO_ASSERT=1")
     ELSE()
-      MESSAGE(WARNING "\n"
-        "deal.II was configured with CMAKE_BUILD_TYPE=Debug but no debug tbb\n"
-        "library was found. The regular tbb library will be used instead.\n\n"
+      MESSAGE(STATUS
+        "deal.II was configured with CMAKE_BUILD_TYPE=Debug but no debug tbb "
+        "library was found. The regular tbb library will be used instead."
         )
       LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${TBB_LIBRARY})
     ENDIF()
