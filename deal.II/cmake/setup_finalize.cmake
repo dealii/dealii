@@ -91,7 +91,10 @@ ENDIF()
 
 
 MESSAGE("
-Configured Features (DEAL_II_FEATURE_AUTODETECTION = ${DEAL_II_FEATURE_AUTODETECTION}):")
+  Configured Features ("
+  "DEAL_II_FEATURE_AUTODETECTION = ${DEAL_II_FEATURE_AUTODETECTION}, "
+  "DEAL_II_ALLOW_CONTRIB = ${DEAL_II_ALLOW_CONTRIB}):"
+  )
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
   IF(var MATCHES "DEAL_II_WITH")
@@ -104,7 +107,11 @@ FOREACH(var ${res})
       ENDIF()
 
       IF(FEATURE_${feature}_CONTRIB_CONFIGURED)
-        MESSAGE("      ${var} set up with contrib packages")
+        IF(DEAL_II_FORCE_CONTRIB_${feature})
+          MESSAGE("      ${var} set up with contrib packages (forced)")
+        ELSE()
+          MESSAGE("      ${var} set up with contrib packages")
+        ENDIF()
       ENDIF()
     ELSE()
       # FEATURE is disabled
