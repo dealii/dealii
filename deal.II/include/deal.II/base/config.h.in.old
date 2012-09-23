@@ -1,3 +1,43 @@
+TODO:
+
+/* enable multigrid compatibility mode */
+#cmakedefine DEAL_II_MULTIGRID_COMPATIBILITY
+
+/* Defined if the system stores words with the most significant byte first */
+#cmakedefine DEAL_II_WORDS_BIGENDIAN
+
+/* Define to 1 if you have the `gethostname' function. */
+#cmakedefine HAVE_GETHOSTNAME
+
+/* Define to 1 if you have the `getpid' function. */
+#cmakedefine HAVE_GETPID
+
+/* Define if you have the rand_r function */
+#cmakedefine HAVE_RAND_R
+
+/* Define to 1 if you have the `times' function. */
+#cmakedefine HAVE_TIMES
+
+/* Define to 1 if you have the `jn' function. */
+#cmakedefine HAVE_JN
+
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+#  undef WORDS_BIGENDIAN
+# endif
+#endif
+
+
+
+
+BUGS:
+
 /* Define if building universal (internal helper macro) */
 #cmakedefine AC_APPLE_UNIVERSAL_BUILD
 
@@ -96,9 +136,6 @@
    the top-level directory. */
 #cmakedefine DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 
-/* enable multigrid compatibility mode */
-#cmakedefine DEAL_II_MULTIGRID_COMPATIBILITY
-
 /* Define if we have to work around a bug in gcc with marking all instances of
    a template class as friends to this class if the class is inside a
    namespace. See the aclocal.m4 file in the top-level directory for a
@@ -168,96 +205,87 @@
    linking. For the details, look at aclocal.m4 in the top-level directory. */
 #cmakedefine DEAL_II_WEAK_LINKAGE_BUG
 
-/* Defined if the system stores words with the most significant byte first */
-#cmakedefine DEAL_II_WORDS_BIGENDIAN
-
-/* Define to 1 if you have the <Amesos.h> header file. */
-#cmakedefine HAVE_AMESOS_H
-
-/* Define to 1 if you have the <AztecOO.h> header file. */
-#cmakedefine HAVE_AZTECOO_H
-
-/* Define to 1 if you have the <AztecOO_Operator.h> header file. */
-#cmakedefine HAVE_AZTECOO_OPERATOR_H
-
-/* Define to 1 if you have the <Epetra_CrsGraph.h> header file. */
-#cmakedefine HAVE_EPETRA_CRSGRAPH_H
-
-/* Define to 1 if you have the <Epetra_CrsMatrix.h> header file. */
-#cmakedefine HAVE_EPETRA_CRSMATRIX_H
-
-/* Define to 1 if you have the <Epetra_Import.h> header file. */
-#cmakedefine HAVE_EPETRA_IMPORT_H
-
-/* Define to 1 if you have the <Epetra_LinearProblem.h> header file. */
-#cmakedefine HAVE_EPETRA_LINEARPROBLEM_H
-
-/* Define to 1 if you have the <Epetra_Map.h> header file. */
-#cmakedefine HAVE_EPETRA_MAP_H
-
-/* Define to 1 if you have the <Epetra_MultiVector.h> header file. */
-#cmakedefine HAVE_EPETRA_MULTIVECTOR_H
-
-/* Define to 1 if you have the <Epetra_Operator.h> header file. */
-#cmakedefine HAVE_EPETRA_OPERATOR_H
-
-/* Define to 1 if you have the <Epetra_SerialComm.h> header file. */
-#cmakedefine HAVE_EPETRA_SERIALCOMM_H
-
-/* Define to 1 if you have the <Epetra_Vector.h> header file. */
-#cmakedefine HAVE_EPETRA_VECTOR_H
-
-/* Define to 1 if you have the `gethostname' function. */
-#cmakedefine HAVE_GETHOSTNAME
-
-/* Define to 1 if you have the `getpid' function. */
-#cmakedefine HAVE_GETPID
-
-/* Availability of the MA27 algorithm from HSL */
-#cmakedefine HAVE_HSL_MA27
-
-/* Availability of the MA47 algorithm from HSL */
-#cmakedefine HAVE_HSL_MA47
-
-/* Define to 1 if you have the <Ifpack.h> header file. */
-#cmakedefine HAVE_IFPACK_H
-
-/* Define to 1 if you have the <inttypes.h> header file. */
-#cmakedefine HAVE_INTTYPES_H
-
-/* Define to 1 if you have the `jn' function. */
-#cmakedefine HAVE_JN
-
-/* Define to 1 if you have the <memory.h> header file. */
-#cmakedefine HAVE_MEMORY_H
-
-/* Define to 1 if you have the <ml_MultiLevelPreconditioner.h> header file. */
-#cmakedefine HAVE_ML_MULTILEVELPRECONDITIONER_H
-
-/* Define if you have the rand_r function */
-#cmakedefine HAVE_RAND_R
-
-/* Define to 1 if you have the <Sacado.hpp> header file. */
-#cmakedefine HAVE_SACADO_HPP
-
-/* Define to 1 if you have the <Teuchos_ParameterList.hpp> header file. */
-#cmakedefine HAVE_TEUCHOS_PARAMETERLIST_HPP
-
-/* Define to 1 if you have the <Teuchos_RCP.hpp> header file. */
-#cmakedefine HAVE_TEUCHOS_RCP_HPP
-
-/* Define to 1 if you have the <Teuchos_RefCountPtr.hpp> header file. */
-#cmakedefine HAVE_TEUCHOS_REFCOUNTPTR_HPP
-
-/* Define to 1 if you have the `times' function. */
-#cmakedefine HAVE_TIMES
-
 /* On SunOS 4.x, the getrusage() function exists, but is not declared in the
    respective header file <resource.h>, as one would think when reading the
    man pages. Then we have to declare this function ourselves in those files
    that use this function. The question whether we have to do so is controlled
    by the preprocessor variable. */
 #cmakedefine NO_HAVE_GETRUSAGE
+
+
+OBSOLETE:
+
+/* Define to 1 if you have the <Amesos.h> header file. */
+#cmakedefine HAVE_AMESOS_H # obosolete?!
+
+/* Define to 1 if you have the <AztecOO.h> header file. */
+#cmakedefine HAVE_AZTECOO_H # obosolete?!
+
+/* Define to 1 if you have the <AztecOO_Operator.h> header file. */
+#cmakedefine HAVE_AZTECOO_OPERATOR_H # obosolete?!
+
+/* Define to 1 if you have the <Epetra_CrsGraph.h> header file. */
+#cmakedefine HAVE_EPETRA_CRSGRAPH_H # obosolete?!
+
+/* Define to 1 if you have the <Epetra_CrsMatrix.h> header file. */
+#cmakedefine HAVE_EPETRA_CRSMATRIX_H # obosolete?!
+
+/* Define to 1 if you have the <Epetra_Import.h> header file. */
+#cmakedefine HAVE_EPETRA_IMPORT_H # obosolete?!
+
+/* Define to 1 if you have the <Epetra_LinearProblem.h> header file. */
+#cmakedefine HAVE_EPETRA_LINEARPROBLEM_H # obosolete?!
+
+/* Define to 1 if you have the <Epetra_Map.h> header file. */
+#cmakedefine HAVE_EPETRA_MAP_H # obosolete?!
+
+/* Define to 1 if you have the <Epetra_MultiVector.h> header file. */
+#cmakedefine HAVE_EPETRA_MULTIVECTOR_H # obosolete?!
+
+/* Define to 1 if you have the <Epetra_Operator.h> header file. */
+#cmakedefine HAVE_EPETRA_OPERATOR_H # obosolete?!
+
+/* Define to 1 if you have the <Epetra_SerialComm.h> header file. */
+#cmakedefine HAVE_EPETRA_SERIALCOMM_H # obosolete?!
+
+/* Define to 1 if you have the <Epetra_Vector.h> header file. */
+#cmakedefine HAVE_EPETRA_VECTOR_H # obosolete?!
+
+/* Define to 1 if you have the <Ifpack.h> header file. */
+#cmakedefine HAVE_IFPACK_H # obsolete?!
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#cmakedefine HAVE_INTTYPES_H # obsolete?!
+
+/* Define to 1 if you have the <memory.h> header file. */
+#cmakedefine HAVE_MEMORY_H # obsolete?!
+
+/* Define to 1 if you have the <ml_MultiLevelPreconditioner.h> header file. */
+#cmakedefine HAVE_ML_MULTILEVELPRECONDITIONER_H
+
+/* Define to 1 if you have the <Sacado.hpp> header file. */
+#cmakedefine HAVE_SACADO_HPP # obsolete?!
+
+/* Define to 1 if you have the <Teuchos_ParameterList.hpp> header file. */
+#cmakedefine HAVE_TEUCHOS_PARAMETERLIST_HPP # obsolete?!
+
+/* Define to 1 if you have the <Teuchos_RCP.hpp> header file. */
+#cmakedefine HAVE_TEUCHOS_RCP_HPP # obsolete?!
+
+/* Define to 1 if you have the <Teuchos_RefCountPtr.hpp> header file. */
+#cmakedefine HAVE_TEUCHOS_REFCOUNTPTR_HPP # obsolete?!
+
+
+
+TODO:
+
+
+
+/* Availability of the MA27 algorithm from HSL */
+#cmakedefine HAVE_HSL_MA27
+
+/* Availability of the MA47 algorithm from HSL */
+#cmakedefine HAVE_HSL_MA47
 
 /* Make sure PETSc doesn't re-define the underscore through the preprocessor,
    since this interferes with boost. PETSc redefines the underscore to be
@@ -266,17 +294,6 @@
    then of course isn't valid any more. See mails in early Feb 2006. */
 #cmakedefine PETSC_SKIP_UNDERSCORE_CHKERR
 
-/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
-   significant byte first (like Motorola and SPARC, unlike Intel). */
-#if defined AC_APPLE_UNIVERSAL_BUILD
-# if defined __BIG_ENDIAN__
-#  define WORDS_BIGENDIAN 1
-# endif
-#else
-# ifndef WORDS_BIGENDIAN
-#  undef WORDS_BIGENDIAN
-# endif
-#endif
 
 /**
  * A #define that indicates whether we are using the Microsoft
