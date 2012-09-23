@@ -128,6 +128,7 @@
  * & (\nabla u_2,\nabla v_2) && = (f_2, v_2)
  * \\
  * && (\nabla u_3,\nabla v_3) & = (f_3, v_3)
+ * \end{matrix}
  * @f]
  * where we used the standard inner product notation $(\mathbf
  * f,\mathbf g) =
@@ -184,7 +185,7 @@
  * \end{pmatrix}^T
  * \begin{pmatrix} f_1 \\ f_2 \\ f_3\end{pmatrix}
  * @f]
- * 
+ *
  * <h4>Mixed elliptic problems</h4>
  * Now, let us
  * consider a more complex example, the mixed Laplace equations discussed in
