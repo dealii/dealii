@@ -2,6 +2,10 @@
 # Configuration for the trilinos library:
 #
 
+#
+# TODO: Fix up WARNING/STATUS of the failure messages.
+#
+
 
 MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
   FIND_PACKAGE(TRILINOS)
@@ -27,7 +31,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       IF(macro_module_found)
         MESSAGE(STATUS "Found ${macro_module}")
       ELSE()
-        MESSAGE(WARNING "Module ${macro_module} not found!")
+        MESSAGE(STATUS "Module ${macro_module} not found!")
         SET(macro_modules_missing "${macro_modules_missing} ${macro_module}")
         SET(${var} FALSE)
       ENDIF()

@@ -8,7 +8,7 @@ INCLUDE(FindPackageHandleStandardArgs)
 # Include the trilinos package configuration:
 #
 find_package(TRILINOS
-  CONFIG
+  QUIET CONFIG
   NAMES Trilinos TRILINOS
   HINTS ${TRILINOS_DIR}
   PATH_PREFIXES lib64/cmake/Trilinos lib/cmake/Trilinos

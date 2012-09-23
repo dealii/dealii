@@ -29,6 +29,8 @@ Major:
 
 Minor:
 
+* Fix up WARNING/STATUS error messages
+
 * There is still a perl script for generating lapack_templates.h. Is this
   necessary.
 

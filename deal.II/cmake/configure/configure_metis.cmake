@@ -8,7 +8,7 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
   IF(METIS_FOUND AND METIS_MAJOR GREATER 4)
     SET(${var} TRUE)
   ELSE()
-    MESSAGE(WARNING "\n"
+    MESSAGE(STATUS 
       "Could not find a sufficient modern metis installation: "
       "Version 5.x required!"
       )
