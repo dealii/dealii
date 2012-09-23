@@ -200,7 +200,6 @@ INCLUDE(setup_cached_variables)
 # Now, set the project and setup the rest:
 #
 PROJECT(deal.II)
-
 INCLUDE(setup_deal_ii)
 
 INCLUDE(setup_compiler_flags)
