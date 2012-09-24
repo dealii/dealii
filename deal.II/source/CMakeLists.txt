@@ -97,5 +97,3 @@ IF(CMAKE_BUILD_TYPE MATCHES "Release")
     )
 
 ENDIF()
-
-MESSAGE("${deal_ii_objects_debug}")
