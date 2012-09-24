@@ -209,7 +209,7 @@ namespace SparsityTools
                                     * elements of the rows of a matrix
                                     * it stores and that may
                                     * eventually be written to. This
-                                    * sparsity pattern will be changes
+                                    * sparsity pattern will be changed
                                     * as a result of this function:
                                     * All entries in rows that belong
                                     * to a different processor are
