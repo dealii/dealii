@@ -53,9 +53,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5062
     #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5319
     #
-    IF(TRILINOS_MAJOR EQUAL 10 AND TRILINOS_MINOR EQUAL 6)
+    IF(TRILINOS_VERSION_MAJOR EQUAL 10 AND TRILINOS_VERSION_MINOR EQUAL 6)
       MESSAGE(WARNING "\n"
-        "Trilinos versions ${TRILINOS_MAJOR}.${TRILINOS_MINOR}.x have bugs that make\n"
+        "Trilinos versions ${TRILINOS_VERSION_MAJOR}.${TRILINOS_VERSION_MINOR}.x have bugs that make\n"
         "it incompatible with deal.II. Please use versions before 10.6 or after\n"
         "10.8.1.\n\n"
         )
@@ -67,9 +67,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # The same is unfortunately true for 10.8.[01]:
     #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5370
     #
-    IF( TRILINOS_MAJOR EQUAL 10 AND
-        TRILINOS_MINOR EQUAL 8 AND
-        TRILINOS_SUBMINOR LESS 2 )
+    IF( TRILINOS_VERSION_MAJOR EQUAL 10 AND
+        TRILINOS_VERSION_MINOR EQUAL 8 AND
+        TRILINOS_VERSION_SUBMINOR LESS 2 )
       MESSAGE(WARNING "\n"
         "Trilinos versions 10.8.0 and 10.8.1 have bugs that make\n"
         "it incompatible with deal.II. Please use versions before 10.6 or after\n"

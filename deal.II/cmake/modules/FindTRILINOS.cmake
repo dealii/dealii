@@ -1,6 +1,16 @@
 #
 # Try to find the Trilinos library
 #
+# This module exports:
+#
+#   TRILINOS_DIR
+#   TRILINOS_INCLUDE_DIRS
+#   TRILINOS_LIBRARY_*
+#   TRILINOS_LIBRARIES
+#   TRILINOS_VERSION_MAJOR
+#   TRILINOS_VERSION_MINOR
+#   TRILINOS_VERSION_SUBMINOR
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
@@ -24,15 +34,15 @@ find_package(TRILINOS
 #
 STRING(REGEX REPLACE
   "^([0-9]+).*$" "\\1"
-  TRILINOS_MAJOR "${Trilinos_VERSION}")
+  TRILINOS_VERSION_MAJOR "${Trilinos_VERSION}")
 
 STRING(REGEX REPLACE
   "^[0-9]+\\.([0-9]+).*$" "\\1"
-  TRILINOS_MINOR "${Trilinos_VERSION}")
+  TRILINOS_VERSION_MINOR "${Trilinos_VERSION}")
 
 STRING(REGEX REPLACE
   "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
-  TRILINOS_SUBMINOR "${Trilinos_VERSION}")
+  TRILINOS_VERSION_SUBMINOR "${Trilinos_VERSION}")
 
 
 SET(TRILINOS_INCLUDE_DIRS ${Trilinos_INCLUDE_DIRS})
