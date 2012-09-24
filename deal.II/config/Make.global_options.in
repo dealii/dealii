@@ -57,7 +57,11 @@ LDFLAGS              = # intentionally left empty and specified in LIBS
 #F77
 #F77-VERSION
 #F77LIBS
-LIBS                 = @MAKEFILE_LIBS@
+ifeq (${debug-mode}, on)
+  LIBS                 = @MAKEFILE_LIBS_DEBUG@
+else
+  LIBS                 = @MAKEFILE_LIBS_RELEASE@
+endif
 LIBDIR               = @CMAKE_INSTALL_PREFIX@/@DEAL_II_LIBRARY_RELDIR@
 #PERL
 #QMAKE
@@ -142,8 +146,8 @@ EXEEXT     = # TODO
 
 
 # set paths to all the libraries we need:
-lib-deal2.o     = ${DEAL_II_LIBRARIES}
-lib-deal2.g     = ${DEAL_II_LIBRARIES}
+lib-deal2.o     = ${DEAL_II_LIBRARIES_RELEASE}
+lib-deal2.g     = ${DEAL_II_LIBRARIES_DEBUG}
 
 
 # include paths as command line flags. while compilers allow a space between
@@ -154,15 +158,15 @@ INCLUDE = ${MAKEFILE_INCLUDE_DIRS}
 
 
 # compiler flags for debug and optimized mode
-CXXFLAGS.g   = @CMAKE_CXX_FLAGS@ ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}} @MAKEFILE_DEFINITIONS@ $(INCLUDE)
-CXXFLAGS.o   = $(CXXFLAGS.g)
+CXXFLAGS.g   = @CMAKE_CXX_FLAGS@ @DEAL_II_CXX_FLAGS_DEBUG@ @MAKEFILE_DEFINITIONS@ @MAKEFILE_DEFINITIONS_DEBUG@ $(INCLUDE)
+CXXFLAGS.o   = @CMAKE_CXX_FLAGS@ @DEAL_II_CXX_FLAGS_RELEASE@ @MAKEFILE_DEFINITIONS@ @MAKEFILE_DEFINITIONS_RELEASE@ $(INCLUDE)
 
 #F77FLAGS.g
 #F77FLAGS.o
 
 # compile flags for C compiler
-CFLAGS.g   = @CMAKE_C_FLAGS@ ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}} @MAKEFILE_DEFINITIONS@
-CFLAGS.o   = $(CFLAGS.g)
+CFLAGS.g   = @CMAKE_C_FLAGS@ @DEAL_II_C_FLAGS_DEBUG@ @MAKEFILE_DEFINITIONS@ @MAKEFILE_DEFINITIONS_DEBUG@
+CFLAGS.o   = @CMAKE_C_FLAGS@ @DEAL_II_C_FLAGS_RELEASE@ @MAKEFILE_DEFINITIONS@ @MAKEFILE_DEFINITIONS_RELEASE@
 
 
 ifeq ($(enable-threads),yes)

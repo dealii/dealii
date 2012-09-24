@@ -48,35 +48,44 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   # actually understands:
   #
 
-  TO_STRING(MAKEFILE_DEFINITIONS
-    ${DEAL_II_EXTERNAL_DEFINITIONS}
-    )
-
   TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_C}"
-    ${DEAL_II_EXTERNAL_INCLUDE_DIRS}
+    ${DEAL_II_USER_INCLUDE_DIRS}
     ${DEAL_II_INCLUDE_DIRS}
     )
 
-  #
-  # Add an rpath directive in front of each library, so that libraries
-  # outside of the default search directories will be found by the runtime
-  # dynamic linker:
-  #
-  FOREACH(lib ${DEAL_II_EXTERNAL_LIBRARIES} ${DEAL_II_LIBRARIES})
-    GET_FILENAME_COMPONENT(path ${lib} PATH)
-    LIST(APPEND MAKEFILE_LIBS "-Wl,-rpath  -Wl,${path}")
+  IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+    LIST(APPEND MAKEFILE_BUILD_TYPES "DEBUG")
+  ENDIF()
+  IF(CMAKE_BUILD_TYPE MATCHES "Release")
+    LIST(APPEND MAKEFILE_BUILD_TYPES "RELEASE")
+  ENDIF()
+
+  FOREACH(type ${MAKEFILE_BUILD_TYPES})
+    TO_STRING(MAKEFILE_DEFINITIONS_${type}
+      ${DEAL_II_USER_DEFINITIONS}
+      ${DEAL_II_USER_DEFINITIONS_${type}}
+      )
     #
-    # Change this into the canonical -L -l format:
+    # Add an rpath directive in front of each library, so that libraries
+    # outside of the default search directories will be found by the runtime
+    # dynamic linker:
     #
-    LIST(APPEND MAKEFILE_LIBS ${lib})
+    FOREACH(lib
+        ${DEAL_II_EXTERNAL_LIBRARIES}
+        ${DEAL_II_EXTERNAL_LIBRARIES_${type}}
+        ${DEAL_II_LIBRARIES_${type}})
+      GET_FILENAME_COMPONENT(path ${lib} PATH)
+      LIST(APPEND MAKEFILE_LIBS_${type} "-Wl,-rpath  -Wl,${path}")
+      LIST(APPEND MAKEFILE_LIBS_${type} ${lib})
+    ENDFOREACH()
+    TO_STRING(MAKEFILE_LIBS_${type} ${MAKEFILE_LIBS_${type}})
+    #
+    # Put our linker flags directly in front of this string:
+    #
+    SET(MAKEFILE_LIBS_${type}
+      "${CMAKE_SHARED_LINKER_FLAGS} ${DEAL_II_SHARED_LINKER_FLAGS_${type}} ${MAKEFILE_LIBS_${type}}"
+      )
   ENDFOREACH()
-  TO_STRING(MAKEFILE_LIBS ${MAKEFILE_LIBS})
-  #
-  # Put our linker flags directly in front of this string:
-  #
-  SET(MAKEFILE_LIBS
-    "${CMAKE_SHARED_LINKER_FLAGS} ${MAKEFILE_LIBS}"
-    )
 
   #
   # Boilerplate: The Make.global_options expects variables to be set to
