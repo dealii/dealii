@@ -28,6 +28,13 @@ IF(NOT DEAL_II_WITH_BOOST)
 ENDIF()
 
 
+#
+# Hide some cmake specific cached variables. This is annoying...
+#
+MARK_AS_ADVANCED(
+  file_cmd
+  )
+
 
 #
 # Append the saved initial (cached) variables ${flags}_SAVED at the end of

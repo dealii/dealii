@@ -7,7 +7,6 @@ Major:
 
 * The following features have to be written:
     * HDF5
-    * PETSC
     * MUMPS
     * SLEPC
     * HSL

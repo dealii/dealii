@@ -95,7 +95,11 @@ OPTION(DEAL_II_WITH_NETCDF
   OFF)
 
 OPTION(DEAL_II_WITH_P4EST
-  "Build deal.II with support for P4EST."
+  "Build deal.II with support for p4est."
+  OFF)
+
+OPTION(DEAL_II_WITH_PETSC
+  "Build deal.II with support for petsc."
   OFF)
 
 OPTION(DEAL_II_WITH_TBB
@@ -126,9 +130,7 @@ OPTION(DEAL_II_WITH_ZLIB
 #
 
 OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
-  "configure sensible default CFLAGS and CXXFLAGS depending on platform,
-  compiler and build target. Disabling this option will turn off almost all
-  compiler flag setup."
+  "configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
   ON)
 
 #
