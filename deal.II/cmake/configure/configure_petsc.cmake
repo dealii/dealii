@@ -27,20 +27,21 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     # Petsc has to be configured with the same MPI configuration as
     # deal.II.
     #
-    # petscconf.h should export PETSC_HAVE_MPI 1 if mpi support is enabled.
+    # petscconf.h should export PETSC_HAVE_MPIUNI 1 in case  mpi support is
+    # _NOT_ enabled.
     # So we check for this:
     #
-    FILE(STRINGS "${PETSC_INCLUDE_DIR}/petscconf.h" PETSC_RELEASE_STRING
-      REGEX "#define.*PETSC_HAVE_MPI.*1")
+    FILE(STRINGS "${PETSC_PETSCCONF_H}" PETSC_RELEASE_STRING
+      REGEX "#define.*PETSC_HAVE_MPIUNI 1")
     IF("${PETSC_RELEASE_STRING}" STREQUAL "")
-      SET(PETSC_WITH_MPI FALSE)
+      SET(PETSC_WITH_MPIUNI FALSE)
     ELSE()
-      SET(PETSC_WITH_MPI TRUE)
+      SET(PETSC_WITH_MPIUNI TRUE)
     ENDIF()
 
-    IF( (PETSC_WITH_MPI AND NOT DEAL_II_COMPILER_SUPPORTS_MPI)
+    IF( (PETSC_WITH_MPIUNI AND DEAL_II_COMPILER_SUPPORTS_MPI)
          OR
-         (NOT PETSC_WITH_MPI AND DEAL_II_COMPILER_SUPPORTS_MPI))
+         (NOT PETSC_WITH_MPIUNI AND NOT DEAL_II_COMPILER_SUPPORTS_MPI))
       MESSAGE(STATUS
         "Could not find a sufficient petsc installation: "
         "Petsc has to be configured with the same MPI configuration as deal.II."
