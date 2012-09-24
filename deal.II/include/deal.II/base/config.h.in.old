@@ -187,16 +187,6 @@ BUGS:
 /* Defined if a MUMPS installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_MUMPS
 
-/* Defined if a PETSc installation was found and is going to be used */
-#cmakedefine DEAL_II_USE_PETSC
-
-/* Defined if a PETSc installation was found with complex scalar type and is
-   going to be used */
-#cmakedefine DEAL_II_USE_PETSC_COMPLEX
-
-/* Defined if a PETSc installation was found and is not a release */
-#cmakedefine DEAL_II_USE_PETSC_DEV
-
 /* Defined if a SLEPc installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_SLEPC
 
@@ -287,14 +277,6 @@ TODO:
 /* Availability of the MA47 algorithm from HSL */
 #cmakedefine HAVE_HSL_MA47
 
-/* Make sure PETSc doesn't re-define the underscore through the preprocessor,
-   since this interferes with boost. PETSc redefines the underscore to be
-   "__gterr =", but then forgets to undef this thing. Boost simply wants to
-   concatenate the underscore with another string to form a class name, which
-   then of course isn't valid any more. See mails in early Feb 2006. */
-#cmakedefine PETSC_SKIP_UNDERSCORE_CHKERR
-
-
 /**
  * A #define that indicates whether we are using the Microsoft
  * Windows Visual C/C++ compiler. We currently do not run ./configure
@@ -315,31 +297,6 @@ TODO:
 #  endif
 #endif
 
-/**
- * These macros are defined to make testing for PETSc versions within
- * the deal.II main code as simple as possible. In brief they are used
- * like this: (i) DEAL_II_PETSC_VERSION_LT is used to advance the
- * PETScWrappers to newer versions of PETSc while preserving backward
- * compatibility; and (ii) DEAL_II_PETSC_VERSION_GTE is used to add
- * functionality to the PETScWrappers that does not exist in previous
- * versions of PETSc.  Examples of usage can be found in
- * lac/source/petsc_matrix_base.h.  Note: SLEPcWrappers do not need
- * their own analogical macros, since SLEPc and PETSc must have
- * identical version numbers anyways.
- */
-#define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
-  ((PETSC_VERSION_MAJOR * 10000 + \
-    PETSC_VERSION_MINOR * 100 + \
-    PETSC_VERSION_SUBMINOR) \
-    <  \
-    (major)*10000 + (minor)*100 + (subminor))
-
-#define DEAL_II_PETSC_VERSION_GTE(major,minor,subminor) \
-  ((PETSC_VERSION_MAJOR * 10000 + \
-    PETSC_VERSION_MINOR * 100 + \
-    PETSC_VERSION_SUBMINOR) \
-    >=  \
-    (major)*10000 + (minor)*100 + (subminor))
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/types.h>

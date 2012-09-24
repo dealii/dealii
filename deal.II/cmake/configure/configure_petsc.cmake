@@ -15,7 +15,7 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     #
     # We support petsc from version 3.x.x onwards
     #
-    IF(PETSC_MAJOR LESS 3)
+    IF(PETSC_VERSION_MAJOR LESS 3)
       MESSAGE(STATUS
         "Could not find a sufficient modern petsc installation: "
         "Version >=3.0.0 required!"
@@ -31,14 +31,6 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     # _NOT_ enabled.
     # So we check for this:
     #
-    FILE(STRINGS "${PETSC_PETSCCONF_H}" PETSC_RELEASE_STRING
-      REGEX "#define.*PETSC_HAVE_MPIUNI 1")
-    IF("${PETSC_RELEASE_STRING}" STREQUAL "")
-      SET(PETSC_WITH_MPIUNI FALSE)
-    ELSE()
-      SET(PETSC_WITH_MPIUNI TRUE)
-    ENDIF()
-
     IF( (PETSC_WITH_MPIUNI AND DEAL_II_COMPILER_SUPPORTS_MPI)
          OR
          (NOT PETSC_WITH_MPIUNI AND NOT DEAL_II_COMPILER_SUPPORTS_MPI))
@@ -49,13 +41,48 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
-
-
   ENDIF()
+
 ENDMACRO()
 
 
 MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL var)
+
+  INCLUDE_DIRECTORIES(${PETSC_INCLUDE_DIRS})
+
+  # The user has to know the location of the petsc headers as well: # TODO
+  # LIST(APPEND DEAL_II_EXTERNAL_INCLUDE_DIRS ${PETSC_INCLUDE_DIRS})
+
+  LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
+    ${PETSC_LIBRARIES}
+    )
+
+  SET(DEAL_II_USE_PETSC TRUE)
+
+  #
+  # Work around a stupidity in PETSc that makes sure it interferes in
+  # a completely obnoxious way with boost.
+  # TODO: Obosolete?
+  #
+  ADD_DEFINITIONS(-DPETSC_SKIP_UNDERSCORE_CHKERR)
+
+  #
+  # Set some definitions for config.h:
+  #
+
+  IF(NOT PETSC_RELEASE)
+    SET(DEAL_II_USE_PETSC_DEV TRUE)
+  ENDIF()
+
+  IF(PETSC_COMPLEX)
+    SET(DEAL_II_USE_PETSC_COMPLEX TRUE)
+  ENDIF()
+
+  SET(DEAL_II_EXPAND_PETSC_VECTOR "PETScWrappers::Vector")
+  SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
+  SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR "PETScWrappers::BlockVector")
+  SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
+
   SET(${var} TRUE)
 ENDMACRO()
 
