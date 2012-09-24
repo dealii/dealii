@@ -40,7 +40,10 @@ never working correctly and it is not used.
 
 
 <ol>
-<li> Nothing so far.
+<li> Simplifications of the internal structures of Triangulation and
+DoFHandler, in particular removal of specializations.
+<br>
+(Guido Kanschat, 2012/09/13)
 </ol>
 
 
@@ -50,6 +53,55 @@ never working correctly and it is not used.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now a function hp::FECollection::n_blocks() in analogy to
+the existing function hp::FECollection::n_components().
+<br>
+(Wolfgang Bangerth, 2012/09/20)
+
+<li> Changed: step-8 now outputs data in VTK format, rather than GMV.
+GMV has long been dead.
+<br>
+(Wolfgang Bangerth, 2012/09/19)
+
+<li> Fixed: One can compile deal.II with MPI support but run programs
+that aren't intended to use parallel communications and that, in fact,
+do not call <code>MPI_Init</code> at all. They are nevertheless supposed
+to work but previously the TimerOutput would crash under these conditions.
+This is now fixed.
+<br>
+(Timo Heister, Wolfgang Bangerth, 2012/09/18)
+
+<li> Fixed: If you pipe content into the deallog object and there
+is no end-line or flush after this content, and if a file stream
+is associated to this object, and if that happens at the end of
+the lifetime of the program, then the program would crash.
+This is now fixed.
+<br>
+(Timo Heister, Wolfgang Bangerth, 2012/09/17)
+
+<li> Fixed: The use of TableHandler::set_precision affected not only the
+precision with which elements of a table were printed, but also the
+precision carried by the output stream after writing the table was
+finished. It thus affected the precision
+with which later output was produced. This is now fixed.
+<br>
+(Timo Heister, 2012/09/16)
+
+<li> Fixed: Output of super-columns in TableHandler::write_text()
+was inconsistent. This is now fixed.
+<br>
+(Timo Heister, 2012/09/16)
+
+<li> Changed: Due to incompatibilties with some hdf5 packages installed from
+repositories we disable auto-detection of hdf5. Use --with-hdf if you need it.
+<br>
+(Timo Heister, 2012/09/14)
+
+<li> New MeshWorker::LocalIntegrator and integration_loop() provide a
+less confusing interface to MeshWorker loops.
+<br>
+(Guido Kanschat, 2012/09/13)
+
 <li> New: TableHandler TextOutputFormat::simple_table_with_separate_column_description
 that skips aligning the columns for increased performance.
 <br>

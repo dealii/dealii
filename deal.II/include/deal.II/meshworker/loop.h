@@ -18,8 +18,10 @@
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/meshworker/local_integrator.h>
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
+
 
 #define DEAL_II_MESHWORKER_PARALLEL 1
 
@@ -282,6 +284,9 @@ namespace MeshWorker
   }
 
 /**
+ * @deprecated The simplification in this loop is
+ * insignificant. Therefore, it is recommended to use loop() instead.
+ *
  * Simplified interface for loop() if specialized for integration.
  *
  * @ingroup MeshWorker
@@ -310,6 +315,49 @@ namespace MeshWorker
        assembler,
        cells_first);
   }
+
+
+/**
+ * Simplified interface for loop() if specialized for integration,
+ * using the virtual functions in LocalIntegrator.
+ *
+ * @ingroup MeshWorker
+ * @author Guido Kanschat, 2009
+ */
+  template<int dim, int spacedim, class ITERATOR, class ASSEMBLER>
+  void integration_loop(ITERATOR begin,
+                        typename identity<ITERATOR>::type end,
+                        DoFInfo<dim, spacedim>& dof_info,
+                        IntegrationInfoBox<dim, spacedim>& box,
+			const LocalIntegrator<dim, spacedim>& integrator,
+                        ASSEMBLER &assembler,
+                        bool cells_first = true)
+  {
+    std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
+    std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
+    std_cxx1x::function<void (DoFInfo<dim>&, DoFInfo<dim>&,
+			      IntegrationInfo<dim, spacedim>&,
+			      IntegrationInfo<dim, spacedim>&)> face_worker;
+  if (integrator.use_cell)
+    cell_worker = std_cxx1x::bind(&LocalIntegrator<dim, spacedim>::cell, &integrator, std_cxx1x::_1, std_cxx1x::_2);
+  if (integrator.use_boundary)
+    boundary_worker = std_cxx1x::bind(&LocalIntegrator<dim, spacedim>::boundary, &integrator, std_cxx1x::_1, std_cxx1x::_2);
+  if (integrator.use_face)
+    face_worker = std_cxx1x::bind(&LocalIntegrator<dim, spacedim>::face, &integrator, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4);
+
+  loop<dim, spacedim>
+      (begin, end,
+       dof_info,
+       box,
+       cell_worker,
+       boundary_worker,
+       face_worker,
+       assembler,
+       cells_first);
+  }
+
+
+
 }
 
 DEAL_II_NAMESPACE_CLOSE

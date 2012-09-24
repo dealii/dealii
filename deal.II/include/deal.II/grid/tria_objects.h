@@ -21,13 +21,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-//TODO: See if we can unify the class hierarchy a bit using partial
-// specialization of classes here, e.g. declare a general class
-// TriaObjects<dim,G>.
-// To consider for this: in that case we would have to duplicate quite a few
-// things, e.g. TriaObjectsHex is derived from TriaObjects<Hexahedron> and
-// declares mainly additional data. This would have to be changed in case of a
-// partial specialization.
+//TODO: This should all be cleaned up. Currently, only a single
+//function in the library makes use of the odd specializations, and
+//this function is Triangulation::execute_refinement() in 3D. I
+//assume, that the other refinement functions would profit from using
+//next_free_single_object() and next_free_pair_object, but they seem
+//to get around it.
 
 //TODO: The TriaObjects class contains a std::vector<G>. This is only an
 //efficient storage scheme if G is relatively well packed, i.e. it's not a
@@ -35,7 +34,8 @@ DEAL_II_NAMESPACE_OPEN
 //actually the case.
 
 template <int dim, int spacedim> class Triangulation;
-
+template <class Accessor> class TriaRawIterator;
+template <int, int, int> class TriaAccessor;
 
 namespace internal
 {
@@ -51,7 +51,7 @@ namespace internal
  * Objects of these classes are included in the TriaLevel and TriaFaces
  * classes.
  *
- * @author Tobias Leicht, Guido Kanschat, 2006, 2007
+ * @author Tobias Leicht, Guido Kanschat, 2006, 2007, 2012
  */
 
     template <typename G>
@@ -124,7 +124,7 @@ namespace internal
                                           *  already been processed.
                                           *
                                           *  You can clear all used flags using
-                                          *  Triangulation::clear_user_flags().
+                                          *  dealii::Triangulation::clear_user_flags().
                                           */
         std::vector<bool> user_flags;
 
@@ -221,48 +221,52 @@ namespace internal
                                          /**
                                           * Return an iterator to the
                                           * next free slot for a
-                                          * single line. Only
-                                          * implemented for
-                                          * <code>G=TriaObject<1>
-                                          * </code>.
+                                          * single object. This
+                                          * function is only used by
+                                          * dealii::Triangulation::execute_refinement()
+                                          * in 3D.
+					  *
+					  * @warning Interestingly,
+					  * this function is not used
+					  * for 1D or 2D
+					  * triangulations, where it
+					  * seems the authors of the
+					  * refinement function insist
+					  * on reimplementing its
+					  * contents.
+					  *
+					  * @todo This function is
+					  * not instantiated for the
+					  * codim-one case
                                           */
         template <int dim, int spacedim>
-        typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
-        next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria);
+	dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
+        next_free_single_object (const dealii::Triangulation<dim,spacedim> &tria);
 
                                          /**
                                           * Return an iterator to the
                                           * next free slot for a pair
-                                          * of lines. Only implemented
-                                          * for <code>G=TriaObject<1>
-                                          * </code>.
+                                          * of objects. This
+                                          * function is only used by
+                                          * dealii::Triangulation::execute_refinement()
+                                          * in 3D.
+					  *
+					  * @warning Interestingly,
+					  * this function is not used
+					  * for 1D or 2D
+					  * triangulations, where it
+					  * seems the authors of the
+					  * refinement function insist
+					  * on reimplementing its
+					  * contents.
+					  *
+					  * @todo This function is
+					  * not instantiated for the
+					  * codim-one case
                                           */
         template <int dim, int spacedim>
-        typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
-        next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria);
-
-                                         /**
-                                          * Return an iterator to the
-                                          * next free slot for a
-                                          * single quad. Only
-                                          * implemented for
-                                          * <code>G=TriaObject@<2@>
-                                          * </code>.
-                                          */
-        template <int dim, int spacedim>
-        typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
-        next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria);
-
-                                         /**
-                                          * Return an iterator to the
-                                          * next free slot for a pair
-                                          * of quads. Only implemented
-                                          * for <code>G=TriaObject@<2@>
-                                          * </code>.
-                                          */
-        template <int dim, int spacedim>
-        typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
-        next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria);
+	dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
+        next_free_pair_object (const dealii::Triangulation<dim,spacedim> &tria);
 
                                          /**
                                           * Return an iterator to the
@@ -401,7 +405,7 @@ namespace internal
                         "but you can only ask for " << arg2 <<"_iterators.");
 
                                          /**
-                                          * Triangulation objects can
+                                          * dealii::Triangulation objects can
                                           * either access a user
                                           * pointer or a user
                                           * index. What you tried to
@@ -929,16 +933,6 @@ namespace internal
 
 
 // declaration of explicit specializations
-
-    template<>
-    void
-    TriaObjects<TriaObject<1> >::reserve_space (const unsigned int new_lines_in_pairs,
-                                      const unsigned int new_lines_single);
-
-    template<>
-    void
-    TriaObjects<TriaObject<2> >::reserve_space (const unsigned int new_quads_in_pairs,
-                                      const unsigned int new_quads_single);
 
     template<>
     void

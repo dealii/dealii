@@ -128,7 +128,7 @@
  * component.
  *
  * The minimal size of each block is dictated by the underlying finite element
- * (a blocks consists of a single component for scalar elements, but in the
+ * (a block consists of a single component for scalar elements, but in the
  * case of the FE_RaviartThomas, for example, a block consists of <tt>dim</tt>
  * components). However, several such minimal blocks can be grouped together
  * into user defined blocks at will, and in accordance with the
@@ -142,8 +142,9 @@
  *
  * <i>Implementation:</i>
  * deal.II has a number of different finite element classes, all of which are
- * derived from the FiniteElement base class (see the @ref feall "module on
- * finite element classes"). With one exception, whether they are scalar or
+ * derived from the FiniteElement base class
+ * (see the @ref feall "module on finite element classes").
+ * With one exception, whether they are scalar or
  * vector valued, they all define a single block: all vector components the
  * finite element defines through its FiniteElement::n_components() function
  * form a single block, i.e. FiniteElement::n_blocks() returns one.

@@ -45,6 +45,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 	   const std::vector<unsigned int>&);
 
 	template
+	  void block_wise<deal_II_dimension,deal_II_space_dimension>
+	  (DoFHandler<deal_II_dimension,deal_II_space_dimension>&);
+
+	template
 	  void subdomain_wise<DoFHandler<deal_II_dimension,deal_II_space_dimension> >
 	  (DoFHandler<deal_II_dimension,deal_II_space_dimension> &);
 
@@ -168,6 +172,19 @@ namespace DoFRenumbering
       void component_wise<deal_II_dimension>
       (MGDoFHandler<deal_II_dimension>&,
        const std::vector<unsigned int>&);
+
+    template
+      void block_wise<deal_II_dimension>
+      (hp::DoFHandler<deal_II_dimension>&);
+
+    template
+      void block_wise<deal_II_dimension>
+      (MGDoFHandler<deal_II_dimension>&,
+       unsigned int);
+
+    template
+      void block_wise<deal_II_dimension>
+      (MGDoFHandler<deal_II_dimension>&);
 
     template
       void hierarchical<deal_II_dimension>

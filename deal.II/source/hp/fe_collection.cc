@@ -73,6 +73,23 @@ namespace hp
 
 
   template <int dim, int spacedim>
+  unsigned int
+  FECollection<dim,spacedim>::n_blocks () const
+  {
+    Assert (finite_elements.size () > 0, ExcNoFiniteElements());
+
+    const unsigned int nb = finite_elements[0]->n_blocks ();
+    for (unsigned int i=1; i<finite_elements.size(); ++i)
+      Assert (finite_elements[i]->n_blocks() == nb,
+          ExcMessage ("Not all finite elements in this collection have "
+                      "the same number of components."));
+
+    return nb;
+  }
+
+
+
+  template <int dim, int spacedim>
   std::size_t
   FECollection<dim,spacedim>::memory_consumption () const
   {

@@ -373,7 +373,7 @@ namespace Step12
 
                                      // After preparing all data in
                                      // <tt>info_box</tt>, we initialize
-                                     // the FEValus objects in there.
+                                     // the FEValues objects in there.
     info_box.initialize(fe, mapping);
 
                                      // The object created so far helps

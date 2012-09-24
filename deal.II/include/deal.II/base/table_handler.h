@@ -77,6 +77,20 @@ namespace internal
     double get_numeric_value () const;
 
     /**
+     * Cache the contained value with the given formatting and return it. The given parameters
+     * from the column definition are used for the formatting. The value
+     * is cached as a string internally in cached_value. The cache needs to be invalidated with this routine
+     * if the formatting of the column changes.
+     */
+    void cache_string(bool scientific, unsigned int precision) const;
+
+    /**
+     * Return the value cached using cache_string(). This is just a wrapper around cached_value.
+     */
+    const std::string & get_cached_string() const;
+
+
+    /**
      * Return a TableEntry object that has the same data type
      * of the stored value but with a value that is default
      * constructed for this data type. This is used to pad
@@ -112,6 +126,11 @@ namespace internal
      * Stored value.
      */
     value_type value;
+
+    /**
+     * cache the current value as a string
+     */
+    mutable std::string cached_value;
 
     friend class dealii::TableHandler;
   };
@@ -558,7 +577,17 @@ class TableHandler
                                           * the purpose of serialization.
                                           */
         template <class Archive>
-        void serialize(Archive & ar, const unsigned int version);
+        void save(Archive & ar, const unsigned int version) const;
+        template<class Archive>
+        void load(Archive & ar, const unsigned int version);
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+
+        /**
+         * Invalidates the string cache of all the entries and recomputes
+         * the maximum length max_length.
+         */
+        void invalidate_cache();
 
                                          /**
                                           * List of entries within
@@ -622,6 +651,11 @@ class TableHandler
                                           * not be computed at all.
                                           */
         unsigned int flag;
+
+        /**
+         * This entry caches the maximum length in characters for all entries in this table.
+         */
+        unsigned int max_length;
     };
 
                                      /**
@@ -852,26 +886,44 @@ void TableHandler::add_value (const std::string &key,
       n = (n >= p->second.entries.size() ? n : p->second.entries.size());
 
     while (columns[key].entries.size()+1 < n)
-      columns[key].entries.push_back (internal::TableEntry(T()));
+      {
+        columns[key].entries.push_back (internal::TableEntry(T()));
+        internal::TableEntry & entry = columns[key].entries.back();
+        entry.cache_string(columns[key].scientific, columns[key].precision);
+        columns[key].max_length = std::max(columns[key].max_length, static_cast<unsigned int>(entry.get_cached_string().length()));
+      }
   }
 
   // now push the value given to this function
   columns[key].entries.push_back (internal::TableEntry(value));
+  internal::TableEntry & entry = columns[key].entries.back();
+  entry.cache_string(columns[key].scientific, columns[key].precision);
+  columns[key].max_length = std::max(columns[key].max_length, static_cast<unsigned int>(entry.get_cached_string().length()));
 }
-
 
 
 template <class Archive>
 void
-TableHandler::Column::serialize(Archive & ar,
-                                const unsigned int)
+TableHandler::Column::save(Archive & ar, const unsigned int version) const
 {
-  ar & entries & tex_caption
-    & tex_format & precision
-    & scientific
-    & flag;
+    ar & entries & tex_caption
+      & tex_format & precision
+      & scientific
+      & flag
+      & max_length;
 }
 
+template<class Archive>
+void
+TableHandler::Column::load(Archive & ar, const unsigned int version)
+{
+    ar & entries & tex_caption
+      & tex_format & precision
+      & scientific
+      & flag
+      & max_length;
+    invalidate_cache();
+}
 
 
 template <class Archive>

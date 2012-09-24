@@ -31,7 +31,10 @@ template<int,int> class MGDoFHandler;
  * an ubiquitous part of each finite element program.
  *
  * The workhorse of this namespace is the loop() function, which implements a
- * completely generic loop over all mesh cells.
+ * completely generic loop over all mesh cells. Since the calls to
+ * loop() are error-prone due to its generality, for many applications
+ * it is advisable to derive a class from MeshWorker::LocalIntegrator
+ * and use the less general integration_loop() instead.
  *
  * The loop() depends on certain objects handed to it as
  * arguments. These objects are of two types, info objects like
@@ -95,7 +98,7 @@ template<int,int> class MGDoFHandler;
  * INTEGRATIONINFO and ASSEMBLER are needed.
  *
  * DOFINFO objects are gathered in a DoFInfoBox. In those objects, we
- * store the results of local operations on each cel and its
+ * store the results of local operations on each cell and its
  * faces. Once all this information has been gathered, an ASSEMBLER is
  * used to assemble it into golbal data.
  *
@@ -175,7 +178,7 @@ namespace MeshWorker
 {
 /**
  * The class providing the scrapbook to fill with results of local
- * integration. Depending on the tesk the mesh worker loop is
+ * integration. Depending on the task the mesh worker loop is
  * performing, local results can be of different types. They have
  * in common that they are the result of local integration over a cell
  * or face. Their actual type is determined by the Assember using

@@ -26,7 +26,7 @@ namespace internal
 
 /**
  * Class template for the <tt>structdim</tt>-dimensional cells constituting
- * a Triangulation of dimension <tt>structdim</tt> or lower dimensional
+ * a dealii::Triangulation of dimension <tt>structdim</tt> or lower dimensional
  * objects of higher dimensions.  They are characterized by the
  * (global) indices of their faces, which are cells of dimension
  * <tt>structdim-1</tt> or vertices if <tt>structdim=1</tt>.

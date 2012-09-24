@@ -56,6 +56,9 @@ namespace TrilinosWrappers
   class SparseMatrix;
   class SparsityPattern;
 
+				   /**
+				    * Iterators for Trilinos matrices
+				    */
   namespace MatrixIterators
   {
 /**

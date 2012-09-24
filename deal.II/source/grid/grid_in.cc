@@ -1116,8 +1116,24 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
                   }
               }
             else
-                                               // cannot read this
-              AssertThrow (false, ExcGmshUnsupportedGeometry(cell_type));
+					       // cannot read this, so throw
+					       // an exception. treat
+					       // triangles and tetrahedra
+					       // specially since this
+					       // deserves a more explicit
+					       // error message
+	      {
+		AssertThrow (cell_type != 2,
+			     ExcMessage("Found triangles while reading a file "
+					"in gmsh format. deal.II does not "
+					"support triangles"));
+		AssertThrow (cell_type != 11,
+			     ExcMessage("Found tetrahedra while reading a file "
+					"in gmsh format. deal.II does not "
+					"support tetrahedra"));
+
+		AssertThrow (false, ExcGmshUnsupportedGeometry(cell_type));
+	      }
     };
 
                                    // Assert we reached the end of the block

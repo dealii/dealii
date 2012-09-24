@@ -781,7 +781,7 @@ namespace DoFRenumbering
         }
 
                                      // now we've got all indices sorted
-                                     // into buckets labelled with their
+                                     // into buckets labeled by their
                                      // target component number. we've
                                      // only got to traverse this list
                                      // and assign the new indices
@@ -898,6 +898,315 @@ namespace DoFRenumbering
 
     return next_free_index;
   }
+
+
+
+  template <int dim, int spacedim>
+  void
+  block_wise (DoFHandler<dim,spacedim>        &dof_handler)
+  {
+    std::vector<unsigned int> renumbering (dof_handler.n_locally_owned_dofs(),
+                                           DoFHandler<dim>::invalid_dof_index);
+
+    typedef
+      internal::WrapDoFIterator<typename DoFHandler<dim,spacedim>
+                                ::active_cell_iterator>
+      ITERATOR;
+
+    typename DoFHandler<dim,spacedim>::active_cell_iterator
+      istart = dof_handler.begin_active();
+    ITERATOR start = istart;
+    const typename DoFHandler<dim,spacedim>::cell_iterator
+      end = dof_handler.end();
+
+    const unsigned int result =
+      compute_block_wise<dim, spacedim, ITERATOR,
+      typename DoFHandler<dim,spacedim>::cell_iterator>
+      (renumbering, start, end);
+    if (result == 0)
+      return;
+
+                                     // verify that the last numbered
+                                     // degree of freedom is either
+                                     // equal to the number of degrees
+                                     // of freedom in total (the
+                                     // sequential case) or in the
+                                     // distributed case at least
+                                     // makes sense
+    Assert ((result == dof_handler.n_locally_owned_dofs())
+            ||
+            ((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs())
+             &&
+             (result <= dof_handler.n_dofs())),
+            ExcRenumberingIncomplete());
+
+    dof_handler.renumber_dofs (renumbering);
+  }
+
+
+
+  template <int dim>
+  void
+  block_wise (hp::DoFHandler<dim>             &dof_handler)
+  {
+    std::vector<unsigned int> renumbering (dof_handler.n_dofs(),
+                                           hp::DoFHandler<dim>::invalid_dof_index);
+
+    typedef
+      internal::WrapDoFIterator<typename hp::DoFHandler<dim>::active_cell_iterator> ITERATOR;
+
+    typename hp::DoFHandler<dim>::active_cell_iterator
+      istart = dof_handler.begin_active();
+    ITERATOR start = istart;
+    const typename hp::DoFHandler<dim>::cell_iterator
+      end = dof_handler.end();
+
+    const unsigned int result =
+      compute_block_wise<dim, dim, ITERATOR,
+      typename hp::DoFHandler<dim>::cell_iterator>(renumbering,
+                                                   start, end);
+
+    if (result == 0)
+      return;
+
+    Assert (result == dof_handler.n_dofs(),
+            ExcRenumberingIncomplete());
+
+    dof_handler.renumber_dofs (renumbering);
+  }
+
+
+
+  template <int dim>
+  void
+  block_wise (MGDoFHandler<dim> &dof_handler,
+              const unsigned int level)
+  {
+    std::vector<unsigned int> renumbering (dof_handler.n_dofs(level),
+                                           DoFHandler<dim>::invalid_dof_index);
+
+    typedef
+      internal::WrapMGDoFIterator<typename MGDoFHandler<dim>::cell_iterator> ITERATOR;
+
+    typename MGDoFHandler<dim>::cell_iterator
+      istart =dof_handler.begin(level);
+    ITERATOR start = istart;
+    typename MGDoFHandler<dim>::cell_iterator
+      iend = dof_handler.end(level);
+    const ITERATOR end = iend;
+
+    const unsigned int result =
+      compute_block_wise<dim, dim, ITERATOR, ITERATOR>(
+        renumbering, start, end);
+
+    if (result == 0) return;
+
+    Assert (result == dof_handler.n_dofs(level),
+            ExcRenumberingIncomplete());
+
+    if (renumbering.size()!=0)
+      dof_handler.renumber_dofs (level, renumbering);
+  }
+
+
+
+  template <int dim>
+  void
+  block_wise (MGDoFHandler<dim> &dof_handler)
+  {
+                                     // renumber the non-MG part of
+                                     // the DoFHandler in parallel to
+                                     // the MG part. Because
+                                     // MGDoFHandler::renumber_dofs
+                                     // uses the user flags we can't
+                                     // run renumbering on individual
+                                     // levels in parallel to the
+                                     // other levels
+    void (*non_mg_part) (DoFHandler<dim> &)
+      = &block_wise<dim>;
+    Threads::Task<>
+      task = Threads::new_task (non_mg_part, dof_handler);
+
+    for (unsigned int level=0; level<dof_handler.get_tria().n_levels(); ++level)
+      block_wise (dof_handler, level);
+
+    task.join();
+  }
+
+
+
+  template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
+  unsigned int
+  compute_block_wise (std::vector<unsigned int>& new_indices,
+                      const ITERATOR   & start,
+                      const ENDITERATOR& end)
+  {
+    const hp::FECollection<dim,spacedim>
+      fe_collection (start->get_dof_handler().get_fe ());
+
+                                     // do nothing if the FE has only
+                                     // one component
+    if (fe_collection.n_blocks() == 1)
+      {
+        new_indices.resize(0);
+        return 0;
+      }
+
+                                     // vector to hold the dof indices on
+                                     // the cell we visit at a time
+    std::vector<unsigned int> local_dof_indices;
+
+                                     // prebuilt list to which block
+                                     // a given dof on a cell
+                                     // should go.
+    std::vector<std::vector<unsigned int> > block_list (fe_collection.size());
+    for (unsigned int f=0; f<fe_collection.size(); ++f)
+      {
+        const FiniteElement<dim,spacedim> & fe = fe_collection[f];
+        block_list[f].resize(fe.dofs_per_cell);
+        for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+          block_list[f][i]
+            = fe.system_to_block_index(i).first;
+      }
+
+                                     // set up a map where for each
+                                     // block the respective degrees
+                                     // of freedom are collected.
+                                     //
+                                     // note that this map is sorted by
+                                     // block but that within each
+                                     // block it is NOT sorted by
+                                     // dof index. note also that some
+                                     // dof indices are entered
+                                     // multiply, so we will have to
+                                     // take care of that
+    std::vector<std::vector<unsigned int> >
+      block_to_dof_map (fe_collection.n_blocks());
+    for (ITERATOR cell=start; cell!=end; ++cell)
+      if (cell->is_locally_owned())
+        {
+                                         // on each cell: get dof indices
+                                         // and insert them into the global
+                                         // list using their component
+          const unsigned int fe_index = cell->active_fe_index();
+          const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
+          local_dof_indices.resize (dofs_per_cell);
+          cell.get_dof_indices (local_dof_indices);
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
+              block_to_dof_map[block_list[fe_index][i]].
+                push_back (local_dof_indices[i]);
+        }
+
+                                     // now we've got all indices sorted
+                                     // into buckets labeled by their
+                                     // target block number. we've
+                                     // only got to traverse this list
+                                     // and assign the new indices
+                                     //
+                                     // however, we first want to sort
+                                     // the indices entered into the
+                                     // buckets to preserve the order
+                                     // within each component and during
+                                     // this also remove duplicate
+                                     // entries
+    for (unsigned int block=0; block<fe_collection.n_blocks();
+         ++block)
+      {
+        std::sort (block_to_dof_map[block].begin(),
+                   block_to_dof_map[block].end());
+        block_to_dof_map[block]
+          .erase (std::unique (block_to_dof_map[block].begin(),
+                               block_to_dof_map[block].end()),
+                  block_to_dof_map[block].end());
+      }
+
+                                     // calculate the number of locally owned
+                                     // DoFs per bucket
+    const unsigned int n_buckets = fe_collection.n_blocks();
+    std::vector<unsigned int> shifts(n_buckets);
+
+    if (const parallel::distributed::Triangulation<dim,spacedim> * tria
+        = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+           (&start->get_dof_handler().get_tria())))
+      {
+#ifdef DEAL_II_USE_P4EST
+        std::vector<unsigned int> local_dof_count(n_buckets);
+
+        for (unsigned int c=0; c<n_buckets; ++c)
+          local_dof_count[c] = block_to_dof_map[c].size();
+
+
+                                         // gather information from all CPUs
+        std::vector<unsigned int>
+          all_dof_counts(fe_collection.n_components() *
+                         Utilities::MPI::n_mpi_processes (tria->get_communicator()));
+
+        MPI_Allgather ( &local_dof_count[0], n_buckets, MPI_UNSIGNED, &all_dof_counts[0],
+                        n_buckets, MPI_UNSIGNED, tria->get_communicator());
+
+        for (unsigned int i=0; i<n_buckets; ++i)
+          Assert (all_dof_counts[n_buckets*tria->locally_owned_subdomain()+i]
+                  ==
+                  local_dof_count[i],
+                  ExcInternalError());
+
+                                         //calculate shifts
+        unsigned int cumulated = 0;
+        for (unsigned int c=0; c<n_buckets; ++c)
+          {
+            shifts[c]=cumulated;
+            for (types::subdomain_id i=0; i<tria->locally_owned_subdomain(); ++i)
+              shifts[c] += all_dof_counts[c+n_buckets*i];
+            for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (tria->get_communicator()); ++i)
+              cumulated += all_dof_counts[c+n_buckets*i];
+          }
+#else
+        (void)tria;
+        Assert (false, ExcInternalError());
+#endif
+      }
+    else
+      {
+        shifts[0] = 0;
+        for (unsigned int c=1; c<fe_collection.n_blocks(); ++c)
+          shifts[c] = shifts[c-1] + block_to_dof_map[c-1].size();
+      }
+
+
+
+
+                                     // now concatenate all the
+                                     // components in the order the user
+                                     // desired to see
+    unsigned int next_free_index = 0;
+    for (unsigned int block=0; block<fe_collection.n_blocks(); ++block)
+      {
+        const typename std::vector<unsigned int>::const_iterator
+          begin_of_component = block_to_dof_map[block].begin(),
+          end_of_component   = block_to_dof_map[block].end();
+
+        next_free_index = shifts[block];
+
+        for (typename std::vector<unsigned int>::const_iterator
+               dof_index = begin_of_component;
+             dof_index != end_of_component; ++dof_index)
+          {
+            Assert (start->get_dof_handler().locally_owned_dofs()
+                    .index_within_set(*dof_index)
+                    <
+                    new_indices.size(),
+                    ExcInternalError());
+            new_indices[start->get_dof_handler().locally_owned_dofs()
+                        .index_within_set(*dof_index)]
+              = next_free_index++;
+          }
+      }
+
+    return next_free_index;
+  }
+
+
 
   namespace
   {

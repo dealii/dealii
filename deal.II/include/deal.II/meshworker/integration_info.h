@@ -458,7 +458,7 @@ namespace MeshWorker
                                         * to the ones already set in
                                         * this program. The four
                                         * boolean flags indicate
-                                        * wether the additional flags
+                                        * whether the additional flags
                                         * should be set for cell,
                                         * boundary, interelement face
                                         * for the cell itself
@@ -567,7 +567,7 @@ namespace MeshWorker
                                         * #boundary_selector and
                                         * #face_selector in order to
                                         * save computational
-                                        * eeffort. If no selectors
+                                        * effort. If no selectors
                                         * are used, then values for
                                         * all named vectors in
                                         * DoFInfo::global_data will be

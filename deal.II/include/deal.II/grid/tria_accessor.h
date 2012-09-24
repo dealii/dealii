@@ -2171,7 +2171,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                      /**
                                       * Copy constructor.
                                       */
-    CellAccessor (const CellAccessor &cell_accessor);
+  CellAccessor (const TriaAccessor<dim,dim,spacedim> &cell_accessor);
 
                                      /**
                                       * Conversion constructor. This

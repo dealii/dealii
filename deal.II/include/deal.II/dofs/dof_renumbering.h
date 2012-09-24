@@ -144,18 +144,21 @@ DEAL_II_NAMESPACE_OPEN
  * may be difficult, however, and in many cases will not justify the effort.
  *
  *
- * <h3>Component-wise numbering</h3>
+ * <h3>Component-wise and block-wise numberings</h3>
  *
  * For finite elements composed of several base elements using the FESystem
  * class, or for elements which provide several components themselves, it
  * may be of interest to sort the DoF indices by component. This will then
  * bring out the block matrix structure, since otherwise the degrees of freedom
  * are numbered cell-wise without taking into account that they may belong to
- * different components.
+ * different components. For example, one may want to sort degree of freedom for
+ * a Stokes discretization so that we first get all velocities and then all
+ * the pressures so that the resulting matrix naturally decomposes into a
+ * $2\times 2$ system.
  *
  * This kind of numbering may be obtained by calling the
  * component_wise() function of this class. Since it does not touch
- * the order of indices within each, it may be worthwhile to first
+ * the order of indices within each component, it may be worthwhile to first
  * renumber using the Cuthill-McKee or a similar algorithm and
  * afterwards renumbering component-wise. This will bring out the
  * matrix structure and additionally have a good numbering within each
@@ -163,8 +166,26 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The component_wise() function allows not only to honor enumeration based on
  * vector components, but also allows to group together vector components into
- * "blocks". See @ref GlossComponent vs @ref GlossBlock for a description of
- * the difference.
+ * "blocks" using a defaulted argument to the various DoFRenumber::component_wise()
+ * functinos (see @ref GlossComponent vs @ref GlossBlock for a description of
+ * the difference). The blocks designated through this argument may, but do not
+ * have to be, equal to the blocks that the finite element reports. For example,
+ * a typical Stokes element would be
+ * @code
+ *   FESystem<dim> stokes_fe (FE_Q<dim>(2), dim,   // dim velocities
+ *                            FE_Q<dim>(1), 1);    // one pressure
+ * @endcode
+ * This element has <code>dim+1</code> vector components and equally many
+ * blocks. However, one may want to consider the velocities as one logical
+ * block so that all velocity degrees of freedom are enumerated the same
+ * way, independent of whether they are $x$- or $y$-velocities. This is done,
+ * for example, in step-20 and step-22 as well as several other tutorial programs.
+ *
+ * On the other hand, if you really want to use block structure reported
+ * by the finite element itself (a case that is often the case if you have
+ * finite elements that have multiple vector components, e.g. the FE_RaviartThomas
+ * or FE_Nedelec elements) then you can use the DoFRenumber::block_wise instead
+ * of the DoFRenumbering::component_wise functions.
  *
  *
  * <h3>Cell-wise numbering</h3>
@@ -669,6 +690,11 @@ namespace DoFRenumbering
                  const bool                  reversed_numbering = false,
                  const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int> ());
 
+  /**
+   * @name Component-wise numberings
+   * @{
+   */
+
                                    /**
                                     * Sort the degrees of freedom by
                                     * vector component. The
@@ -695,7 +721,7 @@ namespace DoFRenumbering
                                     * target component for dofs with
                                     * component @p i in the
                                     * FESystem. Naming the same
-                                    * component more than once is
+                                    * target component more than once is
                                     * possible and results in a
                                     * blocking of several components
                                     * into one. This is discussed in
@@ -755,7 +781,7 @@ namespace DoFRenumbering
   template <int dim>
   void
   component_wise (MGDoFHandler<dim>&               dof_handler,
-                  unsigned int                     level,
+                  const unsigned int               level,
                   const std::vector<unsigned int>& target_component = std::vector<unsigned int>());
 
 
@@ -790,13 +816,123 @@ namespace DoFRenumbering
                           const ENDITERATOR& end,
                           const std::vector<unsigned int> &target_component);
 
+  /**
+   * @}
+   */
+
+  /**
+   * @name Block-wise numberings
+   * @{
+   */
+
                                    /**
-                                        * Renumber the degrees cell by cell in hierarchical order
-                                        * (also known as z-order). The main usage is that this
-                                        * guarantees the same ordering independent of the
-                                        * number of processors involved in a parallel
-                                        * distributed computation.
-                                        */
+                                    * Sort the degrees of freedom by
+                                    * vector block. The
+                                    * numbering within each
+                                    * block is not touched, so a
+                                    * degree of freedom with index
+                                    * $i$, belonging to some
+                                    * block, and another degree
+                                    * of freedom with index $j$
+                                    * belonging to the same
+                                    * block will be assigned new
+                                    * indices $n(i)$ and $n(j)$ with
+                                    * $n(i)<n(j)$ if $i<j$ and
+                                    * $n(i)>n(j)$ if $i>j$.
+                                    */
+  template <int dim, int spacedim>
+  void
+  block_wise (DoFHandler<dim,spacedim> &dof_handler);
+
+
+                                   /**
+                                    * Sort the degrees of freedom by
+                                    * block. It does the same
+                                    * thing as the above function.
+				    *
+				    * This function only succeeds if each of
+				    * the elements in the hp::FECollection
+				    * attached to the hp::DoFHandler argument
+				    * has exactly the same number of blocks
+				    * (see @ref GlossBlock "the glossary" for
+				    * more information). Note that this is not
+				    * always given: while the hp::FECollection
+				    * class ensures that all of its elements
+				    * have the same number of vector
+				    * components, they need not have the same
+				    * number of blocks. At the same time, this
+				    * function here needs to match individual
+				    * blocks across elements and therefore
+				    * requires that elements have the same
+				    * number of blocks and that subsequent
+				    * blocks in one element have the same
+				    * meaning as in another element.
+                                    */
+  template <int dim>
+  void
+  block_wise (hp::DoFHandler<dim> &dof_handler);
+
+                                   /**
+                                    * Sort the degrees of freedom by
+                                    * block. It does the same
+                                    * thing as the above function,
+                                    * only that it does this for one
+                                    * single level of a multi-level
+                                    * discretization. The
+                                    * non-multigrid part of the
+                                    * MGDoFHandler is not touched.
+                                    */
+  template <int dim>
+  void
+  block_wise (MGDoFHandler<dim>  &dof_handler,
+              const unsigned int  level);
+
+
+                                   /**
+                                    * Sort the degrees of freedom by
+                                    * block. It does the same
+                                    * thing as the previous
+                                    * functions, but more: it
+                                    * renumbers not only every level
+                                    * of the multigrid part, but
+                                    * also the global,
+                                    * i.e. non-multigrid components.
+                                    */
+  template <int dim>
+  void
+  block_wise (MGDoFHandler<dim> &dof_handler);
+
+                                   /**
+                                    * Computes the renumbering
+                                    * vector needed by the
+                                    * block_wise()
+                                    * functions. Does not perform
+                                    * the renumbering on the
+                                    * DoFHandler dofs but returns
+                                    * the renumbering vector.
+                                    */
+  template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
+  unsigned int
+  compute_block_wise (std::vector<unsigned int>& new_dof_indices,
+                      const ITERATOR& start,
+                      const ENDITERATOR& end);
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Various cell-wise numberings
+   * @{
+   */
+
+                                   /**
+                                    * Renumber the degrees cell by cell in hierarchical order
+                                    * (also known as z-order). The main usage is that this
+                                    * guarantees the same ordering independent of the
+                                    * number of processors involved in a parallel
+                                    * distributed computation.
+                                    */
   template <int dim>
   void
   hierarchical (DoFHandler<dim> &dof_handler);
@@ -927,6 +1063,14 @@ namespace DoFRenumbering
                      const unsigned int         level,
                      const std::vector<typename MGDoFHandler<dim>::cell_iterator>& cell_order);
 
+  /**
+   * @}
+   */
+
+  /**
+   * @name Directional numberings
+   * @{
+   */
 
                                    /**
                                     * Downstream numbering with respect to a
@@ -1137,6 +1281,15 @@ namespace DoFRenumbering
                         const Point<dim>&          center,
                         const bool                 counter);
 
+  /**
+   * @}
+   */
+
+  /**
+   * @name Selective and random numberings
+   * @{
+   */
+
                                    /**
                                     * Sort those degrees of freedom
                                     * which are tagged with @p true
@@ -1248,6 +1401,15 @@ namespace DoFRenumbering
   compute_random (std::vector<unsigned int> &new_dof_indices,
                   const DH& dof_handler);
 
+  /**
+   * @}
+   */
+
+  /**
+   * @name Numberings based on cell attributes
+   * @{
+   */
+
                                    /**
                                     * Renumber the degrees of
                                     * freedom such that they are
@@ -1300,6 +1462,10 @@ namespace DoFRenumbering
   void
   compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
                           const DH                  &dof_handler);
+
+  /**
+   * @}
+   */
 
                                    /**
                                     * Exception

@@ -124,6 +124,27 @@ namespace hp
                                         */
       unsigned int n_components () const;
 
+      /**
+       * Return the number of vector
+       * blocks of the finite elements in
+       * this collection. While this class ensures that all
+       * elements stored in it have the same number of vector
+       * components, there is no such guarantees for the number
+       * of blocks each element is made up of (an element may
+       * have fewer blocks than vector components; see
+       * @ref GlossBlock "the glossary" for more information).
+       * For example, you may have an FECollection object that stores
+       * one copy of an FESystem with <code>dim</code> FE_Q objects
+       * and one copy of an FE_RaviartThomas element. Both have
+       * <code>dim</code> vector components but while the former has
+       * <code>dim</code> blocks the latter has only one.
+       * Consequently, this function will throw an assertion
+       * if the number of blocks is not the same for all elements.
+       * If they are the same, this function returns the result
+       * of FiniteElement::n_blocks().
+       */
+      unsigned int n_blocks () const;
+
                                        /**
                                         * Return the maximal number of degrees
                                         * of freedom per vertex over all

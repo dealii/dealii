@@ -57,23 +57,152 @@
  *
  *
  * @anchor VVPhilosophy
- * <h3>A philosophical view of vector-valued problems</h3>
+ * <h3>Examples of vector-valued problems</h3>
  *
  * The way one deals systematically with vector-valued problems is not
- * fundamentally different from scalar problems in that one needs to come up
- * first with a weak (variational) formulation of the problem that takes into
- * account all the solution variables. To understand how to do that, let us
- * consider a simple example, the mixed Laplace equations discussed in
- * step-20:
+ * fundamentally different from scalar problems: first, we need a weak
+ * (variational) formulation of the problem that takes into account
+ * all the solution variables. After we did so, generating the system
+ * matrix and solving the linear system follows the same outlines that
+ * we are used to already.
+ *
+ * <h4>Linear elasticity</h4>
+ *
+ * Let us take for example the elasticity problem from step-8 and even
+ * simplify it by choosing $\lambda = 0$ and $\mu = 1$ to highlight the important concepts. Therefore,
+ * let consider the following weak formulation: find $\mathbf u \in
+ * \mathbf V = H^1_0(\Omega; \mathbb R^3)$ such that for all $\mathbf
+ * v\in V$ holds
+ * @f[
+ * a(u,v) \equiv 2\int_{\Omega} \mathbf D\mathbf u : \mathbf D\mathbf
+ * v\,dx = \int_\Omega \mathbf f\cdot \mathbf v \,dx.
+ * @f]
+ * Here, <b>D</b> denotes the symmetric gradient defined by
+ * $\mathbf Du = \tfrac12 (\nabla \mathbf u + (\nabla \mathbf u)^T)$
+ * and the colon indicates double contraction of two tensors of rank 2
+ * (the Frobenius inner product). This bilinear form looks indeed very
+ * much like the bilinear form of the Poisson problem in step-3. The
+ * only differences are
+ * <ol>
+ * <li>We replaced the gradient operator by the symmetric gradient;
+ * this is actually not a significant difference, and everything said
+ * here is true if your replace $\mathbf D$ by $\nabla$. Indeed, let
+ * us do this to simplify the discussion:
+ * @f[
+ * a(u,v) \equiv \int_{\Omega} \nabla\mathbf u : \nabla\mathbf
+ * v\,dx = \int_\Omega \mathbf f\cdot \mathbf v \,dx.
+ * @f]
+ * Note though, that this system is not very exciting, since we could
+ * solve for the three components of <b>u</b> separately.
+ *
+ * <li> The trial and test functions are now from the space
+ * $H^1_0(\Omega; \mathbb R^3)$, which can be viewed as three copies
+ * of the scalar space $H^1_0(\Omega)$. And this is exactly, how we
+ * are going to implement this space below, using FESystem.
+ *
+ * But for now, let us look at the system a little more
+ * closely. First, let us exploit that
+ * <b>u</b>=(<i>u</i><sub>1</sub>,<i>u</i><sub>2</sub>,<i>u</i><sub>3</sub>)<sup>T</sup>
+ * and <b>v</b> accordingly. Then, we can write the simplified equation in
+ * coordinates as
+ * @f[
+ * a(u,v) = \int_\Omega \bigl(\nabla u_1\cdot \nabla v_1
+ +\nabla u_2\cdot \nabla v_2+\nabla u_3\cdot \nabla v_3\bigr)\,dx
+ = \int_\Omega \bigl(f_1v_1 + f_2 v_2 + f_3 v_3\bigr)\,dx.
+ * @f]
+ * We see, that this is just three copies of the bilinear form of the
+ * Laplacian, one applied to each component (this is where the
+ * formulation with the $\mathbf D$ is more exciting, and we want to
+ * derive a framework that applies to that one as well). We can make
+ * this weak form a system of differential equations again by choosing
+ * special test functions: first, choose
+ * <b>v</b>=(<i>v</i><sub>1</sub>,0,0)<sup>T</sup>, then
+ * <b>v</b>=(0,<i>v</i><sub>2</sub>,0)<sup>T</sup>, and finally
+ * <b>v</b>=(0,0,<i>v</i><sub>3</sub>)<sup>T</sup>. writing the outcomes below
+ * each other, we obtain the system
+ * @f[
+ * \arraycolsep1pt
+ * \begin{matrix}
+ * (\nabla u_1,\nabla v_1) &&& = (f_1, v_1)
+ * \\
+ * & (\nabla u_2,\nabla v_2) && = (f_2, v_2)
+ * \\
+ * && (\nabla u_3,\nabla v_3) & = (f_3, v_3)
+ * \end{matrix}
+ * @f]
+ * where we used the standard inner product notation $(\mathbf
+ * f,\mathbf g) =
+ * \int_\Omega \mathbf f \cdot \mathbf g \,dx$. It is important for our understanding, that
+ * we keep in mind that the latter form as a system of PDE is
+ * completely equivalent to the original definition of the bilinear
+ * form <i>a</i>(<i>u</i>,<i>v</i>), which does not immediately
+ * exhibit this system structure. Let us close by writing the full
+ * system of the elastic equation with symmetric gradient <b>D</b>:
+ * @f[
+ * \arraycolsep1pt
+ * \begin{matrix}
+ * (\nabla u_1,\nabla v_1) + (\partial_1 u_1,\partial_1 v_1)
+ * & (\partial_1 u_2,\partial_2 v_1)
+ * & (\partial_1 u_3,\partial_3 v_1)
+ * & = (f_1, v_1)
+ * \\
+ * (\partial_2 u_1,\partial_1 v_2)
+ * & (\nabla u_2,\nabla v_2) + (\partial_2 u_2,\partial_2 v_2)
+ * & (\partial_2 u_3,\partial_3 v_2)
+ * & = (f_2, v_2)
+ * \\
+ * (\partial_3 u_1,\partial_1 v_3)
+ * & (\partial_3 u_2,\partial_2 v_3)
+ * & (\nabla u_3,\nabla v_3) + (\partial_3 u_3,\partial_3 v_3)
+ * & = (f_3, v_3)
+ * \end{matrix}.
+ * @f]
+ * Very formally, if we believe in operator valued matrices, we can
+ * rewrite this in the form <b>v</b><sup>T</sup><b>Au</b> = <b>v</b><sup>T</sup><b>f</b> or
+ * @f[
+ * \begin{pmatrix}
+ * v_1 \\ v_2 \\ v_3
+ * \end{pmatrix}^T
+ * \begin{pmatrix}
+ * (\nabla \cdot,\nabla \cdot) + (\partial_1 \cdot,\partial_1 \cdot)
+ * & (\partial_1 \cdot,\partial_2 \cdot)
+ * & (\partial_1 \cdot,\partial_3 \cdot)
+ * \\
+ * (\partial_2 \cdot,\partial_1 \cdot)
+ * & (\nabla \cdot,\nabla \cdot) + (\partial_2 \cdot,\partial_2 \cdot)
+ * & (\partial_2 \cdot,\partial_3 \cdot)
+ * \\
+ * (\partial_3 \cdot,\partial_1 \cdot)
+ * & (\partial_3 \cdot,\partial_2 \cdot)
+ * & (\nabla \cdot,\nabla \cdot) + (\partial_3 \cdot,\partial_3 \cdot)
+ * \end{pmatrix}
+ * \begin{pmatrix}
+ * u_1 \\ u_2 \\ u_3
+ * \end{pmatrix}
+ * =
+ * \begin{pmatrix}
+ * v_1 \\ v_2 \\ v_3
+ * \end{pmatrix}^T
+ * \begin{pmatrix} f_1 \\ f_2 \\ f_3\end{pmatrix}
+ * @f]
+ *
+ * <h4>Mixed elliptic problems</h4>
+ * Now, let us
+ * consider a more complex example, the mixed Laplace equations discussed in
+ * step-20 in three dimensions:
 @f{eqnarray*}
   \textbf{u} + \nabla p &=& 0,
   \\
   -\textrm{div}\; \textbf{u} &=& f,
 @f}
  *
- * Here, we have <code>dim+1</code> solution components: the scalar pressure
- * $p$ and the vector-valued velocity $\textbf u$ with <code>dim</code> vector
- * components.
+ * Here, we have four solution components: the scalar pressure
+ * $p \in L^2(\Omega)$ and the vector-valued velocity $\mathbf u \in
+ * \mathbf V
+ * = H^{\text{div}}_0(\Omega)$ with three vector
+ * components. Note as important difference to the previous example,
+ * that the vector space <b>V</b> is not just simply a copy of three
+ * identical spaces/
  *
  * A systematic way to get a weak or variational form for this and other
  * vector problems is to first consider it as a problem where the operators
@@ -99,7 +228,7 @@
   \begin{array}{c} \mathbf u \\ p \end{array}
   \right)
 @f}
- * indeed has <code>dim+1</code> components. We note that we could change the
+ * indeed has four components. We note that we could change the
  * ordering of the solution components $\textbf u$ and $p$ inside $U$ if we
  * also change columns of the matrix operator.
  *
@@ -155,13 +284,8 @@
   =
   (q,f),
 @f}
- * where we have defined the scalar product
- * $(\mathbf v, \mathbf u) = \int_\Omega \mathbf v(x)
- * \cdot \mathbf u(x) \; dx$, and similarly if both parts of the scalar
- * product are scalar-valued functions (e.g. the pressure) rather
- * than vector-valued onces (like the velocity).
- *
- * We get the final form by integrating by part the second term:
+*
+* We get the final form by integrating by part the second term:
 @f{eqnarray*}
   (\mathbf v, \mathbf u)
   -
@@ -181,83 +305,122 @@
  * @anchor VVFEs
  * <h3>Describing finite element spaces</h3>
  *
- * Once we have settled on this description, we need to find a way to describe
- * the vector-valued finite element space from which we draw solution and test
+ * Once we have settled on a bilinear form and a functional setting, we need to find a way to describe
+ * the vector-valued finite element spaces from which we draw solution and test
  * functions. This is where the FESystem class comes in: it composes
- * vector-valued finite element spaces from simpler ones. For example, if we
- * were to attempt to use $Q_1$ elements for all <code>dim</code> components
- * of $\mathbf u$ and the one pressure component $p$, we could use the
- * following object:
+ * vector-valued finite element spaces from simpler ones.
+ * In the example of the elasticity problem, we need <code>dim</code>
+ * copies of the same element, for instance
  * @code
- *   FESystem<dim> finite_element (FE_Q<dim>(1), dim,
- *                                 FE_Q<dim>(1), 1);
+ *   FESystem<dim> elasticity_element (FE_Q<dim>(1), dim);
  * @endcode
+ * This will generate a vector valued space of dimension
+ * <code>dim</code>, where each component is a
+ * continuous bilinear element of type FE_Q. It will have <code>dim</code> times
+ * as many basis functions as the corresponding FE_Q, and each of
+ * these basis functions is a basis function of FE_Q, lifted into one
+ * of the components of the vector.
  *
- * This means that the final finite element will consist of <code>dim</code>
- * components made up of FE_Q elements of degree 1, and another one also of
- * degree 1. Of course, a simpler (and more efficient) way to achieve the same
- * is to use the following form instead:
+ * For the mixed Laplacian, the situation is more complex. First, we
+ * have to settle on a pair of discrete spaces $\mathbf V_h \times Q_h
+ * \subset H^{\text{div}}_0(\Omega) \times L^2_0(\Omega)$. One option
+ * would be the stable Raviart-Thomas pair
  * @code
- *   FESystem<dim> finite_element (FE_Q<dim>(1), dim+1);
+ *   FESystem<dim> rt_element (FE_RaviartThomas<dim>(1), 1,
+ *                             FE_DGQ<dim>(1),          1);
  * @endcode
- * Another way (also not efficient, but making it clear which components
- * belong to which element) would be
- * @code
- *   FESystem<dim> finite_element (FESystem<dim>(FE_Q<dim>(1), dim), 1,
- *                                 FE_Q<dim>(1),                     1);
- * @endcode
- * meaning that we first create a vector element with <code>dim</code>
- * components, each consisting of FE_Q elements of order 1. We then couple
- * one copy of this already vector-valued element to a single scalar
- * copy of the FE_Q element of order 1 which will describe the pressure
- * component.
+ * The first element in this system is already a vector valued
+ * element of dimension <code>dim</code>, while the second is a
+ * regular scalar element.
  *
- * As it turns out these (equivalent) choices do not lead to a stable scheme
- * for the mixed Laplace equation. In step-20, we therefore use
- * a Raviart-Thomas element for the velocities. What exactly this means may be
- * of less concern for now except that the FE_RaviartThomas class describes
- * elements that already have <code>dim</code> components. For the pressure,
- * we use piecewise bi-/trilinear elements that may be discontinuous between
- * cells; this is done using the FE_DGQ class. The combined element will then
- * be described by
+ * Alternatively to using the stable Raviart-Thomas pair, we could
+ * consider a stabilized formulation for the mixed Laplacian, for
+ * instance the LDG method. There, we have the option of using the
+ * same spaces for velocity components and pressure, namely
  * @code
- *   FESystem<dim> finite_element (FE_RaviartThomas<dim>(1), 1,
- *                                 FE_DGQ<dim>(1),          1);
+ *   FESystem<dim> ldg_convoluted_element_1 (FE_DGQ<dim>(1), dim+1);
  * @endcode
- * i.e. we combine a single copy of the Raviart-Thomas element with a single
- * copy of the element used for the pressure $p$.
- *
- * In this manner, we can combine the whole vector-valued element from its
- * individual components. However, it is worth pointing out that whichever
- * way you construct your finite element object, this object doesn't really
- * know what it represents. For example, for
+ * This system just has <code>dim+1</code> equal copies of the same
+ * discontinuous element, which not really reflects the structure of
+ * the system. Therefore, we prefer
  * @code
- *   FESystem<dim> finite_element (FE_Q<dim>(1), dim,
- *                                 FE_Q<dim>(1), 1);
+ *   FESystem<dim> ldg_equal_element (FESystem<dim>(FE_DGQ<dim>(1), dim), 1,
+ *                                    FE_DGQ<dim>(1),                     1);
  * @endcode
- * the constructed object really only knows that it has <code>dim+1</code>
- * vector components. It has no notion, however, which of these components
- * represent scalar fields (e.g. temperature, pressure, concentration) and/or
- * if any of its components are parts of vector fields (velocities,
- * displacements) or tensors (e.g. stresses). As a consequence, the FEValues
- * object we use below to evaluate finite element shape functions at
- * quadrature points only knows that it has a finite element with a number
- * of vector components, but doesn't know how to group them. We will show
- * how to give these components a logical connection using the
- * FEValuesExtractors classes.
+ * Here, we have a system of two elements, one vector-valued and one
+ * scalar, very much like with the <code>rt_element</code>. Indeed, in
+ * many codes, the two can be interchanged. This element also allows
+ * us easily to switch to an LDG method with lower order approximation
+ * in the velocity, namely
+ * @code
+ *   FESystem<dim> ldg_unequal_element (FESystem<dim>(FE_DGQ<dim>(1), dim), 1,
+ *                                      FE_DGQ<dim>(2),                     1);
+ * @endcode
+ * It must be pointed out,
+ * that this element is different from
+ * @code
+ *   FESystem<dim> ldg_convoluted_element_2 (FE_DGQ<dim>(1), dim,
+ *                                           FE_DGQ<dim>(2), 1);
+ * @endcode
+ * While the constructor call is very similar to
+ * <code>rt_element</code>, the result actually resembles more
+ * <code>ldg_convoluted_element_1</code> in that this element produces
+ * <code>dim+1</code> independent components.
+ * A more detailed comparison of the resulting FESystem objects is below.
  *
+ * <h4>Internal structure of FESystem</h4>
+ *
+ * FESystem has a few internal variables which reflect the internal
+ * structure set up by the constructor. These can then also be used by
+ * application programs to give structure to matrix assembling and
+ * linear algebra. We give the names and values of these variables for
+ * the examples above in the following table:
+ * <table border="1">
+ * <tr><th>System Element</th>
+ * <th>FiniteElementData::n_blocks()</th>
+ * <th>FiniteElementData::n_components()</th>
+ * <th>FiniteElement::n_base_elements()</th>
+ * </tr>
+ * <tr><td><code>elasticity_element</code></td><td><code>dim</code></td><td><code>dim</code></td><td>1</td>
+ * </tr>
+ * <tr><td><code>rt_element</code></td><td>2</td><td><code>dim+1</code></td><td>2</td>
+ * </tr>
+ * <tr><td><code>ldg_equal_element</code></td><td>2</td><td><code>dim+1</code></td><td>2</td>
+ * </tr>
+ * <tr><td><code>ldg_convoluted_element_1</code></td><td><code>dim+1</code></td><td><code>dim+1</code></td><td>1</td>
+ * </tr>
+ * <tr><td><code>ldg_convoluted_element_2</code></td><td><code>dim+1</code></td><td><code>dim+1</code></td><td>2</td>
+ * </tr>
+ * </table>
+ *
+ * From this table, it is clear that the FESystem reflects a lot of
+ * the structure of the system of differential equations in the cases
+ * of the <code>rt_element</code> and the
+ * <code>ldg_equal_element</code>, in that we have a vector valued and
+ * a scalar variable. On the other hand, the convoluted elements do
+ * not have this structure and we have to reconstruct it somehow when
+ * assembling systems, as described below.
+ *
+ * At this point, it is important to note that nesting of two FESystem
+ * object can give the whole FESystem a richer structure than just
+ * concatenating them. This structure can be exploited by application
+ * programs, but is not automatically so.
  *
  * @anchor VVAssembling
  * <h3>Assembling linear systems</h3>
- *
  * The next step is to assemble the linear system. How to do this for the
  * simple case of a scalar problem has been shown in many tutorial programs,
  * starting with step-3. Here we will show how to do it for
- * vector problems.
+ * vector problems. Corresponding to the different characterizations
+ * of weak formulations above and the different system elements
+ * created, we have a few options which are outlined below.
  *
  * The whole concept is probably best explained by showing an example
  * illustrating how the local contribution of a cell to the weak form of above
- * mixed Laplace equations could be assembled. This is essentially how
+ * mixed Laplace equations could be assembled.
+ *
+ * <h4>A single FEValues and FEValuesExtractors</h4>
+ * This is essentially how
  * step-20 does it:
  * @code
   const FEValuesExtractors::Vector velocities (0);
@@ -450,31 +613,14 @@
                        phi_i_div * phi_j_div
                        +
                        mu_values[q_point] *
-                       scalar_product(phi_i_grad, phi_j_grad)
+                       double_contract(phi_i_grad, phi_j_grad)
                        +
                        mu_values[q_point] *
-                       scalar_product(phi_i_grad, transpose(phi_j_grad))
+                       double_contract(phi_i_grad, transpose(phi_j_grad))
                       ) *
                       fe_values.JxW(q_point);
               }
           }
- * @endcode
- *
- * The scalar product between two tensors used in this bilinear form is
- * implemented as follows:
- *
- * @code
-template <int dim>
-double
-scalar_product (const Tensor<2,dim> &u,
-                const Tensor<2,dim> &v)
-{
-  double tmp = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      tmp += u[i][j] * v[i][j];
-  return tmp;
-}
  * @endcode
  *
  * Now, this is not the code used in step-8. In fact,

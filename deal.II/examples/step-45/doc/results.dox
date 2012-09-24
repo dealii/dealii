@@ -44,6 +44,11 @@ therefore, let us describe a function that computes the same constraints but
 in a dimension-independent way and for any finite element one may want to
 consider.
 
+@note The discussion below is meant as an explanation of how one might
+approach this kind of problem. If you need this functionality, you may also
+want to take a look at DoFTools::make_periodicity_constraints() that already
+provides some of it.
+
 The idea is to work recursively on pairs of faces. For example, let us start
 with the left and right face of the (single) coarse mesh cell. They need to
 match, but they are not active (i.e. they are further refined) and so there
@@ -59,7 +64,7 @@ An implementation of this idea would look like follows (with the
 implementation detail, not an external interface &mdash; put into an anonymous
 namespace):
 @code
-namespace 
+namespace
 {
   template <int dim>
   void
@@ -81,10 +86,10 @@ namespace
       {
 	const unsigned int dofs_per_face
 	  = face_1->get_dof_handler().get_fe().dofs_per_face;
-	
+
 	std::vector<unsigned int> local_dof_indices_1 (dofs_per_face);
 	face_1->get_dof_indices (local_dof_indices_1);
-	
+
 	std::vector<unsigned int> local_dof_indices_2 (dofs_per_face);
 	face_2->get_dof_indices (local_dof_indices_2);
 
@@ -130,7 +135,7 @@ already provide for computing constraints based on hanging nodes. We leave
 implementing this as an exercise, however.
 
 @note The functions above make one assumption, namely that the degrees of
-freedom on one face matche one-to-one to the corresponding other face. This is
+freedom on one face match one-to-one to the corresponding other face. This is
 sometimes difficult to establish, especially in 3d. For example, consider a
 long string of cube cells where we want to match the far left face with the
 far right face for periodicity. If the cells are all undistorted cubes, then
@@ -140,7 +145,7 @@ coordinate systems of the far left and far right face are also rotated
 relative to each other, and the first DoF on the far left face will no longer
 be at the same location as the first DoF on the far right face. To make things
 a bit worse, the 3d case also allows for pathological cases where mesh cells
-are no longer orientable in the standard order (see the 
+are no longer orientable in the standard order (see the
 @ref GlossFaceOrientation "Face orientation" glossary entry), making matching
 coordinate systems difficult. Ultimately, whether you will encounter these
 cases depends on the kind of mesh you have: if your coarse mesh is just the

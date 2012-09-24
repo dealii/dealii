@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -100,7 +100,7 @@ void test()
   DoFHandler<dim> dofh(triangulation);
   dofh.distribute_dofs (fe);
   DoFRenumbering::hierarchical(dofh);
-  
+
   if (myid == 0)
     deallog <<  "#dofs = " << dofh.locally_owned_dofs().size()
 	    << std::endl;
@@ -121,7 +121,7 @@ void test()
   constraints.close();
 
   std::string base = output_file_for_mpi("no_flux_constraints_02");
-  
+
   MPI_Barrier(MPI_COMM_WORLD);
 
   { //write the constraintmatrix to a file on each cpu
@@ -146,7 +146,18 @@ void test()
 		deallog << str << std::endl;
 	  }
 	}
+					 // delete the files created
+					 // by processor 0
+	std::remove ((base + "cm").c_str());
+	std::remove ((base + "cm.check").c_str());
   }
+
+				   // remove tmp files again. wait
+				   // till processor 0 has done its
+				   // job with them
+  MPI_Barrier(MPI_COMM_WORLD);
+  std::remove ((base + "cm_" + Utilities::int_to_string(myid) + ".dot").c_str());
+
 				// print the number of constraints. since
 				// processors might write info in different
 				// orders, copy all numbers to root processor

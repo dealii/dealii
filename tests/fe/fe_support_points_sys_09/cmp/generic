@@ -1,0 +1,6 @@
+
+DEAL::FE_DGQ<2>(3)1FE_Nedelec<2>(1)2<2> cell support points
+DEAL::FE_DGQ<2>(3)1FE_Nedelec<2>(1)2<2> face 0 support points
+DEAL::FE_DGQ<2>(3)1FE_Nedelec<2>(1)2<2> face 1 support points
+DEAL::FE_DGQ<2>(3)1FE_Nedelec<2>(1)2<2> face 2 support points
+DEAL::FE_DGQ<2>(3)1FE_Nedelec<2>(1)2<2> face 3 support points

@@ -56,7 +56,7 @@ DEAL_II_NAMESPACE_OPEN
  * freedom associated with a single base element of an FESystem, where base
  * elements with multiplicities count multiple times. These blocks are usually
  * addressed using the information in DoFHandler::block_info(). The number of
- * blocks of of a FESystem object is simply the sum of all multiplicities of
+ * blocks of a FESystem object is simply the sum of all multiplicities of
  * base elements.
  *
  * For example, the FESystem for the Taylor-Hood element for the
@@ -120,7 +120,7 @@ DEAL_II_NAMESPACE_OPEN
  * subobject (vertex, line, quad, or hex), the degrees of freedom are
  * numbered such that we run over all subelements first, before
  * turning for the next dof on this subobject or for the next
- * subobject. For example, for a element of three components in one
+ * subobject. For example, for an element of three components in one
  * space dimension, the first two components being cubic lagrange
  * elements and the third being a quadratic lagrange element, the
  * ordering for the system <tt>s=(u,v,p)</tt> is:

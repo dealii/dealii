@@ -1,0 +1,6 @@
+
+DEAL::ExcMessage ("Not all finite elements in this collection have " "the same number of components.")
+DEAL::OK
+DEAL::ExcMessage ("Not all finite elements in this collection have " "the same number of components.")
+DEAL::OK
+DEAL::OK

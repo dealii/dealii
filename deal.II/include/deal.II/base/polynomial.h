@@ -672,8 +672,63 @@ namespace Polynomials
                                         */
     static std::vector<std_cxx1x::shared_ptr<const std::vector<double> > > recursive_coefficients;
    };
-}
 
+
+/**
+ * Polynomials for Hermite interpolation condition.
+ *
+ * This is the set of polynomials of degree at least three, such that
+ * the following interpolation conditions are met: the polynomials and
+ * their first derivatives vanish at the values <i>x</i>=0 and
+ * <i>x</i>=1, with the exceptions <i>p</i><sub>0</sub>(0)=1,
+ * <i>p</i><sub><i>1</i></sub>(1)=1, <i>p</i>'<sub>2</sub>(0)=1, 
+ * <i>p'</i><sub>3</sub>(1)=1.
+ *
+ * For degree three, we obtain the standard four Hermitian
+ * interpolation polynomials, see for instance <a
+ * href="http://en.wikipedia.org/wiki/Cubic_Hermite_spline">Wikipedia</a>.
+ * For higher degrees, these are augmented
+ * first, by the polynomial of degree four with vanishing values and
+ * derivatives at <i>x</i>=0 and <i>x</i>=1, then by the product of
+ * this fourth order polynomial with Legendre polynomials of
+ * increasing order. The implementation is
+ * @f{align*}{
+ * p_0(x) &= 2x^3-3x^2+1 \\
+ * p_1(x) &= -2x^2+3x^2 \\
+ * p_2(x) &= x^3-2x^2+x  \\
+ * p_3(x) &= x^3-x^2 \\
+ * p_4(x) &= 16x^2(x-1)^2 \\
+ * \ldots & \ldots \\
+ * p_k(x) &= x^2(x-1)^2 L_{k-4}(x)
+ * @f}
+ *
+ * @author Guido Kanschat
+ * @date 2012
+ */
+  class HermiteInterpolation : public Polynomial<double>
+  {
+    public:
+				     /**
+                                        * Constructor for polynomial
+                                        * with index <tt>p</tt>. See
+                                        * the class documentation on
+                                        * the definition of the
+                                        * sequence of polynomials.
+                                        */
+    HermiteInterpolation (const unsigned int p);
+
+                                       /**
+                                        * Return the polynomials with index
+                                        * <tt>0</tt> up to
+                                        * <tt>p+1</tt> in a space of
+                                        * degree up to
+                                        * <tt>p</tt>. Here, <tt>p</tt>
+                                        * has to be at least 3.
+                                        */
+      static std::vector<Polynomial<double> >
+      generate_complete_basis (const unsigned int p);
+  };
+}
 
 
 /** @} */
