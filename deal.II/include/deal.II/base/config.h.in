@@ -223,11 +223,9 @@
 /* Defined if a PETSc installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_PETSC
 
-/* Define the PETSC version number: */
-#cmakedefine PETSC_VERSION_MAJOR @PETSC_VERSION_MAJOR@
-#cmakedefine PETSC_VERSION_MINOR @PETSC_VERSION_MINOR@
-#cmakedefine PETSC_VERSION_SUBMINOR @PETSC_VERSION_SUBMINOR@
-#cmakedefine PETSC_VERSION_SUBMINOR @PETSC_VERSION_SUBMINOR@
+/* Note: PETSCs version numbers will be directly included from
+ * petscversion.h
+ */
 
 /* Defined if a PETSc installation was found with complex scalar type and is
  * going to be used

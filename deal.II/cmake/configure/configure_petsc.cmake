@@ -64,7 +64,7 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL var)
   # a completely obnoxious way with boost.
   # TODO: Obosolete?
   #
-  ADD_DEFINITIONS(-DPETSC_SKIP_UNDERSCORE_CHKERR)
+  SET(PETSC_SKIP_UNDERSCORE_CHKERR TRUE)
 
   #
   # Set some definitions for config.h:
