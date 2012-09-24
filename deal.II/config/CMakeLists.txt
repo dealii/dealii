@@ -58,7 +58,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     )
 
   #
-  # Add an rpath directive inf front of each library, so that libraries
+  # Add an rpath directive in front of each library, so that libraries
   # outside of the default search directories will be found by the runtime
   # dynamic linker:
   #
@@ -99,13 +99,8 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
 
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in
-    ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options.${CMAKE_BUILD_TYPE}
-    )
-
-  CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.stub
     ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
-    COPYONLY)
+    )
 
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/Version.in
@@ -114,7 +109,6 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
 
   INSTALL(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/template-arguments
-    ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options.${CMAKE_BUILD_TYPE}
     ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
     DESTINATION common
     COMPONENT compat_files
