@@ -318,7 +318,7 @@ class TableHandler
     {
       table_with_headers,
       table_with_separate_column_description,
-      simple_table_with_separate_column_description,
+      simple_table_with_separate_column_description
     };
 
                                      /**
