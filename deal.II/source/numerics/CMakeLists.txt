@@ -40,6 +40,6 @@ SET(inst_in_files
   vector_tools.inst.in
   )
 
-ADD_LIBRARY(obj_numerics OBJECT ${src})
-macro_expand_instantiations(obj_numerics "${inst_in_files}")
-ADD_DEPENDENCIES(obj_numerics deal_ii_target_dependencies)
+DEAL_II_ADD_LIBRARY(obj_numerics OBJECT ${src})
+EXPAND_INSTANTIATIONS(obj_numerics "${inst_in_files}")
+DEAL_II_ADD_DEPENDENCIES(obj_numerics deal_ii_target_dependencies)

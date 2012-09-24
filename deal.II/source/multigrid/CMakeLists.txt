@@ -18,6 +18,6 @@ SET(inst_in_files
   mg_transfer_prebuilt.inst.in
   )
 
-ADD_LIBRARY(obj_multigrid OBJECT ${src})
-macro_expand_instantiations(obj_multigrid "${inst_in_files}")
-ADD_DEPENDENCIES(obj_multigrid deal_ii_target_dependencies)
+DEAL_II_ADD_LIBRARY(obj_multigrid OBJECT ${src})
+EXPAND_INSTANTIATIONS(obj_multigrid "${inst_in_files}")
+DEAL_II_ADD_DEPENDENCIES(obj_multigrid deal_ii_target_dependencies)

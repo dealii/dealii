@@ -2,7 +2,7 @@
 # A macro for the inst.in file expansion
 #
 # Usage:
-#     macro_expand_instantiations(target inst_in_files)
+#     EXPAND_INSTANTATIONS(target inst_in_files)
 #
 # Options:
 #
@@ -16,7 +16,7 @@
 #    a list of inst.in files that will be expanded
 #
 
-MACRO(macro_expand_instantiations target inst_in_files)
+MACRO(EXPAND_INSTANTIATIONS target inst_in_files)
   FOREACH (inst_in_file ${inst_in_files})
     STRING(REGEX REPLACE "\\.in$" "" inst_file "${inst_in_file}" )
 
@@ -43,6 +43,12 @@ MACRO(macro_expand_instantiations target inst_in_files)
   # Add a dependency to target so that target.inst is fully generated
   # before target will be processed.
   #
-  ADD_DEPENDENCIES(${target} ${target}.inst)
+  IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+    ADD_DEPENDENCIES(${target}.g ${target}.inst)
+  ENDIF()
+  IF(CMAKE_BUILD_TYPE MATCHES "Release")
+    ADD_DEPENDENCIES(${target} ${target}.inst)
+  ENDIF()
+
 ENDMACRO()
 

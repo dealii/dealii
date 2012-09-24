@@ -1,0 +1,38 @@
+
+#
+# TODO: A comment
+#
+
+MACRO(DEAL_II_ADD_LIBRARY name)
+
+  IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+    #
+    # and a debug target
+    #
+    ADD_LIBRARY(${name}.g
+      ${ARGN}
+      )
+
+    SET_TARGET_PROPERTIES(${name}.g PROPERTIES
+      LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}"
+      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_DEBUG}"
+      COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_DEBUG}"
+      )
+  ENDIF()
+
+  IF(CMAKE_BUILD_TYPE MATCHES "Release")
+    #
+    # Add a release target
+    #
+    ADD_LIBRARY(${name}
+      ${ARGN}
+      )
+
+    SET_TARGET_PROPERTIES(${name} PROPERTIES
+      LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}"
+      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_RELEASE}"
+      COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_RELEASE}"
+      )
+  ENDIF()
+
+ENDMACRO()

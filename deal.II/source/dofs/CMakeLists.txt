@@ -20,6 +20,6 @@ SET(inst_in_files
   dof_tools.inst.in
   )
 
-ADD_LIBRARY(obj_dofs OBJECT ${src})
-macro_expand_instantiations(obj_dofs "${inst_in_files}")
-ADD_DEPENDENCIES(obj_dofs deal_ii_target_dependencies)
+DEAL_II_ADD_LIBRARY(obj_dofs OBJECT ${src})
+EXPAND_INSTANTIATIONS(obj_dofs "${inst_in_files}")
+DEAL_II_ADD_DEPENDENCIES(obj_dofs deal_ii_target_dependencies)

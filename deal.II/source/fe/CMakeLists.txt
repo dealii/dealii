@@ -63,6 +63,6 @@ SET(inst_in_files
   mapping_q.inst.in
   )
 
-ADD_LIBRARY(obj_fe OBJECT ${src})
-macro_expand_instantiations(obj_fe "${inst_in_files}")
-ADD_DEPENDENCIES(obj_fe deal_ii_target_dependencies)
+DEAL_II_ADD_LIBRARY(obj_fe OBJECT ${src})
+EXPAND_INSTANTIATIONS(obj_fe "${inst_in_files}")
+DEAL_II_ADD_DEPENDENCIES(obj_fe deal_ii_target_dependencies)

@@ -15,6 +15,6 @@ SET(inst_in_files
   mapping_collection.inst.in
   )
 
-ADD_LIBRARY(obj_hp OBJECT ${src})
-macro_expand_instantiations(obj_hp "${inst_in_files}")
-ADD_DEPENDENCIES(obj_hp deal_ii_target_dependencies)
+DEAL_II_ADD_LIBRARY(obj_hp OBJECT ${src})
+EXPAND_INSTANTIATIONS(obj_hp "${inst_in_files}")
+DEAL_II_ADD_DEPENDENCIES(obj_hp deal_ii_target_dependencies)

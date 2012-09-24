@@ -78,6 +78,6 @@ SET(inst_in_files
   vector_view.inst.in
 )
 
-ADD_LIBRARY(obj_lac OBJECT ${src})
-macro_expand_instantiations(obj_lac "${inst_in_files}")
-ADD_DEPENDENCIES(obj_lac deal_ii_target_dependencies)
+DEAL_II_ADD_LIBRARY(obj_lac OBJECT ${src})
+EXPAND_INSTANTIATIONS(obj_lac "${inst_in_files}")
+DEAL_II_ADD_DEPENDENCIES(obj_lac deal_ii_target_dependencies)
