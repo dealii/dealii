@@ -32,6 +32,7 @@ ENDIF()
 SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"
   )
+MARK_AS_ADVANCED(BUILD_SHARED_LIBS)
 
 
 #
@@ -39,8 +40,9 @@ SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
 # cache so that the user can see the value.
 #
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
-  "Set the rpath of the library to the external link pathes on installation
-  ")
+  "Set the rpath of the library to the external link pathes on installation"
+  )
+MARK_AS_ADVANCED(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
 
 
 #
@@ -107,5 +109,9 @@ FOREACH(flag ${deal_ii_used_flags})
   SET(${flag}_SAVED "${${flag}}")
   SET(${flag} "")
 
+  #
+  # Mark these flags as advanced.
+  #
+  MARK_AS_ADVANCED(${flag})
 ENDFOREACH()
 
