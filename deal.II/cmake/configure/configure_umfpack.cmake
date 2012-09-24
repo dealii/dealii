@@ -36,6 +36,10 @@ SET(FEATURE_UMFPACK_HAVE_CONTRIB TRUE)
 
 
 MACRO(FEATURE_UMFPACK_CONFIGURE_CONTRIB var)
+  #
+  # Add umfpack and amd directly to the object files of deal.II
+  #
+
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/umfpack/UMFPACK/Include
     ${CMAKE_SOURCE_DIR}/contrib/umfpack/AMD/Include
@@ -43,16 +47,6 @@ MACRO(FEATURE_UMFPACK_CONFIGURE_CONTRIB var)
 
   ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/umfpack/UMFPACK/Source)
   ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/umfpack/AMD/Source)
-
-  #
-  # Add umfpack and amd directly to the object files of deal.II
-  #
-  LIST(APPEND deal_ii_additional_object_files
-    ${obj_umfpack_object_files}
-    $<TARGET_OBJECTS:obj_amd_int>
-    $<TARGET_OBJECTS:obj_amd_long>
-    $<TARGET_OBJECTS:obj_amd_global>
-    )
 
   SET(HAVE_LIBUMFPACK TRUE)
 

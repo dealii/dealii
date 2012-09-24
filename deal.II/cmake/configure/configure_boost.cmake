@@ -75,10 +75,6 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
     ${CMAKE_SOURCE_DIR}/contrib/boost-1.49.0/libs/serialization/src
     )
 
-  LIST(APPEND deal_ii_additional_object_files
-    $<TARGET_OBJECTS:obj_boost_serialization>
-    )
-
   IF( DEAL_II_USE_MT AND NOT DEAL_II_CAN_USE_CXX11)
     #
     # If the C++ compiler doesn't completely support the C++11 standard
@@ -89,10 +85,6 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
     #
     ADD_SUBDIRECTORY(
       ${CMAKE_SOURCE_DIR}/contrib/boost-1.49.0/libs/thread/src
-      )
-
-    LIST(APPEND deal_ii_additional_object_files
-      $<TARGET_OBJECTS:obj_boost_thread>
       )
   ENDIF()
 

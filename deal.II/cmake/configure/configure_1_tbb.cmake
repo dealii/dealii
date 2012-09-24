@@ -157,10 +157,6 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
 
   ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/src)
 
-  LIST(APPEND deal_ii_additional_object_files
-    $<TARGET_OBJECTS:obj_tbb>
-    )
-
 ENDMACRO()
 
 

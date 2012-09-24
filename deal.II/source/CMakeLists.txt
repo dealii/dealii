@@ -7,9 +7,6 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_BINARY_DIR}/include/
   )
 
-#
-# Each subdirectory specifies an OBJECT target:
-#
 ADD_SUBDIRECTORY(base)
 ADD_SUBDIRECTORY(distributed)
 ADD_SUBDIRECTORY(dofs)
@@ -20,47 +17,74 @@ ADD_SUBDIRECTORY(lac)
 ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(numerics)
 
-#
-# Combine all OBJECT targets to a library:
-#
-ADD_LIBRARY(${DEAL_II_BASE_NAME}
-  $<TARGET_OBJECTS:obj_base>
-  $<TARGET_OBJECTS:obj_distributed>
-  $<TARGET_OBJECTS:obj_dofs>
-  $<TARGET_OBJECTS:obj_fe>
-  $<TARGET_OBJECTS:obj_grid>
-  $<TARGET_OBJECTS:obj_hp>
-  $<TARGET_OBJECTS:obj_lac>
-  $<TARGET_OBJECTS:obj_multigrid>
-  $<TARGET_OBJECTS:obj_numerics>
+IF(CMAKE_BUILD_TYPE MATCHES "Debug")
 
-  # for contrib stuff:
-  ${deal_ii_additional_object_files}
-  )
+  #
+  # Combine all debug OBJECT targets to a debug library:
+  #
+  ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX}
+    ${deal_ii_objects.g}
+    )
 
-#
-# Sonaming: Well... we just use the version number.
-# No point to wrack one's brain over the question whether a new version of
-# a C++ library is still ABI backwards compatible :-]
-#
-SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME} PROPERTIES
-  VERSION ${VERSION}
-  SOVERSION ${VERSION}
-  )
+  SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX}
+    PROPERTIES
+    VERSION ${VERSION}
+    #
+    # Sonaming: Well... we just use the version number.
+    # No point to wrack one's brain over the question whether a new version of
+    # a C++ library is still ABI backwards compatible :-]
+    #
+    SOVERSION ${VERSION}
+    LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}"
+    COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_DEBUG}"
+    COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_DEBUG}"
+    )
 
-SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME} PROPERTIES
-  LINK_FLAGS "${deal_ii_required_linker_flags}"
-  )
+  TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX}
+    "${DEAL_II_EXTERNAL_LIBRARIES};${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}"
+    )
 
-TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME} ${DEAL_II_EXTERNAL_LIBRARIES})
+  INSTALL(TARGETS ${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX}
+    LIBRARY
+    DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+    COMPONENT library
+    )
+
+ENDIF()
 
 
-#
-# Finally, add a rule how to install the library:
-#
-INSTALL(TARGETS ${DEAL_II_BASE_NAME}
-  LIBRARY
-  DESTINATION ${DEAL_II_LIBRARY_RELDIR}
-  COMPONENT library
-  )
+IF(CMAKE_BUILD_TYPE MATCHES "Release")
+
+  #
+  # Combine all debug OBJECT targets to a debug library:
+  #
+  ADD_LIBRARY(${DEAL_II_BASE_NAME}
+    ${deal_ii_objects}
+    )
+
+  SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}
+    PROPERTIES
+    VERSION ${VERSION}
+    #
+    # Sonaming: Well... we just use the version number.
+    # No point to wrack one's brain over the question whether a new version of
+    # a C++ library is still ABI backwards compatible :-]
+    #
+    SOVERSION ${VERSION}
+    LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}"
+    COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_RELEASE}"
+    COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_RELEASE}"
+    )
+
+  TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}
+    "${DEAL_II_EXTERNAL_LIBRARIES};${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}"
+    )
+
+  INSTALL(TARGETS ${DEAL_II_BASE_NAME}
+    LIBRARY
+    DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+    COMPONENT library
+    )
+
+ENDIF()
 
