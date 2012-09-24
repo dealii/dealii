@@ -1,60 +1,33 @@
 #
 # Setup cached variables prior to the PROJECT(deal.II) call
 #
-#
-# We have a problem: We would like to setup our choice of C_FLAGS and
-# CXX_FLAGS but let the user overwrite it (if desired).
-#
-# Unfortunately this is not as easy as it sounds:
-#
-# We have to call PROJECT(deal.II) in order to set up the project and run
-# the C- and CXX-compiler detection and configuration. (Otherwise we cannot
-# compile anything and, furthermore,  have no idea which compiler is
-# selected.) In this process CMAKE_CXX_FLAGS[...] are already set to stupid
-# default values.
-# (And _cannot_ be sanely set from this script afterwards...)
-#
-# To mitigate this problem, we do the following:
-#
-#   - We initialize the cached CMAKE_CXX_FLAGS[...] variables with empty
-#     strings prior to initializing the compiler, so that no default values
-#     are set.
-#
-#   - We save the cached variables (possibly altered by the user via command
-#     line or ccmake) in <variable>_SAVED and set <variable> to an empty
-#     string.
-#
-#   - This way we can happily set our default flags in
-#     setup_compiler_flags.cmake (if the user lets us, see
-#     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-#
-#   - At the end of the configuration step we add <variables>_SAVED
-#     _AT THE END_ of the respective <variable> allowing the user to
-#     effectively overwrite our default settings.
-#
 
 
 #
 # Setup CMAKE_BUILD_TYPE:
 #
 SET(CMAKE_BUILD_TYPE
-  "Release"
+  "DebugRelease"
   CACHE STRING
-  "Choose the type of build, options are: Debug Release.")
+  "Choose the type of build, options are: Debug, Release and DebugRelease.")
 
 
 #
 # This is cruel, I know. But it is better to only have a known number of
 # options for CMAKE_BUILD_TYPE...
 #
-IF( NOT CMAKE_BUILD_TYPE MATCHES "Release" AND
-    NOT CMAKE_BUILD_TYPE MATCHES "Debug" )
-  MESSAGE(FATAL_ERROR "CMAKE_BUILD_TYPE does neither match Release, nor Debug.")
+IF( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
+    NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND
+    NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease" )
+  MESSAGE(FATAL_ERROR
+    "CMAKE_BUILD_TYPE does neither match Release, Debug, nor DebugRelease!"
+    )
 ENDIF()
 
 
 #
-# Set BUILD_SHARED_LIBS to default to ON:
+# Set BUILD_SHARED_LIBS to default to ON and promote to cache so that the
+# user can see the value.
 #
 SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"
@@ -62,11 +35,48 @@ SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
 
 
 #
-# Set CMAKE_INSTALL_RPATH_USE_LINK_PATH to default to ON:
+# Set CMAKE_INSTALL_RPATH_USE_LINK_PATH to default to ON and promote to
+# cache so that the user can see the value.
 #
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
   "Set the rpath of the library to the external link pathes on installation
   ")
+
+
+#
+# Tell the user very prominently, that we're doing things differently w.r.t
+# CMAKE_(C|CXX)_FLAGS_(DEBUG|RELEASE)
+#
+SET(flags C_FLAGS_RELEASE CXX_FLAGS_RELEASE C_FLAGS_DEBUG CXX_FLAGS_DEBUG)
+FOREACH(flag ${flags})
+  IF(NOT "${CMAKE_${flag}}" STREQUAL "")
+    MESSAGE(FATAL_ERROR
+      "\nThe deal.II cmake build system does not use CMAKE_${flag}.\n"
+      "Use DEAL_II_${flag}, instead!\n\n"
+      )
+  ENDIF()
+ENDFOREACH()
+
+
+#
+# Hide all unused compiler flag variables:
+#
+SET(flags
+  CMAKE_CXX_FLAGS_RELEASE
+  CMAKE_CXX_FLAGS_DEBUG
+  CMAKE_CXX_FLAGS_MINSIZEREL
+  CMAKE_CXX_FLAGS_RELWITHDEBINFO
+  CMAKE_C_FLAGS_RELEASE
+  CMAKE_C_FLAGS_DEBUG
+  CMAKE_C_FLAGS_MINSIZEREL
+  CMAKE_C_FLAGS_RELWITHDEBINFO
+  )
+FOREACH(flag ${flags})
+  #
+  # Go away...
+  #
+  SET(${flag} "" CACHE INTERNAL "" FORCE)
+ENDFOREACH()
 
 
 #
@@ -75,17 +85,17 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
 SET(deal_ii_used_flags
   CMAKE_C_FLAGS
   CMAKE_CXX_FLAGS
-  CMAKE_C_FLAGS_RELEASE
-  CMAKE_CXX_FLAGS_RELEASE
-  CMAKE_C_FLAGS_DEBUG
-  CMAKE_CXX_FLAGS_DEBUG
+  DEAL_II_C_FLAGS_RELEASE
+  DEAL_II_CXX_FLAGS_RELEASE
+  DEAL_II_C_FLAGS_DEBUG
+  DEAL_II_CXX_FLAGS_DEBUG
   )
-FOREACH(flags ${deal_ii_used_flags})
+FOREACH(flag ${deal_ii_used_flags})
 
   # "CACHE" ensures that we only set the variable if it is not already set
   # as a  cached variable, effectively we're setting a default value:
-  SET(${flags} "" CACHE STRING
-   "The user supplied cache variable will be appended _at the end_ of the auto generated ${flags} variable"
+  SET(${flag} "" CACHE STRING
+   "The user supplied cache variable will be appended _at the end_ of the auto generated ${flag} variable"
    )
 
   #
@@ -94,8 +104,8 @@ FOREACH(flags ${deal_ii_used_flags})
   # setup_cached_compiler_flags_finalize.cmake (called at the end of the
   # main CMakeLists.txt file).
   #
-  SET(${flags}_SAVED "${${flags}}")
-  SET(${flags} "")
+  SET(${flag}_SAVED "${${flag}}")
+  SET(${flag} "")
 
 ENDFOREACH()
 

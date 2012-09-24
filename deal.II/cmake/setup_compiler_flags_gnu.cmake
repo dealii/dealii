@@ -99,73 +99,70 @@ IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN") # TODO: Check for correct name
 ENDIF()
 
 
-#################################
-#                               #
-#    For the Release target:    #
-#                               #
-#################################
+##############################
+#                            #
+#    For Release targets:    #
+#                            #
+##############################
 
 IF (CMAKE_BUILD_TYPE MATCHES "Release")
   #
   # General optimization flags:
   #
-  ADD_FLAGS(CMAKE_CXX_FLAGS_RELEASE "-O2")
+  ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
 
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-funroll-loops")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-fstrict-aliasing")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-felide-constructors")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-felide-constructors")
 
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_RELEASE "-Wno-unused")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused")
 ENDIF()
 
 
-###############################
-#                             #
-#    For the Debug target:    #
-#                             #
-###############################
+###########################
+#                         #
+#    For Debug target:    #
+#                         #
+###########################
 
 IF (CMAKE_BUILD_TYPE MATCHES "Debug")
 
-  #
-  # Define the DEBUG preprocessor macro globally:
-  #
-  ADD_DEFINITIONS("-DDEBUG")
-  LIST(APPEND CMAKE_EXTERNAL_DEFINTIONS "-DDEBUG")
+  LIST(APPEND DEAL_II_DEFINITIONS_DEBUG "-DDEBUG")
+  LIST(APPEND DEAL_II_USER_DEFINTIONS_DEBUG "-DDEBUG")
 
-  ADD_FLAGS(CMAKE_CXX_FLAGS_DEBUG "-O0")
+  ADD_FLAGS(DEAL_II_CXX_FLAGS_DEBUG "-O0")
 
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_DEBUG "-ggdb")
-  ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-ggdb")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-ggdb")
+  ENABLE_IF_SUPPORTED(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-ggdb")
   #
   # If -ggdb is not available, fall back to -g:
   #
   IF(NOT DEAL_II_HAVE_FLAG_-ggdb)
-    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_DEBUG "-g")
-    ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-g")
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-g")
+    ENABLE_IF_SUPPORTED(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-g")
   ENDIF()
 ENDIF()
 
 
-###############################################
-#                                             #
-#    Set up CMAKE_C_FLAGS<_RELEASE|_DEBUG>    #
-#                                             #
-###############################################
+#########################
+#                       #
+#    Set up C FLAGS:    #
+#                       #
+#########################
 
 #
 # For the moment we assume that CC and CXX are the same compiler and that
 # we can set (almost) the same default flags for both:
 #
 SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
-SET(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-SET(CMAKE_C_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+SET(DEAL_II_C_FLAGS_RELEASE ${DEAL_II_CXX_FLAGS_RELEASE})
+SET(DEAL_II_C_FLAGS_DEBUG ${DEAL_II_CXX_FLAGS_DEBUG})
 
 #
 # OK, touché, touché. We have to strip flags not supported by a C target:
 #
 STRIP_FLAG(CMAKE_C_FLAGS "-Wsynth")
-STRIP_FLAG(CMAKE_C_FLAGS_RELEASE "-felide-constructors")
+STRIP_FLAG(DEAL_II_C_FLAGS_RELEASE "-felide-constructors")
 
 #
 # and disable some warnings:

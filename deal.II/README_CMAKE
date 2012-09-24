@@ -172,7 +172,10 @@ CONFIGURATION
         Build deal.II with support for netcdf
 
     DEAL_II_WITH_P4EST
-        Build deal.II with support for P4EST
+        Build deal.II with support for p4est
+
+    DEAL_II_WITH_PETSC
+        Build deal.II with support for petsc
 
     DEAL_II_WITH_TBB
         Build deal.II with support for tbb. This will enable thread support in deal.II
@@ -306,14 +309,16 @@ CONFIGURATION
   ===================
 
 
-  CMAKE_BUILD_TYPES: We support the "Debug" and "Release" build targets.
-  Default is the "Release" target.
+  CMAKE_BUILD_TYPES: We support the "Debug", "Release" and "DebugRelease"
+  build targets. Default is the "DebugRelease" target.
 
-  - Debug will enable a lot of debug code paths and Assertions, as well as
-    compiling the library with a suitable set of debug compiler flags.
+  - Debug will compile a debug library libdeal_II.g.so with a lot of debug
+    code paths and assertions enabled, as well as a suitable set of debug
+    compiler flags.
 
-  - Release will chose a suitable set of optimizing flags.
+  - Release will build an optimized libdeal_II.so.
 
+  - DebugRelease will build both.
 
   deal.II will configure sensible default CFLAGS and CXXFLAGS depending on
   platform, compiler and build target. There are two options, if this is
@@ -327,10 +332,10 @@ CONFIGURATION
   - Option 2: Overwrite the default configuration by setting the following
     cached variables:
 
-      CMAKE_CXX_FLAGS         -  used during all builds
-      CMAKE_CXX_FLAGS_DEBUG   -  additional flags used during debug builds
-      CMAKE_CXX_FLAGS_RELEASE -  additional flags used during release builds
-      (same for CMAKE_C_...)
+      CMAKE_CXX_FLAGS           - used during all builds
+      DEAL_II_CXX_FLAGS_DEBUG   - additional flags for the debug library
+      DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
+      (same for *_C_FLAGS_* ...)
 
   The content of the cached variables will be preserved and added
   *_TO THE END_* of the default compiler flags, hence giving a possibility
