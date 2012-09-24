@@ -2801,7 +2801,6 @@ namespace VectorTools
 
       const std::vector<Point<dim> >&
         reference_quadrature_points = fe_values.get_quadrature ().get_points ();
-      const unsigned int degree = fe.degree - 1;
       std::pair<unsigned int, unsigned int> base_indices (0, 0);
       
       if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) != 0)
