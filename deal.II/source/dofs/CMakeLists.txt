@@ -4,7 +4,6 @@ SET(src
   dof_faces.cc
   dof_handler.cc
   dof_handler_policy.cc
-  dof_levels.cc
   dof_objects.cc
   dof_renumbering.cc
   dof_tools.cc
