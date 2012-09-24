@@ -83,7 +83,7 @@ ENDIF()
 
 IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN") # TODO: Check for correct name
   #
-  # TODO: Is this flag still necessary? Sound pretty invasive...
+  # TODO: Is this flag still necessary? Sounds pretty invasive...
   #
   # On Cygwin, when using shared libraries, there might occur
   # difficulties when linking libraries for several dimensions,
