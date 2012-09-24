@@ -410,25 +410,35 @@ DEVELOPMENT
                             ============
 
 
-  To keep things clean, only the following cmake variables should be
-  altered in the platform checks and feature configuration
-  (beside setting a lot of DEAL_II_* definitions...):
+  To keep things clean, only the following variables should appended in the
+  platform checks and feature configuration (beside setting a lot of
+  DEAL_II_* definitions...):
 
 
   For internal use:
 
       CMAKE_SHARED_LINKER_FLAGS
+      DEAL_II_SHARED_LINKER_FLAGS_DEBUG
+      DEAL_II_SHARED_LINKER_FLAGS_RELEASE
+
           for setting necessary linker flags for the deal.II library.
 
       CMAKE_CXX_FLAGS (and CMAKE_C_FLAGS)
+      DEAL_II_CXX_FLAGS_DEBUG (and DEAL_II_C_FLAGS_DEBUG)
+      DEAL_II_CXX_FLAGS_RELEASE (and DEAL_II_C_FLAGS_RELEASE)
+
           for setting necessary compiler flags, e.g. -std=c++11 (if
           available).
 
       INCLUDE_DIRECTORIES(...)
+
           For setting necessary include dirs for the compilation of the
           deal.II library.
 
-      ADD_DEFINITIONS(...)
+      DEAL_II_DEFINITIONS
+      DEAL_II_DEFINITIONS_DEBUG
+      DEAL_II_DEFINITIONS_RELEASE
+
           For setting necessary preprocessor definitions ("-D<...>") for
           the compilation of the deal.II library
 
@@ -440,18 +450,22 @@ DEVELOPMENT
   For internal and external use:
 
       DEAL_II_EXTERNAL_LIBRARIES
+      DEAL_II_EXTERNAL_LIBRARIES_DEBUG
+      DEAL_II_EXTERNAL_LIBRARIES_RELEASE
           Used to keep track of external libraries, the deal.II library
           and user programs have to be linked against.
 
 
   For external use:
 
-      DEAL_II_EXTERNAL_DEFINITIONS
+      DEAL_II_USER_DEFINITIONS
+      DEAL_II_USER_DEFINITIONS_DEBUG
+      DEAL_II_USER_DEFINITIONS_RELEASE
           Used to keep track of external preprocessor definitions,
           necessary for the compilation of user programs.
 
 
-      DEAL_II_EXTERNAL_INCLUDE_DIRS
+      DEAL_II_USER_INCLUDE_DIRS
           Used to keep track of external include dirs, necessary for the
           compilation of user programs.
 

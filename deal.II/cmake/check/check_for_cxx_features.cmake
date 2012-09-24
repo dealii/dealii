@@ -151,7 +151,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     MESSAGE(STATUS "Insufficient C++11 support. Disabling -std=c++0x.")
   ENDIF()
 
-  IF(DEAL_II_CAN_USE_CXX1X)
+  IF(DEAL_II_CAN_USE_CXX11)
     #
     # Also test for a couple of C++11 things that we don't use in the
     # library but that users may want to use in their applications and that

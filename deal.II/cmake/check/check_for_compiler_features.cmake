@@ -397,7 +397,7 @@ ENDIF()
 # so don't run the test on cygwin.
 #
 IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
-  ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS_DEBUG "-Wa,--compress-debug-sections")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
+  ENABLE_IF_SUPPORTED(DEAL_II_C_FLAGS_DEBUG "-Wa,--compress-debug-sections")
 ENDIF()
 

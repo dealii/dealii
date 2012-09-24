@@ -33,11 +33,13 @@ MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL var)
   INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIR})
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG
       ${Boost_THREAD_LIBRARY_DEBUG} ${Boost_SERIALIZATION_LIBRARY_DEBUG}
       )
-  ELSE()
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
+  ENDIF()
+
+  IF (CMAKE_BUILD_TYPE MATCHES "Release")
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_RELEASE
       ${Boost_THREAD_LIBRARY_RELEASE} ${Boost_SERIALIZATION_LIBRARY_RELEASE}
       )
   ENDIF()
@@ -58,8 +60,12 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
   # We need to set some definitions to use the headers of the bundled boost
   # library:
   #
-  ADD_DEFINITIONS("-DBOOST_NO_HASH" "-DBOOST_NO_SLIST")
-  LIST(APPEND DEAL_II_EXTERNAL_DEFINIITONS "-DBOOST_NO_HASH" "-DBOOST_NO_SLIST")
+  LIST(APPEND DEAL_II_DEFINITIONS
+    "-DBOOST_NO_HASH" "-DBOOST_NO_SLIST"
+    )
+  LIST(APPEND DEAL_II_USER_DEFINIITONS
+    "-DBOOST_NO_HASH" "-DBOOST_NO_SLIST"
+    )
 
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/contrib/boost-1.49.0/include
@@ -73,9 +79,9 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
     $<TARGET_OBJECTS:obj_boost_serialization>
     )
 
-  IF( DEAL_II_USE_MT AND NOT DEAL_II_CAN_USE_CXX1X)
+  IF( DEAL_II_USE_MT AND NOT DEAL_II_CAN_USE_CXX11)
     #
-    # If the C++ compiler doesn't completely support the C++1x standard
+    # If the C++ compiler doesn't completely support the C++11 standard
     # (and consequently we can't use std::thread, std::mutex, etc), then
     # include all the files that form BOOST's thread implementation so that
     # we don't have to build BOOST itself only to get at this small part of

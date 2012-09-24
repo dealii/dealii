@@ -47,25 +47,26 @@ MACRO(FEATURE_P4EST_CONFIGURE_EXTERNAL var)
   INCLUDE_DIRECTORIES(${P4EST_INCLUDE_DIR} ${SC_INCLUDE_DIR})
 
   # The user has to know the location of the p4est headers as well:
-  LIST(APPEND DEAL_II_EXTERNAL_INCLUDE_DIRS ${P4EST_INCLUDE_DIR} ${SC_INCLUDE_DIR})
+  LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${P4EST_INCLUDE_DIR} ${SC_INCLUDE_DIR})
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
     IF(P4EST_DEBUG_FOUND AND SC_DEBUG_FOUND)
-      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
+      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG
         ${P4EST_DEBUG_LIBRARY} ${SC_DEBUG_LIBRARY}
         )
     ELSE()
-      MESSAGE(WARNING "\n"
-        "deal.II was configured with CMAKE_BUILD_TYPE=Debug but no debug p4est and\n"
-        "sc libraries were found. The regular p4est and sc libraries will be used\n"
-        "instead.\n\n"
+      MESSAGE(STATUS
+        "No debug p4est and sc libraries were found. "
+        "The regular p4est and sc libs will be used for the debug target instead."
         )
-      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
+      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG
         ${P4EST_LIBRARY} ${SC_LIBRARY}
         )
     ENDIF()
-  ELSE()
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
+  ENDIF()
+
+  IF (CMAKE_BUILD_TYPE MATCHES "Release")
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_RELEASE
       ${P4EST_LIBRARY} ${SC_LIBRARY}
       )
   ENDIF()

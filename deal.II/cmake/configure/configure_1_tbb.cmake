@@ -24,7 +24,7 @@ MACRO(SETUP_THREADING var)
     SET(DEAL_II_USE_MT TRUE)
 
     #
-    # Set up some posix threads specific configuration toggles:
+    # Set up some posix thread specific configuration toggles:
     #
     IF(CMAKE_USE_PTHREADS_INIT)
       SET(DEAL_II_USE_MT_POSIX TRUE)
@@ -72,8 +72,8 @@ MACRO(SETUP_THREADING var)
     STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
 
     IF(NOT DEAL_II_HAVE_SANE_MT_DEFINITIONS)
-      ADD_DEFINITIONS("-D_REENTRANT" "-D_THREAD_SAFE")
-      LIST(APPEND DEAL_II_EXTERNAL_DEFINITIONS "-D_REENTRANT" "-D_THREAD_SAFE") # TODO: Necessary?
+      LIST(APPEND DEAL_II_DEFINITIONS "-D_REENTRANT" "-D_THREAD_SAFE")
+      LIST(APPEND DEAL_II_USER_DEFINITIONS "-D_REENTRANT" "-D_THREAD_SAFE") # TODO: Necessary?
     ENDIF()
 
   ENDIF(Threads_FOUND)
@@ -100,18 +100,22 @@ MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
     IF(TBB_DEBUG_FOUND)
-      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${TBB_DEBUG_LIBRARY})
-      ADD_DEFINITIONS("-DTBB_USE_DEBUG=1" "-DTBB_DO_ASSERT=1")
+      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG ${TBB_DEBUG_LIBRARY})
+      LIST(APPEND DEAL_II_DEFINITIONS_DEBUG
+        "-DTBB_USE_DEBUG=1"
+        "-DTBB_DO_ASSERT=1"
+        )
     ELSE()
       MESSAGE(STATUS
-        "deal.II was configured with CMAKE_BUILD_TYPE=Debug but no debug tbb "
-        "library was found. The regular tbb library will be used instead."
+        "No debug tbb library was found. "
+        "The regular tbb lib will be used for the debug target instead."
         )
-      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${TBB_LIBRARY})
+      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG ${TBB_LIBRARY})
     ENDIF()
+  ENDIF()
 
-  ELSE()
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${TBB_LIBRARY})
+  IF (CMAKE_BUILD_TYPE MATCHES "Release")
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_RELEASE ${TBB_LIBRARY})
   ENDIF()
 
   # Setup threading and if successfull return TRUE:
@@ -143,7 +147,9 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
   # Add some definitions to use the header files in debug mode:
   #
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-    ADD_DEFINITIONS("-DTBB_DO_DEBUG=1" "-DTBB_DO_ASSERT=1")
+    LIST(APPEND DEAL_II_DEFINITIONS_DEBUG
+      "-DTBB_DO_DEBUG=1" "-DTBB_DO_ASSERT=1"
+      )
   ENDIF()
 
   INCLUDE_DIRECTORIES(

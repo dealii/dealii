@@ -50,8 +50,8 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL var)
 
   INCLUDE_DIRECTORIES(${PETSC_INCLUDE_DIRS})
 
-  # The user has to know the location of the petsc headers as well: # TODO
-  # LIST(APPEND DEAL_II_EXTERNAL_INCLUDE_DIRS ${PETSC_INCLUDE_DIRS})
+  # The user has to know the location of the petsc headers as well: # TODO: Really?
+  # LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${PETSC_INCLUDE_DIRS})
 
   LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
     ${PETSC_LIBRARIES}
