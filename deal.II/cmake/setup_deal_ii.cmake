@@ -14,10 +14,10 @@ SET_IF_EMPTY(DEAL_II_PACKAGE_TARNAME ${DEAL_II_PACKAGE_NAME}) #TODO
 SET_IF_EMPTY(DEAL_II_PACKAGE_URL "http://www.dealii.org")
 
 STRING(REGEX REPLACE
-  "^([0-9]+)\\..*" "\\1" DEAL_II_MAJOR "${VERSION}"
+  "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${VERSION}"
   )
 STRING(REGEX REPLACE
-  "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_MINOR "${VERSION}"
+  "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_VERSION_MINOR "${VERSION}"
   )
 
 #

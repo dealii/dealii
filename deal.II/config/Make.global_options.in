@@ -65,8 +65,8 @@ enable-threads       = @MAKEFILE_enablethreads@
 enable-shared        = @MAKEFILE_enableshared@
 enable-parser        = @MAKEFILE_enableparser@
 DEAL_II_VERSION      = @VERSION@
-DEAL_II_MAJOR        = @DEAL_II_MAJOR@
-DEAL_II_MINOR        = @DEAL_II_MINOR@
+DEAL_II_MAJOR        = @DEAL_II_VERSION_MAJOR@
+DEAL_II_MINOR        = @DEAL_II_VERSION_MINOR@
 
 #
 # TODO: Reenable or remove

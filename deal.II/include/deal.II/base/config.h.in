@@ -41,10 +41,12 @@
 #define DEAL_II_PATH "@DEAL_II_PATH@"
 
 /* Major version number of deal.II */
-#define DEAL_II_MAJOR "@DEAL_II_MAJOR@"
+#define DEAL_II_MAJOR "@DEAL_II_VERSION_MAJOR@" # legacy
+#define DEAL_II_VERSION_MAJOR "@DEAL_II_VERSION_MAJOR@"
 
 /* Minor version number of deal.II */
-#define DEAL_II_MINOR "@DEAL_II_MINOR@"
+#define DEAL_II_MINOR "@DEAL_II_VERSION_MINOR@" # legacy
+#define DEAL_II_VERSION_MINOR "@DEAL_II_VERSION_MINOR@"
 
 
 
