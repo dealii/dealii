@@ -44,7 +44,7 @@ MACRO(EXPAND_INSTANTIATIONS target inst_in_files)
   # before target will be processed.
   #
   IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-    ADD_DEPENDENCIES(${target}.g ${target}.inst)
+    ADD_DEPENDENCIES(${target}_debug ${target}.inst)
   ENDIF()
   IF(CMAKE_BUILD_TYPE MATCHES "Release")
     ADD_DEPENDENCIES(${target} ${target}.inst)

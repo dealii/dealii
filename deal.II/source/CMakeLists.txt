@@ -22,8 +22,12 @@ IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   #
   # Combine all debug OBJECT targets to a debug library:
   #
+  FILE(STRINGS
+    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/deal_ii_objects_debug
+    deal_ii_objects_debug
+    )
   ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX}
-    ${deal_ii_objects.g}
+    ${deal_ii_objects_debug}
     )
 
   SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX}
@@ -59,6 +63,10 @@ IF(CMAKE_BUILD_TYPE MATCHES "Release")
   #
   # Combine all release OBJECT targets to a release library:
   #
+  FILE(STRINGS
+    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/deal_ii_objects
+    deal_ii_objects
+    )
   ADD_LIBRARY(${DEAL_II_BASE_NAME}
     ${deal_ii_objects}
     )
@@ -90,3 +98,4 @@ IF(CMAKE_BUILD_TYPE MATCHES "Release")
 
 ENDIF()
 
+MESSAGE("${deal_ii_objects_debug}")
