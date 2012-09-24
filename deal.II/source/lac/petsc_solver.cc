@@ -130,138 +130,6 @@ namespace PETScWrappers
 
 
   void
-  SolverBase::solve (const MatrixBase               &A,
-                     VectorBase                     &x,
-                     const VectorBase               &b,
-                     const PreconditionerBase       &preconditioner,
-                     const std::vector<VectorBase>  &nullspace)
-  {
-    int ierr;
-                                     // first create a solver object if this
-                                     // is necessary
-    if (solver_data.get() == 0)
-      {
-        solver_data.reset (new SolverData());
-
-        ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-                                         // set the matrices involved. the
-                                         // last argument is irrelevant here,
-                                         // since we use the solver only once
-                                         // anyway
-        ierr = KSPSetOperators (solver_data->ksp, A, preconditioner,
-                                SAME_PRECONDITIONER);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-                                         // let derived classes set the solver
-                                         // type, and the preconditioning
-                                         // object set the type of
-                                         // preconditioner
-        set_solver_type (solver_data->ksp);
-
-	ierr = KSPSetPC (solver_data->ksp, preconditioner.get_pc());
-	AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-        PC  prec;
-        ierr = KSPGetPC (solver_data->ksp, &prec);
-        ierr = PCFactorSetShiftType (prec, MAT_SHIFT_POSITIVE_DEFINITE);
-
-                                         // then a convergence monitor
-                                         // function. that function simply
-                                         // checks with the solver_control
-                                         // object we have in this object for
-                                         // convergence
-#if DEAL_II_PETSC_VERSION_LT(3,0,0)
-        KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
-                               reinterpret_cast<void *>(&solver_control));
-#else
-        KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
-                               reinterpret_cast<void *>(&solver_control),
-                               PETSC_NULL);
-#endif
-
-      }
-
-                                     // then do the real work: set up solver
-                                     // internal data and solve the
-                                     // system. 
-    ierr = KSPSetUp (solver_data->ksp);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    unsigned int dim_nullsp = nullspace.size();
-
-    if (dim_nullsp > 0)
-      {
-        Vec * nullsp_basis;
-
-        PetscMalloc (dim_nullsp*sizeof(Vec), &nullsp_basis);
-
-        for (unsigned int i=0; i<dim_nullsp; ++i)
-          nullsp_basis[i] = &(*nullspace[i]);
-
-        MatNullSpace  nullsp;
-
-        ierr = MatNullSpaceCreate (mpi_communicator, PETSC_FALSE, dim_nullsp, nullsp_basis, &nullsp);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-        PetscBool  is_nullspace;
-
-        ierr = MatNullSpaceTest (nullsp, A,  &is_nullspace);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-        ierr = KSPSetNullSpace (solver_data->ksp, nullsp);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-      };
-
-    ierr = KSPSolve (solver_data->ksp, b, x);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    KSPConvergedReason  reason;
-    ierr = KSPGetConvergedReason (solver_data->ksp, &reason);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    if (reason < 0)
-      {
-        std::ostringstream error_code;
-
-        if (reason == KSP_DIVERGED_NULL)
-          error_code << "KSP_DIVERGED_NULL";
-        else if (reason == KSP_DIVERGED_ITS)
-          error_code << "KSP_DIVERGED_ITS";
-        else if (reason == KSP_DIVERGED_ITS)
-          error_code << "KSP_DIVERGED_DTOL";
-        else if (reason == KSP_DIVERGED_BREAKDOWN)
-          error_code << "KSP_DIVERGED_BREAKDOWN";
-        else if (reason == KSP_DIVERGED_BREAKDOWN_BICG)
-          error_code << "KSP_DIVERGED_BREAKDOWN_BICG";
-        else if (reason == KSP_DIVERGED_NONSYMMETRIC)
-          error_code << "KSP_DIVERGED_NONSYMMETRIC";
-        else if (reason == KSP_DIVERGED_INDEFINITE_PC)
-          error_code << "KSP_DIVERGED_INDEFINITE_PC";
-        else if (reason == KSP_DIVERGED_NAN)
-          error_code << "KSP_DIVERGED_NAN";
-        else if (reason == KSP_DIVERGED_INDEFINITE_MAT)
-          error_code << "KSP_DIVERGED_INDEFINITE_MAT";
-        else
-          error_code << "Unknown Error";
-
-        AssertThrow (false, ExcPETScSolverError(error_code.str().c_str()));
-      };
-
-                                     // do not destroy solver object
-//    solver_data.reset ();
-
-                                     // in case of failure: throw
-                                     // exception
-    if (solver_control.last_check() != SolverControl::success)
-      throw SolverControl::NoConvergence (solver_control.last_step(),
-                                          solver_control.last_value());
-                                     // otherwise exit as normal
-  }
-
-
-  void
   SolverBase::set_prefix(const std::string &prefix)
   {
     prefix_name = prefix ;
@@ -434,9 +302,6 @@ namespace PETScWrappers
                                      // honor the initial guess in the
                                      // solution vector. do so here as well:
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
-
-    KSPSetTolerances(ksp, PETSC_DEFAULT, this->solver_control.tolerance(),
-                     PETSC_DEFAULT, this->solver_control.max_steps()+1);
   }
 
 
@@ -539,9 +404,6 @@ namespace PETScWrappers
                                      // honor the initial guess in the
                                      // solution vector. do so here as well:
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
-
-    KSPSetTolerances(ksp, PETSC_DEFAULT, this->solver_control.tolerance(),
-                     PETSC_DEFAULT, this->solver_control.max_steps()+1);
   }
 
 

@@ -506,23 +506,6 @@ class TableHandler
     void write_tex (std::ostream &file, const bool with_header=true) const;
 
                                      /**
-                                      * Write table as a tex file
-                                      * and use the booktabs package.
-                                      * Values are written in
-                                      * math mode: $value$
-                                      * If with_header is set to false
-                                      * (it is true by default), then
-                                      * no "\documentclass{...}",
-                                      * "\begin{document}" and
-                                      * "\end{document}" are used. In
-                                      * this way the file can be
-                                      * included into an existing tex
-                                      * file using a command like
-                                      * "\input{table_file}".
-                                      */
-    void write_results (std::ostream &file, const bool with_header=true) const;
-
-                                     /**
                                       * Read or write the data of this
                                       * object to or from a stream for
                                       * the purpose of serialization.
@@ -887,8 +870,6 @@ namespace internal
       }
   }
 }
-
-
 
 template <typename T>
 void TableHandler::add_value (const std::string &key,

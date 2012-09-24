@@ -138,14 +138,6 @@ namespace PETScWrappers
              const PreconditionerBase &preconditioner);
 
 
-
-      void
-      solve (const MatrixBase               &A,
-             VectorBase                     &x,
-             const VectorBase               &b,
-             const PreconditionerBase       &preconditioner,
-             const std::vector<VectorBase>  &nullspace);
-
                                        /**
                                         * Resets the contained preconditioner
                                         * and solver object. See class
@@ -176,10 +168,6 @@ namespace PETScWrappers
                       int,
                       << "An error with error number " << arg1
                       << " occurred while calling a PETSc function");
-
-      DeclException1 (ExcPETScSolverError,
-                      char*,
-                      << "PETSc solver failed: " << arg1);
 
     protected:
 
