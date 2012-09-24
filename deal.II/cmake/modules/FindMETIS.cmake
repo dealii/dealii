@@ -5,11 +5,17 @@
 INCLUDE(FindPackageHandleStandardArgs)
 
 FIND_PATH(METIS_INCLUDE_DIR metis.h
+  HINTS
+    ${METIS_DIR}/include
+    $ENV{METIS_DIR}/include
   PATH_SUFFIXES metis
   )
 
 FIND_LIBRARY(METIS_LIBRARY
   NAMES metis
+  HINTS
+    ${METIS_DIR}
+    $ENV{METIS_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 

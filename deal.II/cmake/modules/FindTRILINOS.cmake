@@ -10,8 +10,13 @@ INCLUDE(FindPackageHandleStandardArgs)
 find_package(TRILINOS
   QUIET CONFIG
   NAMES Trilinos TRILINOS
-  HINTS ${TRILINOS_DIR}
-  PATH_PREFIXES lib64/cmake/Trilinos lib/cmake/Trilinos
+  HINTS
+    ${TRILINOS_DIR}
+    $ENV{TRILINOS_DIR}
+  PATH_SUFFIXES
+    lib${LIB_SUFFIX}/cmake/Trilinos
+    lib64/cmake/Trilinos
+    lib/cmake/Trilinos
   )
 
 #
@@ -37,9 +42,9 @@ SET(TRILINOS_INCLUDE_DIRS ${Trilinos_INCLUDE_DIRS})
 # exports a list with short names...
 # So we check again for every lib and store the full path:
 #
-FOREACH(macro_library ${Trilinos_LIBRARIES})
+FOREACH(library ${Trilinos_LIBRARIES})
   FIND_LIBRARY(TRILINOS_LIBRARY_${macro_library}
-    NAMES ${macro_library}
+    NAMES ${library}
     HINTS ${Trilinos_LIBRARY_DIRS}
     )
   MARK_AS_ADVANCED(TRILINOS_LIBRARY_${macro_library})

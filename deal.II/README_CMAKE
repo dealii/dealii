@@ -28,6 +28,8 @@ TABLE OF CONTENTS
 
       Feature configuration
 
+      External library locations
+
       Component selection
 
       Build configuration
@@ -225,6 +227,50 @@ CONFIGURATION
     separately.
 
 
+  External library locations
+  ==========================
+
+  External libraries will be searched depending on hints in the following
+  order:
+
+  1.) Paths specified via CMAKE_PREFIX_PATH take precedence, e.g. with
+
+          $ cmake -DCMAKE_PREFIX_PATH=~/workspace/local ../deal.II
+
+      libraries from ~/workspace/local will be preferred for dependency
+      resolution.
+
+  2.) Hints given by <library>_DIR via command line or environment for
+      _some_ libraries:
+
+          $ cmake -DP4EST_DIR=~/workspace/p4est-install/ ../deal.II
+      or
+          $ export P4EST_DIR=~/workspace/p4est-install/
+          $ cmake ../deal.II
+      where -D<library>_DIR takes precedence over environment.
+
+      Currently, the following variables will be considered:
+
+        METIS_DIR,
+        P4EST_DIR,
+        PETSC_DIR (and SC_DIR),
+        TRILINOS_DIR,
+        UMFPACK_DIR (and AMD_DIR)
+
+
+  Alternatively, cached variables set by the Find<Module> mechanism may be
+  set, hinted or overwritten directly!
+
+  These variables are usually called <library>_INCLUDE_DIR(S) and
+  <library>_(LIBRARY|LIBRARIES) (highly dependend of the actual library...).
+
+  You can get a list via
+
+      $ ccmake ../deal.II
+
+  and entering advanced configuration mode by pressing [t].
+  Variables that could not be determined are suffixed with -NOTFOUND and
+  may be set by hand.
 
 
   Component selection

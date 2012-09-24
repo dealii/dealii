@@ -5,10 +5,17 @@
 INCLUDE(FindPackageHandleStandardArgs)
 
 FIND_PATH(UMFPACK_INCLUDE_DIR umfpack.h
+  HINTS
+    ${UMFPACK_DIR}/include
+    $ENV{UMFPACK_DIR}/include
+  PATH_SUFFIXES umfpack
 )
 
 FIND_LIBRARY(UMFPACK_LIBRARY
   NAMES umfpack
+  HINTS
+    ${UMFPACK_DIR}
+    $ENV{UMFPACK_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
 )
 

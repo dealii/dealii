@@ -5,10 +5,20 @@
 INCLUDE(FindPackageHandleStandardArgs)
 
 FIND_PATH(AMD_INCLUDE_DIR amd.h
+  HINTS
+    ${AMD_DIR}/include
+    $ENV{AMD_DIR}/include
+    ${UMFPACK_DIR}/include
+    $ENV{UMFPACK_DIR}/include
 )
 
 FIND_LIBRARY(AMD_LIBRARY
   NAMES amd
+  HINTS
+    ${AMD_DIR}
+    $ENV{AMD_DIR}
+    ${UMFPACK_DIR}
+    $ENV{UMFPACK_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
 )
 
