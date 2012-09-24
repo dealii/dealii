@@ -172,7 +172,7 @@ class QTrapez : public Quadrature<dim>
 
 /**
  * Milne-rule. Closed Newton-Cotes formula, exact for polynomials of degree 5.
- * See Stoer: Einführung in die Numerische Mathematik I, p. 102
+ * See Stoer: Einfï¿½hrung in die Numerische Mathematik I, p. 102
  */
 template <int dim>
 class QMilne : public Quadrature<dim>
@@ -184,7 +184,7 @@ class QMilne : public Quadrature<dim>
 
 /**
  * Weddle-rule. Closed Newton-Cotes formula, exact for polynomials of degree 7.
- * See Stoer: Einführung in die Numerische Mathematik I, p. 102
+ * See Stoer: Einfï¿½hrung in die Numerische Mathematik I, p. 102
  */
 template <int dim>
 class QWeddle : public Quadrature<dim>
@@ -430,6 +430,75 @@ class QGaussOneOverR : public Quadrature<dim>
 
 
 
+/**
+ * Gauss Quadrature Formula with $1/R^{3/2}$ weighting function. This formula
+ * can be used to to integrate $1/R^{3/2} \ f(x)$ on the reference
+ * element $[0,1]^2$, where $f$ is a smooth function without
+ * singularities, and $R$ is the distance from the point $x$ to the vertex
+ * $\xi$, given at construction time by specifying its index. Notice that
+ * this distance is evaluated in the reference element.
+ *
+ * This quadrature formula is a specialization of QGaussOneOverR.
+ * We apply a second transformation $R = t^2$ to cancel a singularity
+ * of order $R^{1/2}$:
+ * \f[
+ * \int_0^1 \int_0^1 \frac{1}{R^{1/2}} f(x,y) \biggr|_{x < y} dxdy =
+ * \int_0^1 \int_0^{r(\pi/4 v)} \frac{1}{R^{1/2}} f(R \cos(\pi/4 v), R \sin(\pi/4 v)) \frac{\pi}{4} R dr dv =
+ * 2 \int_0^1 \int_0^{\sqrt{r(\pi/4 v)}} f(t^2 \cos(\pi/4 v), t^2 \sin(\pi/4 v)) \frac{\pi}{4} t^2 dt dv =
+ * 2 \int_0^1 \int_0^1 f(t^2, t^2 \tan(\pi/4 v)) \frac{\pi}{4} \frac{t^2}{(\cos(\pi/4 v))^{3/2}} dt dv
+ * \f]
+ *
+ * Upon construction it is possible to specify wether we want the
+ * singularity removed, or not. In other words, this quadrature can be
+ * used to integrate $g(x) = 1/R^{3/2}\ f(x)$, or simply $f(x)$, with the $1/R^{3/2}$
+ * factor already included in the quadrature weights.
+ */
+template<int dim>
+class QGaussOneOverRThreeHalfs : public Quadrature<dim>
+{
+  public:
+    /**
+     * The constructor takes three arguments: the order of the Gauss
+     * formula, the index of the vertex where the singularity is
+     * located, and whether we include the weighting singular function
+     * inside the quadrature, or we leave it in the user function to
+     * be integrated. Notice that this constructor only works for the
+     * vertices of the quadrilateral.
+     *
+     * Traditionally, quadrature formulas include their weighting
+     * function, and the last argument is set to false by
+     * default. There are cases, however, where this is undesirable
+     * (for example when you only know that your singularity has the
+     * same order of 1/R, but cannot be written exactly in this
+     * way).
+     *
+     * In other words, you can use this function in either of
+     * the following way, obtaining the same result:
+     *
+     * @code
+     * QGaussOneOverRThreeHalfs singular_quad(order, vertex_id, false);
+     * // This will produce the integral of f(x)/R^{3/2}
+     * for(unsigned int i=0; i<singular_quad.size(); ++i)
+     * 	 integral += f(singular_quad.point(i))*singular_quad.weight(i);
+     *
+     * // And the same here
+     * QGaussOneOverRThreeHalfs singular_quad_noR(order, vertex_id, true);
+     *
+     * // This also will produce the integral of f(x)/R^{3/2}, but 1/R^{3/2} has to
+     * // be specified.
+     * for(unsigned int i=0; i<singular_quad.size(); ++i) {
+     *   double R = (singular_quad_noR.point(i)-cell->vertex(vertex_id)).norm();
+     *   integral += f(singular_quad_noR.point(i))*singular_quad_noR.weight(i)/R^{3/2};
+     * }
+     * @endcode
+     */
+    QGaussOneOverRThreeHalfs(const unsigned int n,
+                             const unsigned int vertex_index,
+                             const bool factor_out_singular_weight=false);
+};
+
+
+
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
@@ -460,6 +529,7 @@ template <> QWeddle<1>::QWeddle ();
 template <> QGaussLog<1>::QGaussLog (const unsigned int n, const bool revert);
 template <> QGaussLogR<1>::QGaussLogR (const unsigned int n, const Point<1> x0, const double alpha, const bool flag);
 template <> QGaussOneOverR<2>::QGaussOneOverR (const unsigned int n, const unsigned int index, const bool flag);
+template <> QGaussOneOverRThreeHalfs<2>::QGaussOneOverRThreeHalfs (const unsigned int n, const unsigned int index, const bool flag);
 
 
 

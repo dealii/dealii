@@ -3005,9 +3005,79 @@ namespace parallel
     template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::
-    copy_triangulation (const dealii::Triangulation<dim, spacedim> &)
+    copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria)
     {
-      Assert (false, ExcNotImplemented());
+      clear();
+
+      try
+        {
+          dealii::Triangulation<dim,spacedim>::
+            copy_triangulation (old_tria);
+    }
+      catch (const typename dealii::Triangulation<dim,spacedim>::DistortedCellList &)
+        {
+                                       // the underlying
+                                       // triangulation should not
+                                       // be checking for
+                                       // distorted cells
+          AssertThrow (false, ExcInternalError());
+        }
+
+                                       // note that now we have some content in
+                                       // the p4est objects and call the
+                                       // functions that do the actual work
+                                       // (which are dimension dependent, so
+                                       // separate)
+      triangulation_has_content = true;
+
+      Assert (old_tria.n_levels() == 1,
+              ExcMessage ("Parallel distributed triangulations can only be copied, "
+                          "if they are not refined!"));
+
+      if (dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&old_tria) != 0)
+        {
+          Assert (!(dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>&>
+                   (old_tria).refinement_in_progress),
+                  ExcMessage ("Parallel distributed triangulations can only "
+                              "be copied, if no refinement is in progress!"));
+
+          coarse_cell_to_p4est_tree_permutation =
+            dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>&>
+            (old_tria).coarse_cell_to_p4est_tree_permutation;
+
+          p4est_tree_to_coarse_cell_permutation =
+            dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>&>
+            (old_tria).p4est_tree_to_coarse_cell_permutation;
+
+          attached_data_size =
+            dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>&>
+            (old_tria).attached_data_size;
+
+          n_attached_datas   =
+            dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>&>
+            (old_tria).n_attached_datas;
+        }
+      else
+        {
+          setup_coarse_cell_to_p4est_tree_permutation ();
+        };
+
+      copy_new_triangulation_to_p4est (dealii::internal::int2type<dim>());
+
+      try
+        {
+          copy_local_forest_to_triangulation ();
+        }
+      catch (const typename Triangulation<dim>::DistortedCellList &)
+        {
+                                       // the underlying
+                                       // triangulation should not
+                                       // be checking for
+                                       // distorted cells
+          AssertThrow (false, ExcInternalError());
+        }
+
+      update_number_cache ();
     }
 
 
