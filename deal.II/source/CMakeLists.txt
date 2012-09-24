@@ -56,7 +56,7 @@ ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
 
   #
-  # Combine all debug OBJECT targets to a debug library:
+  # Combine all release OBJECT targets to a release library:
   #
   ADD_LIBRARY(${DEAL_II_BASE_NAME}
     ${deal_ii_objects}
