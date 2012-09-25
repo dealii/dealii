@@ -121,20 +121,12 @@ namespace LocalIntegrators
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
       Assert(result.size() == n_dofs, ExcDimensionMismatch(result.size(), n_dofs));
       
-<<<<<<< HEAD
-      for (unsigned k=0;k<nq;++k)
-	{
-	  const double dx = factor * fe.JxW(k);
-	  for (unsigned i=0;i<n_dofs;++i)
-=======
       for (unsigned int k=0;k<nq;++k)
 	{
 	  const double dx = factor * fe.JxW(k);
 	  for (unsigned int i=0;i<n_dofs;++i)
->>>>>>> trunk
 	    for (unsigned int d=0;d<n_comp;++d)
 	      {
-		
 		result(i) += dx * (input[d][k] * fe.shape_grad_component(i,k,d));
 	      }
 	}
