@@ -64,7 +64,10 @@ MACRO(FEATURE_UMFPACK_ERROR_MESSAGE)
     "Could not find the umfpack and amd libraries!\n"
     "Please ensure that the libraries are installed on your computer.\n"
     "If the libraries are not at a default location, either provide some hints\n"
-    "for the autodetection, or set the relevant variables by hand in ccmake.\n\n"
+    "for the autodetection:\n"
+    "    $ UMFPACK_DIR=\"...\" cmake <...>\n"
+    "    $ ccmake -DUMFPACK_DIR=\"...\" cmake <...>\n"
+    "or set the relevant variables by hand in ccmake.\n"
     "Alternatively you may choose to compile the bundled contrib libraries\n"
     "by setting DEAL_II_ALLOW_CONTRIB=on or DEAL_II_FORCE_CONTRIB_UMFPACK=on.\n\n"
     )

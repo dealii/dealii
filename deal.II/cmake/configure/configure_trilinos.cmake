@@ -182,5 +182,21 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL var)
 ENDMACRO()
 
 
+SET(FEATURE_TRILINOS_CUSTOM_ERROR_MESSAGE TRUE)
+
+
+MACRO(FEATURE_TRILINOS_ERROR_MESSAGE)
+  MESSAGE(SEND_ERROR "\n"
+    "Could not find a suitable set of trilinos libraries!\n"
+    "Please ensure that all necessary libraries are installed on your computer.\n"
+    "If the libraries are not at a default location, either provide some hints\n"
+    "for the autodetection:\n"
+    "    $ TRILINOS_DIR=\"...\" cmake <...>\n"
+    "    $ ccmake -DTRILINOS_DIR=\"...\" cmake <...>\n"
+    "or set the relevant variables by hand in ccmake.\n\n"
+    )
+ENDMACRO()
+
+
 CONFIGURE_FEATURE(TRILINOS)
 
