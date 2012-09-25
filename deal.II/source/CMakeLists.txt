@@ -25,7 +25,7 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
   # Combine all ${build} OBJECT targets to a ${build} library:
   #
   FILE(STRINGS
-    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/deal_ii_objects_${build_lowercase}
+    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${build_lowercase}
     deal_ii_objects_${build_lowercase}
     )
   ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}

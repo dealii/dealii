@@ -131,3 +131,12 @@ IF(CMAKE_BUILD_TYPE MATCHES "Release")
   LIST(APPEND DEAL_II_BUILD_TYPES "RELEASE")
 ENDIF()
 
+#
+# TODO: Remove this hack.
+#
+FOREACH(build ${DEAL_II_BUILD_TYPES})
+  STRING(TOLOWER build_lowercase "${build}")
+  FILE(REMOVE
+    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${build_lowercase}
+    )
+ENDFOREACH()

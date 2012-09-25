@@ -19,7 +19,7 @@ MACRO(DEAL_II_ADD_LIBRARY library)
       )
 
     FILE(APPEND
-      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/deal_ii_objects_${build_lowercase}
+      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${build_lowercase}
       "$<TARGET_OBJECTS:${library}.${build_lowercase}>\n"
       )
   ENDFOREACH()

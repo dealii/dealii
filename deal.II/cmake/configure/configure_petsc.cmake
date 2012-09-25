@@ -60,6 +60,12 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL var)
   SET(DEAL_II_USE_PETSC TRUE)
 
   #
+  # Disable a bunch of warnings when compiling with petsc:
+  #
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
+
+
+  #
   # Work around a stupidity in PETSc that makes sure it interferes in
   # a completely obnoxious way with boost.
   # TODO: Obosolete?
