@@ -112,9 +112,9 @@ OPTION(DEAL_II_WITH_TRILINOS
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK."
   OFF)
-OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
-  "Always use the bundled umfpack library instead of an external one."
-  OFF)
+#OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
+#  "Always use the bundled umfpack library instead of an external one."
+#  OFF)
 
 OPTION(DEAL_II_WITH_ZLIB
   "Build deal.II with support for zlib."
