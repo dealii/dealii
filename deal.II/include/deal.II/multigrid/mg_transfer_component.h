@@ -21,6 +21,7 @@
 #include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/multigrid/mg_base.h>
+#include <deal.II/fe/component_mask.h>
 #include <deal.II/base/mg_level_object.h>
 
 
