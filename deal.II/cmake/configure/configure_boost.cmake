@@ -67,13 +67,18 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
     "BOOST_NO_HASH" "BOOST_NO_SLIST"
     )
 
-  INCLUDE_DIRECTORIES(
-    ${CMAKE_SOURCE_DIR}/contrib/boost-1.49.0/include
+  SET(boost_folder "${CMAKE_SOURCE_DIR}/contrib/boost-1.49.0")
+
+  INCLUDE_DIRECTORIES(${boost_folder}/include)
+
+  INSTALL(DIRECTORY ${boost_folder}/include
+    DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/contrib
+    COMPONENT library
+    FILES_MATCHING PATTERN "*.h"
+    PATTERN ".svn" EXCLUDE
     )
 
-  ADD_SUBDIRECTORY(
-    ${CMAKE_SOURCE_DIR}/contrib/boost-1.49.0/libs/serialization/src
-    )
+  ADD_SUBDIRECTORY(${boost_folder}/libs/serialization/src))
 
   IF( DEAL_II_USE_MT AND NOT DEAL_II_CAN_USE_CXX11)
     #
@@ -83,9 +88,7 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
     # we don't have to build BOOST itself only to get at this small part of
     # it. it also ensures that we use the correct compiler and flags
     #
-    ADD_SUBDIRECTORY(
-      ${CMAKE_SOURCE_DIR}/contrib/boost-1.49.0/libs/thread/src
-      )
+    ADD_SUBDIRECTORY(${boost_folder}/libs/thread/src)
   ENDIF()
 
   SET(${var} TRUE)
@@ -93,3 +96,4 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(BOOST)
+
