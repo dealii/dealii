@@ -10,24 +10,12 @@
 #
 #   library, documentation, compat_files, project_config
 #
-# And a release and debug target (depending on configuration)
-#
 
 ADD_CUSTOM_TARGET(library)
 
-IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  ADD_CUSTOM_TARGET(debug)
-
-  ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX})
-  ADD_DEPENDENCIES(debug ${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX})
-ENDIF()
-
-IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  ADD_CUSTOM_TARGET(release)
-
-  ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME})
-  ADD_DEPENDENCIES(release ${DEAL_II_BASE_NAME})
-ENDIF()
+FOREACH(build ${DEAL_II_BUILD_TYPES})
+  ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX})
+ENDFOREACH()
 
 
 IF(DEAL_II_COMPONENT_DOCUMENTATION)

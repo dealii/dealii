@@ -17,4 +17,4 @@ SET(inst_in_files
 
 DEAL_II_ADD_LIBRARY(obj_hp OBJECT ${src})
 EXPAND_INSTANTIATIONS(obj_hp "${inst_in_files}")
-DEAL_II_ADD_DEPENDENCIES(obj_hp deal_ii_target_dependencies)
+

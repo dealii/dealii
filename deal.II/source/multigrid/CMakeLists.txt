@@ -20,4 +20,4 @@ SET(inst_in_files
 
 DEAL_II_ADD_LIBRARY(obj_multigrid OBJECT ${src})
 EXPAND_INSTANTIATIONS(obj_multigrid "${inst_in_files}")
-DEAL_II_ADD_DEPENDENCIES(obj_multigrid deal_ii_target_dependencies)
+

@@ -47,5 +47,4 @@ SET(src_base
   )
 
 DEAL_II_ADD_LIBRARY(obj_base OBJECT ${src_base})
-DEAL_II_ADD_DEPENDENCIES(obj_base deal_ii_target_dependencies)
 

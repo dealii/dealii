@@ -12,4 +12,4 @@ SET(inst_in_files
 
 DEAL_II_ADD_LIBRARY(obj_distributed OBJECT ${src})
 EXPAND_INSTANTIATIONS(obj_distributed "${inst_in_files}")
-DEAL_II_ADD_DEPENDENCIES(obj_distributed deal_ii_target_dependencies)
+

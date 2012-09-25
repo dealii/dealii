@@ -32,4 +32,4 @@ SET(inst_in_files
 
 DEAL_II_ADD_LIBRARY(obj_grid OBJECT ${src})
 EXPAND_INSTANTIATIONS(obj_grid "${inst_in_files}")
-DEAL_II_ADD_DEPENDENCIES(obj_grid deal_ii_target_dependencies)
+

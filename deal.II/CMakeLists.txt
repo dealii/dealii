@@ -202,13 +202,6 @@ INCLUDE(setup_compiler_flags)
 
 
 #
-# A custom target for all the target dependencies that have to be
-# build/prepared before the deal.II library can be compiled
-#
-ADD_CUSTOM_TARGET(deal_ii_target_dependencies)
-
-
-#
 # Run all system checks:
 #
 FILE(GLOB check_files "cmake/check/*.cmake")

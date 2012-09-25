@@ -23,9 +23,6 @@ ADD_CUSTOM_TARGET(lapack_templates ALL
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/deal.II/lac/lapack_templates.h
   )
 
-ADD_DEPENDENCIES(deal_ii_target_dependencies lapack_templates)
-
-
 #
 # Add a rule on how to install the header files:
 #
