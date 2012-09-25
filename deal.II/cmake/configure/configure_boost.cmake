@@ -78,7 +78,7 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
     PATTERN ".svn" EXCLUDE
     )
 
-  ADD_SUBDIRECTORY(${boost_folder}/libs/serialization/src))
+  ADD_SUBDIRECTORY(${boost_folder}/libs/serialization/src)
 
   IF( DEAL_II_USE_MT AND NOT DEAL_II_CAN_USE_CXX11)
     #
