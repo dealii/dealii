@@ -57,7 +57,7 @@ LDFLAGS              = # intentionally left empty and specified in LIBS
 #F77
 #F77-VERSION
 #F77LIBS
-ifeq (${debug-mode}, on)
+ifeq ($(debug-mode), on)
   LIBS                 = @MAKEFILE_LIBS_DEBUG@
 else
   LIBS                 = @MAKEFILE_LIBS_RELEASE@

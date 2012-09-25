@@ -44,8 +44,8 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
 
   #
-  # Therefore, transform some cmake lists into a string that a Makefile
-  # actually understands:
+  # Therefore, transform some cmake lists into a string that the old
+  # Makefile mechanism actually understands:
   #
 
   TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_C}"
@@ -61,10 +61,12 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   ENDIF()
 
   FOREACH(type ${MAKEFILE_BUILD_TYPES})
-    TO_STRING(MAKEFILE_DEFINITIONS_${type}
+    TO_STRING_AND_ADD_PREFIX(MAKEFILE_DEFINITIONS_${type}
+      "-D"
       ${DEAL_II_USER_DEFINITIONS}
       ${DEAL_II_USER_DEFINITIONS_${type}}
       )
+
     #
     # Add an rpath directive in front of each library, so that libraries
     # outside of the default search directories will be found by the runtime

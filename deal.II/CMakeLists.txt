@@ -255,7 +255,7 @@ ADD_SUBDIRECTORY(include)
 #
 # Build optional contrib targets:
 #
-ADD_SUBDIRECTORY(contrib)
+#ADD_SUBDIRECTORY(contrib)
 
 
 #
