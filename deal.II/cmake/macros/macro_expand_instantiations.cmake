@@ -43,12 +43,10 @@ MACRO(EXPAND_INSTANTIATIONS target inst_in_files)
   # Add a dependency to target so that target.inst is fully generated
   # before target will be processed.
   #
-  IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-    ADD_DEPENDENCIES(${target}_debug ${target}.inst)
-  ENDIF()
-  IF(CMAKE_BUILD_TYPE MATCHES "Release")
-    ADD_DEPENDENCIES(${target} ${target}.inst)
-  ENDIF()
+  FOREACH(build ${DEAL_II_BUILD_TYPES})
+    STRING(TOLOWER ${build} build_lowercase)
+    ADD_DEPENDENCIES(${target}.${build_lowercase} ${target}.inst)
+  ENDFOREACH()
 
 ENDMACRO()
 

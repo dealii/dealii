@@ -17,20 +17,22 @@ ADD_SUBDIRECTORY(lac)
 ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(numerics)
 
-IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+
+FOREACH(build ${DEAL_II_BUILD_TYPES})
+  STRING(TOLOWER ${build} build_lowercase)
 
   #
-  # Combine all debug OBJECT targets to a debug library:
+  # Combine all ${build} OBJECT targets to a ${build} library:
   #
   FILE(STRINGS
-    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/deal_ii_objects_debug
-    deal_ii_objects_debug
+    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/deal_ii_objects_${build_lowercase}
+    deal_ii_objects_${build_lowercase}
     )
-  ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX}
-    ${deal_ii_objects_debug}
+  ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+    ${deal_ii_objects_${build_lowercase}}
     )
 
-  SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX}
+  SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     PROPERTIES
     VERSION ${VERSION}
     #
@@ -39,61 +41,21 @@ IF(CMAKE_BUILD_TYPE MATCHES "Debug")
     # a C++ library is still ABI backwards compatible :-]
     #
     SOVERSION ${VERSION}
-    LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}"
-    COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_DEBUG}"
-    COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_DEBUG}"
+    LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_${build}}"
+    COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
+    COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
     )
 
-  TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX}
+  TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     ${DEAL_II_EXTERNAL_LIBRARIES}
-    ${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}
+    ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
     )
 
-  INSTALL(TARGETS ${DEAL_II_BASE_NAME}${DEAL_II_DEBUG_SUFFIX}
+  INSTALL(TARGETS ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     LIBRARY
     DESTINATION ${DEAL_II_LIBRARY_RELDIR}
     COMPONENT library
     )
 
-ENDIF()
+ENDFOREACH()
 
-
-IF(CMAKE_BUILD_TYPE MATCHES "Release")
-
-  #
-  # Combine all release OBJECT targets to a release library:
-  #
-  FILE(STRINGS
-    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/deal_ii_objects
-    deal_ii_objects
-    )
-  ADD_LIBRARY(${DEAL_II_BASE_NAME}
-    ${deal_ii_objects}
-    )
-
-  SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}
-    PROPERTIES
-    VERSION ${VERSION}
-    #
-    # Sonaming: Well... we just use the version number.
-    # No point to wrack one's brain over the question whether a new version of
-    # a C++ library is still ABI backwards compatible :-]
-    #
-    SOVERSION ${VERSION}
-    LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}"
-    COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_RELEASE}"
-    COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_RELEASE}"
-    )
-
-  TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}
-    ${DEAL_II_EXTERNAL_LIBRARIES}
-    ${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}
-    )
-
-  INSTALL(TARGETS ${DEAL_II_BASE_NAME}
-    LIBRARY
-    DESTINATION ${DEAL_II_LIBRARY_RELDIR}
-    COMPONENT library
-    )
-
-ENDIF()

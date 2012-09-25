@@ -5,12 +5,11 @@
 
 MACRO(DEAL_II_ADD_DEPENDENCIES name target)
 
-  IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-    ADD_DEPENDENCIES(${name}_debug ${target}_debug)
-  ENDIF()
-
-  IF(CMAKE_BUILD_TYPE MATCHES "Release")
-    ADD_DEPENDENCIES(${name} ${target})
-  ENDIF()
+  FOREACH(build ${DEAL_II_BUILD_TYPES})
+    STRING(TOLOWER ${build} build_lowercase)
+    ADD_DEPENDENCIES(${name}.${build_lowercase}
+      ${target}.${build_lowercase}
+      )
+  ENDFOREACH()
 
 ENDMACRO()

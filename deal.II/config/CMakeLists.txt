@@ -53,18 +53,11 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     ${DEAL_II_INCLUDE_DIRS}
     )
 
-  IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-    LIST(APPEND MAKEFILE_BUILD_TYPES "DEBUG")
-  ENDIF()
-  IF(CMAKE_BUILD_TYPE MATCHES "Release")
-    LIST(APPEND MAKEFILE_BUILD_TYPES "RELEASE")
-  ENDIF()
-
-  FOREACH(type ${MAKEFILE_BUILD_TYPES})
-    TO_STRING_AND_ADD_PREFIX(MAKEFILE_DEFINITIONS_${type}
+  FOREACH(build ${DEAL_II_BUILD_TYPES})
+    TO_STRING_AND_ADD_PREFIX(MAKEFILE_DEFINITIONS_${build}
       "-D"
       ${DEAL_II_USER_DEFINITIONS}
-      ${DEAL_II_USER_DEFINITIONS_${type}}
+      ${DEAL_II_USER_DEFINITIONS_${build}}
       )
 
     #
@@ -74,18 +67,18 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     #
     FOREACH(lib
         ${DEAL_II_EXTERNAL_LIBRARIES}
-        ${DEAL_II_EXTERNAL_LIBRARIES_${type}}
-        ${DEAL_II_LIBRARIES_${type}})
+        ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
+        ${DEAL_II_LIBRARIES_${build}})
       GET_FILENAME_COMPONENT(path ${lib} PATH)
-      LIST(APPEND MAKEFILE_LIBS_${type} "-Wl,-rpath  -Wl,${path}")
-      LIST(APPEND MAKEFILE_LIBS_${type} ${lib})
+      LIST(APPEND MAKEFILE_LIBS_${build} "-Wl,-rpath -Wl,${path}")
+      LIST(APPEND MAKEFILE_LIBS_${build} ${lib})
     ENDFOREACH()
-    TO_STRING(MAKEFILE_LIBS_${type} ${MAKEFILE_LIBS_${type}})
+    TO_STRING(MAKEFILE_LIBS_${build} ${MAKEFILE_LIBS_${build}})
     #
     # Put our linker flags directly in front of this string:
     #
-    SET(MAKEFILE_LIBS_${type}
-      "${CMAKE_SHARED_LINKER_FLAGS} ${DEAL_II_SHARED_LINKER_FLAGS_${type}} ${MAKEFILE_LIBS_${type}}"
+    SET(MAKEFILE_LIBS_${build}
+      "${CMAKE_SHARED_LINKER_FLAGS} ${DEAL_II_SHARED_LINKER_FLAGS_${build}} ${MAKEFILE_LIBS_${build}}"
       )
   ENDFOREACH()
 

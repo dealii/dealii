@@ -5,44 +5,23 @@
 
 MACRO(DEAL_II_ADD_LIBRARY library)
 
-  IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-    #
-    # and a debug target
-    #
-    ADD_LIBRARY(${library}_debug
+  FOREACH(build ${DEAL_II_BUILD_TYPES})
+    STRING(TOLOWER ${build} build_lowercase)
+
+    ADD_LIBRARY(${library}.${build_lowercase}
       ${ARGN}
       )
 
-    SET_TARGET_PROPERTIES(${library}_debug PROPERTIES
-      LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}"
-      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_DEBUG}"
-      COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_DEBUG}"
+    SET_TARGET_PROPERTIES(${library}.${build_lowercase} PROPERTIES
+      LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_${build}}"
+      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
+      COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
       )
 
     FILE(APPEND
-      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/deal_ii_objects_debug
-      "$<TARGET_OBJECTS:${library}_debug>\n"
+      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/deal_ii_objects_${build_lowercase}
+      "$<TARGET_OBJECTS:${library}.${build_lowercase}>\n"
       )
-  ENDIF()
-
-  IF(CMAKE_BUILD_TYPE MATCHES "Release")
-    #
-    # Add a release target
-    #
-    ADD_LIBRARY(${library}
-      ${ARGN}
-      )
-
-    SET_TARGET_PROPERTIES(${library} PROPERTIES
-      LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}"
-      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_RELEASE}"
-      COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_RELEASE}"
-      )
-
-    FILE(APPEND
-      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/deal_ii_objects
-      "$<TARGET_OBJECTS:${library}>\n"
-      )
-  ENDIF()
+  ENDFOREACH()
 
 ENDMACRO()
