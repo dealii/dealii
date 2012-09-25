@@ -34,7 +34,7 @@ for (V: EXTERNAL_SEQUENTIAL_VECTORS)
   }
 
 
-for (V: EXTERNAL_DISTRIBUTED_VECTORS)
+for (V: EXTERNAL_PARALLEL_VECTORS)
   {
     template void ConstraintMatrix::set_zero<V >(V&) const;
   }

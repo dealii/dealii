@@ -28,13 +28,16 @@ MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL var)
   # The user has to know the location of the mpi headers as well:
   LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${MPI_CXX_INCLUDE_PATH})
 
-  # TODO: Set up the rest:
 
-  #MPI_CXX_COMPILER        MPI Compiler wrapper for CXX
-  #MPIEXEC                 Executable for running MPI programs
-  #MPIEXEC_NUMPROC_FLAG    Flag to pass to MPIEXEC before giving it the number of processors to run on
-  #MPIEXEC_PREFLAGS        Flags to pass to MPIEXEC directly before the executable to run.
-  #MPIEXEC_POSTFLAGS       Flags to pass to MPIEXEC after other flags
+  SET(DEAL_II_SET_MPI_COMPILER ON CACHE BOOL
+    "Set compiler to the detected mpi wrapper"
+    )
+  MARK_AS_ADVANCED(DEAL_II_SET_MPI_COMPILER)
+
+  IF(DEAL_II_SET_MPI_COMPILER)
+    SET(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
+    SET(CMAKE_C_COMPILER   ${MPI_C_COMPILER})
+  ENDIF()
 
   SET(DEAL_II_COMPILER_SUPPORTS_MPI TRUE)
 

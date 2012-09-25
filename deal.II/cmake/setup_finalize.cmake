@@ -17,6 +17,10 @@ MARK_AS_ADVANCED(file_cmd)
 #
 FOREACH(flags ${deal_ii_used_flags})
   SET(${flags} "${${flags}} ${${flags}_SAVED}")
+  #
+  # Strip leading and trailing whitespace:
+  #
+  STRING(STRIP "${flags}" flags)
 ENDFOREACH()
 
 
@@ -39,6 +43,7 @@ MESSAGE("
       CMAKE_BINARY_DIR:       ${CMAKE_BINARY_DIR}
 
       CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME}
+                              ${CMAKE_CXX_COMPILER}
 
 Compiler flags used for this build:
       CMAKE_CXX_FLAGS:                     ${CMAKE_CXX_FLAGS}")
@@ -61,6 +66,7 @@ IF(FEATURE_UMFPACK_CONTRIB_CONFIGURED)
   MESSAGE("
 The contrib UMFPACK library will be compiled with the following C compiler:
       CMAKE_C_COMPILER:         ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
+                                ${CMAKE_C_COMPILER}
       CMAKE_C_FLAGS:           ${CMAKE_C_FLAGS}")
   IF(CMAKE_BUILD_TYPE MATCHES "Release")
     MESSAGE("      DEAL_II_C_FLAGS_RELEASE: ${DEAL_II_C_FLAGS_RELEASE}")

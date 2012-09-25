@@ -57,7 +57,6 @@ SET(DEAL_II_LINKER_FLAGS_RELEASE "${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}")
 SET(DEAL_II_LINKER "${CMAKE_LINKER}")
 SET(DEAL_II_AR "${CMAKE_AR}")
 
-
 #
 # Information on where to find the deal.II libraries and headers
 #
