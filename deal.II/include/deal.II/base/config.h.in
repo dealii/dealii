@@ -385,12 +385,6 @@
  * Configured in check_for_compiler_bugs: *
  ******************************************/
 
-/* Define if we have to work around a bug in gcc with explicitly
- * instantiating template member operators. See the aclocal.m4 file in the
- * top-level directory for a description of this bug.
- */
-#define DEAL_II_MEMBER_OP_TEMPLATE_INST @DEAL_II_MEMBER_OP_TEMPLATE_INST@
-
 /* Define if we have to work around a bug where the compiler doesn't accept
  * an explicit destructor call. See the aclocal.m4 file in the top-level
  * directory for a description of this bug.
