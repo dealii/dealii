@@ -253,12 +253,6 @@ ADD_SUBDIRECTORY(include)
 
 
 #
-# Build optional contrib targets:
-#
-#ADD_SUBDIRECTORY(contrib)
-
-
-#
 # Compile and install the library:
 #
 ADD_SUBDIRECTORY(source)

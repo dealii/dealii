@@ -13,6 +13,7 @@ SET(FEATURE_FUNCTIONPARSER_HAVE_CONTRIB TRUE)
 
 
 MACRO(FEATURE_FUNCTIONPARSER_CONFIGURE_CONTRIB var)
+
   #
   # compile the necessary parts of functionparser out of ./contrib
   #

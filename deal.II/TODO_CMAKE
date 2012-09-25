@@ -28,14 +28,8 @@ Major:
 
 Minor:
 
-* Fix up WARNING/STATUS error messages
-
 * There is still a perl script for generating lapack_templates.h. Is this
   necessary.
-
-* The Find modules under contrib/cmake/modules export <...>_LIBRARY and
-  <...>_INCLUDE_DIR, wheras the convention is nowadays _LIBRARIES and
-  _INCLUDE_DIRS, fix this.
 
 * What to do with ./lib/meshes ? I have moved it to ./contrib/meshes for
   the time being...
@@ -48,3 +42,5 @@ Minor:
 
 * Reenable support for metis versions 4.x ?!
 
+* The contrib libraries are included too early. User CXX_FLAGS won't be
+  included in the contrib object targets...

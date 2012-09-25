@@ -126,9 +126,6 @@ SET(FEATURE_TBB_HAVE_CONTRIB TRUE)
 
 
 MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
-  #
-  # Add tbb directly to the object files of deal.II
-  #
 
   #
   # Setup threading (before configuring our build...)
@@ -155,6 +152,9 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
 
   INCLUDE_DIRECTORIES(${tbb_folder}/include)
 
+  #
+  # Add tbb directly to the object files of deal.II
+  #
   ADD_SUBDIRECTORY(${tbb_folder}/src)
 
 ENDMACRO()
