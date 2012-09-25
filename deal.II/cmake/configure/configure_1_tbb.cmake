@@ -151,11 +151,11 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
       )
   ENDIF()
 
-  INCLUDE_DIRECTORIES(
-    ${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/include
-    )
+  SET(tbb_folder "${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss")
 
-  ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss/src)
+  INCLUDE_DIRECTORIES(${tbb_folder}/include)
+
+  ADD_SUBDIRECTORY(${tbb_folder}/src)
 
 ENDMACRO()
 
