@@ -58,7 +58,8 @@ IF("${PETSC_INCLUDE_DIR_ARCH}" STREQUAL "${PETSC_DIR}/${PETSC_ARCH}/include")
   # We found petsc and we used PETSC_DIR and PETSC_ARCH for finding it.
   # So, we assume a source tree layout:
   #
-  IF(PETSC_INCLUDE_DIRS MATCHES "-NOTFOUND")
+  IF( PETSC_INCLUDE_DIRS MATCHES "-NOTFOUND" OR
+      "${PETSC_INCLUDE_DIRS}" STREQUAL "" )
     SET(PETSC_INCLUDE_DIRS "${PETSC_INCLUDE_DIR_ARCH};${PETSC_DIR}/include"
       CACHE STRING "Include paths for petsc"
       FORCE
