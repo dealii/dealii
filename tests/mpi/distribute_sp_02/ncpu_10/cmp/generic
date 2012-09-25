@@ -1,0 +1,8 @@
+
+DEAL:mpi::Running on 10 CPU(s).
+DEAL:mpi::blocks: 1x1
+DEAL:mpi::size: 100x100
+DEAL:mpi::part 2
+DEAL:mpi::blocks: 2x2
+DEAL:mpi::size: 101x101
+DEAL:mpi::done
