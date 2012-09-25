@@ -135,8 +135,9 @@ ENDIF()
 # TODO: Remove this hack.
 #
 FOREACH(build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER build_lowercase "${build}")
+  STRING(TOLOWER "${build}" build_lowercase)
   FILE(REMOVE
     ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${build_lowercase}
     )
+  MESSAGE("${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${build_lowercase}")
 ENDFOREACH()
