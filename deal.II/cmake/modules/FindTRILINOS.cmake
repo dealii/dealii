@@ -53,13 +53,13 @@ SET(TRILINOS_INCLUDE_DIRS ${Trilinos_INCLUDE_DIRS})
 # So we check again for every lib and store the full path:
 #
 FOREACH(library ${Trilinos_LIBRARIES})
-  FIND_LIBRARY(TRILINOS_LIBRARY_${macro_library}
+  FIND_LIBRARY(TRILINOS_LIBRARY_${library}
     NAMES ${library}
     HINTS ${Trilinos_LIBRARY_DIRS}
     )
-  MARK_AS_ADVANCED(TRILINOS_LIBRARY_${macro_library})
+  MARK_AS_ADVANCED(TRILINOS_LIBRARY_${library})
 
-  LIST(APPEND TRILINOS_LIBRARIES ${TRILINOS_LIBRARY_${macro_library}})
+  LIST(APPEND TRILINOS_LIBRARIES ${TRILINOS_LIBRARY_${library}})
 ENDFOREACH()
 
 
