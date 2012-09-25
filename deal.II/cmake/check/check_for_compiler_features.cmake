@@ -1,3 +1,4 @@
+
 #
 # Check for various compiler features.
 #
@@ -263,17 +264,14 @@ CHECK_CXX_SOURCE_COMPILES(
 # to make sure that we match the exception specification
 # correctly.
 #
-#include <cstdlib>
-CHECK_CXX_SOURCE_COMPILES(
+# (Yes. It is not a bug. But the logic is the same.)
+CHECK_CXX_COMPILER_BUG(
   "
-  extern \\"C\\" void abort () { for(;;) ; }
+  #include <cstdlib>
+  extern \"C\" void abort () { for(;;) ; }
   int main(){ return 0; }
   "
-  DEAL_II_ABORT_WITHOUT_NOTHROW_EXCEPTION)
-
-IF(DEAL_II_ABORT_WITHOUT_NOTHROW_EXCEPTION)
-  SET(DEAL_II_ABORT_NOTHROW_EXCEPTION TRUE)
-ENDIF()
+  DEAL_II_ABORT_NOTHROW_EXCEPTION)
 
 
 

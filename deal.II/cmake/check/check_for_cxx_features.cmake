@@ -11,26 +11,28 @@ CHECK_CXX_SOURCE_COMPILES(
   HAVE_STD_IOSFWD_HEADER)
 
 
-
-
 #
 # C++11 Support:
 #
 
-
-# See if there is a compiler flag to enable C++11 features
-# (Only test for -std=c++0x for the moment.)
 #
-# TODO: We should also check for -std=c++11.
-CHECK_CXX_COMPILER_FLAG(
-  "-std=c++0x"
-  DEAL_II_HAVE_CXX11_FLAG)
-
+# See if there is a compiler flag to enable C++11 features
+#
+FOREACH(test_flag
+    "-std=c++11"
+    "-std=c++-x"
+    )
+  SET(flag ${test_flag})
+  CHECK_CXX_COMPILER_FLAG("${test_flag}" DEAL_II_HAVE_CXX11_FLAG)
+  IF(DEAL_II_HAVE_CXX11_FLAG)
+    BREAK()
+  ENDIF()
+ENDFOREACH()
 
 IF(DEAL_II_HAVE_CXX11_FLAG)
 
   # Set CMAKE_REQUIRED_FLAGS for the unit tests
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-std=c++0x")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${flag}")
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -139,16 +141,16 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
       DEAL_II_HAVE_CXX11_TUPLE AND
       DEAL_II_HAVE_CXX11_TYPE_TRAITS )
 
-    MESSAGE(STATUS "Sufficient C++11 support. Enabling -std=c++0x.")
+    MESSAGE(STATUS "Sufficient C++11 support. Enabling ${flag}.")
 
     SET(DEAL_II_CAN_USE_CXX1X TRUE) # TODO
     SET(DEAL_II_CAN_USE_CXX11 TRUE)
 
-    ADD_FLAGS(CMAKE_CXX_FLAGS "-std=c++0x")
+    ADD_FLAGS(CMAKE_CXX_FLAGS "${flag}")
 
   ELSE()
 
-    MESSAGE(STATUS "Insufficient C++11 support. Disabling -std=c++0x.")
+    MESSAGE(STATUS "Insufficient C++11 support. Disabling ${flag}.")
   ENDIF()
 
   IF(DEAL_II_CAN_USE_CXX11)
@@ -184,10 +186,10 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     ENDIF()
   ENDIF()
 
-  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-std=c++0x")
+  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${flag}")
 
 ELSE()
-    MESSAGE(STATUS "Insufficient C++11 support. Disabling -std=c++0x.")
+    MESSAGE(STATUS "Insufficient C++11 support. Disabling ${flag}.")
 ENDIF()
 
 
@@ -216,7 +218,7 @@ CHECK_CXX_SOURCE_COMPILES(
 
 
 #
-# Checks for various header files: # TODO: Obsolete?
+# Checks for various header files:
 #
 
 CHECK_INCLUDE_FILE("stdint.h" HAVE_STDINT_H)
