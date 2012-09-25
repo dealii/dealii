@@ -81,6 +81,10 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: Added BlockCompressedSimpleSparsityPattern::column_number().
+<br>
+(Timo Heister, 2012/09/25)
+
 <li> New: There is now a function hp::FECollection::n_blocks() in analogy to
 the existing function hp::FECollection::n_components().
 <br>
