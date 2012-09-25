@@ -68,6 +68,12 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> New: Added SparsityTools::distribute_sparsity_pattern() for
+BlockCompressedSimpleSparsityPattern. This allows parallel computations
+with distributed::Triangulation and PETScWrappers::MPI::BlockSparseMatrix.
+<br>
+(Timo Heister, 2012/09/25)
+
 <li> Simplifications of the internal structures of Triangulation and
 DoFHandler, in particular removal of specializations.
 <br>
