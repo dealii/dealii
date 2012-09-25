@@ -1,8 +1,8 @@
 //----------------------------  dof_tools_12.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,11 +30,11 @@ check_this (const DoFHandler<dim> &dof_handler)
 
                                    // only select first component
   mask[0] = true;
-  DoFTools::extract_dofs (dof_handler, mask, selected_dofs);
+  DoFTools::extract_dofs (dof_handler, ComponentMask(mask), selected_dofs);
   output_bool_vector (selected_dofs);
 
                                    // also select last component
   mask.back() = true;
-  DoFTools::extract_dofs (dof_handler, mask, selected_dofs);
+  DoFTools::extract_dofs (dof_handler, ComponentMask(mask), selected_dofs);
   output_bool_vector (selected_dofs);
 }

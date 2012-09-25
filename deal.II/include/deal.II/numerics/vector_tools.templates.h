@@ -259,7 +259,7 @@ namespace VectorTools
                   = function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]];
             }
         }
-    vec.compress(::dealii::VectorOperation::insert);    
+    vec.compress(::dealii::VectorOperation::insert);
   }
 
 
@@ -1467,14 +1467,13 @@ namespace VectorTools
                                       const DH                 &dof,
                                       const typename FunctionMap<DH::space_dimension>::type &function_map,
                                       std::map<unsigned int,double> &boundary_values,
-                                      const std::vector<bool>       &component_mask_,
+                                      const ComponentMask       &component_mask,
                                       const dealii::internal::int2type<1>)
     {
       const unsigned int dim = DH::dimension;
       const unsigned int spacedim=DH::space_dimension;
 
-      Assert ((component_mask_.size() == 0) ||
-              (component_mask_.size() == dof.get_fe().n_components()),
+      Assert (component_mask.represents_n_components(dof.get_fe().n_components()),
               ExcMessage ("The number of components in the mask has to be either "
                           "zero or equal to the number of components in the finite "
                           "element."));
@@ -1508,13 +1507,7 @@ namespace VectorTools
                       ExcDimensionMismatch(fe.n_components(),
                                            boundary_function.n_components));
 
-                                               // set the component mask to either
-                                               // the original value or a vector
-                                               // of trues
-              const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-                                                      std::vector<bool> (fe.n_components(), true) :
-                                                      component_mask_);
-              Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+              Assert (component_mask.n_selected_components(fe.n_components()) > 0,
                       ExcNoComponentSelected());
 
                                                // now set the value of
@@ -1558,14 +1551,13 @@ namespace VectorTools
                                  const DH                 &dof,
                                  const typename FunctionMap<DH::space_dimension>::type &function_map,
                                  std::map<unsigned int,double> &boundary_values,
-                                 const std::vector<bool>       &component_mask_,
+                                 const ComponentMask       &component_mask,
                                  const dealii::internal::int2type<DH::dimension>)
     {
       const unsigned int dim = DH::dimension;
       const unsigned int spacedim=DH::space_dimension;
 
-      Assert ((component_mask_.size() == 0) ||
-              (component_mask_.size() == dof.get_fe().n_components()),
+      Assert (component_mask.represents_n_components(dof.get_fe().n_components()),
               ExcMessage ("The number of components in the mask has to be either "
                           "zero or equal to the number of components in the finite "
                           "element."));
@@ -1587,15 +1579,6 @@ namespace VectorTools
            i!=function_map.end(); ++i)
         Assert (n_components == i->second->n_components,
                 ExcDimensionMismatch(n_components, i->second->n_components));
-
-                                       // set the component mask to either
-                                       // the original value or a vector
-                                       // of trues
-      const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-                                              std::vector<bool> (n_components, true) :
-                                              component_mask_);
-      Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-              ExcNoComponentSelected());
 
                                        // field to store the indices
       std::vector<unsigned int> face_dofs;
@@ -1718,7 +1701,7 @@ namespace VectorTools
                                                // are in fact primitive
               for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
                 {
-                  const std::vector<bool> &nonzero_component_array
+                  const ComponentMask &nonzero_component_array
                     = cell->get_fe().get_nonzero_components (i);
                   for (unsigned int c=0; c<n_components; ++c)
                     if ((nonzero_component_array[c] == true)
@@ -1877,11 +1860,7 @@ namespace VectorTools
                                                                // component
                                                                // which we
                                                                // will use
-                              component = (std::find (fe.get_nonzero_components(cell_i).begin(),
-                                                      fe.get_nonzero_components(cell_i).end(),
-                                                      true)
-                                           -
-                                           fe.get_nonzero_components(cell_i).begin());
+                              component = fe.get_nonzero_components(cell_i).first_selected_component();
                             }
 
                           if (component_mask[component] == true)
@@ -1917,7 +1896,7 @@ namespace VectorTools
                                const DH                 &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
                                std::map<unsigned int,double> &boundary_values,
-                               const std::vector<bool>       &component_mask_)
+                               const ComponentMask       &component_mask_)
   {
     internal::
       interpolate_boundary_values (mapping, dof, function_map, boundary_values,
@@ -1934,7 +1913,7 @@ namespace VectorTools
                                const types::boundary_id            boundary_component,
                                const Function<DH::space_dimension>           &boundary_function,
                                std::map<unsigned int,double> &boundary_values,
-                               const std::vector<bool>       &component_mask)
+                               const ComponentMask       &component_mask)
   {
     typename FunctionMap<DH::space_dimension>::type function_map;
     function_map[boundary_component] = &boundary_function;
@@ -1950,7 +1929,7 @@ namespace VectorTools
                                const types::boundary_id            boundary_component,
                                const Function<DH::space_dimension>           &boundary_function,
                                std::map<unsigned int,double> &boundary_values,
-                               const std::vector<bool>       &component_mask)
+                               const ComponentMask       &component_mask)
   {
     interpolate_boundary_values(StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
                                 dof, boundary_component,
@@ -1964,7 +1943,7 @@ namespace VectorTools
   interpolate_boundary_values (const DH                 &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
                                std::map<unsigned int,double> &boundary_values,
-                               const std::vector<bool>       &component_mask)
+                               const ComponentMask       &component_mask)
   {
     interpolate_boundary_values(StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
                                 dof, function_map,
@@ -1985,7 +1964,7 @@ namespace VectorTools
    const DH                                              &dof,
    const typename FunctionMap<DH::space_dimension>::type &function_map,
    ConstraintMatrix                                      &constraints,
-   const std::vector<bool>                               &component_mask_)
+   const ComponentMask                               &component_mask_)
   {
     std::map<unsigned int,double> boundary_values;
     interpolate_boundary_values (mapping, dof, function_map,
@@ -2015,7 +1994,7 @@ namespace VectorTools
    const types::boundary_id                                boundary_component,
    const Function<DH::space_dimension>               &boundary_function,
    ConstraintMatrix                                  &constraints,
-   const std::vector<bool>                           &component_mask)
+   const ComponentMask                           &component_mask)
   {
     typename FunctionMap<DH::space_dimension>::type function_map;
     function_map[boundary_component] = &boundary_function;
@@ -2032,7 +2011,7 @@ namespace VectorTools
    const types::boundary_id                  boundary_component,
    const Function<DH::space_dimension> &boundary_function,
    ConstraintMatrix                    &constraints,
-   const std::vector<bool>             &component_mask)
+   const ComponentMask             &component_mask)
   {
     interpolate_boundary_values(StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
                                 dof, boundary_component,
@@ -2047,7 +2026,7 @@ namespace VectorTools
   (const DH                                              &dof,
    const typename FunctionMap<DH::space_dimension>::type &function_map,
    ConstraintMatrix                                      &constraints,
-   const std::vector<bool>                               &component_mask)
+   const ComponentMask                               &component_mask)
   {
     interpolate_boundary_values(StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
                                 dof, function_map,
@@ -2074,7 +2053,7 @@ namespace VectorTools
                                      // projection in 1d is equivalent
                                      // to interpolation
     interpolate_boundary_values (mapping, dof, boundary_functions,
-                                 boundary_values, std::vector<bool>());
+                                 boundary_values, ComponentMask());
   }
 
 
@@ -2092,7 +2071,7 @@ namespace VectorTools
                                      // projection in 1d is equivalent
                                      // to interpolation
     interpolate_boundary_values (mapping, dof, boundary_functions,
-                                 boundary_values, std::vector<bool>());
+                                 boundary_values, ComponentMask());
   }
 
 
@@ -2784,24 +2763,23 @@ namespace VectorTools
 
       const std::vector<Point<dim> >&
         reference_quadrature_points = fe_values.get_quadrature ().get_points ();
-      const unsigned int degree = fe.degree - 1;
       std::pair<unsigned int, unsigned int> base_indices (0, 0);
-      
+
       if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) != 0)
       {
         unsigned int fe_index = 0;
         unsigned int fe_index_old = 0;
         unsigned int i = 0;
-        
+
         for (; i < fe.n_base_elements (); ++i)
         {
           fe_index_old = fe_index;
           fe_index += fe.element_multiplicity (i) * fe.base_element (i).n_components ();
-          
+
           if (fe_index >= first_vector_component)
             break;
         }
-        
+
         base_indices.first = i;
         base_indices.second = (first_vector_component - fe_index_old) / fe.base_element (i).n_components ();
       }
@@ -2875,7 +2853,7 @@ namespace VectorTools
                                  * jacobians[q_point][1][edge_coordinate_direction[face][line]]
                                  + jacobians[q_point][2][edge_coordinate_direction[face][line]]
                                  * jacobians[q_point][2][edge_coordinate_direction[face][line]]));
-              
+
               if (q_point == 0)
                 dofs_processed[i] = true;
             }
@@ -2927,22 +2905,22 @@ namespace VectorTools
         quadrature_points = fe_values.get_quadrature_points ();
       const unsigned int degree = fe.degree - 1;
       std::pair<unsigned int, unsigned int> base_indices (0, 0);
-      
+
       if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) != 0)
       {
         unsigned int fe_index = 0;
         unsigned int fe_index_old = 0;
         unsigned int i = 0;
-        
+
         for (; i < fe.n_base_elements (); ++i)
         {
           fe_index_old = fe_index;
           fe_index += fe.element_multiplicity (i) * fe.base_element (i).n_components ();
-          
+
           if (fe_index >= first_vector_component)
             break;
         }
-        
+
         base_indices.first = i;
         base_indices.second = (first_vector_component - fe_index_old) / fe.base_element (i).n_components ();
       }
@@ -3025,7 +3003,7 @@ namespace VectorTools
                                    * jacobians[q_point][0][face_coordinate_direction[face]]
                                    + jacobians[q_point][1][face_coordinate_direction[face]]
                                    * jacobians[q_point][1][face_coordinate_direction[face]]);
-                    
+
                     if (q_point == 0)
                       dofs_processed[i] = true;
                   }
@@ -3094,7 +3072,7 @@ namespace VectorTools
 
                 for (unsigned int d = 0; d < dim; ++d)
                   tmp[d] = values[q_point] (first_vector_component + d);
-                
+
                 for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
                   if (((dynamic_cast<const FESystem<dim>*> (&fe) != 0)
                        && (fe.system_to_base_index (fe.face_to_cell_index (i, face)).first == base_indices)
@@ -3137,9 +3115,9 @@ namespace VectorTools
                                                  // the face.
                 for (unsigned int d = 0; d < dim; ++d)
                   assembling_vector (dim * q_point + d) = JxW * tmp[d];
-                
+
                 unsigned int index = 0;
-                
+
                 for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
                   if (((dynamic_cast<const FESystem<dim>*> (&fe) != 0)
                        && (fe.system_to_base_index (fe.face_to_cell_index (i, face)).first == base_indices)
@@ -3159,7 +3137,7 @@ namespace VectorTools
 
                       for (unsigned int d = 0; d < dim; ++d)
                         assembling_matrix (index, dim * q_point + d) = shape_value[d];
-                      
+
                       ++index;
                     }
               }
@@ -3186,7 +3164,7 @@ namespace VectorTools
                                              // values.
             {
               unsigned int index = 0;
-              
+
               for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
                 if (((dynamic_cast<const FESystem<dim>*> (&fe) != 0)
                      && (fe.system_to_base_index (fe.face_to_cell_index (i, face)).first == base_indices)
@@ -3252,7 +3230,7 @@ namespace VectorTools
                   assembling_vector (dim * q_point + d) = JxW * tmp[d];
 
                 unsigned int index = 0;
-                
+
                 for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
                   if (((dynamic_cast<const FESystem<dim>*> (&fe) != 0)
                        && (fe.system_to_base_index (fe.face_to_cell_index (i, face)).first == base_indices)
@@ -3268,7 +3246,7 @@ namespace VectorTools
 
                       for (unsigned int d = 0; d < dim; ++d)
                         assembling_matrix (index, dim * q_point + d) = shape_value[d];
-                      
+
                       ++index;
                     }
               }
@@ -3279,7 +3257,7 @@ namespace VectorTools
             cell_matrix_inv.vmult (solution, cell_rhs);
 
             unsigned int index = 0;
-            
+
             for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
               if (((dynamic_cast<const FESystem<dim>*> (&fe) != 0)
                    && (fe.system_to_base_index (fe.face_to_cell_index (i, face)).first == base_indices)
@@ -3517,7 +3495,7 @@ namespace VectorTools
 
                     cell->face (face)->get_dof_indices (face_dof_indices,
                                                         cell->active_fe_index ());
-                    
+
                     const double tol = 0.5 * superdegree * 1e-13 / cell->face (face)->diameter ();
 
                     for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
@@ -3606,7 +3584,7 @@ namespace VectorTools
                       }
 
                     const unsigned int dofs_per_face = cell->get_fe ().dofs_per_face;
-                    
+
                     dofs_processed.resize (dofs_per_face);
                     dof_values.resize (dofs_per_face);
 
@@ -3694,7 +3672,7 @@ namespace VectorTools
                     const unsigned int superdegree = cell->get_fe ().degree;
                     const unsigned int degree = superdegree - 1;
                     const unsigned int dofs_per_face = cell->get_fe ().dofs_per_face;
-                    
+
                     dofs_processed.resize (dofs_per_face);
                     dof_values.resize (dofs_per_face);
 
@@ -3728,7 +3706,7 @@ namespace VectorTools
                     face_dof_indices.resize (dofs_per_face);
                     cell->face (face)->get_dof_indices (face_dof_indices,
                                                         cell->active_fe_index ());
-                    
+
                     const double tol = 0.5 * superdegree * 1e-13  / cell->face (face)->diameter ();
 
                     for (unsigned int dof = 0; dof < dofs_per_face; ++dof)

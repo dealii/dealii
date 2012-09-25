@@ -73,6 +73,181 @@ namespace hp
 
 
   template <int dim, int spacedim>
+  ComponentMask
+  FECollection<dim,spacedim>::
+  component_mask (const FEValuesExtractors::Scalar &scalar) const
+  {
+    Assert (size() > 0,
+            ExcMessage ("This collection contains no finite element."));
+
+    // get the mask from the first element of the collection
+    const ComponentMask mask = (*this)[0].component_mask(scalar);
+
+    // but then also verify that the other elements of the collection
+    // would return the same mask
+    for (unsigned int c=1; c<size(); ++c)
+      Assert (mask == (*this)[c].component_mask(scalar),
+              ExcInternalError());
+
+    return mask;
+  }
+
+
+  template <int dim, int spacedim>
+  ComponentMask
+  FECollection<dim,spacedim>::
+  component_mask (const FEValuesExtractors::Vector &vector) const
+  {
+    Assert (size() > 0,
+            ExcMessage ("This collection contains no finite element."));
+
+    // get the mask from the first element of the collection
+    const ComponentMask mask = (*this)[0].component_mask(vector);
+
+    // but then also verify that the other elements of the collection
+    // would return the same mask
+    for (unsigned int c=1; c<size(); ++c)
+      Assert (mask == (*this)[c].component_mask(vector),
+              ExcInternalError());
+
+    return mask;
+  }
+
+
+  template <int dim, int spacedim>
+  ComponentMask
+  FECollection<dim,spacedim>::
+  component_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const
+  {
+    Assert (size() > 0,
+            ExcMessage ("This collection contains no finite element."));
+
+    // get the mask from the first element of the collection
+    const ComponentMask mask = (*this)[0].component_mask(sym_tensor);
+
+    // but then also verify that the other elements of the collection
+    // would return the same mask
+    for (unsigned int c=1; c<size(); ++c)
+      Assert (mask == (*this)[c].component_mask(sym_tensor),
+              ExcInternalError());
+
+    return mask;
+  }
+
+
+  template <int dim, int spacedim>
+  ComponentMask
+  FECollection<dim,spacedim>::
+  component_mask (const BlockMask &block_mask) const
+  {
+    Assert (size() > 0,
+            ExcMessage ("This collection contains no finite element."));
+
+    // get the mask from the first element of the collection
+    const ComponentMask mask = (*this)[0].component_mask(block_mask);
+
+    // but then also verify that the other elements of the collection
+    // would return the same mask
+    for (unsigned int c=1; c<size(); ++c)
+      Assert (mask == (*this)[c].component_mask(block_mask),
+              ExcMessage ("Not all elements of this collection agree on what "
+			  "the appropriate mask should be."));
+
+    return mask;
+  }
+
+
+  template <int dim, int spacedim>
+  BlockMask
+  FECollection<dim,spacedim>::
+  block_mask (const FEValuesExtractors::Scalar &scalar) const
+  {
+    Assert (size() > 0,
+            ExcMessage ("This collection contains no finite element."));
+
+    // get the mask from the first element of the collection
+    const BlockMask mask = (*this)[0].block_mask(scalar);
+
+    // but then also verify that the other elements of the collection
+    // would return the same mask
+    for (unsigned int c=1; c<size(); ++c)
+      Assert (mask == (*this)[c].block_mask(scalar),
+              ExcMessage ("Not all elements of this collection agree on what "
+			  "the appropriate mask should be."));
+
+    return mask;
+  }
+
+
+  template <int dim, int spacedim>
+  BlockMask
+  FECollection<dim,spacedim>::
+  block_mask (const FEValuesExtractors::Vector &vector) const
+  {
+    Assert (size() > 0,
+            ExcMessage ("This collection contains no finite element."));
+
+    // get the mask from the first element of the collection
+    const BlockMask mask = (*this)[0].block_mask(vector);
+
+    // but then also verify that the other elements of the collection
+    // would return the same mask
+    for (unsigned int c=1; c<size(); ++c)
+      Assert (mask == (*this)[c].block_mask(vector),
+              ExcMessage ("Not all elements of this collection agree on what "
+			  "the appropriate mask should be."));
+
+    return mask;
+  }
+
+
+  template <int dim, int spacedim>
+  BlockMask
+  FECollection<dim,spacedim>::
+  block_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const
+  {
+    Assert (size() > 0,
+            ExcMessage ("This collection contains no finite element."));
+
+    // get the mask from the first element of the collection
+    const BlockMask mask = (*this)[0].block_mask(sym_tensor);
+
+    // but then also verify that the other elements of the collection
+    // would return the same mask
+    for (unsigned int c=1; c<size(); ++c)
+      Assert (mask == (*this)[c].block_mask(sym_tensor),
+              ExcMessage ("Not all elements of this collection agree on what "
+			  "the appropriate mask should be."));
+
+    return mask;
+  }
+
+
+
+  template <int dim, int spacedim>
+  BlockMask
+  FECollection<dim,spacedim>::
+  block_mask (const ComponentMask &component_mask) const
+  {
+    Assert (size() > 0,
+            ExcMessage ("This collection contains no finite element."));
+
+    // get the mask from the first element of the collection
+    const BlockMask mask = (*this)[0].block_mask(component_mask);
+
+    // but then also verify that the other elements of the collection
+    // would return the same mask
+    for (unsigned int c=1; c<size(); ++c)
+      Assert (mask == (*this)[c].block_mask(component_mask),
+              ExcMessage ("Not all elements of this collection agree on what "
+			  "the appropriate mask should be."));
+
+    return mask;
+  }
+
+
+
+  template <int dim, int spacedim>
   unsigned int
   FECollection<dim,spacedim>::n_blocks () const
   {

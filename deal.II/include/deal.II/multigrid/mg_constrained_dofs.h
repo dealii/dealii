@@ -59,7 +59,7 @@ class MGConstrainedDoFs : public Subscriptor
     template <int dim, int spacedim>
     void initialize(const MGDoFHandler<dim,spacedim>& dof,
                     const typename FunctionMap<dim>::type& function_map,
-                    const std::vector<bool>& component_mask = std::vector<bool>());
+                    const ComponentMask &component_mask = ComponentMask());
 
                                      /**
                                       * Reset the data structures.
@@ -209,7 +209,7 @@ void
 MGConstrainedDoFs::initialize(
   const MGDoFHandler<dim,spacedim>& dof,
   const typename FunctionMap<dim>::type& function_map,
-  const std::vector<bool>& component_mask)
+  const ComponentMask &component_mask)
 {
   const unsigned int nlevels = dof.get_tria().n_levels();
   boundary_indices.resize(nlevels);

@@ -1,8 +1,8 @@
 //----------------------------  anna_3.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2010 by the deal.II authors and Anna Schneebeli
+//    Copyright (C) 2002, 2003, 2004, 2005, 2010, 2012 by the deal.II authors and Anna Schneebeli
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_system.h>		
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_base.h>
@@ -39,22 +39,22 @@
 
 
 template <int dim>
-class SystemTest 
+class SystemTest
 {
   public:
     SystemTest ();
-    void run ();    
-				    
+    void run ();
+
   private:
     void make_grid_and_dofs ();
     void check ();
 
-				    
+
     Triangulation<dim>     triangulation;
     FESystem<dim>          fe;
     DoFHandler<dim>        dof_handler;
 
-				   
+
 };
 
 template <int dim>
@@ -67,23 +67,23 @@ SystemTest<dim>::SystemTest () :
 
 template <int dim>
 void SystemTest<dim>::make_grid_and_dofs ()
-{			  
+{
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (0);
   deallog << "Number of active cells: " << triangulation.n_active_cells()
           << std::endl;
   deallog << "Total number of cells: " << triangulation.n_cells()
           << std::endl;
-				  
+
   dof_handler.distribute_dofs (fe);
   deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
-				  
+
 }
 
 
 template <int dim>
-void SystemTest<dim>::check () 
+void SystemTest<dim>::check ()
 {
   for (unsigned int c=0; c<fe.n_components(); ++c)
     {
@@ -91,7 +91,7 @@ void SystemTest<dim>::check ()
       std::vector<bool> x(fe.n_components(), false);
       x[c] = true;
       std::vector<bool> sel(dof_handler.n_dofs());
-      DoFTools::extract_dofs (dof_handler, x, sel);
+      DoFTools::extract_dofs (dof_handler, ComponentMask(x), sel);
 
       for (unsigned int i=0; i<sel.size(); ++i)
         if (sel[i])
@@ -108,7 +108,7 @@ void SystemTest<dim>::check ()
 
 
 template <int dim>
-void SystemTest<dim>::run () 
+void SystemTest<dim>::run ()
 {
   deallog << "************* " << dim << "D *************" << std::endl;
   make_grid_and_dofs ();
@@ -121,9 +121,9 @@ void SystemTest<dim>::run ()
   check ();
 }
 
-    
 
-int main () 
+
+int main ()
 {
   std::ofstream logfile("anna_3/output");
   deallog.attach(logfile);
@@ -131,6 +131,6 @@ int main ()
   deallog.threshold_double(1.e-10);
 
   SystemTest<2>().run();
-  SystemTest<3>().run();  
+  SystemTest<3>().run();
   return 0;
 }

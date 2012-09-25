@@ -1,0 +1,5 @@
+
+DEAL::OK
+DEAL::ExcDimensionMismatch((n),(size()))
+DEAL::ExcMessage ("No component is selected at all!")
+DEAL::ExcInternalError()

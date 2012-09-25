@@ -39,114 +39,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace
 {
                                      /**
-                                      * Adjust block-vectors on all
-                                      * levels to correct size.  Count
-                                      * the numbers of degrees of
-                                      * freedom on each level
-                                      * component-wise. Then, assign
-                                      * each block of @p vector the
-                                      * corresponding size.
-                                      *
-                                      * The boolean field @p selected
-                                      * allows restricting this
-                                      * operation to certain
-                                      * components. In this case, @p
-                                      * vector will only have as many
-                                      * blocks as there are true
-                                      * values in @p selected (no
-                                      * blocks of length zero are
-                                      * padded in). If this argument
-                                      * is omitted, all blocks will be
-                                      * considered.
-                                      *
-                                      * Degrees of freedom must be
-                                      * sorted by component in order
-                                      * to obtain reasonable results
-                                      * from this function.
-                                      *
-                                      * The argument
-                                      * @p target_component allows to
-                                      * re-sort and group components
-                                      * as in
-                                      * DoFRenumbering::component_wise.
-                                      *
-                                      *
-                                      */
-  template <int dim, typename number, int spacedim>
-  void
-  reinit_vector_by_components (
-    const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
-    MGLevelObject<BlockVector<number> > &v,
-    const std::vector<bool> &sel,
-    const std::vector<unsigned int> &target_comp,
-    std::vector<std::vector<unsigned int> >& ndofs)
-  {
-    std::vector<bool> selected=sel;
-    std::vector<unsigned int> target_component=target_comp;
-    const unsigned int ncomp = mg_dof.get_fe().n_components();
-
-                                     // If the selected and
-                                     // target_component have size 0,
-                                     // they must be replaced by default
-                                     // values.
-                                     //
-                                     // Since we already made copies
-                                     // directly after this function was
-                                     // called, we use the arguments
-                                     // directly.
-    if (target_component.size() == 0)
-      {
-        target_component.resize(ncomp);
-        for (unsigned int i=0;i<ncomp;++i)
-          target_component[i] = i;
-      }
-
-                                     // If selected is an empty vector,
-                                     // all components are selected.
-    if (selected.size() == 0)
-      {
-        selected.resize(target_component.size());
-        std::fill_n (selected.begin(), ncomp, false);
-        for (unsigned int i=0;i<target_component.size();++i)
-          selected[target_component[i]] = true;
-      }
-
-    Assert (selected.size() == target_component.size(),
-            ExcDimensionMismatch(selected.size(), target_component.size()));
-
-                                     // Compute the number of blocks needed
-    const unsigned int n_selected
-      = std::accumulate(selected.begin(),
-                        selected.end(),
-                        0U);
-
-    if (ndofs.size() == 0)
-      {
-        std::vector<std::vector<unsigned int> >
-          new_dofs(mg_dof.get_tria().n_levels(),
-                   std::vector<unsigned int>(target_component.size()));
-        std::swap(ndofs, new_dofs);
-        MGTools::count_dofs_per_block (mg_dof, ndofs, target_component);
-      }
-
-    for (unsigned int level=v.get_minlevel();
-         level<=v.get_maxlevel();++level)
-      {
-        v[level].reinit(n_selected, 0);
-        unsigned int k=0;
-        for (unsigned int i=0;i<selected.size() && (k<v[level].n_blocks());++i)
-          {
-            if (selected[i])
-              {
-                v[level].block(k++).reinit(ndofs[level][i]);
-              }
-            v[level].collect_sizes();
-          }
-      }
-  }
-
-
-                                     /**
                                       * Adjust vectors on all levels
                                       * to correct size.  Count the
                                       * numbers of degrees of freedom
@@ -177,25 +69,16 @@ namespace
   reinit_vector_by_components (
     const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
     MGLevelObject<dealii::Vector<number> > &v,
-    const std::vector<bool> &selected,
+    const ComponentMask &component_mask,
     const std::vector<unsigned int> &target_component,
     std::vector<std::vector<unsigned int> >& ndofs)
   {
-    Assert (selected.size() == target_component.size(),
-            ExcDimensionMismatch(selected.size(), target_component.size()));
-
-                                     // Compute the number of blocks needed
-#ifdef DEBUG
-//    const unsigned int n_selected
-//      = std::accumulate(selected.begin(),
-//                      selected.end(),
-//                      0U);
-//    Assert(n_selected == 1, ExcDimensionMismatch(n_selected, 1));
-#endif
+    Assert (component_mask.represents_n_components(target_component.size()),
+    		ExcMessage ("The component mask does not have the correct size."));
 
     unsigned int selected_block = 0;
     for (unsigned int i=0; i<target_component.size(); ++i)
-      if(selected[i])
+      if(component_mask[i])
         selected_block = target_component[i];
 
     if (ndofs.size() == 0)
@@ -230,7 +113,8 @@ MGTransferSelect<number>::do_copy_to_mg (
   Assert(sizes.size()==mg_dof_handler.get_tria().n_levels(),
          ExcMatricesNotBuilt());
 
-  reinit_vector_by_components(mg_dof_handler, dst, mg_selected,
+  reinit_vector_by_components(mg_dof_handler, dst,
+			      mg_component_mask,
                               mg_target_component, sizes);
 
                                    // traverse the grid top-down
@@ -322,8 +206,8 @@ void MGTransferComponentBase::build_matrices (
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
 
-  Assert (mg_selected.size() == fe.n_components(),
-          ExcDimensionMismatch(mg_selected.size(), fe.n_components()));
+  Assert (mg_component_mask.represents_n_components(fe.n_components()),
+          ExcMessage ("Component mask has wrong size."));
 
                                    // Compute the lengths of all blocks
   sizes.resize(n_levels);
@@ -458,7 +342,7 @@ void MGTransferComponentBase::build_matrices (
                           = fe.system_to_component_index(i).first;
                         const unsigned int jcomp
                           = fe.system_to_component_index(j).first;
-                        if ((icomp==jcomp) && mg_selected[icomp])
+                        if ((icomp==jcomp) && mg_component_mask[icomp])
                           prolongation_sparsities[level]->add(dof_indices_child[i],
                                                               dof_indices_parent[j]);
                       };
@@ -492,7 +376,7 @@ void MGTransferComponentBase::build_matrices (
                       {
                         const unsigned int icomp = fe.system_to_component_index(i).first;
                         const unsigned int jcomp = fe.system_to_component_index(j).first;
-                        if ((icomp==jcomp) && mg_selected[icomp])
+                        if ((icomp==jcomp) && mg_component_mask[icomp])
                           prolongation_matrices[level]->set(dof_indices_child[i],
                                                             dof_indices_parent[j],
                                                             prolongation(i,j));
@@ -573,15 +457,23 @@ void MGTransferSelect<number>::build_matrices (
 
   selected_component = select;
   mg_selected_component = mg_select;
-  selected.resize(ncomp, false);
-  for(unsigned int c=0; c<ncomp; ++c)
-    if(t_component[c] == selected_component)
-      selected[c] = true;
 
-  mg_selected.resize(ncomp, false);
-  for(unsigned int c=0; c<ncomp; ++c)
-    if(mg_t_component[c] == mg_selected_component)
-      mg_selected[c] = true;
+  {
+    std::vector<bool> tmp(ncomp, false);
+    for(unsigned int c=0; c<ncomp; ++c)
+      if(t_component[c] == selected_component)
+        tmp[c] = true;
+    component_mask = ComponentMask(tmp);
+  }
+
+  {
+    std::vector<bool> tmp(ncomp, false);
+    for(unsigned int c=0; c<ncomp; ++c)
+      if(mg_t_component[c] == mg_selected_component)
+        tmp[c] = true;
+    mg_component_mask = ComponentMask(tmp);
+  }
+
                                    // If components are renumbered,
                                    // find the first original
                                    // component corresponding to the
@@ -643,7 +535,7 @@ void MGTransferSelect<number>::build_matrices (
             {
               const unsigned int component
                 = fe.system_to_component_index(i).first;
-              if (selected[component] &&
+              if (component_mask[component] &&
                   !interface_dofs[level][level_dof_indices[i]])
                 {
                   const unsigned int level_start

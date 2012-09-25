@@ -1,8 +1,8 @@
 //----------------------------  dof_tools_13a.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2007, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,7 +37,7 @@ check_this (const DoFHandler<dim> &dof_handler)
                                    // the element is not primitive
   if (dof_handler.get_fe().is_primitive() == false)
     return;
-  
+
   Vector<double> cell_data (dof_handler.get_tria().n_active_cells());
   for (unsigned int i=0; i<cell_data.size(); ++i)
     cell_data(i) = i;
@@ -55,7 +55,7 @@ check_this (const DoFHandler<dim> &dof_handler)
     std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
 				      false);
     component_mask[0] = true;
-    DoFTools::extract_dofs (dof_handler, component_mask, component_dofs);
+    DoFTools::extract_dofs (dof_handler, ComponentMask(component_mask), component_dofs);
 
     for (unsigned int i=0; i<dof_data.size(); ++i)
       if (component_dofs[i] == true)
@@ -63,14 +63,14 @@ check_this (const DoFHandler<dim> &dof_handler)
       else
 	dof_data(i) = 0;
   }
-  
+
   DoFTools::distribute_cell_to_dof_vector (dof_handler,
                                            cell_data,
                                            dof_data);
                                    // output every third element
   for (unsigned int i=0; i<dof_data.size(); i+=3)
     deallog << dof_data(i) << " ";
-  deallog << std::endl;  
+  deallog << std::endl;
 
 				   // check that no other values were
 				   // set
@@ -78,20 +78,20 @@ check_this (const DoFHandler<dim> &dof_handler)
     if (component_dofs[i] == false)
       Assert (dof_data(i) == 0,
 	      ExcInternalError());
-  
+
 
                                    // distribute to last component. by
                                    // default we distribute to
                                    // component zero
-  
+
 				   // preset the vector again to make
 				   // sure that the function zeroes out
-				   // previous content. 
+				   // previous content.
   {
     std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
 				      false);
     component_mask.back() = true;
-    DoFTools::extract_dofs (dof_handler, component_mask, component_dofs);
+    DoFTools::extract_dofs (dof_handler, ComponentMask(component_mask), component_dofs);
     for (unsigned int i=0; i<dof_data.size(); ++i)
       if (component_dofs[i] == true)
 	dof_data(i) = i+1;
@@ -104,7 +104,7 @@ check_this (const DoFHandler<dim> &dof_handler)
                                            dof_handler.get_fe().n_components()-1);
   for (unsigned int i=0; i<dof_data.size(); i+=3)
     deallog << dof_data(i) << " ";
-  deallog << std::endl;  
+  deallog << std::endl;
 
 				   // check that no other values were
 				   // set

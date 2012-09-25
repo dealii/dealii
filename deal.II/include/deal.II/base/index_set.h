@@ -64,7 +64,7 @@ class IndexSet
                                       * overall size of the index
                                       * range.
                                       */
-    IndexSet (const unsigned int size);
+    explicit IndexSet (const unsigned int size);
 
                                      /**
                                       * Remove all indices from this

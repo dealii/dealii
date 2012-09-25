@@ -189,17 +189,9 @@ namespace DoFTools
               else
                 {
                   const unsigned int first_nonzero_comp_i
-                    = (std::find (fe_collection[f].get_nonzero_components(i).begin(),
-                                  fe_collection[f].get_nonzero_components(i).end(),
-                                  true)
-                       -
-                       fe_collection[f].get_nonzero_components(i).begin());
+                  = fe_collection[f].get_nonzero_components(i).first_selected_component();
                   const unsigned int first_nonzero_comp_j
-                    = (std::find (fe_collection[f].get_nonzero_components(j).begin(),
-                                  fe_collection[f].get_nonzero_components(j).end(),
-                                  true)
-                       -
-                       fe_collection[f].get_nonzero_components(j).begin());
+                  = fe_collection[f].get_nonzero_components(j).first_selected_component();
                   Assert (first_nonzero_comp_i < fe_collection[f].n_components(),
                           ExcInternalError());
                   Assert (first_nonzero_comp_j < fe_collection[f].n_components(),
@@ -685,11 +677,7 @@ namespace DoFTools
           = (fe.is_primitive(i) ?
              fe.system_to_component_index(i).first
              :
-             (std::find (fe.get_nonzero_components(i).begin(),
-                         fe.get_nonzero_components(i).end(),
-                         true)
-              -
-              fe.get_nonzero_components(i).begin())
+             fe.get_nonzero_components(i).first_selected_component()
           );
         Assert (ii < fe.n_components(), ExcInternalError());
 
@@ -699,11 +687,7 @@ namespace DoFTools
               = (fe.is_primitive(j) ?
                  fe.system_to_component_index(j).first
                  :
-                 (std::find (fe.get_nonzero_components(j).begin(),
-                             fe.get_nonzero_components(j).end(),
-                             true)
-                  -
-                  fe.get_nonzero_components(j).begin())
+                 fe.get_nonzero_components(j).first_selected_component()
               );
             Assert (jj < fe.n_components(), ExcInternalError());
 
@@ -3303,7 +3287,7 @@ namespace DoFTools
   make_periodicity_constraints (const FaceIterator                          &face_1,
                                 const typename identity<FaceIterator>::type &face_2,
                                 dealii::ConstraintMatrix                    &constraint_matrix,
-                                const std::vector<bool>                     &component_mask)
+                                const ComponentMask                         &component_mask)
   {
     static const int dim = FaceIterator::AccessorType::dimension;
 
@@ -3347,8 +3331,7 @@ namespace DoFTools
 
     const dealii::FiniteElement<dim> &fe = face_1->get_fe(face_1_index);
 
-    Assert (component_mask.size() == 0 ||
-            component_mask.size() == fe.n_components(),
+    Assert (component_mask.represents_n_components(fe.n_components()),
             ExcMessage ("The number of components in the mask has to be either "
                         "zero or equal to the number of components in the finite "
                         "element."));
@@ -3364,13 +3347,16 @@ namespace DoFTools
                                    // .. and constrain them (respecting
                                    // component_mask):
     for (unsigned int i = 0; i < dofs_per_face; ++i) {
-      if (component_mask.size() == 0 ||
-          component_mask[fe.face_system_to_component_index(i).first]) {
-        if(!constraint_matrix.is_constrained(dofs_1[i])) {
-          constraint_matrix.add_line(dofs_1[i]);
-          constraint_matrix.add_entry(dofs_1[i], dofs_2[i], 1.0);
+      if ((component_mask.n_selected_components(fe.n_components()) == fe.n_components())
+          ||
+          (component_mask[fe.face_system_to_component_index(i).first] == true))
+        {
+          if(!constraint_matrix.is_constrained(dofs_1[i]))
+            {
+            constraint_matrix.add_line(dofs_1[i]);
+            constraint_matrix.add_entry(dofs_1[i], dofs_2[i], 1.0);
+            }
         }
-      }
     }
   }
 
@@ -3381,7 +3367,7 @@ namespace DoFTools
                                 const types::boundary_id     boundary_component,
                                 const int                      direction,
                                 dealii::ConstraintMatrix       &constraint_matrix,
-                                const std::vector<bool>        &component_mask)
+                                const ComponentMask            &component_mask)
   {
     Tensor<1,DH::space_dimension> dummy;
     make_periodicity_constraints (dof_handler,
@@ -3401,7 +3387,7 @@ namespace DoFTools
                                 dealii::Tensor<1,DH::space_dimension>
                                                                &offset,
                                 dealii::ConstraintMatrix       &constraint_matrix,
-                                const std::vector<bool>        &component_mask)
+                                const ComponentMask            &component_mask)
   {
     static const int space_dim = DH::space_dimension;
     Assert (0<=direction && direction<space_dim,
@@ -3423,23 +3409,23 @@ namespace DoFTools
                                    // make_periodicity_constraints function
                                    // to every matching pair:
     for (typename std::map<CellIterator, CellIterator>::iterator it = matched_cells.begin();
-	 it != matched_cells.end(); ++it)
+         it != matched_cells.end(); ++it)
       {
-	typedef typename DH::face_iterator FaceIterator;
-	FaceIterator face_1 = it->first->face(2*direction);
-	FaceIterator face_2 = it->second->face(2*direction+1);
+        typedef typename DH::face_iterator FaceIterator;
+        FaceIterator face_1 = it->first->face(2*direction);
+        FaceIterator face_2 = it->second->face(2*direction+1);
 
-	Assert(face_1->at_boundary() && face_2->at_boundary(),
-	       ExcInternalError());
+        Assert(face_1->at_boundary() && face_2->at_boundary(),
+               ExcInternalError());
 
-	Assert (face_1->boundary_indicator() == boundary_component &&
-		face_2->boundary_indicator() == boundary_component,
-		ExcInternalError());
+        Assert (face_1->boundary_indicator() == boundary_component &&
+                face_2->boundary_indicator() == boundary_component,
+                ExcInternalError());
 
-	make_periodicity_constraints(face_1,
-				     face_2,
-				     constraint_matrix,
-				     component_mask);
+        make_periodicity_constraints(face_1,
+                                     face_2,
+                                     constraint_matrix,
+                                     component_mask);
       }
   }
 
@@ -3447,124 +3433,134 @@ namespace DoFTools
 
   namespace internal
   {
-                                     // this internal function assigns to each dof
-                                     // the respective component of the vector
-                                     // system. if use_blocks is set, then the
-                                     // assignment is done by blocks, not by
-                                     // components, as specified by
-                                     // component_select. The additional argument
-                                     // component_select is only used for
-                                     // non-primitive FEs, where we need it since
-                                     // more components couple, and no unique
-                                     // component can be assigned. Then, we sort
-                                     // them to the first selected component of the
-                                     // vector system.
-				     //
-				     // the output array dofs_by_component
-				     // lists for each dof the corresponding
-				     // vector component. if the DoFHandler is
-				     // based on a parallel distributed
-				     // triangulation then the output array is
-				     // index by
-				     // dof.locally_owned_dofs().index_within_set(indices[i])
+    // return an array that for each dof on the reference cell
+    // lists the corresponding vector component.
+    //
+    // if an element is non-primitive then we assign to each degree of freedom
+    // the following component:
+    // - if the nonzero components that belong to a shape function are not
+    //   selected in the component_mask, then the shape function is assigned
+    //   to the first nonzero vector component that corresponds to this
+    //   shape function
+    // - otherwise, the shape function is assigned the first component selected
+    //   in the component_mask that corresponds to this shape function
+    template <int dim, int spacedim>
+    std::vector<unsigned char>
+    get_local_component_association (const FiniteElement<dim,spacedim>  &fe,
+                                     const ComponentMask        &component_mask)
+    {
+      std::vector<unsigned char> local_component_association (fe.dofs_per_cell,
+                                                              (unsigned char)(-1));
+
+      // compute the component each local dof belongs to.
+      // if the shape function is primitive, then this
+      // is simple and we can just associate it with
+      // what system_to_component_index gives us
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        if (fe.is_primitive(i))
+          local_component_association[i] =
+                    fe.system_to_component_index(i).first;
+        else
+          // if the shape function is not primitive, then either use the
+          // component of the first nonzero component corresponding
+          // to this shape function (if the component is not specified
+          // in the component_mask), or the first component of this block
+          // that is listed in the component_mask (if the block this
+          // component corresponds to is indeed specified in the component
+          // mask)
+          {
+            const unsigned int first_comp =
+                fe.get_nonzero_components(i).first_selected_component();
+
+            if ((fe.get_nonzero_components(i)
+                &
+                component_mask).n_selected_components(fe.n_components()) == 0)
+              local_component_association[i] = first_comp;
+            else
+              // pick the component selected. we know from the previous 'if'
+              // that within the components that are nonzero for this
+              // shape function there must be at least one for which the
+              // mask is true, so we will for sure run into the break()
+              // at one point
+              for (unsigned int c=first_comp; c<fe.n_components(); ++c)
+                if (component_mask[c] == true)
+                  {
+                    local_component_association[i] = c;
+                    break;
+                  }
+          }
+
+      Assert (std::find (local_component_association.begin(),
+          local_component_association.end(),
+          (unsigned char)(-1))
+          ==
+          local_component_association.end(),
+          ExcInternalError());
+
+      return local_component_association;
+    }
+
+
+    // this internal function assigns to each dof
+    // the respective component of the vector
+    // system.
+    //
+    // the output array dofs_by_component
+    // lists for each dof the corresponding
+    // vector component. if the DoFHandler is
+    // based on a parallel distributed
+    // triangulation then the output array is
+    // index by
+    // dof.locally_owned_dofs().index_within_set(indices[i])
+    //
+    // if an element is non-primitive then we assign to each degree of freedom
+    // the following component:
+    // - if the nonzero components that belong to a shape function are not
+    //   selected in the component_mask, then the shape function is assigned
+    //   to the first nonzero vector component that corresponds to this
+    //   shape function
+    // - otherwise, the shape function is assigned the first component selected
+    //   in the component_mask that corresponds to this shape function
     template <class DH>
-    inline
     void
-    extract_dofs_by_component (const DH                   &dof,
-                               const std::vector<bool>    &component_select,
-                               const bool                  sort_by_blocks,
-                               std::vector<unsigned char> &dofs_by_component)
+    get_component_association (const DH                   &dof,
+        const ComponentMask        &component_mask,
+        std::vector<unsigned char> &dofs_by_component)
     {
       const dealii::hp::FECollection<DH::dimension,DH::space_dimension>
-        fe_collection (dof.get_fe());
+      fe_collection (dof.get_fe());
       Assert (fe_collection.n_components() < 256, ExcNotImplemented());
       Assert (dofs_by_component.size() == dof.n_locally_owned_dofs(),
-              ExcDimensionMismatch(dofs_by_component.size(),
-                                   dof.n_locally_owned_dofs()));
+          ExcDimensionMismatch(dofs_by_component.size(),
+              dof.n_locally_owned_dofs()));
 
-                                       // next set up a table for the degrees
-                                       // of freedom on each of the cells
-                                       // (regardless of the fact whether it
-                                       // is listed in the component_select
-                                       // argument or not)
-				       //
-				       // for each element 'f' of the
-				       // FECollection,
-				       // local_component_association[f][d]
-				       // then returns the vector component
-				       // that degree of freedom 'd' belongs
-				       // to (or, in the case of
-				       // sort_by_blocks, the block that it
-				       // corresponds to)
-      std::vector<std::vector<unsigned char> > local_component_association
-        (fe_collection.size());
+      // next set up a table for the degrees
+      // of freedom on each of the cells
+      // (regardless of the fact whether it
+      // is listed in the component_select
+      // argument or not)
+      //
+      // for each element 'f' of the
+      // FECollection,
+      // local_component_association[f][d]
+      // then returns the vector component
+      // that degree of freedom 'd' belongs
+      // to
+      std::vector<std::vector<unsigned char> >
+      local_component_association (fe_collection.size());
       for (unsigned int f=0; f<fe_collection.size(); ++f)
         {
           const FiniteElement<DH::dimension,DH::space_dimension> &fe =
-            fe_collection[f];
-          local_component_association[f].resize(fe.dofs_per_cell);
-          if (sort_by_blocks == true)
-					     // compute the block each
-					     // local dof belongs to
-            {
-              for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-                local_component_association[f][i]
-                  = fe.system_to_block_index(i).first;
-            }
-          else
-					     // compute the component each
-					     // local dof belongs to
-            for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-              if (fe.is_primitive(i))
-                local_component_association[f][i] =
-                  fe.system_to_component_index(i).first;
-              else
-                                                 // if this shape function is
-                                                 // not primitive, then we have
-                                                 // to work harder. we have to
-                                                 // find out whether _any_ of
-                                                 // the vector components of
-                                                 // this element is selected or
-                                                 // not
-                                                 //
-                                                 // to do so, get the a list of
-                                                 // nonzero elements and see which are
-                                                 // actually active
-                {
-                  const unsigned int first_comp =
-                    (std::find(fe.get_nonzero_components(i).begin(),
-                               fe.get_nonzero_components(i).end(),
-                               true) -
-                     fe.get_nonzero_components(i).begin());
-                  const unsigned int end_comp =
-                    (std::find(fe.get_nonzero_components(i).begin()+first_comp,
-                               fe.get_nonzero_components(i).end(),
-                               false)-
-                     fe.get_nonzero_components(i).begin());
-
-                                                   // now check whether any of
-                                                   // the components in between
-                                                   // is set
-                  if (component_select.size() == 0 ||
-                      (component_select[first_comp] == true ||
-                       std::count(component_select.begin()+first_comp,
-                                  component_select.begin()+end_comp, true) == 0))
-                    local_component_association[f][i] = first_comp;
-                  else
-                    for (unsigned int c=first_comp; c<end_comp; ++c)
-                      if (component_select[c] == true)
-                        {
-                          local_component_association[f][i] = c;
-                          break;
-                        }
-                }
+              fe_collection[f];
+          local_component_association[f]
+                                      = get_local_component_association (fe, component_mask);
         }
 
-                                       // then loop over all cells and do
-                                       // the work
+      // then loop over all cells and do
+      // the work
       std::vector<unsigned int> indices;
       for (typename DH::active_cell_iterator c=dof.begin_active();
-           c!=dof.end(); ++ c)
+          c!=dof.end(); ++ c)
         if (c->is_locally_owned())
           {
             const unsigned int fe_index = c->active_fe_index();
@@ -3574,7 +3570,80 @@ namespace DoFTools
             for (unsigned int i=0; i<dofs_per_cell; ++i)
               if (dof.locally_owned_dofs().is_element(indices[i]))
                 dofs_by_component[dof.locally_owned_dofs().index_within_set(indices[i])]
-                  = local_component_association[fe_index][i];
+                                  = local_component_association[fe_index][i];
+          }
+    }
+
+
+    // this is the function corresponding to the one above but working
+    // on blocks instead of components.
+    //
+    // the output array dofs_by_block
+    // lists for each dof the corresponding
+    // vector block. if the DoFHandler is
+    // based on a parallel distributed
+    // triangulation then the output array is
+    // index by
+    // dof.locally_owned_dofs().index_within_set(indices[i])
+    template <class DH>
+    inline
+    void
+    get_block_association (const DH                   &dof,
+                           std::vector<unsigned char> &dofs_by_block)
+    {
+      const dealii::hp::FECollection<DH::dimension,DH::space_dimension>
+      fe_collection (dof.get_fe());
+      Assert (fe_collection.n_components() < 256, ExcNotImplemented());
+      Assert (dofs_by_block.size() == dof.n_locally_owned_dofs(),
+          ExcDimensionMismatch(dofs_by_block.size(),
+              dof.n_locally_owned_dofs()));
+
+      // next set up a table for the degrees
+      // of freedom on each of the cells
+      // (regardless of the fact whether it
+      // is listed in the component_select
+      // argument or not)
+      //
+      // for each element 'f' of the
+      // FECollection,
+      // local_block_association[f][d]
+      // then returns the vector block
+      // that degree of freedom 'd' belongs
+      // to
+      std::vector<std::vector<unsigned char> > local_block_association
+      (fe_collection.size());
+      for (unsigned int f=0; f<fe_collection.size(); ++f)
+        {
+          const FiniteElement<DH::dimension,DH::space_dimension> &fe =
+              fe_collection[f];
+          local_block_association[f].resize(fe.dofs_per_cell,
+              (unsigned char)(-1));
+          for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+            local_block_association[f][i] = fe.system_to_block_index(i).first;
+
+          Assert (std::find (local_block_association[f].begin(),
+              local_block_association[f].end(),
+              (unsigned char)(-1))
+              ==
+              local_block_association[f].end(),
+              ExcInternalError());
+        }
+
+      // then loop over all cells and do
+      // the work
+      std::vector<unsigned int> indices;
+      for (typename DH::active_cell_iterator c=dof.begin_active();
+          c!=dof.end(); ++ c)
+        if (c->is_locally_owned())
+          {
+            const unsigned int fe_index = c->active_fe_index();
+            const unsigned int dofs_per_cell = c->get_fe().dofs_per_cell;
+            indices.resize(dofs_per_cell);
+            c->get_dof_indices(indices);
+            for (unsigned int i=0; i<dofs_per_cell; ++i)
+              if (dof.locally_owned_dofs().is_element(indices[i]))
+                dofs_by_block[dof.locally_owned_dofs().index_within_set(indices[i])]
+                              = local_block_association[fe_index][i];
           }
     }
   }
@@ -3612,11 +3681,10 @@ namespace DoFTools
     else
       {
         std::vector<unsigned char> component_dofs (dof_handler.n_locally_owned_dofs());
-        std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
-                                          false);
-        component_mask[component] = true;
-        internal::extract_dofs_by_component (dof_handler, component_mask,
-                                             false, component_dofs);
+        internal::get_component_association (dof_handler,
+                                             dof_handler.get_fe().component_mask
+                                             (FEValuesExtractors::Scalar(component)),
+                                             component_dofs);
 
         for (unsigned int i=0; i<dof_data.size(); ++i)
           if (component_dofs[i] == static_cast<unsigned char>(component))
@@ -3675,25 +3743,15 @@ namespace DoFTools
 
   template <int dim, int spacedim>
   void
-  extract_dofs (
-    const DoFHandler<dim,spacedim>   &dof,
-    const std::vector<bool> &component_select,
-    std::vector<bool>       &selected_dofs,
-    const bool               count_by_blocks)
+  extract_dofs (const DoFHandler<dim,spacedim>   &dof,
+                const ComponentMask     &component_mask,
+                std::vector<bool>       &selected_dofs)
   {
     const FiniteElement<dim,spacedim> &fe = dof.get_fe();
 
-    if (count_by_blocks == true)
-      {
-        Assert(component_select.size() == fe.n_blocks(),
-               ExcDimensionMismatch(component_select.size(), fe.n_blocks()));
-      }
-    else
-      {
-        Assert(component_select.size() == n_components(dof),
-               ExcDimensionMismatch(component_select.size(), n_components(dof)));
-      }
-
+    Assert(component_mask.represents_n_components(fe.n_components()),
+           ExcMessage ("The given component mask is not sized correctly to represent the "
+                       "components of the given finite element."));
     Assert(selected_dofs.size() == dof.n_locally_owned_dofs(),
            ExcDimensionMismatch(selected_dofs.size(), dof.n_locally_owned_dofs()));
 
@@ -3701,14 +3759,12 @@ namespace DoFTools
                                      // is selected, and all components
                                      // are selected; both rather
                                      // stupid, but easy to catch
-    if (std::count (component_select.begin(), component_select.end(), true)
-        == 0)
+    if (component_mask.n_selected_components(n_components(dof)) == 0)
       {
         std::fill_n (selected_dofs.begin(), dof.n_locally_owned_dofs(), false);
         return;
       }
-    else if (std::count (component_select.begin(), component_select.end(), true)
-             == static_cast<signed int>(component_select.size()))
+    else if (component_mask.n_selected_components(n_components(dof)) == n_components(dof))
       {
         std::fill_n (selected_dofs.begin(), dof.n_locally_owned_dofs(), true);
         return;
@@ -3718,45 +3774,32 @@ namespace DoFTools
                                      // preset all values by false
     std::fill_n (selected_dofs.begin(), dof.n_locally_owned_dofs(), false);
 
-                                     // if we count by blocks, we need to extract
-                                     // the association of blocks with local dofs,
-                                     // and then go through all the cells and set
-                                     // the properties according to this
-                                     // info. Otherwise, we let the function
-                                     // extract_dofs_by_component function do the
-                                     // job.
+    // get the component association of each DoF
+    // and then select the ones that match the
+    // given set of blocks
     std::vector<unsigned char> dofs_by_component (dof.n_locally_owned_dofs());
-    internal::extract_dofs_by_component (dof, component_select, count_by_blocks,
+    internal::get_component_association (dof, component_mask,
                                          dofs_by_component);
 
     for (unsigned int i=0; i<dof.n_locally_owned_dofs(); ++i)
-      if (component_select[dofs_by_component[i]] == true)
+      if (component_mask[dofs_by_component[i]] == true)
         selected_dofs[i] = true;
   }
 
 
+//TODO: Unify the following two functions with the non-hp case
 
   template <int dim, int spacedim>
   void
-  extract_dofs (
-    const hp::DoFHandler<dim,spacedim>   &dof,
-    const std::vector<bool> &component_select,
-    std::vector<bool>       &selected_dofs,
-    const bool               count_by_blocks)
+  extract_dofs (const hp::DoFHandler<dim,spacedim>   &dof,
+                const ComponentMask     &component_mask,
+                std::vector<bool>       &selected_dofs)
   {
     const FiniteElement<dim,spacedim> &fe = dof.begin_active()->get_fe();
 
-    if (count_by_blocks == true)
-      {
-        Assert(component_select.size() == fe.n_blocks(),
-               ExcDimensionMismatch(component_select.size(), fe.n_blocks()));
-      }
-    else
-      {
-        Assert(component_select.size() == n_components(dof),
-               ExcDimensionMismatch(component_select.size(), n_components(dof)));
-      }
-
+    Assert(component_mask.represents_n_components(fe.n_components()),
+           ExcMessage ("The given component mask is not sized correctly to represent the "
+                       "components of the given finite element."));
     Assert(selected_dofs.size() == dof.n_dofs(),
            ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs()));
 
@@ -3764,63 +3807,73 @@ namespace DoFTools
                                      // is selected, and all components
                                      // are selected; both rather
                                      // stupid, but easy to catch
-    if (std::count (component_select.begin(), component_select.end(), true)
-        == 0)
+    if (component_mask.n_selected_components(n_components(dof)) == 0)
       {
         std::fill_n (selected_dofs.begin(), dof.n_dofs(), false);
         return;
-      };
-    if (std::count (component_select.begin(), component_select.end(), true)
-        == static_cast<signed int>(component_select.size()))
+      }
+    else if (component_mask.n_selected_components(n_components(dof)) == n_components(dof))
       {
         std::fill_n (selected_dofs.begin(), dof.n_dofs(), true);
         return;
-      };
+      }
 
 
                                      // preset all values by false
     std::fill_n (selected_dofs.begin(), dof.n_dofs(), false);
 
-                                     // if we count by blocks, we need to extract
-                                     // the association of blocks with local dofs,
-                                     // and then go through all the cells and set
-                                     // the properties according to this
-                                     // info. Otherwise, we let the function
-                                     // extract_dofs_by_component function do the
-                                     // job.
+    // get the component association of each DoF
+    // and then select the ones that match the
+    // given set of components
     std::vector<unsigned char> dofs_by_component (dof.n_dofs());
-    internal::extract_dofs_by_component (dof, component_select, count_by_blocks,
+    internal::get_component_association (dof, component_mask,
                                          dofs_by_component);
 
     for (unsigned int i=0; i<dof.n_dofs(); ++i)
-      if (component_select[dofs_by_component[i]] == true)
+      if (component_mask[dofs_by_component[i]] == true)
         selected_dofs[i] = true;
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  extract_dofs (const DoFHandler<dim,spacedim>   &dof,
+                const BlockMask     &block_mask,
+                std::vector<bool>       &selected_dofs)
+  {
+    // simply forward to the function that works based on a component mask
+    extract_dofs (dof, dof.get_fe().component_mask (block_mask),
+                  selected_dofs);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  extract_dofs (const hp::DoFHandler<dim,spacedim>   &dof,
+                const BlockMask     &block_mask,
+                std::vector<bool>       &selected_dofs)
+  {
+    // simply forward to the function that works based on a component mask
+    extract_dofs (dof, dof.get_fe().component_mask (block_mask),
+                  selected_dofs);
   }
 
 
 
   template<int dim, int spacedim>
   void
-  extract_level_dofs(
-    const unsigned int       level,
-    const MGDoFHandler<dim,spacedim> &dof,
-    const std::vector<bool> &component_select,
-    std::vector<bool>       &selected_dofs,
-    const bool               count_by_blocks)
+  extract_level_dofs(const unsigned int       level,
+                     const MGDoFHandler<dim,spacedim> &dof,
+                     const ComponentMask &component_mask,
+                     std::vector<bool>       &selected_dofs)
   {
     const FiniteElement<dim,spacedim>& fe = dof.get_fe();
 
-    if (count_by_blocks == true)
-      {
-        Assert(component_select.size() == fe.n_blocks(),
-               ExcDimensionMismatch(component_select.size(), fe.n_blocks()));
-      }
-    else
-      {
-        Assert(component_select.size() == fe.n_components(),
-               ExcDimensionMismatch(component_select.size(), fe.n_components()));
-      }
-
+    Assert(component_mask.represents_n_components(n_components(dof)),
+           ExcMessage ("The given component mask is not sized correctly to represent the "
+                       "components of the given finite element."));
     Assert(selected_dofs.size() == dof.n_dofs(level),
            ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs(level)));
 
@@ -3828,18 +3881,16 @@ namespace DoFTools
                                      // is selected, and all components
                                      // are selected, both rather
                                      // stupid, but easy to catch
-    if (std::count (component_select.begin(), component_select.end(), true)
-        == 0)
+    if (component_mask.n_selected_components(n_components(dof)) == 0)
       {
         std::fill_n (selected_dofs.begin(), dof.n_dofs(level), false);
         return;
-      };
-    if (std::count (component_select.begin(), component_select.end(), true)
-        == static_cast<signed int>(component_select.size()))
+      }
+    else if (component_mask.n_selected_components(n_components(dof)) == n_components(dof))
       {
         std::fill_n (selected_dofs.begin(), dof.n_dofs(level), true);
         return;
-      };
+      }
 
                                      // preset all values by false
     std::fill_n (selected_dofs.begin(), dof.n_dofs(level), false);
@@ -3848,56 +3899,11 @@ namespace DoFTools
                                      // degrees of freedom on each of
                                      // the cells whether it is
                                      // something interesting or not
-    std::vector<bool> local_selected_dofs (fe.dofs_per_cell, false);
+    std::vector<unsigned char> local_component_asssociation
+    = internal::get_local_component_association (fe, component_mask);
+    std::vector<bool> local_selected_dofs (fe.dofs_per_cell);
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-      if (count_by_blocks == true)
-        local_selected_dofs[i]
-          = component_select[fe.system_to_block_index(i).first];
-      else
-        if (fe.is_primitive(i))
-          local_selected_dofs[i]
-            = component_select[fe.system_to_component_index(i).first];
-        else
-                                           // if this shape function is
-                                           // not primitive, then we have
-                                           // to work harder. we have to
-                                           // find out whether _any_ of
-                                           // the vector components of
-                                           // this element is selected or
-                                           // not
-                                           //
-                                           // to do so, get the first and
-                                           // last vector components of
-                                           // the base element to which
-                                           // the local dof with index i
-                                           // belongs
-          {
-            unsigned int first_comp = 0;
-            const unsigned int this_base = fe.system_to_base_index(i).first.first;
-            const unsigned int this_multiplicity
-              = fe.system_to_base_index(i).first.second;
-
-            for (unsigned int b=0; b<this_base; ++b)
-              first_comp += fe.base_element(b).n_components() *
-                            fe.element_multiplicity(b);
-            for (unsigned int m=0; m<this_multiplicity; ++m)
-              first_comp += fe.base_element(this_base).n_components();
-            const unsigned int end_comp = first_comp +
-                                          fe.base_element(this_base).n_components();
-
-            Assert (first_comp < fe.n_components(), ExcInternalError());
-            Assert (end_comp <= fe.n_components(),  ExcInternalError());
-
-                                             // now check whether any of
-                                             // the components in between
-                                             // is set
-            for (unsigned int c=first_comp; c<end_comp; ++c)
-              if (component_select[c] == true)
-                {
-                  local_selected_dofs[i] = true;
-                  break;
-                }
-          }
+      local_selected_dofs[i] = component_mask[local_component_asssociation[i]];
 
                                      // then loop over all cells and do
                                      // work
@@ -3913,10 +3919,24 @@ namespace DoFTools
 
 
 
+  template<int dim, int spacedim>
+  void
+  extract_level_dofs(const unsigned int       level,
+                     const MGDoFHandler<dim,spacedim> &dof,
+                     const BlockMask         &block_mask,
+                     std::vector<bool>       &selected_dofs)
+  {
+    // simply defer to the other extract_level_dofs() function
+    extract_level_dofs (level, dof, dof.get_fe().component_mask(block_mask),
+                        selected_dofs);
+  }
+
+
+
   template <class DH>
   void
   extract_boundary_dofs (const DH                      &dof_handler,
-                         const std::vector<bool>       &component_select,
+                         const ComponentMask           &component_mask,
                          std::vector<bool>             &selected_dofs,
                          const std::set<types::boundary_id> &boundary_indicators)
   {
@@ -3928,7 +3948,7 @@ namespace DoFTools
                         "See the documentation for more information."));
 
     IndexSet indices;
-    extract_boundary_dofs (dof_handler, component_select,
+    extract_boundary_dofs (dof_handler, component_mask,
                            indices, boundary_indicators);
 
     // clear and reset array by default values
@@ -3943,11 +3963,12 @@ namespace DoFTools
   template <class DH>
   void
   extract_boundary_dofs (const DH                      &dof_handler,
-                         const std::vector<bool>       &component_select,
+                         const ComponentMask       &component_mask,
                          IndexSet             &selected_dofs,
                          const std::set<types::boundary_id> &boundary_indicators)
   {
-    AssertDimension (component_select.size(), n_components(dof_handler));
+    Assert (component_mask.represents_n_components(n_components(dof_handler)),
+            ExcMessage ("Component mask has invalid size."));
     Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
     const unsigned int dim=DH::dimension;
@@ -3966,8 +3987,10 @@ namespace DoFTools
                                      // check whether a certain vector
                                      // component is selected, or all
     const bool check_vector_component
-      = (component_select != std::vector<bool>(component_select.size(),
-                                               true));
+    = ((component_mask.represents_the_all_selected_mask() == false)
+        ||
+        (component_mask.n_selected_components(n_components(dof_handler)) !=
+            n_components(dof_handler)));
 
     std::vector<unsigned int> face_dof_indices;
     face_dof_indices.reserve (max_dofs_per_face(dof_handler));
@@ -4044,22 +4067,18 @@ namespace DoFTools
                                           numbers::invalid_unsigned_int)));
                       if (fe.is_primitive (cell_index))
                         {
-                          if (component_select[fe.face_system_to_component_index(i).first]
+                          if (component_mask[fe.face_system_to_component_index(i).first]
                                                == true)
                             selected_dofs.add_index (face_dof_indices[i]);
                         }
                       else // not primitive
                         {
                           const unsigned int first_nonzero_comp
-                          = (std::find (fe.get_nonzero_components(cell_index).begin(),
-                                        fe.get_nonzero_components(cell_index).end(),
-                                        true)
-                          -
-                          fe.get_nonzero_components(cell_index).begin());
+                          = fe.get_nonzero_components(cell_index).first_selected_component();
                           Assert (first_nonzero_comp < fe.n_components(),
                                   ExcInternalError());
 
-                          if (component_select[first_nonzero_comp] == true)
+                          if (component_mask[first_nonzero_comp] == true)
                             selected_dofs.add_index (face_dof_indices[i]);
                         }
                     }
@@ -4071,11 +4090,12 @@ namespace DoFTools
   template <class DH>
   void
   extract_dofs_with_support_on_boundary (const DH                      &dof_handler,
-                                         const std::vector<bool>       &component_select,
+                                         const ComponentMask           &component_mask,
                                          std::vector<bool>             &selected_dofs,
                                          const std::set<types::boundary_id> &boundary_indicators)
   {
-    AssertDimension (component_select.size(), n_components(dof_handler));
+    Assert (component_mask.represents_n_components (n_components(dof_handler)),
+            ExcMessage ("This component mask has the wrong size."));
     Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
 
@@ -4089,8 +4109,7 @@ namespace DoFTools
                                      // check whether a certain vector
                                      // component is selected, or all
     const bool check_vector_component
-      = (component_select != std::vector<bool>(component_select.size(),
-                                               true));
+      = (component_mask.represents_the_all_selected_mask() == false);
 
                                      // clear and reset array by default
                                      // values
@@ -4146,21 +4165,17 @@ namespace DoFTools
                       {
                         if (fe.is_primitive (i))
                           selected_dofs[cell_dof_indices[i]]
-                            = (component_select[fe.system_to_component_index(i).first]
+                            = (component_mask[fe.system_to_component_index(i).first]
                                == true);
                         else // not primitive
                           {
                             const unsigned int first_nonzero_comp
-                              = (std::find (fe.get_nonzero_components(i).begin(),
-                                            fe.get_nonzero_components(i).end(),
-                                            true)
-                                 -
-                                 fe.get_nonzero_components(i).begin());
+                              = fe.get_nonzero_components(i).first_selected_component();
                             Assert (first_nonzero_comp < fe.n_components(),
                                     ExcInternalError());
 
                             selected_dofs[cell_dof_indices[i]]
-                              = (component_select[first_nonzero_comp]
+                              = (component_mask[first_nonzero_comp]
                                  == true);
                           }
                       }
@@ -4430,26 +4445,26 @@ namespace DoFTools
   template <class DH>
   void
   extract_constant_modes (const DH                        &dof_handler,
-                          const std::vector<bool>         &component_select,
+                          const ComponentMask             &component_mask,
                           std::vector<std::vector<bool> > &constant_modes)
   {
     const unsigned int n_components = dof_handler.get_fe().n_components();
-    Assert (n_components == component_select.size(),
+    Assert (n_components == component_mask.size(),
             ExcDimensionMismatch(n_components,
-                                 component_select.size()));
+                                 component_mask.size()));
     std::vector<unsigned int> localized_component (n_components,
                                                    numbers::invalid_unsigned_int);
     unsigned int n_components_selected = 0;
     for (unsigned int i=0; i<n_components; ++i)
-      if (component_select[i] == true)
+      if (component_mask[i] == true)
         localized_component[i] = n_components_selected++;
 
     std::vector<unsigned char> dofs_by_component (dof_handler.n_locally_owned_dofs());
-    internal::extract_dofs_by_component (dof_handler, component_select, false,
+    internal::get_component_association (dof_handler, component_mask,
                                          dofs_by_component);
     unsigned int n_selected_dofs = 0;
     for (unsigned int i=0; i<n_components; ++i)
-      if (component_select[i] == true)
+      if (component_mask[i] == true)
         n_selected_dofs += std::count (dofs_by_component.begin(),
                                        dofs_by_component.end(), i);
 
@@ -4459,11 +4474,11 @@ namespace DoFTools
                                                                     false));
     std::vector<unsigned int> component_list (n_components, 0);
     for (unsigned int d=0; d<n_components; ++d)
-      component_list[d] = component_select[d];
+      component_list[d] = component_mask[d];
 
     unsigned int counter = 0;
     for (unsigned int i=0; i<dof_handler.n_locally_owned_dofs(); ++i)
-      if (component_select[dofs_by_component[i]])
+      if (component_mask[dofs_by_component[i]])
         {
           constant_modes[localized_component[dofs_by_component[i]]][counter] = true;
           ++counter;
@@ -4679,7 +4694,7 @@ namespace DoFTools
     get_subdomain_association (dof_handler, subdomain_association);
 
     std::vector<unsigned char> component_association (dof_handler.n_dofs());
-    internal::extract_dofs_by_component (dof_handler, std::vector<bool>(), false,
+    internal::get_component_association (dof_handler, std::vector<bool>(),
                                          component_association);
 
     for (unsigned int c=0; c<dof_handler.get_fe().n_components(); ++c)
@@ -4850,7 +4865,7 @@ namespace DoFTools
                                      // of dofs in each component
                                      // separately. do so in parallel
     std::vector<unsigned char> dofs_by_component (dof_handler.n_locally_owned_dofs());
-    internal::extract_dofs_by_component (dof_handler, std::vector<bool>(), false,
+    internal::get_component_association (dof_handler, ComponentMask(),
                                          dofs_by_component);
 
                                      // next count what we got
@@ -4944,8 +4959,7 @@ namespace DoFTools
                                          // of dofs in each block
                                          // separately.
         std::vector<unsigned char> dofs_by_block (dof_handler.n_locally_owned_dofs());
-        internal::extract_dofs_by_component (dof_handler, std::vector<bool>(),
-                                             true, dofs_by_block);
+        internal::get_block_association (dof_handler, dofs_by_block);
 
                                          // next count what we got
         for (unsigned int block=0; block<fe.n_blocks(); ++block)
@@ -5561,8 +5575,8 @@ namespace DoFTools
         std::vector<bool> mask (coarse_grid.get_fe().n_components(),
                                 false);
         mask[coarse_component] = true;
-        extract_dofs (coarse_grid, mask, coarse_dof_is_parameter);
-      };
+        extract_dofs (coarse_grid, ComponentMask(mask), coarse_dof_is_parameter);
+      }
 
                                      // now we know that the weights in
                                      // each row constitute a
@@ -6136,23 +6150,16 @@ namespace DoFTools
   void
   make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
                                   ConstraintMatrix        &zero_boundary_constraints,
-                                  const std::vector<bool> &component_mask_)
+                                  const ComponentMask     &component_mask)
   {
-    Assert ((component_mask_.size() == 0) ||
-            (component_mask_.size() == dof.get_fe().n_components()),
+    Assert (component_mask.represents_n_components(dof.get_fe().n_components()),
             ExcMessage ("The number of components in the mask has to be either "
                         "zero or equal to the number of components in the finite "
                         "element."));
 
     const unsigned int n_components = DoFTools::n_components (dof);
 
-                                     // set the component mask to either
-                                     // the original value or a vector
-                                     // of trues
-    const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-                                            std::vector<bool> (n_components, true) :
-                                            component_mask_);
-    Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+    Assert (component_mask.n_selected_components(n_components) > 0,
             VectorTools::ExcNoComponentSelected());
 
                                      // a field to store the indices
@@ -6164,46 +6171,46 @@ namespace DoFTools
       endc = dof.end();
     for (; cell!=endc; ++cell)
       if (!cell->is_artificial())
-	for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-	     ++face_no)
-	  {
-	    const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+        for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+             ++face_no)
+          {
+            const FiniteElement<dim,spacedim> &fe = cell->get_fe();
 
-	    typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
+            typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
 
                                              // if face is on the boundary
-	    if (face->at_boundary ())
-	      {
-						 // get indices and physical
-						 // location on this face
-		face_dofs.resize (fe.dofs_per_face);
-		face->get_dof_indices (face_dofs, cell->active_fe_index());
+            if (face->at_boundary ())
+              {
+                                                 // get indices and physical
+                                                 // location on this face
+                face_dofs.resize (fe.dofs_per_face);
+                face->get_dof_indices (face_dofs, cell->active_fe_index());
 
-						 // enter those dofs into the list
-						 // that match the component
-						 // signature.
-		for (unsigned int i=0; i<face_dofs.size(); ++i)
-		  {
-						     // Find out if a dof
-						     // has a contribution
-						     // in this component,
-						     // and if so, add it
-						     // to the list
-		    const std::vector<bool> &nonzero_component_array
-		      = cell->get_fe().get_nonzero_components (i);
-		    bool nonzero = false;
-		    for (unsigned int c=0; c<n_components; ++c)
-		      if (nonzero_component_array[c] && component_mask[c])
-			{
-			  nonzero = true;
-			  break;
-			}
+                                                 // enter those dofs into the list
+                                                 // that match the component
+                                                 // signature.
+                for (unsigned int i=0; i<face_dofs.size(); ++i)
+                  {
+                                                     // Find out if a dof
+                                                     // has a contribution
+                                                     // in this component,
+                                                     // and if so, add it
+                                                     // to the list
+                    const ComponentMask &nonzero_component_array
+                      = cell->get_fe().get_nonzero_components (i);
+                    bool nonzero = false;
+                    for (unsigned int c=0; c<n_components; ++c)
+                      if (nonzero_component_array[c] && component_mask[c])
+                        {
+                          nonzero = true;
+                          break;
+                        }
 
-		    if (nonzero)
-		      zero_boundary_constraints.add_line (face_dofs[i]);
-		  }
-	      }
-	  }
+                    if (nonzero)
+                      zero_boundary_constraints.add_line (face_dofs[i]);
+                  }
+              }
+          }
   }
 
   template <class DH, class Sparsity>

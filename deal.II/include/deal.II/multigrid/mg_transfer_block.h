@@ -97,6 +97,7 @@ class MGTransferBlockBase
                                     * on the blocks having a
                                     * <tt>true</tt> entry here.
                                     */
+//TODO: rename this to block_mask, in the same way as has already been done in MGTransferComponent, and give it type BlockMask
     std::vector<bool> selected;
 
                                      /**
@@ -116,6 +117,7 @@ class MGTransferBlockBase
                                       * entries may be illegal
                                       * unsigned integers.
                                       */
+//TODO: rename this to mg_block_mask, in the same way as has already been done in MGTransferComponent, and give it type BlockMask
     std::vector<unsigned int> mg_block;
 
                                    /**

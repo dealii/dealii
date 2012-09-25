@@ -25,7 +25,7 @@ FE_PolyFace<POLY,dim,spacedim>::FE_PolyFace (
   const std::vector<bool> &restriction_is_additive_flags):
                 FiniteElement<dim,spacedim> (fe_data,
                                              restriction_is_additive_flags,
-                                             std::vector<std::vector<bool> > (1, std::vector<bool>(1,true))),
+                                             std::vector<ComponentMask> (1, ComponentMask(1,true))),
                 poly_space(poly_space)
 {
   AssertDimension(dim, POLY::dimension+1);

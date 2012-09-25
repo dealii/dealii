@@ -29,6 +29,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_dof_accessor.h>
@@ -100,158 +101,6 @@ namespace internal
   template <>
   struct CurlType<3>{
       typedef Tensor<1,3>     type;
-  };
-}
-
-
-/**
- * A namespace in which we declare "extractors", i.e. classes that when used
- * as subscripts in operator[] expressions on FEValues, FEFaceValues, and
- * FESubfaceValues objects extract certain components of a vector-valued
- * element. The result of applying an extractor to these objects is an object
- * with corresponding type from the namespace FEValuesViews. There are
- * extractors for single scalar components, vector components consisting of
- * <code>dim</code> elements, and second order symmetric tensors consisting of
- * <code>(dim*dim + dim)/2</code> components
- *
- * See the description of the @ref vector_valued module for examples how to
- * use the features of this namespace.
- *
- * @ingroup feaccess vector_valued
- */
-namespace FEValuesExtractors
-{
-                                   /**
-                                    * Extractor for a single scalar component
-                                    * of a vector-valued element. The result
-                                    * of applying an object of this type to an
-                                    * FEValues, FEFaceValues or
-                                    * FESubfaceValues object is of type
-                                    * FEValuesViews::Scalar. The concept of
-                                    * extractors is defined in the
-                                    * documentation of the namespace
-                                    * FEValuesExtractors and in the @ref
-                                    * vector_valued module.
-                                    *
-                                    * @ingroup feaccess vector_valued
-                                    */
-  struct Scalar
-  {
-                                       /**
-                                        * The selected scalar component of the
-                                        * vector.
-                                        */
-      unsigned int component;
-
-                                       /**
-                                        * Constructor. Take the selected
-                                        * vector component as argument.
-                                        */
-      Scalar (const unsigned int component);
-  };
-
-
-                                   /**
-                                    * Extractor for a vector of
-                                    * <code>spacedim</code> components of a
-                                    * vector-valued element. The value of
-                                    * <code>spacedim</code> is defined by the
-                                    * FEValues object the extractor is applied
-                                    * to. The result of applying an object of
-                                    * this type to an FEValues, FEFaceValues
-                                    * or FESubfaceValues object is of type
-                                    * FEValuesViews::Vector.
-                                    *
-                                    * The concept of
-                                    * extractors is defined in the
-                                    * documentation of the namespace
-                                    * FEValuesExtractors and in the @ref
-                                    * vector_valued module.
-                                    *
-                                    * Note that in the current context, a
-                                    * vector is meant in the sense physics
-                                    * uses it: it has <code>spacedim</code>
-                                    * components that behave in specific ways
-                                    * under coordinate system
-                                    * transformations. Examples include
-                                    * velocity or displacement fields. This is
-                                    * opposed to how mathematics uses the word
-                                    * "vector" (and how we use this word in
-                                    * other contexts in the library, for
-                                    * example in the Vector class), where it
-                                    * really stands for a collection of
-                                    * numbers. An example of this latter use
-                                    * of the word could be the set of
-                                    * concentrations of chemical species in a
-                                    * flame; however, these are really just a
-                                    * collection of scalar variables, since
-                                    * they do not change if the coordinate
-                                    * system is rotated, unlike the components
-                                    * of a velocity vector, and consequently,
-                                    * this class should not be used for this
-                                    * context.
-                                    *
-                                    * @ingroup feaccess vector_valued
-                                    */
-  struct Vector
-  {
-                                       /**
-                                        * The first component of the vector
-                                        * view.
-                                        */
-      unsigned int first_vector_component;
-
-                                       /**
-                                        * Constructor. Take the first
-                                        * component of the selected vector
-                                        * inside the FEValues object as
-                                        * argument.
-                                        */
-      Vector (const unsigned int first_vector_component);
-  };
-
-
-                                   /**
-                                    * Extractor for a symmetric tensor of a
-                                    * rank specified by the template
-                                    * argument. For a second order symmetric
-                                    * tensor, this represents a collection of
-                                    * <code>(dim*dim + dim)/2</code>
-                                    * components of a vector-valued
-                                    * element. The value of <code>dim</code>
-                                    * is defined by the FEValues object the
-                                    * extractor is applied to. The result of
-                                    * applying an object of this type to an
-                                    * FEValues, FEFaceValues or
-                                    * FESubfaceValues object is of type
-                                    * FEValuesViews::SymmetricTensor.
-                                    *
-                                    * The concept of
-                                    * extractors is defined in the
-                                    * documentation of the namespace
-                                    * FEValuesExtractors and in the @ref
-                                    * vector_valued module.
-                                    *
-                                    * @ingroup feaccess vector_valued
-                                    *
-                                    * @author Andrew McBride, 2009
-                                    */
-  template <int rank>
-  struct SymmetricTensor
-  {
-                                       /**
-                                        * The first component of the tensor
-                                        * view.
-                                        */
-      unsigned int first_tensor_component;
-
-                                       /**
-                                        * Constructor. Take the first
-                                        * component of the selected tensor
-                                        * inside the FEValues object as
-                                        * argument.
-                                        */
-      SymmetricTensor (const unsigned int first_tensor_component);
   };
 }
 
@@ -1575,33 +1424,63 @@ class FEValuesData
     std::vector<Tensor<1,spacedim> >  boundary_forms;
 
                                      /**
-                                      * Indicate the first row which a
-                                      * given shape function occupies
-                                      * in the #shape_values,
-                                      * #shape_gradients and
-                                      * #shape_hessians
-                                      * arrays. If all shape functions
-                                      * are primitive, then this is
-                                      * the identity mapping. If, on
-                                      * the other hand some shape
-                                      * functions have more than one
-                                      * non-zero vector components,
-                                      * then they may occupy more than
-                                      * one row, and this array
-                                      * indicates which is the first
-                                      * one.
-                                      *
-                                      * The questions which particular
-                                      * vector component occupies
-                                      * which row for a given shape
-                                      * function is answered as
-                                      * follows: we allocate one row
-                                      * for each non-zero component as
-                                      * indicated by the
-                                      * FiniteElement::get_nonzero_components()
-                                      * function, and the rows are in
-                                      * ascending order exactly those
-                                      * non-zero components.
+				      * When asked for the value (or
+				      * gradient, or Hessian) of shape
+				      * function i's c-th vector
+				      * component, we need to look it
+				      * up in the #shape_values,
+				      * #shape_gradients and
+				      * #shape_hessians arrays.  The
+				      * question is where in this
+				      * array does the data for shape
+				      * function i, component c
+				      * reside. This is what this
+				      * table answers.
+				      *
+				      * The format of the table is as
+				      * follows:
+				      * - It has dofs_per_cell times
+				      *   n_components entries.
+				      * - The entry that corresponds to
+				      *   shape function i, component c
+				      *   is <code>i * n_components + c</code>.
+				      * - The value stored at this
+				      *   position indicates the row
+				      *   in #shape_values and the
+				      *   other tables where the
+				      *   corresponding datum is stored
+				      *   for all the quadrature points.
+				      *
+				      * In the general, vector-valued
+				      * context, the number of
+				      * components is larger than one,
+				      * but for a given shape
+				      * function, not all vector
+				      * components may be nonzero
+				      * (e.g., if a shape function is
+				      * primitive, then exactly one
+				      * vector component is non-zero,
+				      * while the others are all
+				      * zero). For such zero
+				      * components, #shape_values and
+				      * friends do not have a
+				      * row. Consequently, for vector
+				      * components for which shape
+				      * function i is zero, the entry
+				      * in the current table is
+				      * numbers::invalid_unsigned_int.
+				      *
+				      * On the other hand, the table
+				      * is guaranteed to have at least
+				      * one valid index for each shape
+				      * function. In particular, for a
+				      * primitive finite element, each
+				      * shape function has exactly one
+				      * nonzero component and so for
+				      * each i, there is exactly one
+				      * valid index within the range
+				      * <code>[i*n_components,
+				      * (i+1)*n_components)</code>.
                                       */
     std::vector<unsigned int> shape_function_to_row_table;
 
@@ -4612,6 +4491,8 @@ operator[] (const FEValuesExtractors::SymmetricTensor<2> &tensor) const
   return fe_values_views_cache.symmetric_second_order_tensors[tensor.first_tensor_component];
 }
 
+
+
 template <int dim, int spacedim>
 inline
 const double &
@@ -4630,16 +4511,19 @@ FEValuesBase<dim,spacedim>::shape_value (const unsigned int i,
   if (fe->is_primitive())
     return this->shape_values(i,j);
   else
-                                     // otherwise, use the mapping
-                                     // between shape function numbers
-                                     // and rows. note that by the
-                                     // assertions above, we know that
-                                     // this particular shape function
-                                     // is primitive, so there is no
-                                     // question to which vector
-                                     // component the call of this
-                                     // function refers
-    return this->shape_values(this->shape_function_to_row_table[i], j);
+    {
+				       // otherwise, use the mapping
+				       // between shape function
+				       // numbers and rows. note that
+				       // by the assertions above, we
+				       // know that this particular
+				       // shape function is primitive,
+				       // so we can call
+				       // system_to_component_index
+      const unsigned int
+	row = this->shape_function_to_row_table[i * fe->n_components() + fe->system_to_component_index(i).first];
+      return this->shape_values(row, j);
+    }
 }
 
 
@@ -4658,52 +4542,18 @@ FEValuesBase<dim,spacedim>::shape_value_component (const unsigned int i,
   Assert (component < fe->n_components(),
           ExcIndexRange(component, 0, fe->n_components()));
 
-                                   // if this particular shape
-                                   // function is primitive, then we
-                                   // can take a short-cut by checking
-                                   // whether the requested component
-                                   // is the only non-zero one (note
-                                   // that calling
-                                   // system_to_component_table only
-                                   // works if the shape function is
-                                   // primitive):
-  if (fe->is_primitive(i))
-    {
-      if (component == fe->system_to_component_index(i).first)
-        return this->shape_values(this->shape_function_to_row_table[i],j);
-      else
-        return 0;
-    }
-  else
-    {
-                                       // no, this shape function is
-                                       // not primitive. then we have
-                                       // to loop over its components
-                                       // to find the corresponding
-                                       // row in the arrays of this
-                                       // object. before that check
-                                       // whether the shape function
-                                       // is non-zero at all within
-                                       // this component:
-      if (fe->get_nonzero_components(i)[component] == false)
-        return 0;
+				   // check whether the shape function
+				   // is non-zero at all within
+				   // this component:
+  if (fe->get_nonzero_components(i)[component] == false)
+    return 0;
 
-                                       // count how many non-zero
-                                       // component the shape function
-                                       // has before the one we are
-                                       // looking for, and add this to
-                                       // the offset of the first
-                                       // non-zero component of this
-                                       // shape function in the arrays
-                                       // we index presently:
-      const unsigned int
-        row = (this->shape_function_to_row_table[i]
-               +
-               std::count (fe->get_nonzero_components(i).begin(),
-                           fe->get_nonzero_components(i).begin()+component,
-                           true));
-      return this->shape_values(row, j);
-    }
+				   // look up the right row in the
+				   // table and take the data from
+				   // there
+  const unsigned int
+    row = this->shape_function_to_row_table[i * fe->n_components() + component];
+  return this->shape_values(row, j);
 }
 
 
@@ -4730,16 +4580,19 @@ FEValuesBase<dim,spacedim>::shape_grad (const unsigned int i,
   if (fe->is_primitive())
     return this->shape_gradients[i][j];
   else
-                                     // otherwise, use the mapping
-                                     // between shape function numbers
-                                     // and rows. note that by the
-                                     // assertions above, we know that
-                                     // this particular shape function
-                                     // is primitive, so there is no
-                                     // question to which vector
-                                     // component the call of this
-                                     // function refers
-    return this->shape_gradients[this->shape_function_to_row_table[i]][j];
+    {
+				       // otherwise, use the mapping
+				       // between shape function
+				       // numbers and rows. note that
+				       // by the assertions above, we
+				       // know that this particular
+				       // shape function is primitive,
+				       // so we can call
+				       // system_to_component_index
+      const unsigned int
+	row = this->shape_function_to_row_table[i * fe->n_components() + fe->system_to_component_index(i).first];
+      return this->shape_gradients[row][j];
+    }
 }
 
 
@@ -4758,52 +4611,18 @@ FEValuesBase<dim,spacedim>::shape_grad_component (const unsigned int i,
   Assert (component < fe->n_components(),
           ExcIndexRange(component, 0, fe->n_components()));
 
-                                   // if this particular shape
-                                   // function is primitive, then we
-                                   // can take a short-cut by checking
-                                   // whether the requested component
-                                   // is the only non-zero one (note
-                                   // that calling
-                                   // system_to_component_table only
-                                   // works if the shape function is
-                                   // primitive):
-  if (fe->is_primitive(i))
-    {
-      if (component == fe->system_to_component_index(i).first)
-        return this->shape_gradients[this->shape_function_to_row_table[i]][j];
-      else
-        return Tensor<1,spacedim>();
-    }
-  else
-    {
-                                       // no, this shape function is
-                                       // not primitive. then we have
-                                       // to loop over its components
-                                       // to find the corresponding
-                                       // row in the arrays of this
-                                       // object. before that check
-                                       // whether the shape function
-                                       // is non-zero at all within
-                                       // this component:
-      if (fe->get_nonzero_components(i)[component] == false)
-        return Tensor<1,spacedim>();
+				   // check whether the shape function
+				   // is non-zero at all within
+				   // this component:
+  if (fe->get_nonzero_components(i)[component] == false)
+    return Tensor<1,spacedim>();
 
-                                       // count how many non-zero
-                                       // component the shape function
-                                       // has before the one we are
-                                       // looking for, and add this to
-                                       // the offset of the first
-                                       // non-zero component of this
-                                       // shape function in the arrays
-                                       // we index presently:
-      const unsigned int
-        row = (this->shape_function_to_row_table[i]
-               +
-               std::count (fe->get_nonzero_components(i).begin(),
-                           fe->get_nonzero_components(i).begin()+component,
-                           true));
-      return this->shape_gradients[row][j];
-    }
+				   // look up the right row in the
+				   // table and take the data from
+				   // there
+  const unsigned int
+    row = this->shape_function_to_row_table[i * fe->n_components() + component];
+  return this->shape_gradients[row][j];
 }
 
 
@@ -4830,16 +4649,19 @@ FEValuesBase<dim,spacedim>::shape_hessian (const unsigned int i,
   if (fe->is_primitive())
     return this->shape_hessians[i][j];
   else
-                                     // otherwise, use the mapping
-                                     // between shape function numbers
-                                     // and rows. note that by the
-                                     // assertions above, we know that
-                                     // this particular shape function
-                                     // is primitive, so there is no
-                                     // question to which vector
-                                     // component the call of this
-                                     // function refers
-    return this->shape_hessians[this->shape_function_to_row_table[i]][j];
+    {
+				       // otherwise, use the mapping
+				       // between shape function
+				       // numbers and rows. note that
+				       // by the assertions above, we
+				       // know that this particular
+				       // shape function is primitive,
+				       // so we can call
+				       // system_to_component_index
+      const unsigned int
+	row = this->shape_function_to_row_table[i * fe->n_components() + fe->system_to_component_index(i).first];
+      return this->shape_hessians[row][j];
+    }
 }
 
 
@@ -4869,52 +4691,18 @@ FEValuesBase<dim,spacedim>::shape_hessian_component (const unsigned int i,
   Assert (component < fe->n_components(),
           ExcIndexRange(component, 0, fe->n_components()));
 
-                                   // if this particular shape
-                                   // function is primitive, then we
-                                   // can take a short-cut by checking
-                                   // whether the requested component
-                                   // is the only non-zero one (note
-                                   // that calling
-                                   // system_to_component_table only
-                                   // works if the shape function is
-                                   // primitive):
-  if (fe->is_primitive(i))
-    {
-      if (component == fe->system_to_component_index(i).first)
-        return this->shape_hessians[this->shape_function_to_row_table[i]][j];
-      else
-        return Tensor<2,spacedim>();
-    }
-  else
-    {
-                                       // no, this shape function is
-                                       // not primitive. then we have
-                                       // to loop over its components
-                                       // to find the corresponding
-                                       // row in the arrays of this
-                                       // object. before that check
-                                       // whether the shape function
-                                       // is non-zero at all within
-                                       // this component:
-      if (fe->get_nonzero_components(i)[component] == false)
-        return Tensor<2,spacedim>();
+				   // check whether the shape function
+				   // is non-zero at all within
+				   // this component:
+  if (fe->get_nonzero_components(i)[component] == false)
+    return Tensor<2,spacedim>();
 
-                                       // count how many non-zero
-                                       // component the shape function
-                                       // has before the one we are
-                                       // looking for, and add this to
-                                       // the offset of the first
-                                       // non-zero component of this
-                                       // shape function in the arrays
-                                       // we index presently:
-      const unsigned int
-        row = (this->shape_function_to_row_table[i]
-               +
-               std::count (fe->get_nonzero_components(i).begin(),
-                           fe->get_nonzero_components(i).begin()+component,
-                           true));
-      return this->shape_hessians[row][j];
-    }
+				   // look up the right row in the
+				   // table and take the data from
+				   // there
+  const unsigned int
+    row = this->shape_function_to_row_table[i * fe->n_components() + component];
+  return this->shape_hessians[row][j];
 }
 
 

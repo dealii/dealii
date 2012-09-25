@@ -292,7 +292,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
          const DH<deal_II_dimension,deal_II_space_dimension> &,
          const FunctionMap<deal_II_space_dimension>::type &,
          std::map<unsigned int,double>       &,
-         const std::vector<bool>    &);
+         const ComponentMask    &);
 
       template
         void interpolate_boundary_values
@@ -301,7 +301,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
          const types::boundary_id,
          const Function<deal_II_space_dimension>   &,
          std::map<unsigned int,double>       &,
-         const std::vector<bool>    &);
+         const ComponentMask    &);
 
       template
         void interpolate_boundary_values (
@@ -309,14 +309,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
           const types::boundary_id,
           const Function<deal_II_space_dimension>   &,
           std::map<unsigned int,double>       &,
-          const std::vector<bool>    &);
+          const ComponentMask    &);
 
       template
         void interpolate_boundary_values
         (const DH<deal_II_dimension,deal_II_space_dimension> &,
          const FunctionMap<deal_II_space_dimension>::type &,
          std::map<unsigned int,double>       &,
-         const std::vector<bool>    &);
+         const ComponentMask    &);
 
       template
         void interpolate_boundary_values (
@@ -324,7 +324,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
           const DH<deal_II_dimension,deal_II_space_dimension> &,
           const FunctionMap<deal_II_space_dimension>::type   &,
           ConstraintMatrix                    &,
-          const std::vector<bool>    &);
+          const ComponentMask    &);
 
       template
         void interpolate_boundary_values
@@ -333,7 +333,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
          const types::boundary_id,
          const Function<deal_II_space_dimension>   &,
          ConstraintMatrix                    &,
-         const std::vector<bool>             &);
+         const ComponentMask             &);
 
       template
         void interpolate_boundary_values (
@@ -341,14 +341,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
           const types::boundary_id,
           const Function<deal_II_space_dimension>   &,
           ConstraintMatrix                    &,
-          const std::vector<bool>    &);
+          const ComponentMask    &);
 
       template
         void interpolate_boundary_values (
           const DH<deal_II_dimension,deal_II_space_dimension> &,
           const FunctionMap<deal_II_space_dimension>::type   &,
           ConstraintMatrix                    &,
-          const std::vector<bool>    &);
+          const ComponentMask    &);
 
       \}
 #endif

@@ -110,7 +110,7 @@ FE_DGPMonomial<dim>::FE_DGPMonomial (const unsigned int degree)
                   PolynomialsP<dim>(degree),
                   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
                   std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
-                  std::vector<std::vector<bool> >(FiniteElementData<dim>(
+                  std::vector<ComponentMask>(FiniteElementData<dim>(
                     get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
   Assert(this->poly_space.n()==this->dofs_per_cell, ExcInternalError());

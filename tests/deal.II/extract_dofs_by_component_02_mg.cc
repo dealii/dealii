@@ -17,7 +17,7 @@
 //
 // this particular test checks the call path to
 // internal::extract_dofs_by_component from DoFTools::extract_dofs via
-// the block_select flag
+// the BlockMask argument
 
 
 #include "../tests.h"
@@ -69,7 +69,7 @@ check ()
 	deallog << "level=" << level << std::endl;
 
 	std::vector<bool> dofs (dof.n_dofs(level));
-	DoFTools::extract_level_dofs (level, dof, component_mask, dofs, true);
+	DoFTools::extract_level_dofs (level, dof, BlockMask(component_mask), dofs);
 
 	for (unsigned int d=0; d<dofs.size(); ++d)
 	  deallog << dofs[d];

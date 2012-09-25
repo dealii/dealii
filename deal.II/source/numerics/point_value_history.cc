@@ -238,12 +238,12 @@ void PointValueHistory<dim>
                    // support points
                    // GridTools::find_active_cell_around_point
                    // is an alternative. That method is not
-                   // used here mostly because of the history 
-                   // of the class. The algorithm used in 
+                   // used here mostly because of the history
+                   // of the class. The algorithm used in
                    // add_points below may be slightly more
                    // efficient than find_active_cell_around_point
                    // because it operates on a set of points.
-                   
+
   for (; cell != endc; cell++)
     {
       fe_values.reinit (cell);
@@ -308,8 +308,8 @@ void PointValueHistory<dim>
     {
                        // add an extra row to each vector
                        // entry
-      std::vector <bool> current_mask = (component_mask.find (data_store_begin->first))->second;
-      unsigned int n_stored = std::count(current_mask.begin(), current_mask.end(), true);
+      const ComponentMask &current_mask = (component_mask.find (data_store_begin->first))->second;
+      unsigned int n_stored = current_mask.n_selected_components();
       for (unsigned int component = 0; component < n_stored; component++)
         {
           data_store_begin->second.push_back (std::vector<double> (0));
@@ -385,8 +385,8 @@ void PointValueHistory<dim>
                    // points
                    // GridTools::find_active_cell_around_point
                    // is an alternative. That method is not
-                   // used here mostly because of the history 
-                   // of the class. The algorithm used here 
+                   // used here mostly because of the history
+                   // of the class. The algorithm used here
                    // may be slightly more
                    // efficient than find_active_cell_around_point
                    // because it operates on a set of points.
@@ -432,8 +432,8 @@ void PointValueHistory<dim>
         {
                        // add an extra row to each vector
                        // entry
-          std::vector <bool> current_mask = (component_mask.find (data_store_begin->first))->second;
-          unsigned int n_stored = std::count(current_mask.begin(), current_mask.end(), true);
+          const ComponentMask current_mask = (component_mask.find (data_store_begin->first))->second;
+          unsigned int n_stored = current_mask.n_selected_components();
           for (unsigned int component = 0; component < n_stored; component++)
             {
               data_store_begin->second.push_back (std::vector<double> (0));
@@ -449,7 +449,8 @@ void PointValueHistory<dim>
 
 template <int dim>
 void PointValueHistory<dim>
-::add_field_name (const std::string &vector_name, const std::vector <bool> &mask)
+::add_field_name (const std::string &vector_name,
+                  const ComponentMask &mask)
 {
                    // can't be closed to add additional points
                    // or vectors
@@ -458,26 +459,30 @@ void PointValueHistory<dim>
   AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
   AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
 
-
-                    // Make a component_mask, if not supplied
-  std::vector <bool> temp_mask = mask;
-  if (temp_mask.size() == 0)
-  {
-      temp_mask = std::vector<bool> (dof_handler->get_fe().n_components(), true);
-  }
-  component_mask.insert (std::pair <std::string, std::vector<bool> > (vector_name, temp_mask));
+  // insert a component mask that is always of the right size
+  if (mask.represents_the_all_selected_mask() == false)
+    component_mask.insert (std::make_pair (vector_name, mask));
+  else
+    component_mask.insert (std::make_pair (vector_name,
+                                           ComponentMask(std::vector<bool>(dof_handler->get_fe().n_components(), true))));
 
                    // insert an empty vector of strings
                    // to ensure each field has an entry
                    // in the map
-  std::pair <std::string, std::vector <std::string> > empty_names (vector_name, std::vector <std::string> ());
+  std::pair <std::string, std::vector <std::string> >
+    empty_names (vector_name, std::vector <std::string> ());
   component_names_map.insert (empty_names);
 
                    // make and add a new vector
                    // point_geometry_data.size() long
   std::pair<std::string, std::vector <std::vector <double> > > pair_data;
   pair_data.first = vector_name;
-  unsigned int n_stored = std::count(temp_mask.begin(), temp_mask.end(), true);
+  const unsigned int n_stored = (mask.represents_the_all_selected_mask() == false
+				 ?
+				 mask.n_selected_components()
+				 :
+				 dof_handler->get_fe().n_components());
+
   int n_datastreams = point_geometry_data.size () * n_stored; // each point has n_stored sub parts
   std::vector < std::vector <double> > vector_size (n_datastreams,
                                                     std::vector <double> (0));
@@ -503,9 +508,9 @@ void PointValueHistory<dim>
   typename std::map <std::string, std::vector <std::string> >::iterator names = component_names_map.find(vector_name);
   Assert (names != component_names_map.end(), ExcMessage("vector_name not in class"));
 
-  typename std::map <std::string, std::vector <bool> >::iterator mask = component_mask.find(vector_name);
+  typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
   Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
-  unsigned int n_stored = std::count(mask->second.begin(), mask->second.end(), true);  
+  unsigned int n_stored = mask->second.n_selected_components();
   Assert (component_names.size() == n_stored, ExcDimensionMismatch (component_names.size(), n_stored));
 
   names->second = component_names;
@@ -576,11 +581,10 @@ void PointValueHistory<dim>
   typename std::map <std::string, std::vector <std::vector <double> > >::iterator data_store_field = data_store.find(vector_name);
   Assert (data_store_field != data_store.end(), ExcMessage("vector_name not in class"));
                    // Repeat for component_mask
-  typename std::map <std::string, std::vector <bool> >::iterator mask = component_mask.find(vector_name);
+  typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
   Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
 
-  Assert (mask->second.size () == dof_handler->get_fe ().n_components (), ExcDimensionMismatch (mask->second.size (), dof_handler->get_fe ().n_components ()));
-  unsigned int n_stored = std::count(mask->second.begin(), mask->second.end(), true);
+  unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_fe ().n_components ());
 
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   for (unsigned int data_store_index = 0; point != point_geometry_data.end (); point++, data_store_index++)
@@ -589,8 +593,8 @@ void PointValueHistory<dim>
                        // in the component_mask, and
                        // access the data associated with
                        // those components
-    
-    for (unsigned int store_index = 0, comp = 0; comp < mask->second.size(); comp++)
+
+    for (unsigned int store_index = 0, comp = 0; comp < dof_handler->get_fe ().n_components (); comp++)
     {
         if (mask->second[comp])
         {
@@ -747,15 +751,14 @@ void PointValueHistory<dim>
             typename std::map <std::string, std::vector <std::vector <double> > >::iterator data_store_field = data_store.find(*name);
             Assert (data_store_field != data_store.end(), ExcMessage("vector_name not in class"));
                             // Repeat for component_mask
-            typename std::map <std::string, std::vector <bool> >::iterator mask = component_mask.find(*name);
+            typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(*name);
             Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
 
-            Assert (mask->second.size () == n_output_variables, ExcDimensionMismatch (mask->second.size (),n_output_variables));
-            unsigned int n_stored = std::count(mask->second.begin(), mask->second.end(), true);
-            
+            unsigned int n_stored = mask->second.n_selected_components(n_output_variables);
+
                             // Push back computed quantities according
                             // to the component_mask.
-            for (unsigned int store_index = 0, comp = 0; comp < mask->second.size(); comp++)
+            for (unsigned int store_index = 0, comp = 0; comp < n_output_variables; comp++)
             {
                 if (mask->second[comp])
                 {
@@ -803,11 +806,10 @@ void PointValueHistory<dim>
   typename std::map <std::string, std::vector <std::vector <double> > >::iterator data_store_field = data_store.find(vector_name);
   Assert (data_store_field != data_store.end(), ExcMessage("vector_name not in class"));
                    // Repeat for component_mask
-  typename std::map <std::string, std::vector <bool> >::iterator mask = component_mask.find(vector_name);
+  typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
   Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
 
-  Assert (mask->second.size () == dof_handler->get_fe ().n_components (), ExcDimensionMismatch (mask->second.size (), dof_handler->get_fe ().n_components ()));
-  unsigned int n_stored = std::count(mask->second.begin(), mask->second.end(), true);
+  unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_fe ().n_components ());
 
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   Vector <double> value (dof_handler->get_fe().n_components());
@@ -991,8 +993,8 @@ void PointValueHistory<dim>
 
           for (; data_store_begin != data_store.end (); data_store_begin++)
             {
-                typename std::map <std::string, std::vector <bool> >::iterator mask = component_mask.find(data_store_begin->first);
-                unsigned int n_stored = std::count(mask->second.begin(), mask->second.end(), true);
+                typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(data_store_begin->first);
+                unsigned int n_stored = mask->second.n_selected_components();
                 std::vector <std::string> names = (component_names_map.find (data_store_begin->first))->second;
 
                 if (names.size() > 0)
@@ -1004,7 +1006,7 @@ void PointValueHistory<dim>
                   }
                 }
                 else
-                {          
+                {
                     for (unsigned int component = 0; component < n_stored; component++)
                     {
                       to_gnuplot << "<" << data_store_begin->first << "_" << component << "> ";
@@ -1027,8 +1029,8 @@ void PointValueHistory<dim>
 
               for (; data_store_begin != data_store.end (); data_store_begin++)
                 {
-                  typename std::map <std::string, std::vector <bool> >::iterator mask = component_mask.find(data_store_begin->first);
-                  unsigned int n_stored = std::count(mask->second.begin(), mask->second.end(), true);
+                  typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(data_store_begin->first);
+                  unsigned int n_stored = mask->second.n_selected_components();
 
                   for (unsigned int component = 0; component < n_stored; component++)
                   {
@@ -1211,7 +1213,7 @@ void PointValueHistory<dim>
     {
                   // Find field mnemonic
       std::string vector_name = data_store_begin->first;
-      typename std::map <std::string, std::vector <bool> >::iterator mask = component_mask.find(vector_name);
+      typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
       Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
       typename std::map <std::string, std::vector <std::string> >::iterator component_names = component_names_map.find(vector_name);
       Assert (component_names != component_names_map.end(), ExcMessage("vector_name not in class"));
@@ -1219,13 +1221,13 @@ void PointValueHistory<dim>
       if (data_store_begin->second.size () != 0)
         {
           out << data_store_begin->first << ": " << data_store_begin->second.size () << " (";
-          out << mask->second.size() << ", " << std::count (mask->second.begin(), mask->second.end(), true) << ") : ";
+          out << mask->second.size() << ", " << mask->second.n_selected_components() << ") : ";
           out << (data_store_begin->second)[0].size () << "\n";
         }
       else
         {
           out << data_store_begin->first << ": " << data_store_begin->second.size () << " (";
-          out << mask->second.size() << ", " << std::count (mask->second.begin(), mask->second.end(), true) << ") : ";
+          out << mask->second.size() << ", " << mask->second.n_selected_components() << ") : ";
           out << "No points added" << "\n";
         }
                   // add names, if available
@@ -1246,10 +1248,10 @@ void PointValueHistory<dim>
 
 template <int dim>
 bool PointValueHistory<dim>
-::deep_check (bool strict)
+::deep_check (const bool strict)
 {
-                   // test ways that it can fail, if control
-                   // reaches last statement return true
+				   // test ways that it can fail, if control
+				   // reaches last statement return true
   if (strict)
     {
       if (n_indep != 0)
@@ -1260,19 +1262,21 @@ bool PointValueHistory<dim>
             }
         }
       std::map <std::string, std::vector <std::vector <double> > >::iterator
-    data_store_begin = data_store.begin ();
+	data_store_begin = data_store.begin ();
       if (have_dof_handler)
         {
           for (; data_store_begin != data_store.end (); data_store_begin++)
             {
+	      Assert (data_store_begin->second.size() > 0,
+		      ExcInternalError());
               if ((data_store_begin->second)[0].size () != dataset_key.size ())
                 return false;
-                           // this loop only tests one
-                           // member for each name,
-                           // i.e. checks the user it will
-                           // not catch internal errors
-                           // which do not update all
-                           // fields for a name.
+					       // this loop only tests one
+					       // member for each name,
+					       // i.e. checks the user it will
+					       // not catch internal errors
+					       // which do not update all
+					       // fields for a name.
             }
         }
       return true;
@@ -1288,16 +1292,19 @@ bool PointValueHistory<dim>
   if (have_dof_handler)
     {
       std::map <std::string, std::vector <std::vector <double> > >::iterator
-    data_store_begin = data_store.begin ();
+	data_store_begin = data_store.begin ();
       for (; data_store_begin != data_store.end (); data_store_begin++)
         {
+	  Assert (data_store_begin->second.size() > 0,
+		  ExcInternalError());
+
           if (std::abs ((int) (data_store_begin->second)[0].size () - (int) dataset_key.size ()) >= 2)
             return false;
-                       // this loop only tests one member
-                       // for each name, i.e. checks the
-                       // user it will not catch internal
-                       // errors which do not update all
-                       // fields for a name.
+					   // this loop only tests one member
+					   // for each name, i.e. checks the
+					   // user it will not catch internal
+					   // errors which do not update all
+					   // fields for a name.
         }
     }
   return true;

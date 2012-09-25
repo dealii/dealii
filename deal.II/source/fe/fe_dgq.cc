@@ -135,7 +135,7 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
                   TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
                   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
                   std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
-                  std::vector<std::vector<bool> >(FiniteElementData<dim>(
+                  std::vector<ComponentMask>(FiniteElementData<dim>(
                     get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
                                    // Reinit the vectors of
@@ -219,7 +219,7 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const Quadrature<1>& points)
                   TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(points.get_points())),
                   FiniteElementData<dim>(get_dpo_vector(points.size()-1), 1, points.size()-1, FiniteElementData<dim>::L2),
                   std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, true),
-                  std::vector<std::vector<bool> >(FiniteElementData<dim>(
+                  std::vector<ComponentMask>(FiniteElementData<dim>(
                     get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, std::vector<bool>(1,true)))
 {
                                    // Reinit the vectors of

@@ -92,7 +92,7 @@ class MGTransferComponentBase
                                     * this refers to the
                                     * <b>renumbered</b> components.
                                     */
-    std::vector<bool> selected;
+    ComponentMask component_mask;
 
                                    /**
                                     * Flag of selected components.
@@ -105,7 +105,7 @@ class MGTransferComponentBase
                                     * this refers to the
                                     * <b>renumbered</b> components.
                                     */
-    std::vector<bool> mg_selected;
+    ComponentMask mg_component_mask;
 
                                      /**
                                       * Target component of the

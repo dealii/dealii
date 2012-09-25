@@ -1,4 +1,6 @@
 SET(src
+  block_mask.cc
+  component_mask.cc
   fe_abf.cc
   fe_bdm.cc
   fe.cc
