@@ -246,12 +246,12 @@ namespace PETScWrappers
                                      // object and link the given matrix A
                                      // to the matrix-vector multiplication
                                      // of this MatrixFree object,
-    MatrixFree  *this_object;
+    void  *this_object;
     int ierr = MatShellGetContext (A, &this_object);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // call vmult of this object:
-    this_object->vmult (dst, src);
+    reinterpret_cast<MatrixFree*>(this_object)->vmult (dst, src);
 
     return (0);
   }
