@@ -1,3 +1,4 @@
+
 #
 # Setup cached variables prior to the PROJECT(deal.II) call
 #
@@ -94,8 +95,10 @@ SET(deal_ii_used_flags
   )
 FOREACH(flag ${deal_ii_used_flags})
 
+  #
   # "CACHE" ensures that we only set the variable if it is not already set
-  # as a  cached variable, effectively we're setting a default value:
+  # as a  cached variable. Effectively we're setting a default value:
+  #
   SET(${flag} "" CACHE STRING
    "The user supplied cache variable will be appended _at the end_ of the auto generated ${flag} variable"
    )
@@ -103,7 +106,7 @@ FOREACH(flag ${deal_ii_used_flags})
   #
   # Save the initial (cached) variable at this point and clear it.
   # ${flags}_SAVED will be appended to ${flags} in
-  # setup_cached_compiler_flags_finalize.cmake (called at the end of the
+  # setup_finalize.cmake (called at the end of the
   # main CMakeLists.txt file).
   #
   SET(${flag}_SAVED "${${flag}}")

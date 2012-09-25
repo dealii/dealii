@@ -1,12 +1,16 @@
 
 #
-# Setup some convenience custom targets for the build system:
+# Setup some convenience custom targets for the build system, i.e.
 #
-
+#   $ make <custom_target>.
 #
-# Custom targets for building all targets necessary to install a specific
-# component. (Too bad, we have to do this by hand. There is no cmake
-# internal way to do this, yet...)
+# We add custom targets for building all targets necessary to install a
+# specific component (too bad, we have to do this by hand. There is no cmake
+# internal way to do this, yet...):
+#
+#   library, documentation, compat_files, project_config
+#
+# And a release and debug target (depending on configuration)
 #
 
 ADD_CUSTOM_TARGET(library)

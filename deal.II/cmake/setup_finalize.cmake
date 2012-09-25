@@ -3,30 +3,6 @@
 #
 
 
-#
-# Dependency check:
-#
-# - DEAL_II_COMPONENT_DOCUMENTATION needs DEAL_II_WITH_DOXYGEN.
-#
-# - DEAL_II_WITH_BOOST has to be enabled.
-#
-# TODO: It is a bit sloppy to test this here. But this is the only
-# dependency of this kind atm.
-#
-IF(DEAL_II_COMPONENT_DOCUMENTATION AND NOT DEAL_II_WITH_DOXYGEN)
-  MESSAGE(SEND_ERROR "\n"
-    "DEAL_II_COMPONENT_DOCUMENTATION has unmet configuration requirements: "
-    "DEAL_II_WITH_DOXYGEN required, but set to OFF!\n\n"
-    )
-ENDIF()
-
-IF(NOT DEAL_II_WITH_BOOST)
-  MESSAGE(SEND_ERROR "\n"
-    "Unmet configuration requirements: "
-    "DEAL_II_WITH_BOOST required, but set to OFF!.\n\n"
-    )
-ENDIF()
-
 
 #
 # Hide some cmake specific cached variables. This is annoying...
@@ -96,12 +72,17 @@ The contrib UMFPACK library will be compiled with the following C compiler:
   ENDIF()
 ENDIF()
 
-
 IF(NOT DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-  MESSAGE("\n
-WARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n")
+  MESSAGE("\n"
+    "WARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n"
+    )
+ELSE()
+  IF(NOT DEAL_II_KNOWN_COMPILER)
+    MESSAGE("\n"
+      "WARNING: Unknown compiler! Please set compiler flags by hand.\n"
+      )
+  ENDIF()
 ENDIF()
-
 
 MESSAGE("
   Configured Features ("
