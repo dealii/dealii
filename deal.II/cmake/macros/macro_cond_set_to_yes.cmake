@@ -9,6 +9,8 @@
 MACRO(COND_SET_TO_YES bool variable)
   IF(${bool})
     SET(${variable} "yes")
+  ELSE()
+    SET(${variable} "no")
   ENDIF()
 ENDMACRO()
 
