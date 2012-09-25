@@ -1,6 +1,41 @@
 #
 # Set up deal.II specific definitions
 #
+# This file defines a long list of variables, used throughout the
+# configuration to determine paths, locations and names:
+#
+# General information about deal:
+#
+#     DEAL_II_PACKAGE_NAME            *)
+#     DEAL_II_PACKAGE_VERSION
+#     DEAL_II_PACKAGE_STRING
+#     DEAL_II_PACKAGE_BUGREPORT       *)
+#     DEAL_II_PACKAGE_TARNAME         *)
+#     DEAL_II_PACKAGE_URL             *)
+#     DEAL_II_VERSION_MAJOR
+#     DEAL_II_VERSION_MINOR
+#
+# Information about paths, install locations and names:
+#
+#     DEAL_II_PROJECT_CONFIG_NAME     *)
+#     DEAL_II_BASE_NAME               *)
+#     DEAL_II_DEBUG_SUFFIX            *)
+#     DEAL_II_LIBRARY_NAME_DEBUG
+#     DEAL_II_LIBRARY_NAME_RELEASE
+#
+#     DEAL_II_PATH                    *)
+#     DEAL_II_DOCUMENTATION_RELDIR    *)
+#     DEAL_II_EXAMPLES_RELDIR         *)
+#     DEAL_II_INCLUDE_RELDIR          *)
+#     DEAL_II_LIBRARY_RELDIR          *)
+#     DEAL_II_PROJECT_CONFIG_RELDIR   *)
+#
+#     DEAL_II_INCLUDE_DIRS
+#     DEAL_II_LIBRARIES
+#
+# *) Values marked with *) can be overwritten by the command line via
+#    -D<...>
+#
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
@@ -11,7 +46,7 @@ SET(DEAL_II_PACKAGE_STRING
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_BUGREPORT "dealii@dealii.org")
 SET_IF_EMPTY(DEAL_II_PACKAGE_TARNAME ${DEAL_II_PACKAGE_NAME}) #TODO
-SET_IF_EMPTY(DEAL_II_PACKAGE_URL "http://www.dealii.org")
+SET_IF_EMPTY(DEAL_II_PACKAGE_URL "http://www.dealii.org") #TODO
 
 STRING(REGEX REPLACE
   "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${VERSION}"
