@@ -110,7 +110,7 @@ template <int dim, int spacedim>
 FiniteElement<dim,spacedim>::FiniteElement (
   const FiniteElementData<dim> &fe_data,
   const std::vector<bool> &r_i_a_f,
-  const std::vector<std::vector<bool> > &nonzero_c)
+  const std::vector<ComponentMask> &nonzero_c)
                 :
                 FiniteElementData<dim> (fe_data),
                 adjust_quad_dof_index_for_face_orientation_table (dim == 3 ?
@@ -145,8 +145,8 @@ FiniteElement<dim,spacedim>::FiniteElement (
 
    if (nonzero_components.size() == 1 && ndofs > 1)
      {
-       std::vector<std::vector<bool> >& aux
-         = const_cast<std::vector<std::vector<bool> >&> (nonzero_components);
+       std::vector<ComponentMask>& aux
+         = const_cast<std::vector<ComponentMask>&> (nonzero_components);
        aux.resize(ndofs, nonzero_components[0]);
      }
 
@@ -171,9 +171,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
     {
       Assert (nonzero_components[i].size() == this->n_components(),
               ExcInternalError());
-      Assert (std::count (nonzero_components[i].begin(),
-                          nonzero_components[i].end(),
-                          true)
+      Assert (nonzero_components[i].n_selected_components ()
               >= 1,
               ExcInternalError());
       Assert (n_nonzero_components_table[i] >= 1,
@@ -382,6 +380,174 @@ FiniteElement<dim,spacedim>::component_to_block_index (const unsigned int index)
   return first_block_of_base(component_to_base_table[index].first.first)
     + component_to_base_table[index].second;
 }
+
+
+template <int dim, int spacedim>
+ComponentMask
+FiniteElement<dim,spacedim>::
+component_mask (const FEValuesExtractors::Scalar &scalar) const
+{
+  AssertIndexRange(scalar.component, this->n_components());
+
+//TODO: it would be nice to verify that it is indeed possible
+// to select this scalar component, i.e., that it is not part
+// of a non-primitive element. unfortunately, there is no simple
+// way to write such a condition...
+
+  std::vector<bool> mask (this->n_components(), false);
+  mask[scalar.component] = true;
+  return mask;
+}
+
+
+template <int dim, int spacedim>
+ComponentMask
+FiniteElement<dim,spacedim>::
+component_mask (const FEValuesExtractors::Vector &vector) const
+{
+  AssertIndexRange(vector.first_vector_component+dim-1, this->n_components());
+
+  //TODO: it would be nice to verify that it is indeed possible
+  // to select these vector components, i.e., that they don't span
+  // beyond the beginning or end of anon-primitive element.
+  // unfortunately, there is no simple way to write such a condition...
+
+  std::vector<bool> mask (this->n_components(), false);
+  for (unsigned int c=vector.first_vector_component; c<vector.first_vector_component+dim; ++c)
+    mask[c] = true;
+  return mask;
+}
+
+
+template <int dim, int spacedim>
+ComponentMask
+FiniteElement<dim,spacedim>::
+component_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const
+{
+  AssertIndexRange((sym_tensor.first_tensor_component +
+                    SymmetricTensor<2,dim>::n_independent_components-1),
+                   this->n_components());
+
+  //TODO: it would be nice to verify that it is indeed possible
+  // to select these vector components, i.e., that they don't span
+  // beyond the beginning or end of anon-primitive element.
+  // unfortunately, there is no simple way to write such a condition...
+
+  std::vector<bool> mask (this->n_components(), false);
+  for (unsigned int c=sym_tensor.first_tensor_component;
+       c<sym_tensor.first_tensor_component+SymmetricTensor<2,dim>::n_independent_components; ++c)
+    mask[c] = true;
+  return mask;
+}
+
+
+
+template <int dim, int spacedim>
+ComponentMask
+FiniteElement<dim,spacedim>::
+component_mask (const BlockMask &block_mask) const
+{
+  // if we get a block mask that represents all blocks, then
+  // do the same for the returned component mask
+  if (block_mask.represents_the_all_selected_mask())
+    return ComponentMask();
+
+  AssertDimension(block_mask.size(), this->n_blocks());
+
+  std::vector<bool> component_mask (this->n_components(), false);
+  for (unsigned int c=0; c<this->n_components(); ++c)
+    if (block_mask[component_to_block_index(c)] == true)
+      component_mask[c] = true;
+
+  return component_mask;
+}
+
+
+
+template <int dim, int spacedim>
+BlockMask
+FiniteElement<dim,spacedim>::
+block_mask (const FEValuesExtractors::Scalar &scalar) const
+{
+  // simply create the corresponding component mask (a simpler
+  // process) and then convert it to a block mask
+  return block_mask(component_mask(scalar));
+}
+
+
+template <int dim, int spacedim>
+BlockMask
+FiniteElement<dim,spacedim>::
+block_mask (const FEValuesExtractors::Vector &vector) const
+{
+  // simply create the corresponding component mask (a simpler
+  // process) and then convert it to a block mask
+  return block_mask(component_mask(vector));
+}
+
+
+template <int dim, int spacedim>
+BlockMask
+FiniteElement<dim,spacedim>::
+block_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const
+{
+  // simply create the corresponding component mask (a simpler
+  // process) and then convert it to a block mask
+  return block_mask(component_mask(sym_tensor));
+}
+
+
+
+template <int dim, int spacedim>
+BlockMask
+FiniteElement<dim,spacedim>::
+block_mask (const ComponentMask &component_mask) const
+{
+  // if we get a component mask that represents all component, then
+  // do the same for the returned block mask
+  if (component_mask.represents_the_all_selected_mask())
+    return BlockMask();
+
+  AssertDimension(component_mask.size(), this->n_components());
+
+				   // walk over all of the components
+				   // of this finite element and see
+				   // if we need to set the
+				   // corresponding block. inside the
+				   // block, walk over all the
+				   // components that correspond to
+				   // this block and make sure the
+				   // component mask is set for all of
+				   // them
+  std::vector<bool> block_mask (this->n_blocks(), false);
+  for (unsigned int c=0; c<this->n_components();)
+    {
+      const unsigned int block = component_to_block_index(c);
+      if (component_mask[c] == true)
+	block_mask[block] = true;
+
+				       // now check all of the other
+				       // components that correspond
+				       // to this block
+      ++c;
+      while ((c<this->n_components())
+	     &&
+	     (component_to_block_index(c) == block))
+	{
+	  Assert (component_mask[c] == block_mask[block],
+		  ExcMessage ("The component mask argument given to this function "
+			      "is not a mask where the individual components belonging "
+			      "to one block of the finite element are either all "
+			      "selected or not selected. You can't call this function "
+			      "with a component mask that splits blocks."));
+	  ++c;
+	}
+    }
+
+
+  return block_mask;
+}
+
 
 
 template <int dim, int spacedim>
@@ -1120,13 +1286,11 @@ FiniteElement<dim,spacedim>::compute_2nd (
 template <int dim, int spacedim>
 std::vector<unsigned int>
 FiniteElement<dim,spacedim>::compute_n_nonzero_components (
-  const std::vector<std::vector<bool> > &nonzero_components)
+  const std::vector<ComponentMask> &nonzero_components)
 {
   std::vector<unsigned int> retval (nonzero_components.size());
   for (unsigned int i=0; i<nonzero_components.size(); ++i)
-    retval[i] = std::count (nonzero_components[i].begin(),
-                            nonzero_components[i].end(),
-                            true);
+    retval[i] = nonzero_components[i].n_selected_components();
   return retval;
 }
 

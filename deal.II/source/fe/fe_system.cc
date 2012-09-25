@@ -3119,7 +3119,7 @@ compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim
 
 
 template <int dim, int spacedim>
-std::vector<std::vector<bool> >
+std::vector<ComponentMask>
 FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
                                            const unsigned int        N1)
 {
@@ -3135,7 +3135,7 @@ FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spac
 
 
 template <int dim, int spacedim>
-std::vector<std::vector<bool> >
+std::vector<ComponentMask>
 FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
                                            const unsigned int        N1,
                                            const FiniteElement<dim,spacedim> &fe2,
@@ -3156,7 +3156,7 @@ FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spac
 
 
 template <int dim, int spacedim>
-std::vector<std::vector<bool> >
+std::vector<ComponentMask>
 FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
                                            const unsigned int        N1,
                                            const FiniteElement<dim,spacedim> &fe2,
@@ -3182,7 +3182,7 @@ FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spac
 
 
 template <int dim, int spacedim>
-std::vector<std::vector<bool> >
+std::vector<ComponentMask>
 FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
                                                     const unsigned int        N1,
                                                     const FiniteElement<dim,spacedim> &fe2,
@@ -3213,7 +3213,7 @@ FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spac
 
 
 template <int dim, int spacedim>
-std::vector<std::vector<bool> >
+std::vector<ComponentMask>
 FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
                                                     const unsigned int        N1,
                                                     const FiniteElement<dim,spacedim> &fe2,
@@ -3249,7 +3249,7 @@ FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spac
 
 
 template <int dim, int spacedim>
-std::vector<std::vector<bool> >
+std::vector<ComponentMask>
 FESystem<dim,spacedim>::
 compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
                             const std::vector<unsigned int>              &multiplicities)
@@ -3425,7 +3425,14 @@ compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*
 
   Assert (total_index == n_shape_functions, ExcInternalError());
 
-  return retval;
+  // now copy the vector<vector<bool> > into a vector<ComponentMask>.
+  // this appears complicated but we do it this way since it's just
+  // awkward to generate ComponentMasks directly and so we need the
+  // recourse of the inner vector<bool> anyway.
+  std::vector<ComponentMask> xretval (retval.size());
+  for (unsigned int i=0; i<retval.size(); ++i)
+    xretval[i] = ComponentMask(retval[i]);
+  return xretval;
 }
 
 

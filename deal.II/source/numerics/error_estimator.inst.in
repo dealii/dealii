@@ -35,7 +35,7 @@ estimate<InputVector,DH<deal_II_dimension> > (const Mapping<deal_II_dimension, d
           const FunctionMap<deal_II_dimension>::type &,    \
           const InputVector       &,    \
           Vector<float>           &,    \
-          const std::vector<bool> &,    \
+          const ComponentMask &,    \
           const Function<deal_II_dimension>     *,    \
           const unsigned int       , \
           const unsigned int       , \
@@ -49,7 +49,7 @@ estimate<InputVector,DH<deal_II_dimension> > (const DH<deal_II_dimension>   &,  
           const FunctionMap<deal_II_dimension>::type &,    \
           const InputVector       &,    \
           Vector<float>           &,    \
-          const std::vector<bool> &,    \
+          const ComponentMask &,    \
           const Function<deal_II_dimension>     *,    \
           const unsigned int       , \
           const unsigned int       , \
@@ -64,7 +64,7 @@ estimate<InputVector,DH<deal_II_dimension> > (const Mapping<deal_II_dimension, d
           const FunctionMap<deal_II_dimension>::type &,    \
           const std::vector<const InputVector *> &,    \
           std::vector<Vector<float>*> &,    \
-          const std::vector<bool>     &,    \
+          const ComponentMask     &,    \
           const Function<deal_II_dimension>         *,    \
           const unsigned int           , \
           const unsigned int           , \
@@ -78,7 +78,7 @@ estimate<InputVector,DH<deal_II_dimension> > (const DH<deal_II_dimension>       
           const FunctionMap<deal_II_dimension>::type &,    \
           const std::vector<const InputVector *> &,    \
           std::vector<Vector<float>*> &,    \
-          const std::vector<bool>     &,    \
+          const ComponentMask     &,    \
           const Function<deal_II_dimension>         *,    \
           const unsigned int           , \
           const unsigned int           , \
@@ -96,7 +96,7 @@ estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const Mapping<
           const FunctionMap<deal_II_dimension+1>::type &,    \
           const InputVector       &,    \
           Vector<float>           &,    \
-          const std::vector<bool> &,    \
+          const ComponentMask &,    \
           const Function<deal_II_dimension+1>     *,    \
           const unsigned int       , \
           const unsigned int       , \
@@ -110,7 +110,7 @@ estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const DH<deal_
           const FunctionMap<deal_II_dimension+1>::type &,    \
           const InputVector       &,    \
           Vector<float>           &,    \
-          const std::vector<bool> &,    \
+          const ComponentMask &,    \
           const Function<deal_II_dimension+1>     *,    \
           const unsigned int       , \
           const unsigned int       , \
@@ -125,7 +125,7 @@ estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const Mapping<
           const FunctionMap<deal_II_dimension+1>::type &,    \
           const std::vector<const InputVector *> &,    \
           std::vector<Vector<float>*> &,    \
-          const std::vector<bool>     &,    \
+          const ComponentMask     &,    \
           const Function<deal_II_dimension+1>         *,    \
           const unsigned int           , \
           const unsigned int           , \
@@ -139,7 +139,7 @@ estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const DH<deal_
           const FunctionMap<deal_II_dimension+1>::type &,    \
           const std::vector<const InputVector *> &,    \
           std::vector<Vector<float>*> &,    \
-          const std::vector<bool>     &,    \
+          const ComponentMask     &,    \
           const Function<deal_II_dimension+1>         *,    \
           const unsigned int           , \
           const unsigned int           , \

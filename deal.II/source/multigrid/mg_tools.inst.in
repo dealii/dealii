@@ -92,21 +92,21 @@ for (deal_II_dimension : DIMENSIONS)
 	const MGDoFHandler<deal_II_dimension>&,
 	const FunctionMap<deal_II_dimension>::type&,
 	std::vector<std::set<unsigned int> >&,
-	const std::vector<bool>&);
+	const ComponentMask &);
 #endif
 
-      template void make_boundary_list(
+    template void make_boundary_list(
 	const MGDoFHandler<deal_II_dimension>&,
 	const FunctionMap<deal_II_dimension>::type&,
 	std::vector<IndexSet>&,
-	const std::vector<bool>&);
+	const ComponentMask &);
 
-      template
+    template
 	void
 	extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
 				      std::vector<std::vector<bool> >  &interface_dofs,
 				      std::vector<std::vector<bool> >  &boundary_interface_dofs);
-      template
+    template
 	void
 	extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
 				      std::vector<std::vector<bool> >  &interface_dofs);

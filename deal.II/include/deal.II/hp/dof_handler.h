@@ -1285,7 +1285,10 @@ namespace hp
                                         * not. It is used by the
                                         * refinement listeners as a
                                         * persistent buffer during the
-                                        * refinement.
+                                        * refinement, i.e. from between
+                                        * when pre_refinement_action is
+                                        * called and when post_refinement_action
+                                        * runs.
                                         */
       std::vector<std::vector<bool> *> has_children;
 

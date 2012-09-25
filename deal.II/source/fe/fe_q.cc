@@ -530,7 +530,7 @@ FE_Q<dim,spacedim>::FE_Q (const unsigned int degree)
                                          1, degree,
                                          FiniteElementData<dim>::H1),
                   std::vector<bool> (1, false),
-                  std::vector<std::vector<bool> >(1, std::vector<bool>(1,true))),
+                  std::vector<ComponentMask>(1, std::vector<bool>(1,true))),
                 face_index_map(FE_Q_Helper::invert_numbering(face_lexicographic_to_hierarchic_numbering (degree)))
 {
   Assert (degree > 0,
@@ -570,7 +570,7 @@ FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
                                          1, points.size()-1,
                                          FiniteElementData<dim>::H1),
                   std::vector<bool> (1, false),
-                  std::vector<std::vector<bool> >(1, std::vector<bool>(1,true))),
+                  std::vector<ComponentMask>(1, std::vector<bool>(1,true))),
                 face_index_map(FE_Q_Helper::invert_numbering(face_lexicographic_to_hierarchic_numbering (points.size()-1)))
 {
   const int degree = points.size()-1;

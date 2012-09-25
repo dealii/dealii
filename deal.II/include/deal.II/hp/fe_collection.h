@@ -15,6 +15,8 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/std_cxx1x/shared_ptr.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_values_extractors.h>
+#include <deal.II/fe/component_mask.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -228,6 +230,197 @@ namespace hp
                                         * matrix between these two elements.
                                         */
       bool hp_constraints_are_implemented () const;
+
+      /**
+       * Return a component mask with as many elements as this
+       * object has vector components and of which exactly the
+       * one component is true that corresponds to the given
+       * argument.
+       *
+       * @note This function is the equivalent of
+       * FiniteElement::component_mask() with the same arguments.
+       * It verifies that it gets the same result from every one
+       * of the elements that are stored in this FECollection. If
+       * this is not the case, it throws an exception.
+       *
+       * @param scalar An object that represents a single scalar
+       * vector component of this finite element.
+       * @return A component mask that is false in all components
+       * except for the one that corresponds to the argument.
+       */
+      ComponentMask
+      component_mask (const FEValuesExtractors::Scalar &scalar) const;
+
+      /**
+       * Return a component mask with as many elements as this
+       * object has vector components and of which exactly the
+       * <code>dim</code> components are true that correspond to the given
+       * argument.
+       *
+       * @note This function is the equivalent of
+       * FiniteElement::component_mask() with the same arguments.
+       * It verifies that it gets the same result from every one
+       * of the elements that are stored in this FECollection. If
+       * this is not the case, it throws an exception.
+       *
+       * @param vector An object that represents dim
+       * vector components of this finite element.
+       * @return A component mask that is false in all components
+       * except for the ones that corresponds to the argument.
+       */
+      ComponentMask
+      component_mask (const FEValuesExtractors::Vector &vector) const;
+
+      /**
+       * Return a component mask with as many elements as this
+       * object has vector components and of which exactly the
+       * <code>dim*(dim+1)/2</code> components are true that
+       * correspond to the given argument.
+       *
+       * @note This function is the equivalent of
+       * FiniteElement::component_mask() with the same arguments.
+       * It verifies that it gets the same result from every one
+       * of the elements that are stored in this FECollection. If
+       * this is not the case, it throws an exception.
+       *
+       * @param sym_tensor An object that represents dim*(dim+1)/2
+       * components of this finite element that are jointly to be
+       * interpreted as forming a symmetric tensor.
+       * @return A component mask that is false in all components
+       * except for the ones that corresponds to the argument.
+       */
+      ComponentMask
+      component_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
+
+				       /**
+					* Given a block mask (see @ref GlossBlockMask "this glossary entry"),
+					* produce a component mask (see @ref GlossComponentMask "this glossary entry")
+					* that represents the components that correspond to the blocks selected in
+					* the input argument. This is essentially a conversion operator from
+					* BlockMask to ComponentMask.
+					*
+					* @note This function is the equivalent of
+					* FiniteElement::component_mask() with the same arguments.
+					* It verifies that it gets the same result from every one
+					* of the elements that are stored in this FECollection. If
+					* this is not the case, it throws an exception.
+					*
+					* @param block_mask The mask that selects individual blocks of the finite
+					* element
+					* @return A mask that selects those components corresponding to the selected
+					* blocks of the input argument.
+					*/
+      ComponentMask
+      component_mask (const BlockMask &block_mask) const;
+
+				       /**
+					* Return a block mask with as many elements as this
+					* object has blocks and of which exactly the
+					* one component is true that corresponds to the given
+					* argument. See @ref GlossBlockMask "the glossary"
+					* for more information.
+					*
+					* @note This function will only succeed if the scalar referenced
+					* by the argument encompasses a complete block. In other words,
+					* if, for example, you pass an extractor for the single
+					* $x$ velocity and this object represents an FE_RaviartThomas
+					* object, then the single scalar object you selected is part
+					* of a larger block and consequently there is no block mask that
+					* would represent it. The function will then produce an exception.
+					*
+					* @note This function is the equivalent of
+					* FiniteElement::component_mask() with the same arguments.
+					* It verifies that it gets the same result from every one
+					* of the elements that are stored in this FECollection. If
+					* this is not the case, it throws an exception.
+					*
+					* @param scalar An object that represents a single scalar
+					* vector component of this finite element.
+					* @return A component mask that is false in all components
+					* except for the one that corresponds to the argument.
+					*/
+      BlockMask
+      block_mask (const FEValuesExtractors::Scalar &scalar) const;
+
+				       /**
+					* Return a component mask with as many elements as this
+					* object has vector components and of which exactly the
+					* <code>dim</code> components are true that correspond to the given
+					* argument. See @ref GlossBlockMask "the glossary"
+					* for more information.
+					*
+					* @note This function is the equivalent of
+					* FiniteElement::component_mask() with the same arguments.
+					* It verifies that it gets the same result from every one
+					* of the elements that are stored in this FECollection. If
+					* this is not the case, it throws an exception.
+					*
+					* @note The same caveat applies as to the version of the function above:
+					* The extractor object passed as argument must be so that it corresponds
+					* to full blocks and does not split blocks of this element.
+					*
+					* @param vector An object that represents dim
+					* vector components of this finite element.
+					* @return A component mask that is false in all components
+					* except for the ones that corresponds to the argument.
+					*/
+      BlockMask
+      block_mask (const FEValuesExtractors::Vector &vector) const;
+
+				       /**
+					* Return a component mask with as many elements as this
+					* object has vector components and of which exactly the
+					* <code>dim*(dim+1)/2</code> components are true that
+					* correspond to the given argument. See @ref GlossBlockMask "the glossary"
+					* for more information.
+					*
+					* @note The same caveat applies as to the version of the function above:
+					* The extractor object passed as argument must be so that it corresponds
+					* to full blocks and does not split blocks of this element.
+					*
+					* @note This function is the equivalent of
+					* FiniteElement::component_mask() with the same arguments.
+					* It verifies that it gets the same result from every one
+					* of the elements that are stored in this FECollection. If
+					* this is not the case, it throws an exception.
+					*
+					* @param sym_tensor An object that represents dim*(dim+1)/2
+					* components of this finite element that are jointly to be
+					* interpreted as forming a symmetric tensor.
+					* @return A component mask that is false in all components
+					* except for the ones that corresponds to the argument.
+					*/
+      BlockMask
+      block_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
+
+				       /**
+					* Given a component mask (see @ref GlossComponentMask "this glossary entry"),
+					* produce a block mask (see @ref GlossBlockMask "this glossary entry")
+					* that represents the blocks that correspond to the components selected in
+					* the input argument. This is essentially a conversion operator from
+					* ComponentMask to BlockMask.
+					*
+					* @note This function will only succeed if the components referenced
+					* by the argument encompasses complete blocks. In other words,
+					* if, for example, you pass an component mask for the single
+					* $x$ velocity and this object represents an FE_RaviartThomas
+					* object, then the single component you selected is part
+					* of a larger block and consequently there is no block mask that
+					* would represent it. The function will then produce an exception.
+					*
+					* @note This function is the equivalent of
+					* FiniteElement::component_mask() with the same arguments.
+					* It verifies that it gets the same result from every one
+					* of the elements that are stored in this FECollection. If
+					* this is not the case, it throws an exception.
+					*
+					* @param component_mask The mask that selects individual components of the finite
+					* element
+					* @return A mask that selects those blocks corresponding to the selected
+					* blocks of the input argument.
+					*/
+      BlockMask
+      block_mask (const ComponentMask &component_mask) const;
 
 
                                        /**

@@ -24,12 +24,40 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li>New: In the past, deal.II used a std::vector of bools in many places
+to denote component masks (see @ref GlossComponentMask) as well as for
+block masks (see @ref GlossBlockMask). This was neither
+descriptive (the data type does not indicate what it is supposed to
+represent, nor whether the proper size for such an argument would be equal
+to the number of degrees of freedom per cell, the number of vector components
+of the finite element, or the number of degrees of freedom in total).
+<br>
+There are now new class types ComponentMask and BlockMask that are used in these places.
+They are used both descriptively (as a return type of the function
+FiniteElement::get_nonzero_components indicating the vector components within
+which a given shape function is nonzero) as well as prescriptively (as
+input arguments to functions such as those listed in the glossary entry
+linked to above).
+<br>
+While the descriptive places are not backward compatible (they return a
+ComponentMask which is not convertible to the std::vector of bools returned
+before), most of the prescriptive places are in fact backward compatible
+(because the std::vector of bool that was passed previously can
+implicitly be converted to an object of type ComponentMask. The sole
+exception is the function DoFTools::extract_dofs (and its multigrid
+equivalent DoFTools::extract_level_dofs) that previously
+could interpret its argument as either a component or
+a block mask, depending on a boolean flag. This function now exists
+in two different versions, one that takes a ComponentMask and
+one that takes a BlockMask. Call sites need to be adjusted.
+<br>
+(Wolfgang Bangerth, 2012/09/22)
+
 <li> Changed: the optional argument offset got removed from
 DoFHandler and MGDoFHandler::distribute_dofs() because it was
 never working correctly and it is not used.
 <br>
 (Timo Heister, 2012/09/03)
-
 </ol>
 
 

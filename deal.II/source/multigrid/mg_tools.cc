@@ -32,6 +32,7 @@
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/component_mask.h>
 
 #include <vector>
 #include <algorithm>
@@ -981,23 +982,24 @@ namespace MGTools
             dofs_in_component (n_components,
                                std::vector<bool>(dof_handler.n_dofs(l),
                                                  false));
-          std::vector<std::vector<bool> >
-            component_select (n_components,
-                              std::vector<bool>(n_components, false));
+          std::vector<ComponentMask> component_select (n_components);
           Threads::TaskGroup<> tasks;
           for (unsigned int i=0; i<n_components; ++i)
             {
               void (*fun_ptr) (const unsigned int       level,
                                const MGDoFHandler<dim,spacedim>    &,
-                               const std::vector<bool>    &,
-                               std::vector<bool>          &,
-                               bool)
+                               const ComponentMask    &,
+                               std::vector<bool>          &)
                 = &DoFTools::template extract_level_dofs<dim>;
-              component_select[i][i] = true;
+
+	      std::vector<bool> tmp(n_components, false);
+	      tmp[i] = true;
+	      component_select[i] = ComponentMask(tmp);
+
               tasks += Threads::new_task (fun_ptr,
                                           l, dof_handler,
                                           component_select[i],
-                                          dofs_in_component[i], false);
+                                          dofs_in_component[i]);
             }
           tasks.join_all();
 
@@ -1038,7 +1040,6 @@ namespace MGTools
 
   template <int dim, int spacedim>
   void
-
   count_dofs_per_component (const MGDoFHandler<dim,spacedim>        &dof_handler,
                             std::vector<std::vector<unsigned int> > &result,
                             std::vector<unsigned int>            target_component)
@@ -1101,22 +1102,24 @@ namespace MGTools
       {
         std::vector<std::vector<bool> >
           dofs_in_block (n_blocks, std::vector<bool>(dof_handler.n_dofs(l), false));
-        std::vector<std::vector<bool> >
-          block_select (n_blocks, std::vector<bool>(n_blocks, false));
+        std::vector<BlockMask> block_select (n_blocks);
         Threads::TaskGroup<> tasks;
         for (unsigned int i=0; i<n_blocks; ++i)
           {
             void (*fun_ptr) (const unsigned int level,
                              const MGDoFHandler<dim,spacedim>&,
-                             const std::vector<bool>&,
-                             std::vector<bool>&,
-                             bool)
+                             const BlockMask &,
+                             std::vector<bool>&)
               = &DoFTools::template extract_level_dofs<dim>;
-            block_select[i][i] = true;
+
+            std::vector<bool> tmp(n_blocks, false);
+	    tmp[i] = true;
+	    block_select[i] = tmp;
+
             tasks += Threads::new_task (fun_ptr,
                                         l, dof_handler, block_select[i],
-                                        dofs_in_block[i], true);
-          };
+                                        dofs_in_block[i]);
+          }
         tasks.join_all ();
 
                                          // next count what we got
@@ -1136,7 +1139,7 @@ namespace MGTools
     const MGDoFHandler<1,1>&,
     const FunctionMap<1>::type&,
     std::vector<std::set<unsigned int> >&,
-    const std::vector<bool>&)
+    const ComponentMask &)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -1149,7 +1152,7 @@ namespace MGTools
     const MGDoFHandler<1,2>&,
     const FunctionMap<1>::type&,
     std::vector<std::set<unsigned int> >&,
-    const std::vector<bool>&)
+    const ComponentMask &)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -1162,7 +1165,7 @@ namespace MGTools
     const MGDoFHandler<dim,spacedim>& dof,
     const typename FunctionMap<dim>::type& function_map,
     std::vector<std::set<unsigned int> >& boundary_indices,
-    const std::vector<bool>& component_mask)
+    const ComponentMask & component_mask)
   {
                                      // if for whatever reason we were
                                      // passed an empty map, return
@@ -1181,13 +1184,14 @@ namespace MGTools
 
     std::vector<unsigned int> local_dofs;
     local_dofs.reserve (DoFTools::max_dofs_per_face(dof));
-    std::fill (local_dofs.begin (), local_dofs.end (),
+    std::fill (local_dofs.begin (),
+    		   local_dofs.end (),
                DoFHandler<dim,spacedim>::invalid_dof_index);
 
                                      // First, deal with the simpler
                                      // case when we have to identify
                                      // all boundary dofs
-    if (component_mask.size() == 0)
+    if (component_mask.n_selected_components(n_components) == n_components)
       {
         typename MGDoFHandler<dim,spacedim>::cell_iterator
           cell = dof.begin(),
@@ -1218,7 +1222,7 @@ namespace MGTools
       }
     else
       {
-        Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+        Assert (component_mask.n_selected_components(n_components) > 0,
                 ExcMessage("It's probably worthwhile to select at least one component."));
 
         typename MGDoFHandler<dim,spacedim>::cell_iterator
@@ -1246,7 +1250,7 @@ namespace MGTools
                                                // are in fact primitive
               for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
                 {
-                  const std::vector<bool> &nonzero_component_array
+                  const ComponentMask &nonzero_component_array
                     = cell->get_fe().get_nonzero_components (i);
                   for (unsigned int c=0; c<n_components; ++c)
                     if ((nonzero_component_array[c] == true)
@@ -1350,11 +1354,7 @@ namespace MGTools
 // components. if shape function is non-primitive, then we will ignore
 // the result in the following anyway, otherwise there's only one
 // non-zero component which we will use
-                              component = (std::find (fe.get_nonzero_components(cell_i).begin(),
-                                                      fe.get_nonzero_components(cell_i).end(),
-                                                      true)
-                                           -
-                                           fe.get_nonzero_components(cell_i).begin());
+                              component = fe.get_nonzero_components(cell_i).first_selected_component();
                             }
 
                           if (component_mask[component] == true)
@@ -1377,7 +1377,7 @@ namespace MGTools
   make_boundary_list(const MGDoFHandler<dim,spacedim>& dof,
                      const typename FunctionMap<dim>::type& function_map,
                      std::vector<IndexSet>& boundary_indices,
-                     const std::vector<bool>& component_mask)
+                     const ComponentMask & component_mask)
   {
     Assert (boundary_indices.size() == dof.get_tria().n_levels(),
             ExcDimensionMismatch (boundary_indices.size(),

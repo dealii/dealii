@@ -98,7 +98,7 @@ template <class POLY, int dim, int spacedim>
 FE_PolyTensor<POLY,dim,spacedim>::FE_PolyTensor (const unsigned int degree,
                                         const FiniteElementData<dim> &fe_data,
                                         const std::vector<bool> &restriction_is_additive_flags,
-                                        const std::vector<std::vector<bool> > &nonzero_components)
+                                        const std::vector<ComponentMask> &nonzero_components)
                 :
                 FiniteElement<dim,spacedim> (fe_data,
                                     restriction_is_additive_flags,
@@ -395,7 +395,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
-      const unsigned int first = data.shape_function_to_row_table[i];
+      const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
+										this->get_nonzero_components(i).first_selected_component()];
 
       if (flags & update_values && cell_similarity != CellSimilarity::translation)
         switch (mapping_type)
@@ -593,7 +594,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
-      const unsigned int first = data.shape_function_to_row_table[i];
+      const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
+										this->get_nonzero_components(i).first_selected_component()];
 
       if (flags & update_values)
         {
@@ -795,7 +797,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
-      const unsigned int first = data.shape_function_to_row_table[i];
+      const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
+										this->get_nonzero_components(i).first_selected_component()];
 
       if (flags & update_values)
         {

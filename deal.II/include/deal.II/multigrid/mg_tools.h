@@ -234,7 +234,7 @@ namespace MGTools
   make_boundary_list (const MGDoFHandler<dim,spacedim>      &mg_dof,
                       const typename FunctionMap<dim>::type &function_map,
                       std::vector<std::set<unsigned int> >  &boundary_indices,
-                      const std::vector<bool>               &component_mask = std::vector<bool>());
+                      const ComponentMask                   &component_mask = ComponentMask());
 
                                    /**
                                     * The same function as above, but return
@@ -246,7 +246,7 @@ namespace MGTools
   make_boundary_list (const MGDoFHandler<dim,spacedim>      &mg_dof,
                       const typename FunctionMap<dim>::type &function_map,
                       std::vector<IndexSet>                 &boundary_indices,
-                      const std::vector<bool>               &component_mask = std::vector<bool>());
+                      const ComponentMask               &component_mask = ComponentMask());
 
                                    /**
                                     * Maybe no longer needed.
@@ -257,7 +257,7 @@ namespace MGTools
   apply_boundary_values (const std::set<unsigned int> &boundary_dofs,
                          SparseMatrix<number>& matrix,
                          const bool preserve_symmetry,
-                              const bool ignore_zeros = false);
+                         const bool ignore_zeros = false);
 
   template <typename number>
   void

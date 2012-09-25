@@ -197,8 +197,79 @@
  * More information on this topic can be found in the documentation of
  * FESystem, the @ref vector_valued module and the tutorial programs
  * referenced therein.
+ *
+ * <i>Selecting blocks:</i>
+ * Many functions allow you to restrict their operation to certain
+ * vector components or blocks. For example, this is the case for
+ * the functions that interpolate boundary values: one may want
+ * to only interpolate the boundary values for the velocity block of
+ * a finite element field but not the pressure block. The way to do
+ * this is by passing a BlockMask argument to such functions, see the
+ * @ref GlossBlockMask "block mask entry of this glossary".
  * </dd>
  *
+ *
+ * <dt class="glossary">@anchor GlossBlockMask <b>Block mask</b></dt>
+ *
+ * <dd>
+ * In much the same way as one can think of elements as being composed
+ * of physical vector components (see @ref GlossComponent) or logical
+ * blocks (see @ref GlossBlock), there is frequently a need to select
+ * a set of such blocks for operations that are not intended to be run
+ * on <i>all</i> blocks of a finite element space. Selecting which blocks
+ * to work on happens using the BlockMask class.
+ *
+ * Block masks work in much the same way as component masks, including the
+ * fact that the BlockMask class has similar semantics to the ComponentMask
+ * class. See @ref GlossComponentMask "the glossary entry on component masks"
+ * for more information.
+ *
+ * @note While components and blocks provide two alternate but equally valid
+ * viewpoints on finite elements with multiple vector components, the fact
+ * is that throughout the library there are far more places where you can
+ * pass a ComponentMask argument rather than a BlockMask argument. Fortunately,
+ * one can be converted into the other, using the syntax
+ * <code>fe.component_mask(block_mask)</code> where <code>block_mask</code>
+ * is a variable of type BlockMask. In other words, if you have a block
+ * mask but need to call a function that only accepts a component mask, this
+ * syntax can be used to obtain the necessary component mask.
+ *
+ * <b>Creation of block masks:</b>
+ * Block masks are typically created by asking the finite element
+ * to generate a block mask from certain selected vector components using
+ * code such as this where we create a mask that only denotes the
+ * velocity components of a Stokes element (see @ref vector_valued):
+ * @code
+ *   FESystem<dim> stokes_fe (FESystem<dim>(FE_Q<dim>(2), dim), 1,    // Q2 element for the velocities
+ *                            FE_Q<dim>(1),                     1);     // Q1 element for the pressure
+ *   FEValuesExtractors::Scalar pressure(dim);
+ *   BlockMask pressure_mask = stokes_fe.block_mask (pressure);
+ * @endcode
+ * The result is a block mask that, in 1d as well as 2d and 3d, would have values
+ * <code>[false, true]</code>. Similarly, using
+ * @code
+ *   FEValuesExtractors::Vector velocities(0);
+ *   BlockMask velocity_mask = stokes_fe.block_mask (velocities);
+ * @endcode
+ * would result in a mask <code>[true, false]</code> in any dimension.
+ *
+ * Note, however, that if we had defined the finite element in the following
+ * way:
+ * @code
+ *   FESystem<dim> stokes_fe (FE_Q<dim>(2), dim,    // Q2 element for the velocities
+ *                            FE_Q<dim>(1), 1);     // Q1 element for the pressure
+ * @endcode
+ * then the code
+ * @code
+ *   FEValuesExtractors::Scalar pressure(dim);
+ *   BlockMask pressure_mask = stokes_fe.block_mask (pressure);
+ * @endcode
+ * would yield a block mask that in 2d has elements
+ * <code>[false, false, true]</code> because the element has
+ * <code>dim+1</code> components and equally many blocks. See the
+ * discussion on what a block represents exactly in the
+ * @ref GlossBlock "block entry of this glossary".
+ * </dd>
  *
  * <dt class="glossary">@anchor GlossBoundaryForm <b>%Boundary form</b></dt>
  *
@@ -238,7 +309,8 @@
  * equation considered in step-22 has four elements: $u=(v_x,v_y,v_z,p)^T$. We
  * call the elements of the vector-valued solution <i>components</i> in
  * deal.II. To be well-posed, for the solution to have $n$ components, there
- * need to be $n$ partial differential equations to describe them.
+ * need to be $n$ partial differential equations to describe them. This
+ * concept is discussed in great detail in the @ref vector_valued module.
  *
  * In finite element programs, one frequently wants to address individual
  * elements (components) of this vector-valued solution, or sets of
@@ -262,13 +334,26 @@
  * terms of blocks is most frequently the better strategy.
  *
  * For a given finite element, the number of components can be queried using
- * the FiniteElementData::n_components() function. Individual components of a
+ * the FiniteElementData::n_components() function, and you can find out
+ * which vector components are nonzero for a given finite element shape
+ * function using FiniteElement::get_nonzero_components(). The values and
+ * gradients of individual components of a
  * shape function (if the element is primitive) can be queried using the
  * FiniteElement::shape_value_component() and
  * FiniteElement::shape_grad_component() functions on the reference cell. The
  * FEValues::shape_value_component() and FEValues::shape_grad_component()
  * functions do the same on a real cell. See also the documentation of the
- * FiniteElement and FEValues classes.</dd>
+ * FiniteElement and FEValues classes.
+  *
+ * <i>Selecting components:</i>
+ * Many functions allow you to restrict their operation to certain
+ * vector components or blocks. For example, this is the case for
+ * the functions that interpolate boundary values: one may want
+ * to only interpolate the boundary values for the velocity components of
+ * a finite element field but not the pressure component. The way to do
+ * this is by passing a ComponentMask argument to such functions, see the
+ * @ref GlossComponentMask "component mask entry of this glossary".
+ * </dd>
  *
  *
  * <dt class="glossary">@anchor GlossComponentMask <b>Component mask</b></dt>
@@ -280,8 +365,8 @@
  * wish to only interpolate boundary values for the velocity components
  * but not the pressure. In deal.II, this is typically done by passing functions
  * a <i>component mask</i>. Component masks are always specified as a
- * <code>std::vector@<bool@></code>, i.e., an array with as many entries as the
- * finite element has components (e.g., in the Stokes case, there are
+ * ComponentMask object which one can think of as an array with
+ * as many entries as the finite element has components (e.g., in the Stokes case, there are
  * <code>dim+1</code> components) and where each entry is either true or false.
  * In the example where we would like to interpolate boundary values only for
  * the velocity components of the Stokes system, this component mask would then
@@ -296,12 +381,55 @@
  * functions with these names but only some of them have a component mask
  * argument.
  *
- * Many of the functions that take a component mask accept a vector of length
- * zero to indicate <i>all components</i>, i.e., as if the vector had the
+ * <b>Semantics of component masks:</b>
+ * Many of the functions that take a component mask object that has been default
+ * constructed to indicate <i>all components</i>, i.e., as if the vector had the
  * correct length and was filled with only <code>true</code> values. The reason
- * is that the empty vector can be constructed in place using the code snippet
- * <code>std::vector@<bool@>()</code> and can thus be used as a default
+ * is that default initialized objects can be constructed in place using the code snippet
+ * <code>ComponentMask()</code> and can thus be used as a default
  * argument in function signatures.
+ *
+ * In other words, ComponentMask objects can be in one of two states: They can have
+ * been initialized by a vector of booleans with a nonzero length; in that case,
+ * they represent a mask of a particular length where some elements may be true
+ * and others may be false. Or, the ComponentMask may have been default initialized
+ * (using the default constructor) in which case it represents an array of indefinite
+ * length (i.e., a length appropriate to the circumstances) in which <i>every entry</i>
+ * is true.
+ *
+ * <b>Creation of component masks:</b>
+ * Component masks are typically created by asking the finite element
+ * to generate a component mask from certain selected components using
+ * code such as this where we create a mask that only denotes the
+ * velocity components of a Stokes element (see @ref vector_valued):
+ * @code
+ *   FESystem<dim> stokes_fe (FE_Q<dim>(2), dim,    // Q2 element for the velocities
+ *                            FE_Q<dim>(1), 1);     // Q1 element for the pressure
+ *   FEValuesExtractors::Scalar pressure(dim);
+ *   ComponentMask pressure_mask = stokes_fe.component_mask (pressure);
+ * @endcode
+ * The result is a component mask that, in 2d, would have values
+ * <code>[false, false, true]</code>. Similarly, using
+ * @code
+ *   FEValuesExtractors::Vector velocities(0);
+ *   ComponentMask velocity_mask = stokes_fe.component_mask (velocities);
+ * @endcode
+ * would result in a mask <code>[true, true, false]</code> in 2d. Of
+ * course, in 3d, the result would be <code>[true, true, true, false]</code>.
+ *
+ * @note Just as one can think of composed elements as being made up of
+ * @ref GlossComponent "components" or @ref GlossBlock "blocks", there are
+ * component masks (represented by the ComponentMask class) and
+ * @ref GlossBlockMask "block masks" (represented by the BlockMask class).
+ * The FiniteElement class has functions that convert between the two kinds of
+ * objects.
+ *
+ * @note Not all component masks actually make sense. For example, if you have
+ * a FE_RaviartThomas object in 2d, then it doesn't make any sense to have a
+ * component mask of the form <code>[true, false]</code> because you try to
+ * select individual vector components of a finite element where each shape
+ * function has both $x$ and $y$ velocities. In essence, while you can of
+ * course create such a component mask, there is nothing you can do with it.
  * </dd>
  *
  *

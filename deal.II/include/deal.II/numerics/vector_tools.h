@@ -748,7 +748,7 @@ namespace VectorTools
                                const DH                 &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
                                std::map<unsigned int,double> &boundary_values,
-                               const std::vector<bool>       &component_mask = std::vector<bool>());
+                               const ComponentMask       &component_mask = ComponentMask());
 
                                    /**
                                     * @deprecated This function exists mainly
@@ -770,7 +770,7 @@ namespace VectorTools
                                const types::boundary_id            boundary_component,
                                const Function<DH::space_dimension>           &boundary_function,
                                std::map<unsigned int,double> &boundary_values,
-                               const std::vector<bool>       &component_mask = std::vector<bool>());
+                               const ComponentMask       &component_mask = ComponentMask());
 
                                    /**
                                     * Calls the other
@@ -784,7 +784,7 @@ namespace VectorTools
                                const types::boundary_id            boundary_component,
                                const Function<DH::space_dimension>           &boundary_function,
                                std::map<unsigned int,double> &boundary_values,
-                               const std::vector<bool>       &component_mask = std::vector<bool>());
+                               const ComponentMask       &component_mask = ComponentMask());
 
 
                                    /**
@@ -798,7 +798,7 @@ namespace VectorTools
   interpolate_boundary_values (const DH                &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
                                std::map<unsigned int,double>         &boundary_values,
-                               const std::vector<bool>               &component_mask = std::vector<bool>());
+                               const ComponentMask               &component_mask = ComponentMask());
 
 
                                    /**
@@ -890,7 +890,7 @@ namespace VectorTools
                                const DH                 &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
                                ConstraintMatrix              &constraints,
-                               const std::vector<bool>       &component_mask = std::vector<bool>());
+                               const ComponentMask       &component_mask = ComponentMask());
 
                                    /**
                                     * @deprecated This function exists
@@ -911,7 +911,7 @@ namespace VectorTools
                                const types::boundary_id                  boundary_component,
                                const Function<DH::space_dimension> &boundary_function,
                                ConstraintMatrix                    &constraints,
-                               const std::vector<bool>             &component_mask = std::vector<bool>());
+                               const ComponentMask             &component_mask = ComponentMask());
 
                                    /**
                                     * Calls the other
@@ -927,7 +927,7 @@ namespace VectorTools
                                const types::boundary_id                  boundary_component,
                                const Function<DH::space_dimension> &boundary_function,
                                ConstraintMatrix                    &constraints,
-                               const std::vector<bool>             &component_mask = std::vector<bool>());
+                               const ComponentMask             &component_mask = ComponentMask());
 
 
                                    /**
@@ -943,7 +943,7 @@ namespace VectorTools
   interpolate_boundary_values (const DH                &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
                                ConstraintMatrix        &constraints,
-                               const std::vector<bool> &component_mask = std::vector<bool>());
+                               const ComponentMask &component_mask = ComponentMask());
 
 
                                    /**

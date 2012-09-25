@@ -33,7 +33,7 @@ FE_PolyTensor<PolynomialsNedelec<dim>, dim>
  FiniteElementData<dim> (get_dpo_vector (p), dim, p + 1,
                          FiniteElementData<dim>::Hcurl, 1),
  std::vector<bool> (PolynomialsNedelec<dim>::compute_n_pols (p), true),
- std::vector<std::vector<bool> >
+ std::vector<ComponentMask>
  (PolynomialsNedelec<dim>::compute_n_pols (p),
   std::vector<bool> (dim, true)))
 {

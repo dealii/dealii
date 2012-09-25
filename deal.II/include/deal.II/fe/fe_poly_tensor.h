@@ -126,7 +126,7 @@ class FE_PolyTensor : public FiniteElement<dim,spacedim>
     FE_PolyTensor (const unsigned int degree,
                    const FiniteElementData<dim> &fe_data,
                    const std::vector<bool> &restriction_is_additive_flags,
-                   const std::vector<std::vector<bool> > &nonzero_components);
+                   const std::vector<ComponentMask> &nonzero_components);
 
                                      /**
                                       * Since these elements are

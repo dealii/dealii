@@ -739,10 +739,8 @@ namespace DoFRenumbering
               = component_order[fe.system_to_component_index(i).first];
           else
             {
-              const unsigned int comp = (std::find(fe.get_nonzero_components(i).begin(),
-                                                   fe.get_nonzero_components(i).end(),
-                                                   true) -
-                                         fe.get_nonzero_components(i).begin());
+              const unsigned int comp
+              = fe.get_nonzero_components(i).first_selected_component();
 
                                            // then associate this degree
                                            // of freedom with this

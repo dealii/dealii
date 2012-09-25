@@ -32,7 +32,7 @@ FE_Nothing<dim>::FE_Nothing (const unsigned int n_components)
                                         n_components, 0,
                                         FiniteElementData<dim>::unknown),
                  std::vector<bool>(),
-                 std::vector<std::vector<bool> >() )
+                 std::vector<ComponentMask>() )
 {
 // in most other elements we have to set up all sorts of stuff
 // here. there isn't much that we have to do here; in particular,

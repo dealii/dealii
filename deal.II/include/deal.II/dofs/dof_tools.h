@@ -23,6 +23,7 @@
 #include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/component_mask.h>
 #include <deal.II/hp/mapping_collection.h>
 
 #include <vector>
@@ -990,9 +991,8 @@ namespace DoFTools
                                     * components of the finite element space
                                     * shall be constrained with periodic
                                     * boundary conditions. If it is left as
-                                    * specified by the default value (i.e. an
-                                    * empty array), all components are
-                                    * constrainted. If it is different from
+                                    * specified by the default value all components are
+                                    * constrained. If it is different from
                                     * the default value, it is assumed that
                                     * the number of entries equals the number
                                     * of components in the boundary functions
@@ -1007,7 +1007,7 @@ namespace DoFTools
   make_periodicity_constraints (const FaceIterator                          &face_1,
                                 const typename identity<FaceIterator>::type &face_2,
                                 dealii::ConstraintMatrix                    &constraint_matrix,
-                                const std::vector<bool>                     &component_mask = std::vector<bool>());
+                                const ComponentMask                         &component_mask = ComponentMask());
 
 
                                    /**
@@ -1069,9 +1069,8 @@ namespace DoFTools
                                     * components of the finite element space
                                     * shall be constrained with periodic
                                     * boundary conditions. If it is left as
-                                    * specified by the default value (i.e. an
-                                    * empty array), all components are
-                                    * constrainted. If it is different from
+                                    * specified by the default value all components are
+                                    * constrained. If it is different from
                                     * the default value, it is assumed that
                                     * the number of entries equals the number
                                     * of components in the boundary functions
@@ -1087,7 +1086,7 @@ namespace DoFTools
                                 const types::boundary_id boundary_component,
                                 const int                  direction,
                                 dealii::ConstraintMatrix   &constraint_matrix,
-                                const std::vector<bool>    &component_mask = std::vector<bool>());
+                                const ComponentMask        &component_mask = ComponentMask());
 
 
                                    /**
@@ -1109,7 +1108,7 @@ namespace DoFTools
                                 dealii::Tensor<1,DH::space_dimension>
                                                                &offset,
                                 dealii::ConstraintMatrix       &constraint_matrix,
-                                const std::vector<bool>        &component_mask = std::vector<bool>());
+                                const ComponentMask            &component_mask = ComponentMask());
                                    //@}
 
 
@@ -1178,34 +1177,31 @@ namespace DoFTools
                                     * Extract the indices of the
                                     * degrees of freedom belonging
                                     * to certain vector components
-                                    * or blocks (if the last
-                                    * argument is <tt>true</tt>) of
+                                    * of
                                     * a vector-valued finite
-                                    * element. The bit vector @p
-                                    * select defines, which
+                                    * element. The @p component_mask
+                                    * defines which
                                     * components or blocks of an
                                     * FESystem are to be extracted
                                     * from the DoFHandler @p
-                                    * dof. The entries in @p
+                                    * dof. The entries in the output array @p
                                     * selected_dofs corresponding to
                                     * degrees of freedom belonging
                                     * to these components are then
                                     * flagged @p true, while all
                                     * others are set to @p false.
                                     *
-                                    * The size of @p select must
-                                    * equal the number of components
-                                    * or blocks in the FiniteElement
-                                    * used by @p dof, depending on
-                                    * the argument
-                                    * <tt>blocks</tt>. The size of
+                                    * The size of @p component_mask must
+                                    * be compatible with the number of components
+                                    * in the FiniteElement
+                                    * used by @p dof. The size of
                                     * @p selected_dofs must equal
                                     * DoFHandler::n_dofs(). Previous
                                     * contents of this array are
                                     * overwritten.
                                     *
                                     * If the finite element under
-                                    * consideration is not primitive, that is
+                                    * consideration is not primitive, i.e.,
                                     * some or all of its shape functions are
                                     * non-zero in more than one vector
                                     * component (which holds, for example, for
@@ -1219,37 +1215,78 @@ namespace DoFTools
                                     * equivalent to selecting <em>all</em>
                                     * vector components corresponding to this
                                     * non-primitive base element.
+                                    *
+                                    * @note If the @p blocks argument is
+                                    * true,
                                     */
   template <int dim, int spacedim>
   void
   extract_dofs (const DoFHandler<dim,spacedim>   &dof_handler,
-                const std::vector<bool> &select,
-                std::vector<bool>       &selected_dofs,
-                const bool               blocks = false);
+                const ComponentMask &component_mask,
+                std::vector<bool>       &selected_dofs);
 
-                                   /**
-                                    * The same function as above,
-                                    * but for a hp::DoFHandler.
-                                    */
+  /**
+   * The same function as above,
+   * but for a hp::DoFHandler.
+   */
   template <int dim, int spacedim>
   void
   extract_dofs (const hp::DoFHandler<dim,spacedim>   &dof_handler,
-                const std::vector<bool> &select,
-                std::vector<bool>       &selected_dofs,
-                const bool               blocks = false);
+                const ComponentMask     &component_mask,
+                std::vector<bool>       &selected_dofs);
 
-                                   /**
-                                    * Do the same thing as
-                                    * extract_dofs() for one level
-                                    * of a multi-grid DoF numbering.
-                                    */
+  /**
+   * This function is the equivalent to the DoFTools::extract_dofs() functions above
+   * except that the selection of which degrees of freedom to extract is not done
+   * based on components (see @ref GlossComponent) but instead based on whether they
+   * are part of a particular block (see @ref GlossBlock). Consequently, the second
+   * argument is not a ComponentMask but a BlockMask object.
+   *
+   * @param dof_handler The DoFHandler object from which to extract degrees of freedom
+   * @param block_mask The block mask that describes which blocks to consider (see
+   *       @ref GlossBlockMask)
+   * @param selected_dofs A vector of length DoFHandler::n_dofs() in which those
+   *       entries are true that correspond to the selected blocks.
+   */
+  template <int dim, int spacedim>
+  void
+  extract_dofs (const DoFHandler<dim,spacedim>   &dof_handler,
+                const BlockMask &block_mask,
+                std::vector<bool>       &selected_dofs);
+
+  /**
+   * The same function as above,
+   * but for a hp::DoFHandler.
+   */
+  template <int dim, int spacedim>
+  void
+  extract_dofs (const hp::DoFHandler<dim,spacedim>   &dof_handler,
+                const BlockMask        &block_mask,
+                std::vector<bool>       &selected_dofs);
+
+  /**
+   * Do the same thing as the corresponding
+   * extract_dofs() functino for one level
+   * of a multi-grid DoF numbering.
+   */
   template <int dim, int spacedim>
   void
   extract_level_dofs (const unsigned int       level,
                       const MGDoFHandler<dim,spacedim> &dof,
-                      const std::vector<bool> &select,
-                      std::vector<bool>       &selected_dofs,
-                      const bool               blocks = false);
+                      const ComponentMask     &component_mask,
+                      std::vector<bool>       &selected_dofs);
+
+  /**
+   * Do the same thing as the corresponding
+   * extract_dofs() functino for one level
+   * of a multi-grid DoF numbering.
+   */
+  template <int dim, int spacedim>
+  void
+  extract_level_dofs (const unsigned int       level,
+                      const MGDoFHandler<dim,spacedim> &dof,
+                      const BlockMask     &component_mask,
+                      std::vector<bool>       &selected_dofs);
 
   /**
    * Extract all degrees of freedom
@@ -1333,7 +1370,7 @@ namespace DoFTools
   template <class DH>
   void
   extract_boundary_dofs (const DH                   &dof_handler,
-                         const std::vector<bool>    &component_mask,
+                         const ComponentMask        &component_mask,
                          std::vector<bool>          &selected_dofs,
                          const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
 
@@ -1369,8 +1406,8 @@ namespace DoFTools
   template <class DH>
   void
   extract_boundary_dofs (const DH                   &dof_handler,
-                         const std::vector<bool>    &component_mask,
-                         IndexSet                    &selected_dofs,
+                         const ComponentMask        &component_mask,
+                         IndexSet                   &selected_dofs,
                          const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
 
                                    /**
@@ -1405,9 +1442,9 @@ namespace DoFTools
                                     */
   template <class DH>
   void
-  extract_dofs_with_support_on_boundary (const DH                   &dof_handler,
-                                         const std::vector<bool>    &component_mask,
-                                         std::vector<bool>          &selected_dofs,
+  extract_dofs_with_support_on_boundary (const DH               &dof_handler,
+                                         const ComponentMask    &component_mask,
+                                         std::vector<bool>      &selected_dofs,
                                          const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
 
                                    /**
@@ -1732,7 +1769,7 @@ namespace DoFTools
                                    /**
                                     * Create a sparsity pattern which
                                     * in each row lists the degrees of
-                                    * freedom associated to the
+                                    * freedom associated with the
                                     * corresponding cell.
                                     *
                                     * Ordering follows the ordering of
@@ -1957,7 +1994,7 @@ namespace DoFTools
   template <class DH>
   void
   extract_constant_modes (const DH                        &dof_handler,
-                          const std::vector<bool>         &component_mask,
+                          const ComponentMask             &component_mask,
                           std::vector<std::vector<bool> > &constant_modes);
 
                                    /**
@@ -2597,8 +2634,8 @@ namespace DoFTools
   template <int dim, int spacedim, template <int, int> class DH>
   void
   make_zero_boundary_constraints (const DH<dim,spacedim> &dof,
-                                  ConstraintMatrix        &zero_boundary_constraints,
-                                  const std::vector<bool> &component_mask_=std::vector<bool>());
+                                  ConstraintMatrix       &zero_boundary_constraints,
+                                  const ComponentMask    &component_mask = ComponentMask());
 
                                    /**
                                     * Map a coupling table from the

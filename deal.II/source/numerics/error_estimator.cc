@@ -241,7 +241,7 @@ namespace internal
                                           * function.
                                           */
         const typename FunctionMap<spacedim>::type *neumann_bc;
-        const std::vector<bool>                component_mask;
+        const ComponentMask                component_mask;
         const Function<spacedim>                   *coefficients;
 
                                          /**
@@ -256,7 +256,7 @@ namespace internal
                       const types::subdomain_id subdomain_id,
                       const types::material_id material_id,
                       const typename FunctionMap<spacedim>::type *neumann_bc,
-                      const std::vector<bool>                component_mask,
+                      const ComponentMask                component_mask,
                       const Function<spacedim>                   *coefficients);
 
                                          /**
@@ -280,7 +280,7 @@ namespace internal
                   const types::subdomain_id subdomain_id,
                   const types::material_id material_id,
                   const typename FunctionMap<spacedim>::type *neumann_bc,
-                  const std::vector<bool>                component_mask,
+                  const ComponentMask                component_mask,
                   const Function<spacedim>         *coefficients)
                     :
                     finite_element (fe),
@@ -1013,7 +1013,7 @@ estimate (const Mapping<1,spacedim>      &mapping,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
-          const std::vector<bool> &component_mask,
+          const ComponentMask &component_mask,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
@@ -1037,7 +1037,7 @@ estimate (const DH   &dof_handler,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
-          const std::vector<bool> &component_mask,
+          const ComponentMask &component_mask,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
@@ -1059,7 +1059,7 @@ estimate (const DH   &dof_handler,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const std::vector<const InputVector*> &solutions,
           std::vector<Vector<float>*> &errors,
-          const std::vector<bool> &component_mask,
+          const ComponentMask &component_mask,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
@@ -1082,7 +1082,7 @@ estimate (const Mapping<1,spacedim>      &mapping,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
-          const std::vector<bool> &component_mask,
+          const ComponentMask &component_mask,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
@@ -1105,7 +1105,7 @@ estimate (const DH   &dof_handler,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
-          const std::vector<bool> &component_mask,
+          const ComponentMask &component_mask,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
@@ -1127,7 +1127,7 @@ estimate (const DH   &dof_handler,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const std::vector<const InputVector*> &solutions,
           std::vector<Vector<float>*> &errors,
-          const std::vector<bool> &component_mask,
+          const ComponentMask &component_mask,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
@@ -1150,7 +1150,7 @@ estimate (const Mapping<1,spacedim>                    &/*mapping*/,
           const typename FunctionMap<spacedim>::type          &/*neumann_bc*/,
           const std::vector<const InputVector *> &/*solutions*/,
           std::vector<Vector<float>*>            &/*errors*/,
-          const std::vector<bool>                &/*component_mask_*/,
+          const ComponentMask                &/*component_mask_*/,
           const Function<spacedim>                   */*coefficient*/,
           const unsigned int,
           const types::subdomain_id          /*subdomain_id*/,
@@ -1170,7 +1170,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
           const typename FunctionMap<spacedim>::type          &neumann_bc,
           const std::vector<const InputVector *> &solutions,
           std::vector<Vector<float>*>              &errors,
-          const std::vector<bool>                  &component_mask_,
+          const ComponentMask                  &component_mask,
           const Function<spacedim>                   *coefficient,
           const unsigned int,
           const types::subdomain_id         subdomain_id_,
@@ -1214,11 +1214,9 @@ estimate (const Mapping<1,spacedim>                    &mapping,
        i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());
 
-  Assert ((component_mask_.size() == 0) ||
-          (component_mask_.size() == n_components), ExcInvalidComponentMask());
-  Assert ((component_mask_.size() == 0) ||
-          (std::count(component_mask_.begin(), component_mask_.end(),
-                      true) > 0),
+  Assert (component_mask.represents_n_components(n_components),
+          ExcInvalidComponentMask());
+  Assert (component_mask.n_selected_components(n_components) > 0,
           ExcInvalidComponentMask());
 
   Assert ((coefficient == 0) ||
@@ -1233,14 +1231,6 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   for (unsigned int n=0; n<solutions.size(); ++n)
     Assert (solutions[n]->size() == dof_handler.n_dofs(),
             ExcInvalidSolutionVector());
-
-                                   // if no mask given: treat all components
-  std::vector<bool> component_mask ((component_mask_.size() == 0)    ?
-                                    std::vector<bool>(n_components, true) :
-                                    component_mask_);
-  Assert (component_mask.size() == n_components, ExcInvalidComponentMask());
-  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-          ExcInvalidComponentMask());
 
   Assert ((coefficient == 0) ||
           (coefficient->n_components == n_components) ||
@@ -1440,7 +1430,7 @@ estimate (const Mapping<dim, spacedim>      &mapping,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
-          const std::vector<bool> &component_mask,
+          const ComponentMask &component_mask,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
@@ -1463,7 +1453,7 @@ estimate (const DH                &dof_handler,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
-          const std::vector<bool> &component_mask,
+          const ComponentMask &component_mask,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
@@ -1486,7 +1476,7 @@ estimate (const Mapping<dim, spacedim>      &mapping,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
-          const std::vector<bool> &component_mask,
+          const ComponentMask &component_mask,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
@@ -1509,7 +1499,7 @@ estimate (const DH                &dof_handler,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
-          const std::vector<bool> &component_mask,
+          const ComponentMask &component_mask,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
@@ -1534,7 +1524,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const std::vector<const InputVector *> &solutions,
           std::vector<Vector<float>*>              &errors,
-          const std::vector<bool>                  &component_mask_,
+          const ComponentMask                  &component_mask,
           const Function<spacedim>                 *coefficients,
           const unsigned int                   ,
           const types::subdomain_id          subdomain_id_,
@@ -1580,11 +1570,9 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
     Assert (i->second->n_components == n_components,
             ExcInvalidBoundaryFunction());
 
-  Assert ((component_mask_.size() == 0) ||
-          (component_mask_.size() == n_components), ExcInvalidComponentMask());
-  Assert ((component_mask_.size() == 0) ||
-          (std::count(component_mask_.begin(), component_mask_.end(),
-                      true) > 0),
+  Assert (component_mask.represents_n_components(n_components),
+          ExcInvalidComponentMask());
+  Assert (component_mask.n_selected_components(n_components) > 0,
           ExcInvalidComponentMask());
 
   Assert ((coefficients == 0) ||
@@ -1595,14 +1583,6 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   for (unsigned int n=0; n<solutions.size(); ++n)
     Assert (solutions[n]->size() == dof_handler.n_dofs(),
             ExcInvalidSolutionVector());
-
-                                   // if no mask given: treat all components
-  std::vector<bool> component_mask ((component_mask_.size() == 0)    ?
-                                    std::vector<bool>(n_components, true) :
-                                    component_mask_);
-  Assert (component_mask.size() == n_components, ExcInvalidComponentMask());
-  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-          ExcInvalidComponentMask());
 
   const unsigned int n_solution_vectors = solutions.size();
 
@@ -1711,7 +1691,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const typename FunctionMap<spacedim>::type &neumann_bc,
           const std::vector<const InputVector *> &solutions,
           std::vector<Vector<float>*>              &errors,
-          const std::vector<bool>                  &component_mask,
+          const ComponentMask                  &component_mask,
           const Function<spacedim>                 *coefficients,
           const unsigned int                   n_threads,
           const types::subdomain_id          subdomain_id,
@@ -1733,7 +1713,7 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
                                          const typename FunctionMap<spacedim>::type &neumann_bc,
                                          const std::vector<const InputVector *> &solutions,
                                          std::vector<Vector<float>*>              &errors,
-                                         const std::vector<bool>                  &component_mask,
+                                         const ComponentMask                  &component_mask,
                                          const Function<spacedim>                 *coefficients,
                                          const unsigned int                   n_threads,
                                          const types::subdomain_id subdomain_id,
@@ -1754,7 +1734,7 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
                                          const typename FunctionMap<spacedim>::type &neumann_bc,
                                          const std::vector<const InputVector *> &solutions,
                                          std::vector<Vector<float>*>              &errors,
-                                         const std::vector<bool>                  &component_mask,
+                                         const ComponentMask                  &component_mask,
                                          const Function<spacedim>                 *coefficients,
                                          const unsigned int                   n_threads,
                                          const types::subdomain_id subdomain_id,

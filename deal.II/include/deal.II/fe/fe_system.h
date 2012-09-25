@@ -1003,7 +1003,7 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       * components of a composed
                                       * finite element.
                                       */
-    static std::vector<std::vector<bool> >
+    static std::vector<ComponentMask>
     compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
                                 const unsigned int        N1);
 
@@ -1012,7 +1012,7 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       * components of a composed
                                       * finite element.
                                       */
-    static std::vector<std::vector<bool> >
+    static std::vector<ComponentMask>
     compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
                                 const unsigned int        N1,
                                 const FiniteElement<dim,spacedim> &fe2,
@@ -1023,7 +1023,7 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       * components of a composed
                                       * finite element.
                                       */
-    static std::vector<std::vector<bool> >
+    static std::vector<ComponentMask>
     compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
                                 const unsigned int        N1,
                                 const FiniteElement<dim,spacedim> &fe2,
@@ -1036,7 +1036,7 @@ class FESystem : public FiniteElement<dim,spacedim>
                                     * components of a composed
                                     * finite element.
                                     */
-   static std::vector<std::vector<bool> >
+   static std::vector<ComponentMask>
     compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
                                 const unsigned int        N1,
                                 const FiniteElement<dim,spacedim> &fe2,
@@ -1049,7 +1049,7 @@ class FESystem : public FiniteElement<dim,spacedim>
                                      /**
                                       * With 5 elements.
                                       */
-   static std::vector<std::vector<bool> >
+   static std::vector<ComponentMask>
     compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
                                 const unsigned int        N1,
                                 const FiniteElement<dim,spacedim> &fe2,
@@ -1069,7 +1069,7 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       * function is called from all
                                       * the above functions.
                                      */
-    static std::vector<std::vector<bool> >
+    static std::vector<ComponentMask>
     compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
                                 const std::vector<unsigned int>              &multiplicities);
 

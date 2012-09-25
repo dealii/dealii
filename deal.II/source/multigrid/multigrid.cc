@@ -250,8 +250,8 @@ std::size_t
 MGTransferComponentBase::memory_consumption () const
 {
   std::size_t result = sizeof(*this);
-  result += MemoryConsumption::memory_consumption(selected)
-            - sizeof(selected);
+  result += MemoryConsumption::memory_consumption(component_mask)
+            - sizeof(ComponentMask);
   result += MemoryConsumption::memory_consumption(target_component)
             - sizeof(mg_target_component);
   result += MemoryConsumption::memory_consumption(sizes)

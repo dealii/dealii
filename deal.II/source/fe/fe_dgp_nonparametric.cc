@@ -32,7 +32,7 @@ FE_DGPNonparametric<dim,spacedim>::FE_DGPNonparametric (const unsigned int degre
                                          FiniteElementData<dim>::L2),
                   std::vector<bool>(
                     FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
-                                    std::vector<std::vector<bool> >(
+                                    std::vector<ComponentMask>(
                                       FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
                                       std::vector<bool>(1,true))),
                 degree(degree),

@@ -23,7 +23,7 @@ template <class POLY, int dim, int spacedim>
 FE_Poly<POLY,dim,spacedim>::FE_Poly (const POLY& poly_space,
                             const FiniteElementData<dim> &fe_data,
                             const std::vector<bool> &restriction_is_additive_flags,
-                            const std::vector<std::vector<bool> > &nonzero_components):
+                            const std::vector<ComponentMask> &nonzero_components):
                 FiniteElement<dim,spacedim> (fe_data,
                                     restriction_is_additive_flags,
                                     nonzero_components),

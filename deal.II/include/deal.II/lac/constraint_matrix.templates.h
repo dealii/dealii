@@ -1737,7 +1737,7 @@ namespace internals
 
 
                                    // similar as before, now with shortcut for
-                                   // deal.II sparse matrices. this lets use
+                                   // deal.II sparse matrices. this lets us
                                    // avoid using extra arrays, and does all the
                                    // operations just in place, i.e., in the
                                    // respective matrix row

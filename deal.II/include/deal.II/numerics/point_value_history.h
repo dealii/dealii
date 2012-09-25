@@ -13,21 +13,21 @@
 #ifndef __dealii__point_value_history_h
 #define __dealii__point_value_history_h
 
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/base/point.h>
-#include <deal.II/lac/vector.h>
-
-#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/utilities.h>
-#include <numerics/data_postprocessor.h>
-#include <grid/grid_tools.h>
+#include <deal.II/fe/component_mask.h>
+#include <deal.II/numerics/data_postprocessor.h>
 
 #include <vector>
 #include <iostream>
@@ -144,7 +144,7 @@ namespace internal
  * </ol>
  *
  * When recording a new mnemonic name, the user must supply a
- * std::vector@<bool@> component_mask (see @ref GlossComponentMask "this glossary entry")
+ * component_mask (see @ref GlossComponentMask "this glossary entry")
  * to indicate the @ref GlossComponent "(vector) components"
  * to be extracted from the given input. If the user simply wants to extract
  * all the components, the mask need not be explicitly supplied to the @p
@@ -318,7 +318,7 @@ class PointValueHistory
                                       * be called in any order.
                                       */
     void add_field_name(const std::string &vector_name,
-                        const std::vector <bool> &component_mask = std::vector <bool>());
+                        const ComponentMask &component_mask = ComponentMask());
 
                                      /**
                                       * Put another mnemonic string (and hence
@@ -747,7 +747,7 @@ class PointValueHistory
 				      * Saves a component mask
 				      * for each mnemonic.
 				      */
-    std::map <std::string, std::vector<bool> > component_mask;
+    std::map <std::string, ComponentMask> component_mask;
 
 
                                      /**
