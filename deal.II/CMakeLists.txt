@@ -1,4 +1,5 @@
 
+SET(VERSION "8.0.pre")
 
 ###########################################################################
 ##                                                                       ##
@@ -8,16 +9,12 @@
 ###########################################################################
 
 #
-# This is the main CMakeLists.txt file for the deal.II project
+#             The cmake build system for the deal.II project
 #
 # The main purpose of this file is to set all the configuration options and
 # then call a lot of modules residing under ./cmake/*/ that do the
 # hard work.
 #
-
-SET(VERSION "8.0.pre")
-
-
 
 
 ###########################################################################
@@ -30,7 +27,6 @@ SET(VERSION "8.0.pre")
 # Feature selection: external libraries and where to take them (if there
 # is a choice, e.g. from contrib vs external)
 #
-
 
 OPTION(DEAL_II_FEATURE_AUTODETECTION
 # Enables feature autodetection. This will automatically overwrite all
@@ -158,8 +154,6 @@ OPTION(DEAL_II_COMPONENT_PROJECT_CONFIG
   ON)
 
 
-
-
 ###########################################################################
 #                                                                         #
 #                             Configuration:                              #
@@ -256,6 +250,12 @@ INCLUDE(setup_finalize)
 ADD_SUBDIRECTORY(config)
 ADD_SUBDIRECTORY(scripts)
 ADD_SUBDIRECTORY(include)
+
+
+#
+# Build optional contrib targets:
+#
+ADD_SUBDIRECTORY(contrib)
 
 
 #

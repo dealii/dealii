@@ -1,15 +1,13 @@
+
 #
 # Finalize the configuration:
 #
 
 
-
 #
 # Hide some cmake specific cached variables. This is annoying...
 #
-MARK_AS_ADVANCED(
-  file_cmd
-  )
+MARK_AS_ADVANCED(file_cmd)
 
 
 #
