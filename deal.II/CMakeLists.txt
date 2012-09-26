@@ -167,8 +167,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
 SET(CMAKE_INCLUDE_CURRENT_DIR true)
 
-SET(CMAKE_MODULE_PATH
-  ${CMAKE_MODULE_PATH}
+LIST(APPEND CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/cmake/
   ${CMAKE_SOURCE_DIR}/cmake/modules/
   )
@@ -204,7 +203,7 @@ INCLUDE(setup_compiler_flags)
 #
 # Run all system checks:
 #
-FILE(GLOB check_files "cmake/check/*.cmake")
+FILE(GLOB check_files "cmake/checks/*.cmake")
 FOREACH(file ${check_files})
   MESSAGE(STATUS "Include ${file}")
   INCLUDE(${file})

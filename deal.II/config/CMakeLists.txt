@@ -5,6 +5,23 @@ CONFIGURE_FILE(
 
 
 IF(DEAL_II_COMPONENT_PROJECT_CONFIG)
+
+  #
+  # Setup and install the convenience macros:
+  #
+
+  LIST(APPEND DEAL_II_MACROS
+    ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_initialize_cached_variables.cmake
+    ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_setup_target.cmake
+    )
+
+  INSTALL(FILES
+    ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
+    ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
+    DESTINATION ${DEAL_II_CMAKE_MACROS_RELDIR}
+    COMPONENT project_config
+    )
+
   #
   # Configure and install the cmake project configuration:
   #
@@ -23,6 +40,18 @@ IF(DEAL_II_COMPONENT_PROJECT_CONFIG)
     ENDIF()
   ENDFOREACH()
 
+  #
+  # Include the convenience macros directly at the end of our project
+  # config:
+  #
+  FOREACH(var ${DEAL_II_MARCROS})
+    FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+      "\nINCLUDE(${var})"
+      )
+  ENDFOREACH()
+
+
+
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
@@ -35,6 +64,7 @@ IF(DEAL_II_COMPONENT_PROJECT_CONFIG)
     DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
     COMPONENT project_config
     )
+
 ENDIF()
 
 

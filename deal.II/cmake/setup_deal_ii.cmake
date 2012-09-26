@@ -25,6 +25,7 @@
 #     DEAL_II_LIBRARY_NAME_RELEASE
 #
 #     DEAL_II_PATH                    *)
+#     DEAL_II_CMAKE_MACROS_RELDIR     *)
 #     DEAL_II_DOCUMENTATION_RELDIR    *)
 #     DEAL_II_EXAMPLES_RELDIR         *)
 #     DEAL_II_INCLUDE_RELDIR          *)
@@ -70,6 +71,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
   # The good, old directory structure:
   #
+  SET_IF_EMPTY(DEAL_II_CMAKE_MACROS_RELDIR "cmake/macros")
   SET_IF_EMPTY(DEAL_II_DOCUMENTATION_RELDIR "doc")
   SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "examples")
   SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
@@ -81,6 +83,7 @@ ELSE()
   # IF DEAL_II_COMPONENT_COMPAT_FILES is not set, we assume that we have to
   # obey the FSHS...
   #
+  SET_IF_EMPTY(DEAL_II_CMAKE_MACROS_RELDIR "share/${DEAL_II_PACKAGE_NAME}/cmake/Macros")
   SET_IF_EMPTY(DEAL_II_DOCUMENTATION_RELDIR "share/doc/${DEAL_II_PACKAGE_NAME}/html")
   SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "share/doc/${DEAL_II_PACKAGE_NAME}/examples")
   SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
