@@ -142,5 +142,4 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
   FILE(REMOVE
     ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${build_lowercase}
     )
-  MESSAGE("${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${build_lowercase}")
 ENDFOREACH()
