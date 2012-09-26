@@ -34,7 +34,7 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
       make clean >/dev/null
       make run | grep "|" > temp.txt
       #cat temp.txt >>../datatable.$test
-      ./../gettimes/a.out $NEXTREVISION >>../datatable.$test
+      ./../gettimes/gettimes $NEXTREVISION >>../datatable.$test
       cd ..      
   
   done  
