@@ -5,6 +5,8 @@ Major:
 
 * Add the rest of the Bug tests
 
+* Enable in source FindModules for P4est and Trilinos.
+
 * The following features have to be written:
     * HDF5
     * MUMPS
