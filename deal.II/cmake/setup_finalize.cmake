@@ -20,7 +20,8 @@ FOREACH(flags ${deal_ii_used_flags})
   #
   # Strip leading and trailing whitespace:
   #
-  STRING(STRIP "${flags}" flags)
+  # STRING(STRIP "${flags}" flags)
+  STRING(STRIP "${${flags}}" ${flags})
 ENDFOREACH()
 
 
@@ -53,7 +54,7 @@ ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   MESSAGE("      DEAL_II_CXX_FLAGS_DEBUG:             ${DEAL_II_CXX_FLAGS_DEBUG}")
 ENDIF()
-MESSAGE("      CMAKE_SHARED_LINKER_FLAGS:          ${CMAKE_SHARED_LINKER_FLAGS}")
+MESSAGE("      CMAKE_SHARED_LINKER_FLAGS:           ${CMAKE_SHARED_LINKER_FLAGS}")
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
   MESSAGE("      DEAL_II_SHARED_LINKER_FLAGS_RELEASE:  ${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}")
 ENDIF()
