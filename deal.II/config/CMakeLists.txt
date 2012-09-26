@@ -44,9 +44,12 @@ IF(DEAL_II_COMPONENT_PROJECT_CONFIG)
   # Include the convenience macros directly at the end of our project
   # config:
   #
-  FOREACH(var ${DEAL_II_MARCROS})
+  FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+    "\n#\n# Include some convenience macros directly in the project config:\n#\n"
+    )
+  FOREACH(var ${DEAL_II_MACROS})
     FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-      "\nINCLUDE(${var})"
+      "INCLUDE(${var})\n"
       )
   ENDFOREACH()
 

@@ -544,7 +544,7 @@ How to use deal.II in your cmake project
 
         INCLUDE(${DEAL_II_MACROS})
 
-        DEAL_II_INITIALIZE_CACHED_VARIABLES()
+        DEAL_II_INITIALIZE_VARIABLES()
 
         PROJECT(step-1)
 
