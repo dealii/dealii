@@ -542,9 +542,7 @@ How to use deal.II in your cmake project
 
         FIND_PACKAGE(deal.II CONFIG REQUIRED)
 
-        INCLUDE(${DEAL_II_MACROS})
-
-        DEAL_II_INITIALIZE_VARIABLES()
+        DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
         PROJECT(step-1)
 
@@ -601,10 +599,6 @@ DEVELOPMENT
 
           For setting necessary preprocessor definitions ("-D<...>") for
           the compilation of the deal.II library
-
-      ADD_DEPENDENCIES(deal_ii_target_dependencies ...)
-          Used as a dummy target for all the stuff that has to be done
-          before the library can be compiled.
 
 
   For internal and external use:
