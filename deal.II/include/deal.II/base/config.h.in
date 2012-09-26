@@ -243,7 +243,8 @@
  * concatenate the underscore with another string to form a class name, which
  * then of course isn't valid any more. See mails in early Feb 2006.
  */
-#cmakedefine PETSC_SKIP_UNDERSCORE_CHKERR
+/* TODO: Obsolete?
+   #cmakedefine PETSC_SKIP_UNDERSCORE_CHKERR */
 
 /**
  * These macros are defined to make testing for PETSc versions within

@@ -2,10 +2,6 @@
 # Configuration for the trilinos library:
 #
 
-#
-# TODO: Fix up WARNING/STATUS of the failure messages.
-#
-
 
 MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
   FIND_PACKAGE(TRILINOS)

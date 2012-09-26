@@ -50,9 +50,6 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL var)
 
   INCLUDE_DIRECTORIES(${PETSC_INCLUDE_DIRS})
 
-  # The user has to know the location of the petsc headers as well: # TODO: Really?
-  # LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${PETSC_INCLUDE_DIRS})
-
   LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
     ${PETSC_LIBRARIES}
     )
@@ -68,9 +65,9 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL var)
   #
   # Work around a stupidity in PETSc that makes sure it interferes in
   # a completely obnoxious way with boost.
-  # TODO: Obosolete?
+  # TODO: Obsolete?
   #
-  SET(PETSC_SKIP_UNDERSCORE_CHKERR TRUE)
+  #SET(PETSC_SKIP_UNDERSCORE_CHKERR TRUE)
 
   #
   # Set some definitions for config.h:
