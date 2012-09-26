@@ -242,9 +242,10 @@
  * "__gterr =", but then forgets to undef this thing. Boost simply wants to
  * concatenate the underscore with another string to form a class name, which
  * then of course isn't valid any more. See mails in early Feb 2006.
+ *
+ * TODO: Obsolete?
  */
-/* TODO: Obsolete?
-   #cmakedefine PETSC_SKIP_UNDERSCORE_CHKERR */
+#cmakedefine PETSC_SKIP_UNDERSCORE_CHKERR
 
 /**
  * These macros are defined to make testing for PETSc versions within
