@@ -4,19 +4,23 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET_IF_EMPTY(METIS_DIR "$ENV{METIS_DIR}")
+
 FIND_PATH(METIS_INCLUDE_DIR metis.h
   HINTS
-    ${METIS_DIR}/include
-    $ENV{METIS_DIR}/include
-  PATH_SUFFIXES metis
+    ${METIS_DIR}
+  PATH_SUFFIXES
+    metis include/metis include
   )
 
 FIND_LIBRARY(METIS_LIBRARY
   NAMES metis
   HINTS
     ${METIS_DIR}
-    $ENV{METIS_DIR}
-  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
+  PATH_SUFFIXES
+    lib${LIB_SUFFIX} lib64 lib
+    # This is a hint, isn't it?
+    build/${CMAKE_CXX_PLATFORM_ID}-${CMAKE_SYSTEM_PROCESSOR}/libmetis
   )
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(METIS DEFAULT_MSG METIS_LIBRARY METIS_INCLUDE_DIR)
@@ -36,6 +40,11 @@ IF(METIS_FOUND)
   MARK_AS_ADVANCED(
     METIS_LIBRARY
     METIS_INCLUDE_DIR
+    METIS_DIR
   )
+ELSE()
+  SET(METIS_DIR "" CACHE STRING
+    "An optional hint to a metis directory"
+    )
 ENDIF()
 

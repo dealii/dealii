@@ -2,6 +2,8 @@
 # Try to find the UMFPACK library
 #
 
+INCLUDE(FindPackageHandleStandardArgs)
+
 SET_IF_EMPTY(AMD_DIR "$ENV{AMD_DIR}")
 SET_IF_EMPTY(UMFPACK_DIR "$ENV{UMFPACK_DIR}")
 
@@ -10,7 +12,7 @@ FIND_PATH(UMFPACK_INCLUDE_DIR umfpack.h
     ${AMD_DIR}
     ${UMFPACK_DIR}
   PATH_SUFFIXES
-    umfpack include Include UMFPACK/Include ../UMFPACK/Include
+    umfpack include/umfpack include Include UMFPACK/Include ../UMFPACK/Include
 )
 
 FIND_LIBRARY(UMFPACK_LIBRARY

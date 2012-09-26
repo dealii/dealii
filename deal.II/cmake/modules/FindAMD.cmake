@@ -2,6 +2,8 @@
 # Try to find the AMD library
 #
 
+INCLUDE(FindPackageHandleStandardArgs)
+
 SET_IF_EMPTY(AMD_DIR "$ENV{AMD_DIR}")
 SET_IF_EMPTY(UMFPACK_DIR "$ENV{UMFPACK_DIR}")
 
@@ -10,7 +12,7 @@ FIND_PATH(AMD_INCLUDE_DIR amd.h
     ${AMD_DIR}
     ${UMFPACK_DIR}
   PATH_SUFFIXES
-    amd include Include AMD/Include ../AMD/Include
+    amd include/amd include Include AMD/Include ../AMD/Include
 )
 
 FIND_LIBRARY(AMD_LIBRARY
