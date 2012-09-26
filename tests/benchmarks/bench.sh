@@ -33,9 +33,8 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
       echo "** working on $test"
       make clean >/dev/null
       make run | grep "|" > temp.txt
-      cat temp.txt >>../datatable.$test
-      #./your_code $NEXTREVISION >>../datatable.$test
-      # collect info
+      #cat temp.txt >>../datatable.$test
+      ./../gettimes/a.out $NEXTREVISION >>../datatable.$test
       cd ..      
   
   done  
