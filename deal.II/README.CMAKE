@@ -701,10 +701,10 @@ DEVELOPMENT
 
     FEATURE_<FEATURE>_FIND_EXTERNAL(var)  (macro, mandatory)
        which should set var to TRUE if all dependencies for the feature are
-       fullfilled. In this case all necessary variables for
+       fulfilled. In this case all necessary variables for
        FEATURE_<FEATURE>_CONFIGURE_EXTERNAL must be set. Otherwise
        var should remain unset.
-       This macro should give an error (SEND_ERROR or FATAL_ERROR).
+       This macro must not give an error (SEND_ERROR or FATAL_ERROR).
 
     FEATURE_<FEATURE>_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
        which should setup all necessary configuration for the feature with
@@ -716,7 +716,7 @@ DEVELOPMENT
        is set up, or be undefined.
 
     FEATURE_<FEATURE>_ERROR_MESSAGE()  (macro, optional)
-       which should print a meaningfull error message (with SEND_ERROR) for
+       which should print a meaningful error message (with SEND_ERROR) for
        the case that no external library was found (and contrib is not
        allowed to be used.) If not defined, a suitable default error message
        will be printed.
