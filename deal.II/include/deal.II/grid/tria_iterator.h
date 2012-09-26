@@ -35,11 +35,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim> class Triangulation;
+template <int, int, int> class TriaAccessorBase;
 
 template <typename> class TriaRawIterator;
 template <typename> class TriaIterator;
 template <typename> class TriaActiveIterator;
-
 
 
 
@@ -312,6 +312,18 @@ class TriaRawIterator : public std::iterator<std::bidirectional_iterator_tag,Acc
     template <typename OtherAccessor>
     TriaRawIterator (const TriaRawIterator<OtherAccessor> &i);
 
+				     /**
+				      * Another conversion operator,
+				      * where we use the pointers to
+				      * the Triangulation from a
+				      * TriaAccessorBase object, while
+				      * the additional data is used
+				      * according to the actual type
+				      * of Accessor.
+				      */
+    TriaRawIterator (const TriaAccessorBase<Accessor::structure_dimension,Accessor::dimension,Accessor::space_dimension>& tria_accessor,
+                  const typename Accessor::AccessorData *local_data);
+    
                                      /**
                                       * Conversion constructor. Same
                                       * as above with the difference
@@ -359,7 +371,7 @@ class TriaRawIterator : public std::iterator<std::bidirectional_iterator_tag,Acc
                                       *  version.
                                       */
     Accessor & operator * ();
-
+    
                                      /**
                                       *  Dereferencing operator, returns a
                                       *  reference of the cell pointed to.
@@ -375,6 +387,25 @@ class TriaRawIterator : public std::iterator<std::bidirectional_iterator_tag,Acc
                                       *  version.
                                       */
     Accessor * operator -> ();
+
+        
+    				     /**
+				      * In order be able to assign
+				      * end-iterators for different
+				      * accessors to each other, we
+				      * need an access function which
+				      * returns the accessor
+				      * regardless of its state.
+				      *
+				      * @warning This function should
+				      * not be used in application
+				      * programs. It is only intended
+				      * for limited purposes inside
+				      * the library and it makes
+				      * debugging much harder.
+				      */
+    const Accessor& access_any () const;
+    
                                      /*@}*/
 
                                      /**
@@ -661,6 +692,18 @@ class TriaIterator : public TriaRawIterator<Accessor>
     template <typename OtherAccessor>
     TriaIterator (const TriaIterator<OtherAccessor> &i);
 
+				     /**
+				      * Another conversion operator,
+				      * where we use the pointers to
+				      * the Triangulation from a
+				      * TriaAccessorBase object, while
+				      * the additional data is used
+				      * according to the actual type
+				      * of Accessor.
+				      */
+    TriaIterator (const TriaAccessorBase<Accessor::structure_dimension,Accessor::dimension,Accessor::space_dimension>& tria_accessor,
+                  const typename Accessor::AccessorData *local_data);
+    
                                      /**
                                       * Similar conversion operator to the above
                                       * one, but does a check whether the
@@ -850,6 +893,18 @@ class TriaActiveIterator : public TriaIterator<Accessor>
     template <typename OtherAccessor>
     TriaActiveIterator (const TriaActiveIterator<OtherAccessor> &i);
 
+    				     /**
+				      * Another conversion operator,
+				      * where we use the pointers to
+				      * the Triangulation from a
+				      * TriaAccessorBase object, while
+				      * the additional data is used
+				      * according to the actual type
+				      * of Accessor.
+				      */
+    TriaActiveIterator (const TriaAccessorBase<Accessor::structure_dimension,Accessor::dimension,Accessor::space_dimension>& tria_accessor,
+			const typename Accessor::AccessorData *local_data);
+    
                                      /**
                                       * Similar conversion operator to the above
                                       * one, but does a check whether the
@@ -1056,6 +1111,16 @@ TriaRawIterator<Accessor>::operator * ()
           state() == IteratorState::valid,
           ExcDereferenceInvalidObject(accessor));
 
+  return accessor;
+}
+
+
+
+template <typename Accessor>
+inline
+const Accessor &
+TriaRawIterator<Accessor>::access_any () const
+{
   return accessor;
 }
 
