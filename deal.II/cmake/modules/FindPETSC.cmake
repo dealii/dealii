@@ -17,13 +17,8 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
-#
-# To safe some logic, promote environment variables to cmake variables if
-# they are not already set.
-#
 SET_IF_EMPTY(PETSC_DIR "$ENV{PETSC_DIR}")
 SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
-
 
 #
 # Search for the first part of the includes:
