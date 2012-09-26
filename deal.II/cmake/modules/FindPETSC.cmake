@@ -193,7 +193,16 @@ IF(PETSC_FOUND)
   MARK_AS_ADVANCED(
     PETSC_LIBRARIES
     PETSC_INCLUDE_DIRS
+    PETSC_DIR
+    PETSC_ARCH
   )
+ELSE()
+  SET(PETSC_DIR "" CACHE STRING
+    "An optional hint to a PETSc directory"
+    )
+  SET(PETSC_ARCH "" CACHE STRING
+    "An optional hint to a PETSc arch"
+    )
 ENDIF()
 
 #

@@ -16,9 +16,9 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     # We support petsc from version 3.x.x onwards
     #
     IF(PETSC_VERSION_MAJOR LESS 3)
-      MESSAGE(WARNING
+      MESSAGE(WARNING "\n"
         "Could not find a sufficient modern petsc installation: "
-        "Version >=3.0.0 required!"
+        "Version >=3.0.0 required!\n\n"
         )
       SET(${var} FALSE)
     ENDIF()
@@ -34,9 +34,9 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     IF( (PETSC_WITH_MPIUNI AND DEAL_II_COMPILER_SUPPORTS_MPI)
          OR
          (NOT PETSC_WITH_MPIUNI AND NOT DEAL_II_COMPILER_SUPPORTS_MPI))
-      MESSAGE(WARNING
+      MESSAGE(WARNING "\n"
         "Could not find a sufficient petsc installation: "
-        "Petsc has to be configured with the same MPI configuration as deal.II."
+        "Petsc has to be configured with the same MPI configuration as deal.II.\n\n"
         )
       SET(${var} FALSE)
     ENDIF()
