@@ -1,5 +1,9 @@
 Major:
 
+* Bug: Unset some cached tests variables. Notably:
+    - A Trilinos test
+    - the LAPACK routine checks
+
 * Implement the documentation component. (I don't grok what's going on in
   this makefiles. There is a rudimentary doxygen call, though.)
 
