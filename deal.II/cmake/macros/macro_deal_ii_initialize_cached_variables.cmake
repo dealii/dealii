@@ -17,9 +17,19 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
     "Choose the type of build, options are: Debug, Release"
     )
 
-  SET(CMAKE_CXX_FLAGS ${DEAL_II_CXX_FLAGS})
-  SET(CMAKE_CXX_FLAGS_RELEASE ${DEAL_II_CXX_FLAGS_RELEASE})
-  SET(CMAKE_CXX_FLAGS_DEBUG ${DEAL_II_CXX_FLAGS_DEBUG})
+  SET(CMAKE_CXX_FLAGS ${DEAL_II_CXX_FLAGS} CACHE STRING
+    "Flags used by the compiler during all build types."
+    )
+
+  SET(CMAKE_CXX_FLAGS_DEBUG ${DEAL_II_CXX_FLAGS_DEBUG} CACHE STRING
+    "Flags used by the compiler during debug builds."
+    )
+
+  SET(CMAKE_CXX_FLAGS_RELEASE ${DEAL_II_CXX_FLAGS_RELEASE} CACHE STRING
+    "Flags used by the compiler during release builds."
+    )
+
+  MARK_AS_ADVANCED(CMAKE_INSTALL_PREFIX)
 
 ENDMACRO()
 

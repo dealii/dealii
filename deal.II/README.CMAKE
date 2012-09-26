@@ -7,7 +7,7 @@
 
           ==================================================
 
-          Author: Matthias Maier, University Heidelberg 2012
+  Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>, 2012
 
 
 
