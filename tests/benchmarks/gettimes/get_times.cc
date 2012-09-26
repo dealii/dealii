@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 	stringstream ss;
 	const int IGNORE_LINES = 3; //Number of initial lines to ignore
 
-	input.open("test_input.txt");
+	input.open("temp.txt");
 	if(argc <= 1)
 	{
 		cerr << "Error: " << argv[0] << " requires one argument" << endl;
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	vector<string> names;
-	vector<float> times;
+	vector<double> times;
 
 	//Extract name and execution time from each line
 	while(!input.eof())
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 		
 		//Find time string and convert to double
 		int num_start = last_s - 1;
-		while(isdigit(curr_line[num_start]) || curr_line[num_start] == '.')
+		while(curr_line[num_start] != ' ')//isdigit(curr_line[num_start]) || curr_line[num_start] == '.')
 			num_start--;
 		string timestr = curr_line.substr(num_start+1, last_s - num_start);
 		////cout << timestr << endl;
