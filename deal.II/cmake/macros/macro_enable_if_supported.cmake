@@ -1,6 +1,6 @@
 #
-# Tests whether the cxx compiler understands flag. If so, add it to
-# variable.
+# Tests whether the cxx compiler understands a flag.
+# If so, add it to 'variable'.
 #
 # Usage:
 #     ENABLE_IF_SUPPORTED(variable flag)

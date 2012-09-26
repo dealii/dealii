@@ -1,4 +1,3 @@
-
 #
 # A small macro used for converting a cmake list into a space
 # separated string. This macro adds the string "prefix" in front of each

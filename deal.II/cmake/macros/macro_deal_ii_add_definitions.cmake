@@ -1,6 +1,7 @@
-
 #
-# TODO: A comment
+# A small wrapper around
+# SET_TARGET_PROPERTY(... PROPERTIES COMPILE_DEFINITIONS ...)
+# to _add_ compile definitions to every target we have specified.
 #
 
 MACRO(DEAL_II_ADD_DEFINITIONS name)

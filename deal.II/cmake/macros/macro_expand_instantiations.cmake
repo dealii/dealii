@@ -8,8 +8,9 @@
 #
 # target
 #
-#    a target that will depend on the generation of all .inst files.
-#    (To ensure that all .inst files are generated prior to compiling.)
+#    where target.${build_type} will depend on the generation of all .inst
+#    files, to ensure that all .inst files are generated prior to
+#    compiling.
 #
 # inst_in_files
 #
@@ -40,8 +41,8 @@ MACRO(EXPAND_INSTANTIATIONS target inst_in_files)
   ADD_CUSTOM_TARGET(${target}.inst ALL DEPENDS ${inst_targets})
 
   #
-  # Add a dependency to target so that target.inst is fully generated
-  # before target will be processed.
+  # Add a dependency to all target.${build_type} so that target.inst is
+  # fully generated before target will be processed.
   #
   FOREACH(build ${DEAL_II_BUILD_TYPES})
     STRING(TOLOWER ${build} build_lowercase)

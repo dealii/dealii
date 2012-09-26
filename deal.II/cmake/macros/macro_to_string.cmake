@@ -1,4 +1,3 @@
-
 #
 # A small macro used for converting a list into a space
 # separated string:

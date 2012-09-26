@@ -1,6 +1,6 @@
 #
-# A small macro used for (string-)appending a string flags to a
-# string variable
+# A small macro used for (string-)appending a string "${flags}" to a
+# string "${variable}"
 #
 # Usage:
 #     ADD_FLAGS(variable flags)

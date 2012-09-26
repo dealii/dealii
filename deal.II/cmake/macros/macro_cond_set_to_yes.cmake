@@ -1,6 +1,6 @@
-
 #
-# IF(bool), set variable to "yes".
+# If bool is "true" (in a cmake fashion...), set variable to "yes",
+# otherwise to "no".
 #
 # Usage:
 #     COND_SET_TO_YES(bool variable)

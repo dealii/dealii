@@ -1,6 +1,5 @@
-
 #
-# TODO: A comment
+# See macro_deal_ii_add_library.cmake for an explanation of this macro
 #
 
 MACRO(DEAL_II_ADD_C_LIBRARY library)

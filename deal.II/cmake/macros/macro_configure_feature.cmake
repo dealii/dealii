@@ -8,11 +8,11 @@
 # For a feature ${feature} (written in all caps) the following options,
 # variables and macros have to be defined (except marked as optional):
 #
-# DEAL_II_WITH_${feature} (option, mandatory)
-#    determines whether the feature will be configured, if
-#    DEAL_II_FEATURE_AUTODETECTION is OFF. If
-#    DEAL_II_FEATURE_AUTODETECTION is ON, this option will be set if
-#    configuring the feature was successful.
+# DEAL_II_WITH_${feature} (bool, mandatory)
+#    If DEAL_II_FEATURE_AUTODETECTION is OFF, this boolean determines
+#    whether the feature will be configured.
+#    If DEAL_II_FEATURE_AUTODETECTION is ON, this boolean will
+#    automatically be set if configuring the feature was successful.
 #
 # FEATURE_${feature}_DEPENDS (variable, optional)
 #    a variable which contains an optional list of other features
@@ -38,7 +38,6 @@
 #    This macro should give an error (SEND_ERROR or FATAL_ERROR).
 #
 # FEATURE_${feature}_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
-#
 #    which should setup all necessary configuration for the feature with
 #    external dependencies. var set to TRUE indicates success,
 #    otherwise this script gives an error.
