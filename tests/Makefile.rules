@@ -8,7 +8,9 @@
 ######################################################################
 
 
-normalize = $D/common/scripts/normalize.pl
+# reference the normalization script in the tests directory, which is
+# one up from where the variable will be expanded
+normalize = ../normalize.pl
 
 verbose = off
 
@@ -182,7 +184,7 @@ report:
 		;; \
 	  esac ; \
 	  echo `date -u +"%Y-%m-%d %H:%M"` \
-               "`perl $D/common/scripts/status_to_report.pl $$file`" \
+               "`perl ../status_to_report.pl $$file`" \
                "`echo $(WORKDIR)/$$test | sed s#/ncpu#---ncpu#g`" ; \
 	done
 
