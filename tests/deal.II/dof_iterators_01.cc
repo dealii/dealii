@@ -25,26 +25,25 @@
 
 #include <fstream>
 
+// One function for testing all begin, last and end functions for
+// cells, faces, lines, quads and hexes, respectively.
 
 template <int dim>
 void test_cell(const Triangulation<dim>& tria, const DoFHandler<dim>& dof)
 {
   LogStream::Prefix lp("cell");
+  deallog.push("Regular");
   for (typename Triangulation<dim>::cell_iterator cell = tria.begin(); cell != tria.end();++cell)
     {
-      deallog << '\t';
-      cell.print(deallog);
+      deallog << '\t'; cell.print(deallog);
     }
   deallog << std::endl;
   
   for (typename DoFHandler<dim>::cell_iterator cell = dof.begin(); cell != dof.end();++cell)
     {
-      deallog << '\t';
-      cell.print(deallog);
+      deallog << '\t'; cell.print(deallog);
     }
   deallog << std::endl;
-
-  deallog.push("Regular");
 
   deallog << "begin\t\t"; dof.begin().print(deallog); deallog << '\t'; tria.begin().print(deallog); deallog << std::endl;
   deallog << "last \t\t"; dof.last() .print(deallog); deallog << '\t'; tria.last() .print(deallog); deallog << std::endl;
@@ -60,6 +59,18 @@ void test_cell(const Triangulation<dim>& tria, const DoFHandler<dim>& dof)
   deallog.pop();
   deallog << std::endl;
   deallog.push("Active ");
+  for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(); cell != tria.end();++cell)
+    {
+      deallog << '\t'; cell.print(deallog);
+    }
+  deallog << std::endl;
+  
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(); cell != dof.end();++cell)
+    {
+      deallog << '\t'; cell.print(deallog);
+    }
+  deallog << std::endl;
+
   
   deallog << "begin\t\t"; dof.begin_active().print(deallog); deallog << '\t'; tria.begin_active().print(deallog); deallog << std::endl;
   deallog << "last \t\t"; dof.last_active() .print(deallog); deallog << '\t'; tria.last_active() .print(deallog); deallog << std::endl;
@@ -74,6 +85,18 @@ void test_cell(const Triangulation<dim>& tria, const DoFHandler<dim>& dof)
   deallog.pop();
   deallog << std::endl;
   deallog.push("Raw ");
+  for (typename Triangulation<dim>::raw_cell_iterator cell = tria.begin_raw(); cell != tria.end();++cell)
+    {
+      deallog << '\t'; cell.print(deallog);
+    }
+  deallog << std::endl;
+  
+  for (typename DoFHandler<dim>::raw_cell_iterator cell = dof.begin_raw(); cell != dof.end();++cell)
+    {
+      deallog << '\t'; cell.print(deallog);
+    }
+  deallog << std::endl;
+
   
   deallog << "begin\t\t"; dof.begin_raw().print(deallog); deallog << '\t'; tria.begin_raw().print(deallog); deallog << std::endl;
   deallog << "last \t\t"; dof.last_raw() .print(deallog); deallog << '\t'; tria.last_raw() .print(deallog); deallog << std::endl;
@@ -88,21 +111,84 @@ void test_cell(const Triangulation<dim>& tria, const DoFHandler<dim>& dof)
   deallog.pop();
 }
 
+
+template <int dim>
+void test_face(const Triangulation<dim>& tria, const DoFHandler<dim>& dof)
+{
+  LogStream::Prefix lp("face");
+  deallog.push("Regular");
+  for (typename Triangulation<dim>::face_iterator face = tria.begin_face(); face != tria.end_face();++face)
+    {
+      deallog << '\t'; face.print(deallog);
+    }
+  deallog << std::endl;
+  
+  for (typename DoFHandler<dim>::face_iterator face = dof.begin_face(); face != dof.end_face();++face)
+    {
+      deallog << '\t'; face.print(deallog);
+    }
+  deallog << std::endl;
+
+  deallog << "begin\t\t"; dof.begin_face().print(deallog); deallog << '\t'; tria.begin_face().print(deallog); deallog << std::endl;
+  deallog << "last \t\t"; dof.last_face() .print(deallog); deallog << '\t'; tria.last_face() .print(deallog); deallog << std::endl;
+  deallog << "end  \t\t"; dof.end_face()  .print(deallog); deallog << '\t'; tria.end_face()  .print(deallog); deallog << std::endl;
+
+  deallog.pop();
+  deallog << std::endl;
+  deallog.push("Active ");
+    for (typename Triangulation<dim>::active_face_iterator face = tria.begin_active_face(); face != tria.end_face();++face)
+    {
+      deallog << '\t'; face.print(deallog);
+    }
+  deallog << std::endl;
+  
+  for (typename DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(); face != dof.end_face();++face)
+    {
+      deallog << '\t'; face.print(deallog);
+    }
+  deallog << std::endl;
+
+  deallog << "begin\t\t"; dof.begin_active_face().print(deallog); deallog << '\t'; tria.begin_active_face().print(deallog); deallog << std::endl;
+  deallog << "last \t\t"; dof.last_active_face() .print(deallog); deallog << '\t'; tria.last_active_face() .print(deallog); deallog << std::endl;
+  deallog << "end  \t\t"; deallog << std::endl;
+
+  deallog.pop();
+  deallog << std::endl;
+  deallog.push("Raw ");
+  for (typename Triangulation<dim>::raw_face_iterator face = tria.begin_raw_face(); face != tria.end_face();++face)
+    {
+      deallog << '\t'; face.print(deallog);
+    }
+  deallog << std::endl;
+  
+  for (typename DoFHandler<dim>::raw_face_iterator face = dof.begin_raw_face(); face != dof.end_face();++face)
+    {
+      deallog << '\t'; face.print(deallog);
+    }
+  deallog << std::endl;
+
+
+  deallog << "begin\t\t"; dof.begin_raw_face().print(deallog); deallog << '\t'; tria.begin_raw_face().print(deallog); deallog << std::endl;
+  deallog << "last \t\t"; dof.last_raw_face() .print(deallog); deallog << '\t'; tria.last_raw_face() .print(deallog); deallog << std::endl;
+  deallog << "end  \t\t"; deallog << std::endl;
+  
+  deallog.pop();
+}
+
+
 template <int dim>
 void test_line(const Triangulation<dim>& tria, const DoFHandler<dim>& dof)
 {
   LogStream::Prefix lp("line");
   for (typename Triangulation<dim>::line_iterator line = tria.begin_line(); line != tria.end_line();++line)
     {
-      deallog << '\t';
-      line.print(deallog);
+      deallog << '\t'; line.print(deallog);
     }
   deallog << std::endl;
   
   for (typename DoFHandler<dim>::line_iterator line = dof.begin_line(); line != dof.end_line();++line)
     {
-      deallog << '\t';
-      line.print(deallog);
+      deallog << '\t'; line.print(deallog);
     }
   deallog << std::endl;
 
@@ -152,6 +238,7 @@ void test_line(const Triangulation<dim>& tria, const DoFHandler<dim>& dof)
       }
   deallog.pop();
 }
+
 
 template <int dim>
 void test_quad(const Triangulation<dim>& tria, const DoFHandler<dim>& dof)
@@ -286,8 +373,6 @@ void test_hex(const Triangulation<dim>& tria, const DoFHandler<dim>& dof)
 template <int dim>
 void test ()
 {
-  deallog << dim << std::endl;
-  
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
   tria.refine_global (2);
@@ -299,6 +384,7 @@ void test ()
   dof.distribute_dofs (fe);
   
   test_cell(tria, dof);
+  if (dim>1) test_face(tria, dof);
   if (dim >= 1) test_line(tria, dof);
   if (dim >= 2) test_quad(tria, dof);
   if (dim >= 3) test_hex(tria, dof);
@@ -313,9 +399,15 @@ int main ()
   deallog.attach(logfile);
 //deallog.depth_console(0);
 
+  deallog.push("1D");
   test<1> ();
+  deallog.pop();
+  deallog.push("2D");
   test<2> ();
+  deallog.pop();
+  deallog.push("3D");
   test<3> ();
+  deallog.pop();
 
   return 0;
 }
