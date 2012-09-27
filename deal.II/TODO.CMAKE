@@ -1,14 +1,24 @@
 Major:
 
+* Reorganize the configuration:
+
+    -> Complete the FindModule logic for ARPACK and UMFPACK, i.e.
+
+       -> check for arpack dependency blas in FindARPACK.cmake
+       -> check for UMFPACK dependencies blas and amd in FindUMFPACK.cmake
+
+    -> Remove DEAL_II_WITH_BLAS.
+
+
 * Implement the documentation component. (I don't grok what's going on in
   this makefiles. There is a rudimentary doxygen call, though.)
 
 * Add the rest of the Bug tests
 
 * The following features have to be written:
-    * HDF5
     * MUMPS
     * SLEPC
+    * HDF5
     * HSL
     * TECPLOT
 
