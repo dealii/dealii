@@ -3392,6 +3392,12 @@ namespace DoFTools
     static const int space_dim = DH::space_dimension;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
+             (&dof_handler.get_tria())
+             ==
+             0),
+            ExcMessage ("This function can not be used with distributed triangulations."
+                        "See the documentation for more information."));
 
     typedef typename DH::cell_iterator CellIterator;
 
