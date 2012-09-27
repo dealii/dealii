@@ -821,12 +821,11 @@ namespace Step43
     {
       darcy_preconditioner_constraints.clear ();
 
-      std::vector<bool> component_mask (dim+1, false);
-      component_mask[dim] = true;
-
+      FEValuesExtractors::Scalar pressure(dim);
 
       DoFTools::make_hanging_node_constraints (darcy_dof_handler, darcy_preconditioner_constraints);
-      DoFTools::make_zero_boundary_constraints (darcy_dof_handler, darcy_preconditioner_constraints, component_mask);
+      DoFTools::make_zero_boundary_constraints (darcy_dof_handler, darcy_preconditioner_constraints,
+						darcy_fe.component_mask(pressure));
 
       darcy_preconditioner_constraints.close ();
     }

@@ -1062,7 +1062,7 @@ namespace Step17
                                         typename FunctionMap<dim>::type(),
                                         localized_solution,
                                         local_error_per_cell,
-                                        std::vector<bool>(),
+                                        ComponentMask(),
                                         0,
                                         multithread_info.n_default_threads,
                                         this_mpi_process);

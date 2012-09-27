@@ -1469,9 +1469,9 @@ namespace Step31
                          (new TrilinosWrappers::PreconditionAMG());
 
     std::vector<std::vector<bool> > constant_modes;
-    std::vector<bool>  velocity_components (dim+1,true);
-    velocity_components[dim] = false;
-    DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components,
+    FEValuesExtractors::Vector velocity_components(0);
+    DoFTools::extract_constant_modes (stokes_dof_handler,
+				      stokes_fe.component_mask(velocity_components),
                                       constant_modes);
     TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
     amg_data.constant_modes = constant_modes;

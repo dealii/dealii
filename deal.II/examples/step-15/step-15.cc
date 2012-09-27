@@ -702,12 +702,13 @@ namespace Step15
 				     // belong to the boundary and then loop
 				     // over all of those and set the residual
 				     // entry to zero. This happens in the
-				     // following lines:
+				     // following lines which we have already
+				     // seen used in step-11:
     hanging_node_constraints.condense (residual);
 
     std::vector<bool> boundary_dofs (dof_handler.n_dofs());
     DoFTools::extract_boundary_dofs (dof_handler,
-				     std::vector<bool>(1,true),
+				     ComponentMask(),
 				     boundary_dofs);
     for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
       if (boundary_dofs[i] == true)

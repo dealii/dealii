@@ -173,13 +173,24 @@ namespace Step11
                                      // argument denotes a mask
                                      // selecting which components of
                                      // vector valued finite elements we
-                                     // want to be considered. Since we
+                                     // want to be considered. This sort
+				     // of information is encoded using
+				     // the ComponentMask class (see also
+				     // @ref GlossComponentMask). Since we
                                      // have a scalar finite element
-                                     // anyway, this mask consists of
-                                     // only one entry, and its value
-                                     // must be <code>true</code>.
+                                     // anyway, this mask in reality should
+                                     // have only one entry with a
+                                     // <code>true</code> value. However,
+				     // the ComponentMask class has
+				     // semantics that allow it to
+				     // represents a mask of indefinite
+				     // size whose every element equals
+                                     // <code>true</code> when one just
+				     // default constructs such an object,
+				     // so this is what we'll do here.
     std::vector<bool> boundary_dofs (dof_handler.n_dofs(), false);
-    DoFTools::extract_boundary_dofs (dof_handler, std::vector<bool>(1,true),
+    DoFTools::extract_boundary_dofs (dof_handler,
+				     ComponentMask(),
                                      boundary_dofs);
 
                                      // Now first for the generation of
