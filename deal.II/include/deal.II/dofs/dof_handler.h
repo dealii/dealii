@@ -478,11 +478,8 @@ class DoFHandler  :  public Subscriptor
                                       *  or not, on level @p level. If a level
                                       *  has no cells, a past-the-end iterator
                                       *  is returned.
-                                      *
-                                      *  This function calls @p begin_raw_line
-                                      *  in 1D and @p begin_raw_quad in 2D.
                                       */
-    raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
+    raw_cell_iterator    begin_raw   (const unsigned int level = 0) const DEAL_II_DEPRECATED;
 
                                      /**
                                       *  Iterator to the first used cell
@@ -540,20 +537,14 @@ class DoFHandler  :  public Subscriptor
                                      /**
                                       *  Return an iterator pointing to the
                                       *  last cell, used or not.
-                                      *
-                                      *  This function calls @p last_raw_line
-                                      *  in 1D and @p last_raw_quad in 2D.
                                       */
-    raw_cell_iterator    last_raw () const;
+    raw_cell_iterator    last_raw () const DEAL_II_DEPRECATED;
 
                                      /**
                                       *  Return an iterator pointing to the last
                                       *  cell of the level @p level, used or not.
-                                      *
-                                      *  This function calls @p last_raw_line
-                                      *  in 1D and @p last_raw_quad in 2D.
                                       */
-    raw_cell_iterator    last_raw (const unsigned int level) const;
+    raw_cell_iterator    last_raw (const unsigned int level) const DEAL_II_DEPRECATED;
 
                                      /**
                                       *  Return an iterator pointing to the last
@@ -603,11 +594,8 @@ class DoFHandler  :  public Subscriptor
                                       *  or not, on level @p level. If a level
                                       *  has no faces, a past-the-end iterator
                                       *  is returned.
-                                      *
-                                      *  This function calls @p begin_raw_line
-                                      *  in 2D and @p begin_raw_quad in 3D.
                                       */
-    raw_face_iterator    begin_raw_face   () const;
+    raw_face_iterator    begin_raw_face   () const DEAL_II_DEPRECATED;
 
                                      /**
                                       *  Iterator to the first used face
@@ -644,7 +632,7 @@ class DoFHandler  :  public Subscriptor
                                       * the last level, then this returns
                                       * <tt>end()</tt>.
                                       */
-    raw_face_iterator    end_raw_face () const;
+    raw_face_iterator    end_raw_face () const DEAL_II_DEPRECATED;
 
                                      /**
                                       * Return an active iterator which is the
@@ -657,11 +645,8 @@ class DoFHandler  :  public Subscriptor
                                      /**
                                       *  Return an iterator pointing to the
                                       *  last face, used or not.
-                                      *
-                                      *  This function calls @p last_raw_line
-                                      *  in 2D and @p last_raw_quad in 3D.
                                       */
-    raw_face_iterator    last_raw_face () const;
+    raw_face_iterator    last_raw_face () const DEAL_II_DEPRECATED;
 
                                      /**
                                       *  Return an iterator pointing to the last
@@ -700,6 +685,9 @@ class DoFHandler  :  public Subscriptor
                                       */
                                      /*@{*/
                                      /**
+				      * @deprecated Raw iterators
+                                      *  should not be used.
+				      *
                                       *  Iterator to the first line, used
                                       *  or not, on level @p level. If a level
                                       *  has no lines, a past-the-end iterator
@@ -736,12 +724,15 @@ class DoFHandler  :  public Subscriptor
     line_iterator        end_line (const unsigned int level) const;
 
                                      /**
+				      * @deprecated Raw iterators
+                                      *  should not be used.
+				      *
                                       * Return a raw iterator which is the first
                                       * iterator not on level. If @p level is
                                       * the last level, then this returns
                                       * <tt>end()</tt>.
                                       */
-    raw_line_iterator    end_raw_line (const unsigned int level) const;
+    raw_line_iterator    end_raw_line (const unsigned int level) const DEAL_II_DEPRECATED;
 
                                      /**
                                       * Return an active iterator which is the
@@ -759,9 +750,11 @@ class DoFHandler  :  public Subscriptor
     raw_line_iterator    last_raw_line () const;
 
                                      /**
+				      * @deprecated Raw iterators
+                                      *  should not be used.
+				      *
                                       *  Return an iterator pointing to the last
                                       *  line of the level @p level, used or not.
-
                                       */
     raw_line_iterator    last_raw_line (const unsigned int level) const;
 
@@ -797,6 +790,9 @@ class DoFHandler  :  public Subscriptor
                                      /*@{
                                       */
                                      /**
+				      * @deprecated Raw iterators
+                                      *  should not be used.
+				      *
                                       *  Iterator to the first quad, used
                                       *  or not, on level @p level. If a level
                                       *  has no quads, a past-the-end iterator
@@ -833,6 +829,9 @@ class DoFHandler  :  public Subscriptor
     quad_iterator        end_quad (const unsigned int level) const;
 
                                      /**
+				      * @deprecated Raw iterators
+                                      *  should not be used.
+				      *
                                       * Return a raw iterator which is the first
                                       * iterator not on level. If @p level is
                                       * the last level, then this returns
@@ -850,15 +849,20 @@ class DoFHandler  :  public Subscriptor
 
 
                                      /**
+				      * @deprecated Raw iterators
+                                      *  should not be used.
+				      *
                                       *  Return an iterator pointing to the
                                       *  last quad, used or not.
                                       */
     raw_quad_iterator    last_raw_quad () const;
 
                                      /**
+				      * @deprecated Raw iterators
+                                      *  should not be used.
+				      *
                                       *  Return an iterator pointing to the last
                                       *  quad of the level @p level, used or not.
-
                                       */
     raw_quad_iterator    last_raw_quad (const unsigned int level) const;
 
@@ -894,13 +898,16 @@ class DoFHandler  :  public Subscriptor
                                      /*@{
                                       */
                                      /**
+				      * @deprecated Raw iterators
+                                      *  should not be used.
+				      *
                                       *  Iterator to the first hex, used
                                       *  or not, on level @p level. If a level
                                       *  has no hexs, a past-the-end iterator
                                       *  is returned.
                                       */
     raw_hex_iterator
-    begin_raw_hex   (const unsigned int level = 0) const;
+    begin_raw_hex   (const unsigned int level = 0) const DEAL_II_DEPRECATED;
 
                                      /**
                                       *  Iterator to the first used hex
@@ -922,8 +929,7 @@ class DoFHandler  :  public Subscriptor
                                       *  iterators with past-the-end or
                                       *  before-the-beginning states.
                                       */
-    raw_hex_iterator
-    end_hex () const;
+    raw_hex_iterator end_hex () const;
 
                                      /**
                                       * Return an iterator which is the first
@@ -934,12 +940,15 @@ class DoFHandler  :  public Subscriptor
     hex_iterator        end_hex (const unsigned int level) const;
 
                                      /**
+				      * @deprecated Raw iterators
+                                      *  should not be used.
+				      *
                                       * Return a raw iterator which is the first
                                       * iterator not on level. If @p level is
                                       * the last level, then this returns
                                       * <tt>end()</tt>.
                                       */
-    raw_hex_iterator    end_raw_hex (const unsigned int level) const;
+    raw_hex_iterator    end_raw_hex (const unsigned int level) const DEAL_II_DEPRECATED;
 
                                      /**
                                       * Return an active iterator which is the
@@ -953,16 +962,16 @@ class DoFHandler  :  public Subscriptor
                                       *  Return an iterator pointing to the
                                       *  last hex, used or not.
                                       */
-    raw_hex_iterator
-    last_raw_hex () const;
+    raw_hex_iterator last_raw_hex () const DEAL_II_DEPRECATED;
 
                                      /**
+				      * @deprecated Raw iterators
+                                      *  should not be used.
+				      *
                                       *  Return an iterator pointing to the last
                                       *  hex of the level @p level, used or not.
-
                                       */
-    raw_hex_iterator
-    last_raw_hex (const unsigned int level) const;
+    raw_hex_iterator last_raw_hex (const unsigned int level) const DEAL_II_DEPRECATED;
 
                                      /**
                                       *  Return an iterator pointing to the last
