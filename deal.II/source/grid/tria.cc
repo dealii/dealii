@@ -9845,6 +9845,7 @@ void Triangulation<dim, spacedim>::distort_random (const double factor,
 template <int dim, int spacedim>
 void Triangulation<dim, spacedim>::set_all_refine_flags ()
 {
+  Assert(n_cells()>0, ExcMessage("Error: An empty Triangulation can not be refined."));
   active_cell_iterator cell = begin_active(),
                        endc = end();
 
