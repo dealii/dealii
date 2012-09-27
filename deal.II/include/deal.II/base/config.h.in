@@ -435,7 +435,7 @@
 /* If the compiler supports it, then this variable is defined to a string
    that when written after a function name makes the compiler emit a warning
    whenever this function is used somewhere that its use is deprecated. */
-#define DEAL_II_DEPRECATED
+#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
 
 
 

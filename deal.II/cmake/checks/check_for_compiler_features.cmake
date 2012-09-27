@@ -399,3 +399,32 @@ IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
   ENABLE_IF_SUPPORTED(DEAL_II_C_FLAGS_DEBUG "-Wa,--compress-debug-sections")
 ENDIF()
 
+
+
+#
+# Gcc and some other compilers have an attribute of the form
+# __attribute__((deprecated)) that can be used to make the
+# compiler warn whenever a deprecated function is used. See
+# if this attribute is available.
+#
+# If it is, set the variable DEAL_II_DEPRECATED to its value. If
+# it isn't, set it to an empty string (actually, to a single
+# space, since the empty string causes CMAKE to #undef the
+# variable in config.h), i.e., to something the compiler will
+# ignore
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+          int old_fn () __attribute__((deprecated));
+          int old_fn () { return 0; }
+          int (*fn_ptr)() = old_fn;
+
+	  int main () {}
+  "
+  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
+
+IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
+  SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
+ELSE()
+  SET(DEAL_II_DEPRECATED " ")
+ENDIF()
