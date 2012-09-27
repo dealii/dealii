@@ -26,9 +26,6 @@ MACRO(FEATURE_DOXYGEN_CONFIGURE_EXTERNAL var)
   #   DOXYGEN_DOT_FOUND      = Was Dot found or not?
   #   DOXYGEN_DOT_PATH       = The path to dot not including the executable
   #
-  # Use these variables to set up a custom target:
-  #
-
   SET(${var} TRUE)
 ENDMACRO()
 

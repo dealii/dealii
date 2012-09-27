@@ -225,27 +225,17 @@
 /* Defined if a PETSc installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_PETSC
 
-/* Note: PETSCs version numbers will be directly included from
- * petscversion.h
- */
-
-/* Defined if a PETSc installation was found with complex scalar type and is
- * going to be used
- */
-#cmakedefine DEAL_II_USE_PETSC_COMPLEX
-
-/* Defined if a PETSc installation was found and is not a release */
-#cmakedefine DEAL_II_USE_PETSC_DEV
-
-/* Make sure PETSc doesn't re-define the underscore through the preprocessor,
- * since this interferes with boost. PETSc redefines the underscore to be
- * "__gterr =", but then forgets to undef this thing. Boost simply wants to
- * concatenate the underscore with another string to form a class name, which
- * then of course isn't valid any more. See mails in early Feb 2006.
+/*
+ * Note: The following definitions will be set in petscconf.h and
+ *       petscversion.h, so we don't repeat them here.
  *
- * TODO: Obsolete?
+ *  PETSC_VERSION_MAJOR
+ *  PETSC_VERSION_MINOR
+ *  PETSC_VERSION_SUBMINOR
+ *  PETSC_VERSION_PATCH
+ *  PETSC_VERSION_RELEASE
+ *  PETSC_USE_COMPLEX
  */
-#cmakedefine PETSC_SKIP_UNDERSCORE_CHKERR
 
 /**
  * These macros are defined to make testing for PETSc versions within

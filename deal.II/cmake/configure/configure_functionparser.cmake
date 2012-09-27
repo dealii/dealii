@@ -1,3 +1,7 @@
+#
+# Configuration for functionparser
+#
+
 MACRO(FEATURE_FUNCTIONPARSER_FIND_EXTERNAL var)
   MESSAGE(STATUS
     "No module available for finding functionparser externally."

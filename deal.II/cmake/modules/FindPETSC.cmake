@@ -11,8 +11,6 @@
 #     PETSC_VERSION_MINOR
 #     PETSC_VERSION_SUBMINOR
 #     PETSC_VERSION_PATCH
-#     PETSC_RELEASE
-#     PETSC_COMPLEX
 #
 
 INCLUDE(FindPackageHandleStandardArgs)
@@ -146,6 +144,8 @@ IF(PETSC_FOUND)
 
   IF(PETSC_WITH_MPIUNI)
     #
+    # TODO: Still needed?
+    #
     # If yes, add libmpiuni.so/a (if available)
     # We need to link with it on some systems where PETSc is built without
     # a real MPI and we need to handle trivial (one process) MPI
@@ -191,22 +191,6 @@ IF(PETSC_FOUND)
     )
 
   SET(PETSC_VERSION "${PETSC_VERSION_MAJOR}.${PETSC_VERSION_MINOR}.${PETSC_VERSION_SUBMINOR}")
-
-  FILE(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_RELEASE_STRING
-    REGEX "#define.*PETSC_VERSION_RELEASE.*1")
-  IF("${PETSC_RELEASE_STRING}" STREQUAL "")
-    SET(PETSC_RELEASE FALSE)
-  ELSE()
-    SET(PETSC_RELEASE TRUE)
-  ENDIF()
-
-  FILE(STRINGS "${PETSC_PETSCCONF_H}" PETSC_COMPLEX_STRING
-    REGEX "#define.*PETSC_USE_COMPLEX.*1")
-  IF("${PETSC_COMPLEX_STRING}" STREQUAL "")
-    SET(PETSC_COMPLEX FALSE)
-  ELSE()
-    SET(PETSC_COMPLEX TRUE)
-  ENDIF()
 
   MARK_AS_ADVANCED(
     PETSC_LIBRARIES

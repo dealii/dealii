@@ -68,12 +68,11 @@ MACRO(SETUP_THREADING var)
       #endif
       int main(){ return 0; }
       "
-      DEAL_II_HAVE_SANE_MT_DEFINITIONS)
+      DEAL_II_HAVE_MT_DEFINITIONS)
     STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
 
-    IF(NOT DEAL_II_HAVE_SANE_MT_DEFINITIONS)
+    IF(NOT DEAL_II_HAVE_MT_DEFINITIONS)
       LIST(APPEND DEAL_II_DEFINITIONS "_REENTRANT" "_THREAD_SAFE")
-      LIST(APPEND DEAL_II_USER_DEFINITIONS "_REENTRANT" "_THREAD_SAFE") # TODO: Necessary?
     ENDIF()
 
   ENDIF(Threads_FOUND)
@@ -126,6 +125,7 @@ SET(FEATURE_TBB_HAVE_CONTRIB TRUE)
 
 
 MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
+  SET(tbb_folder "${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss")
 
   #
   # Setup threading (before configuring our build...)
@@ -147,8 +147,6 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
       "TBB_DO_DEBUG=1" "TBB_DO_ASSERT=1"
       )
   ENDIF()
-
-  SET(tbb_folder "${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss")
 
   INCLUDE_DIRECTORIES(${tbb_folder}/include)
 

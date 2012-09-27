@@ -1,3 +1,4 @@
+
 #
 # Configuration for the lapack library:
 #
@@ -19,8 +20,8 @@ ENDMACRO()
 # function we use. We have to ensure that this check is repeated every time
 # the lapack library or DEAL_II_WITH_LAPACK changes.
 #
-# TODO: Known bug: At the moment we don't cover the case if the lapack
-#                  library changes.
+# TODO: Known bug: At the moment we don't cover the case when the lapack
+#                  library changes..
 #
 
 SET(DEAL_II_LAPACK_FUNCTIONS
@@ -51,6 +52,7 @@ MACRO(RESET_LAPACK_FUNCTIONS_CACHE)
   ENDFOREACH()
 ENDMACRO()
 
+
 MACRO(FEATURE_LAPACK_CONFIGURE_EXTERNAL var)
 
   ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${LAPACK_LINKER_FLAGS}")
@@ -69,6 +71,7 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(LAPACK)
+
 
 #
 # Call RESET_LAPACK_FUNCTIONS_CHECK if DEAL_II_WITH_LAPACK is unset to

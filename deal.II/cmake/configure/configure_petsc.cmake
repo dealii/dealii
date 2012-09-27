@@ -65,25 +65,6 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL var)
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
 
 
-  #
-  # Work around a stupidity in PETSc that makes sure it interferes in
-  # a completely obnoxious way with boost.
-  # TODO: Obsolete?
-  #
-  #SET(PETSC_SKIP_UNDERSCORE_CHKERR TRUE)
-
-  #
-  # Set some definitions for config.h:
-  #
-
-  IF(NOT PETSC_RELEASE)
-    SET(DEAL_II_USE_PETSC_DEV TRUE)
-  ENDIF()
-
-  IF(PETSC_COMPLEX)
-    SET(DEAL_II_USE_PETSC_COMPLEX TRUE)
-  ENDIF()
-
   SET(DEAL_II_EXPAND_PETSC_VECTOR "PETScWrappers::Vector")
   SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR "PETScWrappers::BlockVector")
 

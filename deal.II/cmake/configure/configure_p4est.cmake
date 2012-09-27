@@ -1,5 +1,5 @@
 #
-# Configuration for the umfpack and amd libraries:
+# Configuration for the p4est and sc libraries:
 #
 
 
@@ -9,27 +9,14 @@ SET(FEATURE_P4EST_DEPENDS
 
 
 MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
+
   FIND_PACKAGE(P4EST)
   FIND_PACKAGE(SC)
 
   IF(P4EST_FOUND AND SC_FOUND)
-
     #
     # Check whether p4est supports mpi:
     #
-    LIST(APPEND CMAKE_REQUIRED_INCLUDES ${P4EST_INCLUDE_DIR})
-    CHECK_CXX_SOURCE_COMPILES(
-      "
-      #include <p4est_config.h>
-      #ifndef P4EST_MPI
-      #  error p4est compiled without mpi support
-      invalid
-      #endif
-      int main() { return 0; }
-      "
-      P4EST_WITH_MPI)
-    LIST(REMOVE_ITEM CMAKE_REQUIRED_INCLUDES ${P4EST_INCLUDE_DIR}/p4est_config.h)
-
     IF(NOT P4EST_WITH_MPI)
       MESSAGE(WARNING "\n"
         "Could not find a sufficient p4est installation: "
@@ -38,13 +25,8 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
     ELSE()
       SET(${var} TRUE)
     ENDIF()
-
-    #
-    # Remove the variable from the cache to force a recheck:
-    #
-    UNSET(P4EST_WITH_MPI CACHE)
-
   ENDIF()
+
 ENDMACRO()
 
 
