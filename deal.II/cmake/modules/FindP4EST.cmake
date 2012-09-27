@@ -10,7 +10,7 @@ FIND_PATH(P4EST_INCLUDE_DIR p4est.h
   HINTS
     ${P4EST_DIR}
   PATH_SUFFIXES
-    p4est include/p4est include src p4est/src
+    p4est include/p4est include src
   )
 
 FIND_LIBRARY(P4EST_LIBRARY

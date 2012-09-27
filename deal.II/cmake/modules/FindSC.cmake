@@ -10,7 +10,7 @@ FIND_PATH(SC_INCLUDE_DIR sc.h
     ${SC_DIR}
     ${P4EST_DIR}
   PATH_SUFFIXES
-    sc include/p4est include src sc/src p4est/sc/src
+    sc include/p4est include src sc/src
   )
 
 
@@ -20,7 +20,7 @@ FIND_LIBRARY(SC_LIBRARY
     ${SC_DIR}
     ${P4EST_DIR}
   PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib src
+    lib${LIB_SUFFIX} lib64 lib src sc/src
   )
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(SC DEFAULT_MSG SC_LIBRARY SC_INCLUDE_DIR)
