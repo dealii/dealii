@@ -18,6 +18,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/dofs/function_map.h>
+#include <deal.II/fe/component_mask.h>
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN

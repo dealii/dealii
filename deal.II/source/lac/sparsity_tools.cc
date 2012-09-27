@@ -23,6 +23,7 @@
 #include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/lac/compressed_set_sparsity_pattern.h>
 #include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 #endif
 
 #ifdef DEAL_II_USE_METIS
@@ -532,6 +533,7 @@ const IndexSet & myrange)
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 SPARSITY_FUNCTIONS(CompressedSparsityPattern);
 SPARSITY_FUNCTIONS(CompressedSimpleSparsityPattern);
+SPARSITY_FUNCTIONS(BlockCompressedSimpleSparsityPattern);
 #endif
 
 #undef SPARSITY_FUNCTIONS

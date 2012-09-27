@@ -957,6 +957,14 @@ class BlockCompressedSimpleSparsityPattern : public BlockSparsityPatternBase<Com
                                       */
     void reinit(const std::vector<IndexSet> & partitioning);
 
+    /**
+     * Access to column number field.
+     * Return the column number of
+     * the @p index th entry in row @p row.
+     */
+    unsigned int column_number (const unsigned int row,
+                                  const unsigned int index) const;
+
                                      /**
                                       * Allow the use of the reinit
                                       * functions of the base class as
@@ -1322,6 +1330,31 @@ unsigned int
 BlockSparsityPatternBase<SparsityPatternBase>::n_block_rows () const
 {
   return rows;
+}
+
+
+inline
+unsigned int
+BlockCompressedSimpleSparsityPattern::column_number (const unsigned int row,
+                              const unsigned int index) const
+{
+  // .first= ith block, .second = jth row in that block
+  const std::pair<unsigned int,unsigned int>
+    row_index = row_indices.global_to_local (row);
+
+  Assert(index<row_length(row), ExcIndexRange(index, 0, row_length(row)));
+
+  unsigned int c = 0;
+  for (unsigned int b=0; b<columns; ++b)
+    {
+      unsigned int rowlen = sub_objects[row_index.first][b]->row_length (row_index.second);
+      if (index<c+rowlen)
+          return c+sub_objects[row_index.first][b]->column_number(row_index.second, index-c);
+      c += rowlen;
+    }
+
+  Assert(false, ExcInternalError());
+  return 0;
 }
 
 

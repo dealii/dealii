@@ -1884,54 +1884,70 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 
       case LaTeX:
       {
-        out << "\\begin{itemize}"
-            << std::endl;
+					 // if there are any parameters in
+					 // this section then print them as an
+					 // itemized list
+	bool parameters_exist_here = false;
+	for (boost::property_tree::ptree::const_assoc_iterator
+	       p = current_section.ordered_begin();
+	     p != current_section.not_found(); ++p)
+	  if (is_parameter_node (p->second) == true)
+	    {
+	      parameters_exist_here = true;
+	      break;
+	    }
 
-                                         // print entries one by
-                                         // one. make sure they are
-                                         // sorted by using the
-                                         // appropriate iterators
-        for (boost::property_tree::ptree::const_assoc_iterator
-               p = current_section.ordered_begin();
-             p != current_section.not_found(); ++p)
-          if (is_parameter_node (p->second) == true)
-            {
-              const std::string value = p->second.get<std::string>("value");
+	if (parameters_exist_here)
+	  {
+	    out << "\\begin{itemize}"
+		<< std::endl;
 
-                                               // print name
-              out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n\n"
-                  << std::endl;
+					     // print entries one by
+					     // one. make sure they are
+					     // sorted by using the
+					     // appropriate iterators
+	    for (boost::property_tree::ptree::const_assoc_iterator
+		   p = current_section.ordered_begin();
+		 p != current_section.not_found(); ++p)
+	      if (is_parameter_node (p->second) == true)
+		{
+		  const std::string value = p->second.get<std::string>("value");
 
-              out << "\\index[prmindex]{"
-                  << demangle(p->first)
-                  << "}\n";
-              out << "\\index[prmindexfull]{";
-              for (unsigned int i=0; i<subsection_path.size(); ++i)
-                out << subsection_path[i] << "!";
-              out << demangle(p->first)
-                  << "}\n";
+						   // print name
+		  out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n\n"
+		      << std::endl;
 
-                                               // finally print value and default
-              out << "{\\it Value:} " << value << "\n\n"
-                  << std::endl
-                  << "{\\it Default:} "
-                  << p->second.get<std::string>("default_value") << "\n\n"
-                  << std::endl;
+		  out << "\\index[prmindex]{"
+		      << demangle(p->first)
+		      << "}\n";
+		  out << "\\index[prmindexfull]{";
+		  for (unsigned int i=0; i<subsection_path.size(); ++i)
+		    out << subsection_path[i] << "!";
+		  out << demangle(p->first)
+		      << "}\n";
 
-                                               // if there is a
-                                               // documenting string,
-                                               // print it as well
-              if (!p->second.get<std::string>("documentation").empty())
-                out << "{\\it Description:} "
-                    << p->second.get<std::string>("documentation") << "\n\n"
-                    << std::endl;
+						   // finally print value and default
+		  out << "{\\it Value:} " << value << "\n\n"
+		      << std::endl
+		      << "{\\it Default:} "
+		      << p->second.get<std::string>("default_value") << "\n\n"
+		      << std::endl;
 
-                                               // also output possible values
-              out << "{\\it Possible values:} "
-                  << p->second.get<std::string> ("pattern_description")
-                  << std::endl;
-            }
-        out << "\\end{itemize}" << std::endl;
+						   // if there is a
+						   // documenting string,
+						   // print it as well
+		  if (!p->second.get<std::string>("documentation").empty())
+		    out << "{\\it Description:} "
+			<< p->second.get<std::string>("documentation") << "\n\n"
+			<< std::endl;
+
+						   // also output possible values
+		  out << "{\\it Possible values:} "
+		      << p->second.get<std::string> ("pattern_description")
+		      << std::endl;
+		}
+	    out << "\\end{itemize}" << std::endl;
+	  }
 
         break;
       }

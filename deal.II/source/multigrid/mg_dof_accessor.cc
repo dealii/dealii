@@ -202,6 +202,15 @@ MGDoFAccessor<structdim, dim, spacedim>::copy_from (const MGDoFAccessor &a)
 
 
 template <int structdim, int dim, int spacedim>
+void
+MGDoFAccessor<structdim, dim, spacedim>::copy_from (const TriaAccessorBase<structdim,dim,spacedim> &a)
+{
+  DoFAccessor<structdim, DoFHandler<dim, spacedim> >::copy_from (a);
+}
+
+
+
+template <int structdim, int dim, int spacedim>
 typename internal::MGDoFHandler::Iterators<dim,spacedim>::line_iterator
 MGDoFAccessor<structdim,dim,spacedim>::line (const unsigned int i) const
 {

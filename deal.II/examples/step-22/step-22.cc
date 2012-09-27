@@ -573,52 +573,55 @@ namespace Step22
                                      // Now comes the implementation of
                                      // Dirichlet boundary conditions, which
                                      // should be evident after the discussion
-                                     // in the introduction. All that changed is
-                                     // that the function already appears in the
-                                     // setup functions, whereas we were used to
-                                     // see it in some assembly routine. Further
-                                     // down below where we set up the mesh, we
-                                     // will associate the top boundary where we
-                                     // impose Dirichlet boundary conditions
-                                     // with boundary indicator 1.  We will have
-                                     // to pass this boundary indicator as
-                                     // second argument to the function below
-                                     // interpolating boundary values.  There is
-                                     // one more thing, though.  The function
-                                     // describing the Dirichlet conditions was
-                                     // defined for all components, both
-                                     // velocity and pressure. However, the
-                                     // Dirichlet conditions are to be set for
-                                     // the velocity only.  To this end, we use
-                                     // a <code>component_mask</code> that
-                                     // filters out the pressure component, so
-                                     // that the condensation is performed on
-                                     // velocity degrees of freedom only. Since
-                                     // we use adaptively refined grids the
+                                     // in the introduction. All that changed
+                                     // is that the function already appears
+                                     // in the setup functions, whereas we
+                                     // were used to see it in some assembly
+                                     // routine. Further down below where we
+                                     // set up the mesh, we will associate the
+                                     // top boundary where we impose Dirichlet
+                                     // boundary conditions with boundary
+                                     // indicator 1.  We will have to pass
+                                     // this boundary indicator as second
+                                     // argument to the function below
+                                     // interpolating boundary values.  There
+                                     // is one more thing, though.  The
+                                     // function describing the Dirichlet
+                                     // conditions was defined for all
+                                     // components, both velocity and
+                                     // pressure. However, the Dirichlet
+                                     // conditions are to be set for the
+                                     // velocity only.  To this end, we use a
+                                     // ComponentMask that only selects the
+                                     // velocity components. The component
+                                     // mask is obtained from the finite
+                                     // element by specifying the particular
+                                     // components we want. Since we use
+                                     // adaptively refined grids the
                                      // constraint matrix needs to be first
                                      // filled with hanging node constraints
-                                     // generated from the DoF handler. Note the
-                                     // order of the two functions &mdash; we
-                                     // first compute the hanging node
+                                     // generated from the DoF handler. Note
+                                     // the order of the two functions &mdash;
+                                     // we first compute the hanging node
                                      // constraints, and then insert the
                                      // boundary values into the constraint
-                                     // matrix. This makes sure that we respect
-                                     // H<sup>1</sup> conformity on boundaries
-                                     // with hanging nodes (in three space
-                                     // dimensions), where the hanging node
-                                     // needs to dominate the Dirichlet boundary
-                                     // values.
+                                     // matrix. This makes sure that we
+                                     // respect H<sup>1</sup> conformity on
+                                     // boundaries with hanging nodes (in
+                                     // three space dimensions), where the
+                                     // hanging node needs to dominate the
+                                     // Dirichlet boundary values.
     {
       constraints.clear ();
-      std::vector<bool> component_mask (dim+1, true);
-      component_mask[dim] = false;
+
+      FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints (dof_handler,
                                                constraints);
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 1,
                                                 BoundaryValues<dim>(),
                                                 constraints,
-                                                component_mask);
+                                                fe.component_mask(velocities));
     }
 
     constraints.close ();
@@ -1198,8 +1201,13 @@ namespace Step22
                                    // step-6, with the exception that we base
                                    // the refinement only on the change in
                                    // pressure, i.e., we call the Kelly error
-                                   // estimator with a mask
-                                   // object. Additionally, we do not coarsen
+                                   // estimator with a mask object of type
+                                   // ComponentMask that selects the single
+                                   // scalar component for the pressure that
+                                   // we are interested in (we get such a mask
+                                   // from the finite element class by
+                                   // specifying the component we
+                                   // want). Additionally, we do not coarsen
                                    // the grid again:
   template <int dim>
   void
@@ -1207,14 +1215,13 @@ namespace Step22
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-    std::vector<bool> component_mask (dim+1, false);
-    component_mask[dim] = true;
+    FEValuesExtractors::Scalar pressure(dim);
     KellyErrorEstimator<dim>::estimate (dof_handler,
                                         QGauss<dim-1>(degree+1),
                                         typename FunctionMap<dim>::type(),
                                         solution,
                                         estimated_error_per_cell,
-                                        component_mask);
+                                        fe.component_mask(pressure));
 
     GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                      estimated_error_per_cell,

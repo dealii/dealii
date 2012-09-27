@@ -68,6 +68,12 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> New: Added SparsityTools::distribute_sparsity_pattern() for
+BlockCompressedSimpleSparsityPattern. This allows parallel computations
+with distributed::Triangulation and PETScWrappers::MPI::BlockSparseMatrix.
+<br>
+(Timo Heister, 2012/09/25)
+
 <li> Simplifications of the internal structures of Triangulation and
 DoFHandler, in particular removal of specializations.
 <br>
@@ -81,6 +87,18 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: ParameterHandler::print_parameters, when using
+ParameterHandler::OutputStyle::LaTeX would always print a list
+of parameters in each section as a latex itemized environment.
+However, if there are none, we end up with an empty list which
+latex does not like. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2012/09/27)
+
+<li> New: Added BlockCompressedSimpleSparsityPattern::column_number().
+<br>
+(Timo Heister, 2012/09/25)
+
 <li> New: There is now a function hp::FECollection::n_blocks() in analogy to
 the existing function hp::FECollection::n_components().
 <br>

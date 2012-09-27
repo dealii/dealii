@@ -1681,8 +1681,7 @@ namespace Step18
 				     // restrict vertical motion, it
 				     // has only its last component
 				     // set:
-    std::vector<bool> z_component (dim, false);
-    z_component[dim-1] = true;
+    FEValuesExtractors::Scalar z_component (dim-1);
     std::map<unsigned int,double> boundary_values;
     VectorTools::
       interpolate_boundary_values (dof_handler,
@@ -1695,7 +1694,7 @@ namespace Step18
 				   IncrementalBoundaryValues<dim>(present_time,
 								  present_timestep),
 				   boundary_values,
-				   z_component);
+				   fe.component_mask(z_component));
 
     PETScWrappers::MPI::Vector tmp (mpi_communicator, dof_handler.n_dofs(),
 				    n_local_dofs);
@@ -2250,7 +2249,7 @@ namespace Step18
 					typename FunctionMap<dim>::type(),
 					incremental_displacement,
 					error_per_cell,
-					std::vector<bool>(),
+					ComponentMask(),
 					0,
 					multithread_info.n_default_threads,
 					this_mpi_process);

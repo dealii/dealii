@@ -432,6 +432,10 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #cmakedefine HAVE_UNISTD_H
 
+/* If the compiler supports it, then this variable is defined to a string
+   that when written after a function name makes the compiler emit a warning
+   whenever this function is used somewhere that its use is deprecated. */
+#define DEAL_II_DEPRECATED
 
 
 

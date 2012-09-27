@@ -423,38 +423,19 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::raw_cell_iterator
 DoFHandler<dim,spacedim>::begin_raw (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-            return begin_raw_line (level);
-      case 2:
-            return begin_raw_quad (level);
-      case 3:
-            return begin_raw_hex (level);
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_cell_iterator();
-    }
+  typename Triangulation<dim,spacedim>::raw_cell_iterator ti = tria->begin_raw(level);
+  typename DoFHandler<dim, spacedim>::raw_cell_iterator ri(*ti, this);
+  return ri;
 }
-
 
 
 template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::cell_iterator
 DoFHandler<dim,spacedim>::begin (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-            return begin_line (level);
-      case 2:
-            return begin_quad (level);
-      case 3:
-            return begin_hex (level);
-      default:
-            Assert (false, ExcImpossibleInDim(dim));
-            return cell_iterator();
-    }
+  typename Triangulation<dim,spacedim>::cell_iterator ti = tria->begin(level);
+  typename DoFHandler<dim, spacedim>::cell_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -463,18 +444,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::active_cell_iterator
 DoFHandler<dim,spacedim>::begin_active (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-            return begin_active_line (level);
-      case 2:
-            return begin_active_quad (level);
-      case 3:
-            return begin_active_hex (level);
-      default:
-            Assert (false, ExcNotImplemented());
-            return active_cell_iterator();
-    }
+  typename Triangulation<dim,spacedim>::active_cell_iterator ti = tria->begin_active(level);
+  typename DoFHandler<dim, spacedim>::active_cell_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -483,18 +455,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::raw_cell_iterator
 DoFHandler<dim,spacedim>::last_raw () const
 {
-  switch (dim)
-    {
-      case 1:
-            return last_raw_line ();
-      case 2:
-            return last_raw_quad ();
-      case 3:
-            return last_raw_hex ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_cell_iterator();
-    }
+  typename Triangulation<dim,spacedim>::raw_cell_iterator ti = tria->last_raw();
+  typename DoFHandler<dim, spacedim>::raw_cell_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -503,18 +466,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::raw_cell_iterator
 DoFHandler<dim,spacedim>::last_raw (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-            return last_raw_line (level);
-      case 2:
-            return last_raw_quad (level);
-      case 3:
-            return last_raw_hex (level);
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_cell_iterator();
-    }
+  typename Triangulation<dim,spacedim>::raw_cell_iterator ti = tria->last_raw(level);
+  typename DoFHandler<dim, spacedim>::raw_cell_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -523,18 +477,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::cell_iterator
 DoFHandler<dim,spacedim>::last () const
 {
-  switch (dim)
-    {
-      case 1:
-            return last_line ();
-      case 2:
-            return last_quad ();
-      case 3:
-            return last_hex ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return cell_iterator();
-    }
+  typename Triangulation<dim,spacedim>::cell_iterator ti = tria->last();
+  typename DoFHandler<dim, spacedim>::cell_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -543,18 +488,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::cell_iterator
 DoFHandler<dim,spacedim>::last (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-            return last_line (level);
-      case 2:
-            return last_quad (level);
-      case 3:
-            return last_hex (level);
-      default:
-            Assert (false, ExcNotImplemented());
-            return cell_iterator();
-    }
+  typename Triangulation<dim,spacedim>::cell_iterator ti = tria->last(level);
+  typename DoFHandler<dim, spacedim>::cell_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -563,18 +499,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::active_cell_iterator
 DoFHandler<dim,spacedim>::last_active () const
 {
-  switch (dim)
-    {
-      case 1:
-            return last_active_line ();
-      case 2:
-            return last_active_quad ();
-      case 3:
-            return last_active_hex ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return active_cell_iterator();
-    }
+  typename Triangulation<dim,spacedim>::active_cell_iterator ti = tria->last_active();
+  typename DoFHandler<dim, spacedim>::active_cell_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -583,37 +510,20 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::active_cell_iterator
 DoFHandler<dim,spacedim>::last_active (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-            return last_active_line (level);
-      case 2:
-            return last_active_quad (level);
-      case 3:
-            return last_active_hex (level);
-      default:
-            Assert (false, ExcNotImplemented());
-            return active_cell_iterator();
-    }
+  typename Triangulation<dim,spacedim>::active_cell_iterator ti = tria->last_active(level);
+  typename DoFHandler<dim, spacedim>::active_cell_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
+//TODO: Check if return type should really be raw
 
 template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::raw_cell_iterator
 DoFHandler<dim,spacedim>::end () const
 {
-  switch (dim)
-    {
-      case 1:
-            return end_line();
-      case 2:
-            return end_quad();
-      case 3:
-            return end_hex();
-      default:
-            Assert (false, ExcImpossibleInDim(dim));
-            return raw_cell_iterator();
-    }
+  typename Triangulation<dim,spacedim>::raw_cell_iterator ti = tria->end();
+  typename DoFHandler<dim, spacedim>::raw_cell_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -622,10 +532,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_cell_iterator
 DoFHandler<dim, spacedim>::end_raw (const unsigned int level) const
 {
-  Assert(tria != 0, ExcNotInitialized());
-  return (level == tria->n_levels()-1 ?
-          end() :
-          begin_raw (level+1));
+  typename Triangulation<dim,spacedim>::raw_cell_iterator ti = tria->end_raw(level);
+  typename DoFHandler<dim, spacedim>::raw_cell_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -633,10 +542,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::cell_iterator
 DoFHandler<dim, spacedim>::end (const unsigned int level) const
 {
-  Assert(tria != 0, ExcNotInitialized());
-  return (level == tria->n_levels()-1 ?
-          cell_iterator(end()) :
-          begin (level+1));
+  typename Triangulation<dim,spacedim>::cell_iterator ti = tria->end(level);
+  typename DoFHandler<dim, spacedim>::cell_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -644,10 +552,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_cell_iterator
 DoFHandler<dim, spacedim>::end_active (const unsigned int level) const
 {
-  Assert(tria != 0, ExcNotInitialized());
-  return (level == tria->n_levels()-1 ?
-          active_cell_iterator(end()) :
-          begin_active (level+1));
+  typename Triangulation<dim,spacedim>::active_cell_iterator ti = tria->end_active(level);
+  typename DoFHandler<dim, spacedim>::active_cell_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -815,54 +722,30 @@ DoFHandler<dim,spacedim>::last_active_face () const
             return last_active_quad ();
       default:
             Assert (false, ExcNotImplemented());
-            return raw_face_iterator ();
+            return face_iterator ();
     }
 }
 
 
 /*------------------------ Line iterator functions ------------------------*/
 
-
-
 template <int dim, int spacedim>
-typename DoFHandler<dim, spacedim>::raw_line_iterator
-DoFHandler<dim, spacedim>::begin_raw_line (const unsigned int level) const
+typename DoFHandler<dim,spacedim>::raw_line_iterator
+DoFHandler<dim,spacedim>::begin_raw_line (const unsigned int level) const
 {
-  Assert(tria != 0, ExcNotInitialized());
-  switch (dim)
-    {
-      case 1:
-            Assert (level<tria->n_levels(), ExcInvalidLevel(level));
-
-            if (tria->n_raw_lines(level) == 0)
-              return end_line ();
-
-            return raw_line_iterator (tria,
-                                      level,
-                                      0,
-                                      this);
-
-      default:
-            Assert (level == 0, ExcFacesHaveNoLevel());
-            return raw_line_iterator (tria,
-                                      0,
-                                      0,
-                                      this);
-    }
+  typename Triangulation<dim,spacedim>::raw_line_iterator ti = tria->begin_raw_line(level);
+  typename DoFHandler<dim, spacedim>::raw_line_iterator ri(*ti, this);
+  return ri;
 }
 
 
+
 template <int dim, int spacedim>
-typename DoFHandler<dim, spacedim>::line_iterator
-DoFHandler<dim, spacedim>::begin_line (const unsigned int level) const
+typename DoFHandler<dim,spacedim>::line_iterator
+DoFHandler<dim,spacedim>::begin_line (const unsigned int level) const
 {
-                                   // level is checked in begin_raw
-  raw_line_iterator ri = begin_raw_line (level);
-  if (ri.state() != IteratorState::valid)
-    return ri;
-  while (ri->used() == false)
-    if ((++ri).state() != IteratorState::valid)
-      return ri;
+  typename Triangulation<dim,spacedim>::line_iterator ti = tria->begin_line(level);
+  typename DoFHandler<dim, spacedim>::line_iterator ri(*ti, this);
   return ri;
 }
 
@@ -872,14 +755,40 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_line_iterator
 DoFHandler<dim, spacedim>::begin_active_line (const unsigned int level) const
 {
-                                   // level is checked in begin_raw
-  line_iterator i = begin_line (level);
-  if (i.state() != IteratorState::valid)
-    return i;
-  while (i->has_children())
-    if ((++i).state() != IteratorState::valid)
-      return i;
-  return i;
+  typename Triangulation<dim,spacedim>::active_line_iterator ti = tria->begin_active_line(level);
+  typename DoFHandler<dim, spacedim>::active_line_iterator ri(*ti, this);
+  return ri;
+}
+
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::raw_line_iterator
+DoFHandler<dim, spacedim>::end_raw_line (const unsigned int level) const
+{
+  typename Triangulation<dim,spacedim>::raw_line_iterator ti = tria->end_raw_line(level);
+  typename DoFHandler<dim, spacedim>::raw_line_iterator ri(ti.access_any(), this);
+  return ri;
+}
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::line_iterator
+DoFHandler<dim, spacedim>::end_line (const unsigned int level) const
+{
+  typename Triangulation<dim,spacedim>::line_iterator ti = tria->end_line(level);
+  typename DoFHandler<dim, spacedim>::line_iterator ri(ti.access_any(), this);
+  return ri;
+}
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::active_line_iterator
+DoFHandler<dim, spacedim>::end_active_line (const unsigned int level) const
+{
+  typename Triangulation<dim,spacedim>::active_line_iterator ti = tria->end_active_line(level);
+  typename DoFHandler<dim, spacedim>::active_line_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -888,10 +797,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_line_iterator
 DoFHandler<dim, spacedim>::end_line () const
 {
-  return raw_line_iterator (tria,
-                            -1,
-                            -1,
-                            this);
+  typename Triangulation<dim,spacedim>::raw_line_iterator ti = tria->end_line();
+  typename DoFHandler<dim, spacedim>::raw_line_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -900,26 +808,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_line_iterator
 DoFHandler<dim, spacedim>::last_raw_line (const unsigned int level) const
 {
-  Assert(tria != 0, ExcNotInitialized());
-  switch (dim)
-    {
-      case 1:
-            Assert (level<tria->n_levels(), ExcInvalidLevel(level));
-            Assert (tria->n_raw_lines(level) != 0,
-                    ExcEmptyLevel (level));
-
-            return raw_line_iterator (tria,
-                                      level,
-                                      tria->n_raw_lines(level)-1,
-                                      this);
-
-      default:
-            Assert (level == 0, ExcFacesHaveNoLevel());
-            return raw_line_iterator (tria,
-                                      0,
-                                      tria->n_raw_lines()-1,
-                                      this);
-    }
+  typename Triangulation<dim,spacedim>::raw_line_iterator ti = tria->last_raw_line(level);
+  typename DoFHandler<dim, spacedim>::raw_line_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -928,148 +819,64 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_line_iterator
 DoFHandler<dim, spacedim>::last_raw_line () const
 {
-  if (dim == 1)
-    return last_raw_line (tria->n_levels()-1);
-  else
-    return last_raw_line (0);
+  typename Triangulation<dim,spacedim>::raw_line_iterator ti = tria->last_raw_line();
+  typename DoFHandler<dim, spacedim>::raw_line_iterator ri(*ti, this);
+  return ri;
 }
+
 
 
 template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::line_iterator
 DoFHandler<dim, spacedim>::last_line (const unsigned int level) const
 {
-                                   // level is checked in last_raw
-  raw_line_iterator ri = last_raw_line(level);
-  if (ri->used()==true)
-    return ri;
-  while ((--ri).state() == IteratorState::valid)
-    if (ri->used()==true)
-      return ri;
+  typename Triangulation<dim,spacedim>::line_iterator ti = tria->last_line(level);
+  typename DoFHandler<dim, spacedim>::line_iterator ri(*ti, this);
   return ri;
 }
+
 
 
 template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::line_iterator
 DoFHandler<dim, spacedim>::last_line () const
 {
-  if (dim == 1)
-    return last_line (tria->n_levels()-1);
-  else
-    return last_line (0);
+  typename Triangulation<dim,spacedim>::line_iterator ti = tria->last_line();
+  typename DoFHandler<dim, spacedim>::line_iterator ri(*ti, this);
+  return ri;
 }
+
 
 
 template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_line_iterator
 DoFHandler<dim, spacedim>::last_active_line (const unsigned int level) const
 {
-                                   // level is checked in last_raw
-  line_iterator i = last_line(level);
-  if (i->has_children()==false)
-    return i;
-  while ((--i).state() == IteratorState::valid)
-    if (i->has_children()==false)
-      return i;
-  return i;
+  typename Triangulation<dim,spacedim>::active_line_iterator ti = tria->last_active_line(level);
+  typename DoFHandler<dim, spacedim>::active_line_iterator ri(ti.access_any(), this);
+  return ri;
 }
+
 
 
 template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_line_iterator
 DoFHandler<dim, spacedim>::last_active_line () const
 {
-  if (dim == 1)
-    return last_active_line (tria->n_levels()-1);
-  else
-    return last_active_line (0);
+  typename Triangulation<dim,spacedim>::active_line_iterator ti = tria->last_active_line();
+  typename DoFHandler<dim, spacedim>::active_line_iterator ri(*ti, this);
+  return ri;
 }
-
-
-template <int dim, int spacedim>
-typename DoFHandler<dim, spacedim>::raw_line_iterator
-DoFHandler<dim, spacedim>::end_raw_line (const unsigned int level) const
-{
-  Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 1)
-    return (level == tria->n_levels()-1 ?
-            end_line() :
-            begin_raw_line (level+1));
-  else
-    return end_line();
-}
-
-
-template <int dim, int spacedim>
-typename DoFHandler<dim, spacedim>::line_iterator
-DoFHandler<dim, spacedim>::end_line (const unsigned int level) const
-{
-  Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 1)
-    return (level == tria->n_levels()-1 ?
-            line_iterator(end_line()) :
-            begin_line (level+1));
-  else
-    return line_iterator(end_line());
-}
-
-
-template <int dim, int spacedim>
-typename DoFHandler<dim, spacedim>::active_line_iterator
-DoFHandler<dim, spacedim>::end_active_line (const unsigned int level) const
-{
-  Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 1)
-    return (level == tria->n_levels()-1 ?
-            active_line_iterator(end_line()) :
-            begin_active_line (level+1));
-  else
-    return active_line_iterator(end_line());
-}
-
-
 
 /*------------------------ Quad iterator functions ------------------------*/
-
 
 template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::raw_quad_iterator
 DoFHandler<dim,spacedim>::begin_raw_quad (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_hex_iterator();
-      case 2:
-      {
-        Assert (level<tria->n_levels(), ExcInvalidLevel(level));
-
-        if (tria->n_raw_quads(level) == 0)
-          return end_quad();
-
-        return raw_quad_iterator (tria,
-                                  level,
-                                  0,
-                                  this);
-      }
-
-      case 3:
-      {
-        Assert (level == 0, ExcFacesHaveNoLevel());
-
-        return raw_quad_iterator (tria,
-                                  0,
-                                  0,
-                                  this);
-      }
-
-
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_hex_iterator();
-    }
+  typename Triangulation<dim,spacedim>::raw_quad_iterator ti = tria->begin_raw_quad(level);
+  typename DoFHandler<dim, spacedim>::raw_quad_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -1078,30 +885,20 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::quad_iterator
 DoFHandler<dim,spacedim>::begin_quad (const unsigned int level) const
 {
-                                   // level is checked in begin_raw
-  raw_quad_iterator ri = begin_raw_quad (level);
-  if (ri.state() != IteratorState::valid)
-    return ri;
-  while (ri->used() == false)
-    if ((++ri).state() != IteratorState::valid)
-      return ri;
+  typename Triangulation<dim,spacedim>::quad_iterator ti = tria->begin_quad(level);
+  typename DoFHandler<dim, spacedim>::quad_iterator ri(*ti, this);
   return ri;
 }
 
 
 
 template <int dim, int spacedim>
-typename DoFHandler<dim,spacedim>::active_quad_iterator
-DoFHandler<dim,spacedim>::begin_active_quad (const unsigned int level) const
+typename DoFHandler<dim, spacedim>::active_quad_iterator
+DoFHandler<dim, spacedim>::begin_active_quad (const unsigned int level) const
 {
-                                   // level is checked in begin_raw
-  quad_iterator i = begin_quad (level);
-  if (i.state() != IteratorState::valid)
-    return i;
-  while (i->has_children())
-    if ((++i).state() != IteratorState::valid)
-      return i;
-  return i;
+  typename Triangulation<dim,spacedim>::active_quad_iterator ti = tria->begin_active_quad(level);
+  typename DoFHandler<dim, spacedim>::active_quad_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -1110,28 +907,19 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_quad_iterator
 DoFHandler<dim, spacedim>::end_raw_quad (const unsigned int level) const
 {
-  Assert (dim == 2 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 2)
-    return (level == tria->n_levels()-1 ?
-            end_quad() :
-            begin_raw_quad (level+1));
-  else
-    return end_quad();
+  typename Triangulation<dim,spacedim>::raw_quad_iterator ti = tria->end_raw_quad(level);
+  typename DoFHandler<dim, spacedim>::raw_quad_iterator ri(ti.access_any(), this);
+  return ri;
 }
-
 
 
 template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::quad_iterator
 DoFHandler<dim, spacedim>::end_quad (const unsigned int level) const
 {
-  Assert (dim == 2 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 2)
-    return (level == tria->n_levels()-1 ?
-            quad_iterator(end_quad()) :
-            begin_quad (level+1));
-  else
-    return quad_iterator(end_quad());
+  typename Triangulation<dim,spacedim>::quad_iterator ti = tria->end_quad(level);
+  typename DoFHandler<dim, spacedim>::quad_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -1139,128 +927,87 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_quad_iterator
 DoFHandler<dim, spacedim>::end_active_quad (const unsigned int level) const
 {
-  Assert(dim == 2 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 2)
-    return (level == tria->n_levels()-1 ?
-            active_quad_iterator(end_quad()) :
-            begin_active_quad (level+1));
-  else
-    return active_quad_iterator(end_quad());
-}
-
-
-
-template <int dim, int spacedim>
-typename DoFHandler<dim,spacedim>::raw_quad_iterator
-DoFHandler<dim,spacedim>::end_quad () const
-{
-  return raw_quad_iterator (tria,
-                            -1,
-                            -1,
-                            this);
-}
-
-
-
-template <int dim, int spacedim>
-typename DoFHandler<dim,spacedim>::raw_quad_iterator
-DoFHandler<dim,spacedim>::last_raw_quad (const unsigned int level) const
-{
-  Assert(tria != 0, ExcNotInitialized());
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_quad_iterator();
-      case 2:
-            Assert (level<tria->n_levels(),
-                    ExcInvalidLevel(level));
-            Assert (tria->n_raw_quads(level) != 0,
-                    ExcEmptyLevel (level));
-            return raw_quad_iterator (tria,
-                                      level,
-                                      tria->n_raw_quads(level)-1,
-                                      this);
-      case 3:
-            Assert (level == 0, ExcFacesHaveNoLevel());
-            return raw_quad_iterator (tria,
-                                      0,
-                                      tria->n_raw_quads()-1,
-                                      this);
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_quad_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename DoFHandler<dim,spacedim>::raw_quad_iterator
-DoFHandler<dim,spacedim>::last_raw_quad () const
-{
-  if (dim == 2)
-    return last_raw_quad (tria->n_levels()-1);
-  else
-    return last_raw_quad (0);
-}
-
-
-
-template <int dim, int spacedim>
-typename DoFHandler<dim,spacedim>::quad_iterator
-DoFHandler<dim,spacedim>::last_quad (const unsigned int level) const
-{
-                                   // level is checked in last_raw
-  raw_quad_iterator ri = last_raw_quad(level);
-  if (ri->used()==true)
-    return ri;
-  while ((--ri).state() == IteratorState::valid)
-    if (ri->used()==true)
-      return ri;
+  typename Triangulation<dim,spacedim>::active_quad_iterator ti = tria->end_active_quad(level);
+  typename DoFHandler<dim, spacedim>::active_quad_iterator ri(ti.access_any(), this);
   return ri;
 }
 
 
 
 template <int dim, int spacedim>
-typename DoFHandler<dim,spacedim>::quad_iterator
-DoFHandler<dim,spacedim>::last_quad () const
+typename DoFHandler<dim, spacedim>::raw_quad_iterator
+DoFHandler<dim, spacedim>::end_quad () const
 {
-  if (dim == 2)
-    return last_quad (tria->n_levels()-1);
-  else
-    return last_quad (0);
+  typename Triangulation<dim,spacedim>::raw_quad_iterator ti = tria->end_quad();
+  typename DoFHandler<dim, spacedim>::raw_quad_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
 
 template <int dim, int spacedim>
-typename DoFHandler<dim,spacedim>::active_quad_iterator
-DoFHandler<dim,spacedim>::last_active_quad (const unsigned int level) const
+typename DoFHandler<dim, spacedim>::raw_quad_iterator
+DoFHandler<dim, spacedim>::last_raw_quad (const unsigned int level) const
 {
-                                   // level is checked in last_raw
-  quad_iterator i = last_quad(level);
-  if (i->has_children()==false)
-    return i;
-  while ((--i).state() == IteratorState::valid)
-    if (i->has_children()==false)
-      return i;
-  return i;
+  typename Triangulation<dim,spacedim>::raw_quad_iterator ti = tria->last_raw_quad(level);
+  typename DoFHandler<dim, spacedim>::raw_quad_iterator ri(*ti, this);
+  return ri;
 }
 
 
 
 template <int dim, int spacedim>
-typename DoFHandler<dim,spacedim>::active_quad_iterator
-DoFHandler<dim,spacedim>::last_active_quad () const
+typename DoFHandler<dim, spacedim>::raw_quad_iterator
+DoFHandler<dim, spacedim>::last_raw_quad () const
 {
-  if (dim == 2)
-    return last_active_quad (tria->n_levels()-1);
-  else
-    return last_active_quad (0);
+  typename Triangulation<dim,spacedim>::raw_quad_iterator ti = tria->last_raw_quad();
+  typename DoFHandler<dim, spacedim>::raw_quad_iterator ri(*ti, this);
+  return ri;
 }
 
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::quad_iterator
+DoFHandler<dim, spacedim>::last_quad (const unsigned int level) const
+{
+  typename Triangulation<dim,spacedim>::quad_iterator ti = tria->last_quad(level);
+  typename DoFHandler<dim, spacedim>::quad_iterator ri(*ti, this);
+  return ri;
+}
+
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::quad_iterator
+DoFHandler<dim, spacedim>::last_quad () const
+{
+  typename Triangulation<dim,spacedim>::quad_iterator ti = tria->last_quad();
+  typename DoFHandler<dim, spacedim>::quad_iterator ri(*ti, this);
+  return ri;
+}
+
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::active_quad_iterator
+DoFHandler<dim, spacedim>::last_active_quad (const unsigned int level) const
+{
+  typename Triangulation<dim,spacedim>::active_quad_iterator ti = tria->last_active_quad(level);
+  typename DoFHandler<dim, spacedim>::active_quad_iterator ri(ti.access_any(), this);
+  return ri;
+}
+
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::active_quad_iterator
+DoFHandler<dim, spacedim>::last_active_quad () const
+{
+  typename Triangulation<dim,spacedim>::active_quad_iterator ti = tria->last_active_quad();
+  typename DoFHandler<dim, spacedim>::active_quad_iterator ri(*ti, this);
+  return ri;
+}
 
 /*------------------------ Hex iterator functions ------------------------*/
 
@@ -1269,29 +1016,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::raw_hex_iterator
 DoFHandler<dim,spacedim>::begin_raw_hex (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-      case 2:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_hex_iterator();
-      case 3:
-      {
-        Assert (level<tria->n_levels(), ExcInvalidLevel(level));
-
-        if (tria->n_raw_hexs(level) == 0)
-          return end_hex();
-
-        return raw_hex_iterator (tria,
-                                 level,
-                                 0,
-                                 this);
-      }
-
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_hex_iterator();
-    }
+  typename Triangulation<dim,spacedim>::raw_hex_iterator ti = tria->begin_raw_hex(level);
+  typename DoFHandler<dim, spacedim>::raw_hex_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -1300,13 +1027,8 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::hex_iterator
 DoFHandler<dim,spacedim>::begin_hex (const unsigned int level) const
 {
-                                   // level is checked in begin_raw
-  raw_hex_iterator ri = begin_raw_hex (level);
-  if (ri.state() != IteratorState::valid)
-    return ri;
-  while (ri->used() == false)
-    if ((++ri).state() != IteratorState::valid)
-      return ri;
+  typename Triangulation<dim,spacedim>::hex_iterator ti = tria->begin_hex(level);
+  typename DoFHandler<dim, spacedim>::hex_iterator ri(*ti, this);
   return ri;
 }
 
@@ -1316,14 +1038,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_hex_iterator
 DoFHandler<dim, spacedim>::begin_active_hex (const unsigned int level) const
 {
-                                   // level is checked in begin_raw
-  hex_iterator i = begin_hex (level);
-  if (i.state() != IteratorState::valid)
-    return i;
-  while (i->has_children())
-    if ((++i).state() != IteratorState::valid)
-      return i;
-  return i;
+  typename Triangulation<dim,spacedim>::active_hex_iterator ti = tria->begin_active_hex(level);
+  typename DoFHandler<dim, spacedim>::active_hex_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -1332,9 +1049,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_hex_iterator
 DoFHandler<dim, spacedim>::end_raw_hex (const unsigned int level) const
 {
-  return (level == tria->n_levels()-1 ?
-          end_hex() :
-          begin_raw_hex (level+1));
+  typename Triangulation<dim,spacedim>::raw_hex_iterator ti = tria->end_raw_hex(level);
+  typename DoFHandler<dim, spacedim>::raw_hex_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -1342,9 +1059,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::hex_iterator
 DoFHandler<dim, spacedim>::end_hex (const unsigned int level) const
 {
-  return (level == tria->n_levels()-1 ?
-          hex_iterator(end_hex()) :
-          begin_hex (level+1));
+  typename Triangulation<dim,spacedim>::hex_iterator ti = tria->end_hex(level);
+  typename DoFHandler<dim, spacedim>::hex_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -1352,9 +1069,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_hex_iterator
 DoFHandler<dim, spacedim>::end_active_hex (const unsigned int level) const
 {
-  return (level == tria->n_levels()-1 ?
-          active_hex_iterator(end_hex()) :
-          begin_active_hex (level+1));
+  typename Triangulation<dim,spacedim>::active_hex_iterator ti = tria->end_active_hex(level);
+  typename DoFHandler<dim, spacedim>::active_hex_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -1363,10 +1080,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_hex_iterator
 DoFHandler<dim, spacedim>::end_hex () const
 {
-  return raw_hex_iterator (tria,
-                           -1,
-                           -1,
-                           this);
+  typename Triangulation<dim,spacedim>::raw_hex_iterator ti = tria->end_hex();
+  typename DoFHandler<dim, spacedim>::raw_hex_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -1375,27 +1091,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_hex_iterator
 DoFHandler<dim, spacedim>::last_raw_hex (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-      case 2:
-            Assert (false, ExcImpossibleInDim(dim));
-            return raw_hex_iterator();
-
-      case 3:
-            Assert (level<tria->n_levels(),
-                    ExcInvalidLevel(level));
-            Assert (tria->n_raw_hexs(level) != 0,
-                    ExcEmptyLevel (level));
-
-            return raw_hex_iterator (tria,
-                                     level,
-                                     tria->n_raw_hexs(level)-1,
-                                     this);
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_hex_iterator();
-    }
+  typename Triangulation<dim,spacedim>::raw_hex_iterator ti = tria->last_raw_hex(level);
+  typename DoFHandler<dim, spacedim>::raw_hex_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -1404,7 +1102,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_hex_iterator
 DoFHandler<dim, spacedim>::last_raw_hex () const
 {
-  return last_raw_hex (tria->n_levels()-1);
+  typename Triangulation<dim,spacedim>::raw_hex_iterator ti = tria->last_raw_hex();
+  typename DoFHandler<dim, spacedim>::raw_hex_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -1413,13 +1113,8 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::hex_iterator
 DoFHandler<dim, spacedim>::last_hex (const unsigned int level) const
 {
-                                   // level is checked in last_raw
-  raw_hex_iterator ri = last_raw_hex(level);
-  if (ri->used()==true)
-    return ri;
-  while ((--ri).state() == IteratorState::valid)
-    if (ri->used()==true)
-      return ri;
+  typename Triangulation<dim,spacedim>::hex_iterator ti = tria->last_hex(level);
+  typename DoFHandler<dim, spacedim>::hex_iterator ri(*ti, this);
   return ri;
 }
 
@@ -1429,7 +1124,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::hex_iterator
 DoFHandler<dim, spacedim>::last_hex () const
 {
-  return last_hex (tria->n_levels()-1);
+  typename Triangulation<dim,spacedim>::hex_iterator ti = tria->last_hex();
+  typename DoFHandler<dim, spacedim>::hex_iterator ri(*ti, this);
+  return ri;
 }
 
 
@@ -1438,14 +1135,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_hex_iterator
 DoFHandler<dim, spacedim>::last_active_hex (const unsigned int level) const
 {
-                                   // level is checked in last_raw
-  hex_iterator i = last_hex(level);
-  if (i->has_children()==false)
-    return i;
-  while ((--i).state() == IteratorState::valid)
-    if (i->has_children()==false)
-      return i;
-  return i;
+  typename Triangulation<dim,spacedim>::active_hex_iterator ti = tria->last_active_hex(level);
+  typename DoFHandler<dim, spacedim>::active_hex_iterator ri(ti.access_any(), this);
+  return ri;
 }
 
 
@@ -1454,7 +1146,9 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_hex_iterator
 DoFHandler<dim, spacedim>::last_active_hex () const
 {
-  return last_active_hex (tria->n_levels()-1);
+  typename Triangulation<dim,spacedim>::active_hex_iterator ti = tria->last_active_hex();
+  typename DoFHandler<dim, spacedim>::active_hex_iterator ri(*ti, this);
+  return ri;
 }
 
 

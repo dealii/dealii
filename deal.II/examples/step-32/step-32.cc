@@ -2546,13 +2546,12 @@ namespace Step32
       DoFTools::make_hanging_node_constraints (stokes_dof_handler,
 					       stokes_constraints);
 
-      std::vector<bool> velocity_mask (dim+1, true);
-      velocity_mask[dim] = false;
+      FEValuesExtractors::Vector velocity_components(0);
       VectorTools::interpolate_boundary_values (stokes_dof_handler,
 						0,
 						ZeroFunction<dim>(dim+1),
 						stokes_constraints,
-						velocity_mask);
+						stokes_fe.component_mask(velocity_components));
 
       std::set<types::boundary_id> no_normal_flux_boundaries;
       no_normal_flux_boundaries.insert (1);
@@ -2858,9 +2857,9 @@ namespace Step32
     assemble_stokes_preconditioner ();
 
     std::vector<std::vector<bool> > constant_modes;
-    std::vector<bool>  velocity_components (dim+1,true);
-    velocity_components[dim] = false;
-    DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components,
+    FEValuesExtractors::Vector velocity_components(0);
+    DoFTools::extract_constant_modes (stokes_dof_handler,
+				      stokes_fe.component_mask(velocity_components),
                                       constant_modes);
 
     Mp_preconditioner.reset  (new TrilinosWrappers::PreconditionJacobi());
@@ -4151,7 +4150,7 @@ namespace Step32
                                         typename FunctionMap<dim>::type(),
                                         temperature_solution,
                                         estimated_error_per_cell,
-                                        std::vector<bool>(),
+                                        ComponentMask(),
                                         0,
                                         0,
                                         triangulation.locally_owned_subdomain());

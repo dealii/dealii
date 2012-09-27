@@ -60,6 +60,18 @@ TriaRawIterator (const Triangulation<Accessor::dimension,Accessor::space_dimensi
 
 template <typename Accessor>
 inline
+TriaRawIterator<Accessor>::TriaRawIterator (
+  const TriaAccessorBase<Accessor::structure_dimension,Accessor::dimension,Accessor::space_dimension>& tria_accessor,
+  const typename Accessor::AccessorData *local_data)
+		:
+		accessor(0, -2, -2, local_data)
+{
+  accessor.copy_from(tria_accessor);
+}
+
+
+template <typename Accessor>
+inline
 TriaRawIterator<Accessor> &
 TriaRawIterator<Accessor>::operator = (const TriaRawIterator<Accessor> &i)
 {
@@ -194,6 +206,27 @@ TriaIterator<Accessor>::TriaIterator (const Triangulation<Accessor::dimension,Ac
                                           const int                 index,
                                           const typename Accessor::AccessorData *local_data) :
                 TriaRawIterator<Accessor> (parent, level, index, local_data)
+{
+#ifdef DEBUG
+                                   // do this like this, because:
+                                   // if we write
+                                   // "Assert (IteratorState::past_the_end || used)"
+                                   // used() is called anyway, even if
+                                   // state==IteratorState::past_the_end, and will then
+                                   // throw the exception!
+  if (this->state() != IteratorState::past_the_end)
+    Assert (this->accessor.used(),
+            ExcAssignmentOfUnusedObject());
+#endif
+}
+
+
+template <typename Accessor>
+inline
+TriaIterator<Accessor>::TriaIterator (
+  const TriaAccessorBase<Accessor::structure_dimension,Accessor::dimension,Accessor::space_dimension>& tria_accessor,
+  const typename Accessor::AccessorData *local_data)
+		: TriaRawIterator<Accessor> (tria_accessor, local_data)
 {
 #ifdef DEBUG
                                    // do this like this, because:
@@ -381,6 +414,27 @@ TriaActiveIterator<Accessor>::TriaActiveIterator (const Triangulation<Accessor::
                                                       const int                 index,
                                                       const typename Accessor::AccessorData *local_data) :
                 TriaIterator<Accessor> (parent, level, index, local_data)
+{
+#ifdef DEBUG
+                                   // do this like this, because:
+                                   // if we write
+                                   // "Assert (IteratorState::past_the_end || !has_children())"
+                                   // has_children() is called anyway, even if
+                                   // state==IteratorState::past_the_end, and will then
+                                   // throw the exception!
+  if (this->state() != IteratorState::past_the_end)
+    Assert (this->accessor.has_children()==false,
+            ExcAssignmentOfInactiveObject());
+#endif
+}
+
+
+template <typename Accessor>
+inline
+TriaActiveIterator<Accessor>::TriaActiveIterator (
+  const TriaAccessorBase<Accessor::structure_dimension,Accessor::dimension,Accessor::space_dimension>& tria_accessor,
+  const typename Accessor::AccessorData *local_data)
+		: TriaIterator<Accessor> (tria_accessor, local_data)
 {
 #ifdef DEBUG
                                    // do this like this, because:

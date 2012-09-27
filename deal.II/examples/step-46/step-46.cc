@@ -428,23 +428,19 @@ namespace Step46
       DoFTools::make_hanging_node_constraints (dof_handler,
                                                constraints);
 
-      std::vector<bool> velocity_mask (dim+1+dim, false);
-      for (unsigned int d=0; d<dim; ++d)
-        velocity_mask[d] = true;
+      const FEValuesExtractors::Vector velocities(0);
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 1,
                                                 StokesBoundaryValues<dim>(),
                                                 constraints,
-                                                velocity_mask);
+                                                fe_collection.component_mask(velocities));
 
-      std::vector<bool> elasticity_mask (dim+1+dim, false);
-      for (unsigned int d=dim+1; d<dim+1+dim; ++d)
-        elasticity_mask[d] = true;
+      const FEValuesExtractors::Vector displacements(dim+1);
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 0,
                                                 ZeroFunction<dim>(dim+1+dim),
                                                 constraints,
-                                                elasticity_mask);
+                                                fe_collection.component_mask(displacements));
     }
 
                                      // There are more constraints we have to
@@ -1086,25 +1082,21 @@ namespace Step46
     face_q_collection.push_back (stokes_face_quadrature);
     face_q_collection.push_back (elasticity_face_quadrature);
 
-    std::vector<bool> stokes_component_mask (dim+1+dim, false);
-    for (unsigned int d=0; d<dim; ++d)
-      stokes_component_mask[d] = true;
+    const FEValuesExtractors::Vector velocities(0);
     KellyErrorEstimator<dim>::estimate (dof_handler,
                                         face_q_collection,
                                         typename FunctionMap<dim>::type(),
                                         solution,
                                         stokes_estimated_error_per_cell,
-                                        stokes_component_mask);
+                                        fe_collection.component_mask(velocities));
 
-    std::vector<bool> elasticity_component_mask (dim+1+dim, false);
-    for (unsigned int d=0; d<dim; ++d)
-      elasticity_component_mask[dim+1+d] = true;
+    const FEValuesExtractors::Vector displacements(dim+1);
     KellyErrorEstimator<dim>::estimate (dof_handler,
                                         face_q_collection,
                                         typename FunctionMap<dim>::type(),
                                         solution,
                                         elasticity_estimated_error_per_cell,
-                                        elasticity_component_mask);
+                                        fe_collection.component_mask(displacements));
 
                                      // We then normalize error estimates by
                                      // dividing by their norm and scale the

@@ -359,6 +359,12 @@ class MGDoFAccessor : public dealii::internal::MGDoFAccessor::Inheritance<struct
     void copy_from (const MGDoFAccessor &a);
 
                                      /**
+                                      * Implement the copy operator needed
+                                      * for the iterator classes.
+                                      */
+    void copy_from (const TriaAccessorBase<structdim,dim,spacedim>& a);
+
+                                     /**
                                       * Exception for child classes
                                       */
     DeclException0 (ExcInvalidObject);

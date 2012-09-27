@@ -1012,6 +1012,8 @@ namespace Step42
     constraints.merge (constraints_dirichlet_hanging_nodes, merge_conflict_behavior);
   }
 
+
+
   template <int dim>
   void PlasticityContactProblem<dim>::dirichlet_constraints ()
   {
@@ -1028,26 +1030,29 @@ namespace Step42
     constraints_dirichlet_hanging_nodes.reinit (locally_relevant_dofs);
     constraints_dirichlet_hanging_nodes.merge (constraints_hanging_nodes);
 
-    std::vector<bool> component_mask (dim, true);
-    component_mask[0] = true;
-    component_mask[1] = true;
-    component_mask[2] = true;
+				     // interpolate all components of the solution
     VectorTools::interpolate_boundary_values (dof_handler,
                                               6,
                                               EquationData::BoundaryValues<dim>(),
                                               constraints_dirichlet_hanging_nodes,
-                                              component_mask);
+					      ComponentMask());
 
-    component_mask[0] = true;
-    component_mask[1] = true;
-    component_mask[2] = false;
+				     // interpolate x- and y-components of the
+				     // solution (this is a bit mask, so apply
+				     // operator| )
+    FEValuesExtractors::Scalar x_displacement(0);
+    FEValuesExtractors::Scalar y_displacement(1);
     VectorTools::interpolate_boundary_values (dof_handler,
                                               8,
                                               EquationData::BoundaryValues<dim>(),
                                               constraints_dirichlet_hanging_nodes,
-                                              component_mask);
+					      (fe.component_mask(x_displacement)
+					       |
+					       fe.component_mask(y_displacement)));
     constraints_dirichlet_hanging_nodes.close ();
   }
+
+
 
   template <int dim>
   void PlasticityContactProblem<dim>::solve ()
@@ -1109,6 +1114,8 @@ namespace Step42
     solution = distributed_solution;
   }
 
+
+
   template <int dim>
   void PlasticityContactProblem<dim>::solve_newton ()
   {
@@ -1119,9 +1126,8 @@ namespace Step42
     Timer                          t;
 
     std::vector<std::vector<bool> > constant_modes;
-    std::vector<bool>  components (dim,true);
-    components[dim] = false;
-    DoFTools::extract_constant_modes (dof_handler, components,
+    DoFTools::extract_constant_modes (dof_handler,
+				      ComponentMask(),
                                       constant_modes);
 
     additional_data.elliptic = true;
@@ -1245,6 +1251,8 @@ namespace Step42
     pcout<< "%%%%%% Rechenzeit output = " << run_time[4] <<std::endl;
   }
 
+
+
   template <int dim>
   void PlasticityContactProblem<dim>::refine_grid ()
   {
@@ -1261,6 +1269,8 @@ namespace Step42
     triangulation.execute_coarsening_and_refinement ();
 
   }
+
+
 
   template <int dim>
   void PlasticityContactProblem<dim>::move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const
@@ -1292,6 +1302,8 @@ namespace Step42
               }
           }
   }
+
+
 
   template <int dim>
   void PlasticityContactProblem<dim>::output_results (const std::string& title) const
@@ -1351,11 +1363,13 @@ namespace Step42
     move_mesh (tmp);
   }
 
+
+
   template <int dim>
   void PlasticityContactProblem<dim>::run ()
   {
     pcout << "Solving problem in " << dim << " space dimensions." << std::endl;
-  
+
     Timer                          t;
     run_time.resize (8);
 

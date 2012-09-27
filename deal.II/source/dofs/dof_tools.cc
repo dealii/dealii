@@ -4449,7 +4449,7 @@ namespace DoFTools
                           std::vector<std::vector<bool> > &constant_modes)
   {
     const unsigned int n_components = dof_handler.get_fe().n_components();
-    Assert (n_components == component_mask.size(),
+    Assert (component_mask.represents_n_components(n_components),
             ExcDimensionMismatch(n_components,
                                  component_mask.size()));
     std::vector<unsigned int> localized_component (n_components,
