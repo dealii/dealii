@@ -539,10 +539,12 @@ class TriaRawIterator : public std::iterator<std::bidirectional_iterator_tag,Acc
     IteratorState::IteratorStates state () const;
 
                                      /**
-                                      * Print the iterator to @p out. The
+                                      * Print the iterator to a stream
+                                      * <code>out</code>. The
                                       * format is like <tt>level.index</tt>.
                                       */
-    void print (std::ostream &out) const;
+    template <class STREAM>
+    void print (STREAM& out) const;
 
 
                                      /**
@@ -1222,9 +1224,10 @@ TriaRawIterator<Accessor>::operator -- ()
 
 
 template <typename Accessor>
+template <class STREAM>
 inline
 void
-TriaRawIterator<Accessor>::print (std::ostream &out) const
+TriaRawIterator<Accessor>::print (STREAM& out) const
 {
   if (Accessor::structure_dimension==Accessor::dimension)
     out << accessor.level() << "." << accessor.index();
