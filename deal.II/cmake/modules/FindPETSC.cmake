@@ -21,6 +21,25 @@ SET_IF_EMPTY(PETSC_DIR "$ENV{PETSC_DIR}")
 SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 
 #
+# So, well, yes. I'd like to include the PETScConfig.cmake file via
+# FIND_PACKAGE(), but it is broken beyond belief:
+#
+# - In source, i.e. PETSC_DIR/PETSC_ARCH, it sets BUILD_SHARED_LIBS.
+# - It does not contain its very own version number
+# - It does not contain its very own library location(s) or name(s)
+# - It does not contain necessary includes
+#
+# - It writes a lot of FIND_LIBRARY(..) statements. Seriously. What the
+#   heck? If its not the same library you're linking against, you cannot
+#   assume to be API compatible, so why not just give a list of libraries?
+#
+
+#
+# TODO: We'll have to guess which external libraries we'll have to link
+# against someday...
+#
+
+#
 # Search for the first part of the includes:
 #
 FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
@@ -30,7 +49,6 @@ FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
     ${PETSC_INCLUDE_DIRS}
   PATH_SUFFIXES petsc
 )
-
 
 FIND_LIBRARY(PETSC_LIBRARIES
   NAMES petsc

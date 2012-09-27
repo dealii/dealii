@@ -19,7 +19,7 @@ SET_IF_EMPTY(TRILINOS_DIR "$ENV{TRILINOS_DIR}")
 #
 # Include the trilinos package configuration:
 #
-find_package(TRILINOS
+FIND_PACKAGE(TRILINOS
   QUIET CONFIG
   NAMES Trilinos TRILINOS
   HINTS
