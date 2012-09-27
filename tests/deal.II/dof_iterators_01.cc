@@ -397,7 +397,7 @@ int main ()
   const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-//deallog.depth_console(0);
+  deallog.depth_console(0);
 
   deallog.push("1D");
   test<1> ();
