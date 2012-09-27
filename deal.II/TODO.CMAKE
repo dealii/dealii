@@ -1,15 +1,9 @@
 Major:
 
-* Bug: Unset some cached tests variables. Notably:
-    - A Trilinos test
-    - the LAPACK routine checks
-
 * Implement the documentation component. (I don't grok what's going on in
   this makefiles. There is a rudimentary doxygen call, though.)
 
 * Add the rest of the Bug tests
-
-* Enable in source FindModules for P4est and Trilinos.
 
 * The following features have to be written:
     * HDF5

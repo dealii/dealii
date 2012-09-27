@@ -39,6 +39,11 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
       SET(${var} TRUE)
     ENDIF()
 
+    #
+    # Remove the variable from the cache to force a recheck:
+    #
+    UNSET(P4EST_WITH_MPI CACHE)
+
   ENDIF()
 ENDMACRO()
 
@@ -50,19 +55,9 @@ MACRO(FEATURE_P4EST_CONFIGURE_EXTERNAL var)
   LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${P4EST_INCLUDE_DIR} ${SC_INCLUDE_DIR})
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-    IF(P4EST_DEBUG_FOUND AND SC_DEBUG_FOUND)
-      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG
-        ${P4EST_DEBUG_LIBRARY} ${SC_DEBUG_LIBRARY}
-        )
-    ELSE()
-      MESSAGE(STATUS
-        "No debug p4est and sc libraries were found. "
-        "The regular p4est and sc libs will be used for the debug target instead."
-        )
-      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG
-        ${P4EST_LIBRARY} ${SC_LIBRARY}
-        )
-    ENDIF()
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG
+      ${P4EST_LIBRARY} ${SC_LIBRARY}
+      )
   ENDIF()
 
   IF (CMAKE_BUILD_TYPE MATCHES "Release")
@@ -85,7 +80,10 @@ MACRO(FEATURE_P4EST_ERROR_MESSAGE)
     "Could not find the p4est and sc libraries!\n\n"
     "Please ensure that the libraries are installed on your computer.\n"
     "If the libraries are not at a default location, either provide some hints\n"
-    "for the autodetection, or set the relevant variables by hand in ccmake.\n\n"
+    "for the autodetection:\n"
+    "    $ P4EST_DIR=\"...\" cmake <...>\n"
+    "    $ ccmake -DP4EST_DIR=\"...\" cmake <...>\n"
+    "or set the relevant variables by hand in ccmake.\n"
     )
 ENDMACRO()
 

@@ -14,6 +14,8 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET_IF_EMPTY(TRILINOS_DIR "$ENV{TRILINOS_DIR}")
+
 #
 # Include the trilinos package configuration:
 #
@@ -22,7 +24,6 @@ find_package(TRILINOS
   NAMES Trilinos TRILINOS
   HINTS
     ${TRILINOS_DIR}
-    $ENV{TRILINOS_DIR}
   PATH_SUFFIXES
     lib${LIB_SUFFIX}/cmake/Trilinos
     lib64/cmake/Trilinos
@@ -57,9 +58,14 @@ FOREACH(library ${Trilinos_LIBRARIES})
     NAMES ${library}
     HINTS ${Trilinos_LIBRARY_DIRS}
     )
-  MARK_AS_ADVANCED(TRILINOS_LIBRARY_${library})
 
   LIST(APPEND TRILINOS_LIBRARIES ${TRILINOS_LIBRARY_${library}})
+
+  #
+  # Remove the variables from the cache, so that updating TRILINOS_DIR will
+  # find the new libraries..
+  #
+  UNSET(TRILINOS_LIBRARY_${library} CACHE)
 ENDFOREACH()
 
 
@@ -75,5 +81,12 @@ IF(TRILINOS_FOUND)
     TRILINOS_INCLUDE_DIRS
     TRILINOS_LIBRARIES
     )
+ELSE()
+  IF(TRILINOS_DIR MATCHES "-NOTFOUND")
+    SET(TRILINOS_DIR "" CACHE STRING
+      "A hint to a Trilinos installation"
+      FORCE
+      )
+  ENDIF()
 ENDIF()
 
