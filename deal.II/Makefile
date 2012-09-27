@@ -60,11 +60,6 @@ online-doc doc:
 	@echo
 	@echo
 
-TODO:
-	@egrep -i '// *todo' include/deal.II/*/*.h source/*/*.cc \
-	| perl common/scripts/make_todo.pl > $@
-
-
 TAGS:
 	@cd common ; etags --language=c++ \
 	../include/deal.II/*/*.h ../source/*/*.cc \
