@@ -3297,7 +3297,7 @@ namespace DoFTools
 
                                    // In the case that both faces have
                                    // children, we loop over all children
-                                   // and applu make_periodicty_constrains
+                                   // and apply make_periodicty_constrains
                                    // recursively:
     if (face_1->has_children() && face_2->has_children()) {
       Assert(face_1->n_children() == GeometryInfo<dim>::max_children_per_face &&
