@@ -19,7 +19,7 @@ CHECK_CXX_SOURCE_COMPILES(
 # See if there is a compiler flag to enable C++11 features
 #
 FOREACH(test_flag
-    "-std=c++11"
+    # "-std=c++11"
     "-std=c++0x"
     )
 
