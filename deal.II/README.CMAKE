@@ -637,10 +637,50 @@ DEVELOPMENT
   We currently have
 
     cmake/check/check_for_compiler_bugs.cmake
-
+    cmake/check/check_for_compiler_bugs_*.cmake
     cmake/check/check_for_compiler_features.cmake
-
     cmake/check/check_for_cxx_features.cmake
+
+  Useful commands:
+
+  - There are a number of readily available platform check macros:
+
+      CHECK_CXX_SOURCE_COMPILES(source variable)
+        Checks whether it is possible to compile _and_ link the code snipet
+        <source>. If succesful, variable is set to 1.
+
+      CHECK_CXX_SOURCE_RUNS(source variable)
+        variable is set to 1 if <source> coulde be succesfully compiled and
+        linked and the resulting program ran and exited wihtout error.
+
+      CHECK_CXX_COMPILER_BUG(source variable)
+        Inverts the logic of CHECK_CXX_SOURCE_COMPILES(), i.e. variable is
+        set to 1 if it was not possible to compile and link <source>.
+
+      CHECK_INCLUDE_FILE_CXX(header variable)
+        Check whether it is possible to compile and link a dummy program
+        including <header>.
+
+      CHECK_FUNCTION_EXISTS(function variable)
+        Check for the existence of a function prototype with name
+        <function>. (Don't forget to specify the link libraries, see
+        below.)
+
+  - Necessary compiler flags can easily set in the string variable
+    CMAKE_REQUIRED_FLAGS. There are two small macros that do this job
+    nicely:
+
+      PUSH_TEST_FLAG("-Werror")
+      CHECK_CXX_SOURCE_COMPILES(...)
+      POP_TEST_FLAG()
+
+  - Libraries necessary for linkage can be set in the list variable
+    CMAKE_REQUIRED_LIBRARIES. It is best two hard set this variable to a
+    specific value and later on cleaning it, instead of appending/removing:
+
+      SET(CMAKE_REQUIRED_LIBRARIES <a list of libraries>
+      CHECK_CXX_SOURCE_COMPILES(...)
+      SET(CMAKE_REQUIRED_LIBRARIES)
 
 
   General notes:
