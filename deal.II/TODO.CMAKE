@@ -28,6 +28,8 @@ Major:
 
 Minor:
 
+* HAVE_JN_ ?
+
 * There is still a perl script for generating lapack_templates.h. Is this
   necessary.
 
