@@ -884,62 +884,16 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       */
     static std::vector<bool>
     compute_restriction_is_additive_flags (
-      const FiniteElement<dim,spacedim> &fe,
-      const unsigned int        N);
-
-                                     /**
-                                      * Same as above for mixed elements
-                                      * with two different sub-elements.
-                                      */
-    static std::vector<bool>
-    compute_restriction_is_additive_flags (
-      const FiniteElement<dim,spacedim> &fe1,
+      const FiniteElement<dim,spacedim> *fe1,
       const unsigned int        N1,
-      const FiniteElement<dim,spacedim> &fe2,
-      const unsigned int        N2);
-
-                                     /**
-                                      * Same as above for mixed elements
-                                      * with three different sub-elements.
-                                      */
-    static std::vector<bool>
-    compute_restriction_is_additive_flags (
-      const FiniteElement<dim,spacedim> &fe1,
-      const unsigned int        N1,
-      const FiniteElement<dim,spacedim> &fe2,
-      const unsigned int        N2,
-      const FiniteElement<dim,spacedim> &fe3,
-      const unsigned int        N3);
-
-                                   /**
-                                    *  with four different sub-elements
-                                    */
-    static std::vector<bool>
-    compute_restriction_is_additive_flags (
-      const FiniteElement<dim,spacedim> &fe1,
-      const unsigned int        N1,
-      const FiniteElement<dim,spacedim> &fe2,
-      const unsigned int        N2,
-      const FiniteElement<dim,spacedim> &fe3,
-      const unsigned int        N3,
-      const FiniteElement<dim,spacedim> &fe4,
-      const unsigned int        N4);
-
-                                   /**
-                                    *  and with five different sub-elements
-                                    */
-    static std::vector<bool>
-    compute_restriction_is_additive_flags (
-      const FiniteElement<dim,spacedim> &fe1,
-      const unsigned int        N1,
-      const FiniteElement<dim,spacedim> &fe2,
-      const unsigned int        N2,
-      const FiniteElement<dim,spacedim> &fe3,
-      const unsigned int        N3,
-      const FiniteElement<dim,spacedim> &fe4,
-      const unsigned int        N4,
-      const FiniteElement<dim,spacedim> &fe5,
-      const unsigned int        N5);
+      const FiniteElement<dim,spacedim> *fe2=NULL,
+      const unsigned int        N2=0,
+      const FiniteElement<dim,spacedim> *fe3=NULL,
+      const unsigned int        N3=0,
+      const FiniteElement<dim,spacedim> *fe4=NULL,
+      const unsigned int        N4=0,
+      const FiniteElement<dim,spacedim> *fe5=NULL,
+      const unsigned int        N5=0);
 
                                      /**
                                       * Compute the named flags for a
