@@ -31,10 +31,13 @@ SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 #   heck? If its not the same library you're linking against, you cannot
 #   assume to be API compatible, so why not just give a list of libraries?
 #
+# - It is not even considered to be installed in the gentoo petsc package
+#   :-]
+#
 
 #
 # TODO: We'll have to guess which external libraries we'll have to link
-# against someday...
+# against someday to avoid underlinkage
 #
 
 #
@@ -43,6 +46,7 @@ SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
   HINTS
     # petsc is special. Account for that
+    ${PETSC_DIR}
     ${PETSC_DIR}/${PETSC_ARCH}/include
     ${PETSC_INCLUDE_DIRS}
   PATH_SUFFIXES petsc
@@ -52,10 +56,10 @@ FIND_LIBRARY(PETSC_LIBRARIES
   NAMES petsc
   HINTS
     # petsc is special. Account for that
+    ${PETSC_DIR}
     ${PETSC_DIR}/${PETSC_ARCH}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
 )
-
 
 #
 # So, up to this point it was easy. Now, the tricky part.
@@ -93,23 +97,13 @@ ENDIF()
 FIND_FILE(PETSC_PETSCVERSION_H petscversion.h
   HINTS
     ${PETSC_INCLUDE_DIRS}
-    NO_DEFAULT_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    NO_CMAKE_FIND_ROOT_PATH
+  PATH_SUFFIXES petsc
   )
 
 FIND_FILE(PETSC_PETSCCONF_H petscconf.h
   HINTS
     ${PETSC_INCLUDE_DIRS}
-    NO_DEFAULT_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    NO_CMAKE_FIND_ROOT_PATH
+  PATH_SUFFIXES petsc
   )
 
 #
