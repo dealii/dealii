@@ -91,6 +91,11 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
     ADD_SUBDIRECTORY(${boost_folder}/libs/thread/src)
   ENDIF()
 
+  #
+  # We were able to use contrib boost, so hide some cached variables:
+  #
+  MARK_AS_ADVANCED(Boost_DIR)
+
   SET(${var} TRUE)
 ENDMACRO()
 
