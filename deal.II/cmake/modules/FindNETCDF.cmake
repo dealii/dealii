@@ -7,6 +7,10 @@ INCLUDE(FindPackageHandleStandardArgs)
 FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh
 )
 
+#
+# TODO: netcdf might externally depend on hdf5. Check and fix this.
+#
+
 FIND_LIBRARY(NETCDF_LIBRARY
   NAMES netcdf_c++ netcdf_cpp
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib

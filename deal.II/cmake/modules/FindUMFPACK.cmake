@@ -25,7 +25,7 @@ FIND_PATH(UMFPACK_INCLUDE_DIR umfpack.h
     ${UMFPACK_DIR}
   PATH_SUFFIXES
     umfpack include/umfpack include Include UMFPACK/Include ../UMFPACK/Include
-)
+  )
 
 FIND_LIBRARY(UMFPACK_LIBRARY
   NAMES umfpack
@@ -33,7 +33,7 @@ FIND_LIBRARY(UMFPACK_LIBRARY
     ${UMFPACK_DIR}
   PATH_SUFFIXES
     lib${LIB_SUFFIX} lib64 lib Lib UMFPACK/Lib ../UMFPACK/Lib
-)
+  )
 
 SET(UMFPACK_LIBRARIES
   ${UMFPACK_LIBRARY}

@@ -1,4 +1,6 @@
+#
 # Try to find SC
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
