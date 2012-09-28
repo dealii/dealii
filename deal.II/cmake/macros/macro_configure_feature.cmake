@@ -149,9 +149,9 @@ MACRO(CONFIGURE_FEATURE feature)
             )
           SET_CACHED_OPTION(DEAL_II_WITH_${feature} OFF)
         ELSE()
-          MESSAGE(SEND_ERROR
+          MESSAGE(SEND_ERROR "\n"
             "DEAL_II_WITH_${feature} has unmet configuration requirements: "
-            "${macro_dependency} has to be set to \"ON\"."
+            "${macro_dependency} has to be set to \"ON\".\n\n"
             )
         ENDIF()
         SET(macro_dependencies_ok FALSE)
