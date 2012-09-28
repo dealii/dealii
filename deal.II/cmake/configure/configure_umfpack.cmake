@@ -4,29 +4,26 @@
 
 
 SET(FEATURE_UMFPACK_DEPENDS
-  #
-  # Currently, with enabled umfpack support, we also need LAPACK...
-  #
+  # Currently, with enabled umfpack support, we also need to setup
+  # LAPACK support in deal.II:
   DEAL_II_WITH_LAPACK
   )
 
 
 MACRO(FEATURE_UMFPACK_FIND_EXTERNAL var)
   FIND_PACKAGE(UMFPACK)
-  FIND_PACKAGE(AMD)
 
-  IF(UMFPACK_FOUND AND AMD_FOUND)
+  IF(UMFPACK_FOUND)
     SET(${var} TRUE)
   ENDIF()
 ENDMACRO()
 
 
 MACRO(FEATURE_UMFPACK_CONFIGURE_EXTERNAL var)
-  INCLUDE_DIRECTORIES(${UMFPACK_INCLUDE_DIR} ${AMD_INCLUDE_DIR})
 
-  LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
-    ${UMFPACK_LIBRARY} ${AMD_LIBRARY}
-    )
+  INCLUDE_DIRECTORIES(${UMFPACK_INCLUDE_DIRS})
+  LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${UMFPACK_LIBRARIES})
+  ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${UMFPACK_LINKER_FLAGS}")
 
   SET(HAVE_LIBUMFPACK TRUE)
 
@@ -39,9 +36,13 @@ SET(FEATURE_UMFPACK_HAVE_CONTRIB TRUE)
 
 MACRO(FEATURE_UMFPACK_CONFIGURE_CONTRIB var)
   #
-  # Add umfpack and amd directly to the object files of deal.II
+  # DEAL_II_WITH_LAPACK will pull in an external BLAS library. So no need
+  # to setup something more than contrib BLAS here.
   #
 
+  #
+  # Add umfpack and amd directly to the object files of deal.II
+  #
   SET(umfpack_folder "${CMAKE_SOURCE_DIR}/contrib/umfpack")
 
   INCLUDE_DIRECTORIES(

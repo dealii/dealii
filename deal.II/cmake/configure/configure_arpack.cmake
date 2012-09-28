@@ -2,6 +2,12 @@
 # Configuration for the ARPACK library:
 #
 
+SET(FEATURE_ARPACK_DEPENDS
+  # Currently, with enabled arpack support, we also need to setup
+  # LAPACK support in deal.II:
+  DEAL_II_WITH_LAPACK
+  )
+
 MACRO(FEATURE_ARPACK_FIND_EXTERNAL var)
   FIND_PACKAGE(ARPACK)
 

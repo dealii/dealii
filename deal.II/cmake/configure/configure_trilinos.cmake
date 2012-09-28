@@ -102,8 +102,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # with the -std=c++0x flag of GCC, see deal.II FAQ.
     # Test whether that is indeed the case
     #
-    LIST(APPEND CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIRS})
+    SET(CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIRS})
     PUSH_TEST_FLAG("${DEAL_II_CXX11_FLAG}")
+
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <Sacado_cmath.hpp>
@@ -135,8 +136,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         SET(${var} FALSE)
       ENDIF()
     ENDIF()
+
     POP_TEST_FLAG()
-    LIST(REMOVE_ITEM CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIRS})
+    SET(CMAKE_REQUIRED_INCLUDES)
 
     #
     # Remove the following variables from the cache to force a recheck:
@@ -156,7 +158,10 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL var)
 
 
   LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
+    # The Trilinos libraries:
     ${TRILINOS_LIBRARIES}
+    # All external libraries necessary for the Trilinos libraries. Nice and
+    # easy :-)
     ${Trilinos_TPL_LIBRARIES}
     )
 

@@ -1,6 +1,11 @@
 #
 # Try to find the AMD library
 #
+# This module exports
+#
+#   AMD_LIBRARY
+#   AMD_INCLUDE_DIR
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 
