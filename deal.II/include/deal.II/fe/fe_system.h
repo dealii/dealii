@@ -87,7 +87,7 @@ DEAL_II_NAMESPACE_OPEN
  * contains the pressure degrees of freedom. Note that while @p U itself has 3
  * blocks, the FESystem @p sys2 does not attempt to split @p U into its base
  * elements but considers it a block of its own. By blocking all velocities
- * into one system first as in @p sys2, we achieve the sam block structure
+ * into one system first as in @p sys2, we achieve the same block structure
  * that would be generated if instead of using a $Q_2^3$ element for the
  * velocities we had used vector-valued base elements, for instance like using
  * a mixed discretization of Darcy's law using
