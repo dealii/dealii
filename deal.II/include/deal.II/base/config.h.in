@@ -19,6 +19,7 @@
 #define DEAL_II_NAMESPACE_OPEN namespace dealii {
 #define DEAL_II_NAMESPACE_CLOSE }
 
+
 /* Define to the full name of this package. */
 #define DEAL_II_PACKAGE_NAME "@DEAL_II_PACKAGE_NAME@"
 
@@ -311,8 +312,6 @@
 #cmakedefine HAVE_LIBZ
 
 
-
-
 /**********************************************
  * Configured in check_for_compiler_features: *
  **********************************************/
@@ -362,7 +361,11 @@
  */
 #define DEAL_II_MIN_BOOL_VECTOR_CAPACITY @DEAL_II_MIN_BOOL_VECTOR_CAPACITY@
 
-
+/* If the compiler supports it, then this variable is defined to a string
+ * that when written after a function name makes the compiler emit a warning
+ * whenever this function is used somewhere that its use is deprecated.
+ */
+#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
 
 
 /******************************************
@@ -374,8 +377,6 @@
  * directory for a description of this bug.
  */
 #cmakedefine DEAL_II_EXPLICIT_DESTRUCTOR_BUG
-
-
 
 
 /*****************************************
@@ -409,6 +410,15 @@
 /* Defined if you have the <string.h> header file. */
 #cmakedefine HAVE_STRING_H
 
+
+/********************************************
+ * Configured in check_for_system_features: *
+ ********************************************/
+
+
+/* Defined if you have the <unistd.h> header file. */
+#cmakedefine HAVE_UNISTD_H
+
 /* Defined if you have the <sys/stat.h> header file. */
 #cmakedefine HAVE_SYS_STAT_H
 
@@ -421,13 +431,38 @@
 /* Defined if you have the <sys/types.h> header file. */
 #cmakedefine HAVE_SYS_TYPES_H
 
-/* Define to 1 if you have the <unistd.h> header file. */
-#cmakedefine HAVE_UNISTD_H
+/* Defined if you have the "gethostname" function. */
+#cmakedefine HAVE_GETHOSTNAME
 
-/* If the compiler supports it, then this variable is defined to a string
-   that when written after a function name makes the compiler emit a warning
-   whenever this function is used somewhere that its use is deprecated. */
-#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
+/* Defined if you have the "getpid' function. */
+#cmakedefine HAVE_GETPID
+
+/* Defined if you have the "rand_r" function */
+#cmakedefine HAVE_RAND_R
+
+/* Defined if you have the "times" function. */
+#cmakedefine HAVE_TIMES
+
+/* Defined if you have the "jn" function. */
+#cmakedefine HAVE_JN
+
+/* Defined if the system stores words with the most significant byte first */
+#cmakedefine DEAL_II_WORDS_BIGENDIAN
+
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+#  undef WORDS_BIGENDIAN
+# endif
+#endif
+
+
+
 
 
 

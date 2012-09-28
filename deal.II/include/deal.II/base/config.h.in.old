@@ -3,36 +3,6 @@ TODO:
 /* enable multigrid compatibility mode */
 #cmakedefine DEAL_II_MULTIGRID_COMPATIBILITY
 
-/* Defined if the system stores words with the most significant byte first */
-#cmakedefine DEAL_II_WORDS_BIGENDIAN
-
-/* Define to 1 if you have the `gethostname' function. */
-#cmakedefine HAVE_GETHOSTNAME
-
-/* Define to 1 if you have the `getpid' function. */
-#cmakedefine HAVE_GETPID
-
-/* Define if you have the rand_r function */
-#cmakedefine HAVE_RAND_R
-
-/* Define to 1 if you have the `times' function. */
-#cmakedefine HAVE_TIMES
-
-/* Define to 1 if you have the `jn' function. */
-#cmakedefine HAVE_JN
-
-/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
-   significant byte first (like Motorola and SPARC, unlike Intel). */
-#if defined AC_APPLE_UNIVERSAL_BUILD
-# if defined __BIG_ENDIAN__
-#  define WORDS_BIGENDIAN 1
-# endif
-#else
-# ifndef WORDS_BIGENDIAN
-#  undef WORDS_BIGENDIAN
-# endif
-#endif
-
 
 
 
