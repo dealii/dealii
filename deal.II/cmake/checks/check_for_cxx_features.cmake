@@ -20,19 +20,27 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 FOREACH(test_flag
     "-std=c++11"
-    "-std=c++-x"
+    "-std=c++0x"
     )
-  SET(DEAL_II_CXX11_FLAG ${test_flag})
+
   CHECK_CXX_COMPILER_FLAG("${test_flag}" DEAL_II_HAVE_CXX11_FLAG)
+
   IF(DEAL_II_HAVE_CXX11_FLAG)
+    # We have found a CXX11_FLAG that the compiler understands
+    SET(DEAL_II_CXX11_FLAG "${test_flag}")
     BREAK()
+  ELSE()
+    # Remove test result from cache and try the next flag in the list
+    UNSET(DEAL_II_HAVE_CXX11_FLAG CACHE)
   ENDIF()
+
 ENDFOREACH()
+
 
 IF(DEAL_II_HAVE_CXX11_FLAG)
 
   # Set CMAKE_REQUIRED_FLAGS for the unit tests
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX11_FLAG}")
+  PUSH_TEST_FLAG("${DEAL_II_CXX11_FLAG}")
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -94,7 +102,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
   # multithreading is requested, it will be added to CXXFLAGS
   # later on so there is no need to do this here.
   #
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-lpthread")
+  PUSH_TEST_FLAG("-lpthread")
   CHECK_CXX_SOURCE_RUNS(
     "
     #include <thread>
@@ -102,7 +110,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     int main(){ std::thread t(f,1); t.join(); return 0; }
     "
     DEAL_II_HAVE_CXX11_THREAD_RUN_OK)
-  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-lpthread")
+  POP_TEST_FLAG()
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -151,13 +159,17 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
   ELSE()
 
     MESSAGE(STATUS "Insufficient C++11 support. Disabling ${DEAL_II_CXX11_FLAG}.")
+
   ENDIF()
+
 
   IF(DEAL_II_CAN_USE_CXX11)
     #
     # Also test for a couple of C++11 things that we don't use in the
     # library but that users may want to use in their applications and that
     # we might want to test in the testsuite
+    #
+    # TODO: Actually we have to export the test results somehow. :-]
     #
 
     CHECK_CXX_SOURCE_COMPILES(
@@ -186,7 +198,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     ENDIF()
   ENDIF()
 
-  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX11_FLAG}")
+  POP_TEST_FLAG()
 
 ELSE()
     MESSAGE(STATUS "Insufficient C++11 support. Disabling ${DEAL_II_CXX11_FLAG}.")

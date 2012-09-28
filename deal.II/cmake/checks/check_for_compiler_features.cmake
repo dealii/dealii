@@ -427,7 +427,7 @@ CHECK_CXX_SOURCE_COMPILES(
 
 # ...and then verify whether it actually errors out if
 # -Werror is given
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+PUSH_TEST_FLAG("-Werror")
 CHECK_CXX_SOURCE_COMPILES(
   "
           int old_fn () __attribute__((deprecated));
@@ -437,7 +437,7 @@ CHECK_CXX_SOURCE_COMPILES(
 	  int main () {}
   "
   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED_WARNING)
-STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-Werror")
+POP_TEST_FLAG()
 
 IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
    AND
@@ -448,3 +448,4 @@ ELSE()
   MESSAGE(STATUS "Compiler does not support the deprecated attribute")
   SET(DEAL_II_DEPRECATED " ")
 ENDIF()
+

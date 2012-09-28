@@ -54,14 +54,16 @@ CHECK_CXX_COMPILER_BUG(
 #
 # - maier, rewritten 2012
 #
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wreturn-type -Werror")
+PUSH_TEST_FLAG("-Wreturn-type")
+PUSH_TEST_FLAG("-Werror")
 CHECK_CXX_COMPILER_BUG(
   "
   const double foo() { return 1.; }
   int main() { return 0; }
   "
   DEAL_II_WRETURN_TYPE_CONST_QUALIFIER_BUG)
-STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-Wreturn-type -Werror")
+POP_TEST_FLAG()
+POP_TEST_FLAG()
 
 IF(DEAL_II_WRETURN_TYPE_CONST_QUALIFIER_BUG)
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS -Wno-return-type)
@@ -104,14 +106,16 @@ ENDIF()
 CHECK_INCLUDE_FILE_CXX("mpi.h" HAVE_MPI_H)
 
 IF(HAVE_MPI_H)
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wunused-parameter -Werror")
+  PUSH_TEST_FLAG("-Wunused-parameter")
+  PUSH_TEST_FLAG("-Werror")
   CHECK_CXX_COMPILER_BUG(
     "
     #include <mpi.h>
     int main() { return 0; }
     "
     DEAL_II_ADVANCE_WARNING_BUG)
-  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-Wunused-parameter -Werror")
+  POP_TEST_FLAG()
+  POP_TEST_FLAG()
 
   IF(DEAL_II_ADVANCE_WARNING_BUG)
     ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-parameter")
