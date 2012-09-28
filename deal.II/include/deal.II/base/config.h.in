@@ -59,14 +59,6 @@
 #cmakedefine DEAL_II_USE_ARPACK
 
 
-/***************************************
- * Configured in configure_blas.cmake: *
- ***************************************/
-
-/* Defined if deal.II was configured with BLAS support */
-#cmakedefine HAVE_LIBBLAS
-
-
 /*************************************************
  * Configured in configure_functionparser.cmake: *
  *************************************************/

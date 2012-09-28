@@ -948,14 +948,6 @@ namespace StandardExceptions
                                     */
   DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
 
-                                   /**
-                                    * This function requires the BLAS
-                                    * library. Please reconfigure
-                                    * using the option
-                                    * <tt>--with-blas</tt> and check
-                                    * if it is actually included.
-                                    */
-  DeclException0 (ExcNeedsBLAS);
 
                                    /**
                                     * This function requires the LAPACK
@@ -1060,15 +1052,6 @@ namespace StandardExceptions
  * Unfortunately, the following must be repeated for each library,
  * since we cannot have ifdefs in macros.
  */
-
-/**
- * Assert support for the BLAS library
- */
-#ifdef HAVE_LIBBLAS
-#  define AssertBLAS {}
-#else
-#  define AssertBLAS Assert(false, ExcNeedsBLAS())
-#endif
 
 
 /**
