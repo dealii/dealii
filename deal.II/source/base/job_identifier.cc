@@ -15,7 +15,7 @@
 #include <deal.II/base/job_identifier.h>
 #include <ctime>
 
-#if HAVE_GETHOSTNAME
+#ifdef HAVE_GETHOSTNAME
 # include <unistd.h>
 #endif
 
