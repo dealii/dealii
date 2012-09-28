@@ -521,19 +521,6 @@ namespace Polynomials
   Polynomial<number>::shift(std::vector<number>& coefficients,
                             const number2 offset)
   {
-#ifdef DEAL_II_LONG_DOUBLE_LOOP_BUG
-    AssertThrow (false,
-                 ExcMessage("Sorry, but the compiler you are using has a bug that disallows "
-                            "compilation of this function, so you cannot use it. Read more "
-                            "about the bug and when it occurs in the aclocal.m4 file in the "
-                            "top level directory (watch for the string "
-                            "DEAL_II_LONG_DOUBLE_LOOP_BUG)"));
-                                     // calm down warning for unused
-                                     // args. note that this code is
-                                     // actually unreachable
-    coefficients[0] = offset;
-#else
-
                                 // too many coefficients cause overflow in
                                 // the binomial coefficient used below
     Assert (coefficients.size() < 31, ExcNotImplemented());
@@ -587,7 +574,6 @@ namespace Polynomials
 
                                      // copy new elements to old vector
     coefficients.assign(new_coefficients.begin(), new_coefficients.end());
-#endif
   }
 
 
