@@ -850,59 +850,16 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       * cell.
                                       */
     static FiniteElementData<dim>
-    multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
-                          const unsigned int            N);
-
-                                     /**
-                                      * Same as above for mixed elements
-                                      * with two different sub-elements.
-                                      */
-    static FiniteElementData<dim>
-    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+    multiply_dof_numbers (const FiniteElement<dim,spacedim> *fe1,
                           const unsigned int            N1,
-                          const FiniteElementData<dim> &fe2,
-                          const unsigned int            N2);
-
-                                     /**
-                                      * Same as above for mixed elements
-                                      * with three different sub-elements.
-                                      */
-    static FiniteElementData<dim>
-    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
-                          const unsigned int            N1,
-                          const FiniteElementData<dim> &fe2,
-                          const unsigned int            N2,
-                          const FiniteElementData<dim> &fe3,
-                          const unsigned int            N3);
-
-                                   /**
-                                    * with 4 different sub-elements
-                                    */
-    static FiniteElementData<dim>
-    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
-                          const unsigned int            N1,
-                          const FiniteElementData<dim> &fe2,
-                          const unsigned int            N2,
-                          const FiniteElementData<dim> &fe3,
-                          const unsigned int            N3,
-                          const FiniteElementData<dim> &fe4,
-                          const unsigned int            N4);
-
-
-                                   /**
-                                    * and with 5 different sub-elements
-                                    */
-    static FiniteElementData<dim>
-    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
-                          const unsigned int            N1,
-                          const FiniteElementData<dim> &fe2,
-                          const unsigned int            N2,
-                          const FiniteElementData<dim> &fe3,
-                          const unsigned int            N3,
-                          const FiniteElementData<dim> &fe4,
-                          const unsigned int            N4,
-                          const FiniteElementData<dim> &fe5,
-                          const unsigned int            N5);
+                          const FiniteElement<dim,spacedim> *fe2=NULL,
+                          const unsigned int            N2=0,
+                          const FiniteElement<dim,spacedim> *fe3=NULL,
+                          const unsigned int            N3=0,
+                          const FiniteElement<dim,spacedim> *fe4=NULL,
+                          const unsigned int            N4=0,
+                          const FiniteElement<dim,spacedim> *fe5=NULL,
+                          const unsigned int            N5=0);
 
                                    /**
                                     * Same as above but for
@@ -1083,7 +1040,8 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       * @p prolongation
                                       * matrices.
                                       */
-    void initialize();
+    void initialize (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+                       const std::vector<unsigned int> &multiplicities);
 
                                      /**
                                       * Used by @p initialize.
