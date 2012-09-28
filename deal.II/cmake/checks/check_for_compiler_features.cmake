@@ -413,6 +413,8 @@ ENDIF()
 # variable in config.h), i.e., to something the compiler will
 # ignore
 #
+
+# first see if the compiler accepts the attribute
 CHECK_CXX_SOURCE_COMPILES(
   "
           int old_fn () __attribute__((deprecated));
@@ -423,8 +425,26 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
 
-IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
+# ...and then verify whether it actually errors out if
+# -Werror is given
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+CHECK_CXX_SOURCE_COMPILES(
+  "
+          int old_fn () __attribute__((deprecated));
+          int old_fn () { return 0; }
+          int (*fn_ptr)() = old_fn;
+
+	  int main () {}
+  "
+  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED_WARNING)
+STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-Werror")
+
+IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
+   AND
+   (NOT DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED_WARNING))
+  MESSAGE(STATUS "Compiler supports the deprecated attribute")
   SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
 ELSE()
+  MESSAGE(STATUS "Compiler does not support the deprecated attribute")
   SET(DEAL_II_DEPRECATED " ")
 ENDIF()
