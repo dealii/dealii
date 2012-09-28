@@ -25,6 +25,9 @@ Major:
 
 * Port the testsuite to cmake
 
+* Rename all DEAL_II_USE_* and HAVE_LIB* that refer to a feature to
+  DEAL_II_WITH_*.
+
 
 Minor:
 
