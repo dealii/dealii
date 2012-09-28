@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>FESystem, components and blocks</h3>
  *
  * An FESystem, except in the most trivial case, produces a vector-valued
- * finite element with several components. The number of components
+ * finite element with several components. The number of components n_components()
  * corresponds to the dimension of the solution function in the PDE system,
  * and correspondingly also to the number of equations your PDE system
  * has. For example, the mixed Laplace system covered in step-20 has $d+1$
@@ -57,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  * elements with multiplicities count multiple times. These blocks are usually
  * addressed using the information in DoFHandler::block_info(). The number of
  * blocks of a FESystem object is simply the sum of all multiplicities of
- * base elements.
+ * base elements and is given by n_blocks().
  *
  * For example, the FESystem for the Taylor-Hood element for the
  * three-dimensional Stokes problem can be built using the code
