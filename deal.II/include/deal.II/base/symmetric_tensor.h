@@ -407,7 +407,6 @@ namespace internal
                                          // as friends. make sure to
                                          // work around bugs in some
                                          // compilers
-#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
         template <int,int,typename> friend class SymmetricTensor;
         template <int,int,bool,int,typename>
         friend class Accessor;
@@ -415,10 +414,6 @@ namespace internal
         friend class ::dealii::SymmetricTensor<rank,dim,Number>;
         friend class Accessor<rank,dim,constness,P+1,Number>;
 #  endif
-#else
-        friend class SymmetricTensor<rank,dim,Number>;
-        friend class Accessor<rank,dim,constness,P+1,Number>;
-#endif
     };
 
 
@@ -526,7 +521,6 @@ namespace internal
                                          // as friends. make sure to
                                          // work around bugs in some
                                          // compilers
-#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
         template <int,int,typename> friend class SymmetricTensor;
         template <int,int,bool,int,typename>
         friend class SymmetricTensorAccessors::Accessor;
@@ -534,10 +528,6 @@ namespace internal
         friend class ::dealii::SymmetricTensor<rank,dim,Number>;
         friend class SymmetricTensorAccessors::Accessor<rank,dim,constness,2,Number>;
 #  endif
-#else
-        friend class SymmetricTensor<rank,dim,Number>;
-        friend class Accessor<rank,dim,constness,2,Number>;
-#endif
     };
   }
 }
