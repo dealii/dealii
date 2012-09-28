@@ -22,7 +22,7 @@ FOREACH(test_flag
     "-std=c++11"
     "-std=c++-x"
     )
-  SET(flag ${test_flag})
+  SET(DEAL_II_CXX11_FLAG ${test_flag})
   CHECK_CXX_COMPILER_FLAG("${test_flag}" DEAL_II_HAVE_CXX11_FLAG)
   IF(DEAL_II_HAVE_CXX11_FLAG)
     BREAK()
@@ -32,7 +32,7 @@ ENDFOREACH()
 IF(DEAL_II_HAVE_CXX11_FLAG)
 
   # Set CMAKE_REQUIRED_FLAGS for the unit tests
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${flag}")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX11_FLAG}")
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -141,16 +141,16 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
       DEAL_II_HAVE_CXX11_TUPLE AND
       DEAL_II_HAVE_CXX11_TYPE_TRAITS )
 
-    MESSAGE(STATUS "Sufficient C++11 support. Enabling ${flag}.")
+    MESSAGE(STATUS "Sufficient C++11 support. Enabling ${DEAL_II_CXX11_FLAG}.")
 
     SET(DEAL_II_CAN_USE_CXX1X TRUE) # TODO
     SET(DEAL_II_CAN_USE_CXX11 TRUE)
 
-    ADD_FLAGS(CMAKE_CXX_FLAGS "${flag}")
+    ADD_FLAGS(CMAKE_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
 
   ELSE()
 
-    MESSAGE(STATUS "Insufficient C++11 support. Disabling ${flag}.")
+    MESSAGE(STATUS "Insufficient C++11 support. Disabling ${DEAL_II_CXX11_FLAG}.")
   ENDIF()
 
   IF(DEAL_II_CAN_USE_CXX11)
@@ -186,10 +186,10 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     ENDIF()
   ENDIF()
 
-  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${flag}")
+  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX11_FLAG}")
 
 ELSE()
-    MESSAGE(STATUS "Insufficient C++11 support. Disabling ${flag}.")
+    MESSAGE(STATUS "Insufficient C++11 support. Disabling ${DEAL_II_CXX11_FLAG}.")
 ENDIF()
 
 
