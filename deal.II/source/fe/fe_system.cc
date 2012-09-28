@@ -161,7 +161,7 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe,
                                   const unsigned int n_elements) :
                 FiniteElement<dim,spacedim> (multiply_dof_numbers(&fe, n_elements),
                                     compute_restriction_is_additive_flags (&fe, n_elements),
-                                    compute_nonzero_components(fe, n_elements)),
+                                    compute_nonzero_components(&fe, n_elements)),
                 base_elements((n_elements>0))
 {
   std::vector<const FiniteElement<dim,spacedim>*> fes;
@@ -181,8 +181,8 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
                 FiniteElement<dim,spacedim> (multiply_dof_numbers(&fe1, n1, &fe2, n2),
                                     compute_restriction_is_additive_flags (&fe1, n1,
                                                                            &fe2, n2),
-                                    compute_nonzero_components(fe1, n1,
-                                                               fe2, n2)),
+                                    compute_nonzero_components(&fe1, n1,
+                                                               &fe2, n2)),
                 base_elements((n1>0)+(n2>0))
 {
   std::vector<const FiniteElement<dim,spacedim>*> fes;
@@ -209,9 +209,9 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
                                     compute_restriction_is_additive_flags (&fe1, n1,
                                                                            &fe2, n2,
                                                                            &fe3, n3),
-                                    compute_nonzero_components(fe1, n1,
-                                                               fe2, n2,
-                                                               fe3, n3)),
+                                    compute_nonzero_components(&fe1, n1,
+                                                               &fe2, n2,
+                                                               &fe3, n3)),
                 base_elements((n1>0)+(n2>0)+(n3>0))
 {
   std::vector<const FiniteElement<dim,spacedim>*> fes;
@@ -243,10 +243,10 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
                                                                       &fe2, n2,
                                                                       &fe3, n3,
                                                                       &fe4, n4),
-                               compute_nonzero_components(fe1, n1,
-                                                          fe2, n2,
-                                                          fe3, n3,
-                                                          fe4 ,n4)),
+                               compute_nonzero_components(&fe1, n1,
+                                                          &fe2, n2,
+                                                          &fe3, n3,
+                                                          &fe4 ,n4)),
   base_elements((n1>0)+(n2>0)+(n3>0)+(n4>0))
 {
   std::vector<const FiniteElement<dim,spacedim>*> fes;
@@ -283,11 +283,11 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
                                                                       &fe3, n3,
                                                                       &fe4, n4,
                                                                       &fe5, n5),
-                               compute_nonzero_components(fe1, n1,
-                                                          fe2, n2,
-                                                          fe3, n3,
-                                                          fe4 ,n4,
-                                                          fe5, n5)),
+                               compute_nonzero_components(&fe1, n1,
+                                                          &fe2, n2,
+                                                          &fe3, n3,
+                                                          &fe4 ,n4,
+                                                          &fe5, n5)),
   base_elements((n1>0)+(n2>0)+(n3>0)+(n4>0)+(n5>0))
 {
   std::vector<const FiniteElement<dim,spacedim>*> fes;
@@ -2886,127 +2886,33 @@ compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim
 
 template <int dim, int spacedim>
 std::vector<ComponentMask>
-FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                           const unsigned int        N1)
-{
-  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
-  std::vector<unsigned int>              multiplicities;
-
-  fe_list.push_back (&fe1);
-  multiplicities.push_back (N1);
-
-  return compute_nonzero_components (fe_list, multiplicities);
-}
-
-
-
-template <int dim, int spacedim>
-std::vector<ComponentMask>
-FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                           const unsigned int        N1,
-                                           const FiniteElement<dim,spacedim> &fe2,
-                                           const unsigned int        N2)
-{
-  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
-  std::vector<unsigned int>              multiplicities;
-
-  fe_list.push_back (&fe1);
-  multiplicities.push_back (N1);
-
-  fe_list.push_back (&fe2);
-  multiplicities.push_back (N2);
-
-  return compute_nonzero_components (fe_list, multiplicities);
-}
-
-
-
-template <int dim, int spacedim>
-std::vector<ComponentMask>
-FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                           const unsigned int        N1,
-                                           const FiniteElement<dim,spacedim> &fe2,
-                                           const unsigned int        N2,
-                                           const FiniteElement<dim,spacedim> &fe3,
-                                           const unsigned int        N3)
-{
-  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
-  std::vector<unsigned int>              multiplicities;
-
-  fe_list.push_back (&fe1);
-  multiplicities.push_back (N1);
-
-  fe_list.push_back (&fe2);
-  multiplicities.push_back (N2);
-
-  fe_list.push_back (&fe3);
-  multiplicities.push_back (N3);
-
-  return compute_nonzero_components (fe_list, multiplicities);
-}
-
-
-
-template <int dim, int spacedim>
-std::vector<ComponentMask>
-FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
+FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> *fe1,
                                                     const unsigned int        N1,
-                                                    const FiniteElement<dim,spacedim> &fe2,
+                                                    const FiniteElement<dim,spacedim> *fe2,
                                                     const unsigned int        N2,
-                                                    const FiniteElement<dim,spacedim> &fe3,
+                                                    const FiniteElement<dim,spacedim> *fe3,
                                                     const unsigned int        N3,
-                                                    const FiniteElement<dim,spacedim> &fe4,
-                                                    const unsigned int        N4)
-{
-  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
-  std::vector<unsigned int>              multiplicities;
-
-  fe_list.push_back (&fe1);
-  multiplicities.push_back (N1);
-
-  fe_list.push_back (&fe2);
-  multiplicities.push_back (N2);
-
-  fe_list.push_back (&fe3);
-  multiplicities.push_back (N3);
-
-  fe_list.push_back (&fe4);
-  multiplicities.push_back (N4);
-
-  return compute_nonzero_components (fe_list, multiplicities);
-}
-
-
-
-template <int dim, int spacedim>
-std::vector<ComponentMask>
-FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                                    const unsigned int        N1,
-                                                    const FiniteElement<dim,spacedim> &fe2,
-                                                    const unsigned int        N2,
-                                                    const FiniteElement<dim,spacedim> &fe3,
-                                                    const unsigned int        N3,
-                                                    const FiniteElement<dim,spacedim> &fe4,
+                                                    const FiniteElement<dim,spacedim> *fe4,
                                                     const unsigned int        N4,
-                                                    const FiniteElement<dim,spacedim> &fe5,
+                                                    const FiniteElement<dim,spacedim> *fe5,
                                                     const unsigned int        N5)
 {
   std::vector<const FiniteElement<dim,spacedim>*> fe_list;
   std::vector<unsigned int>              multiplicities;
 
-  fe_list.push_back (&fe1);
+  fe_list.push_back (fe1);
   multiplicities.push_back (N1);
 
-  fe_list.push_back (&fe2);
+  fe_list.push_back (fe2);
   multiplicities.push_back (N2);
 
-  fe_list.push_back (&fe3);
+  fe_list.push_back (fe3);
   multiplicities.push_back (N3);
 
-  fe_list.push_back (&fe4);
+  fe_list.push_back (fe4);
   multiplicities.push_back (N4);
 
-  fe_list.push_back (&fe5);
+  fe_list.push_back (fe5);
   multiplicities.push_back (N5);
 
   return compute_nonzero_components (fe_list, multiplicities);
@@ -3027,11 +2933,13 @@ compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*
                                    // from the given FEs
   unsigned int n_shape_functions = 0;
   for (unsigned int i=0; i<fes.size(); ++i)
-    n_shape_functions += fes[i]->dofs_per_cell * multiplicities[i];
+    if (multiplicities[i]>0) //needed because fe might be NULL
+      n_shape_functions += fes[i]->dofs_per_cell * multiplicities[i];
 
   unsigned int n_components = 0;
   for (unsigned int i=0; i<fes.size(); ++i)
-    n_components += fes[i]->n_components() * multiplicities[i];
+    if (multiplicities[i]>0) //needed because fe might be NULL
+      n_components += fes[i]->n_components() * multiplicities[i];
 
                                    // generate the array that will
                                    // hold the output

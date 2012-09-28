@@ -914,63 +914,17 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       * components of a composed
                                       * finite element.
                                       */
-    static std::vector<ComponentMask>
-    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                const unsigned int        N1);
-
-                                     /**
-                                      * Compute the non-zero vector
-                                      * components of a composed
-                                      * finite element.
-                                      */
-    static std::vector<ComponentMask>
-    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                const unsigned int        N1,
-                                const FiniteElement<dim,spacedim> &fe2,
-                                const unsigned int        N2);
-
-                                     /**
-                                      * Compute the non-zero vector
-                                      * components of a composed
-                                      * finite element.
-                                      */
-    static std::vector<ComponentMask>
-    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                const unsigned int        N1,
-                                const FiniteElement<dim,spacedim> &fe2,
-                                const unsigned int        N2,
-                                const FiniteElement<dim,spacedim> &fe3,
-                                const unsigned int        N3);
-
-                                   /**
-                                    * Compute the non-zero vector
-                                    * components of a composed
-                                    * finite element.
-                                    */
    static std::vector<ComponentMask>
-    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
+    compute_nonzero_components (const FiniteElement<dim,spacedim> *fe1,
                                 const unsigned int        N1,
-                                const FiniteElement<dim,spacedim> &fe2,
-                                const unsigned int        N2,
-                                const FiniteElement<dim,spacedim> &fe3,
-                                const unsigned int        N3,
-                                const FiniteElement<dim,spacedim> &fe4,
-                                const unsigned int        N4);
-
-                                     /**
-                                      * With 5 elements.
-                                      */
-   static std::vector<ComponentMask>
-    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                const unsigned int        N1,
-                                const FiniteElement<dim,spacedim> &fe2,
-                                const unsigned int        N2,
-                                const FiniteElement<dim,spacedim> &fe3,
-                                const unsigned int        N3,
-                                const FiniteElement<dim,spacedim> &fe4,
-                                const unsigned int        N4,
-                                const FiniteElement<dim,spacedim> &fe5,
-                                const unsigned int        N5);
+                                const FiniteElement<dim,spacedim> *fe2=NULL,
+                                const unsigned int        N2=0,
+                                const FiniteElement<dim,spacedim> *fe3=NULL,
+                                const unsigned int        N3=0,
+                                const FiniteElement<dim,spacedim> *fe4=NULL,
+                                const unsigned int        N4=0,
+                                const FiniteElement<dim,spacedim> *fe5=NULL,
+                                const unsigned int        N5=0);
 
                                      /**
                                       * Compute the nonzero components
