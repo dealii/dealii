@@ -16,19 +16,21 @@ SET_IF_EMPTY(SUITESPARSE_DIR "$ENV{SUITESPARSECONFIG_DIR}")
 
 FIND_PATH(SUITESPARSECONFIG_INCLUDE_DIR SuiteSparse_config.h
   HINTS
-    ${UMFPACK_DIR}
     ${SUITESPARSECONFIG_DIR}
+    ${UMFPACK_DIR}
+    ${UMFPACK_DIR}/../SuiteSparse_config
   PATH_SUFFIXES
-    include SuiteSparse_config ../SuiteSparse_config
+    include SuiteSparse_config
 )
 
 FIND_LIBRARY(SUITESPARSECONFIG_LIBRARY
   NAMES suitesparseconfig
   HINTS
-    ${UMFPACK_DIR}
     ${SUITESPARSECONFIG_DIR}
+    ${UMFPACK_DIR}
+    ${UMFPACK_DIR}/../SuiteSparse_config
   PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib SuiteSparse_config ../SuiteSparse_config
+    lib${LIB_SUFFIX} lib64 lib SuiteSparse_config
   )
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(SUITESPARSECONFIG DEFAULT_MSG

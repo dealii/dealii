@@ -18,8 +18,9 @@ FIND_PATH(AMD_INCLUDE_DIR amd.h
   HINTS
     ${AMD_DIR}
     ${UMFPACK_DIR}
+    ${UMFPACK_DIR}/../AMD/
   PATH_SUFFIXES
-    amd include/amd include Include AMD/Include ../AMD/Include
+    amd include/amd include Include AMD/Include
 )
 
 FIND_LIBRARY(AMD_LIBRARY
@@ -27,8 +28,9 @@ FIND_LIBRARY(AMD_LIBRARY
   HINTS
     ${AMD_DIR}
     ${UMFPACK_DIR}
+    ${UMFPACK_DIR}/../AMD
   PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib Lib AMD/Lib ../AMD/Lib
+    lib${LIB_SUFFIX} lib64 lib Lib AMD/Lib
   )
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(AMD DEFAULT_MSG AMD_LIBRARY AMD_INCLUDE_DIR)
