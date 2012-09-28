@@ -6,7 +6,7 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
   FIND_PACKAGE(METIS)
 
   #IF(METIS_FOUND AND METIS_MAJOR GREATER 4)
-  #  SET(${var} TRUE)
+    SET(${var} TRUE)
   #ELSE()
   #  MESSAGE(WARNING "\n"
   #    "Could not find a sufficient modern metis installation: "
