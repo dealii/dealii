@@ -148,10 +148,10 @@ namespace Threads
 
   unsigned int this_thread_id ()
   {
-#ifdef SYS_gettid
-    const int this_id = syscall(SYS_gettid);
-#elif HAVE_GETPID
+#if HAVE_GETPID
     const pid_t this_id = getpid();
+#elif SYS_gettid
+    const int this_id = syscall(SYS_gettid);
 #else
 #  ifdef DEAL_II_MSVC
     const unsigned int this_id = 0;
