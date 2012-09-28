@@ -29,10 +29,6 @@ BUGS:
    linking. For the details, look at aclocal.m4 in the top-level directory. */
 #cmakedefine DEAL_II_ANON_NAMESPACE_LINKAGE_BUG
 
-/* Defined if the compiler has a problem with using arrays as arguments in
-   functions */
-#cmakedefine DEAL_II_ARRAY_ARG_BUG
-
 /* Defined if the compiler has a problem with assigning arrays in conditionals
    */
 #cmakedefine DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG
@@ -64,11 +60,6 @@ BUGS:
    constructors. */
 #cmakedefine DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
-/* Defined if the compiler needs a workaround for certain problems with taking
-   the address of template template functions. For the details, look at
-   aclocal.m4 in the top-level directory. */
-#cmakedefine DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
-
 /* Defined if the compiler has a bug with dynamic casting and dynamic
    libraries */
 #cmakedefine DEAL_II_HAVE_DARWIN_DYNACAST_BUG
@@ -86,46 +77,15 @@ BUGS:
    */
 #cmakedefine DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND
 
-/* Defined if the compiler gets an internal compiler upon some code involving
-   long doubles, and with optimization. For the details, look at aclocal.m4 in
-   the top-level directory. */
-#cmakedefine DEAL_II_LONG_DOUBLE_LOOP_BUG
-
 /* Defined if the compiler refuses to allow the explicit specialization of
    static member arrays. For the exact failure mode, look at aclocal.m4 in the
    top-level directory. */
 #cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
 
-/* Defined if the compiler refuses to specialize an outer class template while
-   keeping a member as a template. For the exact failure mode, look at
-   aclocal.m4 in the top-level directory. */
-#cmakedefine DEAL_II_MEMBER_TEMPLATE_SPECIALIZATION_BUG
-
 /* Defined if the compiler refuses to allow the explicit specialization of
    static member variables. For the exact failure mode, look at aclocal.m4 in
    the top-level directory. */
 #cmakedefine DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-
-/* Define if we have to work around a bug in gcc with marking all instances of
-   a template class as friends to this class if the class is inside a
-   namespace. See the aclocal.m4 file in the top-level directory for a
-   description of this bug. */
-#cmakedefine DEAL_II_NAMESP_TEMPL_FRIEND_BUG
-
-/* Define if we have to work around another bug in gcc with marking all
-   instances of a template class as friends to this class if the class is
-   inside a namespace. See the aclocal.m4 file in the top-level directory for
-   a description of this bug. */
-#cmakedefine DEAL_II_NAMESP_TEMPL_FRIEND_BUG2
-
-/* Defined if the compiler does not properly implement the resolution of
-   defect report #45 to the C++ standard, which makes nested types implicit
-   friends of the enclosing class. */
-#cmakedefine DEAL_II_NESTED_CLASS_FRIEND_BUG
-
-/* Defined if the compiler does not understand friend declarations for nested
-   member classes when giving a full class specification. */
-#cmakedefine DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
 
 /* Defined if the compiler does not support the
    substitution-failure-is-not-an-error paradigm. For the details, look at
@@ -136,11 +96,6 @@ BUGS:
    aclocal.m4 file in the top-level directory for a description of this bug.
    */
 #cmakedefine DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND
-
-/* Defined if the compiler refuses to allow a typedef to a template template
-   class template parameter. For the exact failure mode, look at aclocal.m4 in
-   the top-level directory. */
-#cmakedefine DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
 
 /* Defined if the compiler requires the use of the template keyword for
    disambiguation keyword in certain contexts in which it is not supposed to
