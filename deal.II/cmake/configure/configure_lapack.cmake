@@ -3,6 +3,7 @@
 # Configuration for the lapack library:
 #
 
+
 MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
   FIND_PACKAGE(LAPACK)
 

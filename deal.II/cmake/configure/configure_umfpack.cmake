@@ -4,7 +4,9 @@
 
 
 SET(FEATURE_UMFPACK_DEPENDS
-  DEAL_II_WITH_BLAS
+  #
+  # Currently, with enabled umfpack support, we also need LAPACK...
+  #
   DEAL_II_WITH_LAPACK
   )
 

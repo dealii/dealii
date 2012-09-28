@@ -50,10 +50,6 @@ OPTION(DEAL_II_WITH_ARPACK
   "Build deal.II with support for ARPACK."
   OFF)
 
-OPTION(DEAL_II_WITH_BLAS
-  "Build deal.II with support for BLAS."
-  OFF)
-
 SET(DEAL_II_WITH_BOOST
   # Always true. We need it :-]
   ON
