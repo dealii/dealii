@@ -457,10 +457,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
 
     dnl See whether the gcc we use already has a flag for C++2011 features
-    dnl and whether we can mark functions as deprecated with an attributed
     DEAL_II_CHECK_CXX1X
-    DEAL_II_CHECK_DEPRECATED
-
 
     dnl On some gcc 4.3 snapshots, a 'const' qualifier on a return type triggers a
     dnl warning. This is unfortunate, since we happen to stumble on this
@@ -1051,6 +1048,16 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           ;;
     esac
   fi
+
+  dnl See whether we can mark functions as deprecated with an attribute.
+  dnl This needs to run for all compilers because we set a preprocessor
+  dnl #define to either the empty string or to a particular piece of text
+  dnl and so we need to cross one code path or the other for all compilers
+  dnl we work with. (If we don't, e.g. if the following statement were in
+  dnl the GCC section above, then we would end up with a #undef in
+  dnl config.h and this would result in compiler errors where we use the
+  dnl DEAL_II_DEPRECATED tag in our codes.)
+  DEAL_II_CHECK_DEPRECATED
 ])
 
 
