@@ -74,7 +74,7 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
   INSTALL(DIRECTORY ${boost_folder}/include/boost
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/contrib
     COMPONENT library
-    FILES_MATCHING PATTERN "*.h"
+    FILES_MATCHING PATTERN "*.hh"
     PATTERN ".svn" EXCLUDE
     )
 
