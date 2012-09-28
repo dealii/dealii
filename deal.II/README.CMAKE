@@ -666,6 +666,9 @@ DEVELOPMENT
         <function>. (Don't forget to specify the link libraries, see
         below.)
 
+      CHECK_CXX_COMPILER_FLAG(flag variable)
+        Sets the variable to 1 if the compiler understands the flag.
+
   - Necessary compiler flags can easily set in the string variable
     CMAKE_REQUIRED_FLAGS. There are two small macros that do this job
     nicely:
