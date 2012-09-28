@@ -1,6 +1,8 @@
 #
 # Try to find the AMD library
 #
+# This is a helper module for FindUMFPACK.cmake
+#
 # This module exports
 #
 #   AMD_LIBRARY
