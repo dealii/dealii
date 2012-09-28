@@ -19,8 +19,6 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #ADD_EXECUTABLE(report_features report_features.cc)
   #TARGET_LINK_LIBRARIES(report_features ${DEAL_II_EXTERNAL_LIBRARIES})
 
-  ADD_DEPENDENCIES(report_features deal_ii_target_dependencies)
-
   INSTALL(TARGETS
     make_dependencies
     #report_features
