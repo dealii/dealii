@@ -28,10 +28,6 @@ ENDFOREACH()
 #
 # Depulicate entries in DEAL_II_EXTERNAL_LIBRARIES(_...):
 #
-# Well, cmake has a bad habit of removing duplicate link library entries
-# from targets. It wouldn't be that harmful if cmake would do this from
-# behind... So, do it by hand to link correctly *sigh*
-#
 LIST(REVERSE DEAL_II_EXTERNAL_LIBRARIES)
 LIST(REMOVE_DUPLICATES DEAL_II_EXTERNAL_LIBRARIES)
 LIST(REVERSE DEAL_II_EXTERNAL_LIBRARIES)
