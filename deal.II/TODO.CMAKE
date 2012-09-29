@@ -31,6 +31,8 @@ Major:
 
 Minor:
 
+* Get rid of DEAL_II_PATH in config.h and in the sources.
+
 * HAVE_JN_ ?
 
 * There is still a perl script for generating lapack_templates.h. Is this
