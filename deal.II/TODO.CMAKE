@@ -5,6 +5,8 @@ Major:
 
 * Add the rest of the Bug tests
 
+* Bump functionparser to version 4.5
+
 * The following features have to be written:
     * MUMPS
     * SLEPC

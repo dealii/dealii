@@ -1,0 +1,76 @@
+This folder contains third party projects bundled with deal.II
+
+PLEASE NOTE THAT THESE PROJECTS ARE COPYRIGHTED BY OTHERS THAN THE deal.II
+AUTHORS, but are included by permission. For details, consult the stated
+licenses below.
+
+Below is a detailed list of the content of each subdirectory, and the
+licenses that apply.
+
+
+boost-1.49.0
+============
+
+Contains parts of the boost c++ libraries copyrighted by the boost authors
+and licensed under the Boost Software License Version 1.0. See
+boost-1.49.0/LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt
+
+A full version of the library can be downloaded at http://www.boost.org/.
+
+
+functionparser (TODO: for fparser4.5)
+==============
+
+Contains the functionparser project which copyrighted by Juha Nieminen and
+licensed under the GNU Lesser General Public License (LGPL) Version 3.
+See functionparser/README, functionparser/lgpl-3.0.txt or
+http://warp.povusers.org/FunctionParser/
+
+A full version of the functionparser project can be downloaded at
+http://warp.povusers.org/FunctionParser/.
+
+
+mesh_conversion (TODO -> move to utilities)
+===============
+
+Is a program originally written by Jean-Paul Pelteret and licensed under
+the GNU General Public License (GPL) Version 2.0. See
+mesh_conversion/README.txt, mesh_conversion/gpl-2.0.txt.
+
+TODO: A homepage.
+
+
+parameter_gui (TODO -> move to utilities)
+=============
+
+Is a program written by Martin Steigemann and Wolfgang Bangerth and
+licensed under the GNU Lesser General Public License (LGPL) Version 2.1 or
+later. See parameter_gui/README, parameter_gui/lgpl-2.1.txt.
+
+TODO: A homepage.
+
+
+./tbb30_104oss
+==============
+
+Contains parts of the Intel Threading Building Blocks library copyrighted
+by the respective authors and licensed under the GNU General Public License
+(GPL) Version 2.0 with a runtime exception. See tbb30_104oss/COPYING or
+http://threadingbuildingblocks.org/.
+
+A full version of the tbb project can be downloaded at
+http://threadingbuildingblocks.org/.
+
+
+./umfpack  (UMFPACK 5.0.2, AMD 2.2, UFCONFIG) 
+=========
+
+Contains parts of the UMFPACK, AMD and UFCONFIG libraries copyrighted by
+Timothy A. Davis, Patrick R. Amestoy, and Iain S. Duff and licensed under
+the GNU Lesser General Public Licensse version 2.1 or later. Or alternative
+licenses as explained in umfpack/UMFPACK/Doc/License and
+umfpack/AMD/Doc/License. See umfpack/README.txt and umfpack/lgpl-2.1.txt.
+
+A full version of UMFPACK can be downloaded at
+http://www.cise.ufl.edu/research/sparse/umfpack/.
+

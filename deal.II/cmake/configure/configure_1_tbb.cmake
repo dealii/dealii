@@ -125,7 +125,7 @@ SET(FEATURE_TBB_HAVE_CONTRIB TRUE)
 
 
 MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
-  SET(tbb_folder "${CMAKE_SOURCE_DIR}/contrib/tbb/tbb30_104oss")
+  SET(tbb_folder "${CMAKE_SOURCE_DIR}/contrib/tbb30_104oss")
 
   #
   # Setup threading (before configuring our build...)
