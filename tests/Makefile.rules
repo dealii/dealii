@@ -10,7 +10,7 @@
 
 # reference the normalization script in the tests directory, which is
 # one up from where the variable will be expanded
-normalize = ../normalize.pl
+normalize = $(shell cd .. && pwd)/normalize.pl
 
 verbose = off
 

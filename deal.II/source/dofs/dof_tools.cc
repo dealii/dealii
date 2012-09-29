@@ -3297,7 +3297,7 @@ namespace DoFTools
 
                                    // In the case that both faces have
                                    // children, we loop over all children
-                                   // and applu make_periodicty_constrains
+                                   // and apply make_periodicty_constrains
                                    // recursively:
     if (face_1->has_children() && face_2->has_children()) {
       Assert(face_1->n_children() == GeometryInfo<dim>::max_children_per_face &&
@@ -3392,6 +3392,12 @@ namespace DoFTools
     static const int space_dim = DH::space_dimension;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
+             (&dof_handler.get_tria())
+             ==
+             0),
+            ExcMessage ("This function can not be used with distributed triangulations."
+                        "See the documentation for more information."));
 
     typedef typename DH::cell_iterator CellIterator;
 

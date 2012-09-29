@@ -342,7 +342,8 @@ TimerOutput::enter_subsection (const std::string &section_name)
 
   Assert (std::find (active_sections.begin(), active_sections.end(),
                      section_name) == active_sections.end(),
-          ExcMessage ("Cannot enter the already active section."));
+          ExcMessage (std::string("Cannot enter the already active section <")
+		      + section_name + ">."));
 
   if (sections.find (section_name) == sections.end())
     {

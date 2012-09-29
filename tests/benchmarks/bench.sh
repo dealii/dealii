@@ -21,6 +21,8 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
       continue ;
   fi
 
+  PREVREVISION=$NEXTREVISION
+
   echo "configure"
   ./configure --disable-threads --with-petsc=no >/dev/null
   echo "compiling" 

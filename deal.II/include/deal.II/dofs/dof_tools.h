@@ -1001,6 +1001,12 @@ namespace DoFTools
                                     * function will be used for which the
                                     * respective flag was set in the component
                                     * mask.
+                                    *
+                                    * @note This function will not work
+                                    * for DoFHandler objects that are
+                                    * built on a
+                                    * parallel::distributed::Triangulation
+                                    * object.
                                     */
   template<typename FaceIterator>
   void
@@ -1079,6 +1085,12 @@ namespace DoFTools
                                     * function will be used for which the
                                     * respective flag was set in the component
                                     * mask.
+                                    *
+                                    * @note This function will not work
+                                    * for DoFHandler objects that are
+                                    * built on a
+                                    * parallel::distributed::Triangulation
+                                    * object.
                                     */
   template<typename DH>
   void
@@ -1099,6 +1111,12 @@ namespace DoFTools
                                     * corresponding vertices of the 'right'
                                     * boundary. This can be used to implement
                                     * conditions such as $u(0,y)=u(1,y+1)$.
+                                    *
+                                    * @note This function will not work
+                                    * for DoFHandler objects that are
+                                    * built on a
+                                    * parallel::distributed::Triangulation
+                                    * object.
                                     */
   template<typename DH>
   void

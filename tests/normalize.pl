@@ -1,7 +1,7 @@
 ######################################################################
 # $Id$
 #
-# Copyright (C) 2001, 2003, 2005, 2010, 2011, the deal.II authors
+# Copyright (C) 2001, 2003, 2005, 2010, 2011, 2012, the deal.II authors
 #
 # Remove insignificant volatile data from output files of tests
 #
@@ -12,9 +12,10 @@
 #  small doubles
 ######################################################################
 
-# Remove absolute path names
+# Remove absolute path names. Get the path to the testsuite from
+# the location of this script
 $D = $0;
-$D =~ s!common/scripts/normalize.pl!!;
+$D =~ s!tests/normalize.pl!!;
 s!$D!DEAL_II_PATH/!g;
 
 # Remove JobID
@@ -26,7 +27,7 @@ s/JobId.*//;
 s/%%Creation Date:.*//;
 s/\"created\".*//;
 s/# Time =.*//;
-s/# Date =.*//; 
+s/# Date =.*//;
 s/^\s+Time =.*//;
 s/^\s+Date =.*//;
 s/Time tag:.*//g;
