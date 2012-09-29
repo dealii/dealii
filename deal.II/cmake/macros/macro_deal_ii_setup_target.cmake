@@ -11,6 +11,14 @@
 
 MACRO(DEAL_II_SETUP_TARGET target)
 
+  IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDE)
+    MESSAGE(FATAL_ERROR
+      "DEAL_II_SETUP_TARGET can only be called in external projects after "
+      "the inclusion of deal.IIConfig.cmake. It is not intended for "
+      "internal use."
+      )
+  ENDIF()
+
   CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
   SET_TARGET_PROPERTIES(${target} PROPERTIES
@@ -30,28 +38,10 @@ MACRO(DEAL_II_SETUP_TARGET target)
       "${DEAL_II_USER_DEFINITIONS_RELEASE}"
     )
 
-  IF(NOT "${DEAL_II_LIBRARIES_DEBUG}${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}" STREQUAL "")
     TARGET_LINK_LIBRARIES(${target}
-      debug
-        ${DEAL_II_LIBRARIES_DEBUG}
-        ${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}
-      )
-  ENDIF()
-
-  IF(NOT "${DEAL_II_LIBRARIES_RELEASE}${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}" STREQUAL "")
-    TARGET_LINK_LIBRARIES(${target}
-      optimized
-        ${DEAL_II_LIBRARIES_RELEASE}
-        ${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}
-      )
-  ENDIF()
-
-  IF(NOT "${DEAL_II_EXTERNAL_LIBRARIES}" STREQUAL "")
-    TARGET_LINK_LIBRARIES(${target}
-      general
+        ${DEAL_II_LIBRARIES}
         ${DEAL_II_EXTERNAL_LIBRARIES}
       )
-  ENDIF()
 
 ENDMACRO()
 

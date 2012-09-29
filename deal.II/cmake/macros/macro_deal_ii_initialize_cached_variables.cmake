@@ -13,6 +13,14 @@
 
 MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
 
+  IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDE)
+    MESSAGE(FATAL_ERROR
+      "DEAL_II_INITIALIZE_CACHED_VARIABLES can only be called in external "
+      "projects after the inclusion of deal.IIConfig.cmake. It is not "
+      "intended for internal use."
+      )
+  ENDIF()
+
   SET(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "Choose the type of build, options are: Debug, Release"
     )
