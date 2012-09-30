@@ -1,0 +1,100 @@
+[/
+  (C) Copyright 2011 Vicente J. Botet Escriba.
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+
+[section:compliance Compliance with standard]
+
+[section:cpp11 C++11 standard Thread library]
+
+
+[table Compliance C++11 standard
+    [[Section]        [Description]  [Status] [Comments] [Ticket]]
+    [[30]        [Thread support library]  [Partial] [-] [-]]
+    [[30.1]        [General]  [-] [-] [-]]
+    [[30.2]        [Requirements]  [-] [-] [-]]
+    [[30.2.1]        [Template parameter names]  [-] [-] [-]]
+    [[30.2.2]        [Exceptions]  [No] [-] [#12]]
+    [[30.2.3]        [Native handles]  [Yes] [-] [-]]
+    [[30.2.4]        [Timing specifications]  [No] [-] [#6195]]
+    [[30.2.5]        [Requirements for Lockable types]  [Partial] [-] [-]]
+    [[30.2.5.1]        [In general]  [-] [-] [-]]
+    [[30.2.5.2]        [BasicLockable requirements]  [No] [-] [#13]]
+    [[30.2.5.3]        [Lockable requirements]  [yes] [-] [-]]
+    [[30.2.5.4]        [TimedLockable requirements]  [Partial] [chrono] [#6195]]
+    [[30.2.6]        [decay_copy]  [-] [-] [-]]
+    [[30.3]        [Threads]  [Partial] [-] [-]]
+    [[30.3.1]        [Class thread]  [Partial] [-] [-]]
+    [[30.3.1.1]        [Class thread::id]  [Partial] [Missing noexcept, template <> struct hash<thread::id>] [#3,#4]]
+    [[30.3.1.2]        [thread constructors]  [Partial] [Missing noexcept and move semantics] [#3,#6194]]
+    [[30.3.1.3]        [thread destructor]  [Yes] [-] [-]]
+    [[30.3.1.4]        [thread assignment]  [Partial] [move semantics] [-]]
+    [[30.3.1.5]        [thread members]  [Partial] [Missing noexcept, chrono] [#3,#6195]]
+    [[30.3.1.6]        [thread static members]  [Partial] [Missing noexcept] [#3,#6195]]
+    [[30.3.1.7]        [thread specialized algorithms]  [Yes] [-] [-]]
+    [[30.3.2]        [Namespace this_thread]  [Partial] [chrono] [#6195]]
+    [[30.4]        [Mutual exclusion]  [Partial] [-] [-]]
+    [[30.4.1]        [Mutex requirements]  [Partial] [-] [-]]
+    [[30.4.1.1]        [In general]  [Partial] [-] [-]]
+    [[30.4.1.2]        [Mutex types]  [Partial] [noexcept,delete] [#3,#5]]
+    [[30.4.1.2.1]        [Class mutex]  [Partial] [noexcept,delete] [#3,#5]]
+    [[30.4.1.2.2]        [Class recursive_mutex]  [Partial] [noexcept,delete] [#3,#5]]
+    [[30.4.1.3]        [Timed mutex types]  [Partial] [noexcept,chrono,delete] [#3,#6195,#5]]
+    [[30.4.1.3.1]        [Class timed_mutex]  [Partial] [noexcept,chrono,delete] [#3,#6195,#5]]
+    [[30.4.1.3.1]        [Class recursive_timed_mutex]  [Partial] [noexcept,chrono,delete] [#3,#6195,#5]]
+    [[30.4.2]        [Locks]  [Partial] [noexcept,chrono,move,delete,bool] [#3,#6195,#5,#6]]
+    [[30.4.2.1]        [Class template lock_guard]  [Partial] [cons/dest delete] [#5]]
+    [[30.4.2.2]        [Class template unique_lock]  [Partial] [noexcept, chrono, move, delete] [#3,#6195,#5,#6]]
+    [[30.4.2.2.1]        [unique_lock constructors, destructor, and assignment] [Partial]  [noexcept, chrono, move, delete]  [#3,#6195,#5,#6]]
+    [[30.4.2.2.2]        [unique_lock locking]  [Partial] [chrono] [,#6195,]]
+    [[30.4.2.2.3]        [unique_lock modifiers]  [Yes] [-] [-]]
+    [[30.4.2.2.4]        [unique_lock observers]  [Partial] [explicit operator bool] [#6]]
+    [[30.4.3]        [Generic locking algorithms]  [Partial] [Variadic,] [#7]]
+    [[30.4.4]        [Call once]  [Partial] [move,variadic] [#6194,#7]]
+    [[30.4.4.1]        [Struct once_flag] [Yes] [-] [-]]
+    [[30.4.4.2]        [Function call_once] [Yes] [-] [-]]
+    [[30.5]        [Condition variables]  [Partial] [chrono,cv_status,notify_all_at_thread_exit] [#6195,#8,#9]]
+    [[30.5 6-10]        [Function notify_all_at_thread_exit]  [No] [-] [#9]]
+    [[30.5.1]        [Class condition_variable]  [Partial] [chrono,cv_status] [#6195,#8]]
+    [[30.5.2]        [Class condition_variable_any]  [Partial] [chrono,cv_status] [#6195,#8]]
+    [[30.6]        [Futures]  [Partial] [-] [-]]
+    [[30.6.1]        [Overview]  [Partial] [-] [-]]
+    [[30.6.2]        [Error handling]  [No] [-] [-]]
+    [[30.6.3]        [Class future_error]  [No] [-] [-]]
+    [[30.6.4]        [Shared state]  [No] [-] [-]]
+    [[30.6.5]        [Class template promise]  [Partial] [allocator,move,delete] [#10,#6194,#5]]
+    [[30.6.6]        [Class template future]  [No] [unique_future is the closest to future] [#11]]
+    [[30.6.7]        [Class template shared_future]  [Partial] [allocator,move,delete] [#10,#6194,#5]]
+    [[30.6.8]        [Function template async]  [No] [async] [#4710]]
+    [[30.6.8]        [Class template packaged_task]  [Partial] [-] [-]]
+]
+
+
+[table Extension
+    [[Section]     [Description]   [Comments]]
+    [[30.3.1.5.x]        [interrupt]   [-]]
+    [[30.3.1.5.y]        [operator==,operator!=]   [-]]
+    [[30.3.2.x]        [Interruprion]  [-]]
+    [[30.3.2.y]        [at_thread_exit]  [-]]
+    [[30.4.3.x]        [Generic locking algorithms begin/end]  [-]]
+    [[30.x]        [Barriers]  [-]]
+    [[30.y]        [Thread Local Storage]  [-]]
+    [[30.z]        [Class thread_group]  [-]]
+]
+
+[endsect]
+
+[section:shared Shared Mutex library extension]
+
+[table Clock Requirements
+    [[Section]        [Description]  [Status] [Comments]]
+    [[XXXX]        [DDDD]  [SSSS] [CCCC]]
+    [[XXXX]        [DDDD]  [SSSS] [CCCC]]
+]
+
+[endsect]
+
+
+[endsect]

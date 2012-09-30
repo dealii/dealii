@@ -1,0 +1,75 @@
+umfpack_demo
+
+Enter the printing level for UMFPACK's output statistics:
+0: none, 1: errors only, 2: statistics, 4: print some outputs
+5: print all output [default is 1]: 
+
+--------------------------------------------------------------
+Factor and solve a small system, Ax=b, using default parameters
+Solving Ax=b via UMFPACK:
+Solving Ax=b via MATLAB:
+Difference between UMFPACK and MATLAB solution: 0
+
+--------------------------------------------------------------
+
+Factorizing [L, U, P, Q, R] = umfpack2 (A)
+
+P * (R\A) * Q - L*U should be zero:
+norm (P*(R\A)*Q - L*U, 1) = 2.77556e-16 (exact) 1.21864e-16 (estimated)
+
+Solution to Ax=b via UMFPACK factorization:
+x = Q * (U \ (L \ (P * (R \ b))))
+
+UMFPACK flop count: 2453
+
+Factorizing [L, U, P] = lu (A (:, q))
+If you are using a version of MATLAB prior to V6.0, then the
+following statement (q = colamd (A)) may fail.  Either download
+colamd from http://www.cise.ufl.edu/research/sparse, upgrade to
+MATLAB V6.0 or later, or replace the statement with
+q = colmmd (A) ;
+
+Solution to Ax=b via MATLAB factorization:
+x = U \ (L \ (P * b)) ; x (q) = x ;
+Difference between UMFPACK and MATLAB solution: 5.55112e-15
+
+MATLAB LU flop count: 3160
+
+--------------------------------------------------------------
+Solve A'x=b:
+Solving A'x=b via UMFPACK:
+Solving A'x=b via MATLAB:
+Difference between UMFPACK and MATLAB solution: 1.77636e-15
+
+--------------------------------------------------------------
+Compute C = A', and compute the LU factorization of C.
+Factorizing A' can sometimes be better than factorizing A itself
+(less work and memory usage).  Solve C'x=b; the solution is the
+same as the solution to Ax=b for the original A.
+
+P * (R\C) * Q - L*U should be zero:
+norm (P*(R\C)*Q - L*U, 1) = 1.17961e-16 (exact) 5.60533e-17 (estimated)
+
+Solution to Ax=b via UMFPACK, using the factors of C:
+x = R \ (P' * (L' \ (U' \ (Q' * b)))) ;
+Solution to Ax=b via MATLAB:
+Difference between UMFPACK and MATLAB solution: 3.55271e-15
+
+--------------------------------------------------------------
+
+Solve AX=B, where B is n-by-10, and sparse
+Difference between UMFPACK and MATLAB solution: 6.3926e-14
+
+--------------------------------------------------------------
+
+Solve AX=B, where B is n-by-10, and sparse, using umfpack_btf
+Difference between UMFPACK and MATLAB solution: 4.41347e-14
+
+--------------------------------------------------------------
+
+Solve A'X=B, where B is n-by-10, and sparse
+Difference between UMFPACK and MATLAB solution: 8.90054e-14
+
+--------------------------------------------------------------
+det(A): -4.07453e-05  UMFPACK determinant: -4.07453e-05
+diary off
