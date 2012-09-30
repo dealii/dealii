@@ -16,9 +16,11 @@
 #include <deal.II/lac/vector.h>
 
 #ifdef HAVE_FUNCTIONPARSER
+#include <fparser.hh>
 namespace fparser
 {
-#  include <fparser.hh>
+  class FunctionParser: public ::FunctionParser
+  {};
 }
 #else
 
