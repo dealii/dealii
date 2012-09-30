@@ -40,10 +40,5 @@ Minor:
 * There is still a perl script for generating lapack_templates.h. Is this
   necessary.
 
-* What to do with ./lib/meshes ? I have moved it to ./contrib/meshes for
-  the time being...
-
 * TODO: Update the p4est-setup.sh script...
 
-* The contrib libraries are included too early. User CXX_FLAGS won't be
-  included in the contrib object targets...

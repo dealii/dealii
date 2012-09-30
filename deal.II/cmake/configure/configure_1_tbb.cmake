@@ -5,7 +5,7 @@
 
 #
 # Set up genereal threading:
-# The macro will be included in CONFIGURE_FEATURE_TBB_EXTERNAL/CONTRIB.
+# The macro will be included in CONFIGURE_FEATURE_TBB_EXTERNAL/BUNDLED.
 #
 MACRO(SETUP_THREADING var)
   FIND_PACKAGE(Threads)
@@ -121,11 +121,10 @@ MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
 ENDMACRO()
 
 
-SET(FEATURE_TBB_HAVE_CONTRIB TRUE)
+SET(FEATURE_TBB_HAVE_BUNDLED TRUE)
 
 
-MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
-  SET(tbb_folder "${CMAKE_SOURCE_DIR}/contrib/tbb30_104oss")
+MACRO(FEATURE_TBB_CONFIGURE_BUNDLED var)
 
   #
   # Setup threading (before configuring our build...)
@@ -148,12 +147,11 @@ MACRO(FEATURE_TBB_CONFIGURE_CONTRIB var)
       )
   ENDIF()
 
+  #
+  # TODO: Refactor and remove from here:
+  #
+  SET(tbb_folder "${CMAKE_SOURCE_DIR}/bundled/tbb30_104oss")
   INCLUDE_DIRECTORIES(${tbb_folder}/include)
-
-  #
-  # Add tbb directly to the object files of deal.II
-  #
-  ADD_SUBDIRECTORY(${tbb_folder}/src)
 
 ENDMACRO()
 

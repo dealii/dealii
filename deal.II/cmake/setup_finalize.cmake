@@ -79,9 +79,9 @@ IF(CMAKE_BUILD_TYPE MATCHES "Debug")
 ENDIF()
 
 
-IF(FEATURE_UMFPACK_CONTRIB_CONFIGURED)
+IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
   MESSAGE("
-The contrib UMFPACK library will be compiled with the following C compiler:
+The bundled UMFPACK library will be compiled with the following C compiler:
       CMAKE_C_COMPILER:         ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
                                 ${CMAKE_C_COMPILER}
       CMAKE_C_FLAGS:           ${CMAKE_C_FLAGS}")
@@ -108,7 +108,7 @@ ENDIF()
 MESSAGE("
   Configured Features ("
   "DEAL_II_FEATURE_AUTODETECTION = ${DEAL_II_FEATURE_AUTODETECTION}, "
-  "DEAL_II_ALLOW_CONTRIB = ${DEAL_II_ALLOW_CONTRIB}):"
+  "DEAL_II_ALLOW_BUNDLED = ${DEAL_II_ALLOW_BUNDLED}):"
   )
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
@@ -121,11 +121,11 @@ FOREACH(var ${res})
         MESSAGE("      ${var} set up with external dependencies")
       ENDIF()
 
-      IF(FEATURE_${feature}_CONTRIB_CONFIGURED)
-        IF(DEAL_II_FORCE_CONTRIB_${feature})
-          MESSAGE("      ${var} set up with contrib packages (forced)")
+      IF(FEATURE_${feature}_BUNDLED_CONFIGURED)
+        IF(DEAL_II_FORCE_BUNDLED_${feature})
+          MESSAGE("      ${var} set up with bundled packages (forced)")
         ELSE()
-          MESSAGE("      ${var} set up with contrib packages")
+          MESSAGE("      ${var} set up with bundled packages")
         ENDIF()
       ENDIF()
     ELSE()

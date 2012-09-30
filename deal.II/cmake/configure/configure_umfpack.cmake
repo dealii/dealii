@@ -31,27 +31,20 @@ MACRO(FEATURE_UMFPACK_CONFIGURE_EXTERNAL var)
 ENDMACRO()
 
 
-SET(FEATURE_UMFPACK_HAVE_CONTRIB TRUE)
+SET(FEATURE_UMFPACK_HAVE_BUNDLED TRUE)
 
 
-MACRO(FEATURE_UMFPACK_CONFIGURE_CONTRIB var)
+MACRO(FEATURE_UMFPACK_CONFIGURE_BUNDLED var)
   #
   # DEAL_II_WITH_LAPACK will pull in an external BLAS library. So no need
-  # to setup something more than contrib BLAS here.
+  # to setup something more than bundled UMFPACK here.
   #
 
-  #
-  # Add umfpack and amd directly to the object files of deal.II
-  #
-  SET(umfpack_folder "${CMAKE_SOURCE_DIR}/contrib/umfpack")
-
+  SET(umfpack_folder "${CMAKE_SOURCE_DIR}/bundled/umfpack")
   INCLUDE_DIRECTORIES(
     ${umfpack_folder}/UMFPACK/Include
     ${umfpack_folder}/AMD/Include
     )
-
-  ADD_SUBDIRECTORY(${umfpack_folder}/UMFPACK/Source)
-  ADD_SUBDIRECTORY(${umfpack_folder}/AMD/Source)
 
   SET(HAVE_LIBUMFPACK TRUE)
 
@@ -71,8 +64,8 @@ MACRO(FEATURE_UMFPACK_ERROR_MESSAGE)
     "    $ UMFPACK_DIR=\"...\" cmake <...>\n"
     "    $ ccmake -DUMFPACK_DIR=\"...\" cmake <...>\n"
     "or set the relevant variables by hand in ccmake.\n"
-    "Alternatively you may choose to compile the bundled contrib libraries\n"
-    "by setting DEAL_II_ALLOW_CONTRIB=on or DEAL_II_FORCE_CONTRIB_UMFPACK=on.\n\n"
+    "Alternatively you may choose to compile the bundled libraries\n"
+    "by setting DEAL_II_ALLOW_BUNDLED=ON or DEAL_II_FORCE_BUNDLED_UMFPACK=ON.\n\n"
     )
 ENDMACRO()
 

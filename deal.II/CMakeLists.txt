@@ -25,7 +25,7 @@ SET(VERSION "8.0.pre")
 
 #
 # Feature selection: external libraries and where to take them (if there
-# is a choice, e.g. from contrib vs external)
+# is a choice, e.g. from bundled vs external)
 #
 
 OPTION(DEAL_II_FEATURE_AUTODETECTION
@@ -36,14 +36,14 @@ OPTION(DEAL_II_FEATURE_AUTODETECTION
   "Enables feature autodetection. This will automatically set DEAL_II_WITH_<...> options."
   ON)
 
-OPTION(DEAL_II_ALLOW_CONTRIB
-#  Allow the use of contrib libraries bundled with the source tarball.
-#  Note: If set to off DEAL_II_FORCE_CONTRIB* will still pull in bundled
+OPTION(DEAL_II_ALLOW_BUNDLED
+#  Allow the use of bundled libraries bundled with the source tarball.
+#  Note: If set to off DEAL_II_FORCE_BUNDLED* will still pull in bundled
 #  packages, so to ensure that only external libraries are used
-#  DEAL_II_ALLOW_CONTRIB as well as all DEAL_II_FORCE_CONTRIB_* have to be
+#  DEAL_II_ALLOW_BUNDLED as well as all DEAL_II_FORCE_BUNDLED* have to be
 #  OFF
 # Short description:
-  "Allow the use of contrib libraries bundled with the source tarball. (DEAL_II_FORCE_CONTRIB* will overwrite this option.)"
+  "Allow the use of libraries bundled with the source tarball. (DEAL_II_FORCE_BUNDLED* will overwrite this option.)"
   OFF)
 
 OPTION(DEAL_II_WITH_ARPACK
@@ -55,7 +55,7 @@ SET(DEAL_II_WITH_BOOST
   ON
   CACHE BOOL "Build deal.II with support for boost." FORCE
   )
-OPTION(DEAL_II_FORCE_CONTRIB_BOOST
+OPTION(DEAL_II_FORCE_BUNDLED_BOOST
   "Always use the bundled boost library instead of an external one."
   OFF)
 
@@ -66,7 +66,7 @@ OPTION(DEAL_II_WITH_DOXYGEN
 OPTION(DEAL_II_WITH_FUNCTIONPARSER
   "Build deal.II with support for functionparser."
   OFF)
-OPTION(DEAL_II_FORCE_CONTRIB_FUNCTIONPARSER
+OPTION(DEAL_II_FORCE_BUNDLED_FUNCTIONPARSER
   "Always use the bundled functionparser library instead of an external one."
   ON)
 
@@ -97,7 +97,7 @@ OPTION(DEAL_II_WITH_PETSC
 OPTION(DEAL_II_WITH_TBB
   "Build deal.II with support for tbb. This will enable thread support in deal.II."
   OFF)
-OPTION(DEAL_II_FORCE_CONTRIB_TBB
+OPTION(DEAL_II_FORCE_BUNDLED_TBB
   "Always use the bundled tbb library instead of an external one."
   OFF)
 
@@ -108,7 +108,7 @@ OPTION(DEAL_II_WITH_TRILINOS
 OPTION(DEAL_II_WITH_UMFPACK
   "Build deal.II with support for UMFPACK."
   OFF)
-OPTION(DEAL_II_FORCE_CONTRIB_UMFPACK
+OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
 
@@ -243,6 +243,7 @@ ADD_SUBDIRECTORY(include)
 #
 # Compile and install the library:
 #
+ADD_SUBDIRECTORY(bundled)
 ADD_SUBDIRECTORY(source)
 
 

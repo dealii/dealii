@@ -20,14 +20,14 @@
 #    to work.) The features must be given with the full option toggle:
 #    DEAL_II_WITH_[...]
 #
-# FEATURE_${feature}_HAVE_CONTRIB  (variable, optional)
+# FEATURE_${feature}_HAVE_BUNDLED  (variable, optional)
 #    which should either be set to TRUE if all necessary libraries of the
 #    features comes bundled with deal.II and hence can be supported
 #    without external dependencies, or unset.
 #
-# FEATURE_${feature}_CONFIGURE_CONTRIB(var)  (macro, optional)
+# FEATURE_${feature}_CONFIGURE_BUNDLED(var)  (macro, optional)
 #    which should setup all necessary configuration for the feature with
-#    contrib source dependencies. var set to TRUE indicates success,
+#    bundled source dependencies. var set to TRUE indicates success,
 #    otherwise this script gives an error.
 #
 # FEATURE_${feature}_FIND_EXTERNAL(var)  (macro, mandatory)
@@ -48,7 +48,7 @@
 #
 # FEATURE_${feature}_ERROR_MESSAGE()  (macro, optional)
 #    which should print a meaningfull error message (with SEND_ERROR) for
-#    the case that no external library was found (and contrib is not
+#    the case that no external library was found (and bundled is not
 #    allowed to be used.) If not defined, a suitable default error message
 #    will be printed.
 #
@@ -86,15 +86,15 @@ ENDMACRO()
 #
 MACRO(FEATURE_ERROR_MESSAGE feature)
   STRING(TOLOWER ${feature} feature_lowercase)
-  IF(FEATURE_${feature}_HAVE_CONTRIB)
+  IF(FEATURE_${feature}_HAVE_BUNDLED)
     MESSAGE(SEND_ERROR "\n"
       "Could not find the ${feature_lowercase} library!\n\n"
       "Please ensure that the ${feature_lowercase} library is installed on your computer.\n"
       "If the library is not at a default location, either provide some hints\n"
       "for the autodetection, or set the relevant variables by hand in ccmake.\n\n"
-      "Alternatively you may choose to compile the bundled contrib library of\n"
-      "${feature_lowercase} by setting DEAL_II_ALLOW_CONTRIB=on or\n"
-      "DEAL_II_FORCE_CONTRIB_${feature}=on.\n\n"
+      "Alternatively you may choose to compile the bundled library of\n"
+      "${feature_lowercase} by setting DEAL_II_ALLOW_BUNDLED=on or\n"
+      "DEAL_II_FORCE_BUNDLED_${feature}=on.\n\n"
       )
  ELSE()
     MESSAGE(SEND_ERROR "\n"
@@ -159,18 +159,18 @@ MACRO(CONFIGURE_FEATURE feature)
     ENDFOREACH()
 
     IF(macro_dependencies_ok)
-      IF(DEAL_II_FORCE_CONTRIB_${feature})
+      IF(DEAL_II_FORCE_BUNDLED_${feature})
         #
-        # First case: DEAL_II_FORCE_CONTRIB_${feature} is defined:
+        # First case: DEAL_II_FORCE_BUNDLED_${feature} is defined:
         #
 
-        IF(FEATURE_${feature}_HAVE_CONTRIB)
+        IF(FEATURE_${feature}_HAVE_BUNDLED)
           RUN_COMMAND(
-            "FEATURE_${feature}_CONFIGURE_CONTRIB(FEATURE_${feature}_CONTRIB_CONFIGURED)"
+            "FEATURE_${feature}_CONFIGURE_BUNDLED(FEATURE_${feature}_BUNDLED_CONFIGURED)"
             )
-          IF(FEATURE_${feature}_CONTRIB_CONFIGURED)
+          IF(FEATURE_${feature}_BUNDLED_CONFIGURED)
             MESSAGE(STATUS
-              "DEAL_II_WITH_${feature} successfully set up with contrib packages."
+              "DEAL_II_WITH_${feature} successfully set up with bundled packages."
               )
             IF(DEAL_II_FEATURE_AUTODETECTION)
               SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
@@ -178,17 +178,17 @@ MACRO(CONFIGURE_FEATURE feature)
           ELSE()
             # This should not happen. So give an error
             MESSAGE(SEND_ERROR
-              "Failed to set up DEAL_II_WITH_${feature} with contrib packages."
+              "Failed to set up DEAL_II_WITH_${feature} with bundled packages."
               )
           ENDIF()
         ELSE()
           MESSAGE(FATAL_ERROR
-            "Internal build system error: DEAL_II_FORCE_CONTRIB_${feature} "
-            "defined, but FEATURE_${feature}_HAVE_CONTRIB not present."
+            "Internal build system error: DEAL_II_FORCE_BUNDLED_${feature} "
+            "defined, but FEATURE_${feature}_HAVE_BUNDLED not present."
             )
         ENDIF()
 
-      ELSE(DEAL_II_FORCE_CONTRIB_${feature})
+      ELSE(DEAL_II_FORCE_BUNDLED_${feature})
         #
         # Second case: We are allowed to search for an external library
         #
@@ -225,13 +225,13 @@ MACRO(CONFIGURE_FEATURE feature)
             "DEAL_II_WITH_${feature} has unmet external dependencies."
             )
 
-          IF(FEATURE_${feature}_HAVE_CONTRIB AND DEAL_II_ALLOW_CONTRIB)
+          IF(FEATURE_${feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
             RUN_COMMAND(
-              "FEATURE_${feature}_CONFIGURE_CONTRIB(FEATURE_${feature}_CONTRIB_CONFIGURED)"
+              "FEATURE_${feature}_CONFIGURE_BUNDLED(FEATURE_${feature}_BUNDLED_CONFIGURED)"
               )
-            IF(FEATURE_${feature}_CONTRIB_CONFIGURED)
+            IF(FEATURE_${feature}_BUNDLED_CONFIGURED)
               MESSAGE(STATUS
-                "DEAL_II_WITH_${feature} successfully set up with contrib packages."
+                "DEAL_II_WITH_${feature} successfully set up with bundled packages."
                 )
               IF(DEAL_II_FEATURE_AUTODETECTION)
                 SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
@@ -239,7 +239,7 @@ MACRO(CONFIGURE_FEATURE feature)
             ELSE()
               # This should not happen. So give an error
               MESSAGE(SEND_ERROR
-                "Failed to set up DEAL_II_WITH_${feature} with contrib packages."
+                "Failed to set up DEAL_II_WITH_${feature} with bundled packages."
                 )
             ENDIF()
           ELSE()
@@ -255,7 +255,7 @@ MACRO(CONFIGURE_FEATURE feature)
           ENDIF()
 
         ENDIF(FEATURE_${feature}_EXTERNAL_FOUND)
-      ENDIF(DEAL_II_FORCE_CONTRIB_${feature})
+      ENDIF(DEAL_II_FORCE_BUNDLED_${feature})
     ENDIF(macro_dependencies_ok)
   ENDIF(DEAL_II_FEATURE_AUTODETECTION OR DEAL_II_WITH_${feature})
 

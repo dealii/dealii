@@ -6,7 +6,7 @@
 #
 # This configure script has to be included after configure_tbb.
 # We need some of the variables defined in SETUP_THREADING for
-# the setup of the contrib boost library (if used)
+# the setup of the bundled boost library (if used)
 #
 IF(NOT FEATURE_TBB_PROCESSED)
   MESSAGE(FATAL_ERROR "\n"
@@ -48,13 +48,10 @@ MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL var)
 ENDMACRO()
 
 
-SET(FEATURE_BOOST_HAVE_CONTRIB TRUE)
+SET(FEATURE_BOOST_HAVE_BUNDLED TRUE)
 
 
-MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
-  #
-  # compile the necessary parts of boost out of ./contrib
-  #
+MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED var)
 
   #
   # We need to set some definitions to use the headers of the bundled boost
@@ -67,29 +64,8 @@ MACRO(FEATURE_BOOST_CONFIGURE_CONTRIB var)
     "BOOST_NO_HASH" "BOOST_NO_SLIST"
     )
 
-  SET(boost_folder "${CMAKE_SOURCE_DIR}/contrib/boost-1.49.0")
-
+  SET(boost_folder "${CMAKE_SOURCE_DIR}/bundled/boost-1.49.0")
   INCLUDE_DIRECTORIES(${boost_folder}/include)
-
-  INSTALL(DIRECTORY ${boost_folder}/include/boost
-    DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/contrib
-    COMPONENT library
-    FILES_MATCHING PATTERN "*.hh"
-    PATTERN ".svn" EXCLUDE
-    )
-
-  ADD_SUBDIRECTORY(${boost_folder}/libs/serialization/src)
-
-  IF( DEAL_II_USE_MT AND NOT DEAL_II_CAN_USE_CXX11)
-    #
-    # If the C++ compiler doesn't completely support the C++11 standard
-    # (and consequently we can't use std::thread, std::mutex, etc), then
-    # include all the files that form BOOST's thread implementation so that
-    # we don't have to build BOOST itself only to get at this small part of
-    # it. it also ensures that we use the correct compiler and flags
-    #
-    ADD_SUBDIRECTORY(${boost_folder}/libs/thread/src)
-  ENDIF()
 
   SET(${var} TRUE)
 ENDMACRO()
