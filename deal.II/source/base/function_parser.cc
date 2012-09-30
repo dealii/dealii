@@ -16,7 +16,10 @@
 #include <deal.II/lac/vector.h>
 
 #ifdef HAVE_FUNCTIONPARSER
-#  include <fparser.h>
+namespace fparser
+{
+#  include <fparser.hh>
+}
 #else
 
 namespace fparser
@@ -128,7 +131,8 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
                                        // problems with the number of
                                        // variables...
     }
-
+/*
+TODO: Remove or port to fparser 4.5
                                    // Now we define how many variables
                                    // we expect to read in.  We
                                    // distinguish between two cases:
@@ -153,6 +157,7 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
                ExcDimensionMismatch(n_vars,fp[0].NVars()));
 
                                    // Now set the initialization bit.
+*/
   initialized = true;
 }
 
