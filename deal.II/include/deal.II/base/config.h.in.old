@@ -196,12 +196,6 @@ TODO:
 
 
 
-/* Availability of the MA27 algorithm from HSL */
-#cmakedefine HAVE_HSL_MA27
-
-/* Availability of the MA47 algorithm from HSL */
-#cmakedefine HAVE_HSL_MA47
-
 /**
  * A #define that indicates whether we are using the Microsoft
  * Windows Visual C/C++ compiler. We currently do not run ./configure
