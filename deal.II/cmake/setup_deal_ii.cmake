@@ -1,3 +1,17 @@
+#####
+##
+## Copyright (C) 2012 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## <TODO: Full License information>
+## This file is dual licensed under QPL 1.0 and LGPL 2.1 or any later
+## version of the LGPL license.
+##
+## Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>
+##
+#####
+
 #
 # Set up deal.II specific definitions and look for available components
 #
@@ -20,7 +34,6 @@
 #     DEAL_II_PACKAGE_VERSION
 #     DEAL_II_PACKAGE_STRING
 #     DEAL_II_PACKAGE_BUGREPORT       *)
-#     DEAL_II_PACKAGE_TARNAME         *)
 #     DEAL_II_PACKAGE_URL             *)
 #     DEAL_II_VERSION_MAJOR
 #     DEAL_II_VERSION_MINOR
@@ -138,8 +151,7 @@ SET(DEAL_II_PACKAGE_STRING
   )
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_BUGREPORT "dealii@dealii.org")
-SET_IF_EMPTY(DEAL_II_PACKAGE_TARNAME ${DEAL_II_PACKAGE_NAME}) #TODO
-SET_IF_EMPTY(DEAL_II_PACKAGE_URL "http://www.dealii.org") #TODO
+SET_IF_EMPTY(DEAL_II_PACKAGE_URL "http://www.dealii.org/")
 
 STRING(REGEX REPLACE
   "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${VERSION}"
@@ -229,7 +241,6 @@ IF(CMAKE_BUILD_TYPE MATCHES "Release")
 
   LIST(APPEND DEAL_II_BUILD_TYPES "RELEASE")
 ENDIF()
-
 
 
 #

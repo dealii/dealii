@@ -1,3 +1,17 @@
+#####
+##
+## Copyright (C) 2012 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## <TODO: Full License information>
+## This file is dual licensed under QPL 1.0 and LGPL 2.1 or any later
+## version of the LGPL license.
+##
+## Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>
+##
+#####
+
 #
 # Setup default compiler flags: This file sets up sensible default compiler
 # flags for the various platforms, compilers and build targets supported by
@@ -9,8 +23,15 @@
 # ####################
 #
 # All configuration in setup_compiler_flags.cmake and
-# setup_compiler_flags_<compiler>.cmake shall ONLY consist of CFLAGS,
-# CXXFLAGS and LINKER_FLAGS being set.
+# setup_compiler_flags_<compiler>.cmake shall ONLY modify:
+#
+#   CMAKE_CXX_FLAGS
+#   DEAL_II_CXX_FLAGS_DEBUG
+#   DEAL_II_CXX_FLAGS_RELEASE
+#   CMAKE_SHARED_LINKER_FLAGS
+#   DEAL_II_SHARED_LINKER_FLAGS_DEBUG
+#   DEAL_II_SHARED_LINKER_FLAGS_RELEASE
+#
 #
 # Checks for compiler features (such as C++11 support) and compiler
 # specific bugs that
@@ -19,11 +40,10 @@
 #
 # belong to
 #
-# ./check/check_for_compiler_features.cmake
-#
-# ./check/check_for_compiler_bugs.cmake
-#
-# ./check/check_for_cxx_features.cmake
+#   ./check/check_for_compiler_features.cmake
+#   ./check/check_for_compiler_bugs.cmake
+#   ./check/check_for_compiler_bugs_*.cmake
+#   ./check/check_for_cxx_features.cmake
 #
 
 

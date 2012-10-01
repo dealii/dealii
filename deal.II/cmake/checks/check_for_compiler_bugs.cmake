@@ -1,12 +1,18 @@
-#
-# I'm sure we will have to split this file in various sensible pieces...
-#
-
+#####
+##
+## Copyright (C) 2012 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## <TODO: Full License information>
+## This file is dual licensed under QPL 1.0 and LGPL 2.1 or any later
+## version of the LGPL license.
+##
+#####
 
 #
 # Check for various compiler bugs:
 #
-
 
 
 #
@@ -16,7 +22,7 @@
 # that the workaround fails with some other compilers, so that
 # we can not unconditionally use the workaround...
 #
-# - maier, rewritten 2012
+# - Matthias Maier, rewritten 2012
 #
 CHECK_CXX_COMPILER_BUG(
   "
@@ -45,14 +51,13 @@ CHECK_CXX_COMPILER_BUG(
   DEAL_II_EXPLICIT_DESTRUCTOR_BUG)
 
 
-
 #
 # On some gcc 4.3 snapshots, a 'const' qualifier on a return type triggers a
 # warning. This is unfortunate, since we happen to stumble on this
 # in some of our template trickery with iterator classes. If necessary,
 # do not use the relevant warning flag
 #
-# - maier, rewritten 2012
+# - Matthias Maier, rewritten 2012
 #
 PUSH_TEST_FLAG("-Wreturn-type")
 PUSH_TEST_FLAG("-Werror")
@@ -71,7 +76,6 @@ IF(DEAL_II_WRETURN_TYPE_CONST_QUALIFIER_BUG)
 ENDIF()
 
 
-
 #
 # gcc 4.4 has an interesting problem in that it doesn't
 # care for one of BOOST signals2's header files and produces
@@ -81,14 +85,13 @@ ENDIF()
 # This can be avoided by not using -pedantic for this compiler.
 # For all other versions, we use this flag, however.
 #
-# - maier, rewritten 2012
+# - Matthias Maier, rewritten 2012
 #
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
    CMAKE_CXX_COMPILER_VERSION MATCHES "4.4.")
   STRIP_FLAG(CMAKE_CXX_FLAGS "-pedantic")
   STRIP_FLAG(CMAKE_C_FLAGS "-pedantic")
 ENDIF()
-
 
 
 #
@@ -98,7 +101,7 @@ ENDIF()
 # warning messages. Since this is annoying, switch of the flag -W which
 # causes this.
 #
-# - maier, rewritten 2012
+# - Matthias Maier, rewritten 2012
 #
 
 # TODO: We use the mpi.h header file for this check. We should test this

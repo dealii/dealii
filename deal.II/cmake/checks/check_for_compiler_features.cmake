@@ -1,14 +1,27 @@
+#####
+##
+## Copyright (C) 2012 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## <TODO: Full License information>
+## This file is dual licensed under QPL 1.0 and LGPL 2.1 or any later
+## version of the LGPL license.
+##
+#####
 
 #
 # Check for various compiler features.
 #
 
 
-
 #
 # Check whether the std::vector::iterator is just a plain pointer
 #
 # (Yes. It is not a bug. But the logic is the same.)
+#
+# - Matthias Maier, rewritten 2012
+#
 CHECK_CXX_COMPILER_BUG(
   "
   #include <vector>
@@ -20,12 +33,13 @@ CHECK_CXX_COMPILER_BUG(
   DEAL_II_VECTOR_ITERATOR_IS_POINTER)
 
 
-
 #
 # Check for existence of the __builtin_expect facility of newer
 # gcc compilers. This can be used to hint the compiler's branch
 # prediction unit in some cases. We use it in the AssertThrow
 # macros.
+#
+# - Matthias Maier, rewritten 2012
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
@@ -33,7 +47,6 @@ CHECK_CXX_SOURCE_COMPILES(
   int main(){ if (__builtin_expect(f(),false)) ; }
   "
   HAVE_BUILTIN_EXPECT)
-
 
 
 #
@@ -48,6 +61,8 @@ CHECK_CXX_SOURCE_COMPILES(
 # missing in their program.
 #
 # This test checks whether this feature is available.
+#
+# - Matthias Maier, rewritten 2012
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
@@ -69,13 +84,14 @@ CHECK_CXX_SOURCE_COMPILES(
   HAVE_VERBOSE_TERMINATE)
 
 
-
 #
 # Check whether glibc-like stacktrace information is available
 # for the Exception class. If it is, then try to also determine
 # whether the compiler accepts the -rdynamic flag, since that is
 # recommended for linking if one wants to have meaningful
 # backtraces.
+#
+# - Matthias Maier, rewritten 2012
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
@@ -95,12 +111,13 @@ CHECK_CXX_SOURCE_COMPILES(
 # we can't test for it. Consequently, only run the test
 # if not on OS X.
 #
+# - Matthias Maier, rewritten 2012
+#
 IF(HAVE_GLIBC_STACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
 
   ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-rdynamic")
 
 ENDIF()
-
 
 
 #
@@ -110,6 +127,8 @@ ENDIF()
 #
 # The example code is taken from
 #   http://gcc.gnu.org/onlinedocs/libstdc++/18_support/howto.html#6
+#
+# - Matthias Maier, rewritten 2012
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
@@ -148,7 +167,6 @@ CHECK_CXX_SOURCE_COMPILES(
   HAVE_LIBSTDCXX_DEMANGLER)
 
 
-
 #
 # Check whether the compiler allows for vectorization and that
 # vectorization actually works. For this test, we use compiler
@@ -156,6 +174,8 @@ CHECK_CXX_SOURCE_COMPILES(
 # check whether the arithmetic operations are correctly performed
 # on examples where all numbers are exactly represented as
 # floating point numbers.
+#
+# - Matthias Maier, rewritten 2012
 #
 CHECK_CXX_SOURCE_RUNS(
   "
@@ -239,6 +259,8 @@ ENDIF()
 # fused multiply add, whereas _mm_add_pd explicitly enforces the
 # assembler command.
 #
+# - Matthias Maier, rewritten 2012
+#
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <emmintrin.h>
@@ -265,6 +287,9 @@ CHECK_CXX_SOURCE_COMPILES(
 # correctly.
 #
 # (Yes. It is not a bug. But the logic is the same.)
+#
+# - Matthias Maier, rewritten 2012
+#
 CHECK_CXX_COMPILER_BUG(
   "
   #include <cstdlib>
@@ -272,7 +297,6 @@ CHECK_CXX_COMPILER_BUG(
   int main(){ return 0; }
   "
   DEAL_II_ABORT_NOTHROW_EXCEPTION)
-
 
 
 #
@@ -287,6 +311,8 @@ CHECK_CXX_COMPILER_BUG(
 # __func__ is available and use the preprocessor to set the first
 # thing to the second. If this is also not the case, then set it
 # to something indicating non-availability.
+#
+# - Matthias Maier, rewritten 2012
 #
 
 CHECK_CXX_SOURCE_COMPILES(
@@ -325,6 +351,8 @@ ENDIF()
 #
 # Check for minimal vector capacity
 #
+# - Matthias Maier, rewritten 2012
+#
 GET_CXX_SOURCE_RETURN_VALUE(
   "
   #include <vector>
@@ -354,6 +382,8 @@ ENDIF()
 
 #
 # Do same thing with std::vector<bool>
+#
+# - Matthias Maier, rewritten 2012
 #
 GET_CXX_SOURCE_RETURN_VALUE(
   "
@@ -394,6 +424,8 @@ ENDIF()
 # per email by John Fowkes on the mailing list in Feb 2012,
 # so don't run the test on cygwin.
 #
+# - Matthias Maier, rewritten 2012
+#
 IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
   ENABLE_IF_SUPPORTED(DEAL_II_C_FLAGS_DEBUG "-Wa,--compress-debug-sections")
@@ -412,6 +444,8 @@ ENDIF()
 # space, since the empty string causes CMAKE to #undef the
 # variable in config.h), i.e., to something the compiler will
 # ignore
+#
+# - Wolfgang Bangerth, 2012
 #
 
 # first see if the compiler accepts the attribute

@@ -1,11 +1,27 @@
+#####
+##
+## Copyright (C) 2012 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## <TODO: Full License information>
+## This file is dual licensed under QPL 1.0 and LGPL 2.1 or any later
+## version of the LGPL license.
+##
+## Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>
+##
+#####
+
 #
 # Check for various C++ language features
 #
 
 
-#
-# C++11 Support:
-#
+###########################################################################
+#                                                                         #
+#                              C++11 Support:                             #
+#                                                                         #
+###########################################################################
 
 #
 # See if there is a compiler flag to enable C++11 features
@@ -197,6 +213,11 @@ ELSE()
 ENDIF()
 
 
+###########################################################################
+#                                                                         #
+#                    Check for various C++ features:                      #
+#                                                                         #
+###########################################################################
 
 CHECK_CXX_SOURCE_COMPILES(
   "
@@ -220,5 +241,4 @@ CHECK_CXX_SOURCE_COMPILES(
   int main(){ double d=0; std::isfinite (d); return 0; }
   "
   DEAL_II_HAVE_ISFINITE)
-
 

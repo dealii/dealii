@@ -42,7 +42,7 @@ A full version of the tbb project can be downloaded at
 http://threadingbuildingblocks.org/.
 
 
-./umfpack  (UMFPACK 5.0.2, AMD 2.2, UFCONFIG) 
+./umfpack  (UMFPACK 5.0.2, AMD 2.2, UFCONFIG)
 =========
 
 Contains parts of the UMFPACK, AMD and UFCONFIG libraries copyrighted by

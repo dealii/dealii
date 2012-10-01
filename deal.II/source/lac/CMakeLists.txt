@@ -1,3 +1,17 @@
+#####
+##
+## Copyright (C) 2012 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## <TODO: Full License information>
+## This file is dual licensed under QPL 1.0 and LGPL 2.1 or any later
+## version of the LGPL license.
+##
+## Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>
+##
+#####
+
 SET(src
   block_matrix_array.cc
   block_sparse_matrix.cc
@@ -85,3 +99,4 @@ EXPAND_INSTANTIATIONS(obj_lac "${inst_in_files}")
 # TODO: Remove this dependency when lapack_templates is removed
 #
 ADD_DEPENDENCIES(obj_lac.inst lapack_templates)
+

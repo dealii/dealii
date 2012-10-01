@@ -1,3 +1,17 @@
+#####
+##
+## Copyright (C) 2012 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## <TODO: Full License information>
+## This file is dual licensed under QPL 1.0 and LGPL 2.1 or any later
+## version of the LGPL license.
+##
+## Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>
+##
+#####
+
 SET(src_boost_serialization
   basic_archive.cpp
   basic_iarchive.cpp
@@ -11,7 +25,6 @@ SET(src_boost_serialization
   basic_text_oprimitive.cpp
   basic_xml_archive.cpp
   binary_iarchive.cpp
-
   binary_oarchive.cpp
   extended_type_info.cpp
   extended_type_info_typeid.cpp
@@ -31,3 +44,4 @@ SET(src_boost_serialization
   )
 
 DEAL_II_ADD_LIBRARY(obj_boost_serialization OBJECT ${src_boost_serialization})
+

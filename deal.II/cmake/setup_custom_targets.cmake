@@ -1,3 +1,16 @@
+#####
+##
+## Copyright (C) 2012 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## <TODO: Full License information>
+## This file is dual licensed under QPL 1.0 and LGPL 2.1 or any later
+## version of the LGPL license.
+##
+## Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>
+##
+#####
 
 #
 # Setup some convenience custom targets for the build system, i.e.
@@ -22,7 +35,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   ADD_DEPENDENCIES(documentation doxygen)
 ENDIF()
 
-IF(DEAL_II_COMPONENT_COMPAT_FILES) 
+IF(DEAL_II_COMPONENT_COMPAT_FILES)
   ADD_CUSTOM_TARGET(compat_files)
   ADD_DEPENDENCIES(compat_files
     expand_instantiations
@@ -31,7 +44,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     )
 ENDIF()
 
-IF(DEAL_II_COMPONENT_CONTRIB) 
+IF(DEAL_II_COMPONENT_CONTRIB)
   ADD_CUSTOM_TARGET(contrib)
   ADD_DEPENDENCIES(contrib
     mesh_conversion

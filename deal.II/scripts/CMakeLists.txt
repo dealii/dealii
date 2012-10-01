@@ -1,9 +1,21 @@
+#####
+##
+## Copyright (C) 2012 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## <TODO: Full License information>
+## This file is dual licensed under QPL 1.0 and LGPL 2.1 or any later
+## version of the LGPL license.
+##
+## Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>
+##
+#####
 
 ADD_EXECUTABLE(expand_instantiations expand_instantiations.cc)
 
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
-
   #
   # Build and install the old dependency_resolution and report_features
   # executables:
@@ -24,6 +36,5 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     DESTINATION common/scripts
     COMPONENT compat_files
     )
-
 ENDIF()
 
