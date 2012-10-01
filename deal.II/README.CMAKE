@@ -503,13 +503,7 @@ How to use deal.II in your cmake project
       libraries:
 
         TARGET_LINK_LIBRARIES(step-1
-          debug
-            ${DEAL_II_LIBRARIES_DEBUG}
-            ${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}
-          optimized
-            ${DEAL_II_LIBRARIES_RELEASE}
-            ${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}
-          general
+            ${DEAL_II_LIBRARIES}
             ${DEAL_II_EXTERNAL_LIBRARIES}
           )
 
@@ -576,6 +570,11 @@ DEVELOPMENT
   To keep things clean, only the following variables should appended in the
   platform checks and feature configuration (beside setting a lot of
   DEAL_II_* definitions...):
+
+  All with the following (internal) logic:
+   - name without _DEBUG or _RELEASE: Used for all targets
+   - <...>_DEBUG: _additionally_ used for debug targets
+   - <...>_RELEASE: _additionally_ used for release targets
 
 
   For internal use:
@@ -715,10 +714,7 @@ DEVELOPMENT
   configure <feature>:
 
     DEAL_II_WITH_<FEATURE> (bool, mandatory)
-       If DEAL_II_FEATURE_AUTODETECTION is OFF, this boolean determines
-       whether the feature will be configured.
-       If DEAL_II_FEATURE_AUTODETECTION is ON, this boolean will
-       automatically be set if configuring the feature was successful.
+       An option for enabling or disabling the configuration of <feature>.
 
     FEATURE_<FEATURE>_DEPENDS (variable, optional)
        a variable which contains an optional list of other features
