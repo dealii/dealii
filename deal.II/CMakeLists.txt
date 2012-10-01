@@ -122,6 +122,7 @@ IF(DEAL_II_WITH_DOC_DIRECTORY)
   ADD_SUBDIRECTORY(doc)
 ENDIF()
 ADD_SUBDIRECTORY(examples)
+ADD_SUBDIRECTORY(contrib)
 
 #
 # Define some custom targets for convenience

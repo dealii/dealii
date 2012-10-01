@@ -10,6 +10,7 @@
 #     DEAL_II_ALLOW_BUNDLED           **)
 #     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS **)
 #     DEAL_II_COMPONENT_COMPAT_FILES  **)
+#     DEAL_II_COMPONENT_CONTRIB       **)
 #     DEAL_II_COMPONENT_DOCUMENTATION **)
 #     DEAL_II_COMPONENT_EXAMPLES      **)
 #
@@ -102,6 +103,11 @@ OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
 
 OPTION(DEAL_II_COMPONENT_COMPAT_FILES
   "Enable installation of the example steps. This adds a COMPONENT \"compat_files\" to the build system."
+  ON
+  )
+
+OPTION(DEAL_II_COMPONENT_CONTRIB
+  "Enable installation of contrib packages. This adds a COMPONENT \"contrib\" to the build system."
   ON
   )
 

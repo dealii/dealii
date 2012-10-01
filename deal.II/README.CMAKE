@@ -297,6 +297,10 @@ CONFIGURATION
   The following options control which components of deal.II will be
   configured, build and installed:
 
+    DEAL_II_COMPONENT_CONTRIB
+      Enable configuration and installation of the programs under contrib
+      This adds a COMPONENT "contrib" to the build system.
+
     DEAL_II_COMPONENT_COMPAT_FILES:
       Enable installation of legacy files and tools for compatibility with
       the old build system
@@ -309,10 +313,6 @@ CONFIGURATION
     DEAL_II_COMPONENT_EXAMPLES:
       Enable configuration and installation of the example steps.
       This adds a COMPONENT "examples" to the build system.
-
-    DEAL_II_COMPONENT_CONTRIB
-      Enable configuration and installation of the programs under contrib
-      This adds a COMPONENT "contrib" to the build system.
 
 
 

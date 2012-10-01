@@ -16,7 +16,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     #
     SET(${var} TRUE)
 
-
     #
     # Check whether all required modules of trilinos are installed:
     #
@@ -46,7 +45,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         )
     ENDIF()
 
-
     #
     # Trilinos 10.6 had quite a number of bugs we ran into, see
     # for example
@@ -62,7 +60,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
-
     #
     # The same is unfortunately true for 10.8.[01]:
     #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5370
@@ -77,7 +74,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
-
 
     #
     # Trilinos has to be configured with the same MPI configuration as
@@ -99,7 +95,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
-
 
     #
     # Some verions of Sacado_cmath.hpp does things that aren't compatible

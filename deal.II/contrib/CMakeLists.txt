@@ -1,0 +1,4 @@
+IF(DEAL_II_COMPONENT_CONTRIB)
+  ADD_SUBDIRECTORY(mesh_conversion)
+  ADD_SUBDIRECTorY(parameter_gui)
+ENDIF()

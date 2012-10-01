@@ -27,6 +27,13 @@ Major:
 
 * Port the testsuite to cmake
 
+* Build system for parameter_gui.
+
+* Finish install targets:
+
+   - share files (documentation/manpage/etc.)
+   - same for mesh_conversion and parameter_gui
+
 * Rename all DEAL_II_USE_* and HAVE_LIB* that refer to a feature to
   DEAL_II_WITH_*.
 
