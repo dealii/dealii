@@ -18,15 +18,15 @@ boost-1.49.0/LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt
 A full version of the library can be downloaded at http://www.boost.org/.
 
 
-functionparser
+functionparser (FunctionParser 4.5)
 ==============
 
-Contains the functionparser project which is copyrighted by Juha Nieminen
+Contains the FunctionParser project which is copyrighted by Juha Nieminen
 and licensed under the GNU Lesser General Public License (LGPL) Version 3.
 See functionparser/README, functionparser/lgpl-3.0.txt or
 http://warp.povusers.org/FunctionParser/
 
-A full version of the functionparser project can be downloaded at
+A full version of the FunctionParser project can be downloaded at
 http://warp.povusers.org/FunctionParser/.
 
 
