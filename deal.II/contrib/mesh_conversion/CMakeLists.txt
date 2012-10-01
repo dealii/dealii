@@ -1,7 +1,15 @@
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+#PROJECT(parameter_gui)
+
 ADD_EXECUTABLE(mesh_conversion
   Main.cc
   MeshConversion.cc
   )
+
+IF("${DEAL_II_EXECUTABLE_RELDIR}" STREQUAL "")
+  SET(DEAL_II_EXECUTABLE_RELDIR "bin")
+ENDIF()
 
 INSTALL(TARGETS mesh_conversion
   RUNTIME
