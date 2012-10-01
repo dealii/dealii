@@ -108,7 +108,7 @@ OPTION(DEAL_II_COMPONENT_COMPAT_FILES
 
 OPTION(DEAL_II_COMPONENT_CONTRIB
   "Enable installation of contrib packages. This adds a COMPONENT \"contrib\" to the build system."
-  ON
+  OFF
   )
 
 OPTION(DEAL_II_COMPONENT_EXAMPLES
