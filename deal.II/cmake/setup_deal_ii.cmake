@@ -78,11 +78,13 @@ ENDIF()
 
 OPTION(DEAL_II_FEATURE_AUTODETECTION
   "Enables feature autodetection. This will automatically set DEAL_II_WITH_<...> options."
-  ON)
+  ON
+  )
 
 OPTION(DEAL_II_ALLOW_BUNDLED
   "Allow the use of libraries bundled with the source tarball. (DEAL_II_FORCE_BUNDLED* will overwrite this option.)"
-  ON)
+  ON
+  )
 
 #
 # Build configuration: configuration options regarding compilation and
@@ -90,7 +92,8 @@ OPTION(DEAL_II_ALLOW_BUNDLED
 #
 OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
   "configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
-  ON)
+  ON
+  )
 
 #
 # Component selection: configuration options regarding the setup of
@@ -99,15 +102,18 @@ OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
 
 OPTION(DEAL_II_COMPONENT_COMPAT_FILES
   "Enable installation of the example steps. This adds a COMPONENT \"compat_files\" to the build system."
-  ON)
+  ON
+  )
 
 OPTION(DEAL_II_COMPONENT_EXAMPLES
   "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
-  ON)
+  ON
+  )
 
 If(DEAL_II_WITH_DOC_DIRECTORY)
   OPTION(DEAL_II_COMPONENT_DOCUMENTATION
     "Enable configuration, build and installation of the documentation. This adds a COMPONENT \"documentation\" to the build system."
+    OFF
     )
 ENDIF()
 
