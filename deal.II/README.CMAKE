@@ -201,26 +201,26 @@ CONFIGURATION
         Build deal.II with support for zlib
 
   An enabled feature will usually add one ore more dependencies to external
-  or 'contrib' (i.e. bundled with deal.II and residing under ./contrib/)
+  or 'bundled' (i.e. bundled with deal.II and residing under ./bundled/)
   libraries.
 
 
   There are some options to determine the behaviour of the dependency
   resolution:
 
-  The option DEAL_II_ALLOW_CONTRIB:
+  The option DEAL_II_ALLOW_BUNDLED
 
     - If set to ON external libraries still have precedence. But if there is
-      no external library the bundled contrib library will be used.
+      no external library the bundled library will be used.
 
-    - If set to OFF the contrib libraries will not be used and the dependency
+    - If set to OFF bundled libraries will not be used and the dependency
       resolution will fail if there is no external library. EXCEPT (there is
-      always an exception, isn't it?) DEAL_II_FORCE_CONTRIB_<library> forces
-      the use of the bundled contrib library.
+      always an exception, isn't it?) DEAL_II_FORCE_BUNDLED_<library> forces
+      the use of the bundled library.
 
-  The option DEAL_II_FORCE_CONTRIB_(BOOST|FUNCTIONPARSER|TBB|UMFPACK)
-  forces the use of the bundled  contrib library regardless whether
-  DEAL_II_ALLOW_CONTRIB is set to OFF or an external library is found.
+  The option DEAL_II_FORCE_BUNDLED_(BOOST|FUNCTIONPARSER|TBB|UMFPACK)
+  forces the use of the bundled  library regardless whether
+  DEAL_II_ALLOW_BUNDLED is set to OFF or an external library is found.
 
 
   Autoconfiguration:
@@ -229,15 +229,15 @@ CONFIGURATION
   DEAL_II_WITH_<feature> toggles will be automatically set (overwriting any
   previous configuration) depending on whether they can be supported or
   not.
-  (Note: DEAL_II_FEATURE_AUTODETECTION will respect DEAL_II_ALLOW_CONTRIB
-  and DEAL_II_FORCE_CONTRIB_<feature>)
+  (Note: DEAL_II_FEATURE_AUTODETECTION will respect DEAL_II_ALLOW_BUNDLED
+  and DEAL_II_FORCE_BUNDLED_<feature>)
 
   REMARKS:
 
-  - To ensure that no bundled library is used at all DEAL_II_ALLOW_CONTRIB,
-    as well as every DEAL_II_FORCE_CONTRIB_<library> have to be set to OFF.
+  - To ensure that no bundled library is used at all DEAL_II_ALLOW_BUNDLED,
+    as well as every DEAL_II_FORCE_BUNDLED_<library> have to be set to OFF.
 
-  - DEAL_II_FORCE_CONTRIB_<library>=ON will _not_ automatically enable the
+  - DEAL_II_FORCE_BUNDLED_<library>=ON will _not_ automatically enable the
     corresponding DEAL_II_WITH_<feature> toggle. This has to be set
     separately.
 
@@ -740,7 +740,7 @@ DEVELOPMENT
 
     FEATURE_<FEATURE>_CONFIGURE_BUNDLED(var)  (macro, optional)
        which should setup all necessary configuration for the feature with
-       contrib source dependencies. var set to TRUE indicates success.
+       bundled source dependencies. var set to TRUE indicates success.
 
     FEATURE_<FEATURE>_CUSTOM_ERROR_MESSAGE() (variable, optional)
        which should either be set to TRUE if FEATURE_<FEATURE>_ERROR_MESSAGE
@@ -748,7 +748,7 @@ DEVELOPMENT
 
     FEATURE_<FEATURE>_ERROR_MESSAGE()  (macro, optional)
        which should print a meaningful error message (with SEND_ERROR) for
-       the case that no external library was found (and contrib is not
+       the case that no external library was found (and bundled is not
        allowed to be used.) If not defined, a suitable default error message
        will be printed.
 
@@ -756,8 +756,8 @@ DEVELOPMENT
   In bundled/CMakeLists.txt:
 
     DEAL_II_FORCE_BUNDLED_<FEATURE> (bool, optional)
-      If <feature> can be set up by contrib dependencies, this
-      configuration option must be present to force the use of the contrib
+      If <feature> can be set up by bundled libraries, this
+      configuration option must be present to force the use of the bundled
       dependencies
 
     FEATURE_<FEATURE>_HAVE_BUNDLED  (variable, optional)
