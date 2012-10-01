@@ -2,6 +2,10 @@
 # Configuration for the umfpack and amd libraries:
 #
 
+OPTION(DEAL_II_WITH_UMFPACK
+  "Build deal.II with support for UMFPACK."
+  OFF)
+
 
 SET(FEATURE_UMFPACK_DEPENDS
   # Currently, with enabled umfpack support, we also need to setup
@@ -31,19 +35,15 @@ MACRO(FEATURE_UMFPACK_CONFIGURE_EXTERNAL var)
 ENDMACRO()
 
 
-SET(FEATURE_UMFPACK_HAVE_BUNDLED TRUE)
-
-
 MACRO(FEATURE_UMFPACK_CONFIGURE_BUNDLED var)
   #
   # DEAL_II_WITH_LAPACK will pull in an external BLAS library. So no need
   # to setup something more than bundled UMFPACK here.
   #
 
-  SET(umfpack_folder "${CMAKE_SOURCE_DIR}/bundled/umfpack")
   INCLUDE_DIRECTORIES(
-    ${umfpack_folder}/UMFPACK/Include
-    ${umfpack_folder}/AMD/Include
+    ${UMFPACK_FOLDER}/UMFPACK/Include
+    ${UMFPACK_FOLDER}/AMD/Include
     )
 
   SET(HAVE_LIBUMFPACK TRUE)

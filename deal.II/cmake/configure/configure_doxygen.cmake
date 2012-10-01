@@ -2,6 +2,11 @@
 # Configuration for doxygen
 #
 
+OPTION(DEAL_II_WITH_DOXYGEN
+  "Build deal.II with support for doxygen and dot."
+  OFF)
+
+
 MACRO(FEATURE_DOXYGEN_FIND_EXTERNAL var)
   FIND_PACKAGE(Doxygen)
 

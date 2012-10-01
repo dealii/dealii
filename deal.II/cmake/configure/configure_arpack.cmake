@@ -2,6 +2,11 @@
 # Configuration for the ARPACK library:
 #
 
+OPTION(DEAL_II_WITH_ARPACK
+  "Build deal.II with support for doxygen and dot."
+  OFF)
+
+
 SET(FEATURE_ARPACK_DEPENDS
   # Currently, with enabled arpack support, we also need to setup
   # LAPACK support in deal.II:

@@ -2,6 +2,10 @@
 # Configuration for tbb support:
 #
 
+OPTION(DEAL_II_WITH_TBB
+  "Build deal.II with support for tbb. This will enable thread support in deal.II."
+  OFF)
+
 
 #
 # Set up genereal threading:
@@ -121,9 +125,6 @@ MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
 ENDMACRO()
 
 
-SET(FEATURE_TBB_HAVE_BUNDLED TRUE)
-
-
 MACRO(FEATURE_TBB_CONFIGURE_BUNDLED var)
 
   #
@@ -147,11 +148,7 @@ MACRO(FEATURE_TBB_CONFIGURE_BUNDLED var)
       )
   ENDIF()
 
-  #
-  # TODO: Refactor and remove from here:
-  #
-  SET(tbb_folder "${CMAKE_SOURCE_DIR}/bundled/tbb30_104oss")
-  INCLUDE_DIRECTORIES(${tbb_folder}/include)
+  INCLUDE_DIRECTORIES(${TBB_FOLDER}/include)
 
 ENDMACRO()
 

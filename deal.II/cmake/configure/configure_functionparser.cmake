@@ -2,6 +2,11 @@
 # Configuration for functionparser
 #
 
+OPTION(DEAL_II_WITH_FUNCTIONPARSER
+  "Build deal.II with support for functionparser."
+  OFF)
+
+
 MACRO(FEATURE_FUNCTIONPARSER_FIND_EXTERNAL var)
   MESSAGE(STATUS
     "No module available for finding functionparser externally."
@@ -13,16 +18,9 @@ MACRO(FEATURE_FUNCTIONPARSER_CONFIGURE_EXTERNAL var)
 ENDMACRO()
 
 
-SET(FEATURE_FUNCTIONPARSER_HAVE_BUNDLED TRUE)
-
-
 MACRO(FEATURE_FUNCTIONPARSER_CONFIGURE_BUNDLED var)
-
-  SET(functionparser_folder "${CMAKE_SOURCE_DIR}/bundled/functionparser/")
   INCLUDE_DIRECTORIES(${functionparser_folder})
-
   SET(HAVE_FUNCTIONPARSER TRUE)
-
   SET(${var} TRUE)
 ENDMACRO()
 

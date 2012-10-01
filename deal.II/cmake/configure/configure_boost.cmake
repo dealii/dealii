@@ -2,7 +2,6 @@
 # Configuration for the boost library:
 #
 
-
 #
 # This configure script has to be included after configure_tbb.
 # We need some of the variables defined in SETUP_THREADING for
@@ -14,6 +13,13 @@ IF(NOT FEATURE_TBB_PROCESSED)
     "configure_boost.cmake included before configure_tbb.cmake\n\n"
     )
 ENDIF()
+
+
+SET(DEAL_II_WITH_BOOST
+  # Always true. We need it :-]
+  ON
+  CACHE BOOL "Build deal.II with support for boost." FORCE
+  )
 
 
 MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
@@ -48,9 +54,6 @@ MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL var)
 ENDMACRO()
 
 
-SET(FEATURE_BOOST_HAVE_BUNDLED TRUE)
-
-
 MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED var)
 
   #
@@ -64,15 +67,13 @@ MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED var)
     "BOOST_NO_HASH" "BOOST_NO_SLIST"
     )
 
-  SET(boost_folder "${CMAKE_SOURCE_DIR}/bundled/boost-1.49.0")
-  INCLUDE_DIRECTORIES(${boost_folder}/include)
+  INCLUDE_DIRECTORIES(${BOOST_FOLDER}/include)
 
   SET(${var} TRUE)
 ENDMACRO()
 
 
 CONFIGURE_FEATURE(BOOST)
-
 
 #
 # DEAL_II_WITH_BOOST is always required.

@@ -1,15 +1,17 @@
-
 #
-# TODO:
-# The corresponding <feature>_folder and <feature_HAVE_BUNDLED variables
-# are set under cmake/configure/configure_*. This is a bit unfortunate and
-# should be corrected.
+# Export information about bundled library locations and do the actual
+# setup of compilation targets and installation here:
 #
 
-IF(FEATURE_TBB_BUNDLED_CONFIGURED)
-  ADD_SUBDIRECTORY(${tbb_folder}/src)
-ENDIF()
 
+#
+# Boost C++ libraries
+#
+SET(FEATURE_BOOST_HAVE_BUNDLED TRUE)
+OPTION(DEAL_II_FORCE_BUNDLED_BOOST
+  "Always use the bundled boost library instead of an external one."
+  OFF)
+SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.49.0")
 
 IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
   INSTALL(DIRECTORY ${boost_folder}/include/boost
@@ -19,7 +21,7 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
     PATTERN ".svn" EXCLUDE
     )
 
-  ADD_SUBDIRECTORY(${boost_folder}/libs/serialization/src)
+  ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/serialization/src)
 
   IF( DEAL_II_USE_MT AND NOT DEAL_II_CAN_USE_CXX11)
     #
@@ -29,18 +31,50 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
     # we don't have to build BOOST itself only to get at this small part of
     # it. it also ensures that we use the correct compiler and flags
     #
-    ADD_SUBDIRECTORY(${boost_folder}/libs/thread/src)
+    ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/thread/src)
   ENDIF()
 ENDIF()
 
 
+#
+# FunctionParser project:
+#
+SET(FEATURE_FUNCTIONPARSER_HAVE_BUNDLED TRUE)
+OPTION(DEAL_II_FORCE_BUNDLED_FUNCTIONPARSER
+  "Always use the bundled functionparser library instead of an external one."
+  ON)
+SET(FUNCTIONPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/functionparser/")
+
 IF(FEATURE_FUNCTIONPARSER_BUNDLED_CONFIGURED)
-  ADD_SUBDIRECTORY(${functionparser_folder})
+  ADD_SUBDIRECTORY(${FUNCTIONPARSER_PROJECT})
 ENDIF()
 
 
+#
+# Threading Building Blocks library
+#
+SET(FEATURE_TBB_HAVE_BUNDLED TRUE)
+SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb30_104oss")
+OPTION(DEAL_II_FORCE_BUNDLED_TBB
+  "Always use the bundled tbb library instead of an external one."
+  OFF)
+
+IF(FEATURE_TBB_BUNDLED_CONFIGURED)
+  ADD_SUBDIRECTORY(${TBB_FOLDER}/src)
+ENDIF()
+
+
+#
+# UMFPACK, AMD and UFCONFIG:
+#
+SET(FEATURE_UMFPACK_HAVE_BUNDLED TRUE)
+SET(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
+OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
+  "Always use the bundled umfpack library instead of an external one."
+  OFF)
+
 IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
-  ADD_SUBDIRECTORY(${umfpack_folder}/UMFPACK/Source)
-  ADD_SUBDIRECTORY(${umfpack_folder}/AMD/Source)
+  ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/UMFPACK/Source)
+  ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/AMD/Source)
 ENDIF()
 

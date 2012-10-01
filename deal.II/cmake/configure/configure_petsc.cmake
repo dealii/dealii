@@ -2,6 +2,11 @@
 # Configuration for the petsc library:
 #
 
+OPTION(DEAL_II_WITH_PETSC
+  "Build deal.II with support for petsc."
+  OFF)
+
+
 MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
 
   FIND_PACKAGE(PETSC)

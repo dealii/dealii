@@ -2,6 +2,10 @@
 # Configuration for the p4est and sc libraries:
 #
 
+OPTION(DEAL_II_WITH_P4EST
+  "Build deal.II with support for p4est."
+  OFF)
+
 
 SET(FEATURE_P4EST_DEPENDS DEAL_II_WITH_MPI)
 
