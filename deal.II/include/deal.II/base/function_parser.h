@@ -15,8 +15,6 @@
 #define __deal2__function_parser_h
 
 
-//TODO: Update to latest version of fparser library from http://warp.povusers.org/FunctionParser/
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
@@ -56,7 +54,7 @@ template <typename> class Vector;
  * The following example shows how to use this class:
  * @verbatim
   // Define some constants that will be used by the function parser
-  std::map<std::string> constants;
+  std::map<std::string,double> constants;
   constants["pi"] = numbers::PI;
 
   // Define the variables that will be used inside the expressions
@@ -73,12 +71,12 @@ template <typename> class Vector;
 
   // And populate it with the newly created objects.
   vector_function.initialize(variables,
-                            expressions,
-                            constants);
+                             expressions,
+                             constants);
   @endverbatim
 
  * FunctionParser also provides an option to use <b>units</b> in expressions.
- * We can illustrate the use of this functionality with the following example:
+ * We illustrate the use of this functionality with the following example:
  * @verbatim
  // Define some constants that will be used by the function parser
   std::map<std::string> constants;
@@ -102,7 +100,7 @@ template <typename> class Vector;
   vector_function.initialize(variables,
                 expressions,
                 constants,
-                units); //An exptra argument here
+                units); //An extra argument here
 
   // Point at which we want to evaluate the function
   Point<2> point(2.0, 3.0);
@@ -113,24 +111,24 @@ template <typename> class Vector;
     "[" <<  vector_function.value(point) << "]" << std::endl;
 
  * @endverbatim
-
+ *
  * Units are similar to <b>constants</b> in the way they are passed to the
- * parser, i.e. via std::map<std::string>.  But units are slightly different
+ * parser, i.e. via std::map<std::string,double>.  But units are slightly different
  * in that they have a higher precedence than any other operator
  * (except parentheses). Thus for example "5/2in" is parsed as "5/(2*300)".
- * (If 5/2 inches is what one wants, it has to be written "(5/2)in".)
-
+ * (If you actually do want 5/2 inches, it has to be written as "(5/2)in".)
+ *
  * Overall, the main point of units is to make input expressions more readable
  * since expressing, say, length as 10cm looks more natural than 10*cm.
-
+ *
  * Beware that the user has full control over units as well as full
  * responsibility for "sanity" of the parsed expressions, because the parser
  * does NOT know anything about the physical nature of units and one would not
  * be warned when adding kilometers to kilograms.
-
- * <b>units</b> argument to the initialize function is <b>optional</b>, i.e. the
+ *
+ * The <b>units</b> argument to the initialize function is <b>optional</b>, i.e. the
  * user does NOT have to use this functionality.
-
+ *
  * For more information on this feature, please see
  * contrib/functionparser/fparser.txt
 
@@ -152,10 +150,10 @@ template <typename> class Vector;
 
  @endverbatim
  *
- * This class overloads for you the virtual methods value() and
+ * This class overloads the virtual methods value() and
  * vector_value() of the Function base class with the byte compiled versions
  * of the expressions given to the initialize() methods. Note that the class
- * will not work unless you call the initialize() method first, that accepts
+ * will not work unless you first call the initialize() method that accepts
  * the text description of the function as an argument (among other
  * things). The reason for this is that this text description may be read from
  * an input file, and may therefore not be available at object construction
@@ -534,9 +532,13 @@ class FunctionParser : public Function<dim>
   private:
                                      /**
                                       * A pointer to the actual
-                                      * function parsers.
+                                      * function parsers. The pointer is
+                                      * to an array of parsers, not
+                                      * just a single one. The length of
+                                      * the array equals the number of
+                                      * vector components.
                                       */
-    fparser::FunctionParser * fp;
+    fparser::FunctionParser *fp;
 
                                      /**
                                       * State of usability. This

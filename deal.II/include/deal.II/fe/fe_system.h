@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>FESystem, components and blocks</h3>
  *
  * An FESystem, except in the most trivial case, produces a vector-valued
- * finite element with several components. The number of components
+ * finite element with several components. The number of components n_components()
  * corresponds to the dimension of the solution function in the PDE system,
  * and correspondingly also to the number of equations your PDE system
  * has. For example, the mixed Laplace system covered in step-20 has $d+1$
@@ -57,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  * elements with multiplicities count multiple times. These blocks are usually
  * addressed using the information in DoFHandler::block_info(). The number of
  * blocks of a FESystem object is simply the sum of all multiplicities of
- * base elements.
+ * base elements and is given by n_blocks().
  *
  * For example, the FESystem for the Taylor-Hood element for the
  * three-dimensional Stokes problem can be built using the code
@@ -87,7 +87,7 @@ DEAL_II_NAMESPACE_OPEN
  * contains the pressure degrees of freedom. Note that while @p U itself has 3
  * blocks, the FESystem @p sys2 does not attempt to split @p U into its base
  * elements but considers it a block of its own. By blocking all velocities
- * into one system first as in @p sys2, we achieve the sam block structure
+ * into one system first as in @p sys2, we achieve the same block structure
  * that would be generated if instead of using a $Q_2^3$ element for the
  * velocities we had used vector-valued base elements, for instance like using
  * a mixed discretization of Darcy's law using
@@ -850,59 +850,16 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       * cell.
                                       */
     static FiniteElementData<dim>
-    multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
-                          const unsigned int            N);
-
-                                     /**
-                                      * Same as above for mixed elements
-                                      * with two different sub-elements.
-                                      */
-    static FiniteElementData<dim>
-    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+    multiply_dof_numbers (const FiniteElement<dim,spacedim> *fe1,
                           const unsigned int            N1,
-                          const FiniteElementData<dim> &fe2,
-                          const unsigned int            N2);
-
-                                     /**
-                                      * Same as above for mixed elements
-                                      * with three different sub-elements.
-                                      */
-    static FiniteElementData<dim>
-    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
-                          const unsigned int            N1,
-                          const FiniteElementData<dim> &fe2,
-                          const unsigned int            N2,
-                          const FiniteElementData<dim> &fe3,
-                          const unsigned int            N3);
-
-                                   /**
-                                    * with 4 different sub-elements
-                                    */
-    static FiniteElementData<dim>
-    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
-                          const unsigned int            N1,
-                          const FiniteElementData<dim> &fe2,
-                          const unsigned int            N2,
-                          const FiniteElementData<dim> &fe3,
-                          const unsigned int            N3,
-                          const FiniteElementData<dim> &fe4,
-                          const unsigned int            N4);
-
-
-                                   /**
-                                    * and with 5 different sub-elements
-                                    */
-    static FiniteElementData<dim>
-    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
-                          const unsigned int            N1,
-                          const FiniteElementData<dim> &fe2,
-                          const unsigned int            N2,
-                          const FiniteElementData<dim> &fe3,
-                          const unsigned int            N3,
-                          const FiniteElementData<dim> &fe4,
-                          const unsigned int            N4,
-                          const FiniteElementData<dim> &fe5,
-                          const unsigned int            N5);
+                          const FiniteElement<dim,spacedim> *fe2=NULL,
+                          const unsigned int            N2=0,
+                          const FiniteElement<dim,spacedim> *fe3=NULL,
+                          const unsigned int            N3=0,
+                          const FiniteElement<dim,spacedim> *fe4=NULL,
+                          const unsigned int            N4=0,
+                          const FiniteElement<dim,spacedim> *fe5=NULL,
+                          const unsigned int            N5=0);
 
                                    /**
                                     * Same as above but for
@@ -927,62 +884,16 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       */
     static std::vector<bool>
     compute_restriction_is_additive_flags (
-      const FiniteElement<dim,spacedim> &fe,
-      const unsigned int        N);
-
-                                     /**
-                                      * Same as above for mixed elements
-                                      * with two different sub-elements.
-                                      */
-    static std::vector<bool>
-    compute_restriction_is_additive_flags (
-      const FiniteElement<dim,spacedim> &fe1,
+      const FiniteElement<dim,spacedim> *fe1,
       const unsigned int        N1,
-      const FiniteElement<dim,spacedim> &fe2,
-      const unsigned int        N2);
-
-                                     /**
-                                      * Same as above for mixed elements
-                                      * with three different sub-elements.
-                                      */
-    static std::vector<bool>
-    compute_restriction_is_additive_flags (
-      const FiniteElement<dim,spacedim> &fe1,
-      const unsigned int        N1,
-      const FiniteElement<dim,spacedim> &fe2,
-      const unsigned int        N2,
-      const FiniteElement<dim,spacedim> &fe3,
-      const unsigned int        N3);
-
-                                   /**
-                                    *  with four different sub-elements
-                                    */
-    static std::vector<bool>
-    compute_restriction_is_additive_flags (
-      const FiniteElement<dim,spacedim> &fe1,
-      const unsigned int        N1,
-      const FiniteElement<dim,spacedim> &fe2,
-      const unsigned int        N2,
-      const FiniteElement<dim,spacedim> &fe3,
-      const unsigned int        N3,
-      const FiniteElement<dim,spacedim> &fe4,
-      const unsigned int        N4);
-
-                                   /**
-                                    *  and with five different sub-elements
-                                    */
-    static std::vector<bool>
-    compute_restriction_is_additive_flags (
-      const FiniteElement<dim,spacedim> &fe1,
-      const unsigned int        N1,
-      const FiniteElement<dim,spacedim> &fe2,
-      const unsigned int        N2,
-      const FiniteElement<dim,spacedim> &fe3,
-      const unsigned int        N3,
-      const FiniteElement<dim,spacedim> &fe4,
-      const unsigned int        N4,
-      const FiniteElement<dim,spacedim> &fe5,
-      const unsigned int        N5);
+      const FiniteElement<dim,spacedim> *fe2=NULL,
+      const unsigned int        N2=0,
+      const FiniteElement<dim,spacedim> *fe3=NULL,
+      const unsigned int        N3=0,
+      const FiniteElement<dim,spacedim> *fe4=NULL,
+      const unsigned int        N4=0,
+      const FiniteElement<dim,spacedim> *fe5=NULL,
+      const unsigned int        N5=0);
 
                                      /**
                                       * Compute the named flags for a
@@ -1003,63 +914,17 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       * components of a composed
                                       * finite element.
                                       */
-    static std::vector<ComponentMask>
-    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                const unsigned int        N1);
-
-                                     /**
-                                      * Compute the non-zero vector
-                                      * components of a composed
-                                      * finite element.
-                                      */
-    static std::vector<ComponentMask>
-    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                const unsigned int        N1,
-                                const FiniteElement<dim,spacedim> &fe2,
-                                const unsigned int        N2);
-
-                                     /**
-                                      * Compute the non-zero vector
-                                      * components of a composed
-                                      * finite element.
-                                      */
-    static std::vector<ComponentMask>
-    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                const unsigned int        N1,
-                                const FiniteElement<dim,spacedim> &fe2,
-                                const unsigned int        N2,
-                                const FiniteElement<dim,spacedim> &fe3,
-                                const unsigned int        N3);
-
-                                   /**
-                                    * Compute the non-zero vector
-                                    * components of a composed
-                                    * finite element.
-                                    */
    static std::vector<ComponentMask>
-    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
+    compute_nonzero_components (const FiniteElement<dim,spacedim> *fe1,
                                 const unsigned int        N1,
-                                const FiniteElement<dim,spacedim> &fe2,
-                                const unsigned int        N2,
-                                const FiniteElement<dim,spacedim> &fe3,
-                                const unsigned int        N3,
-                                const FiniteElement<dim,spacedim> &fe4,
-                                const unsigned int        N4);
-
-                                     /**
-                                      * With 5 elements.
-                                      */
-   static std::vector<ComponentMask>
-    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
-                                const unsigned int        N1,
-                                const FiniteElement<dim,spacedim> &fe2,
-                                const unsigned int        N2,
-                                const FiniteElement<dim,spacedim> &fe3,
-                                const unsigned int        N3,
-                                const FiniteElement<dim,spacedim> &fe4,
-                                const unsigned int        N4,
-                                const FiniteElement<dim,spacedim> &fe5,
-                                const unsigned int        N5);
+                                const FiniteElement<dim,spacedim> *fe2=NULL,
+                                const unsigned int        N2=0,
+                                const FiniteElement<dim,spacedim> *fe3=NULL,
+                                const unsigned int        N3=0,
+                                const FiniteElement<dim,spacedim> *fe4=NULL,
+                                const unsigned int        N4=0,
+                                const FiniteElement<dim,spacedim> *fe5=NULL,
+                                const unsigned int        N5=0);
 
                                      /**
                                       * Compute the nonzero components
@@ -1083,7 +948,8 @@ class FESystem : public FiniteElement<dim,spacedim>
                                       * @p prolongation
                                       * matrices.
                                       */
-    void initialize();
+    void initialize (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+                       const std::vector<unsigned int> &multiplicities);
 
                                      /**
                                       * Used by @p initialize.

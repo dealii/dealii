@@ -430,6 +430,10 @@ int main (int argc, char **argv)
           if (basepath[basepath.size()-1] != '/')
             basepath += '/';
         }
+                                       // if string starts with -D,
+                                       // it is a define so can
+                                       // be ignored
+      else if ((arg.length()>2) && (arg[0]=='-') && (arg[1]=='D')) {}
                                        // if string is -n,
                                        // then use new-style format
       else if ((arg.length()==2) && (arg[0]=='-') && (arg[1]=='n'))

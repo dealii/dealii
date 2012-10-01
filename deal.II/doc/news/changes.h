@@ -87,6 +87,10 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: FESystem can now deal with n_elements==0 for a block.
+<br>
+(Timo Heister, 2012/09/28)
+
 <li> Fixed: ParameterHandler::print_parameters, when using
 ParameterHandler::OutputStyle::LaTeX would always print a list
 of parameters in each section as a latex itemized environment.
