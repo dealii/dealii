@@ -519,7 +519,11 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                            // copy of the program, and
                                            // run the detached solver
                                            // slave instead
-          const char * const program_name = DEAL_II_PATH"/lib/bin/detached_ma27";
+          /*
+           * TODO: Does this invocation work with just the name of the
+           * executable? Maier, 2012
+           */
+          const char * const program_name = "detached_ma27";
           const char * const child_argv[] = { program_name, NULL };
           execv(program_name, const_cast<char * const *>(child_argv));
 

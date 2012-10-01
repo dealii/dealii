@@ -40,6 +40,11 @@ Major:
 
 Minor:
 
+* Fixup the TODOs in
+    source/lac/sparse_dircect.cc
+    source/base/path_find.cc
+    source/base/function_parser.cc
+
 * Get rid of DEAL_II_PATH in config.h and in the sources.
 
 * HAVE_JN_ ?

@@ -33,7 +33,9 @@ PathSearch::initialize_classes()
   v.push_back(empty);
   path_lists.insert(map_type(std::string("PARAMETER"), v));
 
-  v.push_back(std::string(DEAL_II_PATH "/lib/meshes/"));
+  /*
+   * TODO: reenable some sensible default paths. Maier, 2012
+   */
   path_lists.insert(map_type(std::string("MESH"), v));
 
   v.clear();
@@ -41,6 +43,10 @@ PathSearch::initialize_classes()
   v.push_back(std::string(".prm"));
   suffix_lists.insert(map_type(std::string("PARAMETER"), v));
 
+  /*
+   * TODO: "Would require linking with the deal.II libraries"? This .cc
+   * file gets compiled into the library... maier, 2012
+   */
                                    // We cannot use the GridIn class
                                    // to query the formats, since this
                                    // would require linking with the
