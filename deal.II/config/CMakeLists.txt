@@ -3,101 +3,94 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_BINARY_DIR}/template-arguments
   )
 
+#
+# Setup and install the convenience macros:
+#
 
-IF(DEAL_II_COMPONENT_PROJECT_CONFIG)
+LIST(APPEND DEAL_II_MACROS
+  ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_initialize_cached_variables.cmake
+  ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_setup_target.cmake
+  )
 
-  #
-  # Setup and install the convenience macros:
-  #
+INSTALL(FILES
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
+  DESTINATION ${DEAL_II_CMAKE_MACROS_RELDIR}
+  COMPONENT library
+  )
 
-  LIST(APPEND DEAL_II_MACROS
-    ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_initialize_cached_variables.cmake
-    ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_setup_target.cmake
+#
+# Configure and install the cmake project configuration:
+#
+
+IF(NOT "${CONFIG_EXTERNAL_LIBRARIES}" STREQUAL "")
+  SET(CONFIG_EXTERNAL_LIBRARIES
+    general
+    ${DEAL_II_EXTERNAL_LIBRARIES}
     )
-
-  INSTALL(FILES
-    ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
-    ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
-    DESTINATION ${DEAL_II_CMAKE_MACROS_RELDIR}
-    COMPONENT project_config
-    )
-
-  #
-  # Configure and install the cmake project configuration:
-  #
-
-  IF(NOT "${CONFIG_EXTERNAL_LIBRARIES}" STREQUAL "")
-    SET(CONFIG_EXTERNAL_LIBRARIES
-      general
-      ${DEAL_II_EXTERNAL_LIBRARIES}
-      )
-  ENDIF()
-
-  IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-    SET(CONFIG_EXTERNAL_LIBRARIES_DEBUG
-      ${DEAL_II_EXTERNAL_LIBRARIES}
-      ${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}
-      )
-    LIST(APPEND CONFIG_LIBRARIES
-      debug
-      ${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}
-      )
-  ENDIF()
-
-  IF(CMAKE_BUILD_TYPE MATCHES "Release")
-    SET(CONFIG_EXTERNAL_LIBRARIES_RELEASE
-      ${DEAL_II_EXTERNAL_LIBRARIES}
-      ${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}
-      )
-    LIST(APPEND CONFIG_LIBRARIES
-      optimized
-      ${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}
-      )
-  ENDIF()
-
-  CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-    )
-
-  GET_CMAKE_PROPERTY(res VARIABLES)
-  FOREACH(var ${res})
-    IF(var MATCHES "DEAL_II_WITH")
-      FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-        "SET(${var} ${${var}})\n"
-        )
-    ENDIF()
-  ENDFOREACH()
-
-  #
-  # Include the convenience macros directly at the end of our project
-  # config:
-  #
-  FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-    "\n#\n# Include some convenience macros directly in the project config:\n#\n"
-    )
-  FOREACH(var ${DEAL_II_MACROS})
-    FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-      "INCLUDE(${var})\n"
-      )
-  ENDFOREACH()
-
-
-
-  CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
-    @ONLY
-    )
-
-  INSTALL(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
-    DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
-    COMPONENT project_config
-    )
-
 ENDIF()
+
+IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+  SET(CONFIG_EXTERNAL_LIBRARIES_DEBUG
+    ${DEAL_II_EXTERNAL_LIBRARIES}
+    ${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}
+    )
+  LIST(APPEND CONFIG_LIBRARIES
+    debug
+    ${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}
+    )
+ENDIF()
+
+IF(CMAKE_BUILD_TYPE MATCHES "Release")
+  SET(CONFIG_EXTERNAL_LIBRARIES_RELEASE
+    ${DEAL_II_EXTERNAL_LIBRARIES}
+    ${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}
+    )
+  LIST(APPEND CONFIG_LIBRARIES
+    optimized
+    ${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}
+    )
+ENDIF()
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  )
+
+GET_CMAKE_PROPERTY(res VARIABLES)
+FOREACH(var ${res})
+  IF(var MATCHES "DEAL_II_WITH")
+    FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+      "SET(${var} ${${var}})\n"
+      )
+  ENDIF()
+ENDFOREACH()
+
+#
+# Include the convenience macros directly at the end of our project
+# config:
+#
+FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  "\n#\n# Include some convenience macros directly in the project config:\n#\n"
+  )
+FOREACH(var ${DEAL_II_MACROS})
+  FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+    "INCLUDE(${var})\n"
+    )
+ENDFOREACH()
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
+  @ONLY
+  )
+
+INSTALL(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
+  DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
+  COMPONENT library
+  )
 
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
