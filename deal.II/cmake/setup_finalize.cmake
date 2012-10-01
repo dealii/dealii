@@ -56,71 +56,64 @@ ENDFOREACH()
 
 
 #
-# And print out a nice configuration summary:
+# And write a nice configuration summary to file:
 #
+SET(log "${CMAKE_BINARY_DIR}/summary.log")
 
 
-MESSAGE("
-
-*     *                                    *     *
+FILE(WRITE ${log}
+"*     *                                    *     *
 *     *       deal.II configuration:       *     *
-*     *                                    *     *
-
-
+*     *                                    *     *\n
       CMAKE_BUILD_TYPE:       ${CMAKE_BUILD_TYPE}
       CMAKE_INSTALL_PREFIX:   ${CMAKE_INSTALL_PREFIX}
       CMAKE_SOURCE_DIR:       ${CMAKE_SOURCE_DIR}
-      CMAKE_BINARY_DIR:       ${CMAKE_BINARY_DIR}
-
+      CMAKE_BINARY_DIR:       ${CMAKE_BINARY_DIR}\n
       CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME}
-                              ${CMAKE_CXX_COMPILER}
-
+                              ${CMAKE_CXX_COMPILER}\n
 Compiler flags used for this build:
-      CMAKE_CXX_FLAGS:                     ${CMAKE_CXX_FLAGS}")
+      CMAKE_CXX_FLAGS:                     ${CMAKE_CXX_FLAGS}\n"
+  )
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  MESSAGE("      DEAL_II_CXX_FLAGS_RELEASE:           ${DEAL_II_CXX_FLAGS_RELEASE}")
+  FILE(APPEND ${log} "      DEAL_II_CXX_FLAGS_RELEASE:           ${DEAL_II_CXX_FLAGS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  MESSAGE("      DEAL_II_CXX_FLAGS_DEBUG:             ${DEAL_II_CXX_FLAGS_DEBUG}")
+  FILE(APPEND ${log} "      DEAL_II_CXX_FLAGS_DEBUG:             ${DEAL_II_CXX_FLAGS_DEBUG}\n")
 ENDIF()
-MESSAGE("      CMAKE_SHARED_LINKER_FLAGS:           ${CMAKE_SHARED_LINKER_FLAGS}")
+FILE(APPEND ${log} "      CMAKE_SHARED_LINKER_FLAGS:           ${CMAKE_SHARED_LINKER_FLAGS}\n")
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  MESSAGE("      DEAL_II_SHARED_LINKER_FLAGS_RELEASE:  ${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}")
+  FILE(APPEND ${log} "      DEAL_II_SHARED_LINKER_FLAGS_RELEASE: ${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  MESSAGE("      DEAL_II_SHARED_LINKER_FLAGS_DEBUG:   ${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}")
+  FILE(APPEND ${log} "      DEAL_II_SHARED_LINKER_FLAGS_DEBUG:   ${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}\n")
 ENDIF()
-
 
 IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
-  MESSAGE("
-The bundled UMFPACK library will be compiled with the following C compiler:
+  FILE(APPEND ${log}
+"\nThe bundled UMFPACK library will be compiled with the following C compiler:
       CMAKE_C_COMPILER:         ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
                                 ${CMAKE_C_COMPILER}
-      CMAKE_C_FLAGS:           ${CMAKE_C_FLAGS}")
+      CMAKE_C_FLAGS:           ${CMAKE_C_FLAGS}\n"
+    )
   IF(CMAKE_BUILD_TYPE MATCHES "Release")
-    MESSAGE("      DEAL_II_C_FLAGS_RELEASE: ${DEAL_II_C_FLAGS_RELEASE}")
+    FILE(APPEND ${log} "      DEAL_II_C_FLAGS_RELEASE: ${DEAL_II_C_FLAGS_RELEASE}\n")
   ENDIF()
   IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-    MESSAGE("      DEAL_II_C_FLAGS_DEBUG:   ${DEAL_II_C_FLAGS_DEBUG}")
+    FILE(APPEND ${log} "      DEAL_II_C_FLAGS_DEBUG:   ${DEAL_II_C_FLAGS_DEBUG}\n")
   ENDIF()
 ENDIF()
 
 IF(NOT DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-  MESSAGE("\n"
-    "WARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n"
-    )
-ELSE()
-  IF(NOT DEAL_II_KNOWN_COMPILER)
-    MESSAGE("\n"
-      "WARNING: Unknown compiler! Please set compiler flags by hand.\n"
-      )
-  ENDIF()
+  FILE(APPEND ${log} "\nWARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n")
+ELSEIF(NOT DEAL_II_KNOWN_COMPILER)
+  FILE(APPEND ${log} "\nWARNING: Unknown compiler! Please set compiler flags by hand.\n")
 ENDIF()
 
-MESSAGE("\nConfigured Features ("
+
+FILE(APPEND ${log}
+  "\nConfigured Features ("
   "DEAL_II_FEATURE_AUTODETECTION = ${DEAL_II_FEATURE_AUTODETECTION}, "
-  "DEAL_II_ALLOW_BUNDLED = ${DEAL_II_ALLOW_BUNDLED}):"
+  "DEAL_II_ALLOW_BUNDLED = ${DEAL_II_ALLOW_BUNDLED}):\n"
   )
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
@@ -128,36 +121,36 @@ FOREACH(var ${res})
     IF(${${var}})
       # FEATURE is enabled
       STRING(REGEX REPLACE "^DEAL_II_WITH_" "" feature ${var})
-
       IF(FEATURE_${feature}_EXTERNAL_CONFIGURED)
-        MESSAGE("      ${var} set up with external dependencies")
-      ENDIF()
-
-      IF(FEATURE_${feature}_BUNDLED_CONFIGURED)
+        FILE(APPEND ${log} "      ${var} set up with external dependencies\n")
+      ELSEIF(FEATURE_${feature}_BUNDLED_CONFIGURED)
         IF(DEAL_II_FORCE_BUNDLED_${feature})
-          MESSAGE("      ${var} set up with bundled packages (forced)")
+          FILE(APPEND ${log} "      ${var} set up with bundled packages (forced)\n")
         ELSE()
-          MESSAGE("      ${var} set up with bundled packages")
+          FILE(APPEND ${log} "      ${var} set up with bundled packages\n")
         ENDIF()
       ENDIF()
     ELSE()
       # FEATURE is disabled
-      MESSAGE("    ( ${var} = ${${var}} )")
+      FILE(APPEND ${log} "    ( ${var} = ${${var}} )\n")
     ENDIF()
   ENDIF()
 ENDFOREACH()
 
-MESSAGE("
-Component configuration:")
+
+FILE(APPEND ${log}
+  "\nComponent configuration:\n"
+  )
 FOREACH(var ${res})
   IF(var MATCHES "DEAL_II_COMPONENT")
     IF(${${var}})
-      MESSAGE("      ${var}")
+      FILE(APPEND ${log} "      ${var}\n")
     ELSE()
-      MESSAGE("    ( ${var} = ${${var}} )")
+      FILE(APPEND ${log} "    ( ${var} = ${${var}} )\n")
     ENDIF()
   ENDIF()
 ENDFOREACH()
 
-MESSAGE("\n")
+FILE(READ ${log} DEAL_II_LOG_SUMMARY)
+MESSAGE("\n\n${DEAL_II_LOG_SUMMARY}\n")
 
