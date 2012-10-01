@@ -170,6 +170,9 @@ CONFIGURATION
     DEAL_II_WITH_METIS
         Build deal.II with support for Metis
 
+    DEAL_II_WITH_MUMPS
+        Build deal.II with support for Mumps
+
     DEAL_II_WITH_MPI
         Build deal.II with support for mpi
 
@@ -180,7 +183,10 @@ CONFIGURATION
         Build deal.II with support for p4est
 
     DEAL_II_WITH_PETSC
-        Build deal.II with support for petsc
+        Build deal.II with support for PETSc
+
+    DEAL_II_WITH_SLEPC
+        Build deal.II with support for SLEPc
 
     DEAL_II_WITH_TBB
         Build deal.II with support for tbb. This will enable thread support in deal.II
@@ -291,24 +297,22 @@ CONFIGURATION
   The following options control which components of deal.II will be
   configured, build and installed:
 
-    DEAL_II_COMPONENT_EXAMPLES:
-      Enable configuration and installation of the example steps.
-      This adds a COMPONENT "examples" to the build system.
-
-    DEAL_II_COMPONENT_DOCUMENTATION:
-      Enable configuration, build and installation of the documentation.
-      This adds a COMPONENT "documentation" to the build system.
-
     DEAL_II_COMPONENT_COMPAT_FILES:
       Enable installation of legacy files and tools for compatibility with
       the old build system
       This adds a COMPONENT "compat_files" to the build system.
 
-    DEAL_II_COMPONENT_PROJECT_CONFIG:
-      Enable configuration and installation of a cmake project config.
-      Useful for finding ( FIND_PACKAGE(DEAL_II) ) the deal.II library out
-      of cmake build systems. This adds a COMPONENT "project_config" to the
-      build system.
+    DEAL_II_COMPONENT_DOCUMENTATION:
+      Enable configuration, build and installation of the documentation.
+      This adds a COMPONENT "documentation" to the build system.
+
+    DEAL_II_COMPONENT_EXAMPLES:
+      Enable configuration and installation of the example steps.
+      This adds a COMPONENT "examples" to the build system.
+
+    DEAL_II_COMPONENT_CONTRIB
+      Enable configuration and installation of the programs under contrib
+      This adds a COMPONENT "contrib" to the build system.
 
 
 
@@ -707,17 +711,6 @@ DEVELOPMENT
   (Note: <FEATURE> means all caps, <feature> means all lowercase)
 
 
-  In the top level ./CMakeLists.txt:
-
-    DEAL_II_WITH_<FEATURE> (bool, mandatory)
-      An option for enabling or disabling the configuration of <feature>
-
-    DEAL_II_FORCE_CONTRIB_<FEATURE> (bool, optional)
-      If <feature> can be set up by contrib dependencies, this
-      configuration option must be present to force the use of the contrib
-      dependencies
-
-
   A file cmake/configure/configure_<feature>.cmake defining how to
   configure <feature>:
 
@@ -733,16 +726,6 @@ DEVELOPMENT
        to work.) The features must be given with the full option toggle:
        DEAL_II_WITH_[...]
 
-    FEATURE_<FEATURE>_HAVE_CONTRIB  (variable, optional)
-       which should either be set to TRUE if all necessary libraries of the
-       features comes bundled with deal.II and hence can be supported
-       without external dependencies, or unset.
-
-    FEATURE_<FEATURE>_CONFIGURE_CONTRIB(var)  (macro, optional)
-       which should setup all necessary configuration for the feature with
-       contrib source dependencies. var set to TRUE indicates success,
-       otherwise this script gives an error.
-
     FEATURE_<FEATURE>_FIND_EXTERNAL(var)  (macro, mandatory)
        which should set var to TRUE if all dependencies for the feature are
        fulfilled. In this case all necessary variables for
@@ -755,6 +738,10 @@ DEVELOPMENT
        external dependencies. var set to TRUE indicates success,
        otherwise this script gives an error.
 
+    FEATURE_<FEATURE>_CONFIGURE_BUNDLED(var)  (macro, optional)
+       which should setup all necessary configuration for the feature with
+       contrib source dependencies. var set to TRUE indicates success.
+
     FEATURE_<FEATURE>_CUSTOM_ERROR_MESSAGE() (variable, optional)
        which should either be set to TRUE if FEATURE_<FEATURE>_ERROR_MESSAGE
        is set up, or be undefined.
@@ -765,4 +752,19 @@ DEVELOPMENT
        allowed to be used.) If not defined, a suitable default error message
        will be printed.
 
+
+  In bundled/CMakeLists.txt:
+
+    DEAL_II_FORCE_BUNDLED_<FEATURE> (bool, optional)
+      If <feature> can be set up by contrib dependencies, this
+      configuration option must be present to force the use of the contrib
+      dependencies
+
+    FEATURE_<FEATURE>_HAVE_BUNDLED  (variable, optional)
+       which should either be set to TRUE if all necessary libraries of the
+       features comes bundled with deal.II and hence can be supported
+       without external dependencies, or unset.
+
+    * Setup of compilation and installation if
+      FEATURE_<FEATURE>_BUNDLED_CONFIGURED is set.
 
