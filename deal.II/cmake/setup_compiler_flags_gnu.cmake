@@ -19,6 +19,13 @@
 # editing this file.
 #
 
+IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.4" )
+  MESSAGE(WARNING "\n"
+    "You're using an old version of the GNU Compiler Collection (gcc/g++)!\n"
+    "It is strongly recommended to use at least version 3.4.\n"
+    )
+ENDIF()
+
 
 ########################
 #                      #
@@ -28,8 +35,6 @@
 
 #
 # Set the pic flag.
-# TODO: On some systems, -fpic/PIC is implied, so don't set anything to
-# avoid a warning.
 #
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 
@@ -38,7 +43,6 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 # the deal.II library with it.
 #
 ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
-
 
 #
 # Set -pedantic if the compiler supports it.
@@ -54,7 +58,6 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wwrite-strings")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wsynth")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wsign-compare")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wswitch")
-
 
 #
 # Newer versions of gcc have a flag -Wunused-local-typedefs that, though in
@@ -92,24 +95,6 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
   # this flag any more, so check whether we can indeed do this
   #
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-double")
-ENDIF()
-
-
-IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN") # TODO: Check for correct name
-  #
-  # TODO: Is this flag still necessary? Sounds pretty invasive...
-  #
-  # On Cygwin, when using shared libraries, there might occur
-  # difficulties when linking libraries for several dimensions,
-  # as some symbols are defined in all of them. This leads to a
-  # linker error. We force the linker to ignore multiple symbols,
-  # but of course this might lead to strange program behaviour if
-  # you accidentally defined one symbol multiple times...
-  # (added 2005/07/13, Ralf B. Schulz)
-  # (modified 2005/12/20, Ralf B. Schulz)
-  ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS
-    "-Xlinker --allow-multiple-definition"
-    )
 ENDIF()
 
 

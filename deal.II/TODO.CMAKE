@@ -40,6 +40,8 @@ Major:
 
 Minor:
 
+* Evaluate this Intel and MPI issue
+
 * Fixup the TODOs in
     source/lac/sparse_dircect.cc
     source/base/path_find.cc
