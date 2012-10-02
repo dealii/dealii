@@ -396,12 +396,13 @@ std::pair<unsigned int,unsigned int>
 BlockIndices::global_to_local (const unsigned int i) const
 {
   Assert (i<total_size(), ExcIndexRange(i, 0, total_size()));
+  Assert (n_blocks > 0, ExcLowrRange(i, 1));
 
-  int block = n_blocks-1;
+  unsigned int block = n_blocks-1;
   while (i < start_indices[block])
     --block;
 
-  return std::make_pair<unsigned int>(block, i-start_indices[block]);
+  return std::make_pair(block, i-start_indices[block]);
 }
 
 
