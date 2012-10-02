@@ -27,6 +27,8 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
 
   IF(LAPACK_FOUND)
     MARK_AS_ADVANCED(
+      atlas_LIBRARY
+      blas_LIBRARY
       lapack_LIBRARY
       )
     SET(${var} TRUE)
