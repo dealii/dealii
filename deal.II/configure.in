@@ -201,10 +201,6 @@ dnl whether other flags are set (e.g. the need for defining
 dnl -D__EXTENSIONS__ depends on whether we use/not use threading
 dnl options), this is done after checking for multithreading
 
-DEAL_II_CHECK_ASSERT_THROW(debug, $CXXFLAGSG,
-                           [CXXFLAGSG="-DDISABLE_ASSERT_THROW $CXXFLAGSG"])
-DEAL_II_CHECK_ASSERT_THROW(optimized, $CXXFLAGSO,
-                           [CXXFLAGSO="-DDISABLE_ASSERT_THROW $CXXFLAGSO"])
 DEAL_II_CHECK_LOCAL_TYPEDEF_COMP
 DEAL_II_CHECK_TEMPLATE_SPEC_ACCESS
 DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST

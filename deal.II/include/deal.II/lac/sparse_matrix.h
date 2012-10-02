@@ -332,9 +332,6 @@ namespace SparseMatrixIterators
                                         * friend if the compiler has a bug
                                         * and requires this.
                                         */
-#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
-      friend class Reference;
-#endif
   };
 
 
