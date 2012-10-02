@@ -27,6 +27,8 @@ INCLUDE(FindPackageHandleStandardArgs)
 # ARPACK needs LAPACK and BLAS as dependency, search for them with the help
 # of the LAPACK find module:
 #
+# TODO: ARPACK and mpi...
+#
 FIND_PACKAGE(LAPACK)
 
 FIND_LIBRARY(ARPACK_LIBRARY
