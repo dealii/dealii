@@ -39,6 +39,9 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
     "Choose the type of build, options are: Debug, Release"
     )
 
+  SET(CMAKE_CXX_COMPILER ${DEAL_II_CXX_COMPILER} CACHE STRING
+    "CXX Compiler.")
+
   SET(CMAKE_CXX_FLAGS ${DEAL_II_CXX_FLAGS} CACHE STRING
     "Flags used by the compiler during all build types."
     )
