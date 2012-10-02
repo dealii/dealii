@@ -96,6 +96,14 @@ ENDFOREACH()
 
 
 #
+# Read in CFLAGS, CXXFLAGS and LDFLAGS from environment
+#
+SET_IF_EMPTY(CMAKE_C_FLAGS "$ENV{CFLAGS}")
+SET_IF_EMPTY(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS}")
+SET_IF_EMPTY(CMAKE_SHARED_LINKER_FLAGS "$ENV{LDFLAGS}")
+
+
+#
 # Set cached compiler flags to an empty string:
 #
 SET(deal_ii_used_flags
