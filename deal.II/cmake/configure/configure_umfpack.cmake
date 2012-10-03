@@ -21,13 +21,6 @@ OPTION(DEAL_II_WITH_UMFPACK
   OFF)
 
 
-SET(FEATURE_UMFPACK_DEPENDS
-  # Currently, with enabled umfpack support, we also need to setup
-  # LAPACK support in deal.II:
-  DEAL_II_WITH_LAPACK
-  )
-
-
 MACRO(FEATURE_UMFPACK_FIND_EXTERNAL var)
   FIND_PACKAGE(UMFPACK)
 
@@ -50,10 +43,9 @@ ENDMACRO()
 
 
 MACRO(FEATURE_UMFPACK_CONFIGURE_BUNDLED var)
-  #
-  # DEAL_II_WITH_LAPACK will pull in an external BLAS library. So no need
-  # to setup something more than bundled UMFPACK here.
-  #
+
+  LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${BLAS_LIBRARIES})
+  ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${BLAS_LINKER_FLAGS}")
 
   INCLUDE_DIRECTORIES(
     ${UMFPACK_FOLDER}/UMFPACK/Include
