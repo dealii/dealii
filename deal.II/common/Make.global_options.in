@@ -173,6 +173,7 @@ endif
 ifeq ($(USE_CONTRIB_PETSC),yes)
   lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
   lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
+  DEAL_II_PETSC_LIBDIR     = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
 
   ifeq ($(enable-shared),yes)
     # Starting with PETSc versions 3.0.0:
