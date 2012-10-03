@@ -19,7 +19,8 @@
 # editing this file.
 #
 
-IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.4" )
+IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
+    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.4" )
   MESSAGE(WARNING "\n"
     "You're using an old version of the GNU Compiler Collection (gcc/g++)!\n"
     "It is strongly recommended to use at least version 3.4.\n"
@@ -47,7 +48,10 @@ ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
 #
 # Set -pedantic if the compiler supports it.
 #
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-pedantic")
+IF(NOT (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
+        CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.4"))
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-pedantic")
+ENDIF()
 
 #
 # Setup various warnings:
