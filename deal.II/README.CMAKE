@@ -222,16 +222,6 @@ CONFIGURATION
   forces the use of the bundled  library regardless whether
   DEAL_II_ALLOW_BUNDLED is set to OFF or an external library is found.
 
-
-  Autoconfiguration:
-
-  If the option DEAL_II_FEATURE_AUTODETECTION is enabled the
-  DEAL_II_WITH_<feature> toggles will be automatically set (overwriting any
-  previous configuration) depending on whether they can be supported or
-  not.
-  (Note: DEAL_II_FEATURE_AUTODETECTION will respect DEAL_II_ALLOW_BUNDLED
-  and DEAL_II_FORCE_BUNDLED_<feature>)
-
   REMARKS:
 
   - To ensure that no bundled library is used at all DEAL_II_ALLOW_BUNDLED,
@@ -240,6 +230,25 @@ CONFIGURATION
   - DEAL_II_FORCE_BUNDLED_<library>=ON will _not_ automatically enable the
     corresponding DEAL_II_WITH_<feature> toggle. This has to be set
     separately.
+
+
+  Auto configuration:
+
+  As long as DEAL_II_WITH_<FEATURE> is not set to ON or OFF in the cache it
+  will be automatically configured. If a toggle DEAL_II_WITH_<FEATURE> is
+  defined it won't be altered.
+  This means that the very first configuration run will set all (at that
+  moment) available features to ON and the rest to OFF. In all subsequent
+  configuration steps DEAL_II_WITH_<FEATURE> have to be changed by hand.)
+
+  This behaviour can be controlled via the variables:
+
+    - DISABLE_AUTODETECTION=ON: This will disable any autoconfiguration by
+      setting undefined DEAL_II_WITH_<FEATURE> toggles to OFF:
+
+    - FORCE_AUTODETECTION=ON: This will force the reconfiguration of every
+      feature by undefining DEAL_II_WITH_<FEATURE> prior to configuration,
+      effectively overwriting _any_ supplied or cached value.
 
 
   External library locations

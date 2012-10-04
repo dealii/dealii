@@ -16,10 +16,6 @@
 # Configuration for the netcdf library:
 #
 
-OPTION(DEAL_II_WITH_METIS
-  "Build deal.II with support for Metis."
-  OFF)
-
 
 MACRO(FEATURE_METIS_FIND_EXTERNAL var)
   FIND_PACKAGE(METIS)

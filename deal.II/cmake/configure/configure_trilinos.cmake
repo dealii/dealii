@@ -16,10 +16,6 @@
 # Configuration for the trilinos library:
 #
 
-OPTION(DEAL_II_WITH_TRILINOS
-  "Build deal.II with support for trilinos."
-  OFF)
-
 
 MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
   FIND_PACKAGE(TRILINOS)

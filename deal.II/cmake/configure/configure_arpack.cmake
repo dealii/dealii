@@ -16,10 +16,6 @@
 # Configuration for the ARPACK library:
 #
 
-OPTION(DEAL_II_WITH_ARPACK
-  "Build deal.II with support for arpack."
-  OFF)
-
 
 MACRO(FEATURE_ARPACK_FIND_EXTERNAL var)
   FIND_PACKAGE(ARPACK)

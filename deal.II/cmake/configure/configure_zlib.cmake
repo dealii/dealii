@@ -16,9 +16,6 @@
 # Configuration for the zlib library:
 #
 
-OPTION(DEAL_II_WITH_ZLIB
-  "Build deal.II with support for zlib."
-  OFF)
 
 MACRO(FEATURE_ZLIB_FIND_EXTERNAL var)
   FIND_PACKAGE(ZLIB)

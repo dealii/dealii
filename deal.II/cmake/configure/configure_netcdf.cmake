@@ -16,10 +16,6 @@
 # Configuration for the netcdf library:
 #
 
-OPTION(DEAL_II_WITH_NETCDF
-  "Build deal.II with support for netcdf."
-  OFF)
-
 
 MACRO(FEATURE_NETCDF_FIND_EXTERNAL var)
   FIND_PACKAGE(NETCDF)

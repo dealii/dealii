@@ -16,9 +16,6 @@
 # Configuration for the MUMPS library:
 #
 
-OPTION(DEAL_II_WITH_MUMPS
-  "Build deal.II with support for MUMPS."
-  OFF)
 
 SET(FEATURE_MUMPS_DEPENDS DEAL_II_WITH_MPI)
 

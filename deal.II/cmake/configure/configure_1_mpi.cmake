@@ -16,10 +16,6 @@
 # Configuration for mpi support:
 #
 
-OPTION(DEAL_II_WITH_MPI
-  "Build deal.II with support for mpi."
-  OFF)
-
 
 MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   FIND_PACKAGE(MPI)

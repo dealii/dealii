@@ -109,12 +109,23 @@ ELSEIF(NOT DEAL_II_KNOWN_COMPILER)
   FILE(APPEND ${log} "\nWARNING: Unknown compiler! Please set compiler flags by hand.\n")
 ENDIF()
 
-
 FILE(APPEND ${log}
   "\nConfigured Features ("
-  "DEAL_II_FEATURE_AUTODETECTION = ${DEAL_II_FEATURE_AUTODETECTION}, "
+  )
+IF(FORCE_AUTODETECTION)
+  FILE(APPEND ${log}
+    "!!! FORCE_AUTODETECTION !!!, "
+    )
+ENDIF()
+IF(DISABLE_AUTODETECTION)
+  FILE(APPEND ${log}
+    "!!! DISABLE_AUTODETECTION !!!, "
+    )
+ENDIF()
+FILE(APPEND ${log}
   "DEAL_II_ALLOW_BUNDLED = ${DEAL_II_ALLOW_BUNDLED}):\n"
   )
+
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
   IF(var MATCHES "DEAL_II_WITH")

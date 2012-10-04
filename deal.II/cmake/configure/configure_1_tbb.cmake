@@ -16,10 +16,6 @@
 # Configuration for tbb support:
 #
 
-OPTION(DEAL_II_WITH_TBB
-  "Build deal.II with support for tbb. This will enable thread support in deal.II."
-  OFF)
-
 
 #
 # Set up genereal threading:

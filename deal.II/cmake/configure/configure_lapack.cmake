@@ -17,11 +17,6 @@
 #
 
 
-OPTION(DEAL_II_WITH_LAPACK
-  "Build deal.II with support for LAPACK."
-  OFF)
-
-
 MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
   FIND_PACKAGE(LAPACK)
 

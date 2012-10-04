@@ -16,10 +16,6 @@
 # Configuration for the umfpack and amd libraries:
 #
 
-OPTION(DEAL_II_WITH_UMFPACK
-  "Build deal.II with support for UMFPACK."
-  OFF)
-
 
 MACRO(FEATURE_UMFPACK_FIND_EXTERNAL var)
   FIND_PACKAGE(UMFPACK)

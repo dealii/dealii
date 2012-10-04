@@ -20,7 +20,6 @@
 #
 # General configuration options:
 #
-#     DEAL_II_FEATURE_AUTODETECTION   **)
 #     DEAL_II_ALLOW_BUNDLED           **)
 #     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS **)
 #     DEAL_II_COMPONENT_COMPAT_FILES  **)
@@ -65,10 +64,9 @@
 #     DEAL_II_WITH_BUNDLED_DIRECTORY
 #     DEAL_II_WITH_DOC_DIRECTORY
 #
-# *)  Values marked with *) can be overwritten by the command line via
+# *)  Uncached variables. Can be overwritten by the command line via
 #     -D<...>
-# **) Cached Option. Can be set via ccmake or on the command line via
-#     -D<...>
+# **) Cached Options. Can be set via ccmake or on the command line via -D<...>
 #
 
 
@@ -89,11 +87,6 @@ ENDIF()
 #                     General configuration options:                      #
 #                                                                         #
 ###########################################################################
-
-OPTION(DEAL_II_FEATURE_AUTODETECTION
-  "Enables feature autodetection. This will automatically set DEAL_II_WITH_<...> options."
-  ON
-  )
 
 OPTION(DEAL_II_ALLOW_BUNDLED
   "Allow the use of libraries bundled with the source tarball. (DEAL_II_FORCE_BUNDLED* will overwrite this option.)"

@@ -87,10 +87,11 @@ ENDMACRO()
 # A small macro to set the DEAL_II_WITH_${feature} variables:
 #
 MACRO(SET_CACHED_OPTION str value)
-  SET(${str}
+  STRING(TOLOWER "${str}" str_lower)
+  SET(DEAL_II_WITH_${str}
     ${value}
     CACHE BOOL
-    "Automatically set due to DEAL_II_FEATURE_AUTODETECTION"
+    "Build deal.II with support for ${str_lower}."
     FORCE)
 ENDMACRO()
 
@@ -145,10 +146,25 @@ MACRO(CONFIGURE_FEATURE feature)
     ENDIF()
   ENDFOREACH()
 
+
   #
-  # Only try to configure ${feature} if we have to:
+  # Obey the user overrides:
   #
-  IF(DEAL_II_FEATURE_AUTODETECTION OR DEAL_II_WITH_${feature})
+  IF(FORCE_AUTODETECTION)
+    UNSET(DEAL_II_WITH_${feature})
+  ENDIF()
+  IF(DISABLE_AUTODETECTION AND
+    (NOT DEFINED DEAL_II_WITH_${feature}) )
+    SET_CACHED_OPTION(${feature} OFF)
+  ENDIF()
+
+
+  #
+  # Only try to configure ${feature} if we have to, i.e.
+  # DEAL_II_WITH_${feature} is set to true or not set at all.
+  #
+  IF((NOT DEFINED DEAL_II_WITH_${feature}) OR
+     DEAL_II_WITH_${feature})
 
     #
     # Are all dependencies fullfilled?
@@ -156,17 +172,17 @@ MACRO(CONFIGURE_FEATURE feature)
     SET(macro_dependencies_ok TRUE)
     FOREACH(macro_dependency ${FEATURE_${feature}_DEPENDS})
       IF(NOT ${macro_dependency})
-        IF(DEAL_II_FEATURE_AUTODETECTION)
-          MESSAGE(STATUS
-            "DEAL_II_WITH_${feature} has unmet configuration requirements: "
-            "${macro_dependency} has to be set to \"ON\"."
-            )
-          SET_CACHED_OPTION(DEAL_II_WITH_${feature} OFF)
-        ELSE()
+        IF(DEAL_II_WITH_${feature})
           MESSAGE(SEND_ERROR "\n"
             "DEAL_II_WITH_${feature} has unmet configuration requirements: "
             "${macro_dependency} has to be set to \"ON\".\n\n"
             )
+        ELSE()
+          MESSAGE(STATUS
+            "DEAL_II_WITH_${feature} has unmet configuration requirements: "
+            "${macro_dependency} has to be set to \"ON\"."
+            )
+          SET_CACHED_OPTION(${feature} OFF)
         ENDIF()
         SET(macro_dependencies_ok FALSE)
       ENDIF()
@@ -186,9 +202,7 @@ MACRO(CONFIGURE_FEATURE feature)
             MESSAGE(STATUS
               "DEAL_II_WITH_${feature} successfully set up with bundled packages."
               )
-            IF(DEAL_II_FEATURE_AUTODETECTION)
-              SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
-            ENDIF()
+            SET_CACHED_OPTION(${feature} ON)
           ELSE()
             # This should not happen. So give an error
             MESSAGE(SEND_ERROR
@@ -223,9 +237,7 @@ MACRO(CONFIGURE_FEATURE feature)
             MESSAGE(STATUS
               "DEAL_II_WITH_${feature} successfully set up with external dependencies."
               )
-            IF(DEAL_II_FEATURE_AUTODETECTION)
-              SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
-            ENDIF()
+            SET_CACHED_OPTION(${feature} ON)
           ELSE()
             # This should not happen. So give an error
             MESSAGE(SEND_ERROR
@@ -248,7 +260,7 @@ MACRO(CONFIGURE_FEATURE feature)
                 "DEAL_II_WITH_${feature} successfully set up with bundled packages."
                 )
               IF(DEAL_II_FEATURE_AUTODETECTION)
-                SET_CACHED_OPTION(DEAL_II_WITH_${feature} ON)
+                SET_CACHED_OPTION(${feature} ON)
               ENDIF()
             ELSE()
               # This should not happen. So give an error
@@ -257,21 +269,21 @@ MACRO(CONFIGURE_FEATURE feature)
                 )
             ENDIF()
           ELSE()
-              IF(DEAL_II_FEATURE_AUTODETECTION)
-                SET_CACHED_OPTION(DEAL_II_WITH_${feature} OFF)
+            IF(DEAL_II_WITH_${feature})
+              IF(FEATURE_${feature}_CUSTOM_ERROR_MESSAGE)
+                RUN_COMMAND("FEATURE_${feature}_ERROR_MESSAGE()")
               ELSE()
-                IF(FEATURE_${feature}_CUSTOM_ERROR_MESSAGE)
-                  RUN_COMMAND("FEATURE_${feature}_ERROR_MESSAGE()")
-                ELSE()
-                  FEATURE_ERROR_MESSAGE(${feature})
-                ENDIF()
+                FEATURE_ERROR_MESSAGE(${feature})
               ENDIF()
+            ELSE()
+              SET_CACHED_OPTION(${feature} OFF)
+            ENDIF()
           ENDIF()
 
         ENDIF(FEATURE_${feature}_EXTERNAL_FOUND)
-      ENDIF(DEAL_II_FORCE_BUNDLED_${feature})
-    ENDIF(macro_dependencies_ok)
-  ENDIF(DEAL_II_FEATURE_AUTODETECTION OR DEAL_II_WITH_${feature})
+      ENDIF()
+    ENDIF()
+  ENDIF()
 
   SET(FEATURE_${feature}_PROCESSED TRUE)
 
