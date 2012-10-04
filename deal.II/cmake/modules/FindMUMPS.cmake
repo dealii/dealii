@@ -35,7 +35,6 @@ FIND_PACKAGE(SCALAPACK) # which will also include lapack and blas
 #
 # TODO: mumps might link to scotch and or metis as well. Ignore this for
 #       now. :-]
-# TODO: libpord.a ?
 #
 
 FIND_PATH(MUMPS_INCLUDE_DIRS dmumps_c.h
@@ -65,6 +64,21 @@ SET(MUMPS_LIBRARIES
   ${LAPACK_LIBRARIES}
   )
 
+#
+# If we can find libport.a (or similiar), link it in as well:
+#
+FIND_LIBRARY(PORD_LIBRARY
+  NAMES port
+  HINTS
+    ${MUMPS_DIR}
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
+  )
+IF(NOT PORD_LIBRARY MATCHES "-NOTFOUND")
+  LIST(APPEND MUMPS_LIBRARIES
+    ${PORD_LIBRARY}
+    )
+ENDIF()
+
 SET(MUMPS_LINKER_FLAGS
   ${LAPACK_LINKER_FLAGS}
   )
@@ -80,6 +94,7 @@ IF(MUMPS_FOUND)
     DMUMPS_LIBRARY
     MUMPS_COMMON_LIBRARY
     MUMPS_INCLUDE_DIRS
+    PORT_LIBRARY
   )
 ENDIF()
 
