@@ -33,6 +33,8 @@ INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE(SCALAPACK) # which will also include lapack and blas
 
 #
+# TODO: mumps might link to scotch and or metis as well. Ignore this for
+#       now. :-]
 # TODO: libpord.a ?
 #
 

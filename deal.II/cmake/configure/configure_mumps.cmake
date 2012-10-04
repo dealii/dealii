@@ -44,5 +44,22 @@ MACRO(FEATURE_MUMPS_CONFIGURE_EXTERNAL var)
 ENDMACRO()
 
 
+SET(FEATURE_MUMPS_CUSTOM_ERROR_MESSAGE TRUE)
+
+
+MACRO(FEATURE_MUMPS_ERROR_MESSAGE)
+  MESSAGE(SEND_ERROR "\n"
+    "Could not find the mumps library!\n"
+    "Please ensure that the library is installed on your computer.\n"
+    "If the libraries is not at a default location, either provide some hints\n"
+    "for the autodetection:\n"
+    "    $ MUMPS_DIR=\"...\" cmake <...>\n"
+    "    $ ccmake -DMUMPS_DIR=\"...\" cmake <...>\n"
+    "or set the relevant variables by hand in ccmake.\n"
+    "Relevant hints for MUMPS are MUMPS_DIR and SCALAPACK_DIR.\n\n"
+    )
+ENDMACRO()
+
+
 CONFIGURE_FEATURE(MUMPS)
 

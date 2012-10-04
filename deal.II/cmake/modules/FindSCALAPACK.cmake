@@ -32,7 +32,7 @@ INCLUDE(FindPackageHandleStandardArgs)
 # SCALAPACK needs LAPACK and BLAS as dependency, search for them with the help
 # of the LAPACK find module:
 #
-# TODO: SCALAPACK and mpi...
+# TODO: ScaLAPACK and mpi...
 #
 FIND_PACKAGE(LAPACK)
 
@@ -58,7 +58,7 @@ SET(SCALAPACK_LINKER_FLAGS
 # probabilistic way...
 #
 FIND_LIBRARY(BLACS_LIBRARY
-  NAMES blacs
+  NAMES blacs # TODO
     ${BLACS_DIR}
     ${SCALAPACK_DIR}
     ${SCALAPACK_DIR}/../blacs/

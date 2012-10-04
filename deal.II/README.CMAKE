@@ -267,10 +267,11 @@ CONFIGURATION
       Currently, the following variables will be considered:
 
         METIS_DIR,
+        MUMPS_DIR (and SCALAPACK_DIR),
         P4EST_DIR (and SC_DIR),
         PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
         TRILINOS_DIR,
-        UMFPACK_DIR (and AMD_DIR)
+        UMFPACK_DIR (and AMD_DIR, SUITESPARSECONFIG_DIR)
 
   3.) The system default locations for libraries and includes.
 

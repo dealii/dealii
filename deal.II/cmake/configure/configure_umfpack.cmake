@@ -70,8 +70,10 @@ MACRO(FEATURE_UMFPACK_ERROR_MESSAGE)
     "    $ UMFPACK_DIR=\"...\" cmake <...>\n"
     "    $ ccmake -DUMFPACK_DIR=\"...\" cmake <...>\n"
     "or set the relevant variables by hand in ccmake.\n"
+    "Relevant hints for UMFPACK are UMFPACK_DIR, AMD_DIR, SUITESPARSECONFIG_DIR.\n"
     "Alternatively you may choose to compile the bundled libraries\n"
-    "by setting DEAL_II_ALLOW_BUNDLED=ON or DEAL_II_FORCE_BUNDLED_UMFPACK=ON.\n\n"
+    "by setting DEAL_II_ALLOW_BUNDLED=ON or DEAL_II_FORCE_BUNDLED_UMFPACK=ON.\n"
+    "(BLAS has to be installed for bundled UMFPACK to be available)\n\n"
     )
 ENDMACRO()
 
