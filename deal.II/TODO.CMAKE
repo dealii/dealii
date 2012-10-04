@@ -8,7 +8,6 @@ Major:
 * Test the fparser 4.5 functionality.
 
 * The following features have to be written:
-    * MUMPS
     * SLEPC
     * HDF5
     * TECPLOT
@@ -27,32 +26,20 @@ Major:
 
 * Port the testsuite to cmake
 
-* Build system for parameter_gui.
-
-* Finish install targets:
-
-   - share files (documentation/manpage/etc.)
-   - same for mesh_conversion and parameter_gui
-
 * Rename all DEAL_II_USE_* and HAVE_LIB* that refer to a feature to
   DEAL_II_WITH_*.
 
+* Refactor lapack_templates.pl
+
 
 Minor:
-
-* Evaluate this Intel and MPI issue
 
 * Fixup the TODOs in
     source/lac/sparse_dircect.cc
     source/base/path_find.cc
     source/base/function_parser.cc
 
-* Get rid of DEAL_II_PATH in config.h and in the sources.
-
 * HAVE_JN_ ?
-
-* There is still a perl script for generating lapack_templates.h. Is this
-  necessary.
 
 * TODO: Update the p4est-setup.sh script...
 
