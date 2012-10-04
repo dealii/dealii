@@ -27,6 +27,10 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
       "Could not find a sufficient modern metis installation: "
       "Version 5.x required!\n\n"
       )
+    UNSET(METIS_LIBRARY CACHE)
+    UNSET(METIS_INCLUDE_DIR CACHE)
+    UNSET(METIS_DIR CACHE)
+    UNSET(METIS_FOUND CACHE)
   ENDIF()
 ENDMACRO()
 

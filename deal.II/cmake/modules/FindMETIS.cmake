@@ -21,11 +21,8 @@ INCLUDE(FindPackageHandleStandardArgs)
 SET_IF_EMPTY(METIS_DIR "$ENV{METIS_DIR}")
 
 #
-# Metis (at least up to version 4.*) is usually pretty self contained. So
-# no external dependencies so far.
-#
-# TODO: What about metis-5.* (e.g. coming from parmetis) This could have
-# deps on pcre and mpi...
+# TODO: Metis is usually pretty self contained. So no external dependencies
+# so far... BUt there could be dependencies on pcre and mpi...
 #
 
 FIND_PATH(METIS_INCLUDE_DIR metis.h
