@@ -96,7 +96,7 @@ IF(NOT DEAL_II_WITH_BOOST)
   IF(DEAL_II_FEATURE_AUTODETECTION)
     FEATURE_ERROR_MESSAGE("BOOST")
   ELSE()
-    MESSAGE(SEND_ERROR "\n"
+    MESSAGE(FATAL_ERROR "\n"
       "Unmet configuration requirements: "
       "DEAL_II_WITH_BOOST required, but set to OFF!.\n\n"
       )

@@ -49,7 +49,7 @@ SET(FEATURE_DOXYGEN_CUSTOM_ERROR_MESSAGE TRUE)
 
 
 MACRO(FEATURE_DOXYGEN_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "\n"
+  MESSAGE(FATAL_ERROR "\n"
     "Could not find the doxygen package!\n\n"
     "Please ensure that doxygen and dot are installed on your computer.\n"
     "If the packages are not at a default location, either provide some hints\n"
@@ -68,7 +68,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION AND NOT DEAL_II_WITH_DOXYGEN)
   IF(DEAL_II_FEATURE_AUTODETECTION)
     FEATURE_DOXYGEN_ERROR_MESSAGE()
   ELSE()
-    MESSAGE(SEND_ERROR "\n"
+    MESSAGE(FATAL_ERROR "\n"
       "DEAL_II_COMPONENT_DOCUMENTATION has unmet configuration requirements: "
       "DEAL_II_WITH_DOXYGEN required, but set to OFF!\n\n"
       )

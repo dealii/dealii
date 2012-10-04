@@ -58,7 +58,7 @@
 #
 IF(NOT ( "${CMAKE_C_COMPILER_ID}" STREQUAL "${CMAKE_CXX_COMPILER_ID}" AND
          "${CMAKE_C_COMPILER_VERSION}" STREQUAL "${CMAKE_CXX_COMPILER_VERSION}" ) )
-    MESSAGE(SEND_ERROR "\n"
+    MESSAGE(FATAL_ERROR "\n"
       "Configuration error: The specified C and CXX compiler have to be the "
       "same, but found:\n"
       "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}\n"

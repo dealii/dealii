@@ -49,7 +49,7 @@
 #    fullfilled. In this case all necessary variables for
 #    FEATURE_${feature}_CONFIGURE_EXTERNAL must be set. Otherwise
 #    var should remain unset.
-#    This macro should give an error (SEND_ERROR or FATAL_ERROR).
+#    This macro should give an error (FATAL_ERROR or FATAL_ERROR).
 #
 # FEATURE_${feature}_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
 #    which should setup all necessary configuration for the feature with
@@ -61,7 +61,7 @@
 #    is set up, or be undefined.
 #
 # FEATURE_${feature}_ERROR_MESSAGE()  (macro, optional)
-#    which should print a meaningfull error message (with SEND_ERROR) for
+#    which should print a meaningfull error message (with FATAL_ERROR) for
 #    the case that no external library was found (and bundled is not
 #    allowed to be used.) If not defined, a suitable default error message
 #    will be printed.
@@ -102,7 +102,7 @@ ENDMACRO()
 MACRO(FEATURE_ERROR_MESSAGE feature)
   STRING(TOLOWER ${feature} feature_lowercase)
   IF(FEATURE_${feature}_HAVE_BUNDLED)
-    MESSAGE(SEND_ERROR "\n"
+    MESSAGE(FATAL_ERROR "\n"
       "Could not find the ${feature_lowercase} library!\n\n"
       "Please ensure that the ${feature_lowercase} library is installed on your computer.\n"
       "If the library is not at a default location, either provide some hints\n"
@@ -112,7 +112,7 @@ MACRO(FEATURE_ERROR_MESSAGE feature)
       "DEAL_II_FORCE_BUNDLED_${feature}=on.\n\n"
       )
  ELSE()
-    MESSAGE(SEND_ERROR "\n"
+    MESSAGE(FATAL_ERROR "\n"
       "Could not find the ${feature_lowercase} library!\n\n"
       "Please ensure that the ${feature_lowercase} library is installed on your computer.\n"
       "If the library is not at a default location, either provide some hints\n"
@@ -173,7 +173,7 @@ MACRO(CONFIGURE_FEATURE feature)
     FOREACH(macro_dependency ${FEATURE_${feature}_DEPENDS})
       IF(NOT ${macro_dependency})
         IF(DEAL_II_WITH_${feature})
-          MESSAGE(SEND_ERROR "\n"
+          MESSAGE(FATAL_ERROR "\n"
             "DEAL_II_WITH_${feature} has unmet configuration requirements: "
             "${macro_dependency} has to be set to \"ON\".\n\n"
             )
@@ -205,14 +205,15 @@ MACRO(CONFIGURE_FEATURE feature)
             SET_CACHED_OPTION(${feature} ON)
           ELSE()
             # This should not happen. So give an error
-            MESSAGE(SEND_ERROR
-              "Failed to set up DEAL_II_WITH_${feature} with bundled packages."
+            MESSAGE(FATAL_ERROR
+              "\nInternal build system error: Failed to set up "
+              "DEAL_II_WITH_${feature} with bundled packages.\n\n"
               )
           ENDIF()
         ELSE()
-          MESSAGE(FATAL_ERROR
+          MESSAGE(FATAL_ERROR "\n"
             "Internal build system error: DEAL_II_FORCE_BUNDLED_${feature} "
-            "defined, but FEATURE_${feature}_HAVE_BUNDLED not present."
+            "defined, but FEATURE_${feature}_HAVE_BUNDLED not present.\n"
             )
         ENDIF()
 
@@ -240,8 +241,9 @@ MACRO(CONFIGURE_FEATURE feature)
             SET_CACHED_OPTION(${feature} ON)
           ELSE()
             # This should not happen. So give an error
-            MESSAGE(SEND_ERROR
-              "Failed to set up DEAL_II_WITH_${feature} with external dependencies."
+            MESSAGE(FATAL_ERROR
+              "\nInternal build system error: Failed to set up "
+              "DEAL_II_WITH_${feature} with external dependencies.\n\n"
               )
           ENDIF()
 
@@ -264,8 +266,9 @@ MACRO(CONFIGURE_FEATURE feature)
               ENDIF()
             ELSE()
               # This should not happen. So give an error
-              MESSAGE(SEND_ERROR
-                "Failed to set up DEAL_II_WITH_${feature} with bundled packages."
+              MESSAGE(FATAL_ERROR
+                "\nInternal build system error: Failed to set up "
+                "DEAL_II_WITH_${feature} with bundled packages.\n\n"
                 )
             ENDIF()
           ELSE()

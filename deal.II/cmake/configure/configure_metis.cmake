@@ -45,7 +45,7 @@ SET(FEATURE_METIS_CUSTOM_ERROR_MESSAGE TRUE)
 
 
 MACRO(FEATURE_METIS_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "\n"
+  MESSAGE(FATAL_ERROR "\n"
     "Could not find the metis library!\n\n"
     "Please ensure that the metis library version 5.0 or newer is installed on your computer.\n"
     "If the library is not at a default location, either provide some hints\n"

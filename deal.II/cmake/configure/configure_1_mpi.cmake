@@ -63,7 +63,7 @@ SET(FEATURE_MPI_CUSTOM_ERROR_MESSAGE TRUE)
 
 
 MACRO(FEATURE_MPI_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "\n"
+  MESSAGE(FATAL_ERROR "\n"
     "Could not find any suitable mpi library!\n\n"
     "Please ensure that an mpi library is installed on your computer.\n"
     "If the library is not at a default location, either provide some hints\n"

@@ -205,7 +205,7 @@ SET(FEATURE_TRILINOS_CUSTOM_ERROR_MESSAGE TRUE)
 
 
 MACRO(FEATURE_TRILINOS_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "\n"
+  MESSAGE(FATAL_ERROR "\n"
     "Could not find a suitable set of trilinos libraries!\n"
     "Please ensure that all necessary libraries are installed on your computer.\n"
     "If the libraries are not at a default location, either provide some hints\n"

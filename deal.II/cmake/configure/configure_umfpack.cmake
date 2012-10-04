@@ -58,7 +58,7 @@ SET(FEATURE_UMFPACK_CUSTOM_ERROR_MESSAGE TRUE)
 
 
 MACRO(FEATURE_UMFPACK_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "\n"
+  MESSAGE(FATAL_ERROR "\n"
     "Could not find the umfpack and amd libraries!\n"
     "Please ensure that the libraries are installed on your computer.\n"
     "If the libraries are not at a default location, either provide some hints\n"

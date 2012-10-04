@@ -60,7 +60,7 @@ SET(FEATURE_P4EST_CUSTOM_ERROR_MESSAGE TRUE)
 
 
 MACRO(FEATURE_P4EST_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "\n"
+  MESSAGE(FATAL_ERROR "\n"
     "Could not find the p4est and sc libraries!\n\n"
     "Please ensure that the libraries are installed on your computer.\n"
     "If the libraries are not at a default location, either provide some hints\n"

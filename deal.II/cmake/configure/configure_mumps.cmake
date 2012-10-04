@@ -48,7 +48,7 @@ SET(FEATURE_MUMPS_CUSTOM_ERROR_MESSAGE TRUE)
 
 
 MACRO(FEATURE_MUMPS_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "\n"
+  MESSAGE(FATAL_ERROR "\n"
     "Could not find the mumps library!\n"
     "Please ensure that the library is installed on your computer.\n"
     "If the libraries is not at a default location, either provide some hints\n"

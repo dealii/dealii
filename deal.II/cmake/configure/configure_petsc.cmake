@@ -96,7 +96,7 @@ SET(FEATURE_PETSC_CUSTOM_ERROR_MESSAGE TRUE)
 
 
 MACRO(FEATURE_PETSC_ERROR_MESSAGE)
-  MESSAGE(SEND_ERROR "\n"
+  MESSAGE(FATAL_ERROR "\n"
     "Could not find the petsc library!\n\n"
     "Please ensure that the petsc library version 3.0.0 or newer is installed on your computer.\n"
     "If the library is not at a default location, either provide some hints\n"
