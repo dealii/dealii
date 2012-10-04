@@ -192,6 +192,14 @@
 
 
 /*****************************************
+ * Configured in configure_mumps.cmake: *
+ *****************************************/
+
+/* Defined if an MUMPS installation was found and is going to be used */
+#cmakedefine DEAL_II_USE_MUMPS
+
+
+/*****************************************
  * Configured in configure_netcdf.cmake: *
  *****************************************/
 
