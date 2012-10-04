@@ -267,7 +267,7 @@ CONFIGURATION
       Currently, the following variables will be considered:
 
         METIS_DIR,
-        MUMPS_DIR (and SCALAPACK_DIR),
+        MUMPS_DIR (and SCALAPACK_DIR, BLACS_DIR),
         P4EST_DIR (and SC_DIR),
         PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
         TRILINOS_DIR,
