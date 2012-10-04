@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 #ifdef DEAL_II_USE_MUMPS
-#  include <base/utilities.h>
+#  include <deal.II/base/utilities.h>
 #  include <dmumps_c.h>
 #endif
 
