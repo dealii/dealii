@@ -32,8 +32,6 @@ INCLUDE(FindPackageHandleStandardArgs)
 # SCALAPACK needs LAPACK and BLAS as dependency, search for them with the help
 # of the LAPACK find module:
 #
-# TODO: ScaLAPACK and mpi...
-#
 FIND_PACKAGE(LAPACK)
 
 FIND_LIBRARY(SCALAPACK_LIBRARY
@@ -57,19 +55,22 @@ SET(SCALAPACK_LINKER_FLAGS
 # be necessary to search for blacs, too. So we do this in a very
 # probabilistic way...
 #
-FIND_LIBRARY(BLACS_LIBRARY
-  NAMES blacs # TODO
-    ${BLACS_DIR}
-    ${SCALAPACK_DIR}
-    ${SCALAPACK_DIR}/../blacs/
-  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
-)
+FOREACH(lib blacs blacsCinit blacsF77init)
+  STRING(TOUPPER "${lib}" lib_upper)
+  FIND_LIBRARY(${lib_upper}_LIBRARY
+    NAMES ${lib} ${lib}_MPI-LINUX-0
+      ${BLACS_DIR}
+      ${SCALAPACK_DIR}
+      ${SCALAPACK_DIR}/../blacs/
+    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib LIB
+  )
+  IF(NOT ${lib_upper}_LIBRARY MATCHES "-NOTFOUND")
+    LIST(APPEND SCLAPACK_LIBRARIES
+      ${${lib_upper}_LIBRARY}
+      )
+  ENDIF()
+ENDFOREACH()
 
-IF(NOT BLACS_LIBRARY MATCHES "-NOTFOUND")
-  LIST(APPEND SCLAPACK_LIBRARIES
-    ${BLACS_LIBRARY}
-    )
-ENDIF()
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(SCALAPACK DEFAULT_MSG
   SCALAPACK_LIBRARY
@@ -83,6 +84,8 @@ IF(SCALAPACK_FOUND)
     blas_LIBRARY
     SCALAPACK_LIBRARY
     BLACS_LIBRARY
-  )
+    BLACSCINIT_LIBRARY
+    BLACSF77INIT_LIBRARY
+    )
 ENDIF()
 
