@@ -13,8 +13,14 @@
 #####
 
 #
-# Configuration for the umfpack and amd libraries:
+# Configuration for the umfpack library:
 #
+
+#
+# We depend on LAPACK to have a sane BLAS/LAPACK installation for bundled
+# packages...
+#
+SET(FEATURE_UMFPACK_DEPENDS DEAL_II_WITH_LAPACK)
 
 
 MACRO(FEATURE_UMFPACK_FIND_EXTERNAL var)

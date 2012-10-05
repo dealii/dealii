@@ -82,31 +82,15 @@ ENDIF()
 # UMFPACK, AMD and UFCONFIG:
 #
 
-#
-# We need BLAS as an external dependency. So only define the bundled
-# umfpack library as usable if we actually have blas available...
-# TODO: Cleanup this hack.
-#
-IF(NOT FEATURE_UMFPACK_HAVE_BUNDLED)
-  FIND_PACKAGE(BLAS)
-ENDIF()
-
-IF(BLAS_FOUND)
-  SET(FEATURE_UMFPACK_HAVE_BUNDLED TRUE)
-  SET(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
-  OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
-    "Always use the bundled umfpack library instead of an external one."
-    OFF)
-  MARK_AS_ADVANCED(
-    atlas_LIBRARY
-    blas_LIBRARY
-    )
-ELSE()
-  MESSAGE(WARNING "\n"
-    "Could not find the BLAS library: "
-    "Disabling bundled UMFPACK\n\n"
-    )
-ENDIF()
+SET(FEATURE_UMFPACK_HAVE_BUNDLED TRUE)
+SET(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
+OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
+  "Always use the bundled umfpack library instead of an external one."
+  OFF)
+MARK_AS_ADVANCED(
+  atlas_LIBRARY
+  blas_LIBRARY
+  )
 
 IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
   ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/UMFPACK/Source)
