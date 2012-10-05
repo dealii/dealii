@@ -102,11 +102,11 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 ENDIF()
 
 
-##############################
-#                            #
-#    For Release targets:    #
-#                            #
-##############################
+#############################
+#                           #
+#    For Release target:    #
+#                           #
+#############################
 
 IF (CMAKE_BUILD_TYPE MATCHES "Release")
   #

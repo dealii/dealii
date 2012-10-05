@@ -92,9 +92,11 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
 
   IF(NOT DEAL_II_KNOWN_COMPILER)
-    MESSAGE(WARNING "\n"
-      "Unrecognized compiler!\n"
-      "Please set the relevant compiler options by hand.\n")
+    MESSAGE(FATAL_ERROR "\n"
+      "Unknown compiler!\n"
+      "If you're serious about it, set DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF "
+      "and set the relevant compiler options by hand.\n\n"
+      )
   ENDIF()
 
 ELSE(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)

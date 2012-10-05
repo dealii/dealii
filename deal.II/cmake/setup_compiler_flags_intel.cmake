@@ -66,11 +66,11 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd177")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1478")
 
 
-##############################
-#                            #
-#    For Release targets:    #
-#                            #
-##############################
+#############################
+#                           #
+#    For Release target:    #
+#                           #
+#############################
 
 IF (CMAKE_BUILD_TYPE MATCHES "Release")
   #

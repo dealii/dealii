@@ -100,6 +100,7 @@ OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
   "configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
   ON
   )
+MARK_AS_ADVANCED(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
 #
 # Component selection: configuration options regarding the setup of
@@ -160,7 +161,7 @@ SET(DEAL_II_PROJECT_CONFIG_NAME "${DEAL_II_PACKAGE_NAME}")
 
 SET_IF_EMPTY(DEAL_II_BASE_NAME "deal_II")
 SET_IF_EMPTY(DEAL_II_DEBUG_SUFFIX ".g")
-SET_IF_EMPTY(DEAL_II_RELEASE_SUFFIX ".o")
+SET_IF_EMPTY(DEAL_II_RELEASE_SUFFIX "")
 
 SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
 
