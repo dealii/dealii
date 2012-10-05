@@ -26,13 +26,11 @@ CONFIGURE_FILE(
 ###########################################################################
 
 LIST(APPEND DEAL_II_MACROS
-  ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_import_library_targets.cmake
   ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_initialize_cached_variables.cmake
   ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_setup_target.cmake
   )
 
 INSTALL(FILES
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_import_library_targets.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
   DESTINATION ${DEAL_II_CMAKE_MACROS_RELDIR}
