@@ -284,6 +284,12 @@ MACRO(CONFIGURE_FEATURE feature)
         ENDIF(FEATURE_${feature}_EXTERNAL_FOUND)
       ENDIF()
     ENDIF()
+  ELSE()
+    #
+    # DEAL_II_WITH_${feature} is defined and set to OFF, promote it to
+    # cache nevertheless:
+    #
+    SET_CACHED_OPTION(${feature} OFF)
   ENDIF()
 
   SET(FEATURE_${feature}_PROCESSED TRUE)
