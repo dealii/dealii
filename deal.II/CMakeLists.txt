@@ -119,7 +119,7 @@ INCLUDE(setup_finalize)
 #
 # Build the toolchain and prepare the includes:
 #
-ADD_SUBDIRECTORY(config)
+INCLUDE(config/setup_template-arguments.in.cmake)
 ADD_SUBDIRECTORY(scripts)
 ADD_SUBDIRECTORY(include)
 
@@ -132,16 +132,14 @@ ENDIF()
 ADD_SUBDIRECTORY(source)
 
 #
-# Prepare some directories for installation
+# Prepare the remaining directories for installation
 #
+ADD_SUBDIRECTORY(config)
 IF(DEAL_II_WITH_DOC_DIRECTORY)
   ADD_SUBDIRECTORY(doc)
 ENDIF()
 ADD_SUBDIRECTORY(examples)
 ADD_SUBDIRECTORY(contrib)
-IF(DEAL_II_COMPONENT_COMPAT_FILES)
-  INCLUDE(config/setup_make.global_options.cmake)
-ENDIF()
 
 
 #

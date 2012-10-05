@@ -89,14 +89,19 @@ SET(DEAL_II_USER_DEFINITIONS_RELEASE "@DEAL_II_USER_DEFINITIONS_RELEASE@")
 
 
 #
-# Information about include directories
+# Information about include directories and libraries
 #
 
-# Include directories of the deal.II library
 SET(DEAL_II_INCLUDE_DIRS "@DEAL_II_INCLUDE_DIRS@")
 
-# External include directories
-SET(DEAL_II_EXTERNAL_INCLUDE_DIRS "@DEAL_II_USER_INCLUDE_DIRS@")
+# Full list of libraries for the debug target:
+SET(DEAL_II_LIBRARIES_DEBUG "@CONFIG_LIBRARIES_DEBUG@")
+
+# Full lis of libraries for the release target:
+SET(DEAL_II_LIBRARIES_RELEASE "@CONFIG_LIBRARIES_RELEASE@")
+
+# Full list of libraries with "debug" and "optimized" keywords for easy use with TARGET_LINK_LIBRARIES:
+SET(DEAL_II_LIBRARIES "@CONFIG_LIBRARIES@")
 
 
 #
