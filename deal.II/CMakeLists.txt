@@ -139,6 +139,10 @@ IF(DEAL_II_WITH_DOC_DIRECTORY)
 ENDIF()
 ADD_SUBDIRECTORY(examples)
 ADD_SUBDIRECTORY(contrib)
+IF(DEAL_II_COMPONENT_COMPAT_FILES)
+  INCLUDE(config/setup_make.global_options.cmake)
+ENDIF()
+
 
 #
 # Define some custom targets for convenience
