@@ -68,7 +68,6 @@ INTRODUCTION
   Quick start
   ===========
 
-
   * Make a build directory, configure, compile and install:
 
         $ mkdir build
@@ -83,7 +82,6 @@ INTRODUCTION
 
   Useful bits
   ===========
-
 
   * All cached variables can be either set via
 
@@ -303,7 +301,6 @@ CONFIGURATION
   Component selection
   ===================
 
-
   The following options control which components of deal.II will be
   configured, build and installed:
 
@@ -325,11 +322,8 @@ CONFIGURATION
       This adds a COMPONENT "examples" to the build system.
 
 
-
-
   Build configuration
   ===================
-
 
   CMAKE_BUILD_TYPE: We support the "Debug", "Release" and "DebugRelease"
   build targets. Default is the "DebugRelease" target.
@@ -376,11 +370,8 @@ CONFIGURATION
     search paths
 
 
-
-
   Installation
   ============
-
 
   CMAKE_INSTALL_PREFIX determines the location, where the deal.II library
   will be installed.
@@ -428,7 +419,6 @@ How to use deal.II in your cmake project
   Finding the deal.II library
   ===========================
 
-
   If DEAL_II_COMPONENT_PROJECT_CONFIG was set, finding the deal.II library
   should be no more than
 
@@ -451,11 +441,40 @@ How to use deal.II in your cmake project
     ~/workspace/local/lib/cmake/deal.II/
 
 
+  deal.IIConfig.cmake
+  ===================
+
+  Importing the deal.IIConfig.cmake file via FIND_PACKAGE will set a bunch
+  of variables and macros; all of the form DEAL_II_*. There is the usual
+  duplet:
+
+    DEAL_II_INCLUDE_DIRS
+    DEAL_II_LIBRARIES
+      (with "debug" and "optimized" keywords. For compatibility there is
+      also DEAL_II_LIBRARIES_DEBUG and DEAL_II_LIBRARIES_RELEASE only
+      specifying the respective set of libraries.)
+
+  Interesting additional variables might be:
+
+    DEAL_II_USER_DEFINITIONS
+    DEAL_II_USER_DEFINITIONS_DEBUG
+    DEAL_II_USER_DEFINITIONS_RELEASE
+    DEAL_II_LINKER_FLAGS
+    DEAL_II_LINKER_FLAGS_DEBUG
+    DEAL_II_LINKER_FLAGS_RELEASE
+    DEAL_II_CXX_FLAGS
+    DEAL_II_CXX_FLAGS_RELEASE
+    DEAL_II_CXX_FLAGS_DEBUG
+
+    DEAL_II_TARGET_CONFIG
+    DEAL_II_TARGET_DEBUG
+    DEAL_II_TARGET_RELEASE
+
+
+
+
   Setting up necessary configuration variables
   ============================================
-
-  Importing the deal.IICONFIG.cmake file via FIND_PACKAGE will set a bunch
-  of variables. All of the form DEAL_II_*.
 
   Usually for actually using deal.II the following configuration steps are
   necessary. This can be either done by hand (a), or set up via macros (b).
@@ -505,22 +524,15 @@ How to use deal.II in your cmake project
       will be set and not the one determined in PROJECT(...)will be set
       and not the one determined in PROJECT(...)
 
-    - Import the deal.II library as an external target:
-
-        IMPORT(${DEAL_II_TARGET_CONFIG})
-
     - After defining your targets, e.g.
 
         ADD_EXECUTABLE(step-1 step-1.cc)
 
-      we have to specify to link against deal.II (and transitively all
-      external libraries):
+      you have to specify to link against deal.II and all external
+      libraries:
 
         TARGET_LINK_LIBRARIES(step-1
-          debug
-            ${DEAL_II_TARGET_DEBUG}
-          optimized
-            ${DEAL_II_TARGET_RELEASE}
+            ${DEAL_II_LIBRARIES}
           )
 
      - As well as using some preprocessor definitions:
@@ -564,6 +576,14 @@ How to use deal.II in your cmake project
         ADD_EXECUTABLE(step-1 step-1.cc)
         DEAL_II_SETUP_TARGET(step-1)
 
+
+  c) It is also possible to include deal.II as external target directly
+     into a cmake project:
+
+        INCLUDE(${DEAL_II_TARGET_CONFIG})
+
+     After that there is a target ${DEAL_II_TARGET_DEBUG} and
+     ${DEAL_II_TARGET_RELEASE} available.
 
 
 
