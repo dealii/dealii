@@ -261,9 +261,7 @@ MACRO(CONFIGURE_FEATURE feature)
               MESSAGE(STATUS
                 "DEAL_II_WITH_${feature} successfully set up with bundled packages."
                 )
-              IF(DEAL_II_FEATURE_AUTODETECTION)
-                SET_CACHED_OPTION(${feature} ON)
-              ENDIF()
+              SET_CACHED_OPTION(${feature} ON)
             ELSE()
               # This should not happen. So give an error
               MESSAGE(FATAL_ERROR
