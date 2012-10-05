@@ -5252,7 +5252,7 @@ write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
 
                                    // then write a header
   out << "[deal.II intermediate format graphics data]" << '\n'
-      << "[written by " << DEAL_II_PACKAGE_STRING << "]" << '\n'
+      << "[written by " << DEAL_II_PACKAGE_NAME << " " << DEAL_II_PACKAGE_VERSION << "]" << '\n'
       << "[Version: " << Deal_II_IntermediateFlags::format_version << "]" << '\n';
 
   out << data_names.size() << '\n';

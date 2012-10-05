@@ -29,9 +29,6 @@
 /* Define to the version of this package. */
 #define DEAL_II_PACKAGE_VERSION "@DEAL_II_PACKAGE_VERSION@"
 
-/* Define to the full name and version of this package. */
-#define DEAL_II_PACKAGE_STRING "@DEAL_II_PACKAGE_STRING@"
-
 /* Define to the address where bug reports for this package should be sent. */
 #define DEAL_II_PACKAGE_BUGREPORT "@DEAL_II_PACKAGE_BUGREPORT@"
 
