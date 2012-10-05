@@ -20,7 +20,7 @@
 #       DEAL_II_SETUP_TARGET(target)
 #
 # This sets the necessary include directories, linker flags, compile
-# definitions and the external libraries the target will be linked against.
+# definitions and the deal.II library the target will be linked against.
 #
 #
 
@@ -28,9 +28,9 @@ MACRO(DEAL_II_SETUP_TARGET target)
 
   IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
-      "DEAL_II_SETUP_TARGET can only be called in external projects after "
+      "\nDEAL_II_SETUP_TARGET can only be called in external projects after "
       "the inclusion of deal.IIConfig.cmake. It is not intended for "
-      "internal use."
+      "internal use.\n\n"
       )
   ENDIF()
 
@@ -46,21 +46,35 @@ MACRO(DEAL_II_SETUP_TARGET target)
       "${DEAL_II_USER_DEFINITIONS}"
     )
 
-  # TODO: A bit more magic...
+  #
+  # Set build type dependend flags and definitions:
+  #
   FOREACH(build ${DEAL_II_BUILD_TYPES})
-    IF(CMAKE_BUILD_TYPE MATCHES "${build}")
-      SET_TARGET_PROPERTIES(${target} PROPERTIES
-        LINK_FLAGS_${CMAKE_BUILD_TYPE}
-          "${DEAL_II_LINKER_FLAGS_${build}}"
-        COMPILE_DEFINITIONS_${CMAKE_BUILD_TYPE}
-          "${DEAL_II_USER_DEFINITIONS_${build}}"
-        )
-      TARGET_LINK_LIBRARIES(${target}
-        ${DEAL_II_TARGET_${build}}
-        )
-      RETURN()
-    ENDIF()
+    SET_TARGET_PROPERTIES(${target} PROPERTIES
+      LINK_FLAGS_${build}
+        "${DEAL_II_LINKER_FLAGS_${build}}"
+      COMPILE_DEFINITIONS_${build}
+        "${DEAL_II_USER_DEFINITIONS_${build}}"
+      )
+
   ENDFOREACH()
+
+  #
+  # Link againgst the correct deal.II library target for the current
+  # CMAKE_BUILD_TYPE:
+  #
+  STRING(TOUPPER "${CMAKE_BUILD_TYPE}" build)
+  IF(NOT "${DEAL_II_TARGET_${build}}" STREQUAL "")
+    TARGET_LINK_LIBRARIES(${target}
+      ${DEAL_II_TARGET_${build}}
+      )
+  ELSE()
+    MESSAGE(FATAL_ERROR
+      "\nNo matching deal.II library target for current build type: "
+      "\"${CMAKE_BUILD_TYPE}\"\n"
+      "Candidates are (case insensitive): ${DEAL_II_BUILD_TYPES}\n\n"
+      )
+  ENDIF()
 
 ENDMACRO()
 

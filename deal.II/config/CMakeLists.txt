@@ -62,7 +62,7 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
 ENDFOREACH()
 
 #
-# Append the feature configuration:
+# Append feature configuration:
 #
 FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   "\n\n#\n# Feature configuration:\n#\n\n"
@@ -77,8 +77,7 @@ FOREACH(var ${res})
 ENDFOREACH()
 
 #
-# Include the convenience macros directly at the end of our project
-# config:
+# Include convenience macros directly at the end of our project config:
 #
 FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   "\n\n#\n# Include some convenience macros directly in the project config:\n#\n\n"

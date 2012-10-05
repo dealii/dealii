@@ -29,23 +29,17 @@ MACRO(DEAL_II_IMPORT_LIBRARY)
 
   IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
-      "DEAL_II_SETUP_TARGET can only be called in external projects after "
+      "\nDEAL_II_SETUP_TARGET can only be called in external projects after "
       "the inclusion of deal.IIConfig.cmake. It is not intended for "
-      "internal use."
+      "internal use.\n\n"
       )
   ENDIF()
 
   INCLUDE(${DEAL_II_TARGET_CONFIG})
 
   #
-  # Fixup the CONFIGURATION types for debug and release targets:
+  # Setup a ${DEAL_II_BASE_NAME} target and populate it with our
   #
-  FOREACH(build ${DEAL_II_BUILD_TYPES})
-    SET_TARGET_PROPERTIES(${DEAL_II_TARGET_${build}}
-      PROPERTIES
-      MAP_IMPORTED_CONFIG ${build}
-      )
-  ENDFOREACH()
 
 ENDMACRO()
 

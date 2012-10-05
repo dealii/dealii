@@ -29,9 +29,9 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
 
   IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
-      "DEAL_II_INITIALIZE_CACHED_VARIABLES can only be called in external "
+      "\nDEAL_II_INITIALIZE_CACHED_VARIABLES can only be called in external "
       "projects after the inclusion of deal.IIConfig.cmake. It is not "
-      "intended for internal use."
+      "intended for internal use.\n\n"
       )
   ENDIF()
 
