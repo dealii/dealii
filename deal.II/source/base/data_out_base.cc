@@ -6532,7 +6532,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     getline (in, header);
 
     std::ostringstream s;
-    s << "[written by " << DEAL_II_PACKAGE_STRING << "]";
+    s << "[written by " << DEAL_II_PACKAGE_NAME << " " << DEAL_II_PACKAGE_VERSION << "]";
 
     Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
   }
