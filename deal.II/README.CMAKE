@@ -517,7 +517,10 @@ How to use deal.II in your cmake project
       external libraries):
 
         TARGET_LINK_LIBRARIES(step-1
-            ${DEAL_II_TARGET_DEBUG}  # or DEAL_II_TARGET_RELEASE
+          debug
+            ${DEAL_II_TARGET_DEBUG}
+          optimized
+            ${DEAL_II_TARGET_RELEASE}
           )
 
      - As well as using some preprocessor definitions:
