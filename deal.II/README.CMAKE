@@ -505,16 +505,19 @@ How to use deal.II in your cmake project
       will be set and not the one determined in PROJECT(...)will be set
       and not the one determined in PROJECT(...)
 
+    - Import the deal.II library as an external target:
+
+        IMPORT(${DEAL_II_TARGET_CONFIG})
+
     - After defining your targets, e.g.
 
         ADD_EXECUTABLE(step-1 step-1.cc)
 
-      we have to specify to link against deal.II and all external
-      libraries:
+      we have to specify to link against deal.II (and transitively all
+      external libraries):
 
         TARGET_LINK_LIBRARIES(step-1
-            ${DEAL_II_LIBRARIES}
-            ${DEAL_II_EXTERNAL_LIBRARIES}
+            ${DEAL_II_TARGET_DEBUG}  # or DEAL_II_TARGET_RELEASE
           )
 
      - As well as using some preprocessor definitions:
