@@ -19,15 +19,15 @@
 # Usage:
 #       DEAL_II_INITIALIZE_CACHED_VARIABLES()
 #
-# This macro sets some cached variables to the values used for compiling
-# the deal.II library.
+# This sets some cached variables to the values used for compiling the
+# deal.II library.
 #
 # This macro has to be called before PROJECT()!
 #
 
 MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
 
-  IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDE)
+  IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
       "DEAL_II_INITIALIZE_CACHED_VARIABLES can only be called in external "
       "projects after the inclusion of deal.IIConfig.cmake. It is not "

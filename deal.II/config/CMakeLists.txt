@@ -12,69 +12,61 @@
 ##
 #####
 
+
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/template-arguments.in
   ${CMAKE_CURRENT_BINARY_DIR}/template-arguments
   )
 
-#
-# Setup and install the convenience macros:
-#
+
+###########################################################################
+#                                                                         #
+#               Setup and install the convenience macros:                 #
+#                                                                         #
+###########################################################################
 
 LIST(APPEND DEAL_II_MACROS
+  ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_import_library_targets.cmake
   ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_initialize_cached_variables.cmake
   ${CMAKE_INSTALL_PREFIX}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii_setup_target.cmake
   )
 
 INSTALL(FILES
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_import_library_targets.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
   DESTINATION ${DEAL_II_CMAKE_MACROS_RELDIR}
   COMPONENT library
   )
 
-#
-# Configure and install the cmake project configuration:
-#
 
-IF(NOT "${DEAL_II_EXTERNAL_LIBRARIES}" STREQUAL "")
-  SET(CONFIG_EXTERNAL_LIBRARIES
-    general
-    ${DEAL_II_EXTERNAL_LIBRARIES}
-    )
-ENDIF()
-
-IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  SET(CONFIG_EXTERNAL_LIBRARIES_DEBUG
-    ${DEAL_II_EXTERNAL_LIBRARIES}
-    ${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}
-    )
-  IF(NOT "${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}" STREQUAL "")
-    LIST(APPEND CONFIG_EXTERNAL_LIBRARIES
-      debug
-      ${DEAL_II_EXTERNAL_LIBRARIES_DEBUG}
-      )
-  ENDIF()
-ENDIF()
-
-IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  SET(CONFIG_EXTERNAL_LIBRARIES_RELEASE
-    ${DEAL_II_EXTERNAL_LIBRARIES}
-    ${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}
-    )
-  IF(NOT "${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}" STREQUAL "")
-    LIST(APPEND CONFIG_EXTERNAL_LIBRARIES
-      optimized
-      ${DEAL_II_EXTERNAL_LIBRARIES_RELEASE}
-      )
-  ENDIF()
-ENDIF()
+###########################################################################
+#                                                                         #
+#         Configure and install the cmake project configuration:          #
+#                                                                         #
+###########################################################################
 
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  @ONLY
   )
 
+#
+# Append target information:
+#
+FOREACH(build ${DEAL_II_BUILD_TYPES})
+  FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+    "SET(DEAL_II_TARGET_${build} \"${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}\")\n"
+    )
+ENDFOREACH()
+
+#
+# Append the feature configuration:
+#
+FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  "\n\n#\n# Feature configuration:\n#\n\n"
+  )
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
   IF(var MATCHES "DEAL_II_WITH")
@@ -89,13 +81,14 @@ ENDFOREACH()
 # config:
 #
 FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-  "\n#\n# Include some convenience macros directly in the project config:\n#\n"
+  "\n\n#\n# Include some convenience macros directly in the project config:\n#\n\n"
   )
 FOREACH(var ${DEAL_II_MACROS})
   FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
     "INCLUDE(${var})\n"
     )
 ENDFOREACH()
+
 
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
@@ -111,16 +104,18 @@ INSTALL(FILES
   )
 
 
+###########################################################################
+#                                                                         #
+#          Configure and install the old Makefile configuration:          #
+#                                                                         #
+###########################################################################
+
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
-  #
-  # Configure and install the old Makefile configuration:
-  #
 
   #
-  # Therefore, transform some cmake lists into a string that the old
-  # Makefile mechanism actually understands:
+  # Transform some cmake lists into a string that the old Makefile
+  # mechanism actually understands:
   #
-
   TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_C}"
     ${DEAL_II_USER_INCLUDE_DIRS}
     ${DEAL_II_INCLUDE_DIRS}

@@ -19,13 +19,14 @@
 # Usage:
 #       DEAL_II_SETUP_TARGET(target)
 #
-# This macro sets the necessary include directories, linker flags, compile
+# This sets the necessary include directories, linker flags, compile
 # definitions and the external libraries the target will be linked against.
+#
 #
 
 MACRO(DEAL_II_SETUP_TARGET target)
 
-  IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDE)
+  IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
       "DEAL_II_SETUP_TARGET can only be called in external projects after "
       "the inclusion of deal.IIConfig.cmake. It is not intended for "
@@ -33,6 +34,7 @@ MACRO(DEAL_II_SETUP_TARGET target)
       )
   ENDIF()
 
+  # Necessary for setting INCLUDE_DIRECTORIES via SET_TARGET_PROPERTIES
   CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
   SET_TARGET_PROPERTIES(${target} PROPERTIES
@@ -40,22 +42,25 @@ MACRO(DEAL_II_SETUP_TARGET target)
       "${DEAL_II_EXTERNAL_INCLUDE_DIRS};${DEAL_II_INCLUDE_DIRS}"
     LINK_FLAGS
       "${DEAL_II_LINKER_FLAGS}"
-    LINK_FLAGS_DEBUG
-      "${DEAL_II_LINKER_FLAGS_DEBUG}"
-    LINK_FLAGS_RELEASE
-      "${DEAL_II_LINKER_FLAGS_RELEASE}"
     COMPILE_DEFINITIONS
       "${DEAL_II_USER_DEFINITIONS}"
-    COMPILE_DEFINITIONS_DEBUG
-      "${DEAL_II_USER_DEFINITIONS_DEBUG}"
-    COMPILE_DEFINITIONS_RELEASE
-      "${DEAL_II_USER_DEFINITIONS_RELEASE}"
     )
 
-    TARGET_LINK_LIBRARIES(${target}
-        ${DEAL_II_LIBRARIES}
-        ${DEAL_II_EXTERNAL_LIBRARIES}
-      )
+  # TODO: A bit more magic...
+  FOREACH(build ${DEAL_II_BUILD_TYPES})
+    IF(CMAKE_BUILD_TYPE MATCHES "${build}")
+      SET_TARGET_PROPERTIES(${target} PROPERTIES
+        LINK_FLAGS_${CMAKE_BUILD_TYPE}
+          "${DEAL_II_LINKER_FLAGS_${build}}"
+        COMPILE_DEFINITIONS_${CMAKE_BUILD_TYPE}
+          "${DEAL_II_USER_DEFINITIONS_${build}}"
+        )
+      TARGET_LINK_LIBRARIES(${target}
+        ${DEAL_II_TARGET_${build}}
+        )
+      RETURN()
+    ENDIF()
+  ENDFOREACH()
 
 ENDMACRO()
 
