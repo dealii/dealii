@@ -20,17 +20,19 @@
 MACRO(FEATURE_METIS_FIND_EXTERNAL var)
   FIND_PACKAGE(METIS)
 
-  IF(METIS_FOUND AND METIS_MAJOR GREATER 4)
-    SET(${var} TRUE)
-  ELSE()
-    MESSAGE(WARNING "\n"
-      "Could not find a sufficient modern metis installation: "
-      "Version 5.x required!\n\n"
-      )
-    UNSET(METIS_LIBRARY CACHE)
-    UNSET(METIS_INCLUDE_DIR CACHE)
-    UNSET(METIS_DIR CACHE)
-    UNSET(METIS_FOUND CACHE)
+  IF(METIS_FOUND)
+    IF(AND METIS_MAJOR GREATER 4)
+      SET(${var} TRUE)
+    ELSE()
+      MESSAGE(WARNING "\n"
+        "Could not find a sufficient modern metis installation: "
+        "Version 5.x required!\n\n"
+        )
+      UNSET(METIS_LIBRARY CACHE)
+      UNSET(METIS_INCLUDE_DIR CACHE)
+      UNSET(METIS_DIR CACHE)
+      UNSET(METIS_FOUND CACHE)
+    ENDIF()
   ENDIF()
 ENDMACRO()
 

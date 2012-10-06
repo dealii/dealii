@@ -17,9 +17,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
 
-// include sys/resource.h for rusage(). Mac OS X needs sys/time.h then
-// as well (strange), so include that, too.
-#ifndef DEAL_II_MSVC
+#if defined(HAVE_SYS_RESOURCE_H) and defined(HAVE_UNISTD_H)
 #  include <sys/resource.h>
 #  include <unistd.h>
 #endif
@@ -370,7 +368,7 @@ LogStream::log_thread_id (const bool flag)
 void
 LogStream::print_line_head()
 {
-#ifndef DEAL_II_MSVC
+#if defined(HAVE_SYS_RESOURCE_H) and defined(HAVE_UNISTD_H)
   rusage usage;
   double utime = 0.;
   if (print_utime)

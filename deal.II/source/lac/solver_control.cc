@@ -129,7 +129,7 @@ SolverControl::check (const unsigned int step,
 #ifdef HAVE_ISNAN
       isnan(check_value) ||
 #else
-#  if HAVE_UNDERSCORE_ISNAN
+#  ifdef HAVE_UNDERSCORE_ISNAN
                                        // on Microsoft Windows, the
                                        // function is called _isnan
       _isnan(check_value) ||

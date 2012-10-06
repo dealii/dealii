@@ -16,11 +16,6 @@
 # Configuration for functionparser
 #
 
-OPTION(DEAL_II_WITH_FUNCTIONPARSER
-  "Build deal.II with support for functionparser."
-  OFF)
-
-
 MACRO(FEATURE_FUNCTIONPARSER_FIND_EXTERNAL var)
   MESSAGE(STATUS
     "No module available for finding functionparser externally."

@@ -56,8 +56,6 @@ SET(src_tbb
   tbb/tbb_thread.cpp
   )
 
-DEAL_II_ADD_LIBRARY(obj_tbb OBJECT ${src_tbb})
-
 #
 # Add necessary definitions:
 #
@@ -70,9 +68,18 @@ IF(DEAL_II_USE_MT_POSIX)
   LIST(APPEND obj_tbb_DEFINITIONS "USE_PTHREAD")
 ENDIF()
 
-IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
-  LIST(APPEND obj_tbb_DEFINITIONS "-DUSE_WINTHREAD")
+IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+  MESSAGE(FATAL_ERROR "No support for internal tbb and CYGWIN atm.")
+  #LIST(APPEND obj_tbb_DEFINITIONS
+  #  "USE_WINTHREAD"
+  #  "_WIN32"
+  #  "__MSVCRT_VERSION__=0x0700"
+  #  )
+  #ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-msse")
+  #ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-mthreads")
 ENDIF()
+
+DEAL_II_ADD_LIBRARY(obj_tbb OBJECT ${src_tbb})
 
 DEAL_II_ADD_DEFINITIONS(obj_tbb ${obj_tbb_DEFINITIONS})
 

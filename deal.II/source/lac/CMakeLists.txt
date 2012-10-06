@@ -98,5 +98,5 @@ EXPAND_INSTANTIATIONS(obj_lac "${inst_in_files}")
 #
 # TODO: Remove this dependency when lapack_templates is removed
 #
-ADD_DEPENDENCIES(obj_lac.inst lapack_templates)
+#ADD_DEPENDENCIES(obj_lac.inst lapack_templates)
 

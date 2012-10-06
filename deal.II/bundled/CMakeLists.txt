@@ -67,11 +67,13 @@ ENDIF()
 #
 # Threading Building Blocks library
 #
-SET(FEATURE_TBB_HAVE_BUNDLED TRUE)
-SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb30_104oss")
-OPTION(DEAL_II_FORCE_BUNDLED_TBB
-  "Always use the bundled tbb library instead of an external one."
-  OFF)
+IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+  SET(FEATURE_TBB_HAVE_BUNDLED TRUE)
+  SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb30_104oss")
+  OPTION(DEAL_II_FORCE_BUNDLED_TBB
+    "Always use the bundled tbb library instead of an external one."
+    OFF)
+ENDIF()
 
 IF(FEATURE_TBB_BUNDLED_CONFIGURED)
   ADD_SUBDIRECTORY(${TBB_FOLDER}/src)
