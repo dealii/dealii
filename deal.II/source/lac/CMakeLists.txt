@@ -95,8 +95,3 @@ SET(inst_in_files
 DEAL_II_ADD_LIBRARY(obj_lac OBJECT ${src})
 EXPAND_INSTANTIATIONS(obj_lac "${inst_in_files}")
 
-#
-# TODO: Remove this dependency when lapack_templates is removed
-#
-#ADD_DEPENDENCIES(obj_lac.inst lapack_templates)
-
