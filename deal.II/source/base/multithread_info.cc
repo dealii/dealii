@@ -14,16 +14,7 @@
 
 #include <deal.II/base/multithread_info.h>
 
-#if defined(__linux__)
-#  include <fstream>
-#  include <string>
-#endif
-
-#if defined(__sun__) || defined(__osf__) || defined(_AIX)
-#  include <unistd.h>
-#endif
-
-#if defined(__sgi__)
+#ifdef HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
 
@@ -46,46 +37,11 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 
-#  if defined(__linux__)
-
-unsigned int MultithreadInfo::get_n_cpus()
-{
-                                   // on linux, we simply count the
-                                   // number of lines listing
-                                   // individual processors when
-                                   // reading from /proc/cpuinfo
-  std::ifstream cpuinfo;
-  std::string search;
-  unsigned int nCPU = 0;
-
-  cpuinfo.open("/proc/cpuinfo");
-
-  AssertThrow(cpuinfo,ExcProcNotPresent());
-
-  while(cpuinfo)
-    {
-      cpuinfo >> search;
-      if (search.find("processor") != std::string::npos)
-        nCPU++;
-    }
-  cpuinfo.close();
-
-  return nCPU;
-}
-
-#  elif defined(__sun__) || defined(__osf__) || defined(_AIX)
+#  if defined(__linux__) ||  defined(__sun__) || defined(__osf__) || defined(_AIX)
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
   return sysconf(_SC_NPROCESSORS_ONLN);
-}
-
-
-#  elif defined(__sgi__)
-
-unsigned int MultithreadInfo::get_n_cpus()
-{
-  return sysconf(_SC_NPROC_ONLN);
 }
 
 #  elif defined(__MACH__) && defined(__APPLE__)
@@ -105,7 +61,6 @@ unsigned int MultithreadInfo::get_n_cpus()
 
         return n_cpus;
 }
-
 
 #  else
 
