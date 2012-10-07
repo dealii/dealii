@@ -17,27 +17,16 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
 
-#if defined(HAVE_SYS_RESOURCE_H) and defined(HAVE_UNISTD_H)
+#if defined(HAVE_SYS_RESOURCE_H)
 #  include <sys/resource.h>
-#  include <unistd.h>
 #endif
-#include <sys/types.h>
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
 
 
-// on SunOS 4.x, getrusage is stated in the man pages and exists, but
-// is not declared in resource.h. declare it ourselves
-#ifdef NO_HAVE_GETRUSAGE
-extern "C" {
-  int getrusage(int who, struct rusage* ru);
-}
-#endif
-
-// When modifying the prefix list, we need to lock it just in case
-// another thread tries to do the same.
 DEAL_II_NAMESPACE_OPEN
 
 namespace
@@ -368,7 +357,7 @@ LogStream::log_thread_id (const bool flag)
 void
 LogStream::print_line_head()
 {
-#if defined(HAVE_SYS_RESOURCE_H) and defined(HAVE_UNISTD_H)
+#if defined(HAVE_SYS_RESOURCE_H)
   rusage usage;
   double utime = 0.;
   if (print_utime)
