@@ -24,24 +24,18 @@
 // these includes should probably be properly
 // ./configure'd using the AC_HEADER_TIME macro:
 
-#ifndef DEAL_II_MSVC
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
 #  include <sys/time.h>
 #  include <sys/resource.h>
-#else
+#endif
+
+#ifdef DEAL_II_MSVC
 #  include <windows.h>
 #endif
 
-// on SunOS 4.x, getrusage is stated in the man pages and exists, but
-// is not declared in resource.h. declare it ourselves
-#ifdef NO_HAVE_GETRUSAGE
-extern "C" {
-  int getrusage(int who, struct rusage* ru);
-}
-#endif
+
 
 DEAL_II_NAMESPACE_OPEN
-
-
 
                                    // in case we use an MPI compiler, need
                                    // to create a communicator just for the
@@ -116,11 +110,7 @@ void Timer::start ()
     MPI_Barrier(mpi_communicator);
 #endif
 
-#ifdef DEAL_II_MSVC
-  start_wall_time = windows::wall_clock();
-  start_time = windows::cpu_clock();
-  start_time_children = start_time;
-#else
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
 
 //TODO: Break this out into a function like the functions in
 //namespace windows above
@@ -135,6 +125,13 @@ void Timer::start ()
   rusage usage_children;
   getrusage (RUSAGE_CHILDREN, &usage_children);
   start_time_children = usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
+
+#elif defined(DEAL_II_MSVC)
+  start_wall_time = windows::wall_clock();
+  start_time = windows::cpu_clock();
+  start_time_children = start_time;
+#else
+#  error unsupported platform. Porting not finished.
 #endif
 }
 
@@ -146,10 +143,7 @@ double Timer::stop ()
     {
       running = false;
 
-#ifdef DEAL_II_MSVC
-      double time = windows::wall_clock() - start_wall_time;
-      cumulative_time += windows::cpu_clock() - start_time;
-#else
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
 //TODO: Break this out into a function like the functions in
 //namespace windows above
       rusage usage;
@@ -167,7 +161,13 @@ double Timer::stop ()
       gettimeofday(&wall_timer, NULL);
       double time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
                               - start_wall_time;
+#elif defined(DEAL_II_MSVC)
+      double time = windows::wall_clock() - start_wall_time;
+      cumulative_time += windows::cpu_clock() - start_time;
+#else
+#  error unsupported platform. Porting not finished.
 #endif
+
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       if (sync_wall_time && Utilities::System::job_supports_mpi())
         {
@@ -189,10 +189,7 @@ double Timer::operator() () const
 {
   if (running)
     {
-#ifdef DEAL_II_MSVC
-      const double running_time = windows::cpu_clock() - start_time + cumulative_time;
-      return running_time;
-#else
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
@@ -215,6 +212,11 @@ double Timer::operator() () const
         return Utilities::MPI::sum (running_time, mpi_communicator);
       else
         return running_time;
+#elif defined(DEAL_II_MSVC)
+      const double running_time = windows::cpu_clock() - start_time + cumulative_time;
+      return running_time;
+#else
+#  error unsupported platform. Porting not finished.
 #endif
     }
   else
@@ -232,16 +234,16 @@ double Timer::wall_time () const
 {
   if (running)
     {
-#ifdef DEAL_II_MSVC
-//TODO[BG]: Do something useful here
-      return 0;
-#else
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
       return (wall_timer.tv_sec
               + 1.e-6 * wall_timer.tv_usec
               - start_wall_time
               + cumulative_wall_time);
+#else
+//TODO[BG]: Do something useful here
+      return 0;
 #endif
     }
   else
