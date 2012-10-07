@@ -17,8 +17,12 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
 
-#if defined(HAVE_SYS_RESOURCE_H)
+#ifdef HAVE_SYS_RESOURCE_H
 #  include <sys/resource.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h>
 #endif
 
 #include <iostream>
@@ -49,7 +53,7 @@ LogStream::LogStream()
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
-#ifdef HAVE_TIMES
+#if defined(HAVE_TIMES) && defined(HAVE_UNISTD_H)
   reference_time_val = 1./sysconf(_SC_CLK_TCK) * times(&reference_tms);
 #endif
 }
@@ -357,7 +361,7 @@ LogStream::log_thread_id (const bool flag)
 void
 LogStream::print_line_head()
 {
-#if defined(HAVE_SYS_RESOURCE_H)
+#ifdef HAVE_SYS_RESOURCE_H
   rusage usage;
   double utime = 0.;
   if (print_utime)
@@ -450,7 +454,7 @@ void
 LogStream::timestamp ()
 {
   struct tms current_tms;
-#ifdef HAVE_TIMES
+#if defined(HAVE_TIMES) && defined(HAVE_UNISTD_H)
   const clock_t tick = sysconf(_SC_CLK_TCK);
   const double time = 1./tick * times(&current_tms);
 #else

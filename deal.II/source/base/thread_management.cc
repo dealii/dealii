@@ -19,6 +19,10 @@
 #include <iostream>
 #include <list>
 
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+#endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
