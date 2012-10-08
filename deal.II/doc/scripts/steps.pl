@@ -8,13 +8,6 @@
 
 use strict;
 
-my @steps = (1,2,3,4,5,6,7,8,9,
-	     10,11,12,13,14,15,16,17,18,19,
-	     20,21,22,23,24,25,   27,28,29,
-	     30,31,32,33,34,35,36,37,38,39,
-             40,41,   43,44,45,46,   48);
-
-
 # List of additional node attributes to highlight purpose and state of the example
 my %style = (
  "basic"          => ',height=.8,width=.8,shape="octagon",fillcolor="green"',
@@ -51,26 +44,30 @@ EOT
 
 # print all nodes
 
-foreach (@steps)
+my $step;
+foreach $step (@ARGV)
 {
+    my $number = $step;
+    $number =~ s/^.*-//;
+
     # read first line of tooltip file
-    open TF, "../../../examples/step-$_/doc/tooltip"
-	or die "Can't open tooltip file step-$_/doc/tooltip";
+    open TF, "$step/doc/tooltip"
+	or die "Can't open tooltip file $step/doc/tooltip";
     my $tooltip = <TF>;
     close TF;
     chop $tooltip;
 
-    printf "Step$_ [label=\"$_\", URL=\"../deal.II/step_$_.html\", tooltip=\"$tooltip\"";
+    printf "Step$number [label=\"$number\", URL=\"../deal.II/step_$number.html\", tooltip=\"$tooltip\"";
 
 
     # read first line of 'kind' file
-    open KF, "../../../examples/step-$_/doc/kind"
-	or die "Can't open kind file step-$_/doc/kind";
+    open KF, "$step/doc/kind"
+	or die "Can't open kind file $step/doc/kind";
     my $kind = <KF>;
     close KF;
     chop $kind;
 
-    die "Unknown kind '$kind' in file step-$_/doc/kind" if (! defined $style{$kind});
+    die "Unknown kind '$kind' in file $step/doc/kind" if (! defined $style{$kind});
     print "$style{$kind}";
 
     print "];\n";
@@ -79,12 +76,15 @@ foreach (@steps)
 # Print all edges
 # Keep sorted by second node on edge!
 
-my $target;
-foreach $target (@steps)
+my $step;
+foreach $step (@ARGV)
 {
+    my $number = $step;
+    $number =~ s/^.*-//;
+
     # read first line of dependency file
-    open BF, "../../../examples/step-$target/doc/builds-on"
-	or die "Can't open builds-on file step-$target/doc/builds-on";
+    open BF, "$step/doc/builds-on"
+	or die "Can't open builds-on file $step/doc/builds-on";
     my $buildson = <BF>;
     close BF;
     chop $buildson;
@@ -92,7 +92,7 @@ foreach $target (@steps)
     my $source;
     foreach $source (split ' ', $buildson) {
 	$source =~ s/step-/Step/g;
-	print "$source -> Step$target\n";
+	print "$source -> Step$number\n";
     }
 }
 

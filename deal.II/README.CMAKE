@@ -156,9 +156,6 @@ CONFIGURATION
     DEAL_II_WITH_BOOST
         Build deal.II with support for boost. Always activated
 
-    DEAL_II_WITH_DOXYGEN
-        Build deal.II with support for doxygen and dot
-
     DEAL_II_WITH_FUNCTIONPARSER
         Build deal.II with support for functionparser
 

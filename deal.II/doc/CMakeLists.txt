@@ -31,7 +31,8 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   INSTALL(DIRECTORY .
     DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}
     COMPONENT documentation
-    FILES_MATCHING REGEX "^.*(html|css|eps|jpg|gif|fig|png|ico)$"  # TODO
+    FILES_MATCHING REGEX "^.*(html|css|eps|jpg|gif|fig|png|ico)$"
+    PATTERN "doxygen" EXCLUDE
     )
 
   CONFIGURE_FILE(
