@@ -60,6 +60,9 @@ ADD_CUSTOM_COMMAND(
   OUTPUT
     ${CMAKE_CURRENT_BINARY_DIR}/images/structure.png
     ${CMAKE_CURRENT_BINARY_DIR}/images/structure.cmapx
+  COMMAND ${CMAKE_COMMAND}
+  ARGS
+    -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/images/
   COMMAND ${DOXYGEN_DOT_EXECUTABLE}
   ARGS
     -Tpng -o ${CMAKE_CURRENT_BINARY_DIR}/images/structure.png
