@@ -679,7 +679,7 @@ namespace GridTools
       cell = container.begin_active(),
       endc = container.end();
 
-    // go through all active cells and look. if the vertex is part of that cell
+    // go through all active cells and look if the vertex is part of that cell
     //
     // in 1d, this is all we need to care about. in 2d/3d we also need to worry
     // that the vertex might be a hanging node on a face or edge of a cell; in
@@ -701,6 +701,17 @@ namespace GridTools
     // the bits/find_cells_adjacent_to_vertex_6 testcase. thus, if we
     // haven't yet found the vertex for the current cell we also need to
     // look at the mid-points of edges
+    //
+    // as a final note, deciding whether a neighbor is actually coarses is
+    // simple in the case of isotropic refinement (we just need to look at
+    // the level of the current and the neighboring cell). however, this
+    // isn't so simple if we have used anisotropic refinement since then
+    // the level of a cell is not indicative of whether it is coarser or
+    // not than the current cell. ultimately, we want to add all cells on
+    // which the vertex is, independent of whether they are coarser or
+    // finer and so in the 2d case below we simply add *any* *active* neighbor.
+    // in the worst case, we add cells multiple times to the adjacent_cells
+    // list, but std::set throws out those cells already entered
     for (; cell != endc; ++cell)
       {
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
@@ -712,9 +723,9 @@ namespace GridTools
               adjacent_cells.insert(cell);
 
               // as explained above, in 2+d we need to check whether
-              // this vertex is on a face behind which there is a coarser
-              // neighbor. if this is the case, then we need to also
-              // add this neighbor
+              // this vertex is on a face behind which there is a
+              // (possibly) coarser neighbor. if this is the case,
+              // then we need to also add this neighbor
               if (dim >= 2)
                 for (unsigned int vface = 0; vface < dim; vface++)
                   {
@@ -723,16 +734,17 @@ namespace GridTools
 
                     if (!cell->at_boundary(face)
                         &&
-                        (cell->neighbor(face)->level() < cell->level()))
+                        cell->neighbor(face)->active())
                       {
-                        // there is a coarser cell behind a face to which the
-                        // vertex belongs. the vertex we are looking at is
-                        // then either a vertex of that coarser neighbor,
-                        // or it is a hanging node on one of the faces of
-                        // that cell. in either case, it is adjacent
-                        // to the vertex, so add it to the list as well
-                        // (if the cell was already in the list then
-                        // the std::set makes sure that we get it only
+                        // there is a (possibly )coarser cell behind a
+                        // face to which the vertex belongs. the
+                        // vertex we are looking at is then either a
+                        // vertex of that coarser neighbor, or it is a
+                        // hanging node on one of the faces of that
+                        // cell. in either case, it is adjacent to the
+                        // vertex, so add it to the list as well (if
+                        // the cell was already in the list then the
+                        // std::set makes sure that we get it only
                         // once)
                         adjacent_cells.insert (cell->neighbor(face));
                         goto next_cell;
@@ -786,7 +798,7 @@ namespace GridTools
   {
 	template <int dim, template<int, int> class Container, int spacedim>
 	void find_active_cell_around_point_internal(const Container<dim,spacedim>& container,
-	  std::set<typename Container<dim,spacedim>::active_cell_iterator>& searched_cells, 
+	  std::set<typename Container<dim,spacedim>::active_cell_iterator>& searched_cells,
 	  std::set<typename Container<dim,spacedim>::active_cell_iterator>& adjacent_cells)
 	{
 	  typedef typename Container<dim,spacedim>::active_cell_iterator cell_iterator;
@@ -794,10 +806,10 @@ namespace GridTools
 					// update the searched cells
 	  searched_cells.insert(adjacent_cells.begin(), adjacent_cells.end());
 					// now we to collect all neighbors
-					// of the cells in adjacent_cells we 
+					// of the cells in adjacent_cells we
 					// have not yet searched.
 	  std::set<cell_iterator> adjacent_cells_new;
-		
+
 	  typename std::set<cell_iterator>::const_iterator
 	  cell = adjacent_cells.begin(),
 	  endc = adjacent_cells.end();
@@ -826,7 +838,7 @@ namespace GridTools
 			adjacent_cells.insert(it);
 			 break;
 		  }
-       }	  
+       }
 	}
   }
 
@@ -862,7 +874,7 @@ namespace GridTools
 
     std::vector<cell_iterator> adjacent_cells_tmp =
       find_cells_adjacent_to_vertex(container, vertex);
-	  
+
 									// Make sure that we have found
 									// at least one cell adjacent to vertex.
 	  Assert(adjacent_cells_tmp.size()>0, ExcInternalError());
@@ -875,7 +887,7 @@ namespace GridTools
 									// in the grid.
 									// As long as we have not found
 									// the cell and have not searched
-									// every cell in the triangulation, 
+									// every cell in the triangulation,
 									// we keep on looking.
 	  const unsigned int n_cells =get_tria(container).n_cells();
 	  bool found = false;
@@ -925,9 +937,9 @@ namespace GridTools
 		  }
 							//udpate the number of cells searched
 		  cells_searched += adjacent_cells.size();
-							// if we have not found the cell in 
+							// if we have not found the cell in
 							// question and have not yet searched every
-							// cell, we expand our search to 
+							// cell, we expand our search to
 							// all the not already searched neighbors of
 							// the cells in adjacent_cells. This is
 							// what find_active_cell_around_poin_internal
@@ -984,7 +996,7 @@ namespace GridTools
 
 		std::vector<cell_iterator> adjacent_cells_tmp =
         find_cells_adjacent_to_vertex(container, vertex);
-		
+
 									// Make sure that we have found
 									// at least one cell adjacent to vertex.
 	  Assert(adjacent_cells_tmp.size()>0, ExcInternalError());
@@ -997,7 +1009,7 @@ namespace GridTools
 									// in the grid.
 									// As long as we have not found
 									// the cell and have not searched
-									// every cell in the triangulation, 
+									// every cell in the triangulation,
 									// we keep on looking.
 	  const unsigned int n_cells =get_tria(container).n_cells();
 	  bool found = false;
@@ -1013,7 +1025,7 @@ namespace GridTools
 			  {
 				const Point<dim> p_cell = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
 
-				
+
 				// calculate the infinity norm of
 				// the distance vector to the unit cell.
 				const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
@@ -1048,9 +1060,9 @@ namespace GridTools
 		  }
 		  	  							//udpate the number of cells searched
 		  cells_searched += adjacent_cells.size();
-							// if we have not found the cell in 
+							// if we have not found the cell in
 							// question and have not yet searched every
-							// cell, we expand our search to 
+							// cell, we expand our search to
 							// all the not already searched neighbors of
 							// the cells in adjacent_cells.
 		  if(!found && cells_searched < n_cells)

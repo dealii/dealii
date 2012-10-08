@@ -12,8 +12,8 @@
 //----------------------------  anisotropic_crash.cc  ---------------------------
 
 
-// Trying to catch a bug in the construction of patches when
-// there is anisotropic refinement
+// GridTools::find_cells_adjacent_to_vertex had a problem in that it
+// wasn't prepared to deal with anisotropic refinement
 
 
 #include <deal.II/grid/tria.h>
@@ -79,7 +79,15 @@ int main()
 
 				   /// For each vertex find the patch of cells
 				   /// that surrounds it
-  for( unsigned v=0; v<tri.n_used_vertices(); ++v )
+  for( unsigned v=0; v<tri.n_vertices(); ++v )
     if (tri.get_used_vertices()[v] == true)
-      GridTools::find_cells_adjacent_to_vertex( tri, v );
+      {
+	deallog << "Vertex=" << v << std::endl;
+
+	const std::vector<Triangulation<2>::active_cell_iterator>
+	  tmp = GridTools::find_cells_adjacent_to_vertex( tri, v );
+
+	for (unsigned int i=0; i<tmp.size(); ++i)
+	  deallog << "   " << tmp[i] << std::endl;
+      }
 }
