@@ -25,7 +25,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
 
 
   #
-  # Install the homepage:
+  # Install the remaining (static) elements of documentation:
   #
 
   INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
