@@ -113,7 +113,9 @@ ADD_CUSTOM_TARGET(doxygen ALL
   #
   # ./deal.II is already created due to CONFIGURE_FILE(... deal.css ...)
   #
-  ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/options.dox
+  ${DOXYGEN_EXECUTABLE}
+    ${CMAKE_CURRENT_BINARY_DIR}/options.dox
+    > ${CMAKE_CURRENT_BINARY_DIR}/doxygen.log 2>&1 # *pssst*
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/images/structure.png
