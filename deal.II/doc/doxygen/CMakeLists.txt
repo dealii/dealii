@@ -24,7 +24,7 @@ ENDIF()
 
 
 #
-# Prepare the example steps for inclusion:
+# Prepare the example steps for doxygen:
 #
 
 ADD_SUBDIRECTORY(tutorial)
@@ -77,17 +77,18 @@ ADD_CUSTOM_COMMAND(
 file(GLOB doxygen_input
   ${CMAKE_SOURCE_DIR}/include/deal.II/*
   ${CMAKE_BINARY_DIR}/include/deal.II/*
+  ${CMAKE_CURRENT_SOURCE_DIR}/headers
+  ${CMAKE_CURRENT_BINARY_DIR}/tutorial
   ${CMAKE_SOURCE_DIR}/doc/news/*.h
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/*.h
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/main.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/headers
-  ${CMAKE_CURRENT_BINARY_DIR}/tutorial
   )
 
 TO_STRING(doxygen_input ${doxygen_input})
 
 file(GLOB doxygen_image_path
   ${CMAKE_CURRENT_SOURCE_DIR}/images
+  ${CMAKE_CURRENT_BINARY_DIR}/images
   ${CMAKE_SOURCE_DIR}/examples/*/doc
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/images
   )
@@ -100,7 +101,12 @@ FILE(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
   "
   )
 
-ADD_CUSTOM_TARGET(doxygen ALL # TODO: Really all?
+
+#
+# And, finally, call doxygen:
+#
+
+ADD_CUSTOM_TARGET(doxygen ALL
   #
   # ./deal.II is already created due to CONFIGURE_FILE(... deal.css ...)
   #
@@ -116,6 +122,7 @@ ADD_CUSTOM_TARGET(doxygen ALL # TODO: Really all?
 ADD_DEPENDENCIES(doxygen tutorial)
 
 INSTALL(DIRECTORY
+  ${CMAKE_CURRENT_SOURCE_DIR}/stylesheet.css
   ${CMAKE_CURRENT_BINARY_DIR}/deal.II
   DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}/doxygen
   COMPONENT documentation
