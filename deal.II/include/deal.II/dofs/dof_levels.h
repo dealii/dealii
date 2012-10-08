@@ -101,8 +101,8 @@ namespace internal
         void serialize(Archive & ar,
                        const unsigned int version);
     };
-    
-    
+
+
     template <int dim>
     inline
     std::size_t
@@ -112,13 +112,13 @@ namespace internal
               MemoryConsumption::memory_consumption (dof_object));
     }
 
-    
+
     template <int dim>
     template <class Archive>
     inline
     void
     DoFLevel<dim>::serialize (Archive &ar,
-			      const unsigned int version)
+			      const unsigned int)
     {
       ar & cell_dof_indices_cache;
       ar & dof_object;
