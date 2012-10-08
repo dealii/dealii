@@ -28,7 +28,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   # Install the homepage:
   #
 
-  INSTALL(DIRECTORY .
+  INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
     DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}
     COMPONENT documentation
     FILES_MATCHING REGEX "^.*(html|css|eps|jpg|gif|fig|png|ico)$"

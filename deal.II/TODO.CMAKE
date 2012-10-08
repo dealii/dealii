@@ -1,8 +1,5 @@
 Major:
 
-* Implement the documentation component. (I don't grok what's going on in
-  this makefiles. There is a rudimentary doxygen call, though.)
-
 * Add the rest of the Bug tests
 
 * Test the fparser 4.5 functionality.
@@ -13,7 +10,6 @@ Major:
     * TECPLOT
 
 * Write a wrapper around cmake. Something like
-    * download and 'install' cmake if necessary
     $ make config
     $ make
     ...
@@ -29,10 +25,10 @@ Major:
 * Rename all DEAL_II_USE_* and HAVE_LIB* that refer to a feature to
   DEAL_II_WITH_*.
 
-* Refactor lapack_templates.pl
-
 
 Minor:
+
+* (Maybe) re-enable validate-xrefs
 
 * Fixup the TODOs in
     source/lac/sparse_dircect.cc

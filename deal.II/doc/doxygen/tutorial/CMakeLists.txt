@@ -17,7 +17,7 @@
 # Prepare steps.png and steps.cmapx:
 #
 
-file(GLOB steps_args
+file(GLOB steps
   ${CMAKE_SOURCE_DIR}/examples/step-*
   )
 
@@ -26,7 +26,7 @@ ADD_CUSTOM_COMMAND(
   COMMAND ${PERL_EXECUTABLE}
   ARGS
     ${CMAKE_SOURCE_DIR}/doc/scripts/steps.pl
-    ${steps_args}
+    ${steps}
     > ${CMAKE_CURRENT_BINARY_DIR}/steps.dot
   )
 
@@ -67,13 +67,130 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/steps.cmapx
   )
 
-ADD_CUSTOM_TARGET(blubb ALL
+
+#
+# A target for the preparation of all the stuff happening in here...
+#
+ADD_CUSTOM_TARGET(tutorial
   DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/toc.html
   )
 
 
 #
-# Prepare toc.html:
+# Prepare the steps for documentation generation
 #
 
+FOREACH(step ${steps})
+  GET_FILENAME_COMPONENT(step "${step}" NAME)
+  STRING(REGEX REPLACE "-" "_" step_underscore "${step}")
+
+  CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/_toc.intro.snippet.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${step}_toc.intro.snippet
+    )
+
+  CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/_plain.snippet.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${step}_plain.snippet
+    )
+
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${step}.cc
+    COMMAND ${PERL_EXECUTABLE}
+    ARGS
+      ${CMAKE_SOURCE_DIR}/doc/scripts/program2plain
+      < ${CMAKE_SOURCE_DIR}/examples/${step}/${step}.cc
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.cc
+    DEPENDS
+      ${CMAKE_SOURCE_DIR}/examples/${step}/${step}.cc
+    VERBATIM
+    )
+
+  ADD_CUSTOM_COMMAND(
+    #
+    # This has to be refactored really, really badly...
+    #
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND cat
+    ARGS
+      ${CMAKE_CURRENT_BINARY_DIR}/${step}_toc.intro.snippet
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND ${PERL_EXECUTABLE}
+    ARGS
+      ${CMAKE_SOURCE_DIR}/doc/scripts/intro2toc
+      < ${CMAKE_SOURCE_DIR}/examples/${step}/doc/intro.dox
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND cat
+    ARGS
+      ${CMAKE_CURRENT_SOURCE_DIR}/_toc.prog.snippet
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND ${PERL_EXECUTABLE}
+    ARGS
+      ${CMAKE_SOURCE_DIR}/doc/scripts/program2toc
+      < ${CMAKE_SOURCE_DIR}/examples/${step}/${step}.cc
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND cat
+    ARGS
+      ${CMAKE_CURRENT_SOURCE_DIR}/_toc.results.snippet
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND ${PERL_EXECUTABLE}
+    ARGS
+      ${CMAKE_SOURCE_DIR}/doc/scripts/intro2toc
+      < ${CMAKE_SOURCE_DIR}/examples/${step}/doc/results.dox
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND cat
+    ARGS
+      ${CMAKE_CURRENT_SOURCE_DIR}/_toc.final.snippet
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND ${PERL_EXECUTABLE}
+    ARGS
+      ${CMAKE_SOURCE_DIR}/doc/scripts/create_anchors
+      < ${CMAKE_SOURCE_DIR}/examples/${step}/doc/intro.dox
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND ${PERL_EXECUTABLE}
+    ARGS
+      ${CMAKE_SOURCE_DIR}/doc/scripts/program2doxygen
+      < ${CMAKE_SOURCE_DIR}/examples/${step}/${step}.cc
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND ${PERL_EXECUTABLE}
+    ARGS
+      ${CMAKE_SOURCE_DIR}/doc/scripts/create_anchors
+      < ${CMAKE_SOURCE_DIR}/examples/${step}/doc/results.dox
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    COMMAND cat
+    ARGS
+      ${CMAKE_CURRENT_BINARY_DIR}/${step}_plain.snippet
+      >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+    WORKING_DIRECTORY
+      ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS
+      ${CMAKE_SOURCE_DIR}/examples/${step}/${step}.cc
+      ${CMAKE_SOURCE_DIR}/examples/${step}/doc/intro.dox
+      ${CMAKE_SOURCE_DIR}/examples/${step}/doc/results.dox
+    VERBATIM
+    )
+  ADD_CUSTOM_TARGET(tutorial_${step}
+    DEPENDS
+      ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
+      ${CMAKE_CURRENT_BINARY_DIR}/${step}.cc
+    )
+  ADD_DEPENDENCIES(tutorial tutorial_${step})
+ENDFOREACH()
+
+
+#
+# Install all bits:
+#
+
+INSTALL(FILES
+  index.html
+  navbar.html
+  title.html
+  toc-list.html #TODO
+  toc-topics.html #TODO
+  ${CMAKE_CURRENT_BINARY_DIR}/steps.png
+  ${CMAKE_CURRENT_BINARY_DIR}/toc.html
+  DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}/doxygen/tutorial
+  COMPONENT documentation
+  )

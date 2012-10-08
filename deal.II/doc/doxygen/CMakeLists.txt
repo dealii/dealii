@@ -46,14 +46,15 @@ CONFIGURE_FILE(
   )
 
 file(GLOB doxygen_input
-  # TODO: Steps
   ${CMAKE_SOURCE_DIR}/include/deal.II/*
   ${CMAKE_BINARY_DIR}/include/deal.II/*
   ${CMAKE_SOURCE_DIR}/doc/news/*.h
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/*.h
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/headers
+  ${CMAKE_CURRENT_BINARY_DIR}/tutorial
   )
+
 TO_STRING(doxygen_input ${doxygen_input})
 
 
@@ -81,4 +82,6 @@ ADD_CUSTOM_TARGET(doxygen ALL # TODO: Really all?
   COMMENT "Generating documentation via doxygen"
   VERBATIM
   )
+
+ADD_DEPENDENCIES(doxygen tutorial)
 
