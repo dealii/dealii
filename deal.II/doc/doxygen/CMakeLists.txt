@@ -16,11 +16,15 @@ FIND_PACKAGE(Perl REQUIRED)
 FIND_PACKAGE(Doxygen REQUIRED)
 
 IF(NOT DOXYGEN_FOUND OR NOT DOXYGEN_DOT_FOUND)
+  # Just to be sure that we actually have dot...
   MESSAGE(FATAL_ERROR
     "Could not find doxygen and dot which is required for building the documentation"
     )
 ENDIF()
 
+#
+# Prepare the example steps for inclusion:
+#
 ADD_SUBDIRECTORY(tutorial)
 
 CONFIGURE_FILE(
@@ -84,4 +88,10 @@ ADD_CUSTOM_TARGET(doxygen ALL # TODO: Really all?
   )
 
 ADD_DEPENDENCIES(doxygen tutorial)
+
+INSTALL(DIRECTORY
+  ${CMAKE_CURRENT_BINARY_DIR}/deal.II
+  DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}/doxygen
+  COMPONENT documentation
+  )
 

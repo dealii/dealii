@@ -19,7 +19,7 @@
 IF(DEAL_II_COMPONENT_DOCUMENTATION)
 
   #
-  # Generate the documentation via doxygen:
+  # Generate the source documentation via doxygen:
   #
   ADD_SUBDIRECTORY(doxygen)
 
