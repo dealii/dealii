@@ -53,7 +53,7 @@ LogStream::LogStream()
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
-#if defined(HAVE_TIMES) && defined(HAVE_UNISTD_H)
+#if defined(HAVE_UNISTD_H) && defined(HAVE_TIMES)
   reference_time_val = 1./sysconf(_SC_CLK_TCK) * times(&reference_tms);
 #endif
 }
@@ -454,7 +454,7 @@ void
 LogStream::timestamp ()
 {
   struct tms current_tms;
-#if defined(HAVE_TIMES) && defined(HAVE_UNISTD_H)
+#if defined(HAVE_UNISTD_H) && defined(HAVE_TIMES)
   const clock_t tick = sysconf(_SC_CLK_TCK);
   const double time = 1./tick * times(&current_tms);
 #else

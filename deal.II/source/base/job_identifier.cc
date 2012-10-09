@@ -15,7 +15,7 @@
 #include <deal.II/base/job_identifier.h>
 #include <ctime>
 
-#ifdef HAVE_GETHOSTNAME
+#ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
 
@@ -34,7 +34,7 @@ JobIdentifier::JobIdentifier()
   time_t t = std::time(0);
   id = std::string("JobId ");
 
-#if defined(HAVE_GETHOSTNAME) && !defined(DEAL_II_BROKEN_GETHOSTNAME) && !defined(DEBUG)
+#if defined(HAVE_UNISTD_H) && defined(HAVE_GETHOSTNAME)
   char name[100];
   gethostname(name,99);
   id += std::string(name) + std::string(" ");

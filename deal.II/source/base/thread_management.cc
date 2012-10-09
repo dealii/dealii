@@ -136,7 +136,7 @@ namespace Threads
   {
 #ifdef SYS_gettid
     const pid_t this_id = syscall(SYS_gettid);
-#elif defined(HAVE_GETPID)
+#elif defined(HAVE_UNISTD_H) && defined(HAVE_GETPID)
     const pid_t this_id = getpid();
 #else
     const unsigned int this_id = 0;
