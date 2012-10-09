@@ -87,6 +87,10 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: handle lucky breakdowns in GMRES/FGMRES.
+<br>
+(Bärbel Jansse, Timo Heister, 2012/10/09)
+
 <li> Fixed: GridTools::find_cells_adjacent_to_vertex got into
 trouble with anisotropically refined meshes. This is now fixed.
 <br>
