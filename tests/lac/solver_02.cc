@@ -63,7 +63,6 @@ int main()
 
   test<SolverGMRES<Vector<double> > >();
   test<SolverCG<Vector<double> > >();
-//  test<SolverFGMRES<Vector<double> > >();
-    
+  test<SolverFGMRES<Vector<double> > >();    
 }
 
