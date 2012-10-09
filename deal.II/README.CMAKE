@@ -96,8 +96,8 @@ INTRODUCTION
   * Configure with autodetection, afterwards disable a feature:
 
       ( $ cd build )
-        $ cmake -DDEAL_II_FEATURE_AUTODETECTION=ON ../
-        $ cmake -DDEAL_II_FEATURE_AUTODETECTION=OFF -DDEAL_II_WITH_METIS=OFF ../
+        $ cmake ../
+        $ cmake -DDEAL_II_WITH_METIS=OFF ../
         $ make install
 
   * Build and install only a specific component:
