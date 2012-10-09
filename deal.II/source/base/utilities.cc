@@ -512,9 +512,13 @@ namespace Utilities
 
     std::string get_hostname ()
     {
+#if defined(HAVE_UNISTD_H) && defined(HAVE_GETHOSTNAME)
       const unsigned int N=1024;
       char hostname[N];
       gethostname (&(hostname[0]), N-1);
+#else
+      std::string hostname("unknown");
+#endif
       return hostname;
     }
 

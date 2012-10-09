@@ -69,103 +69,103 @@
 /* Defined if deal.II was configured with LAPACK support */
 #cmakedefine HAVE_LIBLAPACK
 
-/* Define to 1 if you have the `daxpy_' function. */
+/* Defined if you have the `daxpy_' function. */
 #cmakedefine HAVE_DAXPY_
 
-/* Define to 1 if you have the `dgeevx_' function. */
+/* Defined if you have the `dgeevx_' function. */
 #cmakedefine HAVE_DGEEVX_
 
-/* Define to 1 if you have the `dgeev_' function. */
+/* Defined if you have the `dgeev_' function. */
 #cmakedefine HAVE_DGEEV_
 
-/* Define to 1 if you have the `dgelsd_' function. */
+/* Defined if you have the `dgelsd_' function. */
 #cmakedefine HAVE_DGELSD_
 
-/* Define to 1 if you have the `dgemm_' function. */
+/* Defined if you have the `dgemm_' function. */
 #cmakedefine HAVE_DGEMM_
 
-/* Define to 1 if you have the `dgemv_' function. */
+/* Defined if you have the `dgemv_' function. */
 #cmakedefine HAVE_DGEMV_
 
-/* Define to 1 if you have the `dgeqrf_' function. */
+/* Defined if you have the `dgeqrf_' function. */
 #cmakedefine HAVE_DGEQRF_
 
-/* Define to 1 if you have the `dgesdd_' function. */
+/* Defined if you have the `dgesdd_' function. */
 #cmakedefine HAVE_DGESDD_
 
-/* Define to 1 if you have the `dgesvd_' function. */
+/* Defined if you have the `dgesvd_' function. */
 #cmakedefine HAVE_DGESVD_
 
-/* Define to 1 if you have the `dgetrf_' function. */
+/* Defined if you have the `dgetrf_' function. */
 #cmakedefine HAVE_DGETRF_
 
-/* Define to 1 if you have the `dgetri_' function. */
+/* Defined if you have the `dgetri_' function. */
 #cmakedefine HAVE_DGETRI_
 
-/* Define to 1 if you have the `dgetrs_' function. */
+/* Defined if you have the `dgetrs_' function. */
 #cmakedefine HAVE_DGETRS_
 
-/* Define to 1 if you have the `dorgqr_' function. */
+/* Defined if you have the `dorgqr_' function. */
 #cmakedefine HAVE_DORGQR_
 
-/* Define to 1 if you have the `dormqr_' function. */
+/* Defined if you have the `dormqr_' function. */
 #cmakedefine HAVE_DORMQR_
 
-/* Define to 1 if you have the `dstev_' function. */
+/* Defined if you have the `dstev_' function. */
 #cmakedefine HAVE_DSTEV_
 
-/* Define to 1 if you have the `dsyevx_' function. */
+/* Defined if you have the `dsyevx_' function. */
 #cmakedefine HAVE_DSYEVX_
 
-/* Define to 1 if you have the `dsygvx_' function. */
+/* Defined if you have the `dsygvx_' function. */
 #cmakedefine HAVE_DSYGVX_
 
-/* Define to 1 if you have the `sgeevx_' function. */
+/* Defined if you have the `sgeevx_' function. */
 #cmakedefine HAVE_SGEEVX_
 
-/* Define to 1 if you have the `sgeev_' function. */
+/* Defined if you have the `sgeev_' function. */
 #cmakedefine HAVE_SGEEV_
 
-/* Define to 1 if you have the `sgelsd_' function. */
+/* Defined if you have the `sgelsd_' function. */
 #cmakedefine HAVE_SGELSD_
 
-/* Define to 1 if you have the `sgemm_' function. */
+/* Defined if you have the `sgemm_' function. */
 #cmakedefine HAVE_SGEMM_
 
-/* Define to 1 if you have the `sgemv_' function. */
+/* Defined if you have the `sgemv_' function. */
 #cmakedefine HAVE_SGEMV_
 
-/* Define to 1 if you have the `sgeqrf_' function. */
+/* Defined if you have the `sgeqrf_' function. */
 #cmakedefine HAVE_SGEQRF_
 
-/* Define to 1 if you have the `sgesdd_' function. */
+/* Defined if you have the `sgesdd_' function. */
 #cmakedefine HAVE_SGESDD_
 
-/* Define to 1 if you have the `sgesvd_' function. */
+/* Defined if you have the `sgesvd_' function. */
 #cmakedefine HAVE_SGESVD_
 
-/* Define to 1 if you have the `sgetrf_' function. */
+/* Defined if you have the `sgetrf_' function. */
 #cmakedefine HAVE_SGETRF_
 
-/* Define to 1 if you have the `sgetri_' function. */
+/* Defined if you have the `sgetri_' function. */
 #cmakedefine HAVE_SGETRI_
 
-/* Define to 1 if you have the `sgetrs_' function. */
+/* Defined if you have the `sgetrs_' function. */
 #cmakedefine HAVE_SGETRS_
 
-/* Define to 1 if you have the `sorgqr_' function. */
+/* Defined if you have the `sorgqr_' function. */
 #cmakedefine HAVE_SORGQR_
 
-/* Define to 1 if you have the `sormqr_' function. */
+/* Defined if you have the `sormqr_' function. */
 #cmakedefine HAVE_SORMQR_
 
-/* Define to 1 if you have the `sstev_' function. */
+/* Defined if you have the `sstev_' function. */
 #cmakedefine HAVE_SSTEV_
 
-/* Define to 1 if you have the `ssyevx_' function. */
+/* Defined if you have the `ssyevx_' function. */
 #cmakedefine HAVE_SSYEVX_
 
-/* Define to 1 if you have the `ssygvx_' function. */
+/* Defined if you have the `ssygvx_' function. */
 #cmakedefine HAVE_SSYGVX_
 
 /* Defined if you have the `strtrs_' function. */
@@ -405,21 +405,25 @@
  * Configured in check_for_system_features: *
  ********************************************/
 
+/* Defined if the system stores words with the most significant byte first */
+#cmakedefine DEAL_II_WORDS_BIGENDIAN
 
-/* Defined if you have the <unistd.h> header file. */
-#cmakedefine HAVE_UNISTD_H
 
 /* Defined if you have the <sys/resource.h> header file */
 #cmakedefine HAVE_SYS_RESOURCE_H
 
-/* Defined if you have the <sys/times.h> header file. */
-#cmakedefine HAVE_SYS_TIMES_H
-
 /* Defined if you have the <sys/time.h> header file. */
 #cmakedefine HAVE_SYS_TIME_H
 
+/* Defined if you have the <sys/times.h> header file. */
+#cmakedefine HAVE_SYS_TIMES_H
+
 /* Defined if you have the <sys/types.h> header file. */
 #cmakedefine HAVE_SYS_TYPES_H
+
+
+/* Defined if you have the <unistd.h> header file. */
+#cmakedefine HAVE_UNISTD_H
 
 /* Defined if you have the "gethostname" function. */
 #cmakedefine HAVE_GETHOSTNAME
@@ -433,9 +437,9 @@
 /* Defined if you have the "times" function. */
 #cmakedefine HAVE_TIMES
 
-/* Defined if the system stores words with the most significant byte first */
-#cmakedefine DEAL_II_WORDS_BIGENDIAN
 
+/* Defined if the deal.II was configured on a native Windows platform. */
+#cmakedefine DEAL_II_MSVC
 
 
 

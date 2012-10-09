@@ -16,14 +16,14 @@
 # Check for various system features:
 #
 
-
 INCLUDE(TestBigEndian)
+TEST_BIG_ENDIAN(DEAL_II_WORDS_BIGENDIAN)
+
 
 #
 # Check for various posix (and linux) specific header files:
 #
 
-CHECK_INCLUDE_FILE("unistd.h" HAVE_UNISTD_H)
 CHECK_INCLUDE_FILE("sys/resource.h"  HAVE_SYS_RESOURCE_H)
 CHECK_INCLUDE_FILE("sys/time.h" HAVE_SYS_TIME_H)
 CHECK_INCLUDE_FILE("sys/times.h" HAVE_SYS_TIMES_H)
@@ -31,13 +31,23 @@ CHECK_INCLUDE_FILE("sys/types.h" HAVE_SYS_TYPES_H)
 
 
 #
-# Check for various posix specific functions:
+# Check for various posix specific functions. On a posix system they should
+# be all defined in unistd.h. On other platforms, most notably
+# Windows/MinGW unistd.h is available but not all posix functions. So test
+# for each funtion as well.
 #
 
+CHECK_INCLUDE_FILE("unistd.h" HAVE_UNISTD_H)
 CHECK_FUNCTION_EXISTS(gethostname HAVE_GETHOSTNAME)
 CHECK_FUNCTION_EXISTS(getpid HAVE_GETPID)
 CHECK_FUNCTION_EXISTS(rand_r HAVE_RAND_R)
 CHECK_FUNCTION_EXISTS(times HAVE_TIMES)
 
-TEST_BIG_ENDIAN(DEAL_II_WORDS_BIGENDIAN)
 
+#
+# Export DEAL_II_MSVC if we are on a Windows platform.
+#
+
+IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  SET(DEAL_II_MSVC TRUE)
+ENDIF()
