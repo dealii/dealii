@@ -87,6 +87,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: GridTools::find_cells_adjacent_to_vertex got into
+trouble with anisotropically refined meshes. This is now fixed.
+<br>
+(Abner Salgado, Tobias Leicht, Wolfgang Bangerth, 2012/10/08)
+
 <li> Fixed: FESystem can now deal with n_elements==0 for a block.
 <br>
 (Timo Heister, 2012/09/28)

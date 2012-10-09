@@ -34,7 +34,7 @@ template <int dim, int spacedim> class MappingQ;
 /**
  * Implementation of Raviart-Thomas (RT) elements, conforming with the
  * space H<sup>div</sup>. These elements generate vector fields with
- * normel components continuous between mesh cells.
+ * normal components continuous between mesh cells.
  *
  * We follow the usual definition of the degree of RT elements, which
  * denotes the polynomial degree of the largest complete polynomial

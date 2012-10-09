@@ -18,12 +18,6 @@ int main(int argc, char *argv[]) {
 	const int IGNORE_LINES = 3; //Number of initial lines to ignore
 
 	input.open("temp.txt");
-	if(argc <= 1)
-	{
-		cerr << "Error: " << argv[0] << " requires one argument" << endl;
-		cerr << " <Revision Num>" << endl;
-		return 1;
-	}
 
 	////cout << "Revision " << argv[1] << endl;
 	
@@ -36,8 +30,39 @@ int main(int argc, char *argv[]) {
 
 	vector<string> names;
 	vector<double> times;
+	
+	if(argc <= 1) {
+		while(!input.eof()) {
+			//If no revision number, retrieve column names 
+			string curr_line;
+			getline(input, curr_line);
+			if(curr_line == "")
+				continue;
+		
+			////cout << "curr line: " << curr_line << endl;
+			//Looking for the string after the '|' and ' '
+			int first_char = 0;
+			if(curr_line[0] == '|')
+				first_char++;
+			if (curr_line[1] == ' ')
+				first_char++;
 
-	//Extract name and execution time from each line
+			////cout << "first char at pos: " << first_char << endl;
+	
+			//Test case: char at position first_char is a letter
+			assert(isalpha(curr_line[first_char]));
+			
+			//Find position of first space that occurs after the word
+			int num_chars = 0;
+			while(!isspace(curr_line[first_char + num_chars]))
+				num_chars++;
+	
+			names.push_back(curr_line.substr(first_char, num_chars));
+		}
+	}
+
+
+	//Extract and execution time from each line
 	while(!input.eof())
 	{
 		string curr_line;
@@ -63,10 +88,21 @@ int main(int argc, char *argv[]) {
 	}
 
 
+	//Output individual names
+	if(argc <= 1) {
+		for(int i = 0; i < names.size(); i++) {
+			cout << names[i];
+			if(i < names.size() - 1)
+				cout << endl;
+		}
+	}
+
 	//Output individual times
-	cout << argv[1]; 
-	for(int i = 0; i < times.size(); i++)
-		cout << " " << times[i];
+	if(argc > 1) {
+		cout << argv[1]; 
+		for(int i = 0; i < times.size(); i++)
+			cout << " " << times[i];
+	}
 
 	cout << endl;
 

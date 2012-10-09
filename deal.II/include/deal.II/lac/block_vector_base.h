@@ -645,7 +645,6 @@ namespace internal
         void move_backward ();
 
 
-#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
                                          /**
                                           * Mark all other instances of
                                           * this template as friends. In
@@ -653,19 +652,10 @@ namespace internal
                                           * inverse constness iterator
                                           * as friend, but this is
                                           * something that ISO C++ does
-                                          * not allow to specify. If we
-                                          * have detected a compiler bug
-                                          * during configuration of the
-                                          * library, use a workaround
-                                          * that works for this
-                                          * particular compiler, but is
-                                          * not ISO C++ conforming.
+                                          * not allow to specify.
                                           */
         template <typename N, bool C>
         friend class Iterator;
-#else
-        friend class InverseConstnessIterator;
-#endif
     };
   }  // namespace BlockVectorIterators
 }  // namespace internal
@@ -1165,16 +1155,10 @@ class BlockVectorBase : public Subscriptor
 
                                      /**
                                       * Make the iterator class a
-                                      * friend. We have to work around
-                                      * a compiler bug here again.
+                                      * friend.
                                       */
-#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
     template <typename N, bool C>
     friend class dealii::internal::BlockVectorIterators::Iterator;
-#else
-    friend class iterator;
-    friend class const_iterator;
-#endif
 
     template <typename> friend class BlockVectorBase;
 };

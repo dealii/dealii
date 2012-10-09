@@ -223,7 +223,6 @@ namespace internal
                                          // as friends. make sure to
                                          // work around bugs in some
                                          // compilers
-#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
         template <int N1, typename T1> friend class dealii::Table;
         template <int N1, typename T1, bool C1, unsigned int P1>
         friend class Accessor;
@@ -231,10 +230,6 @@ namespace internal
         friend class dealii::Table<N,T>;
         friend class Accessor<N,T,C,P+1>;
 #  endif
-#else
-        friend class Table<N,T>;
-        friend class Accessor<N,T,C,P+1>;
-#endif
     };
 
 
@@ -374,7 +369,6 @@ namespace internal
                                          // as friends. make sure to
                                          // work around bugs in some
                                          // compilers
-#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
         template <int N1, typename T1> friend class dealii::Table;
         template <int N1, typename T1, bool C1, unsigned int P1>
         friend class Accessor;
@@ -382,10 +376,6 @@ namespace internal
         friend class dealii::Table<2,T>;
         friend class Accessor<N,T,C,2>;
 #  endif
-#else
-        friend class Table<2,T>;
-        friend class Accessor<N,T,C,2>;
-#endif
     };
   }
 

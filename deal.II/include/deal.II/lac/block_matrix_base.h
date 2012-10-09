@@ -1237,20 +1237,11 @@ class BlockMatrixBase : public Subscriptor
                                       * friend. We have to work around
                                       * a compiler bug here again.
                                       */
-#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
     template <typename, bool>
     friend class BlockMatrixIterators::Accessor;
 
     template <typename>
     friend class MatrixIterator;
-#else
-    typedef BlockMatrixIterators::Accessor<BlockMatrixBase, true> ConstAccessor;
-    typedef BlockMatrixIterators::Accessor<BlockMatrixBase, false> Accessor;
-    friend class ConstAccessor;
-
-    friend class const_iterator;
-#endif
-
 };
 
 

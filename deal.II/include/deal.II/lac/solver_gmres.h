@@ -706,9 +706,9 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
           const double s = vv.l2_norm();
           h(inner_iteration+1) = s;
-//TODO: s=0 is a lucky breakdown. Handle this somehow decently
-
-          vv *= 1./s;
+          //s=0 is a lucky breakdown. Handle this somehow decently
+          if(s!=0)
+            vv *= 1./s;
 
                                            /*  Transformation into
                                                triagonal structure  */
