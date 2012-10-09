@@ -736,7 +736,7 @@ namespace GridTools
                         &&
                         cell->neighbor(face)->active())
                       {
-                        // there is a (possibly )coarser cell behind a
+                        // there is a (possibly) coarser cell behind a
                         // face to which the vertex belongs. the
                         // vertex we are looking at is then either a
                         // vertex of that coarser neighbor, or it is a
@@ -747,7 +747,6 @@ namespace GridTools
                         // std::set makes sure that we get it only
                         // once)
                         adjacent_cells.insert (cell->neighbor(face));
-                        goto next_cell;
                       }
                   }
 
