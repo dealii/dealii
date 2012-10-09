@@ -129,6 +129,7 @@ DEAL::   3.11
 DEAL::   3.22
 DEAL::   3.23
 DEAL::Vertex=36
+DEAL::   2.13
 DEAL::   3.12
 DEAL::   3.13
 DEAL::Vertex=37
@@ -140,6 +141,7 @@ DEAL::   2.3
 DEAL::   3.4
 DEAL::   3.5
 DEAL::Vertex=39
+DEAL::   2.3
 DEAL::   3.2
 DEAL::   3.3
 DEAL::Vertex=40
@@ -151,9 +153,11 @@ DEAL::   3.9
 DEAL::   3.11
 DEAL::   3.12
 DEAL::Vertex=42
+DEAL::   3.7
 DEAL::   3.8
 DEAL::   3.9
 DEAL::Vertex=43
+DEAL::   2.5
 DEAL::   3.12
 DEAL::   3.13
 DEAL::Vertex=44
@@ -166,6 +170,7 @@ DEAL::   2.11
 DEAL::   3.19
 DEAL::   3.21
 DEAL::Vertex=46
+DEAL::   3.15
 DEAL::   3.18
 DEAL::   3.19
 DEAL::Vertex=47
@@ -177,9 +182,11 @@ DEAL::   2.14
 DEAL::   3.26
 DEAL::   3.28
 DEAL::Vertex=49
+DEAL::   2.14
 DEAL::   3.24
 DEAL::   3.25
 DEAL::Vertex=50
+DEAL::   2.13
 DEAL::   3.26
 DEAL::   3.27
 DEAL::Vertex=51
