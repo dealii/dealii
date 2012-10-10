@@ -4,7 +4,7 @@ TESTS="step-22 tablehandler"
 
 PREVREVISION="`svn info deal.II | grep Revision | sed s/Revision://`"
 HEADREVISION="`svn info http://www.dealii.org/svn/dealii | grep Revision | sed s/Revision://`"
-MAKECMD="make -j6"
+MAKECMD="make -j2"
 export MAKECMD
 
 echo "previous $PREVREVISION"
@@ -35,7 +35,10 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
       echo "** working on $test"
       make clean >/dev/null
       make run | grep "|" > temp.txt
-      #cat temp.txt >>../datatable.$test
+      ./../gettimes/gettimes > names.test
+      if [[ -s names.test ]] ; then
+      cp names.test ../names.$test
+      fi ;
       ./../gettimes/gettimes $NEXTREVISION >>../datatable.$test
       cd ..      
   
@@ -44,4 +47,3 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
 done
 
 echo "DONE WITH REGRESSION TESTS ON `date`"
-

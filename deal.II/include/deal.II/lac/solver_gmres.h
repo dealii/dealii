@@ -706,9 +706,10 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
           const double s = vv.l2_norm();
           h(inner_iteration+1) = s;
-//TODO: s=0 is a lucky breakdown. Handle this somehow decently
-
-          vv *= 1./s;
+          //s=0 is a lucky breakdown, the solver will reach convergence,
+	  //but we must not divide by zero here.
+          if (numbers::is_finite(1./s))
+            vv *= 1./s;
 
                                            /*  Transformation into
                                                triagonal structure  */
@@ -907,7 +908,11 @@ SolverFGMRES<VECTOR>::solve (
 
       for (unsigned int j=0;j<basis_size;++j)
         {
-          v(j,x).equ(1./a, *aux);
+	  if (numbers::is_finite(1./a)) // treat lucky breakdown
+	    v(j,x).equ(1./a, *aux);
+	  else
+	    v(j,x) = 0.;
+	  
 
           precondition.vmult(z(j,x), v[j]);
           A.vmult(*aux, z[j]);

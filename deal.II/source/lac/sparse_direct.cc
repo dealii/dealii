@@ -1969,12 +1969,12 @@ void SparseDirectMUMPS::initialize (const Matrix& matrix,
                          // column dimensions respectively of the
                          // matrix representation above (a): ie. a[k]
                          // is the matrix element (irn[k], jcn[k])
-      irn = new unsigned int[nz];
-      jcn = new unsigned int[nz];
+      irn = new int[nz];
+      jcn = new int[nz];
 
       unsigned int index = 0;
 
-      for (SparseMatrix<double>::const_iterator ptr = matrix.begin ();
+      for (typename Matrix::const_iterator ptr = matrix.begin ();
            ptr != matrix.end (); ++ptr)
         if (std::abs (ptr->value ()) > 0.0)
           {
@@ -2062,22 +2062,27 @@ void SparseDirectMA27::solve (const SparseMatrix<float>  &matrix,
                                    Vector<double> &);    \
   template    \
   void SparseDirectUMFPACK::initialize (const MATRIX &,    \
-                                        const AdditionalData)
+                                        const AdditionalData);
 
-InstantiateUMFPACK(SparseMatrix<double>);
-InstantiateUMFPACK(SparseMatrix<float>);
-InstantiateUMFPACK(SparseMatrixEZ<double>);
-InstantiateUMFPACK(SparseMatrixEZ<float>);
-InstantiateUMFPACK(BlockSparseMatrix<double>);
-InstantiateUMFPACK(BlockSparseMatrix<float>);
+InstantiateUMFPACK(SparseMatrix<double>)
+InstantiateUMFPACK(SparseMatrix<float>)
+InstantiateUMFPACK(SparseMatrixEZ<double>)
+InstantiateUMFPACK(SparseMatrixEZ<float>)
+InstantiateUMFPACK(BlockSparseMatrix<double>)
+InstantiateUMFPACK(BlockSparseMatrix<float>)
 
 // explicit instantiations for SparseDirectMUMPS
 #ifdef DEAL_II_USE_MUMPS
-template <class Matrix>
-void SparseDirectMUMPS::initialize (const Matrix& matrix,
-                                    const Vector<double>      & vector);
+#define InstantiateMUMPS(MATRIX) \
+  template \
+  void SparseDirectMUMPS::initialize (const MATRIX &, const Vector<double> &);
 
-void SparseDirectMUMPS::solve (Vector<double>& vector);
+InstantiateMUMPS(SparseMatrix<double>)
+InstantiateMUMPS(SparseMatrix<float>)
+// InstantiateMUMPS(SparseMatrixEZ<double>)
+// InstantiateMUMPS(SparseMatrixEZ<float>)
+InstantiateMUMPS(BlockSparseMatrix<double>)
+InstantiateMUMPS(BlockSparseMatrix<float>)
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

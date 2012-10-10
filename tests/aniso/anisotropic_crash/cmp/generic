@@ -1,0 +1,216 @@
+
+DEAL::Vertex=0
+DEAL::   2.0
+DEAL::Vertex=1
+DEAL::   2.5
+DEAL::Vertex=2
+DEAL::   3.20
+DEAL::Vertex=3
+DEAL::   3.29
+DEAL::Vertex=4
+DEAL::   3.1
+DEAL::   3.6
+DEAL::Vertex=5
+DEAL::   3.5
+DEAL::   3.14
+DEAL::Vertex=6
+DEAL::   2.13
+DEAL::   3.13
+DEAL::Vertex=7
+DEAL::   2.11
+DEAL::   2.14
+DEAL::Vertex=8
+DEAL::   2.3
+DEAL::   3.10
+DEAL::   3.16
+DEAL::   3.22
+DEAL::Vertex=9
+DEAL::   2.0
+DEAL::   3.0
+DEAL::Vertex=10
+DEAL::   2.5
+DEAL::   3.6
+DEAL::Vertex=11
+DEAL::   2.0
+DEAL::   3.4
+DEAL::Vertex=12
+DEAL::   3.15
+DEAL::   3.18
+DEAL::Vertex=13
+DEAL::   2.5
+DEAL::   3.13
+DEAL::Vertex=14
+DEAL::   2.13
+DEAL::   3.27
+DEAL::Vertex=15
+DEAL::   2.11
+DEAL::   3.21
+DEAL::Vertex=16
+DEAL::   2.14
+DEAL::   3.28
+DEAL::Vertex=17
+DEAL::   2.3
+DEAL::   3.3
+DEAL::   3.7
+DEAL::   3.8
+DEAL::Vertex=18
+DEAL::   2.11
+DEAL::   2.14
+DEAL::   3.17
+DEAL::   3.24
+DEAL::Vertex=19
+DEAL::   2.3
+DEAL::   3.5
+DEAL::   3.14
+DEAL::   3.16
+DEAL::Vertex=20
+DEAL::   2.13
+DEAL::   3.11
+DEAL::   3.12
+DEAL::   3.23
+DEAL::Vertex=21
+DEAL::   2.0
+DEAL::   2.3
+DEAL::   3.2
+DEAL::   3.4
+DEAL::Vertex=22
+DEAL::   2.5
+DEAL::   3.7
+DEAL::   3.9
+DEAL::   3.12
+DEAL::Vertex=23
+DEAL::   2.11
+DEAL::   3.15
+DEAL::   3.17
+DEAL::   3.19
+DEAL::Vertex=24
+DEAL::   2.13
+DEAL::   2.14
+DEAL::   3.25
+DEAL::   3.26
+DEAL::Vertex=25
+DEAL::   3.0
+DEAL::   3.1
+DEAL::Vertex=26
+DEAL::   3.4
+DEAL::   3.5
+DEAL::Vertex=27
+DEAL::   3.14
+DEAL::   3.15
+DEAL::Vertex=28
+DEAL::   3.18
+DEAL::   3.20
+DEAL::Vertex=29
+DEAL::   3.27
+DEAL::   3.29
+DEAL::Vertex=30
+DEAL::   3.20
+DEAL::   3.21
+DEAL::Vertex=31
+DEAL::   3.28
+DEAL::   3.29
+DEAL::Vertex=32
+DEAL::   3.1
+DEAL::   3.3
+DEAL::   3.6
+DEAL::   3.7
+DEAL::Vertex=33
+DEAL::   2.3
+DEAL::   3.8
+DEAL::   3.10
+DEAL::Vertex=34
+DEAL::   3.16
+DEAL::   3.17
+DEAL::   3.22
+DEAL::   3.24
+DEAL::Vertex=35
+DEAL::   3.10
+DEAL::   3.11
+DEAL::   3.22
+DEAL::   3.23
+DEAL::Vertex=36
+DEAL::   2.13
+DEAL::   3.12
+DEAL::   3.13
+DEAL::Vertex=37
+DEAL::   2.0
+DEAL::   3.0
+DEAL::   3.2
+DEAL::Vertex=38
+DEAL::   2.3
+DEAL::   3.4
+DEAL::   3.5
+DEAL::Vertex=39
+DEAL::   2.3
+DEAL::   3.2
+DEAL::   3.3
+DEAL::Vertex=40
+DEAL::   2.5
+DEAL::   3.6
+DEAL::   3.7
+DEAL::Vertex=41
+DEAL::   3.9
+DEAL::   3.11
+DEAL::   3.12
+DEAL::Vertex=42
+DEAL::   3.7
+DEAL::   3.8
+DEAL::   3.9
+DEAL::Vertex=43
+DEAL::   2.5
+DEAL::   3.12
+DEAL::   3.13
+DEAL::Vertex=44
+DEAL::   3.14
+DEAL::   3.15
+DEAL::   3.16
+DEAL::   3.17
+DEAL::Vertex=45
+DEAL::   2.11
+DEAL::   3.19
+DEAL::   3.21
+DEAL::Vertex=46
+DEAL::   3.15
+DEAL::   3.18
+DEAL::   3.19
+DEAL::Vertex=47
+DEAL::   2.13
+DEAL::   3.23
+DEAL::   3.25
+DEAL::Vertex=48
+DEAL::   2.14
+DEAL::   3.26
+DEAL::   3.28
+DEAL::Vertex=49
+DEAL::   2.14
+DEAL::   3.24
+DEAL::   3.25
+DEAL::Vertex=50
+DEAL::   2.13
+DEAL::   3.26
+DEAL::   3.27
+DEAL::Vertex=51
+DEAL::   3.0
+DEAL::   3.1
+DEAL::   3.2
+DEAL::   3.3
+DEAL::Vertex=52
+DEAL::   3.8
+DEAL::   3.9
+DEAL::   3.10
+DEAL::   3.11
+DEAL::Vertex=53
+DEAL::   3.18
+DEAL::   3.19
+DEAL::   3.20
+DEAL::   3.21
+DEAL::Vertex=54
+DEAL::   3.22
+DEAL::   3.23
+DEAL::   3.24
+DEAL::   3.25
+DEAL::Vertex=55
+DEAL::   3.26
+DEAL::   3.27
+DEAL::   3.28
+DEAL::   3.29

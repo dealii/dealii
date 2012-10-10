@@ -1305,8 +1305,8 @@ class SparseDirectMUMPS
 
   double       *a;
   double       *rhs;
-  unsigned int *irn;
-  unsigned int *jcn;
+  int          *irn;
+  int          *jcn;
   unsigned int  n;
   unsigned int  nz;
 
