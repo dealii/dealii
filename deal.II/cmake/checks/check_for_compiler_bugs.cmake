@@ -128,12 +128,13 @@ ENDIF()
 
 
 #
-# Disable shared libraries on cygwin targets for the moment. Shared
-# libraries on Windows are a bit buggy atm.
+# Disable shared libraries on CYGWIN and Windows targets for the moment.
+# Our support for shared libraries on Windows is a bit buggy atm..
 #
 # - Matthias Maier, 2012
 #
-IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR
+    CMAKE_SYSTEM_NAME MATCHES "Windows" )
   MESSAGE(WARNING "\n"
     "BUILD_SHARED_LIBS forced to OFF\n\n"
     )
