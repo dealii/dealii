@@ -28,11 +28,21 @@ ADD_CUSTOM_TARGET(library)
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
   ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX})
+  IF(build MATCHES "RELEASE")
+    ADD_CUSTOM_TARGET(optimized
+      DEPENDS ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+      )
+  ELSEIF(build MATCHES "DEBUG")
+    ADD_CUSTOM_TARGET(debug
+      DEPENDS ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+      )
+  ENDIF()
 ENDFOREACH()
 
 IF(DEAL_II_COMPONENT_DOCUMENTATION)
-  ADD_CUSTOM_TARGET(documentation)
-  ADD_DEPENDENCIES(documentation doxygen)
+  ADD_CUSTOM_TARGET(documentation
+    DEPENDS doxygen
+    )
 ENDIF()
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
@@ -45,9 +55,10 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
 ENDIF()
 
 IF(DEAL_II_COMPONENT_CONTRIB)
-  ADD_CUSTOM_TARGET(contrib)
-  ADD_DEPENDENCIES(contrib
-    mesh_conversion
+  ADD_CUSTOM_TARGET(contrib
+    DEPENDS
+      mesh_conversion
+      parameter_gui
     )
 ENDIF()
 
