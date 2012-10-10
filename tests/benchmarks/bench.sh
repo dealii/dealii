@@ -34,7 +34,11 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
       cd $test
       echo "** working on $test"
       make clean >/dev/null
-      make run | grep "|" > temp.txt
+      echo -n "" > temp.txt
+      for a in {1..3}; do
+	  echo "*" >> temp.txt
+          make run | grep "|" >> temp.txt
+      done
       ./../gettimes/gettimes > names.test
       if [[ -s names.test ]] ; then
       cp names.test ../names.$test
