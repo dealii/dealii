@@ -971,6 +971,16 @@ namespace
 
 
 
+/*------------------------ Static variables: TriaAccessorBase ---------------------------*/
+
+template <int structdim, int dim, int spacedim>
+const unsigned int TriaAccessorBase<structdim, dim, spacedim>::dimension;
+
+template <int structdim, int dim, int spacedim>
+const unsigned int TriaAccessorBase<structdim, dim, spacedim>::space_dimension;
+
+template <int structdim, int dim, int spacedim>
+const unsigned int TriaAccessorBase<structdim, dim, spacedim>::structure_dimension;
 
 
 /*------------------------ Functions: TriaAccessor ---------------------------*/
