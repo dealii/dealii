@@ -323,7 +323,7 @@ class TriaRawIterator : public std::iterator<std::bidirectional_iterator_tag,Acc
 				      */
     TriaRawIterator (const TriaAccessorBase<Accessor::structure_dimension,Accessor::dimension,Accessor::space_dimension>& tria_accessor,
                   const typename Accessor::AccessorData *local_data);
-    
+
                                      /**
                                       * Conversion constructor. Same
                                       * as above with the difference
@@ -371,7 +371,7 @@ class TriaRawIterator : public std::iterator<std::bidirectional_iterator_tag,Acc
                                       *  version.
                                       */
     Accessor & operator * ();
-    
+
                                      /**
                                       *  Dereferencing operator, returns a
                                       *  reference of the cell pointed to.
@@ -388,7 +388,7 @@ class TriaRawIterator : public std::iterator<std::bidirectional_iterator_tag,Acc
                                       */
     Accessor * operator -> ();
 
-        
+
     				     /**
 				      * In order be able to assign
 				      * end-iterators for different
@@ -405,7 +405,7 @@ class TriaRawIterator : public std::iterator<std::bidirectional_iterator_tag,Acc
 				      * debugging much harder.
 				      */
     const Accessor& access_any () const;
-    
+
                                      /*@}*/
 
                                      /**
@@ -541,7 +541,7 @@ class TriaRawIterator : public std::iterator<std::bidirectional_iterator_tag,Acc
                                      /**
                                       * Print the iterator to a stream
                                       * <code>out</code>. The
-                                      * format is like <tt>level.index</tt>.
+                                      * format is <tt>level.index</tt>.
                                       */
     template <class STREAM>
     void print (STREAM& out) const;
@@ -705,7 +705,7 @@ class TriaIterator : public TriaRawIterator<Accessor>
 				      */
     TriaIterator (const TriaAccessorBase<Accessor::structure_dimension,Accessor::dimension,Accessor::space_dimension>& tria_accessor,
                   const typename Accessor::AccessorData *local_data);
-    
+
                                      /**
                                       * Similar conversion operator to the above
                                       * one, but does a check whether the
@@ -906,7 +906,7 @@ class TriaActiveIterator : public TriaIterator<Accessor>
 				      */
     TriaActiveIterator (const TriaAccessorBase<Accessor::structure_dimension,Accessor::dimension,Accessor::space_dimension>& tria_accessor,
 			const typename Accessor::AccessorData *local_data);
-    
+
                                      /**
                                       * Similar conversion operator to the above
                                       * one, but does a check whether the
