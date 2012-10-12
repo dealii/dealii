@@ -860,52 +860,20 @@ namespace internal
  *   This field can be
  *   accessed as all other data using iterators. Normally, this user flag is
  *   used if an algorithm walks over all cells and needs information whether
- *   another cell, e.g. a neighbor, has already been processed. It can also
- *   be used to flag the lines subject to constraints in 2D, as for example the
- *   functions in the DoFHandler classes do.
- *
- *   There are two functions, @p save_user_flags and @p load_user_flags which
- *   write and read these flags to and from a stream. Unlike
- *   @p save_refine_flags and @p load_refine_flags, these two functions store
- *   and read the flags of all used lines, quads, etc, not only of the
- *   active ones (well, activity is a concept which really only applies to
- *   cells, not for example to lines in 2D, so the abovementioned generalization
- *   to <em>all</em> lines, quads, etc seems plausible).
- *
- *   If you want to store more specific user flags, you can use the functions
- *   @p save_user_flags_line and @p load_user_flags_line and the generalizations
- *   for quads, etc.
- *
- *   As for the refinement and coarsening flags, there exist two versions of these
- *   functions, one which reads/writes from a stream and one which does so from
- *   a <tt>vector<bool></tt>. The latter is used to store flags temporarily, while the
- *   first is used to store them in a file.
- *
- *   It is convention to clear the user flags using the
- *   <tt>Triangulation<>::clear_user_flags()</tt> function before usage, since it is
- *   often necessary to use the flags in more than one function consecutively and
- *   is then error prone to dedicate one of these to clear the flags.
- *
- *   It is recommended that a functions using the flags states so in
- *   its documentation. For example, the
- *   execute_coarsening_and_refinement() function uses some of the user
- *   flags and will therefore destroy any content stored in them.
+ *   another cell, e.g. a neighbor, has already been processed.
+ *   See @ref GlossUserFlags "the glossary for more information".
  *
  *   There is another set of user data, which can be either an
  *   <tt>unsigned int</tt> or a <tt>void *</tt>, for
  *   each line, quad, etc. You can access these through
  *   the functions listed under <tt>User data</tt> in
- *   the accessor classes. These pointers are not used nor changed in
- *   many places of the library, and those classes and functions that
- *   do use them should document this clearly; the most prominent user
- *   of these pointers is the SolutionTransfer class which uses the
- *   cell->user_pointers.
+ *   the accessor classes.
+ *   Again, see @ref GlossUserData "the glossary for more information".
  *
  *   The value of these user indices or pointers is @p NULL by default. Note that
  *   the pointers are not inherited to children upon
  *   refinement. Still, after a remeshing they are available on all
- *   cells, where they were set on the previous mesh (unless, of
- *   course, overwritten by the SolutionTransfer class).
+ *   cells, where they were set on the previous mesh.
  *
  *   The usual warning about the missing type safety of @p void pointers are
  *   obviously in place here; responsibility for correctness of types etc
@@ -915,10 +883,6 @@ namespace internal
  *   place. In order to avoid unwanted conversions, Triangulation
  *   checks which one of them is in use and does not allow access to
  *   the other one, until clear_user_data() has been called.
- *
- *   Just like the user flags, this field is not available for vertices,
- *   which does no harm since the vertices have a unique and continuous number
- *   unlike the structured objects lines and quads.
  *
  *
  *   <h3>Boundary approximation</h3>
@@ -2362,6 +2326,7 @@ class Triangulation : public Subscriptor
                                      /*@{*/
                                      /**
                                       *  Clear all user flags.
+				      *  See also @ref GlossUserFlags .
                                       */
     void clear_user_flags ();
 
@@ -2371,36 +2336,42 @@ class Triangulation : public Subscriptor
                                       *  and the documentation for the
                                       *  @p save_refine_flags for more
                                       *  details.
+				      *  See also @ref GlossUserFlags .
                                       */
     void save_user_flags (std::ostream &out) const;
 
                                      /**
-                                      * Same as above, but store the flags to
-                                      * a bitvector rather than to a file.
-                                      * The output vector is resized if
-                                      * necessary.
+                                      *  Same as above, but store the flags to
+                                      *  a bitvector rather than to a file.
+                                      *  The output vector is resized if
+                                      *  necessary.
+				      *  See also @ref GlossUserFlags .
                                       */
     void save_user_flags (std::vector<bool> &v) const;
 
                                      /**
                                       *  Read the information stored by
                                       *  @p save_user_flags.
+				      *  See also @ref GlossUserFlags .
                                       */
     void load_user_flags (std::istream &in);
 
                                      /**
                                       *  Read the information stored by
                                       *  @p save_user_flags.
+				      *  See also @ref GlossUserFlags .
                                       */
     void load_user_flags (const std::vector<bool> &v);
 
                                      /**
                                       *  Clear all user flags on lines.
+				      *  See also @ref GlossUserFlags .
                                       */
     void clear_user_flags_line ();
 
                                      /**
                                       * Save the user flags on lines.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_line (std::ostream &out) const;
 
@@ -2409,26 +2380,31 @@ class Triangulation : public Subscriptor
                                       * a bitvector rather than to a file.
                                       * The output vector is resized if
                                       * necessary.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_line (std::vector<bool> &v) const;
 
                                      /**
                                       * Load the user flags located on lines.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_line (std::istream &in);
 
                                      /**
                                       * Load the user flags located on lines.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_line (const std::vector<bool> &v);
 
                                      /**
                                       *  Clear all user flags on quads.
+				      * See also @ref GlossUserFlags .
                                       */
     void clear_user_flags_quad ();
 
                                      /**
                                       * Save the user flags on quads.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_quad (std::ostream &out) const;
 
@@ -2437,27 +2413,32 @@ class Triangulation : public Subscriptor
                                       * a bitvector rather than to a file.
                                       * The output vector is resized if
                                       * necessary.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_quad (std::vector<bool> &v) const;
 
                                      /**
                                       * Load the user flags located on quads.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_quad (std::istream &in);
 
                                      /**
                                       * Load the user flags located on quads.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_quad (const std::vector<bool> &v);
 
 
                                      /**
-                                      *  Clear all user flags on quads.
+                                      * Clear all user flags on quads.
+				      * See also @ref GlossUserFlags .
                                       */
     void clear_user_flags_hex ();
 
                                      /**
                                       * Save the user flags on hexs.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_hex (std::ostream &out) const;
 
@@ -2466,16 +2447,19 @@ class Triangulation : public Subscriptor
                                       * a bitvector rather than to a file.
                                       * The output vector is resized if
                                       * necessary.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_hex (std::vector<bool> &v) const;
 
                                      /**
                                       * Load the user flags located on hexs.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_hex (std::istream &in);
 
                                      /**
                                       * Load the user flags located on hexs.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_hex (const std::vector<bool> &v);
 
@@ -2483,6 +2467,7 @@ class Triangulation : public Subscriptor
                                       * Clear all user pointers and
                                       * indices and allow the use of
                                       * both for next access.
+				      * See also @ref GlossUserData .
                                       */
     void clear_user_data ();
 
@@ -2491,6 +2476,7 @@ class Triangulation : public Subscriptor
                                       * clear_user_data() instead.
                                       *
                                       *  Clear all user pointers.
+				      *  See also @ref GlossUserData .
                                       */
     void clear_user_pointers ();
 
@@ -2498,12 +2484,14 @@ class Triangulation : public Subscriptor
                                       * Save all user indices. The
                                       * output vector is resized if
                                       * necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_indices (std::vector<unsigned int> &v) const;
 
                                      /**
                                       * Read the information stored by
                                       * save_user_indices().
+				      * See also @ref GlossUserData .
                                       */
     void load_user_indices (const std::vector<unsigned int> &v);
 
@@ -2511,12 +2499,14 @@ class Triangulation : public Subscriptor
                                       * Save all user pointers. The
                                       * output vector is resized if
                                       * necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_pointers (std::vector<void *> &v) const;
 
                                      /**
                                       * Read the information stored by
                                       * save_user_pointers().
+				      * See also @ref GlossUserData .
                                       */
     void load_user_pointers (const std::vector<void *> &v);
 
@@ -2524,12 +2514,14 @@ class Triangulation : public Subscriptor
                                       * Save the user indices on
                                       * lines. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_indices_line (std::vector<unsigned int> &v) const;
 
                                      /**
                                       * Load the user indices located
                                       * on lines.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_indices_line (const std::vector<unsigned int> &v);
 
@@ -2537,12 +2529,14 @@ class Triangulation : public Subscriptor
                                       * Save the user indices on
                                       * quads. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_indices_quad (std::vector<unsigned int> &v) const;
 
                                      /**
                                       * Load the user indices located
                                       * on quads.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_indices_quad (const std::vector<unsigned int> &v);
 
@@ -2550,24 +2544,28 @@ class Triangulation : public Subscriptor
                                       * Save the user indices on
                                       * hexes. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_indices_hex (std::vector<unsigned int> &v) const;
 
                                      /**
                                       * Load the user indices located
                                       * on hexs.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_indices_hex (const std::vector<unsigned int> &v);
                                      /**
                                       * Save the user indices on
                                       * lines. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_pointers_line (std::vector<void *> &v) const;
 
                                      /**
                                       * Load the user pointers located
                                       * on lines.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_pointers_line (const std::vector<void *> &v);
 
@@ -2575,12 +2573,14 @@ class Triangulation : public Subscriptor
                                       * Save the user pointers on
                                       * quads. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_pointers_quad (std::vector<void *> &v) const;
 
                                      /**
                                       * Load the user pointers located
                                       * on quads.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_pointers_quad (const std::vector<void *> &v);
 
@@ -2588,12 +2588,14 @@ class Triangulation : public Subscriptor
                                       * Save the user pointers on
                                       * hexes. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_pointers_hex (std::vector<void *> &v) const;
 
                                      /**
                                       * Load the user pointers located
                                       * on hexs.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_pointers_hex (const std::vector<void *> &v);
                                      /*@}*/
