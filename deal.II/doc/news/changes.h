@@ -87,9 +87,17 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> Fixed: handle lucky breakdowns in GMRES/FGMRES.
+<li> Fixed: Several static const member variables of the Accessor
+classes were not properly instantiated. This only rarely created
+trouble because they are typically only used as template arguments
+and the compiler substituted them. However, one would get linker
+errors when passing around a reference to them. This is now fixed.
 <br>
-(Bärbel Janssen, Timo Heister, 2012/10/09)
+(Wolfgang Bangerth, Guido Kanschat, 2012/10/11)
+
+<li> Fixed: Handle lucky breakdowns in GMRES/FGMRES.
+<br>
+(B&auml;rbel Janssen, Timo Heister, 2012/10/09)
 
 <li> Fixed: GridTools::find_cells_adjacent_to_vertex got into
 trouble with anisotropically refined meshes. This is now fixed.
