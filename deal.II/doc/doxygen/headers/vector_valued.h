@@ -99,6 +99,7 @@
  * $H^1_0(\Omega; \mathbb R^3)$, which can be viewed as three copies
  * of the scalar space $H^1_0(\Omega)$. And this is exactly, how we
  * are going to implement this space below, using FESystem.
+ * </ol>
  *
  * But for now, let us look at the system a little more
  * closely. First, let us exploit that
