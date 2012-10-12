@@ -47,7 +47,7 @@ http://threadingbuildingblocks.org/.
 
 Contains parts of the UMFPACK, AMD and UFCONFIG libraries copyrighted by
 Timothy A. Davis, Patrick R. Amestoy, and Iain S. Duff and licensed under
-the GNU Lesser General Public Licensse version 2.1 or later. Or alternative
+the GNU Lesser General Public License version 2.1 or later. Or alternative
 licenses as explained in umfpack/UMFPACK/Doc/License and
 umfpack/AMD/Doc/License. See umfpack/README.txt and umfpack/lgpl-2.1.txt.
 
