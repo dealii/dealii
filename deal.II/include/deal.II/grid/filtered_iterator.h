@@ -64,7 +64,8 @@ namespace IteratorFilters
                                     * either the iterator points to an
                                     * object for which the user flag
                                     * is set or an iterator past the
-                                    * end.
+                                    * end. See @ref GlossUserFlags
+				    * for information about user flags.
                                     *
                                     * @ingroup Iterators
                                     */

@@ -702,7 +702,7 @@ namespace GridTools
     // haven't yet found the vertex for the current cell we also need to
     // look at the mid-points of edges
     //
-    // as a final note, deciding whether a neighbor is actually coarses is
+    // as a final note, deciding whether a neighbor is actually coarser is
     // simple in the case of isotropic refinement (we just need to look at
     // the level of the current and the neighboring cell). however, this
     // isn't so simple if we have used anisotropic refinement since then

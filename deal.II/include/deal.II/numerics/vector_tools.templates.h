@@ -401,23 +401,24 @@ namespace VectorTools
                                        // that is actually wholly on
                                        // the boundary, not only by
                                        // one line or one vertex
-      typename dealii::DoFHandler<dim,spacedim>::active_face_iterator
-        face = dof_handler.begin_active_face(),
-        endf = dof_handler.end_face();
+      typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
+        cell = dof_handler.begin_active(),
+        endc = dof_handler.end();
       std::vector<unsigned int> face_dof_indices (fe.dofs_per_face);
-      for (; face!=endf; ++face)
-        if (face->at_boundary())
-          {
-            face->get_dof_indices (face_dof_indices);
-            for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-                                               // enter zero boundary values
-                                               // for all boundary nodes
-                                               //
-                                               // we need not care about
-                                               // vector valued elements here,
-                                               // since we set all components
-              boundary_values[face_dof_indices[i]] = 0.;
-          }
+      for (; cell!=endc; ++cell)
+	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	  if (cell->at_boundary(f))
+	    {
+	      cell->face(f)->get_dof_indices (face_dof_indices);
+	      for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+						 // enter zero boundary values
+						 // for all boundary nodes
+						 //
+						 // we need not care about
+						 // vector valued elements here,
+						 // since we set all components
+		boundary_values[face_dof_indices[i]] = 0.;
+	    }
     }
   }
 

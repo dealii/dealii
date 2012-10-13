@@ -737,7 +737,8 @@ namespace internal
             Assert ((dim==structdim
                      ?
                      typename
-                     dealii::DoFHandler<dim,spacedim>::
+		     dealii::internal::DoFHandler::
+		     Iterators<dealii::DoFHandler<dim,spacedim> >::
                      raw_cell_iterator (&dof_handler.get_tria(),
                                         obj_level,
                                         obj_index,
@@ -746,7 +747,8 @@ namespace internal
                      (structdim==1
                       ?
                       typename
-                      dealii::DoFHandler<dim,spacedim>::
+                      dealii::internal::DoFHandler::
+		      Iterators<dealii::DoFHandler<dim,spacedim> >::
                       raw_line_iterator (&dof_handler.get_tria(),
                                          obj_level,
                                          obj_index,
@@ -787,7 +789,8 @@ namespace internal
             Assert ((dim==structdim
                      ?
                      typename
-                     dealii::DoFHandler<dim,spacedim>::
+		     dealii::internal::DoFHandler::
+		     Iterators<dealii::DoFHandler<dim,spacedim> >::
                      raw_cell_iterator (&dof_handler.get_tria(),
                                         obj_level,
                                         obj_index,
@@ -796,7 +799,8 @@ namespace internal
                      (structdim==1
                       ?
                       typename
-                      dealii::DoFHandler<dim,spacedim>::
+		      dealii::internal::DoFHandler::
+		      Iterators<dealii::DoFHandler<dim,spacedim> >::
                       raw_line_iterator (&dof_handler.get_tria(),
                                          obj_level,
                                          obj_index,
@@ -1782,7 +1786,23 @@ inline
 typename dealii::internal::DoFHandler::Iterators<DH>::line_iterator
 DoFAccessor<structdim,DH>::line (const unsigned int i) const
 {
-  Assert (structdim > 1, ExcImpossibleInDim(structdim));
+				   // if we are asking for a
+				   // particular line and this object
+				   // refers to a line, then the only
+				   // valid index is i==0 and we
+				   // should return *this
+  if (structdim == 1)
+    {
+      Assert (i==0, ExcMessage ("You can only ask for line zero if the "
+				"current object is a line itself."));
+      return
+	typename dealii::internal::DoFHandler::Iterators<DH>::cell_iterator
+	(&this->get_triangulation(),
+	 this->level(),
+	 this->index(),
+	 &this->get_dof_handler());
+    }
+
                                    // checking of 'i' happens in
                                    // line_index(i)
 
@@ -1801,6 +1821,25 @@ inline
 typename dealii::internal::DoFHandler::Iterators<DH>::quad_iterator
 DoFAccessor<structdim,DH>::quad (const unsigned int i) const
 {
+				   // if we are asking for a
+				   // particular quad and this object
+				   // refers to a quad, then the only
+				   // valid index is i==0 and we
+				   // should return *this
+  if (structdim == 2)
+    {
+      Assert (i==0, ExcMessage ("You can only ask for quad zero if the "
+				"current object is a quad itself."));
+      return
+	typename dealii::internal::DoFHandler::Iterators<DH>::cell_iterator
+	(&this->get_triangulation(),
+	 this->level(),
+	 this->index(),
+	 &this->get_dof_handler());
+    }
+
+				   // otherwise we need to be in
+				   // structdim>=3
   Assert (structdim > 2, ExcImpossibleInDim(structdim));
                                    // checking of 'i' happens in
                                    // quad_index(i)

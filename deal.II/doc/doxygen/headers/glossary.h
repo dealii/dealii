@@ -1102,5 +1102,108 @@ Article{JK10,
  * in the interior of the unit line, square, or cube.
  * </dd>
  *
+ *
+ * <dt class="glossary">@anchor GlossUserFlags <b>User flags</b></dt>
+ * <dd>
+ *   A triangulation offers one bit per line, quad, etc for user flags.
+ *   This field can be
+ *   accessed as all other data using iterators, using the syntax
+ *   @code
+ *      cell->set_user_flag();                // set the user flag of a cell
+ *      if (cell->user_flag_set() == false)   // if cell hasn't been flagged yet
+ *        {
+ *           cell->face(0)->set_user_flag();  // flag its first face
+ *        }
+ *   @endcode
+ *   Typically, this user flag is
+ *   used if an algorithm walks over all cells and needs information whether
+ *   another cell, e.g. a neighbor, has already been processed. Similarly,
+ *   it can be used to flag faces, quads or lines at the boundary for which
+ *   some operation has already been performed. The latter is often useful
+ *   since a loop such as
+ *   @code
+ *      // in 3d
+ *      for (cell=dof_handler.begin_active();
+ *           cell!=dof_handler.end(); ++cell)
+ *        for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++l)
+ *          if (cell->line(l)->at_boundary())
+ *            {
+ *               do something with this line
+ *            }
+ *   @endcode
+ *   encounters some boundary lines more than once. Consequently, one would
+ *   set the user flag of the line in the body of the loop, and only enter the
+ *   body if the user flag had not previously been set. There are a number of
+ *   additional functions that can be accessed through the iterator interface;
+ *   see the TriaAccessor class for more information. Note that there are no
+ *   user flags that can be associated with vertices; however, since vertices
+ *   are numbered consecutively, this can easily be emulated in user code
+ *   using a vector of bools.
+ *
+ *   There are two functions, Triangulation::save_user_flags and
+ *   Triangulation::load_user_flags which
+ *   write and read these flags to and from a stream or a vector of bools. Unlike
+ *   Triangulation::save_refine_flags and Triangulation::load_refine_flags,
+ *   these two functions store
+ *   and read the flags of all used lines, quads, etc, i.e., not only of the
+ *   active ones.
+ *
+ *   If you want to store more specific user flags, you can use the functions
+ *   Triangulation::save_user_flags_line and Triangulation::load_user_flags_line
+ *   and the similarly for quads, etc.
+ *
+ *   As for the refinement and coarsening flags, there exist two versions of these
+ *   functions, one which reads/writes from a stream and one which does so from
+ *   a <tt>vector@<bool@></tt>. The latter is used to store flags temporarily, while the
+ *   first is used to store them in a file.
+ *
+ *   It is good practice to clear the user flags using the
+ *   Triangulation::clear_user_flags() function before usage, since it is
+ *   often necessary to use the flags in more than one function. If the flags may
+ *   be in use at the time a function that needs them is called, then this function
+ *   should save and restore the flags as described above.
+ *
+ *   @note If more information than just a single boolean flag needs to be stored
+ *   with a cell, line, or face, then see about @ref GlossUserData "user data".
+ * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossUserData <b>User pointers and user indices</b></dt>
+ * <dd>
+ *   Just like the @ref GlossUserFlags "user flags", the Triangulation class offers a
+ *   field for each line, quad and hex in which to store more descriptive data than just
+ *   a single boolean flag. This is called "user data" and the data that can be stored
+ *   in it is either a single unsigned integer or a void pointer. Both are typically
+ *   used to index into a bigger array that contains more detailed data an application
+ *   wants to attach to a mesh entity.
+ *
+ *   User data is stored and retrieved in the following manner:
+ *   @code
+ *      for (cell=dof_handler.begin_active();
+ *           cell!=dof_handler.end(); ++cell)
+ *        for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++l)
+ *          if (cell->line(l)->at_boundary())
+ *            {
+ *              cell->line(l)->set_user_index(42);
+ *            }
+ *   @endcode
+ *   Similarly, there are functions TriaAccessor::set_user_pointer to set a pointer, and
+ *   TriaAccessor::user_index and TriaAccessor::user_pointer to retrieve the index
+ *   and pointer. To clear all user indices or pointers, use Triangulation::clear_user_data().
+ *   As with flags, there are functions that allow to save and restore user data,
+ *   either for all entities of the mesh hierarchy or for lines, quads or hexes
+ *   separately. There are a number of additional functions that can be accessed
+ *   through the iterator interface; see the TriaAccessor class for more information.
+ *
+ *   @note User pointers and user indices are stored in the same
+ *   place. In order to avoid unwanted conversions, Triangulation
+ *   checks which one of them is in use and does not allow access to
+ *   the other one, until Triangulation::clear_user_data() has been called.
+ *
+ *   @note The usual warning about the missing type safety of @p void pointers are
+ *   obviously in place here; responsibility for correctness of types etc
+ *   lies entirely with the user of the pointer.
+ * </dd>
+ *
  * </dl>
  */

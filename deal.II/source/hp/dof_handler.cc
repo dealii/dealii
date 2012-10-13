@@ -1640,1041 +1640,61 @@ namespace hp
 
 /*------------------------ Cell iterator functions ------------------------*/
 
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_cell_iterator
-  DoFHandler<dim,spacedim>::begin_raw (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-              return begin_raw_line (level);
-        case 2:
-              return begin_raw_quad (level);
-        case 3:
-              return begin_raw_hex (level);
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_cell_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::cell_iterator
-  DoFHandler<dim,spacedim>::begin (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-              return begin_line (level);
-        case 2:
-              return begin_quad (level);
-        case 3:
-              return begin_hex (level);
-        default:
-              Assert (false, ExcImpossibleInDim(dim));
-              return cell_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::active_cell_iterator
-  DoFHandler<dim,spacedim>::begin_active (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-              return begin_active_line (level);
-        case 2:
-              return begin_active_quad (level);
-        case 3:
-              return begin_active_hex (level);
-        default:
-              Assert (false, ExcNotImplemented());
-              return active_cell_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_cell_iterator
-  DoFHandler<dim,spacedim>::last_raw () const
-  {
-    switch (dim)
-      {
-        case 1:
-              return last_raw_line ();
-        case 2:
-              return last_raw_quad ();
-        case 3:
-              return last_raw_hex ();
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_cell_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_cell_iterator
-  DoFHandler<dim,spacedim>::last_raw (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-              return last_raw_line (level);
-        case 2:
-              return last_raw_quad (level);
-        case 3:
-              return last_raw_hex (level);
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_cell_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::cell_iterator
-  DoFHandler<dim,spacedim>::last () const
-  {
-    switch (dim)
-      {
-        case 1:
-              return last_line ();
-        case 2:
-              return last_quad ();
-        case 3:
-              return last_hex ();
-        default:
-              Assert (false, ExcNotImplemented());
-              return cell_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::cell_iterator
-  DoFHandler<dim,spacedim>::last (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-              return last_line (level);
-        case 2:
-              return last_quad (level);
-        case 3:
-              return last_hex (level);
-        default:
-              Assert (false, ExcNotImplemented());
-              return cell_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::active_cell_iterator
-  DoFHandler<dim,spacedim>::last_active () const
-  {
-    switch (dim)
-      {
-        case 1:
-              return last_active_line ();
-        case 2:
-              return last_active_quad ();
-        case 3:
-              return last_active_hex ();
-        default:
-              Assert (false, ExcNotImplemented());
-              return active_cell_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::active_cell_iterator
-  DoFHandler<dim,spacedim>::last_active (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-              return last_active_line (level);
-        case 2:
-              return last_active_quad (level);
-        case 3:
-              return last_active_hex (level);
-        default:
-              Assert (false, ExcNotImplemented());
-              return active_cell_iterator();
-      }
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_cell_iterator
-  DoFHandler<dim,spacedim>::end () const
-  {
-    switch (dim)
-      {
-        case 1:
-              return end_line();
-        case 2:
-              return end_quad();
-        case 3:
-              return end_hex();
-        default:
-              Assert (false, ExcImpossibleInDim(dim));
-              return raw_cell_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_cell_iterator
-  DoFHandler<dim, spacedim>::end_raw (const unsigned int level) const
-  {
-    return (level == tria->n_levels()-1 ?
-            end() :
-            begin_raw (level+1));
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::cell_iterator
-  DoFHandler<dim, spacedim>::end (const unsigned int level) const
-  {
-    return (level == tria->n_levels()-1 ?
-            cell_iterator(end()) :
-            begin (level+1));
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_cell_iterator
-  DoFHandler<dim, spacedim>::end_active (const unsigned int level) const
-  {
-    return (level == tria->n_levels()-1 ?
-            active_cell_iterator(end()) :
-            begin_active (level+1));
-  }
-
-
-/*------------------------ Face iterator functions ------------------------*/
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_face_iterator
-  DoFHandler<dim,spacedim>::begin_raw_face () const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (false, ExcImpossibleInDim(1));
-              return raw_face_iterator();
-        case 2:
-              return begin_raw_line ();
-        case 3:
-              return begin_raw_quad ();
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_face_iterator ();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::face_iterator
-  DoFHandler<dim,spacedim>::begin_face () const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (false, ExcImpossibleInDim(1));
-              return raw_face_iterator();
-        case 2:
-              return begin_line ();
-        case 3:
-              return begin_quad ();
-        default:
-              Assert (false, ExcNotImplemented());
-              return face_iterator ();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::active_face_iterator
-  DoFHandler<dim,spacedim>::begin_active_face () const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (false, ExcImpossibleInDim(1));
-              return raw_face_iterator();
-        case 2:
-              return begin_active_line ();
-        case 3:
-              return begin_active_quad ();
-        default:
-              Assert (false, ExcNotImplemented());
-              return active_face_iterator ();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_face_iterator
-  DoFHandler<dim, spacedim>::end_raw_face () const
-  {
-    return end_face();
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_face_iterator
-  DoFHandler<dim,spacedim>::end_face () const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (false, ExcImpossibleInDim(1));
-              return raw_face_iterator();
-        case 2:
-              return end_line ();
-        case 3:
-              return end_quad ();
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_face_iterator ();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_face_iterator
-  DoFHandler<dim, spacedim>::end_active_face () const
-  {
-    return active_face_iterator(end_face());
-  }
-
-
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_face_iterator
-  DoFHandler<dim,spacedim>::last_raw_face () const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (false, ExcImpossibleInDim(1));
-              return raw_face_iterator();
-        case 2:
-              return last_raw_line ();
-        case 3:
-              return last_raw_quad ();
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_face_iterator ();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::face_iterator
-  DoFHandler<dim,spacedim>::last_face () const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (false, ExcImpossibleInDim(1));
-              return raw_face_iterator();
-        case 2:
-              return last_line ();
-        case 3:
-              return last_quad ();
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_face_iterator ();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::active_face_iterator
-  DoFHandler<dim,spacedim>::last_active_face () const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (false, ExcImpossibleInDim(1));
-              return raw_face_iterator();
-        case 2:
-              return last_active_line ();
-        case 3:
-              return last_active_quad ();
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_face_iterator ();
-      }
-  }
-
-
-/*------------------------ Line iterator functions ------------------------*/
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_line_iterator
-  DoFHandler<dim, spacedim>::begin_raw_line (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (level<tria->n_levels(), ExcInvalidLevel(level));
-
-              if (tria->n_raw_lines(level) == 0)
-                return end_line ();
-
-              return raw_line_iterator (tria,
-                                        level,
-                                        0,
-                                        this);
-
-        default:
-              Assert (level == 0, ExcFacesHaveNoLevel());
-              return raw_line_iterator (tria,
-                                        0,
-                                        0,
-                                        this);
-      }
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::line_iterator
-  DoFHandler<dim, spacedim>::begin_line (const unsigned int level) const
-  {
-                                     // level is checked in begin_raw
-    raw_line_iterator ri = begin_raw_line (level);
-    if (ri.state() != IteratorState::valid)
-      return ri;
-    while (ri->used() == false)
-      if ((++ri).state() != IteratorState::valid)
-        return ri;
-    return ri;
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_line_iterator
-  DoFHandler<dim, spacedim>::begin_active_line (const unsigned int level) const
-  {
-                                     // level is checked in begin_raw
-    line_iterator i = begin_line (level);
-    if (i.state() != IteratorState::valid)
-      return i;
-    while (i->has_children())
-      if ((++i).state() != IteratorState::valid)
-        return i;
+template <int dim, int spacedim>
+typename DoFHandler<dim,spacedim>::cell_iterator
+DoFHandler<dim,spacedim>::begin (const unsigned int level) const
+{
+  return cell_iterator (*this->get_tria().begin(level),
+			this);
+}
+
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim,spacedim>::active_cell_iterator
+DoFHandler<dim,spacedim>::begin_active (const unsigned int level) const
+{
+                                   // level is checked in begin
+  cell_iterator i = begin (level);
+  if (i.state() != IteratorState::valid)
     return i;
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_line_iterator
-  DoFHandler<dim, spacedim>::end_line () const
-  {
-    return raw_line_iterator (tria,
-                              -1,
-                              -1,
-                              this);
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_line_iterator
-  DoFHandler<dim, spacedim>::last_raw_line (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (level<tria->n_levels(), ExcInvalidLevel(level));
-              Assert (tria->n_raw_lines(level) != 0,
-                      ExcEmptyLevel (level));
-
-              return raw_line_iterator (tria,
-                                        level,
-                                        tria->n_raw_lines(level)-1,
-                                        this);
-
-        default:
-              Assert (level == 0, ExcFacesHaveNoLevel());
-              return raw_line_iterator (tria,
-                                        0,
-                                        tria->n_raw_lines()-1,
-                                        this);
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_line_iterator
-  DoFHandler<dim, spacedim>::last_raw_line () const
-  {
-    if (dim == 1)
-      return last_raw_line (tria->n_levels()-1);
-    else
-      return last_raw_line (0);
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::line_iterator
-  DoFHandler<dim, spacedim>::last_line (const unsigned int level) const
-  {
-                                     // level is checked in last_raw
-    raw_line_iterator ri = last_raw_line(level);
-    if (ri->used()==true)
-      return ri;
-    while ((--ri).state() == IteratorState::valid)
-      if (ri->used()==true)
-        return ri;
-    return ri;
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::line_iterator
-  DoFHandler<dim, spacedim>::last_line () const
-  {
-    if (dim == 1)
-      return last_line (tria->n_levels()-1);
-    else
-      return last_line (0);
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_line_iterator
-  DoFHandler<dim, spacedim>::last_active_line (const unsigned int level) const
-  {
-                                     // level is checked in last_raw
-    line_iterator i = last_line(level);
-    if (i->has_children()==false)
+  while (i->has_children())
+    if ((++i).state() != IteratorState::valid)
       return i;
-    while ((--i).state() == IteratorState::valid)
-      if (i->has_children()==false)
-        return i;
-    return i;
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_line_iterator
-  DoFHandler<dim, spacedim>::last_active_line () const
-  {
-    if (dim == 1)
-      return last_active_line (tria->n_levels()-1);
-    else
-      return last_active_line (0);
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_line_iterator
-  DoFHandler<dim, spacedim>::end_raw_line (const unsigned int level) const
-  {
-    Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
-    if (dim == 1)
-      return (level == tria->n_levels()-1 ?
-              end_line() :
-              begin_raw_line (level+1));
-    else
-      return end_line();
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::line_iterator
-  DoFHandler<dim, spacedim>::end_line (const unsigned int level) const
-  {
-    Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
-    if (dim == 1)
-      return (level == tria->n_levels()-1 ?
-              line_iterator(end_line()) :
-              begin_line (level+1));
-    else
-      return line_iterator(end_line());
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_line_iterator
-  DoFHandler<dim, spacedim>::end_active_line (const unsigned int level) const
-  {
-    Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
-    if (dim == 1)
-      return (level == tria->n_levels()-1 ?
-              active_line_iterator(end_line()) :
-              begin_active_line (level+1));
-    else
-      return active_line_iterator(end_line());
-  }
-
-
-
-/*------------------------ Quad iterator functions ------------------------*/
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_quad_iterator
-  DoFHandler<dim,spacedim>::begin_raw_quad (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (false, ExcImpossibleInDim(1));
-              return raw_hex_iterator();
-        case 2:
-        {
-          Assert (level<tria->n_levels(), ExcInvalidLevel(level));
-
-          if (tria->n_raw_quads(level) == 0)
-            return end_quad();
-
-          return raw_quad_iterator (tria,
-                                    level,
-                                    0,
-                                    this);
-        }
-
-        case 3:
-        {
-          Assert (level == 0, ExcFacesHaveNoLevel());
-
-          return raw_quad_iterator (tria,
-                                    0,
-                                    0,
-                                    this);
-        }
-
-
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_hex_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::quad_iterator
-  DoFHandler<dim,spacedim>::begin_quad (const unsigned int level) const
-  {
-                                     // level is checked in begin_raw
-    raw_quad_iterator ri = begin_raw_quad (level);
-    if (ri.state() != IteratorState::valid)
-      return ri;
-    while (ri->used() == false)
-      if ((++ri).state() != IteratorState::valid)
-        return ri;
-    return ri;
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::active_quad_iterator
-  DoFHandler<dim,spacedim>::begin_active_quad (const unsigned int level) const
-  {
-                                     // level is checked in begin_raw
-    quad_iterator i = begin_quad (level);
-    if (i.state() != IteratorState::valid)
-      return i;
-    while (i->has_children())
-      if ((++i).state() != IteratorState::valid)
-        return i;
-    return i;
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_quad_iterator
-  DoFHandler<dim, spacedim>::end_raw_quad (const unsigned int level) const
-  {
-    Assert (dim == 2 || level == 0, ExcFacesHaveNoLevel());
-    if (dim == 2)
-      return (level == tria->n_levels()-1 ?
-              end_quad() :
-              begin_raw_quad (level+1));
-    else
-      return end_quad();
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::quad_iterator
-  DoFHandler<dim, spacedim>::end_quad (const unsigned int level) const
-  {
-    Assert (dim == 2 || level == 0, ExcFacesHaveNoLevel());
-    if (dim == 2)
-      return (level == tria->n_levels()-1 ?
-              quad_iterator(end_quad()) :
-              begin_quad (level+1));
-    else
-      return quad_iterator(end_quad());
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_quad_iterator
-  DoFHandler<dim, spacedim>::end_active_quad (const unsigned int level) const
-  {
-    Assert(dim == 2 || level == 0, ExcFacesHaveNoLevel());
-    if (dim == 2)
-      return (level == tria->n_levels()-1 ?
-              active_quad_iterator(end_quad()) :
-              begin_active_quad (level+1));
-    else
-      return active_quad_iterator(end_quad());
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_quad_iterator
-  DoFHandler<dim,spacedim>::end_quad () const
-  {
-    return raw_quad_iterator (tria,
-                              -1,
-                              -1,
-                              this);
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_quad_iterator
-  DoFHandler<dim,spacedim>::last_raw_quad (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-              Assert (false, ExcImpossibleInDim(1));
-              return raw_quad_iterator();
-        case 2:
-              Assert (level<tria->n_levels(),
-                      ExcInvalidLevel(level));
-              Assert (tria->n_raw_quads(level) != 0,
-                      ExcEmptyLevel (level));
-              return raw_quad_iterator (tria,
-                                        level,
-                                        tria->n_raw_quads(level)-1,
-                                        this);
-        case 3:
-              Assert (level == 0, ExcFacesHaveNoLevel());
-              return raw_quad_iterator (tria,
-                                        0,
-                                        tria->n_raw_quads()-1,
-                                        this);
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_quad_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_quad_iterator
-  DoFHandler<dim,spacedim>::last_raw_quad () const
-  {
-    if (dim == 2)
-      return last_raw_quad (tria->n_levels()-1);
-    else
-      return last_raw_quad (0);
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::quad_iterator
-  DoFHandler<dim,spacedim>::last_quad (const unsigned int level) const
-  {
-                                     // level is checked in last_raw
-    raw_quad_iterator ri = last_raw_quad(level);
-    if (ri->used()==true)
-      return ri;
-    while ((--ri).state() == IteratorState::valid)
-      if (ri->used()==true)
-        return ri;
-    return ri;
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::quad_iterator
-  DoFHandler<dim,spacedim>::last_quad () const
-  {
-    if (dim == 2)
-      return last_quad (tria->n_levels()-1);
-    else
-      return last_quad (0);
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::active_quad_iterator
-  DoFHandler<dim,spacedim>::last_active_quad (const unsigned int level) const
-  {
-                                     // level is checked in last_raw
-    quad_iterator i = last_quad(level);
-    if (i->has_children()==false)
-      return i;
-    while ((--i).state() == IteratorState::valid)
-      if (i->has_children()==false)
-        return i;
-    return i;
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::active_quad_iterator
-  DoFHandler<dim,spacedim>::last_active_quad () const
-  {
-    if (dim == 2)
-      return last_active_quad (tria->n_levels()-1);
-    else
-      return last_active_quad (0);
-  }
-
-
-/*------------------------ Hex iterator functions ------------------------*/
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::raw_hex_iterator
-  DoFHandler<dim,spacedim>::begin_raw_hex (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-        case 2:
-              Assert (false, ExcImpossibleInDim(1));
-              return raw_hex_iterator();
-        case 3:
-        {
-          Assert (level<tria->n_levels(), ExcInvalidLevel(level));
-
-          if (tria->n_raw_hexs(level) == 0)
-            return end_hex();
-
-          return raw_hex_iterator (tria,
-                                   level,
-                                   0,
-                                   this);
-        }
-
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_hex_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::hex_iterator
-  DoFHandler<dim,spacedim>::begin_hex (const unsigned int level) const
-  {
-                                     // level is checked in begin_raw
-    raw_hex_iterator ri = begin_raw_hex (level);
-    if (ri.state() != IteratorState::valid)
-      return ri;
-    while (ri->used() == false)
-      if ((++ri).state() != IteratorState::valid)
-        return ri;
-    return ri;
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_hex_iterator
-  DoFHandler<dim, spacedim>::begin_active_hex (const unsigned int level) const
-  {
-                                     // level is checked in begin_raw
-    hex_iterator i = begin_hex (level);
-    if (i.state() != IteratorState::valid)
-      return i;
-    while (i->has_children())
-      if ((++i).state() != IteratorState::valid)
-        return i;
-    return i;
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_hex_iterator
-  DoFHandler<dim, spacedim>::end_raw_hex (const unsigned int level) const
-  {
-    return (level == tria->n_levels()-1 ?
-            end_hex() :
-            begin_raw_hex (level+1));
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::hex_iterator
-  DoFHandler<dim, spacedim>::end_hex (const unsigned int level) const
-  {
-    return (level == tria->n_levels()-1 ?
-            hex_iterator(end_hex()) :
-            begin_hex (level+1));
-  }
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_hex_iterator
-  DoFHandler<dim, spacedim>::end_active_hex (const unsigned int level) const
-  {
-    return (level == tria->n_levels()-1 ?
-            active_hex_iterator(end_hex()) :
-            begin_active_hex (level+1));
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_hex_iterator
-  DoFHandler<dim, spacedim>::end_hex () const
-  {
-    return raw_hex_iterator (tria,
-                             -1,
-                             -1,
-                             this);
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_hex_iterator
-  DoFHandler<dim, spacedim>::last_raw_hex (const unsigned int level) const
-  {
-    switch (dim)
-      {
-        case 1:
-        case 2:
-              Assert (false, ExcImpossibleInDim(dim));
-              return raw_hex_iterator();
-
-        case 3:
-              Assert (level<tria->n_levels(),
-                      ExcInvalidLevel(level));
-              Assert (tria->n_raw_hexs(level) != 0,
-                      ExcEmptyLevel (level));
-
-              return raw_hex_iterator (tria,
-                                       level,
-                                       tria->n_raw_hexs(level)-1,
-                                       this);
-        default:
-              Assert (false, ExcNotImplemented());
-              return raw_hex_iterator();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::raw_hex_iterator
-  DoFHandler<dim, spacedim>::last_raw_hex () const
-  {
-    return last_raw_hex (tria->n_levels()-1);
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::hex_iterator
-  DoFHandler<dim, spacedim>::last_hex (const unsigned int level) const
-  {
-                                     // level is checked in last_raw
-    raw_hex_iterator ri = last_raw_hex(level);
-    if (ri->used()==true)
-      return ri;
-    while ((--ri).state() == IteratorState::valid)
-      if (ri->used()==true)
-        return ri;
-    return ri;
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::hex_iterator
-  DoFHandler<dim, spacedim>::last_hex () const
-  {
-    return last_hex (tria->n_levels()-1);
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_hex_iterator
-  DoFHandler<dim, spacedim>::last_active_hex (const unsigned int level) const
-  {
-                                     // level is checked in last_raw
-    hex_iterator i = last_hex(level);
-    if (i->has_children()==false)
-      return i;
-    while ((--i).state() == IteratorState::valid)
-      if (i->has_children()==false)
-        return i;
-    return i;
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_hex_iterator
-  DoFHandler<dim, spacedim>::last_active_hex () const
-  {
-    return last_active_hex (tria->n_levels()-1);
-  }
-
-
-
+  return i;
+}
+
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim,spacedim>::cell_iterator
+DoFHandler<dim,spacedim>::end () const
+{
+  return cell_iterator (&this->get_tria(),
+			-1,
+			-1,
+			this);
+}
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim,spacedim>::cell_iterator
+DoFHandler<dim,spacedim>::end (const unsigned int level) const
+{
+  return (level == this->get_tria().n_levels()-1 ?
+	  end() :
+	  begin (level+1));
+}
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::active_cell_iterator
+DoFHandler<dim, spacedim>::end_active (const unsigned int level) const
+{
+  return (level == this->get_tria().n_levels()-1 ?
+          active_cell_iterator(end()) :
+          begin_active (level+1));
+}
 
 
 //------------------------------------------------------------------
@@ -3124,6 +2144,15 @@ template <>
   DoFHandler<dim,spacedim>::
   compute_line_dof_identities (std::vector<unsigned int> &new_dof_indices) const
   {
+				     // we will mark lines that we
+				     // have already treated, so first
+				     // save and clear the user flags
+				     // on lines and later restore
+				     // them
+    std::vector<bool> user_flags;
+    this->get_tria().save_user_flags_line(user_flags);
+    const_cast<Triangulation<dim,spacedim> &>(this->get_tria()).clear_user_flags_line ();
+
                                      // An implementation of the
                                      // algorithm described in the hp
                                      // paper, including the
@@ -3162,174 +2191,183 @@ template <>
       line_dof_identities (finite_elements->size(),
                            finite_elements->size());
 
-    for (line_iterator line=begin_line(); line!=end_line(); ++line)
-      {
-        unsigned int unique_sets_of_dofs
-          = line->n_active_fe_indices();
+    for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
+      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+	if (cell->line(l)->user_flag_set() == false)
+	  {
+	    const line_iterator line = cell->line(l);
+	    line->set_user_flag ();
 
-                                         // do a first loop over all sets of
-                                         // dofs and do identity
-                                         // uniquification
-        for (unsigned int f=0; f<line->n_active_fe_indices(); ++f)
-          for (unsigned int g=f+1; g<line->n_active_fe_indices(); ++g)
-            {
-              const unsigned int fe_index_1 = line->nth_active_fe_index (f),
-                                 fe_index_2 = line->nth_active_fe_index (g);
+	    unsigned int unique_sets_of_dofs
+	      = line->n_active_fe_indices();
 
-              if (((*finite_elements)[fe_index_1].dofs_per_line
-                   ==
-                   (*finite_elements)[fe_index_2].dofs_per_line)
-                  &&
-                  ((*finite_elements)[fe_index_1].dofs_per_line > 0))
-                {
-                  internal::hp::ensure_existence_of_dof_identities<1>
-                    ((*finite_elements)[fe_index_1],
-                     (*finite_elements)[fe_index_2],
-                     line_dof_identities[fe_index_1][fe_index_2]);
-                                                   // see if these sets of dofs
-                                                   // are identical. the first
-                                                   // condition for this is that
-                                                   // indeed there are n
-                                                   // identities
-                  if (line_dof_identities[fe_index_1][fe_index_2]->size()
-                      ==
-                      (*finite_elements)[fe_index_1].dofs_per_line)
-                    {
-                      unsigned int i=0;
-                      for (; i<(*finite_elements)[fe_index_1].dofs_per_line; ++i)
-                        if (((*(line_dof_identities[fe_index_1][fe_index_2]))[i].first != i)
-                            &&
-                            ((*(line_dof_identities[fe_index_1][fe_index_2]))[i].second != i))
-                                                           // not an identity
-                          break;
+					     // do a first loop over all sets of
+					     // dofs and do identity
+					     // uniquification
+	    for (unsigned int f=0; f<line->n_active_fe_indices(); ++f)
+	      for (unsigned int g=f+1; g<line->n_active_fe_indices(); ++g)
+		{
+		  const unsigned int fe_index_1 = line->nth_active_fe_index (f),
+				     fe_index_2 = line->nth_active_fe_index (g);
 
-                      if (i == (*finite_elements)[fe_index_1].dofs_per_line)
-                        {
-                                                           // the dofs of these
-                                                           // two finite
-                                                           // elements are
-                                                           // identical. as a
-                                                           // safety check,
-                                                           // ensure that none
-                                                           // of the two FEs is
-                                                           // trying to dominate
-                                                           // the other, which
-                                                           // wouldn't make any
-                                                           // sense in this case
-                          Assert ((*finite_elements)[fe_index_1].compare_for_face_domination
-                                  ((*finite_elements)[fe_index_2])
-                                  ==
-                                  FiniteElementDomination::either_element_can_dominate,
-                                  ExcInternalError());
+		  if (((*finite_elements)[fe_index_1].dofs_per_line
+		       ==
+		       (*finite_elements)[fe_index_2].dofs_per_line)
+		      &&
+		      ((*finite_elements)[fe_index_1].dofs_per_line > 0))
+		    {
+		      internal::hp::ensure_existence_of_dof_identities<1>
+			((*finite_elements)[fe_index_1],
+			 (*finite_elements)[fe_index_2],
+			 line_dof_identities[fe_index_1][fe_index_2]);
+						       // see if these sets of dofs
+						       // are identical. the first
+						       // condition for this is that
+						       // indeed there are n
+						       // identities
+		      if (line_dof_identities[fe_index_1][fe_index_2]->size()
+			  ==
+			  (*finite_elements)[fe_index_1].dofs_per_line)
+			{
+			  unsigned int i=0;
+			  for (; i<(*finite_elements)[fe_index_1].dofs_per_line; ++i)
+			    if (((*(line_dof_identities[fe_index_1][fe_index_2]))[i].first != i)
+				&&
+				((*(line_dof_identities[fe_index_1][fe_index_2]))[i].second != i))
+							       // not an identity
+			      break;
 
-                          --unique_sets_of_dofs;
+			  if (i == (*finite_elements)[fe_index_1].dofs_per_line)
+			    {
+							       // the dofs of these
+							       // two finite
+							       // elements are
+							       // identical. as a
+							       // safety check,
+							       // ensure that none
+							       // of the two FEs is
+							       // trying to dominate
+							       // the other, which
+							       // wouldn't make any
+							       // sense in this case
+			      Assert ((*finite_elements)[fe_index_1].compare_for_face_domination
+				      ((*finite_elements)[fe_index_2])
+				      ==
+				      FiniteElementDomination::either_element_can_dominate,
+				      ExcInternalError());
 
-                          for (unsigned int j=0; j<(*finite_elements)[fe_index_1].dofs_per_line; ++j)
-                            {
-                              const unsigned int master_dof_index
-                                = line->dof_index (j, fe_index_1);
-                              const unsigned int slave_dof_index
-                                = line->dof_index (j, fe_index_2);
+			      --unique_sets_of_dofs;
 
-                                                               // if master dof
-                                                               // was already
-                                                               // constrained,
-                                                               // constrain to
-                                                               // that one,
-                                                               // otherwise
-                                                               // constrain
-                                                               // slave to
-                                                               // master
-                              if (new_dof_indices[master_dof_index] !=
-                                  numbers::invalid_unsigned_int)
-                                {
-                                  Assert (new_dof_indices[new_dof_indices[master_dof_index]] ==
-                                          numbers::invalid_unsigned_int,
-                                          ExcInternalError());
+			      for (unsigned int j=0; j<(*finite_elements)[fe_index_1].dofs_per_line; ++j)
+				{
+				  const unsigned int master_dof_index
+				    = line->dof_index (j, fe_index_1);
+				  const unsigned int slave_dof_index
+				    = line->dof_index (j, fe_index_2);
 
-                                  new_dof_indices[slave_dof_index]
-                                    = new_dof_indices[master_dof_index];
-                                }
-                              else
-                                {
-                                  Assert ((new_dof_indices[master_dof_index] ==
-                                           numbers::invalid_unsigned_int)
-                                          ||
-                                          (new_dof_indices[slave_dof_index] ==
-                                           master_dof_index),
-                                          ExcInternalError());
+								   // if master dof
+								   // was already
+								   // constrained,
+								   // constrain to
+								   // that one,
+								   // otherwise
+								   // constrain
+								   // slave to
+								   // master
+				  if (new_dof_indices[master_dof_index] !=
+				      numbers::invalid_unsigned_int)
+				    {
+				      Assert (new_dof_indices[new_dof_indices[master_dof_index]] ==
+					      numbers::invalid_unsigned_int,
+					      ExcInternalError());
 
-                                  new_dof_indices[slave_dof_index] = master_dof_index;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+				      new_dof_indices[slave_dof_index]
+					= new_dof_indices[master_dof_index];
+				    }
+				  else
+				    {
+				      Assert ((new_dof_indices[master_dof_index] ==
+					       numbers::invalid_unsigned_int)
+					      ||
+					      (new_dof_indices[slave_dof_index] ==
+					       master_dof_index),
+					      ExcInternalError());
 
-                                         // if at this point, there is only
-                                         // one unique set of dofs left, then
-                                         // we have taken care of everything
-                                         // above. if there are two, then we
-                                         // need to deal with them here. if
-                                         // there are more, then we punt, as
-                                         // described in the paper (and
-                                         // mentioned above)
+				      new_dof_indices[slave_dof_index] = master_dof_index;
+				    }
+				}
+			    }
+			}
+		    }
+		}
+
+					     // if at this point, there is only
+					     // one unique set of dofs left, then
+					     // we have taken care of everything
+					     // above. if there are two, then we
+					     // need to deal with them here. if
+					     // there are more, then we punt, as
+					     // described in the paper (and
+					     // mentioned above)
 //TODO: The check for 'dim==2' was inserted by intuition. It fixes
 // the previous problems with step-27 in 3D. But an explanation
 // for this is still required, and what we do here is not what we
 // describe in the paper!.
-        if ((unique_sets_of_dofs == 2) && (dim == 2))
-          {
-                                             // find out which is the
-                                             // most dominating finite
-                                             // element of the ones that
-                                             // are used on this line
-            const unsigned int most_dominating_fe_index
-              = internal::hp::get_most_dominating_fe_index<dim,spacedim> (line);
+	    if ((unique_sets_of_dofs == 2) && (dim == 2))
+	      {
+						 // find out which is the
+						 // most dominating finite
+						 // element of the ones that
+						 // are used on this line
+		const unsigned int most_dominating_fe_index
+		  = internal::hp::get_most_dominating_fe_index<dim,spacedim> (line);
 
-            const unsigned int n_active_fe_indices
-              = line->n_active_fe_indices ();
+		const unsigned int n_active_fe_indices
+		  = line->n_active_fe_indices ();
 
-                                             // loop over the indices of
-                                             // all the finite elements
-                                             // that are not dominating,
-                                             // and identify their dofs
-                                             // to the most dominating
-                                             // one
-            for (unsigned int f=0; f<n_active_fe_indices; ++f)
-              if (line->nth_active_fe_index (f) !=
-                  most_dominating_fe_index)
-                {
-                  const unsigned int
-                    other_fe_index = line->nth_active_fe_index (f);
+						 // loop over the indices of
+						 // all the finite elements
+						 // that are not dominating,
+						 // and identify their dofs
+						 // to the most dominating
+						 // one
+		for (unsigned int f=0; f<n_active_fe_indices; ++f)
+		  if (line->nth_active_fe_index (f) !=
+		      most_dominating_fe_index)
+		    {
+		      const unsigned int
+			other_fe_index = line->nth_active_fe_index (f);
 
-                  internal::hp::ensure_existence_of_dof_identities<1>
-                    ((*finite_elements)[most_dominating_fe_index],
-                     (*finite_elements)[other_fe_index],
-                     line_dof_identities[most_dominating_fe_index][other_fe_index]);
+		      internal::hp::ensure_existence_of_dof_identities<1>
+			((*finite_elements)[most_dominating_fe_index],
+			 (*finite_elements)[other_fe_index],
+			 line_dof_identities[most_dominating_fe_index][other_fe_index]);
 
-                  internal::hp::DoFIdentities &identities
-                    = *line_dof_identities[most_dominating_fe_index][other_fe_index];
-                  for (unsigned int i=0; i<identities.size(); ++i)
-                    {
-                      const unsigned int master_dof_index
-                        = line->dof_index (identities[i].first, most_dominating_fe_index);
-                      const unsigned int slave_dof_index
-                        = line->dof_index (identities[i].second, other_fe_index);
+		      internal::hp::DoFIdentities &identities
+			= *line_dof_identities[most_dominating_fe_index][other_fe_index];
+		      for (unsigned int i=0; i<identities.size(); ++i)
+			{
+			  const unsigned int master_dof_index
+			    = line->dof_index (identities[i].first, most_dominating_fe_index);
+			  const unsigned int slave_dof_index
+			    = line->dof_index (identities[i].second, other_fe_index);
 
-                      Assert ((new_dof_indices[master_dof_index] ==
-                               numbers::invalid_unsigned_int)
-                              ||
-                              (new_dof_indices[slave_dof_index] ==
-                               master_dof_index),
-                              ExcInternalError());
+			  Assert ((new_dof_indices[master_dof_index] ==
+				   numbers::invalid_unsigned_int)
+				  ||
+				  (new_dof_indices[slave_dof_index] ==
+				   master_dof_index),
+				  ExcInternalError());
 
-                      new_dof_indices[slave_dof_index] = master_dof_index;
-                    }
-                }
-          }
-      }
+			  new_dof_indices[slave_dof_index] = master_dof_index;
+			}
+		    }
+	      }
+	  }
+
+				     // finally restore the user flags
+    const_cast<Triangulation<dim,spacedim> &>(this->get_tria())
+      .load_user_flags_line(user_flags);
   }
 
 
@@ -3373,6 +2411,15 @@ template <>
   DoFHandler<dim,spacedim>::
   compute_quad_dof_identities (std::vector<unsigned int> &new_dof_indices) const
   {
+				     // we will mark quads that we
+				     // have already treated, so first
+				     // save and clear the user flags
+				     // on quads and later restore
+				     // them
+    std::vector<bool> user_flags;
+    this->get_tria().save_user_flags_quad(user_flags);
+    const_cast<Triangulation<dim,spacedim> &>(this->get_tria()).clear_user_flags_quad ();
+
                                      // An implementation of the
                                      // algorithm described in the hp
                                      // paper, including the
@@ -3397,57 +2444,67 @@ template <>
       quad_dof_identities (finite_elements->size(),
                            finite_elements->size());
 
-    for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
-      if (quad->n_active_fe_indices() == 2)
-        {
-                                           // find out which is the
-                                           // most dominating finite
-                                           // element of the ones that
-                                           // are used on this quad
-          const unsigned int most_dominating_fe_index
-            = internal::hp::get_most_dominating_fe_index<dim,spacedim> (quad);
+    for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
+      for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
+	if ((cell->quad(q)->user_flag_set() == false)
+	    &&
+	    (cell->quad(q)->n_active_fe_indices() == 2))
+	  {
+	    const quad_iterator quad = cell->quad(q);
+	    quad->set_user_flag ();
 
-          const unsigned int n_active_fe_indices
-            = quad->n_active_fe_indices ();
+					     // find out which is the
+					     // most dominating finite
+					     // element of the ones that
+					     // are used on this quad
+	    const unsigned int most_dominating_fe_index
+	      = internal::hp::get_most_dominating_fe_index<dim,spacedim> (quad);
 
-                                           // loop over the indices of
-                                           // all the finite elements
-                                           // that are not dominating,
-                                           // and identify their dofs
-                                           // to the most dominating
-                                           // one
-          for (unsigned int f=0; f<n_active_fe_indices; ++f)
-            if (quad->nth_active_fe_index (f) !=
-                most_dominating_fe_index)
-              {
-                const unsigned int
-                  other_fe_index = quad->nth_active_fe_index (f);
+	    const unsigned int n_active_fe_indices
+	      = quad->n_active_fe_indices ();
 
-                internal::hp::ensure_existence_of_dof_identities<2>
-                  ((*finite_elements)[most_dominating_fe_index],
-                   (*finite_elements)[other_fe_index],
-                   quad_dof_identities[most_dominating_fe_index][other_fe_index]);
+					     // loop over the indices of
+					     // all the finite elements
+					     // that are not dominating,
+					     // and identify their dofs
+					     // to the most dominating
+					     // one
+	    for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	      if (quad->nth_active_fe_index (f) !=
+		  most_dominating_fe_index)
+		{
+		  const unsigned int
+		    other_fe_index = quad->nth_active_fe_index (f);
 
-                internal::hp::DoFIdentities &identities
-                  = *quad_dof_identities[most_dominating_fe_index][other_fe_index];
-                for (unsigned int i=0; i<identities.size(); ++i)
-                  {
-                    const unsigned int master_dof_index
-                      = quad->dof_index (identities[i].first, most_dominating_fe_index);
-                    const unsigned int slave_dof_index
-                      = quad->dof_index (identities[i].second, other_fe_index);
+		  internal::hp::ensure_existence_of_dof_identities<2>
+		    ((*finite_elements)[most_dominating_fe_index],
+		     (*finite_elements)[other_fe_index],
+		     quad_dof_identities[most_dominating_fe_index][other_fe_index]);
 
-                    Assert ((new_dof_indices[master_dof_index] ==
-                             numbers::invalid_unsigned_int)
-                            ||
-                            (new_dof_indices[slave_dof_index] ==
-                             master_dof_index),
-                            ExcInternalError());
+		  internal::hp::DoFIdentities &identities
+		    = *quad_dof_identities[most_dominating_fe_index][other_fe_index];
+		  for (unsigned int i=0; i<identities.size(); ++i)
+		    {
+		      const unsigned int master_dof_index
+			= quad->dof_index (identities[i].first, most_dominating_fe_index);
+		      const unsigned int slave_dof_index
+			= quad->dof_index (identities[i].second, other_fe_index);
 
-                    new_dof_indices[slave_dof_index] = master_dof_index;
-                }
-            }
-        }
+		      Assert ((new_dof_indices[master_dof_index] ==
+			       numbers::invalid_unsigned_int)
+			      ||
+			      (new_dof_indices[slave_dof_index] ==
+			       master_dof_index),
+			      ExcInternalError());
+
+		      new_dof_indices[slave_dof_index] = master_dof_index;
+		    }
+		}
+	  }
+
+				     // finally restore the user flags
+    const_cast<Triangulation<dim,spacedim> &>(this->get_tria())
+      .load_user_flags_quad(user_flags);
   }
 
 
@@ -3713,53 +2770,93 @@ template <>
 
     renumber_dofs_internal (new_numbers, internal::int2type<0>());
 
-    for (line_iterator line=begin_line(); line!=end_line(); ++line)
-      {
-        const unsigned int n_active_fe_indices
-          = line->n_active_fe_indices ();
+				     // save user flags on lines so we
+				     // can use them to mark lines
+				     // we've already treated
+    std::vector<bool> saved_line_user_flags;
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .save_user_flags_line (saved_line_user_flags);
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .clear_user_flags_line ();
 
-        for (unsigned int f=0; f<n_active_fe_indices; ++f)
-          {
-            const unsigned int fe_index
-              = line->nth_active_fe_index (f);
+    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
+      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+	if (cell->line(l)->user_flag_set() == false)
+	  {
+	    const line_iterator line = cell->line(l);
+	    line->set_user_flag();
 
-            for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_line; ++d)
-              line->set_dof_index (d,
-                                   new_numbers[line->dof_index(d,fe_index)],
-                                   fe_index);
-          }
-      }
+	    const unsigned int n_active_fe_indices
+	      = line->n_active_fe_indices ();
+
+	    for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	      {
+		const unsigned int fe_index
+		  = line->nth_active_fe_index (f);
+
+		for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_line; ++d)
+		  line->set_dof_index (d,
+				       new_numbers[line->dof_index(d,fe_index)],
+				       fe_index);
+	      }
+	  }
+
+				     // at the end, restore the user
+				     // flags for the lines
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .load_user_flags_line (saved_line_user_flags);
   }
 
 
-
-                                // TODO: should be simplified a bit
+//TODO: Merge the following three functions -- they are identical
   template<>
   void
   DoFHandler<2,2>::
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
                           internal::int2type<2>)
   {
+    const unsigned int dim = 2;
+    const unsigned int spacedim = 2;
+
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
     renumber_dofs_internal (new_numbers, internal::int2type<1>());
 
-    for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
-      {
-        const unsigned int n_active_fe_indices
-          = quad->n_active_fe_indices ();
+				     // save user flags on quads so we
+				     // can use them to mark quads
+				     // we've already treated
+    std::vector<bool> saved_quad_user_flags;
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .save_user_flags_quad (saved_quad_user_flags);
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .clear_user_flags_quad ();
 
-        for (unsigned int f=0; f<n_active_fe_indices; ++f)
-          {
-            const unsigned int fe_index
-              = quad->nth_active_fe_index (f);
+    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
+      for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
+	if (cell->quad(q)->user_flag_set() == false)
+	  {
+	    const quad_iterator quad = cell->quad(q);
+	    quad->set_user_flag();
 
-            for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
-              quad->set_dof_index (d,
-                                   new_numbers[quad->dof_index(d,fe_index)],
-                                   fe_index);
-          }
+	    const unsigned int n_active_fe_indices
+	      = quad->n_active_fe_indices ();
+
+	    for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	      {
+		const unsigned int fe_index
+		  = quad->nth_active_fe_index (f);
+
+		for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
+		  quad->set_dof_index (d,
+				       new_numbers[quad->dof_index(d,fe_index)],
+				       fe_index);
+	      }
       }
+
+				     // at the end, restore the user
+				     // flags for the quads
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .load_user_flags_quad (saved_quad_user_flags);
   }
 
 
@@ -3770,26 +2867,48 @@ template <>
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
                           internal::int2type<2>)
   {
+    const unsigned int dim = 2;
+    const unsigned int spacedim = 3;
+
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
     renumber_dofs_internal (new_numbers, internal::int2type<1>());
 
-    for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
-      {
-        const unsigned int n_active_fe_indices
-          = quad->n_active_fe_indices ();
+				     // save user flags on quads so we
+				     // can use them to mark quads
+				     // we've already treated
+    std::vector<bool> saved_quad_user_flags;
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .save_user_flags_quad (saved_quad_user_flags);
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .clear_user_flags_quad ();
 
-        for (unsigned int f=0; f<n_active_fe_indices; ++f)
-          {
-            const unsigned int fe_index
-              = quad->nth_active_fe_index (f);
+    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
+      for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
+	if (cell->quad(q)->user_flag_set() == false)
+	  {
+	    const quad_iterator quad = cell->quad(q);
+	    quad->set_user_flag();
 
-            for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
-              quad->set_dof_index (d,
-                                   new_numbers[quad->dof_index(d,fe_index)],
-                                   fe_index);
-          }
+	    const unsigned int n_active_fe_indices
+	      = quad->n_active_fe_indices ();
+
+	    for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	      {
+		const unsigned int fe_index
+		  = quad->nth_active_fe_index (f);
+
+		for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
+		  quad->set_dof_index (d,
+				       new_numbers[quad->dof_index(d,fe_index)],
+				       fe_index);
+	      }
       }
+
+				     // at the end, restore the user
+				     // flags for the quads
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .load_user_flags_quad (saved_quad_user_flags);
   }
 
 
@@ -3799,26 +2918,48 @@ template <>
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
                           internal::int2type<2>)
   {
+    const unsigned int dim = 3;
+    const unsigned int spacedim = 3;
+
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
     renumber_dofs_internal (new_numbers, internal::int2type<1>());
 
-    for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
-      {
-        const unsigned int n_active_fe_indices
-          = quad->n_active_fe_indices ();
+				     // save user flags on quads so we
+				     // can use them to mark quads
+				     // we've already treated
+    std::vector<bool> saved_quad_user_flags;
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .save_user_flags_quad (saved_quad_user_flags);
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .clear_user_flags_quad ();
 
-        for (unsigned int f=0; f<n_active_fe_indices; ++f)
-          {
-            const unsigned int fe_index
-              = quad->nth_active_fe_index (f);
+    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
+      for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
+	if (cell->quad(q)->user_flag_set() == false)
+	  {
+	    const quad_iterator quad = cell->quad(q);
+	    quad->set_user_flag();
 
-            for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
-              quad->set_dof_index (d,
-                                   new_numbers[quad->dof_index(d,fe_index)],
-                                   fe_index);
-          }
+	    const unsigned int n_active_fe_indices
+	      = quad->n_active_fe_indices ();
+
+	    for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	      {
+		const unsigned int fe_index
+		  = quad->nth_active_fe_index (f);
+
+		for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
+		  quad->set_dof_index (d,
+				       new_numbers[quad->dof_index(d,fe_index)],
+				       fe_index);
+	      }
       }
+
+				     // at the end, restore the user
+				     // flags for the quads
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .load_user_flags_quad (saved_quad_user_flags);
   }
 
 
@@ -3828,26 +2969,51 @@ template <>
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
                           internal::int2type<3>)
   {
+    const unsigned int dim = 3;
+    const unsigned int spacedim = 3;
+
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
     renumber_dofs_internal (new_numbers, internal::int2type<2>());
 
-    for (hex_iterator hex=begin_hex(); hex!=end_hex(); ++hex)
-      {
-        const unsigned int n_active_fe_indices
-          = hex->n_active_fe_indices ();
+				     // save user flags on hexes so we
+				     // can use them to mark hexes
+				     // we've already treated
+    std::vector<bool> saved_hex_user_flags;
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .save_user_flags_hex (saved_hex_user_flags);
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .clear_user_flags_hex ();
 
-        for (unsigned int f=0; f<n_active_fe_indices; ++f)
-          {
-            const unsigned int fe_index
-              = hex->nth_active_fe_index (f);
+				     // we're in 3d, so hexes are also
+				     // cells. stick with the same
+				     // kind of notation as in the
+				     // previous functions, though
+    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
+      if (cell->user_flag_set() == false)
+	{
+	  const hex_iterator hex = cell;
+	  hex->set_user_flag();
 
-            for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_hex; ++d)
-              hex->set_dof_index (d,
-                                  new_numbers[hex->dof_index(d,fe_index)],
-                                  fe_index);
-          }
-      }
+	  const unsigned int n_active_fe_indices
+	    = hex->n_active_fe_indices ();
+
+	  for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	    {
+	      const unsigned int fe_index
+		= hex->nth_active_fe_index (f);
+
+	      for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_hex; ++d)
+		hex->set_dof_index (d,
+				    new_numbers[hex->dof_index(d,fe_index)],
+				    fe_index);
+	    }
+	}
+
+				     // at the end, restore the user
+				     // flags for the hexs
+    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
+      .load_user_flags_hex (saved_hex_user_flags);
   }
 
 

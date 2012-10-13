@@ -224,7 +224,6 @@ namespace parallel
                                           */
         typedef typename dealii::Triangulation<dim,spacedim>::active_cell_iterator active_cell_iterator;
         typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
-        typedef typename dealii::Triangulation<dim,spacedim>::raw_cell_iterator    raw_cell_iterator;
 
                                          /**
                                           * Generic settings for distributed

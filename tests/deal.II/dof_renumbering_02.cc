@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -116,7 +116,7 @@ check_renumbering(MGDoFHandler<dim>& mgdof)
 
   Point<dim> direction;
   for (unsigned int i=0;i<dim;++i)
-    direction(i) = -5.+i;
+    direction(i) = -5.0001+i;
 
   deallog << std::endl << "Downstream numbering cell-wise" << std::endl;
   DoFRenumbering::downstream(dof, direction);

@@ -890,41 +890,11 @@ MGDoFHandler<dim,spacedim>::memory_consumption() const
 
 
 template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_cell_iterator
-MGDoFHandler<dim,spacedim>::begin_raw (const unsigned int level) const
-{
-  switch (dim)
-    {
-      case 1:
-            return begin_raw_line (level);
-      case 2:
-            return begin_raw_quad (level);
-      case 3:
-            return begin_raw_hex (level);
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_cell_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
 typename MGDoFHandler<dim,spacedim>::cell_iterator
 MGDoFHandler<dim,spacedim>::begin (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-            return begin_line (level);
-      case 2:
-            return begin_quad (level);
-      case 3:
-            return begin_hex (level);
-      default:
-            Assert (false, ExcImpossibleInDim(dim));
-            return cell_iterator();
-    }
+  return cell_iterator (*this->get_tria().begin(level),
+			this);
 }
 
 
@@ -933,178 +903,36 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 MGDoFHandler<dim,spacedim>::begin_active (const unsigned int level) const
 {
-  switch (dim)
-    {
-      case 1:
-            return begin_active_line (level);
-      case 2:
-            return begin_active_quad (level);
-      case 3:
-            return begin_active_hex (level);
-      default:
-            Assert (false, ExcNotImplemented());
-            return active_cell_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_cell_iterator
-MGDoFHandler<dim,spacedim>::last_raw () const
-{
-  switch (dim)
-    {
-      case 1:
-            return last_raw_line ();
-      case 2:
-            return last_raw_quad ();
-      case 3:
-            return last_raw_hex ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_cell_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_cell_iterator
-MGDoFHandler<dim,spacedim>::last_raw (const unsigned int level) const
-{
-  switch (dim)
-    {
-      case 1:
-            return last_raw_line (level);
-      case 2:
-            return last_raw_quad (level);
-      case 3:
-            return last_raw_hex (level);
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_cell_iterator();
-    }
+                                   // level is checked in begin_raw
+  cell_iterator i = begin (level);
+  if (i.state() != IteratorState::valid)
+    return i;
+  while (i->has_children())
+    if ((++i).state() != IteratorState::valid)
+      return i;
+  return i;
 }
 
 
 
 template <int dim, int spacedim>
 typename MGDoFHandler<dim,spacedim>::cell_iterator
-MGDoFHandler<dim,spacedim>::last () const
-{
-  switch (dim)
-    {
-      case 1:
-            return last_line ();
-      case 2:
-            return last_quad ();
-      case 3:
-            return last_hex ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return cell_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::cell_iterator
-MGDoFHandler<dim,spacedim>::last (const unsigned int level) const
-{
-  switch (dim)
-    {
-      case 1:
-            return last_line (level);
-      case 2:
-            return last_quad (level);
-      case 3:
-            return last_hex (level);
-      default:
-            Assert (false, ExcNotImplemented());
-            return cell_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::active_cell_iterator
-MGDoFHandler<dim,spacedim>::last_active () const
-{
-  switch (dim)
-    {
-      case 1:
-            return last_active_line ();
-      case 2:
-            return last_active_quad ();
-      case 3:
-            return last_active_hex ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return active_cell_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::active_cell_iterator
-MGDoFHandler<dim,spacedim>::last_active (const unsigned int level) const
-{
-  switch (dim)
-    {
-      case 1:
-            return last_active_line (level);
-      case 2:
-            return last_active_quad (level);
-      case 3:
-            return last_active_hex (level);
-      default:
-            Assert (false, ExcNotImplemented());
-            return active_cell_iterator();
-    }
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_cell_iterator
 MGDoFHandler<dim,spacedim>::end () const
 {
-  switch (dim)
-    {
-      case 1:
-            return end_line();
-      case 2:
-            return end_quad();
-      case 3:
-            return end_hex();
-      default:
-            Assert (false, ExcImpossibleInDim(dim));
-            return raw_cell_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_cell_iterator
-MGDoFHandler<dim, spacedim>::end_raw (const unsigned int level) const
-{
-  return (level == this->get_tria().n_levels()-1 ?
-          end() :
-          begin_raw (level+1));
+  return cell_iterator (&this->get_tria(),
+			-1,
+			-1,
+			this);
 }
 
 
 template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::cell_iterator
-MGDoFHandler<dim, spacedim>::end (const unsigned int level) const
+typename MGDoFHandler<dim,spacedim>::cell_iterator
+MGDoFHandler<dim,spacedim>::end (const unsigned int level) const
 {
   return (level == this->get_tria().n_levels()-1 ?
-          cell_iterator(end()) :
-          begin (level+1));
+	  end() :
+	  begin (level+1));
 }
 
 
@@ -1116,811 +944,6 @@ MGDoFHandler<dim, spacedim>::end_active (const unsigned int level) const
           active_cell_iterator(end()) :
           begin_active (level+1));
 }
-
-
-/*------------------------ Face iterator functions ------------------------*/
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_face_iterator
-MGDoFHandler<dim,spacedim>::begin_raw_face () const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_face_iterator();
-      case 2:
-            return begin_raw_line ();
-      case 3:
-            return begin_raw_quad ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_face_iterator ();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::face_iterator
-MGDoFHandler<dim,spacedim>::begin_face () const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_face_iterator();
-      case 2:
-            return begin_line ();
-      case 3:
-            return begin_quad ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return face_iterator ();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::active_face_iterator
-MGDoFHandler<dim,spacedim>::begin_active_face () const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_face_iterator();
-      case 2:
-            return begin_active_line ();
-      case 3:
-            return begin_active_quad ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return active_face_iterator ();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_face_iterator
-MGDoFHandler<dim, spacedim>::end_raw_face () const
-{
-  return end_face();
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_face_iterator
-MGDoFHandler<dim,spacedim>::end_face () const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_face_iterator();
-      case 2:
-            return end_line ();
-      case 3:
-            return end_quad ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_face_iterator ();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::active_face_iterator
-MGDoFHandler<dim, spacedim>::end_active_face () const
-{
-  return active_face_iterator(end_face());
-}
-
-
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_face_iterator
-MGDoFHandler<dim,spacedim>::last_raw_face () const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_face_iterator();
-      case 2:
-            return last_raw_line ();
-      case 3:
-            return last_raw_quad ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_face_iterator ();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::face_iterator
-MGDoFHandler<dim,spacedim>::last_face () const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_face_iterator();
-      case 2:
-            return last_line ();
-      case 3:
-            return last_quad ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_face_iterator ();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::active_face_iterator
-MGDoFHandler<dim,spacedim>::last_active_face () const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_face_iterator();
-      case 2:
-            return last_active_line ();
-      case 3:
-            return last_active_quad ();
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_face_iterator ();
-    }
-}
-
-
-/*------------------------ Line iterator functions ------------------------*/
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_line_iterator
-MGDoFHandler<dim, spacedim>::begin_raw_line (const unsigned int level) const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (level<this->get_tria().n_levels(), ExcInvalidLevel(level));
-
-            if (this->get_tria().n_raw_lines(level) == 0)
-              return end_line ();
-
-            return raw_line_iterator (&this->get_tria(),
-                                      level,
-                                      0,
-                                      this);
-
-      default:
-            Assert (level == 0, ExcFacesHaveNoLevel());
-            return raw_line_iterator (&this->get_tria(),
-                                      0,
-                                      0,
-                                      this);
-    }
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::line_iterator
-MGDoFHandler<dim, spacedim>::begin_line (const unsigned int level) const
-{
-                                   // level is checked in begin_raw
-  raw_line_iterator ri = begin_raw_line (level);
-  if (ri.state() != IteratorState::valid)
-    return ri;
-  while (ri->used() == false)
-    if ((++ri).state() != IteratorState::valid)
-      return ri;
-  return ri;
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::active_line_iterator
-MGDoFHandler<dim, spacedim>::begin_active_line (const unsigned int level) const
-{
-                                   // level is checked in begin_raw
-  line_iterator i = begin_line (level);
-  if (i.state() != IteratorState::valid)
-    return i;
-  while (i->has_children())
-    if ((++i).state() != IteratorState::valid)
-      return i;
-  return i;
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_line_iterator
-MGDoFHandler<dim, spacedim>::end_line () const
-{
-  return raw_line_iterator (&this->get_tria(),
-                            -1,
-                            -1,
-                            this);
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_line_iterator
-MGDoFHandler<dim, spacedim>::last_raw_line (const unsigned int level) const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (level<this->get_tria().n_levels(), ExcInvalidLevel(level));
-            Assert (this->get_tria().n_raw_lines(level) != 0,
-                    ExcEmptyLevel (level));
-
-            return raw_line_iterator (&this->get_tria(),
-                                      level,
-                                      this->get_tria().n_raw_lines(level)-1,
-                                      this);
-
-      default:
-            Assert (level == 0, ExcFacesHaveNoLevel());
-            return raw_line_iterator (&this->get_tria(),
-                                      0,
-                                      this->get_tria().n_raw_lines()-1,
-                                      this);
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_line_iterator
-MGDoFHandler<dim, spacedim>::last_raw_line () const
-{
-  if (dim == 1)
-    return last_raw_line (this->get_tria().n_levels()-1);
-  else
-    return last_raw_line (0);
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::line_iterator
-MGDoFHandler<dim, spacedim>::last_line (const unsigned int level) const
-{
-                                   // level is checked in last_raw
-  raw_line_iterator ri = last_raw_line(level);
-  if (ri->used()==true)
-    return ri;
-  while ((--ri).state() == IteratorState::valid)
-    if (ri->used()==true)
-      return ri;
-  return ri;
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::line_iterator
-MGDoFHandler<dim, spacedim>::last_line () const
-{
-  if (dim == 1)
-    return last_line (this->get_tria().n_levels()-1);
-  else
-    return last_line (0);
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::active_line_iterator
-MGDoFHandler<dim, spacedim>::last_active_line (const unsigned int level) const
-{
-                                   // level is checked in last_raw
-  line_iterator i = last_line(level);
-  if (i->has_children()==false)
-    return i;
-  while ((--i).state() == IteratorState::valid)
-    if (i->has_children()==false)
-      return i;
-  return i;
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::active_line_iterator
-MGDoFHandler<dim, spacedim>::last_active_line () const
-{
-  if (dim == 1)
-    return last_active_line (this->get_tria().n_levels()-1);
-  else
-    return last_active_line (0);
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_line_iterator
-MGDoFHandler<dim, spacedim>::end_raw_line (const unsigned int level) const
-{
-  Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 1)
-    return (level == this->get_tria().n_levels()-1 ?
-            end_line() :
-            begin_raw_line (level+1));
-  else
-    return end_line();
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::line_iterator
-MGDoFHandler<dim, spacedim>::end_line (const unsigned int level) const
-{
-  Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 1)
-    return (level == this->get_tria().n_levels()-1 ?
-            line_iterator(end_line()) :
-            begin_line (level+1));
-  else
-    return line_iterator(end_line());
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::active_line_iterator
-MGDoFHandler<dim, spacedim>::end_active_line (const unsigned int level) const
-{
-  Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 1)
-    return (level == this->get_tria().n_levels()-1 ?
-            active_line_iterator(end_line()) :
-            begin_active_line (level+1));
-  else
-    return active_line_iterator(end_line());
-}
-
-
-
-/*------------------------ Quad iterator functions ------------------------*/
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_quad_iterator
-MGDoFHandler<dim,spacedim>::begin_raw_quad (const unsigned int level) const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_hex_iterator();
-      case 2:
-      {
-        Assert (level<this->get_tria().n_levels(), ExcInvalidLevel(level));
-
-        if (this->get_tria().n_raw_quads(level) == 0)
-          return end_quad();
-
-        return raw_quad_iterator (&this->get_tria(),
-                                  level,
-                                  0,
-                                  this);
-      }
-
-      case 3:
-      {
-        Assert (level == 0, ExcFacesHaveNoLevel());
-
-        return raw_quad_iterator (&this->get_tria(),
-                                  0,
-                                  0,
-                                  this);
-      }
-
-
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_hex_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::quad_iterator
-MGDoFHandler<dim,spacedim>::begin_quad (const unsigned int level) const
-{
-                                   // level is checked in begin_raw
-  raw_quad_iterator ri = begin_raw_quad (level);
-  if (ri.state() != IteratorState::valid)
-    return ri;
-  while (ri->used() == false)
-    if ((++ri).state() != IteratorState::valid)
-      return ri;
-  return ri;
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::active_quad_iterator
-MGDoFHandler<dim,spacedim>::begin_active_quad (const unsigned int level) const
-{
-                                   // level is checked in begin_raw
-  quad_iterator i = begin_quad (level);
-  if (i.state() != IteratorState::valid)
-    return i;
-  while (i->has_children())
-    if ((++i).state() != IteratorState::valid)
-      return i;
-  return i;
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_quad_iterator
-MGDoFHandler<dim, spacedim>::end_raw_quad (const unsigned int level) const
-{
-  Assert (dim == 2 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 2)
-    return (level == this->get_tria().n_levels()-1 ?
-            end_quad() :
-            begin_raw_quad (level+1));
-  else
-    return end_quad();
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::quad_iterator
-MGDoFHandler<dim, spacedim>::end_quad (const unsigned int level) const
-{
-  Assert (dim == 2 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 2)
-    return (level == this->get_tria().n_levels()-1 ?
-            quad_iterator(end_quad()) :
-            begin_quad (level+1));
-  else
-    return quad_iterator(end_quad());
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::active_quad_iterator
-MGDoFHandler<dim, spacedim>::end_active_quad (const unsigned int level) const
-{
-  Assert(dim == 2 || level == 0, ExcFacesHaveNoLevel());
-  if (dim == 2)
-    return (level == this->get_tria().n_levels()-1 ?
-            active_quad_iterator(end_quad()) :
-            begin_active_quad (level+1));
-  else
-    return active_quad_iterator(end_quad());
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_quad_iterator
-MGDoFHandler<dim,spacedim>::end_quad () const
-{
-  return raw_quad_iterator (&this->get_tria(),
-                            -1,
-                            -1,
-                            this);
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_quad_iterator
-MGDoFHandler<dim,spacedim>::last_raw_quad (const unsigned int level) const
-{
-  switch (dim)
-    {
-      case 1:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_quad_iterator();
-      case 2:
-            Assert (level<this->get_tria().n_levels(),
-                    ExcInvalidLevel(level));
-            Assert (this->get_tria().n_raw_quads(level) != 0,
-                    ExcEmptyLevel (level));
-            return raw_quad_iterator (&this->get_tria(),
-                                      level,
-                                      this->get_tria().n_raw_quads(level)-1,
-                                      this);
-      case 3:
-            Assert (level == 0, ExcFacesHaveNoLevel());
-            return raw_quad_iterator (&this->get_tria(),
-                                      0,
-                                      this->get_tria().n_raw_quads()-1,
-                                      this);
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_quad_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_quad_iterator
-MGDoFHandler<dim,spacedim>::last_raw_quad () const
-{
-  if (dim == 2)
-    return last_raw_quad (this->get_tria().n_levels()-1);
-  else
-    return last_raw_quad (0);
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::quad_iterator
-MGDoFHandler<dim,spacedim>::last_quad (const unsigned int level) const
-{
-                                   // level is checked in last_raw
-  raw_quad_iterator ri = last_raw_quad(level);
-  if (ri->used()==true)
-    return ri;
-  while ((--ri).state() == IteratorState::valid)
-    if (ri->used()==true)
-      return ri;
-  return ri;
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::quad_iterator
-MGDoFHandler<dim,spacedim>::last_quad () const
-{
-  if (dim == 2)
-    return last_quad (this->get_tria().n_levels()-1);
-  else
-    return last_quad (0);
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::active_quad_iterator
-MGDoFHandler<dim,spacedim>::last_active_quad (const unsigned int level) const
-{
-                                   // level is checked in last_raw
-  quad_iterator i = last_quad(level);
-  if (i->has_children()==false)
-    return i;
-  while ((--i).state() == IteratorState::valid)
-    if (i->has_children()==false)
-      return i;
-  return i;
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::active_quad_iterator
-MGDoFHandler<dim,spacedim>::last_active_quad () const
-{
-  if (dim == 2)
-    return last_active_quad (this->get_tria().n_levels()-1);
-  else
-    return last_active_quad (0);
-}
-
-
-/*------------------------ Hex iterator functions ------------------------*/
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::raw_hex_iterator
-MGDoFHandler<dim,spacedim>::begin_raw_hex (const unsigned int level) const
-{
-  switch (dim)
-    {
-      case 1:
-      case 2:
-            Assert (false, ExcImpossibleInDim(1));
-            return raw_hex_iterator();
-      case 3:
-      {
-        Assert (level<this->get_tria().n_levels(), ExcInvalidLevel(level));
-
-        if (this->get_tria().n_raw_hexs(level) == 0)
-          return end_hex();
-
-        return raw_hex_iterator (&this->get_tria(),
-                                 level,
-                                 0,
-                                 this);
-      }
-
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_hex_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim,spacedim>::hex_iterator
-MGDoFHandler<dim,spacedim>::begin_hex (const unsigned int level) const
-{
-                                   // level is checked in begin_raw
-  raw_hex_iterator ri = begin_raw_hex (level);
-  if (ri.state() != IteratorState::valid)
-    return ri;
-  while (ri->used() == false)
-    if ((++ri).state() != IteratorState::valid)
-      return ri;
-  return ri;
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::active_hex_iterator
-MGDoFHandler<dim, spacedim>::begin_active_hex (const unsigned int level) const
-{
-                                   // level is checked in begin_raw
-  hex_iterator i = begin_hex (level);
-  if (i.state() != IteratorState::valid)
-    return i;
-  while (i->has_children())
-    if ((++i).state() != IteratorState::valid)
-      return i;
-  return i;
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_hex_iterator
-MGDoFHandler<dim, spacedim>::end_raw_hex (const unsigned int level) const
-{
-  return (level == this->get_tria().n_levels()-1 ?
-          end_hex() :
-          begin_raw_hex (level+1));
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::hex_iterator
-MGDoFHandler<dim, spacedim>::end_hex (const unsigned int level) const
-{
-  return (level == this->get_tria().n_levels()-1 ?
-          hex_iterator(end_hex()) :
-          begin_hex (level+1));
-}
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::active_hex_iterator
-MGDoFHandler<dim, spacedim>::end_active_hex (const unsigned int level) const
-{
-  return (level == this->get_tria().n_levels()-1 ?
-          active_hex_iterator(end_hex()) :
-          begin_active_hex (level+1));
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_hex_iterator
-MGDoFHandler<dim, spacedim>::end_hex () const
-{
-  return raw_hex_iterator (&this->get_tria(),
-                           -1,
-                           -1,
-                           this);
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_hex_iterator
-MGDoFHandler<dim, spacedim>::last_raw_hex (const unsigned int level) const
-{
-  switch (dim)
-    {
-      case 1:
-      case 2:
-            Assert (false, ExcImpossibleInDim(dim));
-            return raw_hex_iterator();
-
-      case 3:
-            Assert (level<this->get_tria().n_levels(),
-                    ExcInvalidLevel(level));
-            Assert (this->get_tria().n_raw_hexs(level) != 0,
-                    ExcEmptyLevel (level));
-
-            return raw_hex_iterator (&this->get_tria(),
-                                     level,
-                                     this->get_tria().n_raw_hexs(level)-1,
-                                     this);
-      default:
-            Assert (false, ExcNotImplemented());
-            return raw_hex_iterator();
-    }
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::raw_hex_iterator
-MGDoFHandler<dim, spacedim>::last_raw_hex () const
-{
-  return last_raw_hex (this->get_tria().n_levels()-1);
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::hex_iterator
-MGDoFHandler<dim, spacedim>::last_hex (const unsigned int level) const
-{
-                                   // level is checked in last_raw
-  raw_hex_iterator ri = last_raw_hex(level);
-  if (ri->used()==true)
-    return ri;
-  while ((--ri).state() == IteratorState::valid)
-    if (ri->used()==true)
-      return ri;
-  return ri;
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::hex_iterator
-MGDoFHandler<dim, spacedim>::last_hex () const
-{
-  return last_hex (this->get_tria().n_levels()-1);
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::active_hex_iterator
-MGDoFHandler<dim, spacedim>::last_active_hex (const unsigned int level) const
-{
-                                   // level is checked in last_raw
-  hex_iterator i = last_hex(level);
-  if (i->has_children()==false)
-    return i;
-  while ((--i).state() == IteratorState::valid)
-    if (i->has_children()==false)
-      return i;
-  return i;
-}
-
-
-
-template <int dim, int spacedim>
-typename MGDoFHandler<dim, spacedim>::active_hex_iterator
-MGDoFHandler<dim, spacedim>::last_active_hex () const
-{
-  return last_active_hex (this->get_tria().n_levels()-1);
-}
-
 
 
 
@@ -2099,26 +1122,20 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
       this->get_tria().save_user_flags(user_flags);
       const_cast<Triangulation<2> &>(this->get_tria()).clear_user_flags ();
 
-                                       // flag all lines adjacent to cells of the current
-                                       // level, as those lines logically belong to the same
-                                       // level as the cell, at least for for isotropic
-                                       // refinement
       cell_iterator cell = begin(level),
                 endcell  = end(level);
-      for ( ; cell != endcell; ++cell)
-        for (unsigned int line=0; line < GeometryInfo<2>::faces_per_cell; ++line)
-          cell->face(line)->set_user_flag();
+      for ( ; cell != endcell ; ++cell)
+        for (unsigned int l=0; l < GeometryInfo<2>::lines_per_cell; ++l)
+	  {
+	    const line_iterator line = cell->line(l);
+	    if (line->user_flag_set() == false)
+	      {
+		for (unsigned int d=0; d<this->get_fe().dofs_per_line; ++d)
+		  line->set_mg_dof_index (level, d, new_numbers[line->mg_dof_index(level, d)]);
+		line->set_user_flag();
+	      }
+	  }
 
-      line_iterator line = begin_line(),
-                 endline = end_line();
-
-      for( ; line != endline; ++line)
-        if (line->user_flag_set())
-          {
-            for (unsigned int d=0; d<this->get_fe().dofs_per_line; ++d)
-              line->set_mg_dof_index (level, d, new_numbers[line->mg_dof_index(level, d)]);
-            line->clear_user_flag();
-          }
                                        // finally, restore user flags
       const_cast<Triangulation<2> &>(this->get_tria()).load_user_flags (user_flags);
     }
@@ -2161,28 +1178,19 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
       this->get_tria().save_user_flags(user_flags);
       const_cast<Triangulation<3> &>(this->get_tria()).clear_user_flags ();
 
-                                       // flag all lines adjacent to cells of the current
-                                       // level, as those lines logically belong to the same
-                                       // level as the cell, at least for for isotropic
-                                       // refinement
-
       cell_iterator cell = begin(level),
                 endcell  = end(level);
       for ( ; cell != endcell ; ++cell)
-        for (unsigned int line=0; line < GeometryInfo<3>::lines_per_cell; ++line)
-          cell->line(line)->set_user_flag();
-
-
-      line_iterator line = begin_line(),
-                 endline = end_line();
-
-      for( ; line != endline; ++line)
-        if (line->user_flag_set())
-          {
-            for (unsigned int d=0; d<this->get_fe().dofs_per_line; ++d)
-              line->set_mg_dof_index (level, d, new_numbers[line->mg_dof_index(level, d)]);
-            line->clear_user_flag();
-          }
+        for (unsigned int l=0; l < GeometryInfo<3>::lines_per_cell; ++l)
+	  {
+	    const line_iterator line = cell->line(l);
+	    if (line->user_flag_set() == false)
+	      {
+		for (unsigned int d=0; d<this->get_fe().dofs_per_line; ++d)
+		  line->set_mg_dof_index (level, d, new_numbers[line->mg_dof_index(level, d)]);
+		line->set_user_flag();
+	      }
+	  }
                                        // finally, restore user flags
       const_cast<Triangulation<3> &>(this->get_tria()).load_user_flags (user_flags);
     }
@@ -2195,26 +1203,19 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
       this->get_tria().save_user_flags(user_flags);
       const_cast<Triangulation<3> &>(this->get_tria()).clear_user_flags ();
 
-                                       // flag all quads adjacent to cells of the current
-                                       // level, as those lines logically belong to the same
-                                       // level as the cell, at least for for isotropic
-                                       // refinement
       cell_iterator cell = begin(level),
                 endcell  = end(level);
       for ( ; cell != endcell ; ++cell)
-        for (unsigned int quad=0; quad < GeometryInfo<3>::faces_per_cell; ++quad)
-          cell->face(quad)->set_user_flag();
-
-      quad_iterator quad = begin_quad(),
-                 endline = end_quad();
-
-      for( ; quad != endline; ++quad)
-        if (quad->user_flag_set())
-          {
-            for (unsigned int d=0; d<this->get_fe().dofs_per_quad; ++d)
-              quad->set_mg_dof_index (level, d, new_numbers[quad->mg_dof_index(level, d)]);
-            quad->clear_user_flag();
-          }
+        for (unsigned int q=0; q < GeometryInfo<3>::faces_per_cell; ++q)
+	  {
+	    const quad_iterator quad = cell->quad(q);
+	    if (quad->user_flag_set() == false)
+	      {
+		for (unsigned int d=0; d<this->get_fe().dofs_per_quad; ++d)
+		  quad->set_mg_dof_index (level, d, new_numbers[quad->mg_dof_index(level, d)]);
+		quad->set_user_flag();
+	      }
+	  }
                                        // finally, restore user flags
       const_cast<Triangulation<3> &>(this->get_tria()).load_user_flags (user_flags);
     }

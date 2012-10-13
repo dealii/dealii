@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,24 +46,34 @@ check_user_pointers(Triangulation<dim>& tr)
     }
   deallog << "cells" << std::endl;
 
+				   // now for faces and lines. since
+				   // we visit them multiple times,
+				   // check only the first time around
+  tr.clear_user_flags ();
   if (dim > 1)
-    for (typename Triangulation<dim>::face_iterator it = tr.begin_face();
-	 it != tr.end_face();++it)
-    {
-      deallog << '.';
-      if (it->user_pointer() != p++)
-	deallog << "Error" << std::endl;
-    }
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
+	 it != tr.end();++it)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	if (it->face(f)->user_flag_set() == false)
+	  {
+	    deallog << '.';
+	    if (it->face(f)->user_pointer() != p++)
+	      deallog << "Error" << std::endl;
+	    it->face(f)->set_user_flag();
+	  }
   deallog << "faces" << std::endl;
 
   if (dim > 2)
-    for (typename Triangulation<dim>::line_iterator it = tr.begin_line();
-	 it != tr.end_line();++it)
-    {
-      deallog << '.';
-      if (it->user_pointer() != p++)
-	deallog << "Error" << std::endl;
-    }
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
+	 it != tr.end();++it)
+      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+	if (it->line(l)->user_flag_set() == false)
+	  {
+	    deallog << '.';
+	    if (it->line(l)->user_pointer() != p++)
+	      deallog << "Error" << std::endl;
+	    it->line(l)->set_user_flag();
+	  }
   deallog << "lines" << std::endl;
 }
 
@@ -85,24 +95,34 @@ check_user_indices(Triangulation<dim>& tr)
     }
   deallog << "cells" << std::endl;
 
+				   // now for faces and lines. since
+				   // we visit them multiple times,
+				   // check only the first time around
+  tr.clear_user_flags ();
   if (dim > 1)
-    for (typename Triangulation<dim>::face_iterator it = tr.begin_face();
-	 it != tr.end_face();++it)
-    {
-      deallog << '.';
-      if (it->user_index() != p++)
-	deallog << "Error" << std::endl;
-    }
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
+	 it != tr.end();++it)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	if (it->face(f)->user_flag_set() == false)
+	  {
+	    deallog << '.';
+	    if (it->face(f)->user_index() != p++)
+	      deallog << "Error" << std::endl;
+	    it->face(f)->set_user_flag();
+	  }
   deallog << "faces" << std::endl;
 
   if (dim > 2)
-    for (typename Triangulation<dim>::line_iterator it = tr.begin_line();
-	 it != tr.end_line();++it)
-    {
-      deallog << '.';
-      if (it->user_index() != p++)
-	deallog << "Error" << std::endl;
-    }
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
+	 it != tr.end();++it)
+      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+	if (it->line(l)->user_flag_set() == false)
+	  {
+	    deallog << '.';
+	    if (it->line(l)->user_index() != p++)
+	      deallog << "Error" << std::endl;
+	    it->line(l)->set_user_flag();
+	  }
   deallog << "lines" << std::endl;
 }
 
@@ -112,30 +132,46 @@ void
 user_pointers(Triangulation<dim>& tr)
 {
   deallog << "Pointers" << dim << 'D' << std::endl;
-  
-				   // Fill user pointers with some nonsense
+
+				   // Fill user pointers with some
+				   // nonsense. clear them first
   Triangulation<dim>* p = &tr;
+  tr.clear_user_pointers();
   for (typename Triangulation<dim>::cell_iterator it = tr.begin();
        it != tr.end();++it)
     it->set_user_pointer(p++);
-  
+
+				   // we hit faces and lines more than
+				   // once, possibly. only set them
+				   // the first time around
+  tr.clear_user_flags ();
   if (dim > 1)
-    for (typename Triangulation<dim>::face_iterator it = tr.begin_face();
-	 it != tr.end_face();++it)
-      it->set_user_pointer(p++);
-  
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
+	 it != tr.end();++it)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	if (it->face(f)->user_flag_set() == false)
+	  {
+	    it->face(f)->set_user_pointer(p++);
+	    it->face(f)->set_user_flag();
+	  }
+
   if (dim > 2)
-    for (typename Triangulation<dim>::line_iterator it = tr.begin_line();
-	 it != tr.end_line();++it)
-      it->set_user_pointer(p++);
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
+	 it != tr.end();++it)
+      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+	if (it->line(l)->user_flag_set() == false)
+	  {
+	    it->line(l)->set_user_pointer(p++);
+	    it->line(l)->set_user_flag();
+	  }
 
 				   // Check if they are still the same
   check_user_pointers(tr);
 				   // Create two pointer index clashes here
   tr.begin()->user_index();
   tr.begin()->user_pointer();
-  
-  
+
+
 				   // Check if save and load work
   std::vector<void*> cell_pointers(tr.n_cells());
   deallog << "Save" << dim << 'D' << std::endl;
@@ -143,7 +179,7 @@ user_pointers(Triangulation<dim>& tr)
   tr.clear_user_data();
   deallog << "Load" << dim << 'D' << std::endl;
   tr.load_user_pointers(cell_pointers);
-  check_user_pointers(tr);  
+  check_user_pointers(tr);
 }
 
 
@@ -152,30 +188,61 @@ void
 user_indices(Triangulation<dim>& tr)
 {
   deallog << "Indices" << dim << 'D' << std::endl;
-  
-				   // Fill user pointers with some nonsense
+
+				   // Fill user indices with some
+				   // nonsense. clear them first
+
+  for (typename Triangulation<dim>::cell_iterator it = tr.begin();
+       it != tr.end();++it)
+    {
+      it->clear_user_index();
+
+      if (dim > 1)
+	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	  it->face(f)->clear_user_index();
+
+      if (dim > 2)
+	for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+	  it->line(l)->clear_user_index();
+    }
+
+
   unsigned int p=1;
   for (typename Triangulation<dim>::cell_iterator it = tr.begin();
        it != tr.end();++it)
     it->set_user_index(p++);
-  
+
+				   // we hit faces and lines more than
+				   // once, possibly. only set them
+				   // the first time around
+  tr.clear_user_flags ();
   if (dim > 1)
-    for (typename Triangulation<dim>::face_iterator it = tr.begin_face();
-	 it != tr.end_face();++it)
-      it->set_user_index(p++);
-  
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
+	 it != tr.end();++it)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	if (it->face(f)->user_flag_set() == false)
+	  {
+	    it->face(f)->set_user_index(p++);
+	    it->face(f)->set_user_flag();
+	  }
+
   if (dim > 2)
-    for (typename Triangulation<dim>::line_iterator it = tr.begin_line();
-	 it != tr.end_line();++it)
-      it->set_user_index(p++);
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
+	 it != tr.end();++it)
+      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+	if (it->line(l)->user_flag_set() == false)
+	  {
+	    it->line(l)->set_user_index(p++);
+	    it->line(l)->set_user_flag();
+	  }
 
 				   // Check if they are still the same
   check_user_indices(tr);
 				   // Create two pointer index clashes here
   tr.begin()->user_pointer();
   tr.begin()->user_index();
-  
-  
+
+
 				   // Check if save and load work
   std::vector<unsigned int> indices(tr.n_cells());
   deallog << "Save" << dim << 'D' << std::endl;
@@ -183,7 +250,7 @@ user_indices(Triangulation<dim>& tr)
   tr.clear_user_data();
   deallog << "Load" << dim << 'D' << std::endl;
   tr.load_user_indices(indices);
-  check_user_indices(tr);  
+  check_user_indices(tr);
 }
 
 
@@ -193,7 +260,7 @@ void check()
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
-  
+
   user_pointers(tr);
   tr.clear_user_pointers();
   user_indices(tr);
@@ -209,5 +276,5 @@ int main()
   deallog.threshold_double(1.e-10);
 
   check<2>();
-  check<3>();  
+  check<3>();
 }
