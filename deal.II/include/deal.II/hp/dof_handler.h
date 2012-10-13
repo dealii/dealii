@@ -80,23 +80,18 @@ namespace hp
       typedef typename IteratorSelector::CellAccessor         cell_accessor;
       typedef typename IteratorSelector::FaceAccessor         face_accessor;
 
-      typedef typename IteratorSelector::raw_line_iterator raw_line_iterator;
       typedef typename IteratorSelector::line_iterator line_iterator;
       typedef typename IteratorSelector::active_line_iterator active_line_iterator;
 
-      typedef typename IteratorSelector::raw_quad_iterator raw_quad_iterator;
       typedef typename IteratorSelector::quad_iterator quad_iterator;
       typedef typename IteratorSelector::active_quad_iterator active_quad_iterator;
 
-      typedef typename IteratorSelector::raw_hex_iterator raw_hex_iterator;
       typedef typename IteratorSelector::hex_iterator hex_iterator;
       typedef typename IteratorSelector::active_hex_iterator active_hex_iterator;
 
-      typedef typename IteratorSelector::raw_cell_iterator raw_cell_iterator;
       typedef typename IteratorSelector::cell_iterator cell_iterator;
       typedef typename IteratorSelector::active_cell_iterator active_cell_iterator;
 
-      typedef typename IteratorSelector::raw_face_iterator raw_face_iterator;
       typedef typename IteratorSelector::face_iterator face_iterator;
       typedef typename IteratorSelector::active_face_iterator active_face_iterator;
 
@@ -289,512 +284,50 @@ namespace hp
                                         */
       unsigned int max_couplings_between_boundary_dofs () const;
 
-                                       /**
-                                        *  @name Cell iterator functions
-                                        */
-                                       /*@{*/
-                                       /**
-                                        *  Iterator to the first cell, used
-                                        *  or not, on level @p level. If a level
-                                        *  has no cells, a past-the-end iterator
-                                        *  is returned.
-                                        *
-                                        *  This function calls @p begin_raw_line
-                                        *  in 1D and @p begin_raw_quad in 2D.
-                                        */
-      raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
-
-                                       /**
-                                        *  Iterator to the first used cell
-                                        *  on level @p level.
-                                        *
-                                        *  This function calls @p begin_line
-                                        *  in 1D and @p begin_quad in 2D.
-                                        */
+				       /**
+					*  @name Cell iterator functions
+					*/
+				       /*@{*/
+				       /**
+					* Iterator to the first used
+					* cell on level @p level.
+					*/
       cell_iterator        begin       (const unsigned int level = 0) const;
 
-                                       /**
-                                        *  Iterator to the first active
-                                        *  cell on level @p level.
-                                        *
-                                        *  This function calls @p begin_active_line
-                                        *  in 1D and @p begin_active_quad in 2D.
-                                        */
+				       /**
+					* Iterator to the first active
+					* cell on level @p level.
+					*/
       active_cell_iterator begin_active(const unsigned int level = 0) const;
 
-                                       /**
-                                        *  Iterator past the end; this
-                                        *  iterator serves for comparisons of
-                                        *  iterators with past-the-end or
-                                        *  before-the-beginning states.
-                                        *
-                                        *  This function calls @p end_line
-                                        *  in 1D and @p end_quad in 2D.
-                                        */
-      raw_cell_iterator    end () const;
+				       /**
+					* Iterator past the end; this
+					* iterator serves for
+					* comparisons of iterators with
+					* past-the-end or
+					* before-the-beginning states.
+					*/
+      cell_iterator        end () const;
 
-                                       /**
-                                        * Return an iterator which is the first
-                                        * iterator not on level. If @p level is
-                                        * the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
+				       /**
+					* Return an iterator which is
+					* the first iterator not on
+					* level. If @p level is the
+					* last level, then this returns
+					* <tt>end()</tt>.
+					*/
       cell_iterator        end (const unsigned int level) const;
 
-                                       /**
-                                        * Return a raw iterator which is the first
-                                        * iterator not on level. If @p level is
-                                        * the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
-      raw_cell_iterator    end_raw (const unsigned int level) const;
-
-                                       /**
-                                        * Return an active iterator which is the
-                                        * first iterator not on level. If @p level
-                                        * is the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
+				       /**
+					* Return an active iterator
+					* which is the first iterator
+					* not on level. If @p level is
+					* the last level, then this
+					* returns <tt>end()</tt>.
+					*/
       active_cell_iterator end_active (const unsigned int level) const;
 
-                                       /**
-                                        *  Return an iterator pointing to the
-                                        *  last cell, used or not.
-                                        *
-                                        *  This function calls @p last_raw_line
-                                        *  in 1D and @p last_raw_quad in 2D.
-                                        */
-      raw_cell_iterator    last_raw () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  cell of the level @p level, used or not.
-                                        *
-                                        *  This function calls @p last_raw_line
-                                        *  in 1D and @p last_raw_quad in 2D.
-                                        */
-      raw_cell_iterator    last_raw (const unsigned int level) const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  used cell.
-                                        *
-                                        *  This function calls @p last_line
-                                        *  in 1D and @p last_quad in 2D.
-                                        */
-      cell_iterator        last () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  used cell on level @p level.
-                                        *
-                                        *  This function calls @p last_line
-                                        *  in 1D and @p last_quad in 2D.
-                                        */
-      cell_iterator        last (const unsigned int level) const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  active cell.
-                                        *
-                                        *  This function calls @p last_active_line
-                                        *  in 1D and @p last_active_quad in 2D.
-                                        */
-      active_cell_iterator last_active () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  active cell on level @p level.
-                                        *
-                                        *  This function calls @p last_active_line
-                                        *  in 1D and @p last_active_quad in 2D.
-                                        */
-      active_cell_iterator last_active (const unsigned int level) const;
-                                       //@}
-
-                                       /*---------------------------------------*/
-
-                                       /**
-                                        *  @name Face iterator functions
-                                        */
-                                       /*@{*/
-                                       /**
-                                        *  Iterator to the first face, used
-                                        *  or not.
-                                        *
-                                        *  This function calls @p begin_raw_line
-                                        *  in 2D and @p begin_raw_quad in 3D.
-                                        */
-      raw_face_iterator    begin_raw_face   () const;
-
-                                       /**
-                                        *  Iterator to the first used face.
-                                        *
-                                        *  This function calls @p begin_line
-                                        *  in 2D and @p begin_quad in 3D.
-                                        */
-      face_iterator        begin_face       () const;
-
-                                       /**
-                                        *  Iterator to the first active face.
-                                        *
-                                        *  This function calls @p begin_active_line
-                                        *  in 2D and @p begin_active_quad in 3D.
-                                        */
-      active_face_iterator begin_active_face() const;
-
-                                       /**
-                                        *  Iterator past the end; this
-                                        *  iterator serves for comparisons of
-                                        *  iterators with past-the-end or
-                                        *  before-the-beginning states.
-                                        *
-                                        *  This function calls @p end_line
-                                        *  in 2D and @p end_quad in 3D.
-                                        */
-      raw_face_iterator    end_face () const;
-
-                                       /**
-                                        * Return a raw iterator past-the-end.
-                                        * This is the same as <tt>end_face()</tt>.
-                                        */
-      raw_face_iterator    end_raw_face () const;
-
-                                       /**
-                                        * Return an active iterator past-the-end.
-                                        * This is the same as <tt>end_face()</tt>.
-                                        */
-      active_face_iterator end_active_face () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the
-                                        *  last face, used or not.
-                                        *
-                                        *  This function calls @p last_raw_line
-                                        *  in 2D and @p last_raw_quad in 3D.
-                                        */
-      raw_face_iterator    last_raw_face () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  used face.
-                                        *
-                                        *  This function calls @p last_line
-                                        *  in 2D and @p last_quad in 3D.
-                                        */
-      face_iterator        last_face () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  active face.
-                                        *
-                                        *  This function calls @p last_active_line
-                                        *  in 2D and @p last_active_quad in 3D.
-                                        */
-      active_face_iterator last_active_face () const;
-
-                                       //@}
-
-
-                                       /*---------------------------------------*/
-
-                                       /**
-                                        *  @name Line iterator functions
-                                        */
-                                       /*@{*/
-                                       /**
-                                        *  Iterator to the first line, used
-                                        *  or not, on level @p level. If a level
-                                        *  has no lines, a past-the-end iterator
-                                        *  is returned.
-                                        */
-      raw_line_iterator    begin_raw_line   (const unsigned int level = 0) const;
-
-                                       /**
-                                        *  Iterator to the first used line
-                                        *  on level @p level.
-                                        */
-      line_iterator        begin_line       (const unsigned int level = 0) const;
-
-                                       /**
-                                        *  Iterator to the first active
-                                        *  line on level @p level.
-                                        */
-      active_line_iterator begin_active_line(const unsigned int level = 0) const;
-
-                                       /**
-                                        *  Iterator past the end; this
-                                        *  iterator serves for comparisons of
-                                        *  iterators with past-the-end or
-                                        *  before-the-beginning states.
-                                        */
-      raw_line_iterator    end_line () const;
-
-                                       /**
-                                        * Return an iterator which is the first
-                                        * iterator not on level. If @p level is
-                                        * the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
-      line_iterator        end_line (const unsigned int level) const;
-
-                                       /**
-                                        * Return a raw iterator which is the first
-                                        * iterator not on level. If @p level is
-                                        * the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
-      raw_line_iterator    end_raw_line (const unsigned int level) const;
-
-                                       /**
-                                        * Return an active iterator which is the
-                                        * first iterator not on level. If @p level
-                                        * is the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
-      active_line_iterator end_active_line (const unsigned int level) const;
-
-
-                                       /**
-                                        *  Return an iterator pointing to the
-                                        *  last line, used or not.
-                                        */
-      raw_line_iterator    last_raw_line () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  line of the level @p level, used or not.
-
-                                       */
-      raw_line_iterator    last_raw_line (const unsigned int level) const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  used line.
-                                        */
-      line_iterator        last_line () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  used line on level @p level.
-                                        */
-      line_iterator        last_line (const unsigned int level) const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  active line.
-                                        */
-      active_line_iterator last_active_line () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  active line on level @p level.
-                                        */
-      active_line_iterator last_active_line (const unsigned int level) const;
-                                       /*@}*/
-
-                                       /*---------------------------------------*/
-
-                                       /**
-                                        *  @name Quad iterator functions*/
-                                       /*@{
-                                        */
-                                       /**
-                                        *  Iterator to the first quad, used
-                                        *  or not, on level @p level. If a level
-                                        *  has no quads, a past-the-end iterator
-                                        *  is returned.
-                                        */
-      raw_quad_iterator    begin_raw_quad   (const unsigned int level = 0) const;
-
-                                       /**
-                                        *  Iterator to the first used quad
-                                        *  on level @p level.
-                                        */
-      quad_iterator        begin_quad       (const unsigned int level = 0) const;
-
-                                       /**
-                                        *  Iterator to the first active
-                                        *  quad on level @p level.
-                                        */
-      active_quad_iterator begin_active_quad(const unsigned int level = 0) const;
-
-                                       /**
-                                        *  Iterator past the end; this
-                                        *  iterator serves for comparisons of
-                                        *  iterators with past-the-end or
-                                        *  before-the-beginning states.
-                                        */
-      raw_quad_iterator    end_quad () const;
-
-                                       /**
-                                        * Return an iterator which is the first
-                                        * iterator not on level. If @p level is
-                                        * the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
-      quad_iterator        end_quad (const unsigned int level) const;
-
-                                       /**
-                                        * Return a raw iterator which is the first
-                                        * iterator not on level. If @p level is
-                                        * the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
-      raw_quad_iterator    end_raw_quad (const unsigned int level) const;
-
-                                       /**
-                                        * Return an active iterator which is the
-                                        * first iterator not on level. If @p level
-                                        * is the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
-      active_quad_iterator end_active_quad (const unsigned int level) const;
-
-
-                                       /**
-                                        *  Return an iterator pointing to the
-                                        *  last quad, used or not.
-                                        */
-      raw_quad_iterator    last_raw_quad () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  quad of the level @p level, used or not.
-
-                                       */
-      raw_quad_iterator    last_raw_quad (const unsigned int level) const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  used quad.
-                                        */
-      quad_iterator        last_quad () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  used quad on level @p level.
-                                        */
-      quad_iterator        last_quad (const unsigned int level) const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  active quad.
-                                        */
-      active_quad_iterator last_active_quad () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  active quad on level @p level.
-                                        */
-      active_quad_iterator last_active_quad (const unsigned int level) const;
-                                       /*@}*/
-
-                                       /*---------------------------------------*/
-
-                                       /**
-                                        *  @name Hex iterator functions*/
-                                       /*@{
-                                        */
-                                       /**
-                                        *  Iterator to the first hex, used
-                                        *  or not, on level @p level. If a level
-                                        *  has no hexs, a past-the-end iterator
-                                        *  is returned.
-                                        */
-      raw_hex_iterator
-      begin_raw_hex   (const unsigned int level = 0) const;
-
-                                       /**
-                                        *  Iterator to the first used hex
-                                        *  on level @p level.
-                                        */
-      hex_iterator
-      begin_hex       (const unsigned int level = 0) const;
-
-                                       /**
-                                        *  Iterator to the first active
-                                        *  hex on level @p level.
-                                        */
-      active_hex_iterator
-      begin_active_hex(const unsigned int level = 0) const;
-
-                                       /**
-                                        *  Iterator past the end; this
-                                        *  iterator serves for comparisons of
-                                        *  iterators with past-the-end or
-                                        *  before-the-beginning states.
-                                        */
-      raw_hex_iterator
-      end_hex () const;
-
-                                       /**
-                                        * Return an iterator which is the first
-                                        * iterator not on level. If @p level is
-                                        * the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
-      hex_iterator        end_hex (const unsigned int level) const;
-
-                                       /**
-                                        * Return a raw iterator which is the first
-                                        * iterator not on level. If @p level is
-                                        * the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
-      raw_hex_iterator    end_raw_hex (const unsigned int level) const;
-
-                                       /**
-                                        * Return an active iterator which is the
-                                        * first iterator not on level. If @p level
-                                        * is the last level, then this returns
-                                        * <tt>end()</tt>.
-                                        */
-      active_hex_iterator end_active_hex (const unsigned int level) const;
-
-                                       /**
-                                        *  Return an iterator pointing to the
-                                        *  last hex, used or not.
-                                        */
-      raw_hex_iterator
-      last_raw_hex () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  hex of the level @p level, used or not.
-
-                                       */
-      raw_hex_iterator
-      last_raw_hex (const unsigned int level) const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  used hex.
-                                        */
-      hex_iterator
-      last_hex () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  used hex on level @p level.
-                                        */
-      hex_iterator
-      last_hex (const unsigned int level) const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  active hex.
-                                        */
-      active_hex_iterator
-      last_active_hex () const;
-
-                                       /**
-                                        *  Return an iterator pointing to the last
-                                        *  active hex on level @p level.
-                                        */
-      active_hex_iterator
-      last_active_hex (const unsigned int level) const;
-                                       /*@}*/
+				       //@}
 
                                        /*---------------------------------------*/
 

@@ -1,8 +1,8 @@
 //----------------------------  crash_16.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,48 +72,57 @@ void test ()
 				   // identical
   std::vector<unsigned int> indices_1;
   std::vector<unsigned int> indices_2;
-  
-  for (typename hp::DoFHandler<dim>::active_line_iterator
-	 line = dof_handler.begin_active_line();
-       line != dof_handler.end_line(); ++line)
-    {
-      deallog << "line=" << line << std::endl;
-      
-      for (unsigned int f=0; f<line->n_active_fe_indices(); ++f)
-	{
-	  indices_1.resize (fe[line->nth_active_fe_index(f)].dofs_per_line +
-			    2 * fe[line->nth_active_fe_index(f)].dofs_per_vertex);
-	  line->get_dof_indices (indices_1,
-				 line->nth_active_fe_index(f));
-	  
-	  deallog << "  fe index=" << line->nth_active_fe_index(f)
-		  << ", indices=";
-	  for (unsigned int i=0; i<indices_1.size(); ++i)
-	    deallog << indices_1[i] << ' ';
-	  
-	  deallog << std::endl;
-	}
 
-      for (unsigned int f=0; f<line->n_active_fe_indices(); ++f)
+  std::set<unsigned int> line_already_treated;
+
+  for (typename hp::DoFHandler<dim>::active_cell_iterator
+	 cell = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+      if (line_already_treated.find (cell->line(l)->index())
+	  == line_already_treated.end())
+					 // line not yet treated
 	{
-	  indices_1.resize (fe[line->nth_active_fe_index(f)].dofs_per_line +
-			    2 * fe[line->nth_active_fe_index(f)].dofs_per_vertex);
-	  line->get_dof_indices (indices_1,
-				 line->nth_active_fe_index(f));
-	  for (unsigned int g=f+1; g<line->n_active_fe_indices(); ++g)
-	    if (fe[line->nth_active_fe_index(f)].dofs_per_line
-		==
-		fe[line->nth_active_fe_index(g)].dofs_per_line)
-	      {
-		indices_2.resize (fe[line->nth_active_fe_index(g)].dofs_per_line +
-				  2 * fe[line->nth_active_fe_index(g)].dofs_per_vertex);
-		line->get_dof_indices (indices_2,
-				       line->nth_active_fe_index(g));
-		Assert (indices_1 == indices_2,
-			ExcInternalError());
-	      }
+	  const typename hp::DoFHandler<dim>::active_line_iterator
+	    line = cell->line(l);
+	  deallog << "line=" << line << std::endl;
+	  line_already_treated.insert (line->index());
+
+	  for (unsigned int f=0; f<line->n_active_fe_indices(); ++f)
+	    {
+	      indices_1.resize (fe[line->nth_active_fe_index(f)].dofs_per_line +
+				2 * fe[line->nth_active_fe_index(f)].dofs_per_vertex);
+	      line->get_dof_indices (indices_1,
+				     line->nth_active_fe_index(f));
+
+	      deallog << "  fe index=" << line->nth_active_fe_index(f)
+		      << ", indices=";
+	      for (unsigned int i=0; i<indices_1.size(); ++i)
+		deallog << indices_1[i] << ' ';
+
+	      deallog << std::endl;
+	    }
+
+	  for (unsigned int f=0; f<line->n_active_fe_indices(); ++f)
+	    {
+	      indices_1.resize (fe[line->nth_active_fe_index(f)].dofs_per_line +
+				2 * fe[line->nth_active_fe_index(f)].dofs_per_vertex);
+	      line->get_dof_indices (indices_1,
+				     line->nth_active_fe_index(f));
+	      for (unsigned int g=f+1; g<line->n_active_fe_indices(); ++g)
+		if (fe[line->nth_active_fe_index(f)].dofs_per_line
+		    ==
+		    fe[line->nth_active_fe_index(g)].dofs_per_line)
+		  {
+		    indices_2.resize (fe[line->nth_active_fe_index(g)].dofs_per_line +
+				      2 * fe[line->nth_active_fe_index(g)].dofs_per_vertex);
+		    line->get_dof_indices (indices_2,
+					   line->nth_active_fe_index(g));
+		    Assert (indices_1 == indices_2,
+			    ExcInternalError());
+		  }
+	    }
 	}
-    }
 }
 
 
@@ -122,7 +131,7 @@ int main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (3);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

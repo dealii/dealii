@@ -1,8 +1,8 @@
 //----------------  inhomogeneous_constraints_nonsymmetric.cc  -------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,14 +47,14 @@ std::ofstream logfile("inhomogeneous_constraints_nonsymmetric/output");
 using namespace dealii;
 
 template <int dim>
-class AdvectionProblem 
+class AdvectionProblem
 {
   public:
     AdvectionProblem ();
     ~AdvectionProblem ();
 
     void run ();
-    
+
   private:
     void setup_system ();
     void test_equality ();
@@ -85,7 +85,7 @@ class RightHandSide : public Function<dim>
 {
   public:
     RightHandSide () : Function<dim> () {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const;
 };
@@ -112,7 +112,7 @@ AdvectionProblem<dim>::AdvectionProblem ()
 
 
 template <int dim>
-AdvectionProblem<dim>::~AdvectionProblem () 
+AdvectionProblem<dim>::~AdvectionProblem ()
 {
   dof_handler.clear ();
 }
@@ -139,12 +139,12 @@ void AdvectionProblem<dim>::setup_system ()
 					      0,
 					      RightHandSide<dim>(),
 					      boundary_values);
-    std::map<unsigned int,double>::const_iterator boundary_value = 
+    std::map<unsigned int,double>::const_iterator boundary_value =
       boundary_values.begin();
     for ( ; boundary_value !=boundary_values.end(); ++boundary_value)
       {
 	test_all_constraints.add_line(boundary_value->first);
-	test_all_constraints.set_inhomogeneity (boundary_value->first, 
+	test_all_constraints.set_inhomogeneity (boundary_value->first,
 						boundary_value->second);
       }
   }
@@ -189,7 +189,7 @@ void AdvectionProblem<dim>::test_equality ()
 	  test->value() = 0;
     }
 
-  deallog << "  Matrix difference norm: " 
+  deallog << "  Matrix difference norm: "
 	  << test_matrix.frobenius_norm() << std::endl;
   Assert (test_matrix.frobenius_norm() < 1e-13, ExcInternalError());
 
@@ -203,7 +203,7 @@ void AdvectionProblem<dim>::test_equality ()
     else
       test_rhs(i) = 0;
 
-  deallog << "  RHS difference norm: " 
+  deallog << "  RHS difference norm: "
 	  << test_rhs.l2_norm() << std::endl;
 
   Assert (test_rhs.l2_norm() < 1e-14, ExcInternalError());
@@ -213,14 +213,14 @@ void AdvectionProblem<dim>::test_equality ()
 
 
 template <int dim>
-void AdvectionProblem<dim>::assemble_reference () 
+void AdvectionProblem<dim>::assemble_reference ()
 {
   reference_matrix = 0;
   reference_rhs = 0;
 
   QGauss<dim> quadrature_formula (3);
-  FEValues<dim> fe_values (fe, quadrature_formula, 
-			   update_values    |  update_gradients | 
+  FEValues<dim> fe_values (fe, quadrature_formula,
+			   update_values    |  update_gradients |
 			   update_quadrature_points  |  update_JxW_values);
 
   const RightHandSide<dim> rhs_function;
@@ -232,7 +232,7 @@ void AdvectionProblem<dim>::assemble_reference ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   std::vector<double>  rhs_values (n_q_points);
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -249,7 +249,7 @@ void AdvectionProblem<dim>::assemble_reference ()
       advection_direction[0] = 1;
       advection_direction[1] = 1;
       advection_direction[dim-1] = -1;
-      
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
@@ -286,23 +286,23 @@ void AdvectionProblem<dim>::assemble_reference ()
 				      test_rhs,
 				      reference_rhs);
 
-  deallog << "  Reference matrix nonzeros: " << reference_matrix.n_nonzero_elements() 
-	  << ", actually: " << reference_matrix.n_actually_nonzero_elements (1e-12) 
+  deallog << "  Reference matrix nonzeros: " << reference_matrix.n_nonzero_elements()
+	  << ", actually: " << reference_matrix.n_actually_nonzero_elements (1e-12)
 	  << std::endl;
 }
 
 
 
 template <int dim>
-void AdvectionProblem<dim>::assemble_test_1 () 
+void AdvectionProblem<dim>::assemble_test_1 ()
 {
   test_matrix = 0;
   test_rhs = 0;
 
 
   QGauss<dim> quadrature_formula (3);
-  FEValues<dim> fe_values (fe, quadrature_formula, 
-			   update_values    |  update_gradients | 
+  FEValues<dim> fe_values (fe, quadrature_formula,
+			   update_values    |  update_gradients |
 			   update_quadrature_points  |  update_JxW_values);
 
   const RightHandSide<dim> rhs_function;
@@ -314,7 +314,7 @@ void AdvectionProblem<dim>::assemble_test_1 ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   std::vector<double>  rhs_values (n_q_points);
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -331,7 +331,7 @@ void AdvectionProblem<dim>::assemble_test_1 ()
       advection_direction[0] = 1;
       advection_direction[1] = 1;
       advection_direction[dim-1] = -1;
-      
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
@@ -352,12 +352,12 @@ void AdvectionProblem<dim>::assemble_test_1 ()
       test_matrix.add(local_dof_indices, cell_matrix);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	test_rhs(local_dof_indices[i]) += cell_rhs(i);
-	
+
     }
 
   test_all_constraints.condense (test_matrix, test_rhs);
-  deallog << "  Test matrix 1 nonzeros: " << test_matrix.n_nonzero_elements() 
-	  << ", actually: " << test_matrix.n_actually_nonzero_elements (1e-12) 
+  deallog << "  Test matrix 1 nonzeros: " << test_matrix.n_nonzero_elements()
+	  << ", actually: " << test_matrix.n_actually_nonzero_elements (1e-12)
 	  << std::endl;
 
   test_equality();
@@ -366,14 +366,14 @@ void AdvectionProblem<dim>::assemble_test_1 ()
 
 
 template <int dim>
-void AdvectionProblem<dim>::assemble_test_2 () 
+void AdvectionProblem<dim>::assemble_test_2 ()
 {
   test_matrix = 0;
   test_rhs = 0;
 
   QGauss<dim> quadrature_formula (3);
-  FEValues<dim> fe_values (fe, quadrature_formula, 
-			   update_values    |  update_gradients | 
+  FEValues<dim> fe_values (fe, quadrature_formula,
+			   update_values    |  update_gradients |
 			   update_quadrature_points  |  update_JxW_values);
 
   const RightHandSide<dim> rhs_function;
@@ -385,7 +385,7 @@ void AdvectionProblem<dim>::assemble_test_2 ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   std::vector<double>  rhs_values (n_q_points);
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -402,7 +402,7 @@ void AdvectionProblem<dim>::assemble_test_2 ()
       advection_direction[0] = 1;
       advection_direction[1] = 1;
       advection_direction[dim-1] = -1;
-      
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
@@ -426,15 +426,15 @@ void AdvectionProblem<dim>::assemble_test_2 ()
 						       test_matrix,
 						       test_rhs);
     }
-  deallog << "  Test matrix 2 nonzeros: " << test_matrix.n_nonzero_elements() 
-	  << ", actually: " << test_matrix.n_actually_nonzero_elements (1e-12) 
+  deallog << "  Test matrix 2 nonzeros: " << test_matrix.n_nonzero_elements()
+	  << ", actually: " << test_matrix.n_actually_nonzero_elements (1e-12)
 	  << std::endl;
   test_equality();
 }
 
 
 template <int dim>
-void AdvectionProblem<dim>::run () 
+void AdvectionProblem<dim>::run ()
 {
   GridGenerator::hyper_ball (triangulation);
   triangulation.refine_global (3-dim);
@@ -448,10 +448,15 @@ void AdvectionProblem<dim>::run ()
   }
   triangulation.execute_coarsening_and_refinement();
   {
-    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.last();
-    cell->set_refine_flag();
+				     // find the last cell and mark it
+				     // for refinement
+    for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
+	 cell != dof_handler.end(); ++cell)
+      if (++typename DoFHandler<dim>::active_cell_iterator(cell) ==
+	  dof_handler.end())
+	cell->set_refine_flag();
   }
-  triangulation.execute_coarsening_and_refinement();  
+  triangulation.execute_coarsening_and_refinement();
 
   setup_system ();
 
@@ -473,7 +478,7 @@ void AdvectionProblem<dim>::run ()
 
 
 
-int main () 
+int main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

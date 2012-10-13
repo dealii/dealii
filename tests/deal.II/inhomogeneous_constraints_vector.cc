@@ -1,8 +1,8 @@
 //------------------  inhomogeneous_constraints.cc  ------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,12 +51,12 @@ std::ofstream logfile("inhomogeneous_constraints_vector/output");
 using namespace dealii;
 
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
   public:
     LaplaceProblem ();
     void run ();
-    
+
   private:
     void setup_system ();
     void assemble_system ();
@@ -75,14 +75,14 @@ class LaplaceProblem
 };
 
 template <int dim>
-class Coefficient : public Function<dim> 
+class Coefficient : public Function<dim>
 {
   public:
     Coefficient ()  : Function<dim>() {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
@@ -91,7 +91,7 @@ class Coefficient : public Function<dim>
 
 template <int dim>
 double Coefficient<dim>::value (const Point<dim> &p,
-				const unsigned int /*component*/) const 
+				const unsigned int /*component*/) const
 {
   if (p.square() < 0.5*0.5)
     return 20;
@@ -103,11 +103,11 @@ double Coefficient<dim>::value (const Point<dim> &p,
 template <int dim>
 void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
-				   const unsigned int              component) const 
+				   const unsigned int              component) const
 {
-  Assert (values.size() == points.size(), 
+  Assert (values.size() == points.size(),
 	  ExcDimensionMismatch (values.size(), points.size()));
-  Assert (component == 0, 
+  Assert (component == 0,
 	  ExcIndexRange (component, 0, 1));
 
   const unsigned int n_points = points.size();
@@ -160,12 +160,12 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_system () 
-{  
+void LaplaceProblem<dim>::assemble_system ()
+{
   QGauss<dim>  quadrature_formula(2);
   Vector<double> test(dof_handler.n_dofs());
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values    |  update_gradients |
 			   update_quadrature_points  |  update_JxW_values);
 
@@ -192,7 +192,7 @@ void LaplaceProblem<dim>::assemble_system ()
 
       coefficient.value_list (fe_values.get_quadrature_points(),
 			      coefficient_values);
-      
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
@@ -200,7 +200,7 @@ void LaplaceProblem<dim>::assemble_system ()
 	      cell_matrix(i,j) += ((coefficient_values[q_point] *
 				    fe_values.shape_grad(i,q_point) *
 				    fe_values.shape_grad(j,q_point)
-				    + 
+				    +
 				    fe_values.shape_grad(i,q_point)[0] *
 				    fe_values.shape_value(j,q_point)
                   )*fe_values.JxW(q_point));
@@ -215,15 +215,15 @@ void LaplaceProblem<dim>::assemble_system ()
 
 				   // use standard function with matrix and
 				   // vector argument
-      constraints.distribute_local_to_global(cell_matrix, cell_rhs, 
-					     local_dof_indices, 
+      constraints.distribute_local_to_global(cell_matrix, cell_rhs,
+					     local_dof_indices,
 					     system_matrix, system_rhs);
 
 				   // now do just the right hand side (with
 				   // local matrix for eliminating
 				   // inhomogeneities)
-      constraints.distribute_local_to_global(cell_rhs, 
-					     local_dof_indices, 
+      constraints.distribute_local_to_global(cell_rhs,
+					     local_dof_indices,
 					     test, cell_matrix);
 
     }
@@ -235,7 +235,7 @@ void LaplaceProblem<dim>::assemble_system ()
 }
 
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverBicgstab<>        bicgstab (solver_control);
@@ -256,7 +256,7 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<3; ++cycle)
     {
@@ -274,8 +274,13 @@ void LaplaceProblem<dim>::run ()
 	  }
 	  triangulation.execute_coarsening_and_refinement();
 	  {
-	    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.last();
-	    cell->set_refine_flag();
+					     // find the last cell and mark it
+					     // for refinement
+	    for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
+		 cell != dof_handler.end(); ++cell)
+	      if (++typename DoFHandler<dim>::active_cell_iterator(cell) ==
+		  dof_handler.end())
+		cell->set_refine_flag();
 	  }
 	  triangulation.execute_coarsening_and_refinement();
 	}
@@ -294,7 +299,7 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-int main () 
+int main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

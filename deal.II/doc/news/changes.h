@@ -24,6 +24,46 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li>Removed: The Triangulation and DoFHandler classes had a great number
+of functions that allowed to get the first and last iterators to cells,
+faces, lines, quads and hexes overall and on each level of the mesh
+hierarchy individually. While conceptually a nice idea to offer such a
+rich set of functions, there are two factors that led us to drastically
+reduce this set of functions: (i) A large interface makes it more
+difficult to fully document what every function is doing and more
+difficult to find what one is looking for. (ii) A large interface
+makes it incredibly difficult to evolve the data structures on which
+these functions operate. We felt that the many functions we have impeded
+our ability to make changes to the internal storage of data. A survey
+of the deal.II code base as well as some larger applications also shows
+that most of these functions are rarely used, if at all.
+<br>
+Consequently, most of these functions have been removed. The only functions
+that remain are the following (for each of the Triangulation and the
+various DoFHandler classes):
+<pre>
+<code>
+    cell_iterator        begin       (const unsigned int level = 0) const;
+    active_cell_iterator begin_active(const unsigned int level = 0) const;
+    cell_iterator        end         () const;
+    cell_iterator        end         (const unsigned int level) const;
+    active_cell_iterator end_active  (const unsigned int level) const;
+</code>
+</pre>
+<br>
+Codes that have previously used functions like <code>begin_active_line</code>
+etc. to loop over the lines or quads of a triangulation need to be changed
+to loop over cells, and on each cell loop over the lines or quads of this
+cell. In most cases we have encountered (in deal.II or its testsuite) this
+was a rather trivial modification. A case to watch out for is that the
+old loop over all lines encountered all lines only once whereas one may
+encounter it multiple times when looping over all cells and then the lines
+of each cell. This case is easily avoided by flagging each treated line
+using the @ref GlossUserFlags "user flags" associated with lines, quads,
+and cells.
+<br>
+(Wolfgang Bangerth, 2012/09/22)
+
 <li>New: In the past, deal.II used a std::vector of bools in many places
 to denote component masks (see @ref GlossComponentMask) as well as for
 block masks (see @ref GlossBlockMask). This was neither
@@ -53,7 +93,7 @@ one that takes a BlockMask. Call sites need to be adjusted.
 <br>
 (Wolfgang Bangerth, 2012/09/22)
 
-<li> Changed: the optional argument offset got removed from
+<li> Removed: the optional argument offset got removed from
 DoFHandler and MGDoFHandler::distribute_dofs() because it was
 never working correctly and it is not used.
 <br>

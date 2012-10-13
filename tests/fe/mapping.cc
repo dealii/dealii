@@ -1,5 +1,5 @@
 // mapping.cc,v 1.19 2004/01/30 09:56:19 hartmann Exp
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010, 2011 Ralf Hartmann
+// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010, 2011, 2012 Ralf Hartmann
 //
 // Shows the shape functions implemented and computes the area of cells.
 
@@ -46,7 +46,7 @@ plot_transformation(Mapping<dim> &mapping,
   fe_values.reinit(cell);
 
   deallog.push(name);
-  
+
   unsigned int k=0;
   for (unsigned int nz=0; nz<=((dim>2) ? div : 0); ++nz)
     {
@@ -61,7 +61,7 @@ plot_transformation(Mapping<dim> &mapping,
 	    }
 	  deallog << std::endl;
 	}
-      deallog << std::endl;  
+      deallog << std::endl;
     }
   deallog.pop();
 }
@@ -99,13 +99,13 @@ plot_faces(Mapping<dim> &mapping,
 	      const Point<dim> x = fe_values.quadrature_point(k);
 	      const Point<dim>& n = fe_values.normal_vector(k);
 	      const double ds = fe_values.JxW(k);
-	      
+
 	      deallog << x << '\t' << n << '\t' << ds << std::endl;
 	      ++k;
 	    }
 	  deallog << std::endl;
 	}
-      deallog << std::endl;      
+      deallog << std::endl;
     }
   deallog.pop();
 }
@@ -135,10 +135,10 @@ plot_subfaces(Mapping<dim> &mapping,
 	 ++ sub_nr)
       {
 	fe_values.reinit(cell, face_nr, sub_nr);
-	
+
 	const std::vector<Point<dim> > &normals
 	  =fe_values.get_normal_vectors();
-	
+
 	unsigned int k=0;
 	for (unsigned int ny=0; ny<((dim>2) ? nq : 1); ++ny)
 	  {
@@ -243,7 +243,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       tria_ptr.push_back(tria);
       const double left = 1.;
       const double right = 4.;
-      
+
       const Point<2> vertices[4] = { Point<2>(left,left),
 				       Point<2>(right,left),
 				       Point<2>(right,right),
@@ -253,35 +253,35 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       for (unsigned int j=0; j<4; ++j)
 	cells[0].vertices[j] = cell_vertices[0][j];
       cells[0].material_id = 0;
-      
+
       tria->create_triangulation (std::vector<Point<2> >(&vertices[0], &vertices[4]),
 				  cells,
 				  SubCellData());
       exact_areas.push_back(9.);
     }
-  
+
 				   // tria1: arbitrary quadrilateral
   if (1)
     {
       tria=new Triangulation<2>();
       tria_ptr.push_back(tria);
       GridGenerator::hyper_cube(*tria, 1., 3.);
-      Point<2> &v0=tria->begin_quad()->vertex(0);
+      Point<2> &v0=tria->begin_active()->vertex(0);
       v0(0) = 0.;
-      Point<2> &v3=tria->begin_quad()->vertex(3);
+      Point<2> &v3=tria->begin_active()->vertex(3);
       v3(0) = 5.;
       v3(1) = 4.;
       exact_areas.push_back(7.);
       show[1][0] = 1;
     }
-  
+
 				   // tria2: crazy cell
   if (2)
     {
       Boundary<2> *boundary1=new HyperBallBoundary<2>(Point<2>(3,1), 2);
       Boundary<2> *boundary2=new HyperBallBoundary<2>(Point<2>(2,5), std::sqrt(5.));
       boundary_ptr.push_back(boundary1);
-      boundary_ptr.push_back(boundary2);      
+      boundary_ptr.push_back(boundary2);
       tria=new Triangulation<2>();
       tria_ptr.push_back(tria);
       GridGenerator::hyper_cube(*tria, 1., 5.);
@@ -349,7 +349,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
   Triangulation<3> *tria;
   show.clear();
   show.resize(5, std::vector<unsigned int> (mapping_size,0));
-  
+
 				   // 2x2 cube
   if (1)
     {
@@ -382,7 +382,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
 	    pi=std::acos(-1.);
       Boundary<3> *boundary1=new HyperBallBoundary<3>(m, r);
       boundary_ptr.push_back(boundary1);
-      
+
       tria=new Triangulation<3>();
       tria_ptr.push_back(tria);
       GridGenerator::hyper_cube(*tria, 1., 3.);
@@ -427,12 +427,12 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
     }
 }
 
-  
+
 template<int dim>
 void mapping_test()
 {
   deallog << "dim=" << dim << std::endl;
-  
+
   std::vector<Mapping<dim> *> mapping_ptr;
   std::vector<std::string> mapping_strings;
 
@@ -460,22 +460,22 @@ void mapping_test()
   mapping_strings.push_back("Cartesian");
 
   mapping_size=mapping_ptr.size();
-  
+
   std::vector<Triangulation<dim> *> tria_ptr;
   std::vector<Boundary<dim> *> boundary_ptr;
   std::vector<double> exact_areas;
-  
+
   create_triangulations(tria_ptr, boundary_ptr, exact_areas);
   Assert(show.size()==tria_ptr.size(), ExcInternalError());
 
   FE_Q<dim> fe_q4(4);
-  
+
   for (unsigned int i=0; i<tria_ptr.size(); ++i)
     {
       DoFHandler<dim> dof(*tria_ptr[i]);
-      dof.distribute_dofs(fe_q4);      
+      dof.distribute_dofs(fe_q4);
       typename DoFHandler<dim>::cell_iterator cell = dof.begin_active();
-      
+
       deallog << "Triangulation" << i << ":" << std::endl;
 
       deallog << "exact_area=" << exact_areas[i] << std::endl;
@@ -491,13 +491,13 @@ void mapping_test()
 		plot_transformation(*mapping_ptr[j], fe_q4, cell, ost.str());
 		compute_area(*mapping_ptr[j], fe_q4, cell);
 	      }
-	    
+
 	    if (dim>1)
 	      {
 		std::ostringstream ost;
 		ost << "MappingFace" << dim << "d-" << i << '-'
 		    << mapping_strings[j];
-		deallog << ost.str() << std::endl;	    
+		deallog << ost.str() << std::endl;
 		plot_faces(*mapping_ptr[j], fe_q4, cell, ost.str());
 	      }
 
@@ -506,11 +506,11 @@ void mapping_test()
 		std::ostringstream ost;
 		ost << "MappingSubface" << dim << "d-" << i << '-'
 		    << mapping_strings[j];
-		deallog << ost.str() << std::endl;	    
+		deallog << ost.str() << std::endl;
 		plot_subfaces(*mapping_ptr[j], fe_q4, cell, ost.str());
 	      }
 
-	    
+
 				   // Test for transform_*_to_*_cell
 	    if (true)
 	      {
@@ -528,13 +528,13 @@ void mapping_test()
 			  p_unit=Point<dim>(6/7.,4/7.,5/7.);
 			  break;
 		  }
-		
+
 		Point<dim> p_real=mapping.transform_unit_to_real_cell(cell, p_unit);
 		Point<dim> p_re_unit=mapping.transform_real_to_unit_cell(cell, p_real);
 		deallog << "p_unit=" << p_unit << ",  p_real=" << p_real
 			<< ",  p_re_unit=" << p_re_unit << std::endl;
-	      }	    
-	  }    
+	      }
+	  }
     }
 
 
@@ -559,20 +559,20 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
-				   // ----------------------- 
+
+				   // -----------------------
 				   // Tests for dim=1
 				   // -----------------------
   mapping_test<1>();
 
-  
-				   // ----------------------- 
+
+				   // -----------------------
 				   // Tests for dim=2
 				   // -----------------------
   mapping_test<2>();
-  
 
-				   // ----------------------- 
+
+				   // -----------------------
 				   // Tests for dim=3
 				   // -----------------------
   mapping_test<3>();

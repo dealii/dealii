@@ -769,7 +769,7 @@ namespace DoFRenumbering
                                          // and insert them into the global
                                          // list using their component
           const unsigned int fe_index = cell->active_fe_index();
-          const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
+          const unsigned int dofs_per_cell = fe_collection[fe_index].dofs_per_cell;
           local_dof_indices.resize (dofs_per_cell);
           cell.get_dof_indices (local_dof_indices);
           for (unsigned int i=0; i<dofs_per_cell; ++i)
