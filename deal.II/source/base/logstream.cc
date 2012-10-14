@@ -31,16 +31,6 @@
 #include <sstream>
 
 
-// on SunOS 4.x, getrusage is stated in the man pages and exists, but
-// is not declared in resource.h. declare it ourselves
-#ifdef NO_HAVE_GETRUSAGE
-extern "C" {
-  int getrusage(int who, struct rusage* ru);
-}
-#endif
-
-// When modifying the prefix list, we need to lock it just in case
-// another thread tries to do the same.
 DEAL_II_NAMESPACE_OPEN
 
 namespace
@@ -63,7 +53,7 @@ LogStream::LogStream()
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
-#ifdef HAVE_TIMES
+#if defined(HAVE_UNISTD_H) && defined(HAVE_TIMES)
   reference_time_val = 1./sysconf(_SC_CLK_TCK) * times(&reference_tms);
 #endif
 }
@@ -371,7 +361,7 @@ LogStream::log_thread_id (const bool flag)
 void
 LogStream::print_line_head()
 {
-#ifndef DEAL_II_MSVC
+#ifdef HAVE_SYS_RESOURCE_H
   rusage usage;
   double utime = 0.;
   if (print_utime)
@@ -464,7 +454,7 @@ void
 LogStream::timestamp ()
 {
   struct tms current_tms;
-#ifdef HAVE_TIMES
+#if defined(HAVE_UNISTD_H) && defined(HAVE_TIMES)
   const clock_t tick = sysconf(_SC_CLK_TCK);
   const double time = 1./tick * times(&current_tms);
 #else
