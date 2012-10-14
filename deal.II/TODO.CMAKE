@@ -1,5 +1,7 @@
 Major:
 
+* Add support for native FreeBSD: -lpthread --> -pthread
+
 * Add the rest of the Bug tests
 
 * Test the fparser 4.5 functionality.
