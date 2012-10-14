@@ -500,6 +500,9 @@
 /* Define to 1 if you have the `strtrs_' function. */
 #undef HAVE_STRTRS_
 
+/* Define to 1 if you have the <sys/resource.h> header file. */
+#undef HAVE_SYS_RESOURCE_H
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 

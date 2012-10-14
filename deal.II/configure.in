@@ -244,6 +244,7 @@ AC_CHECK_FUNCS_ONCE([gethostname getpid])
 AC_CHECK_HEADERS_ONCE([sys/syscall.h])
 AC_CHECK_HEADERS_ONCE([sys/times.h])
 AC_CHECK_HEADERS_ONCE([sys/time.h])
+AC_CHECK_HEADERS_ONCE([sys/resource.h])
 AC_CHECK_FUNCS(times)
 DEAL_II_CHECK_BROKEN_SOCKETS
 
