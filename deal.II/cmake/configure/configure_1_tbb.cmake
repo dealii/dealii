@@ -33,9 +33,25 @@ MACRO(SETUP_THREADING var)
     #
     # We support threading. Go on and configure the rest:
     #
+    SET(DEAL_II_USE_MT TRUE)
+
+    #
+    # Change -lphtread to -pthread for more compatibility on non linux
+    # platforms:
+    #
+    IF("${CMAKE_THREAD_LIBS_INIT}" MATCHES "-lpthread")
+      CHECK_CXX_COMPILER_FLAG("-pthread"
+        DEAL_II_HAVE_FLAG_-pthread
+        )
+      IF(DEAL_II_HAVE_FLAG_-pthread)
+        STRING(REPLACE "-lpthread" "-pthread" CMAKE_THREAD_LIBS_INIT
+          "${CMAKE_THREAD_LIBS_INIT}"
+          )
+      ENDIF()
+    ENDIF()
 
     ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-    SET(DEAL_II_USE_MT TRUE)
+
 
     #
     # Set up some posix thread specific configuration toggles:
