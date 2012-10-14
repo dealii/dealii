@@ -14,3 +14,5 @@ ADD_EXECUTABLE(step-1 step-1.cc)
 
 DEAL_II_SETUP_TARGET(step-1)
 
+ADD_CUSTOM_TARGET(run COMMAND step-1)
+
