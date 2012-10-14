@@ -14,29 +14,25 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
 
-#include <fstream>
-#include <iomanip>
+#include <boost/math/special_functions/erf.hpp>
+
 #include <algorithm>
-#include <cstdlib>
-#include <cstdio>
-#include <cstddef>
-#include <ctime>
 #include <cerrno>
 #include <cmath>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <sstream>
 
-#ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-#endif
 #ifdef DEAL_II_MSVC
 #  include <winsock2.h>
 #endif
 
-#include <boost/math/special_functions/erf.hpp>
-
-#include <sys/types.h>
-#include <sstream>
-#include <iostream>
-#include <limits>
 
 #ifdef DEAL_II_USE_TRILINOS
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI

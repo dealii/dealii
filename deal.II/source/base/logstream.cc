@@ -17,13 +17,14 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
 
-// include sys/resource.h for rusage(). Mac OS X needs sys/time.h then
-// as well (strange), so include that, too.
-#ifndef DEAL_II_MSVC
+#ifdef HAVE_SYS_RESOURCE_H
 #  include <sys/resource.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
-#include <sys/types.h>
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>

@@ -24,7 +24,7 @@
 #include <sstream>
 
 #ifdef HAVE_SYS_TIMES_H
-#include <sys/times.h>
+#  include <sys/times.h>
 #else
 struct tms
 {

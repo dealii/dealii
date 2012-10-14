@@ -13,29 +13,11 @@
 
 
 #include <deal.II/base/thread_management.h>
-#include <iostream>
+
+#include <cerrno>
 #include <cstdlib>
-
-#ifdef DEAL_II_USE_MT_POSIX
-#  include <list>
-#endif
-
-#ifndef DEAL_II_USE_DIRECT_ERRNO_H
-#  include <errno.h>
-#else
-#  include </usr/include/errno.h>
-#endif
-#ifndef DEAL_II_MSVC
-#  include <sys/errno.h>
-#endif
-
-#ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-#endif
-
-#ifdef HAVE_SYS_SYSCALL_H
-#  include <sys/syscall.h>
-#endif
+#include <iostream>
+#include <list>
 
 
 DEAL_II_NAMESPACE_OPEN
