@@ -60,10 +60,6 @@
    linking. For the details, look at aclocal.m4 in the top-level directory. */
 #undef DEAL_II_ANON_NAMESPACE_LINKAGE_BUG
 
-/* Defined if the compiler has a problem with using arrays as arguments in
-   functions */
-#undef DEAL_II_ARRAY_ARG_BUG
-
 /* Defined if the compiler has a problem with assigning arrays in conditionals
    */
 #undef DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG
@@ -122,11 +118,6 @@
    directory for a description of this bug. */
 #undef DEAL_II_EXPLICIT_DESTRUCTOR_BUG
 
-/* Defined if the compiler needs a workaround for certain problems with taking
-   the address of template template functions. For the details, look at
-   aclocal.m4 in the top-level directory. */
-#undef DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
-
 /* Defined if the compiler has a bug with dynamic casting and dynamic
    libraries */
 #undef DEAL_II_HAVE_DARWIN_DYNACAST_BUG
@@ -150,11 +141,6 @@
    */
 #undef DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND
 
-/* Defined if the compiler gets an internal compiler upon some code involving
-   long doubles, and with optimization. For the details, look at aclocal.m4 in
-   the top-level directory. */
-#undef DEAL_II_LONG_DOUBLE_LOOP_BUG
-
 /* Major version number of deal.II */
 #undef DEAL_II_MAJOR
 
@@ -167,11 +153,6 @@
    template member operators. See the aclocal.m4 file in the top-level
    directory for a description of this bug. */
 #undef DEAL_II_MEMBER_OP_TEMPLATE_INST
-
-/* Defined if the compiler refuses to specialize an outer class template while
-   keeping a member as a template. For the exact failure mode, look at
-   aclocal.m4 in the top-level directory. */
-#undef DEAL_II_MEMBER_TEMPLATE_SPECIALIZATION_BUG
 
 /* Defined if the compiler refuses to allow the explicit specialization of
    static member variables. For the exact failure mode, look at aclocal.m4 in
@@ -192,27 +173,6 @@
 /* enable multigrid compatibility mode */
 #undef DEAL_II_MULTIGRID_COMPATIBILITY
 
-/* Define if we have to work around a bug in gcc with marking all instances of
-   a template class as friends to this class if the class is inside a
-   namespace. See the aclocal.m4 file in the top-level directory for a
-   description of this bug. */
-#undef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
-
-/* Define if we have to work around another bug in gcc with marking all
-   instances of a template class as friends to this class if the class is
-   inside a namespace. See the aclocal.m4 file in the top-level directory for
-   a description of this bug. */
-#undef DEAL_II_NAMESP_TEMPL_FRIEND_BUG2
-
-/* Defined if the compiler does not properly implement the resolution of
-   defect report #45 to the C++ standard, which makes nested types implicit
-   friends of the enclosing class. */
-#undef DEAL_II_NESTED_CLASS_FRIEND_BUG
-
-/* Defined if the compiler does not understand friend declarations for nested
-   member classes when giving a full class specification. */
-#undef DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
-
 /* Path to the deal.II directory */
 #undef DEAL_II_PATH
 
@@ -225,11 +185,6 @@
    aclocal.m4 file in the top-level directory for a description of this bug.
    */
 #undef DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND
-
-/* Defined if the compiler refuses to allow a typedef to a template template
-   class template parameter. For the exact failure mode, look at aclocal.m4 in
-   the top-level directory. */
-#undef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
 
 /* Defined if the compiler requires the use of the template keyword for
    disambiguation keyword in certain contexts in which it is not supposed to
@@ -553,6 +508,9 @@
 
 /* Define to 1 if you have the <sys/times.h> header file. */
 #undef HAVE_SYS_TIMES_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
