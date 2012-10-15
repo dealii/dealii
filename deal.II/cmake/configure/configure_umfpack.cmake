@@ -70,7 +70,7 @@ MACRO(FEATURE_UMFPACK_ERROR_MESSAGE)
     "If the libraries are not at a default location, either provide some hints\n"
     "for the autodetection:\n"
     "    $ UMFPACK_DIR=\"...\" cmake <...>\n"
-    "    $ ccmake -DUMFPACK_DIR=\"...\" cmake <...>\n"
+    "    $ cmake -DUMFPACK_DIR=\"...\" <...>\n"
     "or set the relevant variables by hand in ccmake.\n"
     "Relevant hints for UMFPACK are UMFPACK_DIR, AMD_DIR, SUITESPARSECONFIG_DIR.\n"
     "Alternatively you may choose to compile the bundled libraries\n"

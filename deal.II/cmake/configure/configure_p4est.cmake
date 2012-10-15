@@ -66,7 +66,7 @@ MACRO(FEATURE_P4EST_ERROR_MESSAGE)
     "If the libraries are not at a default location, either provide some hints\n"
     "for the autodetection:\n"
     "    $ P4EST_DIR=\"...\" cmake <...>\n"
-    "    $ ccmake -DP4EST_DIR=\"...\" cmake <...>\n"
+    "    $ cmake -DP4EST_DIR=\"...\" <...>\n"
     "or set the relevant variables by hand in ccmake.\n"
     )
 ENDMACRO()

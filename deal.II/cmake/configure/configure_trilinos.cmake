@@ -216,7 +216,7 @@ MACRO(FEATURE_TRILINOS_ERROR_MESSAGE)
     "If the libraries are not at a default location, either provide some hints\n"
     "for the autodetection:\n"
     "    $ TRILINOS_DIR=\"...\" cmake <...>\n"
-    "    $ ccmake -DTRILINOS_DIR=\"...\" cmake <...>\n"
+    "    $ cmake -DTRILINOS_DIR=\"...\" <...>\n"
     "or set the relevant variables by hand in ccmake.\n\n"
     )
 ENDMACRO()

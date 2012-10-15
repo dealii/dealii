@@ -57,7 +57,7 @@ MACRO(FEATURE_METIS_ERROR_MESSAGE)
     "If the library is not at a default location, either provide some hints\n"
     "for the autodetection:\n"
     "    $ METIS_DIR=\"...\" cmake <...>\n"
-    "    $ ccmake -DMETIS_DIR=\"...\" cmake <...>\n"
+    "    $ cmake -DMETIS_DIR=\"...\" <...>\n"
     "or set the relevant variables by hand in ccmake.\n\n"
     )
 ENDMACRO()

@@ -109,10 +109,10 @@ MACRO(FEATURE_PETSC_ERROR_MESSAGE)
     "for the autodetection:\n"
     "PETSc installed with --prefix=<...> to a destination:\n"
     "    $ PETSC_DIR=\"...\" cmake <...>\n"
-    "    $ ccmake -DPETSC_DIR=\"...\" cmake <...>\n"
+    "    $ cmake -DPETSC_DIR=\"...\" <...>\n"
     "PETSc compiled in source tree:\n"
     "    $ PETSC_DIR=\"...\"  PETSC_ARCH=\"...\" cmake <...>\n"
-    "    $ ccmake -DPETSC_DIR=\"...\" -DPETSC_ARCH=\"...\" cmake <...>\n"
+    "    $ cmake -DPETSC_DIR=\"...\" -DPETSC_ARCH=\"...\" <...>\n"
     "or set the relevant variables by hand in ccmake.\n\n"
     )
 ENDMACRO()
