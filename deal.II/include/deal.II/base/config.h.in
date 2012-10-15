@@ -62,6 +62,14 @@
 #cmakedefine HAVE_FUNCTIONPARSER
 
 
+/***************************************
+ * Configured in configure_hdf5.cmake: *
+ **************************************/
+
+/* Defined if deal.II was configured with hdf5 support */
+#cmakedefine DEAL_II_HAVE_HDF5
+
+
 /*****************************************
  * Configured in configure_lapack.cmake: *
  *****************************************/

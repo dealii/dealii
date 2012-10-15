@@ -22,7 +22,7 @@ SET_IF_EMPTY(METIS_DIR "$ENV{METIS_DIR}")
 
 #
 # TODO: Metis is usually pretty self contained. So no external dependencies
-# so far... BUt there could be dependencies on pcre and mpi...
+# so far... But there could be dependencies on pcre and mpi...
 #
 
 FIND_PATH(METIS_INCLUDE_DIR metis.h
