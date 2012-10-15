@@ -1,12 +1,14 @@
 Major:
 
+* MPI dependencies?
+  arpack, hdf5, petsc, p4est, trilinos, metis
+
 * Add the rest of the Bug tests
 
 * Test the fparser 4.5 functionality.
 
 * The following features have to be written:
     * SLEPC
-    * HDF5
     * TECPLOT
 
 * Write a wrapper around cmake. Something like
