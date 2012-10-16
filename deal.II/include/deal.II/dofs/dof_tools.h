@@ -1785,12 +1785,24 @@ namespace DoFTools
                                     */
                                    //@{
                                    /**
-                                    * Create a sparsity pattern which
-                                    * in each row lists the degrees of
-                                    * freedom associated with the
-                                    * corresponding cell.
+                                    * Create an incidence matrix that
+                                    * for every cell on a given level
+                                    * of a multilevel DoFHandler flags
+                                    * which degrees of freedom are
+                                    * associated with the
+                                    * corresponding cell. This data
+                                    * structure is matrix with as many
+                                    * rows as there are cells on a
+                                    * given level, as many rows as
+                                    * there are degrees of freedom on
+                                    * this level, and entries that are
+                                    * either true or false. This data
+                                    * structure is conveniently
+                                    * represented by a SparsityPattern
+                                    * object.
                                     *
-                                    * Ordering follows the ordering of
+                                    * @note The ordering of rows
+                                    * (cells) follows the ordering of
                                     * the standard cell iterators.
                                     */
   template <class DH, class Sparsity>
@@ -1800,64 +1812,75 @@ namespace DoFTools
                          const std::vector<bool>& selected_dofs = std::vector<bool>(),
                          unsigned int offset = 0);
 
-                                    /**
-                                     * Create a sparsity pattern which
-                                     * in each row lists the degrees
-                                     * of freedom associated to the
-                                     * cells corresponding to a
-                                     * vertex. The sparsity pattern
-                                     * may be empty when entering this
-                                     * function and will be
-                                     * reinitialized to the correct
-                                     * size.
-                                     *
-                                     * The function has some boolean
-                                     * arguments (lsited below)
-                                     * controlling details of the
-                                     * generated patches. The default
-                                     * settings are those for
-                                     * Arnold-Falk-Winther type
-                                     * smoothers for divergence and
-                                     * curl conforming finite elements
-                                     * with essential boundary
-                                     * conditions. Other applications
-                                     * are possible, in particular
-                                     * changing
-                                     * <tt>boundary_patches</tt> for
-                                     * non-essential boundary conditions.
-                                     *
-                                     * @arg <tt>block_list</tt>: the
-                                     * SparsityPattern into which the
-                                     * patches will be stored.
-                                     * @arg <tt>dof_handler</tt>: The
-                                     * multilevel dof handler
-                                     * providing the topology operated
-                                     * on.
-                                     * @arg
-                                     * <tt>interior_dofs_only</tt>:
-                                     * for each patch of cells around
-                                     * a vertex, collect only the
-                                     * interior degrees of freedom of
-                                     * the patch and disregard those
-                                     * on the boundary of the
-                                     * patch. This is for instance the
-                                     * setting for smoothers of
-                                     * Arnold-Falk-Winther type.
-                                     * @arg <tt>boundary_patches</tt>:
-                                     * include patches around vertices
-                                     * at the boundary of the
-                                     * domain. If not, only patches
-                                     * around interior vertices will
-                                     * be generated.
-                                     * @arg
-                                     * <tt>level_boundary_patches</tt>:
-                                     * same for refinement edges
-                                     * towards coarser cells.
-                                     * @arg
-                                     * <tt>single_cell_patches</tt>:
-                                     * if not true, patches containing
-                                     * a single cell are eliminated.
-                                     */
+				   /**
+				    * Create an incidence matrix that
+				    * for every vertex on a given level
+				    * of a multilevel DoFHandler flags
+				    * which degrees of freedom are
+				    * associated with the
+				    * adjacent cells. This data
+				    * structure is matrix with as many
+				    * rows as there are vertices on a
+				    * given level, as many rows as
+				    * there are degrees of freedom on
+				    * this level, and entries that are
+				    * either true or false. This data
+				    * structure is conveniently
+				    * represented by a SparsityPattern
+				    * object.
+				    * The sparsity pattern
+				    * may be empty when entering this
+				    * function and will be
+				    * reinitialized to the correct
+				    * size.
+				    *
+				    * The function has some boolean
+				    * arguments (listed below)
+				    * controlling details of the
+				    * generated patches. The default
+				    * settings are those for
+				    * Arnold-Falk-Winther type
+				    * smoothers for divergence and
+				    * curl conforming finite elements
+				    * with essential boundary
+				    * conditions. Other applications
+				    * are possible, in particular
+				    * changing
+				    * <tt>boundary_patches</tt> for
+				    * non-essential boundary conditions.
+				    *
+				    * @arg <tt>block_list</tt>: the
+				    * SparsityPattern into which the
+				    * patches will be stored.
+				    * @arg <tt>dof_handler</tt>: The
+				    * multilevel dof handler
+				    * providing the topology operated
+				    * on.
+				    * @arg
+				    * <tt>interior_dofs_only</tt>:
+				    * for each patch of cells around
+				    * a vertex, collect only the
+				    * interior degrees of freedom of
+				    * the patch and disregard those
+				    * on the boundary of the
+				    * patch. This is for instance the
+				    * setting for smoothers of
+				    * Arnold-Falk-Winther type.
+				    * @arg <tt>boundary_patches</tt>:
+				    * include patches around vertices
+				    * at the boundary of the
+				    * domain. If not, only patches
+				    * around interior vertices will
+				    * be generated.
+				    * @arg
+				    * <tt>level_boundary_patches</tt>:
+				    * same for refinement edges
+				    * towards coarser cells.
+				    * @arg
+				    * <tt>single_cell_patches</tt>:
+				    * if not true, patches containing
+				    * a single cell are eliminated.
+				    */
    template <class DH>
    void make_vertex_patches(SparsityPattern& block_list,
                             const DH& dof_handler,
@@ -1867,63 +1890,73 @@ namespace DoFTools
                             const bool level_boundary_patches = false,
                             const bool single_cell_patches = false);
 
-                                    /**
-                                     * Create a sparsity pattern which
-                                     * in each row lists the degrees of
-                                     * freedom associated to the
-                                     * cells which are the children of
-                                     * the same cell. The
-                                     * sparsity pattern may be empty
-                                     * when entering this function and
-                                     * will be reinitialized to the
-                                     * correct size.
-                                     *
-                                     * The function has some boolean
-                                     * arguments (lsited below)
-                                     * controlling details of the
-                                     * generated patches. The default
-                                     * settings are those for
-                                     * Arnold-Falk-Winther type
-                                     * smoothers for divergence and
-                                     * curl conforming finite elements
-                                     * with essential boundary
-                                     * conditions. Other applications
-                                     * are possible, in particular
-                                     * changing
-                                     * <tt>boundary_dofs</tt> for
-                                     * non-essential boundary
-                                     * conditions.
-                                     *
-                                     * Since the patches are defined
-                                     * through refinement, th
-                                     *
-                                     * @arg <tt>block_list</tt>: the
-                                     * SparsityPattern into which the
-                                     * patches will be stored.
-                                     * @arg <tt>dof_handler</tt>: The
-                                     * multilevel dof handler
-                                     * providing the topology operated
-                                     * on.
-                                     * @arg
-                                     * <tt>interior_dofs_only</tt>:
-                                     * for each patch of cells around
-                                     * a vertex, collect only the
-                                     * interior degrees of freedom of
-                                     * the patch and disregard those
-                                     * on the boundary of the
-                                     * patch. This is for instance the
-                                     * setting for smoothers of
-                                     * Arnold-Falk-Winther type.
-                                     * @arg <tt>boundary_dofs</tt>:
-                                     * include degrees of freedom,
-                                     * which would have excluded by
-                                     * <tt>interior_dofs_only</tt>,
-                                     * but are lying on the boundary
-                                     * of the domain, and thus need
-                                     * smoothing. This parameter has
-                                     * no effect if
-                                     * <tt>interior_dofs_only</tt> is false.
-                                     */
+				   /**
+				    * Create an incidence matrix that
+				    * for every cell on a given level
+				    * of a multilevel DoFHandler flags
+				    * which degrees of freedom are
+				    * associated with children of this
+				    * cell. This data
+				    * structure is conveniently
+				    * represented by a SparsityPattern
+				    * object.
+
+				    * Create a sparsity pattern which
+				    * in each row lists the degrees of
+				    * freedom associated to the
+				    * cells which are the children of
+				    * the same cell. The
+				    * sparsity pattern may be empty
+				    * when entering this function and
+				    * will be reinitialized to the
+				    * correct size.
+				    *
+				    * The function has some boolean
+				    * arguments (lsited below)
+				    * controlling details of the
+				    * generated patches. The default
+				    * settings are those for
+				    * Arnold-Falk-Winther type
+				    * smoothers for divergence and
+				    * curl conforming finite elements
+				    * with essential boundary
+				    * conditions. Other applications
+				    * are possible, in particular
+				    * changing
+				    * <tt>boundary_dofs</tt> for
+				    * non-essential boundary
+				    * conditions.
+				    *
+				    * Since the patches are defined
+				    * through refinement, th
+				    *
+				    * @arg <tt>block_list</tt>: the
+				    * SparsityPattern into which the
+				    * patches will be stored.
+				    * @arg <tt>dof_handler</tt>: The
+				    * multilevel dof handler
+				    * providing the topology operated
+				    * on.
+				    * @arg
+				    * <tt>interior_dofs_only</tt>:
+				    * for each patch of cells around
+				    * a vertex, collect only the
+				    * interior degrees of freedom of
+				    * the patch and disregard those
+				    * on the boundary of the
+				    * patch. This is for instance the
+				    * setting for smoothers of
+				    * Arnold-Falk-Winther type.
+				    * @arg <tt>boundary_dofs</tt>:
+				    * include degrees of freedom,
+				    * which would have excluded by
+				    * <tt>interior_dofs_only</tt>,
+				    * but are lying on the boundary
+				    * of the domain, and thus need
+				    * smoothing. This parameter has
+				    * no effect if
+				    * <tt>interior_dofs_only</tt> is false.
+				    */
    template <class DH>
    void make_child_patches(SparsityPattern& block_list,
                             const DH& dof_handler,
