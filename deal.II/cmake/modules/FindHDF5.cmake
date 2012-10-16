@@ -30,14 +30,14 @@ FIND_PATH(HDF5_INCLUDE_DIR hdf5.h
   HINTS
     ${HDF5_DIR}
   PATH_SUFFIXES
-    hdf5 include/hdf5 include
+    hdf5 hdf5/include include/hdf5 include
   )
 
 FIND_LIBRARY(HDF5_LIBRARY NAMES hdf5
   HINTS
     ${HDF5_DIR}
   PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib
+    hdf5/lib lib${LIB_SUFFIX} lib64 lib
   )
 
 FIND_LIBRARY(HDF5_HL_LIBRARY NAMES hdf5_hl
