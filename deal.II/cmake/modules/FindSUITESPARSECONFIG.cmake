@@ -35,7 +35,7 @@ FIND_PATH(SUITESPARSECONFIG_INCLUDE_DIR SuiteSparse_config.h
     ${UMFPACK_DIR}/../SuiteSparse_config
   PATH_SUFFIXES
     include SuiteSparse_config
-)
+  )
 
 FIND_LIBRARY(SUITESPARSECONFIG_LIBRARY
   NAMES suitesparseconfig

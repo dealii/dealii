@@ -61,11 +61,11 @@ FIND_LIBRARY(MUMPS_COMMON_LIBRARY
 SET(MUMPS_LIBRARIES
   ${DMUMPS_LIBRARY}
   ${MUMPS_COMMON_LIBRARY}
-  ${LAPACK_LIBRARIES}
+  ${SCALAPACK_LIBRARIES}
   )
 
 #
-# If we can find libport.a (or similiar), link it in as well:
+# If we can find libport.so (or similiar), link it in as well:
 #
 FIND_LIBRARY(PORD_LIBRARY
   NAMES port
@@ -82,7 +82,7 @@ IF(NOT PORD_LIBRARY MATCHES "-NOTFOUND")
 ENDIF()
 
 SET(MUMPS_LINKER_FLAGS
-  ${LAPACK_LINKER_FLAGS}
+  ${SCALAPACK_LINKER_FLAGS}
   )
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(MUMPS DEFAULT_MSG
@@ -98,5 +98,9 @@ IF(MUMPS_FOUND)
     MUMPS_INCLUDE_DIRS
     PORT_LIBRARY
   )
+ELSE()
+  SET(MUMPS_DIR "" CACHE STRING
+    "An optional hint to a mumps directory"
+    )
 ENDIF()
 

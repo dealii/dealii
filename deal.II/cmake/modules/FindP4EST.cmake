@@ -62,7 +62,6 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(P4EST DEFAULT_MSG
   )
 
 IF(P4EST_FOUND)
-
   #
   # Determine mpi support of p4est:
   #
