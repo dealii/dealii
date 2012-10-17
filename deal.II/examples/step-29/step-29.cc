@@ -474,7 +474,7 @@ namespace Step29
                                    // here vector-valued) representing
                                    // the data vector given to
                                    // DataOut::add_data_vector,
-                                   // evaluated at all quadrature points
+                                   // evaluated at all evaluation points
                                    // where we generate output, and some
                                    // tensor objects representing
                                    // derivatives (that we don't use
@@ -810,9 +810,9 @@ namespace Step29
     QGauss<dim>    quadrature_formula(2);
     QGauss<dim-1>  face_quadrature_formula(2);
 
-    const unsigned int n_q_points             = quadrature_formula.size(),
-                             n_face_q_points  = face_quadrature_formula.size(),
-                             dofs_per_cell    = fe.dofs_per_cell;
+    const unsigned int n_q_point        = quadrature_formula.size(),
+		       n_face_q_points  = face_quadrature_formula.size(),
+		       dofs_per_cell    = fe.dofs_per_cell;
 
                                      // The FEValues objects will
                                      // evaluate the shape functions for
