@@ -23,16 +23,14 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   #
   ADD_SUBDIRECTORY(doxygen)
 
-
   #
-  # Install the remaining (static) elements of documentation:
+  # Install the static elements of the html documentation:
   #
-
   INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
     DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}
     COMPONENT documentation
-    FILES_MATCHING REGEX "^.*(html|css|eps|jpg|gif|fig|png|ico)$"
     PATTERN "doxygen" EXCLUDE
+    PATTERN "CMakeLists.txt" EXCLUDE
     )
 
   CONFIGURE_FILE(

@@ -25,7 +25,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/steps.dot
   COMMAND ${PERL_EXECUTABLE}
   ARGS
-    ${CMAKE_SOURCE_DIR}/doc/scripts/steps.pl
+    ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
     ${steps}
     > ${CMAKE_CURRENT_BINARY_DIR}/steps.dot
   )
@@ -58,7 +58,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/toc.html
   COMMAND ${PERL_EXECUTABLE}
   ARGS
-    ${CMAKE_SOURCE_DIR}/doc/scripts/make_toc.pl
+    ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_toc.pl
     > ${CMAKE_CURRENT_BINARY_DIR}/toc.html
   WORKING_DIRECTORY
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -105,7 +105,7 @@ FOREACH(step ${steps})
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${step}.cc
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/scripts/program2plain
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain
       < ${CMAKE_SOURCE_DIR}/examples/${step}/${step}.cc
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.cc
     DEPENDS
@@ -124,7 +124,7 @@ FOREACH(step ${steps})
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/scripts/intro2toc
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
       < ${CMAKE_SOURCE_DIR}/examples/${step}/doc/intro.dox
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
     COMMAND cat
@@ -133,7 +133,7 @@ FOREACH(step ${steps})
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/scripts/program2toc
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2toc
       < ${CMAKE_SOURCE_DIR}/examples/${step}/${step}.cc
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
     COMMAND cat
@@ -142,7 +142,7 @@ FOREACH(step ${steps})
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/scripts/intro2toc
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
       < ${CMAKE_SOURCE_DIR}/examples/${step}/doc/results.dox
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
     COMMAND cat
@@ -151,17 +151,17 @@ FOREACH(step ${steps})
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/scripts/create_anchors
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
       < ${CMAKE_SOURCE_DIR}/examples/${step}/doc/intro.dox
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/scripts/program2doxygen
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
       < ${CMAKE_SOURCE_DIR}/examples/${step}/${step}.cc
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/scripts/create_anchors
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
       < ${CMAKE_SOURCE_DIR}/examples/${step}/doc/results.dox
       >> ${CMAKE_CURRENT_BINARY_DIR}/${step}.h
     COMMAND cat
