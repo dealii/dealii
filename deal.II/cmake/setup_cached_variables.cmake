@@ -123,7 +123,7 @@ FOREACH(flag ${deal_ii_used_flags})
   # "CACHE" ensures that we only set the variable if it is not already set
   # as a  cached variable. Effectively we're setting a default value:
   #
-  SET(${flag} "" CACHE STRING
+  SET(${flag} "${${flag}}" CACHE STRING
    "The user supplied cache variable will be appended _at the end_ of the auto generated ${flag} variable"
    )
 
