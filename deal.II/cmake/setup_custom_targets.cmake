@@ -21,7 +21,7 @@
 # specific component (too bad, we have to do this by hand. There is no cmake
 # internal way to do this, yet...):
 #
-#   library, documentation, compat_files, project_config
+#   library, documentation, compat_files
 #
 
 ADD_CUSTOM_TARGET(library)
