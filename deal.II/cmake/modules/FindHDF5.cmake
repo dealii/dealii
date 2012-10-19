@@ -62,17 +62,6 @@ SET(HDF5_LIBRARIES
   ${HDF5_HL_LIBRARY}
   )
 
-#
-# Is hdf5 compiled with support for mpi?
-#
-FILE(STRINGS "${HDF5_INCLUDE_DIR}/H5pubconf.h" HDF5_MPI_STRING
-  REGEX "#define.*H5_HAVE_PARALLEL 1")
-IF("${HDF5_MPI_STRING}" STREQUAL "")
-  SET(HDF5_WITH_MPI FALSE)
-ELSE()
-  SET(HDF5_WITH_MPI TRUE)
-ENDIF()
-
 IF(HDF5_FOUND)
   MARK_AS_ADVANCED(
     HDF5_DIR
@@ -80,6 +69,18 @@ IF(HDF5_FOUND)
     HDF5_HL_LIBRARY
     HDF5_INCLUDE_DIR
     )
+
+  #
+  # Is hdf5 compiled with support for mpi?
+  #
+  FILE(STRINGS "${HDF5_INCLUDE_DIR}/H5pubconf.h" HDF5_MPI_STRING
+    REGEX "#define.*H5_HAVE_PARALLEL 1")
+  IF("${HDF5_MPI_STRING}" STREQUAL "")
+    SET(HDF5_WITH_MPI FALSE)
+  ELSE()
+    SET(HDF5_WITH_MPI TRUE)
+  ENDIF()
+
 ELSE()
   SET(HDF5_DIR "" CACHE STRING
     "An optional hint to an hdf5 directory"
