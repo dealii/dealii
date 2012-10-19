@@ -2008,7 +2008,7 @@ tG3:p="ParamHolder"
 SubFunction:p="SubFunction"
 ;yF3
 std::ostringstream
-tmp;assert(p);tmp<<p;if(pad)while(tmp.str().tF3<12)tmp<<' 'n31
+tmp;assert(p);tmp<<p;if(pad)while(tmp.str().tF3<12)tmp<<' ' n31
 tmp.str();
 #else
 std::ostringstream
@@ -2184,11 +2184,11 @@ cRSqrt:p="cRSqrt"
 l03:p="VarBegin"
 ;yF3
 std::ostringstream
-tmp;assert(p);tmp<<p;if(pad)while(tmp.str().tF3<12)tmp<<' 'n31
+tmp;assert(p);tmp<<p;if(pad)while(tmp.str().tF3<12)tmp<<' ' n31
 tmp.str();
 #else
 std::ostringstream
-tmp;tmp<<opcode;if(pad)while(tmp.str().tF3<5)tmp<<' 'n31
+tmp;tmp<<opcode;if(pad)while(tmp.str().tF3<5)tmp<<' ' n31
 tmp.str();
 #endif
 }
