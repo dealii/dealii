@@ -26,23 +26,23 @@
 #
 # See if there is a compiler flag to enable C++11 features
 #
-FOREACH(test_flag
-    "-std=c++11"
-    "-std=c++0x"
-    )
+IF(NOT DEFINED DEAL_II_HAVE_CXX11_FLAG)
+  FOREACH(test_flag
+      "-std=c++11"
+      "-std=c++0x"
+      )
+    CHECK_CXX_COMPILER_FLAG("${test_flag}" DEAL_II_HAVE_CXX11_FLAG)
 
-  CHECK_CXX_COMPILER_FLAG("${test_flag}" DEAL_II_HAVE_CXX11_FLAG)
-
-  IF(DEAL_II_HAVE_CXX11_FLAG)
-    # We have found a CXX11_FLAG that the compiler understands
-    SET(DEAL_II_CXX11_FLAG "${test_flag}")
-    BREAK()
-  ELSE()
-    # Remove test result from cache and try the next flag in the list
-    UNSET(DEAL_II_HAVE_CXX11_FLAG CACHE)
-  ENDIF()
-
-ENDFOREACH()
+    IF(DEAL_II_HAVE_CXX11_FLAG)
+      # We have found a CXX11_FLAG that the compiler understands
+      SET(DEAL_II_CXX11_FLAG "${test_flag}")
+      BREAK()
+    ELSE()
+      # Remove test result from cache and try the next flag in the list
+      UNSET(DEAL_II_HAVE_CXX11_FLAG CACHE)
+    ENDIF()
+  ENDFOREACH()
+ENDIF()
 
 
 IF(DEAL_II_HAVE_CXX11_FLAG)
