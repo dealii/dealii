@@ -35,7 +35,7 @@ IF(NOT DEFINED DEAL_II_HAVE_CXX11_FLAG)
 
     IF(DEAL_II_HAVE_CXX11_FLAG)
       # We have found a CXX11_FLAG that the compiler understands
-      SET(DEAL_II_CXX11_FLAG "${test_flag}")
+      SET(DEAL_II_CXX11_FLAG "${test_flag}" CACHE INTERNAL "")
       BREAK()
     ELSE()
       # Remove test result from cache and try the next flag in the list
