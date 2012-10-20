@@ -55,18 +55,19 @@ SET(SCALAPACK_LINKER_FLAGS
 # be necessary to search for blacs, too. So we do this in a very
 # probabilistic way...
 #
-FOREACH(lib blacs blacsCinit blacsF77init)
-  STRING(TOUPPER "${lib}" lib_upper)
-  FIND_LIBRARY(${lib_upper}_LIBRARY
-    NAMES ${lib} ${lib}_MPI-LINUX-0
+FOREACH(_lib blacs blacsCinit blacsF77init)
+  STRING(TOUPPER "${_lib}" _lib_upper)
+  FIND_LIBRARY(${_lib_upper}_LIBRARY
+    NAMES ${_lib} ${_lib}_MPI-LINUX-0
+    HINTS
       ${BLACS_DIR}
       ${SCALAPACK_DIR}
       ${SCALAPACK_DIR}/../blacs/
     PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib LIB
   )
-  IF(NOT ${lib_upper}_LIBRARY MATCHES "-NOTFOUND")
+  IF(NOT ${_lib_upper}_LIBRARY MATCHES "-NOTFOUND")
     LIST(APPEND SCLAPACK_LIBRARIES
-      ${${lib_upper}_LIBRARY}
+      ${${_lib_upper}_LIBRARY}
       )
   ENDIF()
 ENDFOREACH()

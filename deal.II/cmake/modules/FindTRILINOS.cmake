@@ -66,9 +66,9 @@ SET(TRILINOS_INCLUDE_DIRS ${Trilinos_INCLUDE_DIRS})
 # exports a list with short names...
 # So we check again for every lib and store the full path:
 #
-FOREACH(library ${Trilinos_LIBRARIES})
-  FIND_LIBRARY(TRILINOS_LIBRARY_${library}
-    NAMES ${library}
+FOREACH(_library ${Trilinos_LIBRARIES})
+  FIND_LIBRARY(TRILINOS_LIBRARY_${_library}
+    NAMES ${_library}
     HINTS ${Trilinos_LIBRARY_DIRS}
     NO_DEFAULT_PATH
     NO_CMAKE_ENVIRONMENT_PATH
@@ -78,13 +78,13 @@ FOREACH(library ${Trilinos_LIBRARIES})
     NO_CMAKE_FIND_ROOT_PATH
     )
 
-  LIST(APPEND TRILINOS_LIBRARIES ${TRILINOS_LIBRARY_${library}})
+  LIST(APPEND TRILINOS_LIBRARIES ${TRILINOS_LIBRARY_${_library}})
 
   #
   # Remove the variables from the cache, so that updating TRILINOS_DIR will
   # find the new libraries..
   #
-  UNSET(TRILINOS_LIBRARY_${library} CACHE)
+  UNSET(TRILINOS_LIBRARY_${_library} CACHE)
 ENDFOREACH()
 
 

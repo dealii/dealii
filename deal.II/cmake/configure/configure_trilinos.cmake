@@ -33,15 +33,16 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       "Check whether the found trilinos package contains all required modules:"
       )
 
-    SET(macro_modules_list amesos epetra ifpack aztecoo sacado teuchos)
 
-    FOREACH(macro_module ${macro_modules_list})
-      LIST_CONTAINS(macro_module_found ${macro_module} ${Trilinos_LIBRARIES})
-      IF(macro_module_found)
-        MESSAGE(STATUS "Found ${macro_module}")
+    FOREACH(_module
+      amesos epetra ifpack aztecoo sacado teuchos
+      )
+      LIST_CONTAINS(_module_found ${_module} ${Trilinos_LIBRARIES})
+      IF(_module_found)
+        MESSAGE(STATUS "Found ${_module}")
       ELSE()
-        MESSAGE(STATUS "Module ${macro_module} not found!")
-        SET(macro_modules_missing "${macro_modules_missing} ${macro_module}")
+        MESSAGE(STATUS "Module ${_module} not found!")
+        SET(_modules_missing "${_modules_missing} ${_module}")
         SET(${var} FALSE)
       ENDIF()
     ENDFOREACH()
@@ -50,7 +51,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       MESSAGE(WARNING "\n"
         "The Trilinos installation is missing one or more modules necessary for\n"
         "the deal.II Trilinos interfaces:\n"
-        "${macro_modules_missing}\n\n"
+        "${_modules_missing}\n\n"
         "Please re-install Trilinos with the missing Trilinos subpackages enabled.\n\n"
         )
     ENDIF()

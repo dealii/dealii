@@ -23,7 +23,8 @@
 SET(CMAKE_BUILD_TYPE
   "DebugRelease"
   CACHE STRING
-  "Choose the type of build, options are: Debug, Release and DebugRelease.")
+  "Choose the type of build, options are: Debug, Release and DebugRelease."
+  )
 
 
 #
@@ -63,12 +64,16 @@ MARK_AS_ADVANCED(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
 # Tell the user very prominently, that we're doing things differently w.r.t
 # CMAKE_(C|CXX)_FLAGS_(DEBUG|RELEASE)
 #
-SET(flags C_FLAGS_RELEASE CXX_FLAGS_RELEASE C_FLAGS_DEBUG CXX_FLAGS_DEBUG)
-FOREACH(flag ${flags})
-  IF(NOT "${CMAKE_${flag}}" STREQUAL "")
+FOREACH(_flag
+  C_FLAGS_RELEASE
+  CXX_FLAGS_RELEASE
+  C_FLAGS_DEBUG
+  CXX_FLAGS_DEBUG
+  )
+  IF(NOT "${CMAKE_${_flag}}" STREQUAL "")
     MESSAGE(FATAL_ERROR
-      "\nThe deal.II cmake build system does not use CMAKE_${flag}.\n"
-      "Use DEAL_II_${flag}, instead!\n\n"
+      "\nThe deal.II cmake build system does not use CMAKE_${_flag}.\n"
+      "Use DEAL_II_${_flag}, instead!\n\n"
       )
   ENDIF()
 ENDFOREACH()
@@ -77,7 +82,7 @@ ENDFOREACH()
 #
 # Hide all unused compiler flag variables:
 #
-SET(flags
+FOREACH(_flag
   CMAKE_CXX_FLAGS_RELEASE
   CMAKE_CXX_FLAGS_DEBUG
   CMAKE_CXX_FLAGS_MINSIZEREL
@@ -87,11 +92,10 @@ SET(flags
   CMAKE_C_FLAGS_MINSIZEREL
   CMAKE_C_FLAGS_RELWITHDEBINFO
   )
-FOREACH(flag ${flags})
   #
   # Go away...
   #
-  SET(${flag} "" CACHE INTERNAL "" FORCE)
+  SET(${_flag} "" CACHE INTERNAL "" FORCE)
 ENDFOREACH()
 
 
@@ -106,7 +110,7 @@ SET_IF_EMPTY(CMAKE_SHARED_LINKER_FLAGS "$ENV{LDFLAGS}")
 #
 # Set cached compiler flags to an empty string:
 #
-SET(deal_ii_used_flags
+SET(DEAL_II_USED_FLAGS
   CMAKE_C_FLAGS
   CMAKE_CXX_FLAGS
   CMAKE_SHARED_LINKER_FLAGS
@@ -117,14 +121,15 @@ SET(deal_ii_used_flags
   DEAL_II_CXX_FLAGS_RELEASE
   DEAL_II_SHARED_LINKER_FLAGS_RELEASE
   )
-FOREACH(flag ${deal_ii_used_flags})
+
+FOREACH(_flag ${DEAL_II_USED_FLAGS})
 
   #
   # "CACHE" ensures that we only set the variable if it is not already set
   # as a  cached variable. Effectively we're setting a default value:
   #
-  SET(${flag} "${${flag}}" CACHE STRING
-   "The user supplied cache variable will be appended _at the end_ of the auto generated ${flag} variable"
+  SET(${_flag} "${${_flag}}" CACHE STRING
+   "The user supplied cache variable will be appended _at the end_ of the auto generated ${_flag} variable"
    )
 
   #
@@ -133,12 +138,12 @@ FOREACH(flag ${deal_ii_used_flags})
   # setup_finalize.cmake (called at the end of the
   # main CMakeLists.txt file).
   #
-  SET(${flag}_SAVED "${${flag}}")
-  SET(${flag} "")
+  SET(${_flag}_SAVED "${${_flag}}")
+  SET(${_flag} "")
 
   #
   # Mark these flags as advanced.
   #
-  MARK_AS_ADVANCED(${flag})
+  MARK_AS_ADVANCED(${_flag})
 ENDFOREACH()
 

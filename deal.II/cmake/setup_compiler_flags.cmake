@@ -85,7 +85,7 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   #
   # Setup for ICC (version >= 10) compiler:
   #
-  IF( CMAKE_CXX_COMPILER_ID MATCHES "Intel" )
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     INCLUDE(setup_compiler_flags_intel)
     SET(DEAL_II_KNOWN_COMPILER TRUE)
   ENDIF()

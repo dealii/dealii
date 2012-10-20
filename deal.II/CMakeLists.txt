@@ -54,10 +54,10 @@ LIST(APPEND CMAKE_MODULE_PATH
 #
 # Load all macros:
 #
-FILE(GLOB macro_files "cmake/macros/*.cmake")
-FOREACH(file ${macro_files})
-  MESSAGE(STATUS "Include ${file}")
-  INCLUDE(${file})
+FILE(GLOB _macro_files "cmake/macros/*.cmake")
+FOREACH(_file ${_macro_files})
+  MESSAGE(STATUS "Include ${_file}")
+  INCLUDE(${_file})
 ENDFOREACH()
 
 INCLUDE(setup_external_macros)
@@ -79,10 +79,10 @@ INCLUDE(setup_compiler_flags)
 #
 # Run all system checks:
 #
-FILE(GLOB check_files "cmake/checks/*.cmake")
-FOREACH(file ${check_files})
-  MESSAGE(STATUS "Include ${file}")
-  INCLUDE(${file})
+FILE(GLOB _check_files "cmake/checks/*.cmake")
+FOREACH(_file ${_check_files})
+  MESSAGE(STATUS "Include ${_file}")
+  INCLUDE(${_file})
 ENDFOREACH()
 
 #
@@ -95,13 +95,13 @@ ENDIF()
 #
 # Feature configuration:
 #
-FILE(GLOB configure_files "cmake/configure/configure_*.cmake")
+FILE(GLOB _configure_files "cmake/configure/configure_*.cmake")
 # Make sure the configure_*.cmake files are included in alphabetical order
 # to fullfill some dependencies...
-LIST(SORT configure_files)
-FOREACH(file ${configure_files})
-  MESSAGE(STATUS "Include ${file}")
-  INCLUDE(${file})
+LIST(SORT _configure_files)
+FOREACH(_file ${_configure_files})
+  MESSAGE(STATUS "Include ${_file}")
+  INCLUDE(${_file})
 ENDFOREACH()
 
 #

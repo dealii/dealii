@@ -215,10 +215,10 @@ ENDIF()
 # will be bundled to the deal.II library. (Right now, i.e. cmake 2.8.8,
 # this is the only reliable way to get information in a global scope...)
 #
-FOREACH(build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER "${build}" build_lowercase)
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+  STRING(TOLOWER "${_build}" _build_lowercase)
   FILE(REMOVE
-    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${build_lowercase}
+    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${_build_lowercase}
     )
 ENDFOREACH()
 

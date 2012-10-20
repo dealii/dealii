@@ -28,13 +28,12 @@ MARK_AS_ADVANCED(file_cmd)
 # ${flags}, see setup_cached_compiler_flags.cmake and the main
 # CMakeLists.txt for details.
 #
-FOREACH(flags ${deal_ii_used_flags})
-  SET(${flags} "${${flags}} ${${flags}_SAVED}")
+FOREACH(_flags ${DEAL_II_USED_FLAGS})
+  SET(${_flags} "${${_flags}} ${${_flags}_SAVED}")
   #
   # Strip leading and trailing whitespace:
   #
-  # STRING(STRIP "${flags}" flags)
-  STRING(STRIP "${${flags}}" ${flags})
+  STRING(STRIP "${${_flags}}" ${_flags})
 ENDFOREACH()
 
 
@@ -46,11 +45,11 @@ IF(NOT "${DEAL_II_EXTERNAL_LIBRARIES}" STREQUAL "")
   LIST(REMOVE_DUPLICATES DEAL_II_EXTERNAL_LIBRARIES)
   LIST(REVERSE DEAL_II_EXTERNAL_LIBRARIES)
 ENDIF()
-FOREACH(build ${DEAL_II_BUILD_TYPES})
-  IF(NOT "${DEAL_II_EXTERNAL_LIBRARIES_${build}}" STREQUAL "")
-    LIST(REVERSE DEAL_II_EXTERNAL_LIBRARIES_${build})
-    LIST(REMOVE_DUPLICATES DEAL_II_EXTERNAL_LIBRARIES_${build})
-    LIST(REVERSE DEAL_II_EXTERNAL_LIBRARIES_${build})
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+  IF(NOT "${DEAL_II_EXTERNAL_LIBRARIES_${_build}}" STREQUAL "")
+    LIST(REVERSE DEAL_II_EXTERNAL_LIBRARIES_${_build})
+    LIST(REMOVE_DUPLICATES DEAL_II_EXTERNAL_LIBRARIES_${_build})
+    LIST(REVERSE DEAL_II_EXTERNAL_LIBRARIES_${_build})
   ENDIF()
 ENDFOREACH()
 
@@ -58,10 +57,10 @@ ENDFOREACH()
 #
 # And write a nice configuration summary to file:
 #
-SET(log "${CMAKE_BINARY_DIR}/summary.log")
+SET(_log "${CMAKE_BINARY_DIR}/summary.log")
 
 
-FILE(WRITE ${log}
+FILE(WRITE ${_log}
 "*     *                                    *     *
 *     *       deal.II configuration:       *     *
 *     *                                    *     *\n
@@ -75,93 +74,93 @@ Compiler flags used for this build:
       CMAKE_CXX_FLAGS:                     ${CMAKE_CXX_FLAGS}\n"
   )
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  FILE(APPEND ${log} "      DEAL_II_CXX_FLAGS_RELEASE:           ${DEAL_II_CXX_FLAGS_RELEASE}\n")
+  FILE(APPEND ${_log} "      DEAL_II_CXX_FLAGS_RELEASE:           ${DEAL_II_CXX_FLAGS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  FILE(APPEND ${log} "      DEAL_II_CXX_FLAGS_DEBUG:             ${DEAL_II_CXX_FLAGS_DEBUG}\n")
+  FILE(APPEND ${_log} "      DEAL_II_CXX_FLAGS_DEBUG:             ${DEAL_II_CXX_FLAGS_DEBUG}\n")
 ENDIF()
-FILE(APPEND ${log} "      CMAKE_SHARED_LINKER_FLAGS:           ${CMAKE_SHARED_LINKER_FLAGS}\n")
+FILE(APPEND ${_log} "      CMAKE_SHARED_LINKER_FLAGS:           ${CMAKE_SHARED_LINKER_FLAGS}\n")
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  FILE(APPEND ${log} "      DEAL_II_SHARED_LINKER_FLAGS_RELEASE: ${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}\n")
+  FILE(APPEND ${_log} "      DEAL_II_SHARED_LINKER_FLAGS_RELEASE: ${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  FILE(APPEND ${log} "      DEAL_II_SHARED_LINKER_FLAGS_DEBUG:   ${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}\n")
+  FILE(APPEND ${_log} "      DEAL_II_SHARED_LINKER_FLAGS_DEBUG:   ${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}\n")
 ENDIF()
 
 IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
-  FILE(APPEND ${log}
+  FILE(APPEND ${_log}
 "\nThe bundled UMFPACK library will be compiled with the following C compiler:
       CMAKE_C_COMPILER:         ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
                                 ${CMAKE_C_COMPILER}
       CMAKE_C_FLAGS:           ${CMAKE_C_FLAGS}\n"
     )
   IF(CMAKE_BUILD_TYPE MATCHES "Release")
-    FILE(APPEND ${log} "      DEAL_II_C_FLAGS_RELEASE: ${DEAL_II_C_FLAGS_RELEASE}\n")
+    FILE(APPEND ${_log} "      DEAL_II_C_FLAGS_RELEASE: ${DEAL_II_C_FLAGS_RELEASE}\n")
   ENDIF()
   IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-    FILE(APPEND ${log} "      DEAL_II_C_FLAGS_DEBUG:   ${DEAL_II_C_FLAGS_DEBUG}\n")
+    FILE(APPEND ${_log} "      DEAL_II_C_FLAGS_DEBUG:   ${DEAL_II_C_FLAGS_DEBUG}\n")
   ENDIF()
 ENDIF()
 
 IF(NOT DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-  FILE(APPEND ${log} "\nWARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n")
+  FILE(APPEND ${_log} "\nWARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n")
 ELSEIF(NOT DEAL_II_KNOWN_COMPILER)
-  FILE(APPEND ${log} "\nWARNING: Unknown compiler! Please set compiler flags by hand.\n")
+  FILE(APPEND ${_log} "\nWARNING: Unknown compiler! Please set compiler flags by hand.\n")
 ENDIF()
 
-FILE(APPEND ${log}
+FILE(APPEND ${_log}
   "\nConfigured Features ("
   )
 IF(FORCE_AUTODETECTION)
-  FILE(APPEND ${log}
+  FILE(APPEND ${_log}
     "!!! FORCE_AUTODETECTION !!!, "
     )
 ENDIF()
 IF(DISABLE_AUTODETECTION)
-  FILE(APPEND ${log}
+  FILE(APPEND ${_log}
     "!!! DISABLE_AUTODETECTION !!!, "
     )
 ENDIF()
-FILE(APPEND ${log}
+FILE(APPEND ${_log}
   "DEAL_II_ALLOW_BUNDLED = ${DEAL_II_ALLOW_BUNDLED}):\n"
   )
 
-GET_CMAKE_PROPERTY(res VARIABLES)
-FOREACH(var ${res})
-  IF(var MATCHES "DEAL_II_WITH")
-    IF(${${var}})
+GET_CMAKE_PROPERTY(_res VARIABLES)
+FOREACH(_var ${_res})
+  IF(_var MATCHES "DEAL_II_WITH")
+    IF(${${_var}})
       # FEATURE is enabled
-      STRING(REGEX REPLACE "^DEAL_II_WITH_" "" feature ${var})
+      STRING(REGEX REPLACE "^DEAL_II_WITH_" "" feature ${_var})
       IF(FEATURE_${feature}_EXTERNAL_CONFIGURED)
-        FILE(APPEND ${log} "      ${var} set up with external dependencies\n")
+        FILE(APPEND ${_log} "      ${_var} set up with external dependencies\n")
       ELSEIF(FEATURE_${feature}_BUNDLED_CONFIGURED)
         IF(DEAL_II_FORCE_BUNDLED_${feature})
-          FILE(APPEND ${log} "      ${var} set up with bundled packages (forced)\n")
+          FILE(APPEND ${_log} "      ${_var} set up with bundled packages (forced)\n")
         ELSE()
-          FILE(APPEND ${log} "      ${var} set up with bundled packages\n")
+          FILE(APPEND ${_log} "      ${_var} set up with bundled packages\n")
         ENDIF()
       ENDIF()
     ELSE()
       # FEATURE is disabled
-      FILE(APPEND ${log} "    ( ${var} = ${${var}} )\n")
+      FILE(APPEND ${_log} "    ( ${_var} = ${${_var}} )\n")
     ENDIF()
   ENDIF()
 ENDFOREACH()
 
 
-FILE(APPEND ${log}
+FILE(APPEND ${_log}
   "\nComponent configuration:\n"
   )
-FOREACH(var ${res})
-  IF(var MATCHES "DEAL_II_COMPONENT")
-    IF(${${var}})
-      FILE(APPEND ${log} "      ${var}\n")
+FOREACH(_var ${_res})
+  IF(_var MATCHES "DEAL_II_COMPONENT")
+    IF(${${_var}})
+      FILE(APPEND ${_log} "      ${_var}\n")
     ELSE()
-      FILE(APPEND ${log} "    ( ${var} = ${${var}} )\n")
+      FILE(APPEND ${_log} "    ( ${_var} = ${${_var}} )\n")
     ENDIF()
   ENDIF()
 ENDFOREACH()
 
-FILE(READ ${log} DEAL_II_LOG_SUMMARY)
+FILE(READ ${_log} DEAL_II_LOG_SUMMARY)
 MESSAGE("\n\n${DEAL_II_LOG_SUMMARY}\n")
 
