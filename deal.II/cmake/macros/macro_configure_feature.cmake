@@ -19,48 +19,48 @@
 #     CONFIGURE_FEATURE(feature)
 #
 #
-# For a feature ${_feature} (written in all caps) the following options,
+# For a feature ${feature} (written in all caps) the following options,
 # variables and macros have to be defined (except marked as optional):
 #
-# DEAL_II_WITH_${_feature} (bool, mandatory)
+# DEAL_II_WITH_${feature} (bool, mandatory)
 #    If DEAL_II_FEATURE_AUTODETECTION is OFF, this boolean determines
 #    whether the feature will be configured.
 #    If DEAL_II_FEATURE_AUTODETECTION is ON, this boolean will
 #    automatically be set if configuring the feature was successful.
 #
-# FEATURE_${_feature}_DEPENDS (variable, optional)
+# FEATURE_${feature}_DEPENDS (variable, optional)
 #    a variable which contains an optional list of other features
 #    this feature depends on (and which have to be enbled for this feature
 #    to work.) The features must be given with the full option toggle:
 #    DEAL_II_WITH_[...]
 #
-# FEATURE_${_feature}_HAVE_BUNDLED  (variable, optional)
+# FEATURE_${feature}_HAVE_BUNDLED  (variable, optional)
 #    which should either be set to TRUE if all necessary libraries of the
 #    features comes bundled with deal.II and hence can be supported
 #    without external dependencies, or unset.
 #
-# FEATURE_${_feature}_CONFIGURE_BUNDLED(var)  (macro, optional)
+# FEATURE_${feature}_CONFIGURE_BUNDLED(var)  (macro, optional)
 #    which should setup all necessary configuration for the feature with
 #    bundled source dependencies. var set to TRUE indicates success,
 #    otherwise this script gives an error.
 #
-# FEATURE_${_feature}_FIND_EXTERNAL(var)  (macro, mandatory)
+# FEATURE_${feature}_FIND_EXTERNAL(var)  (macro, mandatory)
 #    which should set var to TRUE if all dependencies for the feature are
 #    fullfilled. In this case all necessary variables for
-#    FEATURE_${_feature}_CONFIGURE_EXTERNAL must be set. Otherwise
+#    FEATURE_${feature}_CONFIGURE_EXTERNAL must be set. Otherwise
 #    var should remain unset.
 #    This macro should give an error (FATAL_ERROR or FATAL_ERROR).
 #
-# FEATURE_${_feature}_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
+# FEATURE_${feature}_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
 #    which should setup all necessary configuration for the feature with
 #    external dependencies. var set to TRUE indicates success,
 #    otherwise this script gives an error.
 #
-# FEATURE_${_feature}_CUSTOM_ERROR_MESSAGE() (variable, optional)
-#    which should either be set to TRUE if FEATURE_${_feature}_ERROR_MESSAGE
+# FEATURE_${feature}_CUSTOM_ERROR_MESSAGE() (variable, optional)
+#    which should either be set to TRUE if FEATURE_${feature}_ERROR_MESSAGE
 #    is set up, or be undefined.
 #
-# FEATURE_${_feature}_ERROR_MESSAGE()  (macro, optional)
+# FEATURE_${feature}_ERROR_MESSAGE()  (macro, optional)
 #    which should print a meaningfull error message (with FATAL_ERROR) for
 #    the case that no external library was found (and bundled is not
 #    allowed to be used.) If not defined, a suitable default error message
