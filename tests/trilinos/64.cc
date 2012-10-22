@@ -68,7 +68,7 @@ int main (int argc,char **argv)
 	  Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world());
 	Assert(n_dofs%n_jobs==0, ExcInternalError());
 	const unsigned int n_local_dofs=n_dofs/n_jobs;
-	Epetra_Map map(n_dofs, n_local_dofs, Utilities::Trilinos::comm_world());
+	Epetra_Map map(static_cast<int>(n_dofs), static_cast<int>(n_local_dofs), Utilities::Trilinos::comm_world());
         TrilinosWrappers::SparseMatrix v2 (map, 5);
         test (v2);
       }
