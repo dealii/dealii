@@ -22,12 +22,13 @@
 # STREQUAL.
 #
 
-MACRO(LIST_CONTAINS var value)
-  SET(${var})
-  FOREACH (value2 ${ARGN})
-    IF (${value} STREQUAL ${value2})
-      SET(${var} TRUE)
-    ENDIF (${value} STREQUAL ${value2})
-  ENDFOREACH (value2)
-ENDMACRO(LIST_CONTAINS)
+MACRO(LIST_CONTAINS _var _value)
+  SET(${_var})
+  FOREACH (_value2 ${ARGN})
+    IF("${_value}" STREQUAL "${_value2}")
+      SET(${_var} TRUE)
+      BREAK()
+    ENDIF()
+  ENDFOREACH()
+ENDMACRO()
 

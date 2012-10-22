@@ -15,44 +15,45 @@
 #
 # TODO: Description...
 #
-MACRO(GET_CXX_SOURCE_RETURN_VALUE SOURCE VAR EXIT_CODE)
+MACRO(GET_CXX_SOURCE_RETURN_VALUE _source _var _exit_code)
 
   #
   # TODO: This file is still very basic :-]
   #
 
-  FILE(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx"
-    "${SOURCE}\n")
+  IF(NOT DEFINED ${_var})
+    FILE(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx"
+      "${_source}\n")
 
-  MESSAGE(STATUS "Performing Test ${VAR}")
+    MESSAGE(STATUS "Performing Test ${_var}")
 
-  TRY_RUN(
-    ${VAR}_EXIT_CODE
-    ${VAR}_COMPILE_OK
-    ${CMAKE_BINARY_DIR}
-    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx)
+    TRY_RUN(
+      ${_var}_EXIT_CODE
+      ${_var}_COMPILE_OK
+      ${CMAKE_BINARY_DIR}
+      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx)
 
-  IF(${VAR}_COMPILE_OK)
-    SET(${VAR} 1 CACHE INTERNAL "Test ${VAR}")
-    SET(${EXIT_CODE} ${VAR_EXIT_CODE} CACHE INTERNAL "Test ${EXIT_CODE}")
-    MESSAGE(STATUS "Performing Test ${VAR} - Success")
+    IF(${_var}_COMPILE_OK)
+      SET(${_var} 1 CACHE INTERNAL "Test ${_var}")
+      SET(${_exit_code} ${${_var}_EXIT_CODE} CACHE INTERNAL "Test ${_exit_code}")
+      MESSAGE(STATUS "Performing Test ${_var} - Success")
 
-    FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
-      "Performing C++ SOURCE FILE Test ${VAR} succeded with the following output:\n"
-      "${OUTPUT}\n"
-      "Return value: ${${VAR}}\n"
-      "Source file was:\n${SOURCE}\n")
+      FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
+        "Performing C++ SOURCE FILE Test ${_var} succeded with the following output:\n"
+        "${OUTPUT}\n"
+        "Return value: ${${_var}}\n"
+        "Source file was:\n${_source}\n")
 
-  ELSE()
+    ELSE()
 
-    SET(${VAR} 0 CACHE INTERNAL "Test ${VAR}")
-    MESSAGE(STATUS "Performing Test ${VAR} - Failed")
+      SET(${_var} 0 CACHE INTERNAL "Test ${_var}")
+      MESSAGE(STATUS "Performing Test ${_var} - Failed")
 
-    FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeError.log
-      "Performing C++ SOURCE FILE Test ${VAR} failed with the following output:\n"
-      "${OUTPUT}\n"
-      "Return value: ${${VAR}_EXITCODE}\n"
-      "Source file was:\n${SOURCE}\n")
+      FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeError.log
+        "Performing C++ SOURCE FILE Test ${_var} failed with the following output:\n"
+        "${OUTPUT}\n"
+        "Return value: ${${_var}_EXITCODE}\n"
+        "Source file was:\n${_source}\n")
+    ENDIF()
   ENDIF()
-
 ENDMACRO()

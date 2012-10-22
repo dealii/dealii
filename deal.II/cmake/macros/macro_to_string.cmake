@@ -20,10 +20,10 @@
 #     TO_STRING(string ${list1} ${list2} ...)
 #
 
-MACRO(TO_STRING variable)
-  SET(${variable} "")
-  FOREACH(var  ${ARGN})
-    SET(${variable} "${${variable}} ${var}")
+MACRO(TO_STRING _variable)
+  SET(${_variable} "")
+  FOREACH(_var  ${ARGN})
+    SET(${_variable} "${${_variable}} ${_var}")
   ENDFOREACH()
-  STRING(STRIP "${${variable}}" ${variable})
+  STRING(STRIP "${${_variable}}" ${_variable})
 ENDMACRO()

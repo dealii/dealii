@@ -21,10 +21,10 @@
 #     TO_STRING_AND_ADD_PREFIX(string "prefix" ${list1} ${list2} ...)
 #
 
-MACRO(TO_STRING_AND_ADD_PREFIX variable prefix)
-  SET(${variable} "")
-  FOREACH(var ${ARGN})
-    SET(${variable} "${${variable}} ${prefix}${var}")
+MACRO(TO_STRING_AND_ADD_PREFIX _variable _prefix)
+  SET(${_variable} "")
+  FOREACH(_var ${ARGN})
+    SET(${_variable} "${${_variable}} ${_prefix}${_var}")
   ENDFOREACH()
-  STRING(STRIP "${${variable}}" ${variable})
+  STRING(STRIP "${${_variable}}" ${_variable})
 ENDMACRO()

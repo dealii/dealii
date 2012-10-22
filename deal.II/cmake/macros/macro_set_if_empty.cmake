@@ -15,9 +15,9 @@
 #
 # If 'variable' is empty it will be set to 'value'
 #
-MACRO(SET_IF_EMPTY variable value)
-  IF("${${variable}}" STREQUAL "")
-    SET(${variable} ${value})
+MACRO(SET_IF_EMPTY _variable _value)
+  IF("${${_variable}}" STREQUAL "")
+    SET(${_variable} ${_value})
   ENDIF()
 ENDMACRO()
 

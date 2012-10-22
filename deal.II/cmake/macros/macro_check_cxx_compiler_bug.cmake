@@ -23,16 +23,16 @@
 # (This just inverts the logic of CHECK_CXX_SOURCE_COMPILES.)
 #
 
-MACRO(CHECK_CXX_COMPILER_BUG source var)
+MACRO(CHECK_CXX_COMPILER_BUG _source _var)
   CHECK_CXX_SOURCE_COMPILES(
-    "${source}"
-    ${var}_OK)
+    "${_source}"
+    ${_var}_OK)
 
-  IF(${var}_OK)
-    MESSAGE(STATUS "Test successful, do not define ${var}")
+  IF(${_var}_OK)
+    MESSAGE(STATUS "Test successful, do not define ${_var}")
   ELSE()
-    MESSAGE(STATUS "Test unsuccessful, define ${var}")
-    SET(${var} 1)
+    MESSAGE(STATUS "Test unsuccessful, define ${_var}")
+    SET(${_var} TRUE)
   ENDIF()
 ENDMACRO()
 

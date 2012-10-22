@@ -20,13 +20,13 @@
 #     ENABLE_IF_SUPPORTED(variable flag)
 #
 
-MACRO(ENABLE_IF_SUPPORTED variable flag)
+MACRO(ENABLE_IF_SUPPORTED _variable _flag)
   CHECK_CXX_COMPILER_FLAG(
-    "${flag}"
-    DEAL_II_HAVE_FLAG_${flag}
+    "${_flag}"
+    DEAL_II_HAVE_FLAG_${_flag}
     )
-  IF(DEAL_II_HAVE_FLAG_${flag})
-    SET(${variable} "${${variable}} ${flag}")
+  IF(DEAL_II_HAVE_FLAG_${_flag})
+    SET(${_variable} "${${_variable}} ${_flag}")
   ENDIF()
 ENDMACRO()
 

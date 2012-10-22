@@ -18,12 +18,12 @@
 # types specified in DEAL_II_BUILD_TYPES
 #
 
-MACRO(DEAL_II_ADD_DEPENDENCIES name target)
+MACRO(DEAL_II_ADD_DEPENDENCIES _name _target)
 
-  FOREACH(build ${DEAL_II_BUILD_TYPES})
-    STRING(TOLOWER ${build} build_lowercase)
-    ADD_DEPENDENCIES(${name}.${build_lowercase}
-      ${target}.${build_lowercase}
+  FOREACH(_build ${DEAL_II_BUILD_TYPES})
+    STRING(TOLOWER ${_build} _build_lowercase)
+    ADD_DEPENDENCIES(${_name}.${_build_lowercase}
+      ${_target}.${_build_lowercase}
       )
   ENDFOREACH()
 

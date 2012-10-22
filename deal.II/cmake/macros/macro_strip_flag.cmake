@@ -19,9 +19,9 @@
 #     STRIP_FLAG(variable flag)
 #
 
-MACRO(STRIP_FLAG variable flag)
-  SET(${variable} " ${${variable}}")
-  STRING(REPLACE " ${flag}" "" "${variable}" ${${variable}})
-  STRING(STRIP "${${variable}}" ${variable})
+MACRO(STRIP_FLAG _variable _flag)
+  SET(${_variable} " ${${_variable}}")
+  STRING(REPLACE " ${_flag}" "" "${_variable}" ${${_variable}})
+  STRING(STRIP "${${_variable}}" ${_variable})
 ENDMACRO()
 

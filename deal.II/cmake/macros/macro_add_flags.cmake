@@ -20,7 +20,7 @@
 #     ADD_FLAGS(variable flags)
 #
 
-MACRO(ADD_FLAGS variable flags)
-  SET(${variable} "${${variable}} ${flags}")
+MACRO(ADD_FLAGS _variable _flags)
+  SET(${_variable} "${${_variable}} ${_flags}")
 ENDMACRO()
 

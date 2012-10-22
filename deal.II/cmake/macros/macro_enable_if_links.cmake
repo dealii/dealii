@@ -21,17 +21,17 @@
 #     ENABLE_IF_LINKS(variable flag)
 #
 
-MACRO(ENABLE_IF_LINKS variable flag)
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${flag}")
+MACRO(ENABLE_IF_LINKS _variable _flag)
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_flag}")
   CHECK_CXX_SOURCE_COMPILES(
   "
   int main() { return 0; }
   "
-  DEAL_II_HAVE_FLAG_${flag}
+  DEAL_II_HAVE_FLAG_${_flag}
   )
-  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${flag}")
-  IF(DEAL_II_HAVE_FLAG_${flag})
-    SET(${variable} "${${variable}} ${flag}")
+  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${_flag}")
+  IF(DEAL_II_HAVE_FLAG_${_flag})
+    SET(${_variable} "${${_variable}} ${_flag}")
   ENDIF()
 ENDMACRO()
 

@@ -20,11 +20,11 @@
 #     COND_SET_TO_YES(bool variable)
 #
 
-MACRO(COND_SET_TO_YES bool variable)
-  IF(${bool})
-    SET(${variable} "yes")
+MACRO(COND_SET_TO_YES _bool _variable)
+  IF(${_bool})
+    SET(${_variable} "yes")
   ELSE()
-    SET(${variable} "no")
+    SET(${_variable} "no")
   ENDIF()
 ENDMACRO()
 
