@@ -2047,6 +2047,8 @@ namespace DoFRenumbering
         bool operator () (const DHCellIterator& c1,
                           const DHCellIterator& c2) const
           {
+	    Assert (dim >= 2,
+		    ExcMessage ("This operation only makes sense for dim>=2."));
 
             const Point<dim> v1 = c1->center() - center;
             const Point<dim> v2 = c2->center() - center;
