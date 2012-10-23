@@ -265,6 +265,14 @@
     (major)*10000 + (minor)*100 + (subminor))
 
 
+/****************************************
+ * Configured in configure_slepc.cmake: *
+ ****************************************/
+
+/* Defined if a SLEPc installation was found and is going to be used */
+#cmakedefine DEAL_II_USE_SLEPC
+
+
 /**************************************
  * Configured in configure_tbb.cmake: *
  **************************************/

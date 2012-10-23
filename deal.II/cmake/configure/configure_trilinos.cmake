@@ -214,6 +214,8 @@ MACRO(FEATURE_TRILINOS_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find a suitable set of trilinos libraries!\n"
     "Please ensure that all necessary libraries are installed on your computer.\n"
+    "Some Trilinos versions have bugs that make it incompatible with deal.II.\n"
+    "(There will be a warning above if this is the case)\n"
     "If the libraries are not at a default location, either provide some hints\n"
     "for the autodetection:\n"
     "    $ TRILINOS_DIR=\"...\" cmake <...>\n"
@@ -224,4 +226,3 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(TRILINOS)
-

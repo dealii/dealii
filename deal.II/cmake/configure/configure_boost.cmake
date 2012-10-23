@@ -49,7 +49,6 @@ ENDMACRO()
 
 
 MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL var)
-
   INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIR})
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -69,7 +68,6 @@ ENDMACRO()
 
 
 MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED var)
-
   #
   # We need to set some definitions to use the headers of the bundled boost
   # library:
@@ -102,4 +100,3 @@ IF(NOT DEAL_II_WITH_BOOST)
       )
   ENDIF()
 ENDIF()
-

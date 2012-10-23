@@ -36,9 +36,6 @@ ENDMACRO()
 # function we use. We have to ensure that this check is repeated every time
 # the lapack library or DEAL_II_WITH_LAPACK changes.
 #
-# TODO: Known bug: At the moment we don't cover the case when the lapack
-#                  library changes..
-#
 
 SET(DEAL_II_LAPACK_FUNCTIONS
   daxpy_ dgeev_ dgeevx_ dgelsd_ dgemm_ dgemv_ dgeqrf_ dgesdd_ dgesvd_ dgetrf_
@@ -70,7 +67,6 @@ ENDMACRO()
 
 
 MACRO(FEATURE_LAPACK_CONFIGURE_EXTERNAL var)
-
   ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${LAPACK_LINKER_FLAGS}")
 
   LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
@@ -80,14 +76,11 @@ MACRO(FEATURE_LAPACK_CONFIGURE_EXTERNAL var)
   CHECK_FOR_LAPACK_FUNCTIONS()
 
   SET(HAVE_LIBLAPACK TRUE)
-
   SET(${var} TRUE)
-
 ENDMACRO()
 
 
 CONFIGURE_FEATURE(LAPACK)
-
 
 #
 # Call RESET_LAPACK_FUNCTIONS_CHECK if DEAL_II_WITH_LAPACK is unset to
@@ -96,4 +89,3 @@ CONFIGURE_FEATURE(LAPACK)
 IF(NOT DEAL_II_WITH_LAPACK)
   RESET_LAPACK_FUNCTIONS_CACHE()
 ENDIF()
-

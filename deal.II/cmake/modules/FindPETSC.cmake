@@ -77,9 +77,9 @@ FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
   HINTS
     # petsc is special. Account for that
     ${PETSC_DIR}
-    ${PETSC_DIR}/${PETSC_ARCH}/include
+    ${PETSC_DIR}/${PETSC_ARCH}
     ${PETSC_INCLUDE_DIRS}
-  PATH_SUFFIXES include petsc
+  PATH_SUFFIXES petsc include include/petsc
 )
 
 #
@@ -98,9 +98,9 @@ FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
 FIND_PATH(PETSC_INCLUDE_DIR_COMMON petscversion.h
   HINTS
     ${PETSC_DIR}
-    ${PETSC_DIR}/${PETSC_ARCH}/include
+    ${PETSC_DIR}/${PETSC_ARCH}
     ${PETSC_INCLUDE_DIRS}
-  PATH_SUFFIXES petsc
+  PATH_SUFFIXES petsc include include/petsc
 )
 
 #
@@ -129,6 +129,8 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(PETSC DEFAULT_MSG
   )
 
 IF(PETSC_FOUND)
+  SET(PETSC_PETSCCONF_H "${PETSC_INCLUDE_DIR_ARCH}/petscconf.h")
+  SET(PETSC_PETSCVERSION_H "${PETSC_INCLUDE_DIR_COMMON}/petscversion.h")
 
   #
   # Is petsc compiled with support for MPIUNI?
@@ -164,7 +166,6 @@ IF(PETSC_FOUND)
     ENDIF()
     MARK_AS_ADVANCED(PETSC_LIBMPIUNI)
   ENDIF()
-
 
   FILE(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_VERSION_MAJOR_STRING
     REGEX "#define.*PETSC_VERSION_MAJOR")

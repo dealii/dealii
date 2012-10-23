@@ -63,12 +63,10 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
       UNSET(PETSC_LIBRARIES CACHE)
     ENDIF()
   ENDIF()
-
 ENDMACRO()
 
 
 MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL var)
-
   INCLUDE_DIRECTORIES(${PETSC_INCLUDE_DIRS})
 
   # The user has to know the location of the petsc headers as well:
@@ -84,7 +82,6 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL var)
   # Disable a bunch of warnings when compiling with petsc:
   #
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
-
 
   SET(DEAL_II_EXPAND_PETSC_VECTOR "PETScWrappers::Vector")
   SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR "PETScWrappers::BlockVector")
@@ -103,8 +100,9 @@ SET(FEATURE_PETSC_CUSTOM_ERROR_MESSAGE TRUE)
 
 MACRO(FEATURE_PETSC_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
-    "Could not find the petsc library!\n\n"
+    "Could not find the petsc library!\n"
     "Please ensure that the petsc library version 3.0.0 or newer is installed on your computer.\n"
+    "Furthermore PETSc has to be configured with the same mpi options as deal.II.\n"
     "If the library is not at a default location, either provide some hints\n"
     "for the autodetection:\n"
     "PETSc installed with --prefix=<...> to a destination:\n"
@@ -119,4 +117,3 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(PETSC)
-

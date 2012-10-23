@@ -41,7 +41,7 @@ SET(FEATURE_HDF5_CUSTOM_ERROR_MESSAGE TRUE)
 
 MACRO(FEATURE_HDF5_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
-    "Could not find the hdf5 library!\n\n"
+    "Could not find the hdf5 library!\n"
     "Please ensure that the hdf5 library is installed on your computer.\n"
     "If the library is not at a default location, either provide some hints\n"
     "for the autodetection:\n"
@@ -53,4 +53,3 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(HDF5)
-

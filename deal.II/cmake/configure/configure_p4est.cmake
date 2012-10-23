@@ -21,7 +21,6 @@ SET(FEATURE_P4EST_DEPENDS DEAL_II_WITH_MPI)
 
 
 MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
-
   FIND_PACKAGE(P4EST)
 
   IF(P4EST_FOUND)
@@ -42,7 +41,6 @@ ENDMACRO()
 
 
 MACRO(FEATURE_P4EST_CONFIGURE_EXTERNAL var)
-
   INCLUDE_DIRECTORIES(${P4EST_INCLUDE_DIRS})
 
   # The user has to know the location of the p4est headers as well:
@@ -61,7 +59,7 @@ SET(FEATURE_P4EST_CUSTOM_ERROR_MESSAGE TRUE)
 
 MACRO(FEATURE_P4EST_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
-    "Could not find the p4est and sc libraries!\n\n"
+    "Could not find the p4est and sc libraries!\n"
     "Please ensure that the libraries are installed on your computer.\n"
     "If the libraries are not at a default location, either provide some hints\n"
     "for the autodetection:\n"
@@ -73,4 +71,3 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(P4EST)
-

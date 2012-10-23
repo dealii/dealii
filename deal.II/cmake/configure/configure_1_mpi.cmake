@@ -64,7 +64,7 @@ SET(FEATURE_MPI_CUSTOM_ERROR_MESSAGE TRUE)
 
 MACRO(FEATURE_MPI_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
-    "Could not find any suitable mpi library!\n\n"
+    "Could not find any suitable mpi library!\n"
     "Please ensure that an mpi library is installed on your computer.\n"
     "If the library is not at a default location, either provide some hints\n"
     "for the autodetection, or set the relevant variables by hand in ccmake.\n"
@@ -73,4 +73,3 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(MPI)
-

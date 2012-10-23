@@ -124,7 +124,6 @@ ENDMACRO()
 
 
 MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
-
   INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -152,7 +151,6 @@ ENDMACRO()
 
 
 MACRO(FEATURE_TBB_CONFIGURE_BUNDLED var)
-
   #
   # Setup threading (before configuring our build...)
   # and if successfull return TRUE:
@@ -180,4 +178,3 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(TBB)
-
