@@ -13,22 +13,14 @@
 #####
 
 
-#
-#             The cmake build system for the deal.II project
-#
-
-###########################################################################
 ##                                                                       ##
-##  See README.cmake for further details on how to use the cmake build   ##
-##  system of deal.II.                                                   ##
+#                                                                         #
+#             The cmake build system for the deal.II project              #
+#                                                                         #
+#   See README.cmake for further details on how to use the cmake build    #
+#   system of deal.II.                                                    #
+#                                                                         #
 ##                                                                       ##
-###########################################################################
-
-#
-# The main purpose of this file is to set all the configuration options and
-# then call a lot of modules residing under ./cmake/*/ that do the
-# hard work.
-#
 
 
 ###########################################################################
@@ -61,6 +53,17 @@ FOREACH(_file ${_macro_files})
 ENDFOREACH()
 
 INCLUDE(setup_external_macros)
+
+#
+# Check whether the doc or bundled folder is available:
+#
+IF(EXISTS ${CMAKE_SOURCE_DIR}/bundled/CMakeLists.txt)
+  SET(DEAL_II_WITH_BUNDLED_DIRECTORY TRUE)
+ENDIF()
+
+IF(EXISTS ${CMAKE_SOURCE_DIR}/doc/CMakeLists.txt)
+  SET(DEAL_II_WITH_DOC_DIRECTORY TRUE)
+ENDIF()
 
 #
 # We have to initialize some cached variables before PROJECT is called, so
@@ -112,7 +115,7 @@ INCLUDE(setup_finalize)
 
 ###########################################################################
 #                                                                         #
-#                    Compile and install the library:                     #
+#                      Compilation and installation:                      #
 #                                                                         #
 ###########################################################################
 
@@ -140,7 +143,6 @@ IF(DEAL_II_WITH_DOC_DIRECTORY)
 ENDIF()
 ADD_SUBDIRECTORY(examples)
 ADD_SUBDIRECTORY(contrib)
-
 
 #
 # Define some custom targets for convenience

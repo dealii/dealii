@@ -13,9 +13,85 @@
 #####
 
 #
-# Setup cached variables prior to the PROJECT(deal.II) call
+# Setup cached variables (prior to the PROJECT(deal.II) call)
+#
+# This file sets up the following cached Options:
+#
+# General configuration options:
+#
+#     DEAL_II_ALLOW_BUNDLED
+#     DEAL_II_COMPONENT_COMPAT_FILES
+#     DEAL_II_COMPONENT_CONTRIB
+#     DEAL_II_COMPONENT_DOCUMENTATION
+#     DEAL_II_COMPONENT_EXAMPLES
+#
+# Options regarding compilation and linking:
+#
+#     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
+#     CMAKE_BUILD_TYPE
+#     BUILD_SHARED_LIBS
+#     CMAKE_INSTALL_RPATH_USE_LINK_PATH
+#     CMAKE_C_FLAGS                     *)
+#     CMAKE_CXX_FLAGS                   *)
+#     CMAKE_SHARED_LINKER_FLAGS         *)
+#     DEAL_II_C_FLAGS_DEBUG
+#     DEAL_II_CXX_FLAGS_DEBUG
+#     DEAL_II_SHARED_LINKER_FLAGS_DEBUG
+#     DEAL_II_C_FLAGS_RELEASE
+#     DEAL_II_CXX_FLAGS_RELEASE
+#     DEAL_II_SHARED_LINKER_FLAGS_RELEASE
+#
+# *) May also be set via environment variable (CFLAGS, CXXFLAGS, LDFLAGS)
 #
 
+
+###########################################################################
+#                                                                         #
+#                     General configuration options:                      #
+#                                                                         #
+###########################################################################
+
+If(DEAL_II_WITH_BUNDLED_DIRECTORY)
+  OPTION(DEAL_II_ALLOW_BUNDLED
+    "Allow the use of libraries bundled with the source tarball. (DEAL_II_FORCE_BUNDLED* will overwrite this option.)"
+    ON
+    )
+ENDIF()
+
+OPTION(DEAL_II_COMPONENT_COMPAT_FILES
+  "Enable installation of the example steps. This adds a COMPONENT \"compat_files\" to the build system."
+  ON
+  )
+
+OPTION(DEAL_II_COMPONENT_CONTRIB
+  "Enable installation of contrib packages. This adds a COMPONENT \"contrib\" to the build system."
+  OFF
+  )
+
+If(DEAL_II_WITH_DOC_DIRECTORY)
+  OPTION(DEAL_II_COMPONENT_DOCUMENTATION
+    "Enable configuration, build and installation of the documentation. This adds a COMPONENT \"documentation\" to the build system."
+    OFF
+    )
+ENDIF()
+
+OPTION(DEAL_II_COMPONENT_EXAMPLES
+  "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
+  ON
+  )
+
+
+###########################################################################
+#                                                                         #
+#                        Compilation and linking:                         #
+#                                                                         #
+###########################################################################
+
+OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
+  "configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
+  ON
+  )
+MARK_AS_ADVANCED(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
 #
 # Setup CMAKE_BUILD_TYPE:
@@ -25,7 +101,6 @@ SET(CMAKE_BUILD_TYPE
   CACHE STRING
   "Choose the type of build, options are: Debug, Release and DebugRelease."
   )
-
 
 #
 # This is cruel, I know. But it is better to only have a known number of
@@ -39,16 +114,10 @@ IF( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
     )
 ENDIF()
 
-
-#
-# Set BUILD_SHARED_LIBS to default to ON and promote to cache so that the
-# user can see the value.
-#
 SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"
   )
 MARK_AS_ADVANCED(BUILD_SHARED_LIBS)
-
 
 #
 # Set CMAKE_INSTALL_RPATH_USE_LINK_PATH to default to ON and promote to
@@ -58,7 +127,6 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
   "Set the rpath of the library to the external link pathes on installation"
   )
 MARK_AS_ADVANCED(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
-
 
 #
 # Tell the user very prominently, that we're doing things differently w.r.t
@@ -78,7 +146,6 @@ FOREACH(_flag
   ENDIF()
 ENDFOREACH()
 
-
 #
 # Hide all unused compiler flag variables:
 #
@@ -92,12 +159,9 @@ FOREACH(_flag
   CMAKE_C_FLAGS_MINSIZEREL
   CMAKE_C_FLAGS_RELWITHDEBINFO
   )
-  #
   # Go away...
-  #
   SET(${_flag} "" CACHE INTERNAL "" FORCE)
 ENDFOREACH()
-
 
 #
 # Read in CFLAGS, CXXFLAGS and LDFLAGS from environment
@@ -105,7 +169,6 @@ ENDFOREACH()
 SET_IF_EMPTY(CMAKE_C_FLAGS "$ENV{CFLAGS}")
 SET_IF_EMPTY(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS}")
 SET_IF_EMPTY(CMAKE_SHARED_LINKER_FLAGS "$ENV{LDFLAGS}")
-
 
 #
 # Set cached compiler flags to an empty string:
@@ -123,10 +186,8 @@ SET(DEAL_II_USED_FLAGS
   )
 
 FOREACH(_flag ${DEAL_II_USED_FLAGS})
-
   #
-  # "CACHE" ensures that we only set the variable if it is not already set
-  # as a  cached variable. Effectively we're setting a default value:
+  # Promote to cache:
   #
   SET(${_flag} "${${_flag}}" CACHE STRING
    "The user supplied cache variable will be appended _at the end_ of the auto generated ${_flag} variable"

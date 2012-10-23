@@ -13,26 +13,15 @@
 #####
 
 #
-# Set up deal.II specific definitions and look for available components
+# Set up deal.II specific definitions
 #
-# This file defines a long list of variables, used throughout the
+# This file defines a long list of uncached variables, used throughout the
 # configuration to determine paths, locations and names:
-#
-# General configuration options:
-#
-#     DEAL_II_ALLOW_BUNDLED           **)
-#     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS **)
-#     DEAL_II_COMPONENT_COMPAT_FILES  **)
-#     DEAL_II_COMPONENT_CONTRIB       **)
-#     DEAL_II_COMPONENT_DOCUMENTATION **)
-#     DEAL_II_COMPONENT_EXAMPLES      **)
 #
 # General information about deal.II:
 #
 #     DEAL_II_PACKAGE_NAME            *)
-#     DEAL_II_PACKAGE_VERSION
-#     DEAL_II_PACKAGE_BUGREPORT       *)
-#     DEAL_II_PACKAGE_URL             *)
+#     DEAL_II_PACKAGE_VERSION         **)
 #     DEAL_II_VERSION_MAJOR
 #     DEAL_II_VERSION_MINOR
 #
@@ -61,74 +50,9 @@
 #     DEAL_II_WITH_BUNDLED_DIRECTORY
 #     DEAL_II_WITH_DOC_DIRECTORY
 #
-# *)  Uncached variables. Can be overwritten by the command line via
-#     -D<...>
-# **) Cached Options. Can be set via ccmake or on the command line via -D<...>
+# *)  Can be overwritten by the command line via -D<...>
+# **) Will be set with to the value of ${VERSION}
 #
-# #)  Set in source/CmakeLists.txt after the target names are known.
-#
-
-
-#
-# Check whether the doc or bundled folder is available:
-#
-IF(EXISTS ${CMAKE_SOURCE_DIR}/bundled/CMakeLists.txt)
-  SET(DEAL_II_WITH_BUNDLED_DIRECTORY TRUE)
-ENDIF()
-
-IF(EXISTS ${CMAKE_SOURCE_DIR}/doc/CMakeLists.txt)
-  SET(DEAL_II_WITH_DOC_DIRECTORY TRUE)
-ENDIF()
-
-
-###########################################################################
-#                                                                         #
-#                     General configuration options:                      #
-#                                                                         #
-###########################################################################
-
-OPTION(DEAL_II_ALLOW_BUNDLED
-  "Allow the use of libraries bundled with the source tarball. (DEAL_II_FORCE_BUNDLED* will overwrite this option.)"
-  ON
-  )
-
-#
-# Build configuration: configuration options regarding compilation and
-# installation of the deal.II library
-#
-OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
-  "configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
-  ON
-  )
-MARK_AS_ADVANCED(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-
-#
-# Component selection: configuration options regarding the setup of
-# different components of the deal.II library
-#
-
-OPTION(DEAL_II_COMPONENT_COMPAT_FILES
-  "Enable installation of the example steps. This adds a COMPONENT \"compat_files\" to the build system."
-  ON
-  )
-
-OPTION(DEAL_II_COMPONENT_CONTRIB
-  "Enable installation of contrib packages. This adds a COMPONENT \"contrib\" to the build system."
-  OFF
-  )
-
-OPTION(DEAL_II_COMPONENT_EXAMPLES
-  "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
-  ON
-  )
-
-If(DEAL_II_WITH_DOC_DIRECTORY)
-  OPTION(DEAL_II_COMPONENT_DOCUMENTATION
-    "Enable configuration, build and installation of the documentation. This adds a COMPONENT \"documentation\" to the build system."
-    OFF
-    )
-ENDIF()
-
 
 ###########################################################################
 #                                                                         #
@@ -139,9 +63,6 @@ ENDIF()
 SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
 SET(DEAL_II_PACKAGE_VERSION ${VERSION})
-
-SET_IF_EMPTY(DEAL_II_PACKAGE_BUGREPORT "dealii@dealii.org")
-SET_IF_EMPTY(DEAL_II_PACKAGE_URL "http://www.dealii.org/")
 
 STRING(REGEX REPLACE
   "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${VERSION}"
@@ -178,7 +99,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   SET_IF_EMPTY(DEAL_II_PROJECT_CONFIG_RELDIR "${DEAL_II_LIBRARY_RELDIR}/cmake/${DEAL_II_PROJECT_CONFIG_NAME}")
 ELSE()
   #
-  # IF DEAL_II_COMPONENT_COMPAT_FILES is not set, we assume that we have to
+  # IF DEAL_II_COMPONENT_COMPAT_FILES=off, we assume that we have to
   # obey the FSHS...
   #
   SET_IF_EMPTY(DEAL_II_CMAKE_MACROS_RELDIR "share/${DEAL_II_PACKAGE_NAME}/cmake/Macros")
@@ -200,7 +121,6 @@ LIST(APPEND DEAL_II_LIBRARY_DIRS
   "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"
   )
 
-
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   LIST(APPEND DEAL_II_BUILD_TYPES "DEBUG")
 ENDIF()
@@ -212,8 +132,9 @@ ENDIF()
 
 #
 # Cleanup some files used for storing the names of alle object targets that
-# will be bundled to the deal.II library. (Right now, i.e. cmake 2.8.8,
-# this is the only reliable way to get information in a global scope...)
+# will be bundled to the deal.II library.
+# (Right now, i.e. cmake 2.8.8, this is the only reliable way to get
+# information into a global scope...)
 #
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER "${_build}" _build_lowercase)

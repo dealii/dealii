@@ -12,16 +12,17 @@
 ##
 #####
 
-#
-# Finalize the configuration:
-#
 
+###########################################################################
+#                                                                         #
+#                       Finalize the configuration:                       #
+#                                                                         #
+###########################################################################
 
 #
 # Hide some cmake specific cached variables. This is annoying...
 #
 MARK_AS_ADVANCED(file_cmd)
-
 
 #
 # Append the saved initial (cached) variables ${flags}_SAVED at the end of
@@ -35,7 +36,6 @@ FOREACH(_flags ${DEAL_II_USED_FLAGS})
   #
   STRING(STRIP "${${_flags}}" ${_flags})
 ENDFOREACH()
-
 
 #
 # Depulicate entries in DEAL_II_EXTERNAL_LIBRARIES(_...):
@@ -54,16 +54,18 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 ENDFOREACH()
 
 
-#
-# And write a nice configuration summary to file:
-#
+###########################################################################
+#                                                                         #
+#             And write a nice configuration summary to file:             #
+#                                                                         #
+###########################################################################
+
 SET(_log "${CMAKE_BINARY_DIR}/summary.log")
 
-
 FILE(WRITE ${_log}
-"*     *                                    *     *
-*     *       deal.II configuration:       *     *
-*     *                                    *     *\n
+"#
+# deal.II configuration:
+#
       CMAKE_BUILD_TYPE:       ${CMAKE_BUILD_TYPE}
       CMAKE_INSTALL_PREFIX:   ${CMAKE_INSTALL_PREFIX}
       CMAKE_SOURCE_DIR:       ${CMAKE_SOURCE_DIR}
@@ -109,21 +111,25 @@ ELSEIF(NOT DEAL_II_KNOWN_COMPILER)
 ENDIF()
 
 FILE(APPEND ${_log}
-  "\nConfigured Features ("
+  "\nConfigured Features:"
   )
 IF(FORCE_AUTODETECTION)
   FILE(APPEND ${_log}
-    "!!! FORCE_AUTODETECTION !!!, "
+    " !!! FORCE_AUTODETECTION !!!"
     )
 ENDIF()
 IF(DISABLE_AUTODETECTION)
   FILE(APPEND ${_log}
-    "!!! DISABLE_AUTODETECTION !!!, "
+    " !!! DISABLE_AUTODETECTION !!!"
     )
 ENDIF()
-FILE(APPEND ${_log}
-  "DEAL_II_ALLOW_BUNDLED = ${DEAL_II_ALLOW_BUNDLED}):\n"
-  )
+IF(DEFINED DEAL_II_ALLOW_BUNDLED)
+  FILE(APPEND ${_log}
+    " (DEAL_II_ALLOW_BUNDLED = ${DEAL_II_ALLOW_BUNDLED})"
+    )
+ENDIF()
+
+FILE(APPEND ${_log} "\n")
 
 GET_CMAKE_PROPERTY(_res VARIABLES)
 FOREACH(_var ${_res})
@@ -146,7 +152,6 @@ FOREACH(_var ${_res})
     ENDIF()
   ENDIF()
 ENDFOREACH()
-
 
 FILE(APPEND ${_log}
   "\nComponent configuration:\n"

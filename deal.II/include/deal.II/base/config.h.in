@@ -6,6 +6,8 @@
 //
 //    TODO: Header
 //
+//    Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>
+//
 //----------------------------  config.h.in  ---------------------------
 
 #ifndef __deal2__config_h
@@ -20,28 +22,21 @@
 #define DEAL_II_NAMESPACE_CLOSE }
 
 
-/* Define to the full name of this package. */
+/**************************************
+ * Configured in setup_deal_ii.cmake: *
+ **************************************/
+
+/* Defined to the full name of this package. */
 #define DEAL_II_PACKAGE_NAME "@DEAL_II_PACKAGE_NAME@"
 
-/* Define to the one symbol short name of this package. */
-#define DEAL_II_PACKAGE_TARNAME "@DEAL_II_PACKAGE_TARNAME@"
-
-/* Define to the version of this package. */
+/* Defined to the version of this package. */
 #define DEAL_II_PACKAGE_VERSION "@DEAL_II_PACKAGE_VERSION@"
-
-/* Define to the address where bug reports for this package should be sent. */
-#define DEAL_II_PACKAGE_BUGREPORT "@DEAL_II_PACKAGE_BUGREPORT@"
-
-/* Define to the home page for this package. */
-#define DEAL_II_PACKAGE_URL "@DEAL_II_PACKAGE_URL@"
 
 /* Major version number of deal.II */
 #define DEAL_II_VERSION_MAJOR @DEAL_II_VERSION_MAJOR@
 
 /* Minor version number of deal.II */
 #define DEAL_II_VERSION_MINOR @DEAL_II_VERSION_MINOR@
-
-
 
 
 /*****************************************
@@ -62,7 +57,7 @@
 
 /***************************************
  * Configured in configure_hdf5.cmake: *
- **************************************/
+ ***************************************/
 
 /* Defined if deal.II was configured with hdf5 support */
 #cmakedefine DEAL_II_HAVE_HDF5
@@ -195,7 +190,7 @@
 
 
 /*****************************************
- * Configured in configure_mumps.cmake: *
+ * Configured in configure_mumps.cmake:  *
  *****************************************/
 
 /* Defined if an MUMPS installation was found and is going to be used */
@@ -452,9 +447,24 @@
 #cmakedefine HAVE_TIMES
 
 
-/* Defined if the deal.II was configured on a native Windows platform. */
+/* Defined if deal.II was configured on a native Windows platform. */
 #cmakedefine DEAL_II_MSVC
 
+/* Disable a bunch of warnings for Microsoft Visual C++. */
+#ifdef DEAL_II_MSVC
+#  pragma warning( disable : 4244 ) /* implied downcasting from double to float */
+#  pragma warning( disable : 4267 ) /* implied downcasting from size_t to unsigned int */
+#  pragma warning( disable : 4996 ) /* unsafe functions, such as strcat and sprintf */
+#  pragma warning( disable : 4355 ) /* 'this' : used in base member initializer list */
+#  pragma warning( disable : 4661 ) /* no suitable definition provided for explicit template instantiation request */
+#  pragma warning( disable : 4800 ) /* forcing value to bool 'true' or 'false' (performance warning) */
+#  pragma warning( disable : 4146 ) /* unary minus operator applied to unsigned type, result still unsigned */
+#  pragma warning( disable : 4667 ) /* no function template defined that matches forced instantiation */
+#  pragma warning( disable : 4520 ) /* multiple default constructors specified */
+#  pragma warning( disable : 4700 ) /* uninitialized local variable */
+#  pragma warning( disable : 4789 ) /* destination of memory copy is too small */
+#  pragma warning( disable : 4808 ) /* case 'value' is not a valid value for switch condition of type 'bool */
+#endif // DEAL_II_MSVC
 
 
 #include <deal.II/base/numbers.h>
