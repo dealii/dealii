@@ -5,8 +5,6 @@ Major:
 
 * Add the rest of the Bug tests
 
-* Test the fparser 4.5 functionality.
-
 * The following features have to be written:
     * TECPLOT
 
@@ -17,9 +15,6 @@ Major:
     - How to interface with external libraries (Unify this...)
 
 * Port the testsuite to cmake
-
-* Rename all DEAL_II_USE_* and HAVE_LIB* that refer to a feature to
-  DEAL_II_WITH_*.
 
 
 Minor:
