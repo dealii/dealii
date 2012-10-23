@@ -59,9 +59,11 @@ MARK_AS_ADVANCED(CMAKE_BUILD_TYPE deal.II_DIR)
 
 # Set build type:
 IF(DEBUG_MODE)
-  SET(CMAKE_BUILD_TYPE "Debug" CACHE FORCE "")
+  SET(CMAKE_BUILD_TYPE "Debug" CACHE FORCE
+    "Please set DEBUG_MODE in CMakeLists.txt")
 ELSE()
-  SET(CMAKE_BUILD_TYPE "Release" CACHE FORCE "")
+  SET(CMAKE_BUILD_TYPE "Release" CACHE FORCE
+    "Please set DEBUG_MODE in CMakeLists.txt")
 ENDIF()
 
 PROJECT(${TARGET})
