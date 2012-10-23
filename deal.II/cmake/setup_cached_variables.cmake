@@ -42,6 +42,8 @@
 #     DEAL_II_SHARED_LINKER_FLAGS_RELEASE
 #
 # *) May also be set via environment variable (CFLAGS, CXXFLAGS, LDFLAGS)
+#    (nonempty cached variable has precedence will not be overwritten by
+#    environment)
 #
 
 
