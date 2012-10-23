@@ -1,12 +1,8 @@
 Major:
 
-* MPI dependencies?
-  arpack, hdf5, petsc, p4est, trilinos, metis
+* Furnish the MPI dependencies (arpack, hdf5, petsc, p4est, trilinos, metis)
 
 * Add the rest of the Bug tests
-
-* The following features have to be written:
-    * TECPLOT
 
 * Update the online documentation on
 
@@ -14,10 +10,20 @@ Major:
 
     - How to interface with external libraries (Unify this...)
 
+    - How to use deal.II
+      * Autopilot CMakeLists.txt
+      * minimal CMakeLists.txt
+      * direct interface
+
+    - The documentation in the example steps
+
 * Port the testsuite to cmake
 
 
 Minor:
+
+* The following features have to be written:
+    * TECPLOT
 
 * (Maybe) re-enable validate-xrefs
 
