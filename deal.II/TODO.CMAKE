@@ -8,13 +8,7 @@ Major:
 * Test the fparser 4.5 functionality.
 
 * The following features have to be written:
-    * SLEPC
     * TECPLOT
-
-* Write a wrapper around cmake. Something like
-    $ make config
-    $ make
-    ...
 
 * Update the online documentation on
 
