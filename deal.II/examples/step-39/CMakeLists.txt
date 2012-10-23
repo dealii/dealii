@@ -6,7 +6,7 @@
 #
 # Set the name of the project and target:
 #
-SET(TARGET "step-1")
+SET(TARGET "step-39")
 
 #
 # Declare all source files the target consists of:
@@ -27,6 +27,8 @@ SET(CLEAN_UP_FILES *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.vtk *.ucd *.d2)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
+FIND_PACKAGE(Perl REQUIRED)
+
 # Search for the deal.II library:
 FIND_PACKAGE(deal.II 8.0 REQUIRED
   HINTS
@@ -45,4 +47,10 @@ FIND_PACKAGE(deal.II 8.0 REQUIRED
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET})
 DEAL_II_INVOKE_AUTOPILOT()
+
+ADD_CUSTOM_TARGET(postprocess
+  COMMAND ${PERL_EXECUTABLE} postprocess.pl deallog > output.dat
+  COMMENT "Postprocessing deallog"
+  )
+ADD_DEPENDENCIES(postprocess run)
 

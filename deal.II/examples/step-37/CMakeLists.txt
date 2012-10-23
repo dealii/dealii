@@ -6,7 +6,7 @@
 #
 # Set the name of the project and target:
 #
-SET(TARGET "step-1")
+SET(TARGET "step-37")
 
 #
 # Declare all source files the target consists of:
@@ -41,6 +41,17 @@ FIND_PACKAGE(deal.II 8.0 REQUIRED
   # can specify additional hints for search paths here, e.g.
   # "$ENV{HOME}/workspace/deal.II"
   )
+
+#
+# Are all dependencies fullfilled?
+#
+IF(NOT DEAL_II_WITH_LAPACK)
+  MESSAGE(FATAL_ERROR "
+Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
+    DEAL_II_WITH_LAPACK = ON
+which is required for this tutorial step."
+    )
+ENDIF()
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET})

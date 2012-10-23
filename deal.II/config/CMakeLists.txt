@@ -22,6 +22,7 @@
 
 INSTALL(FILES
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
   DESTINATION ${DEAL_II_CMAKE_MACROS_RELDIR}
   COMPONENT library

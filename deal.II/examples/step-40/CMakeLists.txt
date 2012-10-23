@@ -6,7 +6,7 @@
 #
 # Set the name of the project and target:
 #
-SET(TARGET "step-1")
+SET(TARGET "step-40")
 
 #
 # Declare all source files the target consists of:
@@ -41,6 +41,21 @@ FIND_PACKAGE(deal.II 8.0 REQUIRED
   # can specify additional hints for search paths here, e.g.
   # "$ENV{HOME}/workspace/deal.II"
   )
+
+#
+# Are all dependencies fullfilled?
+#
+IF( NOT DEAL_II_WITH_PETSC OR
+    NOT DEAL_II_WITH_P4EST OR
+    DEAL_II_WITH_TBB )
+  MESSAGE(FATAL_ERROR "
+Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
+    DEAL_II_WITH_PETSC = ON
+    DEAL_II_WITH_P4EST = ON
+    DEAL_II_WITH_TBB = OFF
+which is required for this tutorial step."
+    )
+ENDIF()
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET})

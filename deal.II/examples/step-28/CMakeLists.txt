@@ -6,7 +6,7 @@
 #
 # Set the name of the project and target:
 #
-SET(TARGET "step-1")
+SET(TARGET "step-28")
 
 #
 # Declare all source files the target consists of:
