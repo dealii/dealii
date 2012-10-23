@@ -397,7 +397,7 @@ namespace TrilinosWrappers
                   const MPI_Comm &communicator)
   {
     last_action = Zero;
-    Epetra_LocalMap map (partitioning.size(),
+    Epetra_LocalMap map (static_cast<int>(partitioning.size()),
                          0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
                          Epetra_MpiComm(communicator));
@@ -489,7 +489,7 @@ namespace TrilinosWrappers
     if (vector->Map().NumGlobalElements() !=
         static_cast<int>(partitioning.size()))
       {
-        Epetra_LocalMap map (partitioning.size(),
+        Epetra_LocalMap map (static_cast<int>(partitioning.size()),
                              0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
                              Epetra_MpiComm(communicator));

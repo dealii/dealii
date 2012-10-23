@@ -381,8 +381,8 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
   compress ();
 
   if ((is_contiguous() == true) && (!overlapping))
-    return Epetra_Map (size(),
-                       n_elements(),
+    return Epetra_Map (static_cast<int>(size()),
+                       static_cast<int>(n_elements()),
                        0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
                        Epetra_MpiComm(communicator));
@@ -395,7 +395,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
       fill_index_vector(indices);
 
       return Epetra_Map (-1,
-                         n_elements(),
+                         static_cast<int>(n_elements()),
                          (n_elements() > 0
                           ?
                           reinterpret_cast<int*>(&indices[0])

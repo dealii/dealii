@@ -662,7 +662,7 @@ namespace TrilinosWrappers
                                         // equidistributed map; avoid
                                         // storing the nonzero
                                         // elements.
-    vector_distributor.reset (new Epetra_Map(n_rows, 0, communicator));
+    vector_distributor.reset (new Epetra_Map(static_cast<int>(n_rows), 0, communicator));
 
     if (trilinos_matrix.get() == 0)
       trilinos_matrix.reset (new SparseMatrix());

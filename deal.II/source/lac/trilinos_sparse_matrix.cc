@@ -169,7 +169,7 @@ namespace TrilinosWrappers
                               const unsigned int n,
                               const unsigned int n_max_entries_per_row)
                   :
-                  column_space_map (new Epetra_Map (n, 0,
+                  column_space_map (new Epetra_Map (static_cast<int>(n), 0,
                                                     Utilities::Trilinos::comm_self())),
 
                                    // on one processor only, we know how the
@@ -181,7 +181,7 @@ namespace TrilinosWrappers
                                    // information from columns is only
                                    // available when entries have been added
                   matrix (new Epetra_FECrsMatrix(Copy,
-                                                 Epetra_Map (m, 0,
+                                                 Epetra_Map (static_cast<int>(m), 0,
                                                              Utilities::Trilinos::comm_self()),
                                                  *column_space_map,
                                                  n_max_entries_per_row,
@@ -196,10 +196,10 @@ namespace TrilinosWrappers
                               const unsigned int               n,
                               const std::vector<unsigned int> &n_entries_per_row)
                   :
-                  column_space_map (new Epetra_Map (n, 0,
+                  column_space_map (new Epetra_Map (static_cast<int>(n), 0,
                                                     Utilities::Trilinos::comm_self())),
                   matrix (new Epetra_FECrsMatrix(Copy,
-                                                 Epetra_Map (m, 0,
+                                                 Epetra_Map (static_cast<int>(m), 0,
                                                              Utilities::Trilinos::comm_self()),
                                                  *column_space_map,
                            (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
@@ -339,10 +339,10 @@ namespace TrilinosWrappers
   void
   SparseMatrix::reinit (const SparsityType &sparsity_pattern)
   {
-    const Epetra_Map rows (sparsity_pattern.n_rows(),
+    const Epetra_Map rows (static_cast<int>(sparsity_pattern.n_rows()),
                            0,
                            Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (sparsity_pattern.n_cols(),
+    const Epetra_Map columns (static_cast<int>(sparsity_pattern.n_cols()),
                               0,
                               Utilities::Trilinos::comm_self());
 
@@ -527,10 +527,10 @@ namespace TrilinosWrappers
                         const bool                            copy_values,
                         const ::dealii::SparsityPattern      *use_this_sparsity)
   {
-    const Epetra_Map rows (dealii_sparse_matrix.m(),
+    const Epetra_Map rows (static_cast<int>(dealii_sparse_matrix.m()),
                            0,
                            Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (dealii_sparse_matrix.n(),
+    const Epetra_Map columns (static_cast<int>(dealii_sparse_matrix.n()),
                               0,
                               Utilities::Trilinos::comm_self());
     reinit (rows, columns, dealii_sparse_matrix, drop_tolerance,
@@ -621,7 +621,7 @@ namespace TrilinosWrappers
     std::size_t in_index, index;
 
     for (unsigned int row=0; row<n_rows; ++row)
-      if (input_row_map.MyGID(row))
+      if (input_row_map.MyGID(static_cast<int>(row)))
         {
           index = rowstart_indices[row];
           in_index = in_rowstart_indices[row];
@@ -718,7 +718,7 @@ namespace TrilinosWrappers
 
                                   // Only do this on the rows owned
                                   // locally on this processor.
-    int local_row = matrix->LRID(row);
+    int local_row = matrix->LRID(static_cast<int>(row));
     if (local_row >= 0)
       {
         TrilinosScalar *values;
@@ -770,7 +770,7 @@ namespace TrilinosWrappers
   {
                                       // Extract local indices in
                                       // the matrix.
-    int trilinos_i = matrix->LRID(i), trilinos_j = matrix->LCID(j);
+    int trilinos_i = matrix->LRID(static_cast<int>(i)), trilinos_j = matrix->LCID(static_cast<int>(j));
     TrilinosScalar value = 0.;
 
                                       // If the data is not on the
@@ -844,7 +844,7 @@ namespace TrilinosWrappers
   {
                                       // Extract local indices in
                                       // the matrix.
-    int trilinos_i = matrix->LRID(i), trilinos_j = matrix->LCID(j);
+    int trilinos_i = matrix->LRID(static_cast<int>(i)), trilinos_j = matrix->LCID(static_cast<int>(j));
     TrilinosScalar value = 0.;
 
                                       // If the data is not on the
@@ -936,7 +936,7 @@ namespace TrilinosWrappers
                                   // get a representation of the
                                   // present row
     int ncols = -1;
-    int local_row = matrix->LRID(row);
+    int local_row = matrix->LRID(static_cast<int>(row));
 
                                   // on the processor who owns this
                                   // row, we'll have a non-negative
@@ -1210,7 +1210,7 @@ namespace TrilinosWrappers
                   ExcDimensionMismatch(matrix->NumGlobalEntries(row),
                                        rhs.matrix->NumGlobalEntries(row)));
 
-          const int row_local = matrix->RowMap().LID(row);
+          const int row_local = matrix->RowMap().LID(static_cast<int>(row));
           int n_entries, rhs_n_entries;
           TrilinosScalar *value_ptr, *rhs_value_ptr;
 
@@ -1272,7 +1272,7 @@ namespace TrilinosWrappers
           for (unsigned int row=local_range.first;
                row < local_range.second; ++row)
             {
-              const int row_local = matrix->RowMap().LID(row);
+              const int row_local = matrix->RowMap().LID(static_cast<int>(row));
               int n_entries;
 
               ierr = rhs.matrix->ExtractMyRowCopy (row_local, max_row_length,

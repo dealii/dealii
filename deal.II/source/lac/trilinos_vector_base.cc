@@ -40,7 +40,7 @@ namespace TrilinosWrappers
                                         // we can use []. Note that we
                                         // can only get local values.
 
-      const int local_index = vector.vector->Map().LID(index);
+      const int local_index = vector.vector->Map().LID(static_cast<int>(index));
       Assert (local_index >= 0,
               ExcAccessToNonLocalElement (index,
                                           vector.vector->Map().MinMyGID(),
@@ -167,7 +167,7 @@ namespace TrilinosWrappers
   {
                                         // Extract local indices in
                                         // the vector.
-    int trilinos_i = vector->Map().LID(index);
+    int trilinos_i = vector->Map().LID(static_cast<int>(index));
     TrilinosScalar value = 0.;
 
                                         // If the element is not
@@ -195,7 +195,7 @@ namespace TrilinosWrappers
   {
                                         // Extract local indices in
                                         // the vector.
-    int trilinos_i = vector->Map().LID(index);
+    int trilinos_i = vector->Map().LID(static_cast<int>(index));
     TrilinosScalar value = 0.;
 
                                         // If the element is not present

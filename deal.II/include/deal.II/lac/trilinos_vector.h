@@ -537,7 +537,7 @@ namespace TrilinosWrappers
       if (size() != v.size())
         {
           vector.reset (new Epetra_FEVector(Epetra_Map
-                                            (v.size(), 0,
+                                            (static_cast<int>(v.size()), 0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
                                              Epetra_MpiComm(MPI_COMM_SELF)
 #else
