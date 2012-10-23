@@ -29,7 +29,7 @@ ADD_CUSTOM_TARGET(library)
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
   ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
   IF(_build MATCHES "RELEASE")
-    ADD_CUSTOM_TARGET(optimized
+    ADD_CUSTOM_TARGET(release
       DEPENDS ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
       )
   ELSEIF(_build MATCHES "DEBUG")
