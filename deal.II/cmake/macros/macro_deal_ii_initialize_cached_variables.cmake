@@ -35,9 +35,15 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
       )
   ENDIF()
 
-  SET(CMAKE_BUILD_TYPE "Debug" CACHE STRING
-    "Choose the type of build, options are: Debug, Release"
-    )
+  IF(DEAL_II_BUILD_TYPE MATCHES "Debug")
+    SET(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+      "Choose the type of build, options are: Debug, Release"
+      )
+  ELSE()
+    SET(CMAKE_BUILD_TYPE "Release" CACHE STRING
+      "Choose the type of build, options are: Debug, Release"
+      )
+  ENDIF()
 
   SET(CMAKE_CXX_COMPILER ${DEAL_II_CXX_COMPILER} CACHE STRING
     "CXX Compiler.")
