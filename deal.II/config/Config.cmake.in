@@ -67,7 +67,7 @@ ENDIF()
 #
 
 FILE(GLOB _macro_files
-  "${DEAL_II_PATH}/${DEAL_II_CMAKE_MACROS_RELDIR}/*.cmake"
+  "${DEAL_II_PATH}/${DEAL_II_CMAKE_MACROS_RELDIR}/macro_deal_ii*.cmake"
   )
 FOREACH(file ${_macro_files})
   IF(NOT ${DEAL_II_PACKAGE_NAME}_FIND_QUIETLY)
