@@ -11,6 +11,12 @@ SET(TARGET_SRC
   # You can specify additional files here!
   )
 
+# A custom command line to run the program
+SET(TARGET_RUN mpirun -np 2 ${TARGET})
+
+# Define the output that should be cleaned:
+SET(CLEAN_UP_FILES *.vtu *.pvtu *.visit)
+
 # Usually, you will not need to modify anything beyond this point...
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
@@ -28,9 +34,12 @@ FIND_PACKAGE(deal.II 8.0 REQUIRED
 #
 # Are all dependencies fullfilled?
 #
-IF(NOT  DEAL_II_WITH_P4EST OR NOT DEAL_II_WITH_TRILINOS)
+IF( NOT DEAL_II_WITH_MPI OR
+    NOT DEAL_II_WITH_P4EST OR
+    NOT DEAL_II_WITH_TRILINOS )
   MESSAGE(FATAL_ERROR "
 Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
+    DEAL_II_WITH_MPI = ON
     DEAL_II_WITH_P4EST = ON
     DEAL_II_WITH_TRILINOS = ON
 which is required for this tutorial step."

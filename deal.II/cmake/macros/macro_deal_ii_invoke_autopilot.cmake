@@ -24,13 +24,13 @@
 #       TARGET         -  a string used for the project and target name
 #       TARGET_SRC     -  a list of source file to compile for target
 #                         ${TARGET}
+#       TARGET_RUN     -  (optional) the command line that should be
+#                         invoked by "make run", will be set to default
+#                         values if empty
 #       CLEAN_UP_FILES -  (optional) a list of files (globs) that will be
 #                         removed with "make runclean" and "make
 #                         distclean", will be set to default values if
 #                         empty
-#       RUN_COMMAND    -  (optional) the command line that should be
-#                         invoked by "make run", will be set to default
-#                         values if empty
 #
 
 MACRO(DEAL_II_INVOKE_AUTOPILOT)
@@ -48,12 +48,13 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     MESSAGE(STATUS "Autopilot invoked")
 
     # Define a custom target to easily run the program:
-    IF("${RUN_COMMAND}" STREQUAL "")
-      SET(RUN_COMMAND ${TARGET})
+    IF("${TARGET_RUN}" STREQUAL "")
+      SET(TARGET_RUN ${TARGET})
     ENDIF()
     ADD_CUSTOM_TARGET(run
-      COMMAND ${RUN_COMMAND}
-      COMMENT "Run ${TARGET} compiled with ${CMAKE_BUILD_TYPE} configuration in ${CMAKE_SOURCE_DIR}"
+      COMMAND ${TARGET_RUN}
+      DEPENDS ${TARGET}
+      COMMENT "Run ${TARGET} with ${CMAKE_BUILD_TYPE} configuration"
       )
 
     # Define custom targets to easily switch the build type:

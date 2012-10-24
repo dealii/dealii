@@ -11,6 +11,9 @@ SET(TARGET_SRC
   # You can specify additional files here!
   )
 
+# A custom command line to run the program
+SET(TARGET_RUN ${TARGET} input.prm)
+
 # Usually, you will not need to modify anything beyond this point...
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
