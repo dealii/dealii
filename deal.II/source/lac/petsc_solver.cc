@@ -599,7 +599,8 @@ namespace PETScWrappers
                                        const AdditionalData &data)
                       :
                       SolverBase (cn, mpi_communicator),
-                      additional_data (data)
+                      additional_data (data),
+                      symmetric_mode(false)
   {}
 
 
@@ -723,13 +724,14 @@ namespace PETScWrappers
 
 				/**
 				 * build PETSc PC for particular
-				 * PCLU preconditioner
-				 * (note: if the matrix is
-				 *  symmetric, then a cholesky
-				 *  decomposition PCCHOLESKY
-				 *  could be used)
-                                 */
-      ierr = PCSetType (solver_data->pc, PCLU);
+                 * PCLU or PCCHOLESKY preconditioner
+                 * depending on whether the
+                 * symmetric mode has been set
+                 */
+      if (symmetric_mode)
+        ierr = PCSetType (solver_data->pc, PCCHOLESKY);
+      else
+        ierr = PCSetType (solver_data->pc, PCLU);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 				/**
@@ -771,6 +773,19 @@ namespace PETScWrappers
 				 * to MUMPS
 				 */
       ierr = MatMumpsSetIcntl (F, icntl, ival);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                /**
+                 * set the command line option prefix name
+                 */
+      ierr = KSPSetOptionsPrefix(solver_data->ksp, prefix_name.c_str());
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                /**
+                 * set the command line options provided
+                 * by the user to override the defaults
+                 */
+      ierr = KSPSetFromOptions (solver_data->ksp);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     }
@@ -860,6 +875,12 @@ namespace PETScWrappers
     }
 
     return 0;
+  }
+
+  void
+  SparseDirectMUMPS::set_symmetric_mode(const bool flag)
+  {
+    symmetric_mode = flag;
   }
 
 }
