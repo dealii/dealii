@@ -1,7 +1,5 @@
 Major:
 
-* Furnish the MPI dependencies (arpack, hdf5, petsc, p4est, trilinos, metis)
-
 * Add the rest of the Bug tests
 
 * Update the online documentation on
@@ -17,10 +15,12 @@ Major:
 
     - The documentation in the example steps
 
-* Port the testsuite to cmake
+    - Remove the p4est-setup.sh script...
 
 
 Minor:
+
+* Port the testsuite to cmake
 
 * The following features have to be written:
     * TECPLOT
@@ -33,6 +33,4 @@ Minor:
     source/base/function_parser.cc
 
 * HAVE_JN_ ?
-
-* TODO: Update the p4est-setup.sh script...
 

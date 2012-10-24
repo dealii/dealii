@@ -55,7 +55,7 @@ ENDFOREACH()
 INCLUDE(setup_external_macros)
 
 #
-# Check whether the doc or bundled folder is available:
+# Check whether the doc and bundled folders are available:
 #
 IF(EXISTS ${CMAKE_SOURCE_DIR}/bundled/CMakeLists.txt)
   SET(DEAL_II_WITH_BUNDLED_DIRECTORY TRUE)
@@ -76,7 +76,6 @@ INCLUDE(setup_cached_variables)
 #
 PROJECT(deal.II)
 INCLUDE(setup_deal_ii)
-
 INCLUDE(setup_compiler_flags)
 
 #
@@ -138,11 +137,11 @@ ADD_SUBDIRECTORY(source)
 # Prepare the remaining directories for installation
 #
 ADD_SUBDIRECTORY(config)
+ADD_SUBDIRECTORY(contrib)
 IF(DEAL_II_WITH_DOC_DIRECTORY)
   ADD_SUBDIRECTORY(doc)
 ENDIF()
 ADD_SUBDIRECTORY(examples)
-ADD_SUBDIRECTORY(contrib)
 
 #
 # Define some custom targets for convenience
