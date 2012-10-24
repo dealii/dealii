@@ -131,7 +131,7 @@ ENDIF()
 
 
 #
-# Cleanup some files used for storing the names of alle object targets that
+# Cleanup some files used for storing the names of all object targets that
 # will be bundled to the deal.II library.
 # (Right now, i.e. cmake 2.8.8, this is the only reliable way to get
 # information into a global scope...)
