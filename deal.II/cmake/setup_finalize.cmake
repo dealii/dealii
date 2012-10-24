@@ -63,55 +63,61 @@ ENDFOREACH()
 SET(_log "${CMAKE_BINARY_DIR}/summary.log")
 
 FILE(WRITE ${_log}
-"#
-# deal.II configuration:
+"###
 #
-      CMAKE_BUILD_TYPE:       ${CMAKE_BUILD_TYPE}
-      CMAKE_INSTALL_PREFIX:   ${CMAKE_INSTALL_PREFIX}
-      CMAKE_SOURCE_DIR:       ${CMAKE_SOURCE_DIR}
-      CMAKE_BINARY_DIR:       ${CMAKE_BINARY_DIR}\n
-      CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME}
-                              ${CMAKE_CXX_COMPILER}\n
-Compiler flags used for this build:
-      CMAKE_CXX_FLAGS:                     ${CMAKE_CXX_FLAGS}\n"
+#  deal.II configuration:
+#
+#        CMAKE_BUILD_TYPE:       ${CMAKE_BUILD_TYPE}
+#        CMAKE_INSTALL_PREFIX:   ${CMAKE_INSTALL_PREFIX}
+#        CMAKE_SOURCE_DIR:       ${CMAKE_SOURCE_DIR}
+#        CMAKE_BINARY_DIR:       ${CMAKE_BINARY_DIR}
+#        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME}
+#                                ${CMAKE_CXX_COMPILER}
+#
+#  Compiler flags used for this build:
+#        CMAKE_CXX_FLAGS:                     ${CMAKE_CXX_FLAGS}
+"
   )
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  FILE(APPEND ${_log} "      DEAL_II_CXX_FLAGS_RELEASE:           ${DEAL_II_CXX_FLAGS_RELEASE}\n")
+  FILE(APPEND ${_log} "#        DEAL_II_CXX_FLAGS_RELEASE:           ${DEAL_II_CXX_FLAGS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  FILE(APPEND ${_log} "      DEAL_II_CXX_FLAGS_DEBUG:             ${DEAL_II_CXX_FLAGS_DEBUG}\n")
+  FILE(APPEND ${_log} "#        DEAL_II_CXX_FLAGS_DEBUG:             ${DEAL_II_CXX_FLAGS_DEBUG}\n")
 ENDIF()
-FILE(APPEND ${_log} "      CMAKE_SHARED_LINKER_FLAGS:           ${CMAKE_SHARED_LINKER_FLAGS}\n")
+FILE(APPEND ${_log} "#        CMAKE_SHARED_LINKER_FLAGS:           ${CMAKE_SHARED_LINKER_FLAGS}\n")
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  FILE(APPEND ${_log} "      DEAL_II_SHARED_LINKER_FLAGS_RELEASE: ${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}\n")
+  FILE(APPEND ${_log} "#        DEAL_II_SHARED_LINKER_FLAGS_RELEASE: ${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  FILE(APPEND ${_log} "      DEAL_II_SHARED_LINKER_FLAGS_DEBUG:   ${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}\n")
+  FILE(APPEND ${_log} "#        DEAL_II_SHARED_LINKER_FLAGS_DEBUG:   ${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}\n")
 ENDIF()
 
 IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
   FILE(APPEND ${_log}
-"\nThe bundled UMFPACK library will be compiled with the following C compiler:
-      CMAKE_C_COMPILER:         ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
-                                ${CMAKE_C_COMPILER}
-      CMAKE_C_FLAGS:           ${CMAKE_C_FLAGS}\n"
+"
+#
+#  The bundled UMFPACK library will be compiled with the following C compiler:
+#        CMAKE_C_COMPILER:         ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
+#                                  ${CMAKE_C_COMPILER}
+#        CMAKE_C_FLAGS:            ${CMAKE_C_FLAGS}
+"
     )
   IF(CMAKE_BUILD_TYPE MATCHES "Release")
-    FILE(APPEND ${_log} "      DEAL_II_C_FLAGS_RELEASE: ${DEAL_II_C_FLAGS_RELEASE}\n")
+    FILE(APPEND ${_log} "#        DEAL_II_C_FLAGS_RELEASE: ${DEAL_II_C_FLAGS_RELEASE}\n")
   ENDIF()
   IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-    FILE(APPEND ${_log} "      DEAL_II_C_FLAGS_DEBUG:   ${DEAL_II_C_FLAGS_DEBUG}\n")
+    FILE(APPEND ${_log} "#        DEAL_II_C_FLAGS_DEBUG:   ${DEAL_II_C_FLAGS_DEBUG}\n")
   ENDIF()
 ENDIF()
 
 IF(NOT DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-  FILE(APPEND ${_log} "\nWARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n")
+  FILE(APPEND ${_log} "#\n#  WARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n")
 ELSEIF(NOT DEAL_II_KNOWN_COMPILER)
-  FILE(APPEND ${_log} "\nWARNING: Unknown compiler! Please set compiler flags by hand.\n")
+  FILE(APPEND ${_log} "#\n#  WARNING: Unknown compiler! Please set compiler flags by hand.\n")
 ENDIF()
 
 FILE(APPEND ${_log}
-  "\nConfigured Features:"
+  "#\n#  Configured Features:"
   )
 IF(FORCE_AUTODETECTION)
   FILE(APPEND ${_log}
@@ -128,7 +134,6 @@ IF(DEFINED DEAL_II_ALLOW_BUNDLED)
     " (DEAL_II_ALLOW_BUNDLED = ${DEAL_II_ALLOW_BUNDLED})"
     )
 ENDIF()
-
 FILE(APPEND ${_log} "\n")
 
 GET_CMAKE_PROPERTY(_res VARIABLES)
@@ -136,36 +141,84 @@ FOREACH(_var ${_res})
   IF(_var MATCHES "DEAL_II_WITH")
     IF(${${_var}})
       # FEATURE is enabled
-      STRING(REGEX REPLACE "^DEAL_II_WITH_" "" feature ${_var})
-      IF(FEATURE_${feature}_EXTERNAL_CONFIGURED)
-        FILE(APPEND ${_log} "      ${_var} set up with external dependencies\n")
-      ELSEIF(FEATURE_${feature}_BUNDLED_CONFIGURED)
-        IF(DEAL_II_FORCE_BUNDLED_${feature})
-          FILE(APPEND ${_log} "      ${_var} set up with bundled packages (forced)\n")
+      STRING(REGEX REPLACE "^DEAL_II_WITH_" "" _feature ${_var})
+      IF(FEATURE_${_feature}_EXTERNAL_CONFIGURED)
+        FILE(APPEND ${_log} "#        ${_var} set up with external dependencies\n")
+        LIST(APPEND _features ${_feature})
+      ELSEIF(FEATURE_${_feature}_BUNDLED_CONFIGURED)
+        LIST(APPEND _features ${_feature})
+        IF(DEAL_II_FORCE_BUNDLED_${_feature})
+          FILE(APPEND ${_log} "#        ${_var} set up with bundled packages (forced)\n")
         ELSE()
-          FILE(APPEND ${_log} "      ${_var} set up with bundled packages\n")
+          FILE(APPEND ${_log} "#        ${_var} set up with bundled packages\n")
         ENDIF()
       ENDIF()
     ELSE()
       # FEATURE is disabled
-      FILE(APPEND ${_log} "    ( ${_var} = ${${_var}} )\n")
+      FILE(APPEND ${_log} "#      ( ${_var} = ${${_var}} )\n")
     ENDIF()
   ENDIF()
 ENDFOREACH()
 
 FILE(APPEND ${_log}
-  "\nComponent configuration:\n"
+  "#\n#  Component configuration:\n"
   )
 FOREACH(_var ${_res})
   IF(_var MATCHES "DEAL_II_COMPONENT")
     IF(${${_var}})
-      FILE(APPEND ${_log} "      ${_var}\n")
+      FILE(APPEND ${_log} "#        ${_var}\n")
+      STRING(REPLACE "DEAL_II_COMPONENT_" "" _component ${_var})
+      LIST(APPEND _components ${_component})
     ELSE()
-      FILE(APPEND ${_log} "    ( ${_var} = ${${_var}} )\n")
+      FILE(APPEND ${_log} "#      ( ${_var} = ${${_var}} )\n")
     ENDIF()
   ENDIF()
 ENDFOREACH()
 
-FILE(READ ${_log} DEAL_II_LOG_SUMMARY)
-MESSAGE("\n\n${DEAL_II_LOG_SUMMARY}\n")
 
+IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+  TO_STRING(_components ${_components})
+  TO_STRING(_features ${_features})
+
+  IF(DISABLE_AUTOPILOT)
+    FILE(APPEND ${_log} "#\n#  Autopilot disabled (DISABLE_AUTOPILOT = ON)\n")
+  ELSE()
+    FILE(APPEND ${_log}
+"#
+###
+
+###
+#
+#  !!! In-source build detected. Activating autopilot. !!!
+#  (If you do not want this, configure with DISABLE_AUTOPILOT = ON)
+#
+#  deal.II configuration (short summary, for the detailed one see above):
+#
+#      CMAKE_BUILD_TYPE:   ${CMAKE_BUILD_TYPE}
+#      CMAKE_SOURCE_DIR:   ${CMAKE_SOURCE_DIR}
+#      CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME}
+#      FEATURES:           ${_features}
+#      COMPONENTS:         ${_components}
+#
+#  You can now run
+#
+#      $ make              - to compile and setup the library in-source
+#
+#      $ make debug        - to switch the build type to \"Debug\"
+#      $ make release      - to switch the build type to \"Release\"
+#      $ make debugrelease - to switch the build type to \"DebugRelease\"
+#      $ make edit_cache   - to change the configuration (e.g. select or deselect features)
+#                            and rerun the configure and generate phases of CMake
+#
+#      $ make clean        - to remove files generated by the build system
+#      $ make distclean    - to clean the directory from _all_ generated files
+#                            (includes clean and the removal of the generated build system)
+#
+#  Have a nice day!
+")
+  ENDIF()
+ENDIF()
+
+FILE(APPEND ${_log}
+  "#\n###"
+  )

@@ -1,0 +1,66 @@
+SET(CMAKE_BINARY_DIR "@CMAKE_BINARY_DIR@")
+
+#
+# Clean subdirectories from the generated CMake build system:
+#
+FOREACH(_folder bundled config contrib doc include scripts source)
+  file(GLOB _files_to_remove
+    ${CMAKE_BINARY_DIR}/${_folder}/cmake_install.cmake
+    ${CMAKE_BINARY_DIR}/${_folder}/*/cmake_install.cmake
+    ${CMAKE_BINARY_DIR}/${_folder}/Makefile
+    ${CMAKE_BINARY_DIR}/${_folder}/*/Makefile
+    )
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E remove ${_files_to_remove}
+    )
+
+  file(GLOB _directories_to_remove
+    ${CMAKE_BINARY_DIR}/${_folder}/CMakeFiles
+    ${CMAKE_BINARY_DIR}/${_folder}/*/CMakeFiles
+    )
+  FOREACH(_dir ${_directories_to_remove})
+    EXECUTE_PROCESS(
+      COMMAND ${CMAKE_COMMAND} -E remove_directory ${_dir}
+      )
+  ENDFOREACH()
+ENDFOREACH()
+
+
+#
+# Remove configured files
+#
+file(GLOB _files_to_remove
+  ${CMAKE_BINARY_DIR}/CMakeCache.txt
+  ${CMAKE_BINARY_DIR}/cmake_install.cmake
+  ${CMAKE_BINARY_DIR}/config/deal.IIConfig.cmake
+  ${CMAKE_BINARY_DIR}/config/deal.IIConfigVersion.cmake
+  ${CMAKE_BINARY_DIR}/config/Make.global_options
+  ${CMAKE_BINARY_DIR}/config/template-arguments
+  ${CMAKE_BINARY_DIR}/distclean.cmake
+  ${CMAKE_BINARY_DIR}/examples/cmake_install.cmake
+  ${CMAKE_BINARY_DIR}/examples/Makefile
+  ${CMAKE_BINARY_DIR}/include/*/base/config.h
+  ${CMAKE_BINARY_DIR}/install_manifest.txt
+  ${CMAKE_BINARY_DIR}/Makefile
+  ${CMAKE_BINARY_DIR}/summary.log
+  )
+EXECUTE_PROCESS(
+  COMMAND ${CMAKE_COMMAND} -E remove ${_files_to_remove}
+  )
+
+#
+# and special folders
+#
+file(GLOB _directories_to_remove
+  ${CMAKE_BINARY_DIR}/bin
+  ${CMAKE_BINARY_DIR}/CMakeFiles
+  ${CMAKE_BINARY_DIR}/common
+  ${CMAKE_BINARY_DIR}/examples/CMakeFiles
+  ${CMAKE_BINARY_DIR}/lib
+  )
+FOREACH(_dir ${_directories_to_remove})
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${_dir}
+    )
+ENDFOREACH()
+

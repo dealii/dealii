@@ -24,6 +24,7 @@
 #     DEAL_II_COMPONENT_CONTRIB
 #     DEAL_II_COMPONENT_DOCUMENTATION
 #     DEAL_II_COMPONENT_EXAMPLES
+#     CMAKE_INSTALL_PREFIX              **)
 #
 # Options regarding compilation and linking:
 #
@@ -41,9 +42,11 @@
 #     DEAL_II_CXX_FLAGS_RELEASE
 #     DEAL_II_SHARED_LINKER_FLAGS_RELEASE
 #
-# *) May also be set via environment variable (CFLAGS, CXXFLAGS, LDFLAGS)
-#    (nonempty cached variable has precedence will not be overwritten by
-#    environment)
+# *)  May also be set via environment variable (CFLAGS, CXXFLAGS, LDFLAGS)
+#     (nonempty cached variable has precedence will not be overwritten by
+#     environment)
+#
+# **) for an in-source build (and if DISABLE_AUTOPILOT is not set)
 #
 
 
@@ -81,6 +84,17 @@ OPTION(DEAL_II_COMPONENT_EXAMPLES
   "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
   ON
   )
+
+#
+# Set CMAKE_INSTALL_PREFIX to the source directory if an in source build is
+# detected (and DISABLE_AUTOPILOT is not set)
+#
+IF( "${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}" AND
+    NOT DISABLE_AUTOPILOT)
+  SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}" CACHE STRING
+    "Install path prefix, prepended onto install directories."
+    )
+ENDIF()
 
 
 ###########################################################################

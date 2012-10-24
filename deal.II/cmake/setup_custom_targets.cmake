@@ -13,30 +13,19 @@
 #####
 
 #
-# Setup some convenience custom targets for the build system, i.e.
+# Setup some convenience custom targets for the build system:
 #
-#   $ make <custom_target>.
-#
-# We add custom targets for building all targets necessary to install a
-# specific component (too bad, we have to do this by hand. There is no cmake
-# internal way to do this, yet...):
-#
-#   library, documentation, compat_files
-#
+
+
+###########################################################################
+#                                                                         #
+#  Custom targets for library, documentation and compat_files components: #
+#                                                                         #
+###########################################################################
 
 ADD_CUSTOM_TARGET(library)
-
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
   ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
-  IF(_build MATCHES "RELEASE")
-    ADD_CUSTOM_TARGET(release
-      DEPENDS ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
-      )
-  ELSEIF(_build MATCHES "DEBUG")
-    ADD_CUSTOM_TARGET(debug
-      DEPENDS ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
-      )
-  ENDIF()
 ENDFOREACH()
 
 IF(DEAL_II_COMPONENT_DOCUMENTATION)
@@ -60,5 +49,54 @@ IF(DEAL_II_COMPONENT_CONTRIB)
       mesh_conversion
       parameter_gui
     )
+ENDIF()
+
+
+###########################################################################
+#                                                                         #
+#                  Custom targets for the autopilot mode:                 #
+#                                                                         #
+###########################################################################
+
+IF( "${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}" AND
+    NOT DISABLE_AUTOPILOT)
+  #
+  # Setup the "distclean" target:
+  #
+  CONFIGURE_FILE(
+    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake.in
+    ${CMAKE_BINARY_DIR}/distclean.cmake
+    @ONLY)
+  ADD_CUSTOM_TARGET(distclean
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/distclean.cmake
+    )
+
+  #
+  # Targets for changing the build type:
+  #
+  ADD_CUSTOM_TARGET(debug
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
+    COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
+    )
+  ADD_CUSTOM_TARGET(release
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
+    COMMENT "Switch CMAKE_BUILD_TYPE to Release"
+    )
+  ADD_CUSTOM_TARGET(debugrelease
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=DebugRelease ${CMAKE_SOURCE_DIR}
+    COMMENT "Switch CMAKE_BUILD_TYPE to DebugRelease"
+    )
+
+  #
+  # A cheesy trick to automatically install and print a summary
+  #
+  ADD_CUSTOM_TARGET("install-intree" ALL
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install/fast
+    )
+  ADD_DEPENDENCIES(install-intree compat_files)
+  ADD_DEPENDENCIES(install-intree contrib)
+  ADD_DEPENDENCIES(install-intree documentation)
+  ADD_DEPENDENCIES(install-intree library)
 ENDIF()
 
