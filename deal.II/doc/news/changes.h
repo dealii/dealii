@@ -127,6 +127,12 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The PETScWrappers::SparseDirectMUMPS class now allows to
+exploit symmetry of the matrix, using the
+PETScWrappers::SparseDirectMUMPS::set_symmetric_mode() function.
+<br>
+(Alexander Grayver, 2012/10/23)
+
 <li> Fixed: Several static const member variables of the Accessor
 classes were not properly instantiated. This only rarely created
 trouble because they are typically only used as template arguments
