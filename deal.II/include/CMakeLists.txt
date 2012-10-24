@@ -20,18 +20,15 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_BINARY_DIR}/deal.II/base/config.h
   )
 
-
 #
 # Add a rule on how to install the header files:
 #
-
 INSTALL(DIRECTORY deal.II
   DESTINATION ${DEAL_II_INCLUDE_RELDIR}
   COMPONENT library
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE
   )
-
 
 #
 # and don't forget to install all generated header files, too:
