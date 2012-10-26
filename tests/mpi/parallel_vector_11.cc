@@ -48,7 +48,7 @@ void test ()
 
   parallel::distributed::Vector<double> v(local_owned, local_relevant,
                                           MPI_COMM_WORLD);
-  AssertDimension (actual_local_size, v.local_size());
+  AssertDimension (static_cast<unsigned int>(actual_local_size), v.local_size());
   parallel::distributed::Vector<double> w (v), x(v), y(v);
 
                                 // set local elements
