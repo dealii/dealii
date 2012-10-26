@@ -31,12 +31,14 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
+  {
+    
   TimerOutput t(logfile, TimerOutput::summary, TimerOutput::cpu_times);
 
   t.enter_subsection("hi");
   t.leave_subsection("hi");
-
-  t.print_summary();
+  }
+  
   deallog << "ok" << std::endl;
 }
 
