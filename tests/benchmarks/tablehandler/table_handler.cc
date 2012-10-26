@@ -50,11 +50,11 @@ int main ()
       }
     }
   
-  timer.enter_section("write_tablehandler");
+  timer.enter_section("write");
   {
     std::ofstream data("datatable.txt");
     table.write_text(data);
 //		   TableHandler::table_with_separate_column_description);
   }
-  timer.exit_section("write_tablehandler");  
+  timer.exit_section("write");  
 }
