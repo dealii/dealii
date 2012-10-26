@@ -804,8 +804,6 @@ namespace PETScWrappers
           bool output_details;
       };
 
-
-
                                        /**
                                         * Empty Constructor. You need to call
                                         * initialize() before using this
@@ -837,6 +835,222 @@ namespace PETScWrappers
                        const AdditionalData &additional_data = AdditionalData());
 
     protected:
+                                       /**
+                                        * Store a copy of the flags for this
+                                        * particular preconditioner.
+                                        */
+      AdditionalData additional_data;
+  };
+
+
+
+/**
+ * A class that implements the interface to use the ParaSails sparse
+ * approximate inverse preconditioner from the HYPRE suite. Note that
+ * PETSc has to be configured with HYPRE (e.g. with --download-hypre=1).
+ *
+ * ParaSails uses least-squares minimization to compute a sparse
+ * approximate inverse. The sparsity pattern used is the pattern
+ * of a power of a sparsified matrix. ParaSails also uses a post-filtering
+ * technique to reduce the cost of applying the preconditioner.
+ *
+ * ParaSails solves symmetric positive definite (SPD) problems
+ * using a factorized SPD preconditioner and can also solve
+ * general (nonsymmetric and/or indefinite) problems with a
+ * nonfactorized preconditioner. The problem type has to be
+ * set in @p AdditionalData.
+ *
+ * The preconditioner does support parallel distributed computations.
+ *
+ * @ingroup PETScWrappers
+ * @author Martin Steigemann, 2012
+ */
+  class PreconditionParaSails : public PreconditionerBase
+  {
+    public:
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional flags to the
+                                        * preconditioner.
+                                        */
+      struct AdditionalData
+      {
+                                           /**
+                                            * Constructor.
+                                            */
+          AdditionalData (
+            const unsigned int symmetric = 1,
+            const unsigned int n_levels = 1,
+            const double threshold = 0.1,
+            const double filter = 0.05,
+            const bool output_details = false
+          );
+
+                                           /**
+                                            * This parameter specifies the
+                                            * type of problem to solve:
+                                            * <ul>
+                                            * <li> @p 0: nonsymmetric and/or indefinite problem, and nonsymmetric preconditioner
+                                            * <li> @p 1: SPD problem, and SPD (factored) preconditioner
+                                            * <li> @p 2: nonsymmetric, definite problem, and SPD (factored) preconditioner
+                                            * </ul>
+                                            * Default is <tt>symmetric = 1</tt>.
+                                            */
+          unsigned int symmetric;
+
+                                           /**
+                                            * Patterns of powers of sparsified
+                                            * matrices can be approximate the
+                                            * pattern of large entries in the
+                                            * inverse of a matrix. Powers of a
+                                            * 
+                                            * The sparsity pattern used for the 
+                                            * apprximate inverse is the pattern
+                                            * of a power <tt>B^m</tt> where <tt>B</tt>
+                                            * has been sparsified from the given
+                                            * matrix <tt>A</tt>, <tt>n_level</tt>
+                                            * is equal to <tt>m+1</tt>. Default 
+                                            * value is <tt>n_levels = 1</tt>.
+                                            */
+          unsigned int n_levels;
+
+                                           /**
+                                            * Sparsification is performed by
+                                            * dropping nonzeros which are smaller
+                                            * than <tt>thresh</tt> in magnitude.
+                                            * Lower values of <tt>thresh</tt> 
+                                            * lead to more accurate, but also more 
+                                            * expensive preconditioners. Default
+                                            * value is <tt>thresh = 0.1</tt>. Setting
+                                            * <tt>thresh < 0</tt> a threshold 
+                                            * is selected automatically, such that
+                                            * <tt>-thresh</tt> represents the 
+                                            * fraction of nonzero elements that are
+                                            * dropped. For example, if <tt>thresh = -0.9</tt>,
+                                            * then <tt>B</tt> will contain about
+                                            * ten percent of the nonzeros of the
+                                            * given matrix <tt>A</tt>.
+                                            */
+          double threshold;
+
+                                           /**
+                                            * Filtering is a post-processing procedure,
+                                            * <tt>filter</tt> represents a fraction
+                                            * of nonzero elements that are dropped
+                                            * after creating the approximate inverse
+                                            * sparsity pattern. Default value is
+                                            * <tt>filter = 0.05</tt>. Setting <tt>filter < 0</tt>
+                                            * a value is selected automatically, such
+                                            * that <tt>-filter</tt> represents the 
+                                            * fraction of nonzero elements that are
+                                            * dropped. For example, if <tt>thresh = -0.9</tt>,
+                                            * then about 90 percent of the entries 
+                                            * in the computed approximate inverse are
+                                            * dropped.
+                                            */
+          double filter;
+
+                                           /**
+                                            * Setting this flag to true
+                                            * produces output from HYPRE,
+                                            * when the preconditioner
+                                            * is constructed.
+                                            */
+	  bool output_details;
+      };
+
+
+
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
+      PreconditionParaSails ();
+
+                                       /**
+                                        * Constructor. Take the matrix which
+                                        * is used to form the preconditioner,
+                                        * and additional flags if there are
+                                        * any.
+                                        */
+      PreconditionParaSails (const MatrixBase     &matrix,
+                             const AdditionalData &additional_data = AdditionalData());
+
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments.
+                                        */
+      void initialize (const MatrixBase     &matrix,
+                       const AdditionalData &additional_data = AdditionalData());
+
+    private:
+                                       /**
+                                        * Store a copy of the flags for this
+                                        * particular preconditioner.
+                                        */
+      AdditionalData additional_data;
+  };
+
+
+
+/**
+ * A class that implements a non-preconditioned method.
+ *
+ * @ingroup PETScWrappers
+ * @author Martin Steigemann, 2012
+ */
+  class PreconditionNone : public PreconditionerBase
+  {
+    public:
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional flags to the
+                                        * preconditioner.
+                                        */
+      struct AdditionalData
+      {};
+
+                                       /**
+                                        * Empty Constructor. You need to call
+                                        * initialize() before using this
+                                        * object.
+                                        */
+      PreconditionNone ();
+
+                                       /**
+                                        * Constructor. Take the matrix which
+                                        * is used to form the preconditioner,
+                                        * and additional flags if there are
+                                        * any. The matrix is completely
+                                        * ignored in computations.
+                                        */
+      PreconditionNone (const MatrixBase     &matrix,
+                        const AdditionalData &additional_data = AdditionalData());
+
+                                       /**
+                                        * Initializes the preconditioner
+                                        * object and calculate all data that
+                                        * is necessary for applying it in a
+                                        * solver. This function is
+                                        * automatically called when calling
+                                        * the constructor with the same
+                                        * arguments and is only used if you
+                                        * create the preconditioner without
+                                        * arguments. The matrix is completely
+                                        * ignored in computations.
+                                        */
+      void initialize (const MatrixBase     &matrix,
+                       const AdditionalData &additional_data = AdditionalData());
+
+    private:
                                        /**
                                         * Store a copy of the flags for this
                                         * particular preconditioner.
