@@ -6,6 +6,9 @@
 #include <deal.II/lac/petsc_matrix_free.h>
 #include <deal.II/lac/vector.h>
 
+// A variant of the tests/lac/testmatrix.h file that uses the PETSc
+// matrix free interface
+
 
 /**
  * Finite difference PETSc matrix-free object on uniform grid.

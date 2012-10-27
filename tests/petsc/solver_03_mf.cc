@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,7 +15,7 @@
 
 
 #include "../tests.h"
-#include "../lac/petsc_mf_testmatrix.h"
+#include "petsc_mf_testmatrix.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>
