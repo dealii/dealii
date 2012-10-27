@@ -12,7 +12,6 @@
 ##
 #####
 
-
 ##                                                                       ##
 #                                                                         #
 #             The cmake build system for the deal.II project              #
@@ -118,29 +117,24 @@ INCLUDE(setup_finalize)
 #                                                                         #
 ###########################################################################
 
-#
-# Build the toolchain and prepare the includes:
-#
-INCLUDE(config/setup_template-arguments.in.cmake)
 ADD_SUBDIRECTORY(scripts)
+
 ADD_SUBDIRECTORY(include)
 
-#
-# Compile and install the library:
-#
 IF(DEAL_II_WITH_BUNDLED_DIRECTORY)
   ADD_SUBDIRECTORY(bundled)
 ENDIF()
+
 ADD_SUBDIRECTORY(source)
 
-#
-# Prepare the remaining directories for installation
-#
-ADD_SUBDIRECTORY(config)
-ADD_SUBDIRECTORY(contrib)
+ADD_SUBDIRECTORY(config) # has to be included after source
+
+ADD_SUBDIRECTORY(contrib) # has to be included after source
+
 IF(DEAL_II_WITH_DOC_DIRECTORY)
   ADD_SUBDIRECTORY(doc)
 ENDIF()
+
 ADD_SUBDIRECTORY(examples)
 
 #

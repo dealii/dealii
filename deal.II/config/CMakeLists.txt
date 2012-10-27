@@ -13,6 +13,15 @@
 #####
 
 
+#
+# Configure the template-arguments file
+#
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/template-arguments.in
+  ${CMAKE_CURRENT_BINARY_DIR}/template-arguments
+  )
+
+
 ###########################################################################
 #                                                                         #
 #               Setup and install the convenience macros:                 #
@@ -186,5 +195,21 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     DESTINATION ${CMAKE_INSTALL_PREFIX}
     COMPONENT compat_files
     )
+ENDIF()
+
+
+###########################################################################
+#                                                                         #
+#    Configure distclean.cmake used by the autopilot 'distclean' target:  #
+#                                                                         #
+###########################################################################
+
+
+IF( "${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}" AND
+    NOT DISABLE_AUTOPILOT)
+  CONFIGURE_FILE(
+    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake.in
+    ${CMAKE_BINARY_DIR}/distclean.cmake
+    @ONLY)
 ENDIF()
 

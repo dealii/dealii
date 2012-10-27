@@ -8,7 +8,7 @@ Below is a detailed list of the content of each subdirectory, and the
 licenses that apply.
 
 
-boost-1.49.0
+./boost-1.49.0
 ============
 
 Contains parts of the boost c++ libraries copyrighted by the boost authors
@@ -18,7 +18,7 @@ boost-1.49.0/LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt
 A full version of the library can be downloaded at http://www.boost.org/.
 
 
-functionparser (FunctionParser 4.5)
+./functionparser (FunctionParser 4.5)
 ==============
 
 Contains the FunctionParser project which is copyrighted by Juha Nieminen

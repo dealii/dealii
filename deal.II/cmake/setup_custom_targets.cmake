@@ -63,10 +63,6 @@ IF( "${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}" AND
   #
   # Setup the "distclean" target:
   #
-  CONFIGURE_FILE(
-    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake.in
-    ${CMAKE_BINARY_DIR}/distclean.cmake
-    @ONLY)
   ADD_CUSTOM_TARGET(distclean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/distclean.cmake
