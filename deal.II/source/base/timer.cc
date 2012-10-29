@@ -500,7 +500,10 @@ TimerOutput::print_summary () const
           out_stream << i->second.total_cpu_time << "s |";
           out_stream << std::setw(10);
           out_stream << std::setprecision(2);
-          out_stream << i->second.total_cpu_time/total_cpu_time * 100 << "% |";
+          double value = i->second.total_cpu_time/total_cpu_time * 100;
+          if (!numbers::is_finite(value))
+            value = 0.0;
+          out_stream << value << "% |";
         }
       out_stream << std::endl
                  << "+---------------------------------+-----------+"
@@ -567,7 +570,10 @@ TimerOutput::print_summary () const
           out_stream << i->second.total_wall_time << "s |";
           out_stream << std::setw(10);
           out_stream << std::setprecision(2);
-          out_stream << i->second.total_wall_time/total_wall_time * 100 << "% |";
+          double value = i->second.total_wall_time/total_wall_time * 100;
+          if (!numbers::is_finite(value))
+            value = 0.0;
+          out_stream << value << "% |";
         }
       out_stream << std::endl
                  << "+---------------------------------+-----------+"

@@ -2957,6 +2957,10 @@ namespace TrilinosWrappers
         col_index_ptr = (int*)col_indices;
         col_value_ptr = values;
         n_columns = n_cols;
+#ifdef DEBUG
+        for (unsigned int j=0; j<n_cols; ++j)
+            Assert (numbers::is_finite(values[j]), ExcNumberNotFinite());
+#endif
       }
     else
       {

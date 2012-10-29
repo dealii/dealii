@@ -108,6 +108,18 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> New: Added PETScWrappers::PreconditionParaSails and
+PETScWrappers::PreconditionNone. PETScWrappers::PreconditionParaSails
+implements the interface to use the ParaSails sparse approximate
+inverse preconditioner from the HYPRE suite. ParaSails supports
+parallel distributed computations and can handle nonsymmetric
+and also indefinite problems. PETScWrappers::PreconditionNone
+implements non-preconditioning in PETSc which can be of use
+together with the PETScWrappers::MatrixFree class.
+
+<br>
+(Martin Steigemann, 2012/10/26)
+
 <li> New: Added SparsityTools::distribute_sparsity_pattern() for
 BlockCompressedSimpleSparsityPattern. This allows parallel computations
 with distributed::Triangulation and PETScWrappers::MPI::BlockSparseMatrix.
