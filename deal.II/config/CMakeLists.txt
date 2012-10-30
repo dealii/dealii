@@ -208,7 +208,7 @@ ENDIF()
 IF( "${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}" AND
     NOT DISABLE_AUTOPILOT)
   CONFIGURE_FILE(
-    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/distclean.cmake.in
     ${CMAKE_BINARY_DIR}/distclean.cmake
     @ONLY)
 ENDIF()
