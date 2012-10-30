@@ -108,6 +108,11 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> Fixed: DoFTools::make_flux_sparsity_pattern wasn't prepared to
+deal with adaptively refined meshes in 1d.
+<br>
+(Wolfgang Bangerth, 2012/10/30)
+
 <li> New: Added PETScWrappers::PreconditionParaSails and
 PETScWrappers::PreconditionNone. PETScWrappers::PreconditionParaSails
 implements the interface to use the ParaSails sparse approximate
@@ -116,7 +121,6 @@ parallel distributed computations and can handle nonsymmetric
 and also indefinite problems. PETScWrappers::PreconditionNone
 implements non-preconditioning in PETSc which can be of use
 together with the PETScWrappers::MatrixFree class.
-
 <br>
 (Martin Steigemann, 2012/10/26)
 
