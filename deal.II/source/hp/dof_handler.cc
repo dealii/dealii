@@ -3283,10 +3283,19 @@ template <>
             if (cell->has_children () &&
                 !(*has_children [cell->level ()])[cell->index ()])
               {
-                                                 // Set active_fe_index in children to the
-                                                 // same value as in the parent cell.
+                                                 // Set active_fe_index in
+                                                 // children to the same value
+                                                 // as in the parent
+                                                 // cell. note that we can't
+                                                 // access the active fe index
+                                                 // of an inactive cell any
+                                                 // more via
+                                                 // cell->active_fe_index, so
+                                                 // we have to do it through a
+                                                 // more indirect way
                 for (unsigned int i = 0; i < cell->n_children(); ++i)
-                  cell->child (i)->set_active_fe_index (cell->active_fe_index ());
+                  cell->child (i)->set_active_fe_index (levels[cell->level()]
+							->active_fe_indices[cell->index()]);
               }
           }
       }
