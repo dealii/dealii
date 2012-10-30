@@ -1478,7 +1478,7 @@ unsigned int
 DoFAccessor<dim,DH>::n_active_fe_indices () const
 {
   if (dim == DH::dimension)
-    Assert (this->active(),
+    Assert (this->has_children() == false,
 	    ExcMessage ("You can't query information about active FE indices on "
 			"cells that have children and are therefore not active."));
 
@@ -1499,7 +1499,7 @@ unsigned int
 DoFAccessor<dim,DH>::nth_active_fe_index (const unsigned int n) const
 {
   if (dim == DH::dimension)
-    Assert (this->active(),
+    Assert (this->has_children() == false,
 	    ExcMessage ("You can't query information about active FE indices on "
 			"cells that have children and are therefore not active."));
 
@@ -1521,7 +1521,7 @@ bool
 DoFAccessor<dim,DH>::fe_index_is_active (const unsigned int fe_index) const
 {
   if (dim == DH::dimension)
-    Assert (this->active(),
+    Assert (this->has_children() == false,
 	    ExcMessage ("You can't query information about active FE indices on "
 			"cells that have children and are therefore not active."));
 
