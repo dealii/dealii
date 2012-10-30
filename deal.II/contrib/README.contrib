@@ -5,6 +5,13 @@ deal.II AUTHORS, but are included by permission. For details, consult the
 stated licenses below.
 
 
+lapack_templates
+================
+
+A small perl script for automatically generating lapack function
+definitions.
+
+
 mesh_conversion
 ===============
 
@@ -19,4 +26,10 @@ parameter_gui
 Is a program written by Martin Steigemann and Wolfgang Bangerth and
 licensed under the GNU Lesser General Public License (LGPL) Version 2.1 or
 later. See parameter_gui/README, parameter_gui/lgpl-2.1.txt.
+
+
+utilities
+=========
+
+A collection of small programs for various purposes.
 

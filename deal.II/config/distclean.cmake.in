@@ -40,7 +40,7 @@ file(GLOB _files_to_remove
   ${CMAKE_BINARY_DIR}/examples/cmake_install.cmake
   ${CMAKE_BINARY_DIR}/examples/Makefile
   ${CMAKE_BINARY_DIR}/include/*/base/config.h
-  ${CMAKE_BINARY_DIR}/install_manifest.txt
+  ${CMAKE_BINARY_DIR}/install_manifest*.txt
   ${CMAKE_BINARY_DIR}/Makefile
   ${CMAKE_BINARY_DIR}/summary.log
   )
