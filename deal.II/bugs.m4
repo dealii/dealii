@@ -572,9 +572,6 @@ dnl Older gcc versions appear to frown upon the way we write the
 dnl IsBlockMatrix<MatrixType> template. If that's the case,
 dnl remove the -Wctor-dtor-privacy flag.
 dnl
-dnl This is gcc bug 18644:
-dnl   http://gcc.gnu.org/bugzilla/show_bug.cgi?id=18644
-dnl
 dnl Usage: DEAL_II_CHECK_CTOR_DTOR_PRIVACY
 dnl
 dnl -------------------------------------------------------------
