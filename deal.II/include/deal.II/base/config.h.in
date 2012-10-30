@@ -356,6 +356,10 @@
  */
 #cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
 
+/* Defined if the prototype of abort() has a no-throw exception specification.
+ */
+#cmakedefine DEAL_II_ABORT_NOTHROW_EXCEPTION
+
 /* If already available, do not define at all. Otherwise, define to
  * __func__ if that is available. In all other cases, indicate that no
  * information about the present function is available for this compiler.
@@ -377,6 +381,7 @@
  * whenever this function is used somewhere that its use is deprecated.
  */
 #cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
+
 
 
 /******************************************

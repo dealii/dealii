@@ -1,20 +1,4 @@
-TODO:
-
-/* enable multigrid compatibility mode */
-#cmakedefine DEAL_II_MULTIGRID_COMPATIBILITY
-
-
-
-
 BUGS:
-
-/* Define if building universal (internal helper macro) */
-#cmakedefine AC_APPLE_UNIVERSAL_BUILD
-
-/* Defined if the prototype of abort() has a no-throw exception specification.
-   */
-#cmakedefine DEAL_II_ABORT_NOTHROW_EXCEPTION
-
 /* Flag indicating whether there is a bug in the compiler that leads to bogus
    warnings for inline class members in anonymous namespaces */
 #cmakedefine DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
@@ -45,13 +29,6 @@ BUGS:
    floating point computations on cygwin systems. */
 #cmakedefine DEAL_II_BROKEN_SOCKETS
 
-/* Define if the compiler provides a <errno.g> header file which does not
-   define all error codes such as EINTR. In that case, use the system include
-   file at /usr/include instead. There is probably a better way to do this,
-   but it is not apparent by looking at the C/C++ compatibility header
-   provided by the compiler. */
-#cmakedefine DEAL_II_USE_DIRECT_ERRNO_H
-
 /* Defined if the compiler has a bug in deducing the type of pointers to const
    member functions. */
 #cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG
@@ -63,10 +40,6 @@ BUGS:
 /* Defined if the compiler has a bug with dynamic casting and dynamic
    libraries */
 #cmakedefine DEAL_II_HAVE_DARWIN_DYNACAST_BUG
-
-/* Flag indicating whether the library shall be compiled to use the Tecplot
-   interface */
-#cmakedefine DEAL_II_HAVE_TECPLOT
 
 /* Defined if the compiler refuses to compile the definition of a function
    that was previously declared abstract. */
@@ -113,11 +86,3 @@ BUGS:
    Darwin7.9.0 and probably previous version. It leads to problems during
    linking. For the details, look at aclocal.m4 in the top-level directory. */
 #cmakedefine DEAL_II_WEAK_LINKAGE_BUG
-
-/* On SunOS 4.x, the getrusage() function exists, but is not declared in the
-   respective header file <resource.h>, as one would think when reading the
-   man pages. Then we have to declare this function ourselves in those files
-   that use this function. The question whether we have to do so is controlled
-   by the preprocessor variable. */
-#cmakedefine NO_HAVE_GETRUSAGE
-
