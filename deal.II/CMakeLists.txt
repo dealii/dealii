@@ -57,11 +57,11 @@ INCLUDE(setup_external_macros)
 # Check whether the doc and bundled folders are available:
 #
 IF(EXISTS ${CMAKE_SOURCE_DIR}/bundled/CMakeLists.txt)
-  SET(DEAL_II_WITH_BUNDLED_DIRECTORY TRUE)
+  SET(DEAL_II_HAVE_BUNDLED_DIRECTORY TRUE)
 ENDIF()
 
 IF(EXISTS ${CMAKE_SOURCE_DIR}/doc/CMakeLists.txt)
-  SET(DEAL_II_WITH_DOC_DIRECTORY TRUE)
+  SET(DEAL_II_HAVE_DOC_DIRECTORY TRUE)
 ENDIF()
 
 #
@@ -89,7 +89,7 @@ ENDFOREACH()
 #
 # Include information about bundled libraries:
 #
-IF(DEAL_II_WITH_BUNDLED_DIRECTORY)
+IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
   INCLUDE(bundled/CMakeLists.txt)
 ENDIF()
 
@@ -121,7 +121,7 @@ ADD_SUBDIRECTORY(scripts)
 
 ADD_SUBDIRECTORY(include)
 
-IF(DEAL_II_WITH_BUNDLED_DIRECTORY)
+IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
   ADD_SUBDIRECTORY(bundled)
 ENDIF()
 
@@ -131,7 +131,7 @@ ADD_SUBDIRECTORY(config) # has to be included after source
 
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 
-IF(DEAL_II_WITH_DOC_DIRECTORY)
+IF(DEAL_II_HAVE_DOC_DIRECTORY)
   ADD_SUBDIRECTORY(doc)
 ENDIF()
 
