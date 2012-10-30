@@ -1477,6 +1477,11 @@ inline
 unsigned int
 DoFAccessor<dim,DH>::n_active_fe_indices () const
 {
+  if (dim == DH::dimension)
+    Assert (this->active(),
+	    ExcMessage ("You can't query information about active FE indices on "
+			"cells that have children and are therefore not active."));
+
                                    // access the respective DoF
   return
     dealii::internal::DoFAccessor::Implementation::
@@ -1493,6 +1498,11 @@ inline
 unsigned int
 DoFAccessor<dim,DH>::nth_active_fe_index (const unsigned int n) const
 {
+  if (dim == DH::dimension)
+    Assert (this->active(),
+	    ExcMessage ("You can't query information about active FE indices on "
+			"cells that have children and are therefore not active."));
+
                                    // access the respective DoF
   return
     dealii::internal::DoFAccessor::Implementation::
@@ -1510,6 +1520,11 @@ inline
 bool
 DoFAccessor<dim,DH>::fe_index_is_active (const unsigned int fe_index) const
 {
+  if (dim == DH::dimension)
+    Assert (this->active(),
+	    ExcMessage ("You can't query information about active FE indices on "
+			"cells that have children and are therefore not active."));
+
                                    // access the respective DoF
   return
     dealii::internal::DoFAccessor::Implementation::
@@ -3299,6 +3314,10 @@ inline
 unsigned int
 DoFCellAccessor<DH>::active_fe_index () const
 {
+  Assert (this->active(),
+	  ExcMessage ("You can't query information about active FE indices on "
+		      "cells that have children and are therefore not active."));
+
   return dealii::internal::DoFCellAccessor::Implementation::active_fe_index (*this);
 }
 
@@ -3309,6 +3328,10 @@ inline
 void
 DoFCellAccessor<DH>::set_active_fe_index (const unsigned int i)
 {
+  Assert (this->active(),
+	  ExcMessage ("You can't query information about active FE indices on "
+		      "cells that have children and are therefore not active."));
+
   dealii::internal::DoFCellAccessor::Implementation::set_active_fe_index (*this, i);
 }
 
