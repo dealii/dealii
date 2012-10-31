@@ -78,6 +78,13 @@ INCLUDE(setup_deal_ii)
 INCLUDE(setup_compiler_flags)
 
 #
+# Include information about bundled libraries:
+#
+IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
+  INCLUDE(bundled/CMakeLists.txt)
+ENDIF()
+
+#
 # Run all system checks:
 #
 FILE(GLOB _check_files "cmake/checks/*.cmake")
@@ -85,13 +92,6 @@ FOREACH(_file ${_check_files})
   MESSAGE(STATUS "Include ${_file}")
   INCLUDE(${_file})
 ENDFOREACH()
-
-#
-# Include information about bundled libraries:
-#
-IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  INCLUDE(bundled/CMakeLists.txt)
-ENDIF()
 
 #
 # Feature configuration:

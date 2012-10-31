@@ -388,11 +388,47 @@
  * Configured in check_for_compiler_bugs: *
  ******************************************/
 
-/* Define if we have to work around a bug where the compiler doesn't accept
+/* Defined if we have to work around a bug where the compiler doesn't accept
  * an explicit destructor call. See the aclocal.m4 file in the top-level
  * directory for a description of this bug.
  */
 #cmakedefine DEAL_II_EXPLICIT_DESTRUCTOR_BUG
+
+/* Defined if we have to work around a bug with some compilers that will not
+ * allow us to specify a fully specialized class of a template as a friend.
+ * See the aclocal.m4 file in the top-level directory for a description of
+ * this bug.
+ * */
+#cmakedefine DEAL_II_TEMPL_SPEC_FRIEND_BUG
+
+/* Defined if the compiler refuses to allow the explicit specialization of
+ * static member arrays. For the exact failure mode, look at aclocal.m4 in the
+ * top-level directory.
+ */
+#cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
+
+/* Defined if the compiler requires the use of the template keyword for
+ * disambiguation keyword in certain contexts in which it is not supposed to
+ * do so. For the exact failure mode, look at aclocal.m4 in the top-level
+ * directory.
+ */
+#cmakedefine DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+
+/* Defined if the compiler does not honor the explicit keyword on template
+ * constructors.
+ */
+#cmakedefine DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
+
+/* Defined if the compiler has a bug in deducing the type of pointers to const
+ * member functions.
+ */
+#cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+
+/* Defined if the compiler gets an internal error compiling some code that
+ * involves boost::bind
+ */
+#cmakedefine DEAL_II_BOOST_BIND_COMPILER_BUG
+
 
 
 /*****************************************
