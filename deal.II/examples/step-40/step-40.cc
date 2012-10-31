@@ -20,6 +20,16 @@
                                  // friends:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
+
+#include <deal.II/lac/parallel_linear_algebra.h>
+
+namespace LA
+{
+  using namespace dealii::LinearAlgebraPETSc;
+//  using namespace dealii::LinearAlgebraTrilinos;
+}
+
+
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_cg.h>
@@ -199,9 +209,9 @@ namespace Step40
 
       ConstraintMatrix     constraints;
 
-      PETScWrappers::MPI::SparseMatrix system_matrix;
-      PETScWrappers::MPI::Vector locally_relevant_solution;
-      PETScWrappers::MPI::Vector system_rhs;
+      LA::SparseMatrix system_matrix;
+      LA::Vector locally_relevant_solution;
+      LA::Vector system_rhs;
 
       ConditionalOStream                pcout;
   };
@@ -591,7 +601,7 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
-    PETScWrappers::MPI::Vector
+    LA::Vector
       completely_distributed_solution (mpi_communicator,
                                        dof_handler.n_dofs(),
                                        dof_handler.n_locally_owned_dofs());
@@ -603,7 +613,7 @@ namespace Step40
                                      // Ask for a symmetric preconditioner by
                                      // setting the first parameter in
                                      // AdditionalData to true.
-    PETScWrappers::PreconditionBoomerAMG
+    LA::PreconditionAMG
       preconditioner(system_matrix,
                      PETScWrappers::PreconditionBoomerAMG::AdditionalData(true));
 
