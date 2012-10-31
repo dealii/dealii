@@ -1305,10 +1305,24 @@ class SparseDirectMUMPS
 
   double       *a;
   double       *rhs;
-  unsigned int *irn;
-  unsigned int *jcn;
+  int          *irn;
+  int          *jcn;
   unsigned int  n;
   unsigned int  nz;
+
+                        /**
+                         * This function initializes a MUMPS instance
+                         * and hands over the system's matrix
+                         * <tt>matrix</tt>.
+                         */
+  template<class Matrix>
+    void initialize_matrix (const Matrix& matrix);
+
+                        /**
+                         * Copy the computed solution into the
+                         * solution vector.
+                         */
+  void copy_solution (Vector<double>& vector);
 
                         /**
                          * Flags storing whether the function
@@ -1345,11 +1359,28 @@ class SparseDirectMUMPS
                      const Vector<double>      & vector);
 
                         /**
+                         * This function initializes a MUMPS instance
+                         * and computes the factorization of the
+                         * system's matrix <tt>matrix</tt>.
+                         */
+  template <class Matrix>
+    void initialize (const Matrix& matrix);
+
+                        /**
                          * A function in which the linear system is
                          * solved and the solution vector is copied
                          * into the given <tt>vector</tt>.
                          */
   void solve (Vector<double>& vector);
+  
+                        /**
+                         * A function in which the inverse of the
+                         * matrix is applied to the input vector
+                         * <tt>src</tt> and the solution is
+                         * written into the output vector
+                         * <tt>dst</tt>.
+                         */
+  void vmult (Vector<double>& dst, const Vector<double>& src);
 };
 
 DEAL_II_NAMESPACE_CLOSE

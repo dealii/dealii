@@ -33,7 +33,7 @@ void test ()
   const unsigned int N = 200;
 
                                    // build the sparse matrix 
-  Epetra_Map map (N*N, 0, Utilities::Trilinos::comm_world());
+  Epetra_Map map (static_cast<int>(N*N), 0, Utilities::Trilinos::comm_world());
   TrilinosWrappers::SparseMatrix matrix (map, 5);
   for(unsigned int i=0; i<N; i++)
     for(unsigned int j=0; j<N; j++)

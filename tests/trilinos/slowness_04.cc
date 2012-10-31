@@ -61,7 +61,7 @@ void test ()
   }
   
                                    // build the sparse matrix 
-  Epetra_Map map (N*N, 0, Utilities::Trilinos::comm_world());
+  Epetra_Map map (static_cast<int>(N*N), 0, Utilities::Trilinos::comm_world());
   TrilinosWrappers::SparseMatrix matrix (map, 5);
   for(unsigned int i_=0; i_<N; i_++)
     for(unsigned int j_=0; j_<N; j_++)

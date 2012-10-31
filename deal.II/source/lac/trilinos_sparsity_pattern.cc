@@ -177,8 +177,8 @@ namespace TrilinosWrappers
                            const unsigned int  n,
                            const unsigned int  n_entries_per_row)
   {
-    const Epetra_Map rows (m, 0, Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (n, 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map rows (static_cast<int>(m), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (static_cast<int>(n), 0, Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, n_entries_per_row);
   }
@@ -227,8 +227,8 @@ namespace TrilinosWrappers
                            const unsigned int  n,
                            const std::vector<unsigned int> &n_entries_per_row)
   {
-    const Epetra_Map rows (m, 0, Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (n, 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map rows (static_cast<int>(m), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (static_cast<int>(n), 0, Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, n_entries_per_row);
   }
@@ -368,8 +368,8 @@ namespace TrilinosWrappers
   void
   SparsityPattern::copy_from (const SparsityType &sp)
   {
-    const Epetra_Map rows (sp.n_rows(), 0, Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (sp.n_cols(), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map rows (static_cast<int>(sp.n_rows()), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (static_cast<int>(sp.n_cols()), 0, Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, sp);
   }
@@ -417,7 +417,7 @@ namespace TrilinosWrappers
   {
                                       // Extract local indices in
                                       // the matrix.
-    int trilinos_i = graph->LRID(i), trilinos_j = graph->LCID(j);
+    int trilinos_i = graph->LRID(static_cast<int>(i)), trilinos_j = graph->LCID(static_cast<int>(j));
 
                                       // If the data is not on the
                                       // present processor, we throw
@@ -587,7 +587,7 @@ namespace TrilinosWrappers
                                   // get a representation of the
                                   // present row
     int ncols = -1;
-    int local_row = graph->LRID(row);
+    int local_row = graph->LRID(static_cast<int>(row));
 
                                   // on the processor who owns this
                                   // row, we'll have a non-negative
@@ -652,7 +652,7 @@ namespace TrilinosWrappers
                                          // j horizontal, gnuplot output is
                                          // x-y, that is we have to exchange
                                          // the order of output
-          out << indices[graph->GRID(j)] << " " << -static_cast<signed int>(row)
+          out << indices[graph->GRID(static_cast<int>(j))] << " " << -static_cast<signed int>(row)
               << std::endl;
       }
 

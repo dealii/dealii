@@ -1278,14 +1278,36 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim,spacedim> &tria)
 template <int dim, int spacedim>
 unsigned int GridOut::n_boundary_lines (const Triangulation<dim, spacedim> &tria) const
 {
-    typename Triangulation<dim, spacedim>::active_line_iterator edge, endedge;
+				   // save the user flags for lines so
+				   // we can use these flags to track
+				   // which ones we've already counted
+  std::vector<bool> line_flags;
+  const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
+    .save_user_flags_line (line_flags);
+  const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
+    .clear_user_flags_line ();
+
   unsigned int n_lines = 0;
 
-  for (edge=tria.begin_active_line(), endedge=tria.end_line();
-       edge != endedge; ++edge)
-    if ((edge->at_boundary()) &&
-        (edge->boundary_indicator() != 0))
-      n_lines++;
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell, endc;
+
+  for (cell=tria.begin_active(), endc=tria.end();
+       cell != endc; ++cell)
+    for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+      if (cell->line(l)->at_boundary()
+	  &&
+	  (cell->line(l)->boundary_indicator() != 0)
+	  &&
+	  (cell->line(l)->user_flag_set() == false))
+      {
+        ++n_lines;
+	cell->line(l)->set_user_flag();
+      }
+
+				   // at the end, restore the user
+				   // flags for the lines
+  const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
+    .load_user_flags_line (line_flags);
 
   return n_lines;
 }
@@ -1397,27 +1419,50 @@ void GridOut::write_msh_lines (const Triangulation<dim, spacedim> &tria,
                                const unsigned int        starting_index,
                                std::ostream             &out) const
 {
-    typename Triangulation<dim,spacedim>::active_line_iterator line, endl;
+				   // save the user flags for lines so
+				   // we can use these flags to track
+				   // which ones we've already taken
+				   // care of
+  std::vector<bool> line_flags;
+  const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
+    .save_user_flags_line (line_flags);
+  const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
+    .clear_user_flags_line ();
+
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell, endc;
   unsigned int index=starting_index;
 
-  for (line=tria.begin_active_line(), endl=tria.end_line();
-       line != endl; ++line)
-    if (line->at_boundary() &&
-        (line->boundary_indicator() != 0))
+  for (cell=tria.begin_active(), endc=tria.end();
+       cell != endc; ++cell)
+    for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+      if (cell->line(l)->at_boundary()
+	  &&
+	  (cell->line(l)->boundary_indicator() != 0)
+	  &&
+	  (cell->line(l)->user_flag_set() == false))
       {
         out << index << " 1 ";
-        out << static_cast<unsigned int>(line->boundary_indicator())
+        out << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
             << ' '
-            << static_cast<unsigned int>(line->boundary_indicator())
+            << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
             << " 2 ";
                                          // note: vertex numbers are 1-base
         for (unsigned int vertex=0; vertex<2; ++vertex)
           out << ' '
-              << line->vertex_index(GeometryInfo<dim-2>::ucd_to_deal[vertex])+1;
+              << cell->line(l)->vertex_index(GeometryInfo<dim-2>::ucd_to_deal[vertex])+1;
         out << '\n';
 
+					 // move on to the next line
+					 // but mark the current one
+					 // as taken care of
         ++index;
-      };
+	cell->line(l)->set_user_flag();
+      }
+
+				   // at the end, restore the user
+				   // flags for the lines
+  const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
+    .load_user_flags_line (line_flags);
 }
 
 
@@ -1523,24 +1568,48 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
                                const unsigned int        starting_index,
                                std::ostream             &out) const
 {
-    typename Triangulation<dim, spacedim>::active_line_iterator line, endl;
+				   // save the user flags for lines so
+				   // we can use these flags to track
+				   // which ones we've already taken
+				   // care of
+  std::vector<bool> line_flags;
+  const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
+    .save_user_flags_line (line_flags);
+  const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
+    .clear_user_flags_line ();
+
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell, endc;
   unsigned int index=starting_index;
 
-  for (line=tria.begin_active_line(), endl=tria.end_line();
-       line != endl; ++line)
-    if (line->at_boundary() &&
-        (line->boundary_indicator() != 0))
+  for (cell=tria.begin_active(), endc=tria.end();
+       cell != endc; ++cell)
+    for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+      if (cell->line(l)->at_boundary()
+	  &&
+	  (cell->line(l)->boundary_indicator() != 0)
+	  &&
+	  (cell->line(l)->user_flag_set() == false))
       {
         out << index << "  "
-            << static_cast<unsigned int>(line->boundary_indicator())
+            << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
             << "  line    ";
-        // note: vertex numbers are 1-base
+        // note: vertex numbers in ucd format are 1-base
         for (unsigned int vertex=0; vertex<2; ++vertex)
-          out << line->vertex_index(GeometryInfo<dim-2>::ucd_to_deal[vertex])+1 << ' ';
+          out << cell->line(l)->vertex_index(GeometryInfo<dim-2>::ucd_to_deal[vertex])+1
+	      << ' ';
         out << '\n';
 
+					 // move on to the next line
+					 // but mark the current one
+					 // as taken care of
         ++index;
-      };
+	cell->line(l)->set_user_flag();
+      }
+
+				   // at the end, restore the user
+				   // flags for the lines
+  const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
+    .load_user_flags_line (line_flags);
 }
 
 
@@ -2218,9 +2287,9 @@ namespace internal
                                        // find out minimum and maximum x and
                                        // y coordinates to compute offsets
                                        // and scaling factors
-      double x_min = tria.begin_active_line()->vertex(0)(0);
+      double x_min = tria.begin_active()->vertex(0)(0);
       double x_max = x_min;
-      double y_min = tria.begin_active_line()->vertex(0)(1);
+      double y_min = tria.begin_active()->vertex(0)(1);
       double y_max = y_min;
       unsigned int  max_level = line_list.begin()->level;
 

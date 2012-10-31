@@ -1129,34 +1129,40 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       */
                                      /**
                                       *  Read the user flag.
+				      *  See @ref GlossUserFlags for more information.
                                       */
     bool user_flag_set () const;
 
                                      /**
                                       *  Set the user flag.
+				      *  See @ref GlossUserFlags for more information.
                                       */
     void set_user_flag () const;
 
                                      /**
                                       *  Clear the user flag.
+				      *  See @ref GlossUserFlags for more information.
                                       */
     void clear_user_flag () const;
 
                                      /**
                                       *  Set the user flag for this
                                       * and all descendants.
+				      *  See @ref GlossUserFlags for more information.
                                       */
     void recursively_set_user_flag () const;
 
                                      /**
                                       *  Clear the user flag for this
                                       * and all descendants.
+				      *  See @ref GlossUserFlags for more information.
                                       */
     void recursively_clear_user_flag () const;
 
                                      /**
                                       * Reset the user data to zero,
                                       * independent if pointer or index.
+				      * See @ref GlossUserData for more information.
                                       */
     void clear_user_data () const;
 
@@ -1171,12 +1177,15 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * you call
                                       * Triangulation::clear_user_data()
                                       * in between.
+				      *
+				      * See @ref GlossUserData for more information.
                                       */
     void set_user_pointer (void *p) const;
 
                                      /**
                                       * Reset the user pointer
                                       * to a @p NULL pointer.
+				      * See @ref GlossUserData for more information.
                                       */
     void clear_user_pointer () const;
 
@@ -1199,6 +1208,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * Triangulation::clear_user_data()
                                       * in between.
                                       * <tt>A *a=static_cast<A*>(cell->user_pointer());</tt>.
+				      *
+				      * See @ref GlossUserData for more information.
                                       */
     void * user_pointer () const;
 
@@ -1236,6 +1247,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * you call
                                       * Triangulation::clear_user_data()
                                       * in between.
+				      *
+				      * See @ref GlossUserData for more information.
                                       */
     void recursively_set_user_pointer (void *p) const;
 
@@ -1246,6 +1259,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * said for the
                                       * recursively_set_user_pointer()
                                       * function.
+				      * See @ref GlossUserData for more information.
                                       */
     void recursively_clear_user_pointer () const;
 
@@ -1260,11 +1274,13 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * you call
                                       * Triangulation::clear_user_data()
                                       * in between.
+				      * See @ref GlossUserData for more information.
                                       */
     void set_user_index (const unsigned int p) const;
 
                                      /**
                                       * Reset the user index to 0.
+				      * See @ref GlossUserData for more information.
                                       */
     void clear_user_index () const;
 
@@ -1279,6 +1295,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * you call
                                       * Triangulation::clear_user_data()
                                       * in between.
+				      *
+				      * See @ref GlossUserData for more information.
                                       */
     unsigned int user_index () const;
 
@@ -1307,6 +1325,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * you call
                                       * Triangulation::clear_user_data()
                                       * in between.
+				      *
+				      * See @ref GlossUserData for more information.
                                       */
     void recursively_set_user_index (const unsigned int p) const;
 
@@ -1317,6 +1337,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * said for the
                                       * recursively_set_user_index()
                                       * function.
+				      *
+				      * See @ref GlossUserData for more information.
                                       */
     void recursively_clear_user_index () const;
                                      /**
@@ -2229,10 +2251,6 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                      /**
                                       * Return an iterator to the
                                       * @p ith face of this cell.
-                                      *
-                                      * This function is not
-                                      * implemented in 1D, and maps to
-                                      * QuadAccessor::line in 2D.
                                       */
     TriaIterator<TriaAccessor<dim-1,dim,spacedim> >
     face (const unsigned int i) const;
@@ -2240,12 +2258,6 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                      /**
                                       * Return the (global) index of the
                                       * @p ith face of this cell.
-                                      *
-                                      * This function returns the
-                                      * vertex_index() of the adjacent
-                                      * vertex in 1D, and maps to
-                                      * line_index() in 2D and
-                                      * quad_index() in 3D.
                                       */
     unsigned int
     face_index (const unsigned int i) const;

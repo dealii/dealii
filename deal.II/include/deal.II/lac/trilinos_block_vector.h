@@ -196,7 +196,7 @@ namespace TrilinosWrappers
 					* information.
 					*/
       void compress (const Epetra_CombineMode last_action);
-      
+
 					 /**
 					  * so it is not hidden
 					  */
@@ -523,16 +523,14 @@ namespace TrilinosWrappers
   void
   BlockVector::compress (const Epetra_CombineMode last_action)
   {
-    ::dealii::VectorOperation::values last_action_;
     if (last_action == Add)
-      last_action_ = ::dealii::VectorOperation::add;
+      this->compress(::dealii::VectorOperation::add);
     else if (last_action == Insert)
-      last_action_ = ::dealii::VectorOperation::insert;
+      this->compress(::dealii::VectorOperation::insert);
     else
       AssertThrow(false, ExcNotImplemented());
-
-    this->compress(last_action_);
   }
+
 
   inline
   void

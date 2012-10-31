@@ -2775,7 +2775,7 @@ namespace TrilinosWrappers
                                    // add the possibility to insert new values,
                                    // and in the second we just replace
                                    // data.
-    if (row_partitioner().MyGID(row) == true)
+    if (row_partitioner().MyGID(static_cast<int>(row)) == true)
       {
         if (matrix->Filled() == false)
           {
@@ -2957,6 +2957,10 @@ namespace TrilinosWrappers
         col_index_ptr = (int*)col_indices;
         col_value_ptr = values;
         n_columns = n_cols;
+#ifdef DEBUG
+        for (unsigned int j=0; j<n_cols; ++j)
+            Assert (numbers::is_finite(values[j]), ExcNumberNotFinite());
+#endif
       }
     else
       {
@@ -2992,7 +2996,7 @@ namespace TrilinosWrappers
                                    // can directly call the Epetra_CrsMatrix
                                    // input function, which is much faster
                                    // than the Epetra_FECrsMatrix function.
-    if (row_partitioner().MyGID(row) == true)
+    if (row_partitioner().MyGID(static_cast<int>(row)) == true)
       {
         ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_columns,
                                          const_cast<double*>(col_value_ptr),
@@ -3031,7 +3035,7 @@ namespace TrilinosWrappers
         std::cout << std::endl << std::endl;
         std::cout << "Matrix row has the following indices:" << std::endl;
         int n_indices, *indices;
-        trilinos_sparsity_pattern().ExtractMyRowView(row_partitioner().LID(row),
+        trilinos_sparsity_pattern().ExtractMyRowView(row_partitioner().LID(static_cast<int>(row)),
                                                      n_indices,
                                                      indices);
         for (int i=0; i<n_indices; ++i)

@@ -581,7 +581,7 @@ namespace DoFTools
                 {
                   typename DH::cell_iterator neighbor = cell->neighbor(face);
 
-                  if (cell_face->has_children())
+                  if (neighbor->has_children())
                     {
                       for (unsigned int sub_nr = 0;
                            sub_nr != cell_face->number_of_children();

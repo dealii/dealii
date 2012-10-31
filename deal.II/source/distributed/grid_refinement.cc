@@ -170,7 +170,7 @@ namespace
         }
     Assert (owned_index == tria.n_locally_owned_active_cells(),
             ExcInternalError());
-    Assert ((active_index == tria.dealii::Triangulation<dim,spacedim>::n_active_cells()),
+    Assert ((active_index == tria.Triangulation<dim,spacedim>::n_active_cells()),
             ExcInternalError());
   }
 

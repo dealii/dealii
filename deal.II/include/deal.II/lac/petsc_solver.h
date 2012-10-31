@@ -197,7 +197,6 @@ namespace PETScWrappers
                                         */
       virtual void set_solver_type (KSP &ksp) const = 0;
 
-    private:
                                        /**
                                         * Solver prefix name to qualify options
                                         * specific to the PETSc KSP object in the
@@ -209,6 +208,7 @@ namespace PETScWrappers
                                         */
       std::string prefix_name;
 
+    private:
                                        /**
                                         * A function that is used in PETSc as
                                         * a callback to check on
@@ -1143,39 +1143,63 @@ namespace PETScWrappers
   };
 
 /**
- * An implementation of the solver interface using the MUMPS lu solver 
- * through PETSc.
+ * An implementation of the solver interface using the sparse direct MUMPS
+ * solver through PETSc. This class has the usual interface of all other
+ * solver classes but it is of course different in that it doesn't implement
+ * an iterative solver. As a consequence, things like the SolverControl object
+ * have no particular meaning here.
+ *
+ * MUMPS allows to make use of symmetry in this matrix. In this class this is
+ * made possible by the set_symmetric_mode() function. If your matrix is
+ * symmetric, you can use this class as follows:
+ * @code
+ *    SolverControl cn;
+ *    PETScWrappers::SparseDirectMUMPS solver(cn, mpi_communicator);
+ *    solver.set_symmetric_mode(true);
+ *    solver.solve(system_matrix, solutions, system_rhs);
+ * @endcode
+ *
+ * @note The class internally calls KSPSetFromOptions thus you are
+ * able to use all the PETSc parameters for MATSOLVERMUMPS package.
+ * See http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Mat/MATSOLVERMUMPS.html
  *
  * @ingroup PETScWrappers
- * @author Daniel Brauss, 2012
+ * @author Daniel Brauss, Alexander Grayver, 2012
  */
   class SparseDirectMUMPS : public SolverBase
   {
     public:
 				/**
 				 * Standardized data structure
-				 * to pipe additional data to 
+				 * to pipe additional data to
 				 * the solver.
 				 */
       struct AdditionalData
       {};
 				/**
-				 * constructor
+				 * Constructor
 				 */
       SparseDirectMUMPS (SolverControl        &cn,
                          const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
                          const AdditionalData &data = AdditionalData());
 
 				/**
-				 * the method to solve the 
-				 * linear system. SolverBase has a method
-				 * with this name already. However, the
-				 * different function calls and objects used here 
-				 * were not easily incorporated
+				 * The method to solve the
+				 * linear system.
 				 */
       void solve (const MatrixBase &A,
                   VectorBase       &x,
                   const VectorBase &b);
+
+				       /**
+					* The method allows to take advantage
+					* if the system matrix is symmetric by
+					* using LDL^T decomposition unstead of
+					* more expensive LU. The argument
+					* indicates whether the matrix is
+					* symmetric or not.
+					*/
+      void set_symmetric_mode (const bool flag);
 
     protected:
 				/**
@@ -1188,7 +1212,7 @@ namespace PETScWrappers
 
     private:
 				/**
-				 * A function that is used in PETSc 
+				 * A function that is used in PETSc
 				 * as a callback to check convergence.
 				 * It takes the information provided
 				 * from PETSc and checks it against
@@ -1211,12 +1235,12 @@ namespace PETScWrappers
                         KSPConvergedReason *reason,
                         void               *solver_control);
 				/**
-				 * A structure that contains the 
+				 * A structure that contains the
 				 * PETSc solver and preconditioner
 				 * objects.  Since the solve member
 				 * function in the base is not used
 				 * here, the private SolverData struct
-				 * located in the base could not be used 
+				 * located in the base could not be used
 				 * either
 				 */
       struct SolverDataMUMPS
@@ -1226,6 +1250,15 @@ namespace PETScWrappers
       };
 
       std_cxx1x::shared_ptr<SolverDataMUMPS> solver_data;
+
+      /**
+       * Flag specifies whether matrix
+       * being factorized is symmetric
+       * or not. It influences the type
+       * of the used preconditioner
+       * (PCLU or PCCHOLESKY)
+       */
+      bool symmetric_mode;
   };
 }
 

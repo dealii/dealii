@@ -35,6 +35,15 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/*------------------------- Static variables: DoFAccessor -----------------------*/
+
+template <int structdim, class DH>
+const unsigned int DoFAccessor<structdim,DH>::dimension;
+
+template <int structdim, class DH>
+const unsigned int DoFAccessor<structdim,DH>::space_dimension;
+
+
 
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
 

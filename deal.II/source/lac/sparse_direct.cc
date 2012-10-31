@@ -19,39 +19,10 @@
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
+#include <cerrno>
 #include <iostream>
 #include <list>
 #include <typeinfo>
-
-// this is a weird hack: on newer linux systems, some system headers
-// include /usr/include/linux/compiler.h which explicitly checks which
-// gcc is in use. in that file is also a comment that explains that
-// the check for gcc version also applies to icc since icc identifies
-// itself as gcc via __GNUC__; if the gcc major version is not >=2, it
-// aborts.
-//
-// now, only icc8 and later identify themselves as gcc, so older icc
-// versions fail to compile this file on such systems. to avoid this
-// failure, we allow icc to identify itself as gcc if it doesn't
-// already do so by itself:
-#if defined(__INTEL_COMPILER) && !defined(__GNUC__)
-#  define __GNUC__ 3
-#endif
-
-#ifndef DEAL_II_MSVC
-#  include <sys/wait.h>
-#  include <unistd.h>
-#ifndef DEAL_II_USE_DIRECT_ERRNO_H
-#  include <errno.h>
-#else
-#  include </usr/include/errno.h>
-#endif
-#include <sys/errno.h>
-#endif
-
-#include <pthread.h>
-#include <sys/types.h>
-#include <signal.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -1957,11 +1928,21 @@ SparseDirectMUMPS::SparseDirectMUMPS ()
 {}
 
 SparseDirectMUMPS::~SparseDirectMUMPS ()
-{}
+{
+  id.job = -2;
+  dmumps_c (&id);
+  
+  // Do some cleaning
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  {
+    delete[] a;
+    delete[] irn;
+    delete[] jcn;
+  }
+}
 
 template <class Matrix>
-void SparseDirectMUMPS::initialize (const Matrix& matrix,
-                                    const Vector<double>      & vector)
+void SparseDirectMUMPS::initialize_matrix (const Matrix& matrix)
 {
                          // Check we haven't been here before:
   Assert (initialize_called == false, ExcInitializeAlreadyCalled());
@@ -1978,11 +1959,10 @@ void SparseDirectMUMPS::initialize (const Matrix& matrix,
                          // Hand over matrix and right-hand side
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-
                          // Objects denoting a MUMPS data structure:
                          //
                          // Set number of unknowns
-      n   = vector.size ();
+      n   = matrix.n ();
 
                          // number of nonzero elements in matrix
       nz  = matrix.n_actually_nonzero_elements ();
@@ -1994,12 +1974,12 @@ void SparseDirectMUMPS::initialize (const Matrix& matrix,
                          // column dimensions respectively of the
                          // matrix representation above (a): ie. a[k]
                          // is the matrix element (irn[k], jcn[k])
-      irn = new unsigned int[nz];
-      jcn = new unsigned int[nz];
+      irn = new int[nz];
+      jcn = new int[nz];
 
       unsigned int index = 0;
 
-      for (SparseMatrix<double>::const_iterator ptr = matrix.begin ();
+      for (typename Matrix::const_iterator ptr = matrix.begin ();
            ptr != matrix.end (); ++ptr)
         if (std::abs (ptr->value ()) > 0.0)
           {
@@ -2009,17 +1989,11 @@ void SparseDirectMUMPS::initialize (const Matrix& matrix,
             ++index;
           }
 
-      rhs = new double[n];
-
-      for (unsigned int i = 0; i < n; ++i)
-        rhs[i] = vector (i);
-
       id.n   = n;
       id.nz  = nz;
       id.irn = irn;
       id.jcn = jcn;
       id.a   = a;
-      id.rhs = rhs;
     }
 
                          // No outputs
@@ -2030,6 +2004,47 @@ void SparseDirectMUMPS::initialize (const Matrix& matrix,
 
                         // Exit by setting this flag:
   initialize_called = true;
+}
+
+template <class Matrix>
+void SparseDirectMUMPS::initialize (const Matrix& matrix,
+                                    const Vector<double>      & vector)
+{
+                        // Hand over matrix and right-hand side
+  initialize_matrix (matrix);
+
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+    {
+                            // Object denoting a MUMPS data structure
+      rhs = new double[n];
+
+      for (unsigned int i = 0; i < n; ++i)
+        rhs[i] = vector (i);
+
+      id.rhs = rhs;
+    }
+}
+
+void SparseDirectMUMPS::copy_solution (Vector<double>& vector)
+{
+                       // Copy solution into the given vector
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+    {
+      for (unsigned int i=0; i<n; ++i)
+        vector(i) = rhs[i];
+      
+      delete[] rhs;
+    }
+}
+
+template <class Matrix>
+void SparseDirectMUMPS::initialize (const Matrix& matrix)
+{
+                         // Initialize MUMPS instance:
+  initialize_matrix (matrix);
+                         // Start factorization
+  id.job = 4;
+  dmumps_c (&id);
 }
 
 void SparseDirectMUMPS::solve (Vector<double>& vector)
@@ -2045,21 +2060,38 @@ void SparseDirectMUMPS::solve (Vector<double>& vector)
                         // Start solver
   id.job = 6;
   dmumps_c (&id);
-  id.job = -2;
-  dmumps_c (&id);
+  copy_solution (vector);
+}
 
-                        // Copy solution into the given vector
+void SparseDirectMUMPS::vmult (Vector<double>&       dst,
+                               const Vector<double>& src)
+{
+                        // Check that the solver has been initialized
+                        // by the routine above:
+  Assert (initialize_called == true, ExcNotInitialized());
+
+                        // and that the matrix has at least one
+                        // nonzero element:
+  Assert (nz != 0, ExcNotInitialized());
+
+                       // Hand over right-hand side
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-      for (unsigned int i=0; i<n; ++i)
-        vector(i) = rhs[i];
+                           // Object denoting a MUMPS data structure:
+      rhs = new double[n];
 
-      delete[] a;
-      delete[] irn;
-      delete[] jcn;
-      delete[] rhs;
+      for (unsigned int i = 0; i < n; ++i)
+        rhs[i] = src (i);
+
+      id.rhs = rhs;
     }
+  
+                       // Start solver
+  id.job = 3;
+  dmumps_c (&id);
+  copy_solution (dst);
 }
+
 #endif // DEAL_II_USE_MUMPS
 
 // explicit instantiations for SparseMatrixMA27
@@ -2087,22 +2119,27 @@ void SparseDirectMA27::solve (const SparseMatrix<float>  &matrix,
                                    Vector<double> &);    \
   template    \
   void SparseDirectUMFPACK::initialize (const MATRIX &,    \
-                                        const AdditionalData)
+                                        const AdditionalData);
 
-InstantiateUMFPACK(SparseMatrix<double>);
-InstantiateUMFPACK(SparseMatrix<float>);
-InstantiateUMFPACK(SparseMatrixEZ<double>);
-InstantiateUMFPACK(SparseMatrixEZ<float>);
-InstantiateUMFPACK(BlockSparseMatrix<double>);
-InstantiateUMFPACK(BlockSparseMatrix<float>);
+InstantiateUMFPACK(SparseMatrix<double>)
+InstantiateUMFPACK(SparseMatrix<float>)
+InstantiateUMFPACK(SparseMatrixEZ<double>)
+InstantiateUMFPACK(SparseMatrixEZ<float>)
+InstantiateUMFPACK(BlockSparseMatrix<double>)
+InstantiateUMFPACK(BlockSparseMatrix<float>)
 
 // explicit instantiations for SparseDirectMUMPS
 #ifdef DEAL_II_USE_MUMPS
-template <class Matrix>
-void SparseDirectMUMPS::initialize (const Matrix& matrix,
-                                    const Vector<double>      & vector);
+#define InstantiateMUMPS(MATRIX) \
+  template \
+  void SparseDirectMUMPS::initialize (const MATRIX &, const Vector<double> &);
 
-void SparseDirectMUMPS::solve (Vector<double>& vector);
+InstantiateMUMPS(SparseMatrix<double>)
+InstantiateMUMPS(SparseMatrix<float>)
+// InstantiateMUMPS(SparseMatrixEZ<double>)
+// InstantiateMUMPS(SparseMatrixEZ<float>)
+InstantiateMUMPS(BlockSparseMatrix<double>)
+InstantiateMUMPS(BlockSparseMatrix<float>)
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

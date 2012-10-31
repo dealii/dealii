@@ -1020,7 +1020,7 @@ GridGenerator::subdivided_hyper_rectangle (
   if (colorize)
     {
       double eps = 0.01 * delta;
-      Triangulation<2>::cell_iterator cell = tria.begin_raw(),
+      Triangulation<2>::cell_iterator cell = tria.begin(),
                                       endc = tria.end();
       for (; cell !=endc; ++cell)
         {
@@ -1134,7 +1134,7 @@ GridGenerator::subdivided_hyper_rectangle (
   if (colorize && dim>1)
     {
       double eps = 0.01 * delta;
-      Triangulation<dim>::cell_iterator cell = tria.begin_raw(),
+      Triangulation<dim>::cell_iterator cell = tria.begin(),
                                         endc = tria.end();
       for (; cell !=endc; ++cell)
         {
@@ -1190,8 +1190,8 @@ GridGenerator::colorize_subdivided_hyper_rectangle (Triangulation<dim> &tria,
                                    // should be smaller than the smallest cell
                                    // diameter.
 
-  typename Triangulation<dim>::raw_face_iterator face = tria.begin_raw_face(),
-                                              endface = tria.end_face();
+  typename Triangulation<dim>::face_iterator face = tria.begin_face(),
+					  endface = tria.end_face();
   for (; face!=endface; ++face)
     {
       if (face->boundary_indicator() == 0)

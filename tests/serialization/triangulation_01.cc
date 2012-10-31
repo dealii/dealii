@@ -85,8 +85,8 @@ namespace dealii
 				     // also check the order of raw iterators as they contain
 				     // something about the history of the triangulation
     typename Triangulation<dim,spacedim>::cell_iterator
-      r1 = t1.begin_raw(),
-      r2 = t2.begin_raw();
+      r1 = t1.begin(),
+      r2 = t2.begin();
     for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
       {
 	if (r1->level() != r2->level())

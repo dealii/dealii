@@ -769,7 +769,7 @@ namespace DoFRenumbering
                                          // and insert them into the global
                                          // list using their component
           const unsigned int fe_index = cell->active_fe_index();
-          const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
+          const unsigned int dofs_per_cell = fe_collection[fe_index].dofs_per_cell;
           local_dof_indices.resize (dofs_per_cell);
           cell.get_dof_indices (local_dof_indices);
           for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -2047,6 +2047,8 @@ namespace DoFRenumbering
         bool operator () (const DHCellIterator& c1,
                           const DHCellIterator& c2) const
           {
+	    Assert (dim >= 2,
+		    ExcMessage ("This operation only makes sense for dim>=2."));
 
             const Point<dim> v1 = c1->center() - center;
             const Point<dim> v2 = c2->center() - center;

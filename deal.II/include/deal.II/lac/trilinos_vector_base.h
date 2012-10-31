@@ -1361,7 +1361,7 @@ namespace TrilinosWrappers
     for (unsigned int i=0; i<n_elements; ++i)
       {
         const unsigned int row = indices[i];
-        const int local_row = vector->Map().LID(indices[i]);
+        const int local_row = vector->Map().LID(static_cast<int>(row));
         if (local_row == -1)
           {
             const int ierr = vector->ReplaceGlobalValues (1,
@@ -1429,7 +1429,7 @@ namespace TrilinosWrappers
     for (unsigned int i=0; i<n_elements; ++i)
       {
         const unsigned int row = indices[i];
-        const int local_row = vector->Map().LID(row);
+        const int local_row = vector->Map().LID(static_cast<int>(row));
         if (local_row == -1)
           {
             const int ierr = vector->SumIntoGlobalValues (1,

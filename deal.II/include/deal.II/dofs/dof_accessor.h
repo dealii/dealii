@@ -310,14 +310,24 @@ class DoFAccessor : public dealii::internal::DoFAccessor::Inheritance<structdim,
 
                                      /**
                                       * Pointer to the @p ith line
-                                      * bounding this object.
+                                      * bounding this object. If the
+				      * current object is a line itself,
+				      * then the only valid index is
+				      * @p i equals to zero, and the
+				      * function returns an iterator
+				      * to itself.
                                       */
     typename dealii::internal::DoFHandler::Iterators<DH>::line_iterator
     line (const unsigned int i) const;
 
                                      /**
                                       * Pointer to the @p ith quad
-                                      * bounding this object.
+                                      * bounding this object. If the
+				      * current object is a quad itself,
+				      * then the only valid index is
+				      * @p i equals to zero, and the
+				      * function returns an iterator
+				      * to itself.
                                       */
     typename dealii::internal::DoFHandler::Iterators<DH>::quad_iterator
     quad (const unsigned int i) const;
@@ -974,14 +984,24 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
 
                                      /**
                                       * Pointer to the @p ith line
-                                      * bounding this object.
+                                      * bounding this object. If the
+				      * current object is a line itself,
+				      * then the only valid index is
+				      * @p i equals to zero, and the
+				      * function returns an iterator
+				      * to itself.
                                       */
     typename dealii::internal::DoFHandler::Iterators<DH<1,spacedim> >::line_iterator
     line (const unsigned int i) const;
 
                                      /**
                                       * Pointer to the @p ith quad
-                                      * bounding this object.
+                                      * bounding this object. If the
+				      * current object is a quad itself,
+				      * then the only valid index is
+				      * @p i equals to zero, and the
+				      * function returns an iterator
+				      * to itself.
                                       */
     typename dealii::internal::DoFHandler::Iterators<DH<1,spacedim> >::quad_iterator
     quad (const unsigned int i) const;

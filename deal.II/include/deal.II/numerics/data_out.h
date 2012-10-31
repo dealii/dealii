@@ -373,7 +373,8 @@ namespace internal
  * The add_data_vector() functions have additional arguments (with default
  * values) that can be used to specify certain transformations. In particular,
  * it allows to attach DataPostprocessor arguments to compute derived
- * information from a data vector at each quadrature point (for example, the
+ * information from a data vector at each point at which the field will
+ * be evaluated so that it can be written to a file (for example, the
  * Mach number in hypersonic flow can be computed from density and velocities;
  * step-29 also shows an example); another piece of information
  * specified through arguments with default values is how certain output

@@ -35,16 +35,23 @@ class PreconditionBlockJacobi;
  * Base class for actual block preconditioners. This class assumes the
  * <tt>MATRIX</tt> consisting of invertible blocks of @p blocksize on
  * the diagonal and provides the inversion of the diagonal blocks of
- * the matrix. NOT only block diagonal matrices are allowed but all
+ * the matrix. It is not necessary for this class that the matrix be
+ * block diagonal; rather, it applies to
  * matrices of arbitrary structure with the minimal property of having
- * invertible blocks on the diagonal! Still the matrix must have
- * access to single matrix entries. therefore, BlockMatrixArray is not
- * a possible matrix class.
+ * invertible blocks on the diagonal. Still the matrix must have
+ * access to single matrix entries. Therefore, BlockMatrixArray and similar
+ * classes are not a possible matrix class template arguments.
  *
- * This block matrix structure is given e.g. for the DG method for the
- * transport equation. For a downstream numbering the matrices even
- * have got a block lower left matrix structure, i.e. the matrices are
- * empty above the diagonal blocks.
+ * The block matrix structure used by this class is given, e.g., for
+ * the DG method for the transport equation. For a downstream
+ * numbering the matrices even have got a block lower left matrix
+ * structure, i.e. the matrices are empty above the diagonal blocks.
+ *
+ * @note This class is intended to be used for matrices whose structure
+ * is given by local contributions from disjoint cells, such as for DG
+ * methods. It is not intended for problems where the block structure
+ * results from different physical variables such as in the Stokes
+ * equations considered in step-22.
  *
  * For all matrices that are empty above and below the diagonal blocks
  * (i.e. for all block diagonal matrices) the @p BlockJacobi

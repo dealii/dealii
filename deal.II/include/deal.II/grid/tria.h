@@ -48,6 +48,8 @@ namespace internal
     template <int dim> class TriaLevel;
     template <int dim> class TriaFaces;
 
+    template <typename> class TriaObjects;
+
                                      /**
                                       * Forward declaration of a class into
                                       * which we put much of the
@@ -860,52 +862,20 @@ namespace internal
  *   This field can be
  *   accessed as all other data using iterators. Normally, this user flag is
  *   used if an algorithm walks over all cells and needs information whether
- *   another cell, e.g. a neighbor, has already been processed. It can also
- *   be used to flag the lines subject to constraints in 2D, as for example the
- *   functions in the DoFHandler classes do.
- *
- *   There are two functions, @p save_user_flags and @p load_user_flags which
- *   write and read these flags to and from a stream. Unlike
- *   @p save_refine_flags and @p load_refine_flags, these two functions store
- *   and read the flags of all used lines, quads, etc, not only of the
- *   active ones (well, activity is a concept which really only applies to
- *   cells, not for example to lines in 2D, so the abovementioned generalization
- *   to <em>all</em> lines, quads, etc seems plausible).
- *
- *   If you want to store more specific user flags, you can use the functions
- *   @p save_user_flags_line and @p load_user_flags_line and the generalizations
- *   for quads, etc.
- *
- *   As for the refinement and coarsening flags, there exist two versions of these
- *   functions, one which reads/writes from a stream and one which does so from
- *   a <tt>vector<bool></tt>. The latter is used to store flags temporarily, while the
- *   first is used to store them in a file.
- *
- *   It is convention to clear the user flags using the
- *   <tt>Triangulation<>::clear_user_flags()</tt> function before usage, since it is
- *   often necessary to use the flags in more than one function consecutively and
- *   is then error prone to dedicate one of these to clear the flags.
- *
- *   It is recommended that a functions using the flags states so in
- *   its documentation. For example, the
- *   execute_coarsening_and_refinement() function uses some of the user
- *   flags and will therefore destroy any content stored in them.
+ *   another cell, e.g. a neighbor, has already been processed.
+ *   See @ref GlossUserFlags "the glossary for more information".
  *
  *   There is another set of user data, which can be either an
  *   <tt>unsigned int</tt> or a <tt>void *</tt>, for
  *   each line, quad, etc. You can access these through
  *   the functions listed under <tt>User data</tt> in
- *   the accessor classes. These pointers are not used nor changed in
- *   many places of the library, and those classes and functions that
- *   do use them should document this clearly; the most prominent user
- *   of these pointers is the SolutionTransfer class which uses the
- *   cell->user_pointers.
+ *   the accessor classes.
+ *   Again, see @ref GlossUserData "the glossary for more information".
  *
  *   The value of these user indices or pointers is @p NULL by default. Note that
  *   the pointers are not inherited to children upon
  *   refinement. Still, after a remeshing they are available on all
- *   cells, where they were set on the previous mesh (unless, of
- *   course, overwritten by the SolutionTransfer class).
+ *   cells, where they were set on the previous mesh.
  *
  *   The usual warning about the missing type safety of @p void pointers are
  *   obviously in place here; responsibility for correctness of types etc
@@ -915,10 +885,6 @@ namespace internal
  *   place. In order to avoid unwanted conversions, Triangulation
  *   checks which one of them is in use and does not allow access to
  *   the other one, until clear_user_data() has been called.
- *
- *   Just like the user flags, this field is not available for vertices,
- *   which does no harm since the vertices have a unique and continuous number
- *   unlike the structured objects lines and quads.
  *
  *
  *   <h3>Boundary approximation</h3>
@@ -1464,38 +1430,18 @@ class Triangulation : public Subscriptor
           maximum_smoothing                  = 0xffff ^ allow_anisotropic_smoothing
     };
 
-    /**
-     *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-     */
-    typedef TriaRawIterator   <CellAccessor<dim,spacedim>         > raw_cell_iterator;
     typedef TriaIterator      <CellAccessor<dim,spacedim>         > cell_iterator;
     typedef TriaActiveIterator<CellAccessor<dim,spacedim>         > active_cell_iterator;
 
-    /**
-     *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-     */
-    typedef TriaRawIterator   <TriaAccessor<dim-1, dim, spacedim> > raw_face_iterator;
     typedef TriaIterator      <TriaAccessor<dim-1, dim, spacedim> > face_iterator;
     typedef TriaActiveIterator<TriaAccessor<dim-1, dim, spacedim> > active_face_iterator;
 
-    /**
-     *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-     */
-    typedef typename IteratorSelector::raw_line_iterator    raw_line_iterator;
     typedef typename IteratorSelector::line_iterator        line_iterator;
     typedef typename IteratorSelector::active_line_iterator active_line_iterator;
 
-    /**
-     *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-     */
-    typedef typename IteratorSelector::raw_quad_iterator    raw_quad_iterator;
     typedef typename IteratorSelector::quad_iterator        quad_iterator;
     typedef typename IteratorSelector::active_quad_iterator active_quad_iterator;
 
-    /**
-     *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-     */
-   typedef typename IteratorSelector::raw_hex_iterator    raw_hex_iterator;
     typedef typename IteratorSelector::hex_iterator        hex_iterator;
     typedef typename IteratorSelector::active_hex_iterator active_hex_iterator;
 
@@ -2362,6 +2308,7 @@ class Triangulation : public Subscriptor
                                      /*@{*/
                                      /**
                                       *  Clear all user flags.
+				      *  See also @ref GlossUserFlags .
                                       */
     void clear_user_flags ();
 
@@ -2371,36 +2318,42 @@ class Triangulation : public Subscriptor
                                       *  and the documentation for the
                                       *  @p save_refine_flags for more
                                       *  details.
+				      *  See also @ref GlossUserFlags .
                                       */
     void save_user_flags (std::ostream &out) const;
 
                                      /**
-                                      * Same as above, but store the flags to
-                                      * a bitvector rather than to a file.
-                                      * The output vector is resized if
-                                      * necessary.
+                                      *  Same as above, but store the flags to
+                                      *  a bitvector rather than to a file.
+                                      *  The output vector is resized if
+                                      *  necessary.
+				      *  See also @ref GlossUserFlags .
                                       */
     void save_user_flags (std::vector<bool> &v) const;
 
                                      /**
                                       *  Read the information stored by
                                       *  @p save_user_flags.
+				      *  See also @ref GlossUserFlags .
                                       */
     void load_user_flags (std::istream &in);
 
                                      /**
                                       *  Read the information stored by
                                       *  @p save_user_flags.
+				      *  See also @ref GlossUserFlags .
                                       */
     void load_user_flags (const std::vector<bool> &v);
 
                                      /**
                                       *  Clear all user flags on lines.
+				      *  See also @ref GlossUserFlags .
                                       */
     void clear_user_flags_line ();
 
                                      /**
                                       * Save the user flags on lines.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_line (std::ostream &out) const;
 
@@ -2409,26 +2362,31 @@ class Triangulation : public Subscriptor
                                       * a bitvector rather than to a file.
                                       * The output vector is resized if
                                       * necessary.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_line (std::vector<bool> &v) const;
 
                                      /**
                                       * Load the user flags located on lines.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_line (std::istream &in);
 
                                      /**
                                       * Load the user flags located on lines.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_line (const std::vector<bool> &v);
 
                                      /**
                                       *  Clear all user flags on quads.
+				      * See also @ref GlossUserFlags .
                                       */
     void clear_user_flags_quad ();
 
                                      /**
                                       * Save the user flags on quads.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_quad (std::ostream &out) const;
 
@@ -2437,27 +2395,32 @@ class Triangulation : public Subscriptor
                                       * a bitvector rather than to a file.
                                       * The output vector is resized if
                                       * necessary.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_quad (std::vector<bool> &v) const;
 
                                      /**
                                       * Load the user flags located on quads.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_quad (std::istream &in);
 
                                      /**
                                       * Load the user flags located on quads.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_quad (const std::vector<bool> &v);
 
 
                                      /**
-                                      *  Clear all user flags on quads.
+                                      * Clear all user flags on quads.
+				      * See also @ref GlossUserFlags .
                                       */
     void clear_user_flags_hex ();
 
                                      /**
                                       * Save the user flags on hexs.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_hex (std::ostream &out) const;
 
@@ -2466,16 +2429,19 @@ class Triangulation : public Subscriptor
                                       * a bitvector rather than to a file.
                                       * The output vector is resized if
                                       * necessary.
+				      * See also @ref GlossUserFlags .
                                       */
     void save_user_flags_hex (std::vector<bool> &v) const;
 
                                      /**
                                       * Load the user flags located on hexs.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_hex (std::istream &in);
 
                                      /**
                                       * Load the user flags located on hexs.
+				      * See also @ref GlossUserFlags .
                                       */
     void load_user_flags_hex (const std::vector<bool> &v);
 
@@ -2483,6 +2449,7 @@ class Triangulation : public Subscriptor
                                       * Clear all user pointers and
                                       * indices and allow the use of
                                       * both for next access.
+				      * See also @ref GlossUserData .
                                       */
     void clear_user_data ();
 
@@ -2491,6 +2458,7 @@ class Triangulation : public Subscriptor
                                       * clear_user_data() instead.
                                       *
                                       *  Clear all user pointers.
+				      *  See also @ref GlossUserData .
                                       */
     void clear_user_pointers ();
 
@@ -2498,12 +2466,14 @@ class Triangulation : public Subscriptor
                                       * Save all user indices. The
                                       * output vector is resized if
                                       * necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_indices (std::vector<unsigned int> &v) const;
 
                                      /**
                                       * Read the information stored by
                                       * save_user_indices().
+				      * See also @ref GlossUserData .
                                       */
     void load_user_indices (const std::vector<unsigned int> &v);
 
@@ -2511,12 +2481,14 @@ class Triangulation : public Subscriptor
                                       * Save all user pointers. The
                                       * output vector is resized if
                                       * necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_pointers (std::vector<void *> &v) const;
 
                                      /**
                                       * Read the information stored by
                                       * save_user_pointers().
+				      * See also @ref GlossUserData .
                                       */
     void load_user_pointers (const std::vector<void *> &v);
 
@@ -2524,12 +2496,14 @@ class Triangulation : public Subscriptor
                                       * Save the user indices on
                                       * lines. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_indices_line (std::vector<unsigned int> &v) const;
 
                                      /**
                                       * Load the user indices located
                                       * on lines.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_indices_line (const std::vector<unsigned int> &v);
 
@@ -2537,12 +2511,14 @@ class Triangulation : public Subscriptor
                                       * Save the user indices on
                                       * quads. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_indices_quad (std::vector<unsigned int> &v) const;
 
                                      /**
                                       * Load the user indices located
                                       * on quads.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_indices_quad (const std::vector<unsigned int> &v);
 
@@ -2550,24 +2526,28 @@ class Triangulation : public Subscriptor
                                       * Save the user indices on
                                       * hexes. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_indices_hex (std::vector<unsigned int> &v) const;
 
                                      /**
                                       * Load the user indices located
                                       * on hexs.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_indices_hex (const std::vector<unsigned int> &v);
                                      /**
                                       * Save the user indices on
                                       * lines. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_pointers_line (std::vector<void *> &v) const;
 
                                      /**
                                       * Load the user pointers located
                                       * on lines.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_pointers_line (const std::vector<void *> &v);
 
@@ -2575,12 +2555,14 @@ class Triangulation : public Subscriptor
                                       * Save the user pointers on
                                       * quads. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_pointers_quad (std::vector<void *> &v) const;
 
                                      /**
                                       * Load the user pointers located
                                       * on quads.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_pointers_quad (const std::vector<void *> &v);
 
@@ -2588,12 +2570,14 @@ class Triangulation : public Subscriptor
                                       * Save the user pointers on
                                       * hexes. The output vector is
                                       * resized if necessary.
+				      * See also @ref GlossUserData .
                                       */
     void save_user_pointers_hex (std::vector<void *> &v) const;
 
                                      /**
                                       * Load the user pointers located
                                       * on hexs.
+				      * See also @ref GlossUserData .
                                       */
     void load_user_pointers_hex (const std::vector<void *> &v);
                                      /*@}*/
@@ -2604,34 +2588,14 @@ class Triangulation : public Subscriptor
                                       */
                                      /*@{*/
                                      /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Iterator to the first cell, used
-                                      *  or not, on level @p level. If a level
-                                      *  has no cells, a past-the-end iterator
-                                      *  is returned.
-                                      *
-                                      *  This function calls begin_raw_line()
-                                      *  in 1D and begin_raw_quad() in 2D.
-                                      */
-    raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
-
-                                     /**
                                       *  Iterator to the first used cell
                                       *  on level @p level.
-                                      *
-                                      *  This function calls @p begin_line
-                                      *  in 1D and @p begin_quad in 2D.
                                       */
     cell_iterator        begin       (const unsigned int level = 0) const;
 
                                      /**
                                       *  Iterator to the first active
                                       *  cell on level @p level.
-                                      *
-                                      *  This function calls @p
-                                      *  begin_active_line in 1D and @p
-                                      *  begin_active_quad in 2D.
                                       */
     active_cell_iterator begin_active(const unsigned int level = 0) const;
 
@@ -2640,11 +2604,8 @@ class Triangulation : public Subscriptor
                                       *  iterator serves for comparisons of
                                       *  iterators with past-the-end or
                                       *  before-the-beginning states.
-                                      *
-                                      *  This function calls @p end_line
-                                      *  in 1D and @p end_quad in 2D.
                                       */
-    raw_cell_iterator    end () const;
+    cell_iterator        end () const;
 
                                      /**
                                       * Return an iterator which is the first
@@ -2653,16 +2614,6 @@ class Triangulation : public Subscriptor
                                       * <tt>end()</tt>.
                                       */
     cell_iterator        end (const unsigned int level) const;
-
-                                     /**
-                                       *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Return a raw iterator which is the first
-                                      * iterator not on level. If @p level is
-                                      * the last level, then this returns
-                                      * <tt>end()</tt>.
-                                      */
-    raw_cell_iterator    end_raw (const unsigned int level) const;
 
                                      /**
                                       * Return an active iterator which is the
@@ -2674,62 +2625,26 @@ class Triangulation : public Subscriptor
 
 
                                      /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Return an iterator pointing to the
-                                      *  last cell, used or not.
-                                      *
-                                      *  This function calls @p last_raw_line
-                                      *  in 1D and @p last_raw_quad in 2D.
-                                      */
-    raw_cell_iterator    last_raw () const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Return an iterator pointing to the
-                                      *  last cell of the level @p level, used
-                                      *  or not.
-                                      *
-                                      *  This function calls @p last_raw_line
-                                      *  in 1D and @p last_raw_quad in 2D.
-                                      */
-    raw_cell_iterator    last_raw (const unsigned int level) const;
-
-                                     /**
                                       *  Return an iterator pointing to the
                                       *  last used cell.
-                                      *
-                                      *  This function calls @p last_line
-                                      *  in 1D and @p last_quad in 2D.
                                       */
     cell_iterator        last () const;
 
                                      /**
                                       *  Return an iterator pointing to the
                                       *  last used cell on level @p level.
-                                      *
-                                      *  This function calls @p last_line
-                                      *  in 1D and @p last_quad in 2D.
                                       */
     cell_iterator        last (const unsigned int level) const;
 
                                      /**
                                       *  Return an iterator pointing to the
                                       *  last active cell.
-                                      *
-                                      *  This function calls @p
-                                      *  last_active_line in 1D and @p
-                                      *  last_active_quad in 2D.
                                       */
     active_cell_iterator last_active () const;
 
                                      /**
                                       *  Return an iterator pointing to the
                                       *  last active cell on level @p level.
-                                      *
-                                      *  This function calls @p last_active_line
-                                      *  in 1D and @p last_active_quad in 2D.
                                       */
     active_cell_iterator last_active (const unsigned int level) const;
                                      /*@}*/
@@ -2742,32 +2657,13 @@ class Triangulation : public Subscriptor
                                       */
                                      /*@{*/
                                      /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Iterator to the first face, used
-                                      *  or not. As faces have no level,
-                                      *  no argument can be given.
-                                      *
-                                      *  This function calls @p begin_raw_line
-                                      *  in 2D and @p begin_raw_quad in 3D.
-                                      */
-    raw_face_iterator    begin_raw_face   () const;
-
-                                     /**
                                       *  Iterator to the first used face.
-                                      *
-                                      *  This function calls @p begin_line
-                                      *  in 2D and @p begin_quad in 3D.
                                       */
     face_iterator        begin_face       () const;
 
                                      /**
                                       *  Iterator to the first active
                                       *  face.
-                                      *
-                                      *  This function calls @p
-                                      *  begin_active_line in 2D and @p
-                                      *  begin_active_quad in 3D.
                                       */
     active_face_iterator begin_active_face() const;
 
@@ -2776,412 +2672,10 @@ class Triangulation : public Subscriptor
                                       *  iterator serves for comparisons of
                                       *  iterators with past-the-end or
                                       *  before-the-beginning states.
-                                      *
-                                      *  This function calls @p end_line
-                                      *  in 2D and @p end_quad in 3D.
                                       */
-    raw_face_iterator    end_face () const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Return a raw iterator which is past
-                                      * the end.  This is the same as
-                                      * <tt>end()</tt> and is only for
-                                      * combatibility with older versions.
-                                      */
-    raw_face_iterator    end_raw_face () const;
-
-                                     /**
-                                      * Return an active iterator which is
-                                      * past the end.  This is the same as
-                                      * <tt>end()</tt> and is only for
-                                      * combatibility with older versions.
-                                      */
-    active_face_iterator end_active_face () const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Return an iterator pointing to the
-                                      *  last face, used or not.
-                                      *
-                                      *  This function calls @p last_raw_line
-                                      *  in 2D and @p last_raw_quad in 3D.
-                                      */
-    raw_face_iterator    last_raw_face () const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last used face.
-                                      *
-                                      *  This function calls @p last_line in
-                                      *  2D and @p last_quad in 3D.
-                                      */
-    face_iterator        last_face () const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last active face.
-                                      *
-                                      *  This function calls @p
-                                      *  last_active_line in 2D and @p
-                                      *  last_active_quad in 3D.
-                                      */
-    active_face_iterator last_active_face () const;
-
+    face_iterator        end_face () const;
                                      /*@}*/
 
-
-                                     /*---------------------------------------*/
-
-                                     /**
-                                      *  @name Line iterator functions
-                                      */
-                                     /*@{*/
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Iterator to the first line, used or
-                                      *  not, on level @p level. If a level
-                                      *  has no lines, a past-the-end iterator
-                                      *  is returned.
-                                      *  If lines are no cells, i.e. for @p dim>1
-                                      *  no @p level argument must be given.
-                                      *  The same applies for all the other functions
-                                      *  above, of course.
-                                      */
-    raw_line_iterator
-    begin_raw_line   (const unsigned int level = 0) const;
-
-                                     /**
-                                      *  Iterator to the first used line
-                                      *  on level @p level.
-                                      */
-    line_iterator
-    begin_line       (const unsigned int level = 0) const;
-
-                                     /**
-                                      *  Iterator to the first active
-                                      *  line on level @p level.
-                                      */
-    active_line_iterator
-    begin_active_line(const unsigned int level = 0) const;
-
-                                     /**
-                                      *  Iterator past the end; this
-                                      *  iterator serves for comparisons of
-                                      *  iterators with past-the-end or
-                                      *  before-the-beginning states.
-                                      */
-    raw_line_iterator
-    end_line () const;
-
-                                     /**
-                                      * Return an iterator which is the first
-                                      * iterator not on level. If @p level is
-                                      * the last level, then this returns
-                                      * <tt>end()</tt>.
-                                      */
-    line_iterator        end_line (const unsigned int level) const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Return a raw iterator which is the
-                                      * first iterator not on level. If @p
-                                      * level is the last level, then this
-                                      * returns <tt>end()</tt>.
-                                      */
-    raw_line_iterator    end_raw_line (const unsigned int level) const;
-
-                                     /**
-                                      * Return an active iterator which is the
-                                      * first iterator not on level. If @p
-                                      * level is the last level, then this
-                                      * returns <tt>end()</tt>.
-                                      */
-    active_line_iterator end_active_line (const unsigned int level) const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Return an iterator pointing to the
-                                      *  last line, used or not.
-                                      */
-    raw_line_iterator
-    last_raw_line () const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Return an iterator pointing to the
-                                      *  last line of the level @p level, used
-                                      *  or not.
-                                      */
-    raw_line_iterator
-    last_raw_line (const unsigned int level) const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last used line.
-                                      */
-    line_iterator
-    last_line () const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last used line on level @p level.
-                                      */
-    line_iterator
-    last_line (const unsigned int level) const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last active line.
-                                      */
-    active_line_iterator
-    last_active_line () const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last active line on level @p level.
-                                      */
-    active_line_iterator
-    last_active_line (const unsigned int level) const;
-                                     /*@}*/
-
-                                     /*---------------------------------------*/
-
-                                     /**
-                                      *  @name Quad iterator functions
-                                      */
-                                     /*@{
-                                      */
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Iterator to the first quad, used or
-                                      *  not, on the given level. If a level
-                                      *  has no quads, a past-the-end iterator
-                                      *  is returned.  If quads are no cells,
-                                      *  i.e. for $dim>2$ no level argument
-                                      *  must be given.
-
-                                      */
-    raw_quad_iterator
-    begin_raw_quad   (const unsigned int level = 0) const;
-
-                                     /**
-                                      *  Iterator to the first used quad
-                                      *  on level @p level.
-                                      */
-    quad_iterator
-    begin_quad       (const unsigned int level = 0) const;
-
-                                     /**
-                                      *  Iterator to the first active
-                                      *  quad on level @p level.
-                                      */
-    active_quad_iterator
-    begin_active_quad(const unsigned int level = 0) const;
-
-                                     /**
-                                      *  Iterator past the end; this
-                                      *  iterator serves for comparisons of
-                                      *  iterators with past-the-end or
-                                      *  before-the-beginning states.
-                                      */
-    raw_quad_iterator    end_quad () const;
-
-                                     /**
-                                      * Return an iterator which is the first
-                                      * iterator not on level. If @p level is
-                                      * the last level, then this returns
-                                      * <tt>end()</tt>.
-                                      */
-    quad_iterator        end_quad (const unsigned int level) const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Return a raw iterator which is the
-                                      * first iterator not on level. If @p
-                                      * level is the last level, then this
-                                      * returns <tt>end()</tt>.
-                                      */
-    raw_quad_iterator    end_raw_quad (const unsigned int level) const;
-
-                                     /**
-                                      * Return an active iterator which is the
-                                      * first iterator not on level. If @p
-                                      * level is the last level, then this
-                                      * returns <tt>end()</tt>.
-                                      */
-    active_quad_iterator end_active_quad (const unsigned int level) const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Return an iterator pointing to the
-                                      *  last quad, used or not.
-                                      */
-    raw_quad_iterator
-    last_raw_quad () const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Return an iterator pointing to the
-                                      *  last quad of the level @p level, used
-                                      *  or not.
-
-                                      */
-    raw_quad_iterator
-    last_raw_quad (const unsigned int level) const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last used quad.
-                                      */
-    quad_iterator
-    last_quad () const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last used quad on level @p level.
-                                      */
-    quad_iterator
-    last_quad (const unsigned int level) const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last active quad.
-                                      */
-    active_quad_iterator
-    last_active_quad () const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last active quad on level @p level.
-                                      */
-    active_quad_iterator
-    last_active_quad (const unsigned int level) const;
-                                     /*@}*/
-
-                                     /*---------------------------------------*/
-
-                                     /**
-                                      *  @name Hex iterator functions
-                                      */
-                                     /*@{
-                                      */
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Iterator to the first hex, used
-                                      *  or not, on level @p level. If a level
-                                      *  has no hexs, a past-the-end iterator
-                                      *  is returned.
-                                      */
-    raw_hex_iterator
-    begin_raw_hex   (const unsigned int level = 0) const;
-
-                                     /**
-                                      *  Iterator to the first used hex
-                                      *  on level @p level.
-                                      */
-    hex_iterator
-    begin_hex       (const unsigned int level = 0) const;
-
-                                     /**
-                                      *  Iterator to the first active
-                                      *  hex on level @p level.
-                                      */
-    active_hex_iterator
-    begin_active_hex(const unsigned int level = 0) const;
-
-                                     /**
-                                      *  Iterator past the end; this
-                                      *  iterator serves for comparisons of
-                                      *  iterators with past-the-end or
-                                      *  before-the-beginning states.
-                                      */
-    raw_hex_iterator    end_hex () const;
-
-                                     /**
-                                      * Return an iterator which is the first
-                                      * iterator not on level. If @p level is
-                                      * the last level, then this returns
-                                      * <tt>end()</tt>.
-                                      */
-    hex_iterator        end_hex (const unsigned int level) const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Return a raw iterator which is the first
-                                      * iterator not on level. If @p level is
-                                      * the last level, then this returns
-                                      * <tt>end()</tt>.
-                                      */
-    raw_hex_iterator    end_raw_hex (const unsigned int level) const;
-
-                                     /**
-                                      * Return an active iterator which is the
-                                      * first iterator not on level. If @p
-                                      * level is the last level, then this
-                                      * returns <tt>end()</tt>.
-                                      */
-    active_hex_iterator end_active_hex (const unsigned int level) const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Return an iterator pointing to the
-                                      *  last hex, used or not.
-                                      */
-    raw_hex_iterator    last_raw_hex () const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Return an iterator pointing to the
-                                      *  last hex of the level @p level, used
-                                      *  or not.
-
-                                      */
-    raw_hex_iterator
-    last_raw_hex (const unsigned int level) const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last used hex.
-                                      */
-    hex_iterator
-    last_hex () const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last used hex on level @p level.
-                                      */
-    hex_iterator
-    last_hex (const unsigned int level) const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last active hex.
-                                      */
-    active_hex_iterator
-    last_active_hex () const;
-
-                                     /**
-                                      *  Return an iterator pointing to the
-                                      *  last active hex on level @p level.
-                                      */
-    active_hex_iterator
-    last_active_hex (const unsigned int level) const;
-                                     /*@}*/
 
                                      /*---------------------------------------*/
 
@@ -3197,7 +2691,7 @@ class Triangulation : public Subscriptor
                                       * argument describing the
                                       * level. The versions with this
                                       * argument are only applicable
-                                      * for objects descibing the
+                                      * for objects describing the
                                       * cells of the present
                                       * triangulation. For example: in
                                       * 2D <tt>n_lines(level)</tt>
@@ -3206,22 +2700,6 @@ class Triangulation : public Subscriptor
                                       * are faces in 2D and therefore
                                       * have no level.
                                       */
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Total Number of lines, used or
-                                      * unused.
-                                      */
-    unsigned int n_raw_lines () const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Number of lines, used or
-                                      * unused, on the given level.
-                                      */
-    unsigned int n_raw_lines (const unsigned int level) const;
 
                                      /**
                                       *  Return total number of used lines,
@@ -3245,22 +2723,6 @@ class Triangulation : public Subscriptor
                                       *  on level @p level.
                                       */
     unsigned int n_active_lines (const unsigned int level) const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Total number of quads, used or
-                                      * unused.
-                                      */
-    unsigned int n_raw_quads () const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Number of quads, used or
-                                      * unused, on the given level.
-                                      */
-    unsigned int n_raw_quads (const unsigned int level) const;
 
                                      /**
                                       *  Return total number of used quads,
@@ -3287,22 +2749,6 @@ class Triangulation : public Subscriptor
     unsigned int n_active_quads (const unsigned int level) const;
 
                                      /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Total number of hexs, used or
-                                      * unused.
-                                      */
-    unsigned int n_raw_hexs () const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Number of hexs, used or
-                                      * unused, on the given level.
-                                      */
-    unsigned int n_raw_hexs (const unsigned int level) const;
-
-                                     /**
                                       *  Return total number of used
                                       *  hexahedra, active or not.
                                       */
@@ -3327,14 +2773,6 @@ class Triangulation : public Subscriptor
                                       *  level.
                                       */
     unsigned int n_active_hexs(const unsigned int level) const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      * Number of cells, used or
-                                      * unused, on the given level.
-                                      */
-    unsigned int n_raw_cells (const unsigned int level) const;
 
                                      /**
                                       *  Return total number of used cells,
@@ -3366,16 +2804,6 @@ class Triangulation : public Subscriptor
                                       * space dimension and so on.
                                       */
     unsigned int n_active_cells (const unsigned int level) const;
-
-                                     /**
-                                      *  @deprecated The use of raw iterators is highly disencouraged and they might go away in future releases
-                                      *
-                                      *  Return total number of faces,
-                                      *  used or not. In 2d, the result
-                                      *  equals n_raw_lines(), while in 3d it
-                                      *  equals n_raw_quads().
-                                      */
-    unsigned int n_raw_faces () const;
 
                                      /**
                                       *  Return total number of used faces,
@@ -3509,6 +2937,167 @@ class Triangulation : public Subscriptor
                                      /*@}*/
 
                                      /**
+                                      *  @name Internal information about the number of objects
+                                      */
+                                     /*@{*/
+
+                                     /**
+                                      * Total number of lines, used or
+                                      * unused.
+				      *
+				      * @note This function really
+				      * exports internal information
+				      * about the triangulation. It
+				      * shouldn't be used in
+				      * applications. The function is
+				      * only part of the public
+				      * interface of this class
+				      * because it is used in some of
+				      * the other classes that build
+				      * very closely on it (in
+				      * particular, the DoFHandler
+				      * class).
+                                      */
+    unsigned int n_raw_lines () const;
+
+                                     /**
+                                      * Number of lines, used or
+                                      * unused, on the given level.
+				      *
+				      * @note This function really
+				      * exports internal information
+				      * about the triangulation. It
+				      * shouldn't be used in
+				      * applications. The function is
+				      * only part of the public
+				      * interface of this class
+				      * because it is used in some of
+				      * the other classes that build
+				      * very closely on it (in
+				      * particular, the DoFHandler
+				      * class).
+                                      */
+    unsigned int n_raw_lines (const unsigned int level) const;
+
+                                     /**
+                                      * Total number of quads, used or
+                                      * unused.
+				      *
+				      * @note This function really
+				      * exports internal information
+				      * about the triangulation. It
+				      * shouldn't be used in
+				      * applications. The function is
+				      * only part of the public
+				      * interface of this class
+				      * because it is used in some of
+				      * the other classes that build
+				      * very closely on it (in
+				      * particular, the DoFHandler
+				      * class).
+                                      */
+    unsigned int n_raw_quads () const;
+
+                                     /**
+                                      * Number of quads, used or
+                                      * unused, on the given level.
+				      *
+				      * @note This function really
+				      * exports internal information
+				      * about the triangulation. It
+				      * shouldn't be used in
+				      * applications. The function is
+				      * only part of the public
+				      * interface of this class
+				      * because it is used in some of
+				      * the other classes that build
+				      * very closely on it (in
+				      * particular, the DoFHandler
+				      * class).
+                                      */
+    unsigned int n_raw_quads (const unsigned int level) const;
+
+                                     /**
+                                      * Total number of hexs, used or
+                                      * unused.
+				      *
+				      * @note This function really
+				      * exports internal information
+				      * about the triangulation. It
+				      * shouldn't be used in
+				      * applications. The function is
+				      * only part of the public
+				      * interface of this class
+				      * because it is used in some of
+				      * the other classes that build
+				      * very closely on it (in
+				      * particular, the DoFHandler
+				      * class).
+                                      */
+    unsigned int n_raw_hexs () const;
+
+                                     /**
+                                      * Number of hexs, used or
+                                      * unused, on the given level.
+				      *
+				      * @note This function really
+				      * exports internal information
+				      * about the triangulation. It
+				      * shouldn't be used in
+				      * applications. The function is
+				      * only part of the public
+				      * interface of this class
+				      * because it is used in some of
+				      * the other classes that build
+				      * very closely on it (in
+				      * particular, the DoFHandler
+				      * class).
+                                      */
+    unsigned int n_raw_hexs (const unsigned int level) const;
+
+                                     /**
+                                      * Number of cells, used or
+                                      * unused, on the given level.
+				      *
+				      * @note This function really
+				      * exports internal information
+				      * about the triangulation. It
+				      * shouldn't be used in
+				      * applications. The function is
+				      * only part of the public
+				      * interface of this class
+				      * because it is used in some of
+				      * the other classes that build
+				      * very closely on it (in
+				      * particular, the DoFHandler
+				      * class).
+                                      */
+    unsigned int n_raw_cells (const unsigned int level) const;
+
+                                     /**
+                                      * Return total number of faces,
+                                      * used or not. In 2d, the result
+                                      * equals n_raw_lines(), while in 3d it
+                                      * equals n_raw_quads().
+				      *
+				      * @note This function really
+				      * exports internal information
+				      * about the triangulation. It
+				      * shouldn't be used in
+				      * applications. The function is
+				      * only part of the public
+				      * interface of this class
+				      * because it is used in some of
+				      * the other classes that build
+				      * very closely on it (in
+				      * particular, the DoFHandler
+				      * class).
+                                      */
+    unsigned int n_raw_faces () const;
+
+                                     /*@}*/
+
+                                     /**
                                       * Determine an estimate for the
                                       * memory consumption (in bytes)
                                       * of this object.
@@ -3535,7 +3124,8 @@ class Triangulation : public Subscriptor
                                       * general documentation of this class.
                                       */
     template <class Archive>
-    void save (Archive & ar, const unsigned int version) const;
+    void save (Archive & ar,
+	       const unsigned int version) const;
 
                                      /**
                                       * Read the data of this object from a
@@ -3562,7 +3152,8 @@ class Triangulation : public Subscriptor
                                       * documentation of this class.
                                       */
     template <class Archive>
-    void load (Archive & ar, const unsigned int version);
+    void load (Archive & ar,
+	       const unsigned int version);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -3666,6 +3257,173 @@ class Triangulation : public Subscriptor
                                   std::istream            &in);
 
   private:
+                                     /**
+                                      *  @name Cell iterator functions for internal use
+                                      */
+                                     /*@{*/
+				     /**
+				      * Declare a number of iterator types for
+				      * raw iterators, i.e., iterators that also
+				      * iterate over holes in the list of cells
+				      * left by cells that have been coarsened
+				      * away in previous mesh refinement cycles.
+				      *
+				      * Since users should never have
+				      * to access these internal
+				      * properties of how we store
+				      * data, these iterator types are
+				      * made private.
+				      */
+    typedef TriaRawIterator   <CellAccessor<dim,spacedim>         > raw_cell_iterator;
+    typedef TriaRawIterator   <TriaAccessor<dim-1, dim, spacedim> > raw_face_iterator;
+    typedef typename IteratorSelector::raw_line_iterator            raw_line_iterator;
+    typedef typename IteratorSelector::raw_quad_iterator            raw_quad_iterator;
+    typedef typename IteratorSelector::raw_hex_iterator             raw_hex_iterator;
+
+                                     /**
+                                      *  Iterator to the first cell, used
+                                      *  or not, on level @p level. If a level
+                                      *  has no cells, a past-the-end iterator
+                                      *  is returned.
+                                      */
+    raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
+
+                                     /**
+                                      * Return a raw iterator which is the first
+                                      * iterator not on level. If @p level is
+                                      * the last level, then this returns
+                                      * <tt>end()</tt>.
+                                      */
+    raw_cell_iterator    end_raw (const unsigned int level) const;
+                                     /*@}*/
+
+                                     /*---------------------------------------*/
+
+                                     /**
+                                      *  @name Line iterator functions for internal use
+                                      */
+                                     /*@{*/
+
+                                     /**
+                                      *  Iterator to the first line, used or
+                                      *  not, on level @p level. If a level
+                                      *  has no lines, a past-the-end iterator
+                                      *  is returned.
+                                      *  If lines are no cells, i.e. for @p dim>1
+                                      *  no @p level argument must be given.
+                                      *  The same applies for all the other functions
+                                      *  above, of course.
+                                      */
+    raw_line_iterator
+    begin_raw_line   (const unsigned int level = 0) const;
+
+                                     /**
+                                      *  Iterator to the first used line
+                                      *  on level @p level.
+                                      */
+    line_iterator
+    begin_line       (const unsigned int level = 0) const;
+
+                                     /**
+                                      *  Iterator to the first active
+                                      *  line on level @p level.
+                                      */
+    active_line_iterator
+    begin_active_line(const unsigned int level = 0) const;
+
+                                     /**
+                                      *  Iterator past the end; this
+                                      *  iterator serves for comparisons of
+                                      *  iterators with past-the-end or
+                                      *  before-the-beginning states.
+                                      */
+    line_iterator        end_line () const;
+                                     /*@}*/
+
+                                     /*---------------------------------------*/
+
+                                     /**
+                                      *  @name Quad iterator functions for internal use
+                                      */
+                                     /*@{
+                                      */
+                                     /**
+                                      *  Iterator to the first quad, used or
+                                      *  not, on the given level. If a level
+                                      *  has no quads, a past-the-end iterator
+                                      *  is returned.  If quads are no cells,
+                                      *  i.e. for $dim>2$ no level argument
+                                      *  must be given.
+
+                                      */
+    raw_quad_iterator
+    begin_raw_quad   (const unsigned int level = 0) const;
+
+                                     /**
+                                      *  Iterator to the first used quad
+                                      *  on level @p level.
+                                      */
+    quad_iterator
+    begin_quad       (const unsigned int level = 0) const;
+
+                                     /**
+                                      *  Iterator to the first active
+                                      *  quad on level @p level.
+                                      */
+    active_quad_iterator
+    begin_active_quad (const unsigned int level = 0) const;
+
+                                     /**
+                                      *  Iterator past the end; this
+                                      *  iterator serves for comparisons of
+                                      *  iterators with past-the-end or
+                                      *  before-the-beginning states.
+                                      */
+    quad_iterator
+    end_quad () const;
+                                     /*@}*/
+
+                                     /*---------------------------------------*/
+
+                                     /**
+                                      *  @name Hex iterator functions for internal use
+                                      */
+                                     /*@{
+                                      */
+                                     /**
+                                      *  Iterator to the first hex, used
+                                      *  or not, on level @p level. If a level
+                                      *  has no hexs, a past-the-end iterator
+                                      *  is returned.
+                                      */
+    raw_hex_iterator
+    begin_raw_hex   (const unsigned int level = 0) const;
+
+                                     /**
+                                      *  Iterator to the first used hex
+                                      *  on level @p level.
+                                      */
+    hex_iterator
+    begin_hex       (const unsigned int level = 0) const;
+
+                                     /**
+                                      *  Iterator to the first active
+                                      *  hex on level @p level.
+                                      */
+    active_hex_iterator
+    begin_active_hex (const unsigned int level = 0) const;
+
+                                     /**
+                                      *  Iterator past the end; this
+                                      *  iterator serves for comparisons of
+                                      *  iterators with past-the-end or
+                                      *  before-the-beginning states.
+                                      */
+    hex_iterator
+    end_hex () const;
+                                     /*@}*/
+
+
                                      /**
                                       * The (public) function clear() will
                                       * only work when the triangulation is
@@ -3854,6 +3612,9 @@ class Triangulation : public Subscriptor
     friend class hp::DoFHandler<dim,spacedim>;
 
     friend struct dealii::internal::Triangulation::Implementation;
+
+    template <typename>
+    friend class dealii::internal::Triangulation::TriaObjects;
 };
 
 
