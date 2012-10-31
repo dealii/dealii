@@ -197,19 +197,3 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     )
 ENDIF()
 
-
-###########################################################################
-#                                                                         #
-#    Configure distclean.cmake used by the autopilot 'distclean' target:  #
-#                                                                         #
-###########################################################################
-
-
-IF( "${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}" AND
-    NOT DISABLE_AUTOPILOT)
-  CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/distclean.cmake.in
-    ${CMAKE_BINARY_DIR}/distclean.cmake
-    @ONLY)
-ENDIF()
-
