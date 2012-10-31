@@ -118,8 +118,14 @@
 /* Defined if you have the `dsyevx_' function. */
 #cmakedefine HAVE_DSYEVX_
 
+/* Defined if you have the `dsygv_' function. */
+#cmakedefine HAVE_DSYGV_
+
 /* Defined if you have the `dsygvx_' function. */
 #cmakedefine HAVE_DSYGVX_
+
+/* Defined if you have the `saxpy_' function. */
+#cmakedefine HAVE_SAXPY_
 
 /* Defined if you have the `sgeevx_' function. */
 #cmakedefine HAVE_SGEEVX_
@@ -165,6 +171,9 @@
 
 /* Defined if you have the `ssyevx_' function. */
 #cmakedefine HAVE_SSYEVX_
+
+/* Defined if you have the `ssygv_' function. */
+#cmakedefine HAVE_SSYGV_
 
 /* Defined if you have the `ssygvx_' function. */
 #cmakedefine HAVE_SSYGVX_
