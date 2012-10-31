@@ -56,7 +56,7 @@
 #                                                                         #
 ###########################################################################
 
-If(DEAL_II_WITH_BUNDLED_DIRECTORY)
+If(DEAL_II_HAVE_BUNDLED_DIRECTORY)
   OPTION(DEAL_II_ALLOW_BUNDLED
     "Allow the use of libraries bundled with the source tarball. (DEAL_II_FORCE_BUNDLED* will overwrite this option.)"
     ON
@@ -73,7 +73,7 @@ OPTION(DEAL_II_COMPONENT_CONTRIB
   OFF
   )
 
-If(DEAL_II_WITH_DOC_DIRECTORY)
+If(DEAL_II_HAVE_DOC_DIRECTORY)
   OPTION(DEAL_II_COMPONENT_DOCUMENTATION
     "Enable configuration, build and installation of the documentation. This adds a COMPONENT \"documentation\" to the build system."
     OFF
