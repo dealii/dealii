@@ -60,10 +60,12 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-w2")
 #   -w175  subscript out of range
 #   -w177  declared but not referenced
 #   -w1478 deprecation warning
+#   -w1572 floating-point equality and inequality comparisons are unreliable
 #
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd175")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd177")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1478")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1572")
 
 
 #############################
