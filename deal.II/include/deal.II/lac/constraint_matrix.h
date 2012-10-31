@@ -381,7 +381,8 @@ class ConstraintMatrix : public Subscriptor
                                       * constraint line <i>i</i>, according
                                       * to the discussion in the general
                                       * class description.
-                                      * Note: the line needs to be added with
+				      *
+                                      * @note the line needs to be added with
                                       * one of the add_line() calls first.
                                       */
     void set_inhomogeneity (const unsigned int line,
@@ -965,9 +966,9 @@ class ConstraintMatrix : public Subscriptor
                                       * argument or the function with both
                                       * matrix and vector arguments.
                                       *
-                                      * Note: This function is not
+                                      * @note This function is not
                                       * thread-safe, so you will need to make
-                                      * sure that only on process at a time
+                                      * sure that only one process at a time
                                       * calls this function.
                                       */
     template <class InVector, class OutVector>
@@ -1042,9 +1043,9 @@ class ConstraintMatrix : public Subscriptor
                                       * function will not be able to correctly
                                       * handle inhomogeneities.
                                       *
-                                      * Note: This function is not
+                                      * @note This function is not
                                       * thread-safe, so you will need to make
-                                      * sure that only on process at a time
+                                      * sure that only one process at a time
                                       * calls this function.
                                       */
     template <typename VectorType>
@@ -1091,9 +1092,9 @@ class ConstraintMatrix : public Subscriptor
                                       * completely ignores inhomogeneous
                                       * constraints.
                                       *
-                                      * Note: This function is not
+                                      * @note This function is not
                                       * thread-safe, so you will need to
-                                      * make sure that only on process at a
+                                      * make sure that only one process at a
                                       * time calls this function.
                                       */
     template <typename ForwardIteratorVec, typename ForwardIteratorInd,
@@ -1166,9 +1167,9 @@ class ConstraintMatrix : public Subscriptor
                                       * the vectors and matrices are fully
                                       * assembled.
                                       *
-                                      * Note: This function is not
+                                      * @note This function is not
                                       * thread-safe, so you will need to
-                                      * make sure that only on process at a
+                                      * make sure that only one process at a
                                       * time calls this function.
                                       */
     template <typename MatrixType>
@@ -1202,9 +1203,9 @@ class ConstraintMatrix : public Subscriptor
                                       * see the documentation in @ref
                                       * constraints module.
                                       *
-                                      * Note: This function is not
+                                      * @note This function is not
                                       * thread-safe, so you will need to
-                                      * make sure that only on process at a
+                                      * make sure that only one process at a
                                       * time calls this function.
                                       */
     template <typename MatrixType, typename VectorType>

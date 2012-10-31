@@ -13,7 +13,7 @@
                                  // @sect3{Include files}
 
 				 // We are using the the same
-                                 // include files as in step-42:
+                                 // include files as in step-41:
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -752,7 +752,7 @@ namespace Step42
           cell->get_dof_indices (local_dof_indices);
           constraints.distribute_local_to_global (cell_matrix, cell_rhs,
                                                   local_dof_indices,
-                                                  system_matrix_newton, system_rhs_newton, true);
+                                                  system_matrix_newton, system_rhs_newton, false);
         };
 
     system_matrix_newton.compress ();
@@ -1063,7 +1063,8 @@ namespace Step42
     TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
     distributed_solution = solution;
 
-    constraints_hanging_nodes.set_zero (distributed_solution);
+    // constraints_hanging_nodes.set_zero (distributed_solution);
+    constraints.set_zero (distributed_solution);
 
     // Solving iterative
 
@@ -1080,10 +1081,10 @@ namespace Step42
     MPI_Barrier (mpi_communicator);
     t.restart();
 
-  //   ReductionControl                 reduction_control (10000, 1e-15, 1e-4);
-  //   SolverCG<TrilinosWrappers::MPI::Vector>
-  //     solver (reduction_control, mpi_communicator);
-  //   solver.solve (system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
+    // ReductionControl                 solver_control (10000, 1e-15, 1e-4);
+    // SolverCG<TrilinosWrappers::MPI::Vector>
+    //   solver (solver_control, mpi_communicator);
+    // solver.solve (system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
 
     PrimitiveVectorMemory<TrilinosWrappers::MPI::Vector> mem;
     TrilinosWrappers::MPI::Vector    tmp (system_rhs_newton);
