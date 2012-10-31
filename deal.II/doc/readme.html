@@ -112,7 +112,7 @@
       <li> <p>
           For debugging programs, we have found that the
 	  <a href="http://www.gnu.org/software/gdb/" target="_top">GNU
-	    debugger GDB</a> is a invaluable tool. GDB is a text-based tool
+	    debugger GDB</a> is an invaluable tool. GDB is a text-based tool
 	    not always easy to use; <a href="http://www.kdbg.org/"
 	    target="_top">kdbg</a>, is one of many graphical user interfaces
 	    for it. Most integrated development environments
@@ -222,13 +222,14 @@
 	<li> <code>/path/install/dir</code> is the directory where you want to
 	  install the deal.II header files and libraries to. This can be a
 	  directory in your home directory (e.g., <code>~/bin</code>) or a
-	  directory such as <code>/usr</code> if you have root privileges.
+	  directory such as <code>/usr/local</code> if you have root privileges.
 
-	<li> If your machine has multiple processors, use <code>make -jN</code> in
-	  the last two steps where <code>N</code> is the number of processors you
-	  want <code>make</code> to use at any given
-	  time. Allowing <code>make</code> to use more processors (assuming
-	  you have that many) will greatly accelerate building the library.
+	<li> If your machine has multiple processors, use <code>make
+	  -jN</code> in the last two steps where <code>N</code> is the
+	  number of simultaneous build processes you want <code>make</code>
+	  to use at any given time. Allowing <code>make</code> to use
+	  more simultaneous build processes (assuming you have that many
+	  processor cores) will greatly accelerate building the library.
 
 	<li>The <acronym>deal.II</acronym> <code>cmake</code> system can accept a
 	  significant number of configuration parameters. See the
