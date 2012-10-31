@@ -117,7 +117,7 @@ INCLUDE(setup_finalize)
 #                                                                         #
 ###########################################################################
 
-ADD_SUBDIRECTORY(scripts)
+ADD_SUBDIRECTORY(cmake/scripts)
 
 ADD_SUBDIRECTORY(include)
 
@@ -127,7 +127,7 @@ ENDIF()
 
 ADD_SUBDIRECTORY(source)
 
-ADD_SUBDIRECTORY(config) # has to be included after source
+ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 
