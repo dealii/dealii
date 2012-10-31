@@ -143,10 +143,10 @@ int main()
   std::cout << "dealii-feature: LibZ=yes" << std::endl;
 #endif
 
-#ifdef DEAL_II_DISABLE_PARSER
-  std::cout << "dealii-feature: parser=no" << std::endl;
-#else
+#ifdef HAVE_FUNCTIONPARSER
   std::cout << "dealii-feature: parser=yes" << std::endl;
+#else
+  std::cout << "dealii-feature: parser=no" << std::endl;
 #endif
   
 }

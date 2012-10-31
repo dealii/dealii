@@ -1,5 +1,7 @@
 Major:
 
+* Cleanup stale workarounds
+
 * Update the online documentation on
 
     - How to install deal.II
@@ -20,8 +22,9 @@ Minor:
 
 * Port the testsuite to cmake
 
-* The following features have to be written:
+* The following features have to be written, or removed:
     * TECPLOT
+    * HSL
 
 * (Maybe) re-enable validate-xrefs
 
