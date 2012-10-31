@@ -368,10 +368,6 @@
  */
 #cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
 
-/* Defined if the prototype of abort() has a no-throw exception specification.
- */
-#cmakedefine DEAL_II_ABORT_NOTHROW_EXCEPTION
-
 /* If already available, do not define at all. Otherwise, define to
  * __func__ if that is available. In all other cases, indicate that no
  * information about the present function is available for this compiler.
@@ -418,13 +414,6 @@
  * top-level directory.
  */
 #cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
-
-/* Defined if the compiler requires the use of the template keyword for
- * disambiguation keyword in certain contexts in which it is not supposed to
- * do so. For the exact failure mode, look at aclocal.m4 in the top-level
- * directory.
- */
-#cmakedefine DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
 
 /* Defined if the compiler does not honor the explicit keyword on template
  * constructors.
@@ -524,3 +513,4 @@
 #include <deal.II/base/types.h>
 
 #endif
+

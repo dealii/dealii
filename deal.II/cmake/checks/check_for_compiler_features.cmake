@@ -281,25 +281,6 @@ CHECK_CXX_SOURCE_COMPILES(
 
 
 #
-# Check if the declared prototype of abort() has a throw()
-# specification. We overload abort() in our testsuite, so have
-# to make sure that we match the exception specification
-# correctly.
-#
-# (Yes. It is not a bug. But the logic is the same.)
-#
-# - Matthias Maier, rewritten 2012
-#
-CHECK_CXX_COMPILER_BUG(
-  "
-  #include <cstdlib>
-  extern \"C\" void abort () { for(;;) ; }
-  int main(){ return 0; }
-  "
-  DEAL_II_ABORT_NOTHROW_EXCEPTION)
-
-
-#
 # Gcc and some other compilers have __PRETTY_FUNCTION__, showing
 # an unmangled version of the function we are presently in,
 # while __FUNCTION__ (or __func__ in ISO C99) simply give the

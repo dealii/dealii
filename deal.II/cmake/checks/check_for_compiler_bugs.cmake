@@ -204,46 +204,6 @@ CHECK_CXX_COMPILER_BUG(
 
 
 #
-# Some versions of gcc get this example wrong:
-#
-# struct X
-# {
-#     template <typename T> void operator << (T);
-# };
-# int main()
-# {
-#   X x;
-#   x.operator << <double> (1);
-# }
-#
-# They want to see a "template" for disambiguation in
-#    x.template operator << <double> (1);
-# which shouldn't be necessary since the left hand side of the
-# dot operator is not template dependent. Surprisingly, this is
-# only the case for operators, not if operator<< were a regular
-# function. Annoyingly, other compilers barf on seeing the
-# disambiguating "template" keyword.
-#
-# - Wolfgang Bangerth, Matthias Maier, rewritten 2012
-#
-CHECK_CXX_COMPILER_BUG(
-  "
-  struct X
-  {
-      template <typename T> void operator << (T) {}
-  };
-  int main()
-  {
-    X x;
-    x.operator << <double> (1);
-    return 0;
-  }
-  "
-  DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
-  )
-
-
-#
 # Some older versions of gcc compile this, despite the 'explicit'
 # keyword:
 #
