@@ -40,9 +40,9 @@ ENDMACRO()
 SET(DEAL_II_LAPACK_FUNCTIONS
   daxpy_ dgeev_ dgeevx_ dgelsd_ dgemm_ dgemv_ dgeqrf_ dgesdd_ dgesvd_
   dgetrf_ dgetri_ dgetrs_ dorgqr_ dormqr_ dstev_ dsyevx_  dsygv_ dsygvx_
-  saxpy_ sgeev_ sgeevx_ sgelsd_ sgemm_ sgemv_ sgeqrf_ sgesdd_ sgesvd_
-  sgetrf_ sgetri_ sgetrs_ sorgqr_ sormqr_ sstev_ ssyevx_ ssygv_ ssygvx_
-  strtrs_
+  dtrtrs_ saxpy_ sgeev_ sgeevx_ sgelsd_ sgemm_ sgemv_ sgeqrf_ sgesdd_
+  sgesvd_ sgetrf_ sgetri_ sgetrs_ sorgqr_ sormqr_ sstev_ ssyevx_ ssygv_
+  ssygvx_ strtrs_
   )
 
 MACRO(CHECK_FOR_LAPACK_FUNCTIONS)

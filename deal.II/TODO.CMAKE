@@ -1,7 +1,5 @@
 Major:
 
-* Add the rest of the Bug tests
-
 * Update the online documentation on
 
     - How to install deal.II
@@ -31,6 +29,4 @@ Minor:
     source/lac/sparse_dircect.cc
     source/base/path_find.cc
     source/base/function_parser.cc
-
-* HAVE_JN_ ?
 

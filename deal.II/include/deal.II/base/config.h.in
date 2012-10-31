@@ -124,6 +124,9 @@
 /* Defined if you have the `dsygvx_' function. */
 #cmakedefine HAVE_DSYGVX_
 
+/* Defined if you have the `dtrtrs_' function. */
+#cmakedefine HAVE_DTRTRS_
+
 /* Defined if you have the `saxpy_' function. */
 #cmakedefine HAVE_SAXPY_
 
