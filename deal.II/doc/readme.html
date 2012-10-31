@@ -29,12 +29,9 @@
       <li> <a href="#installation">Installation</a>
 	<ul>
 	  <li>  <a href="#unpacking">Unpacking</a>
-	  <li>  <a href="#configuration">Configuring</a>
-	  <li>  <a href="#building">Building the library</a>
-	  <li> <a href="#configuration-options">Configuration options</a>
+	  <li>  <a href="#configuration">Configuring and building the library</a>
+	  <li>  <a href="#configuration-options">Configuration options</a>
             <ul>
-	      <li> <a href="#choose-compiler">Changing the compiler or
-		  compiler flags</a>
 	      <li> <a href="#optional">Selecting optional behavior</a>
 	      <li> <a href="#optional-software">Optional interfaces to
 		  other software packages</a>
@@ -99,38 +96,40 @@
     libraries you need to have the following programs installed:
     <ul>
       <li> <p>
-          Perl: Any Perl 5.x version should work.
-	</p>
-
-      <li> <p>
-          Make: We use <a href="http://www.gnu.org"
-			  target="_top">GNU make</a>, version 3.78 or later. Other make
-          programs (i.e. non-GNU) will usually fail
+          <a href="http://www.gnu.org/software/make/" target="_top">GNU make</a>, version
+          3.78 or later. Non-GNU versions of this program will usually fail
           to work and are not supported.
 	</p>
 
       <li> <p>
-          For debugging programs, we have found that the
-	  <a href="http://www.gnu.org" target="_top">GNU
-	    debugger gdb</a> is a valuable tool. Other options
-	  are <a href="http://www.gnu.org/software/ddd/" target="_top">DDD</a>
-	  and <a href="http://www.kdbg.org/" target="_top">kdbg</a>, both of
-	  which have graphical user interfaces. Most integrated development
-	  environments like <a href="http://www.kdevelop.org/"
-			       target="_top">kdevelop</a> or
-	  <a href="http://eclipse.org/" target="_top">Eclipse</a> have built
-	  in debuggers as well.
+          <a href="http://www.cmake.org/" target="_top">CMake</a> version 2.8.8 or later.
 	</p>
 
       <li> <p>
-          In case you want to generate the documentation locally on your
-	  machine from the header <acronym>deal.II</acronym> files, you need a
-	  copy of <a href="http://www.doxygen.org/" target="_top">doxygen</a>
+          <a href="http://www.perl.org/" target="_top">Perl 5.x</a>.
+	</p>
+
+      <li> <p>
+          For debugging programs, we have found that the
+	  <a href="http://www.gnu.org/software/gdb/" target="_top">GNU
+	    debugger GDB</a> is a invaluable tool. GDB is a text-based tool
+	    not always easy to use; <a href="http://www.kdbg.org/"
+	    target="_top">kdbg</a>, is one of many graphical user interfaces
+	    for it. Most integrated development environments
+	    like <a href="http://www.kdevelop.org/" target="_top">kdevelop</a>
+	    or <a href="http://eclipse.org/" target="_top">Eclipse</a> have built
+	    in debuggers as well.
+	</p>
+
+      <li> <p>
+          To generate the documentation locally on your
+	  machine from the <acronym>deal.II</acronym> header files, you need
+	  <a href="http://www.doxygen.org/" target="_top">doxygen</a>
 	  on your machine. If not, you can still work with the library and
-	  use the documentation provided on our homepage for reference. Note
-          that in order to generate inheritance graphs for classes, doxygen
-          can use the <code>dot</code> program, which is part of the <a
-									href="http://www.graphviz.org" target="_top">GraphViz</a>
+	  use the documentation provided on our homepage for reference.
+          In order to generate inheritance graphs for classes, doxygen
+          can use the <code>dot</code> program, which is part of the
+	  <a href="http://www.graphviz.org" target="_top">GraphViz</a>
           package. If this program is not available, then doxygen attempts to
           generate text-mode graphs; these are much less nice, though.
 	</p>
@@ -178,100 +177,73 @@
 
     <a name="unpacking"></a>
     <h3>Unpacking</h3>
-    The whole library usually comes as a .tar.gz file, that is a
-    tarred file archive which is compressed with gzip. After downloading this
-    tar file, please unpack it at the position where you want to install the
-    deal.II library using either
-    <pre>
-
-      gunzip deal.II-X.Y.Z.tar.gz
-      tar xf deal.II-X.Y.Z.tar
-    </pre>
-    or, if you have GNU tar with
-    <pre>
-
-      tar xzf deal.II-X.Y.Z.tar.gz
-    </pre>
-    Unpacking will create a subdirectory <tt>deal.II</tt> with
-    the whole library wherever you do it. Since deal.II does not have
-    a <tt>make install</tt> which would copy the libraries to a final position,
-    this subdirectory is where the built library will reside.
-
-    <a name="configuration"></a>
-    <h3>Configuration</h3>
 
     <p>
-      Unpacking will create a subdirectory <tt>deal.II</tt>. First run
+      The whole library usually comes as a .tar.gz file, that is a
+      tarred file archive which is compressed with gzip. After downloading it,
+      unpack it using either
       <pre>
 
-	cd deal.II
-	./configure
+	gunzip deal.II-X.Y.Z.tar.gz
+	tar xf deal.II-X.Y.Z.tar
       </pre>
-      to set some paths and find out your system parameters. <tt>configure</tt>
-      supports several flags which are discussed
-      further down <a href="#configuration-options">below</a>.
+      or, if you have GNU tar with
+      <pre>
+
+	tar xzf deal.II-X.Y.Z.tar.gz
+      </pre>
+      <b>Note:</b> You will want to hang on to the source files
+      of <acronym>deal.II</acronym> after installation as it makes developing
+      much simpler. Consequently, you should do the steps above in a permanent
+      directory, not on <code>/tmp</code> as one often does when installing
+      software.
+    </p>
+
+    <a name="configuration"></a>
+    <h3>Configuring and building the library</h3>
+
+    <p>
+      <acronym>deal.II</acronym> uses the
+      <a href="http://www.cmake.org/" target="_top">CMake</a>
+      integrated configuration and build system. Unpacking will create a
+      subdirectory <tt>deal.II/</tt> in the current directory. Then do the
+      following steps:
+      <pre>
+
+	mkdir build
+	cd build
+	cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+	make
+	make install
+      </pre>
+      These steps compile, link and install the deal.II libraries and should
+      take between a few minutes and an hour. Note the following:
+      <ul>
+	<li> <code>/path/install/dir</code> is the directory where you want to
+	  install the deal.II header files and libraries to. This can be a
+	  directory in your home directory (e.g., <code>~/bin</code>) or a
+	  directory such as <code>/usr</code> if you have root privileges.
+
+	<li> If your machine has multiple processors, use <code>make -jN</code> in
+	  the last two steps where <code>N</code> is the number of processors you
+	  want <code>make</code> to use at any given
+	  time. Allowing <code>make</code> to use more processors (assuming
+	  you have that many) will greatly accelerate building the library.
+
+	<li>The <acronym>deal.II</acronym> <code>cmake</code> system can accept a
+	  significant number of configuration parameters. See the
+	  discussion <a href="#configuration-options">below</a>.
+      </ul>
     </p>
 
     <p>
-      <code>./configure</code> creates the
-      file <code>deal.II/common/Make.global_options</code>,
-      which remembers paths and configuration options. Please note that it is not
-      possible to move the library directory after configuration. Neither will
-      the library compile, nor will your application programs be able to use it.
-      You can
-      use <code>deal.II/common/Make.global_options</code> in the
-      <a href="development/index.html" target="_top">Makefiles
-	of your own projects</a> to set relevant paths and parameters correctly.
-    </p>
-
-    <a name="building"></a>
-    <h3>Building the library</h3>
-    After configuring, type <tt>make</tt>, to obtain the following help (this
-    output may change slightly over time, just try it):
-
-    <pre>
-      ========================================================================
-      =              Global Makefile for the deal.II libraries               =
-      ========================================================================
-      =                                                                      =
-      = The following targets exist:                                         =
-      =    all        : debug and optimized libraries                        =
-      =    debug      : the debug version of the deal.II library             =
-      =    optimized  : the optimized version of the deal.II library         =
-      =                                                                      =
-      =    contrib    : additional libraries in contrib, if there are any    =
-      =                                                                      =
-      =    online-doc : generate the documentation in HTML format            =
-      =    TODO       : create a "TODO" file from the source files           =
-      =    TAGS       : create a TAGS file from include and source files     =
-      =                                                                      =
-      =    clean      : removes all object files in subdirs                  =
-      =    distclean  : removes all object files, libraries, etc in subdirs  =
-      ========================================================================
-    </pre>
-
-    <p>
-      To execute one of the commands, type for example <code>make
-	all</code>. Building all libraries takes somewhere between 4 minutes
-      and several hours, depending on the number of processors your machine
-      has, and requires about 2 GB of free disk space. If you have a
-      multi-processor machine, you can call <code>make -j16 all</code>
-      to let <code>make</code> call multiple instances of the compiler
-      (in this case sixteen). This speeds up compilation by about
-      the factor given after <code>-j</code>, at least if you have as many
-      processors.
-    </p>
-
-    <p>
-      The <acronym>deal.II</acronym> libraries come in two versions
-      corresponding to their respective targets:
+      The commands above build and install the <acronym>deal.II</acronym>
+      libraries in two variants:
       <ul>
 	<li>
-	  <p><code>lib/libdeal_II.g</code>: This is the
-	    debug version of the library. It is compiled with compiler flags so
-	    that the library contains information that can be used by debuggers. (The
-	    infix <code>.g</code> was historically chosen because gcc uses the
-	    flag <code>-g</code> to request debugging information).
+	  <p><i>Debug mode</i>: This version of the
+	    library is compiled with compiler flags so
+	    that the library contains information that can be used by debuggers.
 	  </p>
 
 	  <p>
@@ -281,35 +253,28 @@
 	    invaluable means to finding programming bugs since they will
 	    almost always abort your program if something goes wrong. In our
 	    experience, more than ninety per cent of all errors are invalid
-	    parameters (such as vectors having the wrong size, etc) and they
-	    are usually found almost instantaneously displaying the file
+	    parameters (such as vectors having the wrong size, etc.) and they
+	    are usually found almost instantaneously, displaying the file
 	    name and line number of where the problem occurred.
 	  </p>
 
-	<li> <p><code>lib/libdeal_II</code>: This is the
-	    optimized version of the library. You will want to link with it
-	    once you know that your program is working as expected. This
-	    version of the library does not contain the safety checks any more
+	<li> <i>Optimized mode</i>: You will want to link with this version of
+	    the library once you know that your program is working as
+	    expected. It does not contain the safety checks any more
 	    and is compiled with aggressive compiler optimizations. The
 	    resulting executables are smaller and will run between 2 and 10
 	    times faster than the debug executables.
 	  </p>
       </ul>
-      Each library file will have a suffix that depends on the system.
-      If static libraries were requested during
-      configuration, then the suffix is <code>.a</code>. For shared
-      libraries, it is <code>.so</code> (for most Unix-like and Linux
-      systems), <code>.dylib</code> (for Mac OS X), or <code>.dll</code>
-      (for Cygwin/Windows).
     </p>
 
     <p>
-      Apart from the libraries, you can generate the full set of
-      documentation files, by typing <code>make online-doc</code>; this takes
-      some minutes but you will
-      have (almost) all the documentation locally on your computer. You
-      will then be able to access it through <a
-						href="documentation.html" target="body">this page</a>.
+      Apart from the libraries, the steps above install all necessary header
+      files you need to develop programs based on <acronym>deal.II</acronym>
+      as well as generate the full set of
+      documentation files so that it can be used locally on your computer. You
+      will then be able to access it through
+      <a href="documentation.html" target="body">this page</a>.
     </p>
 
     <p>
@@ -322,51 +287,6 @@
 
     <a name="configuration-options"></a>
     <h3>Configuration options</h3>
-
-    <a name="choose-compiler"></a>
-    <h4>Changing the compiler or compiler flags</h4>
-
-    To instruct <code>configure</code> to use a particular compiler, there are two
-    options: first, you can prepend your search path by the directory
-    of the desired compiler. Alternatively, if your full compiler paths are
-    <tt>mycc</tt> and <tt>myc++</tt> (for example) for your C and C++ compilers,
-    respectively, type into your <tt>csh</tt>:
-    <pre>
-      setenv CC  mycc
-      setenv CXX myc++
-      ./configure
-    </pre>
-    or into your <tt>bash</tt>
-    <pre>
-      export CC=mycc
-      export CXX=myc++
-      ./configure
-    </pre>
-
-    <p>
-      The paths to these compilers are stored in the
-      <code>common/Make.global_options</code> files, so the compilers
-      are always used when compiling the library even if the environment
-      variables are not set later on any more (for example if you are working
-      within another window, or have unset the variables for other
-      purposes).
-    </p>
-
-    <p>
-      If all you want to do is pass different compiler flags to the
-      compiler, set the standard environment variables <code>CXXFLAGS,
-	CFLAGS, LDFLAGS</code> before calling
-      <code>./configure</code>. For example, to produce
-      <code>gprof</code> output, do:
-      <pre>
-	setenv CXXFLAGS -pg
-	setenv LDFLAGS -pg
-	./configure &lt;configure-options&gt;
-      </pre>
-      The flags so set are used for both optimized and debug mode. If you want to
-      set flags for only one of these two cases, you should
-      set <code>CXXFLAGSO</code> or <code>CXXFLAGSG</code>, respectively.
-    </p>
 
 
     <a name="optional">
@@ -736,18 +656,11 @@
     </p>
 
     <p>
-      For specific problems, send email to either
-      <tt>Wolfgang.Bangerth</tt>, <tt>Timo.Heister</tt>,
-      <tt>Guido.Kanschat</tt>, or simply <tt>authors</tt> at
-      <tt>dealii.org</tt>.
-    </p>
-
-    <p>
       We are interested in any feedback, whether positive or negative,
       in order to determine the directions of future work on the
       library. We are also very much interested in incorporating any
       work and bug fixes by third parties into the library. Of course,
-      you will be credited for this on our home page.
+      you will be credited for this on the <a href="authors.html">authors page</a>.
     </p>
 
     <p>
