@@ -493,6 +493,9 @@
 /* Defined if you have the "times" function. */
 #cmakedefine HAVE_TIMES
 
+/* Defined if you have the "jn" function. */
+#cmakedefine HAVE_JN
+
 
 /* Defined if deal.II was configured on a native Windows platform. */
 #cmakedefine DEAL_II_MSVC
