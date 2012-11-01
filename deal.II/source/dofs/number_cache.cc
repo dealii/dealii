@@ -28,6 +28,14 @@ namespace internal
     {}
 
 
+    void NumberCache::clear ()
+    {
+      n_global_dofs = 0;
+      n_locally_owned_dofs = 0;
+      locally_owned_dofs.clear();
+      n_locally_owned_dofs_per_processor.clear();
+      locally_owned_dofs_per_processor.clear();
+    }
 
     std::size_t
     NumberCache::memory_consumption () const
