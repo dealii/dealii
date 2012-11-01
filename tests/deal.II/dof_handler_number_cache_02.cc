@@ -12,8 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-// Check that DoFHandler::clear() clears the numbercache (a bug right now)
-
+// Check that DoFHandler::clear() clears the NumberCache (a bug that is now fixed)
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
