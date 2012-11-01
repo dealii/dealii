@@ -163,11 +163,7 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
                                       * directly, but only its derived
                                       * classes.
                                       */
-    virtual ~SparseLUDecomposition ()
-#ifndef DEAL_II_IMPLEMENTED_PURE_FUNCTION_BUG
-      = 0
-#endif
-    ;
+    virtual ~SparseLUDecomposition () = 0;
 
                                      /**
                                       * Deletes all member

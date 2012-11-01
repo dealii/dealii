@@ -609,9 +609,6 @@ class Tensor<1,dim,Number>
                                       */
     Number values[(dim!=0) ? (dim) : 1];
 
-#ifdef DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND
-  public:
-#endif
                                      /**
                                       * Help function for unroll. If
                                       * we have detected an access
