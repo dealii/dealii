@@ -415,6 +415,11 @@
  */
 #cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
 
+/* Defined if the compiler refuses to allow the explicit specialization of
+ * static member variables.
+ */
+#cmakedefine DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
+
 /* Defined if the compiler does not honor the explicit keyword on template
  * constructors.
  */

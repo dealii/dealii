@@ -202,6 +202,37 @@ CHECK_CXX_COMPILER_BUG(
   DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
   )
 
+#
+# Many compilers get this wrong (see Section 14.7.3.1, number (4)):
+#
+#   template <int dim> struct T {
+#     static const int i;
+#   };
+#
+#   template <> const int T<1>::i;
+#   template <> const int T<1>::i = 1;
+#
+# First, by Section 14.7.3.14 of the standard, the first template<>
+# line must necessarily be the _declaration_ of a specialization,
+# and the second is then its definition. There is therefore no
+# reason to report a doubly defined variable (Intel ICC 6.0), or
+# to choke on these lines at all (Sun Forte)
+#
+# - Wolfgang Bangerth, Matthias Maier, rewritten 2012
+#
+CHECK_CXX_COMPILER_BUG(
+  "
+  template <int dim> struct T
+  {
+    static const int i;
+  };
+  template <> const int T<1>::i;
+  template <> const int T<1>::i = 1;
+  int main() {return 0;}
+  "
+  DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
+  )
+
 
 #
 # Some older versions of gcc compile this, despite the 'explicit'
