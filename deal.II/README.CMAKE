@@ -218,7 +218,7 @@ CONFIGURATION
       always an exception, isn't it?) DEAL_II_FORCE_BUNDLED_<library> forces
       the use of the bundled library.
 
-  The option DEAL_II_FORCE_BUNDLED_(BOOST|FUNCTIONPARSER|TBB|UMFPACK)
+  The option DEAL_II_FORCE_BUNDLED_(BOOST|FUNCTIONPARSER|THREADS|UMFPACK)
   forces the use of the bundled  library regardless whether
   DEAL_II_ALLOW_BUNDLED is set to OFF or an external library is found.
 
