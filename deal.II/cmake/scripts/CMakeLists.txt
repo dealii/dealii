@@ -21,8 +21,8 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
 
   INCLUDE_DIRECTORIES(
-    ${CMAKE_SOURCE_DIR}/include/
     ${CMAKE_BINARY_DIR}/include/
+    ${CMAKE_SOURCE_DIR}/include/
     )
 
   ADD_EXECUTABLE(make_dependencies make_dependencies.cc)
