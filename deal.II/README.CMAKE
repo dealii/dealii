@@ -751,9 +751,6 @@ DEVELOPMENT
   A file cmake/configure/configure_<feature>.cmake defining how to
   configure <feature>:
 
-    DEAL_II_WITH_<FEATURE> (bool, mandatory)
-       An option for enabling or disabling the configuration of <feature>.
-
     FEATURE_<FEATURE>_DEPENDS (variable, optional)
        a variable which contains an optional list of other features
        this feature depends on (and which have to be enbled for this feature
@@ -770,7 +767,7 @@ DEVELOPMENT
     FEATURE_<FEATURE>_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
        which should setup all necessary configuration for the feature with
        external dependencies. var set to TRUE indicates success,
-       otherwise this script gives an error.
+       otherwise this script should issue a FATAL_ERROR.
 
     FEATURE_<FEATURE>_CONFIGURE_BUNDLED(var)  (macro, optional)
        which should setup all necessary configuration for the feature with
@@ -781,7 +778,7 @@ DEVELOPMENT
        is set up, or be undefined.
 
     FEATURE_<FEATURE>_ERROR_MESSAGE()  (macro, optional)
-       which should print a meaningful error message (with SEND_ERROR) for
+       which should print a meaningful error message (with FATAL_ERROR) for
        the case that no external library was found (and bundled is not
        allowed to be used.) If not defined, a suitable default error message
        will be printed.

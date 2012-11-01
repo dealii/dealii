@@ -22,11 +22,6 @@
 # For a feature ${feature} (written in all caps) the following options,
 # variables and macros have to be defined (except marked as optional):
 #
-# DEAL_II_WITH_${feature} (bool, mandatory)
-#    If DEAL_II_FEATURE_AUTODETECTION is OFF, this boolean determines
-#    whether the feature will be configured.
-#    If DEAL_II_FEATURE_AUTODETECTION is ON, this boolean will
-#    automatically be set if configuring the feature was successful.
 #
 # FEATURE_${feature}_DEPENDS (variable, optional)
 #    a variable which contains an optional list of other features
@@ -42,7 +37,7 @@
 # FEATURE_${feature}_CONFIGURE_BUNDLED(var)  (macro, optional)
 #    which should setup all necessary configuration for the feature with
 #    bundled source dependencies. var set to TRUE indicates success,
-#    otherwise this script gives an error.
+#    otherwise this script should issue a FATAL_ERROR.
 #
 # FEATURE_${feature}_FIND_EXTERNAL(var)  (macro, mandatory)
 #    which should set var to TRUE if all dependencies for the feature are
