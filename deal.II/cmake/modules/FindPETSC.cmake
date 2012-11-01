@@ -193,6 +193,12 @@ IF(PETSC_FOUND)
 
   SET(PETSC_VERSION "${PETSC_VERSION_MAJOR}.${PETSC_VERSION_MINOR}.${PETSC_VERSION_SUBMINOR}")
 
+  IF (${PETSC_VERSION_MAJOR} LESS 3)
+    MESSAGE (FATAL_ERROR "************************************************\n"
+                         "Only PETSc versions 3.0 and later are supported!\n"
+                         "************************************************\n")
+  ENDIF()
+
   MARK_AS_ADVANCED(
     PETSC_ARCH
     PETSC_DIR
