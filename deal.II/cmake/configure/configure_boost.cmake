@@ -17,11 +17,11 @@
 #
 
 #
-# This configure script has to be included after configure_tbb.
+# This configure script has to be included after configure_threads.
 # We need some of the variables defined in SETUP_THREADING for
 # the setup of the bundled boost library (if used)
 #
-IF(NOT FEATURE_TBB_PROCESSED)
+IF(NOT FEATURE_THREADS_PROCESSED)
   MESSAGE(FATAL_ERROR "\n"
     "Internal build system error:\n"
     "configure_boost.cmake included before configure_tbb.cmake\n\n"

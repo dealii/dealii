@@ -12,14 +12,24 @@
 ##
 #####
 
+
 #
-# Configuration for tbb support:
+# Configuration for thread support in deal.II with the help of the tbb
+# library:
 #
 
+
+#
+# Default to off
+#
+SET(DEAL_II_WITH_THREADS
+  OFF # Default to off
+  CACHE BOOL "Build deal.II with threading support." FORCE
+  )
 
 #
 # Set up genereal threading:
-# The macro will be included in CONFIGURE_FEATURE_TBB_EXTERNAL/BUNDLED.
+# The macro will be included in CONFIGURE_FEATURE_THREADS_EXTERNAL/BUNDLED.
 #
 MACRO(SETUP_THREADING var)
   FIND_PACKAGE(Threads)
@@ -114,7 +124,7 @@ ENDMACRO()
 # Set up the tbb library:
 #
 
-MACRO(FEATURE_TBB_FIND_EXTERNAL var)
+MACRO(FEATURE_THREADS_FIND_EXTERNAL var)
   FIND_PACKAGE(TBB)
 
   IF(TBB_FOUND)
@@ -123,7 +133,7 @@ MACRO(FEATURE_TBB_FIND_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
+MACRO(FEATURE_THREADS_CONFIGURE_EXTERNAL var)
   INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -150,7 +160,7 @@ MACRO(FEATURE_TBB_CONFIGURE_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(FEATURE_TBB_CONFIGURE_BUNDLED var)
+MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED var)
   #
   # Setup threading (before configuring our build...)
   # and if successfull return TRUE:
@@ -177,4 +187,4 @@ MACRO(FEATURE_TBB_CONFIGURE_BUNDLED var)
 ENDMACRO()
 
 
-CONFIGURE_FEATURE(TBB)
+CONFIGURE_FEATURE(THREADS)

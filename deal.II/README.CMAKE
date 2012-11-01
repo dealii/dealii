@@ -188,7 +188,7 @@ CONFIGURATION
     DEAL_II_WITH_SLEPC
         Build deal.II with support for SLEPc
 
-    DEAL_II_WITH_TBB
+    DEAL_II_WITH_THREADS
         Build deal.II with support for tbb. This will enable thread support in deal.II
 
     DEAL_II_WITH_TRILINOS
