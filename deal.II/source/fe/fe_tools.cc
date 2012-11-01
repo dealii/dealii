@@ -121,9 +121,6 @@ namespace
                                    // them. used to initialize
                                    // fe_name_map below
   template <int dim>
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-    static
-#endif
   std::map<std::string,std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> > >
   get_default_fe_names ()
   {
@@ -1209,7 +1206,7 @@ namespace FETools
             std::vector<Point<dim> > q_points_coarse(q_points_fine.size());
             for (unsigned int q=0;q<q_points_fine.size();++q)
                 for (unsigned int j=0;j<dim;++j)
-                    q_points_coarse[q](j) = q_points_fine[q](j);            
+                    q_points_coarse[q](j) = q_points_fine[q](j);
 	    Quadrature<dim> q_coarse (q_points_coarse,
 				      fine.get_JxW_values());
 	    FEValues<dim,spacedim> coarse (mapping, fe, q_coarse, update_values);

@@ -56,9 +56,6 @@ namespace FE_Q_Helper
                                      // given a permutation array,
                                      // compute and return the inverse
                                      // permutation
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-    static
-#endif
     inline
     std::vector<unsigned int>
     invert_numbering (const std::vector<unsigned int> &in)
@@ -77,9 +74,6 @@ namespace FE_Q_Helper
                                 // performance reasons. this clears a
                                 // dim-array
     template <int dim>
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-    static
-#endif
     inline
     void
     zero_indices (unsigned int indices[dim])
@@ -96,9 +90,6 @@ namespace FE_Q_Helper
                                 // performance reasons. this increments tensor
                                 // product indices
     template <int dim>
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-    static
-#endif
     inline
     void
     increment_indices (unsigned int       indices[dim],
@@ -123,9 +114,6 @@ namespace FE_Q_Helper
                                 // creates them from dim-dimensional support
                                 // points.
     template <int dim>
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-    static
-#endif
     inline
     std::vector<Polynomials::Polynomial<double> >
     generate_poly_space1d (const std::vector<Point<dim> >  &unit_support_points,
