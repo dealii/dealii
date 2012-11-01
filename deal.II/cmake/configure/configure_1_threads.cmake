@@ -20,14 +20,6 @@
 
 
 #
-# Default to off
-#
-SET(DEAL_II_WITH_THREADS
-  OFF # Default to off
-  CACHE BOOL "Build deal.II with threading support." FORCE
-  )
-
-#
 # Set up genereal threading:
 # The macro will be included in CONFIGURE_FEATURE_THREADS_EXTERNAL/BUNDLED.
 #
