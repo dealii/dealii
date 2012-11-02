@@ -286,7 +286,7 @@ namespace TrilinosWrappers
  * for the relaxation parameter, 0 for the diagonal augmentation and 0
  * for the overlap.
  *
- * Note that a parallel applicatoin of the SSOR preconditioner is
+ * Note that a parallel application of the SSOR preconditioner is
  * actually a block-Jacobi preconditioner with block size equal to the
  * local matrix size. Spoken more technically, this parallel operation
  * is an <a
@@ -414,7 +414,7 @@ namespace TrilinosWrappers
  * for the relaxation parameter, 0 for the diagonal augmentation and 0
  * for the overlap.
  *
- * Note that a parallel applicatoin of the SOR preconditioner is
+ * Note that a parallel application of the SOR preconditioner is
  * actually a block-Jacobi preconditioner with block size equal to the
  * local matrix size. Spoken more technically, this parallel operation
  * is an <a
@@ -551,7 +551,7 @@ namespace TrilinosWrappers
  * for the absolute augmentation tolerance, 1 for the relative
  * augmentation tolerance, 0 for the overlap.
  *
- * Note that a parallel applicatoin of the IC preconditioner is
+ * Note that a parallel application of the IC preconditioner is
  * actually a block-Jacobi preconditioner with block size equal to the
  * local matrix size. Spoken more technically, this parallel operation
  * is an <a
@@ -720,7 +720,7 @@ namespace TrilinosWrappers
  * for the absolute augmentation tolerance, 1 for the relative
  * augmentation tolerance, 0 for the overlap.
  *
- * Note that a parallel applicatoin of the ILU preconditioner is
+ * Note that a parallel application of the ILU preconditioner is
  * actually a block-Jacobi preconditioner with block size equal to the
  * local matrix size. Spoken more technically, this parallel operation
  * is an <a
@@ -890,7 +890,7 @@ namespace TrilinosWrappers
  * for the absolute augmentation tolerance, 1 for the relative augmentation
  * tolerance, 0 for the overlap.
  *
- * Note that a parallel applicatoin of the ILU-T preconditioner is
+ * Note that a parallel application of the ILU-T preconditioner is
  * actually a block-Jacobi preconditioner with block size equal to the
  * local matrix size. Spoken more technically, this parallel operation
  * is an <a
@@ -1044,7 +1044,7 @@ namespace TrilinosWrappers
  * The AdditionalData data structure allows to set preconditioner
  * options.
  *
- * Note that a parallel applicatoin of the block direct solve
+ * Note that a parallel application of the block direct solve
  * preconditioner is actually a block-Jacobi preconditioner with block
  * size equal to the local matrix size. Spoken more technically, this
  * parallel operation is an <a
