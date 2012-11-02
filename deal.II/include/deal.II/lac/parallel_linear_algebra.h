@@ -26,8 +26,7 @@ namespace LinearAlgebraDealII
 
   typedef SparseMatrix<double> SparseMatrix;
 
-  
-  
+  typedef PreconditionSSOR<SparseMatrix > PreconditionSSOR;
   
 }
 
@@ -40,6 +39,7 @@ DEAL_II_NAMESPACE_CLOSE
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
 #include <deal.II/lac/petsc_precondition.h>
 
@@ -49,6 +49,16 @@ DEAL_II_NAMESPACE_OPEN
   {
     using namespace dealii;
 
+  typedef PETScWrappers::Vector Vector;
+  typedef PETScWrappers::BlockVector BlockVector;
+
+  typedef PETScWrappers::SparseMatrix SparseMatrix;
+    typedef PETScWrappers::PreconditionSSOR PreconditionSSOR;
+    
+
+    namespace MPI
+    {
+      
     /**
      * Typedef for the vector type used.
      */
@@ -88,6 +98,8 @@ DEAL_II_NAMESPACE_OPEN
      * for other blocks of the system matrix.
      */
     typedef PETScWrappers::PreconditionILU PreconditionILU;
+    }
+    
   }
 DEAL_II_NAMESPACE_CLOSE
 
@@ -106,7 +118,9 @@ DEAL_II_NAMESPACE_OPEN
   namespace LinearAlgebraTrilinos
   {
     using namespace dealii;
-
+    namespace MPI
+    {
+      
     /**
      * Typedef for the vector type used.
      */
@@ -146,6 +160,8 @@ DEAL_II_NAMESPACE_OPEN
      * for other blocks of the system matrix.
      */
     typedef TrilinosWrappers::PreconditionILU PreconditionILU;
+    }
+    
   }
 
 DEAL_II_NAMESPACE_CLOSE
