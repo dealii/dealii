@@ -35,6 +35,8 @@
 	      <li> <a href="#optional">Selecting optional behavior</a>
 	      <li> <a href="#optional-software">Optional interfaces to
 		  other software packages</a>
+	      <li> <a href="#conf-details">More information on configuring
+		  and building the library</a>
 	    </ul>
 	</ul>
       <li> <a href="#problems">Problems, questions, mailing lists</a>
@@ -604,6 +606,17 @@
     </dl>
 
 
+    <a name="conf-details"></a>
+    <h4>More information on configuring and building the library</h4>
+
+    <p>
+      The <acronym>deal.II</acronym> <code>cmake</code> system allows far
+      greater control over what exactly is configured or built than just the
+      outline above. If you want to learn more about this, take a look
+      <a href="cmake.html">here</a>.
+    </p>
+
+
     <a name="problems"></a>
     <h2>Problems, questions, mailing lists</h2>
 
@@ -669,14 +682,19 @@
       </ul>
 
     <p>
-      <acronym>deal.II</acronym> can interface with a number of <a
-								   href="#external-libs">other packages</a> that you have to install
+      <acronym>deal.II</acronym> can interface with a number of
+      <a href="#optional-software">other packages</a> that you have to install
       yourself. They are, of course, covered by their own licenses. In addition,
-      deal.II comes with copies of <a
-				      href="http://www.cise.ufl.edu/research/sparse/umfpack/">UMFPACK</a> and
-      <a href="http://warp.povusers.org/FunctionParser/">FunctionParser</a>,
-      courtesy of their authors. UMFPACK and FunctionParser are covered by their
-      own licenses; please refer to their webpages to read them.
+      deal.II comes bundled with copies of
+      <a href="http://www.cise.ufl.edu/research/sparse/umfpack/"
+	 target="_top">UMFPACK</a>,
+      <a href="http://threadingbuildingblocks.org/"
+	 target="_top">Threading Building Blocks</a>,
+      <a href="http://www.boost.org/" target="_top">BOOST</a>
+      and
+      <a href="http://warp.povusers.org/FunctionParser/" target="_top">FunctionParser</a>,
+      courtesy of their authors. These are also covered by their
+      own licenses; please refer to their webpages for more information.
 
       <hr>
 

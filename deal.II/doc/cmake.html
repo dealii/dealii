@@ -1,3 +1,21 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>The deal.II Readme</title>
+    <link href="screen.css" rel="StyleSheet">
+    <meta name="author" content="the deal.II authors <authors @ dealii.org>">
+    <meta name="copyright" content="Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors">
+    <meta name="date" content="$Date$">
+    <meta name="svn_id" content="$Id$">
+    <meta name="keywords" content="deal.II">
+  </head>
+
+  <body>
+
+
+    <h1>Details on the <acronym>deal.II</acronym> configuration and build system</h1>
+
 
 
 
@@ -66,8 +84,8 @@ INTRODUCTION
   The philosophy
   ==============
 
-          »I need a new keyboard, my CAPS-KEY is stuck because of writing all
-           this cmake script...«
+          I need a new keyboard, my CAPS-KEY is stuck because of writing all
+           this cmake script...
 
 
   Quick start
@@ -96,7 +114,7 @@ INTRODUCTION
     or at the prompt via:
 
       ( $ cd build )
-        $ cmake -D<OPTION>=<VALUE> [...] path/to/source/tree
+        $ cmake -D&lt;OPTION&gt;=&lt;VALUE&gt; [...] path/to/source/tree
 
   * Configure with autodetection, afterwards disable a feature:
 
@@ -108,8 +126,8 @@ INTRODUCTION
   * Build and install only a specific component:
 
       ( $ cd build )
-        $ make <component>
-        $ cmake -DCOMPONENT=<component> -P build/cmake_install.cmake
+        $ make &lt;component&gt;
+        $ cmake -DCOMPONENT=&lt;component&gt; -P build/cmake_install.cmake
 
   * The build system cmake generates allows fine grained control. It is
     e.g. possible to only compile a single file:
@@ -215,7 +233,7 @@ CONFIGURATION
 
     - If set to OFF bundled libraries will not be used and the dependency
       resolution will fail if there is no external library. EXCEPT (there is
-      always an exception, isn't it?) DEAL_II_FORCE_BUNDLED_<library> forces
+      always an exception, isn't it?) DEAL_II_FORCE_BUNDLED_&lt;library&gt; forces
       the use of the bundled library.
 
   The option DEAL_II_FORCE_BUNDLED_(BOOST|FUNCTIONPARSER|THREADS|UMFPACK)
@@ -225,29 +243,29 @@ CONFIGURATION
   REMARKS:
 
   - To ensure that no bundled library is used at all DEAL_II_ALLOW_BUNDLED,
-    as well as every DEAL_II_FORCE_BUNDLED_<library> have to be set to OFF.
+    as well as every DEAL_II_FORCE_BUNDLED_&lt;library&gt; have to be set to OFF.
 
-  - DEAL_II_FORCE_BUNDLED_<library>=ON will _not_ automatically enable the
-    corresponding DEAL_II_WITH_<feature> toggle. This has to be set
+  - DEAL_II_FORCE_BUNDLED_&lt;library&gt;=ON will _not_ automatically enable the
+    corresponding DEAL_II_WITH_&lt;feature&gt; toggle. This has to be set
     separately.
 
 
   Auto configuration:
 
-  As long as DEAL_II_WITH_<FEATURE> is not set to ON or OFF in the cache it
-  will be automatically configured. If a toggle DEAL_II_WITH_<FEATURE> is
+  As long as DEAL_II_WITH_&lt;FEATURE&gt; is not set to ON or OFF in the cache it
+  will be automatically configured. If a toggle DEAL_II_WITH_&lt;FEATURE&gt; is
   defined it won't be altered.
   This means that the very first configuration run will set all (at that
   moment) available features to ON and the rest to OFF. In all subsequent
-  configuration steps DEAL_II_WITH_<FEATURE> have to be changed by hand.)
+  configuration steps DEAL_II_WITH_&lt;FEATURE&gt; have to be changed by hand.)
 
   This behaviour can be controlled via the variables:
 
     - DISABLE_AUTODETECTION=ON: This will disable any autoconfiguration by
-      setting undefined DEAL_II_WITH_<FEATURE> toggles to OFF:
+      setting undefined DEAL_II_WITH_&lt;FEATURE&gt; toggles to OFF:
 
     - FORCE_AUTODETECTION=ON: This will force the reconfiguration of every
-      feature by undefining DEAL_II_WITH_<FEATURE> prior to configuration,
+      feature by undefining DEAL_II_WITH_&lt;FEATURE&gt; prior to configuration,
       effectively overwriting _any_ supplied or cached value.
 
 
@@ -264,14 +282,14 @@ CONFIGURATION
       libraries from ~/workspace/local will be preferred for dependency
       resolution.
 
-  2.) Hints given by <library>_DIR via command line or environment for
+  2.) Hints given by &lt;library&gt;_DIR via command line or environment for
       _some_ libraries:
 
           $ cmake -DP4EST_DIR=~/workspace/p4est-install/ ../deal.II
       or
           $ export P4EST_DIR=~/workspace/p4est-install/
           $ cmake ../deal.II
-      where -D<library>_DIR takes precedence over environment.
+      where -D&lt;library&gt;_DIR takes precedence over environment.
 
       Currently, the following variables will be considered:
 
@@ -285,11 +303,11 @@ CONFIGURATION
   3.) The system default locations for libraries and includes.
 
 
-  Alternatively, cached variables set by the Find<Module> mechanism may be
+  Alternatively, cached variables set by the Find&lt;Module&gt; mechanism may be
   set, hinted or overwritten directly!
 
-  These variables are usually called <library>_INCLUDE_DIR(|S) and
-  <library>_(LIBRARY|LIBRARIES) (highly dependend of the actual library...).
+  These variables are usually called &lt;library&gt;_INCLUDE_DIR(|S) and
+  &lt;library&gt;_(LIBRARY|LIBRARIES) (highly dependend of the actual library...).
 
   You can get a list via
 
@@ -360,7 +378,7 @@ CONFIGURATION
   for overwriting a flag. E.g.: -Wsign-compare, set by the build system,
   can be overwritten by specifying:
 
-    $ cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" <...>
+    $ cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
 
 
   The build can be further controlled by the following variables:
@@ -432,7 +450,7 @@ How to use deal.II in your cmake project
   Either by directly specifying deal.II_DIR to point to the path were the
   deal.IIConfig.cmake files are located:
 
-    $ cmake -Ddeal.II_DIR=/path/to/the/config/file <...>
+    $ cmake -Ddeal.II_DIR=/path/to/the/config/file &lt;...&gt;
 
   Or by specifying a search path via CMAKE_PREFIX_PATH, e.g.
 
@@ -504,7 +522,7 @@ How to use deal.II in your cmake project
       A cached variable ensures that we can later switch the build type
       by editing the cache:
 
-        $ ccmake <...> or $ make edit_cache
+        $ ccmake &lt;...&gt; or $ make edit_cache
 
     - Often, it is a good idea to use the same compiler and linker
       flags as the deal.II library.
@@ -611,8 +629,8 @@ DEVELOPMENT
 
   All with the following (internal) logic:
    - name without _DEBUG or _RELEASE: Used for all targets
-   - <...>_DEBUG: _additionally_ used for debug targets
-   - <...>_RELEASE: _additionally_ used for release targets
+   - &lt;...&gt;_DEBUG: _additionally_ used for debug targets
+   - &lt;...&gt;_RELEASE: _additionally_ used for release targets
 
 
   For internal use:
@@ -639,7 +657,7 @@ DEVELOPMENT
       DEAL_II_DEFINITIONS_DEBUG
       DEAL_II_DEFINITIONS_RELEASE
 
-          For setting necessary preprocessor definitions ("-D<...>") for
+          For setting necessary preprocessor definitions ("-D&lt;...&gt;") for
           the compilation of the deal.II library
 
 
@@ -689,23 +707,23 @@ DEVELOPMENT
 
       CHECK_CXX_SOURCE_COMPILES(source variable)
         Checks whether it is possible to compile _and_ link the code snipet
-        <source>. If succesful, variable is set to 1.
+        &lt;source&gt;. If succesful, variable is set to 1.
 
       CHECK_CXX_SOURCE_RUNS(source variable)
-        variable is set to 1 if <source> coulde be succesfully compiled and
+        variable is set to 1 if &lt;source&gt; coulde be succesfully compiled and
         linked and the resulting program ran and exited wihtout error.
 
       CHECK_CXX_COMPILER_BUG(source variable)
         Inverts the logic of CHECK_CXX_SOURCE_COMPILES(), i.e. variable is
-        set to 1 if it was not possible to compile and link <source>.
+        set to 1 if it was not possible to compile and link &lt;source&gt;.
 
       CHECK_INCLUDE_FILE_CXX(header variable)
         Check whether it is possible to compile and link a dummy program
-        including <header>.
+        including &lt;header&gt;.
 
       CHECK_FUNCTION_EXISTS(function variable)
         Check for the existence of a function prototype with name
-        <function>. (Don't forget to specify the link libraries, see
+        &lt;function&gt;. (Don't forget to specify the link libraries, see
         below.)
 
       CHECK_CXX_COMPILER_FLAG(flag variable)
@@ -723,7 +741,7 @@ DEVELOPMENT
     CMAKE_REQUIRED_LIBRARIES. It is best two hard set this variable to a
     specific value and later on cleaning it, instead of appending/removing:
 
-      SET(CMAKE_REQUIRED_LIBRARIES <a list of libraries>
+      SET(CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;
       CHECK_CXX_SOURCE_COMPILES(...)
       SET(CMAKE_REQUIRED_LIBRARIES)
 
@@ -742,42 +760,42 @@ DEVELOPMENT
   Writing features
   ================
 
-  For a feature <feature> the following the following toggles, variables and
+  For a feature &lt;feature&gt; the following the following toggles, variables and
   macros should be defined:
 
-  (Note: <FEATURE> means all caps, <feature> means all lowercase)
+  (Note: &lt;FEATURE&gt; means all caps, &lt;feature&gt; means all lowercase)
 
 
-  A file cmake/configure/configure_<feature>.cmake defining how to
-  configure <feature>:
+  A file cmake/configure/configure_&lt;feature&gt;.cmake defining how to
+  configure &lt;feature&gt;:
 
-    FEATURE_<FEATURE>_DEPENDS (variable, optional)
+    FEATURE_&lt;FEATURE&gt;_DEPENDS (variable, optional)
        a variable which contains an optional list of other features
        this feature depends on (and which have to be enbled for this feature
        to work.) The features must be given with the full option toggle:
        DEAL_II_WITH_[...]
 
-    FEATURE_<FEATURE>_FIND_EXTERNAL(var)  (macro, mandatory)
+    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)  (macro, mandatory)
        which should set var to TRUE if all dependencies for the feature are
        fulfilled. In this case all necessary variables for
-       FEATURE_<FEATURE>_CONFIGURE_EXTERNAL must be set. Otherwise
+       FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL must be set. Otherwise
        var should remain unset.
        This macro must not give an error (SEND_ERROR or FATAL_ERROR).
 
-    FEATURE_<FEATURE>_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
+    FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
        which should setup all necessary configuration for the feature with
        external dependencies. var set to TRUE indicates success,
        otherwise this script should issue a FATAL_ERROR.
 
-    FEATURE_<FEATURE>_CONFIGURE_BUNDLED(var)  (macro, optional)
+    FEATURE_&lt;FEATURE&gt;_CONFIGURE_BUNDLED(var)  (macro, optional)
        which should setup all necessary configuration for the feature with
        bundled source dependencies. var set to TRUE indicates success.
 
-    FEATURE_<FEATURE>_CUSTOM_ERROR_MESSAGE() (variable, optional)
-       which should either be set to TRUE if FEATURE_<FEATURE>_ERROR_MESSAGE
+    FEATURE_&lt;FEATURE&gt;_CUSTOM_ERROR_MESSAGE() (variable, optional)
+       which should either be set to TRUE if FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE
        is set up, or be undefined.
 
-    FEATURE_<FEATURE>_ERROR_MESSAGE()  (macro, optional)
+    FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE()  (macro, optional)
        which should print a meaningful error message (with FATAL_ERROR) for
        the case that no external library was found (and bundled is not
        allowed to be used.) If not defined, a suitable default error message
@@ -786,16 +804,26 @@ DEVELOPMENT
 
   In bundled/CMakeLists.txt:
 
-    DEAL_II_FORCE_BUNDLED_<FEATURE> (bool, optional)
-      If <feature> can be set up by bundled libraries, this
+    DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt; (bool, optional)
+      If &lt;feature&gt; can be set up by bundled libraries, this
       configuration option must be present to force the use of the bundled
       dependencies
 
-    FEATURE_<FEATURE>_HAVE_BUNDLED  (variable, optional)
+    FEATURE_&lt;FEATURE&gt;_HAVE_BUNDLED  (variable, optional)
        which should either be set to TRUE if all necessary libraries of the
        features comes bundled with deal.II and hence can be supported
        without external dependencies, or unset.
 
     * Setup of compilation and installation if
-      FEATURE_<FEATURE>_BUNDLED_CONFIGURED is set.
+      FEATURE_&lt;FEATURE&gt;_BUNDLED_CONFIGURED is set.
 
+
+
+    <hr>
+
+    <address>
+      <a href="mail.html" target="body">The deal.II Group</a>
+      $Date$
+    </address>
+  </body>
+</html>
