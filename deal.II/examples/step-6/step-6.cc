@@ -37,6 +37,15 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
+#include <deal.II/lac/parallel_linear_algebra.h>
+
+namespace LA
+{
+  using namespace dealii::LinearAlgebraDealII;
+//  using namespace dealii::LinearAlgebraPETSc;
+//  using namespace dealii::LinearAlgebraTrilinos;
+}
+
 #include <fstream>
 #include <iostream>
 
@@ -149,10 +158,10 @@ class Step6
     ConstraintMatrix     hanging_node_constraints;
 
     SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
+    LA::SparseMatrix system_matrix;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    LA::Vector       solution;
+    LA::Vector       system_rhs;
 };
 
 
@@ -561,7 +570,7 @@ void Step6<dim>::assemble_system ()
   const unsigned int   n_q_points    = quadrature_formula.size();
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs (dofs_per_cell);
+  LA::Vector       cell_rhs (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
