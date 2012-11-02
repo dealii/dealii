@@ -356,19 +356,41 @@
       libraries in a number of standard locations on your file system. For
       <i>optional</i> interfaces, it gives up if they are not there and
       <acronym>deal.II</acronym> will be built without them. However, there
-      are three interfaces that we <i>need</i> to have: to BOOST, UMFPACK and
-      the Threading Building Blocks. If they are not found in places
-      like <code>/usr/</code> then <code>cmake</code> will resort to versions
-      of these libraries that we provide bundled as part of the
-      <acronym>deal.II</acronym> tar files.
+      is one interface that we <i>need</i> to
+      have: <a href="http://www.boost.org/" target="_top">BOOST</a>. If it is
+      not found in places like <code>/usr/</code> then <code>cmake</code> will
+      resort to versions of these libraries that we provide bundled as part of
+      the <acronym>deal.II</acronym> tar files.
     </p>
 
     <p>
       The following paragraphs describe how the interfaces to the various
-      packages <acronym>deal.II</acronym> interacts with can be configured.
+      packages <acronym>deal.II</acronym> interacts with can be configured. As
+      a general rule in the discussion below, if configuring the interface to
+      package <code>libx</code> requires passing a flag of the
+      form <code>-DLIBX_DIR=/path/to/libx</code> then you can alternatively
+      also set <code>LIBX_DIR</code> as an environment variable in
+      your <code>.bashrc</code> or <code>.cshrc</code> file so that you do not
+      have to enter this argument everytime you call <code>cmake</code>.
     </p>
 
     <dl>
+      <a name="ARPACK"></a>
+      <dt><a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a></dt>
+      <dd>
+	<p>
+	  <a href="http://www.caam.rice.edu/software/ARPACK/"
+	     target="_top">ARPACK</a> is a library supporting the computation of
+	  eigenvalues. To use it, use the <code>-DARPACK_DIR=/path/to/arpack</code> argument.
+	  ARPACK comes with its
+	  own <a href="http://www.caam.rice.edu/software/ARPACK/RiceBSD.txt">license</a>;
+	  if you want to use it with deal.II,
+	  please read it and make sure that you agree with it.
+	  For a detailed description of how to compile ARPACK and linking with deal.II, see
+	  <a href="external-libs/arpack.html" target="body">this page</a>.
+	</p>
+      </dd>
+
       <a name="blas"></a>
       <dt>
 	<a href="http://www.netlib.org/blas/" target="_top">BLAS</a>,
@@ -440,6 +462,33 @@
 	</p>
       </dd>
 
+      <a name="mumps"></a>
+      <dt><a href="http://mumps.enseeiht.fr" target="_top">MUMPS</a></dt>
+      <dd>
+	<p>
+	  <a href="http://mumps.enseeiht.fr" target="_top">MUMPS</a>
+	  (MUltifrontal Massively Parallel sparse direct Solver)
+	  is a sparse direct solver that can factorize matrices within or
+	  across nodes of a cluster. To use it, provide the
+	  <code>-DMUMPS_DIR=/path/to/mumps</code> argument to <code>cmake</code>.
+	  For a detailed description of how to compile MUMPS (and
+	  some dependencies) and linking with deal.II, see
+	  <a href="external-libs/mumps.html" target="body">this page</a>.
+	</p>
+      </dd>
+
+      <a name="netcdf"></a>
+      <dt><a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a></dt>
+      <dd>
+	<p>
+	  <a href="http://www.unidata.ucar.edu/software/netcdf/"
+	  target="_top">NetCDF</a> is a library that provides services for
+	  reading and writing mesh data (and many other
+	  things). <acronym>deal.II</acronym> can use it to read meshes via
+	  one of the functions of the <code>GridIn</code> class. To use it,
+	  pass <code>-DNETCDF_DIR=/path/to/netcdf</code> to <code>cmake</code>.
+      </dd>
+
       <a name="p4est"></a>
       <dt><a href="http://www.p4est.org/" target="_top">p4est</a></dt>
       <dd>
@@ -465,9 +514,7 @@
 	  To interface with it, add <code>-DPETSC_DIR=/path/to/petsc
 	  -DPETSC_ARCH=architecture</code> to the argument list
 	  for <code>cmake</code>. The values for these arguments must be the
-	  same as those specified when building PETSc. Alternatively, you can
-	  also set environment variables <code>PETSC_DIR, PETSC_ARCH</code>
-	  and <code>cmake</code> will pick them up.
+	  same as those specified when building PETSc.
 	</p>
 
 	<p>
@@ -488,7 +535,24 @@
 	  variable to set is <code>SLEPC_DIR</code> (it uses the same
 	  architecture as specified in <code>PETSC_ARCH</code>).
 	  For the interface with SLEPc to work, <acronym>deal.II</acronym>'s
-	  interface to PETSc must also be configured correctly (see above).
+	  PETSc interface must also be configured correctly (see above).
+	</p>
+      </dd>
+
+      <a name="tbb"></a>
+      <dt><a href="http://www.threadingbuildingblocks.org/"
+	     target="_top">Threading Building Blocks (TBB)</a></dt>
+      <dd>
+	<p>
+	  <a href="http://www.threadingbuildingblocks.org/"
+	     target="_top">Threading Building Blocks (TBB)</a>
+	  is a library that provides advanced services for using multiple
+	  processor cores on a single machine and is used
+	  in <acronym>deal.II</acronym> to parallelize many operations. If not
+	  found in a system-wide location, <code>cmake</code> will
+	  resort to the version bundled as part of
+	  the <acronym>deal.II</acronym> download. It is always enabled unless
+	  threads are explicitly disabled, see <a href="#optional">above</a>.
 	</p>
       </dd>
 
@@ -535,59 +599,8 @@
 	  UMFPACK <a href="http://www.cise.ufl.edu/research/sparse/umfpack/">here</a>. We
 	  include UMFPACK in the deal.II distributions courtesy of its author,
 	  <a href="http://www.cise.ufl.edu/~davis/">Timothy A. Davis</a>.
+	</p>
       </dd>
-
-
-    </dl>
-
-OLD TEXT OLD TEXT OLD TEXT
-    <dl>
-      <dt>TECPLOT</dt>
-      <dd>Autodetected if one of the variables <tt>$TECHOME</tt>,
-	<tt>$TEC80HOME</tt> or <tt>$TEC90HOME</tt> points to a valid installation
-	of the tecio library. If enabled, allows data output in TECPLOT format.
-      </dd>
-
-
-      <a name="netcdf"></a>
-      <dt>NetCDF</dt>
-      <dd>Autodetected if the <tt>NETCDF_DIR</tt> environment variable
-	points to a valid installation of the <a
-						 href="http://www.unidata.ucar.edu/software/netcdf/">NetCDF</a>
-	library. Can also be enabled by
-	<tt>--with-netcdf=/path/to/netcdf</tt> which overrides the path in
-	<tt>$NETCDF_DIR</tt>. If enabled, <acronym>deal.II</acronym> allows grid
-	input in NetCDF format (GridIn::read_netcdf). If NetCDF was installed as
-	part of <code>/usr</code> or <code>/opt</code>, instead of local
-	directories in a home directory for example, you can use configure
-	switches <code>--with-netcdf-include, --with-netcdf-libs</code>.
-      </dd>
-
-      <a name="mumps"></a>
-      <dt>MUltifrontal Massively Parallel sparse direct Solver (MUMPS)</dt>
-      <dd>
-	It is possible to make use some subroutines that make use of the
-	<a href="http://mumps.enseeiht.fr"
-	   target="_top">MUltifrontal Massively Parallel sparse direct Solver
-	  (MUMPS)</a>. For a detailed description of how to compile MUMPS (and
-	some dependencies) and linking with deal.II, see
-	<a href="external-libs/mumps.html" target="body">this page</a>.
-      </dd>
-
-      <a name="ARPACK"></a>
-      <dt>ARPACK</dt>
-      <dd>
-	There is a wrapper for the eigenvalue solver
-	<a href="http://www.caam.rice.edu/software/ARPACK/">ARPACK</a>
-	library, which has its own license; if you want to use it with deal.II,
-	please read it and make sure that you agree with it.
-	You can find the license of ARPACK
-	<a href="http://www.caam.rice.edu/software/ARPACK/RiceBSD.txt">here</a>.
-	For a detailed description of how to compile ARPACK and linking with deal.II, see
-	<a href="external-libs/arpack.html" target="body">this page</a>.
-      </dd>
-
-
     </dl>
 
 
