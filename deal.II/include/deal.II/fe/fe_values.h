@@ -869,7 +869,7 @@ namespace FEValuesViews
                                             * (e.g. for RT elements it depends
                                             * on the shape of a cell).
                                             */
-          bool is_nonzero_shape_function_component[dim];
+          bool is_nonzero_shape_function_component[spacedim];
 
                                            /**
                                             * For each pair (shape function,
@@ -887,7 +887,7 @@ namespace FEValuesViews
                                             * harder to compute this
                                             * information.
                                             */
-          unsigned int row_index[dim];
+          unsigned int row_index[spacedim];
 
                                            /**
                                             * For each shape function say the
