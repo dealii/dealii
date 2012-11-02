@@ -16,808 +16,891 @@
 
     <h1>Details on the <acronym>deal.II</acronym> configuration and build system</h1>
 
-
-
-
-          ==================================================
-
-            The cmake build system for the deal.II project
-
-          ==================================================
-
-  Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>, 2012
-
-
-
-
-  WARNING: A BIT OUT OF DATE, ATM
-
-
-
-
-=================
-TABLE OF CONTENTS
-=================
-
-  Introduction
-
-      The philosophy
-
-      Quick start
-
-      Useful bits
-
-  Configuration
-
-      Feature configuration
-
-      External library locations
-
-      Component selection
-
-      Build configuration
-
-      Installation
-
-  How to use deal.II in your cmake project
-
-      Finding the deal.II library
-
-      Setting up necessary configuration variables
-
-  Development
-
-      Fat note regarding platform checks and feature configuration
-
-      Writing platform checks
-
-      Writing features
-
-
-
-
-============
-INTRODUCTION
-============
-
-
-  The philosophy
-  ==============
-
-          I need a new keyboard, my CAPS-KEY is stuck because of writing all
-           this cmake script...
-
-
-  Quick start
-  ===========
-
-  * Make a build directory, configure, compile and install:
-
-        $ mkdir build
-        $ cd build
-        $ cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../
-        $ make install
-
-  * Check out the examples, shipped with deal.II:
-
-        $ cd /path/to/install/dir/examples
-
-
-  Useful bits
-  ===========
-
-  * All cached variables can be either set via
-
-      ( $ cd build )
-        $ ccmake
-
-    or at the prompt via:
-
-      ( $ cd build )
-        $ cmake -D&lt;OPTION&gt;=&lt;VALUE&gt; [...] path/to/source/tree
-
-  * Configure with autodetection, afterwards disable a feature:
-
-      ( $ cd build )
-        $ cmake ../
-        $ cmake -DDEAL_II_WITH_METIS=OFF ../
-        $ make install
-
-  * Build and install only a specific component:
-
-      ( $ cd build )
-        $ make &lt;component&gt;
-        $ cmake -DCOMPONENT=&lt;component&gt; -P build/cmake_install.cmake
-
-  * The build system cmake generates allows fine grained control. It is
-    e.g. possible to only compile a single file:
-
-        $ cd source/dofs
-        $ make obj_dofs.inst
-        [  0%] Building CXX object scripts/CMakeFiles/expand_instantiations.dir/expand_instantiations.cc.o
-        Linking CXX executable expand_instantiations
-        [  0%] Built target expand_instantiations
-        [ 33%] Generating block_info.inst
-        [ 33%] Generating dof_accessor.inst
-        [ 33%] Generating dof_handler.inst
-        [ 66%] Generating dof_handler_policy.inst
-        [ 66%] Generating dof_objects.inst
-        [ 66%] Generating dof_renumbering.inst
-        [100%] Generating dof_tools.inst
-        [100%] Built target obj_dofs.inst
-        $ make dof_handler.o
-        Building CXX object source/dofs/CMakeFiles/obj_dofs.dir/dof_handler.cc.o
-
-    For a list of valid targets of a given folder just type
-
-        $ make help
-
-
-
-
-=============
-CONFIGURATION
-=============
-
-
-  The various configuration options of the deal.II library are organized in
-  three categories: Feature, Component and build/install configuration.
-
-
-  Feature configuration
-  =====================
-
-  deal.II provides (optional) interfaces to quite a number of external
-  libraries:
+    <p>
+      The <acronym>deal.II</acronym> <a href="readme.html"
+      target="body">README</a> file gives an overview over the basics
+      of configuring and building the <acronym>deal.II</acronym>
+      library. This page provides more details about configuring
+      with <code>cmake</code> and building with it.
+    </p>
+
+
+    <h3>Operating the configuration system</h3>
+
+    <p>
+      When configuring <acronym>deal.II</acronym> by
+      running <code>cmake</code>, the <code>cmake</code> program
+      creates a cache in the current (build) directory that contains
+      the values of all variables that had previously been passed as
+      command line arguments, been found through running tests, or had
+      otherwise been set.
+    </p>
+
+    <p>
+      Normally, one will then simply build the library in this
+      directory by calling <code>make</code> and install it. If the
+      library changes, one would just call <code>make</code> again and
+      it would only re-compile those files that are depend on those
+      sources that have changed. In other words, one will rarely have
+      to deal with the cached variables at all.
+    </p>
+
+    <p>
+      That said, it is occasionally helpful to run <code>cmake</code>
+      again, either because one would like to change the configuration
+      parameters or because some configuration file (e.g., one of
+      the <code>CMakeLists.txt</code> files) have changed. (In fact,
+      if the latter happens to be the case, then just
+      calling <code>make</code> calls back and runs <code>cmake</code>
+      again automatically.) Either way, if that happens,
+      then <code>cmake</code> will only run whatever tests are really
+      necessary; values for variables that are already in the cache
+      are not re-evaluated. This means that calling <code>cmake</code>
+      a second time without any arguments at all in a situation like
+      this
+      <pre>
+
+	mkdir build
+	cd build
+	cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+	cmake ../deal.II
+      </pre>
+      has absolutely no effect: In particular, the second time around
+      it uses the <code>CMAKE_INSTALL_PREFIX</code> value previously
+      passed, along with all other arguments one may have had on the
+      first invokation. This is different from the way
+      the <code>autoconf/configure</code> mechanism worked.
+    </p>
+
+    <p>
+      This cache has an important reason: one can modify all sorts of
+      configuration parameters and thereby interact with the
+      configuration system is rather powerful (and, possibly,
+      destructive) ways. For example, the following commands
+      <pre>
+
+	mkdir build
+	cd build
+	cmake  ../deal.II
+	ccmake
+      </pre>
+      First configure a bare-bone setup and then call
+      the <code>ccmake</code> program -- an interactive editor for the
+      cached variables. Similarly,
+      <pre>
+
+	mkdir build
+	cd build
+	cmake  ../deal.II
+	cmake -D&lt;OPTION&gt;=&lt;VALUE&gt; [...] ../deal.II
+      </pre>
+      sets a variable the second time around without destroying all
+      the configuration that has happened the first time around. Likewise,
+      <pre>
+
+	mkdir build
+	cd build
+	cmake  ../deal.II
+        cmake -DDEAL_II_WITH_METIS=OFF ../
+      </pre>
+      switches off support for the METIS library that may have been
+      automatically detected the first time around but that we really
+      didn't want to link with.
+    </p>
+
+
+    <h3> Compiling and building only certain parts </h3>
+
+    <p>
+      Just like with simple <code>make</code>, <code>cmake</code>
+      allows to build only selected targets. The difference is that
+      it's not quite so easy any more what the names of these targets
+      are. The most common scenario is that you only want to build
+      debug or optimized libraries. This can be achieved using the
+      following commands in the build directory:
+      <pre>
+
+	make  deal_II.g     # only debug library
+	make  deal_II       # only release (optimized) library
+        make  all           # both
+      </pre>
+    </p>
+
+    <p>
+      For a complete list of possible targets that allow even
+      finer-grained control, do
+      <pre>
+
+        make  help
+      </pre>
+    </p>
+
+    <p>
+      It is frequently useful to be able to see what a particular
+      command does. In that case, use the following:
+      <pre>
+
+        make  deal_II.g VERBOSE=ON
+      </pre>
+      This will show, for every command executed, the exact command
+      line with which it was invoked, including compiler arguments,
+      etc. Every command <code>cmake</code> executes starts at the
+      build directory (rather than being executed by some recursively
+      invoked makefile) so that the command line can be copied and
+      executed from within the build directory.
+    </p>
+
+
+    <h3>Fine tuning the configuration system</h3>
+
+    <p>
+      The various configuration options of the deal.II library are organized in
+      three categories: feature, component and build/install configuration.
+    </p>
+
+
+    <h4>Feature configuration</h4>
+
+    <p>
+      deal.II provides (optional) interfaces to quite a number of external
+      libraries. All of these are represented by <code>cmake</code>
+      variables that are set to <code>ON</code> if an external package
+      is found and recognized and to <code>OFF</code> otherwise. By
+      explicitly setting it to off either on the command line or
+      using <code>ccmake</code>, you can prevent deal.II from using
+      this external package, even if it is found.
+    </p>
+
+    <p>
+      Specifically, the following variables exist (the list may grow
+      over time, but names are standardized):
+      <pre>
 
     DEAL_II_WITH_ARPACK
-        Build deal.II with support for ARPACK
-
     DEAL_II_WITH_BLAS
-        Build deal.II with support for BLAS
-
     DEAL_II_WITH_BOOST
-        Build deal.II with support for boost. Always activated
-
     DEAL_II_WITH_FUNCTIONPARSER
-        Build deal.II with support for functionparser
-
     DEAL_II_WITH_LAPACK
-        Build deal.II with support for LAPACK
-
     DEAL_II_WITH_METIS
-        Build deal.II with support for Metis
-
     DEAL_II_WITH_MUMPS
-        Build deal.II with support for Mumps
-
     DEAL_II_WITH_MPI
-        Build deal.II with support for mpi
-
     DEAL_II_WITH_NETCDF
-        Build deal.II with support for netcdf
-
     DEAL_II_WITH_P4EST
-        Build deal.II with support for p4est
-
     DEAL_II_WITH_PETSC
-        Build deal.II with support for PETSc
-
     DEAL_II_WITH_SLEPC
-        Build deal.II with support for SLEPc
-
     DEAL_II_WITH_THREADS
-        Build deal.II with support for tbb. This will enable thread support in deal.II
-
     DEAL_II_WITH_TRILINOS
-        Build deal.II with support for trilinos
-
     DEAL_II_WITH_UMFPACK
-        Build deal.II with support for UMFPACK
-
     DEAL_II_WITH_ZLIB
-        Build deal.II with support for zlib
-
-  An enabled feature will usually add one ore more dependencies to external
-  or 'bundled' (i.e. bundled with deal.II and residing under ./bundled/)
-  libraries.
-
-
-  There are some options to determine the behaviour of the dependency
-  resolution:
-
-  The option DEAL_II_ALLOW_BUNDLED
-
-    - If set to ON external libraries still have precedence. But if there is
-      no external library the bundled library will be used.
-
-    - If set to OFF bundled libraries will not be used and the dependency
-      resolution will fail if there is no external library. EXCEPT (there is
-      always an exception, isn't it?) DEAL_II_FORCE_BUNDLED_&lt;library&gt; forces
-      the use of the bundled library.
-
-  The option DEAL_II_FORCE_BUNDLED_(BOOST|FUNCTIONPARSER|THREADS|UMFPACK)
-  forces the use of the bundled  library regardless whether
-  DEAL_II_ALLOW_BUNDLED is set to OFF or an external library is found.
-
-  REMARKS:
-
-  - To ensure that no bundled library is used at all DEAL_II_ALLOW_BUNDLED,
-    as well as every DEAL_II_FORCE_BUNDLED_&lt;library&gt; have to be set to OFF.
-
-  - DEAL_II_FORCE_BUNDLED_&lt;library&gt;=ON will _not_ automatically enable the
-    corresponding DEAL_II_WITH_&lt;feature&gt; toggle. This has to be set
-    separately.
-
-
-  Auto configuration:
-
-  As long as DEAL_II_WITH_&lt;FEATURE&gt; is not set to ON or OFF in the cache it
-  will be automatically configured. If a toggle DEAL_II_WITH_&lt;FEATURE&gt; is
-  defined it won't be altered.
-  This means that the very first configuration run will set all (at that
-  moment) available features to ON and the rest to OFF. In all subsequent
-  configuration steps DEAL_II_WITH_&lt;FEATURE&gt; have to be changed by hand.)
-
-  This behaviour can be controlled via the variables:
-
-    - DISABLE_AUTODETECTION=ON: This will disable any autoconfiguration by
-      setting undefined DEAL_II_WITH_&lt;FEATURE&gt; toggles to OFF:
-
-    - FORCE_AUTODETECTION=ON: This will force the reconfiguration of every
-      feature by undefining DEAL_II_WITH_&lt;FEATURE&gt; prior to configuration,
-      effectively overwriting _any_ supplied or cached value.
-
-
-  External library locations
-  ==========================
-
-  External libraries will be searched depending on hints in the following
-  order:
-
-  1.) Paths specified via CMAKE_PREFIX_PATH take precedence, e.g. with
-
-          $ cmake -DCMAKE_PREFIX_PATH=~/workspace/local ../deal.II
-
-      libraries from ~/workspace/local will be preferred for dependency
-      resolution.
-
-  2.) Hints given by &lt;library&gt;_DIR via command line or environment for
-      _some_ libraries:
-
-          $ cmake -DP4EST_DIR=~/workspace/p4est-install/ ../deal.II
-      or
-          $ export P4EST_DIR=~/workspace/p4est-install/
-          $ cmake ../deal.II
-      where -D&lt;library&gt;_DIR takes precedence over environment.
-
-      Currently, the following variables will be considered:
-
-        METIS_DIR,
-        MUMPS_DIR (and SCALAPACK_DIR, BLACS_DIR),
-        P4EST_DIR (and SC_DIR),
-        PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
-        TRILINOS_DIR,
-        UMFPACK_DIR (and AMD_DIR, SUITESPARSECONFIG_DIR)
-
-  3.) The system default locations for libraries and includes.
-
-
-  Alternatively, cached variables set by the Find&lt;Module&gt; mechanism may be
-  set, hinted or overwritten directly!
-
-  These variables are usually called &lt;library&gt;_INCLUDE_DIR(|S) and
-  &lt;library&gt;_(LIBRARY|LIBRARIES) (highly dependend of the actual library...).
-
-  You can get a list via
-
-      $ ccmake ../deal.II (or $ make edit_cache)
-
-  and entering advanced configuration mode by pressing [t].
-  Variables that could not be determined are suffixed with -NOTFOUND and
-  may be set by hand.
-
-
-  Component selection
-  ===================
-
-  The following options control which components of deal.II will be
-  configured, build and installed:
-
-    DEAL_II_COMPONENT_CONTRIB
-      Enable configuration and installation of the programs under contrib
-      This adds a COMPONENT "contrib" to the build system.
-
-    DEAL_II_COMPONENT_COMPAT_FILES:
-      Enable installation of legacy files and tools for compatibility with
-      the old build system
-      This adds a COMPONENT "compat_files" to the build system.
-
-    DEAL_II_COMPONENT_DOCUMENTATION:
-      Enable configuration, build and installation of the documentation.
-      This adds a COMPONENT "documentation" to the build system.
-
-    DEAL_II_COMPONENT_EXAMPLES:
-      Enable configuration and installation of the example steps.
-      This adds a COMPONENT "examples" to the build system.
-
-
-  Build configuration
-  ===================
-
-  CMAKE_BUILD_TYPE: We support the "Debug", "Release" and "DebugRelease"
-  build targets. Default is the "DebugRelease" target.
-
-  - Debug will compile a debug library libdeal_II.g.so with a lot of debug
-    code paths and assertions enabled, as well as a suitable set of debug
-    compiler flags.
-
-  - Release will build an optimized libdeal_II.so.
-
-  - DebugRelease will build both libraries.
-
-
-  deal.II will configure sensible default CFLAGS and CXXFLAGS depending on
-  platform, compiler and build target. There are two options, if this is
-  not desired:
-
-  - Option 1: Disable the configuration completely by setting
-    DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS to OFF.
-    Beware of the fact that certain features may still pull in necessary
-    compiler flags.
-
-  - Option 2: Overwrite the default configuration by setting the following
-    cached variables:
-
-      CMAKE_CXX_FLAGS           - used during all builds
-      DEAL_II_CXX_FLAGS_DEBUG   - additional flags for the debug library
-      DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
-
-  The content of the cached variables will be preserved and added
-  *_TO THE END_* of the default compiler flags, hence giving a possibility
-  for overwriting a flag. E.g.: -Wsign-compare, set by the build system,
-  can be overwritten by specifying:
-
-    $ cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
-
-
-  The build can be further controlled by the following variables:
-
-  - BUILD_SHARED_LIBS: If set, deal.II will be linked as a shared library
-
-  - CMAKE_INSTALL_RPATH_USE_LINK_PATH: If set, the deal.II library will be
-    installed with rpaths  set for all libraries outside of the system
-    search paths
-
-
-  Installation
-  ============
-
-  CMAKE_INSTALL_PREFIX determines the location, where the deal.II library
-  will be installed.
-
-  Please note that depending on whether DEAL_II_COMPONENT_COMPAT_FILES is
-  set, there will be different folder structures:
-
-  With DEAL_II_COMPONENT_COMPAT_FILES=ON:
-
-  ${CMAKE_INSTALL_PREFIX}/
-      common
-      common/scripts
-      doc
-      examples
-      include
-      lib
-
-
-  With DEAL_II_COMPONENT_COMPAT_FILES=OFF:
-
-  ${CMAKE_INSTALL_PREFIX}/
-      include
-      lib${LIB_SUFFIX}
-      /share/doc/deal.II/examples
-      /share/doc/deal.II/html
-
-
-  The individual target directories can be overwritten by
-      DEAL_II_CMAKE_MACROS_RELDIR
-      DEAL_II_DOCUMENTATION_RELDIR
-      DEAL_II_EXAMPLES_RELDIR
-      DEAL_II_EXECUTABLE_RELDIR
-      DEAL_II_INCLUDE_RELDIR
-      DEAL_II_LIBRARY_RELDIR
-      DEAL_II_PROJECT_CONFIG_RELDIR
-
-
-
-
-========================================
-How to use deal.II in your cmake project
-========================================
-
-
-  Finding the deal.II library
-  ===========================
-
-  If DEAL_II_COMPONENT_PROJECT_CONFIG was set, finding the deal.II library
-  should be no more than
-
-    FIND_PACKAGE(deal.II CONFIG REQUIRED)
-
-  in your CMakeLists.txt file.
-
-  You may have to hint for the location of the deal.IIConfig.cmake file.
-  Either by directly specifying deal.II_DIR to point to the path were the
-  deal.IIConfig.cmake files are located:
-
-    $ cmake -Ddeal.II_DIR=/path/to/the/config/file &lt;...&gt;
-
-  Or by specifying a search path via CMAKE_PREFIX_PATH, e.g.
-
-    $ cmake -DCMAKE_PREFIX_PATH=~/workspace/local
-
-  In this case deal.IIConfig.cmake will be searched in
-    ~/workspace/local/
-    ~/workspace/local/lib/cmake/deal.II/
-
-
-  deal.IIConfig.cmake
-  ===================
-
-  Importing the deal.IIConfig.cmake file via FIND_PACKAGE will set a bunch
-  of variables and macros; all of the form DEAL_II_*. There is the usual
-  duplet:
-
-    DEAL_II_INCLUDE_DIRS
-    DEAL_II_LIBRARIES
+      </pre>
+      They all have standard meaning with the exception of
+      two: <code>DEAL_II_WITH_BOOST</code> is always <code>ON</code>
+      since the question is not whether or not to use BOOST but only
+      whether to use a copy of BOOST found on the system or to fall
+      back to the one found in the <code>bundled/</code> directory of
+      deal.II. Secondly, <code>DEAL_II_WITH_THREADS</code> decides
+      whether to use threads and if set to on also decides whether we
+      interface to the Threading Building Blocks (TBB) library which
+      we need in that case.
+    </p>
+
+    <p>
+      If enabled, each of the features above will usually add one ore
+      more dependencies to external or 'bundled' (i.e. bundled with
+      deal.II and residing under <code>bundled/</code>) libraries.
+    </p>
+
+    <p>
+      There are some options to determine the behavior of the dependency
+      resolution. Specifically, the
+      option <code>DEAL_II_ALLOW_BUNDLED</code> determines the
+      following question:
+      <ul>
+	<li> If set to ON external libraries still have precedence. But if there is
+	  no external library the bundled library will be used.
+
+	<li> If set to OFF bundled libraries will not be used and the dependency
+	  resolution will fail if there is no external library (except
+	  in the case of BOOST where we do need to rely on the bundled
+	  library since BOOST can't be disabled).
+
+	<li>DEAL_II_FORCE_BUNDLED_&lt;library&gt; forces the use of
+	  the bundled library regardless whether DEAL_II_ALLOW_BUNDLED
+	  is set to OFF or an external library is found. This applies
+	  to the options
+	  DEAL_II_FORCE_BUNDLED_(BOOST|FUNCTIONPARSER|THREADS|UMFPACK).
+      </ul>
+    </p>
+
+    <p>
+      Thus, to ensure that no bundled library is used at all DEAL_II_ALLOW_BUNDLED,
+      as well as every DEAL_II_FORCE_BUNDLED_&lt;library&gt; have to be set to OFF.
+      Conversely, DEAL_II_FORCE_BUNDLED_&lt;library&gt;=ON will not automatically enable the
+      corresponding DEAL_II_WITH_&lt;feature&gt; toggle. This has to be set
+      separately.
+    </p>
+
+
+    <h4> Autoconfiguration </h4>
+
+    <p>
+      As long as DEAL_II_WITH_&lt;FEATURE&gt; is not set explicitly to ON or OFF in the cache it
+      will be automatically configured. If a toggle DEAL_II_WITH_&lt;FEATURE&gt; is
+      defined it won't be altered.
+      This means that the very first configuration run will set all
+      available features to ON and the rest to OFF. In all subsequent
+      configuration steps DEAL_II_WITH_&lt;FEATURE&gt; have to be
+      changed by hand, see the first section above.
+    </p>
+
+    <p>
+      This behavior can be controlled via several variables:
+      <ul>
+	<li>
+	  DISABLE_AUTODETECTION=ON: This will disable any autoconfiguration by
+	  setting undefined DEAL_II_WITH_&lt;FEATURE&gt; toggles to
+	  OFF.
+
+	<li>
+	  FORCE_AUTODETECTION=ON: This will force the reconfiguration of every
+	  feature by undefining DEAL_II_WITH_&lt;FEATURE&gt; prior to configuration,
+	  effectively overwriting _any_ supplied or cached value.
+      </ul>
+    </p>
+
+
+    <h4> External library locations </h4>
+
+    <p>
+      External libraries will be searched depending on hints in the following
+      order:
+
+      <ol>
+	<li>
+	  <p>
+	    Paths specified via CMAKE_PREFIX_PATH take precedence, e.g. with
+	    <pre>
+
+              cmake -DCMAKE_PREFIX_PATH=~/workspace/local ../deal.II
+	    </pre>
+	    libraries from ~/workspace/local will be preferred for dependency
+	    resolution.
+	  </p>
+
+	<li>
+	  <p>
+	    Hints given by &lt;library&gt;_DIR via command line or environment for
+	    <i>some</i> libraries:
+	    <pre>
+
+              cmake -DP4EST_DIR=~/workspace/p4est-install/ ../deal.II
+	    </pre>
+	    or
+	    <pre>
+
+              export P4EST_DIR=~/workspace/p4est-install/
+              cmake ../deal.II
+	    </pre>
+	    where -D&lt;library&gt;_DIR takes precedence over environment.
+	  </p>
+
+	  <p>
+	    Currently, the following variables will be considered:
+	    <pre>
+
+              METIS_DIR,
+              MUMPS_DIR (and SCALAPACK_DIR, BLACS_DIR),
+              P4EST_DIR (and SC_DIR),
+              PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
+              TRILINOS_DIR,
+              UMFPACK_DIR (and AMD_DIR, SUITESPARSECONFIG_DIR)
+	    </pre>
+	  </p>
+
+	<li>
+	  <p>
+	    The system default locations for libraries and includes.
+	  </p>
+      </ol>
+    </p>
+
+    <p>
+      Alternatively, cached variables set by the Find&lt;Module&gt; mechanism may be
+      set, hinted or overwritten directly.
+      These variables are usually called &lt;library&gt;_INCLUDE_DIR(|S) and
+      &lt;library&gt;_(LIBRARY|LIBRARIES) (highly dependend of the actual library).
+      You can get a list via
+      <pre>
+
+	ccmake ../deal.II (or $ make edit_cache)
+      </pre>
+      and entering advanced configuration mode by pressing [t].
+      Variables that could not be determined are suffixed with -NOTFOUND and
+      may be set by hand.
+    </p>
+
+
+    <h4> Component selection </h4>
+
+    <p>
+      The following options control which components of deal.II will be
+      configured, built and installed:
+
+      <ul>
+	<li>
+	  DEAL_II_COMPONENT_CONTRIB:
+	  Enable configuration and installation of the programs under contrib
+	  This adds a COMPONENT "contrib" to the build system.
+
+	<li>
+	  DEAL_II_COMPONENT_COMPAT_FILES:
+	  Enable installation of legacy files and tools for compatibility with
+	  the old build system
+	  This adds a COMPONENT "compat_files" to the build system.
+
+	<li>
+	  DEAL_II_COMPONENT_DOCUMENTATION:
+	  Enable configuration, build and installation of the documentation.
+	  This adds a COMPONENT "documentation" to the build system.
+
+	<li>
+	  DEAL_II_COMPONENT_EXAMPLES:
+	  Enable configuration and installation of the example steps.
+	  This adds a COMPONENT "examples" to the build system.
+      </ul>
+    </p>
+
+
+    <h4> Build configuration </h4>
+
+    <p>
+      deal.II will configure sensible default CFLAGS and CXXFLAGS depending on
+      platform, compiler and build target. There are two options, if this is
+      not desired:
+
+      <ol>
+	<li>
+	  Disable the configuration completely by setting
+	  DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS to OFF.
+	  Beware of the fact that certain features may still pull in necessary
+	  compiler flags.
+
+	<li>
+	  Overwrite the default configuration by setting the following
+	  cached variables:
+	  <pre>
+
+	    CMAKE_CXX_FLAGS           - used during all builds
+	    DEAL_II_CXX_FLAGS_DEBUG   - additional flags for the debug library
+	    DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
+	  </pre>
+
+	  The content of the cached variables will be preserved and added
+	  <i>to the end</i> of the default compiler flags, hence providing the possibility
+	  for overwriting a flag. E.g.: -Wsign-compare, set by the build system,
+	  can be overwritten by specifying:
+	  <pre>
+
+	    cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
+	  </pre>
+      </ol>
+    </p>
+
+    <p>
+      The build can be further controlled by the following variables:
+      <ul>
+	<li>
+	  BUILD_SHARED_LIBS: If set, deal.II will be linked as a shared library
+
+	<li>
+	  CMAKE_INSTALL_RPATH_USE_LINK_PATH: If set, the deal.II library will be
+	  installed with rpaths  set for all libraries outside of the system
+	  search paths
+      </ul>
+    </p>
+
+
+    <h4> Installation </h4>
+
+    <p>
+      CMAKE_INSTALL_PREFIX determines the location, where the deal.II library
+      will be installed.
+      Please note that depending on whether DEAL_II_COMPONENT_COMPAT_FILES is
+      set, there will be different folder structures:
+      <ul>
+	<li>
+	  With DEAL_II_COMPONENT_COMPAT_FILES=ON:
+	  <pre>
+
+	    ${CMAKE_INSTALL_PREFIX}/
+	    common
+	    common/scripts
+	    doc
+	    examples
+	    include
+	    lib
+	  </pre>
+
+	<li>
+	  With DEAL_II_COMPONENT_COMPAT_FILES=OFF:
+	  <pre>
+
+	    ${CMAKE_INSTALL_PREFIX}/
+	    include
+	    lib${LIB_SUFFIX}
+	    /share/doc/deal.II/examples
+	    /share/doc/deal.II/html
+	  </pre>
+      </ul>
+    </p>
+
+    <p>
+      The individual target directories can be overwritten by setting the
+      following variables:
+      <pre>
+
+	DEAL_II_CMAKE_MACROS_RELDIR
+	DEAL_II_DOCUMENTATION_RELDIR
+	DEAL_II_EXAMPLES_RELDIR
+	DEAL_II_EXECUTABLE_RELDIR
+	DEAL_II_INCLUDE_RELDIR
+	DEAL_II_LIBRARY_RELDIR
+	DEAL_II_PROJECT_CONFIG_RELDIR
+      </pre>
+    </p>
+
+
+    <h3> How to use deal.II in your cmake project </h3>
+
+    <p>
+      Using deal.II in your own project is particularly simple if your
+      project also uses <code>cmake</code>. The following subsections
+      describe this process.
+    </p>
+
+
+    <h4> Finding the deal.II library </h4>
+
+    <p>
+      If DEAL_II_COMPONENT_PROJECT_CONFIG was set, finding the deal.II library
+      should be no more than
+      <pre>
+
+	FIND_PACKAGE(deal.II CONFIG REQUIRED)
+      </pre>
+      in your CMakeLists.txt file.
+      You may have to hint for the location of the deal.IIConfig.cmake file.
+      Either by directly specifying deal.II_DIR to point to the path were the
+      deal.IIConfig.cmake files are located:
+      <pre>
+
+	cmake -Ddeal.II_DIR=/path/to/the/config/file &lt;...&gt;
+      </pre>
+      or by specifying a search path via CMAKE_PREFIX_PATH, e.g.
+      <pre>
+
+	$ cmake -DCMAKE_PREFIX_PATH=~/workspace/local
+      </pre>
+      In this case deal.IIConfig.cmake will be searched for in
+      <pre>
+
+	~/workspace/local/
+	~/workspace/local/lib/cmake/deal.II/
+      </pre>
+    </p>
+
+
+    <h4>  deal.IIConfig.cmake </h4>
+
+    <p>
+      Importing the deal.IIConfig.cmake file via FIND_PACKAGE will set a bunch
+      of variables and macros; all of the form DEAL_II_*. There is the usual
+      duplet:
+      <pre>
+
+	DEAL_II_INCLUDE_DIRS
+	DEAL_II_LIBRARIES
+      </pre>
       (with "debug" and "optimized" keywords. For compatibility there is
       also DEAL_II_LIBRARIES_DEBUG and DEAL_II_LIBRARIES_RELEASE only
       specifying the respective set of libraries.)
-
-  Interesting additional variables might be:
-
-    DEAL_II_USER_DEFINITIONS
-    DEAL_II_USER_DEFINITIONS_DEBUG
-    DEAL_II_USER_DEFINITIONS_RELEASE
-    DEAL_II_LINKER_FLAGS
-    DEAL_II_LINKER_FLAGS_DEBUG
-    DEAL_II_LINKER_FLAGS_RELEASE
-    DEAL_II_CXX_FLAGS
-    DEAL_II_CXX_FLAGS_RELEASE
-    DEAL_II_CXX_FLAGS_DEBUG
-
-    DEAL_II_TARGET_CONFIG
-    DEAL_II_TARGET_DEBUG
-    DEAL_II_TARGET_RELEASE
-
-
-
-
-  Setting up necessary configuration variables
-  ============================================
-
-  Usually for actually using deal.II the following configuration steps are
-  necessary. This can be either done by hand (a), or set up via macros (b).
-
-
-  a) Configuration by hand:
-
-    - Set up all include directories for headers:
-
-        INCLUDE_DIRECTORIES(
-          # The deal.II include directories:
-          ${DEAL_II_INCLUDE_DIRS}
-          # External include directories necessary for user programs:
-          ${DEAL_II_EXTERNAL_INCLUDE_DIRS}
-          )
-
-    - deal.II usually ships with an optimized Release and a Debug version
-      of the library. So it is a good idea to set up CMAKE_BUILD_TYPE
-      accordingly:
-
-        SET(CMAKE_BUILD_TYPE "Debug" CACHE
-          "Choose the type of build, options are: Debug, Release"
-          )
-
-      A cached variable ensures that we can later switch the build type
-      by editing the cache:
-
-        $ ccmake &lt;...&gt; or $ make edit_cache
-
-    - Often, it is a good idea to use the same compiler and linker
-      flags as the deal.II library.
-
-        SET(CMAKE_CXX_FLAGS ${DEAL_II_CXX_FLAGS})
-        SET(CMAKE_CXX_FLAGS_RELEASE ${DEAL_II_CXX_FLAGS_RELEASE})
-        SET(CMAKE_CXX_FLAGS_DEBUG ${DEAL_II_CXX_FLAGS_DEBUG})
-
-      (Optionally you can set them up with 'CACHE "..."' to be able
-      to edit them via ccmake or make edit_cache)
-
-    - _After_ this, specify your project name:
-
-        PROJECT(myProject)
-
-      This ensures that the compiler detection and platform setup that
-      is issued by calling PROJECT(...) will run after we have set up
-      our cached variables. This way it is our choice of variables that
-      will be set and not the one determined in PROJECT(...)will be set
-      and not the one determined in PROJECT(...)
-
-    - After defining your targets, e.g.
-
-        ADD_EXECUTABLE(step-1 step-1.cc)
-
-      you have to specify to link against deal.II and all external
-      libraries:
-
-        TARGET_LINK_LIBRARIES(step-1
-            ${DEAL_II_LIBRARIES}
-          )
-
-     - As well as using some preprocessor definitions:
-
-        SET_TARGET_PROPERTIES(step-1 PROPERTIES
-          COMPILE_DEFINITIONS
-            "${DEAL_II_USER_DEFINITIONS}"
-          COMPILE_DEFINITIONS_DEBUG
-            "${DEAL_II_USER_DEFINITIONS_DEBUG}"
-          COMPILE_DEFINITIONS_RELEASE
-            "${DEAL_II_USER_DEFINITIONS_RELEASE}"
-          )
-
-     - Optionally, you can set the link flags to the one used by the
-       deal.II library:
-
-         SET_TARGET_PROPERTIES(step-1 PROPERTIES
-           LINK_FLAGS
-             "${DEAL_II_LINKER_FLAGS}"
-           LINK_FLAGS_DEBUG
-             "${DEAL_II_LINKER_FLAGS_DEBUG}"
-           LINK_FLAGS_RELEASE
-             "${DEAL_II_LINKER_FLAGS_RELEASE}"
-           )
-
-      And this it is.
-
-
-  b) Configuration with the help of two convencience macros:
-
-    All the steps explained in (a) can be automatically set with the help
-    of two convenience macros. This boils down to the following example
-    code:
-
-        FIND_PACKAGE(deal.II CONFIG REQUIRED)
-
-        DEAL_II_INITIALIZE_CACHED_VARIABLES()
-
-        PROJECT(step-1)
-
-        ADD_EXECUTABLE(step-1 step-1.cc)
-        DEAL_II_SETUP_TARGET(step-1)
-
-
-  c) It is also possible to include deal.II as external target directly
-     into a cmake project:
-
-        INCLUDE(${DEAL_II_TARGET_CONFIG})
-
-     After that there is a target ${DEAL_II_TARGET_DEBUG} and
-     ${DEAL_II_TARGET_RELEASE} available.
-
-
-
-===========
-DEVELOPMENT
-===========
-
-
-  Fat note regarding platform checks and feature configuration
-  ============================================================
-
-
-                            ============
-
-                              FAT NOTE
-
-                            ============
-
-
-  To keep things clean, only the following variables should appended in the
-  platform checks and feature configuration (beside setting a lot of
-  DEAL_II_* definitions...):
-
-  All with the following (internal) logic:
-   - name without _DEBUG or _RELEASE: Used for all targets
-   - &lt;...&gt;_DEBUG: _additionally_ used for debug targets
-   - &lt;...&gt;_RELEASE: _additionally_ used for release targets
-
-
-  For internal use:
-
-      CMAKE_SHARED_LINKER_FLAGS
-      DEAL_II_SHARED_LINKER_FLAGS_DEBUG
-      DEAL_II_SHARED_LINKER_FLAGS_RELEASE
-
-          for setting necessary linker flags for the deal.II library.
-
-      CMAKE_CXX_FLAGS (and CMAKE_C_FLAGS)
-      DEAL_II_CXX_FLAGS_DEBUG (and DEAL_II_C_FLAGS_DEBUG)
-      DEAL_II_CXX_FLAGS_RELEASE (and DEAL_II_C_FLAGS_RELEASE)
-
-          for setting necessary compiler flags, e.g. -std=c++11 (if
-          available).
-
-      INCLUDE_DIRECTORIES(...)
-
-          For setting necessary include dirs for the compilation of the
-          deal.II library.
-
-      DEAL_II_DEFINITIONS
-      DEAL_II_DEFINITIONS_DEBUG
-      DEAL_II_DEFINITIONS_RELEASE
-
-          For setting necessary preprocessor definitions ("-D&lt;...&gt;") for
-          the compilation of the deal.II library
-
-
-  For internal and external use:
-
-      DEAL_II_EXTERNAL_LIBRARIES
-      DEAL_II_EXTERNAL_LIBRARIES_DEBUG
-      DEAL_II_EXTERNAL_LIBRARIES_RELEASE
-
-          Used to keep track of external libraries, the deal.II library
-          and user programs have to be linked against.
-
-
-  For external use:
-
-      DEAL_II_USER_DEFINITIONS
-      DEAL_II_USER_DEFINITIONS_DEBUG
-      DEAL_II_USER_DEFINITIONS_RELEASE
-
-          Used to keep track of external preprocessor definitions,
-          necessary for the compilation of user programs.
-
-
-      DEAL_II_USER_INCLUDE_DIRS
-
+      Interesting additional variables might be:
+      <pre>
+
+	DEAL_II_USER_DEFINITIONS
+	DEAL_II_USER_DEFINITIONS_DEBUG
+	DEAL_II_USER_DEFINITIONS_RELEASE
+	DEAL_II_LINKER_FLAGS
+	DEAL_II_LINKER_FLAGS_DEBUG
+	DEAL_II_LINKER_FLAGS_RELEASE
+	DEAL_II_CXX_FLAGS
+	DEAL_II_CXX_FLAGS_RELEASE
+	DEAL_II_CXX_FLAGS_DEBUG
+
+	DEAL_II_TARGET_CONFIG
+	DEAL_II_TARGET_DEBUG
+	DEAL_II_TARGET_RELEASE
+      </pre>
+    </p>
+
+
+
+    <h4> Setting up necessary configuration variables </h4>
+
+    <p>
+      Usually for actually using deal.II the following configuration steps are
+      necessary. This can be either done by hand (a), or set up via macros (b).
+      <ol>
+	<li> Configuration by hand:
+	  <ul>
+	    <li> Set up all include directories for headers:
+	      <pre>
+
+		INCLUDE_DIRECTORIES(
+		# The deal.II include directories:
+		${DEAL_II_INCLUDE_DIRS}
+		# External include directories necessary for user programs:
+		${DEAL_II_EXTERNAL_INCLUDE_DIRS}
+		)
+	      </pre>
+
+	    <li>
+	      deal.II usually ships with an optimized Release and a Debug version
+	      of the library. So it is a good idea to set up CMAKE_BUILD_TYPE
+	      accordingly:
+	      <pre>
+
+		SET(CMAKE_BUILD_TYPE "Debug" CACHE
+		"Choose the type of build, options are: Debug, Release"
+		)
+	      </pre>
+
+	      A cached variable ensures that we can later switch the build type
+	      by editing the cache:
+	      <pre>
+
+		ccmake &lt;...&gt; or $ make edit_cache
+	      </pre>
+
+	    <li> Often, it is a good idea to use the same compiler and linker
+	      flags as the deal.II library.
+	      <pre>
+
+		SET(CMAKE_CXX_FLAGS ${DEAL_II_CXX_FLAGS})
+		SET(CMAKE_CXX_FLAGS_RELEASE ${DEAL_II_CXX_FLAGS_RELEASE})
+		SET(CMAKE_CXX_FLAGS_DEBUG ${DEAL_II_CXX_FLAGS_DEBUG})
+	      </pre>
+	      (Optionally you can set them up with 'CACHE "..."' to be able
+	      to edit them via ccmake or make edit_cache.)
+
+	    <li>
+	      <i>After</i> this, specify your project name:
+	      <pre>
+
+		PROJECT(myProject)
+	      </pre>
+	      This ensures that the compiler detection and platform setup that
+	      is issued by calling PROJECT(...) will run after we have set up
+	      our cached variables. This way it is our choice of variables that
+	      will be set and not the one determined in PROJECT(...)will be set
+	      and not the one determined in PROJECT(...)
+
+	    <li>
+	      After defining your targets, e.g.
+	      <pre>
+
+		ADD_EXECUTABLE(step-1 step-1.cc)
+	      </pre>
+	      you have to specify to link against deal.II and all external
+	      libraries:
+	      <pre>
+
+		TARGET_LINK_LIBRARIES(step-1
+		                      ${DEAL_II_LIBRARIES}
+		                     )
+	      </pre>
+
+	    <li> As well as using some preprocessor definitions:
+	      <pre>
+		SET_TARGET_PROPERTIES(step-1 PROPERTIES
+		                      COMPILE_DEFINITIONS
+		                      "${DEAL_II_USER_DEFINITIONS}"
+		                      COMPILE_DEFINITIONS_DEBUG
+		                      "${DEAL_II_USER_DEFINITIONS_DEBUG}"
+		                      COMPILE_DEFINITIONS_RELEASE
+		                      "${DEAL_II_USER_DEFINITIONS_RELEASE}"
+		                     )
+
+	      </pre>
+
+	    <li> Optionally, you can set the link flags to the one used by the
+	      deal.II library:
+	      <pre>
+
+		SET_TARGET_PROPERTIES(step-1 PROPERTIES
+  		                      LINK_FLAGS
+		                      "${DEAL_II_LINKER_FLAGS}"
+		                      LINK_FLAGS_DEBUG
+		                      "${DEAL_II_LINKER_FLAGS_DEBUG}"
+		                      LINK_FLAGS_RELEASE
+		                      "${DEAL_II_LINKER_FLAGS_RELEASE}"
+		                     )
+	      </pre>
+	      And this it is.
+
+	  </ul>
+
+	<li> Configuration with the help of two convencience macros:
+	  All the steps explained in the first option above can be automatically dpme with the help
+	  of two convenience macros. This boils down to the following example
+	  code:
+	  <pre>
+
+            FIND_PACKAGE(deal.II CONFIG REQUIRED)
+
+            DEAL_II_INITIALIZE_CACHED_VARIABLES()
+
+            PROJECT(step-1)
+
+            ADD_EXECUTABLE(step-1 step-1.cc)
+            DEAL_II_SETUP_TARGET(step-1)
+	  </pre>
+
+
+	<li> It is also possible to include deal.II as external target directly
+	  into a cmake project:
+	  <pre>
+
+            INCLUDE(${DEAL_II_TARGET_CONFIG})
+	  </pre>
+	  After that there is a target ${DEAL_II_TARGET_DEBUG} and
+	  ${DEAL_II_TARGET_RELEASE} available.
+      </ol>
+    </p>
+
+
+    <h3> Development </h3>
+
+    <p>
+      To keep things clean, only the following variables should appended in the
+      platform checks and feature configuration (beside setting a lot of
+      DEAL_II_* definitions...):
+      <ul>
+	<li>
+	  All with the following (internal) logic:
+	  <ul>
+	    <li>name without _DEBUG or _RELEASE: Used for all targets
+	    <li> &lt;...&gt;_DEBUG: _additionally_ used for debug targets
+	    <li> &lt;...&gt;_RELEASE: _additionally_ used for release targets
+	  </ul>
+
+	<li>
+	  For internal use, for setting necessary linker flags for the deal.II library:
+	  <ul>
+	    <li>  CMAKE_SHARED_LINKER_FLAGS
+	    <li>  DEAL_II_SHARED_LINKER_FLAGS_DEBUG
+	    <li>  DEAL_II_SHARED_LINKER_FLAGS_RELEASE
+	  </ul>
+
+	<li>
+	  For internal use, for setting necessary compiler flags, e.g. -std=c++11 (if
+          available)"
+	  <ul>
+	    <li>  CMAKE_CXX_FLAGS (and CMAKE_C_FLAGS)
+	    <li>      DEAL_II_CXX_FLAGS_DEBUG (and DEAL_II_C_FLAGS_DEBUG)
+	    <li>      DEAL_II_CXX_FLAGS_RELEASE (and DEAL_II_C_FLAGS_RELEASE)
+	  </ul>
+
+	<li>
+	  For internal use, for setting necessary include dirs for the compilation of the
+          deal.II library:
+	  <ul>
+	    <li>
+	      INCLUDE_DIRECTORIES(...)
+	  </ul>
+
+	<li>
+	  For internal use, for setting necessary preprocessor definitions ("-D&lt;...&gt;") for
+          the compilation of the deal.II library:
+	  <ul>
+	    <li>      DEAL_II_DEFINITIONS
+	    <li>      DEAL_II_DEFINITIONS_DEBUG
+	    <li>      DEAL_II_DEFINITIONS_RELEASE
+	  </ul>
+
+	<li>
+	  For internal and external use (used to keep track of external libraries, the deal.II library
+          and user programs have to be linked against):
+	  <ul>
+	    <li>      DEAL_II_EXTERNAL_LIBRARIES
+	    <li>      DEAL_II_EXTERNAL_LIBRARIES_DEBUG
+	    <li>      DEAL_II_EXTERNAL_LIBRARIES_RELEASE
+	  </ul>
+
+	<li>
+	  For external use (used to keep track of external preprocessor definitions,
+          necessary for the compilation of user programs):
+	  <ul>
+	    <li>      DEAL_II_USER_DEFINITIONS
+	    <li>      DEAL_II_USER_DEFINITIONS_DEBUG
+	    <li>      DEAL_II_USER_DEFINITIONS_RELEASE
+	  </ul>
+
+	<li>
           Used to keep track of external include dirs, necessary for the
-          compilation of user programs.
+          compilation of user programs:
+	  <ul>
+	    <li>
+	      DEAL_II_USER_INCLUDE_DIRS
+	  </ul>
+      </ul>
+    </p>
 
 
+    <h4>  Writing platform checks </h4>
+
+    <p>
+      Platform checks reside under cmake/check.
+      We currently have
+      <pre>
+
+	cmake/check/check_for_compiler_bugs.cmake
+	cmake/check/check_for_compiler_bugs_*.cmake
+	cmake/check/check_for_compiler_features.cmake
+	cmake/check/check_for_cxx_features.cmake
+      </pre>
+      Useful commands are:
+      <ul>
+	<li> There are a number of readily available platform check macros:
+	  <pre>
+
+	    CHECK_CXX_SOURCE_COMPILES(source variable)
+            Checks whether it is possible to compile _and_ link the code snipet
+            &lt;source&gt;. If succesful, variable is set to 1.
+
+	    CHECK_CXX_SOURCE_RUNS(source variable)
+            variable is set to 1 if &lt;source&gt; coulde be succesfully compiled and
+            linked and the resulting program ran and exited wihtout error.
+
+	    CHECK_CXX_COMPILER_BUG(source variable)
+            Inverts the logic of CHECK_CXX_SOURCE_COMPILES(), i.e. variable is
+            set to 1 if it was not possible to compile and link &lt;source&gt;.
+
+	    CHECK_INCLUDE_FILE_CXX(header variable)
+            Check whether it is possible to compile and link a dummy program
+            including &lt;header&gt;.
+
+	    CHECK_FUNCTION_EXISTS(function variable)
+            Check for the existence of a function prototype with name
+            &lt;function&gt;. (Don't forget to specify the link libraries, see
+            below.)
+
+	    CHECK_CXX_COMPILER_FLAG(flag variable)
+            Sets the variable to 1 if the compiler understands the flag.
+	  </pre>
+
+	<li> Necessary compiler flags can easily set in the string variable
+	  CMAKE_REQUIRED_FLAGS. There are two small macros that do this job
+	  nicely:
+	  <pre>
+
+	    PUSH_TEST_FLAG("-Werror")
+	    CHECK_CXX_SOURCE_COMPILES(...)
+	    POP_TEST_FLAG()
+	  </pre>
+
+	<li> Libraries necessary for linkage can be set in the list variable
+	  CMAKE_REQUIRED_LIBRARIES. It is best two hard set this variable to a
+	  specific value and later on cleaning it, instead of appending/removing:
+	  <pre>
+
+	    SET(CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;
+	    CHECK_CXX_SOURCE_COMPILES(...)
+	    SET(CMAKE_REQUIRED_LIBRARIES)
+	  </pre>
+      </ul>
+    </p>
+
+    <p>
+      General notes:
+      <ul>
+	<li> A platform check should have a prominent comment explaining what
+	  it does and why it is there, as well as a stating the author and the
+	  year.
+
+	<li> Definition toggles in include/deal.II/base/config.h.in should have
+	  a prominent comment explaining it and should be grouped by file
+	  exporting the definition
+      </ul>
+    </p>
 
 
-  Writing platform checks
-  =======================
+    <h4> Writing feature tests </h4>
 
+    <p>
+      For a feature &lt;feature&gt; the following the following toggles, variables and
+      macros should be defined
+      (Note: &lt;FEATURE&gt; means all caps, &lt;feature&gt; means all lowercase):
+      <ul>
 
-  Platform checks reside under cmake/check.
-  We currently have
+	<li>
+	  A file cmake/configure/configure_&lt;feature&gt;.cmake defining how to
+	  configure &lt;feature&gt;:
+	  <pre>
 
-    cmake/check/check_for_compiler_bugs.cmake
-    cmake/check/check_for_compiler_bugs_*.cmake
-    cmake/check/check_for_compiler_features.cmake
-    cmake/check/check_for_cxx_features.cmake
+	    FEATURE_&lt;FEATURE&gt;_DEPENDS (variable, optional)
+	    a variable which contains an optional list of other features
+	    this feature depends on (and which have to be enbled for this feature
+	    to work.) The features must be given with the full option toggle:
+	    DEAL_II_WITH_[...]
 
-  Useful commands:
+	    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)  (macro, mandatory)
+	    which should set var to TRUE if all dependencies for the feature are
+	    fulfilled. In this case all necessary variables for
+	    FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL must be set. Otherwise
+	    var should remain unset.
+	    This macro must not give an error (SEND_ERROR or FATAL_ERROR).
 
-  - There are a number of readily available platform check macros:
+	    FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
+	    which should setup all necessary configuration for the feature with
+	    external dependencies. var set to TRUE indicates success,
+	    otherwise this script should issue a FATAL_ERROR.
 
-      CHECK_CXX_SOURCE_COMPILES(source variable)
-        Checks whether it is possible to compile _and_ link the code snipet
-        &lt;source&gt;. If succesful, variable is set to 1.
+	    FEATURE_&lt;FEATURE&gt;_CONFIGURE_BUNDLED(var)  (macro, optional)
+	    which should setup all necessary configuration for the feature with
+	    bundled source dependencies. var set to TRUE indicates success.
 
-      CHECK_CXX_SOURCE_RUNS(source variable)
-        variable is set to 1 if &lt;source&gt; coulde be succesfully compiled and
-        linked and the resulting program ran and exited wihtout error.
+	    FEATURE_&lt;FEATURE&gt;_CUSTOM_ERROR_MESSAGE() (variable, optional)
+	    which should either be set to TRUE if FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE
+	    is set up, or be undefined.
 
-      CHECK_CXX_COMPILER_BUG(source variable)
-        Inverts the logic of CHECK_CXX_SOURCE_COMPILES(), i.e. variable is
-        set to 1 if it was not possible to compile and link &lt;source&gt;.
+	    FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE()  (macro, optional)
+	    which should print a meaningful error message (with FATAL_ERROR) for
+	    the case that no external library was found (and bundled is not
+	    allowed to be used.) If not defined, a suitable default error message
+	    will be printed.
+	  </pre>
 
-      CHECK_INCLUDE_FILE_CXX(header variable)
-        Check whether it is possible to compile and link a dummy program
-        including &lt;header&gt;.
+	<li>
+	  In bundled/CMakeLists.txt:
+	  <pre>
 
-      CHECK_FUNCTION_EXISTS(function variable)
-        Check for the existence of a function prototype with name
-        &lt;function&gt;. (Don't forget to specify the link libraries, see
-        below.)
+	    DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt; (bool, optional)
+	    If &lt;feature&gt; can be set up by bundled libraries, this
+	    configuration option must be present to force the use of the bundled
+	    dependencies
 
-      CHECK_CXX_COMPILER_FLAG(flag variable)
-        Sets the variable to 1 if the compiler understands the flag.
+	    FEATURE_&lt;FEATURE&gt;_HAVE_BUNDLED  (variable, optional)
+	    which should either be set to TRUE if all necessary libraries of the
+	    features comes bundled with deal.II and hence can be supported
+	    without external dependencies, or unset.
+	  </pre>
 
-  - Necessary compiler flags can easily set in the string variable
-    CMAKE_REQUIRED_FLAGS. There are two small macros that do this job
-    nicely:
+	<li> Setup of compilation and installation if
+	  FEATURE_&lt;FEATURE&gt;_BUNDLED_CONFIGURED is set.
+      </ul>
 
-      PUSH_TEST_FLAG("-Werror")
-      CHECK_CXX_SOURCE_COMPILES(...)
-      POP_TEST_FLAG()
-
-  - Libraries necessary for linkage can be set in the list variable
-    CMAKE_REQUIRED_LIBRARIES. It is best two hard set this variable to a
-    specific value and later on cleaning it, instead of appending/removing:
-
-      SET(CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;
-      CHECK_CXX_SOURCE_COMPILES(...)
-      SET(CMAKE_REQUIRED_LIBRARIES)
-
-
-  General notes:
-
-  - A platform check should have a prominent comment explaining what
-    it does and why it is there, as well as a stating the author and the
-    year.
-
-  - Definition toggles in include/deal.II/base/config.h.in should have
-    a prominent comment explaining it and should be grouped by file
-    exporting the definition
-
-
-  Writing features
-  ================
-
-  For a feature &lt;feature&gt; the following the following toggles, variables and
-  macros should be defined:
-
-  (Note: &lt;FEATURE&gt; means all caps, &lt;feature&gt; means all lowercase)
-
-
-  A file cmake/configure/configure_&lt;feature&gt;.cmake defining how to
-  configure &lt;feature&gt;:
-
-    FEATURE_&lt;FEATURE&gt;_DEPENDS (variable, optional)
-       a variable which contains an optional list of other features
-       this feature depends on (and which have to be enbled for this feature
-       to work.) The features must be given with the full option toggle:
-       DEAL_II_WITH_[...]
-
-    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)  (macro, mandatory)
-       which should set var to TRUE if all dependencies for the feature are
-       fulfilled. In this case all necessary variables for
-       FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL must be set. Otherwise
-       var should remain unset.
-       This macro must not give an error (SEND_ERROR or FATAL_ERROR).
-
-    FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
-       which should setup all necessary configuration for the feature with
-       external dependencies. var set to TRUE indicates success,
-       otherwise this script should issue a FATAL_ERROR.
-
-    FEATURE_&lt;FEATURE&gt;_CONFIGURE_BUNDLED(var)  (macro, optional)
-       which should setup all necessary configuration for the feature with
-       bundled source dependencies. var set to TRUE indicates success.
-
-    FEATURE_&lt;FEATURE&gt;_CUSTOM_ERROR_MESSAGE() (variable, optional)
-       which should either be set to TRUE if FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE
-       is set up, or be undefined.
-
-    FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE()  (macro, optional)
-       which should print a meaningful error message (with FATAL_ERROR) for
-       the case that no external library was found (and bundled is not
-       allowed to be used.) If not defined, a suitable default error message
-       will be printed.
-
-
-  In bundled/CMakeLists.txt:
-
-    DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt; (bool, optional)
-      If &lt;feature&gt; can be set up by bundled libraries, this
-      configuration option must be present to force the use of the bundled
-      dependencies
-
-    FEATURE_&lt;FEATURE&gt;_HAVE_BUNDLED  (variable, optional)
-       which should either be set to TRUE if all necessary libraries of the
-       features comes bundled with deal.II and hence can be supported
-       without external dependencies, or unset.
-
-    * Setup of compilation and installation if
-      FEATURE_&lt;FEATURE&gt;_BUNDLED_CONFIGURED is set.
-
-
+    </p>
 
     <hr>
 
