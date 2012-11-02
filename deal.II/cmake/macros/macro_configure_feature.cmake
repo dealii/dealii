@@ -145,8 +145,9 @@ MACRO(CONFIGURE_FEATURE _feature)
   #
   # Obey the user overrides:
   #
-  IF(FORCE_AUTODETECTION)
-    UNSET(DEAL_II_WITH_${_feature})
+  IF( FORCE_AUTODETECTION AND
+      (NOT "{_feature}" STREQUAL "BOOST") ) # TODO: Refactor this!
+    UNSET(DEAL_II_WITH_${_feature} CACHE)
   ENDIF()
   IF(DISABLE_AUTODETECTION AND
     (NOT DEFINED DEAL_II_WITH_${_feature}) )
