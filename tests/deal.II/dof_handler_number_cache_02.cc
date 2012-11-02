@@ -2,7 +2,7 @@
 //    $Id: dof_handler_number_cache.cc 24924 2012-01-25 12:35:17Z kormann $
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -108,9 +108,7 @@ void test()
 
 int main()
 {
-  std::ofstream logfile(JobIdentifier::base_name(__FILE__)+"/output");
-  deallog.attach(logfile);
-  deallog.depth_console(0);
+  initlog(__FILE__);
   deallog.threshold_double(1.e-10);
 
   deallog.push("1d");
