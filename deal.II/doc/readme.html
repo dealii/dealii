@@ -237,9 +237,20 @@
 	  sources and recompile things, then you can remove
 	  the <code>build/</code> directory after the last step.
 
-	<li>The <acronym>deal.II</acronym> <code>cmake</code> system can accept a
+	<li> The <acronym>deal.II</acronym> <code>cmake</code> system can accept a
 	  significant number of configuration parameters. See the
 	  discussion <a href="#configuration-options">below</a>.
+
+	<li> If you are changing part of
+	the <acronym>deal.II</acronym> code itself, you can
+	re-compile the library using only the last two commands above
+	but in a previously created build directory. It is possible to
+	also change the configuration used in this directory by
+	calling <code>cmake</code> a second time, possibly with
+	different arguments. However, this sometimes leads to
+	surprising results and you may not get exactly what you were
+	hoping for. For more information, see <a href="cmake.html">here</a>.
+
       </ul>
     </p>
 
@@ -300,7 +311,9 @@
       other libraries. By default, <code>cmake</code> will enable interfaces
       to all external libraries it can find in default paths, but this
       behavior can all be selected using command line switches to the initial
-      call to <code>cmake</code>.
+      call to <code>cmake</code>. A detailed description of how this
+      all works can be found <a href="cmake.html">here</a>. In the
+      following, let us summarize the most common configuration options.
     </p>
 
     <a name="optional">
@@ -330,22 +343,6 @@
 	</p>
     </ul>
 
-    <p>
-      <code>cmake</code> stores the paths to some
-      programs, such as the compilers or the Perl interpreter. The
-      compiler which will be used when compiling the library (or your
-      own application) is therefore selected at the time of
-      configuration and independent of the setting of your $PATH
-      environment value at the time when you run <code>make</code>. If
-      you want to change the compiler used, you will therefore have
-      to re-run ./configure.
-    </p>
-
-    <p>
-      It is in general a good idea to run <code>make clean</code>
-      before re-configuring.
-    </p>
-
 
 
 
@@ -373,7 +370,9 @@
       form <code>-DLIBX_DIR=/path/to/libx</code> then you can alternatively
       also set <code>LIBX_DIR</code> as an environment variable in
       your <code>.bashrc</code> or <code>.cshrc</code> file so that you do not
-      have to enter this argument everytime you call <code>cmake</code>.
+      have to enter this argument everytime you
+      call <code>cmake</code>. Any value passed on the command line
+      wins over a value that may be found in an environment variable.
     </p>
 
     <dl>
@@ -546,7 +545,7 @@
 	     target="_top">Threading Building Blocks (TBB)</a></dt>
       <dd>
 	<p>
-	  <a href="http://www.threadingbuildingblocks.org/"
+	  The <a href="http://www.threadingbuildingblocks.org/"
 	     target="_top">Threading Building Blocks (TBB)</a>
 	  is a library that provides advanced services for using multiple
 	  processor cores on a single machine and is used
