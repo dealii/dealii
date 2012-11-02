@@ -15,6 +15,26 @@
 #include <deal.II/base/config.h>
 
 
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+DEAL_II_NAMESPACE_OPEN
+
+namespace LinearAlgebraDealII
+{
+  typedef Vector<double> Vector;
+  typedef BlockVector<double> BlockVector;
+
+  typedef SparseMatrix<double> SparseMatrix;
+
+  
+  
+  
+}
+
+
+DEAL_II_NAMESPACE_CLOSE
+
+
 #ifdef DEAL_II_USE_PETSC
 
 #include <deal.II/lac/petsc_vector.h>
