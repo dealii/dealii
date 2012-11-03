@@ -24,6 +24,9 @@
       with <code>cmake</code> and building with it.
     </p>
 
+    <p>
+    TODO: Table of Contents
+    </p>
 
     <h3>Operating the configuration system</h3>
 
@@ -244,7 +247,7 @@
     <h4> Autoconfiguration </h4>
 
     <p>
-      As long as DEAL_II_WITH_&lt;FEATURE&gt; is not set explicitly to ON or OFF in the cache it
+      As long as DEAL_II_WITH_&lt;FEATURE&gt; is not explicitly set to ON or OFF in the cache it
       will be automatically configured. If a toggle DEAL_II_WITH_&lt;FEATURE&gt; is
       defined it won't be altered.
       This means that the very first configuration run will set all
@@ -307,11 +310,12 @@
 	  <p>
 	    Currently, the following variables will be considered:
 	    <pre>
-
+              HDF5_DIR
               METIS_DIR,
               MUMPS_DIR (and SCALAPACK_DIR, BLACS_DIR),
               P4EST_DIR (and SC_DIR),
               PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
+              SLEPC_DIR and SLEPC_ARCH (forming ${SLEPC_DIR}/${SLEPC_ARCH}),
               TRILINOS_DIR,
               UMFPACK_DIR (and AMD_DIR, SUITESPARSECONFIG_DIR)
 	    </pre>
@@ -482,8 +486,7 @@
     <h4> Finding the deal.II library </h4>
 
     <p>
-      If DEAL_II_COMPONENT_PROJECT_CONFIG was set, finding the deal.II library
-      should be no more than
+      Finding the deal.II library should be no more than
       <pre>
 
 	FIND_PACKAGE(deal.II CONFIG REQUIRED)
@@ -549,7 +552,8 @@
 
     <p>
       Usually for actually using deal.II the following configuration steps are
-      necessary. This can be either done by hand (a), or set up via macros (b).
+      necessary. This can be either done by hand (1.), or set up via macros
+      (2.).
       <ol>
 	<li> Configuration by hand:
 	  <ul>
@@ -651,7 +655,7 @@
 	  </ul>
 
 	<li> Configuration with the help of two convencience macros:
-	  All the steps explained in the first option above can be automatically dpme with the help
+	  All the steps explained in the first option above can be automatically done with the help
 	  of two convenience macros. This boils down to the following example
 	  code:
 	  <pre>
@@ -667,7 +671,7 @@
 	  </pre>
 
 
-	<li> It is also possible to include deal.II as external target directly
+	<li> It is also possible to include deal.II as an external target directly
 	  into a cmake project:
 	  <pre>
 
