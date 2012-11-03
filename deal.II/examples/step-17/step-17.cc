@@ -1226,14 +1226,14 @@ int main (int argc, char **argv)
                                        // Here is the only real difference:
                                        // PETSc requires that we initialize it
                                        // at the beginning of the program, and
-                                       // un-initialize it at the end. So we
-                                       // call <code>PetscInitialize</code> and
-                                       // <code>PetscFinalize</code>. The original code
+                                       // un-initialize it at the end. The
+                                       // class MPI_InitFinalize takes care
+                                       // of that. The original code
                                        // sits in between, enclosed in braces
                                        // to make sure that the
                                        // <code>elastic_problem</code> variable goes
                                        // out of scope (and is destroyed)
-                                       // before we call
+                                       // before PETSc is closed with
                                        // <code>PetscFinalize</code>. (If we wouldn't
                                        // use braces, the destructor of
                                        // <code>elastic_problem</code> would run after
@@ -1241,7 +1241,7 @@ int main (int argc, char **argv)
                                        // destructor involves calls to PETSc
                                        // functions, we would get strange
                                        // error messages from PETSc.)
-      PetscInitialize(&argc,&argv,0,0);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
       {
         deallog.depth_console (0);
@@ -1249,8 +1249,6 @@ int main (int argc, char **argv)
         ElasticProblem<2> elastic_problem;
         elastic_problem.run ();
       }
-
-      PetscFinalize();
     }
   catch (std::exception &exc)
     {

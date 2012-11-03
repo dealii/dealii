@@ -72,19 +72,18 @@ namespace LA
 #include <deal.II/grid/grid_out.h>
 
 
-                                 // When using locally refined grids,
-                                 // we will get so-called <code>hanging
-                                 // nodes</code>. However, the standard
-                                 // finite element methods assumes
-                                 // that the discrete solution spaces
-                                 // be continuous, so we need to make
-                                 // sure that the degrees of freedom
+                                 // When using locally refined grids, we will
+                                 // get so-called <code>hanging
+                                 // nodes</code>. However, the standard finite
+                                 // element methods assumes that the discrete
+                                 // solution spaces be continuous, so we need
+                                 // to make sure that the degrees of freedom
                                  // on hanging nodes conform to some
-                                 // constraints such that the global
-                                 // solution is continuous. We are
-// also going to store the boundary conditions in this object. The
-                                 // following file contains a class
-                                 // which is used to handle these
+                                 // constraints such that the global solution
+                                 // is continuous. We are also going to store
+                                 // the boundary conditions in this
+                                 // object. The following file contains a
+                                 // class which is used to handle these
                                  // constraints:
 #include <deal.II/lac/constraint_matrix.h>
 
@@ -450,25 +449,25 @@ void Step6<dim>::setup_system ()
                                            constraints);
 
 
-  // Now we are ready to interpolate the ZeroFunction to our
-  // boundary with indicator 0 (the whole boundary) and store
-  // the resulting constraints in our <code>constraints</code>
-  // object. Note that we do not to apply the boundary
-  // conditions after assembly, like we did in earlier steps.
-  // As almost all the stuff,
-  // the interpolation of boundary
-  // values works also for higher
-  // order elements without the need
-  // to change your code for that. We
-  // note that for proper results, it
-  // is important that the
-  // elimination of boundary nodes
-  // from the system of equations
-  // happens *after* the elimination
-  // of hanging nodes. For that reason
-  // we are filling the boundary values into
-  // the ContraintMatrix after the hanging node
-  // constraints.
+				   // Now we are ready to interpolate the
+				   // ZeroFunction to our boundary with
+				   // indicator 0 (the whole boundary) and
+				   // store the resulting constraints in our
+				   // <code>constraints</code> object. Note
+				   // that we do not to apply the boundary
+				   // conditions after assembly, like we did
+				   // in earlier steps.  As almost all the
+				   // stuff, the interpolation of boundary
+				   // values works also for higher order
+				   // elements without the need to change your
+				   // code for that. We note that for proper
+				   // results, it is important that the
+				   // elimination of boundary nodes from the
+				   // system of equations happens *after* the
+				   // elimination of hanging nodes. For that
+				   // reason we are filling the boundary
+				   // values into the ContraintMatrix after
+				   // the hanging node constraints.
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
                                             ZeroFunction<dim>(),
@@ -487,19 +486,22 @@ void Step6<dim>::setup_system ()
                                    // added any more:
   constraints.close ();
 
-                                   // Now we first build our
-                                   // compressed sparsity pattern like
-                                   // we did in the previous
-                                   // examples. Nevertheless, we do
-                                   // not copy it to the final
-                                   // sparsity pattern immediately.
-  // Note that we call a variant of make_sparsity_pattern that takes
-  // the ConstraintMatrix as the third argument. We are letting
-  // the routine know, the we will never write into the locations
-  // given by <code>constraints</code> by setting the argument
-  // <code>keep_constrained_dofs</code> to false. If we were to
-  // condense the constraints after assembling, we would have
-  // to pass <code>true</code> instead.
+                                   // Now we first build our compressed
+                                   // sparsity pattern like we did in the
+                                   // previous examples. Nevertheless, we do
+                                   // not copy it to the final sparsity
+                                   // pattern immediately.  Note that we call
+                                   // a variant of make_sparsity_pattern that
+                                   // takes the ConstraintMatrix as the third
+                                   // argument. We are letting the routine
+                                   // know, the we will never write into the
+                                   // locations given by
+                                   // <code>constraints</code> by setting the
+                                   // argument
+                                   // <code>keep_constrained_dofs</code> to
+                                   // false. If we were to condense the
+                                   // constraints after assembling, we would
+                                   // have to pass <code>true</code> instead.
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler,
       c_sparsity,
@@ -528,48 +530,46 @@ void Step6<dim>::setup_system ()
                                  // Next, we have to assemble the
                                  // matrix again. There are two code
                                  // changes compared to step-5:
-//
-// First, we have to use
-                                 // a higher-order quadrature formula
-                                 // to account for the higher
-                                 // polynomial degree in the finite
-                                 // element shape functions. This is
-                                 // easy to change: the constructor of
-                                 // the <code>QGauss</code> class takes the
-                                 // number of quadrature points in
-                                 // each space direction. Previously,
-                                 // we had two points for bilinear
-                                 // elements. Now we should use three
-                                 // points for biquadratic elements.
-
-// Second, to copy the local matrix and vector on each cell
-// into the global system, we are no longer using a hand-written
-// loop. Instead, we use <code>ConstraintMatrix::distribute_local_to_global</code>
-// that internally executes this loop and eliminates all the constraints
-// at the same time.
-//
-                                 // The rest of the code that forms
-                                 // the local contributions remains unchanged. It is
-                                 // worth noting, however, that under
-                                 // the hood several things are
-                                 // different than before. First, the
-                                 // variables <code>dofs_per_cell</code> and
+				 //
+				 // First, we have to use a higher-order
+                                 // quadrature formula to account for the
+                                 // higher polynomial degree in the finite
+                                 // element shape functions. This is easy to
+                                 // change: the constructor of the
+                                 // <code>QGauss</code> class takes the number
+                                 // of quadrature points in each space
+                                 // direction. Previously, we had two points
+                                 // for bilinear elements. Now we should use
+                                 // three points for biquadratic elements.
+				 //
+				 // Second, to copy the local matrix and
+				 // vector on each cell into the global
+				 // system, we are no longer using a
+				 // hand-written loop. Instead, we use
+				 // <code>ConstraintMatrix::distribute_local_to_global</code>
+				 // that internally executes this loop and
+				 // eliminates all the constraints at the same
+				 // time.
+				 //
+                                 // The rest of the code that forms the local
+                                 // contributions remains unchanged. It is
+                                 // worth noting, however, that under the hood
+                                 // several things are different than
+                                 // before. First, the variables
+                                 // <code>dofs_per_cell</code> and
                                  // <code>n_q_points</code> now are 9 each,
-                                 // where they were 4
-                                 // before. Introducing such variables
-                                 // as abbreviations is a good
-                                 // strategy to make code work with
-                                 // different elements without having
-                                 // to change too much code. Secondly,
-                                 // the <code>fe_values</code> object of course
-                                 // needs to do other things as well,
-                                 // since the shape functions are now
-                                 // quadratic, rather than linear, in
-                                 // each coordinate variable. Again,
-                                 // however, this is something that is
-                                 // completely transparent to user
-                                 // code and nothing that you have to
-                                 // worry about.
+                                 // where they were 4 before. Introducing such
+                                 // variables as abbreviations is a good
+                                 // strategy to make code work with different
+                                 // elements without having to change too much
+                                 // code. Secondly, the <code>fe_values</code>
+                                 // object of course needs to do other things
+                                 // as well, since the shape functions are now
+                                 // quadratic, rather than linear, in each
+                                 // coordinate variable. Again, however, this
+                                 // is something that is completely
+                                 // transparent to user code and nothing that
+                                 // you have to worry about.
 template <int dim>
 void Step6<dim>::assemble_system ()
 {
@@ -621,49 +621,44 @@ void Step6<dim>::assemble_system ()
       // transfer the contributions from @p cell_matrix and @cell_rhs into the global objects.
       constraints.distribute_local_to_global(cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
     }
-// Now we are done assembling the linear system.
-                                   // The constrained nodes are
-                                   // still in the linear system
-                                   // (there is a one on the diagonal
-                                   // of the matrix and all other
-                                   // entries for this line are set to
-                                   // zero) but the computed values
-                                   // are invalid. We compute the correct
-                                   // values for these nodes at the
-                                   // end of the <code>solve</code> function.
+				   // Now we are done assembling the linear
+                                   // system.  The constrained nodes are still
+                                   // in the linear system (there is a one on
+                                   // the diagonal of the matrix and all other
+                                   // entries for this line are set to zero)
+                                   // but the computed values are invalid. We
+                                   // compute the correct values for these
+                                   // nodes at the end of the
+                                   // <code>solve</code> function.
 }
 
 
 
                                  // @sect4{Step6::solve}
 
-                                 // We continue with gradual
-                                 // improvements. The function that
-                                 // solves the linear system again
-                                 // uses the SSOR preconditioner, and
-                                 // is again unchanged except that we
-                                 // have to incorporate hanging node
-                                 // constraints. As mentioned above,
-                                 // the degrees of freedom
-                                 // from the ConstraintMatrix corresponding to hanging node
-                                 // constraints and boundary values have been removed from
-                                 // the linear system by giving the
-                                 // rows and columns of the matrix a
-                                 // special treatment. This way, the
-                                 // values for these degrees of
-                                 // freedom have wrong, but
-                                 // well-defined values after solving
-                                 // the linear system. What we then
-                                 // have to do is to use the
-                                 // constraints to assign to them the
-                                 // values that they should have. This
-                                 // process, called <code>distributing</code>
-                                 // constraints, computes the values
-                                 // of constrained nodes from the
-                                 // values of the unconstrained ones,
-                                 // and requires only a single
-                                 // additional function call that you
-                                 // find at the end of this function:
+                                 // We continue with gradual improvements. The
+                                 // function that solves the linear system
+                                 // again uses the SSOR preconditioner, and is
+                                 // again unchanged except that we have to
+                                 // incorporate hanging node constraints. As
+                                 // mentioned above, the degrees of freedom
+                                 // from the ConstraintMatrix corresponding to
+                                 // hanging node constraints and boundary
+                                 // values have been removed from the linear
+                                 // system by giving the rows and columns of
+                                 // the matrix a special treatment. This way,
+                                 // the values for these degrees of freedom
+                                 // have wrong, but well-defined values after
+                                 // solving the linear system. What we then
+                                 // have to do is to use the constraints to
+                                 // assign to them the values that they should
+                                 // have. This process, called
+                                 // <code>distributing</code> constraints,
+                                 // computes the values of constrained nodes
+                                 // from the values of the unconstrained ones,
+                                 // and requires only a single additional
+                                 // function call that you find at the end of
+                                 // this function:
 
 template <int dim>
 void Step6<dim>::solve ()
