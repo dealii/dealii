@@ -37,7 +37,7 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <deal.II/lac/parallel_linear_algebra.h>
+#include <deal.II/lac/abstract_linear_algebra.h>
 
 namespace LA
 {
@@ -158,7 +158,7 @@ class Step6
     ConstraintMatrix     constraints;
 
     SparsityPattern      sparsity_pattern;
-    LA::SparseMatrix system_matrix;
+    LA::SparseMatrix     system_matrix;
 
     LA::Vector       solution;
     LA::Vector       system_rhs;
@@ -621,7 +621,12 @@ void Step6<dim>::assemble_system ()
       // transfer the contributions from @p cell_matrix and @cell_rhs into the global objects.
       constraints.distribute_local_to_global(cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
     }
-				   // Now we are done assembling the linear
+
+//  system_matrix.compress();
+//  system_rhs.compress();
+  
+
+// Now we are done assembling the linear
                                    // system.  The constrained nodes are still
                                    // in the linear system (there is a one on
                                    // the diagonal of the matrix and all other
@@ -664,11 +669,11 @@ template <int dim>
 void Step6<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              solver (solver_control);
+  SolverCG<LA::Vector>              solver (solver_control);
 
-  PreconditionSSOR<> preconditioner;
+  LA::PreconditionSSOR preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
-
+  
   solver.solve (system_matrix, solution, system_rhs,
                 preconditioner);
 
@@ -1104,7 +1109,7 @@ void Step6<dim>::run ()
                                  // actually encodes the functionality
                                  // particular to the present
                                  // application.
-int main ()
+int main (int argc, char *argv[])
 {
 
                                    // The general idea behind the
@@ -1114,9 +1119,12 @@ int main ()
   try
     {
       deallog.depth_console (0);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
-      Step6<2> laplace_problem_2d;
-      laplace_problem_2d.run ();
+      {
+	Step6<2> laplace_problem_2d;
+	laplace_problem_2d.run ();
+      }
     }
                                    // ...and if this should fail, try
                                    // to gather as much information as
