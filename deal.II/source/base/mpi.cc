@@ -30,6 +30,10 @@
 #ifdef DEAL_II_USE_PETSC
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #    include <petscsys.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #  endif
 #endif
 
@@ -336,7 +340,6 @@ namespace Utilities
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 
-#  if defined(DEAL_II_USE_TRILINOS) && !defined(__APPLE__)
                                        // make memory pool release all
                                        // vectors that are no longer
                                        // used at this point. this is
@@ -347,6 +350,7 @@ namespace Utilities
                                        // MPI_Finalize is called,
                                        // leading to errors
                                        //
+#  if defined(DEAL_II_USE_TRILINOS) && !defined(__APPLE__)
                                        // TODO: On Mac OS X, shared libs can
                                        // only depend on other libs listed
                                        // later on the command line. This
@@ -363,7 +367,18 @@ namespace Utilities
         ::release_unused_memory ();
 #  endif
 
+				       // Same for PETSc.
 #ifdef DEAL_II_USE_PETSC
+      GrowingVectorMemory<PETScWrappers::MPI::Vector>
+        ::release_unused_memory ();
+      GrowingVectorMemory<PETScWrappers::MPI::BlockVector>
+        ::release_unused_memory ();
+      GrowingVectorMemory<PETScWrappers::Vector>
+        ::release_unused_memory ();
+      GrowingVectorMemory<PETScWrappers::BlockVector>
+        ::release_unused_memory ();
+
+				       // now end PETSc.
       PetscFinalize();
 #else
 
