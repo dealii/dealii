@@ -32,6 +32,23 @@ namespace LinearAlgebraDealII
 }
 
 
+// Dummy class. This used to check your program
+// to make sure it is compatible with all
+// linear algebra classes. In other words,
+// this is the minimal interface.
+// TODO: should we move this into tests/ only?
+namespace LinearAlgebraDummy
+{
+  class Vector {void compress();};
+  class BlockVector {void compress();};
+
+  class SparseMatrix { void compress();};
+
+  class PreconditionSSOR {};
+  
+}
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 
