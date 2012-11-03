@@ -21,7 +21,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 
-#include <deal.II/lac/parallel_linear_algebra.h>
+#include <deal.II/lac/abstract_linear_algebra.h>
 
 namespace LA
 {
