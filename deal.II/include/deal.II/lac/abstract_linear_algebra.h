@@ -9,8 +9,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__parallel_linear_algebra_h
-#define __deal2__parallel_linear_algebra_h
+#ifndef __deal2__abstract_linear_algebra_h
+#define __deal2__abstract_linear_algebra_h
 
 #include <deal.II/base/config.h>
 
@@ -18,6 +18,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 DEAL_II_NAMESPACE_OPEN
+
 
 namespace LinearAlgebraDealII
 {
