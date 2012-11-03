@@ -975,65 +975,6 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
     }
 }
 
-#ifdef DEAL_II_MULTIGRID_COMPATIBILITY
-
-template <class MATRIX, class RELAX, class VECTOR>
-inline void
-MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
-  const unsigned int level,
-  VECTOR& u,
-  const VECTOR& rhs) const
-{
-  unsigned int maxlevel = matrices.get_maxlevel();
-  unsigned int steps2 = this->steps;
-
-  if (this->variable)
-    steps2 *= (1<<(maxlevel-level));
-
-  typename VectorMemory<VECTOR>::Pointer r(*this->mem);
-  typename VectorMemory<VECTOR>::Pointer d(*this->mem);
-  r->reinit(u);
-  d->reinit(u);
-
-  bool T = this->transpose;
-  if (this->symmetric && (steps2 % 2 == 0))
-    T = false;
-  if (this->debug > 0)
-    deallog << 'S' << level << ' ';
-
-  for (unsigned int i=0; i<steps2; ++i)
-    {
-      if (T)
-        {
-          if (this->debug > 0)
-            deallog << 'T';
-          matrices[level].vmult(*r,u);
-          r->sadd(-1.,1.,rhs);
-          if (this->debug > 2)
-            deallog << ' ' << r->l2_norm() << ' ';
-          smoothers[level].Tvmult(*d, *r);
-          if (this->debug > 1)
-            deallog << ' ' << d->l2_norm() << ' ';
-        } else {
-          if (this->debug > 0)
-            deallog << 'N';
-          matrices[level].vmult(*r,u);
-          r->sadd(-1.,1.,rhs);
-          if (this->debug > 2)
-            deallog << ' ' << r->l2_norm() << ' ';
-          smoothers[level].vmult(*d, *r);
-          if (this->debug > 1)
-            deallog << ' ' << d->l2_norm() << ' ';
-        }
-      u += *d;
-      if (this->symmetric)
-        T = !T;
-    }
-  if (this->debug > 0)
-    deallog << std::endl;
-}
-
-#else
 
 template <class MATRIX, class RELAX, class VECTOR>
 inline void
@@ -1065,7 +1006,6 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
     }
 }
 
-#endif
 
 
 template <class MATRIX, class RELAX, class VECTOR>

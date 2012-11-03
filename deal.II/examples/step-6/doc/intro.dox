@@ -54,3 +54,18 @@ The only other new thing is a method to catch exceptions in the
 <code>main</code> function in order to output some information in case the
 program crashes for some reason.
 
+
+<h3>The ConstraintMatrix</h3>
+
+As explained above, we are going to use an object called ConstraintMatrix
+that will store the constraints at the hanging nodes to insure the solution
+is continuous at these nodes. We could first assemble the system as normal
+and then condense out the degrees of freedom that need to be constrained.
+This is also explained  @ref constraints documentation
+module. Instead we will go the more efficient route and eliminate the
+constrained entries while we are copying from the local to the global system.
+Because boundary conditions can be treated in the same way, we will
+incorporate the them as constraints in the same ConstraintMatrix object.
+This way, we don't need to apply the boundary conditions after assembly 
+(like we did in the earlier steps).
+ 

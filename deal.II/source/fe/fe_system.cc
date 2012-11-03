@@ -998,34 +998,18 @@ FESystem<dim,spacedim>::compute_fill (
       if (face_no==invalid_face_number)
         {
           Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
-
-                                           // Some Mac OS X versions
-                                           // have a bug that makes
-                                           // the following assertion
-                                           // fail spuriously. In that
-                                           // case, just disable the
-                                           // Assert, as this is not
-                                           // something that depends
-                                           // on input parameters
-                                           // provided by users; the
-                                           // validity of the
-                                           // assertion is still
-                                           // checked on all systems
-                                           // that don't have this bug
-#ifndef DEAL_II_HAVE_DARWIN_DYNACAST_BUG
           Assert (dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer) != 0,
                   ExcInternalError());
-#endif
+
           cell_quadrature
             = static_cast<const Quadrature<dim> *>(quadrature_base_pointer);
         }
       else
         {
           Assert(dim_1==dim-1, ExcDimensionMismatch(dim_1,dim-1));
-#ifndef DEAL_II_HAVE_DARWIN_DYNACAST_BUG
           Assert (dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer) != 0,
                   ExcInternalError());
-#endif
+
           face_quadrature
             = static_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
         }

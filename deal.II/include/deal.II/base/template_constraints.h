@@ -82,23 +82,6 @@ template <typename T> struct constraint_and_return_value<true,T>
 };
 
 
-#ifdef DEAL_II_SFINAE_BUG
-
-/**
- * Closure class in case the compiler lacks support for the SFINAE
- * concept. If the compiler supports it, only the specialization for
- * the positive case is available.
- *
- * @author Wolfgang Bangerth, 2003
- */
-template <typename T> struct constraint_and_return_value<false,T>
-{
-    typedef T type;
-};
-
-#endif
-
-
 
 /**
  * A template class that simply exports its template argument as a local

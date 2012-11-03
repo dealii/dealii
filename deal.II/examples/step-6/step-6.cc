@@ -81,7 +81,8 @@ namespace LA
                                  // sure that the degrees of freedom
                                  // on hanging nodes conform to some
                                  // constraints such that the global
-                                 // solution is continuous. The
+                                 // solution is continuous. We are
+// also going to store the boundary conditions in this object. The
                                  // following file contains a class
                                  // which is used to handle these
                                  // constraints:
@@ -123,8 +124,7 @@ using namespace dealii;
                                  // (instead of the global refinement
                                  // in the previous examples), and a
                                  // variable which will hold the
-                                 // constraints associated to the
-                                 // hanging nodes. In addition, we
+                                 // constraints. In addition, we
                                  // have added a destructor to the
                                  // class for reasons that will become
                                  // clear when we discuss its
@@ -153,9 +153,10 @@ class Step6
                                      // This is the new variable in
                                      // the main class. We need an
                                      // object which holds a list of
-                                     // constraints originating from
-                                     // the hanging nodes:
-    ConstraintMatrix     hanging_node_constraints;
+                                     // constraints to hold the
+				     // hanging nodes and the
+				     // boundary conditions.    
+    ConstraintMatrix     constraints;
 
     SparsityPattern      sparsity_pattern;
     LA::SparseMatrix system_matrix;
@@ -430,7 +431,7 @@ void Step6<dim>::setup_system ()
                                    // hanging nodes. In the class
                                    // desclaration, we have already
                                    // allocated space for an object
-                                   // <code>hanging_node_constraints</code>
+                                   // <code>constraints</code>
                                    // that will hold a list of these
                                    // constraints (they form a matrix,
                                    // which is reflected in the name
@@ -444,23 +445,38 @@ void Step6<dim>::setup_system ()
                                    // over from computations on the
                                    // previous mesh before the last
                                    // adaptive refinement):
-  hanging_node_constraints.clear ();
+  constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
-                                           hanging_node_constraints);
+                                           constraints);
+
+
+  // Now we are ready to interpolate the ZeroFunction to our
+  // boundary with indicator 0 (the whole boundary) and store
+  // the resulting constraints in our <code>constraints</code>
+  // object. Note that we do not to apply the boundary
+  // conditions after assembly, like we did in earlier steps.
+  // As almost all the stuff,
+  // the interpolation of boundary
+  // values works also for higher
+  // order elements without the need
+  // to change your code for that. We
+  // note that for proper results, it
+  // is important that the
+  // elimination of boundary nodes
+  // from the system of equations
+  // happens *after* the elimination
+  // of hanging nodes. For that reason
+  // we are filling the boundary values into
+  // the ContraintMatrix after the hanging node
+  // constraints.
+  VectorTools::interpolate_boundary_values (dof_handler,
+                                            0,
+                                            ZeroFunction<dim>(),
+                                            constraints);
+
 
                                    // The next step is <code>closing</code>
-                                   // this object. For this note that,
-                                   // in principle, the
-                                   // <code>ConstraintMatrix</code> class can
-                                   // hold other constraints as well,
-                                   // i.e. constraints that do not
-                                   // stem from hanging
-                                   // nodes. Sometimes, it is useful
-                                   // to use such constraints, in
-                                   // which case they may be added to
-                                   // the <code>ConstraintMatrix</code> object
-                                   // after the hanging node
-                                   // constraints were computed. After
+                                   // this object. After
                                    // all constraints have been added,
                                    // they need to be sorted and
                                    // rearranged to perform some
@@ -469,7 +485,7 @@ void Step6<dim>::setup_system ()
                                    // <code>close()</code> function, after which
                                    // no further constraints may be
                                    // added any more:
-  hanging_node_constraints.close ();
+  constraints.close ();
 
                                    // Now we first build our
                                    // compressed sparsity pattern like
@@ -477,26 +493,18 @@ void Step6<dim>::setup_system ()
                                    // examples. Nevertheless, we do
                                    // not copy it to the final
                                    // sparsity pattern immediately.
+  // Note that we call a variant of make_sparsity_pattern that takes
+  // the ConstraintMatrix as the third argument. We are letting
+  // the routine know, the we will never write into the locations
+  // given by <code>constraints</code> by setting the argument
+  // <code>keep_constrained_dofs</code> to false. If we were to
+  // condense the constraints after assembling, we would have
+  // to pass <code>true</code> instead.
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
-
-                                   // The constrained hanging nodes
-                                   // will later be eliminated from
-                                   // the linear system of
-                                   // equations. When doing so, some
-                                   // additional entries in the global
-                                   // matrix will be set to non-zero
-                                   // values, so we have to reserve
-                                   // some space for them here. Since
-                                   // the process of elimination of
-                                   // these constrained nodes is
-                                   // called <code>condensation</code>, the
-                                   // functions that eliminate them
-                                   // are called <code>condense</code> for both
-                                   // the system matrix and right hand
-                                   // side, as well as for the
-                                   // sparsity pattern.
-  hanging_node_constraints.condense (c_sparsity);
+  DoFTools::make_sparsity_pattern(dof_handler,
+      c_sparsity,
+      constraints,
+      false /*keep_constrained_dofs*/);
 
                                    // Now all non-zero entries of the
                                    // matrix are known (i.e. those
@@ -518,9 +526,10 @@ void Step6<dim>::setup_system ()
                                  // @sect4{Step6::assemble_system}
 
                                  // Next, we have to assemble the
-                                 // matrix again. There are no code
-                                 // changes compared to step-5 except
-                                 // for a single place: We have to use
+                                 // matrix again. There are two code
+                                 // changes compared to step-5:
+//
+// First, we have to use
                                  // a higher-order quadrature formula
                                  // to account for the higher
                                  // polynomial degree in the finite
@@ -532,11 +541,15 @@ void Step6<dim>::setup_system ()
                                  // we had two points for bilinear
                                  // elements. Now we should use three
                                  // points for biquadratic elements.
-                                 //
+
+// Second, to copy the local matrix and vector on each cell
+// into the global system, we are no longer using a hand-written
+// loop. Instead, we use <code>ConstraintMatrix::distribute_local_to_global</code>
+// that internally executes this loop and eliminates all the constraints
+// at the same time.
+//
                                  // The rest of the code that forms
-                                 // the local contributions and
-                                 // transfers them into the global
-                                 // objects remains unchanged. It is
+                                 // the local contributions remains unchanged. It is
                                  // worth noting, however, that under
                                  // the hood several things are
                                  // different than before. First, the
@@ -605,67 +618,19 @@ void Step6<dim>::assemble_system ()
           }
 
       cell->get_dof_indices (local_dof_indices);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        {
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
-            system_matrix.add (local_dof_indices[i],
-                               local_dof_indices[j],
-                               cell_matrix(i,j));
-
-          system_rhs(local_dof_indices[i]) += cell_rhs(i);
-        }
+      // transfer the contributions from @p cell_matrix and @cell_rhs into the global objects.
+      constraints.distribute_local_to_global(cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
     }
-
-                                   // After the system of equations
-                                   // has been assembled just as for
-                                   // the previous examples, we still
-                                   // have to eliminate the
-                                   // constraints due to hanging
-                                   // nodes. This is done using the
-                                   // following two function calls:
-  hanging_node_constraints.condense (system_matrix);
-  hanging_node_constraints.condense (system_rhs);
-                                   // Using them, degrees of freedom
-                                   // associated to hanging nodes have
-                                   // been removed from the linear
-                                   // system and the independent
-                                   // variables are only the regular
-                                   // nodes. The constrained nodes are
+// Now we are done assembling the linear system.
+                                   // The constrained nodes are
                                    // still in the linear system
                                    // (there is a one on the diagonal
                                    // of the matrix and all other
                                    // entries for this line are set to
                                    // zero) but the computed values
-                                   // are invalid (the <code>condense</code>
-                                   // function modifies the system so
-                                   // that the values in the solution
-                                   // corresponding to constrained
-                                   // nodes are invalid, but that the
-                                   // system still has a well-defined
-                                   // solution; we compute the correct
+                                   // are invalid. We compute the correct
                                    // values for these nodes at the
-                                   // end of the <code>solve</code> function).
-
-                                   // As almost all the stuff before,
-                                   // the interpolation of boundary
-                                   // values works also for higher
-                                   // order elements without the need
-                                   // to change your code for that. We
-                                   // note that for proper results, it
-                                   // is important that the
-                                   // elimination of boundary nodes
-                                   // from the system of equations
-                                   // happens *after* the elimination
-                                   // of hanging nodes.
-  std::map<unsigned int,double> boundary_values;
-  VectorTools::interpolate_boundary_values (dof_handler,
-                                            0,
-                                            ZeroFunction<dim>(),
-                                            boundary_values);
-  MatrixTools::apply_boundary_values (boundary_values,
-                                      system_matrix,
-                                      solution,
-                                      system_rhs);
+                                   // end of the <code>solve</code> function.
 }
 
 
@@ -680,8 +645,8 @@ void Step6<dim>::assemble_system ()
                                  // have to incorporate hanging node
                                  // constraints. As mentioned above,
                                  // the degrees of freedom
-                                 // corresponding to hanging node
-                                 // constraints have been removed from
+                                 // from the ConstraintMatrix corresponding to hanging node
+                                 // constraints and boundary values have been removed from
                                  // the linear system by giving the
                                  // rows and columns of the matrix a
                                  // special treatment. This way, the
@@ -693,7 +658,7 @@ void Step6<dim>::assemble_system ()
                                  // constraints to assign to them the
                                  // values that they should have. This
                                  // process, called <code>distributing</code>
-                                 // hanging nodes, computes the values
+                                 // constraints, computes the values
                                  // of constrained nodes from the
                                  // values of the unconstrained ones,
                                  // and requires only a single
@@ -712,7 +677,7 @@ void Step6<dim>::solve ()
   solver.solve (system_matrix, solution, system_rhs,
                 preconditioner);
 
-  hanging_node_constraints.distribute (solution);
+  constraints.distribute (solution);
 }
 
 
@@ -1077,7 +1042,7 @@ void Step6<dim>::run ()
     }
 
                                    // After we have finished computing
-                                   // the solution on the finesh mesh,
+                                   // the solution on the finest mesh,
                                    // and writing all the grids to
                                    // disk, we want to also write the
                                    // actual solution on this final

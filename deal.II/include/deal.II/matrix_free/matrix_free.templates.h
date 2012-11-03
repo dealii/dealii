@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011 by the deal.II authors
+//    Copyright (C) 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1104,7 +1104,7 @@ namespace internal
                                                       number(scaling));
         return static_cast<unsigned int>
           (boost::hash_range(&mod_tensor[0][0],
-                             &mod_tensor[0][0]+dim*vectorization_length));
+                             &mod_tensor[dim-1][vectorization_length-1]+1));
       }
     else
       {
@@ -1116,8 +1116,7 @@ namespace internal
                                                            number(scaling));
         return static_cast<unsigned int>(boost::hash_range
                                          (&mod_tensor[0][0][0],
-                                          &mod_tensor[0][0][0]+
-                                          dim*dim*vectorization_length));
+                                          &mod_tensor[dim-1][dim-1][vectorization_length-1]+1));
       }
   }
 

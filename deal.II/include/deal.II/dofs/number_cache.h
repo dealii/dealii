@@ -44,6 +44,11 @@ namespace internal
                                           */
         std::size_t memory_consumption () const;
 
+        /**
+         * This function resets all the stored information.
+         */
+        void clear ();
+
                                          /**
                                           * Total number of dofs,
                                           * accumulated over all
