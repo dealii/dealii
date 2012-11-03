@@ -881,17 +881,16 @@ namespace Step40
                                  // step-6. Like in the other programs
                                  // that use PETSc, we have to
                                  // inialize and finalize PETSc, which
-                                 // also initializes and finalizes the
-                                 // MPI subsystem.
+                                 // is done using the helper object
+                                 // MPI_InitFinalize.
                                  //
                                  // Note how we enclose the use the
                                  // use of the LaplaceProblem class in
                                  // a pair of braces. This makes sure
                                  // that all member variables of the
                                  // object are destroyed by the time
-                                 // we hit the
-                                 // <code>PetscFinalize</code>
-                                 // call. Not doing this will lead to
+                                 // we destroy the mpi_intialization
+                                 // object. Not doing this will lead to
                                  // strange and hard to debug errors
                                  // when <code>PetscFinalize</code>
                                  // first deletes all PETSc vectors
@@ -906,15 +905,13 @@ int main(int argc, char *argv[])
       using namespace dealii;
       using namespace Step40;
 
-      PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
       deallog.depth_console (0);
 
       {
         LaplaceProblem<2> laplace_problem_2d;
         laplace_problem_2d.run ();
       }
-
-      PetscFinalize();
     }
   catch (std::exception &exc)
     {

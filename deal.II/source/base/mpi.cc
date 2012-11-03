@@ -27,6 +27,13 @@
 #  endif
 #endif
 
+#ifdef DEAL_II_USE_PETSC
+#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#    include <petscsys.h>
+#  endif
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -299,6 +306,11 @@ namespace Utilities
                           "in a program since it initializes the MPI system."));
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      // if we have PETSc, we will initialize it and let it handle MPI.
+      // Otherwise, we will do it.
+#ifdef DEAL_II_USE_PETSC
+      PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+#else
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
       AssertThrow (MPI_has_been_started == 0,
@@ -308,6 +320,7 @@ namespace Utilities
       mpi_err = MPI_Init (&argc, &argv);
       AssertThrow (mpi_err == 0,
                    ExcMessage ("MPI could not be initialized."));
+#endif
 #else
                                        // make sure the compiler doesn't warn
                                        // about these variables
@@ -350,6 +363,11 @@ namespace Utilities
         ::release_unused_memory ();
 #  endif
 
+#ifdef DEAL_II_USE_PETSC
+      PetscFinalize();
+#else
+
+
       int mpi_err = 0;
 
       int MPI_has_been_started = 0;
@@ -371,6 +389,7 @@ namespace Utilities
 
       AssertThrow (mpi_err == 0,
                    ExcMessage ("An error occurred while calling MPI_Finalize()"));
+#endif
 #endif
     }
 

@@ -108,6 +108,11 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> The class Utilities::MPI::MPI_InitFinalize now also initializes
+PETSc, when PETSc is installed.
+<br>
+(Timo Heister, 2012/11/02)
+
 <li> step-6 now uses ConstraintMatrix::distribute_local_to_global()
 instead of condense(), which is the preferred way to use a ConstraintMatrix
  (and the only sensible way in parallel).

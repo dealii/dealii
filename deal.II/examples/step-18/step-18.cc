@@ -2821,16 +2821,13 @@ int main (int argc, char **argv)
       using namespace dealii;
       using namespace Step18;
 
-      PetscInitialize(&argc,&argv,0,0);
-
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
       {
         deallog.depth_console (0);
 
         TopLevel<3> elastic_problem;
         elastic_problem.run ();
       }
-
-      PetscFinalize();
     }
   catch (std::exception &exc)
     {

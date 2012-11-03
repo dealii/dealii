@@ -267,6 +267,12 @@ namespace Utilities
                                       * program and to shut it down again at
                                       * the end.
                                       *
+                                      * If deal.II is configured with PETSc,
+                                      * the library will also be initialized
+                                      * in the beginning and destructed at the
+                                      * end automatically (internally by calling
+                                      * PetscInitialize() and PetscFinalize()).
+                                      *
                                       * If a program uses MPI one would
                                       * typically just create an object of
                                       * this type at the beginning of
