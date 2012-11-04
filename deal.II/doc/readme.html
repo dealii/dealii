@@ -217,7 +217,10 @@
 	make install
       </pre>
       These steps compile, link and install the deal.II libraries. The
-      whole process should take between a few minutes and an hour.<br />
+      whole process should take between a few minutes and an hour.
+    </p>
+
+    <p>
       <b>Note:</b>
       <ul>
 	<li> <code>/path/install/dir</code> is the directory where you want to
@@ -297,12 +300,16 @@
 
     <p>
       <acronym>deal.II</acronym> has a large number of optional interfaces to
-      other libraries. By default, <code>cmake</code> will enable interfaces
-      to all external libraries it can find in default paths, but this
-      behavior can all be selected using command line switches to the initial
-      call to <code>cmake</code>. A detailed description of how this
-      all works can be found <a href="cmake.html">here</a>. In the
-      following, let us summarize the most common configuration options.
+      other libraries. By default, <code>cmake</code> will enable support
+      for all external libraries it can find in default paths.
+      However, this behavior can be changed using command line switches to
+      the initial call to <code>cmake</code>. A detailed description
+      can be found <a href="cmake.html">here</a>.
+    </p>
+
+    <p>
+      In the following, let us summarize the most common configuration
+      options.
     </p>
 
     <a name="optional">
@@ -312,9 +319,9 @@
       <li>
 	<p>
 	  <i>Threading</i>: By default, deal.II supports parallelism between
-	  multiple cores on the same machine using both threads and a
+	  multiple cores on the same machine using threads and a
 	  task-based model built on the
-	  <a href="http://threadingbuildingblocks.org/"
+          <a href="http://threadingbuildingblocks.org/"
 	  target="_top">Threading Building Blocks</a>. You can switch
 	  threading off by passing the <code>-DDEAL_II_WITH_THREADS=OFF</code>
 	  argument to <code>cmake</code>.
@@ -340,7 +347,7 @@
 
     <p>
       When configuring interfacing to external libraries,
-      the <code>cmake</code> script by default tries to find any of these
+      the <code>cmake</code> script by default tries to find all of these
       libraries in a number of standard locations on your file system. For
       <i>optional</i> interfaces, it gives up if they are not there and
       <acronym>deal.II</acronym> will be built without them. However, there

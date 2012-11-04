@@ -202,6 +202,10 @@ code.member { color: #006000; }
 code.function { color: #006000; }
 code.global { color: #005030; }
 
+code {
+    white-space: nowrap;
+}
+
 td.build {
 	text-align: center;
 	vertical-align: middle;
