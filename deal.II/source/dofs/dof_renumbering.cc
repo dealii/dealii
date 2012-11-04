@@ -15,6 +15,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
@@ -2016,6 +2017,7 @@ namespace DoFRenumbering
                         center(center),
                         counter(counter)
           {}
+
                                          /**
                                           * Comparison operator
                                           */
@@ -2023,15 +2025,42 @@ namespace DoFRenumbering
         bool operator () (const DHCellIterator& c1,
                           const DHCellIterator& c2) const
           {
-	    Assert (dim >= 2,
-		    ExcMessage ("This operation only makes sense for dim>=2."));
+					     // dispatch to
+					     // dimension-dependent functions
+	    return compare (c1, c2, dealii::internal::int2type<dim>());
+          }
 
+      private:
+                                         /**
+                                          * Comparison operator for dim>=2
+                                          */
+        template <class DHCellIterator, int xdim>
+        bool compare (const DHCellIterator& c1,
+		      const DHCellIterator& c2,
+		      dealii::internal::int2type<xdim>) const
+	  {
             const Point<dim> v1 = c1->center() - center;
             const Point<dim> v2 = c2->center() - center;
             const double s1 = std::atan2(v1(0), v1(1));
             const double s2 = std::atan2(v2(0), v2(1));
             return ( counter ? (s1>s2) : (s2>s1));
           }
+
+
+                                         /**
+                                          * Comparison operator for dim==1
+                                          * where this function makes no sense
+                                          */
+        template <class DHCellIterator>
+        bool compare (const DHCellIterator& c1,
+		      const DHCellIterator& c2,
+		      dealii::internal::int2type<1>) const
+	  {
+	    Assert (dim >= 2,
+		    ExcMessage ("This operation only makes sense for dim>=2."));
+	    return false;
+          }
+
     };
   }
 
