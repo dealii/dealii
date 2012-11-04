@@ -25,6 +25,7 @@
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/slepc_spectral_transformation.h>
 
+#  include <petscconf.h>
 #  include <petscksp.h>
 #  include <slepceps.h>
 
@@ -250,7 +251,7 @@ namespace SLEPcWrappers
                                     */
       void
         get_eigenpair (const unsigned int index,
-#ifndef DEAL_II_USE_PETSC_COMPLEX
+#ifndef PETSC_USE_COMPLEX
                        double                    &kr,
 #else
                        std::complex<double>      &kr,
