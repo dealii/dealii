@@ -90,14 +90,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # Trilinos has to be configured with the same MPI configuration as
     # deal.II.
     #
-    # Epetra installs Epetra_MpiComm.h if configured trilinos was
-    # configured with mpi. We use this as a check for the mpi configuration
-    # of Epetra.
-    #
-    IF(EXISTS "${TRILINOS_INCLUDE_DIRS}/Epetra_MpiComm.h")
-      SET(TRILINOS_WITH_MPI TRUE)
-    ENDIF()
-
     IF( (TRILINOS_WITH_MPI AND NOT DEAL_II_COMPILER_SUPPORTS_MPI)
          OR
          (NOT TRILINOS_WITH_MPI AND DEAL_II_COMPILER_SUPPORTS_MPI))
