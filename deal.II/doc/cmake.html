@@ -20,8 +20,8 @@
       The <acronym>deal.II</acronym> <a href="readme.html"
       target="body">README</a> file gives an overview over the basics
       of configuring and building the <acronym>deal.II</acronym>
-      library. This page provides more details about configuring
-      with <code>cmake</code> and building with it.
+      library. This page provides more details about using the
+      <acronym>deal.II</acronym> CMake build system.
     </p>
 
     <p>
@@ -66,18 +66,18 @@
       When configuring <acronym>deal.II</acronym> by
       running <code>cmake</code>, the <code>cmake</code> program
       creates a cache in the current (build) directory that contains
-      the values of all variables that had previously been passed as
-      command line arguments, been found through running tests, or had
-      otherwise been set.
+      the values of all cached variables that had previously been passed
+      as command line arguments, been found through running tests,
+      or had otherwise been set.
     </p>
 
     <p>
       Normally, one will then simply build the library in this
       directory by calling <code>make</code> and install it. If the
       library changes, one would just call <code>make</code> again and
-      it would only re-compile those files that are depend on those
-      sources that have changed. In other words, one will rarely have
-      to deal with the cached variables at all.
+      it would only re-compile those files that depend on those sources
+      that have changed. In other words, one will rarely have to deal
+      with the cached variables at all.
     </p>
 
     <p>
@@ -95,10 +95,10 @@
       this
       <pre>
 
-	mkdir build
-	cd build
-	cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
-	cmake ../deal.II
+    mkdir build
+    cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+    cmake ../deal.II
       </pre>
       has absolutely no effect: In particular, the second time around
       it uses the <code>CMAKE_INSTALL_PREFIX</code> value previously
@@ -108,35 +108,35 @@
     </p>
 
     <p>
-      This cache has an important reason: one can modify all sorts of
-      configuration parameters and thereby interact with the
-      configuration system is rather powerful (and, possibly,
-      destructive) ways. For example, the following commands
+      The cache has an important reason: one can modify all sort of
+      configuration parameters and thereby interact with the configuration
+      system in rather powerful (and, possibly, destructive) ways. For
+      example, the following commands
       <pre>
 
-	mkdir build
-	cd build
-	cmake  ../deal.II
-	ccmake
+    mkdir build
+    cd build
+    cmake  ../deal.II
+    ccmake
       </pre>
-      First configure a bare-bone setup and then call
+      first configure a bare-bone setup and then call
       the <code>ccmake</code> program -- an interactive editor for the
       cached variables. Similarly,
       <pre>
 
-	mkdir build
-	cd build
-	cmake  ../deal.II
-	cmake -D&lt;OPTION&gt;=&lt;VALUE&gt; [...] ../deal.II
+    mkdir build
+    cd build
+    cmake  ../deal.II
+    cmake -D&lt;OPTION&gt;=&lt;VALUE&gt; [...] ../deal.II
       </pre>
       sets a variable the second time around without destroying all
       the configuration that has happened the first time around. Likewise,
       <pre>
 
-	mkdir build
-	cd build
-	cmake  ../deal.II
-        cmake -DDEAL_II_WITH_METIS=OFF ../
+    mkdir build
+    cd build
+    cmake  ../deal.II
+    cmake -DDEAL_II_WITH_METIS=OFF ../
       </pre>
       switches off support for the METIS library that may have been
       automatically detected the first time around but that we really
@@ -145,7 +145,7 @@
 
 
     <a name="compiling"></a>
-    <h3> Compiling and building only certain parts </h3>
+    <h3> Compiling only certain parts </h3>
 
     <p>
       Just like with simple <code>make</code>, <code>cmake</code>
@@ -154,11 +154,12 @@
       are. The most common scenario is that you only want to build
       debug or optimized libraries. This can be achieved using the
       following commands in the build directory:
+      <b>TODO: This is a bit misleading, as <code>make install</code> won't succeed</b>
       <pre>
 
-	make  deal_II.g     # only debug library
-	make  deal_II       # only release (optimized) library
-        make  all           # both
+    make  deal_II.g     # only debug library
+    make  deal_II       # only release (optimized) library
+    make  all           # both
       </pre>
     </p>
 
@@ -167,7 +168,7 @@
       finer-grained control, do
       <pre>
 
-        make  help
+    make  help
       </pre>
     </p>
 
@@ -176,14 +177,14 @@
       command does. In that case, use the following:
       <pre>
 
-        make  deal_II.g VERBOSE=ON
+    make  deal_II.g VERBOSE=ON
       </pre>
       This will show, for every command executed, the exact command
       line with which it was invoked, including compiler arguments,
-      etc. Every command <code>cmake</code> executes starts at the
-      build directory (rather than being executed by some recursively
-      invoked makefile) so that the command line can be copied and
-      executed from within the build directory.
+      etc. Every command <code>cmake</code> executes starts with
+      a <code>cd</code> command to change the current directory
+      appropriately so that the command line can be copied and executed
+      from anywhere within the build directory.
     </p>
 
 
@@ -191,8 +192,11 @@
     <h3>Fine tuning the configuration system</h3>
 
     <p>
-      The various configuration options of the deal.II library are organized in
-      three categories: feature, component and build/install configuration.
+      The various configuration options of the deal.II library are
+      organized in three categories: <a href="#tuningfeature">feature</a>,
+      <a href="#tuningcomp">component</a>, and
+      <a href="#tuningbuild">build</a>/<a href="#tuninginstall">install</a>
+      configuration.
     </p>
 
 
@@ -258,9 +262,7 @@
 	  no external library the bundled library will be used.
 
 	<li> If set to OFF bundled libraries will not be used and the dependency
-	  resolution will fail if there is no external library (except
-	  in the case of BOOST where we do need to rely on the bundled
-	  library since BOOST can't be disabled).
+	  resolution will fail if there is no external library
 
 	<li>DEAL_II_FORCE_BUNDLED_&lt;library&gt; forces the use of
 	  the bundled library regardless whether DEAL_II_ALLOW_BUNDLED
@@ -303,7 +305,7 @@
 	<li>
 	  FORCE_AUTODETECTION=ON: This will force the reconfiguration of every
 	  feature by undefining DEAL_II_WITH_&lt;FEATURE&gt; prior to configuration,
-	  effectively overwriting _any_ supplied or cached value.
+          effectively overwriting <b>any</b> supplied or cached value.
       </ul>
     </p>
 
@@ -321,7 +323,7 @@
 	    Paths specified via CMAKE_PREFIX_PATH take precedence, e.g. with
 	    <pre>
 
-              cmake -DCMAKE_PREFIX_PATH=~/workspace/local ../deal.II
+      cmake -DCMAKE_PREFIX_PATH=~/workspace/local ../deal.II
 	    </pre>
 	    libraries from ~/workspace/local will be preferred for dependency
 	    resolution.
@@ -333,13 +335,13 @@
 	    <i>some</i> libraries:
 	    <pre>
 
-              cmake -DP4EST_DIR=~/workspace/p4est-install/ ../deal.II
+      cmake -DP4EST_DIR=~/workspace/p4est-install/ ../deal.II
 	    </pre>
 	    or
 	    <pre>
 
-              export P4EST_DIR=~/workspace/p4est-install/
-              cmake ../deal.II
+      export P4EST_DIR=~/workspace/p4est-install/
+      cmake ../deal.II
 	    </pre>
 	    where -D&lt;library&gt;_DIR takes precedence over environment.
 	  </p>
@@ -347,14 +349,15 @@
 	  <p>
 	    Currently, the following variables will be considered:
 	    <pre>
-              HDF5_DIR
-              METIS_DIR,
-              MUMPS_DIR (and SCALAPACK_DIR, BLACS_DIR),
-              P4EST_DIR (and SC_DIR),
-              PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
-              SLEPC_DIR and SLEPC_ARCH (forming ${SLEPC_DIR}/${SLEPC_ARCH}),
-              TRILINOS_DIR,
-              UMFPACK_DIR (and AMD_DIR, SUITESPARSECONFIG_DIR)
+
+      HDF5_DIR
+      METIS_DIR,
+      MUMPS_DIR (and SCALAPACK_DIR, BLACS_DIR),
+      P4EST_DIR (and SC_DIR),
+      PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
+      SLEPC_DIR and SLEPC_ARCH (forming ${SLEPC_DIR}/${SLEPC_ARCH}),
+      TRILINOS_DIR,
+      UMFPACK_DIR (and AMD_DIR, SUITESPARSECONFIG_DIR)
 	    </pre>
 	  </p>
 
@@ -373,7 +376,7 @@
       You can get a list via
       <pre>
 
-	ccmake ../deal.II (or $ make edit_cache)
+        make edit_cache
       </pre>
       and entering advanced configuration mode by pressing [t].
       Variables that could not be determined are suffixed with -NOTFOUND and
