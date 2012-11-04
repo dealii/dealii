@@ -25,9 +25,41 @@
     </p>
 
     <p>
-    TODO: Table of Contents
+    <table class="tutorial" width="50%">
+      <tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
+      <tr><td valign="top">
+	  <ul>
+	    <li><a href="#operatingconf">Operating the configuration
+	    system</a>
+	    <li><a href="#compiling">Compiling and building only certain
+	    parts</a>
+	    <li><a href="#tuning">Fine tuning the configuration system</a>
+	      <ul>
+		<li><a href="#tuningfeature">Feature configuration</a>
+		<li><a href="#tuningautoconf">Autoconfiguration</a>
+		<li><a href="#tuningext">External library locations</a>
+		<li><a href="#tuningcomp">Component selection</a>
+		<li><a href="#tuningbuild">Build configuration</a>
+		<li><a href="#tuninginstall">Installation</a>
+	      </ul>
+	    <li><a href="#ext">How to use deal.II in your cmake project</a>
+	      <ul>
+		<li><a href="#extfinding">Finding the deal.II library</a>
+		<li><a href="#extcmake">deal.IIConfig.cmake</a>
+		<li><a href="#extsetup">Setting up necessary configuration variables</a>
+	      </ul>
+	    <li><a href="#dev">Developing the <acronym>deal.II</acronym> <code>cmake</code> system</a>
+	      <ul>
+		<li><a href="#devplatform">Writing platform checks</a>
+		<li><a href="#devfeature">Writing feature tests</a>
+	      </ul>
+	  </ul>
+	</td>
+      </tr>
+    </table>
     </p>
 
+    <a name="operatingconf"></a>
     <h3>Operating the configuration system</h3>
 
     <p>
@@ -112,6 +144,7 @@
     </p>
 
 
+    <a name="compiling"></a>
     <h3> Compiling and building only certain parts </h3>
 
     <p>
@@ -154,6 +187,7 @@
     </p>
 
 
+    <a name="tuning"></a>
     <h3>Fine tuning the configuration system</h3>
 
     <p>
@@ -162,6 +196,7 @@
     </p>
 
 
+    <a name="tuningfeature"></a>
     <h4>Feature configuration</h4>
 
     <p>
@@ -244,6 +279,7 @@
     </p>
 
 
+    <a name="tuningautoconf"></a>
     <h4> Autoconfiguration </h4>
 
     <p>
@@ -272,6 +308,7 @@
     </p>
 
 
+    <a name="tuningext"></a>
     <h4> External library locations </h4>
 
     <p>
@@ -344,6 +381,7 @@
     </p>
 
 
+    <a name="tuningcomp"></a>
     <h4> Component selection </h4>
 
     <p>
@@ -375,6 +413,7 @@
     </p>
 
 
+    <a name="tuningbuild"></a>
     <h4> Build configuration </h4>
 
     <p>
@@ -424,6 +463,7 @@
     </p>
 
 
+    <a name="tuninginstall"></a>
     <h4> Installation </h4>
 
     <p>
@@ -474,6 +514,7 @@
     </p>
 
 
+    <a name="ext"></a>
     <h3> How to use deal.II in your cmake project </h3>
 
     <p>
@@ -483,6 +524,7 @@
     </p>
 
 
+    <a name="extfinding"></a>
     <h4> Finding the deal.II library </h4>
 
     <p>
@@ -513,6 +555,7 @@
     </p>
 
 
+    <a name="extcmake"></a>
     <h4>  deal.IIConfig.cmake </h4>
 
     <p>
@@ -548,6 +591,7 @@
 
 
 
+    <a name="extsetup"></a>
     <h4> Setting up necessary configuration variables </h4>
 
     <p>
@@ -683,7 +727,8 @@
     </p>
 
 
-    <h3> Development </h3>
+    <a name="dev"></a>
+    <h3> Developing the <acronym>deal.II</acronym> <code>cmake</code>system </h3>
 
     <p>
       To keep things clean, only the following variables should appended in the
@@ -761,6 +806,7 @@
     </p>
 
 
+    <a name="devplatform"></a>
     <h4>  Writing platform checks </h4>
 
     <p>
@@ -839,6 +885,7 @@
     </p>
 
 
+    <a name="devfeature"></a>
     <h4> Writing feature tests </h4>
 
     <p>
