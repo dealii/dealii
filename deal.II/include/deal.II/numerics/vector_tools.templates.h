@@ -268,7 +268,6 @@ namespace VectorTools
                     const Function<DH::space_dimension>   &function,
                     VECTOR                &vec)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     interpolate(StaticMappingQ1<DH::dimension, DH::space_dimension>::mapping,
                 dof, function, vec);
   }
@@ -645,7 +644,6 @@ namespace VectorTools
                 const Quadrature<dim-1>  &q_boundary,
                 const bool                project_to_boundary_first)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     project(StaticMappingQ1<dim,spacedim>::mapping, dof, constraints, quadrature, function, vec,
             enforce_zero_boundary, q_boundary, project_to_boundary_first);
   }
@@ -770,7 +768,6 @@ namespace VectorTools
                                const Function<spacedim>      &rhs_function,
                                Vector<double>           &rhs_vector)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_right_hand_side(StaticMappingQ1<dim,spacedim>::mapping, dof_handler, quadrature,
                            rhs_function, rhs_vector);
   }
@@ -909,7 +906,6 @@ namespace VectorTools
                                const Function<spacedim>      &rhs_function,
                                Vector<double>           &rhs_vector)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_right_hand_side(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
                            dof_handler, quadrature,
                            rhs_function, rhs_vector);
@@ -957,7 +953,6 @@ namespace VectorTools
                                    const Point<spacedim>         &p,
                                    Vector<double>           &rhs_vector)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_point_source_vector(StaticMappingQ1<dim,spacedim>::mapping, dof_handler,
                                p, rhs_vector);
   }
@@ -1002,7 +997,6 @@ namespace VectorTools
                                    const Point<spacedim>         &p,
                                    Vector<double>           &rhs_vector)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
                                dof_handler,
                                p, rhs_vector);
@@ -1053,7 +1047,6 @@ namespace VectorTools
                                    const Point<dim>                  &orientation,
                                    Vector<double>                    &rhs_vector)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_point_source_vector(StaticMappingQ1<dim,spacedim>::mapping, dof_handler,
                                p, orientation, rhs_vector);
   }
@@ -1101,7 +1094,6 @@ namespace VectorTools
                                    const Point<dim>                     &orientation,
                                    Vector<double>                       &rhs_vector)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
                                dof_handler,
                                p, orientation, rhs_vector);
@@ -1270,8 +1262,6 @@ namespace VectorTools
                                    Vector<double>          &rhs_vector,
                                    const std::set<types::boundary_id> &boundary_indicators)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-
     create_boundary_right_hand_side(StaticMappingQ1<dim>::mapping, dof_handler,
                                     quadrature,
                                     rhs_function, rhs_vector,
@@ -1453,7 +1443,6 @@ namespace VectorTools
                                    Vector<double>                &rhs_vector,
                                    const std::set<types::boundary_id> &boundary_indicators)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_boundary_right_hand_side(hp::StaticMappingQ1<dim>::mapping_collection,
                                     dof_handler, quadrature,
                                     rhs_function, rhs_vector,
@@ -1943,7 +1932,6 @@ namespace VectorTools
                                std::map<unsigned int,double> &boundary_values,
                                const ComponentMask       &component_mask)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     interpolate_boundary_values(StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
                                 dof, boundary_component,
                                 boundary_function, boundary_values, component_mask);
@@ -1958,7 +1946,6 @@ namespace VectorTools
                                std::map<unsigned int,double> &boundary_values,
                                const ComponentMask       &component_mask)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     interpolate_boundary_values(StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
                                 dof, function_map,
                                 boundary_values, component_mask);
@@ -2027,7 +2014,6 @@ namespace VectorTools
    ConstraintMatrix                    &constraints,
    const ComponentMask             &component_mask)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     interpolate_boundary_values(StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
                                 dof, boundary_component,
                                 boundary_function, constraints, component_mask);
@@ -2043,7 +2029,6 @@ namespace VectorTools
    ConstraintMatrix                                      &constraints,
    const ComponentMask                               &component_mask)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     interpolate_boundary_values(StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
                                 dof, function_map,
                                 constraints, component_mask);
@@ -2267,7 +2252,6 @@ namespace VectorTools
                            std::map<unsigned int,double> &boundary_values,
                            std::vector<unsigned int> component_mapping)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     project_boundary_values(StaticMappingQ1<dim,spacedim>::mapping, dof, boundary_functions, q,
                             boundary_values, component_mapping);
   }
@@ -2313,7 +2297,6 @@ namespace VectorTools
                            ConstraintMatrix &constraints,
                            std::vector<unsigned int> component_mapping)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     project_boundary_values(StaticMappingQ1<dim,spacedim>::mapping, dof, boundary_functions, q,
                             constraints, component_mapping);
   }
@@ -5314,7 +5297,6 @@ namespace VectorTools
                         const Function<spacedim>      *weight,
                         const double              exponent)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     internal
       ::do_integrate_difference(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
                                 dof, fe_function, exact_solution,
@@ -5355,7 +5337,6 @@ namespace VectorTools
                         const Function<spacedim>      *weight,
                         const double              exponent)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     internal
       ::do_integrate_difference(hp::StaticMappingQ1<dim>::mapping_collection,
                                 dof, fe_function, exact_solution,
@@ -5664,7 +5645,7 @@ namespace VectorTools
             }
         }
 
-#if DEAL_II_USE_P4EST
+#ifdef DEAL_II_USE_P4EST
                                      // if this was a distributed
                                      // DoFHandler, we need to do the
                                      // reduction over the entire domain
@@ -5695,7 +5676,6 @@ namespace VectorTools
                       const InVector        &v,
                       const unsigned int     component)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     return compute_mean_value(StaticMappingQ1<dim,spacedim>::mapping, dof, quadrature, v, component);
   }
 }
