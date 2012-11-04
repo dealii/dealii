@@ -27,6 +27,17 @@
 #  endif
 #endif
 
+#ifdef DEAL_II_USE_PETSC
+#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#    include <petscsys.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#  endif
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -299,6 +310,11 @@ namespace Utilities
                           "in a program since it initializes the MPI system."));
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      // if we have PETSc, we will initialize it and let it handle MPI.
+      // Otherwise, we will do it.
+#ifdef DEAL_II_USE_PETSC
+      PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+#else
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
       AssertThrow (MPI_has_been_started == 0,
@@ -308,6 +324,7 @@ namespace Utilities
       mpi_err = MPI_Init (&argc, &argv);
       AssertThrow (mpi_err == 0,
                    ExcMessage ("MPI could not be initialized."));
+#endif
 #else
                                        // make sure the compiler doesn't warn
                                        // about these variables
@@ -323,7 +340,6 @@ namespace Utilities
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 
-#  if defined(DEAL_II_USE_TRILINOS) && !defined(__APPLE__)
                                        // make memory pool release all
                                        // vectors that are no longer
                                        // used at this point. this is
@@ -334,6 +350,7 @@ namespace Utilities
                                        // MPI_Finalize is called,
                                        // leading to errors
                                        //
+#  if defined(DEAL_II_USE_TRILINOS) && !defined(__APPLE__)
                                        // TODO: On Mac OS X, shared libs can
                                        // only depend on other libs listed
                                        // later on the command line. This
@@ -349,6 +366,22 @@ namespace Utilities
       GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>
         ::release_unused_memory ();
 #  endif
+
+				       // Same for PETSc.
+#ifdef DEAL_II_USE_PETSC
+      GrowingVectorMemory<PETScWrappers::MPI::Vector>
+        ::release_unused_memory ();
+      GrowingVectorMemory<PETScWrappers::MPI::BlockVector>
+        ::release_unused_memory ();
+      GrowingVectorMemory<PETScWrappers::Vector>
+        ::release_unused_memory ();
+      GrowingVectorMemory<PETScWrappers::BlockVector>
+        ::release_unused_memory ();
+
+				       // now end PETSc.
+      PetscFinalize();
+#else
+
 
       int mpi_err = 0;
 
@@ -371,6 +404,7 @@ namespace Utilities
 
       AssertThrow (mpi_err == 0,
                    ExcMessage ("An error occurred while calling MPI_Finalize()"));
+#endif
 #endif
     }
 

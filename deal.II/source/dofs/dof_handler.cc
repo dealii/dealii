@@ -842,6 +842,8 @@ void DoFHandler<dim,spacedim>::clear_space ()
 
   std::vector<unsigned int> tmp;
   std::swap (vertex_dofs, tmp);
+
+  number_cache.clear ();
 }
 
 

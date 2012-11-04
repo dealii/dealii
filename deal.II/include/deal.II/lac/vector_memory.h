@@ -241,9 +241,9 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
  *
  * All GrowingVectorMemory objects of the same vector type use the
  * same memory Pool. Therefore, functions can create such a
- * VectorMemory object whenever needed without preformance penalty. A
+ * VectorMemory object whenever needed without performance penalty. A
  * drawback of this policy might be that vectors once allocated are
- * only released at the end of the program run. Nebertheless, the
+ * only released at the end of the program run. Nevertheless, the
  * since they are reused, this should be of no concern. Additionally,
  * the destructor of the Pool warns about memory leaks.
  *
