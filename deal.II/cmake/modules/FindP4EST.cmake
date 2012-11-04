@@ -26,8 +26,30 @@ INCLUDE(FindPackageHandleStandardArgs)
 SET_IF_EMPTY(P4EST_DIR "$ENV{P4EST_DIR}")
 
 #
-# Search for the sc library, usually bundled with p4est:
+# We used to recommend installing p4est with a custom script that
+# compiled p4est twice, once in debug and once in optimized mode.
+# the installation would then have happened into directories
+# $P4EST_DIR/DEBUG and $P4EST_DIR/FAST. If we can find these
+# two directories, then use the FAST directory rather than trying
+# to figure out how we can build deal.II against the two libraries
+# depending on whether we are in debug or optimized mode.
 #
+IF (P4EST_DIR
+    AND
+    EXISTS ${P4EST_DIR}/DEBUG
+    AND
+    EXISTS ${P4EST_DIR}/FAST)
+  MESSAGE("-- Found old-style p4est directory layout")
+  SET (P4EST_DIR ${P4EST_DIR}/FAST)
+ENDIF()
+
+
+#
+# Search for the sc library, usually bundled with p4est. If no SC_DIR was
+# given, take what we chose for p4est.
+#
+SET_IF_EMPTY(SC_DIR "$ENV{SC_DIR}")
+SET_IF_EMPTY(SC_DIR "${P4EST_DIR}")
 FIND_PACKAGE(SC)
 
 FIND_PATH(P4EST_INCLUDE_DIR p4est.h
