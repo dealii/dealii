@@ -39,7 +39,7 @@ IF (P4EST_DIR
     EXISTS ${P4EST_DIR}/DEBUG
     AND
     EXISTS ${P4EST_DIR}/FAST)
-  MESSAGE("-- Found old-style p4est directory layout")
+  MESSAGE(STATUS "Found old-style p4est directory layout")
   SET (P4EST_DIR ${P4EST_DIR}/FAST)
 ENDIF()
 
