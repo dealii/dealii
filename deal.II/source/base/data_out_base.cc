@@ -1084,6 +1084,8 @@ namespace
     unsigned int d2,
     unsigned int d3)
   {
+    Assert (dim <= 3, ExcNotImplemented());
+
     int nodes[8];
     nodes[GeometryInfo<dim>::dx_to_deal[0]] = start;
     nodes[GeometryInfo<dim>::dx_to_deal[1]] = start+d1;
@@ -1306,6 +1308,8 @@ namespace
     unsigned int d2,
     unsigned int d3)
   {
+    Assert (dim <= 3, ExcNotImplemented());
+
     int nodes[8];
     nodes[GeometryInfo<dim>::ucd_to_deal[0]] = start;
     nodes[GeometryInfo<dim>::ucd_to_deal[1]] = start+d1;
