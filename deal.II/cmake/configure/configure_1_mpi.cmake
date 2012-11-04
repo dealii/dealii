@@ -44,8 +44,8 @@ MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL var)
   LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${MPI_CXX_INCLUDE_PATH})
 
 
-  SET(DEAL_II_USE_MPICXX OFF CACHE BOOL
-    "Set the compiler to the detected mpi wrapper"
+  SET(DEAL_II_USE_MPICXX ON CACHE BOOL
+    "Set the compiler to the detected mpi wrapper ${MPI_CXX_COMPILER}"
     )
 
   IF(DEAL_II_MPICXX)
