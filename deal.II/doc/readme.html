@@ -65,7 +65,8 @@
       platforms:
       <ul>
 	<li>Linux: using the GCC compiler versions 4.0 or later; using the
-	  clang compiler version 3.1 or later.
+	  Clang compiler version 3.0 or later; using the ICC compiler
+          version 12 or later.
 	<li>Mac OS X: using the GCC compiler version 4.0 or later (Please see
           the <a href="http://dealii.sourceforge.net/index.php?title=Main_Page"
 		 target="_top">deal.II Wiki</a> for installation issues);
@@ -96,21 +97,27 @@
     <a name="additional-software"></a>
     <h3>Additional software requirements</h3>
 
-    In order to compile and use the <acronym>deal.II</acronym>
-    libraries you need to have the following programs installed:
+    <p>
+      In order to compile and use the <acronym>deal.II</acronym>
+      libraries you need to have the following programs installed:
+    </p>
     <ul>
       <li> <p>
+          <a href="http://www.cmake.org/" target="_top">CMake</a> version 2.8.8 or later
+	</p>
+
+      <li> <p>
           <a href="http://www.gnu.org/software/make/" target="_top">GNU make</a>, version
-          3.78 or later. Non-GNU versions of this program will usually fail
-          to work and are not supported.
+          3.78 or later (or any other generator supported by CMake)
 	</p>
 
       <li> <p>
-          <a href="http://www.cmake.org/" target="_top">CMake</a> version 2.8.8 or later.
-	</p>
-
-      <li> <p>
-          <a href="http://www.perl.org/" target="_top">Perl 5.x</a>.
+          For generating the documentation:
+          <a href="http://www.perl.org/" target="_top">Perl 5.x</a>,
+	  <a href="http://www.doxygen.org/" target="_top">doxygen</a>
+          and <code>dot</code>, which is part of the
+	  <a href="http://www.graphviz.org" target="_top">GraphViz</a>
+          package
 	</p>
 
       <li> <p>
@@ -126,19 +133,6 @@
 	</p>
 
       <li> <p>
-          To generate the documentation locally on your
-	  machine from the <acronym>deal.II</acronym> header files, you need
-	  <a href="http://www.doxygen.org/" target="_top">doxygen</a>
-	  on your machine. If not, you can still work with the library and
-	  use the documentation provided on our homepage for reference.
-          In order to generate inheritance graphs for classes, doxygen
-          can use the <code>dot</code> program, which is part of the
-	  <a href="http://www.graphviz.org" target="_top">GraphViz</a>
-          package. If this program is not available, then doxygen attempts to
-          generate text-mode graphs; these are much less nice, though.
-	</p>
-
-      <li> <p>
           The library generates output in formats readable by
           <a href="http://www.ucc.ie/gnuplot/gnuplot-faq.html" target="_top">GNUPLOT</a>,
 	  <a href="http://www-xdiv.lanl.gov/XCM/gmv/" target="_top">GMV
@@ -149,27 +143,29 @@
 	  <a href="http://www.avs.com" target="_top">AVS Explorer</a>,
 	  <a href="http://www.opendx.org" target="_top">Open DX</a>,
 	  <a href="http://www.povray.org" target="_top">Povray</a>,
-          and directly to Encapsulated Postscript. GNUPLOT and a
-          postscript viewer (for EPS) should be available almost
-          everywhere. In the last few years, most new visualization
-          programs have moved to support VTK/VTU format. There are a
-          number of excellent programs that can read VTK and VTU, such as <a
-									     href="http://www.llnl.gov/visit/" target="_top">Visit</a>,
-	  <a href="http://www.paraview.org/HTML/Index.html"
-             target="_top">ParaView</a>, as well as others.
-	  Povray is freely available for almost all
-          platforms. AVS is a commercial program available for most
-          Unix flavors. Tecplot is a commercial program available for
-          Windows and most Unix platforms.
+          and directly to Encapsulated Postscript.
+        </p>
+        <p>
+          <code>gnuplot</code>
+          and a postscript viewer (for <code>eps</code>) should be
+          available almost everywhere. In the last few years, most
+          new visualization programs have moved to support
+          <code>vtk</code>/<code>vtu</code> format. There are a number
+          of excellent programs that can read <code>vtk</code> and
+          <code>vtu</code>, such as
+          <a href="http://www.llnl.gov/visit/" target="_top">Visit</a>,
+          <a href="http://www.paraview.org/HTML/Index.html" target="_top">ParaView</a>,
+	  as well as others. Povray is freely available for almost all
+	  platforms. AVS is a commercial program available for most Unix
+	  flavors. Tecplot is a commercial program available for Windows
+	  and most Unix platforms.
 	</p>
-
 	<p>
-	  In case you didn't find your favorite graphics format above, adding a new
-	  writer to <acronym>deal.II</acronym> is not too difficult as only a
-	  simple
-	  intermediate format needs to be
-	  converted into output (without references to cells,
-	  nodes, types of finite elements, and the like).
+	  In case you didn't find your favorite graphics format above,
+	  adding a new writer to <acronym>deal.II</acronym> is not too
+	  difficult, as only a simple intermediate format needs to be
+	  converted into output (without references to cells, nodes,
+	  types of finite elements, and the like).
 	</p>
     </ul>
 
