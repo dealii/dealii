@@ -131,7 +131,7 @@ void Timer::start ()
   start_time = windows::cpu_clock();
   start_time_children = start_time;
 #else
-#  error unsupported platform. Porting not finished.
+#  error Unsupported platform. Porting not finished.
 #endif
 }
 
@@ -165,7 +165,7 @@ double Timer::stop ()
       double time = windows::wall_clock() - start_wall_time;
       cumulative_time += windows::cpu_clock() - start_time;
 #else
-#  error unsupported platform. Porting not finished.
+#  error Unsupported platform. Porting not finished.
 #endif
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
@@ -216,7 +216,7 @@ double Timer::operator() () const
       const double running_time = windows::cpu_clock() - start_time + cumulative_time;
       return running_time;
 #else
-#  error unsupported platform. Porting not finished.
+#  error Unsupported platform. Porting not finished.
 #endif
     }
   else
