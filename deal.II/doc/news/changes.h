@@ -154,6 +154,12 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The TrilinosWrappers::PreconditionBase class now has
+a function TrilinosWrappers::PreconditionBase::Tvmult that
+allows applying the transpose preconditioner.
+<br>
+(Guido Kanschat, 2012/11/04)
+
 <li> New: The parallel::distributed::Triangulation::n_global_levels()
 function returns the maximal refinement level over all involved
 processors.

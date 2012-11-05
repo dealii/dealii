@@ -116,6 +116,12 @@ namespace TrilinosWrappers
                   const VectorBase &src) const;
 
                                        /**
+                                        * Apply transpose the preconditioner.
+                                        */
+      void Tvmult (VectorBase       &dst,
+                  const VectorBase &src) const;
+
+                                       /**
                                         * Apply the preconditioner on
                                         * deal.II data structures
                                         * instead of the ones provided
@@ -126,12 +132,31 @@ namespace TrilinosWrappers
                   const dealii::Vector<double> &src) const;
 
                                        /**
+                                        * Apply the transpose preconditioner on
+                                        * deal.II data structures
+                                        * instead of the ones provided
+                                        * in the Trilinos wrapper
+                                        * class.
+                                        */
+      void Tvmult (dealii::Vector<double>       &dst,
+                  const dealii::Vector<double> &src) const;
+
+                                       /**
                                         * Apply the preconditioner on deal.II
                                         * parallel data structures instead of
                                         * the ones provided in the Trilinos
                                         * wrapper class.
                                         */
       void vmult (dealii::parallel::distributed::Vector<double>       &dst,
+                  const dealii::parallel::distributed::Vector<double> &src) const;
+
+                                       /**
+                                        * Apply the transpose preconditioner on deal.II
+                                        * parallel data structures instead of
+                                        * the ones provided in the Trilinos
+                                        * wrapper class.
+                                        */
+      void Tvmult (dealii::parallel::distributed::Vector<double>       &dst,
                   const dealii::parallel::distributed::Vector<double> &src) const;
 
                                        /**
@@ -1488,6 +1513,23 @@ namespace TrilinosWrappers
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
+  inline
+  void
+  PreconditionBase::Tvmult (VectorBase       &dst,
+                           const VectorBase &src) const
+  {
+    Assert (dst.vector_partitioner().SameAs(preconditioner->OperatorRangeMap()),
+            ExcNonMatchingMaps("dst"));
+    Assert (src.vector_partitioner().SameAs(preconditioner->OperatorDomainMap()),
+            ExcNonMatchingMaps("src"));
+    
+    preconditioner->SetUseTranspose(true);
+    const int ierr = preconditioner->ApplyInverse (src.trilinos_vector(),
+                                                   dst.trilinos_vector());
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    preconditioner->SetUseTranspose(false);
+  }
+
 
                                         // For the implementation of
                                         // the <code>vmult</code>
@@ -1531,6 +1573,26 @@ namespace TrilinosWrappers
   }
 
 
+  inline
+  void PreconditionBase::Tvmult (dealii::Vector<double>       &dst,
+                                const dealii::Vector<double> &src) const
+  {
+    AssertDimension (static_cast<int>(dst.size()),
+                     preconditioner->OperatorDomainMap().NumMyElements());
+    AssertDimension (static_cast<int>(src.size()),
+                     preconditioner->OperatorRangeMap().NumMyElements());
+    Epetra_Vector tril_dst (View, preconditioner->OperatorDomainMap(),
+                            dst.begin());
+    Epetra_Vector tril_src (View, preconditioner->OperatorRangeMap(),
+                            const_cast<double*>(src.begin()));
+
+    preconditioner->SetUseTranspose(true);
+    const int ierr = preconditioner->ApplyInverse (tril_src, tril_dst);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    preconditioner->SetUseTranspose(false);
+  }
+
+
 
   inline
   void
@@ -1548,6 +1610,26 @@ namespace TrilinosWrappers
 
     const int ierr = preconditioner->ApplyInverse (tril_src, tril_dst);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+  inline
+  void
+  PreconditionBase::Tvmult (parallel::distributed::Vector<double>       &dst,
+                           const parallel::distributed::Vector<double> &src) const
+  {
+    AssertDimension (static_cast<int>(dst.local_size()),
+                     preconditioner->OperatorDomainMap().NumMyElements());
+    AssertDimension (static_cast<int>(src.local_size()),
+                     preconditioner->OperatorRangeMap().NumMyElements());
+    Epetra_Vector tril_dst (View, preconditioner->OperatorDomainMap(),
+                            dst.begin());
+    Epetra_Vector tril_src (View, preconditioner->OperatorRangeMap(),
+                            const_cast<double*>(src.begin()));
+
+    preconditioner->SetUseTranspose(true);
+    const int ierr = preconditioner->ApplyInverse (tril_src, tril_dst);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    preconditioner->SetUseTranspose(false);
   }
 
 #endif
