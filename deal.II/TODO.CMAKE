@@ -1,7 +1,8 @@
 Major:
 
-* Rename: DEAL_II_ALLOW_AUTODETECTION
-* Rename: DEAL_II_FORCE_AUTODETECTION
+* The documentation
+
+* Example usage (Autopilot/Big project)
 
 Minor:
 
