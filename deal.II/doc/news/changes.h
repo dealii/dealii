@@ -154,6 +154,31 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The TrilinosWrappers::PreconditionBase class now has
+a function TrilinosWrappers::PreconditionBase::Tvmult that
+allows applying the transpose preconditioner.
+<br>
+(Guido Kanschat, 2012/11/04)
+
+<li> New: The parallel::distributed::Triangulation::n_global_levels()
+function returns the maximal refinement level over all involved
+processors.
+<br>
+(Timo Heister, 2012/11/04)
+
+<li> New: In addition to the regular subdomain ids (see
+@ref GlossSubdomainId) there is now a second set of flags called
+"level subdomain ids" that also assigns a subdomain to every cell
+in a multigrid hierarchy.
+<br>
+(Timo Heister, 2012/11/04)
+
+<li> Changed: GridOut::write_xfig has been improved in a number
+of ways. In particular, one can now color cells based on a number
+of different criteria that can be set in GridOutFlags::XFig.
+<br>
+(Guido Kanschat, 2012/11/04)
+
 <li> New: The PETScWrappers::SparseDirectMUMPS class now allows to
 exploit symmetry of the matrix, using the
 PETScWrappers::SparseDirectMUMPS::set_symmetric_mode() function.

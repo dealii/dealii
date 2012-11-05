@@ -621,7 +621,22 @@ namespace GridOutFlags
                                         * Draw boundary lines. Default is true.
                                         */
       bool draw_boundary;
+      	  	  	  	  	  	  	  	  /**
+      	  	  	  	  	  	  	  	   * An enum used for deciding which field is used for coloring the cells.
+      	  	  	  	  	  	  	  	   */
+      enum Coloring {
+    	  /// Convert the material id into the cell color
+    	  material_id,
+    	  /// Convert the level into the cell color
+    	  level_number,
+    	  /// Convert the global subdomain id into the cell color
+    	  subdomain_id,
+    	  /// Convert the level subdomain id into the cell color
+    	  level_subdomain_id
+      } color_by;
                                        /**
+                                        * @deprecated Use the #color_by enum instead. If #color_by is different from #material_id, this flag is ignored.
+                                        *
                                         * Change color depending on
                                         * level. Default is false, therefore,
                                         * color is coded by material or

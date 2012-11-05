@@ -52,6 +52,11 @@ namespace internal
                                 total_cells - subdomain_ids.size(),
                                 0);
 
+          level_subdomain_ids.reserve (total_cells);
+          level_subdomain_ids.insert (level_subdomain_ids.end(),
+                                total_cells - level_subdomain_ids.size(),
+                                0);
+
           if (dimension < space_dimension)
             {
               direction_flags.reserve (total_cells);
@@ -122,6 +127,7 @@ namespace internal
               MemoryConsumption::memory_consumption (coarsen_flags) +
               MemoryConsumption::memory_consumption (neighbors) +
               MemoryConsumption::memory_consumption (subdomain_ids) +
+              MemoryConsumption::memory_consumption (level_subdomain_ids) +
               MemoryConsumption::memory_consumption (parents) +
               MemoryConsumption::memory_consumption (direction_flags) +
               MemoryConsumption::memory_consumption (cells));
@@ -157,6 +163,11 @@ namespace internal
           subdomain_ids.reserve (total_cells);
           subdomain_ids.insert (subdomain_ids.end(),
                                 total_cells - subdomain_ids.size(),
+                                0);
+
+          level_subdomain_ids.reserve (total_cells);
+          level_subdomain_ids.insert (level_subdomain_ids.end(),
+                                total_cells - level_subdomain_ids.size(),
                                 0);
 
           if (dimension < space_dimension)

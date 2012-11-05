@@ -2699,6 +2699,17 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                       */
     void set_subdomain_id (const types::subdomain_id new_subdomain_id) const;
 
+    /**
+     * Get the level subdomain id of this cell. This is used for parallel multigrid.
+     */
+    types::subdomain_id_t level_subdomain_id () const;
+
+    /**
+     * Set the level subdomain id of this cell. This is used for parallel multigrid.
+     */
+    void set_level_subdomain_id (const types::subdomain_id_t new_level_subdomain_id) const;
+
+
                                      /**
                                       * Set the subdomain id of this
                                       * cell and all its children (and

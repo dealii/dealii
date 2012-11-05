@@ -441,6 +441,11 @@ namespace parallel
                                           */
         unsigned int n_global_active_cells () const;
 
+        /**
+         * Returns the global maximum level. This may be bigger than n_levels.
+         */
+        virtual unsigned int n_global_levels () const;
+
                                          /**
                                           * Return the number of
                                           * active cells owned by each
@@ -627,6 +632,7 @@ namespace parallel
         {
             std::vector<unsigned int> n_locally_owned_active_cells;
             unsigned int              n_global_active_cells;
+            unsigned int              n_global_levels;
         };
 
         NumberCache number_cache;
@@ -825,6 +831,7 @@ namespace parallel
                                           * distributed triangulation.
                                           */
         unsigned int n_global_active_cells () const;
+        virtual unsigned int n_global_levels () const;
 
                                          /**
                                           * Returns a permutation vector for the order the coarse

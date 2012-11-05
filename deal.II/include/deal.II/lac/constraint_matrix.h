@@ -1055,6 +1055,15 @@ class ConstraintMatrix : public Subscriptor
                                 VectorType                      &global_vector,
                                 const FullMatrix<double>        &local_matrix) const;
 
+				     /**
+				      * Enter a single value into a
+				      * result vector, obeying constraints.
+				      */
+    template <class VectorType>
+    void
+    distribute_local_to_global (const unsigned int index,
+				const double       value,
+				VectorType        &global_vector) const;
 
                                      /**
                                       * This function takes a pointer to a
@@ -1983,30 +1992,36 @@ ConstraintMatrix::can_store_line (unsigned int line_index) const
 
 
 
-template <class InVector, class OutVector>
+template <class VectorType>
 inline
-void
-ConstraintMatrix::
-distribute_local_to_global (const InVector                  &local_vector,
-                            const std::vector<unsigned int> &local_dof_indices,
-                            OutVector                       &global_vector) const
+void ConstraintMatrix::distribute_local_to_global (
+  const unsigned int index,
+  const double       value,
+  VectorType        &global_vector) const
 {
-  Assert (local_vector.size() == local_dof_indices.size(),
-          ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
-  distribute_local_to_global (local_vector.begin(), local_vector.end(),
-                              local_dof_indices.begin(), global_vector);
-}
+  Assert (sorted == true, ExcMatrixNotClosed());
 
+  if (is_constrained(index) == false)
+    global_vector(index) += value;
+  else
+    {
+      const ConstraintLine& position =
+	lines[lines_cache[calculate_line_index(index)]];
+      for (unsigned int j=0; j<position.entries.size(); ++j)
+	global_vector(position.entries[j].first)
+	  += value * position.entries[j].second;
+    }
+}
 
 
 template <typename ForwardIteratorVec, typename ForwardIteratorInd,
           class VectorType>
 inline
-void ConstraintMatrix::
-  distribute_local_to_global (ForwardIteratorVec local_vector_begin,
-                              ForwardIteratorVec local_vector_end,
-                              ForwardIteratorInd local_indices_begin,
-                              VectorType        &global_vector) const
+void ConstraintMatrix::distribute_local_to_global (
+  ForwardIteratorVec local_vector_begin,
+  ForwardIteratorVec local_vector_end,
+  ForwardIteratorInd local_indices_begin,
+  VectorType        &global_vector) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   for ( ; local_vector_begin != local_vector_end;
@@ -2023,6 +2038,21 @@ void ConstraintMatrix::
               += *local_vector_begin * position.entries[j].second;
         }
     }
+}
+
+
+template <class InVector, class OutVector>
+inline
+void
+ConstraintMatrix::distribute_local_to_global (
+  const InVector                  &local_vector,
+  const std::vector<unsigned int> &local_dof_indices,
+  OutVector                       &global_vector) const
+{
+  Assert (local_vector.size() == local_dof_indices.size(),
+          ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
+  distribute_local_to_global (local_vector.begin(), local_vector.end(),
+                              local_dof_indices.begin(), global_vector);
 }
 
 
