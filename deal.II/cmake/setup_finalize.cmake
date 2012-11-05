@@ -94,9 +94,9 @@ IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
 "
 #
 #  The bundled UMFPACK library will be compiled with the following C compiler:
-#        CMAKE_C_COMPILER:         ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
-#                                  ${CMAKE_C_COMPILER}
-#        CMAKE_C_FLAGS:            ${CMAKE_C_FLAGS}
+#        CMAKE_C_COMPILER:        ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
+#                                 ${CMAKE_C_COMPILER}
+#        CMAKE_C_FLAGS:           ${CMAKE_C_FLAGS}
 "
     )
   IF(CMAKE_BUILD_TYPE MATCHES "Release")
