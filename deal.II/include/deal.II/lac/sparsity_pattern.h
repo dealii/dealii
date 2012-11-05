@@ -83,25 +83,26 @@ namespace internals
 }
 
 
-
+/**
+ * Iterators on sparsity patterns
+ */
 namespace SparsityPatternIterators
 {
                                    // forward declaration
   class Iterator;
 
-                                   /**
-                                    * Accessor class for iterators into
-                                    * sparsity patterns. This class is also
-                                    * the base class for both const and
-                                    * non-const accessor classes into sparse
-                                    * matrices.
-                                    *
-                                    * Note that this class only allow read
-                                    * access to elements, providing their
-                                    * row and column number. It does not
-                                    * allow to modify the sparsity pattern
-                                    * itself.
-                                    */
+/**
+ * Accessor class for iterators into sparsity patterns. This class is
+ * also the base class for both const and non-const accessor classes
+ * into sparse matrices.
+ *
+ * Note that this class only allow read access to elements, providing
+ * their row and column number. It does not allow to modify the
+ * sparsity pattern itself.
+ *
+ * @author Wolfgang Bangerth
+ * @date 2004
+ */
   class Accessor
   {
     public:
