@@ -24,7 +24,8 @@
 #     DEAL_II_COMPONENT_CONTRIB
 #     DEAL_II_COMPONENT_DOCUMENTATION
 #     DEAL_II_COMPONENT_EXAMPLES
-#     CMAKE_INSTALL_PREFIX              **)
+#     DEAL_II_ALLOW_AUTODETECTION
+#     DEAL_II_FORCE_AUTODETECTION
 #
 # Options regarding compilation and linking:
 #
@@ -45,8 +46,6 @@
 # *)  May also be set via environment variable (CFLAGS, CXXFLAGS, LDFLAGS)
 #     (nonempty cached variable has precedence will not be overwritten by
 #     environment)
-#
-# **) for an in-source build (and if DISABLE_AUTOPILOT is not set)
 #
 
 
@@ -85,16 +84,15 @@ OPTION(DEAL_II_COMPONENT_EXAMPLES
   ON
   )
 
-#
-# Set CMAKE_INSTALL_PREFIX to the source directory if an in source build is
-# detected (and DISABLE_AUTOPILOT is not set)
-#
-IF( "${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}" AND
-    NOT DISABLE_AUTOPILOT)
-  SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}" CACHE STRING
-    "Install path prefix, prepended onto install directories."
-    )
-ENDIF()
+OPTION(DEAL_II_ALLOW_AUTODETECTION
+  "Allow to automatically setup features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
+  ON
+  )
+
+OPTION(DEAL_II_FORCE_AUTODETECTION
+  "Force feature autodetection by undefining all DEAL_II_WITH_* variables prior to configure"
+  OFF
+  )
 
 
 ###########################################################################
@@ -224,3 +222,14 @@ FOREACH(_flag ${DEAL_II_USED_FLAGS})
   MARK_AS_ADVANCED(${_flag})
 ENDFOREACH()
 
+IF(DEAL_II_FORCE_AUTODETECTION)
+  #
+  # Undefine all feature toggles DEAL_II_WITH_* prior to configure:
+  #
+  GET_CMAKE_PROPERTY(_res VARIABLES)
+  FOREACH(_var ${_res})
+    IF(_var MATCHES "DEAL_II_WITH_")
+      UNSET(${_var} CACHE)
+    ENDIF()
+  ENDFOREACH()
+ENDIF()
