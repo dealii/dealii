@@ -301,6 +301,7 @@ namespace GridOutFlags
   XFig::XFig ()
                   :
     draw_boundary(true),
+    color_by(material_id),
     level_color(false),
     level_depth(true),
     n_boundary_face_points(0),
@@ -1171,7 +1172,7 @@ void GridOut::write_xfig (
       		if (xfig_flags.level_color)
       		        out << cell->level()	 + 32;
       		      else
-      		        out << cell->material_id() + 32;
+      		        out << static_cast<unsigned int>(cell->material_id()) + 32;
       		break;
       	case GridOutFlags::XFig::level_number:
       		out << cell->level() + 8;
