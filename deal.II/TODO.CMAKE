@@ -1,32 +1,11 @@
 Major:
 
-* Cleanup stale workarounds
-
-* Update the online documentation on
-
-    - How to install deal.II
-
-    - How to interface with external libraries (Unify this...)
-
-    - How to use deal.II
-      * Autopilot CMakeLists.txt
-      * minimal CMakeLists.txt
-      * direct interface
-
-    - The documentation in the example steps
-
-    - Remove the p4est-setup.sh script...
-
+* Rename: DEAL_II_ALLOW_AUTODETECTION
+* Rename: DEAL_II_FORCE_AUTODETECTION
 
 Minor:
 
-* Port the testsuite to cmake
-
-* The following features have to be written, or removed:
-    * TECPLOT
-    * HSL
-
-* (Maybe) re-enable validate-xrefs
+* The following feature has to be written: TECPLOT
 
 * Fixup the TODOs in
     source/lac/sparse_dircect.cc
