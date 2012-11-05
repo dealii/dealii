@@ -256,6 +256,7 @@ namespace internal
                                          // codim=1 meshes in 3d; only
                                          // needed to allow
                                          // compilation
+        // TODO[TH]: this is no longer true and might be a bug.
         std::vector<bool> direction_flags;
 
         TriaObjectsHex cells;
