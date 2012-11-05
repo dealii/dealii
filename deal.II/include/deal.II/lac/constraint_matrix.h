@@ -1061,10 +1061,10 @@ class ConstraintMatrix : public Subscriptor
 				      */
     template <class VectorType>
     void
-    distribute_local_to_global (unsigned int index,
-				double value,
+    distribute_local_to_global (const unsigned int index,
+				const double       value,
 				VectorType        &global_vector) const;
-   
+
                                      /**
                                       * This function takes a pointer to a
                                       * vector of local contributions (@p
@@ -1995,12 +1995,12 @@ ConstraintMatrix::can_store_line (unsigned int line_index) const
 template <class VectorType>
 inline
 void ConstraintMatrix::distribute_local_to_global (
-  unsigned int index,
-  double value,
+  const unsigned int index,
+  const double       value,
   VectorType        &global_vector) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
-  
+
   if (is_constrained(index) == false)
     global_vector(index) += value;
   else
