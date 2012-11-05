@@ -154,6 +154,12 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: GridOut::write_xfig has been improved in a number
+of ways. In particular, one can now color cells based on a number
+of different criteria that can be set in GridOutFlags::XFig.
+<br>
+(Guido Kanschat, 2012/11/04)
+
 <li> New: The PETScWrappers::SparseDirectMUMPS class now allows to
 exploit symmetry of the matrix, using the
 PETScWrappers::SparseDirectMUMPS::set_symmetric_mode() function.
