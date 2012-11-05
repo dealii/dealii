@@ -154,6 +154,13 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: In addition to the regular subdomain ids (see
+@ref GlossSubdomainId) there is now a second set of flags called
+"level subdomain ids" that also assigns a subdomain to every cell
+in a multigrid hierarchy.
+<br>
+(Timo Heister, 2012/11/04)
+
 <li> Changed: GridOut::write_xfig has been improved in a number
 of ways. In particular, one can now color cells based on a number
 of different criteria that can be set in GridOutFlags::XFig.
