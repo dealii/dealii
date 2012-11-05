@@ -317,6 +317,7 @@ namespace internal
       ar & refine_flags & coarsen_flags;
       ar & neighbors;
       ar & subdomain_ids;
+      ar & level_subdomain_ids;
       ar & parents;
       ar & direction_flags;
       ar & cells;
