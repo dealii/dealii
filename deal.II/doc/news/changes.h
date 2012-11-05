@@ -154,6 +154,12 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The parallel::distributed::Triangulation::n_global_levels()
+function returns the maximal refinement level over all involved
+processors.
+<br>
+(Timo Heister, 2012/11/04)
+
 <li> New: In addition to the regular subdomain ids (see
 @ref GlossSubdomainId) there is now a second set of flags called
 "level subdomain ids" that also assigns a subdomain to every cell
