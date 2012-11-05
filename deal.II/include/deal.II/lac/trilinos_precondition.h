@@ -116,7 +116,7 @@ namespace TrilinosWrappers
                   const VectorBase &src) const;
 
                                        /**
-                                        * Apply transpose the preconditioner.
+                                        * Apply the transpose preconditioner.
                                         */
       void Tvmult (VectorBase       &dst,
                   const VectorBase &src) const;
@@ -1522,7 +1522,7 @@ namespace TrilinosWrappers
             ExcNonMatchingMaps("dst"));
     Assert (src.vector_partitioner().SameAs(preconditioner->OperatorDomainMap()),
             ExcNonMatchingMaps("src"));
-    
+
     preconditioner->SetUseTranspose(true);
     const int ierr = preconditioner->ApplyInverse (src.trilinos_vector(),
                                                    dst.trilinos_vector());
