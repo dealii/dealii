@@ -625,10 +625,11 @@
     DEAL_II_LINKER_FLAGS_DEBUG
     DEAL_II_LINKER_FLAGS_RELEASE
     DEAL_II_CXX_FLAGS
-    DEAL_II_CXX_FLAGS_RELEASE
     DEAL_II_CXX_FLAGS_DEBUG
+    DEAL_II_CXX_FLAGS_RELEASE
 
     DEAL_II_TARGET_CONFIG
+    DEAL_II_TARGET
     DEAL_II_TARGET_DEBUG
     DEAL_II_TARGET_RELEASE
       </pre>
@@ -771,18 +772,12 @@
               <pre>
 
     INCLUDE(${DEAL_II_TARGET_CONFIG})
-              </pre>
-              After that there is a target
-              <code>${DEAL_II_TARGET_DEBUG}</code> and
-              <code>${DEAL_II_TARGET_RELEASE}</code> available:
-              <pre>
 
     ADD_EXECUTABLE(step-1
       step-1.cc
-      ${DEAL_II_TARGET_DEBUG}
+      ${DEAL_II_TARGET}
       )
               </pre>
-              <b>TODO: Check and simplify</b>
             </p>
       </ol>
     </p>
