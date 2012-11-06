@@ -256,6 +256,7 @@ namespace internal
                                          // codim=1 meshes in 3d; only
                                          // needed to allow
                                          // compilation
+        // TODO[TH]: this is no longer true and might be a bug.
         std::vector<bool> direction_flags;
 
         TriaObjectsHex cells;
@@ -317,6 +318,7 @@ namespace internal
       ar & refine_flags & coarsen_flags;
       ar & neighbors;
       ar & subdomain_ids;
+      ar & level_subdomain_ids;
       ar & parents;
       ar & direction_flags;
       ar & cells;
