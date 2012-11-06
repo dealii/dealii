@@ -62,15 +62,16 @@ check ()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, -1., 1.);
-  tr.refine_global (1);
 
-  FESystem<dim> fe(FE_DGQ<dim>(1),1,
-		   FE_Q<dim>(2),1);
+  FESystem<dim> fe(FE_Q<dim>(2),2);
   DoFHandler<dim> dof(tr);
   
   dof.distribute_dofs(fe);
-  DoFRenumbering::boost::Cuthill_McKee(dof);
-  print_dofs (dof);
+  std::vector<unsigned int> new_dofs (dof.n_dofs());
+  DoFRenumbering::boost::compute_Cuthill_McKee(new_dofs, dof);
+
+  for (unsigned int i=0; i<new_dofs.size(); ++i)
+    deallog << new_dofs[i] << std::endl;
 }
 
 
