@@ -45,7 +45,7 @@ MACRO(DEAL_II_SETUP_TARGET _target)
   GET_DIRECTORY_PROPERTY(_inc_dirs_so_far INCLUDE_DIRECTORIES)
   SET_TARGET_PROPERTIES(${_target} PROPERTIES
     INCLUDE_DIRECTORIES
-      "${_inc_dirs_so_far};${DEAL_II_EXTERNAL_INCLUDE_DIRS};${DEAL_II_INCLUDE_DIRS}"
+      "${_inc_dirs_so_far};${DEAL_II_INCLUDE_DIRS}"
     LINK_FLAGS
       "${DEAL_II_LINKER_FLAGS}"
     COMPILE_DEFINITIONS
@@ -62,25 +62,14 @@ MACRO(DEAL_II_SETUP_TARGET _target)
       COMPILE_DEFINITIONS_${_build}
         "${DEAL_II_USER_DEFINITIONS_${_build}}"
       )
-
   ENDFOREACH()
 
   #
-  # Link againgst the correct deal.II library target for the current
-  # CMAKE_BUILD_TYPE:
+  # Link against the deal.II targets:
   #
-  STRING(TOUPPER "${CMAKE_BUILD_TYPE}" _build)
-  IF(NOT "${DEAL_II_TARGET_${_build}}" STREQUAL "")
-    TARGET_LINK_LIBRARIES(${_target}
-      ${DEAL_II_TARGET_${_build}}
-      )
-  ELSE()
-    MESSAGE(FATAL_ERROR
-      "\nNo matching deal.II library target for current build type: "
-      "\"${CMAKE_BUILD_TYPE}\"\n"
-      "Candidates are (case insensitive): ${DEAL_II_BUILD_TYPES}\n\n"
-      )
-  ENDIF()
+  TARGET_LINK_LIBRARIES(${_target}
+    ${DEAL_II_TARGET}
+    )
 
 ENDMACRO()
 
