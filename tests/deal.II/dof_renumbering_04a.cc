@@ -63,8 +63,6 @@ check ()
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, -1., 1.);
   tr.refine_global (1);
-  tr.begin_active()->set_refine_flag ();
-  tr.execute_coarsening_and_refinement ();
 
   FESystem<dim> fe(FE_DGQ<dim>(1),1,
 		   FE_Q<dim>(2),dim);
