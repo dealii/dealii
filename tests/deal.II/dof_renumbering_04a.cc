@@ -64,7 +64,8 @@ check ()
   GridGenerator::hyper_cube(tr, -1., 1.);
   tr.refine_global (1);
 
-  FESystem<dim> fe(FE_DGQ<dim>(1),1);
+  FESystem<dim> fe(FE_DGQ<dim>(1),1,
+		   FE_Q<dim>(2),1);
   DoFHandler<dim> dof(tr);
   
   dof.distribute_dofs(fe);
