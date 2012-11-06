@@ -18,13 +18,22 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
-FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh)
+SET_IF_EMPTY(NETCDF_DIR "$ENV{NETCDF_DIR}")
+
+FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh
+  HINTS
+    ${NETCDF_DIR}
+  PATH_SUFFIXES
+    netcdf include
+  )
 
 #
 # TODO: netcdf might externally depend on hdf5. Check and fix this.
 #
 
 FIND_LIBRARY(NETCDF_LIBRARY NAMES netcdf_c++ netcdf_cpp
+  HINTS
+    ${NETCDF_DIR}
   PATH_SUFFIXES
     lib${LIB_SUFFIX} lib64 lib
   )
@@ -38,6 +47,11 @@ IF(NETCDF_FOUND)
   MARK_AS_ADVANCED(
     NETCDF_LIBRARY
     NETCDF_INCLUDE_DIR
+    NETCDF_DIR
   )
+ELSE()
+  SET(NETCDF_DIR "" CACHE STRING
+    "An optional hint to a NETCDF installation"
+    )
 ENDIF()
 
