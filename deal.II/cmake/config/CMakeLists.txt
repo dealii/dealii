@@ -28,7 +28,6 @@ CONFIGURE_FILE(
 #                                                                         #
 ###########################################################################
 
-
 INSTALL(FILES
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
@@ -44,24 +43,38 @@ INSTALL(FILES
 #                                                                         #
 ###########################################################################
 
+#
+# Populate a bunch of CONFIG_* variables with useful information:
+#
 
-FOREACH(build ${DEAL_II_BUILD_TYPES})
-  SET(CONFIG_LIBRARIES_${build}
-    ${MAKEFILE_LIBRARY_${build}}
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+  IF(_build MATCHES DEBUG)
+    SET(_keyword "debug")
+  ELSE()
+    SET(_keyword "optimized")
+  ENDIF()
+
+  SET(CONFIG_LIBRARIES_${_build}
+    ${MAKEFILE_LIBRARY_${_build}}
     ${DEAL_II_EXTERNAL_LIBRARIES}
-    ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
-     )
-  IF(NOT "${CONFIG_LIBRARIES_${build}}" STREQUAL "")
-    IF(build MATCHES DEBUG)
-      SET(keyword "debug")
-    ELSE()
-      SET(keyword "optmized")
-    ENDIF()
+    ${DEAL_II_EXTERNAL_LIBRARIES_${_build}}
+    )
+
+  IF(NOT "${CONFIG_LIBRARIES_${_build}}" STREQUAL "")
     LIST(APPEND CONFIG_LIBRARIES
-      ${keyword}
-      ${CONFIG_LIBRARIES_${build}}
+      ${_keyword}
+      ${CONFIG_LIBRARIES_${_build}}
       )
   ENDIF()
+
+  SET(CONFIG_TARGET_${_build}
+    ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
+    )
+
+  LIST(APPEND CONFIG_TARGET
+    ${_keyword}
+    ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
+    )
 ENDFOREACH()
 
 SET(CONFIG_INCLUDE_DIRS
@@ -76,28 +89,22 @@ CONFIGURE_FILE(
   )
 
 #
-# Append target information:
-#
-FOREACH(build ${DEAL_II_BUILD_TYPES})
-  FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-    "SET(DEAL_II_TARGET_${build} \"${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}\")\n"
-    )
-ENDFOREACH()
-
-#
 # Append feature configuration:
 #
-FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+
+SET(_file ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake)
+FILE(APPEND ${_file}
   "\n\n#\n# Feature configuration:\n#\n\n"
   )
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
   IF(var MATCHES "DEAL_II_WITH")
-    FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+    FILE(APPEND ${_file}
       "SET(${var} ${${var}})\n"
       )
   ENDIF()
 ENDFOREACH()
+
 
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
