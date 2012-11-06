@@ -23,6 +23,8 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET_IF_EMPTY(ARPACK_DIR "$ENV{ARPACK_DIR}")
+
 #
 # ARPACK needs LAPACK and BLAS as dependency, search for them with the help
 # of the LAPACK find module:
@@ -33,6 +35,8 @@ FIND_PACKAGE(LAPACK)
 
 FIND_LIBRARY(ARPACK_LIBRARY
   NAMES arpack
+  HINTS
+    ${ARPACK_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
@@ -56,6 +60,11 @@ IF(ARPACK_FOUND)
     atlas_LIBRARY
     blas_LIBRARY
     ARPACK_LIBRARY
+    ARPACK_DIR
   )
+ELSE()
+  SET(ARPACK_DIR "" CACHE STRING
+    "An optional hint to an ARPACK installation"
+    )
 ENDIF()
 
