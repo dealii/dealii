@@ -30,6 +30,7 @@
 #ifdef DEAL_II_USE_PETSC
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #    include <petscsys.h>
+#include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
