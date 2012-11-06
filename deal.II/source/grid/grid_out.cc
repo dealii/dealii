@@ -1183,6 +1183,8 @@ void GridOut::write_xfig (
       	case GridOutFlags::XFig::level_subdomain_id:
       		out << cell->level_subdomain_id() + 32;
       		break;
+      	default:
+      	  Assert(false, ExcInternalError());
       	}
 
                                        // Depth, unused, fill
