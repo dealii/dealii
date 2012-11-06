@@ -39,10 +39,15 @@
 
 #include <deal.II/lac/abstract_linear_algebra.h>
 
+#define USE_PETSC_LA
+
 namespace LA
 {
+#ifdef USE_PETSC_LA
+  using namespace dealii::LinearAlgebraPETSc;
+#else
   using namespace dealii::LinearAlgebraDealII;
-//  using namespace dealii::LinearAlgebraPETSc;
+#endif  
 //  using namespace dealii::LinearAlgebraTrilinos;
 }
 
@@ -622,9 +627,10 @@ void Step6<dim>::assemble_system ()
       constraints.distribute_local_to_global(cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
     }
 
-//  system_matrix.compress();
-//  system_rhs.compress();
-  
+  #ifdef USE_PETSC_LA
+  system_matrix.compress();
+  system_rhs.compress();
+  #endif
 
 // Now we are done assembling the linear
                                    // system.  The constrained nodes are still
