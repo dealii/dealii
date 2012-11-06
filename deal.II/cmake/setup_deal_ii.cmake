@@ -31,8 +31,6 @@
 #     DEAL_II_BASE_NAME               *)
 #     DEAL_II_DEBUG_SUFFIX            *)
 #     DEAL_II_RELEASE_SUFFIX          *)
-#     DEAL_II_LIBRARY_NAME_DEBUG
-#     DEAL_II_LIBRARY_NAME_RELEASE
 #
 #     DEAL_II_PATH                    *)
 #     DEAL_II_CMAKE_MACROS_RELDIR     *)
