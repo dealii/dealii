@@ -346,29 +346,50 @@
     <h4>Optional interfaces to other software packages</h4>
 
     <p>
-      When configuring interfacing to external libraries,
-      the <code>cmake</code> script by default tries to find all of these
-      libraries in a number of standard locations on your file system. For
-      <i>optional</i> interfaces, it gives up if they are not there and
-      <acronym>deal.II</acronym> will be built without them. However, there
-      is one interface that we <i>need</i> to
-      have: <a href="http://www.boost.org/" target="_top">BOOST</a>. If it is
-      not found in places like <code>/usr/</code> then <code>cmake</code> will
-      resort to versions of these libraries that we provide bundled as part of
-      the <acronym>deal.II</acronym> tar files.
+      When configuring interfacing to external libraries, the
+      <code>cmake</code> script by default tries to find all of these
+      libraries in a number of standard locations on your file system.
+      For <i>optional</i> interfaces, it gives up if the library is not
+      found and <acronym>deal.II</acronym> will be built without support
+      for them.
+      However, there is one interface that we <i>need</i> to have: <a
+      href="http://www.boost.org/" target="_top">BOOST</a>. If it is not
+      found externally <code>cmake</code> will resort to the bundled boost
+      version that is part of the <acronym>deal.II</acronym> tar file.
     </p>
 
     <p>
-      The following paragraphs describe how the interfaces to the various
-      packages <acronym>deal.II</acronym> interacts with can be configured. As
-      a general rule in the discussion below, if configuring the interface to
-      package <code>libx</code> requires passing a flag of the
-      form <code>-DLIBX_DIR=/path/to/libx</code> then you can alternatively
-      also set <code>LIBX_DIR</code> as an environment variable in
-      your <code>.bashrc</code> or <code>.cshrc</code> file so that you do not
-      have to enter this argument everytime you
-      call <code>cmake</code>. Any value passed on the command line
-      wins over a value that may be found in an environment variable.
+      The following paragraphs describe how the interfaces to the
+      various packages, <acronym>deal.II</acronym> interacts with,
+      can be configured.
+    </p>
+
+    <p>
+    <b>Notes:</b>
+      <ul>
+        <li>
+          The majority of libraries mentioned below should be readily
+          packaged by most Linux distributions.  Usually you need to
+          install a <i>development</i> version of a library package,
+          e.g. ending in <code>-dev</code> or <code>-devel</code>.
+          After that <code>cmake</code> will automatically find the
+          library and use it.
+        <li>
+          Configuring the interface to a self compiled package,
+          say <code>foo</code> can usually be done by specifying
+          <code>-DFOO_DIR=/path/to/foo</code>.  Alternatively, you can
+          set <code>FOO_DIR</code> as an environment variable in your
+          <code>.bashrc</code> or <code>.cshrc</code> file so that
+          you do not have to enter this argument again the next time
+          you invoke <code>cmake</code> in a fresh build directory.
+          Any value passed on the command line wins over a value that
+          may be found in an environment variable.
+        <li>
+          To explicitly enable or disable support for
+          a library <code>foo</code> use the argument
+          <code>-DDEAL_II_WITH_FOO=ON</code> resp.
+          <code>-DDEAL_II_WITH_FOO=OFF</code> for <code>cmake</code>.
+    </ul>
     </p>
 
     <dl>
@@ -377,13 +398,15 @@
       <dd>
 	<p>
 	  <a href="http://www.caam.rice.edu/software/ARPACK/"
-	     target="_top">ARPACK</a> is a library supporting the computation of
-	  eigenvalues. To use it, use the <code>-DARPACK_DIR=/path/to/arpack</code> argument.
-	  ARPACK comes with its
-	  own <a href="http://www.caam.rice.edu/software/ARPACK/RiceBSD.txt">license</a>;
-	  if you want to use it with deal.II,
-	  please read it and make sure that you agree with it.
-	  For a detailed description of how to compile ARPACK and linking with deal.II, see
+	     target="_top">ARPACK</a> is a library for computing large
+          scale eigenvalue problems.
+          <a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a>
+          should be readily packaged by most Linux distributions.
+          (Don't forget to install a develpment version of the library).
+          To use a self compiled version, specify
+          <code>-DARPACK_DIR=/path/to/arpack</code> on the command line.
+
+	  For a detailed description on how to compile ARPACK and linking with deal.II, see
 	  <a href="external-libs/arpack.html" target="body">this page</a>.
 	</p>
       </dd>
@@ -400,8 +423,11 @@
 	  <a href="http://www.netlib.org/lapack/" target="_top">LAPACK</a>
 	  (<i>Linear Algebra Package</i>) are two packages that support
 	  low-level linear algebra operations on vectors and dense
-	  matrices. Both of these libraries should be found automatically
-	  whenever available.
+          matrices.
+          Both libraries should be packaged by almost all Linux
+          distributions and found automatically whenever available.
+          (You might have to install develpment versions of the libraries
+          for <acronym>deal.II</acronym> being able to use them).
 	</p>
       </dd>
 
@@ -428,11 +454,16 @@
       <dd>
 	<p>
 	  The <a href="http://www.hdfgroup.org/HDF5/">HDF5 library</a>
-	  provides graphical output capabilities in HDF5/XDMF format.  To use
-	  it, use the <code>-DHDF5_DIR=/path/to/hdf5</code> argument.  For a
-	  detailed description of how to compile HDF5 and linking with
-	  deal.II, see <a href="external-libs/hdf5.html" target="body">this
-	  page</a>.
+	  provides graphical output capabilities in <code>HDF5/XDMF</code>
+	  format.
+	  <a href="http://www.hdfgroup.org/HDF5/">HDF5</a> should be
+	  readily packaged by most Linux distributions.  (Don't forget
+          to install a develpment version of the library).
+	  To use a self compiled version, specify
+	  <code>-DHDF5_DIR=/path/to/hdf5</code> on the command line.
+	  For a detailed description on how to compile HDF5 and
+	  linking with deal.II, see <a href="external-libs/hdf5.html"
+	  target="body">this page</a>.
 	</p>
       </dd>
 
@@ -446,9 +477,9 @@
 	  provides various methods to partition
 	  graphs. <acronym>deal.II</acronym> uses it in programs like the
 	  step-17 tutorial to partition a mesh for parallel computing.
-	  To enable it, pass <code>-DMETIS_DIR=/path/to/metis</code> to
-	  the <code>cmake</code> command. <acronym>deal.II</acronym>
-	  supports METIS 5 and later.
+	  To use a self compiled version, specify
+	  <code>-DMETIS_DIR=/path/to/metis</code> on the command line.
+	  <acronym>deal.II</acronym> supports METIS 5 and later.
 	</p>
 
 	<p>
@@ -466,9 +497,13 @@
 	  <a href="http://mumps.enseeiht.fr" target="_top">MUMPS</a>
 	  (MUltifrontal Massively Parallel sparse direct Solver)
 	  is a sparse direct solver that can factorize matrices within or
-	  across nodes of a cluster. To use it, provide the
+	  across nodes of a cluster.
+	  <a href="http://mumps.enseeiht.fr" target="_top">MUMPS</a>
+          should be readily packaged by most Linux distributions.
+          (Don't forget to install a develpment version of the library).
+          To use a self compiled version, provide the
 	  <code>-DMUMPS_DIR=/path/to/mumps</code> argument to <code>cmake</code>.
-	  For a detailed description of how to compile MUMPS (and
+	  For a detailed description on how to compile MUMPS (and
 	  some dependencies) and linking with deal.II, see
 	  <a href="external-libs/mumps.html" target="body">this page</a>.
 	</p>
@@ -482,8 +517,12 @@
 	  target="_top">NetCDF</a> is a library that provides services for
 	  reading and writing mesh data (and many other
 	  things). <acronym>deal.II</acronym> can use it to read meshes via
-	  one of the functions of the <code>GridIn</code> class. To use it,
-	  pass <code>-DNETCDF_DIR=/path/to/netcdf</code> to <code>cmake</code>.
+          one of the functions of the <code>GridIn</code> class.
+	  <a href="http://www.unidata.ucar.edu/software/netcdf/"
+          target="_top">NetCDF</a> should be readily packaged by most
+          Linux distributions. (Don't forget to install a develpment
+	  version of the library). To use a self compiled version, pass
+	  <code>-DNETCDF_DIR=/path/to/netcdf</code> to <code>cmake</code>.
       </dd>
 
       <a name="p4est"></a>
@@ -496,8 +535,9 @@
 	  meshes with a billion cells on 10,000 processors). Using and
 	  installing p4est is discussed <a href="external-libs/p4est.html"
 					   target="body">here</a>.
-	  To use p4est, pass the argument <code>-DP4EST_DIR=/path/to/p4est</code>
-	  to the <code>cmake</code> command.
+	  To use a self compiled version, pass the argument
+	  <code>-DP4EST_DIR=/path/to/p4est</code> to the
+	  <code>cmake</code> command.
 	</p>
       </dd>
 
@@ -508,10 +548,15 @@
 	<p>
 	  <a href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> is a
 	  library that supports parallel linear algebra and many other things.
-	  To interface with it, add <code>-DPETSC_DIR=/path/to/petsc
-	  -DPETSC_ARCH=architecture</code> to the argument list
-	  for <code>cmake</code>. The values for these arguments must be the
-	  same as those specified when building PETSc.
+
+	  <a href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a>
+	  is already packaged by some Linux distributions and should be
+	  found automatically if present. (Don't forget to install a
+	  develpment version of the library).  To use a self compiled
+	  version of PETSc, add <code>-DPETSC_DIR=/path/to/petsc
+	  -DPETSC_ARCH=architecture</code> to the argument list for
+	  <code>cmake</code>. The values for these arguments must be
+	  the same as those specified when building PETSc.
 	</p>
 
 	<p>
@@ -529,8 +574,10 @@
 	  <a href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a> is
 	  a library for eigenvalue computations that builds on PETSc. Its
 	  configuration works just like that for PETSc, except that the
-	  variable to set is <code>SLEPC_DIR</code> (it uses the same
-	  architecture as specified in <code>PETSC_ARCH</code>).
+          variable to set is <code>SLEPC_DIR</code> and
+          <code>SLEPC_ARCH</code>.
+          If <code>SLEPC_ARCH</code> is left empty, <code>cmake</code> will
+          use the same architecture as specified in <code>PETSC_ARCH</code>.
 	  For the interface with SLEPc to work, <acronym>deal.II</acronym>'s
 	  PETSc interface must also be configured correctly (see above).
 	</p>
@@ -560,9 +607,11 @@
 	  <a href="http://trilinos.sandia.gov" target="_top">Trilinos</a> is a
 	  library for parallel linear algebra and all sorts of other things as
 	  well.
-	  To interface with it,
-	  add <code>-DTRILINOS_DIR=/path/to/trilinos</code> to the argument
-	  list for <code>cmake</code>. Alternatively, you can
+
+	  To interface with a self compiled version of <a
+	  href="http://trilinos.sandia.gov" target="_top">Trilinos</a>
+	  add <code>-DTRILINOS_DIR=/path/to/trilinos</code> to the
+	  argument list for <code>cmake</code>.  Alternatively, you can
 	  also set an environment variable <code>TRILINOS_DIR</code>
 	  and <code>cmake</code> will pick up this path.
 	</p>
@@ -584,18 +633,25 @@
 	  <a href="http://www.cise.ufl.edu/research/sparse/umfpack/"
 	     target="_top">UMFPACK</a> is a sparse direct solver that we often
 	  use in prototype codes where the goal is to simply get a linear
-	  system solved robustly. The default is to enable this interface,
-	  either using a version installed on your system of using a version
-	  that comes bundled with <acronym>deal.II</acronym>. It can be
-	  enabled using the <code>-DDEAL_II_WITH_UMFPACK=OFF</code> argument.
+          system solved robustly.
+	  The interface will be enabled by default, either using a version
+	  installed on your system of using a version that comes bundled
+	  with <acronym>deal.II</acronym>.
+	  It can be disabled explicitly by using the
+	  <code>-DDEAL_II_WITH_UMFPACK=OFF</code> argument.
+	  To use a self compiled version, pass the argument
+	  <code>-DUMFPACK_DIR=/path/to/umfpack</code> to the
+	  <code>cmake</code> command.
 	</p>
 
 	<p>
-	  UMFPACK has its own license. To use it with deal.II, please read it
-	  and make sure that you agree with it. You can find the license of
-	  UMFPACK <a href="http://www.cise.ufl.edu/research/sparse/umfpack/">here</a>. We
-	  include UMFPACK in the deal.II distributions courtesy of its author,
-	  <a href="http://www.cise.ufl.edu/~davis/">Timothy A. Davis</a>.
+	  UMFPACK has its own license. To use it with deal.II, please
+	  read it and make sure that you agree with it. You can find
+	  the license of UMFPACK
+          <a href="http://www.cise.ufl.edu/research/sparse/umfpack/">here</a>.
+	  We include UMFPACK in the deal.II distributions courtesy of
+	  its author, <a href="http://www.cise.ufl.edu/~davis/">Timothy
+	  A. Davis</a>.
 	</p>
       </dd>
     </dl>
