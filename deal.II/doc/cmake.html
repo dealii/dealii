@@ -258,36 +258,41 @@
 
     <p>
       There are some options to determine the behavior of the dependency
-      resolution. Specifically, the
-      option <code>DEAL_II_ALLOW_BUNDLED</code> determines the
-      following:
+      resolution.
       <ul>
-	<li> If set to <code>ON</code> external libraries still have
-	  precedence. But if there is no external library the bundled
-	  library will be used.
-
-        <li> If set to <code>OFF</code> bundled libraries will not be
-	  used and the dependency resolution will fail if there is no
-	  external library
-
-	<li><code>DEAL_II_FORCE_BUNDLED_&lt;library&gt;</code> forces
-	  the use of the bundled library regardless whether
-	  <code>DEAL_II_ALLOW_BUNDLED</code> is set to <code>OFF</code>
-	  or an external library is found. This applies to the options
-	  <code>DEAL_II_FORCE_BUNDLED_(BOOST|FUNCTIONPARSER|THREADS|UMFPACK)</code>.
+        <li>
+          <p>
+            <code>DEAL_II_ALLOW_BUNDLED</code>:
+          </p>
+          <p>
+            If set to <code>ON</code> external libraries still have
+            precedence. But if there is no external library the bundled
+            library will be used.
+            If set to <code>OFF</code> bundled libraries will not be
+            used and the dependency resolution will fail if there is no
+            external library.
+          </p>
+        <li>
+          <p>
+            <code>DEAL_II_FORCE_BUNDLED_(BOOST|FUNCTIONPARSER|THREADS|UMFPACK)</code>:
+          </p>
+          <p>
+            Forces the use of the bundled library regardless whether
+            <code>DEAL_II_ALLOW_BUNDLED</code> is set to <code>OFF</code>
+            or an external library is found.
+          </p>
+        <li>
+          Thus, to ensure that no bundled library is used at all
+          <code>DEAL_II_ALLOW_BUNDLED</code>, as well as every
+          <code>DEAL_II_FORCE_BUNDLED_&lt;library&gt;</code>
+          have to be set to <code>OFF</code>.  Conversely,
+          <code>DEAL_II_FORCE_BUNDLED_&lt;library&gt;=ON</code>
+          will not automatically enable the corresponding
+          <code>DEAL_II_WITH_&lt;feature&gt;</code> toggle. This has to be
+          set separately.
       </ul>
     </p>
 
-    <p>
-      Thus, to ensure that no bundled library is used at all
-      <code>DEAL_II_ALLOW_BUNDLED</code>, as well as every
-      <code>DEAL_II_FORCE_BUNDLED_&lt;library&gt;</code>
-      have to be set to <code>OFF</code>.  Conversely,
-      </code>DEAL_II_FORCE_BUNDLED_&lt;library&gt;=ON</code>
-      will not automatically enable the corresponding
-      <code>DEAL_II_WITH_&lt;feature&gt;</code> toggle. This has to be
-      set separately.
-    </p>
 
 
     <a name="tuningautoconf"></a>
