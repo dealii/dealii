@@ -32,6 +32,7 @@ INCLUDE(FindPackageHandleStandardArgs)
 SET_IF_EMPTY(SLEPC_DIR "$ENV{SLEPC_DIR}")
 SET_IF_EMPTY(SLEPC_ARCH "$ENV{SLEPC_ARCH}")
 SET_IF_EMPTY(PETSC_DIR "$ENV{PETSC_DIR}")
+SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 
 #
 # Luckily, SLEPc wants the same insanity as PETSc, so we can just copy the
@@ -44,6 +45,7 @@ FIND_LIBRARY(SLEPC_LIBRARIES
     # SLEPC is special. Account for that
     ${SLEPC_DIR}
     ${SLEPC_DIR}/${SLEPC_ARCH}
+    ${SLEPC_DIR}/${PETSC_ARCH}
     ${PETSC_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
 )
@@ -62,6 +64,7 @@ FIND_PATH(SLEPC_INCLUDE_DIR_ARCH slepcconf.h
     # SLEPC is special. Account for that
     ${SLEPC_DIR}
     ${SLEPC_DIR}/${SLEPC_ARCH}
+    ${SLEPC_DIR}/${PETSC_ARCH}
     ${SLEPC_INCLUDE_DIRS}
     ${PETSC_DIR}
   PATH_SUFFIXES slepc include include/slepc
@@ -84,6 +87,7 @@ FIND_PATH(SLEPC_INCLUDE_DIR_COMMON slepcversion.h
   HINTS
     ${SLEPC_DIR}
     ${SLEPC_DIR}/${SLEPC_ARCH}
+    ${SLEPC_DIR}/${PETSC_ARCH}
     ${SLEPC_INCLUDE_DIRS}
     ${PETSC_DIR}
   PATH_SUFFIXES slepc include include/slepc
