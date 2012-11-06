@@ -66,18 +66,17 @@
       When configuring <acronym>deal.II</acronym> by
       running <code>cmake</code>, the <code>cmake</code> program
       creates a cache in the current (build) directory that contains
-      the values of all cached variables that had previously been passed
+      the values of all (cached) variables that had previously been passed
       as command line arguments, been found through running tests,
       or had otherwise been set.
     </p>
 
     <p>
-      Normally, one will then simply build the library in this
-      directory by calling <code>make</code> and install it. If the
-      library changes, one would just call <code>make</code> again and
-      it would only re-compile those files that depend on those sources
-      that have changed. In other words, one will rarely have to deal
-      with the cached variables at all.
+      Normally, after running <code>cmake</code> one will simply build
+      the library by calling <code>make</code>.  If the library changes,
+      a subsequent call to <code>make</code>  will only re-compile those
+      files that depend on sources that have changed.  In other words,
+      one will rarely have to deal with the cached variables at all.
     </p>
 
     <p>
@@ -89,10 +88,9 @@
       calling <code>make</code> calls back and runs <code>cmake</code>
       again automatically.) Either way, if that happens,
       then <code>cmake</code> will only run whatever tests are really
-      necessary; values for variables that are already in the cache
-      are not re-evaluated. This means that calling <code>cmake</code>
-      a second time without any arguments at all in a situation like
-      this
+      necessary; <i>values for variables that are already in the cache
+      are not re-evaluated</i>. This means that calling <code>cmake</code>
+      a second time without any arguments at all in a situation like this
       <pre>
 
     mkdir build
@@ -103,7 +101,7 @@
       has absolutely no effect: In particular, the second time around
       it uses the <code>CMAKE_INSTALL_PREFIX</code> value previously
       passed, along with all other arguments one may have had on the
-      first invokation. This is different from the way
+      first invocation. This is different from the way
       the <code>autoconf/configure</code> mechanism worked.
     </p>
 
@@ -139,13 +137,14 @@
     cmake -DDEAL_II_WITH_METIS=OFF ../
       </pre>
       switches off support for the METIS library that may have been
-      automatically detected the first time around but that we really
-      didn't want to link with.
+      automatically detected during the first invocation of
+      <code>cmake</code> but that we really didn't want to link with.
     </p>
 
 
     <a name="compiling"></a>
     <h3> Compiling only certain parts </h3>
+    <p>
 
     <p>
       Just like with simple <code>make</code>, <code>cmake</code>
@@ -154,7 +153,8 @@
       are. The most common scenario is that you only want to build
       debug or optimized libraries. This can be achieved using the
       following commands in the build directory:
-      <b>TODO: This is a bit misleading, as <code>make install</code> won't succeed</b>
+      <b>TODO: This is a bit misleading, as <code>make install</code>
+        always implies <code>make all</code>.</b>
       <pre>
 
     make  deal_II.g     # only debug library
@@ -443,6 +443,25 @@
 
     <a name="tuningbuild"></a>
     <h4> Build configuration </h4>
+
+    <p>
+      <code>CMAKE_BUILD_TYPE</code> controls the type of build.
+      We support the <code>Debug</code>, <code>Release</code>
+      and <code>DebugRelease</code> build targets. Default is the
+      <code>DebugRelease</code> target.
+      <ul>
+        <li>
+          <code>Debug</code> will compile a debug library
+          <code>libdeal_II.g.so</code>
+        <li>
+          <code>Release</code> will build an optimized
+          <code>libdeal_II.so</code>.
+        <li>
+          <code>DebugRelease</code> will build both libraries
+      </ul>
+      For more information, see the general discussion
+      <a href="readme.html#configuration">here</a>.
+    </p>
 
     <p>
       deal.II will configure sensible default <code>CFLAGS</code> and
