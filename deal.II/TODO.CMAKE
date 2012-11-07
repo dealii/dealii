@@ -7,7 +7,11 @@ Major:
   - The ReadME should mention how to install the documentation
 
   - Write a page on how to use deal.II in external CMake projects.
+    (doc/development/toc.html already links to it)
     (A more detailed copy of what is already standing in cmake.html)
+
+  - Modify doc/porting.html
+
 
 Minor:
 
@@ -17,4 +21,3 @@ Minor:
     source/lac/sparse_dircect.cc
     source/base/path_find.cc
     source/base/function_parser.cc
-
