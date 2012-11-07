@@ -96,8 +96,8 @@ namespace SparsityPatternIterators
  * also the base class for both const and non-const accessor classes
  * into sparse matrices.
  *
- * Note that this class only allow read access to elements, providing
- * their row and column number. It does not allow to modify the
+ * Note that this class only allows read access to elements, providing
+ * their row and column number. It does not allow modifying the
  * sparsity pattern itself.
  *
  * @author Wolfgang Bangerth
