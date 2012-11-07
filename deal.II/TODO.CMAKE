@@ -3,6 +3,8 @@ Major:
 * The documentation
 
   - Update FAQ hyperlinks to point to googlegroups
+    (WB: actually, no -- this is a change that should happen on
+     mainline once we have migrated the whole wiki)
 
   - The ReadME should mention how to install the documentation
 
