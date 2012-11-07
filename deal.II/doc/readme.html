@@ -337,6 +337,26 @@
 	  specifically do not want to use it, then
 	  pass <code>-DDEAL_II_WITH_MPI=OFF</code>.
 	</p>
+
+      <li>
+        <p>
+          To build and install the documentation, specify
+          <code>-DDEAL_II_COMPONENT_DOCUMENTATION=ON</code>
+          on the command line.  For generating the documentation <a
+          href="http://www.perl.org/" target="_top">Perl 5.x</a>,
+          <a href="http://www.doxygen.org/" target="_top">doxygen</a>
+          and <code>dot</code> (which is part of the <a
+            href="http://www.graphviz.org" target="_top">GraphViz</a>
+          package) have to be installed.
+
+      <li>
+        <p>
+          If you wish to install projects residing under
+          <code>contrib/</code> such as ParameterGUI,
+          specify <code>-DDEAL_II_COMPONENT_CONTRIB=ON</code>.
+          Beware of the fact that parameterGUI needs
+          development packages for Qt.
+
     </ul>
 
 

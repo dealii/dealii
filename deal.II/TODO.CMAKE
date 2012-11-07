@@ -6,8 +6,6 @@ Major:
     (WB: actually, no -- this is a change that should happen on
      mainline once we have migrated the whole wiki)
 
-  - The ReadME should mention how to install the documentation
-
   - Write a page on how to use deal.II in external CMake projects.
     (doc/development/toc.html already links to it)
     (A more detailed copy of what is already standing in cmake.html)
