@@ -57,13 +57,16 @@
 
     <li> <p><a href="porting.html" target="body">Porting
          <acronym>deal.II</acronym> to a new system</a>:
-         <acronym>deal.II</acronym> uses the mechanism provided by
-         GNU&nbsp;autoconf. Therefore, porting to a reasonably
-         standardized UNIX system should not be too difficult. Other
-         systems, such as proprietary ones, might or might not work (it is
-	 possible, for example, to use Microsoft Windows);
-         see the <a href="../readme.html" target="body">ReadMe</a>
-         file for more information on supported systems and porting.
+
+         <acronym>deal.II</acronym> uses CMake as build system
+         and is fairly ISO (1998) C++ Standard compliant.
+         So, porting to a reasonably <a
+         href="http://www.opengroup.org/austin/">POSIX</a> compliant
+         system with a reasonably ISO C++ compliant compiler shouldn't be
+         much work. Other (mostly proprietary) systems might require more
+         work. See the <a href="../readme.html" target="body">ReadMe</a>
+         file for more information on already supported systems. This
+         resource gives some hints for porting to unknown platforms.
 	 </p>
 
     <li> <p><a href="https://sourceforge.net/apps/trac/dealii" target="_top">Bugs</a>:

@@ -10,9 +10,6 @@ Major:
     (doc/development/toc.html already links to it)
     (A more detailed copy of what is already standing in cmake.html)
 
-  - Modify doc/porting.html
-
-
 Minor:
 
 * The following feature has to be written: TECPLOT
