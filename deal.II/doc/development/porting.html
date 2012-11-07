@@ -127,8 +127,11 @@
     <p>
       It is possible to use <a href="http://www.cmake.org/"
       target="_top">CMake</a> to cross compile
-      <acronym>deal.II</acronym> for a foreign platform. Further
-      information on that topic can be found int the <a
+      <acronym>deal.II</acronym> for a foreign platform.  It is best
+      to start cross compiling with minimal external dependencies
+      (<code>-DDEAL_II_ALLOW_AUTODETECTION=OFF</code>, see the
+      <a href="cmake.html">deal.II CMake documentation</a>).
+      Further information on that topic can be found in the <a
       href="http://www.cmake.org/Wiki/CMake_Cross_Compiling">CMake
       wiki</a>.
 
