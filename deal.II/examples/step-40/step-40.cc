@@ -209,9 +209,9 @@ namespace Step40
 
       ConstraintMatrix     constraints;
 
-      LA::SparseMatrix system_matrix;
-      LA::Vector locally_relevant_solution;
-      LA::Vector system_rhs;
+      LA::MPI::SparseMatrix system_matrix;
+      LA::MPI::Vector locally_relevant_solution;
+      LA::MPI::Vector system_rhs;
 
       ConditionalOStream                pcout;
   };
@@ -601,7 +601,7 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
-    LA::Vector
+    LA::MPI::Vector
       completely_distributed_solution (mpi_communicator,
                                        dof_handler.n_dofs(),
                                        dof_handler.n_locally_owned_dofs());
@@ -613,7 +613,7 @@ namespace Step40
                                      // Ask for a symmetric preconditioner by
                                      // setting the first parameter in
                                      // AdditionalData to true.
-    LA::PreconditionAMG
+    LA::MPI::PreconditionAMG
       preconditioner(system_matrix,
                      PETScWrappers::PreconditionBoomerAMG::AdditionalData(true));
 
