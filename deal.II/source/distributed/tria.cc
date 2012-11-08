@@ -2816,6 +2816,7 @@ namespace parallel
         = std::accumulate (number_cache.n_locally_owned_active_cells.begin(),
                            number_cache.n_locally_owned_active_cells.end(),
                            0);
+      number_cache.n_global_levels = Utilities::MPI::max(this->n_levels(), mpi_communicator);
     }
 
 
@@ -2844,6 +2845,15 @@ namespace parallel
     Triangulation<dim,spacedim>::n_global_active_cells () const
     {
       return number_cache.n_global_active_cells;
+    }
+
+
+
+    template <int dim, int spacedim>
+    unsigned int
+    Triangulation<dim,spacedim>::n_global_levels () const
+    {
+      return number_cache.n_global_levels;
     }
 
 
@@ -2977,6 +2987,7 @@ namespace parallel
         + MemoryConsumption::memory_consumption(triangulation_has_content)
         + MemoryConsumption::memory_consumption(number_cache.n_locally_owned_active_cells)
         + MemoryConsumption::memory_consumption(number_cache.n_global_active_cells)
+        + MemoryConsumption::memory_consumption(number_cache.n_global_levels)
         + MemoryConsumption::memory_consumption(connectivity)
         + MemoryConsumption::memory_consumption(parallel_forest)
         + MemoryConsumption::memory_consumption(refinement_in_progress)
@@ -3100,6 +3111,15 @@ namespace parallel
 
 
     template <>
+    unsigned int
+    Triangulation<1,1>::n_global_levels () const
+    {
+      Assert (false, ExcNotImplemented());
+      return 0;
+    }
+
+
+    template <>
     MPI_Comm
     Triangulation<1,1>::get_communicator () const
     {
@@ -3149,6 +3169,15 @@ namespace parallel
 
 
     template <>
+    unsigned int
+    Triangulation<1,2>::n_global_levels () const
+    {
+      Assert (false, ExcNotImplemented());
+      return 0;
+    }
+
+
+    template <>
     MPI_Comm
     Triangulation<1,2>::get_communicator () const
     {
@@ -3183,6 +3212,15 @@ namespace parallel
     template <>
     unsigned int
     Triangulation<1,3>::n_global_active_cells () const
+    {
+      Assert (false, ExcNotImplemented());
+      return 0;
+    }
+
+
+    template <>
+    unsigned int
+    Triangulation<1,3>::n_global_levels () const
     {
       Assert (false, ExcNotImplemented());
       return 0;

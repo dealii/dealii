@@ -84,18 +84,18 @@
       {
         public:
                  /**
-		  * Constructor
-		  */
+                  * Constructor
+                  */
           TestClass ();
 
                  /**
-		  * Example function
-		  */
+                  * Example function
+                  */
           virtual void test () const = 0;
 
                  /**
-		  * Member variable
-		  */
+                  * Member variable
+                  */
           const unsigned int abc;
       };
     </pre>
@@ -127,120 +127,120 @@
         block is found in the derived class.
 
     <li> <em>Itemized lists:</em>
-	 By writing comments like the following,
-	 <pre>
-	   /**
-	    * &lt;ul&gt;
-	    *   &lt;li&gt; foo
-	    *   &lt;li&gt; bar
-	    * &lt;/ul&gt;
-	    */
-	 </pre>
-	 you can get itemized lists both in the online and printed
-	 documentation:
-	 <ul>
-	 <li> foo
-	 <li> bar
-	 </ul>
+         By writing comments like the following,
+         <pre>
+           /**
+            * &lt;ul&gt;
+            *   &lt;li&gt; foo
+            *   &lt;li&gt; bar
+            * &lt;/ul&gt;
+            */
+         </pre>
+         you can get itemized lists both in the online and printed
+         documentation:
+         <ul>
+         <li> foo
+         <li> bar
+         </ul>
 
-	 <p>
-	 In other words, one can use standard HTML tags for this
-	 task. Likewise, you can get numbered lists by using the
-	 respective HTML tags <code>&lt;ol&gt;</code>.
-	 </p>
+         <p>
+         In other words, one can use standard HTML tags for this
+         task. Likewise, you can get numbered lists by using the
+         respective HTML tags <code>&lt;ol&gt;</code>.
+         </p>
 
     <li> <em>Verbatim output:</em>
          <p>
-	 If you write comments like this,
-	 </p>
-	 <pre>
-	   /**
-	    * @verbatim
-	    *   void foobar ()
-	    *   {
-	    *     i = 0;
-	    *   }
-	    * @endverbatim
-	    */
-	 </pre>
-	 you will get the lines between the verbatim environment with
-	 the same formatting and in typewriter font:
-	 <pre>
+         If you write comments like this,
+         </p>
+         <pre>
+           /**
+            * @verbatim
+            *   void foobar ()
+            *   {
+            *     i = 0;
+            *   }
+            * @endverbatim
+            */
+         </pre>
+         you will get the lines between the verbatim environment with
+         the same formatting and in typewriter font:
+         <pre>
      void foobar ()
      {
        i = 0;
      }
-	 </pre>
-	 This is useful if you want to include small sample code snippets
-	 into your documentation. In particular, it is important that
-	 the formatting is preserved, which is not the case for all
-	 other text.
+         </pre>
+         This is useful if you want to include small sample code snippets
+         into your documentation. In particular, it is important that
+         the formatting is preserved, which is not the case for all
+         other text.
 
     <li> <em>Typewriter font:</em>
-	 <p>In order to use typewriter font for instance for function
-	 arguments or variables, use the <code>&lt;tt&gt;</code> HTML
-	 tag. For a single word, you can also use the form <code>@p
-	 one_word_without_spaces</code>.</p>
+         <p>In order to use typewriter font for instance for function
+         arguments or variables, use the <code>&lt;tt&gt;</code> HTML
+         tag. For a single word, you can also use the form <code>@p
+         one_word_without_spaces</code>.</p>
 
-	 <p>
-	 If you refer to member variables and member functions
-	 <acronym>doxygen</acronym> has better options than this: use
-	 <tt>function_name()</tt> to reference member functions and
-	 <tt>#variable_name</tt> for member variables to create links
-	 automatically. Refer to the documentation of <a
-	 href="http:www.doxygen.org"><acronym>doxygen</acronym></a> to
-	 get even more options for global variables.
-	 </p>
+         <p>
+         If you refer to member variables and member functions
+         <acronym>doxygen</acronym> has better options than this: use
+         <tt>function_name()</tt> to reference member functions and
+         <tt>#variable_name</tt> for member variables to create links
+         automatically. Refer to the documentation of <a
+         href="http:www.doxygen.org"><acronym>doxygen</acronym></a> to
+         get even more options for global variables.
+         </p>
 
     <li> <em>Emphasis:</em>
          <p>
-	 To generate output in italics, use the <code>@em
-	 one_word_without_spaces</code> tag or the <tt>&lt;em&gt;</tt>
-	 HTML tag. To generate boldface, use <tt>&lt;b&gt;</tt>
-	 </p>
+         To generate output in italics, use the <code>@em
+         one_word_without_spaces</code> tag or the <tt>&lt;em&gt;</tt>
+         HTML tag. To generate boldface, use <tt>&lt;b&gt;</tt>
+         </p>
 
     <li> <em>Formul&aelig;:</em>
          <p>
-	 For simple and short formul&aelig; use the <tt>&lt;i&gt;</tt>
-	 HTML tag. Remark that you can use <tt>&lt;sub&gt;</tt> and
-	 <tt>&lt;sup&gt;</tt> to get subscripts an superscripts,
-	 resp. Only for longer formul&aelig; use
-	 <tt>$formula$</tt> to generate an LaTeX formula which will be
-	 included as a graphical image.
-	 </p>
+         For simple and short formul&aelig; use the <tt>&lt;i&gt;</tt>
+         HTML tag. Note that you can use <tt>&lt;sub&gt;</tt> and
+         <tt>&lt;sup&gt;</tt> to get subscripts an superscripts,
+         respectively. Only for longer formul&aelig; use
+         <tt>$formula$</tt> to generate a LaTeX formula which will then be
+         included as a graphical image.
+         </p>
 
     <li> <em>Sections:</em>
          <p>
-	 Sections in class and function documentations can be
-	 generated using the <tt>&lt;hN&gt;</tt> HTML headline
-	 tags. Headlines inside class documentation should start at
-	 level 3 (<tt>&lt;h3&gt;</tt>) to stay consistent with the
-	 structure of the <acronym>doxygen</acronym> output.
-	 </p>
+         Sections in class and function documentations can be
+         generated using the <tt>&lt;hN&gt;</tt> HTML headline
+         tags. Headlines inside class documentation should start at
+         level 3 (<tt>&lt;h3&gt;</tt>) to stay consistent with the
+         structure of the <acronym>doxygen</acronym> output.
+         </p>
 
-	 <p>
-	 Sections cannot be referenced, unless you add a <tt>&lt;A
-	 NAME="..."&gt;</tt> name anchor to them. If you really have
-	 to do this, please make sure the name does not interfere with
-	 <acronym>doxygen</acronym> generated anchors.
-	 </p>
+         <p>
+         Sections cannot be referenced, unless you add a <tt>&lt;A
+         NAME="..."&gt;</tt> name anchor to them. If you really have
+         to do this, please make sure the name does not interfere with
+         <acronym>doxygen</acronym> generated anchors.
+         </p>
 
     <li> <em>Exclusion from documentation:</em>
          <p> <acronym>doxygen</acronym> sometimes has problems with inlined
-	 functions of template classes. For these cases (and other cases of
-	 parts of the code to be excluded from documentation), we define a
-	 preprocessor symbol <tt>DOXYGEN</tt> when running
-	 <acronym>doxygen</acronym>. Therefore, the following template can be
-	 used to avoid documentation:</p>
-	 <pre>
-	 documented code here
+         functions of template classes. For these cases (and other cases of
+         parts of the code to be excluded from documentation), we define a
+         preprocessor symbol <tt>DOXYGEN</tt> when running
+         <acronym>doxygen</acronym>. Therefore, the following template can be
+         used to avoid documentation:</p>
+         <pre>
+         documented code here
 
-	 #ifndef DOXYGEN
+         #ifndef DOXYGEN
 
-	 code here is compiled, but ignored by doxygen
+         code here is compiled, but ignored by doxygen
 
-	 #endif // DOXYGEN
-	 </pre>
+         #endif // DOXYGEN
+         </pre>
     </ul>
 
     <h3>Code examples for the usage of single classes</h3>
@@ -468,4 +468,3 @@
 
   </body>
 </html>
-

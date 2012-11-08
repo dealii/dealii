@@ -2566,15 +2566,14 @@ namespace SparseMatrixIterators
 
   template <typename number>
   inline
-  Accessor<number, false>::Reference::
-  Reference (const Accessor *accessor,
-             const bool)
-                  :
-                  accessor (accessor)
-  {}
-
-
-
+  Accessor<number, false>::Reference::Reference (
+    const Accessor *accessor,
+    const bool)
+    :
+    accessor (accessor)
+    {}
+  
+  
   template <typename number>
   inline
   Accessor<number, false>::Reference::operator number() const

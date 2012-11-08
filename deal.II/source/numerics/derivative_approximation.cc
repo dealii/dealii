@@ -522,7 +522,6 @@ approximate_gradient (const DH<dim,spacedim>         &dof_handler,
                       Vector<float>         &derivative_norm,
                       const unsigned int     component)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   approximate_derivative<Gradient<dim>,dim> (StaticMappingQ1<dim>::mapping,
                                              dof_handler,
                                              solution,
@@ -556,7 +555,6 @@ approximate_second_derivative (const DH<dim,spacedim>         &dof_handler,
                                Vector<float>         &derivative_norm,
                                const unsigned int     component)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   approximate_derivative<SecondDerivative<dim>,dim> (StaticMappingQ1<dim>::mapping,
                                                      dof_handler,
                                                      solution,
@@ -597,7 +595,6 @@ approximate_derivative_tensor (const DH<dim,spacedim>                           
 {
                                    // just call the respective function with Q1
                                    // mapping
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   approximate_derivative_tensor (StaticMappingQ1<dim>::mapping,
                                  dof,
                                  solution,

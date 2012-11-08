@@ -17,11 +17,7 @@
 #include <deal.II/base/memory_consumption.h>
 
 #include <vector>
-#ifdef HAVE_STD_IOSFWD_HEADER
-#  include <iosfwd>
-#else
-#  include <iostream>
-#endif
+#include <iosfwd>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -75,6 +75,9 @@ namespace dealii
 	if (c1->subdomain_id() != c2->subdomain_id())
 	  return false;
 
+	if (c1->level_subdomain_id() != c2->level_subdomain_id())
+	  return false;
+
 	if (c1->material_id() != c2->material_id())
 	  return false;
 
@@ -138,6 +141,7 @@ void test ()
   tria_1.execute_coarsening_and_refinement();
 
   tria_1.begin_active()->set_subdomain_id (1);
+  tria_1.begin_active()->set_level_subdomain_id (4);
   tria_1.begin_active()->set_material_id (2);
   tria_1.begin_active()->set_user_index (3);
   tria_1.begin_active()->set_user_flag ();

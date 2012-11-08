@@ -140,6 +140,11 @@ namespace internal
                                           */
         std::vector<types::subdomain_id> subdomain_ids;
 
+        /**
+         * for parallel multigrid
+         */
+        std::vector<types::subdomain_id_t> level_subdomain_ids;
+
                                          /**
                                           * One integer for every consecutive
                                           * pair of cells to store which
@@ -243,6 +248,7 @@ namespace internal
         std::vector<bool> coarsen_flags;
         std::vector<std::pair<int,int> > neighbors;
         std::vector<types::subdomain_id> subdomain_ids;
+        std::vector<types::subdomain_id_t> level_subdomain_ids;
         std::vector<int> parents;
 
                                          // The following is not used
@@ -250,6 +256,7 @@ namespace internal
                                          // codim=1 meshes in 3d; only
                                          // needed to allow
                                          // compilation
+        // TODO[TH]: this is no longer true and might be a bug.
         std::vector<bool> direction_flags;
 
         TriaObjectsHex cells;
@@ -296,6 +303,7 @@ namespace internal
       ar & refine_flags & coarsen_flags;
       ar & neighbors;
       ar & subdomain_ids;
+      ar & level_subdomain_ids;
       ar & parents;
       ar & direction_flags;
       ar & cells;
@@ -310,6 +318,7 @@ namespace internal
       ar & refine_flags & coarsen_flags;
       ar & neighbors;
       ar & subdomain_ids;
+      ar & level_subdomain_ids;
       ar & parents;
       ar & direction_flags;
       ar & cells;

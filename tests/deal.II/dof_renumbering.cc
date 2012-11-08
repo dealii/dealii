@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -93,7 +93,7 @@ check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
 
   if (discontinuous)
     {
-      DoFRenumbering::downstream_dg(dof, direction);
+      DoFRenumbering::downstream(dof, direction);
     }
   else
     {
@@ -127,7 +127,7 @@ check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
 
       if (discontinuous)
 	{
-	  DoFRenumbering::downstream_dg(mgdof, level, direction);
+	  DoFRenumbering::downstream(mgdof, level, direction);
 	}
 
                                        // renumber the non-MG part of the

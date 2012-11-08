@@ -21,12 +21,10 @@ for (S1, S2 : REAL_SCALARS)
   {
     template
       bool
-      Vector<S1>::DEAL_II_MEMBER_OP_TEMPLATE_INST
-      operator==<S2>(const Vector<S2>&) const;
+      Vector<S1>::operator==<S2>(const Vector<S2>&) const;
     template
       S1
-      Vector<S1>::DEAL_II_MEMBER_OP_TEMPLATE_INST
-      operator*<S2>(const Vector<S2>&) const;
+      Vector<S1>::operator*<S2>(const Vector<S2>&) const;
     template
       void Vector<S1>::reinit<S2>(const Vector<S2>&, const bool);
   }
@@ -42,12 +40,10 @@ for (S1, S2 : COMPLEX_SCALARS)
   {
     template
       bool
-      Vector<S1>::DEAL_II_MEMBER_OP_TEMPLATE_INST
-      operator==<S2>(const Vector<S2>&) const;
+      Vector<S1>::operator==<S2>(const Vector<S2>&) const;
     template
       S1
-      Vector<S1>::DEAL_II_MEMBER_OP_TEMPLATE_INST
-      operator*<S2>(const Vector<S2>&) const;
+      Vector<S1>::operator*<S2>(const Vector<S2>&) const;
     template
       void Vector<S1>::reinit<S2>(const Vector<S2>&, const bool);
   }

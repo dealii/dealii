@@ -2162,13 +2162,8 @@ struct GeometryInfo
     static
     void
     alternating_form_at_vertices
-#ifndef DEAL_II_ARRAY_ARG_BUG
     (const Point<spacedim> (&vertices)[vertices_per_cell],
      Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell])
-#else
-    (const Point<spacedim> *vertices,
-     Tensor<spacedim-dim,spacedim> *forms)
-#endif
       ;
 
                                      /**

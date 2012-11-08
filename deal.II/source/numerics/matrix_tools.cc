@@ -651,7 +651,6 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim> * const coefficient)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof,
                        q, matrix, coefficient);
   }
@@ -707,7 +706,6 @@ namespace MatrixCreator
                            Vector<double>           &rhs_vector,
                            const Function<spacedim> * const coefficient)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping,
                        dof, q, matrix, rhs, rhs_vector, coefficient);
   }
@@ -756,7 +754,6 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim> * const coefficient)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
   }
 
@@ -808,7 +805,6 @@ namespace MatrixCreator
                            Vector<double>           &rhs_vector,
                            const Function<spacedim> * const coefficient)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
                        matrix, rhs, rhs_vector, coefficient);
   }
@@ -1595,7 +1591,6 @@ namespace MatrixCreator
                                     const Function<spacedim> * const a,
                                     std::vector<unsigned int> component_mapping)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_boundary_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
                                 matrix,rhs, rhs_vector, dof_to_boundary_mapping, a, component_mapping);
   }
@@ -1701,7 +1696,6 @@ namespace MatrixCreator
                                     const Function<spacedim> * const a,
                                     std::vector<unsigned int> component_mapping)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_boundary_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
                                 matrix,rhs, rhs_vector, dof_to_boundary_mapping, a, component_mapping);
   }
@@ -1758,7 +1752,6 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> * const coefficient)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
   }
 
@@ -1818,7 +1811,6 @@ namespace MatrixCreator
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> * const coefficient)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
                           matrix, rhs, rhs_vector, coefficient);
   }
@@ -1872,7 +1864,6 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> * const coefficient)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
   }
 
@@ -1929,7 +1920,6 @@ namespace MatrixCreator
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> * const coefficient)
   {
-    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
                           matrix, rhs, rhs_vector, coefficient);
   }

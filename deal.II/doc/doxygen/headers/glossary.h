@@ -1024,7 +1024,9 @@ Article{JK10,
  * <dd>Each cell of a triangulation has associated with it a property called
  * the "subdomain id" that can be queried using a call like
  * <code>cell-@>subdomain_id()</code> and that can be set for example by using
- * <code>cell-@>set_subdomain_id(13)</code>. While in principle this property
+ * <code>cell-@>set_subdomain_id(13)</code>. (These calls resolve to
+ * CellAccessor::subdomain_id() and CellAccessor::set_subdomain_id(), respectively.)
+ * While in principle this property
  * can be used in any way application programs deem useful (it is simply an
  * integer associated with each cell that can indicate whatever you want), at
  * least for programs that run in %parallel it usually denotes the processor a
@@ -1058,6 +1060,14 @@ Article{JK10,
  * one refinement level. These cells are called "artificial" (see
  * @ref GlossArtificialCell "here") and have the special subdomain id value
  * types::artificial_subdomain_id.
+ *
+ * In addition to regular subdomain ids, there is a second, closely related set
+ * of flags that are associated with each cell: "level subdomain ids."
+ * These exist not only for active cells but, in fact, for every cell in
+ * a mesh hierarchy. Their meaning is entirely analogous to the regular
+ * subdomain ids, but they are read and written by the
+ * CellAccessor::level_subdomain_id() and CellAccessor::set_level_subdomain_id()
+ * functions.
  * </dd>
  *
  *

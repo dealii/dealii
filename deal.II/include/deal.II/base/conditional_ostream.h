@@ -14,11 +14,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef HAVE_STD_OSTREAM_HEADER
-#  include <ostream>
-#else
-#  include <iostream>
-#endif
+#include <ostream>
 
 DEAL_II_NAMESPACE_OPEN
 

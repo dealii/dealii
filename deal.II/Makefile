@@ -153,6 +153,16 @@ build-test-do:
 	@echo BUILD TEST SUCCESSFUL `date -u '+%Y-%m-%d %T'`
 
 
+style-h-files:= $(wildcard include/deal.II/*/*.h)
+style-cc-files:= $(wildcard source/*/*.cc)
+
+indent:
+	@echo "============ Indenting all files"
+	astyle --options=common/astyle.rc $(style-h-files) $(style-cc-files)
+
+.PHONY: indent	
+
+
 .PHONY: all \
         online-doc doc printable-doc tex-doc contrib \
         clean clean-contrib clean-base clean-lac clean-dealII \
