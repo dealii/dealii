@@ -16,9 +16,11 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/rml/include
   )
 
-FILE(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version_string.tmp"
-  "#define __TBB_VERSION_STRINGS \"Empty\""
-  )
+IF(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/version_string.tmp")
+  FILE(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version_string.tmp"
+    "#define __TBB_VERSION_STRINGS \"Empty\""
+    )
+ENDIF()
 
 SET(src_tbb
   rml/client/omp_dynamic_link.cpp
