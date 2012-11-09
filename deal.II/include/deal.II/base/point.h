@@ -225,6 +225,7 @@ inline
 Point<dim,Number>::Point (const Number x)
 {
   Assert (dim==1, StandardExceptions::ExcInvalidConstructorCall());
+  if(dim != 1) return;
   this->values[0] = x;
 }
 
@@ -235,6 +236,7 @@ inline
 Point<dim,Number>::Point (const Number x, const Number y)
 {
   Assert (dim==2, StandardExceptions::ExcInvalidConstructorCall());
+  if(dim != 2) return;
   this->values[0] = x;
   this->values[1] = y;
 }
@@ -246,6 +248,7 @@ inline
 Point<dim,Number>::Point (const Number x, const Number y, const Number z)
 {
   Assert (dim==3, StandardExceptions::ExcInvalidConstructorCall());
+  if(dim != 3) return;
   this->values[0] = x;
   this->values[1] = y;
   this->values[2] = z;
