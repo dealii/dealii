@@ -174,6 +174,15 @@ MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED var)
       )
   ENDIF()
 
+  #
+  # tbb uses dlopen/dlclose, so link against libdl.so as well:
+  #
+  FIND_LIBRARY(dl_lib NAMES dl)
+  MARK_AS_ADVANCED(dl_lib)
+  IF(NOT "${dl_lib}" STREQUAL "-NOTFOUND")
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${dl_lib})
+  ENDIF()
+
   INCLUDE_DIRECTORIES(${TBB_FOLDER}/include)
 
 ENDMACRO()
