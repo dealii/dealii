@@ -1084,9 +1084,7 @@ namespace
     unsigned int d2,
     unsigned int d3)
   {
-    Assert (dim <= 3, ExcNotImplemented());
-
-    int nodes[8];
+    int nodes[1<<dim];
     nodes[GeometryInfo<dim>::dx_to_deal[0]] = start;
     nodes[GeometryInfo<dim>::dx_to_deal[1]] = start+d1;
     if (dim>=2)
@@ -1308,9 +1306,7 @@ namespace
     unsigned int d2,
     unsigned int d3)
   {
-    Assert (dim <= 3, ExcNotImplemented());
-
-    int nodes[8];
+    int nodes[1<<dim];
     nodes[GeometryInfo<dim>::ucd_to_deal[0]] = start;
     nodes[GeometryInfo<dim>::ucd_to_deal[1]] = start+d1;
     if (dim>=2)
@@ -5902,7 +5898,6 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
     (void)comm;
     AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
 #else
-    int             world_size;
     hid_t           h5_file_id, plist_id;
     hid_t           node_dataspace, node_dataset, node_file_dataspace, node_memory_dataspace;
     hid_t           cell_dataspace, cell_dataset, cell_file_dataspace, cell_memory_dataspace;
@@ -5915,6 +5910,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
     // If HDF5 is not parallel and we're using multiple processes, abort
 #ifndef H5_HAVE_PARALLEL
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    int world_size;
     MPI_Comm_size(comm, &world_size);
     AssertThrow (world_size <= 1,
                  ExcMessage ("Serial HDF5 output on multiple processes is not yet supported."));
