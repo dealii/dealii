@@ -36,7 +36,7 @@ namespace
     return std::count_if(vec.begin(), vec.end(), IsNonZero);
   }
 
-};
+}
 /* ----------------------- FESystem::InternalData ------------------- */
 
 
