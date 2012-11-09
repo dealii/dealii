@@ -18,7 +18,7 @@ INCLUDE_DIRECTORIES(
 
 IF(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/version_string.tmp")
   FILE(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version_string.tmp"
-    "#define __TBB_VERSION_STRINGS \"Empty\""
+    "#define __TBB_VERSION_STRINGS \"Empty\"\n"
     )
 ENDIF()
 
