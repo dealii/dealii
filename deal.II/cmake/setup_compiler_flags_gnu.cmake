@@ -74,21 +74,16 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
-  # Like many other compilers, clang produces warnings for array
-  # accesses out of bounds, even if they are in code that's dead
-  # for this dimension. Suppress this.
+  # *Boy*, clang seems to be the very definition of "pedantic" in
+  # "-pedantic" mode, so disable a bunch of harmless warnings
+  # (that are mainly triggered in third party headers so that we cannot
+  # easily fix them...)
   #
-  # There are a number of other warnings we get that can't easily
-  # be worked around and that are definitely not useful. Suppress
-  # those too.
-  #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-array-bounds")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-parentheses")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-delete-non-virtual-dtor")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unneeded-internal-declaration")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-delete-non-virtual-dtor") # not harmless but needed for boost <1.50.0
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-newline-eof")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-function")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-variable")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
 ENDIF()
 
 
