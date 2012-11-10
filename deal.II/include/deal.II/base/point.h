@@ -224,9 +224,12 @@ template <int dim, typename Number>
 inline
 Point<dim,Number>::Point (const Number x)
 {
-  Assert (dim==1, StandardExceptions::ExcInvalidConstructorCall());
-  if(dim != 1) return;
-  this->values[0] = x;
+  switch(dim) {
+    case 1:
+      this->values[0] = x;
+    default:
+      Assert (dim==1, StandardExceptions::ExcInvalidConstructorCall());
+  }
 }
 
 
@@ -235,10 +238,13 @@ template <int dim, typename Number>
 inline
 Point<dim,Number>::Point (const Number x, const Number y)
 {
-  Assert (dim==2, StandardExceptions::ExcInvalidConstructorCall());
-  if(dim != 2) return;
-  this->values[0] = x;
-  this->values[1] = y;
+  switch(dim) {
+    case 2:
+      this->values[0] = x;
+      this->values[1] = y;
+    default:
+      Assert (dim==2, StandardExceptions::ExcInvalidConstructorCall());
+  }
 }
 
 
@@ -247,11 +253,14 @@ template <int dim, typename Number>
 inline
 Point<dim,Number>::Point (const Number x, const Number y, const Number z)
 {
-  Assert (dim==3, StandardExceptions::ExcInvalidConstructorCall());
-  if(dim != 3) return;
-  this->values[0] = x;
-  this->values[1] = y;
-  this->values[2] = z;
+  switch(dim) {
+    case 3:
+      this->values[0] = x;
+      this->values[1] = y;
+      this->values[2] = z;
+    default:
+      Assert (dim==3, StandardExceptions::ExcInvalidConstructorCall());
+  }
 }
 
 
