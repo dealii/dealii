@@ -28,14 +28,14 @@ SET(CLEAN_UP_FILES
 #
 # (Optional)
 # A custom command line that should be invoked by "make run". If empty,
-# ${TARGET} will be invoked.
+# ./${TARGET} will be invoked.
 #
 SET(TARGET_RUN
   # a custom command line, e.g. mpirun -np 2 ${TARGET}
   )
 
 #
-# It is good practise to specify a version requirement:
+# It is good practice to specify a version requirement:
 #
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
@@ -59,4 +59,3 @@ FIND_PACKAGE(deal.II 8.0 REQUIRED
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET})
 DEAL_II_INVOKE_AUTOPILOT()
-

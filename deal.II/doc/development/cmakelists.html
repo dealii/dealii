@@ -40,10 +40,23 @@
     <h3> Using <acronym>deal.II</acronym> in a CMake project </h3>
 
     <p>
-      This section presents some <code>CMakeLists.txt</code> examples for
+      <code>cmake</code> is the configuration and build tool we use
+      in <acronym>deal.II</acronym>. Its advantage is not only that it makes
+      configuration of <acronym>deal.II</acronym> itself simpler across
+      platforms (compared to the older <code>autoconf/make</code> combination)
+      but also that it <i>exports</i> information about the deal.II
+      configuration that makes it particularly simple for projects
+      using <acronym>deal.II</acronym> to configure and link against it.
+    </p>
+
+    <p>
+      <code>cmake</code> is controlled by input files that by convention are
+      called <code>CMakeLists.txt</code>, listing both configuration commands
+      as well as dependencies between source files and targets.
+      This page presents some <code>CMakeLists.txt</code> examples for
       potential use in your projects. A detailed description of the
-      <acronym>deal.II</acronym> project configuration is given in the 
-      <a href="cmake.html#ext" target="body">deal.II CMake ReadME</a>.
+      <acronym>deal.II</acronym> project configuration is given in the
+      <a href="cmake.html" target="body">deal.II CMake ReadMe</a>.
     </p>
 
     <a name="cmakesimple"></a>
@@ -51,9 +64,10 @@
 
     <p>
       The easiest way to write a <code>CMakeLists.txt</code> file is to use
-      an "autopilot" style macro which mimics the old user
-      <code>Makefile</code> behaviour. Here is an example for the step-1
-      tutorial program: (<a href="CMakeLists.txt.example" target="_top">raw</a> version.)
+      an "autopilot" style macro. Here is an example for the step-1
+      tutorial program (<a href="CMakeLists.txt.example"
+      target="_top">plain text</a> version) that can be used for simple
+      projects:
       <pre>
 
     #
@@ -82,14 +96,14 @@
     #
     # (Optional)
     # A custom command line that should be invoked by "make run". If empty,
-    # ${TARGET} will be invoked.
+    # ./${TARGET} will be invoked.
     #
     SET(TARGET_RUN
       # a custom command line, e.g. mpirun -np 2 ${TARGET}
       )
 
     #
-    # It is good practise to specify a version requirement:
+    # It is good practice to specify a version requirement:
     #
     CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
@@ -116,7 +130,11 @@
       </pre>
 
       This <code>CMakeLists.txt</code> is intended for use with a small
-      project and <i>in-source</i> build:
+      project and <i>in-source</i> build (i.e., one does not create a separate
+      build directory as we recommend for the <acronym>deal.II</acronym> build
+      in the <a href="../readme.html#configuration" target="_body">readme
+      file</a>). Using this input file, you can run <code>cmake</code> in the
+      source directory as follows:
       <pre>
 
     $ cd step-1
@@ -162,7 +180,8 @@
       above tends to be too inflexible.
       So, if you wish to have more control about targets the
       <code>DEAL_II_SETUP_TARGET</code> macro might be of interest for you.
-      Here is a full example for the step-1 tutorial program:
+      Here is a full example, again using the step-1 tutorial program as a
+      template:
       <pre>
 
     #
@@ -229,6 +248,12 @@
     <h3> Legacy Make.global_options </h3>
 
     <p>
+      Before version 8.0, <acronym>deal.II</acronym> used the
+      traditional <code>autoconf/make</code> configuration and build
+      system. The interaction between these two programs, as well as
+      propagation of information from <acronym>deal.II</acronym> to user
+      programs happened through a number of files that were generated within
+      the <acronym>deal.II</acronym> directory tree.
       The CMake build system sets up the following compatibility files (if
       <code>DEAL_II_COMPONENT_COMPAT_FILES</code> is set, which is default):
       <pre>
