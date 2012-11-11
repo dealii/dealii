@@ -714,8 +714,80 @@ namespace
                                     */
   template <int spacedim>
   void
-  update_neighbors (Triangulation<1,spacedim> &/*triangulation*/)
-  {}
+  update_neighbors (Triangulation<1,spacedim> &triangulation)
+  {
+                                     // each face can be neighbored on two sides
+                                     // by cells. according to the face's
+                                     // fixed ordering in cells we define the left
+                                     // neighbor as the one for which the face
+                                     // is face number 1, and store that
+                                     // one first; the second one is then
+                                     // the right neighbor for which the
+                                     // face has number 0.
+                                     //
+                                     // There is one more point to
+                                     // consider, however: if we have
+                                     // 1<spacedim, then we may have
+                                     // cases where cells are
+                                     // inverted. In effect, both
+                                     // cells think they are the left
+                                     // neighbor of an edge, for
+                                     // example, which leads us to
+                                     // forget neighborship
+                                     // information (a case that shows
+                                     // this is
+                                     // codim_one/hanging_nodes_02). We
+                                     // store whether a cell is
+                                     // inverted using the
+                                     // direction_flag, so if a cell
+                                     // has a false direction_flag,
+                                     // then we need to invert our
+                                     // selection whether we are a
+                                     // left or right neighbor in all
+                                     // following computations.
+                                     //
+    const unsigned int dim = 1;
+                                     // create a vector of the two active
+                                     // neighbors (left and right) for each face
+                                     // and fill it by looping over all cells. For
+                                     // cases with anisotropic refinement and more
+                                     // then one cell neighboring at a given side
+                                     // of the face we will automatically get the
+                                     // active one on the highest level as we loop
+                                     // over cells from lower levels first.
+    const typename Triangulation<dim,spacedim>::cell_iterator dummy;
+    std::vector<typename Triangulation<dim,spacedim>::cell_iterator>
+      adjacent_cells (2 * (triangulation.n_cells () + 1), dummy);
+
+    typename Triangulation<dim,spacedim>::cell_iterator
+      cell = triangulation.begin(),
+      endc = triangulation.end();
+    for (; cell != endc; ++cell)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      {
+        const typename Triangulation<dim,spacedim>::face_iterator
+          face=cell->face(f);
+
+        const unsigned int
+          offset = (cell->direction_flag() ? 0 : 1);
+
+        adjacent_cells[2*face->index() + offset] = cell;
+      }
+
+                                     // now loop again over all cells and set the
+                                     // corresponding neighbor cell. Note, that we
+                                     // have to use the opposite of the offset in
+                                     // this case as we want the offset of the
+                                     // neighbor, not our own.
+    for (cell=triangulation.begin(); cell != endc; ++cell)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      {
+        const unsigned int
+          offset = (cell->direction_flag() ? 0 : 1);
+          cell->set_neighbor(f,
+                             adjacent_cells[2*cell->face(f)->index() + 1 - offset]);
+      }
+  }
 
 
   template <int dim, int spacedim>
