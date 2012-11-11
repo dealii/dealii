@@ -16,8 +16,8 @@
 #                                                                         #
 #             The cmake build system for the deal.II project              #
 #                                                                         #
-#   See README.cmake for further details on how to use the cmake build    #
-#   system of deal.II.                                                    #
+#     See doc/readme.html and doc/development/cmake.html for further      #
+#     details on how to use the cmake build system of deal.II.            #
 #                                                                         #
 ##                                                                       ##
 
