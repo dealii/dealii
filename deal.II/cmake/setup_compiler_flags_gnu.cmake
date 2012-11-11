@@ -71,6 +71,12 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wswitch")
 #
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
 
+#
+# Silence the -Wnewline-eof warning. We trigger this in various 3rd party
+# headers...
+#
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-newline-eof")
+
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
@@ -81,7 +87,6 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-delete-non-virtual-dtor") # not harmless but needed for boost <1.50.0
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-newline-eof")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-function")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-variable")
 ENDIF()
