@@ -757,36 +757,48 @@ namespace
                                      // over cells from lower levels first.
     const typename Triangulation<dim,spacedim>::cell_iterator dummy;
     std::vector<typename Triangulation<dim,spacedim>::cell_iterator>
-      adjacent_cells (2 * (triangulation.n_cells () + 1), dummy);
+      adjacent_cells (2 * triangulation.n_vertices (), dummy);
 
     typename Triangulation<dim,spacedim>::cell_iterator
       cell = triangulation.begin(),
       endc = triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    {
+      if (cell->direction_flag ())
       {
-        const typename Triangulation<dim,spacedim>::face_iterator
-          face=cell->face(f);
-
-        const unsigned int
-          offset = (cell->direction_flag() ? 0 : 1);
-
-        adjacent_cells[2*face->index() + offset] = cell;
+        adjacent_cells[2 * cell->vertex_index (0)] = cell;
+        adjacent_cells[2 * cell->vertex_index (1) + 1] = cell;
       }
-
+      
+      else
+      {
+        adjacent_cells[2 * cell->vertex_index (0) + 1] = cell;
+        adjacent_cells[2 * cell->vertex_index (1)] = cell;
+      }
+    }
                                      // now loop again over all cells and set the
                                      // corresponding neighbor cell. Note, that we
                                      // have to use the opposite of the offset in
                                      // this case as we want the offset of the
                                      // neighbor, not our own.
-    for (cell=triangulation.begin(); cell != endc; ++cell)
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    for (cell = triangulation.begin (); cell != endc; ++cell)
+    {
+      if (cell->direction_flag ())
       {
-        const unsigned int
-          offset = (cell->direction_flag() ? 0 : 1);
-          cell->set_neighbor(f,
-                             adjacent_cells[2*cell->face(f)->index() + 1 - offset]);
+        cell->set_neighbor (0,
+                            adjacent_cells[2 * cell->vertex_index (0) + 1]);
+        cell->set_neighbor (1,
+                            adjacent_cells[2 * cell->vertex_index (1)]);
       }
+      
+      else
+      {
+        cell->set_neighbor (0,
+                            adjacent_cells[2 * cell->vertex_index (0)]);
+        cell->set_neighbor (1,
+                            adjacent_cells[2 * cell->vertex_index (1) + 1]);
+      }
+    }
   }
 
 
@@ -4517,22 +4529,18 @@ namespace internal
                         first_child->set_neighbor (0, cell->neighbor(0));
                       else
                         if (cell->neighbor(0)->active())
-                          {
-                                                             // since the
-                                                             // neighbors level
-                                                             // is always
-                                                             // <=level, if the
-                                                             // cell is active,
-                                                             // then there are
-                                                             // no cells to the
-                                                             // left which may
-                                                             // want to know
-                                                             // about this new
-                                                             // child cell.
-                            Assert (cell->neighbor(0)->level() <= cell->level(),
-                                    ExcInternalError());
-                            first_child->set_neighbor (0, cell->neighbor(0));
-                          }
+                                                           // since the
+                                                           // neighbors level
+                                                           // is always
+                                                           // <=level, if the
+                                                           // cell is active,
+                                                           // then there are
+                                                           // no cells to the
+                                                           // left which may
+                                                           // want to know
+                                                           // about this new
+                                                           // child cell.
+                          first_child->set_neighbor (0, cell->neighbor(0));
                         else
                                                            // left neighbor is
                                                            // refined
@@ -4571,11 +4579,7 @@ namespace internal
                         second_child->set_neighbor (1, cell->neighbor(1));
                       else
                         if (cell->neighbor(1)->active())
-                          {
-                            Assert (cell->neighbor(1)->level() <= cell->level(),
-                                    ExcInternalError());
-                            second_child->set_neighbor (1, cell->neighbor(1));
-                          }
+                          second_child->set_neighbor (1, cell->neighbor(1));
                         else
                                                            // right neighbor is
                                                            // refined same as
