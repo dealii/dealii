@@ -28,6 +28,7 @@ ENDIF()
 #
 
 ADD_SUBDIRECTORY(tutorial)
+ADD_SUBDIRECTORY(images)
 
 
 #
@@ -56,38 +57,20 @@ CONFIGURE_FILE(
   COPYONLY
   )
 
-ADD_CUSTOM_COMMAND(
-  OUTPUT
-    ${CMAKE_CURRENT_BINARY_DIR}/images/structure.png
-    ${CMAKE_CURRENT_BINARY_DIR}/images/structure.cmapx
-  COMMAND ${CMAKE_COMMAND}
-  ARGS
-    -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/images/
-  COMMAND ${DOXYGEN_DOT_EXECUTABLE}
-  ARGS
-    -Tpng -o ${CMAKE_CURRENT_BINARY_DIR}/images/structure.png
-    -Tcmapx -o ${CMAKE_CURRENT_BINARY_DIR}/images/strucutre.cmapx
-    ${CMAKE_CURRENT_SOURCE_DIR}/images/structure.dot
-  DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/images/structure.dot
-  )
-
-
 #
 # Finalize the doxygen configuration:
 #
 
 file(GLOB doxygen_input
-  ${CMAKE_SOURCE_DIR}/include/deal.II/*
-  ${CMAKE_BINARY_DIR}/include/deal.II/*
-  ${CMAKE_CURRENT_SOURCE_DIR}/headers
-  ${CMAKE_CURRENT_BINARY_DIR}/tutorial
+  ${CMAKE_SOURCE_DIR}/include/deal.II/**/*.h
+  ${CMAKE_BINARY_DIR}/include/deal.II/**/*.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/headers/*.h
+  ${CMAKE_CURRENT_BINARY_DIR}/tutorial/*.h
   ${CMAKE_SOURCE_DIR}/doc/news/*.h
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/*.h
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/main.cpp
   )
-
-TO_STRING(doxygen_input ${doxygen_input})
+TO_STRING(doxygen_input_string ${doxygen_input})
 
 file(GLOB doxygen_image_path
   ${CMAKE_CURRENT_SOURCE_DIR}/images
@@ -95,36 +78,37 @@ file(GLOB doxygen_image_path
   ${CMAKE_SOURCE_DIR}/examples/*/doc
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/images
   )
-TO_STRING(doxygen_image_path ${doxygen_image_path})
+TO_STRING(doxygen_image_path_string ${doxygen_image_path})
 
 FILE(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
   "
-  INPUT=${doxygen_input}
-  IMAGE_PATH=${doxygen_image_path}
+  INPUT=${doxygen_input_string}
+  IMAGE_PATH=${doxygen_image_path_string}
   "
   )
-
 
 #
 # And, finally, call doxygen:
 #
 
-ADD_CUSTOM_TARGET(doxygen ALL
-  #
-  # ./deal.II is already created due to CONFIGURE_FILE(... deal.css ...)
-  #
-  ${DOXYGEN_EXECUTABLE}
+ADD_CUSTOM_COMMAND(
+  OUTPUT
+    ${CMAKE_CURRENT_BINARY_DIR}/doxygen.log
+  COMMAND ${DOXYGEN_EXECUTABLE}
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     > ${CMAKE_CURRENT_BINARY_DIR}/doxygen.log 2>&1 # *pssst*
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
-    ${CMAKE_CURRENT_BINARY_DIR}/images/structure.png
-    ${CMAKE_CURRENT_BINARY_DIR}/images/structure.cmapx
+    tutorial
+    images
+    ${CMAKE_CURRENT_BINARY_DIR}/options.dox
+    ${doxygen_input}
   COMMENT "Generating documentation via doxygen (This may take a _really_ long time)"
   VERBATIM
   )
-
-ADD_DEPENDENCIES(doxygen tutorial)
+ADD_CUSTOM_TARGET(doxygen ALL
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/doxygen.log
+  )
 
 INSTALL(FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/stylesheet.css
