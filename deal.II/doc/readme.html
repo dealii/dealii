@@ -217,7 +217,8 @@
 	make install
       </pre>
       These steps compile, link and install the deal.II libraries. The
-      whole process should take between a few minutes and an hour.
+      whole process should take between a few minutes and an hour, depending
+      on your machine.
     </p>
 
     <p>
@@ -238,6 +239,17 @@
 	<li> If you do not intend to modify the <acronym>deal.II</acronym>
 	  sources and recompile things, then you can remove
 	  the <code>build/</code> directory after the last step.
+
+	<li> In principle, after installing <acronym>deal.II</acronym>, you
+	  can remove the source directory as well (i.e., the directory into
+	  which <code>tar</code> unpacked the file you downloaded) since
+	  projects using deal.II should only need files that have been
+	  installed. However, you will find it convenient to keep the source
+	  files around anyway, for two reasons: (i) When
+	  debugging you often end up with assertions for which you'd like to
+	  see the place in the library's source files that triggered it. (ii)
+	  You may want to use the tutorial programs located in the source
+	  directory.
 
 	<li> The <acronym>deal.II</acronym> <code>CMake</code> system can accept a
 	  significant number of configuration parameters. See the
