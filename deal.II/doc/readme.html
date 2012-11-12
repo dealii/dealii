@@ -30,6 +30,7 @@
 	      <ul>
 		<li>  <a href="#unpacking">Unpacking</a>
 		<li>  <a href="#configuration">Configuring and building the library</a>
+		<li>  <a href="#documentation">Configuring and building the documentation</a>
 		<li>  <a href="#configuration-options">Configuration options</a>
 		  <ul>
 		    <li> <a href="#optional">Selecting optional behavior</a>
@@ -257,7 +258,7 @@
 
 	<li> If you are changing part of the <acronym>deal.II</acronym>
 	code itself, you can re-compile the library using only the
-	last two commands above but in a previously created build
+	last two commands above in the previously created build
 	directory. It is also possible to change the configuration used
 	in this directory by calling <code>cmake</code> a second time,
 	possibly with different arguments.
@@ -307,6 +308,43 @@
       <a href="doxygen/tutorial/index.html" target="_top">tutorial</a>.
     </p>
 
+    <a name="documentation"></a>
+    <h3>Configuring and building the documentation</h3>
+
+    <p>
+      All the documentation about the version that you downloaded and that can
+      be found <a href="http://www.dealii.org" target="_top">at the
+      http://www.dealii.org/ domain</a> can also be generated locally. To do
+      so, invoke <code>cmake</code> in the build instructions above as follows:
+      <pre>
+
+	cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+      </pre>
+      For this to succeed, you will need <a href="http://www.perl.org/"
+      target="_top">Perl 5.x</a>,
+      <a href="http://www.doxygen.org/" target="_top">doxygen</a>
+      and <code>dot</code> (which is part of
+      the <a href="http://www.graphviz.org" target="_top">GraphViz</a>
+      package) to be installed.
+    </p>
+
+    <p>
+      Upon calling <code>make</code> and <code>make install</code>, this will
+      install both this readme, other installation instructions, as well as the
+      <a href="doxygen/deal.II/index.html" target="_top">manual that documents
+      all functions and classes</a> as well as
+      the <a href="doxygen/tutorial/index.html" target="_top"> tutorial
+      of well-documented example programs</a> (the "steps").
+    </p>
+
+    <p>
+      <b>Note:</b> Generating this documentation can take a <i>really long
+      time</i> &mdash; running doxygen through our hundreds of thousands of
+      lines of code can take 15-20 minutes even on a fast machine during which
+      you will not get any output from <code>make</code>.
+    </p>
+
+
     <a name="configuration-options"></a>
     <h3>Configuration options</h3>
 
@@ -352,23 +390,12 @@
 
       <li>
         <p>
-          To build and install the documentation, specify
-          <code>-DDEAL_II_COMPONENT_DOCUMENTATION=ON</code>
-          on the command line.  For generating the documentation <a
-          href="http://www.perl.org/" target="_top">Perl 5.x</a>,
-          <a href="http://www.doxygen.org/" target="_top">doxygen</a>
-          and <code>dot</code> (which is part of the <a
-            href="http://www.graphviz.org" target="_top">GraphViz</a>
-          package) have to be installed.
-
-      <li>
-        <p>
           If you wish to install projects residing under
           <code>contrib/</code> such as ParameterGUI,
           specify <code>-DDEAL_II_COMPONENT_CONTRIB=ON</code>.
           Beware of the fact that parameterGUI needs
           development packages for Qt.
-
+	</p>
     </ul>
 
 
