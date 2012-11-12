@@ -79,15 +79,29 @@ should play with them. To this end, go to the
 <code>examples/step-1</code> directory (or whatever the number of the
 tutorial is that you're interested in) and type
 @code
+  cmake .
   make
   make run
 @endcode
-The first command compiles the sources into an executable, while the
-second executes it (strictly speaking, <code>make run</code> will also
+The first command sets up the files that describe which include files this
+tutorial program depends on, how to compile it and how to run it. This command
+should find the installed deal.II libraries as well that were generated when
+you compiled and installed everything as described in the <a
+href="http://www.dealii.org/readme.html">deal.II ReadMe file</a>.
+If this command should fail to find the deal.II library, then you need to
+provide the path to the installation using the command
+@code
+  cmake -DDEAL_II_DIR=/path/to/installed/deal.II .
+@endcode
+instead.
+
+The second of the commands above compiles the sources into an executable, while the
+last one executes it (strictly speaking, <code>make run</code> will also
 compile the code if the executable doesn't exist yet, so you could
-have skipped the first command if you wanted). This is all that's
+have skipped the second command if you wanted). This is all that's
 needed to run the code and produce the output that is discussed in the
-"Results" section of the tutorial programs.
+"Results" section of the tutorial programs. This sequence needs to be repeated
+in all of the tutorial directories you want to play with.
 
 When learning the library, you need to play with it and see what
 happens. To this end, open the <code>examples/step-1/step-1.cc</code>
