@@ -716,89 +716,6 @@ namespace
   void
   update_neighbors (Triangulation<1,spacedim> &triangulation)
   {
-                                     // each face can be neighbored on two sides
-                                     // by cells. according to the face's
-                                     // fixed ordering in cells we define the left
-                                     // neighbor as the one for which the face
-                                     // is face number 1, and store that
-                                     // one first; the second one is then
-                                     // the right neighbor for which the
-                                     // face has number 0.
-                                     //
-                                     // There is one more point to
-                                     // consider, however: if we have
-                                     // 1<spacedim, then we may have
-                                     // cases where cells are
-                                     // inverted. In effect, both
-                                     // cells think they are the left
-                                     // neighbor of an edge, for
-                                     // example, which leads us to
-                                     // forget neighborship
-                                     // information (a case that shows
-                                     // this is
-                                     // codim_one/hanging_nodes_02). We
-                                     // store whether a cell is
-                                     // inverted using the
-                                     // direction_flag, so if a cell
-                                     // has a false direction_flag,
-                                     // then we need to invert our
-                                     // selection whether we are a
-                                     // left or right neighbor in all
-                                     // following computations.
-                                     //
-    const unsigned int dim = 1;
-                                     // create a vector of the two active
-                                     // neighbors (left and right) for each face
-                                     // and fill it by looping over all cells. For
-                                     // cases with anisotropic refinement and more
-                                     // then one cell neighboring at a given side
-                                     // of the face we will automatically get the
-                                     // active one on the highest level as we loop
-                                     // over cells from lower levels first.
-    const typename Triangulation<dim,spacedim>::cell_iterator dummy;
-    std::vector<typename Triangulation<dim,spacedim>::cell_iterator>
-      adjacent_cells (2 * triangulation.n_vertices (), dummy);
-
-    typename Triangulation<dim,spacedim>::cell_iterator
-      cell = triangulation.begin(),
-      endc = triangulation.end();
-    for (; cell != endc; ++cell)
-    {
-      if (cell->direction_flag ())
-      {
-        adjacent_cells[2 * cell->vertex_index (0)] = cell;
-        adjacent_cells[2 * cell->vertex_index (1) + 1] = cell;
-      }
-      
-      else
-      {
-        adjacent_cells[2 * cell->vertex_index (0) + 1] = cell;
-        adjacent_cells[2 * cell->vertex_index (1)] = cell;
-      }
-    }
-                                     // now loop again over all cells and set the
-                                     // corresponding neighbor cell. Note, that we
-                                     // have to use the opposite of the offset in
-                                     // this case as we want the offset of the
-                                     // neighbor, not our own.
-    for (cell = triangulation.begin (); cell != endc; ++cell)
-    {
-      if (cell->direction_flag ())
-      {
-        cell->set_neighbor (0,
-                            adjacent_cells[2 * cell->vertex_index (0) + 1]);
-        cell->set_neighbor (1,
-                            adjacent_cells[2 * cell->vertex_index (1)]);
-      }
-      
-      else
-      {
-        cell->set_neighbor (0,
-                            adjacent_cells[2 * cell->vertex_index (0)]);
-        cell->set_neighbor (1,
-                            adjacent_cells[2 * cell->vertex_index (1) + 1]);
-      }
-    }
   }
 
 
@@ -906,7 +823,7 @@ namespace
 
                                            // if this cell is not refined, but the
                                            // face is, then we'll have to set our
-                                           // cell as neighbor for the cild faces
+                                           // cell as neighbor for the child faces
                                            // as well. Fortunately the normal
                                            // orientation of children will be just
                                            // the same.
@@ -4529,18 +4446,22 @@ namespace internal
                         first_child->set_neighbor (0, cell->neighbor(0));
                       else
                         if (cell->neighbor(0)->active())
-                                                           // since the
-                                                           // neighbors level
-                                                           // is always
-                                                           // <=level, if the
-                                                           // cell is active,
-                                                           // then there are
-                                                           // no cells to the
-                                                           // left which may
-                                                           // want to know
-                                                           // about this new
-                                                           // child cell.
-                          first_child->set_neighbor (0, cell->neighbor(0));
+                          {
+                                                             // since the
+                                                             // neighbors level
+                                                             // is always
+                                                             // <=level, if the
+                                                             // cell is active,
+                                                             // then there are
+                                                             // no cells to the
+                                                             // left which may
+                                                             // want to know
+                                                             // about this new
+                                                             // child cell.
+                            Assert (cell->neighbor (0)->level () <= cell->level (),
+                                    ExcInternalError ());
+                            first_child->set_neighbor (0, cell->neighbor(0));
+                          }
                         else
                                                            // left neighbor is
                                                            // refined
@@ -4579,7 +4500,11 @@ namespace internal
                         second_child->set_neighbor (1, cell->neighbor(1));
                       else
                         if (cell->neighbor(1)->active())
-                          second_child->set_neighbor (1, cell->neighbor(1));
+                          {
+                            Assert (cell->neighbor (1)->level () <= cell->level (),
+                                    ExcInternalError ());
+                            second_child->set_neighbor (1, cell->neighbor(1));
+                          }
                         else
                                                            // right neighbor is
                                                            // refined same as
