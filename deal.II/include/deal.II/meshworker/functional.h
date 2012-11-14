@@ -47,7 +47,7 @@ namespace MeshWorker
                                           * number of functionals to
                                           * be computed.
                                           */
-        void initialize(unsigned int n);
+        void initialize(const unsigned int n);
                                          /**
                                           * Initialize the local data
                                           * in the DoFInfo object used
@@ -81,7 +81,7 @@ namespace MeshWorker
                                           * The value of the ith entry
                                           * in #results.
                                           */
-        number operator() (unsigned int i) const;
+        number operator() (const unsigned int i) const;
       private:
                                          /**
                                           * The values into which the
@@ -181,7 +181,7 @@ namespace MeshWorker
                                           * The value of the ith entry
                                           * in @p results.
                                           */
-        number operator() (unsigned int i) const;
+        number operator() (const unsigned int i) const;
       private:
         DataVectors results;
         bool separate_faces;
@@ -190,7 +190,7 @@ namespace MeshWorker
 
     template <typename number>
     inline void
-    Functional<number>::initialize(unsigned int n)
+    Functional<number>::initialize(const unsigned int n)
     {
       results.resize(n);
       std::fill(results.begin(), results.end(), 0.);
@@ -232,7 +232,7 @@ namespace MeshWorker
 
     template <typename number>
     inline number
-    Functional<number>::operator() (unsigned int i) const
+    Functional<number>::operator() (const unsigned int i) const
     {
       AssertIndexRange(i, results.size());
       return results[i];
