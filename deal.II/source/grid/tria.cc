@@ -714,7 +714,7 @@ namespace
                                     */
   template <int spacedim>
   void
-  update_neighbors (Triangulation<1,spacedim> &triangulation)
+  update_neighbors (Triangulation<1,spacedim> &)
   {
   }
 
@@ -14172,4 +14172,3 @@ Triangulation<dim, spacedim>::remove_refinement_listener (RefinementListener &li
 #include "tria.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-
