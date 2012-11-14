@@ -714,8 +714,9 @@ namespace
                                     */
   template <int spacedim>
   void
-  update_neighbors (Triangulation<1,spacedim> &/*triangulation*/)
-  {}
+  update_neighbors (Triangulation<1,spacedim> &triangulation)
+  {
+  }
 
 
   template <int dim, int spacedim>
@@ -822,7 +823,7 @@ namespace
 
                                            // if this cell is not refined, but the
                                            // face is, then we'll have to set our
-                                           // cell as neighbor for the cild faces
+                                           // cell as neighbor for the child faces
                                            // as well. Fortunately the normal
                                            // orientation of children will be just
                                            // the same.
@@ -4457,8 +4458,8 @@ namespace internal
                                                              // want to know
                                                              // about this new
                                                              // child cell.
-                            Assert (cell->neighbor(0)->level() <= cell->level(),
-                                    ExcInternalError());
+                            Assert (cell->neighbor (0)->level () <= cell->level (),
+                                    ExcInternalError ());
                             first_child->set_neighbor (0, cell->neighbor(0));
                           }
                         else
@@ -4500,8 +4501,8 @@ namespace internal
                       else
                         if (cell->neighbor(1)->active())
                           {
-                            Assert (cell->neighbor(1)->level() <= cell->level(),
-                                    ExcInternalError());
+                            Assert (cell->neighbor (1)->level () <= cell->level (),
+                                    ExcInternalError ());
                             second_child->set_neighbor (1, cell->neighbor(1));
                           }
                         else

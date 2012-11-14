@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,8 +17,10 @@
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/numerics/mesh_worker_info.h>
 
+//TODO[GK]: Remove the using directive
 using namespace dealii;
 
+//TODO[GK]: Provide any kind of documentation for this class and the one below...
 class VectorInfo
 {
   public:
@@ -28,12 +30,12 @@ class VectorInfo
 				      * selector.
 				      */
     void initialize_data(const NamedData<BlockVector<double>*>&data);
-    
+
     template<int dim, int spacedim>
     void reinit(const MeshWorker::DoFInfo<dim, spacedim>& i);
 
     BlockVector<double>& operator() (unsigned int i);
-    
+
   private:
     std::vector<BlockVector<double> > local_data;
     				       /**
@@ -42,7 +44,7 @@ class VectorInfo
 					* values in quadrature
 					* points.
 					*/
-    SmartPointer<const NamedData<BlockVector<double>*> > global_data;    
+    SmartPointer<const NamedData<BlockVector<double>*> > global_data;
 };
 
 
@@ -50,9 +52,9 @@ class VectorInfoBox
  {
    public:
      typedef VectorInfo CellInfo;
-     
+
      void initialize_data(const NamedData<BlockVector<double>*>&data);
-     
+
      template <int dim, class DOFINFO>
      void post_cell(const MeshWorker::DoFInfoBox<dim, DOFINFO>&)
        {}
@@ -60,7 +62,7 @@ class VectorInfoBox
      template <int dim, class DOFINFO>
      void post_faces(const MeshWorker::DoFInfoBox<dim, DOFINFO>&)
        {}
-     
+
      VectorInfo cell;
      VectorInfo boundary;
      VectorInfo face;
@@ -84,11 +86,11 @@ void
 VectorInfo::reinit(const MeshWorker::DoFInfo<dim, spacedim>& i)
 {
   const NamedData<BlockVector<double>*>& gd = *global_data;
-  
+
   for (unsigned int k=0;k<local_data.size();++k)
     {
       const BlockVector<double>& v = *gd(k);
-      
+
       local_data[k].reinit(i.block_info->local());
       for (unsigned int j=0;j<local_data[k].size();++j)
 	local_data[k](j) = v(i.indices[j]);

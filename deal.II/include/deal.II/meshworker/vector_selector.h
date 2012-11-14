@@ -63,9 +63,9 @@ namespace MeshWorker
                                         * cell or face.
                                         */
       void add(const std::string& name,
-               bool values = true,
-               bool gradients = false,
-               bool hessians = false);
+               const bool values = true,
+               const bool gradients = false,
+               const bool hessians = false);
 
                                        /**
                                         * Does the same as the function
@@ -140,17 +140,17 @@ namespace MeshWorker
                                        /**
                                         * The vector index for the ith value
                                         */
-      unsigned int value_index (unsigned int i) const;
+      unsigned int value_index (const unsigned int i) const;
 
                                        /**
                                         * The vector index for the ith gradient
                                         */
-      unsigned int gradient_index (unsigned int i) const;
+      unsigned int gradient_index (const unsigned int i) const;
 
                                        /**
                                         * The vector index for the ith Hessian
                                         */
-      unsigned int hessian_index (unsigned int i) const;
+      unsigned int hessian_index (const unsigned int i) const;
 
                                        /**
                                         * Print the contents of the
@@ -291,10 +291,10 @@ namespace MeshWorker
         std::vector<std::vector<std::vector<Tensor<2,dim> > > >& hessians,
         const FEValuesBase<dim,spacedim>& fe,
         const std::vector<unsigned int>& index,
-        unsigned int component,
-        unsigned int n_comp,
-        unsigned int start,
-        unsigned int size) const;
+        const unsigned int component,
+        const unsigned int n_comp,
+        const unsigned int start,
+        const unsigned int size) const;
 
                                        /**
                                         * Fill the local data vector
@@ -312,12 +312,12 @@ namespace MeshWorker
         std::vector<std::vector<std::vector<Tensor<1,dim> > > >& gradients,
         std::vector<std::vector<std::vector<Tensor<2,dim> > > >& hessians,
         const FEValuesBase<dim,spacedim>& fe,
-        unsigned int level,
+        const unsigned int level,
         const std::vector<unsigned int>& index,
-        unsigned int component,
-        unsigned int n_comp,
-        unsigned int start,
-        unsigned int size) const;
+        const unsigned int component,
+        const unsigned int n_comp,
+        const unsigned int start,
+        const unsigned int size) const;
 
                                        /**
                                         * The memory used by this object.
@@ -383,10 +383,10 @@ namespace MeshWorker
         std::vector<std::vector<std::vector<Tensor<2,dim> > > >& hessians,
         const FEValuesBase<dim,spacedim>& fe,
         const std::vector<unsigned int>& index,
-        unsigned int component,
-        unsigned int n_comp,
-        unsigned int start,
-        unsigned int size) const;
+        const unsigned int component,
+        const unsigned int n_comp,
+        const unsigned int start,
+        const unsigned int size) const;
 
                                        /**
                                         * The memory used by this object.
@@ -454,12 +454,12 @@ namespace MeshWorker
         std::vector<std::vector<std::vector<Tensor<1,dim> > > >& gradients,
         std::vector<std::vector<std::vector<Tensor<2,dim> > > >& hessians,
         const FEValuesBase<dim,spacedim>& fe,
-        unsigned int level,
+        const unsigned int level,
         const std::vector<unsigned int>& index,
-        unsigned int component,
-        unsigned int n_comp,
-        unsigned int start,
-        unsigned int size) const;
+        const unsigned int component,
+        const unsigned int n_comp,
+        const unsigned int start,
+        const unsigned int size) const;
 
                                        /**
                                         * The memory used by this object.
@@ -474,11 +474,17 @@ namespace MeshWorker
 //----------------------------------------------------------------------//
 
   inline void
-  VectorSelector::add(const std::string& name, bool values, bool gradients, bool hessians)
+  VectorSelector::add(const std::string& name,
+		      const bool values,
+		      const bool gradients,
+		      const bool hessians)
   {
-    if (values) value_selection.add(name);
-    if (gradients) gradient_selection.add(name);
-    if (hessians) hessian_selection.add(name);
+    if (values)
+      value_selection.add(name);
+    if (gradients)
+      gradient_selection.add(name);
+    if (hessians)
+      hessian_selection.add(name);
   }
 
 
@@ -554,21 +560,21 @@ namespace MeshWorker
 
 
   inline unsigned int
-  VectorSelector::value_index(unsigned int i) const
+  VectorSelector::value_index(const unsigned int i) const
   {
     return value_selection(i);
   }
 
 
   inline unsigned int
-  VectorSelector::gradient_index(unsigned int i) const
+  VectorSelector::gradient_index(const unsigned int i) const
   {
     return gradient_selection(i);
   }
 
 
   inline unsigned int
-  VectorSelector::hessian_index(unsigned int i) const
+  VectorSelector::hessian_index(const unsigned int i) const
   {
     return hessian_selection(i);
   }

@@ -43,10 +43,10 @@ namespace MeshWorker
         std::vector<std::vector<std::vector<Tensor<2,dim> > > >&,
         const FEValuesBase<dim,spacedim>&,
         const std::vector<unsigned int>&,
-        unsigned int,
-        unsigned int,
-        unsigned int,
-        unsigned int) const
+        const unsigned int,
+        const unsigned int,
+        const unsigned int,
+        const unsigned int) const
   {
     Assert(false, ExcNotImplemented());
   }
@@ -59,12 +59,12 @@ namespace MeshWorker
         std::vector<std::vector<std::vector<Tensor<1,dim> > > >&,
         std::vector<std::vector<std::vector<Tensor<2,dim> > > >&,
         const FEValuesBase<dim,spacedim>&,
-        unsigned int,
+        const unsigned int,
         const std::vector<unsigned int>&,
-        unsigned int,
-        unsigned int,
-        unsigned int,
-        unsigned int) const
+        const unsigned int,
+        const unsigned int,
+        const unsigned int,
+        const unsigned int) const
   {
     Assert(false, ExcNotImplemented());
   }
@@ -111,10 +111,10 @@ namespace MeshWorker
         std::vector<std::vector<std::vector<Tensor<2,dim> > > >& hessians,
         const FEValuesBase<dim,spacedim>& fe,
         const std::vector<unsigned int>& index,
-        unsigned int component,
-        unsigned int n_comp,
-        unsigned int start,
-        unsigned int size) const
+        const unsigned int component,
+        const unsigned int n_comp,
+        const unsigned int start,
+        const unsigned int size) const
   {
     AssertDimension(values.size(), this->n_values());
     AssertDimension(gradients.size(), this->n_gradients());
@@ -193,12 +193,12 @@ namespace MeshWorker
         std::vector<std::vector<std::vector<Tensor<1,dim> > > >& gradients,
         std::vector<std::vector<std::vector<Tensor<2,dim> > > >& hessians,
         const FEValuesBase<dim,spacedim>& fe,
-        unsigned int level,
+        const unsigned int level,
         const std::vector<unsigned int>& index,
-        unsigned int component,
-        unsigned int n_comp,
-        unsigned int start,
-        unsigned int size) const
+        const unsigned int component,
+        const unsigned int n_comp,
+        const unsigned int start,
+        const unsigned int size) const
   {
     AssertDimension(values.size(), this->n_values());
     AssertDimension(gradients.size(), this->n_gradients());
