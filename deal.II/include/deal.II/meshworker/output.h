@@ -225,7 +225,7 @@ namespace MeshWorker
                                      ? dim : (dim-1);
       const unsigned int row_length = n_points;
                                        // If patches are 1D, end the
-                                       // patch after a row, else and
+                                       // patch after a row, else end
                                        // it after a square
       const unsigned int row_length2 = (patch_dim==1) ? row_length : (row_length*row_length);
 
