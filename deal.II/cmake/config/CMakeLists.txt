@@ -132,7 +132,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   # Transform some cmake lists into a string that the old Makefile
   # mechanism actually understands:
   #
-  TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_C}"
+  TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_CXX}"
     ${DEAL_II_USER_INCLUDE_DIRS}
     ${DEAL_II_INCLUDE_DIRS}
     )
