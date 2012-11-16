@@ -23,10 +23,15 @@
 
 #include <deal.II/lac/abstract_linear_algebra.h>
 
+#define USE_PETSC_LA
+
 namespace LA
 {
+#ifdef USE_PETSC_LA
   using namespace dealii::LinearAlgebraPETSc;
-//  using namespace dealii::LinearAlgebraTrilinos;
+#else
+  using namespace dealii::LinearAlgebraTrilinos;
+#endif
 }
 
 
@@ -334,8 +339,8 @@ namespace Step40
                                       locally_relevant_dofs);
     locally_relevant_solution = 0;
     system_rhs.reinit (mpi_communicator,
-                       dof_handler.n_dofs(),
-                       dof_handler.n_locally_owned_dofs());
+                       locally_owned_dofs);
+                       
     system_rhs = 0;
 
                                      // The next step is to compute hanging node
@@ -608,6 +613,7 @@ namespace Step40
 
     SolverControl solver_control (dof_handler.n_dofs(), 1e-12);
 
+#ifdef USE_PETSC_LA
     PETScWrappers::SolverCG solver(solver_control, mpi_communicator);
 
                                      // Ask for a symmetric preconditioner by
@@ -622,6 +628,8 @@ namespace Step40
 
     pcout << "   Solved in " << solver_control.last_step()
           << " iterations." << std::endl;
+
+#endif
 
     constraints.distribute (completely_distributed_solution);
 
