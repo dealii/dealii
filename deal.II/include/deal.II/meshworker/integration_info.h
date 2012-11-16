@@ -30,17 +30,10 @@ namespace MeshWorker
  * Class for objects handed to local integration functions.
  *
  * Objects of this class contain one or more objects of type FEValues,
- * FEFaceValues or FESubfacevalues to be used in local
+ * FEFaceValues or FESubfaceValues to be used in local
  * integration. They are stored in an array of pointers to the base
- * classes FEValuesBase for cells and FEFaceValuesBase for faces and
- * subfaces, respectively. The template parameter VECTOR allows the
+ * classes FEValuesBase. The template parameter VECTOR allows the
  * use of different data types for the global system.
- *
- * The @p FEVALUESBASE template parameter should be either
- * FEValuesBase or FEFaceValuesBase, depending on whether the object
- * is used to integrate over cells or faces. The actual type of @p
- * FEVALUES object is fixed in the constructor and only used to
- * initialize the pointers in #fevalv.
  *
  * Additionally, this function contains space to store the values of
  * finite element functions stored in #global_data in the

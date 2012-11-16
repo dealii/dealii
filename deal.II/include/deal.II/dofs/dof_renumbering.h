@@ -938,8 +938,7 @@ namespace DoFRenumbering
   hierarchical (DoFHandler<dim> &dof_handler);
 
                                    /**
-                                    * Cell-wise renumbering for DG
-                                    * elements.  This function takes
+                                    * Cell-wise renumbering. This function takes
                                     * the ordered set of cells in
                                     * <tt>cell_order</tt>, and makes
                                     * sure that all degrees of
@@ -949,12 +948,6 @@ namespace DoFRenumbering
                                     * lower index. The order inside
                                     * a cell block will be the same
                                     * as before this renumbering.
-                                    *
-                                    * This function only works with
-                                    * Discontinuous Galerkin Finite
-                                    * Elements, i.e. all degrees of
-                                    * freedom have to be associated
-                                    * with the interior of the cell.
                                     */
   template <class DH>
   void
@@ -1264,7 +1257,7 @@ namespace DoFRenumbering
                 const unsigned int level,
                 const Point<dim> &center,
                 const bool counter = false);
-
+  
                                    /**
                                     * Computes the renumbering
                                     * vector needed by the
