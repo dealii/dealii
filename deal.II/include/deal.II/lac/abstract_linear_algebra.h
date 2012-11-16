@@ -132,6 +132,7 @@ DEAL_II_NAMESPACE_CLOSE
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_precondition.h>
+#include <deal.II/lac/trilinos_solver.h>
 
 DEAL_II_NAMESPACE_OPEN
 
