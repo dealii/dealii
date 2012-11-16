@@ -26,6 +26,7 @@ void test ()
   VEC x(3);
   x(0)=10;
   deallog << x.l2_norm() << std::endl;
+  x.compress();
   
   deallog << "OK" << std::endl;
 }
