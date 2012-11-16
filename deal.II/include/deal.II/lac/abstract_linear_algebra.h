@@ -138,6 +138,9 @@ DEAL_II_NAMESPACE_OPEN
   namespace LinearAlgebraTrilinos
   {
     using namespace dealii;
+    
+    typedef TrilinosWrappers::Vector Vector;
+
     namespace MPI
     {
       
