@@ -622,6 +622,7 @@ namespace Step40
     SolverControl solver_control (dof_handler.n_dofs(), 1e-12);
 
 #ifdef USE_PETSC_LA
+
     PETScWrappers::SolverCG solver(solver_control, mpi_communicator);
 
                                      // Ask for a symmetric preconditioner by
@@ -630,6 +631,24 @@ namespace Step40
     LA::MPI::PreconditionAMG
       preconditioner(system_matrix,
                      PETScWrappers::PreconditionBoomerAMG::AdditionalData(true));
+
+    solver.solve (system_matrix, completely_distributed_solution, system_rhs,
+                  preconditioner);
+
+    pcout << "   Solved in " << solver_control.last_step()
+          << " iterations." << std::endl;
+
+#else
+
+    TrilinosWrappers::SolverCG solver(solver_control);
+
+                                     // Ask for a symmetric preconditioner by
+                                     // setting the first parameter in
+                                     // AdditionalData to true.
+    LA::MPI::PreconditionAMG
+      preconditioner;
+    preconditioner.initialize(system_matrix);
+                     
 
     solver.solve (system_matrix, completely_distributed_solution, system_rhs,
                   preconditioner);
