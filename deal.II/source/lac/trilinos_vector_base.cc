@@ -425,6 +425,11 @@ namespace TrilinosWrappers
       + this->local_size()*( sizeof(double)+sizeof(int) );
   }
 
+  void
+  VectorBase::update_ghost_values() const
+  {
+  }
+
 } /* end of namespace TrilinosWrappers */
 
 

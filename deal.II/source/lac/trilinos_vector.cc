@@ -106,6 +106,17 @@ namespace TrilinosWrappers
       reinit (v, false, true);
     }
 
+    Vector::Vector (const MPI_Comm &communicator,
+                    const IndexSet &local,
+                    const IndexSet &ghost)
+                    :
+                    VectorBase()
+    {
+        IndexSet parallel_partitioning = local;
+        parallel_partitioning.add_indices(ghost);
+        reinit(parallel_partitioning, communicator);
+    }
+
 
 
     Vector::~Vector ()
@@ -278,6 +289,13 @@ namespace TrilinosWrappers
 
     }
 
+
+    void Vector::reinit(const MPI_Comm &communicator, const IndexSet &local, const IndexSet &ghost)
+    {
+        IndexSet parallel_partitioning = local;
+        parallel_partitioning.add_indices(ghost);
+        reinit(parallel_partitioning, communicator);
+    }
 
 
     Vector &

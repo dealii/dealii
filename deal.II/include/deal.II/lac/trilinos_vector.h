@@ -236,6 +236,16 @@ namespace TrilinosWrappers
                      const bool         import_data = false);
 
                                        /**
+                                        * Reinit function. Creates a vector
+                                        * using the IndexSet local as our
+                                        * own unknowns, add optional ghost
+                                        * values ghost.
+                                        */
+        void reinit (const MPI_Comm &communicator,
+                     const IndexSet &local,
+                     const IndexSet &ghost=IndexSet(0));
+
+                                       /**
                                         * Set all components of the
                                         * vector to the given number @p
                                         * s. Simply pass this down to
@@ -415,6 +425,10 @@ namespace TrilinosWrappers
                                         */
         Vector (const IndexSet &parallel_partitioning,
                 const MPI_Comm &communicator = MPI_COMM_WORLD);
+
+        Vector (const MPI_Comm &communicator,
+                const IndexSet &local,
+                const IndexSet &ghost=IndexSet(0));
 
                                        /**
                                         * Copy constructor from the
@@ -617,6 +631,16 @@ namespace TrilinosWrappers
               const MPI_Comm &communicator = MPI_COMM_WORLD);
 
                                        /**
+                                        * This constructor creates a vector
+                                        * using the IndexSet local as our
+                                        * own unknowns, add optional ghost
+                                        * values ghost.
+                                        */
+      Vector (const MPI_Comm &communicator,
+              const IndexSet &local,
+              const IndexSet &ghost);
+
+                                       /**
                                         * This constructor takes a
                                         * (possibly parallel) Trilinos
                                         * Vector and generates a
@@ -690,6 +714,7 @@ namespace TrilinosWrappers
       void reinit (const VectorBase &V,
                    const bool        fast = false,
                    const bool        allow_different_maps = false);
+
 
                                        /**
                                         * Set all components of the
