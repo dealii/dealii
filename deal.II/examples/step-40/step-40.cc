@@ -429,11 +429,20 @@ namespace Step40
                                                 dof_handler.n_locally_owned_dofs_per_processor(),
                                                 mpi_communicator,
                                                 locally_relevant_dofs);
+
+#ifdef USE_PETSC_LA
     system_matrix.reinit (mpi_communicator,
                           csp,
                           dof_handler.n_locally_owned_dofs_per_processor(),
                           dof_handler.n_locally_owned_dofs_per_processor(),
                           Utilities::MPI::this_mpi_process(mpi_communicator));
+#else
+    system_matrix.reinit (locally_owned_dofs,
+                          locally_owned_dofs,
+                          csp,
+                          mpi_communicator,
+                          false);
+#endif
   }
 
 
@@ -608,8 +617,7 @@ namespace Step40
   {
     LA::MPI::Vector
       completely_distributed_solution (mpi_communicator,
-                                       dof_handler.n_dofs(),
-                                       dof_handler.n_locally_owned_dofs());
+                                       locally_owned_dofs);
 
     SolverControl solver_control (dof_handler.n_dofs(), 1e-12);
 
