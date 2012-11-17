@@ -170,9 +170,6 @@
    i.e. its minimal capacity. */
 #undef DEAL_II_MIN_VECTOR_CAPACITY
 
-/* enable multigrid compatibility mode */
-#undef DEAL_II_MULTIGRID_COMPATIBILITY
-
 /* Path to the deal.II directory */
 #undef DEAL_II_PATH
 
