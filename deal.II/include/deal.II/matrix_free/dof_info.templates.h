@@ -21,8 +21,17 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-namespace MatrixFreeFunctions
-{
+  namespace MatrixFreeFunctions
+  {
+
+    struct ConstraintComparator
+    {
+      bool operator()(const std::pair<unsigned int,double> &p1,
+                      const std::pair<unsigned int,double> &p2) const
+      {
+        return p1.second < p2.second;
+      }
+    };
 
                                      /**
                                       * A struct that takes entries describing
@@ -52,135 +61,62 @@ namespace MatrixFreeFunctions
       unsigned short
       insert_entries (const std::vector<std::pair<unsigned int,double> > &entries);
 
-      std::vector<Number> constraint_pool_data;
-      std::vector<unsigned int> constraint_pool_row_index;
-      std::vector<std::pair<unsigned int, unsigned int> >  pool_locations;
-      std::vector<std::pair<Number,unsigned int> > constraint_entries;
+      std::vector<std::pair<unsigned int, double> > constraint_entries;
       std::vector<unsigned int> constraint_indices;
-      std::vector<double>      one_constraint;
-      HashValue                hashes;
+      std::pair<std::vector<Number>,unsigned int> next_constraint;
+      std::map<std::vector<Number>,unsigned int,FPArrayComparator<double> > constraints;
     };
 
 
     template <typename Number>
     ConstraintValues<Number>::ConstraintValues ()
       :
-      hashes (1.)
-    {
-      constraint_pool_row_index.push_back (0);
-    }
+      constraints(FPArrayComparator<Number>(1.))
+    {}
 
     template <typename Number>
     unsigned short
     ConstraintValues<Number>::
     insert_entries (const std::vector<std::pair<unsigned int,double> > &entries)
     {
-      unsigned int insert_position = deal_II_numbers::invalid_unsigned_int;
-
-      typedef std::vector<std::pair<unsigned int, unsigned int> >::iterator iter;
-      constraint_entries.resize(entries.size());
-      one_constraint.resize(entries.size());
-      constraint_indices.resize(entries.size());
-      for (unsigned int j=0;j<entries.size(); j++)
+      next_constraint.first.resize(entries.size());
+      if (entries.size() > 0)
         {
-          constraint_entries[j].first = entries[j].second;
-          constraint_entries[j].second = entries[j].first;
-        }
-
-      std::sort(constraint_entries.begin(),constraint_entries.end());
-      for (unsigned int j=0;j<entries.size(); j++)
-        {
+          constraint_indices.resize(entries.size());
+          constraint_entries = entries;
+          std::sort(constraint_entries.begin(), constraint_entries.end(),
+                    ConstraintComparator());
+          for (unsigned int j=0;j<constraint_entries.size(); j++)
+            {
                           // copy the indices of the constraint entries after
                           // sorting.
-          constraint_indices[j] = constraint_entries[j].second;
+              constraint_indices[j] = constraint_entries[j].first;
 
                           // one_constraint takes the weights of the
                           // constraint
-          one_constraint[j] = constraint_entries[j].first;
-        }
-
-                                // check whether or not constraint is already
-                                // in pool
-      unsigned int hash_val = hashes(one_constraint);
-      std::pair<unsigned int,unsigned int> test (hash_val, 0);
-
-                                // Try to find a constraint in the pool with
-                                // the same hash value.
-      iter pos = std::lower_bound (pool_locations.begin(),
-                                   pool_locations.end(),
-                                   test);
-
-                                // If constraint has to be added, which will
-                                // be its no.
-      test.second = constraint_pool_row_index.size()-1;
-
-                                // Hash value larger than all the ones
-                                // before. We need to add it.
-      if (pos == pool_locations.end())
-        goto insert;
-
-                                // A constraint in the pool with the same hash
-                                // value identified.
-      else if (pos->first == test.first)
-        {
-          bool is_same = true;
-          while(is_same == true)
-            {
-              if(one_constraint.size()!=
-                 (constraint_pool_row_index[pos->second+1]-
-                  constraint_pool_row_index[pos->second]))
-                                // The constraints have different length, and
-                                // hence different.
-                is_same = false;
-              else
-                for (unsigned int q=0; q<one_constraint.size(); ++q)
-                                // check whether or not all weights are the
-                                // same.
-                  if (std::fabs(constraint_pool_data[constraint_pool_row_index
-                                                     [pos->second]+q]-
-                                one_constraint[q])>hashes.scaling)
-                    {
-                      is_same = false;
-                      break;
-                    }
-              if (is_same == false)
-                {
-                                // Try if there is another constraint with the
-                                // same hash value.
-                  ++pos;
-                  if (pos != pool_locations.end() && pos->first == test.first)
-                    is_same = true;
-                  else
-                    goto insert;
-                }
-              else
-                {
-                                // The constraint is the same as the
-                                // (pos->second)th in the pool. Add the
-                                // location of constraint in pool
-                  insert_position = pos->second;
-                  break;
-                }
+              next_constraint.first[j] = constraint_entries[j].second;
             }
         }
+      next_constraint.second = constraints.size();
+
+                                // check whether or not constraint is already
+                                // in pool. the initial implementation
+                                // computed a hash value based on the truncated
+                                // array (to given accuracy around 1e-13) in
+                                // order to easily detect different arrays and
+                                // then made a fine-grained check when the
+                                // hash values were equal. this was quite
+                                // lenghty and now we use a std::map with a
+                                // user-defined comparator to compare floating
+                                // point arrays to a tolerance 1e-13.
+      std::pair<typename std::map<std::vector<Number>, unsigned int,
+                                  FPArrayComparator<Number> >::iterator,
+                bool> it = constraints.insert(next_constraint);
+      unsigned int insert_position = deal_II_numbers::invalid_unsigned_int;
+      if (it.second == false)
+        insert_position = it.first->second;
       else
-        {
-                                // A new constraint has been identified. It
-                                // needs to be added (at the position
-                                // test->second in pool_locations).
-        insert:
-          pool_locations.insert (pos, test);
-
-                                // Remember hash value and location of
-                                // constraint.
-          constraint_pool_data.insert (constraint_pool_data.end(),
-                                       one_constraint.begin(),
-                                       one_constraint.end());
-          constraint_pool_row_index.push_back (constraint_pool_data.size());
-
-                                // Add the location of constraint in pool.
-          insert_position = test.second;
-        }
+        insert_position = next_constraint.second;
 
                                 // we want to store the result as a short
                                 // variable, so we have to make sure that the
@@ -214,6 +150,9 @@ namespace MatrixFreeFunctions
     dofs_per_cell (dof_info_in.dofs_per_cell),
     dofs_per_face (dof_info_in.dofs_per_face),
     store_plain_indices (dof_info_in.store_plain_indices),
+    cell_active_fe_index (dof_info_in.cell_active_fe_index),
+    max_fe_index (dof_info_in.max_fe_index),
+    fe_index_conversion (dof_info_in.fe_index_conversion),
     ghost_dofs (dof_info_in.ghost_dofs)
   {}
 
@@ -229,9 +168,13 @@ namespace MatrixFreeFunctions
     ghost_dofs.clear();
     dofs_per_cell.clear();
     dofs_per_face.clear();
+    n_components = 0;
     row_starts_plain_indices.clear();
     plain_dof_indices.clear();
     store_plain_indices = false;
+    cell_active_fe_index.clear();
+    max_fe_index = 0;
+    fe_index_conversion.clear();
   }
 
 
@@ -251,7 +194,7 @@ namespace MatrixFreeFunctions
     const unsigned int n_owned     = last_owned - first_owned;
     std::pair<unsigned short,unsigned short> constraint_iterator (0,0);
 
-    unsigned int dofs_this_cell = (cell_active_fe_index.size() == 0) ?
+    unsigned int dofs_this_cell = (cell_active_fe_index.empty()) ?
       dofs_per_cell[0] : dofs_per_cell[cell_active_fe_index[cell_number]];
     for (unsigned int i=0; i<dofs_this_cell; i++)
       {
@@ -390,21 +333,6 @@ namespace MatrixFreeFunctions
               }
           }
       }
-
-#ifdef DEBUG
-    {
-      unsigned int n_dofs = 0;
-      const std::pair<unsigned short,unsigned short> * blb = begin_indicators(cell_number);
-      for (unsigned int j=0; j<row_length_indicators(cell_number); ++j)
-        {
-          n_dofs += blb[j].first;
-          n_dofs += constraint_values.constraint_pool_row_index[blb[j].second+1]
-            - constraint_values.constraint_pool_row_index[blb[j].second];
-        }
-      n_dofs += constraint_iterator.first;
-      AssertDimension(n_dofs, row_length_indices(cell_number));
-    }
-#endif
   }
 
 
@@ -535,7 +463,7 @@ namespace MatrixFreeFunctions
                                                  numbers::invalid_unsigned_int);
     const unsigned int n_boundary_cells = boundary_cells.size();
     for (unsigned int j=0; j<n_boundary_cells; ++j)
-      reverse_numbering[boundary_cells[j]] = 
+      reverse_numbering[boundary_cells[j]] =
         j + size_info.vectorization_length*size_info.boundary_cells_start;
     unsigned int counter = 0;
     unsigned int j = 0;
@@ -660,7 +588,7 @@ namespace MatrixFreeFunctions
     size_info.boundary_cells_end   = (size_info.boundary_cells_end -
                                       size_info.boundary_cells_start);
     size_info.boundary_cells_start = 0;
-    
+
     AssertDimension (counter, size_info.n_active_cells);
     renumbering = Utilities::invert_permutation (reverse_numbering);
   }
@@ -822,7 +750,7 @@ namespace MatrixFreeFunctions
     new_row_starts[size_info.n_macro_cells] =
       std_cxx1x::tuple<unsigned int,unsigned int,unsigned int>
       (new_dof_indices.size(), new_constraint_indicator.size(), 0);
-      
+
     AssertDimension(dof_indices.size(), new_dof_indices.size());
     AssertDimension(constraint_indicator.size(),
                     new_constraint_indicator.size());
@@ -984,7 +912,8 @@ namespace MatrixFreeFunctions
       for(counter=start_nonboundary*vectorization_length;
           counter<size_info.n_active_cells; counter++)
         {
-          renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
+          renumbering_fe_index[cell_active_fe_index.empty() ? 0 :
+                               cell_active_fe_index[renumbering[counter]]].
             push_back(renumbering[counter]);
         }
       counter = start_nonboundary * vectorization_length;
@@ -1010,14 +939,14 @@ namespace MatrixFreeFunctions
       if (task_info.block_size_last == 0)
         task_info.block_size_last = task_info.block_size;
     }
-    
+
                                     // assume that all FEs have the same
                                 // connectivity graph, so take the zeroth FE
     task_info.n_blocks = (size_info.n_macro_cells+task_info.block_size-1)/
       task_info.block_size;
     task_info.block_size_last = size_info.n_macro_cells-
       (task_info.block_size*(task_info.n_blocks-1));
-                                
+
                                     // create the connectivity graph with internal
                                 // blocking
     CompressedSimpleSparsityPattern connectivity;
@@ -1098,7 +1027,7 @@ namespace MatrixFreeFunctions
                         neighbor_neighbor_list.push_back(*neighbor);
                         partition_list[counter++] = *neighbor;
                       }
-                  }                  
+                  }
               }
             neighbor_list = neighbor_neighbor_list;
             neighbor_neighbor_list.resize(0);
@@ -1573,7 +1502,8 @@ namespace MatrixFreeFunctions
                         for(cell=counter-partition_counter; cell<counter; ++cell)
                           {
                             renumbering_fe_index
-                              [cell_active_fe_index[partition_partition_list
+                              [cell_active_fe_index.empty() ? 0 :
+                               cell_active_fe_index[partition_partition_list
                                                     [cell]]].
                               push_back(partition_partition_list[cell]);
                           }
@@ -1640,7 +1570,8 @@ namespace MatrixFreeFunctions
                               {
                                 unsigned int this_index = 0;
                                 if(hp_bool == true)
-                                  this_index = cell_active_fe_index[*neighbor];
+                                  this_index = cell_active_fe_index.empty() ? 0 :
+                                    cell_active_fe_index[*neighbor];
 
                                 // Only add this cell if we need more macro
                                 // cells in the current block or if there is a
@@ -2107,13 +2038,13 @@ namespace MatrixFreeFunctions
       (out, (row_starts.capacity()*sizeof(std_cxx1x::tuple<unsigned int,
                                           unsigned int, unsigned int>)));
     out << "       Memory dof indices:           ";
-    size_info.print_memory_statistics 
+    size_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (dof_indices));
     out << "       Memory constraint indicators: ";
     size_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (constraint_indicator));
     out << "       Memory plain indices:         ";
-    size_info.print_memory_statistics 
+    size_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (row_starts_plain_indices)+
        MemoryConsumption::memory_consumption (plain_dof_indices));
     out << "       Memory vector partitioner:    ";
@@ -2169,7 +2100,7 @@ namespace MatrixFreeFunctions
   }
 
 
-} // end of namespace MatrixFreeFunctions
+  } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

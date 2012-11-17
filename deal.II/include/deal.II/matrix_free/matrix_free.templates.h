@@ -771,19 +771,38 @@ void MatrixFree<dim,Number>::initialize_indices
     AssertDimension (cell_level_index.size(),size_info.n_macro_cells*vectorization_length);
   }
 
-                                // set constraint pool and reorder the indices
-  constraint_pool_row_index =
-    constraint_values.constraint_pool_row_index;
-  constraint_pool_data.resize (constraint_values.constraint_pool_data.size());
-  std::copy (constraint_values.constraint_pool_data.begin(),
-             constraint_values.constraint_pool_data.end(),
-             constraint_pool_data.begin());
-  for (unsigned int no=0; no<n_fe; ++no)
+                                // set constraint pool from the std::map and
+                                // reorder the indices
+  typename std::map<std::vector<double>, unsigned int,
+           internal::MatrixFreeFunctions::FPArrayComparator<Number> >::iterator
+    it = constraint_values.constraints.begin(),
+    end = constraint_values.constraints.end();
+  std::vector<const std::vector<double>*>
+    constraints (constraint_values.constraints.size());
+  unsigned int length = 0;
+  for ( ; it != end; ++it)
     {
-      dof_info[no].reorder_cells(size_info, renumbering,
-                                 constraint_pool_row_index,
-                                 irregular_cells, vectorization_length);
+      AssertIndexRange(it->second, constraints.size());
+      constraints[it->second] = &it->first;
+      length += it->first.size();
     }
+  constraint_pool_data.clear();
+  constraint_pool_data.reserve (length);
+  constraint_pool_row_index.reserve(constraint_values.constraints.size()+1);
+  constraint_pool_row_index.resize(1, 0);
+  for (unsigned int i=0; i<constraints.size(); ++i)
+    {
+      Assert(constraints[i] != 0, ExcInternalError());
+      constraint_pool_data.insert(constraint_pool_data.end(),
+                                  constraints[i]->begin(),
+                                  constraints[i]->end());
+      constraint_pool_row_index.push_back(constraint_pool_data.size());
+    }
+  AssertDimension(constraint_pool_data.size(), length);
+  for (unsigned int no=0; no<n_fe; ++no)
+    dof_info[no].reorder_cells(size_info, renumbering,
+                               constraint_pool_row_index,
+                               irregular_cells, vectorization_length);
 
   indices_are_initialized = true;
 }
@@ -1070,56 +1089,69 @@ namespace internal
 
 
 
-  HashValue::HashValue (const double element_size)
-    :
-    scaling (element_size * std::numeric_limits<double>::epsilon() *
-             1024.)
-  {}
+    template <typename Number>
+    FPArrayComparator<Number>::FPArrayComparator (const Number scaling)
+      : 
+      tolerance (scaling * std::numeric_limits<double>::epsilon() * 1024.)
+    {}
 
 
 
-  unsigned int HashValue::operator ()(const std::vector<double> &vec)
-  {
-    std::vector<double> mod_vec(vec);
-    for (unsigned int i=0; i<mod_vec.size(); ++i)
-      mod_vec[i] -= fmod (mod_vec[i], scaling);
-    return static_cast<unsigned int>(boost::hash_range (mod_vec.begin(), mod_vec.end()));
-  }
+    template <typename Number>
+    bool
+    FPArrayComparator<Number>::operator() (const std::vector<Number> &v1,
+                                           const std::vector<Number> &v2) const
+    {
+      const unsigned int s1 = v1.size(), s2 = v2.size();
+      if (s1 < s2)
+        return true;
+      else if (s1 > s2)
+        return false;
+      else
+        for (unsigned int i=0; i<s1; ++i)
+          if (v1[i] < v2[i] - tolerance)
+            return true;
+          else if (v1[i] > v2[i] + tolerance)
+            return false;
+      return false;
+    }
 
 
-  template <int dim, typename number>
-  unsigned int HashValue::operator ()
-    (const Tensor<2,dim,VectorizedArray<number> > &input,
-     const bool     is_diagonal)
-  {
-    const unsigned int vectorization_length =
-      VectorizedArray<number>::n_array_elements;
 
-    if (is_diagonal)
-      {
-        number mod_tensor [dim][vectorization_length];
-        for (unsigned int i=0; i<dim; ++i)
-          for (unsigned int j=0; j<vectorization_length; ++j)
-            mod_tensor[i][j] = input[i][i][j] - fmod (input[i][i][j],
-                                                      number(scaling));
-        return static_cast<unsigned int>
-          (boost::hash_range(&mod_tensor[0][0],
-                             &mod_tensor[dim-1][vectorization_length-1]+1));
-      }
-    else
-      {
-        number mod_tensor [dim][dim][vectorization_length];
-        for (unsigned int i=0; i<dim; ++i)
-          for (unsigned int d=0; d<dim; ++d)
-            for (unsigned int j=0; j<vectorization_length; ++j)
-              mod_tensor[i][d][j] = input[i][d][j] - fmod (input[i][d][j],
-                                                           number(scaling));
-        return static_cast<unsigned int>(boost::hash_range
-                                         (&mod_tensor[0][0][0],
-                                          &mod_tensor[dim-1][dim-1][vectorization_length-1]+1));
-      }
-  }
+    template <typename Number>
+    template <int dim>
+    bool
+    FPArrayComparator<Number>::
+    operator ()(const Tensor<1,dim,VectorizedArray<Number> > *t1,
+                const Tensor<1,dim,VectorizedArray<Number> > *t2) const
+    {
+      for (unsigned int d=0; d<dim; ++d)
+        for (unsigned int k=0;k<VectorizedArray<Number>::n_array_elements;++k)
+          if ((*t1)[d][k] < (*t2)[d][k] - tolerance)
+            return true;
+          else if ((*t1)[d][k] > (*t2)[d][k] + tolerance)
+            return false;
+      return false;
+    }
 
+
+
+    template <typename Number>
+    template <int dim>
+    bool
+    FPArrayComparator<Number>::
+    operator ()(const Tensor<2,dim,VectorizedArray<Number> > *t1,
+                const Tensor<2,dim,VectorizedArray<Number> > *t2) const
+    {
+      for (unsigned int d=0; d<dim; ++d)
+        for (unsigned int e=0; e<dim; ++e)
+          for (unsigned int k=0;k<VectorizedArray<Number>::n_array_elements;++k)
+            if ((*t1)[d][e][k] < (*t2)[d][e][k] - tolerance)
+              return true;
+            else if ((*t1)[d][e][k] > (*t2)[d][e][k] + tolerance)
+              return false;
+      return false;
+    }
   }
 }
 

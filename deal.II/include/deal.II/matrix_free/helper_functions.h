@@ -22,8 +22,6 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/vectorization.h>
 
-#include <boost/functional/hash.hpp>
-
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -100,7 +98,7 @@ namespace MatrixFreeFunctions
                                  * to zero.
                                  */
     void clear();
-    
+
                                 /**
                                  * Prints minimum, average, and
                                  * maximal memory consumption over the
@@ -144,54 +142,38 @@ namespace MatrixFreeFunctions
 
                                 /**
                                  * Data type to identify cell type.
-                                 */ 
+                                 */
   enum CellType {cartesian=0, affine=1, general=2, undefined=3};
 
-  // ----------------- hash structure --------------------------------
 
-                                /**
-                                 * A class that is
-                                 * used to quickly find out whether two
-                                 * vectors of floating point numbers are the
-                                 * same without going through all the
-                                 * elements: store a hash value for each
-                                 * vector. Generate the
-                                 * hash value by a sum of all values
-                                 * multiplied by random numbers (cast to
-                                 * int). Of course, this is not a sure
-                                 * criterion and one must manually check for
-                                 * equality before this hash is telling
-                                 * something useful. However, inequalities are
-                                 * easily detected (unless roundoff spoils the
-                                 * hash function)
-                                 */
-  struct HashValue
+  /**
+   * A class that is used to compare floating point arrays (e.g. std::vectors,
+   * Tensor<1,dim>, etc.). The idea of this class is to consider two arrays as
+   * equal if they are the same within a given tolerance. We use this
+   * comparator class within an std::map<> of the given arrays. Note that this
+   * comparison operator does not satisfy all the mathematical properties one
+   * usually wants to have (consider e.g. the numbers a=0, b=0.1, c=0.2 with
+   * tolerance 0.15; the operator gives a<c, but neither of a<b? or b<c? is
+   * satisfied). This is not a problem in the use cases for this class, but be
+   * careful when using it in other contexts.
+   */
+  template<typename Number>
+  struct FPArrayComparator
   {
-                                // Constructor: sets the size of Number values
-                                // with the typical magnitude that is to be
-                                // expected.
-    HashValue (const double element_size = 1.);
-    
-                                // get hash value for a vector of floating
-                                // point numbers (which are assumed to be of
-                                // order of magnitude one). Do this by first
-                                // truncating everything that is smaller than
-                                // the scaling (in order to eliminate noise
-                                // from roundoff errors) and then calling the
-                                // boost hash function
-    unsigned int operator ()(const std::vector<double> &vec);
+    FPArrayComparator (const Number scaling);
 
-                                // get hash value for a tensor of rank
-                                // two where the magnitude of the
-                                // entries is given by the parameter
-                                // weight
-    template <int dim, typename number>
-    unsigned int operator ()(const Tensor<2,dim,VectorizedArray<number> > 
-                             &input,
-                             const bool     is_diagonal);
- 
-    
-    const double scaling;
+    bool operator() (const std::vector<Number> &v1,
+                     const std::vector<Number> &v2) const;
+
+    template <int dim>
+    bool operator ()(const Tensor<1,dim,VectorizedArray<Number> > *t1,
+                     const Tensor<1,dim,VectorizedArray<Number> > *t2) const;
+
+    template <int dim>
+    bool operator ()(const Tensor<2,dim,VectorizedArray<Number> > *t1,
+                     const Tensor<2,dim,VectorizedArray<Number> > *t2) const;
+
+    Number tolerance;
   };
 
   // Note: Implementation in matrix_free.templates.h
