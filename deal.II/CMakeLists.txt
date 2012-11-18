@@ -13,12 +13,10 @@
 #####
 
 ##                                                                       ##
-#                                                                         #
 #             The cmake build system for the deal.II project              #
 #                                                                         #
 #     See doc/readme.html and doc/development/cmake.html for further      #
 #     details on how to use the cmake build system of deal.II.            #
-#                                                                         #
 ##                                                                       ##
 
 
@@ -89,6 +87,7 @@ ENDIF()
 #
 FILE(GLOB _check_files "cmake/checks/*.cmake")
 FOREACH(_file ${_check_files})
+  MESSAGE(STATUS "")
   MESSAGE(STATUS "Include ${_file}")
   INCLUDE(${_file})
 ENDFOREACH()
@@ -101,6 +100,7 @@ FILE(GLOB _configure_files "cmake/configure/configure_*.cmake")
 # to fullfill some dependencies...
 LIST(SORT _configure_files)
 FOREACH(_file ${_configure_files})
+  MESSAGE(STATUS "")
   MESSAGE(STATUS "Include ${_file}")
   INCLUDE(${_file})
 ENDFOREACH()
