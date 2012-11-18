@@ -58,19 +58,19 @@
       <acronym>deal.II</acronym> is mostly developed on Linux using the
       <a href="http://gcc.gnu.org">GCC</a> compiler. However, it is not
       platform specific and we strive to keep the source code C++
-      standard compliant.
+      Standard compliant.
     </p>
 
     <p>
-      We expect that <acronym>deal.II</acronym> should work on the following
+      <acronym>deal.II</acronym> supports at least the following
       platforms:
       <ul>
-	<li>Linux: using the GCC compiler versions 4.0 or later; using the
+	<li>GNU/Linux: using the GCC compiler version 4.0 or later; using the
 	  Clang compiler version 3.0 or later; using the ICC compiler
-          version 12 or later.
+          version 12 or later
 	<li>Mac OS X: using the GCC compiler version 4.0 or later (Please see
           the <a href="http://dealii.sourceforge.net/index.php?title=Main_Page"
-		 target="_top">deal.II Wiki</a> for installation issues);
+		 target="_top">deal.II Wiki</a> for installation issues)
 	<li><a href="http://www.cygwin.com"
                target="_top">Cygwin/Windows</a> with recent GCC
           versions. For <a href="http://dealii.sourceforge.net/index.php?title=Windows"
@@ -80,18 +80,14 @@
 		 target="_top">deal.II Wiki</a>!
       </ul>
       Most other combinations of POSIX-style operating systems and C++
-      Standard compliant compilers should also work. If they don't, please
-      report it as a bug.
+      Standard compliant compilers should also work. <i>If they don't,
+      please report it as a bug.</i>
     </p>
 
     <p>
-      There are many C++ compilers out there. Our experience is that,
-      unfortunately, most of them do not fully support the C++ 1998 standard
-      upon which we build, and they eventually fail on a project as large as
-      deal.II. Your best bet is to stick with the ones listed above. The only
-      platform where this is not trivial is Microsoft Windows where the widely
-      used Microsoft Visual C++ compiler simply has too many bugs supporting
-      advanced C++ code.
+      Please note that the Microsoft Visual C++ compiler, that is widely
+      used on Microsoft Windows, is not supported. If you need a native
+      Windows target, use the MinGW compiler instead.
     </p>
 
 
@@ -99,8 +95,8 @@
     <h3>Additional software requirements</h3>
 
     <p>
-      In order to compile and use the <acronym>deal.II</acronym>
-      libraries you need to have the following programs installed:
+      In order to compile and use <acronym>deal.II</acronym>
+      you need to have the following programs installed:
     </p>
     <ul>
       <li> <p>
@@ -180,7 +176,7 @@
     <h3>Unpacking</h3>
 
     <p>
-      The whole library usually comes as a <code>.tar.gz</code> file,
+      The whole library usually comes as a <code>tar.gz</code> file,
       which is a file archive compressed with gzip. After downloading it,
       unpack it using either
       <pre>
@@ -217,7 +213,7 @@
 	make
 	make install
       </pre>
-      These steps compile, link and install the deal.II libraries. The
+      These steps compile, link and install the deal.II library. The
       whole process should take between a few minutes and an hour, depending
       on your machine.
     </p>
@@ -235,7 +231,7 @@
 	  number of simultaneous build processes you want <code>make</code>
 	  to use at any given time. Allowing <code>make</code> to use
 	  more simultaneous build processes (assuming you have that many
-	  processor cores) will greatly accelerate the build time.
+	  processor cores) will greatly lower the build time.
 
 	<li> If you do not intend to modify the <acronym>deal.II</acronym>
 	  sources and recompile things, then you can remove
@@ -246,11 +242,9 @@
 	  which <code>tar</code> unpacked the file you downloaded) since
 	  projects using deal.II should only need files that have been
 	  installed. However, you will find it convenient to keep the source
-	  files around anyway, for two reasons: (i) When
+	  files around anyway, for one reason: When
 	  debugging you often end up with assertions for which you'd like to
-	  see the place in the library's source files that triggered it. (ii)
-	  You may want to use the tutorial programs located in the source
-	  directory.
+          see the place in the library's source files that triggered it.
 
 	<li> The <acronym>deal.II</acronym> <code>CMake</code> system can accept a
 	  significant number of configuration parameters. See the
@@ -313,8 +307,8 @@
 
     <p>
       All the documentation about the version that you downloaded and that can
-      be found <a href="http://www.dealii.org" target="_top">at the
-      http://www.dealii.org/ domain</a> can also be generated locally. To do
+      be found at the <a href="http://www.dealii.org/" target="_top">
+      http://www.dealii.org/</a> domain  can also be generated locally. To do
       so, invoke <code>cmake</code> in the build instructions above as follows:
       <pre>
 
@@ -350,8 +344,9 @@
 
     <p>
       <acronym>deal.II</acronym> has a large number of optional interfaces to
-      other libraries. By default, <code>cmake</code> will enable support
-      for all external libraries it can find in default paths.
+      other libraries. <b>By default, <code>cmake</code> will automatically
+      enable support  for all external libraries it can find in default
+      paths.</b>
       However, this behavior can be changed using command line switches to
       the initial call to <code>cmake</code>. A detailed description
       can be found <a href="development/cmake.html">here</a>.
@@ -427,12 +422,12 @@
     <b>Notes:</b>
       <ul>
         <li>
-          The majority of libraries mentioned below should be readily
-          packaged by most Linux distributions.  Usually you need to
+          <b>The majority of libraries mentioned below should be readily
+          packaged by most Linux distributions. Usually you need to
           install a <i>development</i> version of a library package,
           e.g. ending in <code>-dev</code> or <code>-devel</code>.
           After that <code>cmake</code> will automatically find the
-          library and use it.
+          library and use it.</b>
         <li>
           Configuring the interface to a self compiled package,
           say <code>foo</code> can usually be done by specifying
