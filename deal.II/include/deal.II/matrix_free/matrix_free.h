@@ -1012,6 +1012,12 @@ public:
   get_dof_info (const unsigned int fe_component = 0) const;
 
                                 /**
+                                 * Returns the number of weights in the
+                                 * constraint pool.
+                                 */
+  unsigned int n_constraint_pool_entries() const;
+
+                                /**
                                  * Returns a pointer to the first
                                  * number in the constraint pool data
                                  * with index @p pool_index (to
@@ -1326,6 +1332,16 @@ MatrixFree<dim,Number>::get_dof_info (unsigned int dof_index) const
 {
   AssertIndexRange (dof_index, n_components());
   return dof_info[dof_index];
+}
+
+
+
+template <int dim, typename Number>
+inline
+unsigned int
+MatrixFree<dim,Number>::n_constraint_pool_entries() const
+{
+  return constraint_pool_row_index.size()-1;
 }
 
 

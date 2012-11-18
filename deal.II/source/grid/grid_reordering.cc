@@ -15,6 +15,7 @@
 #include <deal.II/grid/grid_reordering_internal.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/std_cxx1x/bind.h>
 
 #include <algorithm>
 #include <set>

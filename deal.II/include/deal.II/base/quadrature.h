@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * degree of polynomials integrated exactly. This number is given in
  * the documentation of each formula. The order of the integration
  * error is <tt>m+1</tt>, that is, the error is the size of the cell
- * two the <tt>m+1</tt> by the Bramble-Hilbert Lemma. The number
+ * to the <tt>m+1</tt> by the Bramble-Hilbert Lemma. The number
  * <tt>m</tt> is to be found in the documentation of each concrete
  * formula. For the optimal formulæ QGauss we have $m = 2N-1$, where
  * N is the constructor parameter to QGauss. The tensor product

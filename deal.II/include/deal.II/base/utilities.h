@@ -193,12 +193,14 @@ namespace Utilities
                                     * number by a template expression where
                                     * both the number <code>a</code> and the
                                     * power <code>N</code> are compile-time
-                                    * constants. This gives compile-time
-                                    * knowledge of the result of the power
-                                    * operation.
+                                    * constants. This computes the result of
+                                    * the power operation at compile time,
+                                    * enables its use e.g. in other
+                                    * templates.
                                     *
-                                    * Use this function as in
-                                    * <code>fixed_int_power@<a,N@>::value</code>.
+                                    * Use this function with the arguments
+                                    * <code>fixed_int_power@<5,2@>::value</code>
+                                    * to compute 5<sup>2</sup>.
                                     */
   template <int a, int N>
   struct fixed_int_power

@@ -202,7 +202,7 @@ namespace MatrixFreeFunctions
               Utilities::fixed_power<dim>(n_q_points_1d[q]);
             current_data.n_q_points.push_back (n_q_points);
 
-            current_data.n_q_points_face.push_back 
+            current_data.n_q_points_face.push_back
               (Utilities::fixed_power<dim-1>(n_q_points_1d[q]));
             current_data.quadrature.push_back
               (Quadrature<dim>(quad[my_q][q]));
@@ -245,7 +245,7 @@ namespace MatrixFreeFunctions
                                 // considered together, this variable holds
                                 // the individual info of the last chunk of
                                 // cells
-        CellType cell_t [vectorization_length], 
+        CellType cell_t [vectorization_length],
           cell_t_prev [vectorization_length];
         for (unsigned int j=0; j<vectorization_length; ++j)
           cell_t_prev[j] = undefined;
@@ -287,11 +287,11 @@ namespace MatrixFreeFunctions
               current_data.jacobians_grad_upper.reserve (reserve_size);
           }
 
-                                // a hash structure that is used to detect
-                                // similarities between mapping data from one
-                                // cell to the next.
-        std::vector<std::pair<unsigned int, int> > hash_collection;
-        HashValue hash_value (jacobian_size);
+        FPArrayComparator<Number> comparator(jacobian_size);
+        std::map<const Tensor<1,dim,VectorizedArray<Number> >*, unsigned int,
+                 FPArrayComparator<Number> > cartesians(comparator);
+        std::map<const Tensor<2,dim,VectorizedArray<Number> >*, unsigned int,
+                 FPArrayComparator<Number> > affines(comparator);
 
                                 // loop over all cells
         for (unsigned int cell=0; cell<n_macro_cells; ++cell)
@@ -305,7 +305,7 @@ namespace MatrixFreeFunctions
               active_fe_index[cell] : 0;
             const unsigned int n_q_points = current_data.n_q_points[fe_index];
             if (fe_values[fe_index].get() == 0)
-              fe_values[fe_index].reset 
+              fe_values[fe_index].reset
                 (new FEValues<dim> (mapping, dummy_fe,
                                     current_data.quadrature[fe_index],
                                     update_flags_feval));
@@ -341,105 +341,73 @@ namespace MatrixFreeFunctions
                   if (cell_t[j] > most_general_type)
                     most_general_type = cell_t[j];
                 AssertIndexRange (most_general_type, 3);
+                unsigned int insert_position = numbers::invalid_unsigned_int;
 
                                 // Cartesian cell with diagonal Jacobian: only
                                 // insert the diagonal of the inverse and the
-                                // Jacobian determinant
-                unsigned int insert_position = numbers::invalid_unsigned_int;
-                typedef std::vector<std::pair<unsigned int,int> >::iterator iter;
+                                // Jacobian determinant. We do this by using
+                                // an std::map that collects pointers to all
+                                // Cartesian Jacobians. We need a pointer in
+                                // the std::map because it cannot store data
+                                // based on VectorizedArray (alignment
+                                // issue). We circumvent the problem by
+                                // temporarily filling the next value into the
+                                // cartesian_data field and, in case we did an
+                                // insertion, the data is already in the
+                                // correct place.
                 if (most_general_type == cartesian)
                   {
-                    std::pair<Tensor<1,dim,VectorizedArray<Number> >,
-                              VectorizedArray<Number> > new_entry;
+                    std::pair<const Tensor<1,dim,VectorizedArray<Number> >*,
+                              unsigned int> new_entry;
+                    new_entry.second = cartesian_data.size();
+                    Tensor<1,dim,VectorizedArray<Number> > cart;
                     for (unsigned int d=0; d<dim; ++d)
-                      new_entry.first[d] = data.const_jac[d][d];
-                    insert_position = cartesian_data.size();
+                      cart[d] = data.const_jac[d][d];
+                    cartesian_data.push_back
+                      (std::pair<Tensor<1,dim,VectorizedArray<Number> >,
+                                 VectorizedArray<Number> >
+                       (cart, VectorizedArray<Number>()));
+                    new_entry.first = &cartesian_data[new_entry.second].first;
 
-                                // check whether everything is the same as on
-                                // another cell before. find an insertion point
-                                // in the list of keys that we have
-                                // collected. put negative position so that
-                                // the insertion position from lower_bound is
-                                // that with the same key
-                    const unsigned int hash = hash_value.template operator()<dim,Number> (data.const_jac, true);
-                    std::pair<unsigned int,int> insertion (hash, -insert_position);
-                    iter pos = std::lower_bound (hash_collection.begin(),
-                                                 hash_collection.end(),
-                                                 insertion);
-
-                                // ok, found a data field with the same
-                                // key. check whether we really hit a
-                                // duplicate, i.e., whether the hash really
-                                // was effective
-                    bool duplicate = true;
-                    if (pos != hash_collection.end() &&
-                        pos->first == hash)
+                    std::pair<typename std::
+                              map<const Tensor<1,dim,VectorizedArray<Number> >*,
+                                  unsigned int,
+                                  FPArrayComparator<Number> >::iterator,
+                              bool> it = cartesians.insert(new_entry);
+                    if (it.second == false)
                       {
-                        for (unsigned int d=0; d<dim; ++d)
-                          for (unsigned int j=0; j<vectorization_length; ++j)
-                            if (std::fabs(data.const_jac[d][d][j]-
-                                          cartesian_data[-pos->second].first[d][j])>
-                                hash_value.scaling)
-                              duplicate = false;
+                        insert_position = it.first->second;
+                        cartesian_data.resize(new_entry.second);
                       }
                     else
-                      duplicate = false;
-
-                                // if no duplicate, insert the data
-                    if (duplicate == false)
-                      {
-                        hash_collection.insert (pos, insertion);
-                        cartesian_data.push_back (new_entry);
-                      }
-                                // else, remember the position
-                    else
-                      insert_position = -pos->second;
+                      insert_position = new_entry.second;
                   }
 
                                 // Constant Jacobian case. same strategy as
                                 // before, but with other data fields
                 else if (most_general_type == affine)
                   {
-                    insert_position = affine_data.size();
+                    std::pair<const Tensor<2,dim,VectorizedArray<Number> >*,
+                              unsigned int> new_entry;
+                    new_entry.second = affine_data.size();
+                    affine_data.push_back
+                      (std::pair<Tensor<2,dim,VectorizedArray<Number> >,
+                                 VectorizedArray<Number> >
+                       (data.const_jac, VectorizedArray<Number>()));
+                    new_entry.first = &affine_data[new_entry.second].first;
 
-                                // check whether everything is the same as on
-                                // the previous cell
-                    const unsigned int hash = hash_value.template operator()<dim,Number> (data.const_jac, false);
-                    std::pair<unsigned int,int> insertion (hash, -insert_position);
-                    iter pos = std::lower_bound (hash_collection.begin(),
-                                                 hash_collection.end(),
-                                                 insertion);
-
-                                // ok, found a data field with the same
-                                // key. check whether we really hit a
-                                // duplicate
-                    bool duplicate = true;
-                    if (pos != hash_collection.end() &&
-                        pos->first == hash)
+                    std::pair<typename std::
+                              map<const Tensor<2,dim,VectorizedArray<Number> >*,
+                                  unsigned int,
+                                  FPArrayComparator<Number> >::iterator,
+                              bool> it = affines.insert(new_entry);
+                    if (it.second == false)
                       {
-                        for (unsigned int d=0; d<dim; ++d)
-                          for (unsigned int e=0; e<dim; ++e)
-                            for (unsigned int j=0; j<vectorization_length; ++j)
-                              if (std::fabs(data.const_jac[d][e][j]-
-                                            affine_data[-pos->second].first[d]
-                                            [e][j])>
-                                  hash_value.scaling)
-                                duplicate = false;
+                        insert_position = it.first->second;
+                        affine_data.resize(new_entry.second);
                       }
                     else
-                      duplicate = false;
-
-                    if (duplicate == false)
-                      {
-                        hash_collection.insert (pos, insertion);
-                        affine_data.push_back 
-                          (std::pair<Tensor<2,dim,VectorizedArray<Number> >,
-                           VectorizedArray<Number> >(data.const_jac,
-                                                     make_vectorized_array 
-                                                     (Number(0.))));
-                      }
-                    else
-                      insert_position = -pos->second;
+                      insert_position = new_entry.second;
                   }
 
                                 // general cell case: first resize the data
@@ -598,7 +566,7 @@ namespace MatrixFreeFunctions
 
             if (update_flags & update_quadrature_points)
               {
-                                 // eventually we turn to the quadrature points
+                                // eventually we turn to the quadrature points
                                 // that we can compress in case we have
                                 // Cartesian cells. we also need to reorder
                                 // them into arrays of vectorized data types.
@@ -636,7 +604,7 @@ namespace MatrixFreeFunctions
                   }
               }
           } // end for ( cell < n_macro_cells )
-        current_data.rowstart_jacobians.push_back 
+        current_data.rowstart_jacobians.push_back
           (current_data.jacobians.size());
         current_data.rowstart_q_points[n_macro_cells] =
           current_data.quadrature_points.size();
@@ -711,7 +679,7 @@ namespace MatrixFreeFunctions
                                 // and we already have determined that this
                                 // cell is either Cartesian or with constant
                                 // Jacobian, we have nothing more to do.
-        if (my_q > 0 && (get_cell_type(cell) == cartesian 
+        if (my_q > 0 && (get_cell_type(cell) == cartesian
                          || get_cell_type(cell) == affine) )
           continue;
 
@@ -957,7 +925,7 @@ namespace MatrixFreeFunctions
     if (general_size_glob > 0)
       {
         out << "      Memory Jacobian data:          ";
-        size_info.print_memory_statistics 
+        size_info.print_memory_statistics
           (out, MemoryConsumption::memory_consumption (jacobians) +
            MemoryConsumption::memory_consumption (JxW_values));
         out << "      Memory second derivative data: ";
@@ -976,7 +944,7 @@ namespace MatrixFreeFunctions
     if (quad_size_glob > 0)
       {
         out << "      Memory quadrature points:      ";
-        size_info.print_memory_statistics 
+        size_info.print_memory_statistics
           (out, MemoryConsumption::memory_consumption (rowstart_q_points) +
            MemoryConsumption::memory_consumption (quadrature_points));
       }
@@ -990,10 +958,10 @@ namespace MatrixFreeFunctions
                                                          const SizeInfo &size_info) const
   {
     out << "    Cell types:                      ";
-    size_info.print_memory_statistics 
+    size_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (cell_type));
     out << "    Memory transformations compr:    ";
-    size_info.print_memory_statistics 
+    size_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (affine_data) +
        MemoryConsumption::memory_consumption (cartesian_data));
     for (unsigned int j=0; j<mapping_data_gen.size(); ++j)
