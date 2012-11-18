@@ -13,6 +13,8 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/std_cxx1x/bind.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_levels.h>
@@ -20,7 +22,6 @@
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/base/geometry_info.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/magic_numbers.h>
 #include <deal.II/fe/mapping_q1.h>
