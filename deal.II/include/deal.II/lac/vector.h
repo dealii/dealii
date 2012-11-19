@@ -16,9 +16,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/parallel.h>
 #include <deal.II/base/subscriptor.h>
-#include <boost/lambda/lambda.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/split_member.hpp>
 
@@ -411,7 +409,7 @@ class Vector : public Subscriptor
                                       * Copy the given vector. Resize the
                                       * present vector if necessary.
                                       */
-    Vector<Number> & operator= (const Vector<Number> &c);
+    Vector<Number> & operator= (const Vector<Number> &v);
 
                                      /**
                                       * Copy the given vector. Resize the
@@ -1036,17 +1034,19 @@ class Vector : public Subscriptor
                                       */
     Number *val;
 
-                                     /*
+                                     /**
                                       * Make all other vector types
                                       * friends.
                                       */
     template <typename Number2> friend class Vector;
-                                     /*
+
+                                     /**
                                       * LAPACK matrices need access to
                                       * the data.
                                       */
     friend class LAPACKFullMatrix<Number>;
-                                     /*
+
+                                     /**
                                       * VectorView will access the
                                       * pointer.
                                       */
@@ -1140,85 +1140,16 @@ void Vector<Number>::reinit (const unsigned int n, const bool fast)
 
 
 
+// declare function that is implemented in vector.templates.h
 namespace internal
 {
   namespace Vector
   {
-    template<typename T>
-    void set_subrange (const T            s,
-                       const unsigned int begin,
-                       const unsigned int end,
-                       dealii::Vector<T> &dst)
-    {
-      if (s == T())
-        std::memset ((dst.begin()+begin),0,(end-begin)*sizeof(T));
-      else
-        std::fill (&*(dst.begin()+begin), &*(dst.begin()+end), s);
-    }
-
-    template<typename T>
-    void copy_subrange (const dealii::Vector<T>&src,
-                        const unsigned int      begin,
-                        const unsigned int      end,
-                        dealii::Vector<T>      &dst)
-    {
-      memcpy(&*(dst.begin()+begin), &*(src.begin()+begin),
-             (end-begin)*sizeof(T));
-    }
-
-    template<typename T, typename U>
-    void copy_subrange_ext (const dealii::Vector<T>&src,
-                            const unsigned int      begin,
-                            const unsigned int      end,
-                            dealii::Vector<U>      &dst)
-    {
-      const T* q = src.begin()+begin;
-      const T* const end_q = src.begin()+end;
-      U* p = dst.begin()+begin;
-      for (; q!=end_q; ++q, ++p)
-        *p = *q;
-    }
+    template <typename T, typename U>
+    void copy_vector (const dealii::Vector<T> &src,
+                      dealii::Vector<U>       &dst);
   }
 }
-
-
-
-template <typename Number>
-inline
-Vector<Number> & Vector<Number>::operator = (const Number s)
-{
-  Assert (numbers::is_finite(s), ExcNumberNotFinite());
-  if (s != Number())
-    Assert (vec_size!=0, ExcEmptyObject());
-  if (vec_size>dealii::internal::Vector::minimum_parallel_grain_size)
-    parallel::apply_to_subranges (0U, vec_size,
-                                  std_cxx1x::bind(&dealii::internal::Vector::template
-                                                  set_subrange<Number>,
-                                                  s, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::ref(*this)),
-                                  dealii::internal::Vector::minimum_parallel_grain_size);
-  else if (vec_size > 0)
-    dealii::internal::Vector::set_subrange<Number>(s, 0U, vec_size, *this);
-
-  return *this;
-}
-
-
-
-#ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
-template <>
-inline
-Vector<std::complex<float> > &
-Vector<std::complex<float> >::operator = (const std::complex<float> s)
-{
-  Assert (numbers::is_finite(s), ExcNumberNotFinite());
-  if (s != std::complex<float>())
-    Assert (vec_size!=0, ExcEmptyObject());
-  if (vec_size!=0)
-    std::fill (begin(), end(), s);
-
-  return *this;
-}
-#endif
 
 
 
@@ -1227,23 +1158,7 @@ inline
 Vector<Number> &
 Vector<Number>::operator = (const Vector<Number>& v)
 {
-                                // if v is the same vector as *this, there is
-                                // nothing to
-  if (PointerComparison::equal(this, &v) == true)
-    return *this;
-
-  if (v.vec_size != vec_size)
-    reinit (v.vec_size, true);
-  if (vec_size>dealii::internal::Vector::minimum_parallel_grain_size)
-    parallel::apply_to_subranges (0U, vec_size,
-                                  std_cxx1x::bind(&dealii::internal::Vector::template
-                                                  copy_subrange<Number>,
-                                                  std_cxx1x::cref(v), std_cxx1x::_1, std_cxx1x::_2,
-                                                  std_cxx1x::ref(*this)),
-                                  dealii::internal::Vector::minimum_parallel_grain_size);
-  else if (vec_size > 0)
-    dealii::internal::Vector::copy_subrange<Number>(v, 0U, vec_size, *this);
-
+  internal::Vector::copy_vector (v, *this);
   return *this;
 }
 
@@ -1255,18 +1170,7 @@ inline
 Vector<Number> &
 Vector<Number>::operator = (const Vector<Number2>& v)
 {
-  if (v.vec_size != vec_size)
-    reinit (v.vec_size, true);
-  if (vec_size>dealii::internal::Vector::minimum_parallel_grain_size)
-    parallel::apply_to_subranges (0U, vec_size,
-                                  std_cxx1x::bind(&dealii::internal::Vector::template
-                                                  copy_subrange_ext<Number2,Number>,
-                                                  std_cxx1x::cref(v), std_cxx1x::_1, std_cxx1x::_2,
-                                                  std_cxx1x::ref(*this)),
-                                  dealii::internal::Vector::minimum_parallel_grain_size);
-  else if (vec_size > 0)
-    dealii::internal::Vector::copy_subrange_ext<Number2,Number>(v, 0U, vec_size, *this);
-
+  internal::Vector::copy_vector (v, *this);
   return *this;
 }
 
@@ -1387,24 +1291,6 @@ Vector<Number>::operator /= (const Number factor)
 
 
 template <typename Number>
-inline
-void
-Vector<Number>::scale (const Number factor)
-{
-  Assert (numbers::is_finite(factor),ExcNumberNotFinite());
-
-  Assert (vec_size!=0, ExcEmptyObject());
-
-  parallel::transform (val,
-                       val+vec_size,
-                       val,
-                       (factor*boost::lambda::_1),
-                       dealii::internal::Vector::minimum_parallel_grain_size);
-}
-
-
-
-template <typename Number>
 template <typename OtherNumber>
 inline
 void
@@ -1449,51 +1335,6 @@ Vector<Number>::add (const unsigned int  n_indices,
       val[indices[i]] += values[i];
     }
 }
-
-
-
-template <typename Number>
-inline
-void
-Vector<Number>::add (const Number a,
-                     const Vector<Number>& v)
-{
-  Assert (numbers::is_finite(a),ExcNumberNotFinite());
-
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-
-  parallel::transform (val,
-                       val+vec_size,
-                       v.val,
-                       val,
-                       (boost::lambda::_1 + a*boost::lambda::_2),
-                       dealii::internal::Vector::minimum_parallel_grain_size);
-}
-
-
-
-template <typename Number>
-inline
-void
-Vector<Number>::sadd (const Number x,
-                      const Number a,
-                      const Vector<Number>& v)
-{
-  Assert (numbers::is_finite(x),ExcNumberNotFinite());
-  Assert (numbers::is_finite(a),ExcNumberNotFinite());
-
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-
-  parallel::transform (val,
-                       val+vec_size,
-                       v.val,
-                       val,
-                       (x*boost::lambda::_1 + a*boost::lambda::_2),
-                       dealii::internal::Vector::minimum_parallel_grain_size);
-}
-
 
 
 

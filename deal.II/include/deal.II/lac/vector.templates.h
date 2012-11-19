@@ -15,6 +15,8 @@
 
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/numbers.h>
+#include <deal.II/base/parallel.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 
@@ -27,6 +29,7 @@
 #  include <deal.II/lac/trilinos_vector.h>
 #endif
 
+#include <boost/lambda/lambda.hpp>
 #include <cmath>
 #include <cstring>
 #include <algorithm>
@@ -35,7 +38,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#define BLOCK_LEVEL 6
 
 namespace internal
 {
@@ -124,7 +126,7 @@ Vector<Number>::Vector (const Vector<Number>& v)
     {
       val = new Number[max_vec_size];
       Assert (val != 0, ExcOutOfMemory());
-      std::copy (v.begin(), v.end(), begin());
+      *this = v;
     }
 }
 
@@ -316,6 +318,397 @@ Vector<Number>::is_non_negative () const
 
 
 
+namespace internal
+{
+  namespace Vector
+  {
+    template<typename T>
+    void set_subrange (const T            s,
+                       const unsigned int begin,
+                       const unsigned int end,
+                       dealii::Vector<T> &dst)
+    {
+      if (s == T())
+        std::memset ((dst.begin()+begin),0,(end-begin)*sizeof(T));
+      else
+        std::fill (&*(dst.begin()+begin), &*(dst.begin()+end), s);
+    }
+
+    template<typename T>
+    void copy_subrange (const unsigned int      begin,
+                        const unsigned int      end,
+                        const dealii::Vector<T>&src,
+                        dealii::Vector<T>      &dst)
+    {
+      memcpy(&*(dst.begin()+begin), &*(src.begin()+begin),
+             (end-begin)*sizeof(T));
+    }
+
+    template<typename T, typename U>
+    void copy_subrange (const unsigned int      begin,
+                        const unsigned int      end,
+                        const dealii::Vector<T>&src,
+                        dealii::Vector<U>      &dst)
+    {
+      const T *q = src.begin()+begin;
+      const T *const end_q = src.begin()+end;
+      U *p = dst.begin()+begin;
+      for (; q!=end_q; ++q, ++p)
+        *p = *q;
+    }
+
+    template<typename T, typename U>
+    void copy_subrange_wrap (const unsigned int      begin,
+                             const unsigned int      end,
+                             const dealii::Vector<T>&src,
+                             dealii::Vector<U>      &dst)
+    {
+      copy_subrange (begin, end, src, dst);
+    }
+
+    template <typename T, typename U>
+    void copy_vector (const dealii::Vector<T>&src,
+                      dealii::Vector<U>      &dst)
+    {
+      const unsigned int vec_size = src.size();
+      const unsigned int dst_size = dst.size();
+      if (dst_size != vec_size)
+        dst.reinit (vec_size, true);
+      if (vec_size>internal::Vector::minimum_parallel_grain_size)
+        parallel::apply_to_subranges (0U, vec_size,
+                                      std_cxx1x::bind(&internal::Vector::template
+                                                      copy_subrange_wrap <T,U>,
+                                                      std_cxx1x::_1,
+                                                      std_cxx1x::_2,
+                                                      std_cxx1x::cref(src),
+                                                      std_cxx1x::ref(dst)),
+                                      internal::Vector::minimum_parallel_grain_size);
+      else if (vec_size > 0)
+        copy_subrange (0U, vec_size, src, dst);
+    }
+  }
+}
+
+
+
+template <typename Number>
+Vector<Number> &
+Vector<Number>::operator = (const Number s)
+{
+  Assert (numbers::is_finite(s), ExcNumberNotFinite());
+  if (s != Number())
+    Assert (vec_size!=0, ExcEmptyObject());
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::apply_to_subranges (0U, vec_size,
+                                  std_cxx1x::bind(&internal::Vector::template
+                                                  set_subrange<Number>,
+                                                  s, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::ref(*this)),
+                                  internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    internal::Vector::set_subrange<Number>(s, 0U, vec_size, *this);
+
+  return *this;
+}
+
+
+
+#ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
+template <>
+Vector<std::complex<float> > &
+Vector<std::complex<float> >::operator = (const std::complex<float> s)
+{
+  Assert (numbers::is_finite(s), ExcNumberNotFinite());
+  if (s != std::complex<float>())
+    Assert (vec_size!=0, ExcEmptyObject());
+  if (vec_size!=0)
+    std::fill (begin(), end(), s);
+
+  return *this;
+}
+#endif
+
+
+
+template <typename Number>
+void
+Vector<Number>::scale (const Number factor)
+{
+  Assert (numbers::is_finite(factor),ExcNumberNotFinite());
+
+  Assert (vec_size!=0, ExcEmptyObject());
+
+  parallel::transform (val,
+                       val+vec_size,
+                       val,
+                       (factor*boost::lambda::_1),
+                       internal::Vector::minimum_parallel_grain_size);
+}
+
+
+
+template <typename Number>
+void
+Vector<Number>::add (const Number a,
+                     const Vector<Number>& v)
+{
+  Assert (numbers::is_finite(a),ExcNumberNotFinite());
+
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+
+  parallel::transform (val,
+                       val+vec_size,
+                       v.val,
+                       val,
+                       (boost::lambda::_1 + a*boost::lambda::_2),
+                       internal::Vector::minimum_parallel_grain_size);
+}
+
+
+
+template <typename Number>
+void
+Vector<Number>::sadd (const Number x,
+                      const Number a,
+                      const Vector<Number>& v)
+{
+  Assert (numbers::is_finite(x),ExcNumberNotFinite());
+  Assert (numbers::is_finite(a),ExcNumberNotFinite());
+
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+
+  parallel::transform (val,
+                       val+vec_size,
+                       v.val,
+                       val,
+                       (x*boost::lambda::_1 + a*boost::lambda::_2),
+                       internal::Vector::minimum_parallel_grain_size);
+}
+
+
+
+namespace internal
+{
+  namespace Vector
+  {
+    // All sums over all the vector entries (l2-norm, inner product, etc.) are
+    // performed with the same code, using a templated operation defined here
+    template <typename Number, typename Number2>
+    struct InnerProd
+    {
+      Number
+      operator() (const Number*&X, const Number2*&Y, const Number &) const
+      {
+        return *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
+      }
+    };
+
+    template <typename Number, typename RealType>
+    struct Norm2
+    {
+      RealType
+      operator() (const Number*&X, const Number* &, const RealType &) const
+      {
+        return numbers::NumberTraits<Number>::abs_square(*X++);
+      }
+    };
+
+    template <typename Number, typename RealType>
+    struct Norm1
+    {
+      RealType
+      operator() (const Number*&X, const Number* &, const RealType &) const
+      {
+        return numbers::NumberTraits<Number>::abs(*X++);
+      }
+    };
+
+    template <typename Number, typename RealType>
+    struct NormP
+    {
+      RealType
+      operator() (const Number*&X, const Number* &, const RealType &p) const
+      {
+        return std::pow(numbers::NumberTraits<Number>::abs(*X++), p);
+      }
+    };
+
+    template <typename Number>
+    struct MeanValue
+    {
+      Number
+      operator() (const Number*&X, const Number* &, const Number &) const
+      {
+        return *X++;
+      }
+    };
+
+    // this is the main working loop for all vector sums using the templated
+    // operation above. it accumulates the sums using a block-wise summation
+    // algorithm with post-update. this blocked algorithm has been proposed in
+    // a similar form by Castaldo, Whaley and Chronopoulos (SIAM
+    // J. Sci. Comput. 31, 1156-1174, 2008) and we use the smallest possible
+    // block size, 2. Sometimes it is referred to as pairwise summation. The
+    // worst case error made by this algorithm is on the order O(eps *
+    // log2(vec_size)), whereas a naive summation is O(eps * vec_size). Even
+    // though the Kahan summation is even more accurate with an error O(eps)
+    // by carrying along remainders not captured by the sum, that involves
+    // additional costs which are not worthwhile. See the Wikipedia article on
+    // the Kahan summation algorithm.
+
+    // The algorithm implemented here has the additional benefit that it is
+    // easily parallelized without changing the order of how the elements are
+    // added (floating point addition is not associative). For the same vector
+    // size and minimum_parallel_grainsize, the blocks are always the
+    // same. Only at the innermost level, eight values are summed up
+    // consecutively in order to better balance multiplications and additions.
+
+    // The code returns the result as the last argument in order to make
+    // spawning tasks simpler and use automatic template deduction.
+    template <typename Operation, typename Number, typename Number2,
+             typename ResultType>
+    void accumulate (const Operation   &op,
+                     const Number      *X,
+                     const Number2     *Y,
+                     const ResultType   power,
+                     const unsigned int vec_size,
+                     ResultType        &result)
+    {
+      if (vec_size <= 4096)
+        {
+          // the vector is short enough so we perform the summation. first
+          // work on the regular part. The innermost 32 values are expanded in
+          // order to obtain known loop bounds for most of the work.
+          const Number *X_original = X;
+          ResultType outer_results [128];
+          unsigned int n_chunks = vec_size / 32;
+          const unsigned int remainder = vec_size % 32;
+          Assert (remainder == 0 || n_chunks < 128, ExcInternalError());
+
+          for (unsigned int i=0; i<n_chunks; ++i)
+            {
+              ResultType r0 = op(X, Y, power);
+              for (unsigned int j=1; j<8; ++j)
+                r0 += op(X, Y, power);
+              ResultType r1 = op(X, Y, power);
+              for (unsigned int j=1; j<8; ++j)
+                r1 += op(X, Y, power);
+              r0 += r1;
+              r1 = op(X, Y, power);
+              for (unsigned int j=1; j<8; ++j)
+                r1 += op(X, Y, power);
+              ResultType r2 = op(X, Y, power);
+              for (unsigned int j=1; j<8; ++j)
+                r2 += op(X, Y, power);
+              r1 += r2;
+              r0 += r1;
+              outer_results[i] = r0;
+            }
+
+          // now work on the remainder, i.e., the last
+          // 32 values. Use switch statement with
+          // fall-through to work on these values.
+          if (remainder > 0)
+            {
+              const unsigned int inner_chunks = remainder / 8;
+              Assert (inner_chunks <= 3, ExcInternalError());
+              const unsigned int remainder_inner = remainder % 8;
+              ResultType r0 = ResultType(), r1 = ResultType(),
+                         r2 = ResultType();
+              switch (inner_chunks)
+                {
+                  case 3:
+                    r2 = op(X, Y, power);
+                    for (unsigned int j=1; j<8; ++j)
+                      r2 += op(X, Y, power);
+                      // no break
+                  case 2:
+                    r1 = op(X, Y, power);
+                    for (unsigned int j=1; j<8; ++j)
+                      r1 += op(X, Y, power);
+                    r1 += r2;
+                    // no break
+                  case 1:
+                    r2 = op(X, Y, power);
+                    for (unsigned int j=1; j<8; ++j)
+                      r2 += op(X, Y, power);
+                      // no break
+                  default:
+                    for (unsigned int j=0; j<remainder_inner; ++j)
+                      r0 += op(X, Y, power);
+                    r0 += r2;
+                    r0 += r1;
+                    outer_results[n_chunks] = r0;
+				break;
+			}
+              n_chunks++;
+            }
+          AssertDimension(X - X_original, vec_size);
+
+          // now sum the results from the chunks
+          // recursively
+          while (n_chunks > 1)
+            {
+              if (n_chunks % 2 == 1)
+                outer_results[n_chunks++] = ResultType();
+              for (unsigned int i=0; i<n_chunks; i+=2)
+                outer_results[i/2] = outer_results[i] + outer_results[i+1];
+              n_chunks /= 2;
+            }
+          result = outer_results[0];
+        }
+#if DEAL_II_USE_MT == 1
+      else if (vec_size > 4 * internal::Vector::minimum_parallel_grain_size)
+        {
+          // split the vector into smaller pieces to be
+          // worked on recursively and create tasks for
+          // them. Make pieces divisible by 1024.
+          const unsigned int new_size = (vec_size / 4096) * 1024;
+          ResultType r0, r1, r2, r3;
+          Threads::TaskGroup<> task_group;
+          task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
+                                          ResultType>,
+                                          op, X, Y, power, new_size, r0);
+          task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
+                                          ResultType>,
+                                          op, X+new_size, Y+new_size, power,
+                                          new_size, r1);
+          task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
+                                          ResultType>,
+                                          op, X+2*new_size, Y+2*new_size, power,
+                                          new_size, r2);
+          task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
+                                          ResultType>,
+                                          op, X+3*new_size, Y+3*new_size, power,
+                                          vec_size-3*new_size, r3);
+          task_group.join_all();
+          r0 += r1;
+          r2 += r3;
+          result = r0 + r2;
+        }
+#endif
+      else
+        {
+          // split vector into four pieces and work on
+          // the pieces recursively. Make pieces
+          // divisible by 1024.
+          const unsigned int new_size = (vec_size / 4096) * 1024;
+          ResultType r0, r1, r2, r3;
+          accumulate (op, X, Y, power, new_size, r0);
+          accumulate (op, X+new_size, Y+new_size, power, new_size, r1);
+          accumulate (op, X+2*new_size, Y+2*new_size, power, new_size, r2);
+          accumulate (op, X+3*new_size, Y+3*new_size, power, vec_size-3*new_size, r3);
+          r0 += r1;
+          r2 += r3;
+          result = r0 + r2;
+        }
+    }
+  }
+}
+
+
+
 template <typename Number>
 template <typename Number2>
 Number Vector<Number>::operator * (const Vector<Number2>& v) const
@@ -328,71 +721,9 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
   Assert (vec_size == v.size(),
           ExcDimensionMismatch(vec_size, v.size()));
 
-  const unsigned int blocking = 1<<BLOCK_LEVEL;
-  Number sum1, sum2, sum3, sum = Number();
-  const Number * X = val, *X_end = X + vec_size,
-    *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
-    *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
-    *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
-  const Number2  * Y = v.val;
-
-                                   // multiply the two vectors. we have to
-                                   // convert the elements of u to the type of
-                                   // the result vector. this is necessary
-                                   // because
-                                   // operator*(complex<float>,complex<double>)
-                                   // is not defined by default. do the
-                                   // operations block-wise with post-update.
-                                   // use three nested loops, which should make
-                                   // the roundoff error very small up to
-                                   // about 20m entries. in the
-                                   // end do extra loops with the remainders.
-                                   // this blocked algorithm has been proposed
-                                   // by Castaldo, Whaley and Chronopoulos
-                                   // (SIAM J. Sci. Comput. 31, 1156-1174,
-                                   // 2008)
-  while (X != X_end1)
-    {
-      sum1 = Number();
-      for (unsigned int j=0; j<blocking; ++j)
-        {
-          sum2 = Number();
-          for (unsigned int k=0; k<blocking; ++k)
-            {
-              sum3 = Number();
-              for (unsigned int i=0; i<blocking; ++i)
-                sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
-              sum2 += sum3;
-            }
-          sum1 += sum2;
-        }
-      sum += sum1;
-    }
-  while (X != X_end2)
-    {
-      sum2 = Number();
-      for (unsigned int j=0; j<blocking; ++j)
-        {
-          sum3 = Number();
-          for (unsigned int i=0; i<blocking; ++i)
-            sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
-          sum2 += sum3;
-        }
-      sum += sum2;
-    }
-  while (X != X_end3)
-    {
-      sum3 = Number();
-      for (unsigned int i=0; i<blocking; ++i)
-        sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
-      sum += sum3;
-    }
-
-  sum3 = Number();
-  while (X != X_end)
-    sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
-  sum += sum3;
-
+  Number sum;
+  internal::Vector::accumulate (internal::Vector::InnerProd<Number,Number2>(),
+                                val, v.val, Number(), vec_size, sum);
   Assert(numbers::is_finite(sum), ExcNumberNotFinite());
 
   return sum;
@@ -405,54 +736,9 @@ Vector<Number>::norm_sqr () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  const unsigned int blocking = 1<<BLOCK_LEVEL;
-  real_type sum1, sum2, sum3, sum = 0.;
-  const Number * X = val, *X_end = X + vec_size,
-    *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
-    *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
-    *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
-
-  while (X != X_end1)
-    {
-      sum1 = 0.;
-      for (unsigned int j=0; j<blocking; ++j)
-        {
-          sum2 = 0.;
-          for (unsigned int k=0; k<blocking; ++k)
-            {
-              sum3 = 0.;
-              for (unsigned int i=0; i<blocking; ++i)
-                sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
-              sum2 += sum3;
-            }
-          sum1 += sum2;
-        }
-      sum += sum1;
-    }
-  while (X != X_end2)
-    {
-      sum2 = 0.;
-      for (unsigned int j=0; j<blocking; ++j)
-        {
-          sum3 = 0.;
-          for (unsigned int i=0; i<blocking; ++i)
-            sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
-          sum2 += sum3;
-        }
-      sum += sum2;
-    }
-  while (X != X_end3)
-    {
-      sum3 = 0.;
-      for (unsigned int i=0; i<blocking; ++i)
-        sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
-      sum += sum3;
-    }
-
-  sum3 = 0.;
-  while (X != X_end)
-    sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
-  sum += sum3;
+  real_type sum;
+  internal::Vector::accumulate (internal::Vector::Norm2<Number,real_type>(),
+                                val, val, real_type(), vec_size, sum);
 
   Assert(numbers::is_finite(sum), ExcNumberNotFinite());
 
@@ -465,54 +751,9 @@ Number Vector<Number>::mean_value () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  const unsigned int blocking = 1<<BLOCK_LEVEL;
-  Number sum1, sum2, sum3, sum = Number();
-  const Number * X = val, *X_end = X + vec_size,
-    *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
-    *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
-    *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
-
-  while (X != X_end1)
-    {
-      sum1 = Number();
-      for (unsigned int j=0; j<blocking; ++j)
-        {
-          sum2 = Number();
-          for (unsigned int k=0; k<blocking; ++k)
-            {
-              sum3 = Number();
-              for (unsigned int i=0; i<blocking; ++i)
-                sum3 += *X++;
-              sum2 += sum3;
-            }
-          sum1 += sum2;
-        }
-      sum += sum1;
-    }
-  while (X != X_end2)
-    {
-      sum2 = Number();
-      for (unsigned int j=0; j<blocking; ++j)
-        {
-          sum3 = Number();
-          for (unsigned int i=0; i<blocking; ++i)
-            sum3 += *X++;
-          sum2 += sum3;
-        }
-      sum += sum2;
-    }
-  while (X != X_end3)
-    {
-      sum3 = Number();
-      for (unsigned int i=0; i<blocking; ++i)
-        sum3 += *X++;
-      sum += sum3;
-    }
-
-  sum3 = Number();
-  while (X != X_end)
-    sum3 += *X++;
-  sum += sum3;
+  Number sum;
+  internal::Vector::accumulate (internal::Vector::MeanValue<Number>(),
+                                val, val, Number(), vec_size, sum);
 
   return sum / real_type(size());
 }
@@ -525,54 +766,9 @@ Vector<Number>::l1_norm () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  const unsigned int blocking = 1<<BLOCK_LEVEL;
-  real_type sum1, sum2, sum3, sum = 0.;
-  const Number * X = val, *X_end = X + vec_size,
-    *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
-    *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
-    *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
-
-  while (X != X_end1)
-    {
-      sum1 = 0.;
-      for (unsigned int j=0; j<blocking; ++j)
-        {
-          sum2 = 0.;
-          for (unsigned int k=0; k<blocking; ++k)
-            {
-              sum3 = 0.;
-              for (unsigned int i=0; i<blocking; ++i)
-                sum3 += numbers::NumberTraits<Number>::abs(*X++);
-              sum2 += sum3;
-            }
-          sum1 += sum2;
-        }
-      sum += sum1;
-    }
-  while (X != X_end2)
-    {
-      sum2 = 0.;
-      for (unsigned int j=0; j<blocking; ++j)
-        {
-          sum3 = 0.;
-          for (unsigned int i=0; i<blocking; ++i)
-            sum3 += numbers::NumberTraits<Number>::abs(*X++);
-          sum2 += sum3;
-        }
-      sum += sum2;
-    }
-  while (X != X_end3)
-    {
-      sum3 = 0.;
-      for (unsigned int i=0; i<blocking; ++i)
-        sum3 += numbers::NumberTraits<Number>::abs(*X++);
-      sum += sum3;
-    }
-
-  sum3 = 0.;
-  while (X != X_end)
-    sum3 += numbers::NumberTraits<Number>::abs(*X++);
-  sum += sum3;
+  real_type sum;
+  internal::Vector::accumulate (internal::Vector::Norm1<Number,real_type>(),
+                                val, val, real_type(), vec_size, sum);
 
   return sum;
 }
@@ -583,7 +779,41 @@ template <typename Number>
 typename Vector<Number>::real_type
 Vector<Number>::l2_norm () const
 {
-  return std::sqrt(norm_sqr());
+  // if l2_norm()^2 is finite and non-zero, the answer is computed as
+  // std::sqrt(norm_sqr()). If norm_sqr() is infinite or zero, the l2 norm
+  // might still be finite. In that case, recompute it (this is a rare case,
+  // so working on the vector twice is uncritical and paid off by the extended
+  // precision) using the BLAS approach with a weight, see e.g. dnrm2.f.
+  Assert (vec_size!=0, ExcEmptyObject());
+
+  real_type norm_square;
+  internal::Vector::accumulate (internal::Vector::Norm2<Number,real_type>(),
+                                val, val, real_type(), vec_size, norm_square);
+  if (numbers::is_finite(norm_square) &&
+      norm_square > std::numeric_limits<real_type>::min())
+    return std::sqrt(norm_square);
+  else
+    {
+      real_type scale = 0.;
+      real_type sum = 1.;
+      for (unsigned int i=0; i<vec_size; ++i)
+        {
+          if (val[i] != Number())
+            {
+              const real_type abs_x =
+                numbers::NumberTraits<Number>::abs(val[i]);
+              if (scale < abs_x)
+                {
+                  sum = 1. + sum * (scale/abs_x) * (scale/abs_x);
+                  scale = abs_x;
+                }
+              else
+                sum += (abs_x/scale) * (abs_x/scale);
+            }
+        }
+      Assert(numbers::is_finite(scale)*std::sqrt(sum), ExcNumberNotFinite());
+      return scale * std::sqrt(sum);
+    }
 }
 
 
@@ -597,58 +827,35 @@ Vector<Number>::lp_norm (const real_type p) const
   if (p == 1.)
     return l1_norm();
   else if (p == 2.)
-    return std::sqrt(norm_sqr());
+    return l2_norm();
 
-  const unsigned int blocking = 1<<BLOCK_LEVEL;
-  real_type sum1, sum2, sum3, sum = 0.;
-  const Number * X = val, *X_end = X + vec_size,
-    *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
-    *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
-    *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
+  real_type sum;
+  internal::Vector::accumulate (internal::Vector::NormP<Number,real_type>(),
+                                val, val, p, vec_size, sum);
 
-  while (X != X_end1)
+  if (numbers::is_finite(sum) && sum > std::numeric_limits<real_type>::min())
+    return std::pow(sum, static_cast<real_type>(1./p));
+  else
     {
-      sum1 = 0.;
-      for (unsigned int j=0; j<blocking; ++j)
+      real_type scale = 0.;
+      real_type sum = 1.;
+      for (unsigned int i=0; i<vec_size; ++i)
         {
-          sum2 = 0.;
-          for (unsigned int k=0; k<blocking; ++k)
+          if (val[i] != Number())
             {
-              sum3 = 0.;
-              for (unsigned int i=0; i<blocking; ++i)
-                sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
-              sum2 += sum3;
+              const real_type abs_x =
+                numbers::NumberTraits<Number>::abs(val[i]);
+              if (scale < abs_x)
+                {
+                  sum = 1. + sum * std::pow(scale/abs_x, p);
+                  scale = abs_x;
+                }
+              else
+                sum += std::pow(abs_x/scale, p);
             }
-          sum1 += sum2;
         }
-      sum += sum1;
+      return scale * std::pow(sum, static_cast<real_type>(1./p));
     }
-  while (X != X_end2)
-    {
-      sum2 = 0.;
-      for (unsigned int j=0; j<blocking; ++j)
-        {
-          sum3 = 0.;
-          for (unsigned int i=0; i<blocking; ++i)
-            sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
-          sum2 += sum3;
-        }
-      sum += sum2;
-    }
-  while (X != X_end3)
-    {
-      sum3 = 0.;
-      for (unsigned int i=0; i<blocking; ++i)
-        sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
-      sum += sum3;
-    }
-
-  sum3 = 0.;
-  while (X != X_end)
-    sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
-  sum += sum3;
-
-  return std::pow(sum, static_cast<real_type>(1./p));
 }
 
 
@@ -797,13 +1004,13 @@ void Vector<Number>::sadd (const Number x, const Number a,
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
 
   if (vec_size>internal::Vector::minimum_parallel_grain_size)
-  parallel::transform (val,
-                       val+vec_size,
-                       v.val,
-                       w.val,
-                       val,
-                       (x*boost::lambda::_1 + a*boost::lambda::_2 + b*boost::lambda::_3),
-                       internal::Vector::minimum_parallel_grain_size);
+    parallel::transform (val,
+                         val+vec_size,
+                         v.val,
+                         w.val,
+                         val,
+                         (x*boost::lambda::_1 + a*boost::lambda::_2 + b*boost::lambda::_3),
+                         internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
     for (unsigned int i=0; i<vec_size; ++i)
       val[i] = x*val[i] + a * v.val[i] + b * w.val[i];
@@ -1008,9 +1215,9 @@ Vector<Number>::operator = (const PETScWrappers::Vector &v)
 
       internal::copy (start_ptr, start_ptr+vec_size, begin());
 
-                                       // restore the representation of the
-                                       // vector
-      ierr = VecRestoreArray (static_cast<const Vec&>(v), &start_ptr);
+      // restore the representation of the
+      // vector
+      ierr = VecRestoreArray (static_cast<const Vec &>(v), &start_ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
     }
 
@@ -1145,7 +1352,7 @@ void Vector<Number>::print (std::ostream      &out,
 
 template <typename Number>
 void
-Vector<Number>::print (LogStream& out, const unsigned int width, const bool across) const
+Vector<Number>::print (LogStream &out, const unsigned int width, const bool across) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
@@ -1177,11 +1384,11 @@ void Vector<Number>::block_write (std::ostream &out) const
   std::strcat(buf, "\n[");
 
   out.write(buf, std::strlen(buf));
-  out.write (reinterpret_cast<const char*>(begin()),
-             reinterpret_cast<const char*>(end())
-             - reinterpret_cast<const char*>(begin()));
+  out.write (reinterpret_cast<const char *>(begin()),
+             reinterpret_cast<const char *>(end())
+             - reinterpret_cast<const char *>(begin()));
 
-                                   // out << ']';
+  // out << ']';
   const char outro = ']';
   out.write (&outro, 1);
 
@@ -1208,15 +1415,15 @@ void Vector<Number>::block_read (std::istream &in)
   reinit (sz, true);
 
   char c;
-                                   //  in >> c;
+  //  in >> c;
   in.read (&c, 1);
   AssertThrow (c=='[', ExcIO());
 
-  in.read (reinterpret_cast<char*>(begin()),
-           reinterpret_cast<const char*>(end())
-           - reinterpret_cast<const char*>(begin()));
+  in.read (reinterpret_cast<char *>(begin()),
+           reinterpret_cast<const char *>(end())
+           - reinterpret_cast<const char *>(begin()));
 
-                                   //  in >> c;
+  //  in >> c;
   in.read (&c, 1);
   AssertThrow (c==']', ExcIO());
 }

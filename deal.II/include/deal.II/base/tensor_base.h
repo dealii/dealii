@@ -607,7 +607,7 @@ class Tensor<1,dim,Number>
                                       * constructor to disallow the
                                       * creation of such an object.
                                       */
-    Number values[(dim!=0) ? (dim) : 1];
+    Number values[(dim!=0) ? (dim) : (dim+1)];
 
                                      /**
                                       * Help function for unroll. If
@@ -975,29 +975,9 @@ inline
 Tensor<1,dim,Number> &
 Tensor<1,dim,Number>::operator = (const Tensor<1,dim,Number> &p)
 {
-                                   // unroll by hand since this is a
-                                   // frequently called function and
-                                   // some compilers don't want to
-                                   // always unroll the loop in the
-                                   // general template
-  switch (dim)
-    {
-    case 1:
-      values[0] = p.values[0];
-      break;
-    case 2:
-      values[0] = p.values[0];
-      values[1] = p.values[1];
-      break;
-    case 3:
-      values[0] = p.values[0];
-      values[1] = p.values[1];
-      values[2] = p.values[2];
-      break;
-    default:
-      for (unsigned int i=0; i<dim; ++i)
-        values[i] = p.values[i];
-    }
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] = p.values[i];
+
   return *this;
 }
 

@@ -162,9 +162,9 @@ namespace MeshWorker
             Assert(!cell->has_children(), ExcInternalError());
             Assert(!neighbor->has_children(), ExcInternalError());
 
-            std::pair<unsigned int, unsigned int> neighbor_face_no
+            const std::pair<unsigned int, unsigned int> neighbor_face_no
               = cell->neighbor_of_coarser_neighbor(face_no);
-            typename ITERATOR::AccessorType::Container::face_iterator nface
+            const typename ITERATOR::AccessorType::Container::face_iterator nface
               = neighbor->face(neighbor_face_no.first);
 
             dof_info.interior_face_available[face_no] = true;
@@ -196,7 +196,7 @@ namespace MeshWorker
             if (internal::is_active_iterator(cell) && neighbor->has_children())
               continue;
 
-            unsigned int neighbor_face_no = cell->neighbor_face_no(face_no);
+            const unsigned int neighbor_face_no = cell->neighbor_face_no(face_no);
             Assert (neighbor->face(neighbor_face_no) == face, ExcInternalError());
             // Regular interior face
             dof_info.interior_face_available[face_no] = true;

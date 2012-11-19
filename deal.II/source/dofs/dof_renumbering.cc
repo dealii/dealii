@@ -2035,8 +2035,8 @@ namespace DoFRenumbering
                                           * Comparison operator for dim>=2
                                           */
         template <class DHCellIterator, int xdim>
-        bool compare (const DHCellIterator& c1,
-		      const DHCellIterator& c2,
+        bool compare (const DHCellIterator &c1,
+		      const DHCellIterator &c2,
 		      dealii::internal::int2type<xdim>) const
 	  {
             const Point<dim> v1 = c1->center() - center;
@@ -2052,15 +2052,14 @@ namespace DoFRenumbering
                                           * where this function makes no sense
                                           */
         template <class DHCellIterator>
-        bool compare (const DHCellIterator& c1,
-		      const DHCellIterator& c2,
+        bool compare (const DHCellIterator &,
+		      const DHCellIterator &,
 		      dealii::internal::int2type<1>) const
 	  {
 	    Assert (dim >= 2,
 		    ExcMessage ("This operation only makes sense for dim>=2."));
 	    return false;
           }
-
     };
   }
 

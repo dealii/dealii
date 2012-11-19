@@ -16,28 +16,13 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/utilities.h>
 
 #include <cmath>
 #include <cstdlib>
 #include <iterator>
 
 DEAL_II_NAMESPACE_OPEN
-
-
-namespace
-{
-/**
- * Integer to the power of dim
- */
-  template <int dim>
-  inline unsigned int dimpow (unsigned int n)
-  {
-    unsigned int result = n;
-    for (unsigned int i=1;i<dim;++i)
-      result *= n;
-    return result;
-  }
-}
 
 
 template <>
@@ -222,8 +207,8 @@ template <int dim>
 Quadrature<dim>::Quadrature (const Quadrature<dim != 1 ? 1 : 0> &q)
                 :
                 Subscriptor(),
-                quadrature_points (dimpow<dim>(q.size())),
-                weights (dimpow<dim>(q.size()))
+                quadrature_points (Utilities::fixed_power<dim>(q.size())),
+                weights (Utilities::fixed_power<dim>(q.size()))
 {
   Assert (dim <= 3, ExcNotImplemented());
 

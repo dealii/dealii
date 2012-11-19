@@ -2210,7 +2210,7 @@ AC_DEFUN(DEAL_II_DETECT_VECTORIZATION_LEVEL, dnl
 [
   AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
-  dnl SSE2 check in debug mode
+  dnl SSE2 check
   AC_MSG_CHECKING(whether CPU supports SSE2)
   AC_TRY_RUN(
     [
@@ -2243,7 +2243,7 @@ AC_DEFUN(DEAL_II_DETECT_VECTORIZATION_LEVEL, dnl
     ],
     [
       AC_MSG_RESULT(yes)
-      dnl AVX check in debug mode
+      dnl AVX check
       AC_MSG_CHECKING(whether CPU supports AVX)
       AC_TRY_RUN(
       [
@@ -2271,6 +2271,7 @@ AC_DEFUN(DEAL_II_DETECT_VECTORIZATION_LEVEL, dnl
           if (ptr[i] != 5.0625)
             return_value = 1;
         _mm_free (data);
+        return return_value;
         }
       ],
       [
