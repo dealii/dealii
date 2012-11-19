@@ -133,8 +133,6 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
                                        // problems with the number of
                                        // variables...
     }
-/*
-TODO: Remove or port to fparser 4.5
                                    // Now we define how many variables
                                    // we expect to read in.  We
                                    // distinguish between two cases:
@@ -153,13 +151,16 @@ TODO: Remove or port to fparser 4.5
   else
     n_vars = dim;
 
+/*
                                    // Let's check if the number of
                                    // variables is correct...
   AssertThrow (n_vars == fp[0].NVars(),
+!                              ~~~~~~~
+!                              not available anymore in fparser-4.5, maier 2012
                ExcDimensionMismatch(n_vars,fp[0].NVars()));
+*/
 
                                    // Now set the initialization bit.
-*/
   initialized = true;
 }
 
