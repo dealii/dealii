@@ -1002,8 +1002,12 @@ namespace Step42
     constraints.merge (constraints_dirichlet_hanging_nodes);
   }
 
+                                   // @sect4{PlasticityContactProblem::dirichlet_constraints}
 
-
+                                   // This function defines the new ConstraintMatrix
+                                   // constraints_dirichlet_hanging_nodes. It contains
+                                   // the dirichlet boundary values as well as the
+                                   // hanging nodes constraints.
   template <int dim>
   void PlasticityContactProblem<dim>::dirichlet_constraints ()
   {
@@ -1052,11 +1056,12 @@ namespace Step42
                                    //
                                    // For the hanging nodes we have to apply
                                    // the set_zero function to system_rhs_newton.
-                                   // This is necessary if a hanging node x_0
-                                   // has one neighbor x_1 which is in contact
-                                   // and one neighbor x_2 which is not. This
-                                   // leads to an inhomogeneity constraint
-                                   // with value x_1/2 in the ConstraintMatrix.
+                                   // This is necessary if a hanging node value x_0
+                                   // has one neighbor which is in contact with
+                                   // value x_0 and one neighbor which is not with
+                                   // value x_1. This leads to an inhomogeneity
+                                   // constraint with value x_1/2 = gap/2 in the
+                                   // ConstraintMatrix.
                                    // So the corresponding entries in the 
                                    // ride-hang-side are non-zero with a
                                    // meaningless value. These values have to
