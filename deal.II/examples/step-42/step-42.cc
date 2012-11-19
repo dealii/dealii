@@ -400,21 +400,21 @@ namespace Step42
         return_value = p(1);
       if (component == 2)
         {
-          // double hz = 0.98;
-          // double position_x = 0.5;
-          // double alpha = 12.0;
-          // double s_x = 0.5039649116;
-          // double s_y = hz + 0.00026316298;
-          // if (p(0) > position_x - R && p(0) < s_x)
-          //   {
-          //     return_value = -sqrt(R*R - (p(0)-position_x)*(p(0)-position_x)) + hz + R;
-          //   }
-          // else if (p(0) >= s_x)
-          //   {
-          //     return_value = 12.0/90.0*p(0) + (s_y - alpha/90.0*s_x);
-          //   }
-          // else
-          //   return_value = 1e+10;
+      //     double hz = 0.98;
+      //     double position_x = 0.5;
+      //     double alpha = 12.0;
+      //     double s_x = 0.5039649116;
+      //     double s_y = hz + 0.00026316298;
+      //     if (p(0) > position_x - R && p(0) < s_x)
+      //       {
+      //         return_value = -sqrt(R*R - (p(0)-position_x)*(p(0)-position_x)) + hz + R;
+      //       }
+      //     else if (p(0) >= s_x)
+      //       {
+      //         return_value = 12.0/90.0*p(0) + (s_y - alpha/90.0*s_x);
+      //       }
+      //     else
+      //       return_value = 1e+10;
 
           // Hindernis Dortmund
           double x1 = p(0);
@@ -430,9 +430,9 @@ namespace Step42
           // return_value = 0.032 + data->dicke - input_copy->mikro_height (p(0) + shift_walze_x, p(1) + shift_walze_y, p(2));
 
           // Ball with radius R
-          // double R = 0.5;
+          // double R = 1.0;
           // if (std::pow ((p(0)-1.0/2.0), 2) + std::pow ((p(1)-1.0/2.0), 2) < R*R)
-          //   return_value = 1.0 + R - 0.001 - sqrt (R*R  - std::pow ((p(0)-1.0/2.0), 2)
+          //   return_value = 1.0 + R - 0.01 - sqrt (R*R  - std::pow ((p(0)-1.0/2.0), 2)
           // 					 - std::pow ((p(1)-1.0/2.0), 2));
           // else
           //   return_value = 1e+5;
@@ -752,7 +752,7 @@ namespace Step42
           cell->get_dof_indices (local_dof_indices);
           constraints.distribute_local_to_global (cell_matrix, cell_rhs,
                                                   local_dof_indices,
-                                                  system_matrix_newton, system_rhs_newton, false);
+                                                  system_matrix_newton, system_rhs_newton, true);
         };
 
     system_matrix_newton.compress ();
@@ -962,7 +962,7 @@ namespace Step42
                   continue;
 
                 // the local row where
-                Point<dim> point (cell->face (face)->vertex (v)[0],/* + solution (index_x),*/
+                Point<dim> point (cell->face (face)->vertex (v)[0],
                                   cell->face (face)->vertex (v)[1],
                                   cell->face (face)->vertex (v)[2]);
 
@@ -974,10 +974,11 @@ namespace Step42
                     c *
                     diag_mass_matrix_vector_relevant (index_z) *
                     (solution_index_z - gap)
-                    > 0)
+                    > 0 &&
+		    !(constraints_hanging_nodes.is_constrained(index_z)))
                   {
-                    constraints.add_line (index_z);
-                    constraints.set_inhomogeneity (index_z, gap);
+		    constraints.add_line (index_z);
+		    constraints.set_inhomogeneity (index_z, gap);
 
                     distributed_solution (index_z) = gap;
 
@@ -986,15 +987,6 @@ namespace Step42
 
                     if (locally_owned_dofs.is_element (index_z))
                       active_set_locally_owned.add_index (index_z);
-
-                    // std::cout<< index_z << ", "
-                    // 	   << "Error: " << lambda (index_z) +
-                    //   diag_mass_matrix_vector_relevant (index_z)*c*(solution_index_z - gap)
-                    // 	   << ", " << lambda (index_z)
-                    // 	   << ", " << diag_mass_matrix_vector_relevant (index_z)
-                    // 	   << ", " << obstacle_value
-                    // 	   << ", " << solution_index_z
-                    // 	   <<std::endl;
                   }
               }
     distributed_solution.compress(Insert);
@@ -1007,9 +999,7 @@ namespace Step42
 
     constraints.close ();
 
-    const ConstraintMatrix::MergeConflictBehavior
-      merge_conflict_behavior = ConstraintMatrix::left_object_wins;
-    constraints.merge (constraints_dirichlet_hanging_nodes, merge_conflict_behavior);
+    constraints.merge (constraints_dirichlet_hanging_nodes);
   }
 
 
@@ -1063,8 +1053,14 @@ namespace Step42
     TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
     distributed_solution = solution;
 
-    // constraints_hanging_nodes.set_zero (distributed_solution);
-    constraints.set_zero (distributed_solution);
+    constraints_hanging_nodes.set_zero (distributed_solution);
+    /* This is necessary if contact constraints are neighbors of
+     * hanging nodes constraints. In that case these hanging node
+     * constraints are inhomogeneity constraints and the corresponding
+     * values in the right-hand-side vector contains meaningless
+     * values. So these values have to be set to zero.
+     */
+    constraints_hanging_nodes.set_zero (system_rhs_newton);
 
     // Solving iterative
 
@@ -1090,6 +1086,10 @@ namespace Step42
     TrilinosWrappers::MPI::Vector    tmp (system_rhs_newton);
     const double solver_tolerance = 1e-4 *
           system_matrix_newton.residual (tmp, distributed_solution, system_rhs_newton);
+
+    // resid_vector = tmp;
+    // output_results ("Startresidual");
+
     SolverControl solver_control (system_matrix_newton.m(), solver_tolerance);
     SolverFGMRES<TrilinosWrappers::MPI::Vector>
        solver(solver_control, mem,
@@ -1351,7 +1351,7 @@ namespace Step42
         for (unsigned int i=0;
              i<Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          filenames.push_back ("solution-" +
+          filenames.push_back (title + "-" +
                                Utilities::int_to_string (i, 4) +
                                ".vtu");
 
@@ -1401,7 +1401,7 @@ namespace Step42
         MPI_Barrier (mpi_communicator);
         t.restart();
         std::ostringstream filename_solution;
-        filename_solution << "solution_";
+        filename_solution << "solution-";
         filename_solution << cycle;
         output_results (filename_solution.str ());
         MPI_Barrier (mpi_communicator);
