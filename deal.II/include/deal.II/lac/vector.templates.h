@@ -658,7 +658,7 @@ namespace internal
             }
           result = outer_results[0];
         }
-#if DEAL_II_USE_MT == 1
+#ifdef DEAL_II_USE_MT
       else if (vec_size > 4 * internal::Vector::minimum_parallel_grain_size)
         {
           // split the vector into smaller pieces to be
