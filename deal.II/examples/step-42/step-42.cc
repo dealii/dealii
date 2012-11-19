@@ -1042,8 +1042,31 @@ namespace Step42
     constraints_dirichlet_hanging_nodes.close ();
   }
 
+                                   // @sect4{PlasticityContactProblem::solve}
 
+                                   // In addition to step-41 we have
+                                   // to deal with the hanging node
+                                   // constraints. Again we also consider
+                                   // the locally_owned_dofs only by
+                                   // creating the vector distributed_solution.
+                                   //
+                                   // For the hanging nodes we have to apply
+                                   // the set_zero function to system_rhs_newton.
+                                   // This is necessary if a hanging node x_0
+                                   // has one neighbor x_1 which is in contact
+                                   // and one neighbor x_2 which is not. This
+                                   // leads to an inhomogeneity constraint
+                                   // with value x_1/2 in the ConstraintMatrix.
+                                   // So the corresponding entries in the 
+                                   // ride-hang-side are non-zero with a
+                                   // meaningless value. These values have to
+                                   // to set to zero.
 
+                                   // The rest of the funtion is smiliar to
+				   // step-41 except that we use a FGMRES-solver
+                                   // instead of CG. For a very small hardening
+                                   // value gamma the linear system becomes
+                                   // almost semi definite but still symmetric.
   template <int dim>
   void PlasticityContactProblem<dim>::solve ()
   {
@@ -1054,15 +1077,7 @@ namespace Step42
     distributed_solution = solution;
 
     constraints_hanging_nodes.set_zero (distributed_solution);
-    /* This is necessary if contact constraints are neighbors of
-     * hanging nodes constraints. In that case these hanging node
-     * constraints are inhomogeneity constraints and the corresponding
-     * values in the right-hand-side vector contains meaningless
-     * values. So these values have to be set to zero.
-     */
     constraints_hanging_nodes.set_zero (system_rhs_newton);
-
-    // Solving iterative
 
     MPI_Barrier (mpi_communicator);
     t.restart();
@@ -1077,18 +1092,10 @@ namespace Step42
     MPI_Barrier (mpi_communicator);
     t.restart();
 
-    // ReductionControl                 solver_control (10000, 1e-15, 1e-4);
-    // SolverCG<TrilinosWrappers::MPI::Vector>
-    //   solver (solver_control, mpi_communicator);
-    // solver.solve (system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
-
     PrimitiveVectorMemory<TrilinosWrappers::MPI::Vector> mem;
     TrilinosWrappers::MPI::Vector    tmp (system_rhs_newton);
     const double solver_tolerance = 1e-4 *
           system_matrix_newton.residual (tmp, distributed_solution, system_rhs_newton);
-
-    // resid_vector = tmp;
-    // output_results ("Startresidual");
 
     SolverControl solver_control (system_matrix_newton.m(), solver_tolerance);
     SolverFGMRES<TrilinosWrappers::MPI::Vector>
@@ -1099,7 +1106,7 @@ namespace Step42
 
     pcout << "Initial error: " << solver_control.initial_value() <<std::endl;
     pcout << "   " << solver_control.last_step()
-              << " CG iterations needed to obtain convergence with an error: "
+              << " FGMRES iterations needed to obtain convergence with an error: "
               <<  solver_control.last_value()
               << std::endl;
 
