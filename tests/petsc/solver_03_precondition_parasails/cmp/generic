@@ -1,0 +1,6 @@
+
+DEAL::Size 32 Unknowns 961
+DEAL::Solver type: N6dealii13PETScWrappers8SolverCGE
+DEAL::Starting value 36.94
+DEAL::Convergence step 19 value 0.0008561
+DEAL::Solver stopped after 19 iterations

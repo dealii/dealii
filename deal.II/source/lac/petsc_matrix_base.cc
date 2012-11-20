@@ -248,7 +248,7 @@ namespace PETScWrappers
 
 
   void
-  MatrixBase::compress (::dealii::VectorOperation::values operation)
+  MatrixBase::compress (::dealii::VectorOperation::values)
   {
                                      // flush buffers
     int ierr;
@@ -428,7 +428,7 @@ namespace PETScWrappers
     return tmp*v;
   }
 
-  
+
   PetscScalar
   MatrixBase::matrix_scalar_product (const VectorBase &u,
 				     const VectorBase &v) const

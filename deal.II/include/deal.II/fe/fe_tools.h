@@ -1418,7 +1418,8 @@ namespace FETools
                   << "You are using continuous elements on a grid with "
                   << "hanging nodes but without providing hanging node "
                   << "constraints. Use the respective function with "
-                  << "additional ConstraintMatrix argument(s), instead.");
+                  << "additional ConstraintMatrix argument(s), instead."
+                  << (arg1?"":""));
                                    /**
                                     * You need at least two grid levels.
                                     *
