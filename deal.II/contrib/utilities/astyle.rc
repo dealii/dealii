@@ -1,0 +1,20 @@
+# astyle 2.02 indentation style for deal.II
+# Run astyle in a command like
+#    astyle --options=lib/astyle.rc *cc *h
+
+--style=gnu
+
+--convert-tabs
+--indent-preprocessor
+--indent=spaces=2
+--indent-namespaces
+--min-conditional-indent=0
+--pad-header
+
+# write things as 'char *p', not 'char* p'
+--align-pointer=name
+--align-reference=name
+
+--max-instatement-indent=60
+--suffix=none
+--quiet
