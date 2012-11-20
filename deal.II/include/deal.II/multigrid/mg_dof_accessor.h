@@ -523,10 +523,10 @@ public:
    * do anything useful here and so
    * may not actually be called.
    */
-  MGDoFAccessor (const Triangulation<1,spacedim> *=  0,
+  MGDoFAccessor (const Triangulation<1,spacedim> *tria = 0,
                  const int = 0,
                  const int = 0,
-                 const MGDoFHandler<1,spacedim> *= 0);
+                 const MGDoFHandler<1,spacedim> *dof_handler = 0);
 
   /**
    * Conversion constructor. This
