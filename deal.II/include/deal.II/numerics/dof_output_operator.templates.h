@@ -18,9 +18,9 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <class VECTOR, int dim, int spacedim>
-  OutputOperator<VECTOR>&
+  OutputOperator<VECTOR> &
   DoFOutputOperator<VECTOR, dim, spacedim>::operator<<(
-      const NamedData<VECTOR*>& vectors)
+    const NamedData<VECTOR *> &vectors)
   {
     Assert ((dof!=0), ExcNotInitialized());
     DataOut<dim> out;

@@ -22,9 +22,9 @@ namespace internal
   namespace DoFHandler
   {
     NumberCache::NumberCache ()
-                    :
-                    n_global_dofs (0),
-                    n_locally_owned_dofs (0)
+      :
+      n_global_dofs (0),
+      n_locally_owned_dofs (0)
     {}
 
 

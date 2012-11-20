@@ -134,318 +134,318 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename number>
 class SparseLUDecomposition : protected SparseMatrix<number>,
-                              public virtual Subscriptor
+  public virtual Subscriptor
 {
-  protected:
-                                     /**
-                                      * Constructor. Does nothing.
-                                      *
-                                      * Call the initialize()
-                                      * function before using this
-                                      * object as preconditioner
-                                      * (vmult()).
-                                      */
-    SparseLUDecomposition ();
+protected:
+  /**
+   * Constructor. Does nothing.
+   *
+   * Call the initialize()
+   * function before using this
+   * object as preconditioner
+   * (vmult()).
+   */
+  SparseLUDecomposition ();
 
-                                     /**
-                                      * This method is deprecated, and
-                                      * left for backward
-                                      * compability. It will be removed
-                                      * in later versions.
-                                      */
-    SparseLUDecomposition (const SparsityPattern& sparsity);
+  /**
+   * This method is deprecated, and
+   * left for backward
+   * compability. It will be removed
+   * in later versions.
+   */
+  SparseLUDecomposition (const SparsityPattern &sparsity);
 
+public:
+  /**
+   * Destruction. Mark the
+   * destructor pure to ensure that
+   * this class isn't used
+   * directly, but only its derived
+   * classes.
+   */
+  virtual ~SparseLUDecomposition () = 0;
+
+  /**
+   * Deletes all member
+   * variables. Leaves the class in
+   * the state that it had directly
+   * after calling the constructor
+   */
+  virtual void clear();
+
+  /**
+   * Parameters for
+   * SparseDecomposition.
+   */
+  class AdditionalData
+  {
   public:
-                                     /**
-                                      * Destruction. Mark the
-                                      * destructor pure to ensure that
-                                      * this class isn't used
-                                      * directly, but only its derived
-                                      * classes.
-                                      */
-    virtual ~SparseLUDecomposition () = 0;
+    /**
+     * Constructor. For the
+     * parameters' description,
+     * see below.
+     */
+    AdditionalData (const double strengthen_diagonal=0,
+                    const unsigned int extra_off_diagonals=0,
+                    const bool use_previous_sparsity=false,
+                    const SparsityPattern *use_this_sparsity=0);
 
-                                     /**
-                                      * Deletes all member
-                                      * variables. Leaves the class in
-                                      * the state that it had directly
-                                      * after calling the constructor
-                                      */
-    virtual void clear();
+    /**
+     * <tt>strengthen_diag</tt> times
+     * the sum of absolute row
+     * entries is added to the
+     * diagonal entries.
+     *
+     * Per default, this value is
+     * zero, i.e. the diagonal is
+     * not strengthened.
+     */
+    double strengthen_diagonal;
 
-                                     /**
-                                      * Parameters for
-                                      * SparseDecomposition.
-                                      */
-    class AdditionalData
-    {
-      public:
-                                         /**
-                                          * Constructor. For the
-                                          * parameters' description,
-                                          * see below.
-                                          */
-        AdditionalData (const double strengthen_diagonal=0,
-                        const unsigned int extra_off_diagonals=0,
-                        const bool use_previous_sparsity=false,
-                        const SparsityPattern *use_this_sparsity=0);
+    /**
+     * By default, the
+     * <tt>initialize(matrix,
+     * data)</tt> function creates
+     * its own sparsity. This
+     * sparsity has the same
+     * SparsityPattern as
+     * <tt>matrix</tt> with some extra
+     * off diagonals the number
+     * of which is specified by
+     * <tt>extra_off_diagonals</tt>.
+     *
+     * The user can give a
+     * SparsityPattern to
+     * <tt>use_this_sparsity</tt>. Then
+     * this sparsity is used and
+     * the
+     * <tt>extra_off_diagonals</tt>
+     * argument is ignored.
+     */
+    unsigned int extra_off_diagonals;
 
-                                         /**
-                                          * <tt>strengthen_diag</tt> times
-                                          * the sum of absolute row
-                                          * entries is added to the
-                                          * diagonal entries.
-                                          *
-                                          * Per default, this value is
-                                          * zero, i.e. the diagonal is
-                                          * not strengthened.
-                                          */
-        double strengthen_diagonal;
+    /**
+     * If this flag is true the
+     * initialize() function uses
+     * the same sparsity that was
+     * used during the previous
+     * initialize() call.
+     *
+     * This might be useful when
+     * several linear problems on
+     * the same sparsity need to
+     * solved, as for example
+     * several Newton iteration
+     * steps on the same
+     * triangulation.
+     */
+    bool use_previous_sparsity;
 
-                                         /**
-                                          * By default, the
-                                          * <tt>initialize(matrix,
-                                          * data)</tt> function creates
-                                          * its own sparsity. This
-                                          * sparsity has the same
-                                          * SparsityPattern as
-                                          * <tt>matrix</tt> with some extra
-                                          * off diagonals the number
-                                          * of which is specified by
-                                          * <tt>extra_off_diagonals</tt>.
-                                          *
-                                          * The user can give a
-                                          * SparsityPattern to
-                                          * <tt>use_this_sparsity</tt>. Then
-                                          * this sparsity is used and
-                                          * the
-                                          * <tt>extra_off_diagonals</tt>
-                                          * argument is ignored.
-                                          */
-        unsigned int extra_off_diagonals;
+    /**
+     * When a
+     * SparsityPattern is
+     * given to this argument,
+     * the initialize()
+     * function calls
+     * <tt>reinit(*use_this_sparsity)</tt>
+     * causing this sparsity to
+     * be used.
+     *
+     * Note that the sparsity structures
+     * of <tt>*use_this_sparsity</tt> and
+     * the matrix passed to the
+     * initialize function need not be
+     * equal. Fill-in is allowed, as well
+     * as filtering out some elements in
+     * the matrix.
+     */
+    const SparsityPattern *use_this_sparsity;
+  };
 
-                                         /**
-                                          * If this flag is true the
-                                          * initialize() function uses
-                                          * the same sparsity that was
-                                          * used during the previous
-                                          * initialize() call.
-                                          *
-                                          * This might be useful when
-                                          * several linear problems on
-                                          * the same sparsity need to
-                                          * solved, as for example
-                                          * several Newton iteration
-                                          * steps on the same
-                                          * triangulation.
-                                          */
-        bool use_previous_sparsity;
+  /**
+   * This function needs to be
+   * called before an object of
+   * this class is used as
+   * preconditioner.
+   *
+   * For more detail about possible
+   * parameters, see the class
+   * documentation and the
+   * documentation of the
+   * SparseLUDecomposition::AdditionalData
+   * class.
+   *
+   * According to the
+   * <tt>parameters</tt>, this function
+   * creates a new SparsityPattern
+   * or keeps the previous sparsity
+   * or takes the sparsity given by
+   * the user to <tt>data</tt>. Then,
+   * this function performs the LU
+   * decomposition.
+   *
+   * After this function is called
+   * the preconditioner is ready to
+   * be used (using the
+   * <code>vmult</code> function of
+   * derived classes).
+   */
+  template <typename somenumber>
+  void initialize (const SparseMatrix<somenumber> &matrix,
+                   const AdditionalData parameters);
 
-                                         /**
-                                          * When a
-                                          * SparsityPattern is
-                                          * given to this argument,
-                                          * the initialize()
-                                          * function calls
-                                          * <tt>reinit(*use_this_sparsity)</tt>
-                                          * causing this sparsity to
-                                          * be used.
-                                          *
-                                          * Note that the sparsity structures
-                                          * of <tt>*use_this_sparsity</tt> and
-                                          * the matrix passed to the
-                                          * initialize function need not be
-                                          * equal. Fill-in is allowed, as well
-                                          * as filtering out some elements in
-                                          * the matrix.
-                                          */
-        const SparsityPattern *use_this_sparsity;
-    };
+  /**
+   * This method is deprecated,
+   * and left for backward
+   * compatibility. It will be removed
+   * in later versions.
+   *
+   * @deprecated
+   */
+  void reinit (const SparsityPattern &sparsity);
 
-                                     /**
-                                      * This function needs to be
-                                      * called before an object of
-                                      * this class is used as
-                                      * preconditioner.
-                                      *
-                                      * For more detail about possible
-                                      * parameters, see the class
-                                      * documentation and the
-                                      * documentation of the
-                                      * SparseLUDecomposition::AdditionalData
-                                      * class.
-                                      *
-                                      * According to the
-                                      * <tt>parameters</tt>, this function
-                                      * creates a new SparsityPattern
-                                      * or keeps the previous sparsity
-                                      * or takes the sparsity given by
-                                      * the user to <tt>data</tt>. Then,
-                                      * this function performs the LU
-                                      * decomposition.
-                                      *
-                                      * After this function is called
-                                      * the preconditioner is ready to
-                                      * be used (using the
-                                      * <code>vmult</code> function of
-                                      * derived classes).
-                                      */
-    template <typename somenumber>
-    void initialize (const SparseMatrix<somenumber> &matrix,
-                     const AdditionalData parameters);
+  /**
+   * This method is deprecated,
+   * and left for backward
+   * compability. It will be removed
+   * in later versions.
+   *
+   * @deprecated
+   */
+  template <typename somenumber>
+  void decompose (const SparseMatrix<somenumber> &matrix,
+                  const double                    strengthen_diagonal=0.);
 
-                                     /**
-                                      * This method is deprecated,
-                                      * and left for backward
-                                      * compatibility. It will be removed
-                                      * in later versions.
-                                      *
-                                      * @deprecated
-                                      */
-    void reinit (const SparsityPattern &sparsity);
+  /**
+   * This method is deprecated,
+   * and left for backward
+   * compability. It will be removed
+   * in later versions.
+   *
+   * @deprecated
+   */
+  virtual bool is_decomposed () const;
 
-                                     /**
-                                      * This method is deprecated,
-                                      * and left for backward
-                                      * compability. It will be removed
-                                      * in later versions.
-                                      *
-                                      * @deprecated
-                                      */
-    template <typename somenumber>
-    void decompose (const SparseMatrix<somenumber> &matrix,
-                    const double                    strengthen_diagonal=0.);
+  /**
+   * Return whether the object is
+   * empty. It calls the inherited
+   * SparseMatrix::empty() function.
+   */
+  bool empty () const;
 
-                                     /**
-                                      * This method is deprecated,
-                                      * and left for backward
-                                      * compability. It will be removed
-                                      * in later versions.
-                                      *
-                                      * @deprecated
-                                      */
-    virtual bool is_decomposed () const;
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  virtual std::size_t memory_consumption () const;
 
-                                     /**
-                                      * Return whether the object is
-                                      * empty. It calls the inherited
-                                      * SparseMatrix::empty() function.
-                                      */
-    bool empty () const;
+  /** @addtogroup Exceptions
+   * @{ */
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
-    virtual std::size_t memory_consumption () const;
+  /**
+   * Exception
+   */
+  DeclException1 (ExcInvalidStrengthening,
+                  double,
+                  << "The strengthening parameter " << arg1
+                  << " is not greater or equal than zero!");
+  //@}
+protected:
+  /**
+   * Copies the passed SparseMatrix
+   * onto this object. This
+   * object's sparsity pattern
+   * remains unchanged.
+   */
+  template<typename somenumber>
+  void copy_from (const SparseMatrix<somenumber> &matrix);
 
-                                     /** @addtogroup Exceptions
-                                      * @{ */
+  /**
+   * Performs the strengthening
+   * loop. For each row calculates
+   * the sum of absolute values of
+   * its elements, determines the
+   * strengthening factor (through
+   * get_strengthen_diagonal())
+   * sf and multiplies the diagonal
+   * entry with <tt>sf+1</tt>.
+   */
+  virtual void strengthen_diagonal_impl ();
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcInvalidStrengthening,
-                    double,
-                    << "The strengthening parameter " << arg1
-                    << " is not greater or equal than zero!");
-                                     //@}
-  protected:
-                                     /**
-                                      * Copies the passed SparseMatrix
-                                      * onto this object. This
-                                      * object's sparsity pattern
-                                      * remains unchanged.
-                                      */
-    template<typename somenumber>
-    void copy_from (const SparseMatrix<somenumber>& matrix);
+  /**
+   * In the decomposition phase,
+   * computes a strengthening
+   * factor for the diagonal entry
+   * in row <tt>row</tt> with sum of
+   * absolute values of its
+   * elements <tt>rowsum</tt>.<br> Note:
+   * The default implementation in
+   * SparseLUDecomposition
+   * returns
+   * <tt>strengthen_diagonal</tt>'s
+   * value.
+   */
+  virtual number get_strengthen_diagonal(const number rowsum, const unsigned int row) const;
 
-                                     /**
-                                      * Performs the strengthening
-                                      * loop. For each row calculates
-                                      * the sum of absolute values of
-                                      * its elements, determines the
-                                      * strengthening factor (through
-                                      * get_strengthen_diagonal())
-                                      * sf and multiplies the diagonal
-                                      * entry with <tt>sf+1</tt>.
-                                      */
-    virtual void strengthen_diagonal_impl ();
+  /**
+   * State flag. If not in
+   * decomposed state, it is
+   * illegal to apply the
+   * decomposition.  This flag is
+   * cleared when the underlaying
+   * SparseMatrix
+   * SparsityPattern is
+   * changed, and set by
+   * decompose().
+   */
+  bool decomposed;
 
-                                     /**
-                                      * In the decomposition phase,
-                                      * computes a strengthening
-                                      * factor for the diagonal entry
-                                      * in row <tt>row</tt> with sum of
-                                      * absolute values of its
-                                      * elements <tt>rowsum</tt>.<br> Note:
-                                      * The default implementation in
-                                      * SparseLUDecomposition
-                                      * returns
-                                      * <tt>strengthen_diagonal</tt>'s
-                                      * value.
-                                      */
-    virtual number get_strengthen_diagonal(const number rowsum, const unsigned int row) const;
+  /**
+   * The default strengthening
+   * value, returned by
+   * get_strengthen_diagonal().
+   */
+  double  strengthen_diagonal;
 
-                                     /**
-                                      * State flag. If not in
-                                      * decomposed state, it is
-                                      * illegal to apply the
-                                      * decomposition.  This flag is
-                                      * cleared when the underlaying
-                                      * SparseMatrix
-                                      * SparsityPattern is
-                                      * changed, and set by
-                                      * decompose().
-                                      */
-    bool decomposed;
+  /**
+   * For every row in the
+   * underlying
+   * SparsityPattern, this
+   * array contains a pointer
+   * to the row's first
+   * afterdiagonal entry. Becomes
+   * available after invocation of
+   * decompose().
+   */
+  std::vector<const unsigned int *> prebuilt_lower_bound;
 
-                                     /**
-                                      * The default strengthening
-                                      * value, returned by
-                                      * get_strengthen_diagonal().
-                                      */
-    double  strengthen_diagonal;
+private:
+  /**
+   * Fills the
+   * #prebuilt_lower_bound
+   * array.
+   */
+  void prebuild_lower_bound ();
 
-                                     /**
-                                      * For every row in the
-                                      * underlying
-                                      * SparsityPattern, this
-                                      * array contains a pointer
-                                      * to the row's first
-                                      * afterdiagonal entry. Becomes
-                                      * available after invocation of
-                                      * decompose().
-                                      */
-    std::vector<const unsigned int*> prebuilt_lower_bound;
-
-  private:
-                                     /**
-                                      * Fills the
-                                      * #prebuilt_lower_bound
-                                      * array.
-                                      */
-    void prebuild_lower_bound ();
-
-                                     /**
-                                      * In general this pointer is
-                                      * zero except for the case that
-                                      * no SparsityPattern is
-                                      * given to this class. Then, a
-                                      * SparsityPattern is created
-                                      * and is passed down to the
-                                      * SparseMatrix base class.
-                                      *
-                                      * Nevertheless, the
-                                      * SparseLUDecomposition
-                                      * needs to keep ownership of
-                                      * this sparsity. It keeps this
-                                      * pointer to it enabling it to
-                                      * delete this sparsity at
-                                      * destruction time.
-                                      */
-    SparsityPattern *own_sparsity;
+  /**
+   * In general this pointer is
+   * zero except for the case that
+   * no SparsityPattern is
+   * given to this class. Then, a
+   * SparsityPattern is created
+   * and is passed down to the
+   * SparseMatrix base class.
+   *
+   * Nevertheless, the
+   * SparseLUDecomposition
+   * needs to keep ownership of
+   * this sparsity. It keeps this
+   * pointer to it enabling it to
+   * delete this sparsity at
+   * destruction time.
+   */
+  SparsityPattern *own_sparsity;
 };
 
 /*@}*/
@@ -491,10 +491,10 @@ SparseLUDecomposition<number>::AdditionalData::AdditionalData (
   const unsigned int extra_off_diag,
   const bool use_prev_sparsity,
   const SparsityPattern *use_this_spars):
-                strengthen_diagonal(strengthen_diag),
-                extra_off_diagonals(extra_off_diag),
-                use_previous_sparsity(use_prev_sparsity),
-                use_this_sparsity(use_this_spars)
+  strengthen_diagonal(strengthen_diag),
+  extra_off_diagonals(extra_off_diag),
+  use_previous_sparsity(use_prev_sparsity),
+  use_this_sparsity(use_this_spars)
 {}
 
 

@@ -49,64 +49,64 @@ DEAL_II_NAMESPACE_OPEN
 template<int dim, class SOLVER, class VECTOR = Vector<double> >
 class DoFPrintSolverStep : public SOLVER
 {
-  public:
-                                     /**
-                                      * Constructor.  First, we take
-                                      * the arguments needed for the
-                                      * solver. @p data_out is the
-                                      * object doing the output as a
-                                      * finite element function.
-                                      *
-                                      * One output file with the name
-                                      * <tt>basename.[step].[suffix]</tt>
-                                      * will be produced for each
-                                      * iteration step.
-                                      */
-    DoFPrintSolverStep (SolverControl& control,
-                        VectorMemory<VECTOR>& mem,
-                        DataOut<dim>& data_out,
-                        const std::string& basename);
+public:
+  /**
+   * Constructor.  First, we take
+   * the arguments needed for the
+   * solver. @p data_out is the
+   * object doing the output as a
+   * finite element function.
+   *
+   * One output file with the name
+   * <tt>basename.[step].[suffix]</tt>
+   * will be produced for each
+   * iteration step.
+   */
+  DoFPrintSolverStep (SolverControl &control,
+                      VectorMemory<VECTOR> &mem,
+                      DataOut<dim> &data_out,
+                      const std::string &basename);
 
-                                     /**
-                                      * Call-back function for the
-                                      * iterative method.
-                                      */
-    virtual void print_vectors (const unsigned int step,
-                                const VECTOR& x,
-                                const VECTOR& r,
-                                const VECTOR& d) const;
-  private:
-                                     /**
-                                      * Output object.
-                                      */
-    DataOut<dim>& out;
+  /**
+   * Call-back function for the
+   * iterative method.
+   */
+  virtual void print_vectors (const unsigned int step,
+                              const VECTOR &x,
+                              const VECTOR &r,
+                              const VECTOR &d) const;
+private:
+  /**
+   * Output object.
+   */
+  DataOut<dim> &out;
 
-                                     /**
-                                      * Base of filenames.
-                                      */
-    const std::string basename;
+  /**
+   * Base of filenames.
+   */
+  const std::string basename;
 };
 
 
 /* ----------------------- template functions --------------- */
 
 template<int dim, class SOLVER, class VECTOR>
-DoFPrintSolverStep<dim, SOLVER, VECTOR>::DoFPrintSolverStep (SolverControl& control,
-                                                             VectorMemory<VECTOR>& mem,
-                                                             DataOut<dim>& data_out,
-                                                             const std::string& basename)
-                : SOLVER (control, mem),
-                  out (data_out),
-                  basename (basename)
+DoFPrintSolverStep<dim, SOLVER, VECTOR>::DoFPrintSolverStep (SolverControl &control,
+    VectorMemory<VECTOR> &mem,
+    DataOut<dim> &data_out,
+    const std::string &basename)
+  : SOLVER (control, mem),
+    out (data_out),
+    basename (basename)
 {}
 
 
 template<int dim, class SOLVER, class VECTOR>
 void
 DoFPrintSolverStep<dim, SOLVER, VECTOR>::print_vectors (const unsigned int step,
-                                                        const VECTOR& x,
-                                                        const VECTOR& r,
-                                                        const VECTOR& d) const
+                                                        const VECTOR &x,
+                                                        const VECTOR &r,
+                                                        const VECTOR &d) const
 {
   out.clear_data_vectors();
   out.add_data_vector(x, "solution");

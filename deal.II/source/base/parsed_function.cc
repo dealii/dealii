@@ -17,19 +17,20 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Functions {
+namespace Functions
+{
   template <int dim>
   ParsedFunction<dim>::ParsedFunction (const unsigned int n_components, const double h)
-                  :
-                  AutoDerivativeFunction<dim>(h, n_components),
-                  function_object(n_components)
+    :
+    AutoDerivativeFunction<dim>(h, n_components),
+    function_object(n_components)
   {}
 
 
 
   template <int dim>
   void
-  ParsedFunction<dim>::declare_parameters(ParameterHandler  &prm,
+  ParsedFunction<dim>::declare_parameters(ParameterHandler &prm,
                                           const unsigned int n_components)
   {
     Assert(n_components > 0, ExcZero());
@@ -37,18 +38,18 @@ namespace Functions {
     std::string vnames;
     switch (dim)
       {
-        case 1:
-              vnames = "x,t";
-              break;
-        case 2:
-              vnames = "x,y,t";
-              break;
-        case 3:
-              vnames = "x,y,z,t";
-              break;
-        default:
-              AssertThrow(false, ExcNotImplemented());
-              break;
+      case 1:
+        vnames = "x,t";
+        break;
+      case 2:
+        vnames = "x,y,t";
+        break;
+      case 3:
+        vnames = "x,y,z,t";
+        break;
+      default:
+        AssertThrow(false, ExcNotImplemented());
+        break;
       }
     prm.declare_entry("Variable names", vnames, Patterns::Anything(),
                       "The name of the variables as they will be used in the "
@@ -63,7 +64,7 @@ namespace Functions {
                       "wish to set this input parameter to `r,phi,theta,t' and then use these "
                       "variable names in your function expression.");
 
-                                     // The expression of the function
+    // The expression of the function
     std::string expr = "0";
     for (unsigned int i=1; i<n_components; ++i)
       expr += "; 0";
@@ -107,7 +108,7 @@ namespace Functions {
     std::vector<std::string> const_list =
       Utilities::split_string_list(constants_list, ',');
     std::map<std::string, double> constants;
-    for(unsigned int i = 0; i < const_list.size(); ++i)
+    for (unsigned int i = 0; i < const_list.size(); ++i)
       {
         std::vector<std::string> this_c =
           Utilities::split_string_list(const_list[i], '=');
@@ -126,16 +127,16 @@ namespace Functions {
     unsigned int nn = (Utilities::split_string_list(vnames)).size();
     switch (nn)
       {
-        case dim:
-                                               // Time independent function
-              function_object.initialize(vnames, expression, constants);
-              break;
-        case dim+1:
-                                               // Time dependent function
-              function_object.initialize(vnames, expression, constants, true);
-              break;
-        default:
-              AssertThrow(false, ExcMessage("Not the correct size. Check your code."));
+      case dim:
+        // Time independent function
+        function_object.initialize(vnames, expression, constants);
+        break;
+      case dim+1:
+        // Time dependent function
+        function_object.initialize(vnames, expression, constants, true);
+        break;
+      default:
+        AssertThrow(false, ExcMessage("Not the correct size. Check your code."));
       }
   }
 

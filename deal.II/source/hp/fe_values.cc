@@ -30,17 +30,17 @@ namespace internal
                   const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
                   const dealii::hp::QCollection<q_dim>     &q_collection,
                   const UpdateFlags                   update_flags)
-                    :
-                    fe_collection (&fe_collection),
-                    mapping_collection (&mapping_collection),
-                    q_collection (q_collection),
-                    fe_values_table (fe_collection.size(),
-                                     mapping_collection.size(),
-                                     q_collection.size()),
-                    present_fe_values_index (numbers::invalid_unsigned_int,
-                                             numbers::invalid_unsigned_int,
-                                             numbers::invalid_unsigned_int),
-                    update_flags (update_flags)
+      :
+      fe_collection (&fe_collection),
+      mapping_collection (&mapping_collection),
+      q_collection (q_collection),
+      fe_values_table (fe_collection.size(),
+                       mapping_collection.size(),
+                       q_collection.size()),
+      present_fe_values_index (numbers::invalid_unsigned_int,
+                               numbers::invalid_unsigned_int,
+                               numbers::invalid_unsigned_int),
+      update_flags (update_flags)
     {}
 
 
@@ -49,18 +49,18 @@ namespace internal
     FEValuesBase (const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
                   const dealii::hp::QCollection<q_dim> &q_collection,
                   const UpdateFlags         update_flags)
-                    :
-                  fe_collection (&fe_collection),
-                  mapping_collection (&dealii::hp::StaticMappingQ1<dim,FEValues::space_dimension>::
-                                      mapping_collection),
-                    q_collection (q_collection),
-                    fe_values_table (fe_collection.size(),
-                                     1,
-                                     q_collection.size()),
-                    present_fe_values_index (numbers::invalid_unsigned_int,
-                                             numbers::invalid_unsigned_int,
-                                             numbers::invalid_unsigned_int),
-                    update_flags (update_flags)
+      :
+      fe_collection (&fe_collection),
+      mapping_collection (&dealii::hp::StaticMappingQ1<dim,FEValues::space_dimension>::
+                          mapping_collection),
+      q_collection (q_collection),
+      fe_values_table (fe_collection.size(),
+                       1,
+                       q_collection.size()),
+      present_fe_values_index (numbers::invalid_unsigned_int,
+                               numbers::invalid_unsigned_int,
+                               numbers::invalid_unsigned_int),
+      update_flags (update_flags)
     {}
 
 
@@ -80,26 +80,26 @@ namespace internal
               ExcIndexRange (q_index, 0, q_collection.size()));
 
 
-                                       // set the triple of indices
-                                       // that we want to work with
+      // set the triple of indices
+      // that we want to work with
       present_fe_values_index = TableIndices<3> (fe_index,
                                                  mapping_index,
                                                  q_index);
 
-                                       // first check whether we
-                                       // already have an object for
-                                       // this particular combination
-                                       // of indices
+      // first check whether we
+      // already have an object for
+      // this particular combination
+      // of indices
       if (fe_values_table(present_fe_values_index).get() == 0)
         fe_values_table(present_fe_values_index)
           =
-          std_cxx1x::shared_ptr<FEValues>
-          (new FEValues ((*mapping_collection)[mapping_index],
-                         (*fe_collection)[fe_index],
-                         q_collection[q_index],
-                         update_flags));
+            std_cxx1x::shared_ptr<FEValues>
+            (new FEValues ((*mapping_collection)[mapping_index],
+                           (*fe_collection)[fe_index],
+                           q_collection[q_index],
+                           update_flags));
 
-                                       // now there definitely is one!
+      // now there definitely is one!
       return *fe_values_table(present_fe_values_index);
     }
   }
@@ -118,11 +118,11 @@ namespace hp
                                     const hp::FECollection<dim,spacedim>      &fe_collection,
                                     const hp::QCollection<dim>       &q_collection,
                                     const UpdateFlags                 update_flags)
-                  :
+    :
     internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> > (mapping,
-                                                                        fe_collection,
-                                                                        q_collection,
-                                                                        update_flags)
+        fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
@@ -130,10 +130,10 @@ namespace hp
   FEValues<dim,spacedim>::FEValues (const hp::FECollection<dim,spacedim> &fe_collection,
                                     const hp::QCollection<dim>      &q_collection,
                                     const UpdateFlags            update_flags)
-                  :
+    :
     internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> > (fe_collection,
-                                                                        q_collection,
-                                                                        update_flags)
+        q_collection,
+        update_flags)
   {}
 
 
@@ -144,8 +144,8 @@ namespace hp
                                   const unsigned int mapping_index,
                                   const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -169,7 +169,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = cell->active_fe_index();
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -177,9 +177,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell);
@@ -194,8 +194,8 @@ namespace hp
                                   const unsigned int mapping_index,
                                   const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -209,7 +209,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -217,9 +217,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell);
@@ -234,8 +234,8 @@ namespace hp
                                   const unsigned int mapping_index,
                                   const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -249,7 +249,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -257,9 +257,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell);
@@ -274,8 +274,8 @@ namespace hp
                                   const unsigned int mapping_index,
                                   const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -289,7 +289,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -297,9 +297,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell);
@@ -311,25 +311,25 @@ namespace hp
 
   template <int dim, int spacedim>
   FEFaceValues<dim,spacedim>::FEFaceValues (const hp::MappingCollection<dim,spacedim> &mapping,
-                                   const hp::FECollection<dim,spacedim>  &fe_collection,
-                                   const hp::QCollection<dim-1> &q_collection,
-                                   const UpdateFlags         update_flags)
-                  :
-                  internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> > (mapping,
-                                                                              fe_collection,
-                                                                              q_collection,
-                                                                              update_flags)
+                                            const hp::FECollection<dim,spacedim> &fe_collection,
+                                            const hp::QCollection<dim-1> &q_collection,
+                                            const UpdateFlags         update_flags)
+    :
+    internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> > (mapping,
+        fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
   template <int dim, int spacedim>
-  FEFaceValues<dim,spacedim>::FEFaceValues (const hp::FECollection<dim,spacedim>  &fe_collection,
-                                   const hp::QCollection<dim-1> &q_collection,
-                                   const UpdateFlags         update_flags)
-                  :
-                  internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> > (fe_collection,
-                                                                              q_collection,
-                                                                              update_flags)
+  FEFaceValues<dim,spacedim>::FEFaceValues (const hp::FECollection<dim,spacedim> &fe_collection,
+                                            const hp::QCollection<dim-1> &q_collection,
+                                            const UpdateFlags         update_flags)
+    :
+    internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> > (fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
@@ -341,8 +341,8 @@ namespace hp
                                       const unsigned int mapping_index,
                                       const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -366,7 +366,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = cell->active_fe_index();
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -374,9 +374,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell, face_no);
@@ -392,8 +392,8 @@ namespace hp
                                       const unsigned int mapping_index,
                                       const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -407,7 +407,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -415,9 +415,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell, face_no);
@@ -433,8 +433,8 @@ namespace hp
                                       const unsigned int mapping_index,
                                       const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -448,7 +448,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -456,9 +456,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell, face_no);
@@ -474,8 +474,8 @@ namespace hp
                                       const unsigned int mapping_index,
                                       const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -489,7 +489,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -497,9 +497,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell, face_no);
@@ -511,25 +511,25 @@ namespace hp
 
   template <int dim, int spacedim>
   FESubfaceValues<dim,spacedim>::FESubfaceValues (const hp::MappingCollection<dim,spacedim> &mapping,
-                                         const hp::FECollection<dim,spacedim>  &fe_collection,
-                                         const hp::QCollection<dim-1> &q_collection,
-                                         const UpdateFlags         update_flags)
-                  :
-                  internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> > (mapping,
-                                                                                 fe_collection,
-                                                                                 q_collection,
-                                                                                 update_flags)
+                                                  const hp::FECollection<dim,spacedim> &fe_collection,
+                                                  const hp::QCollection<dim-1> &q_collection,
+                                                  const UpdateFlags         update_flags)
+    :
+    internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> > (mapping,
+        fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
   template <int dim, int spacedim>
-  FESubfaceValues<dim,spacedim>::FESubfaceValues (const hp::FECollection<dim,spacedim>  &fe_collection,
-                                         const hp::QCollection<dim-1> &q_collection,
-                                         const UpdateFlags         update_flags)
-                  :
-                  internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> > (fe_collection,
-                                                                                 q_collection,
-                                                                                 update_flags)
+  FESubfaceValues<dim,spacedim>::FESubfaceValues (const hp::FECollection<dim,spacedim> &fe_collection,
+                                                  const hp::QCollection<dim-1> &q_collection,
+                                                  const UpdateFlags         update_flags)
+    :
+    internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> > (fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
@@ -542,8 +542,8 @@ namespace hp
                                          const unsigned int mapping_index,
                                          const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -567,7 +567,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = cell->active_fe_index();
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -575,9 +575,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell, face_no, subface_no);
@@ -594,8 +594,8 @@ namespace hp
                                          const unsigned int mapping_index,
                                          const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -609,7 +609,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -617,9 +617,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell, face_no, subface_no);
@@ -636,8 +636,8 @@ namespace hp
                                          const unsigned int mapping_index,
                                          const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -651,7 +651,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -659,9 +659,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell, face_no, subface_no);
@@ -678,8 +678,8 @@ namespace hp
                                          const unsigned int mapping_index,
                                          const unsigned int fe_index)
   {
-                                     // determine which indices we
-                                     // should actually use
+    // determine which indices we
+    // should actually use
     unsigned int real_q_index       = q_index,
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
@@ -693,7 +693,7 @@ namespace hp
     if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
-                                     // some checks
+    // some checks
     Assert (real_q_index < this->q_collection.size(),
             ExcIndexRange (real_q_index, 0, this->q_collection.size()));
     Assert (real_mapping_index < this->mapping_collection->size(),
@@ -701,9 +701,9 @@ namespace hp
     Assert (real_fe_index < this->fe_collection->size(),
             ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
 
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
+    // now finally actually get the
+    // corresponding object and
+    // initialize it
     this->select_fe_values (real_fe_index,
                             real_mapping_index,
                             real_q_index).reinit (cell, face_no, subface_no);

@@ -89,76 +89,76 @@ template <class number> class SparseMatrix;
  * @author Ralf Hartmann, 1999
  */
 template <class MATRIX = SparseMatrix<double>,
-          class VECTOR = dealii::Vector<double> >
+         class VECTOR = dealii::Vector<double> >
 class PreconditionSelector : public Subscriptor
 {
-  public:
+public:
 
-                                     /**
-                                      * Constructor. @p omega denotes
-                                      * the damping parameter of
-                                      * the preconditioning.
-                                      */
-    PreconditionSelector(const std::string                 &preconditioning,
-                         const typename VECTOR::value_type &omega=1.);
+  /**
+   * Constructor. @p omega denotes
+   * the damping parameter of
+   * the preconditioning.
+   */
+  PreconditionSelector(const std::string                 &preconditioning,
+                       const typename VECTOR::value_type &omega=1.);
 
-                                     /**
-                                      * Destructor.
-                                      */
-    virtual ~PreconditionSelector();
+  /**
+   * Destructor.
+   */
+  virtual ~PreconditionSelector();
 
-                                     /**
-                                      * Takes the matrix that is needed
-                                      * for preconditionings that involves a
-                                      * matrix. e.g. for @p precondition_jacobi,
-                                      * <tt>~_sor</tt>, <tt>~_ssor</tt>.
-                                      */
-    void use_matrix(const MATRIX &M);
+  /**
+   * Takes the matrix that is needed
+   * for preconditionings that involves a
+   * matrix. e.g. for @p precondition_jacobi,
+   * <tt>~_sor</tt>, <tt>~_ssor</tt>.
+   */
+  void use_matrix(const MATRIX &M);
 
-                                     /**
-                                      * Precondition procedure. Calls the
-                                      * preconditioning that was specified in
-                                      * the constructor.
-                                      */
-    virtual void vmult (VECTOR &dst, const VECTOR&src) const;
+  /**
+   * Precondition procedure. Calls the
+   * preconditioning that was specified in
+   * the constructor.
+   */
+  virtual void vmult (VECTOR &dst, const VECTOR &src) const;
 
-                                     /**
-                                      * Get the names of all implemented
-                                      * preconditionings.
-                                      */
-    static std::string get_precondition_names();
+  /**
+   * Get the names of all implemented
+   * preconditionings.
+   */
+  static std::string get_precondition_names();
 
-                                     /** @addtogroup Exceptions
-                                      * @{ */
+  /** @addtogroup Exceptions
+   * @{ */
 
 
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException0 (ExcNoMatrixGivenToUse);
+  /**
+   * Exception.
+   */
+  DeclException0 (ExcNoMatrixGivenToUse);
 
-                                     //@}
-  protected:
+  //@}
+protected:
 
-                                     /**
-                                      * Stores the name of the
-                                      * preconditioning.
-                                      */
-    std::string preconditioning;
+  /**
+   * Stores the name of the
+   * preconditioning.
+   */
+  std::string preconditioning;
 
-  private:
-                                     /**
-                                      * Matrix that is used for the
-                                      * matrix-builtin preconditioning function.
-                                      * cf. also @p PreconditionUseMatrix.
-                                      */
-    SmartPointer<const MATRIX,PreconditionSelector<MATRIX,VECTOR> > A;
+private:
+  /**
+   * Matrix that is used for the
+   * matrix-builtin preconditioning function.
+   * cf. also @p PreconditionUseMatrix.
+   */
+  SmartPointer<const MATRIX,PreconditionSelector<MATRIX,VECTOR> > A;
 
-                                     /**
-                                      * Stores the damping parameter
-                                      * of the preconditioner.
-                                      */
-    const typename VECTOR::value_type omega;
+  /**
+   * Stores the damping parameter
+   * of the preconditioner.
+   */
+  const typename VECTOR::value_type omega;
 };
 
 /*@}*/
@@ -169,14 +169,14 @@ template <class MATRIX, class VECTOR>
 PreconditionSelector<MATRIX,VECTOR>
 ::PreconditionSelector(const std::string                 &preconditioning,
                        const typename VECTOR::value_type &omega) :
-                preconditioning(preconditioning),
-                omega(omega)  {}
+  preconditioning(preconditioning),
+  omega(omega)  {}
 
 
 template <class MATRIX, class VECTOR>
 PreconditionSelector<MATRIX,VECTOR>::~PreconditionSelector()
 {
-                                   // release the matrix A
+  // release the matrix A
   A=0;
 }
 

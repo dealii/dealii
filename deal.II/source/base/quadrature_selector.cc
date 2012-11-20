@@ -24,7 +24,7 @@ QuadratureSelector<dim>::
 create_quadrature (const std::string &s,
                    const unsigned int order)
 {
-  if(s == "gauss")
+  if (s == "gauss")
     {
       AssertThrow(order >= 2, ExcInvalidQGaussOrder(order));
       return QGauss<dim>(order);
@@ -40,11 +40,11 @@ create_quadrature (const std::string &s,
       else if (s == "weddle")     return QWeddle<dim>();
     }
 
-                                   // we didn't find this name
+  // we didn't find this name
   AssertThrow (false, ExcInvalidQuadrature(s));
-                                   // return something to suppress
-                                   // stupid warnings by some
-                                   // compilers
+  // return something to suppress
+  // stupid warnings by some
+  // compilers
   return Quadrature<dim>();
 }
 
@@ -53,9 +53,9 @@ create_quadrature (const std::string &s,
 template <int dim>
 QuadratureSelector<dim>::QuadratureSelector (const std::string &s,
                                              const unsigned int order)
-                :
-                Quadrature<dim> (create_quadrature(s, order).get_points(),
-                                 create_quadrature(s, order).get_weights())
+  :
+  Quadrature<dim> (create_quadrature(s, order).get_points(),
+                   create_quadrature(s, order).get_weights())
 {
 }
 

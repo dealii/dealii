@@ -21,41 +21,43 @@ DEAL_II_NAMESPACE_OPEN
 // namespace for some functions that are used in this file.
 namespace
 {
-                                   // storage of hand-chosen support
-                                   // points
-                                   //
-                                   // For dim=2, dofs_per_cell of
-                                   // FE_DGPMonomial(k) is given by
-                                   // 0.5(k+1)(k+2), i.e.
-                                   //
-                                   // k    0  1  2  3  4  5  6  7
-                                   // dofs 1  3  6 10 15 21 28 36
-                                   //
-                                   // indirect access of unit points:
-                                   // the points for degree k are
-                                   // located at
-                                   //
-                                   // points[start_index[k]..start_index[k+1]-1]
-  const unsigned int start_index2d[6]={0,1,4,10,20,35};
+  // storage of hand-chosen support
+  // points
+  //
+  // For dim=2, dofs_per_cell of
+  // FE_DGPMonomial(k) is given by
+  // 0.5(k+1)(k+2), i.e.
+  //
+  // k    0  1  2  3  4  5  6  7
+  // dofs 1  3  6 10 15 21 28 36
+  //
+  // indirect access of unit points:
+  // the points for degree k are
+  // located at
+  //
+  // points[start_index[k]..start_index[k+1]-1]
+  const unsigned int start_index2d[6]= {0,1,4,10,20,35};
   const double points2d[35][2]=
-  {{0,0},
-   {0,0},{1,0},{0,1},
-   {0,0},{1,0},{0,1},{1,1},{0.5,0},{0,0.5},
-   {0,0},{1,0},{0,1},{1,1},{1./3.,0},{2./3.,0},{0,1./3.},{0,2./3.},{0.5,1},{1,0.5},
-   {0,0},{1,0},{0,1},{1,1},{0.25,0},{0.5,0},{0.75,0},{0,0.25},{0,0.5},{0,0.75},{1./3.,1},{2./3.,1},{1,1./3.},{1,2./3.},{0.5,0.5}
+  {
+    {0,0},
+    {0,0},{1,0},{0,1},
+    {0,0},{1,0},{0,1},{1,1},{0.5,0},{0,0.5},
+    {0,0},{1,0},{0,1},{1,1},{1./3.,0},{2./3.,0},{0,1./3.},{0,2./3.},{0.5,1},{1,0.5},
+    {0,0},{1,0},{0,1},{1,1},{0.25,0},{0.5,0},{0.75,0},{0,0.25},{0,0.5},{0,0.75},{1./3.,1},{2./3.,1},{1,1./3.},{1,2./3.},{0.5,0.5}
   };
 
-                                   // For dim=3, dofs_per_cell of
-                                   // FE_DGPMonomial(k) is given by
-                                   // 1./6.(k+1)(k+2)(k+3), i.e.
-                                   //
-                                   // k    0  1  2  3  4  5  6   7
-                                   // dofs 1  4 10 20 35 56 84 120
-  const unsigned int start_index3d[6]={0,1,5,15/*,35*/};
+  // For dim=3, dofs_per_cell of
+  // FE_DGPMonomial(k) is given by
+  // 1./6.(k+1)(k+2)(k+3), i.e.
+  //
+  // k    0  1  2  3  4  5  6   7
+  // dofs 1  4 10 20 35 56 84 120
+  const unsigned int start_index3d[6]= {0,1,5,15/*,35*/};
   const double points3d[35][3]=
-  {{0,0,0},
-   {0,0,0},{1,0,0},{0,1,0},{0,0,1},
-   {0,0,0},{1,0,0},{0,1,0},{0,0,1},{0.5,0,0},{0,0.5,0},{0,0,0.5},{1,1,0},{1,0,1},{0,1,1}
+  {
+    {0,0,0},
+    {0,0,0},{1,0,0},{0,1,0},{0,0,1},
+    {0,0,0},{1,0,0},{0,1,0},{0,0,1},{0.5,0,0},{0,0.5,0},{0,0,0.5},{1,1,0},{1,0,1},{0,1,1}
   };
 
 
@@ -105,27 +107,27 @@ namespace
 
 template <int dim>
 FE_DGPMonomial<dim>::FE_DGPMonomial (const unsigned int degree)
-                :
-                FE_Poly<PolynomialsP<dim>, dim> (
-                  PolynomialsP<dim>(degree),
-                  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-                  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
-                  std::vector<ComponentMask>(FiniteElementData<dim>(
-                    get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))
+  :
+  FE_Poly<PolynomialsP<dim>, dim> (
+    PolynomialsP<dim>(degree),
+    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
+    std::vector<ComponentMask>(FiniteElementData<dim>(
+                                 get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
   Assert(this->poly_space.n()==this->dofs_per_cell, ExcInternalError());
   Assert(this->poly_space.degree()==this->degree, ExcInternalError());
 
-                                   // DG doesn't have constraints, so
-                                   // leave them empty
+  // DG doesn't have constraints, so
+  // leave them empty
 
-                                   // Reinit the vectors of
-                                   // restriction and prolongation
-                                   // matrices to the right sizes
+  // Reinit the vectors of
+  // restriction and prolongation
+  // matrices to the right sizes
   this->reinit_restriction_and_prolongation_matrices();
-                                   // Fill prolongation matrices with embedding operators
+  // Fill prolongation matrices with embedding operators
   FETools::compute_embedding_matrices (*this, this->prolongation);
-                                   // Fill restriction matrices with L2-projection
+  // Fill restriction matrices with L2-projection
   FETools::compute_projection_matrices (*this, this->restriction);
 }
 
@@ -135,12 +137,12 @@ template <int dim>
 std::string
 FE_DGPMonomial<dim>::get_name () const
 {
-                                   // note that the
-                                   // FETools::get_fe_from_name
-                                   // function depends on the
-                                   // particular format of the string
-                                   // this function returns, so they
-                                   // have to be kept in synch
+  // note that the
+  // FETools::get_fe_from_name
+  // function depends on the
+  // particular format of the string
+  // this function returns, so they
+  // have to be kept in synch
 
   std::ostringstream namebuf;
   namebuf << "FE_DGPMonomial<" << dim << ">(" << this->degree << ")";
@@ -171,9 +173,9 @@ get_interpolation_matrix (const FiniteElement<dim> &source_fe,
 
   if (source_dgp_monomial)
     {
-                                   // ok, source_fe is a DGP_Monomial
-                                   // element. Then, the interpolation
-                                   // matrix is simple
+      // ok, source_fe is a DGP_Monomial
+      // element. Then, the interpolation
+      // matrix is simple
       const unsigned int m=interpolation_matrix.m();
       const unsigned int n=interpolation_matrix.n();
       Assert (m == this->dofs_per_cell, ExcDimensionMismatch (m, this->dofs_per_cell));
@@ -229,7 +231,7 @@ FE_DGPMonomial<dim>::get_dpo_vector (const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim+1, 0U);
   dpo[dim] = deg+1;
-  for (unsigned int i=1;i<dim;++i)
+  for (unsigned int i=1; i<dim; ++i)
     {
       dpo[dim] *= deg+1+i;
       dpo[dim] /= i+1;
@@ -244,12 +246,12 @@ FE_DGPMonomial<dim>::
 get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                                FullMatrix<double>       &interpolation_matrix) const
 {
-                                   // this is only implemented, if the source
-                                   // FE is also a DGPMonomial element. in that case,
-                                   // both elements have no dofs on their
-                                   // faces and the face interpolation matrix
-                                   // is necessarily empty -- i.e. there isn't
-                                   // much we need to do here.
+  // this is only implemented, if the source
+  // FE is also a DGPMonomial element. in that case,
+  // both elements have no dofs on their
+  // faces and the face interpolation matrix
+  // is necessarily empty -- i.e. there isn't
+  // much we need to do here.
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPMonomial<") == 0)
                ||
                (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != 0),
@@ -273,12 +275,12 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                                   const unsigned int ,
                                   FullMatrix<double>           &interpolation_matrix) const
 {
-                                   // this is only implemented, if the source
-                                   // FE is also a DGPMonomial element. in that case,
-                                   // both elements have no dofs on their
-                                   // faces and the face interpolation matrix
-                                   // is necessarily empty -- i.e. there isn't
-                                   // much we need to do here.
+  // this is only implemented, if the source
+  // FE is also a DGPMonomial element. in that case,
+  // both elements have no dofs on their
+  // faces and the face interpolation matrix
+  // is necessarily empty -- i.e. there isn't
+  // much we need to do here.
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPMonomial<") == 0)
                ||
                (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != 0),
@@ -309,8 +311,8 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGPMonomial<dim>::
 hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
 {
-                                   // there are no such constraints for DGPMonomial
-                                   // elements at all
+  // there are no such constraints for DGPMonomial
+  // elements at all
   if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
@@ -328,8 +330,8 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGPMonomial<dim>::
 hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 {
-                                   // there are no such constraints for DGPMonomial
-                                   // elements at all
+  // there are no such constraints for DGPMonomial
+  // elements at all
   if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
@@ -347,8 +349,8 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGPMonomial<dim>::
 hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 {
-                                   // there are no such constraints for DGPMonomial
-                                   // elements at all
+  // there are no such constraints for DGPMonomial
+  // elements at all
   if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
@@ -366,10 +368,10 @@ FiniteElementDomination::Domination
 FE_DGPMonomial<dim>::
 compare_for_face_domination (const FiniteElement<dim> &fe_other) const
 {
-                                   // check whether both are discontinuous
-                                   // elements, see
-                                   // the description of
-                                   // FiniteElementDomination::Domination
+  // check whether both are discontinuous
+  // elements, see
+  // the description of
+  // FiniteElementDomination::Domination
   if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != 0)
     return FiniteElementDomination::no_requirements;
 

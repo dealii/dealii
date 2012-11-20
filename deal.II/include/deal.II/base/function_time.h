@@ -61,41 +61,41 @@ DEAL_II_NAMESPACE_OPEN
  */
 class FunctionTime
 {
-  public:
-                                     /**
-                                      * Constructor. May take an initial vakue
-                                      * for the time variable, which defaults
-                                      * to zero.
-                                      */
-    FunctionTime (const double initial_time = 0.0);
+public:
+  /**
+   * Constructor. May take an initial vakue
+   * for the time variable, which defaults
+   * to zero.
+   */
+  FunctionTime (const double initial_time = 0.0);
 
-                                     /**
-                                      * Virtual destructor.
-                                      */
-    virtual ~FunctionTime();
+  /**
+   * Virtual destructor.
+   */
+  virtual ~FunctionTime();
 
-                                     /**
-                                      * Return the value of the time variable/
-                                      */
-    double get_time () const;
+  /**
+   * Return the value of the time variable/
+   */
+  double get_time () const;
 
-                                     /**
-                                      * Set the time to <tt>new_time</tt>, overwriting
-                                      * the old value.
-                                      */
-    virtual void set_time (const double new_time);
+  /**
+   * Set the time to <tt>new_time</tt>, overwriting
+   * the old value.
+   */
+  virtual void set_time (const double new_time);
 
-                                     /**
-                                      * Advance the time by the given
-                                      * time step <tt>delta_t</tt>.
-                                      */
-    virtual void advance_time (const double delta_t);
+  /**
+   * Advance the time by the given
+   * time step <tt>delta_t</tt>.
+   */
+  virtual void advance_time (const double delta_t);
 
-  private:
-                                     /**
-                                      * Store the present time.
-                                      */
-    double time;
+private:
+  /**
+   * Store the present time.
+   */
+  double time;
 };
 
 

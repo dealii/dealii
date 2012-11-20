@@ -53,81 +53,81 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <int rank, int dim>
 class TensorFunction : public FunctionTime,
-                       public Subscriptor
+  public Subscriptor
 {
-  public:
-                                     /**
-                                      * Define typedefs for the return
-                                      * types of the <tt>value</tt>
-                                      * functions.
-                                      */
-    typedef Tensor<rank,dim> value_type;
+public:
+  /**
+   * Define typedefs for the return
+   * types of the <tt>value</tt>
+   * functions.
+   */
+  typedef Tensor<rank,dim> value_type;
 
-    typedef Tensor<rank+1,dim> gradient_type;
+  typedef Tensor<rank+1,dim> gradient_type;
 
-                                     /**
-                                      * Constructor. May take an
-                                      * initial value for the time
-                                      * variable, which defaults to
-                                      * zero.
-                                      */
-    TensorFunction (const double initial_time = 0.0);
+  /**
+   * Constructor. May take an
+   * initial value for the time
+   * variable, which defaults to
+   * zero.
+   */
+  TensorFunction (const double initial_time = 0.0);
 
-                                     /**
-                                      * Virtual destructor; absolutely
-                                      * necessary in this case, as
-                                      * classes are usually not used
-                                      * by their true type, but rather
-                                      * through pointers to this base
-                                      * class.
-                                      */
-    virtual ~TensorFunction ();
+  /**
+   * Virtual destructor; absolutely
+   * necessary in this case, as
+   * classes are usually not used
+   * by their true type, but rather
+   * through pointers to this base
+   * class.
+   */
+  virtual ~TensorFunction ();
 
-                                     /**
-                                      * Return the value of the function
-                                      * at the given point.
-                                      */
-    virtual value_type value (const Point<dim> &p) const;
+  /**
+   * Return the value of the function
+   * at the given point.
+   */
+  virtual value_type value (const Point<dim> &p) const;
 
-                                     /**
-                                      * Set <tt>values</tt> to the point
-                                      * values of the function at the
-                                      * <tt>points</tt>.  It is assumed
-                                      * that <tt>values</tt> already has
-                                      * the right size, i.e.  the same
-                                      * size as the <tt>points</tt> array.
-                                      */
-    virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<value_type> &values) const;
+  /**
+   * Set <tt>values</tt> to the point
+   * values of the function at the
+   * <tt>points</tt>.  It is assumed
+   * that <tt>values</tt> already has
+   * the right size, i.e.  the same
+   * size as the <tt>points</tt> array.
+   */
+  virtual void value_list (const std::vector<Point<dim> > &points,
+                           std::vector<value_type> &values) const;
 
-                                     /**
-                                      * Return the gradient of the
-                                      * function at the given point.
-                                      */
-    virtual gradient_type gradient (const Point<dim> &p) const;
+  /**
+   * Return the gradient of the
+   * function at the given point.
+   */
+  virtual gradient_type gradient (const Point<dim> &p) const;
 
-                                     /**
-                                      * Set <tt>gradients</tt> to the
-                                      * gradients of the function at
-                                      * the <tt>points</tt>.  It is assumed
-                                      * that <tt>values</tt> already has
-                                      * the right size, i.e.  the same
-                                      * size as the <tt>points</tt> array.
-                                      */
-    virtual void gradient_list (const std::vector<Point<dim> >   &points,
-                                std::vector<gradient_type> &gradients) const;
+  /**
+   * Set <tt>gradients</tt> to the
+   * gradients of the function at
+   * the <tt>points</tt>.  It is assumed
+   * that <tt>values</tt> already has
+   * the right size, i.e.  the same
+   * size as the <tt>points</tt> array.
+   */
+  virtual void gradient_list (const std::vector<Point<dim> >   &points,
+                              std::vector<gradient_type> &gradients) const;
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcPureFunctionCalled);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException2 (ExcVectorHasWrongSize,
-                    int, int,
-                    << "The vector has size " << arg1 << " but should have "
-                    << arg2 << " elements.");
+  /**
+   * Exception
+   */
+  DeclException0 (ExcPureFunctionCalled);
+  /**
+   * Exception
+   */
+  DeclException2 (ExcVectorHasWrongSize,
+                  int, int,
+                  << "The vector has size " << arg1 << " but should have "
+                  << arg2 << " elements.");
 
 };
 

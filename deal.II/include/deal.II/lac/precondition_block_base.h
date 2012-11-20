@@ -50,301 +50,301 @@ template <typename number> class Vector;
 template <typename number>
 class PreconditionBlockBase
 {
-  public:
-                                     /**
-                                      * Choose a method for inverting
-                                      * the blocks, and thus the data
-                                      * type for the inverses.
-                                      */
-    enum Inversion
-    {
-                                           /**
-                                            * Use the standard
-                                            * Gauss-Jacobi method
-                                            * implemented in FullMatrix::inverse().
-                                            */
-          gauss_jordan,
-                                           /**
-                                            * Use QR decomposition of
-                                            * the Householder class.
-                                            */
-          householder,
-                                           /**
-                                            * Use the singular value
-                                            * decomposition of LAPACKFullMatrix.
-                                            */
-          svd
-    };
+public:
+  /**
+   * Choose a method for inverting
+   * the blocks, and thus the data
+   * type for the inverses.
+   */
+  enum Inversion
+  {
+    /**
+     * Use the standard
+     * Gauss-Jacobi method
+     * implemented in FullMatrix::inverse().
+     */
+    gauss_jordan,
+    /**
+     * Use QR decomposition of
+     * the Householder class.
+     */
+    householder,
+    /**
+     * Use the singular value
+     * decomposition of LAPACKFullMatrix.
+     */
+    svd
+  };
 
-                                     /**
-                                      * Constructor initializing
-                                      * default values.
-                                      */
-    PreconditionBlockBase(bool store_diagonals = false,
-                          Inversion method = gauss_jordan);
+  /**
+   * Constructor initializing
+   * default values.
+   */
+  PreconditionBlockBase(bool store_diagonals = false,
+                        Inversion method = gauss_jordan);
 
-                                     /**
-                                      * The virtual destructor
-                                      */
-    ~PreconditionBlockBase();
+  /**
+   * The virtual destructor
+   */
+  ~PreconditionBlockBase();
 
-                                     /**
-                                      * Deletes the inverse diagonal
-                                      * block matrices if existent hence
-                                      * leaves the class in the state
-                                      * that it had directly after
-                                      * calling the constructor.
-                                      */
-    void clear();
+  /**
+   * Deletes the inverse diagonal
+   * block matrices if existent hence
+   * leaves the class in the state
+   * that it had directly after
+   * calling the constructor.
+   */
+  void clear();
 
-                                     /**
-                                      * Resize to this number of
-                                      * diagonal blocks with the given
-                                      * block size. If
-                                      * <tt>compress</tt> is true,
-                                      * then only one block will be
-                                      * stored.
-                                      */
-    void reinit(unsigned int nblocks, unsigned int blocksize, bool compress,
-                Inversion method = gauss_jordan);
+  /**
+   * Resize to this number of
+   * diagonal blocks with the given
+   * block size. If
+   * <tt>compress</tt> is true,
+   * then only one block will be
+   * stored.
+   */
+  void reinit(unsigned int nblocks, unsigned int blocksize, bool compress,
+              Inversion method = gauss_jordan);
 
-                                     /**
-                                      * Tell the class that inverses
-                                      * are computed.
-                                      */
-    void inverses_computed(bool are_they);
+  /**
+   * Tell the class that inverses
+   * are computed.
+   */
+  void inverses_computed(bool are_they);
 
-                                     /**
-                                      * Use only the inverse of the
-                                      * first diagonal block to save
-                                      * memory and computation time.
-                                      *
-                                      * Possible applications:
-                                      * computing on a cartesian grid,
-                                      * all diagonal blocks are the
-                                      * same or all diagonal blocks
-                                      * are at least similar and
-                                      * inversion of one of them still
-                                      * yields a preconditioner.
-                                      */
-    void set_same_diagonal ();
+  /**
+   * Use only the inverse of the
+   * first diagonal block to save
+   * memory and computation time.
+   *
+   * Possible applications:
+   * computing on a cartesian grid,
+   * all diagonal blocks are the
+   * same or all diagonal blocks
+   * are at least similar and
+   * inversion of one of them still
+   * yields a preconditioner.
+   */
+  void set_same_diagonal ();
 
-                                     /**
-                                      * Does the matrix use only one
-                                      * diagonal block?
-                                      */
-    bool same_diagonal () const;
+  /**
+   * Does the matrix use only one
+   * diagonal block?
+   */
+  bool same_diagonal () const;
 
-                                     /**
-                                      * Check, whether diagonal blocks
-                                      * (not their inverses)
-                                      * should be stored.
-                                      */
-    bool store_diagonals() const;
+  /**
+   * Check, whether diagonal blocks
+   * (not their inverses)
+   * should be stored.
+   */
+  bool store_diagonals() const;
 
-                                     /**
-                                      * Return true, if inverses are
-                                      * ready for use.
-                                      */
-    bool inverses_ready () const;
+  /**
+   * Return true, if inverses are
+   * ready for use.
+   */
+  bool inverses_ready () const;
 
-                                     /**
-                                      * Checks whether the object is empty.
-                                      */
-    bool empty () const;
+  /**
+   * Checks whether the object is empty.
+   */
+  bool empty () const;
 
-                                     /**
-                                      * The number of blocks.
-                                      */
-    unsigned int size() const;
+  /**
+   * The number of blocks.
+   */
+  unsigned int size() const;
 
-                                     /**
-                                      * Read-only access to entries.
-                                      * This function is only possible
-                                      * if the inverse diagonal blocks
-                                      * are stored.
-                                      */
-    number el(unsigned int i, unsigned int j) const;
+  /**
+   * Read-only access to entries.
+   * This function is only possible
+   * if the inverse diagonal blocks
+   * are stored.
+   */
+  number el(unsigned int i, unsigned int j) const;
 
-                                     /**
-                                      * Multiply with the inverse
-                                      * block at position <tt>i</tt>.
-                                      */
-    template <typename number2>
-    void inverse_vmult(unsigned int i, Vector<number2>& dst, const Vector<number2>& src) const;
+  /**
+   * Multiply with the inverse
+   * block at position <tt>i</tt>.
+   */
+  template <typename number2>
+  void inverse_vmult(unsigned int i, Vector<number2> &dst, const Vector<number2> &src) const;
 
-                                     /**
-                                      * Multiply with the transposed inverse
-                                      * block at position <tt>i</tt>.
-                                      */
-    template <typename number2>
-    void inverse_Tvmult(unsigned int i, Vector<number2>& dst, const Vector<number2>& src) const;
+  /**
+   * Multiply with the transposed inverse
+   * block at position <tt>i</tt>.
+   */
+  template <typename number2>
+  void inverse_Tvmult(unsigned int i, Vector<number2> &dst, const Vector<number2> &src) const;
 
-                                     /**
-                                      * Access to the inverse diagonal
-                                      * blocks if Inversion is #gauss_jordan.
-                                      */
-    FullMatrix<number>& inverse (unsigned int i);
+  /**
+   * Access to the inverse diagonal
+   * blocks if Inversion is #gauss_jordan.
+   */
+  FullMatrix<number> &inverse (unsigned int i);
 
-                                     /**
-                                      * Access to the inverse diagonal
-                                      * blocks if Inversion is #householder.
-                                      */
-    Householder<number>& inverse_householder (unsigned int i);
+  /**
+   * Access to the inverse diagonal
+   * blocks if Inversion is #householder.
+   */
+  Householder<number> &inverse_householder (unsigned int i);
 
-                                     /**
-                                      * Access to the inverse diagonal
-                                      * blocks if Inversion is #householder.
-                                      */
-    LAPACKFullMatrix<number>& inverse_svd (unsigned int i);
+  /**
+   * Access to the inverse diagonal
+   * blocks if Inversion is #householder.
+   */
+  LAPACKFullMatrix<number> &inverse_svd (unsigned int i);
 
-                                     /**
-                                      * Access to the inverse diagonal
-                                      * blocks.
-                                      */
-    const FullMatrix<number>& inverse (unsigned int i) const;
+  /**
+   * Access to the inverse diagonal
+   * blocks.
+   */
+  const FullMatrix<number> &inverse (unsigned int i) const;
 
-                                     /**
-                                      * Access to the inverse diagonal
-                                      * blocks if Inversion is #householder.
-                                      */
-    const Householder<number>& inverse_householder (unsigned int i) const;
+  /**
+   * Access to the inverse diagonal
+   * blocks if Inversion is #householder.
+   */
+  const Householder<number> &inverse_householder (unsigned int i) const;
 
-                                     /**
-                                      * Access to the inverse diagonal
-                                      * blocks if Inversion is #householder.
-                                      */
-    const LAPACKFullMatrix<number>& inverse_svd (unsigned int i) const;
+  /**
+   * Access to the inverse diagonal
+   * blocks if Inversion is #householder.
+   */
+  const LAPACKFullMatrix<number> &inverse_svd (unsigned int i) const;
 
-                                     /**
-                                      * Access to the diagonal
-                                      * blocks.
-                                      */
-    FullMatrix<number>& diagonal (unsigned int i);
+  /**
+   * Access to the diagonal
+   * blocks.
+   */
+  FullMatrix<number> &diagonal (unsigned int i);
 
-                                     /**
-                                      * Access to the diagonal
-                                      * blocks.
-                                      */
-    const FullMatrix<number>& diagonal (unsigned int i) const;
+  /**
+   * Access to the diagonal
+   * blocks.
+   */
+  const FullMatrix<number> &diagonal (unsigned int i) const;
 
-				     /**
-				      * Print some statistics about
-				      * the inverses to @p deallog. Output depends
-				      * on #Inversion. It is richest
-				      * for svd, where we obtain
-				      * statistics on extremal
-				      * singular values and condition
-				      * numbers.
-				      */
-    void log_statistics () const;
+  /**
+   * Print some statistics about
+   * the inverses to @p deallog. Output depends
+   * on #Inversion. It is richest
+   * for svd, where we obtain
+   * statistics on extremal
+   * singular values and condition
+   * numbers.
+   */
+  void log_statistics () const;
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    std::size_t memory_consumption () const;
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  std::size_t memory_consumption () const;
 
-                                     /**
-                                      * You are trying to access a
-                                      * diagonal block (not its
-                                      * inverse), but you decided not
-                                      * to store the diagonal blocks.
-                                      */
-    DeclException0 (ExcDiagonalsNotStored);
+  /**
+   * You are trying to access a
+   * diagonal block (not its
+   * inverse), but you decided not
+   * to store the diagonal blocks.
+   */
+  DeclException0 (ExcDiagonalsNotStored);
 
-                                     /**
-                                      * You are accessing a diagonal
-                                      * block, assuming that it has a certain
-                                      * type. But, the method used for
-                                      * inverting the diagonal blocks
-                                      * does not use this type
-                                      */
-    DeclException0 (ExcInverseNotAvailable);
+  /**
+   * You are accessing a diagonal
+   * block, assuming that it has a certain
+   * type. But, the method used for
+   * inverting the diagonal blocks
+   * does not use this type
+   */
+  DeclException0 (ExcInverseNotAvailable);
 
-  protected:
-                                     /**
-                                      * The method used for inverting blocks.
-                                      */
-    Inversion inversion;
+protected:
+  /**
+   * The method used for inverting blocks.
+   */
+  Inversion inversion;
 
-  private:
-                                     /**
-                                      * The number of (inverse)
-                                      * diagonal blocks, if only one
-                                      * is stored.
-                                      */
-    unsigned int n_diagonal_blocks;
+private:
+  /**
+   * The number of (inverse)
+   * diagonal blocks, if only one
+   * is stored.
+   */
+  unsigned int n_diagonal_blocks;
 
-                                     /**
-                                      * Storage of the inverse
-                                      * matrices of the diagonal
-                                      * blocks matrices as
-                                      * <tt>FullMatrix<number></tt>
-                                      * matrices, if Inversion
-                                      * #gauss_jordan is used. Using
-                                      * <tt>number=float</tt> saves
-                                      * memory in comparison with
-                                      * <tt>number=double</tt>, but
-                                      * may introduce numerical instability.
-                                      */
-    std::vector<FullMatrix<number> > var_inverse_full;
+  /**
+   * Storage of the inverse
+   * matrices of the diagonal
+   * blocks matrices as
+   * <tt>FullMatrix<number></tt>
+   * matrices, if Inversion
+   * #gauss_jordan is used. Using
+   * <tt>number=float</tt> saves
+   * memory in comparison with
+   * <tt>number=double</tt>, but
+   * may introduce numerical instability.
+   */
+  std::vector<FullMatrix<number> > var_inverse_full;
 
-                                     /**
-                                      * Storage of the inverse
-                                      * matrices of the diagonal
-                                      * blocks matrices as
-                                      * <tt>Householder</tt>
-                                      * matrices if Inversion
-                                      * #householder is used. Using
-                                      * <tt>number=float</tt> saves
-                                      * memory in comparison with
-                                      * <tt>number=double</tt>, but
-                                      * may introduce numerical instability.
-                                      */
-    std::vector<Householder<number> > var_inverse_householder;
+  /**
+   * Storage of the inverse
+   * matrices of the diagonal
+   * blocks matrices as
+   * <tt>Householder</tt>
+   * matrices if Inversion
+   * #householder is used. Using
+   * <tt>number=float</tt> saves
+   * memory in comparison with
+   * <tt>number=double</tt>, but
+   * may introduce numerical instability.
+   */
+  std::vector<Householder<number> > var_inverse_householder;
 
-                                     /**
-                                      * Storage of the inverse
-                                      * matrices of the diagonal
-                                      * blocks matrices as
-                                      * <tt>LAPACKFullMatrix</tt>
-                                      * matrices if Inversion
-                                      * #svd is used. Using
-                                      * <tt>number=float</tt> saves
-                                      * memory in comparison with
-                                      * <tt>number=double</tt>, but
-                                      * may introduce numerical instability.
-                                      */
-    std::vector<LAPACKFullMatrix<number> > var_inverse_svd;
+  /**
+   * Storage of the inverse
+   * matrices of the diagonal
+   * blocks matrices as
+   * <tt>LAPACKFullMatrix</tt>
+   * matrices if Inversion
+   * #svd is used. Using
+   * <tt>number=float</tt> saves
+   * memory in comparison with
+   * <tt>number=double</tt>, but
+   * may introduce numerical instability.
+   */
+  std::vector<LAPACKFullMatrix<number> > var_inverse_svd;
 
-                                     /**
-                                      * Storage of the original diagonal blocks.
-                                      *
-                                      * Used by the blocked SSOR method.
-                                      */
-    std::vector<FullMatrix<number> > var_diagonal;
+  /**
+   * Storage of the original diagonal blocks.
+   *
+   * Used by the blocked SSOR method.
+   */
+  std::vector<FullMatrix<number> > var_diagonal;
 
 
-                                     /**
-                                      * This is true, if the field
-                                      * #var_diagonal is to be used.
-                                      */
-    bool var_store_diagonals;
+  /**
+   * This is true, if the field
+   * #var_diagonal is to be used.
+   */
+  bool var_store_diagonals;
 
-                                     /**
-                                      * This is true, if only one
-                                      * inverse is stored.
-                                      */
-    bool var_same_diagonal;
+  /**
+   * This is true, if only one
+   * inverse is stored.
+   */
+  bool var_same_diagonal;
 
-                                     /**
-                                      * The inverse matrices are
-                                      * usable. Set by the parent
-                                      * class via inverses_computed().
-                                      */
-    bool var_inverses_ready;
+  /**
+   * The inverse matrices are
+   * usable. Set by the parent
+   * class via inverses_computed().
+   */
+  bool var_inverses_ready;
 };
 
 //----------------------------------------------------------------------//
@@ -353,12 +353,12 @@ template <typename number>
 inline
 PreconditionBlockBase<number>::PreconditionBlockBase(
   bool store, Inversion method)
-                :
-                inversion(method),
-                n_diagonal_blocks(0),
-                var_store_diagonals(store),
-                var_same_diagonal(false),
-                var_inverses_ready(false)
+  :
+  inversion(method),
+  n_diagonal_blocks(0),
+  var_store_diagonals(store),
+  var_same_diagonal(false),
+  var_inverses_ready(false)
 {}
 
 
@@ -384,7 +384,7 @@ template <typename number>
 inline
 void
 PreconditionBlockBase<number>::reinit(unsigned int n, unsigned int b, bool compress,
-Inversion method)
+                                      Inversion method)
 {
   inversion = method;
   var_same_diagonal = compress;
@@ -393,21 +393,21 @@ Inversion method)
 
   if (compress)
     {
-      switch(inversion)
+      switch (inversion)
         {
-          case gauss_jordan:
-                var_inverse_full.resize(1);
-                var_inverse_full[0].reinit(b,b);
-                break;
-          case householder:
-                var_inverse_householder.resize(1);
-                break;
-          case svd:
-                var_inverse_svd.resize(1);
-                var_inverse_svd[0].reinit(b,b);
-                break;
-          default:
-                Assert(false, ExcNotImplemented());
+        case gauss_jordan:
+          var_inverse_full.resize(1);
+          var_inverse_full[0].reinit(b,b);
+          break;
+        case householder:
+          var_inverse_householder.resize(1);
+          break;
+        case svd:
+          var_inverse_svd.resize(1);
+          var_inverse_svd[0].reinit(b,b);
+          break;
+        default:
+          Assert(false, ExcNotImplemented());
         }
 
       if (store_diagonals())
@@ -418,42 +418,42 @@ Inversion method)
     }
   else
     {
-                                       // set the arrays to the right
-                                       // size. we could do it like this:
-                                       // var_inverse = vector<>(nblocks,FullMatrix<>())
-                                       // but this would involve copying many
-                                       // FullMatrix objects.
-                                       //
-                                       // the following is a neat trick which
-                                       // avoids copying
+      // set the arrays to the right
+      // size. we could do it like this:
+      // var_inverse = vector<>(nblocks,FullMatrix<>())
+      // but this would involve copying many
+      // FullMatrix objects.
+      //
+      // the following is a neat trick which
+      // avoids copying
       if (store_diagonals())
         {
           std::vector<FullMatrix<number> >
-            tmp(n, FullMatrix<number>(b));
+          tmp(n, FullMatrix<number>(b));
           var_diagonal.swap (tmp);
         }
 
-      switch(inversion)
+      switch (inversion)
         {
-          case gauss_jordan:
-          {
-            std::vector<FullMatrix<number> >
-              tmp(n, FullMatrix<number>(b));
-            var_inverse_full.swap (tmp);
-            break;
-          }
-          case householder:
-                var_inverse_householder.resize(n);
-                break;
-          case svd:
-          {
-            std::vector<LAPACKFullMatrix<number> >
-              tmp(n, LAPACKFullMatrix<number>(b));
-            var_inverse_svd.swap (tmp);
-            break;
-          }
-          default:
-                Assert(false, ExcNotImplemented());
+        case gauss_jordan:
+        {
+          std::vector<FullMatrix<number> >
+          tmp(n, FullMatrix<number>(b));
+          var_inverse_full.swap (tmp);
+          break;
+        }
+        case householder:
+          var_inverse_householder.resize(n);
+          break;
+        case svd:
+        {
+          std::vector<LAPACKFullMatrix<number> >
+          tmp(n, LAPACKFullMatrix<number>(b));
+          var_inverse_svd.swap (tmp);
+          break;
+        }
+        default:
+          Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -472,26 +472,26 @@ template <typename number2>
 inline
 void
 PreconditionBlockBase<number>::inverse_vmult(
-  unsigned int i, Vector<number2>& dst, const Vector<number2>& src) const
+  unsigned int i, Vector<number2> &dst, const Vector<number2> &src) const
 {
   const unsigned int ii = same_diagonal() ? 0U : i;
 
   switch (inversion)
     {
-      case gauss_jordan:
-            AssertIndexRange (ii, var_inverse_full.size());
-            var_inverse_full[ii].vmult(dst, src);
-            break;
-      case householder:
-            AssertIndexRange (ii, var_inverse_householder.size());
-            var_inverse_householder[ii].vmult(dst, src);
-            break;
-      case svd:
-            AssertIndexRange (ii, var_inverse_svd.size());
-            var_inverse_svd[ii].vmult(dst, src);
-            break;
-      default:
-            Assert(false, ExcNotImplemented());
+    case gauss_jordan:
+      AssertIndexRange (ii, var_inverse_full.size());
+      var_inverse_full[ii].vmult(dst, src);
+      break;
+    case householder:
+      AssertIndexRange (ii, var_inverse_householder.size());
+      var_inverse_householder[ii].vmult(dst, src);
+      break;
+    case svd:
+      AssertIndexRange (ii, var_inverse_svd.size());
+      var_inverse_svd[ii].vmult(dst, src);
+      break;
+    default:
+      Assert(false, ExcNotImplemented());
     }
 }
 
@@ -501,33 +501,33 @@ template <typename number2>
 inline
 void
 PreconditionBlockBase<number>::inverse_Tvmult(
-  unsigned int i, Vector<number2>& dst, const Vector<number2>& src) const
+  unsigned int i, Vector<number2> &dst, const Vector<number2> &src) const
 {
   const unsigned int ii = same_diagonal() ? 0U : i;
 
   switch (inversion)
     {
-      case gauss_jordan:
-            AssertIndexRange (ii, var_inverse_full.size());
-            var_inverse_full[ii].Tvmult(dst, src);
-            break;
-      case householder:
-            AssertIndexRange (ii, var_inverse_householder.size());
-            var_inverse_householder[ii].Tvmult(dst, src);
-            break;
-      case svd:
-            AssertIndexRange (ii, var_inverse_svd.size());
-            var_inverse_svd[ii].Tvmult(dst, src);
-            break;
-      default:
-            Assert(false, ExcNotImplemented());
+    case gauss_jordan:
+      AssertIndexRange (ii, var_inverse_full.size());
+      var_inverse_full[ii].Tvmult(dst, src);
+      break;
+    case householder:
+      AssertIndexRange (ii, var_inverse_householder.size());
+      var_inverse_householder[ii].Tvmult(dst, src);
+      break;
+    case svd:
+      AssertIndexRange (ii, var_inverse_svd.size());
+      var_inverse_svd[ii].Tvmult(dst, src);
+      break;
+    default:
+      Assert(false, ExcNotImplemented());
     }
 }
 
 
 template <typename number>
 inline
-const FullMatrix<number>&
+const FullMatrix<number> &
 PreconditionBlockBase<number>::inverse(unsigned int i) const
 {
   if (same_diagonal())
@@ -540,7 +540,7 @@ PreconditionBlockBase<number>::inverse(unsigned int i) const
 
 template <typename number>
 inline
-const Householder<number>&
+const Householder<number> &
 PreconditionBlockBase<number>::inverse_householder(unsigned int i) const
 {
   if (same_diagonal())
@@ -553,7 +553,7 @@ PreconditionBlockBase<number>::inverse_householder(unsigned int i) const
 
 template <typename number>
 inline
-const LAPACKFullMatrix<number>&
+const LAPACKFullMatrix<number> &
 PreconditionBlockBase<number>::inverse_svd(unsigned int i) const
 {
   if (same_diagonal())
@@ -566,7 +566,7 @@ PreconditionBlockBase<number>::inverse_svd(unsigned int i) const
 
 template <typename number>
 inline
-const FullMatrix<number>&
+const FullMatrix<number> &
 PreconditionBlockBase<number>::diagonal(unsigned int i) const
 {
   Assert(store_diagonals(), ExcDiagonalsNotStored());
@@ -581,7 +581,7 @@ PreconditionBlockBase<number>::diagonal(unsigned int i) const
 
 template <typename number>
 inline
-FullMatrix<number>&
+FullMatrix<number> &
 PreconditionBlockBase<number>::inverse(unsigned int i)
 {
   Assert(var_inverse_full.size() != 0, ExcInverseNotAvailable());
@@ -596,7 +596,7 @@ PreconditionBlockBase<number>::inverse(unsigned int i)
 
 template <typename number>
 inline
-Householder<number>&
+Householder<number> &
 PreconditionBlockBase<number>::inverse_householder(unsigned int i)
 {
   Assert(var_inverse_householder.size() != 0, ExcInverseNotAvailable());
@@ -611,7 +611,7 @@ PreconditionBlockBase<number>::inverse_householder(unsigned int i)
 
 template <typename number>
 inline
-LAPACKFullMatrix<number>&
+LAPACKFullMatrix<number> &
 PreconditionBlockBase<number>::inverse_svd(unsigned int i)
 {
   Assert(var_inverse_svd.size() != 0, ExcInverseNotAvailable());
@@ -626,7 +626,7 @@ PreconditionBlockBase<number>::inverse_svd(unsigned int i)
 
 template <typename number>
 inline
-FullMatrix<number>&
+FullMatrix<number> &
 PreconditionBlockBase<number>::diagonal(unsigned int i)
 {
   Assert(store_diagonals(), ExcDiagonalsNotStored());
@@ -683,26 +683,26 @@ PreconditionBlockBase<number>::log_statistics () const
       double sigmin = 1.e300, sigmax= -1.e300;
       double kappamin = 1.e300, kappamax= -1.e300;
 
-      for (unsigned int b=0;b<size();++b)
-	{
-	  const LAPACKFullMatrix<number>& matrix = inverse_svd(b);
-	  unsigned int k=1;
-	  while (k <= matrix.n_cols() && matrix.singular_value(matrix.n_cols()-k) == 0)
-	    ++k;
-	  const double s0 = matrix.singular_value(0);
-	  const double sm = matrix.singular_value(matrix.n_cols()-k);
-	  const double co = sm/s0;
+      for (unsigned int b=0; b<size(); ++b)
+        {
+          const LAPACKFullMatrix<number> &matrix = inverse_svd(b);
+          unsigned int k=1;
+          while (k <= matrix.n_cols() && matrix.singular_value(matrix.n_cols()-k) == 0)
+            ++k;
+          const double s0 = matrix.singular_value(0);
+          const double sm = matrix.singular_value(matrix.n_cols()-k);
+          const double co = sm/s0;
 
-	  if (kermin > k) kermin = k-1;
-	  if (kermax < k) kermax = k-1;
-	  if (s0 < sigmin) sigmin = s0;
-	  if (sm > sigmax) sigmax = sm;
-	  if (co < kappamin) kappamin = co;
-	  if (co > kappamax) kappamax = co;
-	}
+          if (kermin > k) kermin = k-1;
+          if (kermax < k) kermax = k-1;
+          if (s0 < sigmin) sigmin = s0;
+          if (sm > sigmax) sigmax = sm;
+          if (co < kappamin) kappamin = co;
+          if (co > kappamax) kappamax = co;
+        }
       deallog << "dim ker [" << kermin << ':' << kermax
-	      << "] sigma [" << sigmin << ':' << sigmax
-	      << "] kappa [" << kappamin << ':' << kappamax << ']' << std::endl;
+              << "] sigma [" << sigmin << ':' << sigmax
+              << "] kappa [" << kappamin << ':' << kappamax << ']' << std::endl;
 
     }
   else if (inversion == householder)

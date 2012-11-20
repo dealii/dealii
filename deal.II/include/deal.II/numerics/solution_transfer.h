@@ -199,274 +199,276 @@ DEAL_II_NAMESPACE_OPEN
 template<int dim, typename VECTOR=Vector<double>, class DH=DoFHandler<dim> >
 class SolutionTransfer
 {
-  public:
+public:
 
-                                     /**
-                                      * Constructor, takes the current DoFHandler
-                                      * as argument.
-                                      */
-    SolutionTransfer(const DH &dof);
+  /**
+   * Constructor, takes the current DoFHandler
+   * as argument.
+   */
+  SolutionTransfer(const DH &dof);
 
-                                     /**
-                                      * Destructor
-                                      */
-    ~SolutionTransfer();
+  /**
+   * Destructor
+   */
+  ~SolutionTransfer();
 
-                                     /**
-                                      * Reinit this class to the state that
-                                      * it has
-                                      * directly after calling the Constructor
-                                      */
-    void clear();
+  /**
+   * Reinit this class to the state that
+   * it has
+   * directly after calling the Constructor
+   */
+  void clear();
 
-                                     /**
-                                      * Prepares the @p SolutionTransfer for
-                                      * pure refinement. It
-                                      * stores the dof indices of each cell.
-                                      * After calling this function
-                                      * only calling the @p refine_interpolate
-                                      * functions is allowed.
-                                      */
-    void prepare_for_pure_refinement();
+  /**
+   * Prepares the @p SolutionTransfer for
+   * pure refinement. It
+   * stores the dof indices of each cell.
+   * After calling this function
+   * only calling the @p refine_interpolate
+   * functions is allowed.
+   */
+  void prepare_for_pure_refinement();
 
-                                     /**
-                                      * Prepares the @p SolutionTransfer for
-                                      * coarsening and refinement. It
-                                      * stores the dof indices of each cell and
-                                      * stores the dof values of the vectors in
-                                      * @p all_in in each cell that'll be coarsened.
-                                      * @p all_in includes all vectors
-                                      * that are to be interpolated
-                                      * onto the new (refined and/or
-                                      * coarsenend) grid.
-                                      */
-    void prepare_for_coarsening_and_refinement (const std::vector<VECTOR> &all_in);
+  /**
+   * Prepares the @p SolutionTransfer for
+   * coarsening and refinement. It
+   * stores the dof indices of each cell and
+   * stores the dof values of the vectors in
+   * @p all_in in each cell that'll be coarsened.
+   * @p all_in includes all vectors
+   * that are to be interpolated
+   * onto the new (refined and/or
+   * coarsenend) grid.
+   */
+  void prepare_for_coarsening_and_refinement (const std::vector<VECTOR> &all_in);
 
-                                     /**
-                                      * Same as previous function
-                                      * but for only one discrete function
-                                      * to be interpolated.
-                                      */
-    void prepare_for_coarsening_and_refinement (const VECTOR &in);
+  /**
+   * Same as previous function
+   * but for only one discrete function
+   * to be interpolated.
+   */
+  void prepare_for_coarsening_and_refinement (const VECTOR &in);
 
-                                     /**
-                                      * This function
-                                      * interpolates the discrete function @p in,
-                                      * which is a vector on the grid before the
-                                      * refinement, to the function @p out
-                                      * which then is a vector on the refined grid.
-                                      * It assumes the vectors having the
-                                      * right sizes (i.e. <tt>in.size()==n_dofs_old</tt>,
-                                      * <tt>out.size()==n_dofs_refined</tt>)
-                                      *
-                                      * Calling this function is allowed only
-                                      * if @p prepare_for_pure_refinement is called
-                                      * and the refinement is
-                                      * executed before.
-                                      * Multiple calling of this function is
-                                      * allowed. e.g. for interpolating several
-                                      * functions.
-                                      */
-    void refine_interpolate (const VECTOR &in,
-                             VECTOR &out) const;
+  /**
+   * This function
+   * interpolates the discrete function @p in,
+   * which is a vector on the grid before the
+   * refinement, to the function @p out
+   * which then is a vector on the refined grid.
+   * It assumes the vectors having the
+   * right sizes (i.e. <tt>in.size()==n_dofs_old</tt>,
+   * <tt>out.size()==n_dofs_refined</tt>)
+   *
+   * Calling this function is allowed only
+   * if @p prepare_for_pure_refinement is called
+   * and the refinement is
+   * executed before.
+   * Multiple calling of this function is
+   * allowed. e.g. for interpolating several
+   * functions.
+   */
+  void refine_interpolate (const VECTOR &in,
+                           VECTOR &out) const;
 
-                                     /**
-                                      * This function
-                                      * interpolates the discrete functions
-                                      * that are stored in @p all_in onto
-                                      * the refined and/or coarsenend grid.
-                                      * It assumes the vectors in @p all_in
-                                      * denote the same vectors
-                                      * as in @p all_in as parameter of
-                                      * <tt>prepare_for_refinement_and_coarsening(all_in)</tt>.
-                                      * However, there is no way of verifying
-                                      * this internally, so be careful here.
-                                      *
-                                      * Calling this function is
-                                      * allowed only if first
-                                      * Triangulation::prepare_coarsening_and_refinement,
-                                      * second
-                                      * @p SolutionTransfer::prepare_for_coarsening_and_refinement,
-                                      * an then third
-                                      * Triangulation::execute_coarsening_and_refinement
-                                      * are called before. Multiple
-                                      * calling of this function is
-                                      * NOT allowed. Interpolating
-                                      * several functions can be
-                                      * performed in one step.
-                                      *
-                                      * The number of output vectors
-                                      * is assumed to be the same as
-                                      * the number of input
-                                      * vectors. Also, the sizes of
-                                      * the output vectors are assumed
-                                      * to be of the right size
-                                      * (@p n_dofs_refined). Otherwise
-                                      * an assertion will be thrown.
-                                      */
-    void interpolate (const std::vector<VECTOR>&all_in,
-                      std::vector<VECTOR>      &all_out) const;
+  /**
+   * This function
+   * interpolates the discrete functions
+   * that are stored in @p all_in onto
+   * the refined and/or coarsenend grid.
+   * It assumes the vectors in @p all_in
+   * denote the same vectors
+   * as in @p all_in as parameter of
+   * <tt>prepare_for_refinement_and_coarsening(all_in)</tt>.
+   * However, there is no way of verifying
+   * this internally, so be careful here.
+   *
+   * Calling this function is
+   * allowed only if first
+   * Triangulation::prepare_coarsening_and_refinement,
+   * second
+   * @p SolutionTransfer::prepare_for_coarsening_and_refinement,
+   * an then third
+   * Triangulation::execute_coarsening_and_refinement
+   * are called before. Multiple
+   * calling of this function is
+   * NOT allowed. Interpolating
+   * several functions can be
+   * performed in one step.
+   *
+   * The number of output vectors
+   * is assumed to be the same as
+   * the number of input
+   * vectors. Also, the sizes of
+   * the output vectors are assumed
+   * to be of the right size
+   * (@p n_dofs_refined). Otherwise
+   * an assertion will be thrown.
+   */
+  void interpolate (const std::vector<VECTOR> &all_in,
+                    std::vector<VECTOR>      &all_out) const;
 
-                                     /**
-                                      * Same as the previous function.
-                                      * It interpolates only one function.
-                                      * It assumes the vectors having the
-                                      * right sizes (i.e. <tt>in.size()==n_dofs_old</tt>,
-                                      * <tt>out.size()==n_dofs_refined</tt>)
-                                      *
-                                      * Multiple calling of this function is
-                                      * NOT allowed. Interpolating
-                                      * several functions can be performed
-                                      * in one step by using
-                                      * <tt>interpolate (all_in, all_out)</tt>
-                                      */
-    void interpolate (const VECTOR &in,
-                      VECTOR       &out) const;
+  /**
+   * Same as the previous function.
+   * It interpolates only one function.
+   * It assumes the vectors having the
+   * right sizes (i.e. <tt>in.size()==n_dofs_old</tt>,
+   * <tt>out.size()==n_dofs_refined</tt>)
+   *
+   * Multiple calling of this function is
+   * NOT allowed. Interpolating
+   * several functions can be performed
+   * in one step by using
+   * <tt>interpolate (all_in, all_out)</tt>
+   */
+  void interpolate (const VECTOR &in,
+                    VECTOR       &out) const;
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  std::size_t memory_consumption () const;
+
+  /**
+   * Exception
+   */
+  DeclException0(ExcNotPrepared);
+
+  /**
+   * Exception
+   */
+  DeclException0(ExcAlreadyPrepForRef);
+
+  /**
+   * Exception
+   */
+  DeclException0(ExcAlreadyPrepForCoarseAndRef);
+
+  /**
+   * Exception
+   */
+  DeclException0(ExcTriaPrepCoarseningNotCalledBefore);
+
+  /**
+   * Exception
+   */
+  DeclException0(ExcNoInVectorsGiven);
+
+  /**
+   * Exception
+   */
+  DeclException0(ExcVectorsDifferFromInVectors);
+
+  /**
+   * Exception
+   */
+  DeclException0(ExcNumberOfDoFsPerCellHasChanged);
+
+private:
+
+  /**
+   * Pointer to the degree of freedom handler
+   * to work with.
+   */
+  SmartPointer<const DH,SolutionTransfer<dim,VECTOR,DH> > dof_handler;
+
+  /**
+   * Stores the number of DoFs before the
+   * refinement and/or coarsening.
+   */
+  unsigned int n_dofs_old;
+
+  /**
+   * Declaration of
+   * @p PreparationState that
+   * denotes the three possible
+   * states of the
+   * @p SolutionTransfer: being
+   * prepared for 'pure
+   * refinement', prepared for
+   * 'coarsening and refinement' or
+   * not prepared.
+   */
+  enum PreparationState
+  {
+    none, pure_refinement, coarsening_and_refinement
+  };
+
+  /**
+   * Definition of the respective variable.
+   */
+  PreparationState prepared_for;
+
+
+  /**
+   * Is used for @p prepare_for_refining
+   * (of course also for
+   * @p repare_for_refining_and_coarsening)
+   * and stores all dof indices
+   * of the cells that'll be refined
+   */
+  std::vector<std::vector<unsigned int> > indices_on_cell;
+
+  /**
+   * All cell data (the dof indices and
+   * the dof values)
+   * should be accessible from each cell.
+   * As each cell has got only one
+   * @p user_pointer, multiple pointers to the
+   * data need to be packetized in a structure.
+   * Note that in our case on each cell
+   * either the
+   * <tt>vector<unsigned int> indices</tt> (if the cell
+   * will be refined) or the
+   * <tt>vector<double> dof_values</tt> (if the
+   * children of this cell will be deleted)
+   * is needed, hence one @p user_pointer should
+   * be sufficient, but to allow some error checks
+   * and to preserve the user from making
+   * user errors the @p user_pointer will be
+   * 'multiplied' by this structure.
+   */
+  struct Pointerstruct
+  {
+    Pointerstruct() : indices_ptr(0), dof_values_ptr(0), active_fe_index(0) {};
+    Pointerstruct(std::vector<unsigned int> *indices_ptr_in,
+                  const unsigned int active_fe_index_in = 0)
+      :
+      indices_ptr(indices_ptr_in),
+      dof_values_ptr (0),
+      active_fe_index(active_fe_index_in) {};
+    Pointerstruct(std::vector<Vector<typename VECTOR::value_type> > *dof_values_ptr_in,
+                  const unsigned int active_fe_index_in = 0) :
+      indices_ptr (0),
+      dof_values_ptr(dof_values_ptr_in),
+      active_fe_index(active_fe_index_in) {};
     std::size_t memory_consumption () const;
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0(ExcNotPrepared);
+    std::vector<unsigned int>    *indices_ptr;
+    std::vector<Vector<typename VECTOR::value_type> > *dof_values_ptr;
+    unsigned int active_fe_index;
+  };
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0(ExcAlreadyPrepForRef);
+  /**
+   * Map mapping from level and index of cell
+   * to the @p Pointerstructs (cf. there).
+   * This map makes it possible to keep all
+   * the information needed to transfer the
+   * solution inside this object rather than
+   * using user pointers of the Triangulation
+   * for this purpose.
+   */
+  std::map<std::pair<unsigned int, unsigned int>, Pointerstruct> cell_map;
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0(ExcAlreadyPrepForCoarseAndRef);
-
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0(ExcTriaPrepCoarseningNotCalledBefore);
-
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0(ExcNoInVectorsGiven);
-
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0(ExcVectorsDifferFromInVectors);
-
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0(ExcNumberOfDoFsPerCellHasChanged);
-
-  private:
-
-                                     /**
-                                      * Pointer to the degree of freedom handler
-                                      * to work with.
-                                      */
-    SmartPointer<const DH,SolutionTransfer<dim,VECTOR,DH> > dof_handler;
-
-                                     /**
-                                      * Stores the number of DoFs before the
-                                      * refinement and/or coarsening.
-                                      */
-    unsigned int n_dofs_old;
-
-                                     /**
-                                      * Declaration of
-                                      * @p PreparationState that
-                                      * denotes the three possible
-                                      * states of the
-                                      * @p SolutionTransfer: being
-                                      * prepared for 'pure
-                                      * refinement', prepared for
-                                      * 'coarsening and refinement' or
-                                      * not prepared.
-                                      */
-    enum PreparationState {
-          none, pure_refinement, coarsening_and_refinement
-    };
-
-                                     /**
-                                      * Definition of the respective variable.
-                                      */
-    PreparationState prepared_for;
-
-
-                                     /**
-                                      * Is used for @p prepare_for_refining
-                                      * (of course also for
-                                      * @p repare_for_refining_and_coarsening)
-                                      * and stores all dof indices
-                                      * of the cells that'll be refined
-                                      */
-    std::vector<std::vector<unsigned int> > indices_on_cell;
-
-                                     /**
-                                      * All cell data (the dof indices and
-                                      * the dof values)
-                                      * should be accessible from each cell.
-                                      * As each cell has got only one
-                                      * @p user_pointer, multiple pointers to the
-                                      * data need to be packetized in a structure.
-                                      * Note that in our case on each cell
-                                      * either the
-                                      * <tt>vector<unsigned int> indices</tt> (if the cell
-                                      * will be refined) or the
-                                      * <tt>vector<double> dof_values</tt> (if the
-                                      * children of this cell will be deleted)
-                                      * is needed, hence one @p user_pointer should
-                                      * be sufficient, but to allow some error checks
-                                      * and to preserve the user from making
-                                      * user errors the @p user_pointer will be
-                                      * 'multiplied' by this structure.
-                                      */
-    struct Pointerstruct {
-      Pointerstruct() : indices_ptr(0), dof_values_ptr(0), active_fe_index(0) {};
-      Pointerstruct(std::vector<unsigned int> *indices_ptr_in,
-                    const unsigned int active_fe_index_in = 0)
-        :
-        indices_ptr(indices_ptr_in),
-        dof_values_ptr (0),
-        active_fe_index(active_fe_index_in) {};
-      Pointerstruct(std::vector<Vector<typename VECTOR::value_type> > *dof_values_ptr_in,
-                    const unsigned int active_fe_index_in = 0) :
-        indices_ptr (0),
-        dof_values_ptr(dof_values_ptr_in),
-        active_fe_index(active_fe_index_in) {};
-        std::size_t memory_consumption () const;
-
-        std::vector<unsigned int>    *indices_ptr;
-        std::vector<Vector<typename VECTOR::value_type> > *dof_values_ptr;
-        unsigned int active_fe_index;
-    };
-
-                                     /**
-                                      * Map mapping from level and index of cell
-                                      * to the @p Pointerstructs (cf. there).
-                                      * This map makes it possible to keep all
-                                      * the information needed to transfer the
-                                      * solution inside this object rather than
-                                      * using user pointers of the Triangulation
-                                      * for this purpose.
-                                      */
-    std::map<std::pair<unsigned int, unsigned int>, Pointerstruct> cell_map;
-
-                                     /**
-                                      * Is used for
-                                      * @p prepare_for_refining_and_coarsening
-                                      * The interpolated dof values
-                                      * of all cells that'll be coarsened
-                                      * will be stored in this vector.
-                                      */
-    std::vector<std::vector<Vector<typename VECTOR::value_type> > > dof_values_on_cell;
+  /**
+   * Is used for
+   * @p prepare_for_refining_and_coarsening
+   * The interpolated dof values
+   * of all cells that'll be coarsened
+   * will be stored in this vector.
+   */
+  std::vector<std::vector<Vector<typename VECTOR::value_type> > > dof_values_on_cell;
 };
 
 

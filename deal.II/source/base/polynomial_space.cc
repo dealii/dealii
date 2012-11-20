@@ -56,10 +56,10 @@ compute_index (const unsigned int i,
   Assert(i<index_map.size(),
          ExcIndexRange(i,0,index_map.size()));
   const unsigned int n=index_map[i];
-                                   // there should be a better way to
-                                   // write this function (not
-                                   // linear in n_1d), someone
-                                   // should think about this...
+  // there should be a better way to
+  // write this function (not
+  // linear in n_1d), someone
+  // should think about this...
   const unsigned int n_1d=polynomials.size();
   unsigned int k=0;
   for (unsigned int iy=0; iy<n_1d; ++iy)
@@ -84,13 +84,13 @@ compute_index (const unsigned int i,
   Assert(i<index_map.size(),
          ExcIndexRange(i,0,index_map.size()));
   const unsigned int n=index_map[i];
-                                   // there should be a better way to
-                                   // write this function (not
-                                   // quadratic in n_1d), someone
-                                   // should think about this...
-                                   //
-                                   // (ah, and yes: the original
-                                   // algorithm was even cubic!)
+  // there should be a better way to
+  // write this function (not
+  // quadratic in n_1d), someone
+  // should think about this...
+  //
+  // (ah, and yes: the original
+  // algorithm was even cubic!)
   const unsigned int n_1d=polynomials.size();
   unsigned int k=0;
   for (unsigned int iz=0; iz<n_1d; ++iz)
@@ -125,13 +125,13 @@ PolynomialSpace<dim>::set_numbering(
 template <int dim>
 double
 PolynomialSpace<dim>::compute_value (const unsigned int i,
-                                     const Point<dim>  &p) const
+                                     const Point<dim> &p) const
 {
   unsigned int ix[dim];
   compute_index(i,ix);
-                                   // take the product of the
-                                   // polynomials in the various space
-                                   // directions
+  // take the product of the
+  // polynomials in the various space
+  // directions
   double result = 1.;
   for (unsigned int d=0; d<dim; ++d)
     result *= polynomials[ix[d]].value(p(d));
@@ -143,7 +143,7 @@ PolynomialSpace<dim>::compute_value (const unsigned int i,
 template <int dim>
 Tensor<1,dim>
 PolynomialSpace<dim>::compute_grad (const unsigned int i,
-                                    const Point<dim>  &p) const
+                                    const Point<dim> &p) const
 {
   unsigned int ix[dim];
   compute_index(i,ix);
@@ -152,7 +152,7 @@ PolynomialSpace<dim>::compute_grad (const unsigned int i,
   for (unsigned int d=0; d<dim; ++d)
     result[d] = 1.;
 
-                                   // get value and first derivative
+  // get value and first derivative
   std::vector<double> v(2);
   for (unsigned int d=0; d<dim; ++d)
     {
@@ -169,7 +169,7 @@ PolynomialSpace<dim>::compute_grad (const unsigned int i,
 template <int dim>
 Tensor<2,dim>
 PolynomialSpace<dim>::compute_grad_grad (const unsigned int i,
-                                         const Point<dim>  &p) const
+                                         const Point<dim> &p) const
 {
   unsigned int ix[dim];
   compute_index(i,ix);
@@ -179,8 +179,8 @@ PolynomialSpace<dim>::compute_grad_grad (const unsigned int i,
     for (unsigned int d1=0; d1<dim; ++d1)
       result[d][d1] = 1.;
 
-                                   // get value, first and second
-                                   // derivatives
+  // get value, first and second
+  // derivatives
   std::vector<double> v(3);
   for (unsigned int d=0; d<dim; ++d)
     {
@@ -238,12 +238,12 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
       v_size=3;
     }
 
-                                   // Store data in a single
-                                   // object. Access is by
-                                   // v[d][n][o]
-                                   //  d: coordinate direction
-                                   //  n: number of 1d polynomial
-                                   //  o: order of derivative
+  // Store data in a single
+  // object. Access is by
+  // v[d][n][o]
+  //  d: coordinate direction
+  //  n: number of 1d polynomial
+  //  o: order of derivative
   Table<2,std::vector<double> > v(dim, n_1d);
   for (unsigned int d=0; d<v.size()[0]; ++d)
     for (unsigned int i=0; i<v.size()[1]; ++i)
@@ -256,8 +256,8 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
     {
       unsigned int k = 0;
 
-      for (unsigned int iz=0;iz<((dim>2) ? n_1d : 1);++iz)
-        for (unsigned int iy=0;iy<((dim>1) ? n_1d-iz : 1);++iy)
+      for (unsigned int iz=0; iz<((dim>2) ? n_1d : 1); ++iz)
+        for (unsigned int iy=0; iy<((dim>1) ? n_1d-iz : 1); ++iy)
           for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
             values[index_map_inverse[k++]] =
               v[0][ix][0]
@@ -269,15 +269,15 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
     {
       unsigned int k = 0;
 
-      for (unsigned int iz=0;iz<((dim>2) ? n_1d : 1);++iz)
-        for (unsigned int iy=0;iy<((dim>1) ? n_1d-iz : 1);++iy)
+      for (unsigned int iz=0; iz<((dim>2) ? n_1d : 1); ++iz)
+        for (unsigned int iy=0; iy<((dim>1) ? n_1d-iz : 1); ++iy)
           for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
             {
               const unsigned int k2=index_map_inverse[k++];
-              for (unsigned int d=0;d<dim;++d)
+              for (unsigned int d=0; d<dim; ++d)
                 grads[k2][d] = v[0][ix][(d==0) ? 1 : 0]
-                  * ((dim>1) ? v[1][iy][(d==1) ? 1 : 0] : 1.)
-                  * ((dim>2) ? v[2][iz][(d==2) ? 1 : 0] : 1.);
+                               * ((dim>1) ? v[1][iy][(d==1) ? 1 : 0] : 1.)
+                               * ((dim>2) ? v[2][iz][(d==2) ? 1 : 0] : 1.);
             }
     }
 
@@ -285,23 +285,23 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
     {
       unsigned int k = 0;
 
-      for (unsigned int iz=0;iz<((dim>2) ? n_1d : 1);++iz)
-        for (unsigned int iy=0;iy<((dim>1) ? n_1d-iz : 1);++iy)
+      for (unsigned int iz=0; iz<((dim>2) ? n_1d : 1); ++iz)
+        for (unsigned int iy=0; iy<((dim>1) ? n_1d-iz : 1); ++iy)
           for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
             {
               const unsigned int k2=index_map_inverse[k++];
               for (unsigned int d1=0; d1<dim; ++d1)
                 for (unsigned int d2=0; d2<dim; ++d2)
                   {
-                                                     // Derivative
-                                                     // order for each
-                                                     // direction
+                    // Derivative
+                    // order for each
+                    // direction
                     const unsigned int
-                      j0 = ((d1==0) ? 1 : 0) + ((d2==0) ? 1 : 0);
+                    j0 = ((d1==0) ? 1 : 0) + ((d2==0) ? 1 : 0);
                     const unsigned int
-                      j1 = ((d1==1) ? 1 : 0) + ((d2==1) ? 1 : 0);
+                    j1 = ((d1==1) ? 1 : 0) + ((d2==1) ? 1 : 0);
                     const unsigned int
-                      j2 = ((d1==2) ? 1 : 0) + ((d2==2) ? 1 : 0);
+                    j2 = ((d1==2) ? 1 : 0) + ((d2==2) ? 1 : 0);
 
                     grad_grads[k2][d1][d2] =
                       v[0][ix][j0]

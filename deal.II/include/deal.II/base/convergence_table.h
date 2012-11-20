@@ -57,209 +57,210 @@ DEAL_II_NAMESPACE_OPEN
  */
 class ConvergenceTable: public TableHandler
 {
-  public:
-                                     /**
-                                      * Constructor.
-                                      */
-    ConvergenceTable();
+public:
+  /**
+   * Constructor.
+   */
+  ConvergenceTable();
 
-                                     /**
-                                      * Rate in relation to the rows.
-                                      */
-    enum RateMode {
-                                           /**
-                                            * Do not do anything.
-                                            */
-          none,
-                                           /**
-                                            * Quotient of values in
-                                            * the previous row and in
-                                            * this row.
-                                            */
-          reduction_rate,
-                                           /**
-                                            * Logarithm of
-                                            * #reduction_rate to the
-                                            * base 2 representing the
-                                            * order of convergence
-                                            * when halving the grid
-                                            * size, e.g. from h to
-                                            * h/2.
-                                            */
-          reduction_rate_log2
-    };
+  /**
+   * Rate in relation to the rows.
+   */
+  enum RateMode
+  {
+    /**
+     * Do not do anything.
+     */
+    none,
+    /**
+     * Quotient of values in
+     * the previous row and in
+     * this row.
+     */
+    reduction_rate,
+    /**
+     * Logarithm of
+     * #reduction_rate to the
+     * base 2 representing the
+     * order of convergence
+     * when halving the grid
+     * size, e.g. from h to
+     * h/2.
+     */
+    reduction_rate_log2
+  };
 
-                                     /**
-                                      * Evaluates the convergence rates of the
-                                      * data column <tt>data_column_key</tt>
-                                      * due to the #RateMode in relation to
-                                      * the reference column <tt>reference_column_key</tt>.
-                                      * Be sure that the value types of the
-                                      * table entries of the
-                                      * data column and the reference data column
-                                      * is a number, i.e. double, float,
-                                      * (unsigned) int, and so on.
-                                      *
-                                      * The new rate column and the data column
-                                      * will be merged to a supercolumn. The
-                                      * tex caption of the supercolumn will be
-                                      * (by default) the same as the one of the
-                                      * data column. This may be changed by using
-                                      * the <tt>set_tex_supercaption (...)</tt> function
-                                      * of the base class TableHandler.
-                                      *
-                                      * This method behaves in the following way:
-                                      *
-                                      * If RateMode is reduction_rate, then the computed
-                                      * output is
-                                      * $ \frac{e_{n-1}/k_{n-1}}{e_n/k_n} $.
-                                      *
-                                      * Where $k$ is the reference column.
-                                      *
-                                      * If RateMode is reduction_rate_log2, then the
-                                      * computed output is
-                                      * $
-                                      * 2\frac{\log |e_{n-1}/e_{n}|}{\log |k_n/k_{n-1}|}
-                                      * $.
-                                      *
-                                      * This is useful, for example, if we use as
-                                      * reference key the number of degrees of freedom.
-                                      * Assuming that the error is proportional to
-                                      * $ C (1/\sqrt{k})^r $, then this method will
-                                      * produce the rate $r$ as a result.
-                                      *
-                                      * @note Since this function adds columns
-                                      * to the table after several rows have
-                                      * already been filled, it switches off
-                                      * the auto fill mode of the TableHandler
-                                      * base class. If you intend to add
-                                      * further data with auto fill, you will
-                                      * have to re-enable it after calling
-                                      * this function.
-                                      */
-    void
-    evaluate_convergence_rates (const std::string &data_column_key,
-                                const std::string &reference_column_key,
-                                const RateMode     rate_mode);
+  /**
+   * Evaluates the convergence rates of the
+   * data column <tt>data_column_key</tt>
+   * due to the #RateMode in relation to
+   * the reference column <tt>reference_column_key</tt>.
+   * Be sure that the value types of the
+   * table entries of the
+   * data column and the reference data column
+   * is a number, i.e. double, float,
+   * (unsigned) int, and so on.
+   *
+   * The new rate column and the data column
+   * will be merged to a supercolumn. The
+   * tex caption of the supercolumn will be
+   * (by default) the same as the one of the
+   * data column. This may be changed by using
+   * the <tt>set_tex_supercaption (...)</tt> function
+   * of the base class TableHandler.
+   *
+   * This method behaves in the following way:
+   *
+   * If RateMode is reduction_rate, then the computed
+   * output is
+   * $ \frac{e_{n-1}/k_{n-1}}{e_n/k_n} $.
+   *
+   * Where $k$ is the reference column.
+   *
+   * If RateMode is reduction_rate_log2, then the
+   * computed output is
+   * $
+   * 2\frac{\log |e_{n-1}/e_{n}|}{\log |k_n/k_{n-1}|}
+   * $.
+   *
+   * This is useful, for example, if we use as
+   * reference key the number of degrees of freedom.
+   * Assuming that the error is proportional to
+   * $ C (1/\sqrt{k})^r $, then this method will
+   * produce the rate $r$ as a result.
+   *
+   * @note Since this function adds columns
+   * to the table after several rows have
+   * already been filled, it switches off
+   * the auto fill mode of the TableHandler
+   * base class. If you intend to add
+   * further data with auto fill, you will
+   * have to re-enable it after calling
+   * this function.
+   */
+  void
+  evaluate_convergence_rates (const std::string &data_column_key,
+                              const std::string &reference_column_key,
+                              const RateMode     rate_mode);
 
 
-                                     /**
-                                      * Evaluates the convergence rates of the
-                                      * data column <tt>data_column_key</tt>
-                                      * due to the #RateMode.
-                                      * Be sure that the value types of the
-                                      * table entries of the data column
-                                      * is a number, i.e. double, float,
-                                      * (unsigned) int, and so on.
-                                      *
-                                      * The new rate column and the data column
-                                      * will be merged to a supercolumn. The
-                                      * tex caption of the supercolumn will be
-                                      * (by default) the same as the one of the
-                                      * data column. This may be changed by using
-                                      * the set_tex_supercaption() function
-                                      * of the base class TableHandler.
-                                      *
-                                      * @note Since this function adds columns
-                                      * to the table after several rows have
-                                      * already been filled, it switches off
-                                      * the auto fill mode of the TableHandler
-                                      * base class. If you intend to add
-                                      * further data with auto fill, you will
-                                      * have to re-enable it after calling
-                                      * this function.
-                                      */
-    void
-    evaluate_convergence_rates (const std::string &data_column_key,
-                                const RateMode     rate_mode);
+  /**
+   * Evaluates the convergence rates of the
+   * data column <tt>data_column_key</tt>
+   * due to the #RateMode.
+   * Be sure that the value types of the
+   * table entries of the data column
+   * is a number, i.e. double, float,
+   * (unsigned) int, and so on.
+   *
+   * The new rate column and the data column
+   * will be merged to a supercolumn. The
+   * tex caption of the supercolumn will be
+   * (by default) the same as the one of the
+   * data column. This may be changed by using
+   * the set_tex_supercaption() function
+   * of the base class TableHandler.
+   *
+   * @note Since this function adds columns
+   * to the table after several rows have
+   * already been filled, it switches off
+   * the auto fill mode of the TableHandler
+   * base class. If you intend to add
+   * further data with auto fill, you will
+   * have to re-enable it after calling
+   * this function.
+   */
+  void
+  evaluate_convergence_rates (const std::string &data_column_key,
+                              const RateMode     rate_mode);
 
-                                     /**
-                                      * Omit this column <tt>key</tt>
-                                      * (not supercolumn!) from the
-                                      * evaluation of the convergence rates
-                                      * of `all' columns (see the following
-                                      * two functions).
-                                      *
-                                      * The Column::flag==1 is reserved for
-                                      * omitting the column from convergence
-                                      * rate evalution.
-                                      */
-    void
-    omit_column_from_convergence_rate_evaluation(const std::string &key);
+  /**
+   * Omit this column <tt>key</tt>
+   * (not supercolumn!) from the
+   * evaluation of the convergence rates
+   * of `all' columns (see the following
+   * two functions).
+   *
+   * The Column::flag==1 is reserved for
+   * omitting the column from convergence
+   * rate evalution.
+   */
+  void
+  omit_column_from_convergence_rate_evaluation(const std::string &key);
 
-                                     /**
-                                      * Evaluates convergence rates
-                                      * due to the <tt>rate_mode</tt>
-                                      * in relation to the reference
-                                      * column
-                                      * <tt>reference_column_key</tt>. This
-                                      * function evaluates the rates
-                                      * of ALL columns except of the
-                                      * columns that are to be omitted
-                                      * (see previous function) and
-                                      * execpt of the columns that are
-                                      * previously evaluated rate
-                                      * columns.  This function allows
-                                      * to evaluate the convergence
-                                      * rate for almost all columns of
-                                      * a table without calling
-                                      * evaluate_convergence_rates()
-                                      * for each column separately.
-                                      *
-                                      * Example:
-                                      * Columns like <tt>n cells</tt> or
-                                      * <tt>n dofs</tt> columns may be wanted
-                                      * to be omitted in the evaluation
-                                      * of the convergence rates. Hence they
-                                      * should omitted by calling the
-                                      * omit_column_from_convergence_rate_evaluation().
-                                      */
-    void
-    evaluate_all_convergence_rates(const std::string &reference_column_key,
-                                   const RateMode     rate_mode);
+  /**
+   * Evaluates convergence rates
+   * due to the <tt>rate_mode</tt>
+   * in relation to the reference
+   * column
+   * <tt>reference_column_key</tt>. This
+   * function evaluates the rates
+   * of ALL columns except of the
+   * columns that are to be omitted
+   * (see previous function) and
+   * execpt of the columns that are
+   * previously evaluated rate
+   * columns.  This function allows
+   * to evaluate the convergence
+   * rate for almost all columns of
+   * a table without calling
+   * evaluate_convergence_rates()
+   * for each column separately.
+   *
+   * Example:
+   * Columns like <tt>n cells</tt> or
+   * <tt>n dofs</tt> columns may be wanted
+   * to be omitted in the evaluation
+   * of the convergence rates. Hence they
+   * should omitted by calling the
+   * omit_column_from_convergence_rate_evaluation().
+   */
+  void
+  evaluate_all_convergence_rates(const std::string &reference_column_key,
+                                 const RateMode     rate_mode);
 
-                                     /**
-                                      * Evaluates convergence rates
-                                      * due to the <tt>rate_mode</tt>. This
-                                      * function evaluates the rates of
-                                      * ALL columns except of the
-                                      * columns that are to be omitted
-                                      * (see previous function)
-                                      * and execpt of the columns that are
-                                      * previously
-                                      * evaluated rate columns.
-                                      * This function allows to evaluate
-                                      * the convergence rate for almost all
-                                      * columns of a table without calling
-                                      * evaluate_convergence_rates()
-                                      * for each column seperately.
-                                      *
-                                      * Example:
-                                      * Columns like <tt>n cells</tt> or
-                                      * <tt>n dofs</tt> columns may be wanted
-                                      * to be omitted in the evaluation
-                                      * of the convergence rates. Hence they
-                                      * should omitted by calling the
-                                      * omit_column_from_convergence_rate_evaluation().
-                                      */
-    void
-    evaluate_all_convergence_rates(const RateMode rate_mode);
+  /**
+   * Evaluates convergence rates
+   * due to the <tt>rate_mode</tt>. This
+   * function evaluates the rates of
+   * ALL columns except of the
+   * columns that are to be omitted
+   * (see previous function)
+   * and execpt of the columns that are
+   * previously
+   * evaluated rate columns.
+   * This function allows to evaluate
+   * the convergence rate for almost all
+   * columns of a table without calling
+   * evaluate_convergence_rates()
+   * for each column seperately.
+   *
+   * Example:
+   * Columns like <tt>n cells</tt> or
+   * <tt>n dofs</tt> columns may be wanted
+   * to be omitted in the evaluation
+   * of the convergence rates. Hence they
+   * should omitted by calling the
+   * omit_column_from_convergence_rate_evaluation().
+   */
+  void
+  evaluate_all_convergence_rates(const RateMode rate_mode);
 
-                                     /** @addtogroup Exceptions
-                                      * @{ */
+  /** @addtogroup Exceptions
+   * @{ */
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcWrongValueType);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcWrongValueType);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcRateColumnAlreadyExists,
-                    std::string,
-                    << "Rate column <" << arg1 << "> does already exist.");
-                                     //@}
+  /**
+   * Exception
+   */
+  DeclException1 (ExcRateColumnAlreadyExists,
+                  std::string,
+                  << "Rate column <" << arg1 << "> does already exist.");
+  //@}
 };
 
 

@@ -68,39 +68,39 @@ namespace Step47
   template <int dim>
   class LaplaceProblem
   {
-    public:
-      LaplaceProblem ();
-      ~LaplaceProblem ();
+  public:
+    LaplaceProblem ();
+    ~LaplaceProblem ();
 
-      void run ();
+    void run ();
 
-    private:
-      bool interface_intersects_cell (const typename Triangulation<dim>::cell_iterator &cell) const;
-      std::pair<unsigned int, Quadrature<dim> > compute_quadrature(const Quadrature<dim> &plain_quadrature, const typename hp::DoFHandler<dim>::active_cell_iterator &cell, const std::vector<double> &level_set_values);
-      void append_quadrature(const Quadrature<dim> &plain_quadrature,
-                             const std::vector<Point<dim> > &v      ,
-                             std::vector<Point<dim> > &xfem_points,
-                             std::vector<double>      &xfem_weights);
+  private:
+    bool interface_intersects_cell (const typename Triangulation<dim>::cell_iterator &cell) const;
+    std::pair<unsigned int, Quadrature<dim> > compute_quadrature(const Quadrature<dim> &plain_quadrature, const typename hp::DoFHandler<dim>::active_cell_iterator &cell, const std::vector<double> &level_set_values);
+    void append_quadrature(const Quadrature<dim> &plain_quadrature,
+                           const std::vector<Point<dim> > &v      ,
+                           std::vector<Point<dim> > &xfem_points,
+                           std::vector<double>      &xfem_weights);
 
-      void setup_system ();
-      void assemble_system ();
-      void solve ();
-      void refine_grid ();
-      void output_results (const unsigned int cycle) const;
-      void compute_error () const;
+    void setup_system ();
+    void assemble_system ();
+    void solve ();
+    void refine_grid ();
+    void output_results (const unsigned int cycle) const;
+    void compute_error () const;
 
-      Triangulation<dim>    triangulation;
+    Triangulation<dim>    triangulation;
 
-      hp::DoFHandler<dim>   dof_handler;
-      hp::FECollection<dim> fe_collection;
+    hp::DoFHandler<dim>   dof_handler;
+    hp::FECollection<dim> fe_collection;
 
-      ConstraintMatrix      constraints;
+    ConstraintMatrix      constraints;
 
-      SparsityPattern       sparsity_pattern;
-      SparseMatrix<double>  system_matrix;
+    SparsityPattern       sparsity_pattern;
+    SparseMatrix<double>  system_matrix;
 
-      Vector<double>        solution;
-      Vector<double>        system_rhs;
+    Vector<double>        solution;
+    Vector<double>        system_rhs;
   };
 
 
@@ -109,15 +109,15 @@ namespace Step47
   template <int dim>
   class Coefficient : public Function<dim>
   {
-    public:
-      Coefficient () : Function<dim>() {}
+  public:
+    Coefficient () : Function<dim>() {}
 
-      virtual double value (const Point<dim>   &p,
-                            const unsigned int  component = 0) const;
+    virtual double value (const Point<dim>   &p,
+                          const unsigned int  component = 0) const;
 
-      virtual void value_list (const std::vector<Point<dim> > &points,
-                               std::vector<double>            &values,
-                               const unsigned int              component = 0) const;
+    virtual void value_list (const std::vector<Point<dim> > &points,
+                             std::vector<double>            &values,
+                             const unsigned int              component = 0) const;
   };
 
 
@@ -173,8 +173,8 @@ namespace Step47
 
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem ()
-                  :
-                  dof_handler (triangulation)
+    :
+    dof_handler (triangulation)
   {
     fe_collection.push_back (FESystem<dim> (FE_Q<dim>(1), 1,
                                             FE_Nothing<dim>(), 1));
@@ -219,9 +219,9 @@ namespace Step47
       if (level_set(cell->vertex(v)) * level_set(cell->vertex(v+1)) < 0)
         return true;
 
-                                     // we get here only if all vertices
-                                     // have the same sign, which means
-                                     // that the cell is not intersected
+    // we get here only if all vertices
+    // have the same sign, which means
+    // that the cell is not intersected
     return false;
   }
 
@@ -231,7 +231,7 @@ namespace Step47
   void LaplaceProblem<dim>::setup_system ()
   {
     for (typename hp::DoFHandler<dim>::cell_iterator cell
-           = dof_handler.begin_active();
+         = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
       if (interface_intersects_cell(cell) == false)
         cell->set_active_fe_index(0);
@@ -246,8 +246,8 @@ namespace Step47
 
     constraints.clear ();
 //TODO: fix this, it currently crashes
-                                     // DoFTools::make_hanging_node_constraints (dof_handler,
-                                     //                                            constraints);
+    // DoFTools::make_hanging_node_constraints (dof_handler,
+    //                                            constraints);
 
 //TODO: component 1 must satisfy zero boundary conditions
     constraints.close();
@@ -288,8 +288,8 @@ namespace Step47
     std::vector<double>    coefficient_values (n_q_points);
 
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
 
     for (; cell!=endc; ++cell)
       {
@@ -457,7 +457,7 @@ namespace Step47
 
     unsigned int type = 0;
 
-                                     // find the type of cut
+    // find the type of cut
     int sign_ls[GeometryInfo<dim>::vertices_per_cell];
     for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       {
@@ -466,11 +466,11 @@ namespace Step47
         else sign_ls[v] = 0;
       }
 
-                                     // the sign of the level set function at the 4 nodes of the elements can be positive + or negative -
-                                     // depending on the sign of the level set function we have the folloing three classes of decomposition
-                                     // type 1: ++++, ----
-                                     // type 2: -+++, +-++, ++-+, +++-, +---, -+--, --+-, ---+
-                                     // type 3: +--+, ++--, +-+-, -++-, --++, -+-+
+    // the sign of the level set function at the 4 nodes of the elements can be positive + or negative -
+    // depending on the sign of the level set function we have the folloing three classes of decomposition
+    // type 1: ++++, ----
+    // type 2: -+++, +-++, ++-+, +++-, +---, -+--, --+-, ---+
+    // type 3: +--+, ++--, +-+-, -++-, --++, -+-+
 
     if ( sign_ls[0]==sign_ls[1] & sign_ls[0]==sign_ls[2] & sign_ls[0]==sign_ls[3] ) type =1;
     else if ( sign_ls[0]*sign_ls[1]*sign_ls[2]*sign_ls[3] < 0 ) type = 2;
@@ -497,8 +497,8 @@ namespace Step47
       {
         const unsigned int   n_q_points    = plain_quadrature.size();
 
-                                         // loop over all subelements for integration
-                                         // in type 2 there are 5 subelements
+        // loop over all subelements for integration
+        // in type 2 there are 5 subelements
 
         Quadrature<dim> xfem_quadrature(5*n_q_points);
 
@@ -510,15 +510,15 @@ namespace Step47
         else if (sign_ls[3]!=sign_ls[0] && sign_ls[3]!=sign_ls[1] && sign_ls[3]!=sign_ls[2]) Pos = 3;
         else assert(0); // error message
 
-                                         // Find cut coordinates
+        // Find cut coordinates
 
-                                         // deal.ii local coordinates
+        // deal.ii local coordinates
 
-                                         //    2-------3
-                                         //    |       |
-                                         //             |       |
-                                         //             |       |
-                                         //             0-------1
+        //    2-------3
+        //    |       |
+        //             |       |
+        //             |       |
+        //             0-------1
 
         if (Pos == 0)
           {
@@ -581,12 +581,12 @@ namespace Step47
             F(1) = 0.5*( 1. + B(1) );
           }
 
-                                         //std::cout << A << std::endl;
-                                         //std::cout << B << std::endl;
-                                         //std::cout << C << std::endl;
-                                         //std::cout << D << std::endl;
-                                         //std::cout << E << std::endl;
-                                         //std::cout << F << std::endl;
+        //std::cout << A << std::endl;
+        //std::cout << B << std::endl;
+        //std::cout << C << std::endl;
+        //std::cout << D << std::endl;
+        //std::cout << E << std::endl;
+        //std::cout << F << std::endl;
 
         std::string filename = "vertices.dat";
         std::ofstream output (filename.c_str());
@@ -634,35 +634,36 @@ namespace Step47
         std::vector<Point<dim> > xfem_points;
         std::vector<double>      xfem_weights;
 
-                                         // lookup table for the decomposition
+        // lookup table for the decomposition
 
         if (dim==2)
           {
-            unsigned int subcell_v_indices[4][5][4] = {
-                  {{0,8,9,7}, {9,7,5,6}, {8,4,7,6}, {5,6,2,3}, {6,4,3,1}},
-                  {{8,1,7,9}, {4,8,6,7}, {6,7,5,9}, {0,4,2,6}, {2,6,3,5}},
-                  {{9,7,2,8}, {5,6,9,7}, {6,4,7,8}, {0,1,5,6}, {6,1,4,3}},
-                  {{7,9,8,3}, {4,6,8,7}, {6,5,7,9}, {0,6,2,4}, {0,1,6,5}}
+            unsigned int subcell_v_indices[4][5][4] =
+            {
+              {{0,8,9,7}, {9,7,5,6}, {8,4,7,6}, {5,6,2,3}, {6,4,3,1}},
+              {{8,1,7,9}, {4,8,6,7}, {6,7,5,9}, {0,4,2,6}, {2,6,3,5}},
+              {{9,7,2,8}, {5,6,9,7}, {6,4,7,8}, {0,1,5,6}, {6,1,4,3}},
+              {{7,9,8,3}, {4,6,8,7}, {6,5,7,9}, {0,6,2,4}, {0,1,6,5}}
             };
 
             for (unsigned int subcell = 0; subcell<5; subcell++)
               {
-                                                 //std::cout << "subcell   : " << subcell << std::endl;
+                //std::cout << "subcell   : " << subcell << std::endl;
                 std::vector<Point<dim> > vertices;
                 for (unsigned int i=0; i<4; i++)
                   {
                     vertices.push_back( subcell_vertices[subcell_v_indices[Pos][subcell][i]] );
-                                                     //std::cout << "i         : " << i << std::endl;
-                                                     //std::cout << "subcell v : " << subcell_v_indices[Pos][subcell][i] << std::endl;
-                                                     //std::cout << vertices[i](0) << "  " << vertices[i](1) << std::endl;
+                    //std::cout << "i         : " << i << std::endl;
+                    //std::cout << "subcell v : " << subcell_v_indices[Pos][subcell][i] << std::endl;
+                    //std::cout << vertices[i](0) << "  " << vertices[i](1) << std::endl;
                   }
-                                                 //std::cout << std::endl;
-                                                 // create quadrature rule
+                //std::cout << std::endl;
+                // create quadrature rule
                 append_quadrature( plain_quadrature,
                                    vertices,
                                    xfem_points,
                                    xfem_weights);
-                                                 //initialize xfem_quadrature with quadrature points of all subelements
+                //initialize xfem_quadrature with quadrature points of all subelements
                 xfem_quadrature.initialize(xfem_points, xfem_weights);
               }
           }
@@ -671,15 +672,15 @@ namespace Step47
         return std::pair<unsigned int, Quadrature<dim> >(2, xfem_quadrature);
       }
 
-                                     // Type three decomposition
-                                     // (+--+, ++--, +-+-, -++-, --++, -+-+)
+    // Type three decomposition
+    // (+--+, ++--, +-+-, -++-, --++, -+-+)
 
     if (type==3)
       {
         const unsigned int   n_q_points    = plain_quadrature.size();
 
-                                         // loop over all subelements for integration
-                                         // in type 2 there are 5 subelements
+        // loop over all subelements for integration
+        // in type 2 there are 5 subelements
 
         Quadrature<dim> xfem_quadrature(5*n_q_points);
 
@@ -712,16 +713,16 @@ namespace Step47
             assert(0);
           }
 
-                                         //std::cout << "Pos " << Pos << std::endl;
-                                         //std::cout << A << std::endl;
-                                         //std::cout << B << std::endl;
+        //std::cout << "Pos " << Pos << std::endl;
+        //std::cout << A << std::endl;
+        //std::cout << B << std::endl;
         std::string filename = "vertices.dat";
         std::ofstream output (filename.c_str());
         output << "#vertices of xfem subcells" << std::endl;
         output << A(0) << "   " << A(1) << std::endl;
         output << B(0) << "   " << B(1) << std::endl;
 
-                                         //fill xfem_quadrature
+        //fill xfem_quadrature
         Point<dim> subcell_vertices[6];
         subcell_vertices[0] = v0;
         subcell_vertices[1] = v1;
@@ -735,30 +736,31 @@ namespace Step47
 
         if (dim==2)
           {
-            unsigned int subcell_v_indices[2][2][4] = {
-                  {{0,1,4,5}, {4,5,2,3}},
-                  {{0,4,2,5}, {4,1,5,3}}
+            unsigned int subcell_v_indices[2][2][4] =
+            {
+              {{0,1,4,5}, {4,5,2,3}},
+              {{0,4,2,5}, {4,1,5,3}}
             };
 
-                                             //std::cout << "Pos       : " << Pos << std::endl;
+            //std::cout << "Pos       : " << Pos << std::endl;
             for (unsigned int subcell = 0; subcell<2; subcell++)
               {
-                                                 //std::cout << "subcell   : " << subcell << std::endl;
+                //std::cout << "subcell   : " << subcell << std::endl;
                 std::vector<Point<dim> > vertices;
                 for (unsigned int i=0; i<4; i++)
                   {
                     vertices.push_back( subcell_vertices[subcell_v_indices[Pos][subcell][i]] );
-                                                     //std::cout << "i         : " << i << std::endl;
-                                                     //std::cout << "subcell v : " << subcell_v_indices[Pos][subcell][i] << std::endl;
-                                                     //std::cout << vertices[i](0) << "  " << vertices[i](1) << std::endl;
+                    //std::cout << "i         : " << i << std::endl;
+                    //std::cout << "subcell v : " << subcell_v_indices[Pos][subcell][i] << std::endl;
+                    //std::cout << vertices[i](0) << "  " << vertices[i](1) << std::endl;
                   }
-                                                 //std::cout << std::endl;
-                                                 // create quadrature rule
+                //std::cout << std::endl;
+                // create quadrature rule
                 append_quadrature( plain_quadrature,
                                    vertices,
                                    xfem_points,
                                    xfem_weights);
-                                                 //initialize xfem_quadrature with quadrature points of all subelements
+                //initialize xfem_quadrature with quadrature points of all subelements
                 xfem_quadrature.initialize(xfem_points, xfem_weights);
               }
           }
@@ -777,11 +779,11 @@ namespace Step47
                                                 std::vector<double>      &xfem_weights)
 
   {
-                                     // Project integration points into sub-elements.
-                                     // This maps quadrature points from a reference element to a subelement of a reference element.
-                                     // To implement the action of this map the coordinates of the subelements have been calculated (A(0)...F(0),A(1)...F(1))
-                                     // the coordinates of the quadrature points are given by the bi-linear map defined by the form functions
-                                     // $x^\prime_i = \sum_j v^\prime \phi_j(x^hat_i)$, where the $\phi_j$ are the shape functions of the FEQ.
+    // Project integration points into sub-elements.
+    // This maps quadrature points from a reference element to a subelement of a reference element.
+    // To implement the action of this map the coordinates of the subelements have been calculated (A(0)...F(0),A(1)...F(1))
+    // the coordinates of the quadrature points are given by the bi-linear map defined by the form functions
+    // $x^\prime_i = \sum_j v^\prime \phi_j(x^hat_i)$, where the $\phi_j$ are the shape functions of the FEQ.
 
     unsigned int n_v = GeometryInfo<dim>::vertices_per_cell;
 
@@ -799,39 +801,39 @@ namespace Step47
       {
         switch (dim)
           {
-            case 2:
-            {
-              double xi  = q_points[i](0);
-              double eta = q_points[i](1);
+          case 2:
+          {
+            double xi  = q_points[i](0);
+            double eta = q_points[i](1);
 
-                                               // Define shape functions on reference element
-                                               // we consider a bi-linear mapping
-              phi[0] = (1. - xi) * (1. - eta);
-              phi[1] = xi * (1. - eta);
-              phi[2] = (1. - xi) * eta;
-              phi[3] = xi * eta;
+            // Define shape functions on reference element
+            // we consider a bi-linear mapping
+            phi[0] = (1. - xi) * (1. - eta);
+            phi[1] = xi * (1. - eta);
+            phi[2] = (1. - xi) * eta;
+            phi[3] = xi * eta;
 
-              grad_phi[0][0] = (-1. + eta);
-              grad_phi[1][0] = (1. - eta);
-              grad_phi[2][0] = -eta;
-              grad_phi[3][0] = eta;
+            grad_phi[0][0] = (-1. + eta);
+            grad_phi[1][0] = (1. - eta);
+            grad_phi[2][0] = -eta;
+            grad_phi[3][0] = eta;
 
-              grad_phi[0][1] = (-1. + xi);
-              grad_phi[1][1] = -xi;
-              grad_phi[2][1] = 1-xi;
-              grad_phi[3][1] = xi;
+            grad_phi[0][1] = (-1. + xi);
+            grad_phi[1][1] = -xi;
+            grad_phi[2][1] = 1-xi;
+            grad_phi[3][1] = xi;
 
-              break;
-            }
+            break;
+          }
 
-            default:
-                  Assert (false, ExcNotImplemented());
+          default:
+            Assert (false, ExcNotImplemented());
           }
 
 
         Tensor<2,dim> jacobian;
 
-                                         // Calculate Jacobian of transformation
+        // Calculate Jacobian of transformation
         for (unsigned int d=0; d<dim; ++d)
           for (unsigned int e=0; e<dim; ++e)
             {
@@ -844,7 +846,7 @@ namespace Step47
         double detJ = determinant(jacobian);
         xfem_weights.push_back (W[i] * detJ);
 
-                                         // Map integration points from reference element to subcell of reference element
+        // Map integration points from reference element to subcell of reference element
         Point<dim> q_prime;
         for (unsigned int d=0; d<dim; ++d)
           for (unsigned int j = 0; j<GeometryInfo<dim>::vertices_per_cell; j++)
@@ -895,23 +897,23 @@ namespace Step47
   template <int dim>
   class Postprocessor : public DataPostprocessor<dim>
   {
-    public:
-      virtual
-      void
-      compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                         const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                         const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-                                         const std::vector<Point<dim> >                  &normals,
-                                         const std::vector<Point<dim> >                  &evaluation_points,
-                                         std::vector<Vector<double> >                    &computed_quantities) const;
+  public:
+    virtual
+    void
+    compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
+                                       const std::vector<std::vector<Tensor<1,dim> > > &duh,
+                                       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+                                       const std::vector<Point<dim> >                  &normals,
+                                       const std::vector<Point<dim> >                  &evaluation_points,
+                                       std::vector<Vector<double> >                    &computed_quantities) const;
 
-      virtual std::vector<std::string> get_names () const;
+    virtual std::vector<std::string> get_names () const;
 
-      virtual
-      std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      get_data_component_interpretation () const;
+    virtual
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    get_data_component_interpretation () const;
 
-      virtual UpdateFlags get_needed_update_flags () const;
+    virtual UpdateFlags get_needed_update_flags () const;
   };
 
 
@@ -931,8 +933,8 @@ namespace Step47
   get_data_component_interpretation () const
   {
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      interpretation (2,
-                      DataComponentInterpretation::component_is_scalar);
+    interpretation (2,
+                    DataComponentInterpretation::component_is_scalar);
     return interpretation;
   }
 
@@ -949,9 +951,9 @@ namespace Step47
   void
   Postprocessor<dim>::
   compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &/*duh*/,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
-                                     const std::vector<Point<dim> >                  &/*normals*/,
+                                     const std::vector<std::vector<Tensor<1,dim> > > & /*duh*/,
+                                     const std::vector<std::vector<Tensor<2,dim> > > & /*dduh*/,
+                                     const std::vector<Point<dim> >                  & /*normals*/,
                                      const std::vector<Point<dim> >                  &evaluation_points,
                                      std::vector<Vector<double> >                    &computed_quantities) const
   {
@@ -1014,8 +1016,8 @@ namespace Step47
     std::vector<Vector<double> > solution_values;
 
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
 
     for (; cell!=endc; ++cell)
       {
@@ -1057,7 +1059,7 @@ namespace Step47
         if (cycle == 0)
           {
             GridGenerator::hyper_ball (triangulation);
-                                             //GridGenerator::hyper_cube (triangulation, -1, 1);
+            //GridGenerator::hyper_cube (triangulation, -1, 1);
 
             static const HyperBallBoundary<dim> boundary;
             triangulation.set_boundary (0, boundary);

@@ -51,134 +51,134 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number>
 class SparseILU : public SparseLUDecomposition<number>
 {
-  public:
-                                     /**
-                                      * Constructor. Does nothing.
-                                      *
-                                      * Call the @p initialize
-                                      * function before using this
-                                      * object as preconditioner.
-                                      */
-    SparseILU ();
+public:
+  /**
+   * Constructor. Does nothing.
+   *
+   * Call the @p initialize
+   * function before using this
+   * object as preconditioner.
+   */
+  SparseILU ();
 
-                                     /**
-                                      * @deprecated This method is
-                                      * deprecated, and left for
-                                      * backward compability. It will
-                                      * be removed in later versions.
-                                      */
-    SparseILU (const SparsityPattern &sparsity);
+  /**
+   * @deprecated This method is
+   * deprecated, and left for
+   * backward compability. It will
+   * be removed in later versions.
+   */
+  SparseILU (const SparsityPattern &sparsity);
 
-                                     /**
-                                      * Make
-                                      * SparseLUDecomposition::AdditionalData
-                                      * accessible to this class as
-                                      * well.
-                                      */
-    typedef
-    typename SparseLUDecomposition<number>::AdditionalData
-    AdditionalData;
+  /**
+   * Make
+   * SparseLUDecomposition::AdditionalData
+   * accessible to this class as
+   * well.
+   */
+  typedef
+  typename SparseLUDecomposition<number>::AdditionalData
+  AdditionalData;
 
-                                     /**
-                                      * Perform the incomplete LU
-                                      * factorization of the given
-                                      * matrix.
-                                      *
-                                      * This function needs to be
-                                      * called before an object of
-                                      * this class is used as
-                                      * preconditioner.
-                                      *
-                                      * For more details about
-                                      * possible parameters, see the
-                                      * class documentation of
-                                      * SparseLUDecomposition and the
-                                      * documentation of the
-                                      * @p SparseLUDecomposition::AdditionalData
-                                      * class.
-                                      *
-                                      * According to the
-                                      * @p parameters, this function
-                                      * creates a new SparsityPattern
-                                      * or keeps the previous sparsity
-                                      * or takes the sparsity given by
-                                      * the user to @p data. Then,
-                                      * this function performs the LU
-                                      * decomposition.
-                                      *
-                                      * After this function is called
-                                      * the preconditioner is ready to
-                                      * be used.
-                                      */
-    template <typename somenumber>
-    void initialize (const SparseMatrix<somenumber> &matrix,
-                     const AdditionalData parameters = AdditionalData());
+  /**
+   * Perform the incomplete LU
+   * factorization of the given
+   * matrix.
+   *
+   * This function needs to be
+   * called before an object of
+   * this class is used as
+   * preconditioner.
+   *
+   * For more details about
+   * possible parameters, see the
+   * class documentation of
+   * SparseLUDecomposition and the
+   * documentation of the
+   * @p SparseLUDecomposition::AdditionalData
+   * class.
+   *
+   * According to the
+   * @p parameters, this function
+   * creates a new SparsityPattern
+   * or keeps the previous sparsity
+   * or takes the sparsity given by
+   * the user to @p data. Then,
+   * this function performs the LU
+   * decomposition.
+   *
+   * After this function is called
+   * the preconditioner is ready to
+   * be used.
+   */
+  template <typename somenumber>
+  void initialize (const SparseMatrix<somenumber> &matrix,
+                   const AdditionalData parameters = AdditionalData());
 
-                                     /**
-                                      * This method is deprecated, and
-                                      * left for backward
-                                      * compability. It will be
-                                      * removed in later versions.
-                                      */
-    template <typename somenumber>
-    void decompose (const SparseMatrix<somenumber> &matrix,
-                    const double                    strengthen_diagonal=0.);
+  /**
+   * This method is deprecated, and
+   * left for backward
+   * compability. It will be
+   * removed in later versions.
+   */
+  template <typename somenumber>
+  void decompose (const SparseMatrix<somenumber> &matrix,
+                  const double                    strengthen_diagonal=0.);
 
-                                     /**
-                                      * This method is deprecated, and
-                                      * left for backward
-                                      * compability. It will be
-                                      * removed in later versions.
-                                      */
-    template <typename somenumber>
-    void apply_decomposition (Vector<somenumber>       &dst,
-                              const Vector<somenumber> &src) const;
+  /**
+   * This method is deprecated, and
+   * left for backward
+   * compability. It will be
+   * removed in later versions.
+   */
+  template <typename somenumber>
+  void apply_decomposition (Vector<somenumber>       &dst,
+                            const Vector<somenumber> &src) const;
 
-                                     /**
-                                      * Apply the incomplete decomposition,
-                                      * i.e. do one forward-backward step
-                                      * $dst=(LU)^{-1}src$.
-                                      *
-                                      * The initialize() function
-                                      * needs to be called before.
-                                      */
-    template <typename somenumber>
-    void vmult (Vector<somenumber>       &dst,
-                const Vector<somenumber> &src) const;
-
-
-                                     /**
-                                      * Apply the transpose of the
-                                      * incomplete decomposition,
-                                      * i.e. do one forward-backward step
-                                      * $dst=(LU)^{-T}src$.
-                                      *
-                                      * The initialize() function
-                                      * needs to be called before.
-                                      */
-    template <typename somenumber>
-    void Tvmult (Vector<somenumber>       &dst,
-                 const Vector<somenumber> &src) const;
+  /**
+   * Apply the incomplete decomposition,
+   * i.e. do one forward-backward step
+   * $dst=(LU)^{-1}src$.
+   *
+   * The initialize() function
+   * needs to be called before.
+   */
+  template <typename somenumber>
+  void vmult (Vector<somenumber>       &dst,
+              const Vector<somenumber> &src) const;
 
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
-    std::size_t memory_consumption () const;
+  /**
+   * Apply the transpose of the
+   * incomplete decomposition,
+   * i.e. do one forward-backward step
+   * $dst=(LU)^{-T}src$.
+   *
+   * The initialize() function
+   * needs to be called before.
+   */
+  template <typename somenumber>
+  void Tvmult (Vector<somenumber>       &dst,
+               const Vector<somenumber> &src) const;
 
-                                     /** @addtogroup Exceptions
-                                      * @{ */
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcInvalidStrengthening,
-                    double,
-                    << "The strengthening parameter " << arg1
-                    << " is not greater or equal than zero!");
-                                     //@}
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  std::size_t memory_consumption () const;
+
+  /** @addtogroup Exceptions
+   * @{ */
+
+  /**
+   * Exception
+   */
+  DeclException1 (ExcInvalidStrengthening,
+                  double,
+                  << "The strengthening parameter " << arg1
+                  << " is not greater or equal than zero!");
+  //@}
 };
 
 /*@}*/

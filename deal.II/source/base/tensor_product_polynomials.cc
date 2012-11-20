@@ -137,10 +137,10 @@ TensorProductPolynomials<dim>::compute_grad (const unsigned int i,
   unsigned int indices[dim];
   compute_index (i, indices);
 
-                                   // compute values and
-                                   // uni-directional derivatives at
-                                   // the given point in each
-                                   // co-ordinate direction
+  // compute values and
+  // uni-directional derivatives at
+  // the given point in each
+  // co-ordinate direction
   double v [dim][2];
   {
     std::vector<double> tmp (2);
@@ -228,9 +228,9 @@ compute (const Point<dim>            &p,
              update_grads      = (grads.size()==n_tensor_pols),
              update_grad_grads = (grad_grads.size()==n_tensor_pols);
 
-                                   // check how many
-                                   // values/derivatives we have to
-                                   // compute
+  // check how many
+  // values/derivatives we have to
+  // compute
   unsigned int n_values_and_derivatives = 0;
   if (update_values)
     n_values_and_derivatives = 1;
@@ -240,14 +240,14 @@ compute (const Point<dim>            &p,
     n_values_and_derivatives = 3;
 
 
-                                   // compute the values (and derivatives, if
-                                   // necessary) of all polynomials at this
-                                   // evaluation point. to avoid many
-                                   // reallocation, use one std::vector for
-                                   // polynomial evaluation and store the
-                                   // result as Tensor<1,3> (that has enough
-                                   // fields for any evaluation of values and
-                                   // derivatives)
+  // compute the values (and derivatives, if
+  // necessary) of all polynomials at this
+  // evaluation point. to avoid many
+  // reallocation, use one std::vector for
+  // polynomial evaluation and store the
+  // result as Tensor<1,3> (that has enough
+  // fields for any evaluation of values and
+  // derivatives)
   Table<2,Tensor<1,3> > v(dim, polynomials.size());
   {
     std::vector<double> tmp (n_values_and_derivatives);
@@ -262,10 +262,10 @@ compute (const Point<dim>            &p,
 
   for (unsigned int i=0; i<n_tensor_pols; ++i)
     {
-                                       // first get the
-                                       // one-dimensional indices of
-                                       // this particular tensor
-                                       // product polynomial
+      // first get the
+      // one-dimensional indices of
+      // this particular tensor
+      // product polynomial
       unsigned int indices[dim];
       compute_index (i, indices);
 
@@ -300,7 +300,7 @@ compute (const Point<dim>            &p,
                         derivative=1;
                     }
                   grad_grads[i][d1][d2]
-                    *= v(x,indices[x])[derivative];
+                  *= v(x,indices[x])[derivative];
                 }
             }
     }
@@ -333,9 +333,9 @@ TensorProductPolynomials<0>::n() const
 template <int dim>
 AnisotropicPolynomials<dim>::
 AnisotropicPolynomials(const std::vector<std::vector<Polynomials::Polynomial<double> > > &pols)
-                :
-                polynomials (pols),
-                n_tensor_pols(get_n_tensor_pols(pols))
+  :
+  polynomials (pols),
+  n_tensor_pols(get_n_tensor_pols(pols))
 {
   Assert (pols.size() == dim, ExcDimensionMismatch(pols.size(), dim));
   for (unsigned int d=0; d<dim; ++d)
@@ -393,7 +393,7 @@ compute_index (const unsigned int i,
 template <int dim>
 double
 AnisotropicPolynomials<dim>::compute_value (const unsigned int i,
-                                              const Point<dim> &p) const
+                                            const Point<dim> &p) const
 {
   unsigned int indices[dim];
   compute_index (i, indices);
@@ -409,15 +409,15 @@ AnisotropicPolynomials<dim>::compute_value (const unsigned int i,
 template <int dim>
 Tensor<1,dim>
 AnisotropicPolynomials<dim>::compute_grad (const unsigned int i,
-                                             const Point<dim> &p) const
+                                           const Point<dim> &p) const
 {
   unsigned int indices[dim];
   compute_index (i, indices);
 
-                                   // compute values and
-                                   // uni-directional derivatives at
-                                   // the given point in each
-                                   // co-ordinate direction
+  // compute values and
+  // uni-directional derivatives at
+  // the given point in each
+  // co-ordinate direction
   std::vector<std::vector<double> > v(dim, std::vector<double> (2));
   for (unsigned int d=0; d<dim; ++d)
     polynomials[d][indices[d]].value(p(d), v[d]);
@@ -437,7 +437,7 @@ AnisotropicPolynomials<dim>::compute_grad (const unsigned int i,
 template <int dim>
 Tensor<2,dim>
 AnisotropicPolynomials<dim>::compute_grad_grad (const unsigned int i,
-                                                  const Point<dim> &p) const
+                                                const Point<dim> &p) const
 {
   unsigned int indices[dim];
   compute_index (i, indices);
@@ -490,9 +490,9 @@ compute (const Point<dim>            &p,
              update_grads      = (grads.size()==n_tensor_pols),
              update_grad_grads = (grad_grads.size()==n_tensor_pols);
 
-                                   // check how many
-                                   // values/derivatives we have to
-                                   // compute
+  // check how many
+  // values/derivatives we have to
+  // compute
   unsigned int n_values_and_derivatives = 0;
   if (update_values)
     n_values_and_derivatives = 1;
@@ -502,10 +502,10 @@ compute (const Point<dim>            &p,
     n_values_and_derivatives = 3;
 
 
-                                   // compute the values (and
-                                   // derivatives, if necessary) of
-                                   // all polynomials at this
-                                   // evaluation point
+  // compute the values (and
+  // derivatives, if necessary) of
+  // all polynomials at this
+  // evaluation point
   std::vector<std::vector<std::vector<double> > > v(dim);
   for (unsigned int d=0; d<dim; ++d)
     {
@@ -519,10 +519,10 @@ compute (const Point<dim>            &p,
 
   for (unsigned int i=0; i<n_tensor_pols; ++i)
     {
-                                       // first get the
-                                       // one-dimensional indices of
-                                       // this particular tensor
-                                       // product polynomial
+      // first get the
+      // one-dimensional indices of
+      // this particular tensor
+      // product polynomial
       unsigned int indices[dim];
       compute_index (i, indices);
 
@@ -557,7 +557,7 @@ compute (const Point<dim>            &p,
                         derivative=1;
                     }
                   grad_grads[i][d1][d2]
-                    *= v[x][indices[x]][derivative];
+                  *= v[x][indices[x]][derivative];
                 }
             }
     }

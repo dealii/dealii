@@ -26,18 +26,18 @@ DEAL_II_NAMESPACE_OPEN
 namespace IteratorState
 {
 
-/**
- *   The three states an iterator can be in: valid, past-the-end and
- *   invalid.
- */
+  /**
+   *   The three states an iterator can be in: valid, past-the-end and
+   *   invalid.
+   */
   enum IteratorStates
   {
-                                         /// Iterator points to a valid object
-        valid,
-                                         /// Iterator reached end of container
-        past_the_end,
-                                         /// Iterator is invalid, probably due to an error
-        invalid
+    /// Iterator points to a valid object
+    valid,
+    /// Iterator reached end of container
+    past_the_end,
+    /// Iterator is invalid, probably due to an error
+    invalid
   };
 }
 

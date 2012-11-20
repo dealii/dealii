@@ -22,15 +22,15 @@ namespace Algorithms
   std::vector<std::string> Event::names;
 
   Event
-  Event::assign(const char* name)
+  Event::assign(const char *name)
   {
     unsigned int index = names.size();
     names.push_back(name);
 
     Event result;
-                                     // The constructor generated an
-                                     // object with all flags equal
-                                     // zero. Now we set the new one.
+    // The constructor generated an
+    // object with all flags equal
+    // zero. Now we set the new one.
     result.flags[index] = true;
 
     return result;
@@ -38,9 +38,9 @@ namespace Algorithms
 
 
   Event::Event ()
-                  :
-                  all_true(false),
-                  flags(names.size(), false)
+    :
+    all_true(false),
+    flags(names.size(), false)
   {}
 
 

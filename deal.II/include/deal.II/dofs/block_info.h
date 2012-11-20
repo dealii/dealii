@@ -88,147 +88,147 @@ namespace hp
  */
 class BlockInfo : public Subscriptor
 {
-  public:
-                                     /**
-                                      * @brief Fill the object with values
-                                      * describing block structure
-                                      * of the DoFHandler.
-                                      *
-                                      * This function will also clear
-                                      * the local() indices.
-                                      */
-    template <int dim, int spacedim>
-    void initialize(const DoFHandler<dim, spacedim>&);
+public:
+  /**
+   * @brief Fill the object with values
+   * describing block structure
+   * of the DoFHandler.
+   *
+   * This function will also clear
+   * the local() indices.
+   */
+  template <int dim, int spacedim>
+  void initialize(const DoFHandler<dim, spacedim> &);
 
-                                     /**
-                                      * @brief Fill the object with values
-                                      * describing level block
-                                      * structure of the
-                                      * MGDoFHandler. If
-                                      * <tt>levels_only</tt> is false,
-                                      * the other initialize() is
-                                      * called as well.
-                                      *
-                                      * This function will also clear
-                                      * the local() indices.
-                                      */
-    template <int dim, int spacedim>
-    void initialize(const MGDoFHandler<dim, spacedim>&, bool levels_only = false);
+  /**
+   * @brief Fill the object with values
+   * describing level block
+   * structure of the
+   * MGDoFHandler. If
+   * <tt>levels_only</tt> is false,
+   * the other initialize() is
+   * called as well.
+   *
+   * This function will also clear
+   * the local() indices.
+   */
+  template <int dim, int spacedim>
+  void initialize(const MGDoFHandler<dim, spacedim> &, bool levels_only = false);
 
-                                     /**
-                                      * @brief Initialize block structure
-                                      * on cells and compute
-                                      * renumbering between cell
-                                      * dofs and block cell dofs.
-                                      */
-    template <int dim, int spacedim>
-    void initialize_local(const DoFHandler<dim, spacedim>&);
+  /**
+   * @brief Initialize block structure
+   * on cells and compute
+   * renumbering between cell
+   * dofs and block cell dofs.
+   */
+  template <int dim, int spacedim>
+  void initialize_local(const DoFHandler<dim, spacedim> &);
 
-                                     /**
-                                      * Access the BlockIndices
-                                      * structure of the global
-                                      * system.
-                                      */
-    const BlockIndices& global() const;
+  /**
+   * Access the BlockIndices
+   * structure of the global
+   * system.
+   */
+  const BlockIndices &global() const;
 
-                                     /**
-                                      * Access BlockIndices for the
-                                      * local system on a cell.
-                                      */
-    const BlockIndices& local() const;
+  /**
+   * Access BlockIndices for the
+   * local system on a cell.
+   */
+  const BlockIndices &local() const;
 
-                                     /**
-                                      * Access the BlockIndices
-                                      * structure of a level in the
-                                      * multilevel hierarchy.
-                                      */
-    const BlockIndices& level(unsigned int level) const;
+  /**
+   * Access the BlockIndices
+   * structure of a level in the
+   * multilevel hierarchy.
+   */
+  const BlockIndices &level(unsigned int level) const;
 
-                                     /**
-                                      * Return the index after local
-                                      * renumbering.
-                                      *
-                                      * The input of this function is
-                                      * an index between zero and the
-                                      * number of dofs per cell,
-                                      * numbered in local block
-                                      * ordering, that is first all
-                                      * indices of the first system
-                                      * block, then all of the second
-                                      * block and so forth. The
-                                      * function then outputs the index
-                                      * in the standard local
-                                      * numbering of DoFAccessor.
-                                      */
-    unsigned int renumber (const unsigned int i) const;
+  /**
+   * Return the index after local
+   * renumbering.
+   *
+   * The input of this function is
+   * an index between zero and the
+   * number of dofs per cell,
+   * numbered in local block
+   * ordering, that is first all
+   * indices of the first system
+   * block, then all of the second
+   * block and so forth. The
+   * function then outputs the index
+   * in the standard local
+   * numbering of DoFAccessor.
+   */
+  unsigned int renumber (const unsigned int i) const;
 
-                                     /**
-                                      * The number of base elements.
-                                      */
-    unsigned int n_base_elements() const;
+  /**
+   * The number of base elements.
+   */
+  unsigned int n_base_elements() const;
 
-                                     /**
-                                      * Return the base element of
-                                      * this index.
-                                      */
-    unsigned int base_element (const unsigned int i) const;
+  /**
+   * Return the base element of
+   * this index.
+   */
+  unsigned int base_element (const unsigned int i) const;
 
-                                     /**
-                                      * Write a summary of the block
-                                      * structure to the stream.
-                                      */
-    template <class OS>
-    void
-    print(OS& stream) const;
+  /**
+   * Write a summary of the block
+   * structure to the stream.
+   */
+  template <class OS>
+  void
+  print(OS &stream) const;
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
-    std::size_t memory_consumption () const;
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  std::size_t memory_consumption () const;
 
-    /**
-     * Read or write the data of this object to or
-     * from a stream for the purpose of serialization
-     */
-    template <class Archive>
-    void serialize (Archive & ar,
-                    const unsigned int version);
+  /**
+   * Read or write the data of this object to or
+   * from a stream for the purpose of serialization
+   */
+  template <class Archive>
+  void serialize (Archive &ar,
+                  const unsigned int version);
 
-  private:
-                                     /**
-                                      * @brief The block structure
-                                      * of the global system.
-                                      */
-    BlockIndices bi_global;
-                                     /**
-                                      * @brief The multilevel block structure.
-                                      */
-    std::vector<BlockIndices> levels;
+private:
+  /**
+   * @brief The block structure
+   * of the global system.
+   */
+  BlockIndices bi_global;
+  /**
+   * @brief The multilevel block structure.
+   */
+  std::vector<BlockIndices> levels;
 
-                                     /**
-                                      * @brief The block structure
-                                      * of the cell systems.
-                                      */
-    BlockIndices bi_local;
+  /**
+   * @brief The block structure
+   * of the cell systems.
+   */
+  BlockIndices bi_local;
 
-                                     /**
-                                      * The base element associated
-                                      * with each block.
-                                      */
-    std::vector<unsigned int> base_elements;
+  /**
+   * The base element associated
+   * with each block.
+   */
+  std::vector<unsigned int> base_elements;
 
-                                     /**
-                                      * A vector containing the
-                                      * renumbering from the
-                                      * standard order of degrees of
-                                      * freedom on a cell to a
-                                      * component wise
-                                      * ordering. Filled by
-                                      * initialize().
-                                      */
-    std::vector<unsigned int> local_renumbering;
+  /**
+   * A vector containing the
+   * renumbering from the
+   * standard order of degrees of
+   * freedom on a cell to a
+   * component wise
+   * ordering. Filled by
+   * initialize().
+   */
+  std::vector<unsigned int> local_renumbering;
 };
 
 
@@ -236,7 +236,7 @@ class BlockInfo : public Subscriptor
 //----------------------------------------------------------------------//
 
 inline
-const BlockIndices&
+const BlockIndices &
 BlockInfo::global() const
 {
   return bi_global;
@@ -244,7 +244,7 @@ BlockInfo::global() const
 
 
 inline
-const BlockIndices&
+const BlockIndices &
 BlockInfo::local() const
 {
   return bi_local;
@@ -252,7 +252,7 @@ BlockInfo::local() const
 
 
 inline
-const BlockIndices&
+const BlockIndices &
 BlockInfo::level (const unsigned int l) const
 {
   AssertIndexRange(l, levels.size());
@@ -290,10 +290,10 @@ BlockInfo::n_base_elements() const
 template <class OS>
 inline
 void
-BlockInfo::print (OS& os) const
+BlockInfo::print (OS &os) const
 {
   os << "global   dofs " << std::setw(5) << global().total_size() << " blocks";
-  for (unsigned int i=0;i<global().size();++i)
+  for (unsigned int i=0; i<global().size(); ++i)
     os << ' ' << std::setw(5) << global().block_size(i);
   os << std::endl;
 
@@ -304,15 +304,15 @@ BlockInfo::print (OS& os) const
   else
     {
       os << "local    dofs " << std::setw(5) << local().total_size() << " blocks";
-      for (unsigned int i=0;i<local().size();++i)
+      for (unsigned int i=0; i<local().size(); ++i)
         os << ' '  << std::setw(5) << local().block_size(i);
       os << std::endl;
     }
 
-  for (unsigned int l=0;l<levels.size();++l)
+  for (unsigned int l=0; l<levels.size(); ++l)
     {
       os << "level " << std::setw(2) << l << " dofs " << std::setw(5) << level(l).total_size() << " blocks";
-      for (unsigned int i=0;i<level(l).size();++i)
+      for (unsigned int i=0; i<level(l).size(); ++i)
         os << ' '  << std::setw(5) << level(l).block_size(i);
       os << std::endl;
     }
@@ -331,14 +331,14 @@ BlockInfo::memory_consumption () const
 
 
 template <class Archive>
-void BlockInfo::serialize (Archive & ar,
+void BlockInfo::serialize (Archive &ar,
                            const unsigned int version)
 {
-  ar & bi_global;
-  ar & levels;
-  ar & bi_local;
-  ar & base_elements;
-  ar & local_renumbering;
+  ar &bi_global;
+  ar &levels;
+  ar &bi_local;
+  ar &base_elements;
+  ar &local_renumbering;
 }
 
 

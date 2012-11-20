@@ -33,25 +33,25 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int n)
-                :
-                Table<2,number> (n,n)
+  :
+  Table<2,number> (n,n)
 {}
 
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int m,
                                 const unsigned int n)
-                :
-                Table<2,number> (m, n)
+  :
+  Table<2,number> (m, n)
 {}
 
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int m,
                                 const unsigned int n,
-                                const number* entries)
-                :
-                Table<2,number> (m, n)
+                                const number *entries)
+  :
+  Table<2,number> (m, n)
 {
   this->fill (entries);
 }
@@ -59,16 +59,16 @@ FullMatrix<number>::FullMatrix (const unsigned int m,
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const FullMatrix &m)
-                :
-                Table<2,number> (m)
+  :
+  Table<2,number> (m)
 {}
 
 
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const IdentityMatrix &id)
-                :
-                Table<2,number> (id.m(), id.n())
+  :
+  Table<2,number> (id.m(), id.n())
 {
   for (unsigned int i=0; i<id.m(); ++i)
     (*this)(i,i) = 1;
@@ -76,8 +76,8 @@ FullMatrix<number>::FullMatrix (const IdentityMatrix &id)
 
 
 template <typename number>
-FullMatrix<number>&
-FullMatrix<number>::operator = (const FullMatrix<number>& M)
+FullMatrix<number> &
+FullMatrix<number>::operator = (const FullMatrix<number> &M)
 {
   Table<2,number>::operator=(M);
   return *this;
@@ -86,8 +86,8 @@ FullMatrix<number>::operator = (const FullMatrix<number>& M)
 
 template <typename number>
 template <typename number2>
-FullMatrix<number>&
-FullMatrix<number>::operator = (const FullMatrix<number2>& M)
+FullMatrix<number> &
+FullMatrix<number>::operator = (const FullMatrix<number2> &M)
 {
   TableBase<2,number>::operator=(M);
   return *this;
@@ -96,7 +96,7 @@ FullMatrix<number>::operator = (const FullMatrix<number2>& M)
 
 
 template <typename number>
-FullMatrix<number>&
+FullMatrix<number> &
 FullMatrix<number>::operator = (const IdentityMatrix &id)
 {
   this->reinit (id.m(), id.n());
@@ -111,12 +111,12 @@ FullMatrix<number>::operator = (const IdentityMatrix &id)
 template <typename number>
 template <typename number2>
 FullMatrix<number> &
-FullMatrix<number>::operator = (const LAPACKFullMatrix<number2>& M)
+FullMatrix<number>::operator = (const LAPACKFullMatrix<number2> &M)
 {
   Assert (this->m() == M.n_rows(), ExcDimensionMismatch(this->m(), M.n_rows()));
   Assert (this->n() == M.n_cols(), ExcDimensionMismatch(this->n(), M.n_rows()));
-  for (unsigned int i=0;i<this->m();++i)
-    for (unsigned int j=0;j<this->n();++j)
+  for (unsigned int i=0; i<this->m(); ++i)
+    for (unsigned int j=0; j<this->n(); ++j)
       (*this)(i,j) = M(i,j);
 
   return *this;
@@ -130,8 +130,8 @@ FullMatrix<number>::all_zero () const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
-  const number* p = this->data();
-  const number* const e = this->data() + this->n_elements();
+  const number *p = this->data();
+  const number *const e = this->data() + this->n_elements();
   while (p!=e)
     if (*p++ != number(0.0))
       return false;
@@ -183,8 +183,8 @@ FullMatrix<number>::operator /= (const number factor)
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::vmult (Vector<number2>& dst,
-                           const Vector<number2>& src,
+FullMatrix<number>::vmult (Vector<number2> &dst,
+                           const Vector<number2> &src,
                            const bool adding) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
@@ -194,11 +194,11 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
 
   Assert (&src != &dst, ExcSourceEqualsDestination());
 
-  const number* e = this->data();
-                                   // get access to the data in order to
-                                   // avoid copying it when using the ()
-                                   // operator
-  const number2* src_ptr = &(*const_cast<Vector<number2>*>(&src))(0);
+  const number *e = this->data();
+  // get access to the data in order to
+  // avoid copying it when using the ()
+  // operator
+  const number2 *src_ptr = &(*const_cast<Vector<number2>*>(&src))(0);
   const unsigned int size_m = m(), size_n = n();
   for (unsigned int i=0; i<size_m; ++i)
     {
@@ -224,17 +224,17 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 
   Assert (&src != &dst, ExcSourceEqualsDestination());
 
-  const number* e = this->data();
-  number2* dst_ptr = &dst(0);
+  const number *e = this->data();
+  number2 *dst_ptr = &dst(0);
   const unsigned int size_m = m(), size_n = n();
 
-                                   // zero out data if we are not adding
+  // zero out data if we are not adding
   if (!adding)
     for (unsigned int j=0; j<size_n; ++j)
       dst_ptr[j] = 0.;
 
-                                   // write the loop in a way that we can
-                                   // access the data contiguously
+  // write the loop in a way that we can
+  // access the data contiguously
   for (unsigned int i=0; i<size_m; ++i)
     {
       const number2 d = src(i);
@@ -246,9 +246,9 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 
 template <typename number>
 template <typename number2, typename number3>
-number FullMatrix<number>::residual (Vector<number2>& dst,
-                                     const Vector<number2>& src,
-                                     const Vector<number3>& right) const
+number FullMatrix<number>::residual (Vector<number2> &dst,
+                                     const Vector<number2> &src,
+                                     const Vector<number3> &right) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -334,7 +334,7 @@ void FullMatrix<number>::fill (const FullMatrix<number2> &src,
   Assert (src_offset_j < src.n(),
           ExcIndexRange (src_offset_j, 0, src.n()));
 
-                                   // Compute maximal size of copied block
+  // Compute maximal size of copied block
   const unsigned int rows = std::min (m() - dst_offset_i,
                                       src.m() - src_offset_i);
   const unsigned int cols = std::min (n() - dst_offset_j,
@@ -350,16 +350,16 @@ void FullMatrix<number>::fill (const FullMatrix<number2> &src,
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
-                                           const std::vector<unsigned int>& p_rows,
-                                           const std::vector<unsigned int>& p_cols)
+                                           const std::vector<unsigned int> &p_rows,
+                                           const std::vector<unsigned int> &p_cols)
 {
   Assert (p_rows.size() == this->n_rows(),
           ExcDimensionMismatch (p_rows.size(), this->n_rows()));
   Assert (p_cols.size() == this->n_cols(),
           ExcDimensionMismatch (p_cols.size(), this->n_cols()));
 
-  for (unsigned int i=0;i<this->n_rows();++i)
-    for (unsigned int j=0;j<this->n_cols();++j)
+  for (unsigned int i=0; i<this->n_rows(); ++i)
+    for (unsigned int j=0; j<this->n_cols(); ++j)
       (*this)(i,j) = src(p_rows[i], p_cols[j]);
 }
 
@@ -537,11 +537,11 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
   Assert (dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
   Assert (dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
 
-                                   // see if we can use BLAS algorithms
-                                   // for this and if the type for 'number'
-                                   // works for us (it is usually not
-                                   // efficient to use BLAS for very small
-                                   // matrices):
+  // see if we can use BLAS algorithms
+  // for this and if the type for 'number'
+  // works for us (it is usually not
+  // efficient to use BLAS for very small
+  // matrices):
 #if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
   if ((types_are_equal<number,double>::value
        ||
@@ -549,57 +549,57 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
       &&
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.n() > 300)
-    {
-                                       // In case we have the BLAS
-                                       // function gemm detected at
-                                       // configure, we use that algorithm
-                                       // for matrix-matrix multiplication
-                                       // since it provides better
-                                       // performance than the deal.II
-                                       // native function (it uses cache
-                                       // and register blocking in order to
-                                       // access local data).
-                                       //
-                                       // Note that BLAS/LAPACK stores
-                                       // matrix elements column-wise (i.e.,
-                                       // all values in one column, then all
-                                       // in the next, etc.), whereas the
-                                       // FullMatrix stores them row-wise.
-                                       // We ignore that difference, and
-                                       // give our row-wise data to BLAS,
-                                       // let BLAS build the product of
-                                       // transpose matrices, and read the
-                                       // result as if it were row-wise
-                                       // again. In other words, we calculate
-                                       // (B^T A^T)^T, which is AB.
+      {
+        // In case we have the BLAS
+        // function gemm detected at
+        // configure, we use that algorithm
+        // for matrix-matrix multiplication
+        // since it provides better
+        // performance than the deal.II
+        // native function (it uses cache
+        // and register blocking in order to
+        // access local data).
+        //
+        // Note that BLAS/LAPACK stores
+        // matrix elements column-wise (i.e.,
+        // all values in one column, then all
+        // in the next, etc.), whereas the
+        // FullMatrix stores them row-wise.
+        // We ignore that difference, and
+        // give our row-wise data to BLAS,
+        // let BLAS build the product of
+        // transpose matrices, and read the
+        // result as if it were row-wise
+        // again. In other words, we calculate
+        // (B^T A^T)^T, which is AB.
 
-      const int m = src.n();
-      const int n = this->m();
-      const int k = this->n();
-      const char *notrans = "n";
+        const int m = src.n();
+        const int n = this->m();
+        const int k = this->n();
+        const char *notrans = "n";
 
-      const number alpha = 1.;
-      const number beta = (adding == true) ? 1. : 0.;
+        const number alpha = 1.;
+        const number beta = (adding == true) ? 1. : 0.;
 
-                                       // Use the BLAS function gemm for
-                                       // calculating the matrix-matrix
-                                       // product.
-      gemm(notrans, notrans, &m, &n, &k, &alpha, &src(0,0), &m,
-           &this->values[0], &k, &beta, &dst(0,0), &m);
+        // Use the BLAS function gemm for
+        // calculating the matrix-matrix
+        // product.
+        gemm(notrans, notrans, &m, &n, &k, &alpha, &src(0,0), &m,
+             &this->values[0], &k, &beta, &dst(0,0), &m);
 
-      return;
-    }
+        return;
+      }
 
 #endif
 
   const unsigned int m = this->m(), n = src.n(), l = this->n();
 
-                                        // arrange the loops in a way that
-                                        // we keep write operations low,
-                                        // (writing is usually more costly
-                                        // than reading), even though we
-                                        // need to access the data in src
-                                        // not in a contiguous way.
+  // arrange the loops in a way that
+  // we keep write operations low,
+  // (writing is usually more costly
+  // than reading), even though we
+  // need to access the data in src
+  // not in a contiguous way.
   for (unsigned int i=0; i<m; i++)
     for (unsigned int j=0; j<n; j++)
       {
@@ -624,11 +624,11 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
   Assert (src.n() == dst.n(), ExcDimensionMismatch(src.n(), dst.n()));
 
 
-                                   // see if we can use BLAS algorithms
-                                   // for this and if the type for 'number'
-                                   // works for us (it is usually not
-                                   // efficient to use BLAS for very small
-                                   // matrices):
+  // see if we can use BLAS algorithms
+  // for this and if the type for 'number'
+  // works for us (it is usually not
+  // efficient to use BLAS for very small
+  // matrices):
 #if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
   if ((types_are_equal<number,double>::value
        ||
@@ -636,62 +636,62 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
       &&
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.n() > 300)
-    {
-                                       // In case we have the BLAS
-                                       // function gemm detected at
-                                       // configure, we use that algorithm
-                                       // for matrix-matrix multiplication
-                                       // since it provides better
-                                       // performance than the deal.II
-                                       // native function (it uses cache
-                                       // and register blocking in order to
-                                       // access local data).
-                                       //
-                                       // Note that BLAS/LAPACK stores
-                                       // matrix elements column-wise (i.e.,
-                                       // all values in one column, then all
-                                       // in the next, etc.), whereas the
-                                       // FullMatrix stores them row-wise.
-                                       // We ignore that difference, and
-                                       // give our row-wise data to BLAS,
-                                       // let BLAS build the product of
-                                       // transpose matrices, and read the
-                                       // result as if it were row-wise
-                                       // again. In other words, we calculate
-                                       // (B^T A)^T, which is A^T B.
+      {
+        // In case we have the BLAS
+        // function gemm detected at
+        // configure, we use that algorithm
+        // for matrix-matrix multiplication
+        // since it provides better
+        // performance than the deal.II
+        // native function (it uses cache
+        // and register blocking in order to
+        // access local data).
+        //
+        // Note that BLAS/LAPACK stores
+        // matrix elements column-wise (i.e.,
+        // all values in one column, then all
+        // in the next, etc.), whereas the
+        // FullMatrix stores them row-wise.
+        // We ignore that difference, and
+        // give our row-wise data to BLAS,
+        // let BLAS build the product of
+        // transpose matrices, and read the
+        // result as if it were row-wise
+        // again. In other words, we calculate
+        // (B^T A)^T, which is A^T B.
 
-      const int m = src.n();
-      const int n = this->n();
-      const int k = this->m();
-      const char *trans = "t";
-      const char *notrans = "n";
+        const int m = src.n();
+        const int n = this->n();
+        const int k = this->m();
+        const char *trans = "t";
+        const char *notrans = "n";
 
-      const number alpha = 1.;
-      const number beta = (adding == true) ? 1. : 0.;
+        const number alpha = 1.;
+        const number beta = (adding == true) ? 1. : 0.;
 
-                                       // Use the BLAS function gemm for
-                                       // calculating the matrix-matrix
-                                       // product.
-      gemm(notrans, trans, &m, &n, &k, &alpha, &src(0,0), &m,
-           &this->values[0], &n, &beta, &dst(0,0), &m);
+        // Use the BLAS function gemm for
+        // calculating the matrix-matrix
+        // product.
+        gemm(notrans, trans, &m, &n, &k, &alpha, &src(0,0), &m,
+             &this->values[0], &n, &beta, &dst(0,0), &m);
 
-      return;
-    }
+        return;
+      }
 
 #endif
 
   const unsigned int m = n(), n = src.n(), l = this->m();
 
-                                        // arrange the loops in a way that
-                                        // we keep write operations low,
-                                        // (writing is usually more costly
-                                        // than reading), even though we
-                                        // need to access the data in src
-                                        // not in a contiguous way. However,
-                                        // we should usually end up in the
-                                        // optimized gemm operation in case
-                                        // the matrix is big, so this
-                                        // shouldn't be too bad.
+  // arrange the loops in a way that
+  // we keep write operations low,
+  // (writing is usually more costly
+  // than reading), even though we
+  // need to access the data in src
+  // not in a contiguous way. However,
+  // we should usually end up in the
+  // optimized gemm operation in case
+  // the matrix is big, so this
+  // shouldn't be too bad.
   for (unsigned int i=0; i<m; i++)
     for (unsigned int j=0; j<n; j++)
       {
@@ -715,11 +715,11 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
   Assert (dst.n() == src.m(), ExcDimensionMismatch(dst.n(), src.m()));
   Assert (dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
 
-                                   // see if we can use BLAS algorithms
-                                   // for this and if the type for 'number'
-                                   // works for us (it is usually not
-                                   // efficient to use BLAS for very small
-                                   // matrices):
+  // see if we can use BLAS algorithms
+  // for this and if the type for 'number'
+  // works for us (it is usually not
+  // efficient to use BLAS for very small
+  // matrices):
 #if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
   if ((types_are_equal<number,double>::value
        ||
@@ -727,56 +727,56 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
       &&
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.m() > 300)
-    {
-                                       // In case we have the BLAS
-                                       // function gemm detected at
-                                       // configure, we use that algorithm
-                                       // for matrix-matrix multiplication
-                                       // since it provides better
-                                       // performance than the deal.II
-                                       // native function (it uses cache
-                                       // and register blocking in order to
-                                       // access local data).
-                                       //
-                                       // Note that BLAS/LAPACK stores
-                                       // matrix elements column-wise (i.e.,
-                                       // all values in one column, then all
-                                       // in the next, etc.), whereas the
-                                       // FullMatrix stores them row-wise.
-                                       // We ignore that difference, and
-                                       // give our row-wise data to BLAS,
-                                       // let BLAS build the product of
-                                       // transpose matrices, and read the
-                                       // result as if it were row-wise
-                                       // again. In other words, we calculate
-                                       // (B A^T)^T, which is AB^T.
+      {
+        // In case we have the BLAS
+        // function gemm detected at
+        // configure, we use that algorithm
+        // for matrix-matrix multiplication
+        // since it provides better
+        // performance than the deal.II
+        // native function (it uses cache
+        // and register blocking in order to
+        // access local data).
+        //
+        // Note that BLAS/LAPACK stores
+        // matrix elements column-wise (i.e.,
+        // all values in one column, then all
+        // in the next, etc.), whereas the
+        // FullMatrix stores them row-wise.
+        // We ignore that difference, and
+        // give our row-wise data to BLAS,
+        // let BLAS build the product of
+        // transpose matrices, and read the
+        // result as if it were row-wise
+        // again. In other words, we calculate
+        // (B A^T)^T, which is AB^T.
 
-      const int m = src.m();
-      const int n = this->m();
-      const int k = this->n();
-      const char *notrans = "n";
-      const char *trans = "t";
+        const int m = src.m();
+        const int n = this->m();
+        const int k = this->n();
+        const char *notrans = "n";
+        const char *trans = "t";
 
-      const number alpha = 1.;
-      const number beta = (adding == true) ? 1. : 0.;
+        const number alpha = 1.;
+        const number beta = (adding == true) ? 1. : 0.;
 
-                                       // Use the BLAS function gemm for
-                                       // calculating the matrix-matrix
-                                       // product.
-      gemm(trans, notrans, &m, &n, &k, &alpha, &src(0,0), &k,
-           &this->values[0], &k, &beta, &dst(0,0), &m);
+        // Use the BLAS function gemm for
+        // calculating the matrix-matrix
+        // product.
+        gemm(trans, notrans, &m, &n, &k, &alpha, &src(0,0), &k,
+             &this->values[0], &k, &beta, &dst(0,0), &m);
 
-      return;
-    }
+        return;
+      }
 
 #endif
 
   const unsigned int m = this->m(), n = src.m(), l = this->n();
 
-                                        // arrange the loops in a way that
-                                        // we keep write operations low,
-                                        // (writing is usually more costly
-                                        // than reading).
+  // arrange the loops in a way that
+  // we keep write operations low,
+  // (writing is usually more costly
+  // than reading).
   for (unsigned int i=0; i<m; i++)
     for (unsigned int j=0; j<n; j++)
       {
@@ -801,11 +801,11 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
   Assert (src.m() == dst.n(), ExcDimensionMismatch(src.m(), dst.n()));
 
 
-                                   // see if we can use BLAS algorithms
-                                   // for this and if the type for 'number'
-                                   // works for us (it is usually not
-                                   // efficient to use BLAS for very small
-                                   // matrices):
+  // see if we can use BLAS algorithms
+  // for this and if the type for 'number'
+  // works for us (it is usually not
+  // efficient to use BLAS for very small
+  // matrices):
 #if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
   if ((types_are_equal<number,double>::value
        ||
@@ -813,62 +813,62 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
       &&
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.m() > 300)
-    {
-                                       // In case we have the BLAS
-                                       // function gemm detected at
-                                       // configure, we use that algorithm
-                                       // for matrix-matrix multiplication
-                                       // since it provides better
-                                       // performance than the deal.II
-                                       // native function (it uses cache
-                                       // and register blocking in order to
-                                       // access local data).
-                                       //
-                                       // Note that BLAS/LAPACK stores
-                                       // matrix elements column-wise (i.e.,
-                                       // all values in one column, then all
-                                       // in the next, etc.), whereas the
-                                       // FullMatrix stores them row-wise.
-                                       // We ignore that difference, and
-                                       // give our row-wise data to BLAS,
-                                       // let BLAS build the product of
-                                       // transpose matrices, and read the
-                                       // result as if it were row-wise
-                                       // again. In other words, we calculate
-                                       // (B A)^T, which is A^T B^T.
+      {
+        // In case we have the BLAS
+        // function gemm detected at
+        // configure, we use that algorithm
+        // for matrix-matrix multiplication
+        // since it provides better
+        // performance than the deal.II
+        // native function (it uses cache
+        // and register blocking in order to
+        // access local data).
+        //
+        // Note that BLAS/LAPACK stores
+        // matrix elements column-wise (i.e.,
+        // all values in one column, then all
+        // in the next, etc.), whereas the
+        // FullMatrix stores them row-wise.
+        // We ignore that difference, and
+        // give our row-wise data to BLAS,
+        // let BLAS build the product of
+        // transpose matrices, and read the
+        // result as if it were row-wise
+        // again. In other words, we calculate
+        // (B A)^T, which is A^T B^T.
 
-      const int m = src.n();
-      const int n = this->n();
-      const int k = this->m();
-      const char *trans = "t";
+        const int m = src.n();
+        const int n = this->n();
+        const int k = this->m();
+        const char *trans = "t";
 
-      const number alpha = 1.;
-      const number beta = (adding == true) ? 1. : 0.;
+        const number alpha = 1.;
+        const number beta = (adding == true) ? 1. : 0.;
 
-                                       // Use the BLAS function gemm for
-                                       // calculating the matrix-matrix
-                                       // product.
-      gemm(trans, trans, &m, &n, &k, &alpha, &src(0,0), &k,
-           &this->values[0], &n, &beta, &dst(0,0), &m);
+        // Use the BLAS function gemm for
+        // calculating the matrix-matrix
+        // product.
+        gemm(trans, trans, &m, &n, &k, &alpha, &src(0,0), &k,
+             &this->values[0], &n, &beta, &dst(0,0), &m);
 
-      return;
-    }
+        return;
+      }
 
 #endif
 
   const unsigned int m = n(), n = src.m(), l = this->m();
 
-                                        // arrange the loops in a way that
-                                        // we keep write operations low,
-                                        // (writing is usually more costly
-                                        // than reading), even though we
-                                        // need to access the data in the
-                                        // calling matrix not in a
-                                        // contiguous way. However, we
-                                        // should usually end up in the
-                                        // optimized gemm operation in case
-                                        // the matrix is big, so this
-                                        // shouldn't be too bad.
+  // arrange the loops in a way that
+  // we keep write operations low,
+  // (writing is usually more costly
+  // than reading), even though we
+  // need to access the data in the
+  // calling matrix not in a
+  // contiguous way. However, we
+  // should usually end up in the
+  // optimized gemm operation in case
+  // the matrix is big, so this
+  // shouldn't be too bad.
   for (unsigned int i=0; i<m; i++)
     for (unsigned int j=0; j<n; j++)
       {
@@ -883,9 +883,9 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
 template <typename number>
 void
 FullMatrix<number>::triple_product(
-  const FullMatrix<number>& A,
-  const FullMatrix<number>& B,
-  const FullMatrix<number>& D,
+  const FullMatrix<number> &A,
+  const FullMatrix<number> &B,
+  const FullMatrix<number> &D,
   const bool transpose_B,
   const bool transpose_D,
   const number scaling)
@@ -911,27 +911,27 @@ FullMatrix<number>::triple_product(
       AssertDimension(D.n(), n());
     }
 
-                                   // For all entries of the product
-                                   // AD
-  for (unsigned int i=0; i<A.m();++i)
-    for (unsigned int j=0; j<n();++j)
+  // For all entries of the product
+  // AD
+  for (unsigned int i=0; i<A.m(); ++i)
+    for (unsigned int j=0; j<n(); ++j)
       {
-                                         // Compute the entry
+        // Compute the entry
         number ADij = 0.;
         if (transpose_D)
-          for (unsigned int k=0;k<A.n();++k)
+          for (unsigned int k=0; k<A.n(); ++k)
             ADij += A(i,k)*D(j,k);
         else
-          for (unsigned int k=0;k<A.n();++k)
+          for (unsigned int k=0; k<A.n(); ++k)
             ADij += A(i,k)*D(k,j);
-                                   // And add it to this after
-                                   // multiplying with the right
-                                   // factor from B
+        // And add it to this after
+        // multiplying with the right
+        // factor from B
         if (transpose_B)
-          for (unsigned int k=0;k<m();++k)
+          for (unsigned int k=0; k<m(); ++k)
             this->operator()(k,j) += scaling * ADij * B(i,k);
         else
-          for (unsigned int k=0;k<m();++k)
+          for (unsigned int k=0; k<m(); ++k)
             this->operator()(k,j) += scaling * ADij * B(k,i);
       }
 }
@@ -955,7 +955,7 @@ FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
   for (unsigned int row=0; row<n_rows; ++row)
     {
       number s = 0.;
-      const number * const val_end_of_row = val_ptr+n_rows;
+      const number *const val_end_of_row = val_ptr+n_rows;
       v_ptr = v.begin();
       while (val_ptr != val_end_of_row)
         s += number(*val_ptr++) * number(*v_ptr++);
@@ -971,7 +971,7 @@ template <typename number>
 template <typename number2>
 number2
 FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
-                                                   const Vector<number2> &v) const
+                                           const Vector<number2> &v) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -987,7 +987,7 @@ FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
   for (unsigned int row=0; row<n_rows; ++row)
     {
       number s = 0.;
-      const number * const val_end_of_row = val_ptr+n_cols;
+      const number *const val_end_of_row = val_ptr+n_cols;
       v_ptr = v.begin();
       while (val_ptr != val_end_of_row)
         s += number(*val_ptr++) * number(*v_ptr++);
@@ -1146,7 +1146,7 @@ void FullMatrix<number>::add (const FullMatrix<number2> &src,
   Assert (src_offset_j < src.n(),
           ExcIndexRange (src_offset_j, 0, src.n()));
 
-                                   // Compute maximal size of copied block
+  // Compute maximal size of copied block
   const unsigned int rows = std::min (m() - dst_offset_i,
                                       src.m() - src_offset_i);
   const unsigned int cols = std::min (n() - dst_offset_j,
@@ -1155,7 +1155,7 @@ void FullMatrix<number>::add (const FullMatrix<number2> &src,
   for (unsigned int i=0; i<rows ; ++i)
     for (unsigned int j=0; j<cols ; ++j)
       (*this)(dst_offset_i+i,dst_offset_j+j)
-        += factor * number(src(src_offset_i+i,src_offset_j+j));
+      += factor * number(src(src_offset_i+i,src_offset_j+j));
 }
 
 
@@ -1163,11 +1163,11 @@ void FullMatrix<number>::add (const FullMatrix<number2> &src,
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
-                              const number factor,
-                              const unsigned int dst_offset_i,
-                              const unsigned int dst_offset_j,
-                              const unsigned int src_offset_i,
-                              const unsigned int src_offset_j)
+                               const number factor,
+                               const unsigned int dst_offset_i,
+                               const unsigned int dst_offset_j,
+                               const unsigned int src_offset_i,
+                               const unsigned int src_offset_j)
 {
   Assert (dst_offset_i < m(),
           ExcIndexRange (dst_offset_i, 0, m()));
@@ -1178,7 +1178,7 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
   Assert (src_offset_j < src.m(),
           ExcIndexRange (src_offset_j, 0, src.m()));
 
-                                   // Compute maximal size of copied block
+  // Compute maximal size of copied block
   const unsigned int rows = std::min (m() - dst_offset_i,
                                       src.n() - src_offset_j);
   const unsigned int cols = std::min (n() - dst_offset_j,
@@ -1188,7 +1188,7 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
   for (unsigned int i=0; i<rows ; ++i)
     for (unsigned int j=0; j<cols ; ++j)
       (*this)(dst_offset_i+i,dst_offset_j+j)
-        += factor * number(src(src_offset_i+j,src_offset_j+i));
+      += factor * number(src(src_offset_i+j,src_offset_j+i));
 }
 
 
@@ -1215,14 +1215,14 @@ template <typename number>
 bool
 FullMatrix<number>::operator == (const FullMatrix<number> &M) const
 {
-                                   // the matrices may either be both
-                                   // empty, or of same size and with
-                                   // same values, if they shall be
-                                   // equal
+  // the matrices may either be both
+  // empty, or of same size and with
+  // same values, if they shall be
+  // equal
   bool result = (this->data()==0) && (M.data()==0);
   result = result || ((m()==M.m()) && (n()==M.n()) &&
-             std::equal (this->data(), this->data()+m()*n(),
-                         M.data()));
+                      std::equal (this->data(), this->data()+m()*n(),
+                                  M.data()));
 
   return result;
 }
@@ -1239,20 +1239,20 @@ FullMatrix<number>::determinant () const
 
   switch (this->n_cols())
     {
-      case 1:
-            return (*this)(0,0);
-      case 2:
-            return (*this)(0,0)*(*this)(1,1) - (*this)(1,0)*(*this)(0,1);
-      case 3:
-            return  ((*this)(0,0)*(*this)(1,1)*(*this)(2,2)
-                     -(*this)(0,0)*(*this)(1,2)*(*this)(2,1)
-                     -(*this)(1,0)*(*this)(0,1)*(*this)(2,2)
-                     +(*this)(1,0)*(*this)(0,2)*(*this)(2,1)
-                     +(*this)(2,0)*(*this)(0,1)*(*this)(1,2)
-                     -(*this)(2,0)*(*this)(0,2)*(*this)(1,1));
-      default:
-            Assert (false, ExcNotImplemented());
-            return 0;
+    case 1:
+      return (*this)(0,0);
+    case 2:
+      return (*this)(0,0)*(*this)(1,1) - (*this)(1,0)*(*this)(0,1);
+    case 3:
+      return  ((*this)(0,0)*(*this)(1,1)*(*this)(2,2)
+               -(*this)(0,0)*(*this)(1,2)*(*this)(2,1)
+               -(*this)(1,0)*(*this)(0,1)*(*this)(2,2)
+               +(*this)(1,0)*(*this)(0,2)*(*this)(2,1)
+               +(*this)(2,0)*(*this)(0,1)*(*this)(1,2)
+               -(*this)(2,0)*(*this)(0,2)*(*this)(1,1));
+    default:
+      Assert (false, ExcNotImplemented());
+      return 0;
     };
 }
 
@@ -1331,20 +1331,20 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 
   if (PointerComparison::equal(&M, this))
     {
-                                       // avoid overwriting source
-                                       // by destination matrix:
+      // avoid overwriting source
+      // by destination matrix:
       FullMatrix<number2> M2 = M;
       invert(M2);
     }
   else
-  switch (this->n_cols())
-    {
+    switch (this->n_cols())
+      {
       case 1:
-            (*this)(0,0) = number2(1.0)/M(0,0);
-            return;
+        (*this)(0,0) = number2(1.0)/M(0,0);
+        return;
       case 2:
-                                             // this is Maple output,
-                                             // thus a bit unstructured
+        // this is Maple output,
+        // thus a bit unstructured
       {
         const number2 t4 = number2(1.0)/(M(0,0)*M(1,1)-M(0,1)*M(1,0));
         (*this)(0,0) = M(1,1)*t4;
@@ -1356,34 +1356,34 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 
       case 3:
       {
-            const number2 t4 = M(0,0)*M(1,1),
-                          t6 = M(0,0)*M(1,2),
-                          t8 = M(0,1)*M(1,0),
-                         t00 = M(0,2)*M(1,0),
-                         t01 = M(0,1)*M(2,0),
-                         t04 = M(0,2)*M(2,0),
-                         t07 = number2(1.0)/(t4*M(2,2)-t6*M(2,1)-t8*M(2,2)+
-                                             t00*M(2,1)+t01*M(1,2)-t04*M(1,1));
-            (*this)(0,0) = (M(1,1)*M(2,2)-M(1,2)*M(2,1))*t07;
-            (*this)(0,1) = -(M(0,1)*M(2,2)-M(0,2)*M(2,1))*t07;
-            (*this)(0,2) = -(-M(0,1)*M(1,2)+M(0,2)*M(1,1))*t07;
-            (*this)(1,0) = -(M(1,0)*M(2,2)-M(1,2)*M(2,0))*t07;
-            (*this)(1,1) = (M(0,0)*M(2,2)-t04)*t07;
-            (*this)(1,2) = -(t6-t00)*t07;
-            (*this)(2,0) = -(-M(1,0)*M(2,1)+M(1,1)*M(2,0))*t07;
-            (*this)(2,1) = -(M(0,0)*M(2,1)-t01)*t07;
-            (*this)(2,2) = (t4-t8)*t07;
-            return;
+        const number2 t4 = M(0,0)*M(1,1),
+                      t6 = M(0,0)*M(1,2),
+                      t8 = M(0,1)*M(1,0),
+                      t00 = M(0,2)*M(1,0),
+                      t01 = M(0,1)*M(2,0),
+                      t04 = M(0,2)*M(2,0),
+                      t07 = number2(1.0)/(t4*M(2,2)-t6*M(2,1)-t8*M(2,2)+
+                                          t00*M(2,1)+t01*M(1,2)-t04*M(1,1));
+        (*this)(0,0) = (M(1,1)*M(2,2)-M(1,2)*M(2,1))*t07;
+        (*this)(0,1) = -(M(0,1)*M(2,2)-M(0,2)*M(2,1))*t07;
+        (*this)(0,2) = -(-M(0,1)*M(1,2)+M(0,2)*M(1,1))*t07;
+        (*this)(1,0) = -(M(1,0)*M(2,2)-M(1,2)*M(2,0))*t07;
+        (*this)(1,1) = (M(0,0)*M(2,2)-t04)*t07;
+        (*this)(1,2) = -(t6-t00)*t07;
+        (*this)(2,0) = -(-M(1,0)*M(2,1)+M(1,1)*M(2,0))*t07;
+        (*this)(2,1) = -(M(0,0)*M(2,1)-t01)*t07;
+        (*this)(2,2) = (t4-t8)*t07;
+        return;
       };
 
       case 4:
       {
-                                         // with (linalg);
-                                         // a:=matrix(4,4);
-                                         // evalm(a);
-                                         // ai:=inverse(a);
-                                         // readlib(C);
-                                         // C(ai,optimized,filename=x4);
+        // with (linalg);
+        // a:=matrix(4,4);
+        // evalm(a);
+        // ai:=inverse(a);
+        // readlib(C);
+        // C(ai,optimized,filename=x4);
 
         const number2 t14 = M(0,0)*M(1,1);
         const number2 t15 = M(2,2)*M(3,3);
@@ -1441,51 +1441,51 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
         const number2 t133 = M(1,0)*M(0,2);
         const number2 t135 = M(1,0)*M(0,3);
         (*this)(0,0) = (M(1,1)*M(2,2)*M(3,3)-M(1,1)*M(2,3)*M(3,2)-
-                         M(2,1)*M(1,2)*M(3,3)+M(2,1)*M(1,3)*M(3,2)+
-                         M(3,1)*M(1,2)*M(2,3)-M(3,1)*M(1,3)*M(2,2))*t65;
+                        M(2,1)*M(1,2)*M(3,3)+M(2,1)*M(1,3)*M(3,2)+
+                        M(3,1)*M(1,2)*M(2,3)-M(3,1)*M(1,3)*M(2,2))*t65;
         (*this)(0,1) = -(M(0,1)*M(2,2)*M(3,3)-M(0,1)*M(2,3)*M(3,2)-
-                          t71*M(3,3)+t73*M(3,2)+t75*M(2,3)-t77*M(2,2))*t65;
+                         t71*M(3,3)+t73*M(3,2)+t75*M(2,3)-t77*M(2,2))*t65;
         (*this)(0,2) = (t81*M(3,3)-t83*M(3,2)-t85*M(3,3)+t87*M(3,2)+
-                         t75*M(1,3)-t77*M(1,2))*t65;
+                        t75*M(1,3)-t77*M(1,2))*t65;
         (*this)(0,3) = -(t81*M(2,3)-t83*M(2,2)-t85*M(2,3)+t87*M(2,2)+
-                          t71*M(1,3)-t73*M(1,2))*t65;
+                         t71*M(1,3)-t73*M(1,2))*t65;
         (*this)(1,0) = -(t101*M(3,3)-t103*M(3,2)-t105*M(3,3)+t107*M(3,2)+
-                          t109*M(2,3)-t111*M(2,2))*t65;
+                         t109*M(2,3)-t111*M(2,2))*t65;
         (*this)(1,1) = (t115*M(3,3)-t117*M(3,2)-t119*M(3,3)+t121*M(3,2)+
-                         t123*M(2,3)-t125*M(2,2))*t65;
+                        t123*M(2,3)-t125*M(2,2))*t65;
         (*this)(1,2) = -(t129*M(3,3)-t131*M(3,2)-t133*M(3,3)+t135*M(3,2)+
-                          t123*M(1,3)-t125*M(1,2))*t65;
+                         t123*M(1,3)-t125*M(1,2))*t65;
         (*this)(1,3) = (t129*M(2,3)-t131*M(2,2)-t133*M(2,3)+t135*M(2,2)+
-                         t119*M(1,3)-t121*M(1,2))*t65;
+                        t119*M(1,3)-t121*M(1,2))*t65;
         (*this)(2,0) = (t32*M(3,3)-t103*M(3,1)-t46*M(3,3)+t107*M(3,1)+
-                         t57*M(2,3)-t111*M(2,1))*t65;
+                        t57*M(2,3)-t111*M(2,1))*t65;
         (*this)(2,1) = -(t19*M(3,3)-t117*M(3,1)-t43*M(3,3)+t121*M(3,1)+
-                          t54*M(2,3)-t125*M(2,1))*t65;
+                         t54*M(2,3)-t125*M(2,1))*t65;
         (*this)(2,2) = (t14*M(3,3)-t131*M(3,1)-t29*M(3,3)+t135*M(3,1)+
-                         t54*M(1,3)-t125*M(1,1))*t65;
+                        t54*M(1,3)-t125*M(1,1))*t65;
         (*this)(2,3) = -(t14*M(2,3)-t131*M(2,1)-t29*M(2,3)+t135*M(2,1)+
-                          t43*M(1,3)-t121*M(1,1))*t65;
+                         t43*M(1,3)-t121*M(1,1))*t65;
         (*this)(3,0) = -(t32*M(3,2)-t101*M(3,1)-t46*M(3,2)+t105*M(3,1)+
-                          t57*M(2,2)-t109*M(2,1))*t65;
+                         t57*M(2,2)-t109*M(2,1))*t65;
         (*this)(3,1) = (t19*M(3,2)-t115*M(3,1)-t43*M(3,2)+t119*M(3,1)+
-                         t54*M(2,2)-t123*M(2,1))*t65;
+                        t54*M(2,2)-t123*M(2,1))*t65;
         (*this)(3,2) = -(t14*M(3,2)-t129*M(3,1)-t29*M(3,2)+t133*M(3,1)+
-                          t54*M(1,2)-t123*M(1,1))*t65;
+                         t54*M(1,2)-t123*M(1,1))*t65;
         (*this)(3,3) = (t14*M(2,2)-t129*M(2,1)-t29*M(2,2)+t133*M(2,1)+
-                         t43*M(1,2)-t119*M(1,1))*t65;
+                        t43*M(1,2)-t119*M(1,1))*t65;
 
         break;
       }
 
 
       default:
-                                             // if no inversion is
-                                             // hardcoded, fall back
-                                             // to use the
-                                             // Gauss-Jordan algorithm
-            *this = M;
-            gauss_jordan();
-    };
+        // if no inversion is
+        // hardcoded, fall back
+        // to use the
+        // Gauss-Jordan algorithm
+        *this = M;
+        gauss_jordan();
+      };
 }
 
 
@@ -1497,40 +1497,42 @@ FullMatrix<number>::cholesky (const FullMatrix<number2> &A)
   Assert (!A.empty(), ExcEmptyMatrix());
   Assert (A.n() == A.m(),
           ExcNotQuadratic());
-                                        // Matrix must be symmetric.
+  // Matrix must be symmetric.
   Assert(A.relative_symmetry_norm2() < 1.0e-10, ExcMessage("A must be symmetric."));
 
   if (PointerComparison::equal(&A, this))
     {
-                                       // avoid overwriting source
-                                       // by destination matrix:
+      // avoid overwriting source
+      // by destination matrix:
       FullMatrix<number2> A2 = A;
       cholesky(A2);
     }
   else
     {
-                                   /* reinit *this to 0 */
+      /* reinit *this to 0 */
       this->reinit(A.m(), A.n());
 
       double SLik2 = 0.0, SLikLjk = 0.0;
-      for (unsigned int i=0; i< this->n_cols(); i++){
-        SLik2 = 0.0;
-        for (unsigned int j = 0; j < i; j++){
-          SLikLjk = 0.0;
-          for (unsigned int k =0; k<j; k++)
+      for (unsigned int i=0; i< this->n_cols(); i++)
+        {
+          SLik2 = 0.0;
+          for (unsigned int j = 0; j < i; j++)
             {
-              SLikLjk += (*this)(i,k)*(*this)(j,k);
-            };
-          (*this)(i,j) = (1./(*this)(j,j))*(A(i,j) - SLikLjk);
-          SLik2 += (*this)(i,j)*(*this)(i,j);
-        }
-        AssertThrow (A(i,i) - SLik2 >= 0,
-                     ExcMatrixNotPositiveDefinite());
+              SLikLjk = 0.0;
+              for (unsigned int k =0; k<j; k++)
+                {
+                  SLikLjk += (*this)(i,k)*(*this)(j,k);
+                };
+              (*this)(i,j) = (1./(*this)(j,j))*(A(i,j) - SLikLjk);
+              SLik2 += (*this)(i,j)*(*this)(i,j);
+            }
+          AssertThrow (A(i,i) - SLik2 >= 0,
+                       ExcMatrixNotPositiveDefinite());
 
-        (*this)(i,i) = std::sqrt(A(i,i) - SLik2);
-      }
+          (*this)(i,i) = std::sqrt(A(i,i) - SLik2);
+        }
     }
-  }
+}
 
 
 template <typename number>
@@ -1542,9 +1544,9 @@ FullMatrix<number>::outer_product (const Vector<number2> &V,
   Assert (V.size() == W.size(), ExcMessage("Vectors V, W must be the same size."));
   this->reinit(V.size(), V.size());
 
-  for(unsigned int i = 0; i<this->n(); i++)
+  for (unsigned int i = 0; i<this->n(); i++)
     {
-      for(unsigned int j = 0; j< this->n(); j++)
+      for (unsigned int j = 0; j< this->n(); j++)
         {
           (*this)(i,j) = V(i)*W(j);
         }
@@ -1571,13 +1573,13 @@ FullMatrix<number>::left_invert (const FullMatrix<number2> &A)
   A_t.mmult(A_t_times_A,A);
   if (number(A_t_times_A.determinant())==number(0))
     Assert(false, ExcSingular())
-  else
-    {
-      A_t_times_A_inv.invert(A_t_times_A);
-      A_t_times_A_inv.mmult(left_inv,A_t);
+    else
+      {
+        A_t_times_A_inv.invert(A_t_times_A);
+        A_t_times_A_inv.mmult(left_inv,A_t);
 
-      *this=left_inv;
-    }
+        *this=left_inv;
+      }
 }
 
 template <typename number>
@@ -1599,13 +1601,13 @@ FullMatrix<number>::right_invert (const FullMatrix<number2> &A)
   A.mmult(A_times_A_t,A_t);
   if (number(A_times_A_t.determinant())==number(0))
     Assert(false, ExcSingular())
-  else
-    {
-      A_times_A_t_inv.invert(A_times_A_t);
-      A_t.mmult(right_inv,A_times_A_t_inv);
+    else
+      {
+        A_times_A_t_inv.invert(A_times_A_t);
+        A_t.mmult(right_inv,A_times_A_t_inv);
 
-      *this=right_inv;
-    }
+        *this=right_inv;
+      }
 }
 
 
@@ -1704,8 +1706,8 @@ FullMatrix<number>::print_formatted (
   Assert ((!this->empty()) || (this->n_cols()+this->n_rows()==0),
           ExcInternalError());
 
-                                   // set output format, but store old
-                                   // state
+  // set output format, but store old
+  // state
   std::ios::fmtflags old_flags = out.flags();
   unsigned int old_precision = out.precision (precision);
 
@@ -1714,7 +1716,9 @@ FullMatrix<number>::print_formatted (
       out.setf (std::ios::scientific, std::ios::floatfield);
       if (!width)
         width = precision+7;
-    } else {
+    }
+  else
+    {
       out.setf (std::ios::fixed, std::ios::floatfield);
       if (!width)
         width = precision+2;
@@ -1732,7 +1736,7 @@ FullMatrix<number>::print_formatted (
     };
 
   AssertThrow (out, ExcIO());
-                                   // reset output format
+  // reset output format
   out.flags (old_flags);
   out.precision(old_precision);
 }
@@ -1745,97 +1749,97 @@ FullMatrix<number>::gauss_jordan ()
   Assert (!this->empty(), ExcEmptyMatrix());
   Assert (this->n_cols() == this->n_rows(), ExcNotQuadratic());
 
-                                   // see if we can use Lapack algorithms
-                                   // for this and if the type for 'number'
-                                   // works for us (it is usually not
-                                   // efficient to use Lapack for very small
-                                   // matrices):
+  // see if we can use Lapack algorithms
+  // for this and if the type for 'number'
+  // works for us (it is usually not
+  // efficient to use Lapack for very small
+  // matrices):
 #if defined(HAVE_DGETRF_) && defined (HAVE_SGETRF_) && \
     defined(HAVE_DGETRI_) && defined (HAVE_SGETRI_)
   if (types_are_equal<number,double>::value
       ||
       types_are_equal<number,float>::value)
     if (this->n_cols() > 15)
-    {
-                                       // In case we have the LAPACK functions
-                                       // getrf and getri detected at configure,
-                                       // we use these algorithms for inversion
-                                       // since they provide better performance
-                                       // than the deal.II native functions.
-                                       //
-                                       // Note that BLAS/LAPACK stores matrix
-                                       // elements column-wise (i.e., all values in
-                                       // one column, then all in the next, etc.),
-                                       // whereas the FullMatrix stores them
-                                       // row-wise.
-                                       // We ignore that difference, and give our
-                                       // row-wise data to LAPACK,
-                                       // let LAPACK build the inverse of the
-                                       // transpose matrix, and read the result as
-                                       // if it were row-wise again. In other words,
-                                       // we just got ((A^T)^{-1})^T, which is
-                                       // A^{-1}.
+      {
+        // In case we have the LAPACK functions
+        // getrf and getri detected at configure,
+        // we use these algorithms for inversion
+        // since they provide better performance
+        // than the deal.II native functions.
+        //
+        // Note that BLAS/LAPACK stores matrix
+        // elements column-wise (i.e., all values in
+        // one column, then all in the next, etc.),
+        // whereas the FullMatrix stores them
+        // row-wise.
+        // We ignore that difference, and give our
+        // row-wise data to LAPACK,
+        // let LAPACK build the inverse of the
+        // transpose matrix, and read the result as
+        // if it were row-wise again. In other words,
+        // we just got ((A^T)^{-1})^T, which is
+        // A^{-1}.
 
-      const int nn = this->n();
+        const int nn = this->n();
 
-                                       // workspace for permutations
-      std::vector<int> ipiv(nn);
-      int info;
+        // workspace for permutations
+        std::vector<int> ipiv(nn);
+        int info;
 
-                                       // Use the LAPACK function getrf for
-                                       // calculating the LU factorization.
-      getrf(&nn, &nn, &this->values[0], &nn, &ipiv[0], &info);
+        // Use the LAPACK function getrf for
+        // calculating the LU factorization.
+        getrf(&nn, &nn, &this->values[0], &nn, &ipiv[0], &info);
 
-      Assert(info >= 0, ExcInternalError());
-      Assert(info == 0, LACExceptions::ExcSingular());
+        Assert(info >= 0, ExcInternalError());
+        Assert(info == 0, LACExceptions::ExcSingular());
 
-                                       // scratch array
-      std::vector<number> inv_work (nn);
+        // scratch array
+        std::vector<number> inv_work (nn);
 
-                                       // Use the LAPACK function getri for
-                                       // calculating the actual inverse using
-                                       // the LU factorization.
-      getri(&nn, &this->values[0], &nn, &ipiv[0], &inv_work[0], &nn, &info);
+        // Use the LAPACK function getri for
+        // calculating the actual inverse using
+        // the LU factorization.
+        getri(&nn, &this->values[0], &nn, &ipiv[0], &inv_work[0], &nn, &info);
 
-      Assert(info >= 0, ExcInternalError());
-      Assert(info == 0, LACExceptions::ExcSingular());
+        Assert(info >= 0, ExcInternalError());
+        Assert(info == 0, LACExceptions::ExcSingular());
 
-      return;
-    }
+        return;
+      }
 
 #endif
 
-                                   // otherwise do it by hand. use the
-                                   // Gauss-Jordan-Algorithmus from
-                                   // Stoer & Bulirsch I (4th Edition)
-                                   // p. 153
+  // otherwise do it by hand. use the
+  // Gauss-Jordan-Algorithmus from
+  // Stoer & Bulirsch I (4th Edition)
+  // p. 153
   const unsigned int N = n();
 
-                                   // first get an estimate of the
-                                   // size of the elements of this
-                                   // matrix, for later checks whether
-                                   // the pivot element is large
-                                   // enough, or whether we have to
-                                   // fear that the matrix is not
-                                   // regular
+  // first get an estimate of the
+  // size of the elements of this
+  // matrix, for later checks whether
+  // the pivot element is large
+  // enough, or whether we have to
+  // fear that the matrix is not
+  // regular
   double diagonal_sum = 0;
   for (unsigned int i=0; i<N; ++i)
     diagonal_sum += std::abs((*this)(i,i));
   const double typical_diagonal_element = diagonal_sum/N;
 
-                                   // initialize the array that holds
-                                   // the permutations that we find
-                                   // during pivot search
+  // initialize the array that holds
+  // the permutations that we find
+  // during pivot search
   std::vector<unsigned int> p(N);
   for (unsigned int i=0; i<N; ++i)
     p[i] = i;
 
   for (unsigned int j=0; j<N; ++j)
     {
-                                       // pivot search: search that
-                                       // part of the line on and
-                                       // right of the diagonal for
-                                       // the largest element
+      // pivot search: search that
+      // part of the line on and
+      // right of the diagonal for
+      // the largest element
       real_type max = std::abs((*this)(j,j));
       unsigned int r   = j;
       for (unsigned int i=j+1; i<N; ++i)
@@ -1846,12 +1850,12 @@ FullMatrix<number>::gauss_jordan ()
               r = i;
             }
         }
-                                       // check whether the pivot is
-                                       // too small
+      // check whether the pivot is
+      // too small
       Assert(max > 1.e-16*typical_diagonal_element,
              ExcNotRegular(max));
 
-                                       // row interchange
+      // row interchange
       if (r>j)
         {
           for (unsigned int k=0; k<N; ++k)
@@ -1860,7 +1864,7 @@ FullMatrix<number>::gauss_jordan ()
           std::swap (p[j], p[r]);
         }
 
-                                       // transformation
+      // transformation
       const number hr = number(1.)/(*this)(j,j);
       (*this)(j,j) = hr;
       for (unsigned int k=0; k<N; ++k)
@@ -1879,7 +1883,7 @@ FullMatrix<number>::gauss_jordan ()
         }
       (*this)(j,j) = hr;
     }
-                                   // column interchange
+  // column interchange
   std::vector<number> hv(N);
   for (unsigned int i=0; i<N; ++i)
     {

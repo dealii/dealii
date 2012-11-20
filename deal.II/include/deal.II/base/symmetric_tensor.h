@@ -40,24 +40,24 @@ determinant (const SymmetricTensor<2,dim,Number> &);
 
 namespace internal
 {
-                                   /**
-                                    * A namespace for classes that are
-                                    * internal to how the SymmetricTensor
-                                    * class works.
-                                    */
+  /**
+   * A namespace for classes that are
+   * internal to how the SymmetricTensor
+   * class works.
+   */
   namespace SymmetricTensorAccessors
   {
-                                     /**
-                                      * Create a TableIndices<2>
-                                      * object where the first entries
-                                      * up to <tt>position-1</tt> are
-                                      * taken from previous_indices,
-                                      * and new_index is put at
-                                      * position
-                                      * <tt>position</tt>. The
-                                      * remaining indices remain in
-                                      * invalid state.
-                                      */
+    /**
+     * Create a TableIndices<2>
+     * object where the first entries
+     * up to <tt>position-1</tt> are
+     * taken from previous_indices,
+     * and new_index is put at
+     * position
+     * <tt>position</tt>. The
+     * remaining indices remain in
+     * invalid state.
+     */
     inline
     TableIndices<2> merge (const TableIndices<2> &previous_indices,
                            const unsigned int     new_index,
@@ -73,17 +73,17 @@ namespace internal
 
 
 
-                                     /**
-                                      * Create a TableIndices<4>
-                                      * object where the first entries
-                                      * up to <tt>position-1</tt> are
-                                      * taken from previous_indices,
-                                      * and new_index is put at
-                                      * position
-                                      * <tt>position</tt>. The
-                                      * remaining indices remain in
-                                      * invalid state.
-                                      */
+    /**
+     * Create a TableIndices<4>
+     * object where the first entries
+     * up to <tt>position-1</tt> are
+     * taken from previous_indices,
+     * and new_index is put at
+     * position
+     * <tt>position</tt>. The
+     * remaining indices remain in
+     * invalid state.
+     */
     inline
     TableIndices<4> merge (const TableIndices<4> &previous_indices,
                            const unsigned int     new_index,
@@ -93,40 +93,40 @@ namespace internal
 
       switch (position)
         {
-          case 0:
-                return TableIndices<4>(new_index);
-          case 1:
-                return TableIndices<4>(previous_indices[0],
-                                       new_index);
-          case 2:
-                return TableIndices<4>(previous_indices[0],
-                                       previous_indices[1],
-                                       new_index);
-          case 3:
-                return TableIndices<4>(previous_indices[0],
-                                       previous_indices[1],
-                                       previous_indices[2],
-                                       new_index);
+        case 0:
+          return TableIndices<4>(new_index);
+        case 1:
+          return TableIndices<4>(previous_indices[0],
+                                 new_index);
+        case 2:
+          return TableIndices<4>(previous_indices[0],
+                                 previous_indices[1],
+                                 new_index);
+        case 3:
+          return TableIndices<4>(previous_indices[0],
+                                 previous_indices[1],
+                                 previous_indices[2],
+                                 new_index);
         }
       Assert (false, ExcInternalError());
       return TableIndices<4>();
     }
 
 
-                                     /**
-                                      * Typedef template magic
-                                      * denoting the result of a
-                                      * double contraction between two
-                                      * tensors or ranks rank1 and
-                                      * rank2. In general, this is a
-                                      * tensor of rank
-                                      * <tt>rank1+rank2-4</tt>, but if
-                                      * this is zero it is a single
-                                      * scalar Number. For this case,
-                                      * we have a specialization.
-                                      *
-                                      * @author Wolfgang Bangerth, 2005
-                                      */
+    /**
+     * Typedef template magic
+     * denoting the result of a
+     * double contraction between two
+     * tensors or ranks rank1 and
+     * rank2. In general, this is a
+     * tensor of rank
+     * <tt>rank1+rank2-4</tt>, but if
+     * this is zero it is a single
+     * scalar Number. For this case,
+     * we have a specialization.
+     *
+     * @author Wolfgang Bangerth, 2005
+     */
     template <int rank1, int rank2, int dim, typename Number>
     struct double_contraction_result
     {
@@ -134,399 +134,399 @@ namespace internal
     };
 
 
-                                     /**
-                                      * Typedef template magic
-                                      * denoting the result of a
-                                      * double contraction between two
-                                      * tensors or ranks rank1 and
-                                      * rank2. In general, this is a
-                                      * tensor of rank
-                                      * <tt>rank1+rank2-4</tt>, but if
-                                      * this is zero it is a single
-                                      * scalar Number. For this case,
-                                      * we have a specialization.
-                                      *
-                                      * @author Wolfgang Bangerth, 2005
-                                      */
+    /**
+     * Typedef template magic
+     * denoting the result of a
+     * double contraction between two
+     * tensors or ranks rank1 and
+     * rank2. In general, this is a
+     * tensor of rank
+     * <tt>rank1+rank2-4</tt>, but if
+     * this is zero it is a single
+     * scalar Number. For this case,
+     * we have a specialization.
+     *
+     * @author Wolfgang Bangerth, 2005
+     */
     template <int dim, typename Number>
     struct double_contraction_result<2,2,dim,Number>
     {
-        typedef Number type;
+      typedef Number type;
     };
 
 
 
-                                     /**
-                                      * Declaration of typedefs for the type
-                                      * of data structures which are used to
-                                      * store symmetric tensors. For example,
-                                      * for rank-2 symmetric tensors, we use a
-                                      * flat vector to store all the
-                                      * elements. On the other hand, symmetric
-                                      * rank-4 tensors are mappings from
-                                      * symmetric rank-2 tensors into
-                                      * symmetric rank-2 tensors, so they can
-                                      * be represented as matrices, etc.
-                                      *
-                                      * This information is probably of little
-                                      * interest to all except the accessor
-                                      * classes that need it. In particular,
-                                      * you shouldn't make any assumptions
-                                      * about the storage format in your
-                                      * application programs.
-                                      */
+    /**
+     * Declaration of typedefs for the type
+     * of data structures which are used to
+     * store symmetric tensors. For example,
+     * for rank-2 symmetric tensors, we use a
+     * flat vector to store all the
+     * elements. On the other hand, symmetric
+     * rank-4 tensors are mappings from
+     * symmetric rank-2 tensors into
+     * symmetric rank-2 tensors, so they can
+     * be represented as matrices, etc.
+     *
+     * This information is probably of little
+     * interest to all except the accessor
+     * classes that need it. In particular,
+     * you shouldn't make any assumptions
+     * about the storage format in your
+     * application programs.
+     */
     template <int rank, int dim, typename Number>
     struct StorageType;
 
-                                     /**
-                                      * Specialization of StorageType for
-                                      * rank-2 tensors.
-                                      */
+    /**
+     * Specialization of StorageType for
+     * rank-2 tensors.
+     */
     template <int dim, typename Number>
     struct StorageType<2,dim,Number>
     {
-                                         /**
-                                          * Number of independent components of a
-                                          * symmetric tensor of rank 2. We store
-                                          * only the upper right half of it.
-                                          */
-        static const unsigned int
-        n_independent_components = (dim*dim + dim)/2;
+      /**
+       * Number of independent components of a
+       * symmetric tensor of rank 2. We store
+       * only the upper right half of it.
+       */
+      static const unsigned int
+      n_independent_components = (dim*dim + dim)/2;
 
-                                         /**
-                                          * Declare the type in which we actually
-                                          * store the data.
-                                          */
-        typedef Tensor<1,n_independent_components,Number> base_tensor_type;
+      /**
+       * Declare the type in which we actually
+       * store the data.
+       */
+      typedef Tensor<1,n_independent_components,Number> base_tensor_type;
     };
 
 
 
-                                     /**
-                                      * Specialization of StorageType for
-                                      * rank-4 tensors.
-                                      */
+    /**
+     * Specialization of StorageType for
+     * rank-4 tensors.
+     */
     template <int dim, typename Number>
     struct StorageType<4,dim,Number>
     {
-                                         /**
-                                          * Number of independent components
-                                          * of a symmetric tensor of rank
-                                          * 2. Since rank-4 tensors are
-                                          * mappings between such objects, we
-                                          * need this information.
-                                          */
-        static const unsigned int
-        n_rank2_components = (dim*dim + dim)/2;
+      /**
+       * Number of independent components
+       * of a symmetric tensor of rank
+       * 2. Since rank-4 tensors are
+       * mappings between such objects, we
+       * need this information.
+       */
+      static const unsigned int
+      n_rank2_components = (dim*dim + dim)/2;
 
-                                         /**
-                                          * Number of independent components of a
-                                          * symmetric tensor of rank 4.
-                                          */
-        static const unsigned int
-        n_independent_components = (n_rank2_components *
-                                    StorageType<2,dim,Number>::n_independent_components);
+      /**
+       * Number of independent components of a
+       * symmetric tensor of rank 4.
+       */
+      static const unsigned int
+      n_independent_components = (n_rank2_components *
+                                  StorageType<2,dim,Number>::n_independent_components);
 
-                                         /**
-                                          * Declare the type in which we
-                                          * actually store the data. Symmetric
-                                          * rank-4 tensors are mappings
-                                          * between symmetric rank-2 tensors,
-                                          * so we can represent the data as a
-                                          * matrix if we represent the rank-2
-                                          * tensors as vectors.
-                                          */
-        typedef Tensor<2,n_rank2_components,Number> base_tensor_type;
+      /**
+       * Declare the type in which we
+       * actually store the data. Symmetric
+       * rank-4 tensors are mappings
+       * between symmetric rank-2 tensors,
+       * so we can represent the data as a
+       * matrix if we represent the rank-2
+       * tensors as vectors.
+       */
+      typedef Tensor<2,n_rank2_components,Number> base_tensor_type;
     };
 
 
 
-                                     /**
-                                      * Switch type to select a tensor of
-                                      * rank 2 and dimension <tt>dim</tt>,
-                                      * switching on whether the tensor
-                                      * should be constant or not.
-                                      */
+    /**
+     * Switch type to select a tensor of
+     * rank 2 and dimension <tt>dim</tt>,
+     * switching on whether the tensor
+     * should be constant or not.
+     */
     template <int rank, int dim, bool constness, typename Number>
     struct AccessorTypes;
 
-                                     /**
-                                      * Switch type to select a tensor of
-                                      * rank 2 and dimension <tt>dim</tt>,
-                                      * switching on whether the tensor
-                                      * should be constant or not.
-                                      *
-                                      * Specialization for constant tensors.
-                                      */
+    /**
+     * Switch type to select a tensor of
+     * rank 2 and dimension <tt>dim</tt>,
+     * switching on whether the tensor
+     * should be constant or not.
+     *
+     * Specialization for constant tensors.
+     */
     template <int rank, int dim, typename Number>
     struct AccessorTypes<rank,dim,true,Number>
     {
-        typedef const ::dealii::SymmetricTensor<rank,dim,Number> tensor_type;
+      typedef const ::dealii::SymmetricTensor<rank,dim,Number> tensor_type;
 
-        typedef Number reference;
+      typedef Number reference;
     };
 
-                                     /**
-                                      * Switch type to select a tensor of
-                                      * rank 2 and dimension <tt>dim</tt>,
-                                      * switching on whether the tensor
-                                      * should be constant or not.
-                                      *
-                                      * Specialization for non-constant
-                                      * tensors.
-                                      */
+    /**
+     * Switch type to select a tensor of
+     * rank 2 and dimension <tt>dim</tt>,
+     * switching on whether the tensor
+     * should be constant or not.
+     *
+     * Specialization for non-constant
+     * tensors.
+     */
     template <int rank, int dim, typename Number>
     struct AccessorTypes<rank,dim,false,Number>
     {
-        typedef ::dealii::SymmetricTensor<rank,dim,Number> tensor_type;
+      typedef ::dealii::SymmetricTensor<rank,dim,Number> tensor_type;
 
-        typedef Number &reference;
+      typedef Number &reference;
     };
 
 
-/**
- * @internal
- *
- * Class that acts as accessor to elements of type
- * SymmetricTensor. The template parameter <tt>C</tt> may be either
- * true or false, and indicates whether the objects worked on are
- * constant or not (i.e. write access is only allowed if the value is
- * false).
- *
- * Since with <tt>N</tt> indices, the effect of applying
- * <tt>operator[]</tt> is getting access to something we <tt>N-1</tt>
- * indices, we have to implement these accessor classes recursively,
- * with stopping when we have only one index left. For the latter
- * case, a specialization of this class is declared below, where
- * calling <tt>operator[]</tt> gives you access to the objects
- * actually stored by the tensor; the tensor class also makes sure
- * that only those elements are actually accessed which we actually
- * store, i.e. it reorders indices if necessary. The template
- * parameter <tt>P</tt> indicates how many remaining indices there
- * are. For a rank-2 tensor, <tt>P</tt> may be two, and when using
- * <tt>operator[]</tt>, an object with <tt>P=1</tt> emerges.
- *
- * As stated for the entire namespace, you will not usually have to do
- * with these classes directly, and should not try to use their
- * interface directly as it may change without notice. In fact, since
- * the constructors are made private, you will not even be able to
- * generate objects of this class, as they are only thought as
- * temporaries for access to elements of the table class, not for
- * passing them around as arguments of functions, etc.
- *
- * This class is an adaptation of a similar class used for the Table
- * class.
- *
- * @author Wolfgang Bangerth, 2002, 2005
- */
+    /**
+     * @internal
+     *
+     * Class that acts as accessor to elements of type
+     * SymmetricTensor. The template parameter <tt>C</tt> may be either
+     * true or false, and indicates whether the objects worked on are
+     * constant or not (i.e. write access is only allowed if the value is
+     * false).
+     *
+     * Since with <tt>N</tt> indices, the effect of applying
+     * <tt>operator[]</tt> is getting access to something we <tt>N-1</tt>
+     * indices, we have to implement these accessor classes recursively,
+     * with stopping when we have only one index left. For the latter
+     * case, a specialization of this class is declared below, where
+     * calling <tt>operator[]</tt> gives you access to the objects
+     * actually stored by the tensor; the tensor class also makes sure
+     * that only those elements are actually accessed which we actually
+     * store, i.e. it reorders indices if necessary. The template
+     * parameter <tt>P</tt> indicates how many remaining indices there
+     * are. For a rank-2 tensor, <tt>P</tt> may be two, and when using
+     * <tt>operator[]</tt>, an object with <tt>P=1</tt> emerges.
+     *
+     * As stated for the entire namespace, you will not usually have to do
+     * with these classes directly, and should not try to use their
+     * interface directly as it may change without notice. In fact, since
+     * the constructors are made private, you will not even be able to
+     * generate objects of this class, as they are only thought as
+     * temporaries for access to elements of the table class, not for
+     * passing them around as arguments of functions, etc.
+     *
+     * This class is an adaptation of a similar class used for the Table
+     * class.
+     *
+     * @author Wolfgang Bangerth, 2002, 2005
+     */
     template <int rank, int dim, bool constness, int P, typename Number>
     class Accessor
     {
-      public:
-                                         /**
-                                          * Import two typedefs from the
-                                          * switch class above.
-                                          */
-        typedef typename AccessorTypes<rank,dim,constness,Number>::reference reference;
-        typedef typename AccessorTypes<rank,dim,constness,Number>::tensor_type tensor_type;
+    public:
+      /**
+       * Import two typedefs from the
+       * switch class above.
+       */
+      typedef typename AccessorTypes<rank,dim,constness,Number>::reference reference;
+      typedef typename AccessorTypes<rank,dim,constness,Number>::tensor_type tensor_type;
 
-      private:
-                                         /**
-                                          * Constructor. Take a
-                                          * reference to the tensor
-                                          * object which we will
-                                          * access.
-                                          *
-                                          * The second argument
-                                          * denotes the values of
-                                          * previous indices into the
-                                          * tensor. For example, for a
-                                          * rank-4 tensor, if P=2,
-                                          * then we will already have
-                                          * had two successive element
-                                          * selections (e.g. through
-                                          * <tt>tensor[1][2]</tt>),
-                                          * and the two index values
-                                          * have to be stored
-                                          * somewhere. This class
-                                          * therefore only makes use
-                                          * of the first rank-P
-                                          * elements of this array,
-                                          * but passes it on to the
-                                          * next level with P-1 which
-                                          * fills the next entry, and
-                                          * so on.
-                                          *
-                                          * The constructor is made
-                                          * private in order to prevent
-                                          * you having such objects
-                                          * around. The only way to
-                                          * create such objects is via
-                                          * the <tt>Table</tt> class, which
-                                          * only generates them as
-                                          * temporary objects. This
-                                          * guarantees that the accessor
-                                          * objects go out of scope
-                                          * earlier than the mother
-                                          * object, avoid problems with
-                                          * data consistency.
-                                          */
-        Accessor (tensor_type              &tensor,
-                  const TableIndices<rank> &previous_indices);
+    private:
+      /**
+       * Constructor. Take a
+       * reference to the tensor
+       * object which we will
+       * access.
+       *
+       * The second argument
+       * denotes the values of
+       * previous indices into the
+       * tensor. For example, for a
+       * rank-4 tensor, if P=2,
+       * then we will already have
+       * had two successive element
+       * selections (e.g. through
+       * <tt>tensor[1][2]</tt>),
+       * and the two index values
+       * have to be stored
+       * somewhere. This class
+       * therefore only makes use
+       * of the first rank-P
+       * elements of this array,
+       * but passes it on to the
+       * next level with P-1 which
+       * fills the next entry, and
+       * so on.
+       *
+       * The constructor is made
+       * private in order to prevent
+       * you having such objects
+       * around. The only way to
+       * create such objects is via
+       * the <tt>Table</tt> class, which
+       * only generates them as
+       * temporary objects. This
+       * guarantees that the accessor
+       * objects go out of scope
+       * earlier than the mother
+       * object, avoid problems with
+       * data consistency.
+       */
+      Accessor (tensor_type              &tensor,
+                const TableIndices<rank> &previous_indices);
 
-                                         /**
-                                          * Default constructor. Not
-                                          * needed, and invisible, so
-                                          * private.
-                                          */
-        Accessor ();
+      /**
+       * Default constructor. Not
+       * needed, and invisible, so
+       * private.
+       */
+      Accessor ();
 
-                                         /**
-                                          * Copy constructor. Not
-                                          * needed, and invisible, so
-                                          * private.
-                                          */
-        Accessor (const Accessor &a);
+      /**
+       * Copy constructor. Not
+       * needed, and invisible, so
+       * private.
+       */
+      Accessor (const Accessor &a);
 
-      public:
+    public:
 
-                                         /**
-                                          * Index operator.
-                                          */
-        Accessor<rank,dim,constness,P-1,Number> operator [] (const unsigned int i);
+      /**
+       * Index operator.
+       */
+      Accessor<rank,dim,constness,P-1,Number> operator [] (const unsigned int i);
 
-      private:
-                                         /**
-                                          * Store the data given to the
-                                          * constructor.
-                                          */
-        tensor_type             &tensor;
-        const TableIndices<rank> previous_indices;
+    private:
+      /**
+       * Store the data given to the
+       * constructor.
+       */
+      tensor_type             &tensor;
+      const TableIndices<rank> previous_indices;
 
-                                         // declare some other classes
-                                         // as friends. make sure to
-                                         // work around bugs in some
-                                         // compilers
-        template <int,int,typename> friend class SymmetricTensor;
-        template <int,int,bool,int,typename>
-        friend class Accessor;
+      // declare some other classes
+      // as friends. make sure to
+      // work around bugs in some
+      // compilers
+      template <int,int,typename> friend class SymmetricTensor;
+      template <int,int,bool,int,typename>
+      friend class Accessor;
 #  ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
-        friend class ::dealii::SymmetricTensor<rank,dim,Number>;
-        friend class Accessor<rank,dim,constness,P+1,Number>;
+      friend class ::dealii::SymmetricTensor<rank,dim,Number>;
+      friend class Accessor<rank,dim,constness,P+1,Number>;
 #  endif
     };
 
 
 
-/**
- * @internal
- * Accessor class for SymmetricTensor. This is the specialization for the last
- * index, which actually allows access to the elements of the table,
- * rather than recursively returning access objects for further
- * subsets. The same holds for this specialization as for the general
- * template; see there for more information.
- *
- * @author Wolfgang Bangerth, 2002, 2005
- */
+    /**
+     * @internal
+     * Accessor class for SymmetricTensor. This is the specialization for the last
+     * index, which actually allows access to the elements of the table,
+     * rather than recursively returning access objects for further
+     * subsets. The same holds for this specialization as for the general
+     * template; see there for more information.
+     *
+     * @author Wolfgang Bangerth, 2002, 2005
+     */
     template <int rank, int dim, bool constness, typename Number>
     class Accessor<rank,dim,constness,1,Number>
     {
-      public:
-                                         /**
-                                          * Import two typedefs from the
-                                          * switch class above.
-                                          */
-        typedef typename AccessorTypes<rank,dim,constness,Number>::reference reference;
-        typedef typename AccessorTypes<rank,dim,constness,Number>::tensor_type tensor_type;
+    public:
+      /**
+       * Import two typedefs from the
+       * switch class above.
+       */
+      typedef typename AccessorTypes<rank,dim,constness,Number>::reference reference;
+      typedef typename AccessorTypes<rank,dim,constness,Number>::tensor_type tensor_type;
 
-      private:
-                                         /**
-                                          * Constructor. Take a
-                                          * reference to the tensor
-                                          * object which we will
-                                          * access.
-                                          *
-                                          * The second argument
-                                          * denotes the values of
-                                          * previous indices into the
-                                          * tensor. For example, for a
-                                          * rank-4 tensor, if P=2,
-                                          * then we will already have
-                                          * had two successive element
-                                          * selections (e.g. through
-                                          * <tt>tensor[1][2]</tt>),
-                                          * and the two index values
-                                          * have to be stored
-                                          * somewhere. This class
-                                          * therefore only makes use
-                                          * of the first rank-P
-                                          * elements of this array,
-                                          * but passes it on to the
-                                          * next level with P-1 which
-                                          * fills the next entry, and
-                                          * so on.
-                                          *
-                                          * For this particular
-                                          * specialization, i.e. for
-                                          * P==1, all but the last
-                                          * index are already filled.
-                                          *
-                                          * The constructor is made
-                                          * private in order to prevent
-                                          * you having such objects
-                                          * around. The only way to
-                                          * create such objects is via
-                                          * the <tt>Table</tt> class, which
-                                          * only generates them as
-                                          * temporary objects. This
-                                          * guarantees that the accessor
-                                          * objects go out of scope
-                                          * earlier than the mother
-                                          * object, avoid problems with
-                                          * data consistency.
-                                          */
-        Accessor (tensor_type              &tensor,
-                  const TableIndices<rank> &previous_indices);
+    private:
+      /**
+       * Constructor. Take a
+       * reference to the tensor
+       * object which we will
+       * access.
+       *
+       * The second argument
+       * denotes the values of
+       * previous indices into the
+       * tensor. For example, for a
+       * rank-4 tensor, if P=2,
+       * then we will already have
+       * had two successive element
+       * selections (e.g. through
+       * <tt>tensor[1][2]</tt>),
+       * and the two index values
+       * have to be stored
+       * somewhere. This class
+       * therefore only makes use
+       * of the first rank-P
+       * elements of this array,
+       * but passes it on to the
+       * next level with P-1 which
+       * fills the next entry, and
+       * so on.
+       *
+       * For this particular
+       * specialization, i.e. for
+       * P==1, all but the last
+       * index are already filled.
+       *
+       * The constructor is made
+       * private in order to prevent
+       * you having such objects
+       * around. The only way to
+       * create such objects is via
+       * the <tt>Table</tt> class, which
+       * only generates them as
+       * temporary objects. This
+       * guarantees that the accessor
+       * objects go out of scope
+       * earlier than the mother
+       * object, avoid problems with
+       * data consistency.
+       */
+      Accessor (tensor_type              &tensor,
+                const TableIndices<rank> &previous_indices);
 
-                                         /**
-                                          * Default constructor. Not
-                                          * needed, and invisible, so
-                                          * private.
-                                          */
-        Accessor ();
+      /**
+       * Default constructor. Not
+       * needed, and invisible, so
+       * private.
+       */
+      Accessor ();
 
-                                         /**
-                                          * Copy constructor. Not
-                                          * needed, and invisible, so
-                                          * private.
-                                          */
-        Accessor (const Accessor &a);
+      /**
+       * Copy constructor. Not
+       * needed, and invisible, so
+       * private.
+       */
+      Accessor (const Accessor &a);
 
-      public:
+    public:
 
-                                         /**
-                                          * Index operator.
-                                          */
-        reference operator [] (const unsigned int);
+      /**
+       * Index operator.
+       */
+      reference operator [] (const unsigned int);
 
-      private:
-                                         /**
-                                          * Store the data given to the
-                                          * constructor.
-                                          */
-        tensor_type             &tensor;
-        const TableIndices<rank> previous_indices;
+    private:
+      /**
+       * Store the data given to the
+       * constructor.
+       */
+      tensor_type             &tensor;
+      const TableIndices<rank> previous_indices;
 
-                                         // declare some other classes
-                                         // as friends. make sure to
-                                         // work around bugs in some
-                                         // compilers
-        template <int,int,typename> friend class SymmetricTensor;
-        template <int,int,bool,int,typename>
-        friend class SymmetricTensorAccessors::Accessor;
+      // declare some other classes
+      // as friends. make sure to
+      // work around bugs in some
+      // compilers
+      template <int,int,typename> friend class SymmetricTensor;
+      template <int,int,bool,int,typename>
+      friend class SymmetricTensorAccessors::Accessor;
 #  ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
-        friend class ::dealii::SymmetricTensor<rank,dim,Number>;
-        friend class SymmetricTensorAccessors::Accessor<rank,dim,constness,2,Number>;
+      friend class ::dealii::SymmetricTensor<rank,dim,Number>;
+      friend class SymmetricTensorAccessors::Accessor<rank,dim,constness,2,Number>;
 #  endif
     };
   }
@@ -603,447 +603,447 @@ namespace internal
 template <int rank, int dim, typename Number>
 class SymmetricTensor
 {
-  public:
-                                     /**
-                                      * Provide a way to get the
-                                      * dimension of an object without
-                                      * explicit knowledge of it's
-                                      * data type. Implementation is
-                                      * this way instead of providing
-                                      * a function <tt>dimension()</tt>
-                                      * because now it is possible to
-                                      * get the dimension at compile
-                                      * time without the expansion and
-                                      * preevaluation of an inlined
-                                      * function; the compiler may
-                                      * therefore produce more
-                                      * efficient code and you may use
-                                      * this value to declare other
-                                      * data types.
-                                      */
-    static const unsigned int dimension = dim;
+public:
+  /**
+   * Provide a way to get the
+   * dimension of an object without
+   * explicit knowledge of it's
+   * data type. Implementation is
+   * this way instead of providing
+   * a function <tt>dimension()</tt>
+   * because now it is possible to
+   * get the dimension at compile
+   * time without the expansion and
+   * preevaluation of an inlined
+   * function; the compiler may
+   * therefore produce more
+   * efficient code and you may use
+   * this value to declare other
+   * data types.
+   */
+  static const unsigned int dimension = dim;
 
-                                     /**
-                                      * An integer denoting the number of
-                                      * independent components that fully
-                                      * describe a symmetric tensor. In $d$
-                                      * space dimensions, this number equals
-                                      * $\frac 12 (d^2+d)$ for symmetric
-                                      * tensors of rank 2.
-                                      */
-    static const unsigned int n_independent_components
+  /**
+   * An integer denoting the number of
+   * independent components that fully
+   * describe a symmetric tensor. In $d$
+   * space dimensions, this number equals
+   * $\frac 12 (d^2+d)$ for symmetric
+   * tensors of rank 2.
+   */
+  static const unsigned int n_independent_components
     = internal::SymmetricTensorAccessors::StorageType<rank,dim,Number>::
       n_independent_components;
 
-                                     /**
-                                      * Default constructor. Creates a zero
-                                      * tensor.
-                                      */
-    SymmetricTensor ();
+  /**
+   * Default constructor. Creates a zero
+   * tensor.
+   */
+  SymmetricTensor ();
 
-                                     /**
-                                      * Constructor. Generate a symmetric
-                                      * tensor from a general one. Assumes
-                                      * that @p t is already symmetric, and in
-                                      * debug mode this is in fact
-                                      * checked. Note that no provision is
-                                      * made to assure that the tensor is
-                                      * symmetric only up to round-off error:
-                                      * if the incoming tensor is not exactly
-                                      * symmetric, then an exception is
-                                      * thrown. If you know that incoming
-                                      * tensor is symmetric only up to
-                                      * round-off, then you may want to call
-                                      * the <tt>symmetrize</tt> function
-                                      * first. If you aren't sure, it is good
-                                      * practice to check before calling
-                                      * <tt>symmetrize</tt>.
-                                      */
-    SymmetricTensor (const Tensor<2,dim,Number> &t);
+  /**
+   * Constructor. Generate a symmetric
+   * tensor from a general one. Assumes
+   * that @p t is already symmetric, and in
+   * debug mode this is in fact
+   * checked. Note that no provision is
+   * made to assure that the tensor is
+   * symmetric only up to round-off error:
+   * if the incoming tensor is not exactly
+   * symmetric, then an exception is
+   * thrown. If you know that incoming
+   * tensor is symmetric only up to
+   * round-off, then you may want to call
+   * the <tt>symmetrize</tt> function
+   * first. If you aren't sure, it is good
+   * practice to check before calling
+   * <tt>symmetrize</tt>.
+   */
+  SymmetricTensor (const Tensor<2,dim,Number> &t);
 
-                                     /**
-                                      * A constructor that creates a
-                                      * symmetric tensor from an array
-                                      * holding its independent
-                                      * elements. Using this
-                                      * constructor assumes that the
-                                      * caller knows the order in
-                                      * which elements are stored in
-                                      * symmetric tensors; its use is
-                                      * therefore discouraged, but if
-                                      * you think you want to use it
-                                      * anyway you can query the order
-                                      * of elements using the
-                                      * unrolled_index() function.
-                                      *
-                                      * This constructor is currently only
-                                      * implemented for symmetric tensors of
-                                      * rank 2.
-                                      *
-                                      * The size of the array passed
-                                      * is equal to
-                                      * SymmetricTensor<rank,dim>::n_independent_component;
-                                      * the reason for using the
-                                      * object from the internal
-                                      * namespace is to work around
-                                      * bugs in some older compilers.
-                                      */
-    SymmetricTensor (const Number (&array) [n_independent_components]);
+  /**
+   * A constructor that creates a
+   * symmetric tensor from an array
+   * holding its independent
+   * elements. Using this
+   * constructor assumes that the
+   * caller knows the order in
+   * which elements are stored in
+   * symmetric tensors; its use is
+   * therefore discouraged, but if
+   * you think you want to use it
+   * anyway you can query the order
+   * of elements using the
+   * unrolled_index() function.
+   *
+   * This constructor is currently only
+   * implemented for symmetric tensors of
+   * rank 2.
+   *
+   * The size of the array passed
+   * is equal to
+   * SymmetricTensor<rank,dim>::n_independent_component;
+   * the reason for using the
+   * object from the internal
+   * namespace is to work around
+   * bugs in some older compilers.
+   */
+  SymmetricTensor (const Number (&array) [n_independent_components]);
 
-                                     /**
-                                      *  Assignment operator.
-                                      */
-    SymmetricTensor & operator = (const SymmetricTensor &);
+  /**
+   *  Assignment operator.
+   */
+  SymmetricTensor &operator = (const SymmetricTensor &);
 
-                                     /**
-                                      * This operator assigns a scalar
-                                      * to a tensor. To avoid
-                                      * confusion with what exactly it
-                                      * means to assign a scalar value
-                                      * to a tensor, zero is the only
-                                      * value allowed for <tt>d</tt>,
-                                      * allowing the intuitive
-                                      * notation <tt>t=0</tt> to reset
-                                      * all elements of the tensor to
-                                      * zero.
-                                      */
-    SymmetricTensor & operator = (const Number d);
+  /**
+   * This operator assigns a scalar
+   * to a tensor. To avoid
+   * confusion with what exactly it
+   * means to assign a scalar value
+   * to a tensor, zero is the only
+   * value allowed for <tt>d</tt>,
+   * allowing the intuitive
+   * notation <tt>t=0</tt> to reset
+   * all elements of the tensor to
+   * zero.
+   */
+  SymmetricTensor &operator = (const Number d);
 
-                                     /**
-                                      * Convert the present symmetric tensor
-                                      * into a full tensor with the same
-                                      * elements, but using the different
-                                      * storage scheme of full tensors.
-                                      */
-    operator Tensor<rank,dim,Number> () const;
+  /**
+   * Convert the present symmetric tensor
+   * into a full tensor with the same
+   * elements, but using the different
+   * storage scheme of full tensors.
+   */
+  operator Tensor<rank,dim,Number> () const;
 
-                                     /**
-                                      *  Test for equality of two tensors.
-                                      */
-    bool operator == (const SymmetricTensor &) const;
+  /**
+   *  Test for equality of two tensors.
+   */
+  bool operator == (const SymmetricTensor &) const;
 
-                                     /**
-                                      *  Test for inequality of two tensors.
-                                      */
-    bool operator != (const SymmetricTensor &) const;
+  /**
+   *  Test for inequality of two tensors.
+   */
+  bool operator != (const SymmetricTensor &) const;
 
-                                     /**
-                                      *  Add another tensor.
-                                      */
-    SymmetricTensor & operator += (const SymmetricTensor &);
+  /**
+   *  Add another tensor.
+   */
+  SymmetricTensor &operator += (const SymmetricTensor &);
 
-                                     /**
-                                      *  Subtract another tensor.
-                                      */
-    SymmetricTensor & operator -= (const SymmetricTensor &);
+  /**
+   *  Subtract another tensor.
+   */
+  SymmetricTensor &operator -= (const SymmetricTensor &);
 
-                                     /**
-                                      *  Scale the tensor by <tt>factor</tt>,
-                                      *  i.e. multiply all components by
-                                      *  <tt>factor</tt>.
-                                      */
-    SymmetricTensor & operator *= (const Number factor);
+  /**
+   *  Scale the tensor by <tt>factor</tt>,
+   *  i.e. multiply all components by
+   *  <tt>factor</tt>.
+   */
+  SymmetricTensor &operator *= (const Number factor);
 
-                                     /**
-                                      *  Scale the vector by
-                                      *  <tt>1/factor</tt>.
-                                      */
-    SymmetricTensor & operator /= (const Number factor);
+  /**
+   *  Scale the vector by
+   *  <tt>1/factor</tt>.
+   */
+  SymmetricTensor &operator /= (const Number factor);
 
-                                     /**
-                                      *  Add two tensors. If possible, you
-                                      *  should use <tt>operator +=</tt>
-                                      *  instead since this does not need the
-                                      *  creation of a temporary.
-                                      */
-    SymmetricTensor   operator + (const SymmetricTensor &s) const;
+  /**
+   *  Add two tensors. If possible, you
+   *  should use <tt>operator +=</tt>
+   *  instead since this does not need the
+   *  creation of a temporary.
+   */
+  SymmetricTensor   operator + (const SymmetricTensor &s) const;
 
-                                     /**
-                                      *  Subtract two tensors. If possible,
-                                      *  you should use <tt>operator -=</tt>
-                                      *  instead since this does not need the
-                                      *  creation of a temporary.
-                                      */
-    SymmetricTensor   operator - (const SymmetricTensor &s) const;
+  /**
+   *  Subtract two tensors. If possible,
+   *  you should use <tt>operator -=</tt>
+   *  instead since this does not need the
+   *  creation of a temporary.
+   */
+  SymmetricTensor   operator - (const SymmetricTensor &s) const;
 
-                                     /**
-                                      * Unary minus operator. Negate all
-                                      * entries of a tensor.
-                                      */
-    SymmetricTensor   operator - () const;
+  /**
+   * Unary minus operator. Negate all
+   * entries of a tensor.
+   */
+  SymmetricTensor   operator - () const;
 
-                                     /**
-                                      * Product between the present
-                                      * symmetric tensor and a tensor
-                                      * of rank 2. For example, if the
-                                      * present object is also a
-                                      * rank-2 tensor, then this is
-                                      * the scalar-product double
-                                      * contraction
-                                      * <tt>a<sub>ij</sub>b<sub>ij</sub></tt>
-                                      * over all indices
-                                      * <tt>i,j</tt>. In this case,
-                                      * the return value evaluates to
-                                      * a single scalar. While it is
-                                      * possible to define other
-                                      * scalar product (and associated
-                                      * induced norms), this one seems
-                                      * to be the most appropriate
-                                      * one.
-                                      *
-                                      * If the present object is a
-                                      * rank-4 tensor, the the result
-                                      * is a rank-2 tensor, the
-                                      * operation contracts over the
-                                      * last two indices of the
-                                      * present object and the indices
-                                      * of the argument, and the
-                                      * result is a tensor of rank 2.
-                                      *
-                                      * Note that the multiplication
-                                      * operator for symmetrict
-                                      * tensors is defined to be a
-                                      * double contraction over two
-                                      * indices, while it is defined
-                                      * as a single contraction over
-                                      * only one index for regular
-                                      * <tt>Tensor</tt> objects. For
-                                      * symmetric tensors it therefore
-                                      * acts in a way that is commonly
-                                      * denoted by a "colon
-                                      * multiplication" in the
-                                      * mathematica literature.
-                                      *
-                                      * There are global functions
-                                      * <tt>double_contract</tt> that
-                                      * do the same work as this
-                                      * operator, but rather than
-                                      * returning the result as a
-                                      * return value, they write it
-                                      * into the first argument to the
-                                      * function.
-                                      */
+  /**
+   * Product between the present
+   * symmetric tensor and a tensor
+   * of rank 2. For example, if the
+   * present object is also a
+   * rank-2 tensor, then this is
+   * the scalar-product double
+   * contraction
+   * <tt>a<sub>ij</sub>b<sub>ij</sub></tt>
+   * over all indices
+   * <tt>i,j</tt>. In this case,
+   * the return value evaluates to
+   * a single scalar. While it is
+   * possible to define other
+   * scalar product (and associated
+   * induced norms), this one seems
+   * to be the most appropriate
+   * one.
+   *
+   * If the present object is a
+   * rank-4 tensor, the the result
+   * is a rank-2 tensor, the
+   * operation contracts over the
+   * last two indices of the
+   * present object and the indices
+   * of the argument, and the
+   * result is a tensor of rank 2.
+   *
+   * Note that the multiplication
+   * operator for symmetrict
+   * tensors is defined to be a
+   * double contraction over two
+   * indices, while it is defined
+   * as a single contraction over
+   * only one index for regular
+   * <tt>Tensor</tt> objects. For
+   * symmetric tensors it therefore
+   * acts in a way that is commonly
+   * denoted by a "colon
+   * multiplication" in the
+   * mathematica literature.
+   *
+   * There are global functions
+   * <tt>double_contract</tt> that
+   * do the same work as this
+   * operator, but rather than
+   * returning the result as a
+   * return value, they write it
+   * into the first argument to the
+   * function.
+   */
   typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim,Number>::type
   operator * (const SymmetricTensor<2,dim,Number> &s) const;
 
-                                     /**
-                                      * Contraction over two indices
-                                      * of the present object with the
-                                      * rank-4 symmetric tensor given
-                                      * as argument.
-                                      */
-    typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,dim,Number>::type
-    operator * (const SymmetricTensor<4,dim,Number> &s) const;
+  /**
+   * Contraction over two indices
+   * of the present object with the
+   * rank-4 symmetric tensor given
+   * as argument.
+   */
+  typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,dim,Number>::type
+  operator * (const SymmetricTensor<4,dim,Number> &s) const;
 
-                                     /**
-                                      * Return a read-write reference
-                                      * to the indicated element.
-                                      */
-    Number & operator() (const TableIndices<rank> &indices);
+  /**
+   * Return a read-write reference
+   * to the indicated element.
+   */
+  Number &operator() (const TableIndices<rank> &indices);
 
-                                     /**
-                                      * Return the value of the
-                                      * indicated element as a
-                                      * read-only reference.
-                                      *
-                                      * We return the requested value
-                                      * as a constant reference rather
-                                      * than by value since this
-                                      * object may hold data types
-                                      * that may be large, and we
-                                      * don't know here whether
-                                      * copying is expensive or not.
-                                      */
-    Number operator() (const TableIndices<rank> &indices) const;
+  /**
+   * Return the value of the
+   * indicated element as a
+   * read-only reference.
+   *
+   * We return the requested value
+   * as a constant reference rather
+   * than by value since this
+   * object may hold data types
+   * that may be large, and we
+   * don't know here whether
+   * copying is expensive or not.
+   */
+  Number operator() (const TableIndices<rank> &indices) const;
 
-                                     /**
-                                      * Access the elements of a row of this
-                                      * symmetric tensor. This function is
-                                      * called for constant tensors.
-                                      */
-    internal::SymmetricTensorAccessors::Accessor<rank,dim,true,rank-1,Number>
-    operator [] (const unsigned int row) const;
+  /**
+   * Access the elements of a row of this
+   * symmetric tensor. This function is
+   * called for constant tensors.
+   */
+  internal::SymmetricTensorAccessors::Accessor<rank,dim,true,rank-1,Number>
+  operator [] (const unsigned int row) const;
 
-                                     /**
-                                      * Access the elements of a row of this
-                                      * symmetric tensor. This function is
-                                      * called for non-constant tensors.
-                                      */
-    internal::SymmetricTensorAccessors::Accessor<rank,dim,false,rank-1,Number>
-    operator [] (const unsigned int row);
+  /**
+   * Access the elements of a row of this
+   * symmetric tensor. This function is
+   * called for non-constant tensors.
+   */
+  internal::SymmetricTensorAccessors::Accessor<rank,dim,false,rank-1,Number>
+  operator [] (const unsigned int row);
 
-                                     /**
-                                      * Access to an element where you
-                                      * specify the entire set of
-                                      * indices.
-                                      */
-    Number
-    operator [] (const TableIndices<rank> &indices) const;
+  /**
+   * Access to an element where you
+   * specify the entire set of
+   * indices.
+   */
+  Number
+  operator [] (const TableIndices<rank> &indices) const;
 
-                                     /**
-                                      * Access to an element where you
-                                      * specify the entire set of
-                                      * indices.
-                                      */
-    Number &
-    operator [] (const TableIndices<rank> &indices);
+  /**
+   * Access to an element where you
+   * specify the entire set of
+   * indices.
+   */
+  Number &
+  operator [] (const TableIndices<rank> &indices);
 
-                                     /**
-                                      * Access to an element according
-                                      * to unrolled index. The
-                                      * function
-                                      * <tt>s.access_raw_entry(i)</tt>
-                                      * does the same as
-                                      * <tt>s[s.unrolled_to_component_indices(i)]</tt>,
-                                      * but more efficiently.
-                                      */
-    Number
-    access_raw_entry (const unsigned int unrolled_index) const;
+  /**
+   * Access to an element according
+   * to unrolled index. The
+   * function
+   * <tt>s.access_raw_entry(i)</tt>
+   * does the same as
+   * <tt>s[s.unrolled_to_component_indices(i)]</tt>,
+   * but more efficiently.
+   */
+  Number
+  access_raw_entry (const unsigned int unrolled_index) const;
 
-                                     /**
-                                      * Access to an element according
-                                      * to unrolled index. The
-                                      * function
-                                      * <tt>s.access_raw_entry(i)</tt>
-                                      * does the same as
-                                      * <tt>s[s.unrolled_to_component_indices(i)]</tt>,
-                                      * but more efficiently.
-                                      */
-    Number &
-    access_raw_entry (const unsigned int unrolled_index);
+  /**
+   * Access to an element according
+   * to unrolled index. The
+   * function
+   * <tt>s.access_raw_entry(i)</tt>
+   * does the same as
+   * <tt>s[s.unrolled_to_component_indices(i)]</tt>,
+   * but more efficiently.
+   */
+  Number &
+  access_raw_entry (const unsigned int unrolled_index);
 
-                                     /**
-                                      * Return the Frobenius-norm of a tensor,
-                                      * i.e. the square root of the sum of
-                                      * squares of all entries. This norm is
-                                      * induced by the scalar product defined
-                                      * above for two symmetric tensors. Note
-                                      * that it includes <i>all</i> entries of
-                                      * the tensor, counting symmetry, not
-                                      * only the unique ones (for example, for
-                                      * rank-2 tensors, this norm includes
-                                      * adding up the squares of upper right
-                                      * as well as lower left entries, not
-                                      * just one of them, although they are
-                                      * equal for symmetric tensors).
-                                      */
-    Number norm () const;
+  /**
+   * Return the Frobenius-norm of a tensor,
+   * i.e. the square root of the sum of
+   * squares of all entries. This norm is
+   * induced by the scalar product defined
+   * above for two symmetric tensors. Note
+   * that it includes <i>all</i> entries of
+   * the tensor, counting symmetry, not
+   * only the unique ones (for example, for
+   * rank-2 tensors, this norm includes
+   * adding up the squares of upper right
+   * as well as lower left entries, not
+   * just one of them, although they are
+   * equal for symmetric tensors).
+   */
+  Number norm () const;
 
-                                     /**
-                                      * Tensors can be unrolled by
-                                      * simply pasting all elements
-                                      * into one long vector, but for
-                                      * this an order of elements has
-                                      * to be defined. For symmetric
-                                      * tensors, this function returns
-                                      * which index within the range
-                                      * <code>[0,n_independent_components)</code>
-                                      * the given entry in a symmetric
-                                      * tensor has.
-                                      */
-    static
-    unsigned int
-    component_to_unrolled_index (const TableIndices<rank> &indices);
+  /**
+   * Tensors can be unrolled by
+   * simply pasting all elements
+   * into one long vector, but for
+   * this an order of elements has
+   * to be defined. For symmetric
+   * tensors, this function returns
+   * which index within the range
+   * <code>[0,n_independent_components)</code>
+   * the given entry in a symmetric
+   * tensor has.
+   */
+  static
+  unsigned int
+  component_to_unrolled_index (const TableIndices<rank> &indices);
 
-                                     /**
-                                      * The opposite of the previous
-                                      * function: given an index $i$
-                                      * in the unrolled form of the
-                                      * tensor, return what set of
-                                      * indices $(k,l)$ (for rank-2
-                                      * tensors) or $(k,l,m,n)$ (for
-                                      * rank-4 tensors) corresponds to
-                                      * it.
-                                      */
-    static
-    TableIndices<rank>
-    unrolled_to_component_indices (const unsigned int i);
+  /**
+   * The opposite of the previous
+   * function: given an index $i$
+   * in the unrolled form of the
+   * tensor, return what set of
+   * indices $(k,l)$ (for rank-2
+   * tensors) or $(k,l,m,n)$ (for
+   * rank-4 tensors) corresponds to
+   * it.
+   */
+  static
+  TableIndices<rank>
+  unrolled_to_component_indices (const unsigned int i);
 
-                                     /**
-                                      * Reset all values to zero.
-                                      *
-                                      * Note that this is partly inconsistent
-                                      * with the semantics of the @p clear()
-                                      * member functions of the STL and of
-                                      * several other classes within deal.II
-                                      * which not only reset the values of
-                                      * stored elements to zero, but release
-                                      * all memory and return the object into
-                                      * a virginial state. However, since the
-                                      * size of objects of the present type is
-                                      * determined by its template parameters,
-                                      * resizing is not an option, and indeed
-                                      * the state where all elements have a
-                                      * zero value is the state right after
-                                      * construction of such an object.
-                                      */
-    void clear ();
+  /**
+   * Reset all values to zero.
+   *
+   * Note that this is partly inconsistent
+   * with the semantics of the @p clear()
+   * member functions of the STL and of
+   * several other classes within deal.II
+   * which not only reset the values of
+   * stored elements to zero, but release
+   * all memory and return the object into
+   * a virginial state. However, since the
+   * size of objects of the present type is
+   * determined by its template parameters,
+   * resizing is not an option, and indeed
+   * the state where all elements have a
+   * zero value is the state right after
+   * construction of such an object.
+   */
+  void clear ();
 
-                                     /**
-                                      * Determine an estimate for
-                                      * the memory consumption (in
-                                      * bytes) of this
-                                      * object.
-                                      */
-    static std::size_t memory_consumption ();
+  /**
+   * Determine an estimate for
+   * the memory consumption (in
+   * bytes) of this
+   * object.
+   */
+  static std::size_t memory_consumption ();
 
-                     /**
-                      * Read or write the data of this object to or
-                      * from a stream for the purpose of serialization
-                      */
-    template <class Archive>
-    void serialize(Archive & ar, const unsigned int version);
+  /**
+   * Read or write the data of this object to or
+   * from a stream for the purpose of serialization
+   */
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version);
 
-  private:
-                                     /**
-                                      * A structure that describes
-                                      * properties of the base tensor.
-                                      */
-    typedef
-    internal::SymmetricTensorAccessors::StorageType<rank,dim,Number>
-    base_tensor_descriptor;
+private:
+  /**
+   * A structure that describes
+   * properties of the base tensor.
+   */
+  typedef
+  internal::SymmetricTensorAccessors::StorageType<rank,dim,Number>
+  base_tensor_descriptor;
 
-                                     /**
-                                      * Data storage type for a
-                                      * symmetric tensor.
-                                      */
-    typedef typename base_tensor_descriptor::base_tensor_type base_tensor_type;
+  /**
+   * Data storage type for a
+   * symmetric tensor.
+   */
+  typedef typename base_tensor_descriptor::base_tensor_type base_tensor_type;
 
-                                     /**
-                                      * The place where we store the
-                                      * data of the tensor.
-                                      */
-    base_tensor_type data;
+  /**
+   * The place where we store the
+   * data of the tensor.
+   */
+  base_tensor_type data;
 
-                                     /**
-                                      * Make all other symmetric tensors friends.
-                                      */
-    template <int, int, typename> friend class SymmetricTensor;
+  /**
+   * Make all other symmetric tensors friends.
+   */
+  template <int, int, typename> friend class SymmetricTensor;
 
-                                     /**
-                                      * Make a few more functions friends.
-                                      */
-    template <int dim2, typename Number2>
-    friend Number2 trace (const SymmetricTensor<2,dim2,Number2> &d);
+  /**
+   * Make a few more functions friends.
+   */
+  template <int dim2, typename Number2>
+  friend Number2 trace (const SymmetricTensor<2,dim2,Number2> &d);
 
-    template <int dim2, typename Number2>
-    friend Number2 determinant (const SymmetricTensor<2,dim2,Number2> &t);
+  template <int dim2, typename Number2>
+  friend Number2 determinant (const SymmetricTensor<2,dim2,Number2> &t);
 
-    template <int dim2, typename Number2>
-    friend SymmetricTensor<2,dim2,Number2>
-    deviator (const SymmetricTensor<2,dim2,Number2> &t);
+  template <int dim2, typename Number2>
+  friend SymmetricTensor<2,dim2,Number2>
+  deviator (const SymmetricTensor<2,dim2,Number2> &t);
 
-    template <int dim2, typename Number2>
-    friend SymmetricTensor<2,dim2,Number2> unit_symmetric_tensor ();
+  template <int dim2, typename Number2>
+  friend SymmetricTensor<2,dim2,Number2> unit_symmetric_tensor ();
 
-    template <int dim2, typename Number2>
-    friend SymmetricTensor<4,dim2,Number2> deviator_tensor ();
+  template <int dim2, typename Number2>
+  friend SymmetricTensor<4,dim2,Number2> deviator_tensor ();
 
-    template <int dim2, typename Number2>
-    friend SymmetricTensor<4,dim2,Number2> identity_tensor ();
+  template <int dim2, typename Number2>
+  friend SymmetricTensor<4,dim2,Number2> identity_tensor ();
 
-    template <int dim2, typename Number2>
-    friend SymmetricTensor<4,dim2,Number2> invert (const SymmetricTensor<4,dim2,Number2> &);
+  template <int dim2, typename Number2>
+  friend SymmetricTensor<4,dim2,Number2> invert (const SymmetricTensor<4,dim2,Number2> &);
 };
 
 
@@ -1060,9 +1060,9 @@ namespace internal
     Accessor<rank,dim,constness,P,Number>::
     Accessor (tensor_type              &tensor,
               const TableIndices<rank> &previous_indices)
-                    :
-                    tensor (tensor),
-                    previous_indices (previous_indices)
+      :
+      tensor (tensor),
+      previous_indices (previous_indices)
     {}
 
 
@@ -1081,9 +1081,9 @@ namespace internal
     Accessor<rank,dim,constness,1,Number>::
     Accessor (tensor_type              &tensor,
               const TableIndices<rank> &previous_indices)
-                    :
-                    tensor (tensor),
-                    previous_indices (previous_indices)
+      :
+      tensor (tensor),
+      previous_indices (previous_indices)
     {}
 
 
@@ -1146,8 +1146,8 @@ SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Tensor<2,dim,Number> &t
 template <int rank, int dim, typename Number>
 inline
 SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Number (&array) [n_independent_components])
-                :
-                data (array)
+  :
+  data (array)
 {}
 
 
@@ -1178,8 +1178,8 @@ SymmetricTensor<rank,dim,Number>::operator = (const Number d)
 
 
 
-                                // helper function to convert symmetric tensor
-                                // to generic tensor
+// helper function to convert symmetric tensor
+// to generic tensor
 namespace internal
 {
   template <typename Number>
@@ -1197,7 +1197,8 @@ namespace internal
   conversion (const Tensor<1,3,Number> &data)
   {
     const Number t[2][2] = {{data[0], data[2]},
-                            {data[2], data[1]}};
+      {data[2], data[1]}
+    };
     return Tensor<2,2,Number>(t);
   }
 
@@ -1207,8 +1208,9 @@ namespace internal
   conversion (const Tensor<1,6,Number> &data)
   {
     const Number t[3][3] = {{data[0], data[3], data[4]},
-                            {data[3], data[1], data[5]},
-                            {data[4], data[5], data[2]}};
+      {data[3], data[1], data[5]},
+      {data[4], data[5], data[2]}
+    };
     return Tensor<2,3,Number>(t);
   }
 }
@@ -1501,10 +1503,10 @@ inline
 typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim,Number>::type
 SymmetricTensor<rank,dim,Number>::operator * (const SymmetricTensor<2,dim,Number> &s) const
 {
-                                // need to have two different function calls
-                                // because a scalar and rank-2 tensor are not
-                                // the same data type (see internal function
-                                // above)
+  // need to have two different function calls
+  // because a scalar and rank-2 tensor are not
+  // the same data type (see internal function
+  // above)
   return internal::perform_double_contraction<dim,Number> (data, s.data);
 }
 
@@ -1516,21 +1518,21 @@ typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,di
 SymmetricTensor<rank,dim,Number>::operator * (const SymmetricTensor<4,dim,Number> &s) const
 {
   typename internal::SymmetricTensorAccessors::
-    double_contraction_result<rank,4,dim,Number>::type tmp;
+  double_contraction_result<rank,4,dim,Number>::type tmp;
   tmp.data = internal::perform_double_contraction<dim,Number> (data,s.data);
   return tmp;
 }
 
 
 
-                                // internal namespace to switch between the
-                                // access of different tensors. There used to
-                                // be explicit instantiations before for
-                                // different ranks and dimensions, but since
-                                // we now allow for templates on the data
-                                // type, and since we cannot partially
-                                // specialize the implementation, this got
-                                // into a separate namespace
+// internal namespace to switch between the
+// access of different tensors. There used to
+// be explicit instantiations before for
+// different ranks and dimensions, but since
+// we now allow for templates on the data
+// type, and since we cannot partially
+// specialize the implementation, this got
+// into a separate namespace
 namespace internal
 {
   template <int dim, typename Number>
@@ -1545,30 +1547,30 @@ namespace internal
         return data[0];
 
       case 2:
-                                   // first treat the main diagonal
-                                   // elements, which are stored
-                                   // consecutively at the beginning
+        // first treat the main diagonal
+        // elements, which are stored
+        // consecutively at the beginning
         if (indices[0] == indices[1])
           return data[indices[0]];
 
-                                   // the rest is messier and requires a few
-                                   // switches. at least for the 2x2 case it
-                                   // is reasonably simple
+        // the rest is messier and requires a few
+        // switches. at least for the 2x2 case it
+        // is reasonably simple
         Assert (((indices[0]==1) && (indices[1]==0)) ||
                 ((indices[0]==0) && (indices[1]==1)),
                 ExcInternalError());
         return data[2];
 
       case 3:
-                                   // first treat the main diagonal
-                                   // elements, which are stored
-                                   // consecutively at the beginning
+        // first treat the main diagonal
+        // elements, which are stored
+        // consecutively at the beginning
         if (indices[0] == indices[1])
           return data[indices[0]];
 
-                                   // the rest is messier and requires a few
-                                   // switches, but simpler if we just sort
-                                   // our indices
+        // the rest is messier and requires a few
+        // switches, but simpler if we just sort
+        // our indices
         {
           TableIndices<2> sorted_indices (indices);
           sorted_indices.sort ();
@@ -1602,30 +1604,30 @@ namespace internal
         return data[0];
 
       case 2:
-                                   // first treat the main diagonal
-                                   // elements, which are stored
-                                   // consecutively at the beginning
+        // first treat the main diagonal
+        // elements, which are stored
+        // consecutively at the beginning
         if (indices[0] == indices[1])
           return data[indices[0]];
 
-                                   // the rest is messier and requires a few
-                                   // switches. at least for the 2x2 case it
-                                   // is reasonably simple
+        // the rest is messier and requires a few
+        // switches. at least for the 2x2 case it
+        // is reasonably simple
         Assert (((indices[0]==1) && (indices[1]==0)) ||
                 ((indices[0]==0) && (indices[1]==1)),
                 ExcInternalError());
         return data[2];
 
       case 3:
-                                   // first treat the main diagonal
-                                   // elements, which are stored
-                                   // consecutively at the beginning
+        // first treat the main diagonal
+        // elements, which are stored
+        // consecutively at the beginning
         if (indices[0] == indices[1])
           return data[indices[0]];
 
-                                   // the rest is messier and requires a few
-                                   // switches, but simpler if we just sort
-                                   // our indices
+        // the rest is messier and requires a few
+        // switches, but simpler if we just sort
+        // our indices
         {
           TableIndices<2> sorted_indices (indices);
           sorted_indices.sort ();
@@ -1655,95 +1657,95 @@ namespace internal
   {
     switch (dim)
       {
-        case 1:
-              return data[0][0];
+      case 1:
+        return data[0][0];
 
-        case 2:
-                                               // each entry of the tensor can be
-                                               // thought of as an entry in a
-                                               // matrix that maps the rolled-out
-                                               // rank-2 tensors into rolled-out
-                                               // rank-2 tensors. this is the
-                                               // format in which we store rank-4
-                                               // tensors. determine which
-                                               // position the present entry is
-                                               // stored in
-        {
-          unsigned int base_index[2] ;
-          if ((indices[0] == 0) && (indices[1] == 0))
-            base_index[0] = 0;
-          else if ((indices[0] == 1) && (indices[1] == 1))
-            base_index[0] = 1;
-          else
-            base_index[0] = 2;
+      case 2:
+        // each entry of the tensor can be
+        // thought of as an entry in a
+        // matrix that maps the rolled-out
+        // rank-2 tensors into rolled-out
+        // rank-2 tensors. this is the
+        // format in which we store rank-4
+        // tensors. determine which
+        // position the present entry is
+        // stored in
+      {
+        unsigned int base_index[2] ;
+        if ((indices[0] == 0) && (indices[1] == 0))
+          base_index[0] = 0;
+        else if ((indices[0] == 1) && (indices[1] == 1))
+          base_index[0] = 1;
+        else
+          base_index[0] = 2;
 
-          if ((indices[2] == 0) && (indices[3] == 0))
-            base_index[1] = 0;
-          else if ((indices[2] == 1) && (indices[3] == 1))
-            base_index[1] = 1;
-          else
-            base_index[1] = 2;
+        if ((indices[2] == 0) && (indices[3] == 0))
+          base_index[1] = 0;
+        else if ((indices[2] == 1) && (indices[3] == 1))
+          base_index[1] = 1;
+        else
+          base_index[1] = 2;
 
-          return data[base_index[0]][base_index[1]];
-        }
+        return data[base_index[0]][base_index[1]];
+      }
 
-        case 3:
-                                               // each entry of the tensor can be
-                                               // thought of as an entry in a
-                                               // matrix that maps the rolled-out
-                                               // rank-2 tensors into rolled-out
-                                               // rank-2 tensors. this is the
-                                               // format in which we store rank-4
-                                               // tensors. determine which
-                                               // position the present entry is
-                                               // stored in
-        {
-          unsigned int base_index[2] ;
-          if ((indices[0] == 0) && (indices[1] == 0))
-            base_index[0] = 0;
-          else if ((indices[0] == 1) && (indices[1] == 1))
-            base_index[0] = 1;
-          else if ((indices[0] == 2) && (indices[1] == 2))
-            base_index[0] = 2;
-          else if (((indices[0] == 0) && (indices[1] == 1)) ||
-                   ((indices[0] == 1) && (indices[1] == 0)))
-            base_index[0] = 3;
-          else if (((indices[0] == 0) && (indices[1] == 2)) ||
-                   ((indices[0] == 2) && (indices[1] == 0)))
-            base_index[0] = 4;
-          else
-            {
-              Assert (((indices[0] == 1) && (indices[1] == 2)) ||
-                      ((indices[0] == 2) && (indices[1] == 1)),
-                      ExcInternalError());
-              base_index[0] = 5;
-            }
+      case 3:
+        // each entry of the tensor can be
+        // thought of as an entry in a
+        // matrix that maps the rolled-out
+        // rank-2 tensors into rolled-out
+        // rank-2 tensors. this is the
+        // format in which we store rank-4
+        // tensors. determine which
+        // position the present entry is
+        // stored in
+      {
+        unsigned int base_index[2] ;
+        if ((indices[0] == 0) && (indices[1] == 0))
+          base_index[0] = 0;
+        else if ((indices[0] == 1) && (indices[1] == 1))
+          base_index[0] = 1;
+        else if ((indices[0] == 2) && (indices[1] == 2))
+          base_index[0] = 2;
+        else if (((indices[0] == 0) && (indices[1] == 1)) ||
+                 ((indices[0] == 1) && (indices[1] == 0)))
+          base_index[0] = 3;
+        else if (((indices[0] == 0) && (indices[1] == 2)) ||
+                 ((indices[0] == 2) && (indices[1] == 0)))
+          base_index[0] = 4;
+        else
+          {
+            Assert (((indices[0] == 1) && (indices[1] == 2)) ||
+                    ((indices[0] == 2) && (indices[1] == 1)),
+                    ExcInternalError());
+            base_index[0] = 5;
+          }
 
-          if ((indices[2] == 0) && (indices[3] == 0))
-            base_index[1] = 0;
-          else if ((indices[2] == 1) && (indices[3] == 1))
-            base_index[1] = 1;
-          else if ((indices[2] == 2) && (indices[3] == 2))
-            base_index[1] = 2;
-          else if (((indices[2] == 0) && (indices[3] == 1)) ||
-                   ((indices[2] == 1) && (indices[3] == 0)))
-            base_index[1] = 3;
-          else if (((indices[2] == 0) && (indices[3] == 2)) ||
-                   ((indices[2] == 2) && (indices[3] == 0)))
-            base_index[1] = 4;
-          else
-            {
-              Assert (((indices[2] == 1) && (indices[3] == 2)) ||
-                      ((indices[2] == 2) && (indices[3] == 1)),
-                      ExcInternalError());
-              base_index[1] = 5;
-            }
+        if ((indices[2] == 0) && (indices[3] == 0))
+          base_index[1] = 0;
+        else if ((indices[2] == 1) && (indices[3] == 1))
+          base_index[1] = 1;
+        else if ((indices[2] == 2) && (indices[3] == 2))
+          base_index[1] = 2;
+        else if (((indices[2] == 0) && (indices[3] == 1)) ||
+                 ((indices[2] == 1) && (indices[3] == 0)))
+          base_index[1] = 3;
+        else if (((indices[2] == 0) && (indices[3] == 2)) ||
+                 ((indices[2] == 2) && (indices[3] == 0)))
+          base_index[1] = 4;
+        else
+          {
+            Assert (((indices[2] == 1) && (indices[3] == 2)) ||
+                    ((indices[2] == 2) && (indices[3] == 1)),
+                    ExcInternalError());
+            base_index[1] = 5;
+          }
 
-          return data[base_index[0]][base_index[1]];
-        }
+        return data[base_index[0]][base_index[1]];
+      }
 
-        default:
-              Assert (false, ExcNotImplemented());
+      default:
+        Assert (false, ExcNotImplemented());
       }
 
     static Number dummy;
@@ -1763,91 +1765,91 @@ namespace internal
         return data[0][0];
 
       case 2:
-                                   // each entry of the tensor can be
-                                   // thought of as an entry in a
-                                   // matrix that maps the rolled-out
-                                   // rank-2 tensors into rolled-out
-                                   // rank-2 tensors. this is the
-                                   // format in which we store rank-4
-                                   // tensors. determine which
-                                   // position the present entry is
-                                   // stored in
-        {
-          unsigned int base_index[2] ;
-          if ((indices[0] == 0) && (indices[1] == 0))
-            base_index[0] = 0;
-          else if ((indices[0] == 1) && (indices[1] == 1))
-            base_index[0] = 1;
-          else
-            base_index[0] = 2;
+        // each entry of the tensor can be
+        // thought of as an entry in a
+        // matrix that maps the rolled-out
+        // rank-2 tensors into rolled-out
+        // rank-2 tensors. this is the
+        // format in which we store rank-4
+        // tensors. determine which
+        // position the present entry is
+        // stored in
+      {
+        unsigned int base_index[2] ;
+        if ((indices[0] == 0) && (indices[1] == 0))
+          base_index[0] = 0;
+        else if ((indices[0] == 1) && (indices[1] == 1))
+          base_index[0] = 1;
+        else
+          base_index[0] = 2;
 
-          if ((indices[2] == 0) && (indices[3] == 0))
-            base_index[1] = 0;
-          else if ((indices[2] == 1) && (indices[3] == 1))
-            base_index[1] = 1;
-          else
-            base_index[1] = 2;
+        if ((indices[2] == 0) && (indices[3] == 0))
+          base_index[1] = 0;
+        else if ((indices[2] == 1) && (indices[3] == 1))
+          base_index[1] = 1;
+        else
+          base_index[1] = 2;
 
-          return data[base_index[0]][base_index[1]];
-        }
+        return data[base_index[0]][base_index[1]];
+      }
 
       case 3:
-                                   // each entry of the tensor can be
-                                   // thought of as an entry in a
-                                   // matrix that maps the rolled-out
-                                   // rank-2 tensors into rolled-out
-                                   // rank-2 tensors. this is the
-                                   // format in which we store rank-4
-                                   // tensors. determine which
-                                   // position the present entry is
-                                   // stored in
-        {
-          unsigned int base_index[2] ;
-          if ((indices[0] == 0) && (indices[1] == 0))
-            base_index[0] = 0;
-          else if ((indices[0] == 1) && (indices[1] == 1))
-            base_index[0] = 1;
-          else if ((indices[0] == 2) && (indices[1] == 2))
-            base_index[0] = 2;
-          else if (((indices[0] == 0) && (indices[1] == 1)) ||
-                   ((indices[0] == 1) && (indices[1] == 0)))
-            base_index[0] = 3;
-          else if (((indices[0] == 0) && (indices[1] == 2)) ||
-                   ((indices[0] == 2) && (indices[1] == 0)))
-            base_index[0] = 4;
-          else
-            {
-              Assert (((indices[0] == 1) && (indices[1] == 2)) ||
-                      ((indices[0] == 2) && (indices[1] == 1)),
-                      ExcInternalError());
-              base_index[0] = 5;
-            }
+        // each entry of the tensor can be
+        // thought of as an entry in a
+        // matrix that maps the rolled-out
+        // rank-2 tensors into rolled-out
+        // rank-2 tensors. this is the
+        // format in which we store rank-4
+        // tensors. determine which
+        // position the present entry is
+        // stored in
+      {
+        unsigned int base_index[2] ;
+        if ((indices[0] == 0) && (indices[1] == 0))
+          base_index[0] = 0;
+        else if ((indices[0] == 1) && (indices[1] == 1))
+          base_index[0] = 1;
+        else if ((indices[0] == 2) && (indices[1] == 2))
+          base_index[0] = 2;
+        else if (((indices[0] == 0) && (indices[1] == 1)) ||
+                 ((indices[0] == 1) && (indices[1] == 0)))
+          base_index[0] = 3;
+        else if (((indices[0] == 0) && (indices[1] == 2)) ||
+                 ((indices[0] == 2) && (indices[1] == 0)))
+          base_index[0] = 4;
+        else
+          {
+            Assert (((indices[0] == 1) && (indices[1] == 2)) ||
+                    ((indices[0] == 2) && (indices[1] == 1)),
+                    ExcInternalError());
+            base_index[0] = 5;
+          }
 
-          if ((indices[2] == 0) && (indices[3] == 0))
-            base_index[1] = 0;
-          else if ((indices[2] == 1) && (indices[3] == 1))
-            base_index[1] = 1;
-          else if ((indices[2] == 2) && (indices[3] == 2))
-            base_index[1] = 2;
-          else if (((indices[2] == 0) && (indices[3] == 1)) ||
-                   ((indices[2] == 1) && (indices[3] == 0)))
-            base_index[1] = 3;
-          else if (((indices[2] == 0) && (indices[3] == 2)) ||
-                   ((indices[2] == 2) && (indices[3] == 0)))
-            base_index[1] = 4;
-          else
-            {
-              Assert (((indices[2] == 1) && (indices[3] == 2)) ||
-                      ((indices[2] == 2) && (indices[3] == 1)),
-                      ExcInternalError());
-              base_index[1] = 5;
-            }
+        if ((indices[2] == 0) && (indices[3] == 0))
+          base_index[1] = 0;
+        else if ((indices[2] == 1) && (indices[3] == 1))
+          base_index[1] = 1;
+        else if ((indices[2] == 2) && (indices[3] == 2))
+          base_index[1] = 2;
+        else if (((indices[2] == 0) && (indices[3] == 1)) ||
+                 ((indices[2] == 1) && (indices[3] == 0)))
+          base_index[1] = 3;
+        else if (((indices[2] == 0) && (indices[3] == 2)) ||
+                 ((indices[2] == 2) && (indices[3] == 0)))
+          base_index[1] = 4;
+        else
+          {
+            Assert (((indices[2] == 1) && (indices[3] == 2)) ||
+                    ((indices[2] == 2) && (indices[3] == 1)),
+                    ExcInternalError());
+            base_index[1] = 5;
+          }
 
-          return data[base_index[0]][base_index[1]];
-        }
+        return data[base_index[0]][base_index[1]];
+      }
 
-        default:
-              Assert (false, ExcNotImplemented());
+      default:
+        Assert (false, ExcNotImplemented());
       }
 
     static Number dummy;
@@ -1874,7 +1876,7 @@ template <int rank, int dim, typename Number>
 inline
 Number
 SymmetricTensor<rank,dim,Number>::operator ()
-  (const TableIndices<rank> &indices) const
+(const TableIndices<rank> &indices) const
 {
   for (unsigned int r=0; r<rank; ++r)
     Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
@@ -2033,37 +2035,40 @@ template <int rank, int dim, typename Number>
 inline
 unsigned int
 SymmetricTensor<rank,dim,Number>::component_to_unrolled_index
-  (const TableIndices<rank> &indices)
+(const TableIndices<rank> &indices)
 {
   Assert (rank == 2, ExcNotImplemented());
   Assert (indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
   Assert (indices[1] < dim, ExcIndexRange(indices[1], 0, dim));
 
-  switch(dim)
+  switch (dim)
     {
     case 1:
       return 0;
     case 2:
-      {
-        static const unsigned int table[2][2] = {{0, 2},
-                                                 {2, 1}};
-        return table[indices[0]][indices[1]];
-      }
+    {
+      static const unsigned int table[2][2] = {{0, 2},
+        {2, 1}
+      };
+      return table[indices[0]][indices[1]];
+    }
     case 3:
-      {
-        static const unsigned int table[3][3] = {{0, 3, 4},
-                                                 {3, 1, 5},
-                                                 {4, 5, 2}};
-        return table[indices[0]][indices[1]];
-      }
+    {
+      static const unsigned int table[3][3] = {{0, 3, 4},
+        {3, 1, 5},
+        {4, 5, 2}
+      };
+      return table[indices[0]][indices[1]];
+    }
     case 4:
-      {
-        static const unsigned int table[4][4] = {{0, 4, 5, 6},
-                                                 {4, 1, 7, 8},
-                                                 {5, 7, 2, 9},
-                                                 {6, 8, 9, 3}};
-        return table[indices[0]][indices[1]];
-      }
+    {
+      static const unsigned int table[4][4] = {{0, 4, 5, 6},
+        {4, 1, 7, 8},
+        {5, 7, 2, 9},
+        {6, 8, 9, 3}
+      };
+      return table[indices[0]][indices[1]];
+    }
     default:
       Assert (false, ExcNotImplemented());
       return 0;
@@ -2076,7 +2081,7 @@ template <int rank, int dim, typename Number>
 inline
 TableIndices<rank>
 SymmetricTensor<rank,dim,Number>::unrolled_to_component_indices
-  (const unsigned int i)
+(const unsigned int i)
 {
   Assert (rank == 2, ExcNotImplemented());
   Assert (i < n_independent_components, ExcIndexRange(i, 0, n_independent_components));
@@ -2085,24 +2090,28 @@ SymmetricTensor<rank,dim,Number>::unrolled_to_component_indices
     case 1:
       return TableIndices<2>(0,0);
     case 2:
+    {
+      static const TableIndices<2> table[3] =
       {
-        static const TableIndices<2> table[3] =
-          { TableIndices<2> (0,0),
-            TableIndices<2> (1,1),
-            TableIndices<2> (0,1) };
-        return table[i];
-      }
+        TableIndices<2> (0,0),
+        TableIndices<2> (1,1),
+        TableIndices<2> (0,1)
+      };
+      return table[i];
+    }
     case 3:
+    {
+      static const TableIndices<2> table[6] =
       {
-        static const TableIndices<2> table[6] =
-          { TableIndices<2> (0,0),
-            TableIndices<2> (1,1),
-            TableIndices<2> (2,2),
-            TableIndices<2> (0,1),
-            TableIndices<2> (0,2),
-            TableIndices<2> (1,2) };
-        return table[i];
-      }
+        TableIndices<2> (0,0),
+        TableIndices<2> (1,1),
+        TableIndices<2> (2,2),
+        TableIndices<2> (0,1),
+        TableIndices<2> (0,2),
+        TableIndices<2> (1,2)
+      };
+      return table[i];
+    }
     default:
       Assert (false, ExcNotImplemented());
       return TableIndices<2>(0,0);
@@ -2115,9 +2124,9 @@ template <int rank, int dim, typename Number>
 template <class Archive>
 inline
 void
-SymmetricTensor<rank,dim,Number>::serialize(Archive & ar, const unsigned int)
+SymmetricTensor<rank,dim,Number>::serialize(Archive &ar, const unsigned int)
 {
-  ar & data;
+  ar &data;
 }
 
 
@@ -2149,9 +2158,9 @@ Number determinant (const SymmetricTensor<2,dim,Number> &t)
     case 2:
       return (t.data[0] * t.data[1] - t.data[2]*t.data[2]);
     case 3:
-                                   // in analogy to general tensors, but
-                                   // there's something to be simplified for
-                                   // the present case
+      // in analogy to general tensors, but
+      // there's something to be simplified for
+      // the present case
       return ( t.data[0]*t.data[1]*t.data[2]
                -t.data[0]*t.data[5]*t.data[5]
                -t.data[1]*t.data[4]*t.data[4]
@@ -2303,7 +2312,7 @@ deviator (const SymmetricTensor<2,dim,Number> &t)
 {
   SymmetricTensor<2,dim,Number> tmp = t;
 
-                                   // subtract scaled trace from the diagonal
+  // subtract scaled trace from the diagonal
   const Number tr = trace(t) / dim;
   for (unsigned int i=0; i<dim; ++i)
     tmp.data[i] -= tr;
@@ -2382,16 +2391,16 @@ deviator_tensor ()
 {
   SymmetricTensor<4,dim,Number> tmp;
 
-                                   // fill the elements treating the diagonal
+  // fill the elements treating the diagonal
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       tmp.data[i][j] = (i==j ? 1 : 0) - 1./dim;
 
-                                   // then fill the ones that copy over the
-                                   // non-diagonal elements. note that during
-                                   // the double-contraction, we handle the
-                                   // off-diagonal elements twice, so simply
-                                   // copying requires a weight of 1/2
+  // then fill the ones that copy over the
+  // non-diagonal elements. note that during
+  // the double-contraction, we handle the
+  // off-diagonal elements twice, so simply
+  // copying requires a weight of 1/2
   for (unsigned int i=dim;
        i<internal::SymmetricTensorAccessors::StorageType<4,dim,Number>::n_rank2_components;
        ++i)
@@ -2455,15 +2464,15 @@ identity_tensor ()
 {
   SymmetricTensor<4,dim,Number> tmp;
 
-                                   // fill the elements treating the diagonal
+  // fill the elements treating the diagonal
   for (unsigned int i=0; i<dim; ++i)
     tmp.data[i][i] = 1;
 
-                                   // then fill the ones that copy over the
-                                   // non-diagonal elements. note that during
-                                   // the double-contraction, we handle the
-                                   // off-diagonal elements twice, so simply
-                                   // copying requires a weight of 1/2
+  // then fill the ones that copy over the
+  // non-diagonal elements. note that during
+  // the double-contraction, we handle the
+  // off-diagonal elements twice, so simply
+  // copying requires a weight of 1/2
   for (unsigned int i=dim;
        i<internal::SymmetricTensorAccessors::StorageType<4,dim,Number>::n_rank2_components;
        ++i)
@@ -2531,67 +2540,67 @@ invert (const SymmetricTensor<4,dim,Number> &t)
       break;
     case 2:
 
-                                   // inverting this tensor is a little more
-                                   // complicated than necessary, since we
-                                   // store the data of 't' as a 3x3 matrix
-                                   // t.data, but the product between a rank-4
-                                   // and a rank-2 tensor is really not the
-                                   // product between this matrix and the
-                                   // 3-vector of a rhs, but rather
-                                   //
-                                   // B.vec = t.data * mult * A.vec
-                                   //
-                                   // where mult is a 3x3 matrix with
-                                   // entries [[1,0,0],[0,1,0],[0,0,2]] to
-                                   // capture the fact that we need to add up
-                                   // both the c_ij12*a_12 and the c_ij21*a_21
-                                   // terms
-                                   //
-                                   // in addition, in this scheme, the
-                                   // identity tensor has the matrix
-                                   // representation mult^-1.
-                                   //
-                                   // the inverse of 't' therefore has the
-                                   // matrix representation
-                                   //
-                                   // inv.data = mult^-1 * t.data^-1 * mult^-1
-                                   //
-                                   // in order to compute it, let's first
-                                   // compute the inverse of t.data and put it
-                                   // into tmp.data; at the end of the
-                                   // function we then scale the last row and
-                                   // column of the inverse by 1/2,
-                                   // corresponding to the left and right
-                                   // multiplication with mult^-1
-      {
-        const Number t4 = t.data[0][0]*t.data[1][1],
-                     t6 = t.data[0][0]*t.data[1][2],
-                     t8 = t.data[0][1]*t.data[1][0],
-                     t00 = t.data[0][2]*t.data[1][0],
-                     t01 = t.data[0][1]*t.data[2][0],
-                     t04 = t.data[0][2]*t.data[2][0],
-                     t07 = 1.0/(t4*t.data[2][2]-t6*t.data[2][1]-
-                                t8*t.data[2][2]+t00*t.data[2][1]+
-                                t01*t.data[1][2]-t04*t.data[1][1]);
-        tmp.data[0][0] = (t.data[1][1]*t.data[2][2]-t.data[1][2]*t.data[2][1])*t07;
-        tmp.data[0][1] = -(t.data[0][1]*t.data[2][2]-t.data[0][2]*t.data[2][1])*t07;
-        tmp.data[0][2] = -(-t.data[0][1]*t.data[1][2]+t.data[0][2]*t.data[1][1])*t07;
-        tmp.data[1][0] = -(t.data[1][0]*t.data[2][2]-t.data[1][2]*t.data[2][0])*t07;
-        tmp.data[1][1] = (t.data[0][0]*t.data[2][2]-t04)*t07;
-        tmp.data[1][2] = -(t6-t00)*t07;
-        tmp.data[2][0] = -(-t.data[1][0]*t.data[2][1]+t.data[1][1]*t.data[2][0])*t07;
-        tmp.data[2][1] = -(t.data[0][0]*t.data[2][1]-t01)*t07;
-        tmp.data[2][2] = (t4-t8)*t07;
+      // inverting this tensor is a little more
+      // complicated than necessary, since we
+      // store the data of 't' as a 3x3 matrix
+      // t.data, but the product between a rank-4
+      // and a rank-2 tensor is really not the
+      // product between this matrix and the
+      // 3-vector of a rhs, but rather
+      //
+      // B.vec = t.data * mult * A.vec
+      //
+      // where mult is a 3x3 matrix with
+      // entries [[1,0,0],[0,1,0],[0,0,2]] to
+      // capture the fact that we need to add up
+      // both the c_ij12*a_12 and the c_ij21*a_21
+      // terms
+      //
+      // in addition, in this scheme, the
+      // identity tensor has the matrix
+      // representation mult^-1.
+      //
+      // the inverse of 't' therefore has the
+      // matrix representation
+      //
+      // inv.data = mult^-1 * t.data^-1 * mult^-1
+      //
+      // in order to compute it, let's first
+      // compute the inverse of t.data and put it
+      // into tmp.data; at the end of the
+      // function we then scale the last row and
+      // column of the inverse by 1/2,
+      // corresponding to the left and right
+      // multiplication with mult^-1
+    {
+      const Number t4 = t.data[0][0]*t.data[1][1],
+                   t6 = t.data[0][0]*t.data[1][2],
+                   t8 = t.data[0][1]*t.data[1][0],
+                   t00 = t.data[0][2]*t.data[1][0],
+                   t01 = t.data[0][1]*t.data[2][0],
+                   t04 = t.data[0][2]*t.data[2][0],
+                   t07 = 1.0/(t4*t.data[2][2]-t6*t.data[2][1]-
+                              t8*t.data[2][2]+t00*t.data[2][1]+
+                              t01*t.data[1][2]-t04*t.data[1][1]);
+      tmp.data[0][0] = (t.data[1][1]*t.data[2][2]-t.data[1][2]*t.data[2][1])*t07;
+      tmp.data[0][1] = -(t.data[0][1]*t.data[2][2]-t.data[0][2]*t.data[2][1])*t07;
+      tmp.data[0][2] = -(-t.data[0][1]*t.data[1][2]+t.data[0][2]*t.data[1][1])*t07;
+      tmp.data[1][0] = -(t.data[1][0]*t.data[2][2]-t.data[1][2]*t.data[2][0])*t07;
+      tmp.data[1][1] = (t.data[0][0]*t.data[2][2]-t04)*t07;
+      tmp.data[1][2] = -(t6-t00)*t07;
+      tmp.data[2][0] = -(-t.data[1][0]*t.data[2][1]+t.data[1][1]*t.data[2][0])*t07;
+      tmp.data[2][1] = -(t.data[0][0]*t.data[2][1]-t01)*t07;
+      tmp.data[2][2] = (t4-t8)*t07;
 
-                                   // scale last row and column as mentioned
-                                   // above
-        tmp.data[2][0] /= 2;
-        tmp.data[2][1] /= 2;
-        tmp.data[0][2] /= 2;
-        tmp.data[1][2] /= 2;
-        tmp.data[2][2] /= 4;
-      }
-      break;
+      // scale last row and column as mentioned
+      // above
+      tmp.data[2][0] /= 2;
+      tmp.data[2][1] /= 2;
+      tmp.data[0][2] /= 2;
+      tmp.data[1][2] /= 2;
+      tmp.data[2][2] /= 4;
+    }
+    break;
     default:
       Assert (false, ExcNotImplemented());
     }
@@ -2642,7 +2651,7 @@ outer_product (const SymmetricTensor<2,dim,Number> &t1,
 {
   SymmetricTensor<4,dim,Number> tmp;
 
-                                   // fill only the elements really needed
+  // fill only the elements really needed
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=i; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
@@ -2711,7 +2720,8 @@ symmetrize (const Tensor<2,3,Number> &t)
     = { t[0][0], t[1][1], t[2][2],
         (t[0][1] + t[1][0])/2,
         (t[0][2] + t[2][0])/2,
-        (t[1][2] + t[2][1])/2 };
+        (t[1][2] + t[2][1])/2
+      };
   return SymmetricTensor<2,3,Number>(array);
 }
 
@@ -3061,12 +3071,12 @@ operator * (const SymmetricTensor<2,dim,Number> &src1,
  */
 template <int dim, typename Number>
 inline
-std::ostream & operator << (std::ostream &out,
-                            const SymmetricTensor<2,dim,Number> &t)
+std::ostream &operator << (std::ostream &out,
+                           const SymmetricTensor<2,dim,Number> &t)
 {
-                                   //make out lives a bit simpler by outputing
-                                   //the tensor through the operator for the
-                                   //general Tensor class
+  //make out lives a bit simpler by outputing
+  //the tensor through the operator for the
+  //general Tensor class
   Tensor<2,dim,Number> tt;
 
   for (unsigned int i=0; i<dim; ++i)
@@ -3089,12 +3099,12 @@ std::ostream & operator << (std::ostream &out,
  */
 template <int dim, typename Number>
 inline
-std::ostream & operator << (std::ostream &out,
-                            const SymmetricTensor<4,dim,Number> &t)
+std::ostream &operator << (std::ostream &out,
+                           const SymmetricTensor<4,dim,Number> &t)
 {
-                                   //make out lives a bit simpler by outputing
-                                   //the tensor through the operator for the
-                                   //general Tensor class
+  //make out lives a bit simpler by outputing
+  //the tensor through the operator for the
+  //general Tensor class
   Tensor<4,dim,Number> tt;
 
   for (unsigned int i=0; i<dim; ++i)

@@ -31,8 +31,8 @@ namespace Threads
 {
   namespace internal
   {
-                                     // counter and access mutex for the
-                                     // number of threads
+    // counter and access mutex for the
+    // number of threads
     volatile unsigned int n_existing_threads_counter = 1;
     ThreadMutex  n_existing_threads_mutex;
 
@@ -57,13 +57,13 @@ namespace Threads
 
     void handle_std_exception (const std::exception &exc)
     {
-                                       // lock the following context
-                                       // to ensure that we don't
-                                       // print things over each other
-                                       // if we have trouble from
-                                       // multiple threads. release
-                                       // the lock before calling
-                                       // std::abort, though
+      // lock the following context
+      // to ensure that we don't
+      // print things over each other
+      // if we have trouble from
+      // multiple threads. release
+      // the lock before calling
+      // std::abort, though
       static Mutex mutex;
       {
         Mutex::ScopedLock lock(mutex);
@@ -94,13 +94,13 @@ namespace Threads
 
     void handle_unknown_exception ()
     {
-                                       // lock the following context
-                                       // to ensure that we don't
-                                       // print things over each other
-                                       // if we have trouble from
-                                       // multiple threads. release
-                                       // the lock before calling
-                                       // std::abort, though
+      // lock the following context
+      // to ensure that we don't
+      // print things over each other
+      // if we have trouble from
+      // multiple threads. release
+      // the lock before calling
+      // std::abort, though
       static Mutex mutex;
       {
         Mutex::ScopedLock lock(mutex);
@@ -149,8 +149,8 @@ namespace Threads
 
 #if DEAL_II_USE_MT != 1
   DummyBarrier::DummyBarrier (const unsigned int  count,
-                              const char         *,
-                              void               *)
+                              const char *,
+                              void *)
   {
     Assert (count == 1, ExcBarrierSizeNotUseful(count));
   }
@@ -162,8 +162,8 @@ namespace Threads
 
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
   PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
-                                          const char         *,
-                                          void               *)
+                                          const char *,
+                                          void *)
   {
     pthread_barrier_init (&barrier, 0, count);
   }
@@ -171,16 +171,16 @@ namespace Threads
 #else
 
   PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
-                                          const char         *,
-                                          void               *)
-                  : count (count)
+                                          const char *,
+                                          void *)
+    : count (count)
   {
-                                     // throw an exception unless we
-                                     // have the special case that a
-                                     // count of 1 is given, since
-                                     // then waiting for a barrier is
-                                     // a no-op, and we don't need the
-                                     // POSIX functionality
+    // throw an exception unless we
+    // have the special case that a
+    // count of 1 is given, since
+    // then waiting for a barrier is
+    // a no-op, and we don't need the
+    // POSIX functionality
     AssertThrow (count == 1,
                  ExcMessage ("Your local POSIX installation does not support\n"
                              "POSIX barriers. You will not be able to use\n"
@@ -196,9 +196,9 @@ namespace Threads
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
     pthread_barrier_destroy (&barrier);
 #else
-                                     // unless the barrier is a no-op,
-                                     // complain again (how did we get
-                                     // here then?)
+    // unless the barrier is a no-op,
+    // complain again (how did we get
+    // here then?)
     if (count != 1)
       std::abort ();
 #endif
@@ -212,10 +212,10 @@ namespace Threads
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
     return pthread_barrier_wait (&barrier);
 #else
-                                     // in the special case, this
-                                     // function is a no-op. otherwise
-                                     // complain about the missing
-                                     // POSIX functions
+    // in the special case, this
+    // function is a no-op. otherwise
+    // complain about the missing
+    // POSIX functions
     if (count == 1)
       return 0;
     else
@@ -254,10 +254,10 @@ namespace Threads
           {
             return_values[i].second = (return_values[i].first
                                        + n_elements_per_interval);
-                                             // distribute residual in
-                                             // division equally among
-                                             // the first few
-                                             // subintervals
+            // distribute residual in
+            // division equally among
+            // the first few
+            // subintervals
             if (i < residual)
               ++return_values[i].second;
             return_values[i+1].first = return_values[i].second;

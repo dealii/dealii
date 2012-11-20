@@ -80,81 +80,81 @@ DEAL_II_NAMESPACE_OPEN
  */
 class ConditionalOStream
 {
-  public:
-                                     /**
-                                      * Constructor. Set the stream to which
-                                      * we want to write, and the condition
-                                      * based on which writes are actually
-                                      * forwarded. Per default the condition
-                                      * of an object is active.
-                                      */
-    ConditionalOStream (std::ostream &stream,
-                        const bool    active = true);
+public:
+  /**
+   * Constructor. Set the stream to which
+   * we want to write, and the condition
+   * based on which writes are actually
+   * forwarded. Per default the condition
+   * of an object is active.
+   */
+  ConditionalOStream (std::ostream &stream,
+                      const bool    active = true);
 
-                                     /**
-                                      * Depending on the
-                                      * <tt>active</tt> flag set the
-                                      * condition of this stream to
-                                      * active (true) or non-active
-                                      * (false). An object of this
-                                      * class prints to <tt>cout</tt>
-                                      * if and only if its condition
-                                      * is active.
-                                      */
-    void set_condition (const bool active);
+  /**
+   * Depending on the
+   * <tt>active</tt> flag set the
+   * condition of this stream to
+   * active (true) or non-active
+   * (false). An object of this
+   * class prints to <tt>cout</tt>
+   * if and only if its condition
+   * is active.
+   */
+  void set_condition (const bool active);
 
-                                     /**
-                                      * Return the condition of the object.
-                                      */
-    bool is_active() const;
+  /**
+   * Return the condition of the object.
+   */
+  bool is_active() const;
 
-                                     /**
-                                      * Return a reference to the stream
-                                      * currently in use.
-                                      */
-    std::ostream & get_stream () const;
+  /**
+   * Return a reference to the stream
+   * currently in use.
+   */
+  std::ostream &get_stream () const;
 
-                                     /**
-                                      * Output a constant something through
-                                      * this stream. This function must be @p
-                                      * const so that member objects of this
-                                      * type can also be used from @p const
-                                      * member functions of the surrounding
-                                      * class.
-                                      */
-    template <typename T>
-    const ConditionalOStream &
-    operator << (const T &t) const;
+  /**
+   * Output a constant something through
+   * this stream. This function must be @p
+   * const so that member objects of this
+   * type can also be used from @p const
+   * member functions of the surrounding
+   * class.
+   */
+  template <typename T>
+  const ConditionalOStream &
+  operator << (const T &t) const;
 
-                                     /**
-                                      * Treat ostream manipulators. This
-                                      * function must be @p const so that
-                                      * member objects of this type can also
-                                      * be used from @p const member functions
-                                      * of the surrounding class.
-                                      *
-                                      * Note that compilers want to see this
-                                      * treated differently from the general
-                                      * template above since functions like @p
-                                      * std::endl are actually overloaded and
-                                      * can't be bound directly to a template
-                                      * type.
-                                      */
-    const ConditionalOStream &
-    operator<< (std::ostream& (*p) (std::ostream&)) const;
+  /**
+   * Treat ostream manipulators. This
+   * function must be @p const so that
+   * member objects of this type can also
+   * be used from @p const member functions
+   * of the surrounding class.
+   *
+   * Note that compilers want to see this
+   * treated differently from the general
+   * template above since functions like @p
+   * std::endl are actually overloaded and
+   * can't be bound directly to a template
+   * type.
+   */
+  const ConditionalOStream &
+  operator<< (std::ostream& (*p) (std::ostream &)) const;
 
-  private:
-                                     /**
-                                      * Reference to the stream we
-                                      * want to write to.
-                                      */
-    std::ostream  &output_stream;
+private:
+  /**
+   * Reference to the stream we
+   * want to write to.
+   */
+  std::ostream &output_stream;
 
-                                     /**
-                                      * Stores the actual condition
-                                      * the object is in.
-                                      */
-    bool active_flag;
+  /**
+   * Stores the actual condition
+   * the object is in.
+   */
+  bool active_flag;
 };
 
 
@@ -163,7 +163,7 @@ class ConditionalOStream
 template <class T>
 inline
 const ConditionalOStream &
-ConditionalOStream::operator<< (const T& t) const
+ConditionalOStream::operator<< (const T &t) const
 {
   if (active_flag == true)
     output_stream << t;
@@ -174,7 +174,7 @@ ConditionalOStream::operator<< (const T& t) const
 
 inline
 const ConditionalOStream &
-ConditionalOStream::operator<< (std::ostream& (*p) (std::ostream&)) const
+ConditionalOStream::operator<< (std::ostream& (*p) (std::ostream &)) const
 {
   if (active_flag == true)
     output_stream << p;

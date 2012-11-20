@@ -29,10 +29,10 @@ namespace PETScWrappers
 
     Vector::Vector ()
     {
-                                       // this is an invalid empty vector, so we
-                                       // can just as well create a sequential
-                                       // one to avoid all the overhead incurred
-                                       // by parallelism
+      // this is an invalid empty vector, so we
+      // can just as well create a sequential
+      // one to avoid all the overhead incurred
+      // by parallelism
       const int n = 0;
       const int ierr
         = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
@@ -44,8 +44,8 @@ namespace PETScWrappers
     Vector::Vector (const MPI_Comm    &communicator,
                     const unsigned int n,
                     const unsigned int local_size)
-                    :
-                    communicator (communicator)
+      :
+      communicator (communicator)
     {
       Vector::create_vector (n, local_size);
     }
@@ -53,10 +53,10 @@ namespace PETScWrappers
 
 
     Vector::Vector (const MPI_Comm    &communicator,
-                    const VectorBase  &v,
+                    const VectorBase &v,
                     const unsigned int local_size)
-                    :
-                    communicator (communicator)
+      :
+      communicator (communicator)
     {
       Vector::create_vector (v.size(), local_size);
 
@@ -66,20 +66,20 @@ namespace PETScWrappers
 
 
     Vector::Vector (const MPI_Comm     &communicator,
-                    const IndexSet &  local,
-                    const IndexSet & ghost)
-                    :
-                    communicator (communicator)
+                    const IndexSet   &local,
+                    const IndexSet &ghost)
+      :
+      communicator (communicator)
     {
       Assert(local.is_contiguous(), ExcNotImplemented());
 
       IndexSet ghost_set = ghost;
       ghost_set.subtract_set(local);
 
-                                       //possible optmization: figure out if
-                                       //there are ghost indices (collective
-                                       //operation!) and then create a
-                                       //non-ghosted vector.
+      //possible optmization: figure out if
+      //there are ghost indices (collective
+      //operation!) and then create a
+      //non-ghosted vector.
 //      Vector::create_vector (local.size(), local.n_elements());
 
       Vector::create_vector(local.size(), local.n_elements(), ghost_set);
@@ -95,23 +95,23 @@ namespace PETScWrappers
     {
       communicator = comm;
 
-                                       // only do something if the sizes
-                                       // mismatch (may not be true for every proc)
+      // only do something if the sizes
+      // mismatch (may not be true for every proc)
 
       int k_global, k = ((size() != n) || (local_size() != local_sz));
       MPI_Allreduce (&k, &k_global, 1,
-        MPI_INT, MPI_LOR, communicator);
+                     MPI_INT, MPI_LOR, communicator);
 
       if (k_global)
         {
-                                           // FIXME: I'd like to use this here,
-                                           // but somehow it leads to odd errors
-                                           // somewhere down the line in some of
-                                           // the tests:
+          // FIXME: I'd like to use this here,
+          // but somehow it leads to odd errors
+          // somewhere down the line in some of
+          // the tests:
 //         const int ierr = VecSetSizes (vector, n, n);
 //         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                           // so let's go the slow way:
+          // so let's go the slow way:
           int ierr;
 
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
@@ -125,8 +125,8 @@ namespace PETScWrappers
           create_vector (n, local_sz);
         }
 
-                                       // finally clear the new vector if so
-                                       // desired
+      // finally clear the new vector if so
+      // desired
       if (fast == false)
         *this = 0;
     }
@@ -146,8 +146,8 @@ namespace PETScWrappers
 
     void
     Vector::reinit (const MPI_Comm     &comm,
-                    const IndexSet &  local,
-                    const IndexSet & ghost)
+                    const IndexSet   &local,
+                    const IndexSet &ghost)
     {
       communicator = comm;
 
@@ -164,31 +164,31 @@ namespace PETScWrappers
     Vector &
     Vector::operator = (const PETScWrappers::Vector &v)
     {
-                                       // first flush buffers
+      // first flush buffers
       compress ();
 
       int ierr;
 
-                                       // get a pointer to the local memory of
-                                       // this vector
+      // get a pointer to the local memory of
+      // this vector
       PetscScalar *dest_array;
       ierr = VecGetArray (vector, &dest_array);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                       // then also a pointer to the source
-                                       // vector
+      // then also a pointer to the source
+      // vector
       PetscScalar *src_array;
       ierr = VecGetArray (static_cast<const Vec &>(v), &src_array);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                       // then copy:
+      // then copy:
       const std::pair<unsigned int, unsigned int>
-        local_elements = local_range ();
+      local_elements = local_range ();
       std::copy (src_array + local_elements.first,
                  src_array + local_elements.second,
                  dest_array);
 
-                                       // finally restore the arrays
+      // finally restore the arrays
       ierr = VecRestoreArray (vector, &dest_array);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -219,23 +219,23 @@ namespace PETScWrappers
     void
     Vector::create_vector (const unsigned int  n,
                            const unsigned int  local_size,
-                           const IndexSet & ghostnodes)
+                           const IndexSet &ghostnodes)
     {
       Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
       ghosted = true;
       ghost_indices = ghostnodes;
 
-                                       //64bit indices won't work yet:
+      //64bit indices won't work yet:
       Assert (sizeof(unsigned int)==sizeof(PetscInt), ExcInternalError());
 
 
       std::vector<unsigned int> ghostindices;
       ghostnodes.fill_index_vector(ghostindices);
 
-      const PetscInt * ptr
+      const PetscInt *ptr
         = (ghostindices.size() > 0
            ?
-           (const PetscInt*)(&(ghostindices[0]))
+           (const PetscInt *)(&(ghostindices[0]))
            :
            0);
 
@@ -253,14 +253,14 @@ namespace PETScWrappers
               ExcDimensionMismatch (size(), n));
 
 #if DEBUG
-                                       // test ghost allocation in debug mode
+      // test ghost allocation in debug mode
 
 #ifdef PETSC_USE_64BIT_INDICES
       PetscInt
 #else
-        int
+      int
 #endif
-        begin, end;
+      begin, end;
 
       ierr = VecGetOwnershipRange (vector, &begin, &end);
 

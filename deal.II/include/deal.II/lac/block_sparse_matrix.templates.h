@@ -38,8 +38,8 @@ BlockSparseMatrix (const BlockSparsityPattern &sparsity)
 template <typename number>
 BlockSparseMatrix<number>::~BlockSparseMatrix ()
 {
-                                   // delete previous content of
-                                   // the subobjects array
+  // delete previous content of
+  // the subobjects array
   clear ();
   sparsity_pattern = 0;
 }
@@ -56,10 +56,10 @@ operator = (const BlockSparseMatrix<number> &m)
   Assert (this->column_block_indices == m.column_block_indices,
           ExcBlockDimensionMismatch());
 
-                                   // this operator does not do
-                                   // anything except than checking
-                                   // whether the base objects want to
-                                   // do something
+  // this operator does not do
+  // anything except than checking
+  // whether the base objects want to
+  // do something
   for (unsigned int r=0; r<this->n_block_rows(); ++r)
     for (unsigned int c=0; c<this->n_block_cols(); ++c)
       this->block(r,c) = m.block(r,c);
@@ -84,13 +84,13 @@ void
 BlockSparseMatrix<number>::
 reinit (const BlockSparsityPattern &sparsity)
 {
-                                   // first delete previous content of
-                                   // the subobjects array and delete
-                                   // the table completely
+  // first delete previous content of
+  // the subobjects array and delete
+  // the table completely
   clear ();
 
-                                   // then associate new sparsity
-                                   // pattern and resize
+  // then associate new sparsity
+  // pattern and resize
   sparsity_pattern = &sparsity;
 
   this->row_block_indices    = sparsity.row_indices;
@@ -99,7 +99,7 @@ reinit (const BlockSparsityPattern &sparsity)
   this->sub_objects.reinit (sparsity.n_block_rows(),
                             sparsity.n_block_cols());
 
-                                   // and reinitialize the blocks
+  // and reinitialize the blocks
   for (unsigned int r=0; r<this->n_block_rows(); ++r)
     for (unsigned int c=0; c<this->n_block_cols(); ++c)
       {
@@ -177,8 +177,8 @@ print_formatted (std::ostream       &out,
                  const char         *zero_string,
                  const double        denominator) const
 {
-  for (unsigned int r=0;r<this->n_block_rows();++r)
-    for (unsigned int c=0;c<this->n_block_cols();++c)
+  for (unsigned int r=0; r<this->n_block_rows(); ++r)
+    for (unsigned int c=0; c<this->n_block_cols(); ++c)
       {
         out << "Component (" << r << "," << c << ")" << std::endl;
         this->block(r,c).print_formatted (out, precision, scientific,

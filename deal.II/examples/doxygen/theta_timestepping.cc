@@ -29,32 +29,32 @@ using namespace Algorithms;
 class Explicit
   : public Operator<Vector<double> >
 {
-  public:
-    Explicit(const FullMatrix<double>& matrix);
-    void operator() (NamedData<Vector<double>*>& out,
-                     const NamedData<Vector<double>*>& in);
+public:
+  Explicit(const FullMatrix<double> &matrix);
+  void operator() (NamedData<Vector<double>*> &out,
+                   const NamedData<Vector<double>*> &in);
 
-    void initialize_timestep_data(const TimestepData&);
-  private:
-    const TimestepData* timestep_data;
-    SmartPointer<const FullMatrix<double>, Explicit> matrix;
-    FullMatrix<double> m;
+  void initialize_timestep_data(const TimestepData &);
+private:
+  const TimestepData *timestep_data;
+  SmartPointer<const FullMatrix<double>, Explicit> matrix;
+  FullMatrix<double> m;
 };
 
 
 class Implicit
   : public Operator<Vector<double> >
 {
-  public:
-    Implicit(const FullMatrix<double>& matrix);
-    void operator() (NamedData<Vector<double>*>& out,
-                     const NamedData<Vector<double>*>& in);
+public:
+  Implicit(const FullMatrix<double> &matrix);
+  void operator() (NamedData<Vector<double>*> &out,
+                   const NamedData<Vector<double>*> &in);
 
-    void initialize_timestep_data(const TimestepData&);
-  private:
-    const TimestepData* timestep_data;
-    SmartPointer<const FullMatrix<double>, Implicit> matrix;
-    FullMatrix<double> m;
+  void initialize_timestep_data(const TimestepData &);
+private:
+  const TimestepData *timestep_data;
+  SmartPointer<const FullMatrix<double>, Implicit> matrix;
+  FullMatrix<double> m;
 };
 
 // End of declarations
@@ -81,7 +81,7 @@ int main()
   value(0) = 1.;
   NamedData<Vector<double>*> indata;
   NamedData<Vector<double>*> outdata;
-  Vector<double>* p = &value;
+  Vector<double> *p = &value;
   outdata.add(p, "value");
 
   solver.notify(Events::initial);
@@ -89,28 +89,28 @@ int main()
 }
 
 
-Explicit::Explicit(const FullMatrix<double>& M)
-                :
-                matrix(&M)
+Explicit::Explicit(const FullMatrix<double> &M)
+  :
+  matrix(&M)
 {
   m.reinit(M.m(), M.n());
 }
 
 
 void
-Explicit::initialize_timestep_data(const TimestepData& t)
+Explicit::initialize_timestep_data(const TimestepData &t)
 {
   timestep_data = &t;
 }
 
 
 void
-Explicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<double>*>& in)
+Explicit::operator() (NamedData<Vector<double>*> &out, const NamedData<Vector<double>*> &in)
 {
   if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
     {
       m.equ(-timestep_data->step, *matrix);
-      for (unsigned int i=0;i<m.m();++i)
+      for (unsigned int i=0; i<m.m(); ++i)
         m(i,i) += 1.;
     }
   this->notifications.clear();
@@ -119,28 +119,28 @@ Explicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<do
 }
 
 
-Implicit::Implicit(const FullMatrix<double>& M)
-                :
-                matrix(&M)
+Implicit::Implicit(const FullMatrix<double> &M)
+  :
+  matrix(&M)
 {
   m.reinit(M.m(), M.n());
 }
 
 
 void
-Implicit::initialize_timestep_data(const TimestepData& t)
+Implicit::initialize_timestep_data(const TimestepData &t)
 {
   timestep_data = &t;
 }
 
 
 void
-Implicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<double>*>& in)
+Implicit::operator() (NamedData<Vector<double>*> &out, const NamedData<Vector<double>*> &in)
 {
   if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
     {
       m.equ(timestep_data->step, *matrix);
-      for (unsigned int i=0;i<m.m();++i)
+      for (unsigned int i=0; i<m.m(); ++i)
         m(i,i) += 1.;
       m.gauss_jordan();
     }

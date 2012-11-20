@@ -20,14 +20,14 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <class VECTOR>
-  ThetaTimestepping<VECTOR>::ThetaTimestepping (Operator<VECTOR>& e, Operator<VECTOR>& i)
-                  : vtheta(0.5), adaptive(false), op_explicit(&e), op_implicit(&i)
+  ThetaTimestepping<VECTOR>::ThetaTimestepping (Operator<VECTOR> &e, Operator<VECTOR> &i)
+    : vtheta(0.5), adaptive(false), op_explicit(&e), op_implicit(&i)
   {}
 
 
   template <class VECTOR>
   void
-  ThetaTimestepping<VECTOR>::notify(const Event& e)
+  ThetaTimestepping<VECTOR>::notify(const Event &e)
   {
     op_explicit->notify(e);
     op_implicit->notify(e);
@@ -35,7 +35,7 @@ namespace Algorithms
 
   template <class VECTOR>
   void
-  ThetaTimestepping<VECTOR>::declare_parameters(ParameterHandler& param)
+  ThetaTimestepping<VECTOR>::declare_parameters(ParameterHandler &param)
   {
     param.enter_subsection("ThetaTimestepping");
     TimestepControl::declare_parameters (param);
@@ -46,7 +46,7 @@ namespace Algorithms
 
   template <class VECTOR>
   void
-  ThetaTimestepping<VECTOR>::initialize (ParameterHandler& param)
+  ThetaTimestepping<VECTOR>::initialize (ParameterHandler &param)
   {
     param.enter_subsection("ThetaTimestepping");
     control.parse_parameters (param);
@@ -58,7 +58,7 @@ namespace Algorithms
 
   template <class VECTOR>
   void
-  ThetaTimestepping<VECTOR>::operator() (NamedData<VECTOR*>& out, const NamedData<VECTOR*>& in)
+  ThetaTimestepping<VECTOR>::operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in)
   {
     Assert(!adaptive, ExcNotImplemented());
 
@@ -71,22 +71,22 @@ namespace Algorithms
 
     d_explicit.time = control.now();
 
-                                     // The data used to compute the
-                                     // vector associated with the old
-                                     // timestep
-    VECTOR* p = out(0);
-    NamedData<VECTOR*> src1;
+    // The data used to compute the
+    // vector associated with the old
+    // timestep
+    VECTOR *p = out(0);
+    NamedData<VECTOR *> src1;
     src1.add(p, "Previous iterate");
     src1.merge(in);
 
-    NamedData<VECTOR*> src2;
+    NamedData<VECTOR *> src2;
     src2.add(p, "Previous iterate");
 
     p = aux;
-    NamedData<VECTOR*> out1;
+    NamedData<VECTOR *> out1;
     out1.add(p, "Result");
-                                     // The data provided to the inner
-                                     // solver
+    // The data provided to the inner
+    // solver
     src2.add(p, "Previous time");
     src2.merge(in);
 
@@ -109,8 +109,8 @@ namespace Algorithms
             op_implicit->notify(Events::new_timestep_size);
           }
 
-                                         // Compute
-                                         // (I + (1-theta)dt A) u
+        // Compute
+        // (I + (1-theta)dt A) u
         (*op_explicit)(out1, src1);
         (*op_implicit)(out, src2);
 

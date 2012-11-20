@@ -38,16 +38,16 @@ BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n)
 
 
 template <typename Number>
-BlockVector<Number>::BlockVector (const BlockIndices& n)
+BlockVector<Number>::BlockVector (const BlockIndices &n)
 {
   reinit (n, false);
 }
 
 
 template <typename Number>
-BlockVector<Number>::BlockVector (const BlockVector<Number>& v)
-                :
-                BlockVectorBase<Vector<Number> > ()
+BlockVector<Number>::BlockVector (const BlockVector<Number> &v)
+  :
+  BlockVectorBase<Vector<Number> > ()
 {
   this->components.resize (v.n_blocks());
   this->block_indices = v.block_indices;
@@ -61,7 +61,7 @@ BlockVector<Number>::BlockVector (const BlockVector<Number>& v)
 
 template <typename Number>
 template <typename OtherNumber>
-BlockVector<Number>::BlockVector (const BlockVector<OtherNumber>& v)
+BlockVector<Number>::BlockVector (const BlockVector<OtherNumber> &v)
 {
   reinit (v, true);
   *this = v;
@@ -112,7 +112,7 @@ void BlockVector<Number>::reinit (const std::vector<unsigned int> &n,
 
 template <typename Number>
 void BlockVector<Number>::reinit (
-  const BlockIndices& n,
+  const BlockIndices &n,
   const bool fast)
 {
   this->block_indices = n;
@@ -126,14 +126,14 @@ void BlockVector<Number>::reinit (
 
 template <typename Number>
 template <typename Number2>
-void BlockVector<Number>::reinit (const BlockVector<Number2>& v,
+void BlockVector<Number>::reinit (const BlockVector<Number2> &v,
                                   const bool fast)
 {
   this->block_indices = v.get_block_indices();
   if (this->components.size() != this->n_blocks())
     this->components.resize(this->n_blocks());
 
-  for (unsigned int i=0;i<this->n_blocks();++i)
+  for (unsigned int i=0; i<this->n_blocks(); ++i)
     this->block(i).reinit(v.block(i), fast);
 }
 
@@ -174,7 +174,7 @@ void BlockVector<Number>::print (std::ostream       &out,
                                  const bool          scientific,
                                  const bool          across) const
 {
-  for (unsigned int i=0;i<this->n_blocks();++i)
+  for (unsigned int i=0; i<this->n_blocks(); ++i)
     {
       if (across)
         out << 'C' << i << ':';
@@ -189,7 +189,7 @@ void BlockVector<Number>::print (std::ostream       &out,
 template <typename Number>
 void BlockVector<Number>::block_write (std::ostream &out) const
 {
-  for (unsigned int i=0;i<this->n_blocks();++i)
+  for (unsigned int i=0; i<this->n_blocks(); ++i)
     this->components[i].block_write(out);
 }
 
@@ -198,7 +198,7 @@ void BlockVector<Number>::block_write (std::ostream &out) const
 template <typename Number>
 void BlockVector<Number>::block_read (std::istream &in)
 {
-  for (unsigned int i=0;i<this->n_blocks();++i)
+  for (unsigned int i=0; i<this->n_blocks(); ++i)
     this->components[i].block_read(in);
 }
 

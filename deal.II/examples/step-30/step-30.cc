@@ -10,10 +10,10 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
-                                 // The deal.II include files have already
-                                 // been covered in previous examples
-                                 // and will thus not be further
-                                 // commented on.
+// The deal.II include files have already
+// been covered in previous examples
+// and will thus not be further
+// commented on.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/lac/vector.h>
@@ -36,49 +36,49 @@
 #include <deal.II/numerics/derivative_approximation.h>
 #include <deal.II/base/timer.h>
 
-                                 // And this again is C++:
+// And this again is C++:
 #include <iostream>
 #include <fstream>
 
-                                 // The last step is as in all
-                                 // previous programs:
+// The last step is as in all
+// previous programs:
 namespace Step30
 {
   using namespace dealii;
 
-                                   // @sect3{Equation data}
-                                   //
-                                   // The classes describing equation data and the
-                                   // actual assembly of individual terms are
-                                   // almost entirely copied from step-12. We will
-                                   // comment on differences.
+  // @sect3{Equation data}
+  //
+  // The classes describing equation data and the
+  // actual assembly of individual terms are
+  // almost entirely copied from step-12. We will
+  // comment on differences.
   template <int dim>
   class RHS:  public Function<dim>
   {
-    public:
-      virtual void value_list (const std::vector<Point<dim> > &points,
-                               std::vector<double> &values,
-                               const unsigned int component=0) const;
+  public:
+    virtual void value_list (const std::vector<Point<dim> > &points,
+                             std::vector<double> &values,
+                             const unsigned int component=0) const;
   };
 
 
   template <int dim>
   class BoundaryValues:  public Function<dim>
   {
-    public:
-      virtual void value_list (const std::vector<Point<dim> > &points,
-                               std::vector<double> &values,
-                               const unsigned int component=0) const;
+  public:
+    virtual void value_list (const std::vector<Point<dim> > &points,
+                             std::vector<double> &values,
+                             const unsigned int component=0) const;
   };
 
 
   template <int dim>
   class Beta
   {
-    public:
-      Beta () {}
-      void value_list (const std::vector<Point<dim> > &points,
-                       std::vector<Point<dim> > &values) const;
+  public:
+    Beta () {}
+    void value_list (const std::vector<Point<dim> > &points,
+                     std::vector<Point<dim> > &values) const;
   };
 
 
@@ -95,27 +95,27 @@ namespace Step30
   }
 
 
-                                   // The flow field is chosen to be a
-                                   // quarter circle with
-                                   // counterclockwise flow direction
-                                   // and with the origin as midpoint
-                                   // for the right half of the domain
-                                   // with positive $x$ values, whereas
-                                   // the flow simply goes to the left
-                                   // in the left part of the domain at
-                                   // a velocity that matches the one
-                                   // coming in from the right. In the
-                                   // circular part the magnitude of the
-                                   // flow velocity is proportional to
-                                   // the distance from the origin. This
-                                   // is a difference to step-12, where
-                                   // the magnitude was 1
-                                   // evereywhere. the new definition
-                                   // leads to a linear variation of
-                                   // $\beta$ along each given face of a
-                                   // cell. On the other hand, the
-                                   // solution $u(x,y)$ is exactly the
-                                   // same as before.
+  // The flow field is chosen to be a
+  // quarter circle with
+  // counterclockwise flow direction
+  // and with the origin as midpoint
+  // for the right half of the domain
+  // with positive $x$ values, whereas
+  // the flow simply goes to the left
+  // in the left part of the domain at
+  // a velocity that matches the one
+  // coming in from the right. In the
+  // circular part the magnitude of the
+  // flow velocity is proportional to
+  // the distance from the origin. This
+  // is a difference to step-12, where
+  // the magnitude was 1
+  // evereywhere. the new definition
+  // leads to a linear variation of
+  // $\beta$ along each given face of a
+  // cell. On the other hand, the
+  // solution $u(x,y)$ is exactly the
+  // same as before.
   template <int dim>
   void Beta<dim>::value_list(const std::vector<Point<dim> > &points,
                              std::vector<Point<dim> > &values) const
@@ -157,67 +157,67 @@ namespace Step30
   }
 
 
-                                   // @sect3{Class: DGTransportEquation}
-                                   //
-                                   // This declaration of this
-                                   // class is utterly unaffected by our
-                                   // current changes.  The only
-                                   // substantial change is that we use
-                                   // only the second assembly scheme
-                                   // described in step-12.
+  // @sect3{Class: DGTransportEquation}
+  //
+  // This declaration of this
+  // class is utterly unaffected by our
+  // current changes.  The only
+  // substantial change is that we use
+  // only the second assembly scheme
+  // described in step-12.
   template <int dim>
   class DGTransportEquation
   {
-    public:
-      DGTransportEquation();
+  public:
+    DGTransportEquation();
 
-      void assemble_cell_term(const FEValues<dim>& fe_v,
-                              FullMatrix<double> &ui_vi_matrix,
-                              Vector<double> &cell_vector) const;
+    void assemble_cell_term(const FEValues<dim> &fe_v,
+                            FullMatrix<double> &ui_vi_matrix,
+                            Vector<double> &cell_vector) const;
 
-      void assemble_boundary_term(const FEFaceValues<dim>& fe_v,
-                                  FullMatrix<double> &ui_vi_matrix,
-                                  Vector<double> &cell_vector) const;
+    void assemble_boundary_term(const FEFaceValues<dim> &fe_v,
+                                FullMatrix<double> &ui_vi_matrix,
+                                Vector<double> &cell_vector) const;
 
-      void assemble_face_term2(const FEFaceValuesBase<dim>& fe_v,
-                               const FEFaceValuesBase<dim>& fe_v_neighbor,
-                               FullMatrix<double> &ui_vi_matrix,
-                               FullMatrix<double> &ue_vi_matrix,
-                               FullMatrix<double> &ui_ve_matrix,
-                               FullMatrix<double> &ue_ve_matrix) const;
-    private:
-      const Beta<dim> beta_function;
-      const RHS<dim> rhs_function;
-      const BoundaryValues<dim> boundary_function;
+    void assemble_face_term2(const FEFaceValuesBase<dim> &fe_v,
+                             const FEFaceValuesBase<dim> &fe_v_neighbor,
+                             FullMatrix<double> &ui_vi_matrix,
+                             FullMatrix<double> &ue_vi_matrix,
+                             FullMatrix<double> &ui_ve_matrix,
+                             FullMatrix<double> &ue_ve_matrix) const;
+  private:
+    const Beta<dim> beta_function;
+    const RHS<dim> rhs_function;
+    const BoundaryValues<dim> boundary_function;
   };
 
 
-                                   // Likewise, the constructor of the
-                                   // class as well as the functions
-                                   // assembling the terms corresponding
-                                   // to cell interiors and boundary
-                                   // faces are unchanged from
-                                   // before. The function that
-                                   // assembles face terms between cells
-                                   // also did not change because all it
-                                   // does is operate on two objects of
-                                   // type FEFaceValuesBase (which is
-                                   // the base class of both
-                                   // FEFaceValues and
-                                   // FESubfaceValues). Where these
-                                   // objects come from, i.e. how they
-                                   // are initialized, is of no concern
-                                   // to this function: it simply
-                                   // assumes that the quadrature points
-                                   // on faces or subfaces represented
-                                   // by the two objects correspond to
-                                   // the same points in physical space.
+  // Likewise, the constructor of the
+  // class as well as the functions
+  // assembling the terms corresponding
+  // to cell interiors and boundary
+  // faces are unchanged from
+  // before. The function that
+  // assembles face terms between cells
+  // also did not change because all it
+  // does is operate on two objects of
+  // type FEFaceValuesBase (which is
+  // the base class of both
+  // FEFaceValues and
+  // FESubfaceValues). Where these
+  // objects come from, i.e. how they
+  // are initialized, is of no concern
+  // to this function: it simply
+  // assumes that the quadrature points
+  // on faces or subfaces represented
+  // by the two objects correspond to
+  // the same points in physical space.
   template <int dim>
   DGTransportEquation<dim>::DGTransportEquation ()
-                  :
-                  beta_function (),
-                  rhs_function (),
-                  boundary_function ()
+    :
+    beta_function (),
+    rhs_function (),
+    boundary_function ()
   {}
 
 
@@ -250,7 +250,7 @@ namespace Step30
 
   template <int dim>
   void DGTransportEquation<dim>::assemble_boundary_term(
-    const FEFaceValues<dim>& fe_v,
+    const FEFaceValues<dim> &fe_v,
     FullMatrix<double> &ui_vi_matrix,
     Vector<double> &cell_vector) const
   {
@@ -285,8 +285,8 @@ namespace Step30
 
   template <int dim>
   void DGTransportEquation<dim>::assemble_face_term2(
-    const FEFaceValuesBase<dim>& fe_v,
-    const FEFaceValuesBase<dim>& fe_v_neighbor,
+    const FEFaceValuesBase<dim> &fe_v,
+    const FEFaceValuesBase<dim> &fe_v_neighbor,
     FullMatrix<double> &ui_vi_matrix,
     FullMatrix<double> &ue_vi_matrix,
     FullMatrix<double> &ui_ve_matrix,
@@ -338,109 +338,109 @@ namespace Step30
   }
 
 
-                                   // @sect3{Class: DGMethod}
-                                   //
-                                   // Even the main class of this
-                                   // program stays more or less the
-                                   // same. We omit one of the assembly
-                                   // routines and use only the second,
-                                   // more effective one of the two
-                                   // presented in step-12. However, we
-                                   // introduce a new routine
-                                   // (set_anisotropic_flags) and modify
-                                   // another one (refine_grid).
+  // @sect3{Class: DGMethod}
+  //
+  // Even the main class of this
+  // program stays more or less the
+  // same. We omit one of the assembly
+  // routines and use only the second,
+  // more effective one of the two
+  // presented in step-12. However, we
+  // introduce a new routine
+  // (set_anisotropic_flags) and modify
+  // another one (refine_grid).
   template <int dim>
   class DGMethod
   {
-    public:
-      DGMethod (const bool anisotropic);
-      ~DGMethod ();
+  public:
+    DGMethod (const bool anisotropic);
+    ~DGMethod ();
 
-      void run ();
+    void run ();
 
-    private:
-      void setup_system ();
-      void assemble_system1 ();
-      void assemble_system2 ();
-      void solve (Vector<double> &solution);
-      void refine_grid ();
-      void set_anisotropic_flags ();
-      void output_results (const unsigned int cycle) const;
+  private:
+    void setup_system ();
+    void assemble_system1 ();
+    void assemble_system2 ();
+    void solve (Vector<double> &solution);
+    void refine_grid ();
+    void set_anisotropic_flags ();
+    void output_results (const unsigned int cycle) const;
 
-      Triangulation<dim>   triangulation;
-      const MappingQ1<dim> mapping;
-                                       // Again we want to use DG elements of
-                                       // degree 1 (but this is only specified in
-                                       // the constructor). If you want to use a
-                                       // DG method of a different degree replace
-                                       // 1 in the constructor by the new degree.
-      const unsigned int   degree;
-      FE_DGQ<dim>          fe;
-      DoFHandler<dim>      dof_handler;
+    Triangulation<dim>   triangulation;
+    const MappingQ1<dim> mapping;
+    // Again we want to use DG elements of
+    // degree 1 (but this is only specified in
+    // the constructor). If you want to use a
+    // DG method of a different degree replace
+    // 1 in the constructor by the new degree.
+    const unsigned int   degree;
+    FE_DGQ<dim>          fe;
+    DoFHandler<dim>      dof_handler;
 
-      SparsityPattern      sparsity_pattern;
-      SparseMatrix<double> system_matrix;
-                                       // This is new, the threshold value used in
-                                       // the evaluation of the anisotropic jump
-                                       // indicator explained in the
-                                       // introduction. Its value is set to 3.0 in
-                                       // the constructor, but it can easily be
-                                       // changed to a different value greater
-                                       // than 1.
-      const double anisotropic_threshold_ratio;
-                                       // This is a bool flag indicating whether
-                                       // anisotropic refinement shall be used or
-                                       // not. It is set by the constructor, which
-                                       // takes an argument of the same name.
-      const bool anisotropic;
+    SparsityPattern      sparsity_pattern;
+    SparseMatrix<double> system_matrix;
+    // This is new, the threshold value used in
+    // the evaluation of the anisotropic jump
+    // indicator explained in the
+    // introduction. Its value is set to 3.0 in
+    // the constructor, but it can easily be
+    // changed to a different value greater
+    // than 1.
+    const double anisotropic_threshold_ratio;
+    // This is a bool flag indicating whether
+    // anisotropic refinement shall be used or
+    // not. It is set by the constructor, which
+    // takes an argument of the same name.
+    const bool anisotropic;
 
-      const QGauss<dim>   quadrature;
-      const QGauss<dim-1> face_quadrature;
+    const QGauss<dim>   quadrature;
+    const QGauss<dim-1> face_quadrature;
 
-      Vector<double>       solution2;
-      Vector<double>       right_hand_side;
+    Vector<double>       solution2;
+    Vector<double>       right_hand_side;
 
-      const DGTransportEquation<dim> dg;
+    const DGTransportEquation<dim> dg;
   };
 
 
   template <int dim>
   DGMethod<dim>::DGMethod (const bool anisotropic)
-                  :
-                  mapping (),
-                                                   // Change here for DG
-                                                   // methods of
-                                                   // different degrees.
-                  degree(1),
-                  fe (degree),
-                  dof_handler (triangulation),
-                  anisotropic_threshold_ratio(3.),
-                  anisotropic(anisotropic),
-                                                   // As beta is a
-                                                   // linear function,
-                                                   // we can choose the
-                                                   // degree of the
-                                                   // quadrature for
-                                                   // which the
-                                                   // resulting
-                                                   // integration is
-                                                   // correct. Thus, we
-                                                   // choose to use
-                                                   // <code>degree+1</code>
-                                                   // gauss points,
-                                                   // which enables us
-                                                   // to integrate
-                                                   // exactly
-                                                   // polynomials of
-                                                   // degree
-                                                   // <code>2*degree+1</code>,
-                                                   // enough for all the
-                                                   // integrals we will
-                                                   // perform in this
-                                                   // program.
-                  quadrature (degree+1),
-                  face_quadrature (degree+1),
-                  dg ()
+    :
+    mapping (),
+    // Change here for DG
+    // methods of
+    // different degrees.
+    degree(1),
+    fe (degree),
+    dof_handler (triangulation),
+    anisotropic_threshold_ratio(3.),
+    anisotropic(anisotropic),
+    // As beta is a
+    // linear function,
+    // we can choose the
+    // degree of the
+    // quadrature for
+    // which the
+    // resulting
+    // integration is
+    // correct. Thus, we
+    // choose to use
+    // <code>degree+1</code>
+    // gauss points,
+    // which enables us
+    // to integrate
+    // exactly
+    // polynomials of
+    // degree
+    // <code>2*degree+1</code>,
+    // enough for all the
+    // integrals we will
+    // perform in this
+    // program.
+    quadrature (degree+1),
+    face_quadrature (degree+1),
+    dg ()
   {}
 
 
@@ -471,22 +471,22 @@ namespace Step30
   }
 
 
-                                   // @sect4{Function: assemble_system2}
-                                   //
-                                   // We proceed with the
-                                   // <code>assemble_system2</code> function that
-                                   // implements the DG discretization in its
-                                   // second version. This function is very
-                                   // similar to the <code>assemble_system2</code>
-                                   // function from step-12, even the four cases
-                                   // considered for the neighbor-relations of a
-                                   // cell are the same, namely a) cell is at the
-                                   // boundary, b) there are finer neighboring
-                                   // cells, c) the neighbor is neither coarser
-                                   // nor finer and d) the neighbor is coarser.
-                                   // However, the way in which we decide upon
-                                   // which case we have are modified in the way
-                                   // described in the introduction.
+  // @sect4{Function: assemble_system2}
+  //
+  // We proceed with the
+  // <code>assemble_system2</code> function that
+  // implements the DG discretization in its
+  // second version. This function is very
+  // similar to the <code>assemble_system2</code>
+  // function from step-12, even the four cases
+  // considered for the neighbor-relations of a
+  // cell are the same, namely a) cell is at the
+  // boundary, b) there are finer neighboring
+  // cells, c) the neighbor is neither coarser
+  // nor finer and d) the neighbor is coarser.
+  // However, the way in which we decide upon
+  // which case we have are modified in the way
+  // described in the introduction.
   template <int dim>
   void DGMethod<dim>::assemble_system2 ()
   {
@@ -525,9 +525,9 @@ namespace Step30
     Vector<double>  cell_vector (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    for (;cell!=endc; ++cell)
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    for (; cell!=endc; ++cell)
       {
         ui_vi_matrix = 0;
         cell_vector = 0;
@@ -545,7 +545,7 @@ namespace Step30
             typename DoFHandler<dim>::face_iterator face=
               cell->face(face_no);
 
-                                             // Case a)
+            // Case a)
             if (face->at_boundary())
               {
                 fe_v_face.reinit (cell, face_no);
@@ -560,51 +560,51 @@ namespace Step30
                         ExcInternalError());
                 typename DoFHandler<dim>::cell_iterator neighbor=
                   cell->neighbor(face_no);
-                                                 // Case b), we decide that there
-                                                 // are finer cells as neighbors
-                                                 // by asking the face, whether it
-                                                 // has children. if so, then
-                                                 // there must also be finer cells
-                                                 // which are children or farther
-                                                 // offsprings of our neighbor.
+                // Case b), we decide that there
+                // are finer cells as neighbors
+                // by asking the face, whether it
+                // has children. if so, then
+                // there must also be finer cells
+                // which are children or farther
+                // offsprings of our neighbor.
                 if (face->has_children())
                   {
-                                                     // We need to know, which of
-                                                     // the neighbors faces points
-                                                     // in the direction of our
-                                                     // cell. Using the @p
-                                                     // neighbor_face_no function
-                                                     // we get this information
-                                                     // for both coarser and
-                                                     // non-coarser neighbors.
+                    // We need to know, which of
+                    // the neighbors faces points
+                    // in the direction of our
+                    // cell. Using the @p
+                    // neighbor_face_no function
+                    // we get this information
+                    // for both coarser and
+                    // non-coarser neighbors.
                     const unsigned int neighbor2=
                       cell->neighbor_face_no(face_no);
 
-                                                     // Now we loop over all
-                                                     // subfaces, i.e. the
-                                                     // children and possibly
-                                                     // grandchildren of the
-                                                     // current face.
+                    // Now we loop over all
+                    // subfaces, i.e. the
+                    // children and possibly
+                    // grandchildren of the
+                    // current face.
                     for (unsigned int subface_no=0;
                          subface_no<face->number_of_children(); ++subface_no)
                       {
-                                                         // To get the cell behind
-                                                         // the current subface we
-                                                         // can use the @p
-                                                         // neighbor_child_on_subface
-                                                         // function. it takes
-                                                         // care of all the
-                                                         // complicated situations
-                                                         // of anisotropic
-                                                         // refinement and
-                                                         // non-standard faces.
+                        // To get the cell behind
+                        // the current subface we
+                        // can use the @p
+                        // neighbor_child_on_subface
+                        // function. it takes
+                        // care of all the
+                        // complicated situations
+                        // of anisotropic
+                        // refinement and
+                        // non-standard faces.
                         typename DoFHandler<dim>::cell_iterator neighbor_child
                           = cell->neighbor_child_on_subface (face_no, subface_no);
                         Assert (!neighbor_child->has_children(), ExcInternalError());
 
-                                                         // The remaining part of
-                                                         // this case is
-                                                         // unchanged.
+                        // The remaining part of
+                        // this case is
+                        // unchanged.
                         ue_vi_matrix = 0;
                         ui_ve_matrix = 0;
                         ue_ve_matrix = 0;
@@ -635,42 +635,42 @@ namespace Step30
                   }
                 else
                   {
-                                                     // Case c). We simply ask,
-                                                     // whether the neighbor is
-                                                     // coarser. If not, then it
-                                                     // is neither coarser nor
-                                                     // finer, since any finer
-                                                     // neighbor would have been
-                                                     // treated above with case
-                                                     // b). Of all the cases with
-                                                     // the same refinement
-                                                     // situation of our cell and
-                                                     // the neighbor we want to
-                                                     // treat only one half, so
-                                                     // that each face is
-                                                     // considered only once. Thus
-                                                     // we have the additional
-                                                     // condition, that the cell
-                                                     // with the lower index does
-                                                     // the work. In the rare case
-                                                     // that both cells have the
-                                                     // same index, the cell with
-                                                     // lower level is selected.
+                    // Case c). We simply ask,
+                    // whether the neighbor is
+                    // coarser. If not, then it
+                    // is neither coarser nor
+                    // finer, since any finer
+                    // neighbor would have been
+                    // treated above with case
+                    // b). Of all the cases with
+                    // the same refinement
+                    // situation of our cell and
+                    // the neighbor we want to
+                    // treat only one half, so
+                    // that each face is
+                    // considered only once. Thus
+                    // we have the additional
+                    // condition, that the cell
+                    // with the lower index does
+                    // the work. In the rare case
+                    // that both cells have the
+                    // same index, the cell with
+                    // lower level is selected.
                     if (!cell->neighbor_is_coarser(face_no) &&
                         (neighbor->index() > cell->index() ||
                          (neighbor->level() < cell->level() &&
                           neighbor->index() == cell->index())))
                       {
-                                                         // Here we know, that the
-                                                         // neigbor is not coarser
-                                                         // so we can use the
-                                                         // usual @p
-                                                         // neighbor_of_neighbor
-                                                         // function. However, we
-                                                         // could also use the
-                                                         // more general @p
-                                                         // neighbor_face_no
-                                                         // function.
+                        // Here we know, that the
+                        // neigbor is not coarser
+                        // so we can use the
+                        // usual @p
+                        // neighbor_of_neighbor
+                        // function. However, we
+                        // could also use the
+                        // more general @p
+                        // neighbor_face_no
+                        // function.
                         const unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
 
                         ue_vi_matrix = 0;
@@ -701,10 +701,10 @@ namespace Step30
                             }
                       }
 
-                                                     // We do not need to consider
-                                                     // case d), as those faces
-                                                     // are treated 'from the
-                                                     // other side within case b).
+                    // We do not need to consider
+                    // case d), as those faces
+                    // are treated 'from the
+                    // other side within case b).
                   }
               }
           }
@@ -719,12 +719,12 @@ namespace Step30
   }
 
 
-                                   // @sect3{Solver}
-                                   //
-                                   // For this simple problem we use the simple
-                                   // Richardson iteration again. The solver is
-                                   // completely unaffected by our anisotropic
-                                   // changes.
+  // @sect3{Solver}
+  //
+  // For this simple problem we use the simple
+  // Richardson iteration again. The solver is
+  // completely unaffected by our anisotropic
+  // changes.
   template <int dim>
   void DGMethod<dim>::solve (Vector<double> &solution)
   {
@@ -740,68 +740,68 @@ namespace Step30
   }
 
 
-                                   // @sect3{Refinement}
-                                   //
-                                   // We refine the grid according to the same
-                                   // simple refinement criterion used in step-12,
-                                   // namely an approximation to the
-                                   // gradient of the solution.
+  // @sect3{Refinement}
+  //
+  // We refine the grid according to the same
+  // simple refinement criterion used in step-12,
+  // namely an approximation to the
+  // gradient of the solution.
   template <int dim>
   void DGMethod<dim>::refine_grid ()
   {
     Vector<float> gradient_indicator (triangulation.n_active_cells());
 
-                                     // We approximate the gradient,
+    // We approximate the gradient,
     DerivativeApproximation::approximate_gradient (mapping,
                                                    dof_handler,
                                                    solution2,
                                                    gradient_indicator);
 
-                                     // and scale it to obtain an error indicator.
+    // and scale it to obtain an error indicator.
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
     for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
       gradient_indicator(cell_no)*=std::pow(cell->diameter(), 1+1.0*dim/2);
-                                     // Then we use this indicator to flag the 30
-                                     // percent of the cells with highest error
-                                     // indicator to be refined.
+    // Then we use this indicator to flag the 30
+    // percent of the cells with highest error
+    // indicator to be refined.
     GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                      gradient_indicator,
                                                      0.3, 0.1);
-                                     // Now the refinement flags are set for those
-                                     // cells with a large error indicator. If
-                                     // nothing is done to change this, those
-                                     // cells will be refined isotropically. If
-                                     // the @p anisotropic flag given to this
-                                     // function is set, we now call the
-                                     // set_anisotropic_flags() function, which
-                                     // uses the jump indicator to reset some of
-                                     // the refinement flags to anisotropic
-                                     // refinement.
+    // Now the refinement flags are set for those
+    // cells with a large error indicator. If
+    // nothing is done to change this, those
+    // cells will be refined isotropically. If
+    // the @p anisotropic flag given to this
+    // function is set, we now call the
+    // set_anisotropic_flags() function, which
+    // uses the jump indicator to reset some of
+    // the refinement flags to anisotropic
+    // refinement.
     if (anisotropic)
       set_anisotropic_flags();
-                                     // Now execute the refinement considering
-                                     // anisotropic as well as isotropic
-                                     // refinement flags.
+    // Now execute the refinement considering
+    // anisotropic as well as isotropic
+    // refinement flags.
     triangulation.execute_coarsening_and_refinement ();
   }
 
-                                   // Once an error indicator has been evaluated
-                                   // and the cells with largerst error are
-                                   // flagged for refinement we want to loop over
-                                   // the flagged cells again to decide whether
-                                   // they need isotropic refinemnt or whether
-                                   // anisotropic refinement is more
-                                   // appropriate. This is the anisotropic jump
-                                   // indicator explained in the introduction.
+  // Once an error indicator has been evaluated
+  // and the cells with largerst error are
+  // flagged for refinement we want to loop over
+  // the flagged cells again to decide whether
+  // they need isotropic refinemnt or whether
+  // anisotropic refinement is more
+  // appropriate. This is the anisotropic jump
+  // indicator explained in the introduction.
   template <int dim>
   void DGMethod<dim>::set_anisotropic_flags ()
   {
-                                     // We want to evaluate the jump over faces of
-                                     // the flagged cells, so we need some objects
-                                     // to evaluate values of the solution on
-                                     // faces.
+    // We want to evaluate the jump over faces of
+    // the flagged cells, so we need some objects
+    // to evaluate values of the solution on
+    // faces.
     UpdateFlags face_update_flags
       = UpdateFlags(update_values | update_JxW_values);
 
@@ -809,13 +809,13 @@ namespace Step30
     FESubfaceValues<dim> fe_v_subface (mapping, fe, face_quadrature, face_update_flags);
     FEFaceValues<dim> fe_v_face_neighbor (mapping, fe, face_quadrature, update_values);
 
-                                     // Now we need to loop over all active cells.
+    // Now we need to loop over all active cells.
     typename DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active(),
                                                    endc=dof_handler.end();
 
     for (; cell!=endc; ++cell)
-                                       // We only need to consider cells which are
-                                       // flaged for refinement.
+      // We only need to consider cells which are
+      // flaged for refinement.
       if (cell->refine_flag_set())
         {
           Point<dim> jump;
@@ -833,92 +833,92 @@ namespace Step30
                   std::vector<double> u (fe_v_face.n_quadrature_points);
                   std::vector<double> u_neighbor (fe_v_face.n_quadrature_points);
 
-                                                   // The four cases of different
-                                                   // neighbor relations senn in
-                                                   // the assembly routines are
-                                                   // repeated much in the same
-                                                   // way here.
+                  // The four cases of different
+                  // neighbor relations senn in
+                  // the assembly routines are
+                  // repeated much in the same
+                  // way here.
                   if (face->has_children())
                     {
-                                                       // The neighbor is refined.
-                                                       // First we store the
-                                                       // information, which of
-                                                       // the neighbor's faces
-                                                       // points in the direction
-                                                       // of our current
-                                                       // cell. This property is
-                                                       // inherited to the
-                                                       // children.
+                      // The neighbor is refined.
+                      // First we store the
+                      // information, which of
+                      // the neighbor's faces
+                      // points in the direction
+                      // of our current
+                      // cell. This property is
+                      // inherited to the
+                      // children.
                       unsigned int neighbor2=cell->neighbor_face_no(face_no);
-                                                       // Now we loop over all subfaces,
+                      // Now we loop over all subfaces,
                       for (unsigned int subface_no=0; subface_no<face->number_of_children(); ++subface_no)
                         {
-                                                           // get an iterator
-                                                           // pointing to the cell
-                                                           // behind the present
-                                                           // subface...
+                          // get an iterator
+                          // pointing to the cell
+                          // behind the present
+                          // subface...
                           typename DoFHandler<dim>::cell_iterator neighbor_child = cell->neighbor_child_on_subface(face_no,subface_no);
                           Assert (!neighbor_child->has_children(), ExcInternalError());
-                                                           // ... and reinit the
-                                                           // respective
-                                                           // FEFaceValues und
-                                                           // FESubFaceValues
-                                                           // objects.
+                          // ... and reinit the
+                          // respective
+                          // FEFaceValues und
+                          // FESubFaceValues
+                          // objects.
                           fe_v_subface.reinit (cell, face_no, subface_no);
                           fe_v_face_neighbor.reinit (neighbor_child, neighbor2);
-                                                           // We obtain the function values
+                          // We obtain the function values
                           fe_v_subface.get_function_values(solution2, u);
                           fe_v_face_neighbor.get_function_values(solution2, u_neighbor);
-                                                           // as well as the
-                                                           // quadrature weights,
-                                                           // multiplied by the
-                                                           // jacobian determinant.
+                          // as well as the
+                          // quadrature weights,
+                          // multiplied by the
+                          // jacobian determinant.
                           const std::vector<double> &JxW = fe_v_subface.get_JxW_values ();
-                                                           // Now we loop over all
-                                                           // quadrature points
+                          // Now we loop over all
+                          // quadrature points
                           for (unsigned int x=0; x<fe_v_subface.n_quadrature_points; ++x)
                             {
-                                                               // and integrate
-                                                               // the absolute
-                                                               // value of the
-                                                               // jump of the
-                                                               // solution,
-                                                               // i.e. the
-                                                               // absolute value
-                                                               // of the
-                                                               // difference
-                                                               // between the
-                                                               // function value
-                                                               // seen from the
-                                                               // current cell and
-                                                               // the neighboring
-                                                               // cell,
-                                                               // respectively. We
-                                                               // know, that the
-                                                               // first two faces
-                                                               // are orthogonal
-                                                               // to the first
-                                                               // coordinate
-                                                               // direction on the
-                                                               // unit cell, the
-                                                               // second two faces
-                                                               // are orthogonal
-                                                               // to the second
-                                                               // coordinate
-                                                               // direction and so
-                                                               // on, so we
-                                                               // accumulate these
-                                                               // values ito
-                                                               // vectors with
-                                                               // <code>dim</code>
-                                                               // components.
+                              // and integrate
+                              // the absolute
+                              // value of the
+                              // jump of the
+                              // solution,
+                              // i.e. the
+                              // absolute value
+                              // of the
+                              // difference
+                              // between the
+                              // function value
+                              // seen from the
+                              // current cell and
+                              // the neighboring
+                              // cell,
+                              // respectively. We
+                              // know, that the
+                              // first two faces
+                              // are orthogonal
+                              // to the first
+                              // coordinate
+                              // direction on the
+                              // unit cell, the
+                              // second two faces
+                              // are orthogonal
+                              // to the second
+                              // coordinate
+                              // direction and so
+                              // on, so we
+                              // accumulate these
+                              // values ito
+                              // vectors with
+                              // <code>dim</code>
+                              // components.
                               jump[face_no/2]+=std::fabs(u[x]-u_neighbor[x])*JxW[x];
-                                                               // We also sum up
-                                                               // the scaled
-                                                               // weights to
-                                                               // obtain the
-                                                               // measure of the
-                                                               // face.
+                              // We also sum up
+                              // the scaled
+                              // weights to
+                              // obtain the
+                              // measure of the
+                              // face.
                               area[face_no/2]+=JxW[x];
                             }
                         }
@@ -927,16 +927,16 @@ namespace Step30
                     {
                       if (!cell->neighbor_is_coarser(face_no))
                         {
-                                                           // Our current cell and
-                                                           // the neighbor have
-                                                           // the same refinement
-                                                           // along the face under
-                                                           // consideration. Apart
-                                                           // from that, we do
-                                                           // much the same as
-                                                           // with one of the
-                                                           // subcells in the
-                                                           // above case.
+                          // Our current cell and
+                          // the neighbor have
+                          // the same refinement
+                          // along the face under
+                          // consideration. Apart
+                          // from that, we do
+                          // much the same as
+                          // with one of the
+                          // subcells in the
+                          // above case.
                           unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
 
                           fe_v_face.reinit (cell, face_no);
@@ -955,26 +955,26 @@ namespace Step30
                         }
                       else //i.e. neighbor is coarser than cell
                         {
-                                                           // Now the neighbor is
-                                                           // actually
-                                                           // coarser. This case
-                                                           // is new, in that it
-                                                           // did not occur in the
-                                                           // assembly
-                                                           // routine. Here, we
-                                                           // have to consider it,
-                                                           // but this is not
-                                                           // overly
-                                                           // complicated. We
-                                                           // simply use the @p
-                                                           // neighbor_of_coarser_neighbor
-                                                           // function, which
-                                                           // again takes care of
-                                                           // anisotropic
-                                                           // refinement and
-                                                           // non-standard face
-                                                           // orientation by
-                                                           // itself.
+                          // Now the neighbor is
+                          // actually
+                          // coarser. This case
+                          // is new, in that it
+                          // did not occur in the
+                          // assembly
+                          // routine. Here, we
+                          // have to consider it,
+                          // but this is not
+                          // overly
+                          // complicated. We
+                          // simply use the @p
+                          // neighbor_of_coarser_neighbor
+                          // function, which
+                          // again takes care of
+                          // anisotropic
+                          // refinement and
+                          // non-standard face
+                          // orientation by
+                          // itself.
                           std::pair<unsigned int,unsigned int> neighbor_face_subface
                             = cell->neighbor_of_coarser_neighbor(face_no);
                           Assert (neighbor_face_subface.first<GeometryInfo<dim>::faces_per_cell, ExcInternalError());
@@ -1001,10 +1001,10 @@ namespace Step30
                     }
                 }
             }
-                                           // Now we analyze the size of the mean
-                                           // jumps, which we get dividing the
-                                           // jumps by the measure of the
-                                           // respective faces.
+          // Now we analyze the size of the mean
+          // jumps, which we get dividing the
+          // jumps by the measure of the
+          // respective faces.
           double average_jumps[dim];
           double sum_of_average_jumps=0.;
           for (unsigned int i=0; i<dim; ++i)
@@ -1013,30 +1013,30 @@ namespace Step30
               sum_of_average_jumps += average_jumps[i];
             }
 
-                                           // Now we loop over the <code>dim</code>
-                                           // coordinate directions of the unit
-                                           // cell and compare the average jump
-                                           // over the faces orthogional to that
-                                           // direction with the average jumnps
-                                           // over faces orthogonal to the
-                                           // remining direction(s). If the first
-                                           // is larger than the latter by a given
-                                           // factor, we refine only along hat
-                                           // axis. Otherwise we leave the
-                                           // refinement flag unchanged, resulting
-                                           // in isotropic refinement.
+          // Now we loop over the <code>dim</code>
+          // coordinate directions of the unit
+          // cell and compare the average jump
+          // over the faces orthogional to that
+          // direction with the average jumnps
+          // over faces orthogonal to the
+          // remining direction(s). If the first
+          // is larger than the latter by a given
+          // factor, we refine only along hat
+          // axis. Otherwise we leave the
+          // refinement flag unchanged, resulting
+          // in isotropic refinement.
           for (unsigned int i=0; i<dim; ++i)
             if (average_jumps[i] > anisotropic_threshold_ratio*(sum_of_average_jumps-average_jumps[i]))
               cell->set_refine_flag(RefinementCase<dim>::cut_axis(i));
         }
   }
 
-                                   // @sect3{The Rest}
-                                   //
-                                   // The remaining part of the program is again
-                                   // unmodified. Only the creation of the
-                                   // original triangulation is changed in order
-                                   // to reproduce the new domain.
+  // @sect3{The Rest}
+  //
+  // The remaining part of the program is again
+  // unmodified. Only the creation of the
+  // original triangulation is changed in order
+  // to reproduce the new domain.
   template <int dim>
   void DGMethod<dim>::output_results (const unsigned int cycle) const
   {
@@ -1095,16 +1095,16 @@ namespace Step30
 
         if (cycle == 0)
           {
-                                             // Create the rectangular domain.
+            // Create the rectangular domain.
             Point<dim> p1,p2;
             p1(0)=0;
             p1(0)=-1;
             for (unsigned int i=0; i<dim; ++i)
               p2(i)=1.;
-                                             // Adjust the number of cells in
-                                             // different directions to obtain
-                                             // completely isotropic cells for the
-                                             // original mesh.
+            // Adjust the number of cells in
+            // different directions to obtain
+            // completely isotropic cells for the
+            // original mesh.
             std::vector<unsigned int> repetitions(dim,1);
             repetitions[0]=2;
             GridGenerator::subdivided_hyper_rectangle (triangulation,
@@ -1149,14 +1149,14 @@ int main ()
       using namespace dealii;
       using namespace Step30;
 
-                                       // If you want to run the program in 3D,
-                                       // simply change the following line to
-                                       // <code>const unsigned int dim = 3;</code>.
+      // If you want to run the program in 3D,
+      // simply change the following line to
+      // <code>const unsigned int dim = 3;</code>.
       const unsigned int dim = 2;
 
       {
-                                         // First, we perform a run with
-                                         // isotropic refinement.
+        // First, we perform a run with
+        // isotropic refinement.
         std::cout << "Performing a " << dim << "D run with isotropic refinement..." << std::endl
                   << "------------------------------------------------" << std::endl;
         DGMethod<dim> dgmethod_iso(false);
@@ -1164,8 +1164,8 @@ int main ()
       }
 
       {
-                                         // Now we do a second run, this time
-                                         // with anisotropic refinement.
+        // Now we do a second run, this time
+        // with anisotropic refinement.
         std::cout << std::endl
                   << "Performing a " << dim << "D run with anisotropic refinement..." << std::endl
                   << "--------------------------------------------------" << std::endl;

@@ -20,11 +20,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace MeshWorker
 {
   template <int dim, int spacedim, typename number>
-  DoFInfo<dim,spacedim,number>::DoFInfo(const BlockInfo& info)
-                  : block_info(&info, typeid(*this).name())
+  DoFInfo<dim,spacedim,number>::DoFInfo(const BlockInfo &info)
+    : block_info(&info, typeid(*this).name())
   {
     indices_by_block.resize(info.local().size());
-    for (unsigned int i=0;i<indices_by_block.size();++i)
+    for (unsigned int i=0; i<indices_by_block.size(); ++i)
       indices_by_block[i].resize(info.local().block_size(i));
   }
 
@@ -38,22 +38,22 @@ namespace MeshWorker
   void
   DoFInfo<dim,spacedim,number>::set_block_indices()
   {
-    for (unsigned int i=0;i<indices.size();++i)
+    for (unsigned int i=0; i<indices.size(); ++i)
       {
         const std::pair<unsigned int, unsigned int>
-          bi = block_info->local().global_to_local(this->block_info->renumber(i));
+        bi = block_info->local().global_to_local(this->block_info->renumber(i));
         indices_by_block[bi.first][bi.second] = indices_org[i];
       }
-                                     // Remove this after
-                                     // changing block codes
-    for (unsigned int i=0;i<indices.size();++i)
+    // Remove this after
+    // changing block codes
+    for (unsigned int i=0; i<indices.size(); ++i)
       indices[this->block_info->renumber(i)] = indices_org[i];
   }
 
 
   template <int dim, int spacedim, typename number>
   void
-  DoFInfo<dim,spacedim,number>::get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c)
+  DoFInfo<dim,spacedim,number>::get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator &c)
   {
     if (!c->has_children())
       {
@@ -77,7 +77,7 @@ namespace MeshWorker
 
   template <int dim, int spacedim, typename number>
   void
-  DoFInfo<dim,spacedim,number>::get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator& c)
+  DoFInfo<dim,spacedim,number>::get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator &c)
   {
     indices.resize(c->get_fe().dofs_per_cell);
 

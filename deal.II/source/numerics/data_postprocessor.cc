@@ -27,10 +27,10 @@ DataPostprocessor<dim>::~DataPostprocessor()
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_scalar (const std::vector<double>         &/*uh*/,
-                                   const std::vector<Tensor<1,dim> > &/*duh*/,
-                                   const std::vector<Tensor<2,dim> > &/*dduh*/,
-                                   const std::vector<Point<dim> >    &/*normals*/,
+compute_derived_quantities_scalar (const std::vector<double> &         /*uh*/,
+                                   const std::vector<Tensor<1,dim> > & /*duh*/,
+                                   const std::vector<Tensor<2,dim> > & /*dduh*/,
+                                   const std::vector<Point<dim> > &    /*normals*/,
                                    std::vector<Vector<double> >      &computed_quantities) const
 {
   computed_quantities.clear();
@@ -45,7 +45,7 @@ compute_derived_quantities_scalar (const std::vector<double>         &uh,
                                    const std::vector<Tensor<1,dim> > &duh,
                                    const std::vector<Tensor<2,dim> > &dduh,
                                    const std::vector<Point<dim> >    &normals,
-                                   const std::vector<Point<dim> >    &/*evaluation_points*/,
+                                   const std::vector<Point<dim> > &    /*evaluation_points*/,
                                    std::vector<Vector<double> >      &computed_quantities) const
 {
   compute_derived_quantities_scalar(uh, duh, dduh, normals, computed_quantities);
@@ -56,10 +56,10 @@ compute_derived_quantities_scalar (const std::vector<double>         &uh,
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_vector (const std::vector<Vector<double> > &/*uh*/,
-                                   const std::vector<std::vector<Tensor<1,dim> > > &/*duh*/,
-                                   const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
-                                   const std::vector<Point<dim> >                  &/*normals*/,
+compute_derived_quantities_vector (const std::vector<Vector<double> > & /*uh*/,
+                                   const std::vector<std::vector<Tensor<1,dim> > > & /*duh*/,
+                                   const std::vector<std::vector<Tensor<2,dim> > > & /*dduh*/,
+                                   const std::vector<Point<dim> > &                  /*normals*/,
                                    std::vector<Vector<double> >                    &computed_quantities) const
 {
   computed_quantities.clear();
@@ -75,7 +75,7 @@ compute_derived_quantities_vector (const std::vector<Vector<double> > &uh,
                                    const std::vector<std::vector<Tensor<1,dim> > > &duh,
                                    const std::vector<std::vector<Tensor<2,dim> > > &dduh,
                                    const std::vector<Point<dim> >                  &normals,
-                                   const std::vector<Point<dim> >                  &/*evaluation_points*/,
+                                   const std::vector<Point<dim> > &                  /*evaluation_points*/,
                                    std::vector<Vector<double> >                    &computed_quantities) const
 {
   compute_derived_quantities_vector(uh, duh, dduh, normals, computed_quantities);
@@ -87,8 +87,8 @@ template <int dim>
 std::vector<DataComponentInterpretation::DataComponentInterpretation>
 DataPostprocessor<dim>::get_data_component_interpretation () const
 {
-                                   // default implementation assumes that all
-                                   // components are independent scalars
+  // default implementation assumes that all
+  // components are independent scalars
   return
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     (get_names().size(),
@@ -102,9 +102,9 @@ template <int dim>
 DataPostprocessorScalar<dim>::
 DataPostprocessorScalar (const std::string &name,
                          const UpdateFlags  update_flags)
-:
-name (name),
-update_flags (update_flags)
+  :
+  name (name),
+  update_flags (update_flags)
 {}
 
 
@@ -125,8 +125,8 @@ DataPostprocessorScalar<dim>::
 get_data_component_interpretation () const
 {
   return
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-  (1, DataComponentInterpretation::component_is_scalar);
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    (1, DataComponentInterpretation::component_is_scalar);
 }
 
 
@@ -140,15 +140,15 @@ get_needed_update_flags () const
 
 
 
-  // -------------------------- DataPostprocessorVector ---------------------------
+// -------------------------- DataPostprocessorVector ---------------------------
 
 template <int dim>
 DataPostprocessorVector<dim>::
 DataPostprocessorVector (const std::string &name,
                          const UpdateFlags  update_flags)
-:
-name (name),
-update_flags (update_flags)
+  :
+  name (name),
+  update_flags (update_flags)
 {}
 
 
@@ -169,8 +169,8 @@ DataPostprocessorVector<dim>::
 get_data_component_interpretation () const
 {
   return
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-  (dim, DataComponentInterpretation::component_is_part_of_vector);
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    (dim, DataComponentInterpretation::component_is_part_of_vector);
 }
 
 

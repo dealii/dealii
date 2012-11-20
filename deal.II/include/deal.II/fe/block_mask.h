@@ -67,7 +67,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 class BlockMask
 {
-  public:
+public:
   /**
    * Initialize a block mask. The default is that a block
    * mask represents a set of blocks that are <i>all</i>
@@ -206,7 +206,7 @@ class BlockMask
   std::size_t
   memory_consumption () const;
 
-  private:
+private:
   /**
    * The actual block mask.
    */
@@ -215,8 +215,8 @@ class BlockMask
   // make the output operator a friend so it can access
   // the block_mask array
   friend
-  std::ostream & operator << (std::ostream &out,
-                              const BlockMask &mask);
+  std::ostream &operator << (std::ostream &out,
+                             const BlockMask &mask);
 };
 
 
@@ -232,8 +232,8 @@ class BlockMask
  * @param mask The mask to write.
  * @return A reference to the first argument.
  */
-std::ostream & operator << (std::ostream &out,
-                            const BlockMask &mask);
+std::ostream &operator << (std::ostream &out,
+                           const BlockMask &mask);
 
 
 // -------------------- inline functions ---------------------
@@ -245,16 +245,16 @@ BlockMask::BlockMask()
 
 inline
 BlockMask::BlockMask(const std::vector<bool> &block_mask)
-:
-block_mask (block_mask)
+  :
+  block_mask (block_mask)
 {}
 
 
 inline
 BlockMask::BlockMask(const unsigned int n_blocks,
-                                     const bool         initializer)
-:
-block_mask (n_blocks, initializer)
+                     const bool         initializer)
+  :
+  block_mask (n_blocks, initializer)
 {}
 
 
@@ -290,8 +290,8 @@ bool
 BlockMask::represents_n_blocks(const unsigned int n) const
 {
   return ((block_mask.size() == 0)
-      ||
-      (block_mask.size() == n));
+          ||
+          (block_mask.size() == n));
 }
 
 

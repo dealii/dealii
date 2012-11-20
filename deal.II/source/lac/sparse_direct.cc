@@ -54,12 +54,12 @@ namespace HSL
                   const unsigned int *,
                   const unsigned int *,
                   const unsigned int *,
-                  unsigned int       *,
+                  unsigned int *,
                   const unsigned int *,
-                  unsigned int       *,
-                  unsigned int       *,
-                  unsigned int       *,
-                  int                *)
+                  unsigned int *,
+                  unsigned int *,
+                  unsigned int *,
+                  int *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -73,15 +73,15 @@ namespace HSL
                   const unsigned int *,
                   const unsigned int *,
                   const unsigned int *,
-                  double             *,
+                  double *,
                   const unsigned int *,
-                  unsigned int       *,
+                  unsigned int *,
                   const unsigned int *,
                   const unsigned int *,
                   const unsigned int *,
-                  unsigned int       *,
-                  unsigned int       *,
-                  int                *)
+                  unsigned int *,
+                  unsigned int *,
+                  int *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -92,13 +92,13 @@ namespace HSL
 
     extern "C"
     void ma27cd_ (const unsigned int *,
-                  const double       *,
+                  const double *,
                   const unsigned int *,
                   const unsigned int *,
                   const unsigned int *,
-                  double             *,
+                  double *,
                   const unsigned int *,
-                  double             *,
+                  double *,
                   const unsigned int *,
                   const unsigned int *)
     {
@@ -145,7 +145,7 @@ namespace HSL
   namespace MA47
   {
     extern "C"
-    void ma47id_ (double       *,
+    void ma47id_ (double *,
                   unsigned int *)
     {
       AssertThrow (false,
@@ -158,14 +158,14 @@ namespace HSL
     extern "C"
     void ma47ad_ (const unsigned int *,
                   const unsigned int *,
-                  unsigned int       *,
-                  unsigned int       *,
-                  unsigned int       *,
+                  unsigned int *,
+                  unsigned int *,
+                  unsigned int *,
                   const unsigned int *,
-                  unsigned int       *,
+                  unsigned int *,
                   const unsigned int *,
-                  double             *,
-                  int                *)
+                  double *,
+                  int *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -178,16 +178,16 @@ namespace HSL
     void ma47bd_ (const unsigned int *,
                   const unsigned int *,
                   const unsigned int *,
-                  double             *,
+                  double *,
                   const unsigned int *,
-                  unsigned int       *,
+                  unsigned int *,
                   const unsigned int *,
                   const unsigned int *,
-                  const double       *,
+                  const double *,
                   const unsigned int *,
-                  unsigned int       *,
-                  double             *,
-                  int                *)
+                  unsigned int *,
+                  double *,
+                  int *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -198,13 +198,13 @@ namespace HSL
 
     extern "C"
     void ma47cd_ (const unsigned int *,
-                  const double       *,
+                  const double *,
                   const unsigned int *,
                   const unsigned int *,
                   const unsigned int *,
-                  double             *,
-                  double             *,
-                  unsigned int       *,
+                  double *,
+                  double *,
+                  unsigned int *,
                   const unsigned int *)
     {
       AssertThrow (false,
@@ -221,9 +221,9 @@ namespace HSL
 
 namespace
 {
-/**
- * Output an error message and terminate the program.
- */
+  /**
+   * Output an error message and terminate the program.
+   */
   void die (const std::string &text,
             const pid_t child)
   {
@@ -233,10 +233,10 @@ namespace
   }
 
 
-/**
- * Output an error message and terminate the program. Write two error
- * codes.
- */
+  /**
+   * Output an error message and terminate the program. Write two error
+   * codes.
+   */
   template <typename T1, typename T2>
   void die (const std::string &text,
             const T1 t1,
@@ -259,100 +259,100 @@ Threads::ThreadMutex SparseDirectMA27::static_synchronisation_lock;
 
 struct SparseDirectMA27::DetachedModeData
 {
-                                     /**
-                                      * Mutex to assure that only one
-                                      * thread is currently talking
-                                      * through the pipe.
-                                      */
-    Threads::ThreadMutex mutex;
+  /**
+   * Mutex to assure that only one
+   * thread is currently talking
+   * through the pipe.
+   */
+  Threads::ThreadMutex mutex;
 
-                                     /**
-                                      * File handles for the pipe
-                                      * between server (computing
-                                      * process) and client (display
-                                      * process).
-                                      */
-    int server_client_pipe[2];
-    int client_server_pipe[2];
+  /**
+   * File handles for the pipe
+   * between server (computing
+   * process) and client (display
+   * process).
+   */
+  int server_client_pipe[2];
+  int client_server_pipe[2];
 
-                                     /**
-                                      * PID of the forked child
-                                      * process.
-                                      */
-    pid_t child_pid;
+  /**
+   * PID of the forked child
+   * process.
+   */
+  pid_t child_pid;
 
-                                     /**
-                                      * Put a message from the server
-                                      * to the client program. Obey
-                                      * all the rules the operating
-                                      * system sets, and create a log
-                                      * entry for this communication
-                                      */
-    template <typename T>
-    void put (const T *t,
-              const std::size_t N,
-              const char * /*debug_info*/) const
+  /**
+   * Put a message from the server
+   * to the client program. Obey
+   * all the rules the operating
+   * system sets, and create a log
+   * entry for this communication
+   */
+  template <typename T>
+  void put (const T *t,
+            const std::size_t N,
+            const char * /*debug_info*/) const
+  {
+    unsigned int count = 0;
+    while (count < sizeof(T)*N)
       {
-        unsigned int count = 0;
-        while (count < sizeof(T)*N)
-          {
-                                             // repeat writing until
-                                             // syscall is not
-                                             // interrupted
-            int ret = -1;
+        // repeat writing until
+        // syscall is not
+        // interrupted
+        int ret = -1;
 #ifndef DEAL_II_MSVC
-            do
-              ret = write (server_client_pipe[1],
-                           reinterpret_cast<const char *> (t) + count,
-                           sizeof(T) * N - count);
-            while ((ret<0) && (errno==EINTR));
+        do
+          ret = write (server_client_pipe[1],
+                       reinterpret_cast<const char *> (t) + count,
+                       sizeof(T) * N - count);
+        while ((ret<0) && (errno==EINTR));
 #else
-	    Assert (false,
-		    ExcMessage ("Detached mode isn't currently implemented on Windows"));
+        Assert (false,
+                ExcMessage ("Detached mode isn't currently implemented on Windows"));
 #endif
-            if (ret < 0)
-              die ("error on client side in 'put'", ret, errno, child_pid);
+        if (ret < 0)
+          die ("error on client side in 'put'", ret, errno, child_pid);
 
-            count += ret;
-          };
+        count += ret;
+      };
 
-        std::fflush (NULL);
-      }
+    std::fflush (NULL);
+  }
 
 
-                                     /**
-                                      * Get a message from the client
-                                      * program. Obey all the rules
-                                      * the operating system sets, and
-                                      * create a log entry for this
-                                      * communication
-                                      */
-    template <typename T>
-    void get (T *t,
-              const std::size_t N,
-              const char * /*debug_info*/) const
+  /**
+   * Get a message from the client
+   * program. Obey all the rules
+   * the operating system sets, and
+   * create a log entry for this
+   * communication
+   */
+  template <typename T>
+  void get (T *t,
+            const std::size_t N,
+            const char * /*debug_info*/) const
+  {
+    unsigned int count = 0;
+    while (count < sizeof(T)*N)
       {
-        unsigned int count = 0;
-        while (count < sizeof(T)*N)
-          {
-            int ret = -1;
+        int ret = -1;
 #ifndef DEAL_II_MSVC
-            do
-              ret = write (server_client_pipe[1],
-                           reinterpret_cast<const char *> (t) + count,
-                          sizeof(T) * N - count);
-            while ((ret<0) && (errno==EINTR));
+        do
+          ret = write (server_client_pipe[1],
+                       reinterpret_cast<const char *> (t) + count,
+                       sizeof(T) * N - count);
+        while ((ret<0) && (errno==EINTR));
 #else
-	    Assert (false,
-		    ExcMessage ("Detached mode isn't currently implemented on Windows"));
+        Assert (false,
+                ExcMessage ("Detached mode isn't currently implemented on Windows"));
 #endif
 
-            if (ret < 0)
-              die ("error on client side in 'get'", ret, errno, child_pid);
+        if (ret < 0)
+          die ("error on client side in 'get'", ret, errno, child_pid);
 
-            count += ret;
-          }
+        count += ret;
       }
+  }
 };
 
 
@@ -364,19 +364,19 @@ SparseDirectMA27::SparseDirectMA27 (const double LIW_factor_1,
                                     const double LIW_increase_factor_2,
                                     const double LA_increase_factor,
                                     const bool   suppress_output)
-                :
-                suppress_output (suppress_output),
-                detached_mode (false),
-                detached_mode_data (0),
-                LIW_factor_1 (LIW_factor_1),
-                LIW_factor_2 (LIW_factor_2),
-                LA_factor (LA_factor),
-                LIW_increase_factor_1 (LIW_increase_factor_1),
-                LIW_increase_factor_2 (LIW_increase_factor_2),
-                LA_increase_factor (LA_increase_factor),
-                initialize_called (false),
-                factorize_called (false),
-                sparsity_pattern (0, typeid(*this).name())
+  :
+  suppress_output (suppress_output),
+  detached_mode (false),
+  detached_mode_data (0),
+  LIW_factor_1 (LIW_factor_1),
+  LIW_factor_2 (LIW_factor_2),
+  LA_factor (LA_factor),
+  LIW_increase_factor_1 (LIW_increase_factor_1),
+  LIW_increase_factor_2 (LIW_increase_factor_2),
+  LA_increase_factor (LA_increase_factor),
+  initialize_called (false),
+  factorize_called (false),
+  sparsity_pattern (0, typeid(*this).name())
 {}
 
 
@@ -386,20 +386,20 @@ SparseDirectMA27::~SparseDirectMA27()
   if (detached_mode)
     if (detached_mode_data != 0)
       {
-                                         // close down client
+        // close down client
         Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
-                                         // Assign the result of write
-                                         // and reset the variable to
-                                         // avoid compiler warnings
+        // Assign the result of write
+        // and reset the variable to
+        // avoid compiler warnings
 #ifndef DEAL_II_MSVC
 //TODO:[WB] Shouldn't t be used to trace errors?
         ssize_t t = write (detached_mode_data->server_client_pipe[1], "7", 1);
         (void)t;
 #else
-	Assert (false,
-		ExcMessage ("Detached mode isn't currently implemented on Windows"));
+        Assert (false,
+                ExcMessage ("Detached mode isn't currently implemented on Windows"));
 #endif
-                                         // then also delete data
+        // then also delete data
         delete detached_mode_data;
         detached_mode_data = 0;
       }
@@ -432,53 +432,53 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
           ExcInitializeAlreadyCalled());
 
 
-                                   // first thing is: if detached mode
-                                   // is requested, then we need to
-                                   // spawn an instance of the
-                                   // detached solver and open
-                                   // communication channels with it
+  // first thing is: if detached mode
+  // is requested, then we need to
+  // spawn an instance of the
+  // detached solver and open
+  // communication channels with it
   if (detached_mode_set())
     {
       Assert (detached_mode_data == 0, ExcInternalError());
       detached_mode_data = new DetachedModeData();
 
-                                       // create pipes to which we can
-                                       // write and from which the
-                                       // slave process will read its
-                                       // stdin
+      // create pipes to which we can
+      // write and from which the
+      // slave process will read its
+      // stdin
 
-                                       // Assign the return value to a
-                                       // variable to avoid compiler
-                                       // warnings
+      // Assign the return value to a
+      // variable to avoid compiler
+      // warnings
 #ifndef DEAL_II_MSVC
 //TODO:[WB] Use t to trace errors?
       int t = pipe(detached_mode_data->server_client_pipe);
       (void)t;
 #else
       Assert (false,
-	      ExcMessage ("Detached mode isn't currently implemented on Windows"));
+              ExcMessage ("Detached mode isn't currently implemented on Windows"));
 #endif
-                                       // fflush(NULL) is said to be a
-                                       // good idea before fork()
+      // fflush(NULL) is said to be a
+      // good idea before fork()
       std::fflush(NULL);
 
-                                       // now fork and create child
-                                       // process
+      // now fork and create child
+      // process
 #ifndef DEAL_II_MSVC
-			// BG comment out until pipes are implemented in MSVC
+      // BG comment out until pipes are implemented in MSVC
       detached_mode_data->child_pid = fork();
 #else
       Assert (false,
-	      ExcMessage ("Detached mode isn't currently implemented on Windows"));
+              ExcMessage ("Detached mode isn't currently implemented on Windows"));
 #endif
 
       if (detached_mode_data->child_pid == 0)
-                                           // child process starts here
+        // child process starts here
         {
-                                           // copy read end of input
-                                           // pipe to stdin, and
-                                           // likewise with write end
-                                           // of pipe to stdout
+          // copy read end of input
+          // pipe to stdin, and
+          // likewise with write end
+          // of pipe to stdout
 #ifndef DEAL_II_MSVC
           dup2(detached_mode_data->server_client_pipe[0], 0);
           close(detached_mode_data->server_client_pipe[0]);
@@ -486,50 +486,50 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
           dup2(detached_mode_data->client_server_pipe[1], 1);
           close(detached_mode_data->client_server_pipe[1]);
 
-                                           // then dispose of this
-                                           // copy of the program, and
-                                           // run the detached solver
-                                           // slave instead
-          const char * const program_name = DEAL_II_PATH"/lib/bin/detached_ma27";
-          const char * const child_argv[] = { program_name, NULL };
-          execv(program_name, const_cast<char * const *>(child_argv));
+          // then dispose of this
+          // copy of the program, and
+          // run the detached solver
+          // slave instead
+          const char *const program_name = DEAL_II_PATH"/lib/bin/detached_ma27";
+          const char *const child_argv[] = { program_name, NULL };
+          execv(program_name, const_cast<char *const *>(child_argv));
 
 
-                                           // usually execv does not
-                                           // return. if it does, then an
-                                           // error happened and we report it
-                                           // herewith:
-	  AssertThrow (false,
-		       ExcMessage ("execv returned, which it is not supposed to do!"));
-	  std::exit(1);
+          // usually execv does not
+          // return. if it does, then an
+          // error happened and we report it
+          // herewith:
+          AssertThrow (false,
+                       ExcMessage ("execv returned, which it is not supposed to do!"));
+          std::exit(1);
 
 #else
-	  Assert (false,
-		  ExcMessage ("Detached mode isn't currently implemented on Windows"));
+          Assert (false,
+                  ExcMessage ("Detached mode isn't currently implemented on Windows"));
 #endif
         };
-                                       // parent process continues
-                                       // here.  first thing is to
-                                       // send the process id of the
-                                       // present process. this is
-                                       // used to make sure that the
-                                       // client can end itself when
-                                       // it finds that the master
-                                       // process was somehow
-                                       // terminated without sending
-                                       // him this information
+      // parent process continues
+      // here.  first thing is to
+      // send the process id of the
+      // present process. this is
+      // used to make sure that the
+      // client can end itself when
+      // it finds that the master
+      // process was somehow
+      // terminated without sending
+      // him this information
 #ifndef DEAL_II_MSVC
       const pid_t parent_pid = getpid();
       detached_mode_data->put (&parent_pid, 1, "parent_pid");
 #else
       Assert (false,
-	      ExcMessage ("Detached mode isn't currently implemented on Windows"));
+              ExcMessage ("Detached mode isn't currently implemented on Windows"));
 #endif
     };
 
 
-                                   // suppress error output if
-                                   // requested
+  // suppress error output if
+  // requested
   if (suppress_output)
     {
       const unsigned int LP = 0;
@@ -539,16 +539,16 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
   sparsity_pattern = &sp;
 
   const unsigned int
-    n_rows           = sparsity_pattern->n_rows();
-  const std::size_t * const
-    rowstart_indices = sparsity_pattern->get_rowstart_indices();
-  const unsigned int * const
-    col_nums         = sparsity_pattern->get_column_numbers();
+  n_rows           = sparsity_pattern->n_rows();
+  const std::size_t *const
+  rowstart_indices = sparsity_pattern->get_rowstart_indices();
+  const unsigned int *const
+  col_nums         = sparsity_pattern->get_column_numbers();
 
-                                   // first count number of nonzero
-                                   // elements in the upper right
-                                   // part. the matrix is symmetric,
-                                   // so this suffices
+  // first count number of nonzero
+  // elements in the upper right
+  // part. the matrix is symmetric,
+  // so this suffices
   n_nonzero_elements = 0;
   for (unsigned int row=0; row<n_rows; ++row)
     for (const unsigned int *col=&col_nums[rowstart_indices[row]];
@@ -558,12 +558,12 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
         ++n_nonzero_elements;
 
 
-                                   // fill the row numbers and column
-                                   // numbers arrays from the sparsity
-                                   // pattern. note that we have
-                                   // Fortran convention, i.e. indices
-                                   // need to be 1-base, as opposed to
-                                   // C's 0-based convention!
+  // fill the row numbers and column
+  // numbers arrays from the sparsity
+  // pattern. note that we have
+  // Fortran convention, i.e. indices
+  // need to be 1-base, as opposed to
+  // C's 0-based convention!
   row_numbers.resize (n_nonzero_elements);
   column_numbers.resize (n_nonzero_elements);
 
@@ -572,9 +572,9 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
     for (const unsigned int *col=&col_nums[rowstart_indices[row]];
          col != &col_nums[rowstart_indices[row+1]];
          ++col)
-                                       // note that the matrix must be
-                                       // symmetric, so only treat the
-                                       // upper right part
+      // note that the matrix must be
+      // symmetric, so only treat the
+      // upper right part
       if (row <= *col)
         {
           Assert (global_index < n_nonzero_elements, ExcInternalError());
@@ -585,21 +585,21 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
         };
   Assert (global_index == n_nonzero_elements, ExcInternalError());
 
-                                   // initialize scratch arrays and
-                                   // variables
+  // initialize scratch arrays and
+  // variables
   LIW = static_cast<unsigned int>((2*n_nonzero_elements + 3*n_rows + 1) *
                                   LIW_factor_1);
   IW.resize    (detached_mode_set() ? 0 : LIW);
   IKEEP.resize (detached_mode_set() ? 0 : 3*n_rows);
   IW1.resize   (detached_mode_set() ? 0 : 2*n_rows);
 
-                                   // no output please
+  // no output please
   IFLAG = 0;
 
-                                   // loop until memory requirements
-                                   // are satisfied or we are not
-                                   // allowed to allocate more memory
-                                   // no more
+  // loop until memory requirements
+  // are satisfied or we are not
+  // allowed to allocate more memory
+  // no more
   bool call_succeeded = true;
   do
     {
@@ -609,31 +609,31 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                    &IW1[0], &NSTEPS, &IFLAG);
       call_succeeded = (IFLAG==0);
 
-                                       // if enough memory or no
-                                       // increase allowed: exit loop
+      // if enough memory or no
+      // increase allowed: exit loop
       if (call_succeeded || (LIW_increase_factor_1 <= 1))
         break;
 
-                                       // otherwise: increase LIW and retry
+      // otherwise: increase LIW and retry
       LIW = static_cast<unsigned int>(LIW * LIW_increase_factor_1);
       IW.resize (LIW);
     }
   while (true);
 
-                                   // if we were not allowed to
-                                   // allocate more memory, then throw
-                                   // an exception
+  // if we were not allowed to
+  // allocate more memory, then throw
+  // an exception
   AssertThrow (call_succeeded, ExcMA27AFailed(IFLAG));
 
-                                   // catch returned values from the
-                                   // COMMON block. we need these
-                                   // values in order to set array
-                                   // sizes in the next function
+  // catch returned values from the
+  // COMMON block. we need these
+  // values in order to set array
+  // sizes in the next function
   call_ma27x1 (&NRLNEC);
   call_ma27x2 (&NIRNEC);
 
-                                   // note that we have already been
-                                   // in this function
+  // note that we have already been
+  // in this function
   initialize_called = true;
 }
 
@@ -643,24 +643,24 @@ template <typename number>
 void
 SparseDirectMA27::factorize (const SparseMatrix<number> &matrix)
 {
-                                   // if necessary, initialize process
+  // if necessary, initialize process
   if (initialize_called == false)
     initialize (matrix.get_sparsity_pattern());
 
-                                   // make sure the sparsity patterns
-                                   // are the same
+  // make sure the sparsity patterns
+  // are the same
   Assert (sparsity_pattern == &matrix.get_sparsity_pattern(),
           ExcDifferentSparsityPatterns());
 
 
-                                   // set LA and fill the A array of
-                                   // values
+  // set LA and fill the A array of
+  // values
   LA = std::max (static_cast<int>(NRLNEC * LA_factor),
                  static_cast<int>(n_nonzero_elements));
   A.resize (LA);
   fill_A (matrix);
 
-                                   // if necessary extend IW
+  // if necessary extend IW
   if (LIW < NIRNEC * LIW_factor_2)
     {
       LIW = static_cast<unsigned int>(NIRNEC * LIW_factor_2);
@@ -669,10 +669,10 @@ SparseDirectMA27::factorize (const SparseMatrix<number> &matrix)
 
   const unsigned int n_rows = matrix.get_sparsity_pattern().n_rows();
 
-                                   // loop until memory requirements
-                                   // are satisfied or we are not
-                                   // allowed to allocate more memory
-                                   // no more
+  // loop until memory requirements
+  // are satisfied or we are not
+  // allowed to allocate more memory
+  // no more
   bool call_succeeded = true;
   do
     {
@@ -683,10 +683,10 @@ SparseDirectMA27::factorize (const SparseMatrix<number> &matrix)
                    &IW1[0], &IFLAG);
       call_succeeded = (IFLAG==0);
 
-                                       // if enough memory or no
-                                       // increase allowed: exit
-                                       // loop. delete data that is no
-                                       // more used
+      // if enough memory or no
+      // increase allowed: exit
+      // loop. delete data that is no
+      // more used
       if (call_succeeded)
         {
           std::vector<unsigned int> tmp1, tmp2, tmp3;
@@ -698,90 +698,90 @@ SparseDirectMA27::factorize (const SparseMatrix<number> &matrix)
         };
 
 
-                                       // otherwise: increase LIW or
-                                       // LA if that is allowed and
-                                       // retry
+      // otherwise: increase LIW or
+      // LA if that is allowed and
+      // retry
       switch (IFLAG)
         {
-          case -3:
-          {
-            if (LIW_increase_factor_2 <= 1)
-              goto exit_loop;
+        case -3:
+        {
+          if (LIW_increase_factor_2 <= 1)
+            goto exit_loop;
 
-            LIW = static_cast<unsigned int>(LIW * LIW_increase_factor_2);
-            IW.resize (LIW);
-            break;
-          };
+          LIW = static_cast<unsigned int>(LIW * LIW_increase_factor_2);
+          IW.resize (LIW);
+          break;
+        };
 
-          case -4:
-          {
-            if (LA_increase_factor <= 1)
-              goto exit_loop;
-                                             // increase A. note that
-                                             // since the function has
-                                             // already part of the
-                                             // array @p{A}, we have
-                                             // to re-fill it with the
-                                             // original values. minor
-                                             // clue: since the old
-                                             // entries are no more
-                                             // needed, we can discard
-                                             // them; we use this to
-                                             // first release all
-                                             // memory (through the
-                                             // call to @p{swap} and
-                                             // the subsequent call to
-                                             // the destructor of the
-                                             // @p{tmp} object) and
-                                             // only then re-allocate
-                                             // it. If we called
-                                             // @p{resize} directly,
-                                             // this would first
-                                             // allocate more memory,
-                                             // then copy the old
-                                             // contents, and only
-                                             // then release the old
-                                             // memory, but keeping
-                                             // both memory regions at
-                                             // the same time could
-                                             // sometimes be more than
-                                             // we can do, leading to
-                                             // an exception on the
-                                             // allocation.
-            std::cout << "<*>" << std::flush;
+        case -4:
+        {
+          if (LA_increase_factor <= 1)
+            goto exit_loop;
+          // increase A. note that
+          // since the function has
+          // already part of the
+          // array @p{A}, we have
+          // to re-fill it with the
+          // original values. minor
+          // clue: since the old
+          // entries are no more
+          // needed, we can discard
+          // them; we use this to
+          // first release all
+          // memory (through the
+          // call to @p{swap} and
+          // the subsequent call to
+          // the destructor of the
+          // @p{tmp} object) and
+          // only then re-allocate
+          // it. If we called
+          // @p{resize} directly,
+          // this would first
+          // allocate more memory,
+          // then copy the old
+          // contents, and only
+          // then release the old
+          // memory, but keeping
+          // both memory regions at
+          // the same time could
+          // sometimes be more than
+          // we can do, leading to
+          // an exception on the
+          // allocation.
+          std::cout << "<*>" << std::flush;
 
-            LA  = static_cast<unsigned int>(LA * LA_increase_factor);
-            if (true)
-              {
-                std::vector<double> tmp;
-                A.swap (tmp);
-              };
+          LA  = static_cast<unsigned int>(LA * LA_increase_factor);
+          if (true)
+            {
+              std::vector<double> tmp;
+              A.swap (tmp);
+            };
 
-            A.resize (LA);
-            fill_A (matrix);
+          A.resize (LA);
+          fill_A (matrix);
 
-            break;
-          };
+          break;
+        };
 
-                                            // ups, other return
-                                            // value, don't know
-                                            // what to do here
-          default:
-                AssertThrow (false, ExcMA27BFailed(IFLAG));
+        // ups, other return
+        // value, don't know
+        // what to do here
+        default:
+          AssertThrow (false, ExcMA27BFailed(IFLAG));
         };
       continue;
 
-      exit_loop:
+exit_loop:
       break;
     }
   while (true);
 
   AssertThrow (call_succeeded, ExcMA27BFailed(IFLAG));
 
-                                   // note that we have been here
-                                   // already and release the sparsity
-                                   // pattern object, since we won't
-                                   // need it any more
+  // note that we have been here
+  // already and release the sparsity
+  // pattern object, since we won't
+  // need it any more
   factorize_called = true;
   sparsity_pattern = 0;
 }
@@ -808,8 +808,8 @@ SparseDirectMA27::solve (Vector<float> &rhs_and_solution) const
 {
   Assert (factorize_called == true, ExcFactorizeNotCalled());
 
-                                   // first have to convert data type to
-                                   // doubles
+  // first have to convert data type to
+  // doubles
   Vector<double> tmp (rhs_and_solution.size());
   tmp = rhs_and_solution;
 
@@ -818,7 +818,7 @@ SparseDirectMA27::solve (Vector<float> &rhs_and_solution) const
                &IW[0], &LIW, &MAXFRT,
                &tmp(0), &IW1[0], &NSTEPS);
 
-                                   // then copy result back
+  // then copy result back
   rhs_and_solution = tmp;
 }
 
@@ -878,9 +878,9 @@ SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
     for (const unsigned int *col=&col_nums[rowstart_indices[row]];
          col != &col_nums[rowstart_indices[row+1]];
          ++col)
-                                       // note that the matrix must be
-                                       // symmetric, so only treat the
-                                       // upper right part
+      // note that the matrix must be
+      // symmetric, so only treat the
+      // upper right part
       if (row <= *col)
         {
           Assert (global_index < n_nonzero_elements, ExcInternalError());
@@ -888,9 +888,9 @@ SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
           A[global_index] = matrix(row,*col);
           ++global_index;
 
-                                           // make sure that the symmetric
-                                           // entry exists and has the same
-                                           // value, unless this one is zero
+          // make sure that the symmetric
+          // entry exists and has the same
+          // value, unless this one is zero
           Assert ((matrix(row,*col) == 0)
                   ||
                   (std::fabs(matrix(row,*col) - matrix(*col,row))
@@ -898,12 +898,12 @@ SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
                   ExcMatrixNotSymmetric());
         }
       else
-                                         // lower left part. just check
-                                         // symmetry
+        // lower left part. just check
+        // symmetry
         Assert ((matrix(row,*col) == 0)
                 ||
                 (std::fabs(matrix(row,*col) - matrix(*col,row))
-                   <= 1e-15 * std::fabs (matrix(row,*col))),
+                 <= 1e-15 * std::fabs (matrix(row,*col))),
                 ExcMatrixNotSymmetric());
 
   Assert (global_index == n_nonzero_elements, ExcInternalError());
@@ -929,10 +929,10 @@ void SparseDirectMA27::call_ma27ad (const unsigned int *N,
   else
     {
       Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
-                                       // first write the data we have
-                                       // to push over, i.e. first
-                                       // function index, then array
-                                       // sizes, then arrays
+      // first write the data we have
+      // to push over, i.e. first
+      // function index, then array
+      // sizes, then arrays
       detached_mode_data->put ("1", 1, "ACTION 1");
 
       detached_mode_data->put (N,   1, "N");
@@ -942,14 +942,14 @@ void SparseDirectMA27::call_ma27ad (const unsigned int *N,
       detached_mode_data->put (LIW, 1, "LIW");
       detached_mode_data->put (IFLAG, 1, "IFLAG");
 
-                                       // all other fields are kept at
-                                       // the client. array should not
-                                       // be in used on this side
+      // all other fields are kept at
+      // the client. array should not
+      // be in used on this side
       Assert (this->IKEEP.size() == 0, ExcInternalError());
       Assert (this->IW1.size() == 0, ExcInternalError());
 
-                                       // next get back what we need
-                                       // to know
+      // next get back what we need
+      // to know
       detached_mode_data->get (IFLAG, 1, "IFLAG");
     };
 }
@@ -975,17 +975,17 @@ void SparseDirectMA27::call_ma27bd (const unsigned int *N,
                         IKEEP, NSTEPS, MAXFRT, IW1, IFLAG);
   else
     {
-                                       // basically, everything is
-                                       // already over the line,
-                                       // except for A and LA
+      // basically, everything is
+      // already over the line,
+      // except for A and LA
       Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
       detached_mode_data->put ("2", 1, "ACTION 2");
 
       detached_mode_data->put (LA, 1, "LA");
       detached_mode_data->put (A,  *LA, "A");
 
-                                       // next get back what we need
-                                       // to know
+      // next get back what we need
+      // to know
       detached_mode_data->get (IFLAG, 1, "IFLAG");
     };
 }
@@ -1011,8 +1011,8 @@ void SparseDirectMA27::call_ma27cd (const unsigned int *N,
     {
       detached_mode_data->put ("3", 1, "ACTION 3");
 
-                                       // we only have to push and get
-                                       // the rhs vector
+      // we only have to push and get
+      // the rhs vector
       detached_mode_data->put (RHS, *N, "RHS");
       detached_mode_data->get (RHS, *N, "RHS");
     };
@@ -1027,9 +1027,9 @@ void SparseDirectMA27::call_ma27x1 (unsigned int *NRLNEC)
   else
     {
       Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
-                                       // ma27x1 only reads data, so
-                                       // don't send anything except
-                                       // for the id
+      // ma27x1 only reads data, so
+      // don't send anything except
+      // for the id
       detached_mode_data->put ("4", 1, "ACTION 4");
       detached_mode_data->get (NRLNEC, 1, "NRLNEC");
     };
@@ -1044,9 +1044,9 @@ void SparseDirectMA27::call_ma27x2 (unsigned int *NIRNEC)
   else
     {
       Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
-                                       // ma27x2 only reads data, so
-                                       // don't send anything except
-                                       // for the id
+      // ma27x2 only reads data, so
+      // don't send anything except
+      // for the id
       detached_mode_data->put ("5", 1, "ACTION 5");
       detached_mode_data->get (NIRNEC, 1, "NIRNEC");
     };
@@ -1061,9 +1061,9 @@ void SparseDirectMA27::call_ma27x3 (const unsigned int *LP)
   else
     {
       Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
-                                       // ma27x2 only reads data, so
-                                       // don't send anything except
-                                       // for the id
+      // ma27x2 only reads data, so
+      // don't send anything except
+      // for the id
       detached_mode_data->put ("6", 1, "ACTION 6");
       detached_mode_data->put (LP, 1, "LP");
     };
@@ -1085,17 +1085,17 @@ SparseDirectMA47::SparseDirectMA47 (const double LIW_factor_1,
                                     const double LIW_increase_factor_2,
                                     const double LA_increase_factor,
                                     const bool   suppress_output)
-                :
-                suppress_output (suppress_output),
-                LIW_factor_1 (LIW_factor_1),
-                LIW_factor_2 (LIW_factor_2),
-                LA_factor (LA_factor),
-                LIW_increase_factor_1 (LIW_increase_factor_1),
-                LIW_increase_factor_2 (LIW_increase_factor_2),
-                LA_increase_factor (LA_increase_factor),
-                initialize_called (false),
-                factorize_called (false),
-                matrix (0, typeid(*this).name())
+  :
+  suppress_output (suppress_output),
+  LIW_factor_1 (LIW_factor_1),
+  LIW_factor_2 (LIW_factor_2),
+  LA_factor (LA_factor),
+  LIW_increase_factor_1 (LIW_increase_factor_1),
+  LIW_increase_factor_2 (LIW_increase_factor_2),
+  LA_increase_factor (LA_increase_factor),
+  initialize_called (false),
+  factorize_called (false),
+  matrix (0, typeid(*this).name())
 {}
 
 
@@ -1106,43 +1106,43 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
   Assert (initialize_called == false,
           ExcInitializeAlreadyCalled());
 
-                                   // some initialization stuff
+  // some initialization stuff
   call_ma47id (CNTL, ICNTL);
   if (suppress_output)
     ICNTL[0] = 0;
 
-                                   // then start with work
+  // then start with work
   matrix = &m;
   const SparsityPattern &sparsity_pattern = matrix->get_sparsity_pattern();
 
   const unsigned int
-    n_rows           = sparsity_pattern.n_rows();
-  const std::size_t * const
-    rowstart_indices = sparsity_pattern.get_rowstart_indices();
-  const unsigned int * const
-    col_nums         = sparsity_pattern.get_column_numbers();
+  n_rows           = sparsity_pattern.n_rows();
+  const std::size_t *const
+  rowstart_indices = sparsity_pattern.get_rowstart_indices();
+  const unsigned int *const
+  col_nums         = sparsity_pattern.get_column_numbers();
 
-                                   // first count number of nonzero
-                                   // elements in the upper right
-                                   // part. the matrix is symmetric,
-                                   // so this suffices
+  // first count number of nonzero
+  // elements in the upper right
+  // part. the matrix is symmetric,
+  // so this suffices
   n_nonzero_elements = 0;
   for (unsigned int row=0; row<n_rows; ++row)
     for (const unsigned int *col=&col_nums[rowstart_indices[row]];
          col != &col_nums[rowstart_indices[row+1]];
          ++col)
-                                       // skip zero elements, as
-                                       // required by the docs of MA47
+      // skip zero elements, as
+      // required by the docs of MA47
       if ((row <= *col) && (m(row,*col) != 0))
         ++n_nonzero_elements;
 
 
-                                   // fill the row numbers and column
-                                   // numbers arrays from the sparsity
-                                   // pattern. note that we have
-                                   // Fortran convention, i.e. indices
-                                   // need to be 1-base, as opposed to
-                                   // C's 0-based convention!
+  // fill the row numbers and column
+  // numbers arrays from the sparsity
+  // pattern. note that we have
+  // Fortran convention, i.e. indices
+  // need to be 1-base, as opposed to
+  // C's 0-based convention!
   row_numbers.resize (n_nonzero_elements);
   column_numbers.resize (n_nonzero_elements);
 
@@ -1151,9 +1151,9 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
     for (const unsigned int *col=&col_nums[rowstart_indices[row]];
          col != &col_nums[rowstart_indices[row+1]];
          ++col)
-                                       // note that the matrix must be
-                                       // symmetric, so only treat the
-                                       // upper right part
+      // note that the matrix must be
+      // symmetric, so only treat the
+      // upper right part
       if ((row <= *col) && (m(row,*col) != 0))
         {
           Assert (global_index < n_nonzero_elements, ExcInternalError());
@@ -1164,14 +1164,14 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
         };
   Assert (global_index == n_nonzero_elements, ExcInternalError());
 
-                                   // initialize scratch arrays and
-                                   // variables
+  // initialize scratch arrays and
+  // variables
   LIW = static_cast<unsigned int>((2*n_nonzero_elements + 5*n_rows + 4) *
                                   LIW_factor_1);
   IW.resize (LIW);
   KEEP.resize (n_nonzero_elements + 5*n_rows + 2);
 
-                                   // declare output info fields
+  // declare output info fields
   bool call_succeeded;
   do
     {
@@ -1181,12 +1181,12 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
                   &ICNTL[0], &INFO[0]);
       call_succeeded = (INFO[0] == 0);
 
-                                       // if enough memory or no
-                                       // increase allowed: exit loop
+      // if enough memory or no
+      // increase allowed: exit loop
       if (call_succeeded || (LIW_increase_factor_1 <= 1))
         break;
 
-                                       // otherwise: increase LIW and retry
+      // otherwise: increase LIW and retry
       LIW = static_cast<unsigned int>(LIW * LIW_increase_factor_1);
       IW.resize (LIW);
     }
@@ -1194,8 +1194,8 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
 
   AssertThrow (call_succeeded, ExcMA47AFailed(INFO[0]));
 
-                                   // note that we have already been
-                                   // in this function
+  // note that we have already been
+  // in this function
   initialize_called = true;
 }
 
@@ -1207,23 +1207,23 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
   Assert (factorize_called == false,
           ExcCantFactorizeAgain());
 
-                                   // if necessary, initialize process
+  // if necessary, initialize process
   if (initialize_called == false)
     initialize (m);
 
-                                   // make sure the matrices
-                                   // are the same
+  // make sure the matrices
+  // are the same
   Assert (matrix == &m, ExcDifferentMatrices());
 
 
-                                   // set LA and fill the A array of
-                                   // values
+  // set LA and fill the A array of
+  // values
   LA = std::max (static_cast<int>(INFO[5] * LA_factor),
                  static_cast<int>(n_nonzero_elements));
   A.resize (LA);
   fill_A (m);
 
-                                   // if necessary extend IW
+  // if necessary extend IW
   if (LIW < INFO[6] * LIW_factor_2)
     {
       LIW = static_cast<unsigned int>(INFO[6] * LIW_factor_2);
@@ -1233,7 +1233,7 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
   const unsigned int n_rows = m.get_sparsity_pattern().n_rows();
   IW1.resize (2*n_rows+2);
 
-                                   // output info flags
+  // output info flags
   bool call_succeeded;
   do
     {
@@ -1243,93 +1243,93 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
                    &IW1[0], &INFO[0]);
       call_succeeded = (INFO[0] == 0);
 
-                                       // if enough memory or no
-                                       // increase allowed: exit loop
+      // if enough memory or no
+      // increase allowed: exit loop
       if (call_succeeded)
         break;
 
-                                       // otherwise: increase LIW or
-                                       // LA if that is allowed and
-                                       // retry
+      // otherwise: increase LIW or
+      // LA if that is allowed and
+      // retry
       switch (INFO[0])
         {
-          case -3:
-          {
-            if (LIW_increase_factor_2 <= 1)
-              goto exit_loop;
+        case -3:
+        {
+          if (LIW_increase_factor_2 <= 1)
+            goto exit_loop;
 
-            LIW = static_cast<unsigned int>(LIW * LIW_increase_factor_2);
-            IW.resize (LIW);
-            break;
-          };
+          LIW = static_cast<unsigned int>(LIW * LIW_increase_factor_2);
+          IW.resize (LIW);
+          break;
+        };
 
-          case -4:
-          {
-            if (LA_increase_factor <= 1)
-              goto exit_loop;
-                                             // increase A. note that
-                                             // since the function has
-                                             // already part of the
-                                             // array @p{A}, we have
-                                             // to re-fill it with the
-                                             // original values. minor
-                                             // clue: since the old
-                                             // entries are no more
-                                             // needed, we can discard
-                                             // them; we use this to
-                                             // first release all
-                                             // memory (through the
-                                             // call to @p{swap} and
-                                             // the subsequent call to
-                                             // the destructor of the
-                                             // @p{tmp} object) and
-                                             // only then re-allocate
-                                             // it. If we called
-                                             // @p{resize} directly,
-                                             // this would first
-                                             // allocate more memory,
-                                             // then copy the old
-                                             // contents, and only
-                                             // then release the old
-                                             // memory, but keeping
-                                             // both memory regions at
-                                             // the same time could
-                                             // sometimes be more than
-                                             // we can do, leading to
-                                             // an exception on the
-                                             // allocation.
-            std::cout << "<*>" << std::flush;
+        case -4:
+        {
+          if (LA_increase_factor <= 1)
+            goto exit_loop;
+          // increase A. note that
+          // since the function has
+          // already part of the
+          // array @p{A}, we have
+          // to re-fill it with the
+          // original values. minor
+          // clue: since the old
+          // entries are no more
+          // needed, we can discard
+          // them; we use this to
+          // first release all
+          // memory (through the
+          // call to @p{swap} and
+          // the subsequent call to
+          // the destructor of the
+          // @p{tmp} object) and
+          // only then re-allocate
+          // it. If we called
+          // @p{resize} directly,
+          // this would first
+          // allocate more memory,
+          // then copy the old
+          // contents, and only
+          // then release the old
+          // memory, but keeping
+          // both memory regions at
+          // the same time could
+          // sometimes be more than
+          // we can do, leading to
+          // an exception on the
+          // allocation.
+          std::cout << "<*>" << std::flush;
 
-            LA  = static_cast<unsigned int>(LA * LA_increase_factor);
-            if (true)
-              {
-                std::vector<double> tmp;
-                A.swap (tmp);
-              };
+          LA  = static_cast<unsigned int>(LA * LA_increase_factor);
+          if (true)
+            {
+              std::vector<double> tmp;
+              A.swap (tmp);
+            };
 
-            A.resize (LA);
-            fill_A (m);
+          A.resize (LA);
+          fill_A (m);
 
-            break;
-          };
+          break;
+        };
 
-                                            // ups, other return
-                                            // value, don't know
-                                            // what to do here
-          default:
-                AssertThrow (false, ExcMA47BFailed(INFO[0]));
+        // ups, other return
+        // value, don't know
+        // what to do here
+        default:
+          AssertThrow (false, ExcMA47BFailed(INFO[0]));
         };
       continue;
 
-      exit_loop:
+exit_loop:
       break;
     }
   while (true);
 
   AssertThrow (call_succeeded, ExcMA47BFailed(INFO[0]));
 
-                                   // note that we have been here
-                                   // already
+  // note that we have been here
+  // already
   factorize_called = true;
 }
 
@@ -1397,9 +1397,9 @@ SparseDirectMA47::fill_A (const SparseMatrix<double> &matrix)
     for (const unsigned int *col=&col_nums[rowstart_indices[row]];
          col != &col_nums[rowstart_indices[row+1]];
          ++col)
-                                       // note that the matrix must be
-                                       // symmetric, so only treat the
-                                       // upper right part
+      // note that the matrix must be
+      // symmetric, so only treat the
+      // upper right part
       if ((row <= *col) && (matrix(row,*col) != 0))
         {
           Assert (global_index < n_nonzero_elements, ExcInternalError());
@@ -1407,17 +1407,17 @@ SparseDirectMA47::fill_A (const SparseMatrix<double> &matrix)
           A[global_index] = matrix(row,*col);
           ++global_index;
 
-                                           // make sure that the symmetric
-                                           // entry exists and has the same
-                                           // value, unless this one is zero
+          // make sure that the symmetric
+          // entry exists and has the same
+          // value, unless this one is zero
           Assert ((matrix(row,*col) == 0)
                   ||
                   (matrix(row,*col) == matrix(*col,row)),
                   ExcMatrixNotSymmetric());
         }
       else
-                                         // lower left part. just check
-                                         // symmetry
+        // lower left part. just check
+        // symmetry
         Assert ((matrix(row,*col) == 0)
                 ||
                 (matrix(row,*col) == matrix(*col,row)),
@@ -1516,10 +1516,10 @@ initialize (const SparsityPattern &)
 #ifdef HAVE_LIBUMFPACK
 
 SparseDirectUMFPACK::SparseDirectUMFPACK ()
-                :
-                symbolic_decomposition (0),
-                numeric_decomposition (0),
-                control (UMFPACK_CONTROL)
+  :
+  symbolic_decomposition (0),
+  numeric_decomposition (0),
+  control (UMFPACK_CONTROL)
 {
   umfpack_dl_defaults (&control[0]);
 }
@@ -1529,8 +1529,8 @@ SparseDirectUMFPACK::SparseDirectUMFPACK ()
 void
 SparseDirectUMFPACK::clear ()
 {
-                                   // delete objects that haven't been deleted
-                                   // yet
+  // delete objects that haven't been deleted
+  // yet
   if (symbolic_decomposition != 0)
     {
       umfpack_dl_free_symbolic (&symbolic_decomposition);
@@ -1568,38 +1568,38 @@ void
 SparseDirectUMFPACK::
 sort_arrays (const SparseMatrix<number> &matrix)
 {
-                                   // do the copying around of entries
-                                   // so that the diagonal entry is in the
-                                   // right place. note that this is easy to
-                                   // detect: since all entries apart from the
-                                   // diagonal entry are sorted, we know that
-                                   // the diagonal entry is in the wrong place
-                                   // if and only if its column index is
-                                   // larger than the column index of the
-                                   // second entry in a row
-                                   //
-                                   // ignore rows with only one or no entry
+  // do the copying around of entries
+  // so that the diagonal entry is in the
+  // right place. note that this is easy to
+  // detect: since all entries apart from the
+  // diagonal entry are sorted, we know that
+  // the diagonal entry is in the wrong place
+  // if and only if its column index is
+  // larger than the column index of the
+  // second entry in a row
+  //
+  // ignore rows with only one or no entry
   for (unsigned int row=0; row<matrix.m(); ++row)
     {
-                                       // we may have to move some elements
-                                       // that are left of the diagonal but
-                                       // presently after the diagonal entry
-                                       // to the left, whereas the diagonal
-                                       // entry has to move to the right. we
-                                       // could first figure out where to
-                                       // move everything to, but for
-                                       // simplicity we just make a series
-                                       // of swaps instead (this is kind of
-                                       // a single run of bubble-sort, which
-                                       // gives us the desired result since
-                                       // the array is already "almost"
-                                       // sorted)
-                                       //
-                                       // in the first loop, the condition
-                                       // in the while-header also checks
-                                       // that the row has at least two
-                                       // entries and that the diagonal
-                                       // entry is really in the wrong place
+      // we may have to move some elements
+      // that are left of the diagonal but
+      // presently after the diagonal entry
+      // to the left, whereas the diagonal
+      // entry has to move to the right. we
+      // could first figure out where to
+      // move everything to, but for
+      // simplicity we just make a series
+      // of swaps instead (this is kind of
+      // a single run of bubble-sort, which
+      // gives us the desired result since
+      // the array is already "almost"
+      // sorted)
+      //
+      // in the first loop, the condition
+      // in the while-header also checks
+      // that the row has at least two
+      // entries and that the diagonal
+      // entry is really in the wrong place
       long int cursor = Ap[row];
       while ((cursor < Ap[row+1]-1) &&
              (Ai[cursor] > Ai[cursor+1]))
@@ -1618,7 +1618,7 @@ void
 SparseDirectUMFPACK::
 sort_arrays (const SparseMatrixEZ<number> &matrix)
 {
-                                   //same thing for SparseMatrixEZ
+  //same thing for SparseMatrixEZ
   for (unsigned int row=0; row<matrix.m(); ++row)
     {
       long int cursor = Ap[row];
@@ -1639,45 +1639,45 @@ void
 SparseDirectUMFPACK::
 sort_arrays (const BlockSparseMatrix<number> &matrix)
 {
-                                   // the case for block matrices is a
-                                   // bit more difficult, since all we
-                                   // know is that *within each
-                                   // block*, the diagonal of that
-                                   // block may come first. however,
-                                   // that means that there may be as
-                                   // many entries per row in the
-                                   // wrong place as there are block
-                                   // columns. we can do the same
-                                   // thing as above, but we have to
-                                   // do it multiple times
+  // the case for block matrices is a
+  // bit more difficult, since all we
+  // know is that *within each
+  // block*, the diagonal of that
+  // block may come first. however,
+  // that means that there may be as
+  // many entries per row in the
+  // wrong place as there are block
+  // columns. we can do the same
+  // thing as above, but we have to
+  // do it multiple times
   for (unsigned int row=0; row<matrix.m(); ++row)
     {
       long int cursor = Ap[row];
       for (unsigned int block=0; block<matrix.n_block_cols(); ++block)
         {
 
-                                           // find the next
-                                           // out-of-order element
-        while ((cursor < Ap[row+1]-1) &&
-               (Ai[cursor] < Ai[cursor+1]))
-          ++cursor;
+          // find the next
+          // out-of-order element
+          while ((cursor < Ap[row+1]-1) &&
+                 (Ai[cursor] < Ai[cursor+1]))
+            ++cursor;
 
-                                         // if there is none, then
-                                         // just go on
-        if (cursor == Ap[row+1]-1)
-          break;
+          // if there is none, then
+          // just go on
+          if (cursor == Ap[row+1]-1)
+            break;
 
-                                         // otherwise swap this entry
-                                         // with successive ones as
-                                         // long as necessary
-        long int element = cursor;
-        while ((element < Ap[row+1]-1) &&
-               (Ai[element] > Ai[element+1]))
-          {
-            std::swap (Ai[element], Ai[element+1]);
-            std::swap (Ax[element], Ax[element+1]);
-            ++element;
-          }
+          // otherwise swap this entry
+          // with successive ones as
+          // long as necessary
+          long int element = cursor;
+          while ((element < Ap[row+1]-1) &&
+                 (Ai[element] > Ai[element+1]))
+            {
+              std::swap (Ai[element], Ai[element+1]);
+              std::swap (Ax[element], Ax[element+1]);
+              ++element;
+            }
         }
     }
 }
@@ -1695,84 +1695,84 @@ factorize (const Matrix &matrix)
 
   const unsigned int N = matrix.m();
 
-                                   // copy over the data from the matrix to
-                                   // the data structures UMFPACK wants. note
-                                   // two things: first, UMFPACK wants
-                                   // compressed column storage whereas we
-                                   // always do compressed row storage; we
-                                   // work around this by, rather than
-                                   // shuffling things around, copy over the
-                                   // data we have, but then call the
-                                   // umfpack_dl_solve function with the
-                                   // UMFPACK_At argument, meaning that we
-                                   // want to solve for the transpose system
-                                   //
-                                   // second: the data we have in the sparse
-                                   // matrices is "almost" right already;
-                                   // UMFPACK wants the entries in each row
-                                   // (i.e. really: column) to be sorted in
-                                   // ascending order. we almost have that,
-                                   // except that we usually store the
-                                   // diagonal first in each row to allow for
-                                   // some optimizations. thus, we have to
-                                   // resort things a little bit, but only
-                                   // within each row
-                                   //
-                                   // final note: if the matrix has entries in
-                                   // the sparsity pattern that are actually
-                                   // occupied by entries that have a zero
-                                   // numerical value, then we keep them
-                                   // anyway. people are supposed to provide
-                                   // accurate sparsity patterns.
+  // copy over the data from the matrix to
+  // the data structures UMFPACK wants. note
+  // two things: first, UMFPACK wants
+  // compressed column storage whereas we
+  // always do compressed row storage; we
+  // work around this by, rather than
+  // shuffling things around, copy over the
+  // data we have, but then call the
+  // umfpack_dl_solve function with the
+  // UMFPACK_At argument, meaning that we
+  // want to solve for the transpose system
+  //
+  // second: the data we have in the sparse
+  // matrices is "almost" right already;
+  // UMFPACK wants the entries in each row
+  // (i.e. really: column) to be sorted in
+  // ascending order. we almost have that,
+  // except that we usually store the
+  // diagonal first in each row to allow for
+  // some optimizations. thus, we have to
+  // resort things a little bit, but only
+  // within each row
+  //
+  // final note: if the matrix has entries in
+  // the sparsity pattern that are actually
+  // occupied by entries that have a zero
+  // numerical value, then we keep them
+  // anyway. people are supposed to provide
+  // accurate sparsity patterns.
   Ap.resize (N+1);
   Ai.resize (matrix.n_nonzero_elements());
   Ax.resize (matrix.n_nonzero_elements());
 
-                                   // first fill row lengths array
+  // first fill row lengths array
   Ap[0] = 0;
   for (unsigned int row=1; row<=N; ++row)
     Ap[row] = Ap[row-1] + matrix.get_row_length(row-1);
   Assert (static_cast<unsigned int>(Ap.back()) == Ai.size(),
           ExcInternalError());
 
-                                   // then copy over matrix
-                                   // elements. note that for sparse
-                                   // matrices, iterators are sorted
-                                   // so that they traverse each row
-                                   // from start to end before moving
-                                   // on to the next row. however,
-                                   // this isn't true for block
-                                   // matrices, so we have to do a bit
-                                   // of book keeping
+  // then copy over matrix
+  // elements. note that for sparse
+  // matrices, iterators are sorted
+  // so that they traverse each row
+  // from start to end before moving
+  // on to the next row. however,
+  // this isn't true for block
+  // matrices, so we have to do a bit
+  // of book keeping
   {
-                                     // have an array that for each
-                                     // row points to the first entry
-                                     // not yet written to
+    // have an array that for each
+    // row points to the first entry
+    // not yet written to
     std::vector<long int> row_pointers = Ap;
 
     for (typename Matrix::const_iterator p=matrix.begin();
          p!=matrix.end(); ++p)
       {
-                                         // write entry into the first
-                                         // free one for this row
+        // write entry into the first
+        // free one for this row
         Ai[row_pointers[p->row()]] = p->column();
         Ax[row_pointers[p->row()]] = p->value();
 
-                                         // then move pointer ahead
+        // then move pointer ahead
         ++row_pointers[p->row()];
       }
 
-                                     // at the end, we should have
-                                     // written all rows completely
+    // at the end, we should have
+    // written all rows completely
     for (unsigned int i=0; i<Ap.size()-1; ++i)
       Assert (row_pointers[i] == Ap[i+1], ExcInternalError());
   }
 
-                                   // make sure that the elements in
-                                   // each row are sorted. we have to
-                                   // be more careful for block sparse
-                                   // matrices, so ship this task out
-                                   // to a different function
+  // make sure that the elements in
+  // each row are sorted. we have to
+  // be more careful for block sparse
+  // matrices, so ship this task out
+  // to a different function
   sort_arrays (matrix);
 
   int status;
@@ -1798,8 +1798,8 @@ factorize (const Matrix &matrix)
 void
 SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution) const
 {
-                                   // make sure that some kind of factorize()
-                                   // call has happened before
+  // make sure that some kind of factorize()
+  // call has happened before
   Assert (Ap.size() != 0, ExcNotInitialized());
   Assert (Ai.size() != 0, ExcNotInitialized());
   Assert (Ai.size() == Ax.size(), ExcNotInitialized());
@@ -1807,12 +1807,12 @@ SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution) const
   Vector<double> rhs (rhs_and_solution.size());
   rhs = rhs_and_solution;
 
-                                   // solve the system. note that since
-                                   // UMFPACK wants compressed column storage
-                                   // instead of the compressed row storage
-                                   // format we use in deal.II's
-                                   // SparsityPattern classes, we solve for
-                                   // UMFPACK's A^T instead
+  // solve the system. note that since
+  // UMFPACK wants compressed column storage
+  // instead of the compressed row storage
+  // format we use in deal.II's
+  // SparsityPattern classes, we solve for
+  // UMFPACK's A^T instead
   const int status
     = umfpack_dl_solve (UMFPACK_At,
                         &Ap[0], &Ai[0], &Ax[0],
@@ -1838,10 +1838,10 @@ SparseDirectUMFPACK::solve (const Matrix   &matrix,
 
 
 SparseDirectUMFPACK::SparseDirectUMFPACK ()
-                :
-                symbolic_decomposition (0),
-                numeric_decomposition (0),
-                control (0)
+  :
+  symbolic_decomposition (0),
+  numeric_decomposition (0),
+  control (0)
 {}
 
 
@@ -1866,7 +1866,7 @@ SparseDirectUMFPACK::solve (Vector<double> &) const
 
 template <class Matrix>
 void
-SparseDirectUMFPACK::solve (const Matrix   &,
+SparseDirectUMFPACK::solve (const Matrix &,
                             Vector<double> &)
 {
   AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but you called ./configure without the necessary --with-umfpack switch."));
@@ -1887,8 +1887,8 @@ SparseDirectUMFPACK::initialize (const Matrix        &M,
 
 void
 SparseDirectUMFPACK::vmult (
-  Vector<double>&       dst,
-  const Vector<double>& src) const
+  Vector<double>       &dst,
+  const Vector<double> &src) const
 {
   dst = src;
   this->solve(dst);
@@ -1897,8 +1897,8 @@ SparseDirectUMFPACK::vmult (
 
 void
 SparseDirectUMFPACK::Tvmult (
-  Vector<double>&,
-  const Vector<double>&) const
+  Vector<double> &,
+  const Vector<double> &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1906,8 +1906,8 @@ SparseDirectUMFPACK::Tvmult (
 
 void
 SparseDirectUMFPACK::vmult_add (
-  Vector<double>&,
-  const Vector<double>&) const
+  Vector<double> &,
+  const Vector<double> &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1915,8 +1915,8 @@ SparseDirectUMFPACK::vmult_add (
 
 void
 SparseDirectUMFPACK::Tvmult_add (
-  Vector<double>&,
-  const Vector<double>&) const
+  Vector<double> &,
+  const Vector<double> &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1931,49 +1931,49 @@ SparseDirectMUMPS::~SparseDirectMUMPS ()
 {
   id.job = -2;
   dmumps_c (&id);
-  
+
   // Do some cleaning
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-  {
-    delete[] a;
-    delete[] irn;
-    delete[] jcn;
-  }
+    {
+      delete[] a;
+      delete[] irn;
+      delete[] jcn;
+    }
 }
 
 template <class Matrix>
-void SparseDirectMUMPS::initialize_matrix (const Matrix& matrix)
+void SparseDirectMUMPS::initialize_matrix (const Matrix &matrix)
 {
-                         // Check we haven't been here before:
+  // Check we haven't been here before:
   Assert (initialize_called == false, ExcInitializeAlreadyCalled());
 
-                         // Initialize MUMPS instance:
+  // Initialize MUMPS instance:
   id.job = -1;
   id.par =  1;
   id.sym =  0;
 
-                         // Use MPI_COMM_WORLD as communicator
+  // Use MPI_COMM_WORLD as communicator
   id.comm_fortran = -987654;
   dmumps_c (&id);
 
-                         // Hand over matrix and right-hand side
+  // Hand over matrix and right-hand side
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-                         // Objects denoting a MUMPS data structure:
-                         //
-                         // Set number of unknowns
+      // Objects denoting a MUMPS data structure:
+      //
+      // Set number of unknowns
       n   = matrix.n ();
 
-                         // number of nonzero elements in matrix
+      // number of nonzero elements in matrix
       nz  = matrix.n_actually_nonzero_elements ();
 
-                         // representation of the matrix
+      // representation of the matrix
       a   = new double[nz];
 
-                         // matrix indices pointing to the row and
-                         // column dimensions respectively of the
-                         // matrix representation above (a): ie. a[k]
-                         // is the matrix element (irn[k], jcn[k])
+      // matrix indices pointing to the row and
+      // column dimensions respectively of the
+      // matrix representation above (a): ie. a[k]
+      // is the matrix element (irn[k], jcn[k])
       irn = new int[nz];
       jcn = new int[nz];
 
@@ -1996,26 +1996,26 @@ void SparseDirectMUMPS::initialize_matrix (const Matrix& matrix)
       id.a   = a;
     }
 
-                         // No outputs
+  // No outputs
   id.icntl[0] = -1;
   id.icntl[1] = -1;
   id.icntl[2] = -1;
   id.icntl[3] =  0;
 
-                        // Exit by setting this flag:
+  // Exit by setting this flag:
   initialize_called = true;
 }
 
 template <class Matrix>
-void SparseDirectMUMPS::initialize (const Matrix& matrix,
-                                    const Vector<double>      & vector)
+void SparseDirectMUMPS::initialize (const Matrix &matrix,
+                                    const Vector<double>       &vector)
 {
-                        // Hand over matrix and right-hand side
+  // Hand over matrix and right-hand side
   initialize_matrix (matrix);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-                            // Object denoting a MUMPS data structure
+      // Object denoting a MUMPS data structure
       rhs = new double[n];
 
       for (unsigned int i = 0; i < n; ++i)
@@ -2025,59 +2025,59 @@ void SparseDirectMUMPS::initialize (const Matrix& matrix,
     }
 }
 
-void SparseDirectMUMPS::copy_solution (Vector<double>& vector)
+void SparseDirectMUMPS::copy_solution (Vector<double> &vector)
 {
-                       // Copy solution into the given vector
+  // Copy solution into the given vector
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       for (unsigned int i=0; i<n; ++i)
         vector(i) = rhs[i];
-      
+
       delete[] rhs;
     }
 }
 
 template <class Matrix>
-void SparseDirectMUMPS::initialize (const Matrix& matrix)
+void SparseDirectMUMPS::initialize (const Matrix &matrix)
 {
-                         // Initialize MUMPS instance:
+  // Initialize MUMPS instance:
   initialize_matrix (matrix);
-                         // Start factorization
+  // Start factorization
   id.job = 4;
   dmumps_c (&id);
 }
 
-void SparseDirectMUMPS::solve (Vector<double>& vector)
+void SparseDirectMUMPS::solve (Vector<double> &vector)
 {
-                        // Check that the solver has been initialized
-                        // by the routine above:
+  // Check that the solver has been initialized
+  // by the routine above:
   Assert (initialize_called == true, ExcNotInitialized());
 
-                        // and that the matrix has at least one
-                        // nonzero element:
+  // and that the matrix has at least one
+  // nonzero element:
   Assert (nz != 0, ExcNotInitialized());
 
-                        // Start solver
+  // Start solver
   id.job = 6;
   dmumps_c (&id);
   copy_solution (vector);
 }
 
-void SparseDirectMUMPS::vmult (Vector<double>&       dst,
-                               const Vector<double>& src)
+void SparseDirectMUMPS::vmult (Vector<double>       &dst,
+                               const Vector<double> &src)
 {
-                        // Check that the solver has been initialized
-                        // by the routine above:
+  // Check that the solver has been initialized
+  // by the routine above:
   Assert (initialize_called == true, ExcNotInitialized());
 
-                        // and that the matrix has at least one
-                        // nonzero element:
+  // and that the matrix has at least one
+  // nonzero element:
   Assert (nz != 0, ExcNotInitialized());
 
-                       // Hand over right-hand side
+  // Hand over right-hand side
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-                           // Object denoting a MUMPS data structure:
+      // Object denoting a MUMPS data structure:
       rhs = new double[n];
 
       for (unsigned int i = 0; i < n; ++i)
@@ -2085,8 +2085,8 @@ void SparseDirectMUMPS::vmult (Vector<double>&       dst,
 
       id.rhs = rhs;
     }
-  
-                       // Start solver
+
+  // Start solver
   id.job = 3;
   dmumps_c (&id);
   copy_solution (dst);
@@ -2103,10 +2103,10 @@ void SparseDirectMA27::factorize (const SparseMatrix<float> &matrix);
 
 template
 void SparseDirectMA27::solve (const SparseMatrix<double> &matrix,
-                         Vector<double>             &rhs_and_solution);
+                              Vector<double>             &rhs_and_solution);
 
 template
-void SparseDirectMA27::solve (const SparseMatrix<float>  &matrix,
+void SparseDirectMA27::solve (const SparseMatrix<float> &matrix,
                               Vector<double>             &rhs_and_solution);
 
 

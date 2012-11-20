@@ -60,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 class ComponentMask
 {
-  public:
+public:
   /**
    * Initialize a component mask. The default is that a component
    * mask represents a set of components that are <i>all</i>
@@ -199,7 +199,7 @@ class ComponentMask
   std::size_t
   memory_consumption () const;
 
-  private:
+private:
   /**
    * The actual component mask.
    */
@@ -208,8 +208,8 @@ class ComponentMask
   // make the output operator a friend so it can access
   // the component_mask array
   friend
-  std::ostream & operator << (std::ostream &out,
-                              const ComponentMask &mask);
+  std::ostream &operator << (std::ostream &out,
+                             const ComponentMask &mask);
 };
 
 
@@ -225,8 +225,8 @@ class ComponentMask
  * @param mask The mask to write.
  * @return A reference to the first argument.
  */
-std::ostream & operator << (std::ostream &out,
-                            const ComponentMask &mask);
+std::ostream &operator << (std::ostream &out,
+                           const ComponentMask &mask);
 
 
 // -------------------- inline functions ---------------------
@@ -238,16 +238,16 @@ ComponentMask::ComponentMask()
 
 inline
 ComponentMask::ComponentMask(const std::vector<bool> &component_mask)
-:
-component_mask (component_mask)
+  :
+  component_mask (component_mask)
 {}
 
 
 inline
 ComponentMask::ComponentMask(const unsigned int n_components,
-                                     const bool         initializer)
-:
-component_mask (n_components, initializer)
+                             const bool         initializer)
+  :
+  component_mask (n_components, initializer)
 {}
 
 
@@ -283,8 +283,8 @@ bool
 ComponentMask::represents_n_components(const unsigned int n) const
 {
   return ((component_mask.size() == 0)
-      ||
-      (component_mask.size() == n));
+          ||
+          (component_mask.size() == n));
 }
 
 

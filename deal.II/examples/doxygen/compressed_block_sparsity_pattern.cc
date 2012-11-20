@@ -38,22 +38,22 @@ int main()
   FE_Q<2> fe1(1);
   FE_Q<2> fe2(2);
   FESystem<2> fe(fe1, 2, fe2, 1);
-  
+
   DoFHandler<2> dof(tr);
   dof.distribute_dofs(fe);
   DoFRenumbering::Cuthill_McKee(dof);
   DoFRenumbering::component_wise(dof);
-  
+
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
-  
+
   std::vector<unsigned int> dofs_per_block(fe.n_blocks());
   DoFTools::count_dofs_per_block(dof, dofs_per_block);
-  
+
   BlockCompressedSparsityPattern c_sparsity(fe.n_blocks(), fe.n_blocks());
-  for (unsigned int i=0;i<fe.n_blocks();++i)
-    for (unsigned int j=0;j<fe.n_blocks();++j)
+  for (unsigned int i=0; i<fe.n_blocks(); ++i)
+    for (unsigned int j=0; j<fe.n_blocks(); ++j)
       c_sparsity.block(i,j).reinit(dofs_per_block[i],dofs_per_block[j]);
   c_sparsity.collect_sizes();
 
@@ -64,16 +64,16 @@ int main()
   sparsity.copy_from(c_sparsity);
 
   unsigned int ig = 0;
-  for (unsigned int ib=0;ib<fe.n_blocks();++ib)
-    for (unsigned int i=0;i<dofs_per_block[ib];++i,++ig)
+  for (unsigned int ib=0; ib<fe.n_blocks(); ++ib)
+    for (unsigned int i=0; i<dofs_per_block[ib]; ++i,++ig)
       {
-	unsigned int jg = 0;
-	for (unsigned int jb=0;jb<fe.n_blocks();++jb)
-	  for (unsigned int j=0;j<dofs_per_block[jb];++j,++jg)
-	    {
-	      if (sparsity.exists(ig,jg))
-		std::cout << ig << ' ' << jg
-			  << '\t' << ib << jb << std::endl;
-	    }
+        unsigned int jg = 0;
+        for (unsigned int jb=0; jb<fe.n_blocks(); ++jb)
+          for (unsigned int j=0; j<dofs_per_block[jb]; ++j,++jg)
+            {
+              if (sparsity.exists(ig,jg))
+                std::cout << ig << ' ' << jg
+                          << '\t' << ib << jb << std::endl;
+            }
       }
 }

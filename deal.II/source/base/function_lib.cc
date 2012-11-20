@@ -66,9 +66,9 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
+        const Point<dim> &p = points[i];
         values[i] = p.square();
       }
   }
@@ -76,7 +76,7 @@ namespace Functions
 
   template<int dim>
   double
-  SquareFunction<dim>::laplacian (const Point<dim>   &,
+  SquareFunction<dim>::laplacian (const Point<dim> &,
                                   const unsigned int) const
   {
     return 2*dim;
@@ -92,7 +92,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       values[i] = 2*dim;
   }
 
@@ -110,8 +110,8 @@ namespace Functions
   template<int dim>
   void
   SquareFunction<dim>::vector_gradient (
-    const Point<dim>& p,
-    std::vector<Tensor<1,dim> >& values) const
+    const Point<dim> &p,
+    std::vector<Tensor<1,dim> > &values) const
   {
     AssertDimension(values.size(), 1);
     values[0] = p*2.;
@@ -157,9 +157,9 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
+        const Point<dim> &p = points[i];
         values[i] = p(0)*p(1);
       }
   }
@@ -168,17 +168,17 @@ namespace Functions
   template<int dim>
   void
   Q1WedgeFunction<dim>::vector_value_list (
-    const std::vector<Point<dim> >& points,
-    std::vector<Vector<double> >& values) const
+    const std::vector<Point<dim> > &points,
+    std::vector<Vector<double> > &values) const
   {
     Assert (dim>=2, ExcInternalError());
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
     Assert(values[0].size() == 1, ExcDimensionMismatch(values[0].size(), 1));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
+        const Point<dim> &p = points[i];
         values[i](0) = p(0)*p(1);
       }
   }
@@ -186,7 +186,7 @@ namespace Functions
 
   template<int dim>
   double
-  Q1WedgeFunction<dim>::laplacian (const Point<dim>   &,
+  Q1WedgeFunction<dim>::laplacian (const Point<dim> &,
                                    const unsigned int) const
   {
     Assert (dim>=2, ExcInternalError());
@@ -204,7 +204,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       values[i] = 0.;
   }
 
@@ -245,8 +245,8 @@ namespace Functions
   template<int dim>
   void
   Q1WedgeFunction<dim>::vector_gradient_list (
-    const std::vector<Point<dim> >& points,
-    std::vector<std::vector<Tensor<1,dim> > >& gradients) const
+    const std::vector<Point<dim> > &points,
+    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
   {
     Assert (dim>=2, ExcInternalError());
     Assert (gradients.size() == points.size(),
@@ -267,8 +267,8 @@ namespace Functions
 
   template<int dim>
   PillowFunction<dim>::PillowFunction (const double offset)
-                  :
-                  offset(offset)
+    :
+    offset(offset)
   {}
 
 
@@ -277,16 +277,16 @@ namespace Functions
   PillowFunction<dim>::value (const Point<dim>   &p,
                               const unsigned int) const
   {
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              return 1.-p(0)*p(0)+offset;
-        case 2:
-              return (1.-p(0)*p(0))*(1.-p(1)*p(1))+offset;
-        case 3:
-              return (1.-p(0)*p(0))*(1.-p(1)*p(1))*(1.-p(2)*p(2))+offset;
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        return 1.-p(0)*p(0)+offset;
+      case 2:
+        return (1.-p(0)*p(0))*(1.-p(1)*p(1))+offset;
+      case 3:
+        return (1.-p(0)*p(0))*(1.-p(1)*p(1))*(1.-p(2)*p(2))+offset;
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -300,22 +300,22 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  values[i] = 1.-p(0)*p(0)+offset;
-                  break;
-            case 2:
-                  values[i] = (1.-p(0)*p(0))*(1.-p(1)*p(1))+offset;
-                  break;
-            case 3:
-                  values[i] = (1.-p(0)*p(0))*(1.-p(1)*p(1))*(1.-p(2)*p(2))+offset;
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+          case 1:
+            values[i] = 1.-p(0)*p(0)+offset;
+            break;
+          case 2:
+            values[i] = (1.-p(0)*p(0))*(1.-p(1)*p(1))+offset;
+            break;
+          case 3:
+            values[i] = (1.-p(0)*p(0))*(1.-p(1)*p(1))*(1.-p(2)*p(2))+offset;
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -327,18 +327,18 @@ namespace Functions
   PillowFunction<dim>::laplacian (const Point<dim>   &p,
                                   const unsigned int) const
   {
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              return -2.;
-        case 2:
-              return -2.*((1.-p(0)*p(0))+(1.-p(1)*p(1)));
-        case 3:
-              return -2.*((1.-p(0)*p(0))*(1.-p(1)*p(1))
-                          +(1.-p(1)*p(1))*(1.-p(2)*p(2))
-                          +(1.-p(2)*p(2))*(1.-p(0)*p(0)));
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        return -2.;
+      case 2:
+        return -2.*((1.-p(0)*p(0))+(1.-p(1)*p(1)));
+      case 3:
+        return -2.*((1.-p(0)*p(0))*(1.-p(1)*p(1))
+                    +(1.-p(1)*p(1))*(1.-p(2)*p(2))
+                    +(1.-p(2)*p(2))*(1.-p(0)*p(0)));
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -352,24 +352,24 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  values[i] = -2.;
-                  break;
-            case 2:
-                  values[i] = -2.*((1.-p(0)*p(0))+(1.-p(1)*p(1)));
-                  break;
-            case 3:
-                  values[i] = -2.*((1.-p(0)*p(0))*(1.-p(1)*p(1))
-                                   +(1.-p(1)*p(1))*(1.-p(2)*p(2))
-                                   +(1.-p(2)*p(2))*(1.-p(0)*p(0)));
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+          case 1:
+            values[i] = -2.;
+            break;
+          case 2:
+            values[i] = -2.*((1.-p(0)*p(0))+(1.-p(1)*p(1)));
+            break;
+          case 3:
+            values[i] = -2.*((1.-p(0)*p(0))*(1.-p(1)*p(1))
+                             +(1.-p(1)*p(1))*(1.-p(2)*p(2))
+                             +(1.-p(2)*p(2))*(1.-p(0)*p(0)));
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -380,22 +380,22 @@ namespace Functions
                                  const unsigned int) const
   {
     Tensor<1,dim> result;
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              result[0] = -2.*p(0);
-              break;
-        case 2:
-              result[0] = -2.*p(0)*(1.-p(1)*p(1));
-              result[1] = -2.*p(1)*(1.-p(0)*p(0));
-              break;
-        case 3:
-              result[0] = -2.*p(0)*(1.-p(1)*p(1))*(1.-p(2)*p(2));
-              result[1] = -2.*p(1)*(1.-p(0)*p(0))*(1.-p(2)*p(2));
-              result[2] = -2.*p(2)*(1.-p(0)*p(0))*(1.-p(1)*p(1));
-              break;
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        result[0] = -2.*p(0);
+        break;
+      case 2:
+        result[0] = -2.*p(0)*(1.-p(1)*p(1));
+        result[1] = -2.*p(1)*(1.-p(0)*p(0));
+        break;
+      case 3:
+        result[0] = -2.*p(0)*(1.-p(1)*p(1))*(1.-p(2)*p(2));
+        result[1] = -2.*p(1)*(1.-p(0)*p(0))*(1.-p(2)*p(2));
+        result[2] = -2.*p(2)*(1.-p(0)*p(0))*(1.-p(1)*p(1));
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return result;
   }
@@ -409,25 +409,25 @@ namespace Functions
     Assert (gradients.size() == points.size(),
             ExcDimensionMismatch(gradients.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  gradients[i][0] = -2.*p(0);
-                  break;
-            case 2:
-                  gradients[i][0] = -2.*p(0)*(1.-p(1)*p(1));
-                  gradients[i][1] = -2.*p(1)*(1.-p(0)*p(0));
-                  break;
-            case 3:
-                  gradients[i][0] = -2.*p(0)*(1.-p(1)*p(1))*(1.-p(2)*p(2));
-                  gradients[i][1] = -2.*p(1)*(1.-p(0)*p(0))*(1.-p(2)*p(2));
-                  gradients[i][2] = -2.*p(2)*(1.-p(0)*p(0))*(1.-p(1)*p(1));
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+          case 1:
+            gradients[i][0] = -2.*p(0);
+            break;
+          case 2:
+            gradients[i][0] = -2.*p(0)*(1.-p(1)*p(1));
+            gradients[i][1] = -2.*p(1)*(1.-p(0)*p(0));
+            break;
+          case 3:
+            gradients[i][0] = -2.*p(0)*(1.-p(1)*p(1))*(1.-p(2)*p(2));
+            gradients[i][1] = -2.*p(1)*(1.-p(0)*p(0))*(1.-p(2)*p(2));
+            gradients[i][2] = -2.*p(2)*(1.-p(0)*p(0))*(1.-p(1)*p(1));
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -436,8 +436,8 @@ namespace Functions
 
   template <int dim>
   CosineFunction<dim>::CosineFunction (const unsigned int n_components)
-                  :
-                  Function<dim> (n_components)
+    :
+    Function<dim> (n_components)
   {}
 
 
@@ -447,16 +447,16 @@ namespace Functions
   CosineFunction<dim>::value (const Point<dim>   &p,
                               const unsigned int) const
   {
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              return std::cos(M_PI_2*p(0));
-        case 2:
-              return std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-        case 3:
-              return std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        return std::cos(M_PI_2*p(0));
+      case 2:
+        return std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+      case 3:
+        return std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -470,7 +470,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       values[i] = value(points[i]);
   }
 
@@ -484,10 +484,10 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         const double v = value(points[i]);
-        for (unsigned int k=0;k<values[i].size();++k)
+        for (unsigned int k=0; k<values[i].size(); ++k)
           values[i](k) = v;
       }
   }
@@ -498,16 +498,16 @@ namespace Functions
   CosineFunction<dim>::laplacian (const Point<dim>   &p,
                                   const unsigned int) const
   {
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              return -M_PI_2*M_PI_2* std::cos(M_PI_2*p(0));
-        case 2:
-              return -2*M_PI_2*M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-        case 3:
-              return -3*M_PI_2*M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        return -M_PI_2*M_PI_2* std::cos(M_PI_2*p(0));
+      case 2:
+        return -2*M_PI_2*M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+      case 3:
+        return -3*M_PI_2*M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -521,7 +521,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       values[i] = laplacian(points[i]);
   }
 
@@ -531,22 +531,22 @@ namespace Functions
                                  const unsigned int) const
   {
     Tensor<1,dim> result;
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              result[0] = -M_PI_2* std::sin(M_PI_2*p(0));
-              break;
-        case 2:
-              result[0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-              result[1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
-              break;
-        case 3:
-              result[0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-              result[1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-              result[2] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
-              break;
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        result[0] = -M_PI_2* std::sin(M_PI_2*p(0));
+        break;
+      case 2:
+        result[0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+        result[1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
+        break;
+      case 3:
+        result[0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+        result[1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+        result[2] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return result;
   }
@@ -560,25 +560,25 @@ namespace Functions
     Assert (gradients.size() == points.size(),
             ExcDimensionMismatch(gradients.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  gradients[i][0] = -M_PI_2* std::sin(M_PI_2*p(0));
-                  break;
-            case 2:
-                  gradients[i][0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-                  gradients[i][1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
-                  break;
-            case 3:
-                  gradients[i][0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-                  gradients[i][1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-                  gradients[i][2] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+          case 1:
+            gradients[i][0] = -M_PI_2* std::sin(M_PI_2*p(0));
+            break;
+          case 2:
+            gradients[i][0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+            gradients[i][1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
+            break;
+          case 3:
+            gradients[i][0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+            gradients[i][1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+            gradients[i][2] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -591,43 +591,43 @@ namespace Functions
     const double pi2 = M_PI_2*M_PI_2;
 
     Tensor<2,dim> result;
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              result[0][0] = -pi2* std::cos(M_PI_2*p(0));
-              break;
-        case 2:
-              if (true)
-                {
-                  const double coco = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-                  const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
-                  result[0][0] = coco;
-                  result[1][1] = coco;
-                  result[0][1] = sisi;
-                  result[1][0] = sisi;
-                }
-              break;
-        case 3:
-              if (true)
-                {
-                  const double cococo = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-                  const double sisico = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-                  const double sicosi = pi2*std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
-                  const double cosisi = pi2*std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+      case 1:
+        result[0][0] = -pi2* std::cos(M_PI_2*p(0));
+        break;
+      case 2:
+        if (true)
+          {
+            const double coco = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+            const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
+            result[0][0] = coco;
+            result[1][1] = coco;
+            result[0][1] = sisi;
+            result[1][0] = sisi;
+          }
+        break;
+      case 3:
+        if (true)
+          {
+            const double cococo = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+            const double sisico = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+            const double sicosi = pi2*std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+            const double cosisi = pi2*std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
 
-                  result[0][0] = cococo;
-                  result[1][1] = cococo;
-                  result[2][2] = cococo;
-                  result[0][1] = sisico;
-                  result[1][0] = sisico;
-                  result[0][2] = sicosi;
-                  result[2][0] = sicosi;
-                  result[1][2] = cosisi;
-                  result[2][1] = cosisi;
-                }
-              break;
-        default:
-              Assert(false, ExcNotImplemented());
+            result[0][0] = cococo;
+            result[1][1] = cococo;
+            result[2][2] = cococo;
+            result[0][1] = sisico;
+            result[1][0] = sisico;
+            result[0][2] = sicosi;
+            result[2][0] = sicosi;
+            result[1][2] = cosisi;
+            result[2][1] = cosisi;
+          }
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return result;
   }
@@ -643,46 +643,46 @@ namespace Functions
 
     const double pi2 = M_PI_2*M_PI_2;
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  hessians[i][0][0] = -pi2* std::cos(M_PI_2*p(0));
-                  break;
-            case 2:
-                  if (true)
-                    {
-                      const double coco = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-                      const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
-                      hessians[i][0][0] = coco;
-                      hessians[i][1][1] = coco;
-                      hessians[i][0][1] = sisi;
-                      hessians[i][1][0] = sisi;
-                    }
-                  break;
-            case 3:
-                  if (true)
-                    {
-                      const double cococo = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-                      const double sisico = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-                      const double sicosi = pi2*std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
-                      const double cosisi = pi2*std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+          case 1:
+            hessians[i][0][0] = -pi2* std::cos(M_PI_2*p(0));
+            break;
+          case 2:
+            if (true)
+              {
+                const double coco = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+                const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
+                hessians[i][0][0] = coco;
+                hessians[i][1][1] = coco;
+                hessians[i][0][1] = sisi;
+                hessians[i][1][0] = sisi;
+              }
+            break;
+          case 3:
+            if (true)
+              {
+                const double cococo = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+                const double sisico = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+                const double sicosi = pi2*std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+                const double cosisi = pi2*std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
 
-                      hessians[i][0][0] = cococo;
-                      hessians[i][1][1] = cococo;
-                      hessians[i][2][2] = cococo;
-                      hessians[i][0][1] = sisico;
-                      hessians[i][1][0] = sisico;
-                      hessians[i][0][2] = sicosi;
-                      hessians[i][2][0] = sicosi;
-                      hessians[i][1][2] = cosisi;
-                      hessians[i][2][1] = cosisi;
-                    }
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+                hessians[i][0][0] = cococo;
+                hessians[i][1][1] = cococo;
+                hessians[i][2][2] = cococo;
+                hessians[i][0][1] = sisico;
+                hessians[i][1][0] = sisico;
+                hessians[i][0][2] = sicosi;
+                hessians[i][2][0] = sicosi;
+                hessians[i][1][2] = cosisi;
+                hessians[i][2][1] = cosisi;
+              }
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -691,8 +691,8 @@ namespace Functions
 
   template <int dim>
   CosineGradFunction<dim>::CosineGradFunction ()
-                  :
-                  Function<dim> (dim)
+    :
+    Function<dim> (dim)
   {}
 
 
@@ -705,16 +705,16 @@ namespace Functions
     AssertIndexRange(d, dim);
     const unsigned int d1 = (d+1) % dim;
     const unsigned int d2 = (d+2) % dim;
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              return (-M_PI_2* std::sin(M_PI_2*p(0)));
-        case 2:
-              return (-M_PI_2* std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)));
-        case 3:
-              return (-M_PI_2* std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2)));
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        return (-M_PI_2* std::sin(M_PI_2*p(0)));
+      case 2:
+        return (-M_PI_2* std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)));
+      case 3:
+        return (-M_PI_2* std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2)));
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -723,26 +723,26 @@ namespace Functions
   template<int dim>
   void
   CosineGradFunction<dim>::vector_value (
-    const Point<dim>& p,
-    Vector<double>& result) const
+    const Point<dim> &p,
+    Vector<double> &result) const
   {
     AssertDimension(result.size(), dim);
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              result(0) = -M_PI_2* std::sin(M_PI_2*p(0));
-              break;
-        case 2:
-              result(0) = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-              result(1) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
-              break;
-        case 3:
-              result(0) = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-              result(1) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-              result(2) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
-              break;
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        result(0) = -M_PI_2* std::sin(M_PI_2*p(0));
+        break;
+      case 2:
+        result(0) = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+        result(1) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
+        break;
+      case 3:
+        result(0) = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+        result(1) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+        result(2) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
       }
   }
 
@@ -750,8 +750,8 @@ namespace Functions
   template<int dim>
   void
   CosineGradFunction<dim>::value_list (
-    const std::vector<Point<dim> >& points,
-    std::vector<double>& values,
+    const std::vector<Point<dim> > &points,
+    std::vector<double> &values,
     const unsigned int d) const
   {
     Assert (values.size() == points.size(),
@@ -760,22 +760,22 @@ namespace Functions
     const unsigned int d1 = (d+1) % dim;
     const unsigned int d2 = (d+2) % dim;
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  values[i] = -M_PI_2* std::sin(M_PI_2*p(d));
-                  break;
-            case 2:
-                  values[i] = -M_PI_2* std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1));
-                  break;
-            case 3:
-                  values[i] = -M_PI_2* std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2));
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+          case 1:
+            values[i] = -M_PI_2* std::sin(M_PI_2*p(d));
+            break;
+          case 2:
+            values[i] = -M_PI_2* std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1));
+            break;
+          case 3:
+            values[i] = -M_PI_2* std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2));
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -790,25 +790,25 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  values[i](0) = -M_PI_2* std::sin(M_PI_2*p(0));
-                  break;
-            case 2:
-                  values[i](0) = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-                  values[i](1) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
-                  break;
-            case 3:
-                  values[i](0) = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-                  values[i](1) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-                  values[i](2) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+          case 1:
+            values[i](0) = -M_PI_2* std::sin(M_PI_2*p(0));
+            break;
+          case 2:
+            values[i](0) = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+            values[i](1) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
+            break;
+          case 3:
+            values[i](0) = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+            values[i](1) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+            values[i](2) = -M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -827,7 +827,7 @@ namespace Functions
   template<int dim>
   Tensor<1,dim>
   CosineGradFunction<dim>::gradient (
-    const Point<dim>& p,
+    const Point<dim> &p,
     const unsigned int d) const
   {
     AssertIndexRange(d, dim);
@@ -836,22 +836,22 @@ namespace Functions
     const double pi2 = M_PI_2*M_PI_2;
 
     Tensor<1,dim> result;
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              result[0] = -pi2* std::cos(M_PI_2*p(0));
-              break;
-        case 2:
-              result[d ] = -pi2*std::cos(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1));
-              result[d1] =  pi2*std::sin(M_PI_2*p(d)) * std::sin(M_PI_2*p(d1));
-              break;
-        case 3:
-              result[d ] = -pi2*std::cos(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2));
-              result[d1] =  pi2*std::sin(M_PI_2*p(d)) * std::sin(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2));
-              result[d2] =  pi2*std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::sin(M_PI_2*p(d2));
-              break;
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        result[0] = -pi2* std::cos(M_PI_2*p(0));
+        break;
+      case 2:
+        result[d ] = -pi2*std::cos(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1));
+        result[d1] =  pi2*std::sin(M_PI_2*p(d)) * std::sin(M_PI_2*p(d1));
+        break;
+      case 3:
+        result[d ] = -pi2*std::cos(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2));
+        result[d1] =  pi2*std::sin(M_PI_2*p(d)) * std::sin(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2));
+        result[d2] =  pi2*std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::sin(M_PI_2*p(d2));
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return result;
   }
@@ -871,29 +871,29 @@ namespace Functions
 
     Assert (gradients.size() == points.size(),
             ExcDimensionMismatch(gradients.size(), points.size()));
-     for (unsigned int i=0;i<points.size();++i)
-       {
-         const Point<dim>& p = points[i];
-         Tensor<1,dim>& result = gradients[i];
+    for (unsigned int i=0; i<points.size(); ++i)
+      {
+        const Point<dim> &p = points[i];
+        Tensor<1,dim> &result = gradients[i];
 
-         switch(dim)
-           {
-             case 1:
-                   result[0] = -pi2* std::cos(M_PI_2*p(0));
-                   break;
-             case 2:
-                   result[d ] = -pi2*std::cos(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1));
-                   result[d1] =  pi2*std::sin(M_PI_2*p(d)) * std::sin(M_PI_2*p(d1));
-                   break;
-             case 3:
-                   result[d ] = -pi2*std::cos(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2));
-                   result[d1] =  pi2*std::sin(M_PI_2*p(d)) * std::sin(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2));
-                   result[d2] =  pi2*std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::sin(M_PI_2*p(d2));
-                   break;
-             default:
-                   Assert(false, ExcNotImplemented());
-           }
-       }
+        switch (dim)
+          {
+          case 1:
+            result[0] = -pi2* std::cos(M_PI_2*p(0));
+            break;
+          case 2:
+            result[d ] = -pi2*std::cos(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1));
+            result[d1] =  pi2*std::sin(M_PI_2*p(d)) * std::sin(M_PI_2*p(d1));
+            break;
+          case 3:
+            result[d ] = -pi2*std::cos(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2));
+            result[d1] =  pi2*std::sin(M_PI_2*p(d)) * std::sin(M_PI_2*p(d1)) * std::cos(M_PI_2*p(d2));
+            result[d2] =  pi2*std::sin(M_PI_2*p(d)) * std::cos(M_PI_2*p(d1)) * std::sin(M_PI_2*p(d2));
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
+          }
+      }
   }
 
 
@@ -901,51 +901,51 @@ namespace Functions
   void
   CosineGradFunction<dim>::vector_gradient_list (
     const std::vector<Point<dim> > &points,
-    std::vector<std::vector<Tensor<1,dim> > >& gradients) const
+    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
   {
     AssertVectorVectorDimension(gradients, points.size(), dim);
     const double pi2 = M_PI_2*M_PI_2;
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  gradients[i][0][0] = -pi2* std::cos(M_PI_2*p(0));
-                  break;
-            case 2:
-                  if (true)
-                    {
-                      const double coco = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-                      const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
-                      gradients[i][0][0] = coco;
-                      gradients[i][1][1] = coco;
-                      gradients[i][0][1] = sisi;
-                      gradients[i][1][0] = sisi;
-                    }
-                  break;
-            case 3:
-                  if (true)
-                    {
-                      const double cococo = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-                      const double sisico = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-                      const double sicosi = pi2*std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
-                      const double cosisi = pi2*std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+          case 1:
+            gradients[i][0][0] = -pi2* std::cos(M_PI_2*p(0));
+            break;
+          case 2:
+            if (true)
+              {
+                const double coco = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+                const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
+                gradients[i][0][0] = coco;
+                gradients[i][1][1] = coco;
+                gradients[i][0][1] = sisi;
+                gradients[i][1][0] = sisi;
+              }
+            break;
+          case 3:
+            if (true)
+              {
+                const double cococo = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+                const double sisico = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+                const double sicosi = pi2*std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+                const double cosisi = pi2*std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
 
-                      gradients[i][0][0] = cococo;
-                      gradients[i][1][1] = cococo;
-                      gradients[i][2][2] = cococo;
-                      gradients[i][0][1] = sisico;
-                      gradients[i][1][0] = sisico;
-                      gradients[i][0][2] = sicosi;
-                      gradients[i][2][0] = sicosi;
-                      gradients[i][1][2] = cosisi;
-                      gradients[i][2][1] = cosisi;
-                    }
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+                gradients[i][0][0] = cococo;
+                gradients[i][1][1] = cococo;
+                gradients[i][2][2] = cococo;
+                gradients[i][0][1] = sisico;
+                gradients[i][1][0] = sisico;
+                gradients[i][0][2] = sicosi;
+                gradients[i][2][0] = sicosi;
+                gradients[i][1][2] = cosisi;
+                gradients[i][2][1] = cosisi;
+              }
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -958,16 +958,16 @@ namespace Functions
   ExpFunction<dim>::value (const Point<dim>   &p,
                            const unsigned int) const
   {
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              return std::exp(p(0));
-        case 2:
-              return std::exp(p(0)) * std::exp(p(1));
-        case 3:
-              return std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        return std::exp(p(0));
+      case 2:
+        return std::exp(p(0)) * std::exp(p(1));
+      case 3:
+        return std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -981,22 +981,22 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  values[i] = std::exp(p(0));
-                  break;
-            case 2:
-                  values[i] = std::exp(p(0)) * std::exp(p(1));
-                  break;
-            case 3:
-                  values[i] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+          case 1:
+            values[i] = std::exp(p(0));
+            break;
+          case 2:
+            values[i] = std::exp(p(0)) * std::exp(p(1));
+            break;
+          case 3:
+            values[i] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -1006,16 +1006,16 @@ namespace Functions
   ExpFunction<dim>::laplacian (const Point<dim>   &p,
                                const unsigned int) const
   {
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              return std::exp(p(0));
-        case 2:
-              return 2 * std::exp(p(0)) * std::exp(p(1));
-        case 3:
-              return 3 * std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        return std::exp(p(0));
+      case 2:
+        return 2 * std::exp(p(0)) * std::exp(p(1));
+      case 3:
+        return 3 * std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -1029,22 +1029,22 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  values[i] = std::exp(p(0));
-                  break;
-            case 2:
-                  values[i] = 2 * std::exp(p(0)) * std::exp(p(1));
-                  break;
-            case 3:
-                  values[i] = 3 * std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+          case 1:
+            values[i] = std::exp(p(0));
+            break;
+          case 2:
+            values[i] = 2 * std::exp(p(0)) * std::exp(p(1));
+            break;
+          case 3:
+            values[i] = 3 * std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -1055,22 +1055,22 @@ namespace Functions
                               const unsigned int) const
   {
     Tensor<1,dim> result;
-    switch(dim)
+    switch (dim)
       {
-        case 1:
-              result[0] = std::exp(p(0));
-              break;
-        case 2:
-              result[0] = std::exp(p(0)) * std::exp(p(1));
-              result[1] = std::exp(p(0)) * std::exp(p(1));
-              break;
-        case 3:
-              result[0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-              result[1] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-              result[2] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-              break;
-        default:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        result[0] = std::exp(p(0));
+        break;
+      case 2:
+        result[0] = std::exp(p(0)) * std::exp(p(1));
+        result[1] = std::exp(p(0)) * std::exp(p(1));
+        break;
+      case 3:
+        result[0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+        result[1] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+        result[2] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
       }
     return result;
   }
@@ -1084,25 +1084,25 @@ namespace Functions
     Assert (gradients.size() == points.size(),
             ExcDimensionMismatch(gradients.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
-        switch(dim)
+        const Point<dim> &p = points[i];
+        switch (dim)
           {
-            case 1:
-                  gradients[i][0] = std::exp(p(0));
-                  break;
-            case 2:
-                  gradients[i][0] = std::exp(p(0)) * std::exp(p(1));
-                  gradients[i][1] = std::exp(p(0)) * std::exp(p(1));
-                  break;
-            case 3:
-                  gradients[i][0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-                  gradients[i][1] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-                  gradients[i][2] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-                  break;
-            default:
-                  Assert(false, ExcNotImplemented());
+          case 1:
+            gradients[i][0] = std::exp(p(0));
+            break;
+          case 2:
+            gradients[i][0] = std::exp(p(0)) * std::exp(p(1));
+            gradients[i][1] = std::exp(p(0)) * std::exp(p(1));
+            break;
+          case 3:
+            gradients[i][0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+            gradients[i][1] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+            gradients[i][2] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -1135,7 +1135,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         double x = points[i](0);
         double y = points[i](1);
@@ -1155,13 +1155,13 @@ namespace Functions
 
   void
   LSingularityFunction::vector_value_list (
-    const std::vector<Point<2> >& points,
-    std::vector<Vector<double> >& values) const
+    const std::vector<Point<2> > &points,
+    std::vector<Vector<double> > &values) const
   {
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         Assert (values[i].size() == 1,
                 ExcDimensionMismatch(values[i].size(), 1));
@@ -1182,7 +1182,7 @@ namespace Functions
 
 
   double
-  LSingularityFunction::laplacian (const Point<2>   &,
+  LSingularityFunction::laplacian (const Point<2> &,
                                    const unsigned int) const
   {
     return 0.;
@@ -1197,7 +1197,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       values[i] = 0.;
   }
 
@@ -1226,9 +1226,9 @@ namespace Functions
     Assert (gradients.size() == points.size(),
             ExcDimensionMismatch(gradients.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<2>& p = points[i];
+        const Point<2> &p = points[i];
         double x = p(0);
         double y = p(1);
         double phi = std::atan2(y,-x)+M_PI;
@@ -1242,17 +1242,17 @@ namespace Functions
 
   void
   LSingularityFunction::vector_gradient_list (
-    const std::vector<Point<2> >& points,
-    std::vector<std::vector<Tensor<1,2> > >& gradients) const
+    const std::vector<Point<2> > &points,
+    std::vector<std::vector<Tensor<1,2> > > &gradients) const
   {
     Assert (gradients.size() == points.size(),
             ExcDimensionMismatch(gradients.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         Assert(gradients[i].size() == 1,
                ExcDimensionMismatch(gradients[i].size(), 1));
-        const Point<2>& p = points[i];
+        const Point<2> &p = points[i];
         double x = p(0);
         double y = p(1);
         double phi = std::atan2(y,-x)+M_PI;
@@ -1266,8 +1266,8 @@ namespace Functions
 //////////////////////////////////////////////////////////////////////
 
   LSingularityGradFunction::LSingularityGradFunction ()
-                  :
-                  Function<2> (2)
+    :
+    Function<2> (2)
   {}
 
 
@@ -1286,22 +1286,22 @@ namespace Functions
                   (d==0
                    ? (std::cos(2./3.*phi)*y)
                    : (-std::cos(2./3.*phi)*x)))
-      /r43;
+           /r43;
   }
 
 
   void
   LSingularityGradFunction::value_list (
-    const std::vector<Point<2> >& points,
-    std::vector<double>& values,
+    const std::vector<Point<2> > &points,
+    std::vector<double> &values,
     const unsigned int d) const
   {
     AssertIndexRange(d, 2);
     AssertDimension(values.size(), points.size());
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<2>& p = points[i];
+        const Point<2> &p = points[i];
         const double x = p(0);
         const double y = p(1);
         const double phi = std::atan2(y,-x)+M_PI;
@@ -1318,16 +1318,16 @@ namespace Functions
 
   void
   LSingularityGradFunction::vector_value_list (
-    const std::vector<Point<2> >& points,
-    std::vector<Vector<double> >& values) const
+    const std::vector<Point<2> > &points,
+    std::vector<Vector<double> > &values) const
   {
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         AssertDimension(values[i].size(), 2);
-        const Point<2>& p = points[i];
+        const Point<2> &p = points[i];
         const double x = p(0);
         const double y = p(1);
         const double phi = std::atan2(y,-x)+M_PI;
@@ -1340,7 +1340,7 @@ namespace Functions
 
 
   double
-  LSingularityGradFunction::laplacian (const Point<2>   &,
+  LSingularityGradFunction::laplacian (const Point<2> &,
                                        const unsigned int) const
   {
     return 0.;
@@ -1355,7 +1355,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       values[i] = 0.;
   }
 
@@ -1363,7 +1363,7 @@ namespace Functions
 
   Tensor<1,2>
   LSingularityGradFunction::gradient (
-    const Point<2>   &/*p*/,
+    const Point<2> &   /*p*/,
     const unsigned int /*component*/) const
   {
     Assert(false, ExcNotImplemented());
@@ -1373,8 +1373,8 @@ namespace Functions
 
   void
   LSingularityGradFunction::gradient_list (
-    const std::vector<Point<2> >& /*points*/,
-    std::vector<Tensor<1,2> >& /*gradients*/,
+    const std::vector<Point<2> > & /*points*/,
+    std::vector<Tensor<1,2> > & /*gradients*/,
     const unsigned int /*component*/) const
   {
     Assert(false, ExcNotImplemented());
@@ -1383,8 +1383,8 @@ namespace Functions
 
   void
   LSingularityGradFunction::vector_gradient_list (
-    const std::vector<Point<2> >& /*points*/,
-    std::vector<std::vector<Tensor<1,2> > >& /*gradients*/) const
+    const std::vector<Point<2> > & /*points*/,
+    std::vector<std::vector<Tensor<1,2> > > & /*gradients*/) const
   {
     Assert(false, ExcNotImplemented());
   }
@@ -1417,7 +1417,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         double x = points[i](0);
         double y = points[i](1);
@@ -1433,13 +1433,13 @@ namespace Functions
   template <int dim>
   void
   SlitSingularityFunction<dim>::vector_value_list (
-    const std::vector<Point<dim> >& points,
-    std::vector<Vector<double> >& values) const
+    const std::vector<Point<dim> > &points,
+    std::vector<Vector<double> > &values) const
   {
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         Assert (values[i].size() == 1,
                 ExcDimensionMismatch(values[i].size(), 1));
@@ -1457,7 +1457,7 @@ namespace Functions
 
   template <int dim>
   double
-  SlitSingularityFunction<dim>::laplacian (const Point<dim>   &,
+  SlitSingularityFunction<dim>::laplacian (const Point<dim> &,
                                            const unsigned int) const
   {
     return 0.;
@@ -1474,7 +1474,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       values[i] = 0.;
   }
 
@@ -1505,9 +1505,9 @@ namespace Functions
     Assert (gradients.size() == points.size(),
             ExcDimensionMismatch(gradients.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<dim>& p = points[i];
+        const Point<dim> &p = points[i];
         double x = p(0);
         double y = p(1);
         double phi = std::atan2(x,y)+M_PI;
@@ -1515,7 +1515,7 @@ namespace Functions
 
         gradients[i][0] = 1./2.*(std::sin(1./2.*phi)*x + std::cos(1./2.*phi)*y)/r64;
         gradients[i][1] = 1./2.*(std::sin(1./2.*phi)*y - std::cos(1./2.*phi)*x)/r64;
-        for (unsigned int d=2;d<dim;++d)
+        for (unsigned int d=2; d<dim; ++d)
           gradients[i][d] = 0.;
       }
   }
@@ -1523,18 +1523,18 @@ namespace Functions
   template <int dim>
   void
   SlitSingularityFunction<dim>::vector_gradient_list (
-    const std::vector<Point<dim> >& points,
-    std::vector<std::vector<Tensor<1,dim> > >& gradients) const
+    const std::vector<Point<dim> > &points,
+    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
   {
     Assert (gradients.size() == points.size(),
             ExcDimensionMismatch(gradients.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         Assert(gradients[i].size() == 1,
                ExcDimensionMismatch(gradients[i].size(), 1));
 
-        const Point<dim>& p = points[i];
+        const Point<dim> &p = points[i];
         double x = p(0);
         double y = p(1);
         double phi = std::atan2(x,y)+M_PI;
@@ -1542,7 +1542,7 @@ namespace Functions
 
         gradients[i][0][0] = 1./2.*(std::sin(1./2.*phi)*x + std::cos(1./2.*phi)*y)/r64;
         gradients[i][0][1] = 1./2.*(std::sin(1./2.*phi)*y - std::cos(1./2.*phi)*x)/r64;
-        for (unsigned int d=2;d<dim;++d)
+        for (unsigned int d=2; d<dim; ++d)
           gradients[i][0][d] = 0.;
       }
   }
@@ -1573,7 +1573,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         double x = points[i](0);
         double y = points[i](1);
@@ -1588,13 +1588,13 @@ namespace Functions
 
   void
   SlitHyperSingularityFunction::vector_value_list (
-    const std::vector<Point<2> >& points,
-    std::vector<Vector<double> >& values) const
+    const std::vector<Point<2> > &points,
+    std::vector<Vector<double> > &values) const
   {
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         Assert(values[i].size() == 1,
                ExcDimensionMismatch(values[i].size(), 1));
@@ -1612,7 +1612,7 @@ namespace Functions
 
   double
   SlitHyperSingularityFunction::laplacian (
-    const Point<2>   &,
+    const Point<2> &,
     const unsigned int) const
   {
     return 0.;
@@ -1628,7 +1628,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       values[i] = 0.;
   }
 
@@ -1660,9 +1660,9 @@ namespace Functions
     Assert (gradients.size() == points.size(),
             ExcDimensionMismatch(gradients.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
-        const Point<2>& p = points[i];
+        const Point<2> &p = points[i];
         double x = p(0);
         double y = p(1);
         double phi = std::atan2(x,y)+M_PI;
@@ -1677,17 +1677,17 @@ namespace Functions
   void
   SlitHyperSingularityFunction::vector_gradient_list (
     const std::vector<Point<2> > &points,
-    std::vector<std::vector<Tensor<1,2> > >& gradients) const
+    std::vector<std::vector<Tensor<1,2> > > &gradients) const
   {
     Assert (gradients.size() == points.size(),
             ExcDimensionMismatch(gradients.size(), points.size()));
 
-    for (unsigned int i=0;i<points.size();++i)
+    for (unsigned int i=0; i<points.size(); ++i)
       {
         Assert(gradients[i].size() == 1,
                ExcDimensionMismatch(gradients[i].size(), 1));
 
-        const Point<2>& p = points[i];
+        const Point<2> &p = points[i];
         double x = p(0);
         double y = p(1);
         double phi = std::atan2(x,y)+M_PI;
@@ -1703,20 +1703,20 @@ namespace Functions
   template<int dim>
   JumpFunction<dim>::JumpFunction(const Point<dim> &direction,
                                   const double      steepness)
-                  :
-                  direction(direction),
-                  steepness(steepness)
+    :
+    direction(direction),
+    steepness(steepness)
   {
     switch (dim)
       {
-        case 1:
-              angle = 0;
-              break;
-        case 2:
-              angle = std::atan2(direction(0),direction(1));
-              break;
-        case 3:
-              Assert(false, ExcNotImplemented());
+      case 1:
+        angle = 0;
+        break;
+      case 2:
+        angle = std::atan2(direction(0),direction(1));
+        break;
+      case 3:
+        Assert(false, ExcNotImplemented());
       }
     sine = std::sin(angle);
     cosine = std::cos(angle);
@@ -1744,7 +1744,7 @@ namespace Functions
     Assert (values.size() == p.size(),
             ExcDimensionMismatch(values.size(), p.size()));
 
-    for (unsigned int i=0;i<p.size();++i)
+    for (unsigned int i=0; i<p.size(); ++i)
       {
         double x = steepness*(-cosine*p[i](0)+sine*p[i](1));
         values[i] = -std::atan(x);
@@ -1774,7 +1774,7 @@ namespace Functions
 
     double f = 2*steepness*steepness;
 
-    for (unsigned int i=0;i<p.size();++i)
+    for (unsigned int i=0; i<p.size(); ++i)
       {
         double x = steepness*(-cosine*p[i](0)+sine*p[i](1));
         double r = 1+x*x;
@@ -1802,7 +1802,7 @@ namespace Functions
   template<int dim>
   void
   JumpFunction<dim>::gradient_list (const std::vector<Point<dim> > &p,
-                                    std::vector<Tensor<1,dim> >  &gradients,
+                                    std::vector<Tensor<1,dim> > &gradients,
                                     const unsigned int) const
   {
     Assert (gradients.size() == p.size(),
@@ -1823,8 +1823,8 @@ namespace Functions
   std::size_t
   JumpFunction<dim>::memory_consumption () const
   {
-                                     // only simple data elements, so
-                                     // use sizeof operator
+    // only simple data elements, so
+    // use sizeof operator
     return sizeof (*this);
   }
 
@@ -1832,15 +1832,15 @@ namespace Functions
 
 
 
-/* ---------------------- FourierCosineFunction ----------------------- */
+  /* ---------------------- FourierCosineFunction ----------------------- */
 
 
   template <int dim>
   FourierCosineFunction<dim>::
   FourierCosineFunction (const Point<dim> &fourier_coefficients)
-                  :
-                  Function<dim> (1),
-                  fourier_coefficients (fourier_coefficients)
+    :
+    Function<dim> (1),
+    fourier_coefficients (fourier_coefficients)
   {}
 
 
@@ -1879,16 +1879,16 @@ namespace Functions
 
 
 
-/* ---------------------- FourierSineFunction ----------------------- */
+  /* ---------------------- FourierSineFunction ----------------------- */
 
 
 
   template <int dim>
   FourierSineFunction<dim>::
   FourierSineFunction (const Point<dim> &fourier_coefficients)
-                  :
-                  Function<dim> (1),
-                  fourier_coefficients (fourier_coefficients)
+    :
+    Function<dim> (1),
+    fourier_coefficients (fourier_coefficients)
   {}
 
 
@@ -1927,7 +1927,7 @@ namespace Functions
 
 
 
-/* ---------------------- FourierSineSum ----------------------- */
+  /* ---------------------- FourierSineSum ----------------------- */
 
 
 
@@ -1935,10 +1935,10 @@ namespace Functions
   FourierSineSum<dim>::
   FourierSineSum (const std::vector<Point<dim> > &fourier_coefficients,
                   const std::vector<double>      &weights)
-                  :
-                  Function<dim> (1),
-                  fourier_coefficients (fourier_coefficients),
-                  weights (weights)
+    :
+    Function<dim> (1),
+    fourier_coefficients (fourier_coefficients),
+    weights (weights)
   {
     Assert (fourier_coefficients.size() > 0, ExcZero());
     Assert (fourier_coefficients.size() == weights.size(),
@@ -1999,7 +1999,7 @@ namespace Functions
 
 
 
-/* ---------------------- FourierCosineSum ----------------------- */
+  /* ---------------------- FourierCosineSum ----------------------- */
 
 
 
@@ -2007,10 +2007,10 @@ namespace Functions
   FourierCosineSum<dim>::
   FourierCosineSum (const std::vector<Point<dim> > &fourier_coefficients,
                     const std::vector<double>      &weights)
-                  :
-                  Function<dim> (1),
-                  fourier_coefficients (fourier_coefficients),
-                  weights (weights)
+    :
+    Function<dim> (1),
+    fourier_coefficients (fourier_coefficients),
+    weights (weights)
   {
     Assert (fourier_coefficients.size() > 0, ExcZero());
     Assert (fourier_coefficients.size() == weights.size(),
@@ -2072,7 +2072,7 @@ namespace Functions
 
 
 
-/* ---------------------- Monomial ----------------------- */
+  /* ---------------------- Monomial ----------------------- */
 
 
 
@@ -2080,9 +2080,9 @@ namespace Functions
   Monomial<dim>::
   Monomial (const Tensor<1,dim> &exponents,
             const unsigned int   n_components)
-                  :
-                  Function<dim> (n_components),
-                  exponents (exponents)
+    :
+    Function<dim> (n_components),
+    exponents (exponents)
   {}
 
 
@@ -2163,15 +2163,15 @@ namespace Functions
     const unsigned int order,
     const double wave_number,
     const Point<dim> center)
-                  :
-                  order(order),
-                  wave_number(wave_number),
-                  center(center)
+    :
+    order(order),
+    wave_number(wave_number),
+    center(center)
   {}
 
   template <int dim>
   double
-  Bessel1<dim>::value(const Point<dim>& p, const unsigned int) const
+  Bessel1<dim>::value(const Point<dim> &p, const unsigned int) const
   {
     Assert(dim==2, ExcNotImplemented());
     const double r = p.distance(center);
@@ -2193,13 +2193,13 @@ namespace Functions
   {
     Assert(dim==2, ExcNotImplemented());
     AssertDimension(points.size(), values.size());
-    for (unsigned int k=0;k<points.size();++k)
+    for (unsigned int k=0; k<points.size(); ++k)
       {
 #ifdef HAVE_JN_
         const double r = points[k].distance(center);
         values[k] = jn(order, r*wave_number);
 #else
-    Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+        Assert(false, ExcMessage("Bessel function jn was not found by configure"));
 #endif
       }
   }
@@ -2240,9 +2240,9 @@ namespace Functions
   {
     Assert(dim==2, ExcNotImplemented());
     AssertDimension(points.size(), gradients.size());
-    for (unsigned int k=0;k<points.size();++k)
+    for (unsigned int k=0; k<points.size(); ++k)
       {
-        const Point<dim>& p = points[k];
+        const Point<dim> &p = points[k];
         const double r = p.distance(center);
         const double co = (r==0.) ? 0. : (p(0)-center(0))/r;
         const double si = (r==0.) ? 0. : (p(1)-center(1))/r;
@@ -2255,7 +2255,7 @@ namespace Functions
         const double dJn = 0.;
         Assert(false, ExcMessage("Bessel function jn was not found by configure"));
 #endif
-        Tensor<1,dim>& result = gradients[k];
+        Tensor<1,dim> &result = gradients[k];
         result[0] = wave_number * co * dJn;
         result[1] = wave_number * si * dJn;
       }

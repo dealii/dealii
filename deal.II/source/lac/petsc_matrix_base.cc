@@ -31,10 +31,10 @@ namespace PETScWrappers
     MatrixBase::const_iterator::Accessor::
     visit_present_row ()
     {
-                                       // if we are asked to visit the
-                                       // past-the-end line, then simply
-                                       // release all our caches and go on
-                                       // with life
+      // if we are asked to visit the
+      // past-the-end line, then simply
+      // release all our caches and go on
+      // with life
       if (this->a_row == matrix->m())
         {
           colnum_cache.reset ();
@@ -43,11 +43,11 @@ namespace PETScWrappers
           return;
         }
 
-                                       // otherwise first flush PETSc caches
+      // otherwise first flush PETSc caches
       matrix->compress ();
 
-                                       // get a representation of the present
-                                       // row
+      // get a representation of the present
+      // row
       PetscInt           ncols;
       const PetscInt    *colnums;
       const PetscScalar *values;
@@ -56,18 +56,18 @@ namespace PETScWrappers
       ierr = MatGetRow(*matrix, this->a_row, &ncols, &colnums, &values);
       AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
-                                       // copy it into our caches if the line
-                                       // isn't empty. if it is, then we've
-                                       // done something wrong, since we
-                                       // shouldn't have initialized an
-                                       // iterator for an empty line (what
-                                       // would it point to?)
+      // copy it into our caches if the line
+      // isn't empty. if it is, then we've
+      // done something wrong, since we
+      // shouldn't have initialized an
+      // iterator for an empty line (what
+      // would it point to?)
       Assert (ncols != 0, ExcInternalError());
       colnum_cache.reset (new std::vector<unsigned int> (colnums,
                                                          colnums+ncols));
       value_cache.reset (new std::vector<PetscScalar> (values, values+ncols));
 
-                                       // and finally restore the matrix
+      // and finally restore the matrix
       ierr = MatRestoreRow(*matrix, this->a_row, &ncols, &colnums, &values);
       AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
     }
@@ -76,8 +76,8 @@ namespace PETScWrappers
 
 
   MatrixBase::MatrixBase ()
-                  :
-                  last_action (LastAction::none)
+    :
+    last_action (LastAction::none)
   {}
 
 
@@ -97,15 +97,15 @@ namespace PETScWrappers
   void
   MatrixBase::clear ()
   {
-                                     // destroy the matrix...
+    // destroy the matrix...
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
     int ierr = MatDestroy (matrix);
 #else
     int ierr = MatDestroy (&matrix);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-                                     // ...and replace it by an empty
-                                     // sequential matrix
+    // ...and replace it by an empty
+    // sequential matrix
     const int m=0, n=0, n_nonzero_per_row=0;
     ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
                            0, &matrix);
@@ -119,10 +119,10 @@ namespace PETScWrappers
   {
     Assert (d==value_type(), ExcScalarAssignmentOnlyForZeroValue());
 
-                                     // flush previously cached elements. this
-                                     // seems to be necessary since petsc
-                                     // 2.2.1, at least for parallel vectors
-                                     // (see test bits/petsc_64)
+    // flush previously cached elements. this
+    // seems to be necessary since petsc
+    // 2.2.1, at least for parallel vectors
+    // (see test bits/petsc_64)
     compress ();
 
     const int ierr = MatZeroEntries (matrix);
@@ -139,8 +139,8 @@ namespace PETScWrappers
   {
     compress ();
 
-                                     // now set all the entries of this row to
-                                     // zero
+    // now set all the entries of this row to
+    // zero
     const PetscInt petsc_row = row;
 
     IS index_set;
@@ -176,13 +176,13 @@ namespace PETScWrappers
   {
     compress ();
 
-                                     // now set all the entries of these rows
-                                     // to zero
+    // now set all the entries of these rows
+    // to zero
     const std::vector<PetscInt> petsc_rows (rows.begin(), rows.end());
 
-                                     // call the functions. note that we have
-                                     // to call them even if #rows is empty,
-                                     // since this is a collective operation
+    // call the functions. note that we have
+    // to call them even if #rows is empty,
+    // since this is a collective operation
     IS index_set;
 
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
@@ -222,7 +222,7 @@ namespace PETScWrappers
 #else
     int
 #endif
-      petsc_i = i, petsc_j = j;
+    petsc_i = i, petsc_j = j;
     PetscScalar value;
 
     const int ierr
@@ -240,8 +240,8 @@ namespace PETScWrappers
   {
     Assert (m() == n(), ExcNotQuadratic());
 
-                                     // this doesn't seem to work any
-                                     // different than any other element
+    // this doesn't seem to work any
+    // different than any other element
     return el(i,i);
   }
 
@@ -250,7 +250,7 @@ namespace PETScWrappers
   void
   MatrixBase::compress (::dealii::VectorOperation::values)
   {
-                                     // flush buffers
+    // flush buffers
     int ierr;
     ierr = MatAssemblyBegin (matrix,MAT_FINAL_ASSEMBLY);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -271,7 +271,7 @@ namespace PETScWrappers
 #else
     int
 #endif
-      n_rows, n_cols;
+    n_rows, n_cols;
     int ierr = MatGetSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -288,7 +288,7 @@ namespace PETScWrappers
 #else
     int
 #endif
-      n_rows, n_cols;
+    n_rows, n_cols;
     int ierr = MatGetSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -305,7 +305,7 @@ namespace PETScWrappers
 #else
     int
 #endif
-      n_rows, n_cols;
+    n_rows, n_cols;
     int ierr = MatGetLocalSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -322,7 +322,7 @@ namespace PETScWrappers
 #else
     int
 #endif
-      begin, end;
+    begin, end;
     const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
                                            &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -357,8 +357,8 @@ namespace PETScWrappers
 //entries in a row bypassing the call to compress(), but I can't find one
     Assert (row < m(), ExcInternalError());
 
-                                     // get a representation of the present
-                                     // row
+    // get a representation of the present
+    // row
     PetscInt ncols;
     const PetscInt    *colnums;
     const PetscScalar *values;
@@ -369,9 +369,9 @@ namespace PETScWrappers
     ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
     AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
-                                     // then restore the matrix and return the
-                                     // number of columns in this row as
-                                     // queried previously
+    // then restore the matrix and return the
+    // number of columns in this row as
+    // queried previously
     ierr = MatRestoreRow(*this, row, &ncols, &colnums, &values);
     AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
@@ -431,7 +431,7 @@ namespace PETScWrappers
 
   PetscScalar
   MatrixBase::matrix_scalar_product (const VectorBase &u,
-				     const VectorBase &v) const
+                                     const VectorBase &v) const
   {
     Vector tmp(v.size());
     vmult (tmp, v);
@@ -530,9 +530,9 @@ namespace PETScWrappers
                         const VectorBase &x,
                         const VectorBase &b) const
   {
-                                     // avoid the use of a temporary, and
-                                     // rather do one negation pass more than
-                                     // necessary
+    // avoid the use of a temporary, and
+    // rather do one negation pass more than
+    // necessary
     vmult (dst, x);
     dst -= b;
     dst *= -1;
@@ -564,10 +564,10 @@ namespace PETScWrappers
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
     PetscTruth
 #else
-      PetscBool
+    PetscBool
 #endif
-      truth;
-                                       // First flush PETSc caches
+    truth;
+    // First flush PETSc caches
     compress ();
     MatIsSymmetric (matrix, tolerance, &truth);
     return truth;
@@ -583,11 +583,11 @@ namespace PETScWrappers
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
     PetscTruth
 #else
-      PetscBool
+    PetscBool
 #endif
-      truth;
+    truth;
 
-                                     // First flush PETSc caches
+    // First flush PETSc caches
     compress ();
     MatIsHermitian (matrix, tolerance, &truth);
 
@@ -597,14 +597,14 @@ namespace PETScWrappers
   void
   MatrixBase::write_ascii ()
   {
-                                       // First flush PETSc caches
+    // First flush PETSc caches
     compress ();
 
-                                       // Set options
+    // Set options
     PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
                           PETSC_VIEWER_DEFAULT);
 
-                                       // Write to screen
+    // Write to screen
     MatView (matrix,PETSC_VIEWER_STDOUT_WORLD);
   }
 

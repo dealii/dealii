@@ -11,8 +11,8 @@
 /*    further information on this license.                        */
 
 
-                                // The necessary files from the deal.II
-                                // library.
+// The necessary files from the deal.II
+// library.
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
@@ -34,9 +34,9 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/distributed/tria.h>
 
-                                // This includes the data structures for the
-                                // efficient implementation of matrix-free
-                                // methods.
+// This includes the data structures for the
+// efficient implementation of matrix-free
+// methods.
 #include <deal.II/lac/parallel_vector.h>
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
@@ -50,99 +50,99 @@ namespace Step48
 {
   using namespace dealii;
 
-                                   // We start by defining two global
-                                   // variables to collect all parameters
-                                   // subject to changes at one place:
-                                   // One for the dimension and one for
-                                   // the finite element degree. The
-                                   // dimension is used in the main
-                                   // function as a template argument for
-                                   // the actual classes (like in all
-                                   // other deal.II programs), whereas
-                                   // the degree of the finite element is
-                                   // more crucial, as it is passed as a
-                                   // template argument to the
-                                   // implementation of the Sine-Gordon
-                                   // operator. Therefore, it needs to be
-                                   // a compile-time constant.
+  // We start by defining two global
+  // variables to collect all parameters
+  // subject to changes at one place:
+  // One for the dimension and one for
+  // the finite element degree. The
+  // dimension is used in the main
+  // function as a template argument for
+  // the actual classes (like in all
+  // other deal.II programs), whereas
+  // the degree of the finite element is
+  // more crucial, as it is passed as a
+  // template argument to the
+  // implementation of the Sine-Gordon
+  // operator. Therefore, it needs to be
+  // a compile-time constant.
   const unsigned int dimension = 2;
   const unsigned int fe_degree = 4;
 
 
-                                   // @sect3{SineGordonOperation}
+  // @sect3{SineGordonOperation}
 
-                                   // The <code>SineGordonOperation</code> class
-                                   // implements the cell-based operation that is
-                                   // needed in each time step. This nonlinear
-                                   // operation can be implemented
-                                   // straight-forwardly based on the
-                                   // <code>MatrixFree</code> class, in the
-                                   // same way as a linear operation would be
-                                   // treated by this implementation of the
-                                   // finite element operator application. We
-                                   // apply two template arguments to the class,
-                                   // one for the dimension and one for the
-                                   // degree of the finite element. This is a
-                                   // difference to other functions in deal.II
-                                   // where only the dimension is a template
-                                   // argument. This is necessary to provide the
-                                   // inner loops in @p FEEvaluation with
-                                   // information about loop lengths etc., which
-                                   // is essential for efficiency. On the other
-                                   // hand, it makes it more challenging to
-                                   // implement the degree as a run-time
-                                   // parameter.
+  // The <code>SineGordonOperation</code> class
+  // implements the cell-based operation that is
+  // needed in each time step. This nonlinear
+  // operation can be implemented
+  // straight-forwardly based on the
+  // <code>MatrixFree</code> class, in the
+  // same way as a linear operation would be
+  // treated by this implementation of the
+  // finite element operator application. We
+  // apply two template arguments to the class,
+  // one for the dimension and one for the
+  // degree of the finite element. This is a
+  // difference to other functions in deal.II
+  // where only the dimension is a template
+  // argument. This is necessary to provide the
+  // inner loops in @p FEEvaluation with
+  // information about loop lengths etc., which
+  // is essential for efficiency. On the other
+  // hand, it makes it more challenging to
+  // implement the degree as a run-time
+  // parameter.
   template <int dim, int fe_degree>
   class SineGordonOperation
   {
-    public:
-      SineGordonOperation(const MatrixFree<dim,double> &data_in,
-                          const double                      time_step);
+  public:
+    SineGordonOperation(const MatrixFree<dim,double> &data_in,
+                        const double                      time_step);
 
-      void apply (parallel::distributed::Vector<double>                        &dst,
-                  const std::vector<parallel::distributed::Vector<double>*> &src) const;
+    void apply (parallel::distributed::Vector<double>                        &dst,
+                const std::vector<parallel::distributed::Vector<double>*> &src) const;
 
-    private:
-      const MatrixFree<dim,double>         &data;
-      const VectorizedArray<double>         delta_t_sqr;
-      parallel::distributed::Vector<double> inv_mass_matrix;
+  private:
+    const MatrixFree<dim,double>         &data;
+    const VectorizedArray<double>         delta_t_sqr;
+    parallel::distributed::Vector<double> inv_mass_matrix;
 
-      void local_apply (const MatrixFree<dim,double>               &data,
-                        parallel::distributed::Vector<double>      &dst,
-                        const std::vector<parallel::distributed::Vector<double>*>&src,
-                        const std::pair<unsigned int,unsigned int> &cell_range) const;
+    void local_apply (const MatrixFree<dim,double>               &data,
+                      parallel::distributed::Vector<double>      &dst,
+                      const std::vector<parallel::distributed::Vector<double>*> &src,
+                      const std::pair<unsigned int,unsigned int> &cell_range) const;
   };
 
 
 
-                                   // @sect4{SineGordonOperation::SineGordonOperation}
+  // @sect4{SineGordonOperation::SineGordonOperation}
 
-                                   // This is the constructor of the
-                                   // SineGordonOperation class. It receives a
-                                   // reference to the MatrixFree holding the
-                                   // problem information and the time step size
-                                   // as input parameters. The initialization
-                                   // routine sets up the mass matrix. Since we
-                                   // use Gauss-Lobatto elements, the mass matrix
-                                   // is a diagonal matrix and can be stored as a
-                                   // vector. The computation of the mass matrix
-                                   // diagonal is simple to achieve with the data
-                                   // structures provided by FEEvaluation: Just
-                                   // loop over all (macro-) cells and integrate
-                                   // over the function that is constant one on
-                                   // all quadrature points by using the
-                                   // <code>integrate</code> function with @p
-                                   // true argument at the slot for
-                                   // values. Finally, we invert the diagonal
-                                   // entries since we have to multiply by the
-                                   // inverse mass matrix in each time step.
+  // This is the constructor of the
+  // SineGordonOperation class. It receives a
+  // reference to the MatrixFree holding the
+  // problem information and the time step size
+  // as input parameters. The initialization
+  // routine sets up the mass matrix. Since we
+  // use Gauss-Lobatto elements, the mass matrix
+  // is a diagonal matrix and can be stored as a
+  // vector. The computation of the mass matrix
+  // diagonal is simple to achieve with the data
+  // structures provided by FEEvaluation: Just
+  // loop over all (macro-) cells and integrate
+  // over the function that is constant one on
+  // all quadrature points by using the
+  // <code>integrate</code> function with @p
+  // true argument at the slot for
+  // values. Finally, we invert the diagonal
+  // entries since we have to multiply by the
+  // inverse mass matrix in each time step.
   template <int dim, int fe_degree>
   SineGordonOperation<dim,fe_degree>::
   SineGordonOperation(const MatrixFree<dim,double> &data_in,
                       const double                  time_step)
-                  :
-                  data(data_in),
-                  delta_t_sqr(make_vectorized_array(time_step*time_step))
+    :
+    data(data_in),
+    delta_t_sqr(make_vectorized_array(time_step *time_step))
   {
     VectorizedArray<double> one = make_vectorized_array (1.);
 
@@ -170,59 +170,59 @@ namespace Step48
 
 
 
-                                   // @sect4{SineGordonOperation::local_apply}
+  // @sect4{SineGordonOperation::local_apply}
 
-                                   // This operator implements the core operation
-                                   // of the program, the integration over a
-                                   // range of cells for the nonlinear operator
-                                   // of the Sine-Gordon problem. The
-                                   // implementation is based on the
-                                   // FEEvaluationGL class since we are using
-                                   // the cell-based implementation for
-                                   // Gauss-Lobatto elements.
+  // This operator implements the core operation
+  // of the program, the integration over a
+  // range of cells for the nonlinear operator
+  // of the Sine-Gordon problem. The
+  // implementation is based on the
+  // FEEvaluationGL class since we are using
+  // the cell-based implementation for
+  // Gauss-Lobatto elements.
 
-                                   // The nonlinear function that we have to
-                                   // evaluate for the time stepping routine
-                                   // includes the value of the function at
-                                   // the present time @p current as well as
-                                   // the value at the previous time step @p
-                                   // old. Both values are passed to the
-                                   // operator in the collection of source
-                                   // vectors @p src, which is simply an STL
-                                   // vector of pointers to the actual
-                                   // solution vectors. This construct of
-                                   // collecting several source vectors into
-                                   // one is necessary as the cell loop in @p
-                                   // MatrixFree takes exactly one source
-                                   // and one destination vector, even if we
-                                   // happen to use many vectors like the two
-                                   // in this case. Note that the cell loop
-                                   // accepts any valid class for input and
-                                   // output, which does not only include
-                                   // vectors but general data types. However,
-                                   // only in case it encounters a
-                                   // parallel::distributed::Vector<Number> or
-                                   // an STL vector collecting these vectors,
-                                   // it calls functions that exchange data at
-                                   // the beginning and the end of the
-                                   // loop. In the loop over the cells, we
-                                   // first have to read in the values in the
-                                   // vectors related to the local
-                                   // values. Then, we evaluate the value and
-                                   // the gradient of the current solution
-                                   // vector and the values of the old vector
-                                   // at the quadrature points. Then, we
-                                   // combine the terms in the scheme in the
-                                   // loop over the quadrature
-                                   // points. Finally, we integrate the result
-                                   // against the test function and accumulate
-                                   // the result to the global solution vector
-                                   // @p dst.
+  // The nonlinear function that we have to
+  // evaluate for the time stepping routine
+  // includes the value of the function at
+  // the present time @p current as well as
+  // the value at the previous time step @p
+  // old. Both values are passed to the
+  // operator in the collection of source
+  // vectors @p src, which is simply an STL
+  // vector of pointers to the actual
+  // solution vectors. This construct of
+  // collecting several source vectors into
+  // one is necessary as the cell loop in @p
+  // MatrixFree takes exactly one source
+  // and one destination vector, even if we
+  // happen to use many vectors like the two
+  // in this case. Note that the cell loop
+  // accepts any valid class for input and
+  // output, which does not only include
+  // vectors but general data types. However,
+  // only in case it encounters a
+  // parallel::distributed::Vector<Number> or
+  // an STL vector collecting these vectors,
+  // it calls functions that exchange data at
+  // the beginning and the end of the
+  // loop. In the loop over the cells, we
+  // first have to read in the values in the
+  // vectors related to the local
+  // values. Then, we evaluate the value and
+  // the gradient of the current solution
+  // vector and the values of the old vector
+  // at the quadrature points. Then, we
+  // combine the terms in the scheme in the
+  // loop over the quadrature
+  // points. Finally, we integrate the result
+  // against the test function and accumulate
+  // the result to the global solution vector
+  // @p dst.
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::
   local_apply (const MatrixFree<dim>                 &data,
                parallel::distributed::Vector<double>     &dst,
-               const std::vector<parallel::distributed::Vector<double>*>&src,
+               const std::vector<parallel::distributed::Vector<double>*> &src,
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     AssertDimension (src.size(), 2);
@@ -256,22 +256,22 @@ namespace Step48
 
 
 
-                                   //@sect4{SineGordonOperation::apply}
+  //@sect4{SineGordonOperation::apply}
 
-                                   // This function performs the time stepping
-                                   // routine based on the cell-local
-                                   // strategy. First the destination vector is
-                                   // set to zero, then the cell-loop is called,
-                                   // and finally the solution is multiplied by
-                                   // the inverse mass matrix. The structure of
-                                   // the cell loop is implemented in the cell
-                                   // finite element operator class. On each cell
-                                   // it applies the routine defined as the
-                                   // <code>local_apply()</code> method of the
-                                   // class <code>SineGordonOperation</code>,
-                                   // i.e., <code>this</code>. One could also
-                                   // provide a function with the same signature
-                                   // that is not part of a class.
+  // This function performs the time stepping
+  // routine based on the cell-local
+  // strategy. First the destination vector is
+  // set to zero, then the cell-loop is called,
+  // and finally the solution is multiplied by
+  // the inverse mass matrix. The structure of
+  // the cell loop is implemented in the cell
+  // finite element operator class. On each cell
+  // it applies the routine defined as the
+  // <code>local_apply()</code> method of the
+  // class <code>SineGordonOperation</code>,
+  // i.e., <code>this</code>. One could also
+  // provide a function with the same signature
+  // that is not part of a class.
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::
   apply (parallel::distributed::Vector<double>                        &dst,
@@ -284,21 +284,21 @@ namespace Step48
   }
 
 
-                                   //@sect3{Equation data}
+  //@sect3{Equation data}
 
-                                   // We define a time-dependent function that is
-                                   // used as initial value. Different solutions
-                                   // can be obtained by varying the starting
-                                   // time. This function has already been
-                                   // explained in step-25.
+  // We define a time-dependent function that is
+  // used as initial value. Different solutions
+  // can be obtained by varying the starting
+  // time. This function has already been
+  // explained in step-25.
   template <int dim>
   class ExactSolution : public Function<dim>
   {
-    public:
-      ExactSolution (const unsigned int n_components = 1,
-                     const double time = 0.) : Function<dim>(n_components, time) {}
-      virtual double value (const Point<dim> &p,
-                            const unsigned int component = 0) const;
+  public:
+    ExactSolution (const unsigned int n_components = 1,
+                   const double time = 0.) : Function<dim>(n_components, time) {}
+    virtual double value (const Point<dim> &p,
+                          const unsigned int component = 0) const;
   };
 
   template <int dim>
@@ -320,100 +320,100 @@ namespace Step48
 
 
 
-                                   // @sect3{SineGordonProblem class}
+  // @sect3{SineGordonProblem class}
 
-                                   // This is the main class that builds on the
-                                   // class in step-25.  However, we replaced
-                                   // the SparseMatrix<double> class by the
-                                   // MatrixFree class to store
-                                   // the geometry data. Also, we use a
-                                   // distributed triangulation in this example.
+  // This is the main class that builds on the
+  // class in step-25.  However, we replaced
+  // the SparseMatrix<double> class by the
+  // MatrixFree class to store
+  // the geometry data. Also, we use a
+  // distributed triangulation in this example.
   template <int dim>
   class SineGordonProblem
   {
-    public:
-      SineGordonProblem ();
-      void run ();
+  public:
+    SineGordonProblem ();
+    void run ();
 
-    private:
-      ConditionalOStream pcout;
+  private:
+    ConditionalOStream pcout;
 
-      void make_grid_and_dofs ();
-      void oldstyle_operation ();
-      void assemble_system ();
-      void output_results (const unsigned int timestep_number) const;
+    void make_grid_and_dofs ();
+    void oldstyle_operation ();
+    void assemble_system ();
+    void output_results (const unsigned int timestep_number) const;
 
 #ifdef DEAL_II_USE_P4EST
-      parallel::distributed::Triangulation<dim>   triangulation;
+    parallel::distributed::Triangulation<dim>   triangulation;
 #else
-      Triangulation<dim>   triangulation;
+    Triangulation<dim>   triangulation;
 #endif
-      FE_Q<dim>            fe;
-      DoFHandler<dim>      dof_handler;
-      ConstraintMatrix     constraints;
-      IndexSet             locally_relevant_dofs;
+    FE_Q<dim>            fe;
+    DoFHandler<dim>      dof_handler;
+    ConstraintMatrix     constraints;
+    IndexSet             locally_relevant_dofs;
 
-      MatrixFree<dim,double> matrix_free_data;
+    MatrixFree<dim,double> matrix_free_data;
 
-      parallel::distributed::Vector<double> solution, old_solution, old_old_solution;
+    parallel::distributed::Vector<double> solution, old_solution, old_old_solution;
 
-      const unsigned int n_global_refinements;
-      double time, time_step;
-      const double final_time;
-      const double cfl_number;
-      const unsigned int output_timestep_skip;
+    const unsigned int n_global_refinements;
+    double time, time_step;
+    const double final_time;
+    const double cfl_number;
+    const unsigned int output_timestep_skip;
   };
 
 
-                                   //@sect4{SineGordonProblem::SineGordonProblem}
+  //@sect4{SineGordonProblem::SineGordonProblem}
 
-                                   // This is the constructor of the
-                                   // SineGordonProblem class. The time interval
-                                   // and time step size are defined
-                                   // here. Moreover, we use the degree of the
-                                   // finite element that we defined at the top
-                                   // of the program to initialize a FE_Q finite
-                                   // element based on Gauss-Lobatto support
-                                   // points. These points are convenient because
-                                   // in conjunction with a QGaussLobatto
-                                   // quadrature rule of the same order they give
-                                   // a diagonal mass matrix without compromising
-                                   // accuracy too much (note that the
-                                   // integration is inexact, though), see also
-                                   // the discussion in the introduction.
+  // This is the constructor of the
+  // SineGordonProblem class. The time interval
+  // and time step size are defined
+  // here. Moreover, we use the degree of the
+  // finite element that we defined at the top
+  // of the program to initialize a FE_Q finite
+  // element based on Gauss-Lobatto support
+  // points. These points are convenient because
+  // in conjunction with a QGaussLobatto
+  // quadrature rule of the same order they give
+  // a diagonal mass matrix without compromising
+  // accuracy too much (note that the
+  // integration is inexact, though), see also
+  // the discussion in the introduction.
   template <int dim>
   SineGordonProblem<dim>::SineGordonProblem ()
-                  :
-                  pcout (std::cout,
-                         Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)==0),
+    :
+    pcout (std::cout,
+           Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)==0),
 #ifdef DEAL_II_USE_P4EST
-                  triangulation (MPI_COMM_WORLD),
+    triangulation (MPI_COMM_WORLD),
 #endif
-                  fe (QGaussLobatto<1>(fe_degree+1)),
-                  dof_handler (triangulation),
-                  n_global_refinements (11-2*dim),
-                  time (-10),
-                  final_time (10),
-                  cfl_number (.1/fe_degree),
-                  output_timestep_skip (200)
+    fe (QGaussLobatto<1>(fe_degree+1)),
+    dof_handler (triangulation),
+    n_global_refinements (11-2*dim),
+    time (-10),
+    final_time (10),
+    cfl_number (.1/fe_degree),
+    output_timestep_skip (200)
   {}
 
-                                   //@sect4{SineGordonProblem::make_grid_and_dofs}
+  //@sect4{SineGordonProblem::make_grid_and_dofs}
 
-                                   // As in step-25 this functions sets up a cube
-                                   // grid in <code>dim</code> dimensions of
-                                   // extent $[-15,15]$. We refine the mesh more
-                                   // in the center of the domain since the
-                                   // solution is concentrated there. We first
-                                   // refine all cells whose center is within a
-                                   // radius of 11, and then refine once more for
-                                   // a radius 6.  This is simple ad-hoc
-                                   // refinement could be done better by adapting
-                                   // the mesh to the solution using error
-                                   // estimators during the time stepping as done
-                                   // in other example programs, and using
-                                   // parallel::distributed::SolutionTransfer to
-                                   // transfer the solution to the new mesh.
+  // As in step-25 this functions sets up a cube
+  // grid in <code>dim</code> dimensions of
+  // extent $[-15,15]$. We refine the mesh more
+  // in the center of the domain since the
+  // solution is concentrated there. We first
+  // refine all cells whose center is within a
+  // radius of 11, and then refine once more for
+  // a radius 6.  This is simple ad-hoc
+  // refinement could be done better by adapting
+  // the mesh to the solution using error
+  // estimators during the time stepping as done
+  // in other example programs, and using
+  // parallel::distributed::SolutionTransfer to
+  // transfer the solution to the new mesh.
   template <int dim>
   void SineGordonProblem<dim>::make_grid_and_dofs ()
   {
@@ -421,8 +421,8 @@ namespace Step48
     triangulation.refine_global (n_global_refinements);
     {
       typename Triangulation<dim>::active_cell_iterator
-        cell = triangulation.begin_active(),
-        end_cell = triangulation.end();
+      cell = triangulation.begin_active(),
+      end_cell = triangulation.end();
       for ( ; cell != end_cell; ++cell)
         if (cell->is_locally_owned())
           if (cell->center().norm() < 11)
@@ -453,27 +453,27 @@ namespace Step48
           << std::endl;
 
 
-                                     // We generate hanging node constraints for
-                                     // ensuring continuity of the solution. As in
-                                     // step-40, we need to equip the constraint
-                                     // matrix with the IndexSet of locally
-                                     // relevant degrees of freedom to avoid it to
-                                     // consume too much memory for big
-                                     // problems. Next, the <code> MatrixFree
-                                     // </code> for the problem is set up. Note
-                                     // that we specify the MPI communicator which
-                                     // we are going to use, and that we also want
-                                     // to use shared-memory parallelization (hence
-                                     // one would use multithreading for intra-node
-                                     // parallelism and not MPI; note that we here
-                                     // choose the standard option &mdash; if we
-                                     // wanted to disable shared memory
-                                     // parallelization, we would choose @p
-                                     // none). Finally, three solution vectors are
-                                     // initialized. MatrixFree stores the
-                                     // layout that is to be used by distributed
-                                     // vectors, so we just ask it to initialize
-                                     // the vectors.
+    // We generate hanging node constraints for
+    // ensuring continuity of the solution. As in
+    // step-40, we need to equip the constraint
+    // matrix with the IndexSet of locally
+    // relevant degrees of freedom to avoid it to
+    // consume too much memory for big
+    // problems. Next, the <code> MatrixFree
+    // </code> for the problem is set up. Note
+    // that we specify the MPI communicator which
+    // we are going to use, and that we also want
+    // to use shared-memory parallelization (hence
+    // one would use multithreading for intra-node
+    // parallelism and not MPI; note that we here
+    // choose the standard option &mdash; if we
+    // wanted to disable shared memory
+    // parallelization, we would choose @p
+    // none). Finally, three solution vectors are
+    // initialized. MatrixFree stores the
+    // layout that is to be used by distributed
+    // vectors, so we just ask it to initialize
+    // the vectors.
     DoFTools::extract_locally_relevant_dofs (dof_handler,
                                              locally_relevant_dofs);
     constraints.clear();
@@ -488,7 +488,7 @@ namespace Step48
       MatrixFree<dim>::AdditionalData::partition_partition;
 
     matrix_free_data.reinit (dof_handler, constraints,
-                                  quadrature, additional_data);
+                             quadrature, additional_data);
 
     matrix_free_data.initialize_dof_vector (solution);
     old_solution.reinit (solution);
@@ -497,30 +497,30 @@ namespace Step48
 
 
 
-                                   //@sect4{SineGordonProblem::output_results}
+  //@sect4{SineGordonProblem::output_results}
 
-                                   // This function prints the norm of the
-                                   // solution and writes the solution vector to
-                                   // a file. The norm is standard (except for
-                                   // the fact that we need to be sure to only
-                                   // count norms on locally owned cells), and
-                                   // the second is similar to what we did in
-                                   // step-40. However, we first need to generate
-                                   // an appropriate vector for output: The ones
-                                   // we used during time stepping contained
-                                   // information about ghosts dofs that one
-                                   // needs write access to during the loops over
-                                   // cell. However, that is not the same as
-                                   // needed when outputting. So we first
-                                   // initialize a vector with locally relevant
-                                   // degrees of freedom by copying the solution
-                                   // (note how we use the function @p copy_from
-                                   // to transfer data between vectors with the
-                                   // same local range, but different layouts of
-                                   // ghosts). Then, we import the values on the
-                                   // ghost DoFs and then distribute the
-                                   // constraints (as constraints are zero in the
-                                   // vectors during loop over all cells).
+  // This function prints the norm of the
+  // solution and writes the solution vector to
+  // a file. The norm is standard (except for
+  // the fact that we need to be sure to only
+  // count norms on locally owned cells), and
+  // the second is similar to what we did in
+  // step-40. However, we first need to generate
+  // an appropriate vector for output: The ones
+  // we used during time stepping contained
+  // information about ghosts dofs that one
+  // needs write access to during the loops over
+  // cell. However, that is not the same as
+  // needed when outputting. So we first
+  // initialize a vector with locally relevant
+  // degrees of freedom by copying the solution
+  // (note how we use the function @p copy_from
+  // to transfer data between vectors with the
+  // same local range, but different layouts of
+  // ghosts). Then, we import the values on the
+  // ghost DoFs and then distribute the
+  // constraints (as constraints are zero in the
+  // vectors during loop over all cells).
   template <int dim>
   void
   SineGordonProblem<dim>::output_results (const unsigned int timestep_number) const
@@ -580,28 +580,28 @@ namespace Step48
   }
 
 
-                                   // @sect4{SineGordonProblem::run}
+  // @sect4{SineGordonProblem::run}
 
-                                   // This function is called by the main
-                                   // function and calls the subroutines
-                                   // of the class.
-                                   //
-                                   // The first step is to set up the grid and
-                                   // the cell operator. Then, the time step is
-                                   // computed from the CFL number given in the
-                                   // constructor and the finest mesh size. The
-                                   // finest mesh size is computed as the
-                                   // diameter of the last cell in the
-                                   // triangulation, which is the last cell on
-                                   // the finest level of the mesh. This is only
-                                   // possible for Cartesian meshes, otherwise,
-                                   // one needs to loop over all cells). Note
-                                   // that we need to query all the processors
-                                   // for their finest cell since the not all
-                                   // processors might hold a region where the
-                                   // mesh is at the finest level. Then, we
-                                   // readjust the time step a little to hit the
-                                   // final time exactly if necessary.
+  // This function is called by the main
+  // function and calls the subroutines
+  // of the class.
+  //
+  // The first step is to set up the grid and
+  // the cell operator. Then, the time step is
+  // computed from the CFL number given in the
+  // constructor and the finest mesh size. The
+  // finest mesh size is computed as the
+  // diameter of the last cell in the
+  // triangulation, which is the last cell on
+  // the finest level of the mesh. This is only
+  // possible for Cartesian meshes, otherwise,
+  // one needs to loop over all cells). Note
+  // that we need to query all the processors
+  // for their finest cell since the not all
+  // processors might hold a region where the
+  // mesh is at the finest level. Then, we
+  // readjust the time step a little to hit the
+  // final time exactly if necessary.
   template <int dim>
   void
   SineGordonProblem<dim>::run ()
@@ -617,24 +617,24 @@ namespace Step48
     pcout << "   Time step size: " << time_step << ", finest cell: "
           << global_min_cell_diameter << std::endl << std::endl;
 
-                                     // Next the initial value is set. Since we
-                                     // have a two-step time stepping method, we
-                                     // also need a value of the solution at
-                                     // time-time_step. For accurate results, one
-                                     // would need to compute this from the time
-                                     // derivative of the solution at initial time,
-                                     // but here we ignore this difficulty and just
-                                     // set it to the initial value function at
-                                     // that artificial time.
+    // Next the initial value is set. Since we
+    // have a two-step time stepping method, we
+    // also need a value of the solution at
+    // time-time_step. For accurate results, one
+    // would need to compute this from the time
+    // derivative of the solution at initial time,
+    // but here we ignore this difficulty and just
+    // set it to the initial value function at
+    // that artificial time.
 
-                                     // We create an output of the initial
-                                     // value. Then we also need to collect
-                                     // the two starting solutions in an STL
-                                     // vector of pointers field and to set up
-                                     // an instance of the <code>
-                                     // SineGordonOperation class </code>
-                                     // based on the finite element degree
-                                     // specified at the top of this file.
+    // We create an output of the initial
+    // value. Then we also need to collect
+    // the two starting solutions in an STL
+    // vector of pointers field and to set up
+    // an instance of the <code>
+    // SineGordonOperation class </code>
+    // based on the finite element degree
+    // specified at the top of this file.
     VectorTools::interpolate (dof_handler,
                               ExactSolution<dim> (1, time),
                               solution);
@@ -650,39 +650,39 @@ namespace Step48
     SineGordonOperation<dim,fe_degree> sine_gordon_op (matrix_free_data,
                                                        time_step);
 
-                                     // Now loop over the time steps. In each
-                                     // iteration, we shift the solution
-                                     // vectors by one and call the <code>
-                                     // apply </code> function of the <code>
-                                     // SineGordonOperator </code>. Then, we
-                                     // write the solution to a file. We clock
-                                     // the wall times for the computational
-                                     // time needed as wall as the time needed
-                                     // to create the output and report the
-                                     // numbers when the time stepping is
-                                     // finished.
-                                     //
-                                     // Note how this shift is implemented: We
-                                     // simply call the swap method on the two
-                                     // vectors which swaps only some pointers
-                                     // without the need to copy data
-                                     // around. Obviously, this is a more
-                                     // efficient way to move data around. Let
-                                     // us see what happens in more detail:
-                                     // First, we exchange
-                                     // <code>old_solution</code> with
-                                     // <code>old_old_solution</code>, which
-                                     // means that
-                                     // <code>old_old_solution</code> gets
-                                     // <code>old_solution</code>, which is
-                                     // what we expect. Similarly,
-                                     // <code>old_solution</code> gets the
-                                     // content from <code>solution</code> in
-                                     // the next step. Afterward,
-                                     // <code>solution</code> holds
-                                     // <code>old_old_solution</code>, but
-                                     // that will be overwritten during this
-                                     // step.
+    // Now loop over the time steps. In each
+    // iteration, we shift the solution
+    // vectors by one and call the <code>
+    // apply </code> function of the <code>
+    // SineGordonOperator </code>. Then, we
+    // write the solution to a file. We clock
+    // the wall times for the computational
+    // time needed as wall as the time needed
+    // to create the output and report the
+    // numbers when the time stepping is
+    // finished.
+    //
+    // Note how this shift is implemented: We
+    // simply call the swap method on the two
+    // vectors which swaps only some pointers
+    // without the need to copy data
+    // around. Obviously, this is a more
+    // efficient way to move data around. Let
+    // us see what happens in more detail:
+    // First, we exchange
+    // <code>old_solution</code> with
+    // <code>old_old_solution</code>, which
+    // means that
+    // <code>old_old_solution</code> gets
+    // <code>old_solution</code>, which is
+    // what we expect. Similarly,
+    // <code>old_solution</code> gets the
+    // content from <code>solution</code> in
+    // the next step. Afterward,
+    // <code>solution</code> holds
+    // <code>old_old_solution</code>, but
+    // that will be overwritten during this
+    // step.
     unsigned int timestep_number = 1;
 
     Timer timer;
@@ -720,10 +720,10 @@ namespace Step48
 
 
 
-                                // @sect3{The <code>main</code> function}
+// @sect3{The <code>main</code> function}
 
-                                 // This is as in all other programs:
-int main (int argc, char ** argv)
+// This is as in all other programs:
+int main (int argc, char **argv)
 {
   using namespace Step48;
   using namespace dealii;

@@ -83,334 +83,334 @@ DEAL_II_NAMESPACE_OPEN
 namespace MemoryConsumption
 {
 
-                                   /**
-                                    * This function is the generic
-                                    * interface for determining the
-                                    * memory used by an object. If no
-                                    * specialization for the type
-                                    * <tt>T</tt> is specified, it will
-                                    * call the member function
-                                    * <tt>t.memory_consumption()</tt>.
-                                    *
-                                    * The library provides
-                                    * specializations for all basic
-                                    * C++ data types. Every additional
-                                    * type needs to have a member
-                                    * function memory_consumption()
-                                    * callable for constant objects to
-                                    * be used in this framework.
-                                    */
+  /**
+   * This function is the generic
+   * interface for determining the
+   * memory used by an object. If no
+   * specialization for the type
+   * <tt>T</tt> is specified, it will
+   * call the member function
+   * <tt>t.memory_consumption()</tt>.
+   *
+   * The library provides
+   * specializations for all basic
+   * C++ data types. Every additional
+   * type needs to have a member
+   * function memory_consumption()
+   * callable for constant objects to
+   * be used in this framework.
+   */
   template <typename T>
   inline
   std::size_t memory_consumption (const T &t);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a <tt>bool</tt>
-                                    * variable.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a <tt>bool</tt>
+   * variable.
+   */
   inline
   std::size_t memory_consumption (const bool);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a <tt>char</tt>
-                                    * variable.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a <tt>char</tt>
+   * variable.
+   */
   inline
   std::size_t memory_consumption (const char);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a
-                                    * <tt>short int</tt> variable.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a
+   * <tt>short int</tt> variable.
+   */
   inline
   std::size_t memory_consumption (const short int);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a
-                                    * <tt>short unsigned int</tt> variable.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a
+   * <tt>short unsigned int</tt> variable.
+   */
   inline
   std::size_t memory_consumption (const short unsigned int);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a <tt>int</tt>
-                                    * variable.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a <tt>int</tt>
+   * variable.
+   */
   inline
   std::size_t memory_consumption (const int);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a <tt>unsigned int</tt>
-                                    * variable.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a <tt>unsigned int</tt>
+   * variable.
+   */
   inline
   std::size_t memory_consumption (const unsigned int);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a <tt>float</tt>
-                                    * variable.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a <tt>float</tt>
+   * variable.
+   */
   inline
   std::size_t memory_consumption (const float);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a <tt>double</tt>
-                                    * variable.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a <tt>double</tt>
+   * variable.
+   */
   inline
   std::size_t memory_consumption (const double);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a <tt>long double</tt>
-                                    * variable.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a <tt>long double</tt>
+   * variable.
+   */
   inline
   std::size_t memory_consumption (const long double);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a <tt>std::complex</tt>
-                                    * variable.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a <tt>std::complex</tt>
+   * variable.
+   */
   template <typename T>
   inline
   std::size_t memory_consumption (const std::complex<T> &);
 
-                                   /**
-                                    * Determine an estimate of the
-                                    * amount of memory in bytes
-                                    * consumed by a <tt>std::string</tt>
-                                    * variable.
-                                    */
+  /**
+   * Determine an estimate of the
+   * amount of memory in bytes
+   * consumed by a <tt>std::string</tt>
+   * variable.
+   */
   inline
   std::size_t memory_consumption (const std::string &s);
 
-                                   /**
-                                    * Determine the amount of memory
-                                    * in bytes consumed by a
-                                    * <tt>std::vector</tt> of elements
-                                    * of type <tt>T</tt> by
-                                    * recursively calling
-                                    * memory_consumption() for each entry.
-                                    *
-                                    * This function loops over all
-                                    * entries of the vector and
-                                    * determines their sizes using
-                                    * memory_consumption() for each
-                                    * <tt>v[i]</tt>. If the entries
-                                    * are of constant size, there
-                                    * might be another global function
-                                    * memory_consumption() for this
-                                    * data type or if there is a
-                                    * member function of that class of
-                                    * that names that returns a
-                                    * constant value and the compiler
-                                    * will unroll this loop so that
-                                    * the operation is fast. If the
-                                    * size of the data elements is
-                                    * variable, for example if they do
-                                    * memory allocation themselves,
-                                    * then the operation will
-                                    * necessarily be more expensive.
-                                    *
-                                    * Using the algorithm, in
-                                    * particular the loop over all
-                                    * elements, it is possible to also
-                                    * compute the memory consumption
-                                    * of vectors of vectors, vectors
-                                    * of strings, etc, where the
-                                    * individual elements may have
-                                    * vastly different sizes.
-                                    *
-                                    * Note that this algorithm also
-                                    * takes into account the size of
-                                    * elements that are allocated by
-                                    * this vector but not currently
-                                    * used.
-                                    *
-                                    * For the most commonly used
-                                    * vectors, there are special
-                                    * functions that compute the size
-                                    * without a loop. This also
-                                    * applies for the special case of
-                                    * vectors of bools.
-                                    */
+  /**
+   * Determine the amount of memory
+   * in bytes consumed by a
+   * <tt>std::vector</tt> of elements
+   * of type <tt>T</tt> by
+   * recursively calling
+   * memory_consumption() for each entry.
+   *
+   * This function loops over all
+   * entries of the vector and
+   * determines their sizes using
+   * memory_consumption() for each
+   * <tt>v[i]</tt>. If the entries
+   * are of constant size, there
+   * might be another global function
+   * memory_consumption() for this
+   * data type or if there is a
+   * member function of that class of
+   * that names that returns a
+   * constant value and the compiler
+   * will unroll this loop so that
+   * the operation is fast. If the
+   * size of the data elements is
+   * variable, for example if they do
+   * memory allocation themselves,
+   * then the operation will
+   * necessarily be more expensive.
+   *
+   * Using the algorithm, in
+   * particular the loop over all
+   * elements, it is possible to also
+   * compute the memory consumption
+   * of vectors of vectors, vectors
+   * of strings, etc, where the
+   * individual elements may have
+   * vastly different sizes.
+   *
+   * Note that this algorithm also
+   * takes into account the size of
+   * elements that are allocated by
+   * this vector but not currently
+   * used.
+   *
+   * For the most commonly used
+   * vectors, there are special
+   * functions that compute the size
+   * without a loop. This also
+   * applies for the special case of
+   * vectors of bools.
+   */
   template <typename T>
   inline
   std::size_t memory_consumption (const std::vector<T> &v);
 
-                                   /**
-                                    * Estimate the amount of memory
-                                    * (in bytes) occupied by a
-                                    * C-style array. Since in this
-                                    * library we do not usually
-                                    * store simple data elements
-                                    * like <tt>double</tt>s in such
-                                    * arrays (but rather use STL
-                                    * <tt>std::vector</tt>s or deal.II
-                                    * <tt>Vector</tt> objects), we do not
-                                    * provide specializations like
-                                    * for the <tt>std::vector</tt> arrays, but
-                                    * always use the loop over all
-                                    * elements.
-                                    */
+  /**
+   * Estimate the amount of memory
+   * (in bytes) occupied by a
+   * C-style array. Since in this
+   * library we do not usually
+   * store simple data elements
+   * like <tt>double</tt>s in such
+   * arrays (but rather use STL
+   * <tt>std::vector</tt>s or deal.II
+   * <tt>Vector</tt> objects), we do not
+   * provide specializations like
+   * for the <tt>std::vector</tt> arrays, but
+   * always use the loop over all
+   * elements.
+   */
   template <typename T, int N>
   inline
   std::size_t memory_consumption (const T (&v)[N]);
 
-                                   /**
-                                    * Specialization of the
-                                    * determination of the memory
-                                    * consumption of a vector, here
-                                    * for a vector of <tt>bool</tt>s.
-                                    *
-                                    * This is a special case, as the
-                                    * bools are not stored
-                                    * one-by-one, but as a bit
-                                    * field.
-                                    */
+  /**
+   * Specialization of the
+   * determination of the memory
+   * consumption of a vector, here
+   * for a vector of <tt>bool</tt>s.
+   *
+   * This is a special case, as the
+   * bools are not stored
+   * one-by-one, but as a bit
+   * field.
+   */
   inline
   std::size_t memory_consumption (const std::vector<bool> &v);
 
-                                   /**
-                                    * Specialization of the
-                                    * determination of the memory
-                                    * consumption of a vector, here
-                                    * for a vector of <tt>int</tt>s.
-                                    */
+  /**
+   * Specialization of the
+   * determination of the memory
+   * consumption of a vector, here
+   * for a vector of <tt>int</tt>s.
+   */
   inline
   std::size_t memory_consumption (const std::vector<int> &v);
 
-                                   /**
-                                    * Specialization of the
-                                    * determination of the memory
-                                    * consumption of a vector, here
-                                    * for a vector of <tt>double</tt>s.
-                                    */
+  /**
+   * Specialization of the
+   * determination of the memory
+   * consumption of a vector, here
+   * for a vector of <tt>double</tt>s.
+   */
   inline
   std::size_t memory_consumption (const std::vector<double> &v);
 
-                                   /**
-                                    * Specialization of the
-                                    * determination of the memory
-                                    * consumption of a vector, here
-                                    * for a vector of <tt>float</tt>s.
-                                    */
+  /**
+   * Specialization of the
+   * determination of the memory
+   * consumption of a vector, here
+   * for a vector of <tt>float</tt>s.
+   */
   inline
   std::size_t memory_consumption (const std::vector<float> &v);
 
-                                   /**
-                                    * Specialization of the
-                                    * determination of the memory
-                                    * consumption of a vector, here
-                                    * for a vector of <tt>char</tt>s.
-                                    */
+  /**
+   * Specialization of the
+   * determination of the memory
+   * consumption of a vector, here
+   * for a vector of <tt>char</tt>s.
+   */
   inline
   std::size_t memory_consumption (const std::vector<char> &v);
 
-                                   /**
-                                    * Specialization of the
-                                    * determination of the memory
-                                    * consumption of a vector, here
-                                    * for a vector of <tt>unsigned char</tt>s.
-                                    */
+  /**
+   * Specialization of the
+   * determination of the memory
+   * consumption of a vector, here
+   * for a vector of <tt>unsigned char</tt>s.
+   */
   inline
   std::size_t memory_consumption (const std::vector<unsigned char> &v);
 
-                                   /**
-                                    * Specialization of the
-                                    * determination of the memory
-                                    * consumption of a vector, here
-                                    * for a vector of pointers.
-                                    */
+  /**
+   * Specialization of the
+   * determination of the memory
+   * consumption of a vector, here
+   * for a vector of pointers.
+   */
   template <typename T>
   inline
   std::size_t memory_consumption (const std::vector<T *> &v);
 
-                                   /**
-                                    * Specialization of the
-                                    * determination of the memory
-                                    * consumption of a vector, here
-                                    * for a vector of strings. This
-                                    * function is not necessary from a
-                                    * strict C++ viewpoint, since it
-                                    * could be generated, but is
-                                    * necessary for compatibility with
-                                    * IBM's xlC 5.0 compiler, and
-                                    * doesn't harm for other compilers
-                                    * as well.
-                                    */
+  /**
+   * Specialization of the
+   * determination of the memory
+   * consumption of a vector, here
+   * for a vector of strings. This
+   * function is not necessary from a
+   * strict C++ viewpoint, since it
+   * could be generated, but is
+   * necessary for compatibility with
+   * IBM's xlC 5.0 compiler, and
+   * doesn't harm for other compilers
+   * as well.
+   */
   std::size_t memory_consumption (const std::vector<std::string> &v);
 
 
-                                   /**
-                                    * Determine an estimate of the
-                                    * amount of memory in bytes
-                                    * consumed by a pair of values.
-                                    */
+  /**
+   * Determine an estimate of the
+   * amount of memory in bytes
+   * consumed by a pair of values.
+   */
   template <typename A, typename B>
   inline
   std::size_t memory_consumption (const std::pair<A,B> &p);
 
-                                   /**
-                                    * Return the amount of memory
-                                    * used by a pointer.
-                                    *
-                                    * @note This returns the size of
-                                    * the pointer, not of the object
-                                    * pointed to.
-                                    */
+  /**
+   * Return the amount of memory
+   * used by a pointer.
+   *
+   * @note This returns the size of
+   * the pointer, not of the object
+   * pointed to.
+   */
   template <typename T>
   inline
-  std::size_t memory_consumption (const T * const);
+  std::size_t memory_consumption (const T *const);
 
-                                   /**
-                                    * Return the amount of memory
-                                    * used by a pointer.
-                                    *
-                                    * @note This returns the size of
-                                    * the pointer, not of the object
-                                    * pointed to.
-                                    */
+  /**
+   * Return the amount of memory
+   * used by a pointer.
+   *
+   * @note This returns the size of
+   * the pointer, not of the object
+   * pointed to.
+   */
   template <typename T>
   inline
-  std::size_t memory_consumption (T * const);
+  std::size_t memory_consumption (T *const);
 
-                                   /**
-                                    * Return the amount of memory
-                                    * used by a void pointer.
-                                    *
-                                    * Note that we needed this
-                                    * function since <tt>void</tt> is no
-                                    * type and a <tt>void*</tt> is thus
-                                    * not caught by the general
-                                    * <tt>T*</tt> template function
-                                    * above.
-                                    *
-                                    * @note This returns the size of
-                                    * the pointer, not of the object
-                                    * pointed to.
-                                    */
+  /**
+   * Return the amount of memory
+   * used by a void pointer.
+   *
+   * Note that we needed this
+   * function since <tt>void</tt> is no
+   * type and a <tt>void*</tt> is thus
+   * not caught by the general
+   * <tt>T*</tt> template function
+   * above.
+   *
+   * @note This returns the size of
+   * the pointer, not of the object
+   * pointed to.
+   */
   inline
-  std::size_t memory_consumption (void * const);
+  std::size_t memory_consumption (void *const);
 
-                                   /**
-                                    * Return the amount of memory used
-                                    * by a shared pointer.
-                                    *
-                                    * @note This returns the size of
-                                    * the pointer, not of the object
-                                    * pointed to.
-                                    */
+  /**
+   * Return the amount of memory used
+   * by a shared pointer.
+   *
+   * @note This returns the size of
+   * the pointer, not of the object
+   * pointed to.
+   */
   template <typename T>
   inline
   std::size_t memory_consumption (const std_cxx1x::shared_ptr<T> &);
@@ -610,9 +610,9 @@ namespace MemoryConsumption
   template <typename T>
   inline
   std::size_t
-  memory_consumption (const T * const)
+  memory_consumption (const T *const)
   {
-    return sizeof(T*);
+    return sizeof(T *);
   }
 
 
@@ -620,18 +620,18 @@ namespace MemoryConsumption
   template <typename T>
   inline
   std::size_t
-  memory_consumption (T * const)
+  memory_consumption (T *const)
   {
-    return sizeof(T*);
+    return sizeof(T *);
   }
 
 
 
   inline
   std::size_t
-  memory_consumption (void * const)
+  memory_consumption (void *const)
   {
-    return sizeof(void*);
+    return sizeof(void *);
   }
 
 

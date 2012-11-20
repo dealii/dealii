@@ -34,106 +34,106 @@ namespace internal
   {
     struct NumberCache;
 
-                                     /**
-                                      * A namespace in which we define
-                                      * classes that describe how to
-                                      * distribute and renumber
-                                      * degrees of freedom.
-                                      */
+    /**
+     * A namespace in which we define
+     * classes that describe how to
+     * distribute and renumber
+     * degrees of freedom.
+     */
     namespace Policy
     {
       struct Implementation;
 
-                                       /**
-                                        * A class that implements policies for
-                                        * how the DoFHandler::distribute_dofs
-                                        * and DoFHandler::renumber_dofs
-                                        * functions should work.
-                                        */
+      /**
+       * A class that implements policies for
+       * how the DoFHandler::distribute_dofs
+       * and DoFHandler::renumber_dofs
+       * functions should work.
+       */
       template <int dim, int spacedim>
       class PolicyBase
       {
-        public:
-                                           /**
-                                            * Destructor.
-                                            */
-          virtual ~PolicyBase ();
+      public:
+        /**
+         * Destructor.
+         */
+        virtual ~PolicyBase ();
 
-                                           /**
-                                            * Distribute degrees of freedom on
-                                            * the object given as last argument.
-                                            */
-          virtual
-          NumberCache
-          distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const = 0;
+        /**
+         * Distribute degrees of freedom on
+         * the object given as last argument.
+         */
+        virtual
+        NumberCache
+        distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const = 0;
 
-                                           /**
-                                            * Renumber degrees of freedom as
-                                            * specified by the first argument.
-                                            */
-          virtual
-          NumberCache
-          renumber_dofs (const std::vector<unsigned int>  &new_numbers,
-                         dealii::DoFHandler<dim,spacedim> &dof_handler) const = 0;
+        /**
+         * Renumber degrees of freedom as
+         * specified by the first argument.
+         */
+        virtual
+        NumberCache
+        renumber_dofs (const std::vector<unsigned int> &new_numbers,
+                       dealii::DoFHandler<dim,spacedim> &dof_handler) const = 0;
       };
 
 
-                                       /**
-                                        * This class implements the
-                                        * default policy for sequential
-                                        * operations, i.e. for the case where
-                                        * all cells get degrees of freedom.
-                                        */
+      /**
+       * This class implements the
+       * default policy for sequential
+       * operations, i.e. for the case where
+       * all cells get degrees of freedom.
+       */
       template <int dim, int spacedim>
       class Sequential : public PolicyBase<dim,spacedim>
       {
-        public:
-                                           /**
-                                            * Distribute degrees of freedom on
-                                            * the object given as last argument.
-                                            */
-          virtual
-          NumberCache
-          distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const;
+      public:
+        /**
+         * Distribute degrees of freedom on
+         * the object given as last argument.
+         */
+        virtual
+        NumberCache
+        distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const;
 
-                                           /**
-                                            * Renumber degrees of freedom as
-                                            * specified by the first argument.
-                                            */
-          virtual
-          NumberCache
-          renumber_dofs (const std::vector<unsigned int>  &new_numbers,
-                         dealii::DoFHandler<dim,spacedim> &dof_handler) const;
+        /**
+         * Renumber degrees of freedom as
+         * specified by the first argument.
+         */
+        virtual
+        NumberCache
+        renumber_dofs (const std::vector<unsigned int> &new_numbers,
+                       dealii::DoFHandler<dim,spacedim> &dof_handler) const;
       };
 
 
-                                       /**
-                                        * This class implements the
-                                        * policy for operations when
-                                        * we use a
-                                        * parallel::distributed::Triangulation
-                                        * object.
-                                        */
+      /**
+       * This class implements the
+       * policy for operations when
+       * we use a
+       * parallel::distributed::Triangulation
+       * object.
+       */
       template <int dim, int spacedim>
       class ParallelDistributed : public PolicyBase<dim,spacedim>
       {
-        public:
-                                           /**
-                                            * Distribute degrees of freedom on
-                                            * the object given as last argument.
-                                            */
-          virtual
-          NumberCache
-          distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const;
+      public:
+        /**
+         * Distribute degrees of freedom on
+         * the object given as last argument.
+         */
+        virtual
+        NumberCache
+        distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const;
 
-                                           /**
-                                            * Renumber degrees of freedom as
-                                            * specified by the first argument.
-                                            */
-          virtual
-          NumberCache
-          renumber_dofs (const std::vector<unsigned int>  &new_numbers,
-                         dealii::DoFHandler<dim,spacedim> &dof_handler) const;
+        /**
+         * Renumber degrees of freedom as
+         * specified by the first argument.
+         */
+        virtual
+        NumberCache
+        renumber_dofs (const std::vector<unsigned int> &new_numbers,
+                       dealii::DoFHandler<dim,spacedim> &dof_handler) const;
       };
     }
   }

@@ -32,74 +32,74 @@ namespace internal
   {
 
 
-/**
- * Structure for storing degree of freedom information for cells,
- * organized by levels.
- *
- * We store are cached values for the DoF indices on
- * each cell in#cell_dof_indices_cache, since this is a frequently requested operation. The
- * values are set by DoFCellAccessor::update_cell_dof_indices_cache
- * and are used by DoFCellAccessor::get_dof_indices.
- *
- * Note that vertices are separate from, and in fact have nothing to
- * do with cells. The indices of degrees of freedom located on
- * vertices therefore are not stored here, but rather in member
- * variables of the dealii::DoFHandler class.
- *
- * The indices of degrees of freedom located on lower dimensional
- * objects, i.e. on lines for 2D and on quads and lines for 3D are
- * treated similarly than that on cells. However, theses geometrical
- * objects, which are called faces as a generalisation, are not
- * organised in a hierarchical structure of levels. Therefore, the
- * degrees of freedom located on these objects are stored in separate
- * classes, namely the <tt>DoFFaces</tt> classes.
- *
- * Access to this object is usually
- * through the DoFAccessor::set_dof_index() and
- * DoFAccessor::dof_index() functions or similar functions of derived
- * classes that in turn access the member variables using the
- * DoFHandler::get_dof_index() and corresponding setter functions.
- * Knowledge of the actual data format is therefore
- * encapsulated to the present hierarchy of classes as well as the
- * dealii::DoFHandler class.
- *
- * @author Wolfgang Bangerth, 1998, 2006, Guido Kanschat, 2012
- */
+    /**
+     * Structure for storing degree of freedom information for cells,
+     * organized by levels.
+     *
+     * We store are cached values for the DoF indices on
+     * each cell in#cell_dof_indices_cache, since this is a frequently requested operation. The
+     * values are set by DoFCellAccessor::update_cell_dof_indices_cache
+     * and are used by DoFCellAccessor::get_dof_indices.
+     *
+     * Note that vertices are separate from, and in fact have nothing to
+     * do with cells. The indices of degrees of freedom located on
+     * vertices therefore are not stored here, but rather in member
+     * variables of the dealii::DoFHandler class.
+     *
+     * The indices of degrees of freedom located on lower dimensional
+     * objects, i.e. on lines for 2D and on quads and lines for 3D are
+     * treated similarly than that on cells. However, theses geometrical
+     * objects, which are called faces as a generalisation, are not
+     * organised in a hierarchical structure of levels. Therefore, the
+     * degrees of freedom located on these objects are stored in separate
+     * classes, namely the <tt>DoFFaces</tt> classes.
+     *
+     * Access to this object is usually
+     * through the DoFAccessor::set_dof_index() and
+     * DoFAccessor::dof_index() functions or similar functions of derived
+     * classes that in turn access the member variables using the
+     * DoFHandler::get_dof_index() and corresponding setter functions.
+     * Knowledge of the actual data format is therefore
+     * encapsulated to the present hierarchy of classes as well as the
+     * dealii::DoFHandler class.
+     *
+     * @author Wolfgang Bangerth, 1998, 2006, Guido Kanschat, 2012
+     */
     template <int dim>
     class DoFLevel
     {
-      public:
-                                         /**
-                                          * Cache for the DoF indices
-                                          * on cells. The size of this
-                                          * array equals the number of
-                                          * cells on a given level
-                                          * times
-                                          * selected_fe.dofs_per_cell.
-                                          */
-        std::vector<unsigned int> cell_dof_indices_cache;
+    public:
+      /**
+       * Cache for the DoF indices
+       * on cells. The size of this
+       * array equals the number of
+       * cells on a given level
+       * times
+       * selected_fe.dofs_per_cell.
+       */
+      std::vector<unsigned int> cell_dof_indices_cache;
 
-					 /**
-					  * The object containing dof-indices
-					  * and related access-functions
-					  */
-        DoFObjects<dim> dof_object;
+      /**
+       * The object containing dof-indices
+       * and related access-functions
+       */
+      DoFObjects<dim> dof_object;
 
 
-                                         /**
-                                          * Determine an estimate for the
-                                          * memory consumption (in bytes)
-                                          * of this object.
-                                          */
-        std::size_t memory_consumption () const;
+      /**
+       * Determine an estimate for the
+       * memory consumption (in bytes)
+       * of this object.
+       */
+      std::size_t memory_consumption () const;
 
-        /**
-         * Read or write the data of this object to or
-         * from a stream for the purpose of serialization
-         */
-        template <class Archive>
-        void serialize(Archive & ar,
-                       const unsigned int version);
+      /**
+       * Read or write the data of this object to or
+       * from a stream for the purpose of serialization
+       */
+      template <class Archive>
+      void serialize(Archive &ar,
+                     const unsigned int version);
     };
 
 
@@ -118,10 +118,10 @@ namespace internal
     inline
     void
     DoFLevel<dim>::serialize (Archive &ar,
-			      const unsigned int)
+                              const unsigned int)
     {
-      ar & cell_dof_indices_cache;
-      ar & dof_object;
+      ar &cell_dof_indices_cache;
+      ar &dof_object;
     }
   }
 }

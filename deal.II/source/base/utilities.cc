@@ -71,8 +71,8 @@ namespace Utilities
   int_to_string (const unsigned int i,
                  const unsigned int digits)
   {
-                                     // if second argument is invalid, then do
-                                     // not pad the resulting string at all
+    // if second argument is invalid, then do
+    // not pad the resulting string at all
     if (digits == numbers::invalid_unsigned_int)
       return int_to_string (i, needed_digits(i));
 
@@ -88,21 +88,21 @@ namespace Utilities
     std::string s;
     switch (digits)
       {
-        case 6:
-              s += '0' + i/100000;
-        case 5:
-              s += '0' + (i%100000)/10000;
-        case 4:
-              s += '0' + (i%10000)/1000;
-        case 3:
-              s += '0' + (i%1000)/100;
-        case 2:
-              s += '0' + (i%100)/10;
-        case 1:
-              s += '0' + i%10;
-              break;
-        default:
-              s += "invalid digits information";
+      case 6:
+        s += '0' + i/100000;
+      case 5:
+        s += '0' + (i%100000)/10000;
+      case 4:
+        s += '0' + (i%10000)/1000;
+      case 3:
+        s += '0' + (i%1000)/100;
+      case 2:
+        s += '0' + (i%100)/10;
+      case 1:
+        s += '0' + i%10;
+        break;
+      default:
+        s += "invalid digits information";
       };
     return s;
   }
@@ -137,9 +137,9 @@ namespace Utilities
 
     int i = std::numeric_limits<int>::max();
     ss >> i;
-                                     // check for errors
+    // check for errors
     AssertThrow (i != std::numeric_limits<int>::max(),
-		 ExcCantConvertString (s));
+                 ExcCantConvertString (s));
 
 //TODO: The test for errors above doesn't work, as can easily be
 //verified. furthermore, it doesn't catch cases like when calling
@@ -170,9 +170,9 @@ namespace Utilities
     double i = std::numeric_limits<double>::max();
     ss >> i;
 
-                                     // check for errors
+    // check for errors
     AssertThrow (i != std::numeric_limits<double>::max(),
-		 ExcCantConvertString (s));
+                 ExcCantConvertString (s));
 
 //TODO: The test for errors above doesn't work, as can easily be
 //verified. furthermore, it doesn't catch cases like when calling
@@ -203,7 +203,7 @@ namespace Utilities
     std::vector<std::string> split_list;
     split_list.reserve (std::count (tmp.begin(), tmp.end(), delimiter)+1);
 
-                                     // split the input list
+    // split the input list
     while (tmp.length() != 0)
       {
         std::string name;
@@ -240,15 +240,15 @@ namespace Utilities
     std::string              text = original_text;
     std::vector<std::string> lines;
 
-                                     // remove trailing spaces
+    // remove trailing spaces
     while ((text.length() != 0) && (text[text.length()-1] == delimiter))
       text.erase(text.length()-1,1);
 
-                                     // then split the text into lines
+    // then split the text into lines
     while (text.length() != 0)
       {
-                                         // in each iteration, first remove
-                                         // leading spaces
+        // in each iteration, first remove
+        // leading spaces
         while ((text.length() != 0) && (text[0] == delimiter))
           text.erase(0, 1);
 
@@ -263,12 +263,12 @@ namespace Utilities
             continue;
           }
 
-                                         // if we can fit everything into one
-                                         // line, then do so. otherwise, we have
-                                         // to keep breaking
+        // if we can fit everything into one
+        // line, then do so. otherwise, we have
+        // to keep breaking
         if (text.length() < width)
           {
-                                             // remove trailing spaces
+            // remove trailing spaces
             while ((text.length() != 0) && (text[text.length()-1] == delimiter))
               text.erase(text.length()-1,1);
             lines.push_back (text);
@@ -276,16 +276,16 @@ namespace Utilities
           }
         else
           {
-                                             // starting at position width, find the
-                                             // location of the previous space, so
-                                             // that we can break around there
+            // starting at position width, find the
+            // location of the previous space, so
+            // that we can break around there
             int location = std::min<int>(width,text.length()-1);
             for (; location>0; --location)
               if (text[location] == delimiter)
                 break;
 
-                                             // if there are no spaces, then try if
-                                             // there are spaces coming up
+            // if there are no spaces, then try if
+            // there are spaces coming up
             if (location == 0)
               for (location = std::min<int>(width,text.length()-1);
                    location<static_cast<int>(text.length());
@@ -293,9 +293,9 @@ namespace Utilities
                 if (text[location] == delimiter)
                   break;
 
-                                             // now take the text up to the found
-                                             // location and put it into a single
-                                             // line, and remove it from 'text'
+            // now take the text up to the found
+            // location and put it into a single
+            // line, and remove it from 'text'
             std::string line (text, 0, location);
             while ((line.length() != 0) && (line[line.length()-1] == delimiter))
               line.erase(line.length()-1,1);
@@ -339,10 +339,10 @@ namespace Utilities
     int i;
     if (str >> i)
       {
-                                         // compute the number of
-                                         // digits of i. assuming it
-                                         // is less than 8 is likely
-                                         // ok
+        // compute the number of
+        // digits of i. assuming it
+        // is less than 8 is likely
+        // ok
         if (i<10)
           return std::make_pair (i, 1U);
         else if (i<100)
@@ -373,7 +373,7 @@ namespace Utilities
   generate_normal_random_number (const double a,
                                  const double sigma)
   {
-                                     // if no noise: return now
+    // if no noise: return now
     if (sigma == 0)
       return a;
 
@@ -384,10 +384,10 @@ namespace Utilities
     const double y = 1.0*rand()/RAND_MAX;
 #endif
 
-                                     // find x such that y=erf(x). do so
-                                     // using a Newton method to find
-                                     // the zero of F(x)=erf(x)-y. start
-                                     // at x=0
+    // find x such that y=erf(x). do so
+    // using a Newton method to find
+    // the zero of F(x)=erf(x)-y. start
+    // at x=0
     double x = 0;
     unsigned int iteration = 0;
     while (true)
@@ -401,8 +401,8 @@ namespace Utilities
                                std::exp(-x*x/sigma/sigma/2);
         x += -residual / F_prime;
 
-                                         // make sure that we don't
-                                         // recurse endlessly
+        // make sure that we don't
+        // recurse endlessly
         ++iteration;
         Assert (iteration < 20, ExcInternalError());
       };
@@ -438,8 +438,8 @@ namespace Utilities
         out[permutation[i]] = i;
       }
 
-                                     // check that we have actually reached
-                                     // all indices
+    // check that we have actually reached
+    // all indices
     for (unsigned int i=0; i<n; ++i)
       Assert (out[i] != numbers::invalid_unsigned_int,
               ExcMessage ("The given input permutation had duplicate entries!"));
@@ -477,13 +477,13 @@ namespace Utilities
 
 
 
-    void get_memory_stats (MemoryStats & stats)
+    void get_memory_stats (MemoryStats &stats)
     {
       stats.VmPeak = stats.VmSize = stats.VmHWM = stats.VmRSS = 0;
 
-                                       // parsing /proc/self/stat would be a
-                                       // lot easier, but it does not contain
-                                       // VmHWM, so we use /status instead.
+      // parsing /proc/self/stat would be a
+      // lot easier, but it does not contain
+      // VmHWM, so we use /status instead.
 #if defined(__linux__)
       std::ifstream file("/proc/self/status");
       std::string line;
@@ -568,7 +568,7 @@ namespace Utilities
 
     void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
                                               double my_value,
-                                              MinMaxAvg & result)
+                                              MinMaxAvg &result)
     {
       result = Utilities::MPI::min_max_avg (my_value,
                                             mpi_communicator);
@@ -582,15 +582,15 @@ namespace Utilities
 
   namespace Trilinos
   {
-    const Epetra_Comm&
+    const Epetra_Comm &
     comm_world()
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       static Teuchos::RCP<Epetra_MpiComm>
-        communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_WORLD), true);
+      communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_WORLD), true);
 #else
       static Teuchos::RCP<Epetra_SerialComm>
-        communicator = Teuchos::rcp (new Epetra_SerialComm (), true);
+      communicator = Teuchos::rcp (new Epetra_SerialComm (), true);
 #endif
 
       return *communicator;
@@ -598,15 +598,15 @@ namespace Utilities
 
 
 
-    const Epetra_Comm&
+    const Epetra_Comm &
     comm_self()
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       static Teuchos::RCP<Epetra_MpiComm>
-        communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_SELF), true);
+      communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_SELF), true);
 #else
       static Teuchos::RCP<Epetra_SerialComm>
-        communicator = Teuchos::rcp (new Epetra_SerialComm (), true);
+      communicator = Teuchos::rcp (new Epetra_SerialComm (), true);
 #endif
 
       return *communicator;
@@ -619,24 +619,24 @@ namespace Utilities
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 
-                                       // see if the communicator is in fact a
-                                       // parallel MPI communicator; if so,
-                                       // return a duplicate of it
+      // see if the communicator is in fact a
+      // parallel MPI communicator; if so,
+      // return a duplicate of it
       const Epetra_MpiComm
-        *mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&communicator);
+      *mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&communicator);
       if (mpi_comm != 0)
         return new Epetra_MpiComm(Utilities::System::
                                   duplicate_communicator(mpi_comm->GetMpiComm()));
 #endif
 
-                                       // if we don't support MPI, or if the
-                                       // communicator in question was in fact
-                                       // not an MPI communicator, return a
-                                       // copy of the same object again
-      Assert (dynamic_cast<const Epetra_SerialComm*>(&communicator)
+      // if we don't support MPI, or if the
+      // communicator in question was in fact
+      // not an MPI communicator, return a
+      // copy of the same object again
+      Assert (dynamic_cast<const Epetra_SerialComm *>(&communicator)
               != 0,
               ExcInternalError());
-      return new Epetra_SerialComm(dynamic_cast<const Epetra_SerialComm&>(communicator));
+      return new Epetra_SerialComm(dynamic_cast<const Epetra_SerialComm &>(communicator));
     }
 
 
@@ -645,14 +645,14 @@ namespace Utilities
     {
       Assert (&communicator != 0, ExcInternalError());
 
-                                       // save the communicator, reset
-                                       // the map, and delete the
-                                       // communicator if this whole
-                                       // thing was created as an MPI
-                                       // communicator
+      // save the communicator, reset
+      // the map, and delete the
+      // communicator if this whole
+      // thing was created as an MPI
+      // communicator
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       Epetra_MpiComm
-        *mpi_comm = dynamic_cast<Epetra_MpiComm *>(&communicator);
+      *mpi_comm = dynamic_cast<Epetra_MpiComm *>(&communicator);
       if (mpi_comm != 0)
         {
           MPI_Comm comm = mpi_comm->GetMpiComm();
@@ -683,11 +683,11 @@ namespace Utilities
     {
       if (map.LinearMap() == true)
         {
-                                           // each processor stores a
-                                           // contiguous range of
-                                           // elements in the
-                                           // following constructor
-                                           // call
+          // each processor stores a
+          // contiguous range of
+          // elements in the
+          // following constructor
+          // call
           return Epetra_Map (map.NumGlobalElements(),
                              map.NumMyElements(),
                              map.IndexBase(),
@@ -695,8 +695,8 @@ namespace Utilities
         }
       else
         {
-                                           // the range is not
-                                           // contiguous
+          // the range is not
+          // contiguous
           return Epetra_Map (map.NumGlobalElements(),
                              map.NumMyElements(),
                              map.MyGlobalElements (),

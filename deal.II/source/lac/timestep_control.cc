@@ -40,7 +40,7 @@ TimestepControl::TimestepControl (double start,
 
 
 
-void TimestepControl::declare_parameters (ParameterHandler& param)
+void TimestepControl::declare_parameters (ParameterHandler &param)
 {
   param.declare_entry ("Start", "0.", Patterns::Double());
   param.declare_entry ("Final", "1.", Patterns::Double());
@@ -55,7 +55,7 @@ void TimestepControl::declare_parameters (ParameterHandler& param)
 
 
 
-void TimestepControl::parse_parameters (ParameterHandler& param)
+void TimestepControl::parse_parameters (ParameterHandler &param)
 {
   start (param.get_double ("Start"));
   start_step (param.get_double ("First step"));
@@ -79,8 +79,8 @@ TimestepControl::advance ()
   bool changed = false;
   double s = step_val;
 
-                                   // Do time step control, but not in
-                                   // first step.
+  // Do time step control, but not in
+  // first step.
   if (now_val != start())
     {
       if (strategy_val == doubling && 2*s <= tolerance_val)
@@ -89,19 +89,19 @@ TimestepControl::advance ()
         s = max_step_val;
     }
 
-                                   // Try incrementing time by s
+  // Try incrementing time by s
   double h = now_val + s;
   changed = s != step_val;
 
   step_val = s;
   current_step_val = s;
-                                   // If we just missed the final
-                                   // time, increase the step size a
-                                   // bit. This way, we avoid a very
-                                   // small final step. If the step
-                                   // shot over the final time, adjust
-                                   // it so we hit the final time
-                                   // exactly.
+  // If we just missed the final
+  // time, increase the step size a
+  // bit. This way, we avoid a very
+  // small final step. If the step
+  // shot over the final time, adjust
+  // it so we hit the final time
+  // exactly.
   double s1 = .01*s;
   if (h > final_val-s1)
     {

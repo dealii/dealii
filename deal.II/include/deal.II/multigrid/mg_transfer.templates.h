@@ -28,18 +28,18 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-                                     /**
-                                      * Adjust vectors on all levels to
-                                      * correct size.  Here, we just
-                                      * count the numbers of degrees
-                                      * of freedom on each level and
-                                      * @p reinit each level vector
-                                      * to this length.
-                                      * For compatibility reasons with
-                                      * the next function
-                                      * the target_component is added
-                                      * here but is not used.
-                                      */
+  /**
+   * Adjust vectors on all levels to
+   * correct size.  Here, we just
+   * count the numbers of degrees
+   * of freedom on each level and
+   * @p reinit each level vector
+   * to this length.
+   * For compatibility reasons with
+   * the next function
+   * the target_component is added
+   * here but is not used.
+   */
   template <int dim, typename number, int spacedim>
   void
   reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
@@ -47,7 +47,7 @@ namespace
                  MGLevelObject<dealii::Vector<number> > &v)
   {
     for (unsigned int level=v.get_minlevel();
-         level<=v.get_maxlevel();++level)
+         level<=v.get_maxlevel(); ++level)
       {
         unsigned int n = mg_dof.n_dofs (level);
         v[level].reinit(n);
@@ -56,16 +56,16 @@ namespace
   }
 
 
-                                     /**
-                                      * Adjust vectors on all levels to
-                                      * correct size.  Here, we just
-                                      * count the numbers of degrees
-                                      * of freedom on each level and
-                                      * @p reinit each level vector
-                                      * to this length. The target_component
-                                      * is handed to MGTools::count_dofs_per_block.
-                                      * See for documentation there.
-                                      */
+  /**
+   * Adjust vectors on all levels to
+   * correct size.  Here, we just
+   * count the numbers of degrees
+   * of freedom on each level and
+   * @p reinit each level vector
+   * to this length. The target_component
+   * is handed to MGTools::count_dofs_per_block.
+   * See for documentation there.
+   */
   template <int dim, typename number, int spacedim>
   void
   reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
@@ -76,7 +76,7 @@ namespace
     if (target_component.size()==0)
       {
         target_component.resize(n_blocks);
-        for (unsigned int i=0;i<n_blocks;++i)
+        for (unsigned int i=0; i<n_blocks; ++i)
           target_component[i] = i;
       }
     Assert(target_component.size()==n_blocks,
@@ -87,12 +87,12 @@ namespace
     const unsigned int n_target_blocks = max_block + 1;
 
     std::vector<std::vector<unsigned int> >
-      ndofs(mg_dof.get_tria().n_levels(),
-            std::vector<unsigned int>(n_target_blocks));
+    ndofs(mg_dof.get_tria().n_levels(),
+          std::vector<unsigned int>(n_target_blocks));
     MGTools::count_dofs_per_block (mg_dof, ndofs, target_component);
 
     for (unsigned int level=v.get_minlevel();
-         level<=v.get_maxlevel();++level)
+         level<=v.get_maxlevel(); ++level)
       {
         v[level].reinit(n_target_blocks);
         for (unsigned int b=0; b<n_target_blocks; ++b)
@@ -113,31 +113,31 @@ template <class VECTOR>
 template <int dim, class InVector, int spacedim>
 void
 MGTransferPrebuilt<VECTOR>::copy_to_mg (
-  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
-  MGLevelObject<VECTOR>& dst,
-  const InVector& src) const
+  const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  MGLevelObject<VECTOR> &dst,
+  const InVector &src) const
 {
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
   bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
+  for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level != 0;)
     {
       --level;
-      VECTOR& dst_level = dst[level];
+      VECTOR &dst_level = dst[level];
 
       typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
       for (IT i= copy_indices[level].begin();
-           i != copy_indices[level].end();++i)
+           i != copy_indices[level].end(); ++i)
         dst_level(i->second) = src(i->first);
 
-                                       // For non-DG: degrees of
-                                       // freedom in the refinement
-                                       // face may need special
-                                       // attention, since they belong
-                                       // to the coarse level, but
-                                       // have fine level basis
-                                       // functions
+      // For non-DG: degrees of
+      // freedom in the refinement
+      // face may need special
+      // attention, since they belong
+      // to the coarse level, but
+      // have fine level basis
+      // functions
       if (!first)
-       restrict_and_add (level+1, dst[level], dst[level+1]);
+        restrict_and_add (level+1, dst[level], dst[level+1]);
 
       first = false;
     }
@@ -149,26 +149,26 @@ template <class VECTOR>
 template <int dim, class OutVector, int spacedim>
 void
 MGTransferPrebuilt<VECTOR>::copy_from_mg(
-  const MGDoFHandler<dim,spacedim>&       mg_dof_handler,
-  OutVector&                     dst,
-  const MGLevelObject<VECTOR>& src) const
+  const MGDoFHandler<dim,spacedim>       &mg_dof_handler,
+  OutVector                     &dst,
+  const MGLevelObject<VECTOR> &src) const
 {
-                                       // For non-DG: degrees of
-                                       // freedom in the refinement
-                                       // face may need special
-                                       // attention, since they belong
-                                       // to the coarse level, but
-                                       // have fine level basis
-                                       // functions
+  // For non-DG: degrees of
+  // freedom in the refinement
+  // face may need special
+  // attention, since they belong
+  // to the coarse level, but
+  // have fine level basis
+  // functions
   dst = 0;
-  for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
-  {
-    typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
+  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+    {
+      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
 
-    for (IT i= copy_indices[level].begin();
-         i != copy_indices[level].end();++i)
-      dst(i->first) = src[level](i->second);
-  }
+      for (IT i= copy_indices[level].begin();
+           i != copy_indices[level].end(); ++i)
+        dst(i->first) = src[level](i->second);
+    }
   if (constraints != 0)
     constraints->condense(dst);
 }
@@ -179,24 +179,24 @@ template <class VECTOR>
 template <int dim, class OutVector, int spacedim>
 void
 MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
-  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
+  const MGDoFHandler<dim,spacedim> &mg_dof_handler,
   OutVector                            &dst,
   const MGLevelObject<VECTOR> &src) const
 {
-                                       // For non-DG: degrees of
-                                       // freedom in the refinement
-                                       // face may need special
-                                       // attention, since they belong
-                                       // to the coarse level, but
-                                       // have fine level basis
-                                       // functions
-  for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
-  {
-    typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
-    for (IT i= copy_indices[level].begin();
-         i != copy_indices[level].end();++i)
-      dst(i->first) += src[level](i->second);
-  }
+  // For non-DG: degrees of
+  // freedom in the refinement
+  // face may need special
+  // attention, since they belong
+  // to the coarse level, but
+  // have fine level basis
+  // functions
+  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+    {
+      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
+      for (IT i= copy_indices[level].begin();
+           i != copy_indices[level].end(); ++i)
+        dst(i->first) += src[level](i->second);
+    }
 }
 
 
@@ -216,7 +216,7 @@ MGTransferPrebuilt<VECTOR>::memory_consumption () const
   std::size_t result = sizeof(*this);
   result += sizeof(unsigned int) * sizes.size();
 
-  for (unsigned int i=0;i<prolongation_matrices.size();++i)
+  for (unsigned int i=0; i<prolongation_matrices.size(); ++i)
     result += prolongation_matrices[i]->memory_consumption()
               + prolongation_sparsities[i]->memory_consumption();
 

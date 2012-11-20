@@ -34,20 +34,20 @@ namespace internal
     dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
     TriaObjects<G>::next_free_single_object (const dealii::Triangulation<dim,spacedim> &tria)
     {
-                                       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+      // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos=next_free_single,
-         last=used.size()-1;
+          last=used.size()-1;
       if (!reverse_order_next_free_single)
         {
-                                           // first sweep forward, only use
-                                           // really single slots, do not use
-                                           // pair slots
+          // first sweep forward, only use
+          // really single slots, do not use
+          // pair slots
           for (; pos<last; ++pos)
             if (!used[pos])
               if (used[++pos])
                 {
-                                                   // this was a single slot
+                  // this was a single slot
                   pos-=1;
                   break;
                 }
@@ -61,17 +61,17 @@ namespace internal
             next_free_single=pos+1;
         }
 
-      if(reverse_order_next_free_single)
+      if (reverse_order_next_free_single)
         {
-                                           // second sweep, use all slots, even
-                                           // in pairs
-          for(;pos>=0;--pos)
+          // second sweep, use all slots, even
+          // in pairs
+          for (; pos>=0; --pos)
             if (!used[pos])
               break;
           if (pos>0)
             next_free_single=pos-1;
           else
-                                             // no valid single object anymore
+            // no valid single object anymore
             return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, -1, -1);
         }
 
@@ -85,20 +85,20 @@ namespace internal
     dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
     TriaObjects<G>::next_free_pair_object (const dealii::Triangulation<dim,spacedim> &tria)
     {
-                                       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+      // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos=next_free_pair,
-         last=used.size()-1;
+          last=used.size()-1;
       for (; pos<last; ++pos)
         if (!used[pos])
           if (!used[++pos])
             {
-                                               // this was a pair slot
+              // this was a pair slot
               pos-=1;
               break;
             }
       if (pos>=last)
-                                         // no free slot
+        // no free slot
         return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, -1, -1);
       else
         next_free_pair=pos+2;
@@ -110,7 +110,7 @@ namespace internal
     template<class G>
     void
     TriaObjects<G>::reserve_space (const unsigned int new_objects_in_pairs,
-				   const unsigned int new_objects_single)
+                                   const unsigned int new_objects_single)
     {
       Assert(new_objects_in_pairs%2==0, ExcInternalError());
 
@@ -118,9 +118,9 @@ namespace internal
       next_free_pair=0;
       reverse_order_next_free_single=false;
 
-                                       // count the number of objects, of
-                                       // unused single objects and of
-                                       // unused pairs of objects
+      // count the number of objects, of
+      // unused single objects and of
+      // unused pairs of objects
       unsigned int n_objects=0;
       unsigned int n_unused_pairs=0;
       unsigned int n_unused_singles=0;
@@ -150,8 +150,8 @@ namespace internal
       Assert(n_objects+2*n_unused_pairs+n_unused_singles==used.size(),
              ExcInternalError());
 
-                                       // how many single objects are needed in
-                                       // addition to n_unused_objects?
+      // how many single objects are needed in
+      // addition to n_unused_objects?
       const int additional_single_objects=
         new_objects_single-n_unused_singles;
 
@@ -160,7 +160,7 @@ namespace internal
       if (additional_single_objects>0)
         new_size+=additional_single_objects;
 
-                                       // only allocate space if necessary
+      // only allocate space if necessary
       if (new_size>cells.size())
         {
           cells.reserve (new_size);
@@ -178,24 +178,24 @@ namespace internal
                              new_size-user_flags.size(),
                              false);
 
-	  const unsigned int factor = GeometryInfo<G::dimension>::max_children_per_cell / 2;
+          const unsigned int factor = GeometryInfo<G::dimension>::max_children_per_cell / 2;
           children.reserve (factor*new_size);
           children.insert (children.end(),
                            factor*new_size-children.size(),
                            -1);
 
-	  if (G::dimension > 1)
-	    {
-	      refinement_cases.reserve (new_size);
-	      refinement_cases.insert (refinement_cases.end(),
-				       new_size - refinement_cases.size(),
-				       RefinementCase<G::dimension>::no_refinement);
-	    }
+          if (G::dimension > 1)
+            {
+              refinement_cases.reserve (new_size);
+              refinement_cases.insert (refinement_cases.end(),
+                                       new_size - refinement_cases.size(),
+                                       RefinementCase<G::dimension>::no_refinement);
+            }
 
           boundary_or_material_id.reserve (new_size);
           boundary_or_material_id.insert (boundary_or_material_id.end(),
-                              new_size-boundary_or_material_id.size(),
-                              BoundaryOrMaterialId());
+                                          new_size-boundary_or_material_id.size(),
+                                          BoundaryOrMaterialId());
 
           user_data.reserve (new_size);
           user_data.insert (user_data.end(),
@@ -215,21 +215,21 @@ namespace internal
     template <int dim, int spacedim>
     typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator
     TriaObjects<TriaObject<3> >::next_free_hex (const dealii::Triangulation<dim,spacedim> &tria,
-                                            const unsigned int               level)
+                                                const unsigned int               level)
     {
-                                       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+      // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos=next_free_pair,
-         last=used.size()-1;
+          last=used.size()-1;
       for (; pos<last; ++pos)
         if (!used[pos])
           {
-                                             // this should be a pair slot
-              Assert(!used[pos+1], ExcInternalError());
-              break;
-            }
+            // this should be a pair slot
+            Assert(!used[pos+1], ExcInternalError());
+            break;
+          }
       if (pos>=last)
-                                         // no free slot
+        // no free slot
         return tria.end_hex();
       else
         next_free_pair=pos+2;
@@ -249,7 +249,7 @@ namespace internal
                                                    used.end(),
                                                    std::bind2nd (std::equal_to<bool>(), true));
 
-                                       // see above...
+      // see above...
       if (new_size>cells.size())
         {
           cells.reserve (new_size);
@@ -274,8 +274,8 @@ namespace internal
 
           boundary_or_material_id.reserve (new_size);
           boundary_or_material_id.insert (boundary_or_material_id.end(),
-                              new_size-boundary_or_material_id.size(),
-                              BoundaryOrMaterialId());
+                                          new_size-boundary_or_material_id.size(),
+                                          BoundaryOrMaterialId());
 
           user_data.reserve (new_size);
           user_data.insert (user_data.end(),
@@ -290,19 +290,19 @@ namespace internal
 
           refinement_cases.reserve (new_size);
           refinement_cases.insert (refinement_cases.end(),
-                               new_size-refinement_cases.size(),
-                               RefinementCase<3>::no_refinement);
+                                   new_size-refinement_cases.size(),
+                                   RefinementCase<3>::no_refinement);
 
           face_flips.reserve (new_size * GeometryInfo<3>::faces_per_cell);
           face_flips.insert (face_flips.end(),
-                                    new_size * GeometryInfo<3>::faces_per_cell
-                                    - face_flips.size(),
-                                    false);
+                             new_size * GeometryInfo<3>::faces_per_cell
+                             - face_flips.size(),
+                             false);
           face_rotations.reserve (new_size * GeometryInfo<3>::faces_per_cell);
           face_rotations.insert (face_rotations.end(),
-                                    new_size * GeometryInfo<3>::faces_per_cell
-                                    - face_rotations.size(),
-                                    false);
+                                 new_size * GeometryInfo<3>::faces_per_cell
+                                 - face_rotations.size(),
+                                 false);
         }
       next_free_single=next_free_pair=0;
     }
@@ -318,9 +318,9 @@ namespace internal
       next_free_pair=0;
       reverse_order_next_free_single=false;
 
-                                       // count the number of objects, of unused
-                                       // single objects and of unused pairs of
-                                       // objects
+      // count the number of objects, of unused
+      // single objects and of unused pairs of
+      // objects
       unsigned int n_quads=0;
       unsigned int n_unused_pairs=0;
       unsigned int n_unused_singles=0;
@@ -350,8 +350,8 @@ namespace internal
       Assert(n_quads+2*n_unused_pairs+n_unused_singles==used.size(),
              ExcInternalError());
 
-                                       // how many single quads are needed in
-                                       // addition to n_unused_quads?
+      // how many single quads are needed in
+      // addition to n_unused_quads?
       const int additional_single_quads=
         new_quads_single-n_unused_singles;
 
@@ -360,13 +360,13 @@ namespace internal
       if (additional_single_quads>0)
         new_size+=additional_single_quads;
 
-                                       // see above...
+      // see above...
       if (new_size>cells.size())
         {
-                                           // reseve space for the base class
+          // reseve space for the base class
           TriaObjects<TriaObject<2> >::reserve_space(new_quads_in_pairs,new_quads_single);
-                                           // reserve the field of the derived
-                                           // class
+          // reserve the field of the derived
+          // class
           line_orientations.reserve (new_size * GeometryInfo<2>::lines_per_cell);
           line_orientations.insert (line_orientations.end(),
                                     new_size * GeometryInfo<2>::lines_per_cell
@@ -386,13 +386,13 @@ namespace internal
     void
     TriaObjects<TriaObject<1> >::monitor_memory (const unsigned int) const
     {
-                                       // check that we have not allocated
-                                       // too much memory. note that bool
-                                       // vectors allocate their memory in
-                                       // chunks of whole integers, so
-                                       // they may over-allocate by up to
-                                       // as many elements as an integer
-                                       // has bits
+      // check that we have not allocated
+      // too much memory. note that bool
+      // vectors allocate their memory in
+      // chunks of whole integers, so
+      // they may over-allocate by up to
+      // as many elements as an integer
+      // has bits
       Assert (cells.size() <=
               cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("lines",
@@ -426,13 +426,13 @@ namespace internal
     void
     TriaObjects<TriaObject<2> >::monitor_memory (const unsigned int) const
     {
-                                       // check that we have not allocated
-                                       // too much memory. note that bool
-                                       // vectors allocate their memory in
-                                       // chunks of whole integers, so
-                                       // they may over-allocate by up to
-                                       // as many elements as an integer
-                                       // has bits
+      // check that we have not allocated
+      // too much memory. note that bool
+      // vectors allocate their memory in
+      // chunks of whole integers, so
+      // they may over-allocate by up to
+      // as many elements as an integer
+      // has bits
       Assert (cells.size() <=
               cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("quads",
@@ -467,13 +467,13 @@ namespace internal
     void
     TriaObjectsHex::monitor_memory (const unsigned int) const
     {
-                                       // check that we have not allocated
-                                       // too much memory. note that bool
-                                       // vectors allocate their memory in
-                                       // chunks of whole integers, so
-                                       // they may over-allocate by up to
-                                       // as many elements as an integer
-                                       // has bits
+      // check that we have not allocated
+      // too much memory. note that bool
+      // vectors allocate their memory in
+      // chunks of whole integers, so
+      // they may over-allocate by up to
+      // as many elements as an integer
+      // has bits
       Assert (cells.size() <=
               cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("hexes",
@@ -518,13 +518,13 @@ namespace internal
     void
     TriaObjectsQuad3D::monitor_memory (const unsigned int) const
     {
-                                       // check that we have not allocated
-                                       // too much memory. note that bool
-                                       // vectors allocate their memory in
-                                       // chunks of whole integers, so
-                                       // they may over-allocate by up to
-                                       // as many elements as an integer
-                                       // has bits
+      // check that we have not allocated
+      // too much memory. note that bool
+      // vectors allocate their memory in
+      // chunks of whole integers, so
+      // they may over-allocate by up to
+      // as many elements as an integer
+      // has bits
       Assert (cells.size() * GeometryInfo<2>::lines_per_cell
               == line_orientations.size(),
               ExcMemoryInexact (cells.size() * GeometryInfo<2>::lines_per_cell,
@@ -604,7 +604,7 @@ namespace internal
     template class TriaObjects<TriaObject<1> >;
     template class TriaObjects<TriaObject<2> >;
 
-    #include "tria_objects.inst"
+#include "tria_objects.inst"
   }
 }
 

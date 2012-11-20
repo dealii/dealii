@@ -35,9 +35,9 @@ bool Histogram::logarithmic_less (const number n1,
 
 Histogram::Interval::Interval (const double left_point,
                                const double right_point) :
-                left_point (left_point),
-                right_point (right_point),
-                content (0)
+  left_point (left_point),
+  right_point (right_point),
+  content (0)
 {}
 
 
@@ -63,133 +63,133 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
   Assert (values.size() == y_values_.size(),
           ExcIncompatibleArraySize(values.size(), y_values_.size()));
 
-                                   // store y_values
+  // store y_values
   y_values = y_values_;
 
-                                   // first find minimum and maximum value
-                                   // in the indicators
+  // first find minimum and maximum value
+  // in the indicators
   number min_value=0, max_value=0;
   switch (interval_spacing)
     {
-      case linear:
-      {
-        min_value = *std::min_element(values[0].begin(),
-                                      values[0].end());
-        max_value = *std::max_element(values[0].begin(),
-                                      values[0].end());
+    case linear:
+    {
+      min_value = *std::min_element(values[0].begin(),
+                                    values[0].end());
+      max_value = *std::max_element(values[0].begin(),
+                                    values[0].end());
 
-        for (unsigned int i=1; i<values.size(); ++i)
-          {
-            min_value = std::min (min_value,
-                                  *std::min_element(values[i].begin(),
-                                                    values[i].end()));
-            max_value = std::max (max_value,
-                                  *std::max_element(values[i].begin(),
-                                                    values[i].end()));
-          };
+      for (unsigned int i=1; i<values.size(); ++i)
+        {
+          min_value = std::min (min_value,
+                                *std::min_element(values[i].begin(),
+                                                  values[i].end()));
+          max_value = std::max (max_value,
+                                *std::max_element(values[i].begin(),
+                                                  values[i].end()));
+        };
 
-        break;
-      };
-
-      case logarithmic:
-      {
-        typedef bool (*comparator) (const number, const number);
-        const comparator logarithmic_less_function
-          = &Histogram::template logarithmic_less<number>;
-
-        min_value = *std::min_element(values[0].begin(),
-                                      values[0].end(),
-                                      logarithmic_less_function);
-
-        max_value = *std::max_element(values[0].begin(),
-                                      values[0].end(),
-                                      logarithmic_less_function);
-
-        for (unsigned int i=1; i<values.size(); ++i)
-          {
-            min_value = std::min (min_value,
-                                  *std::min_element(values[i].begin(),
-                                                    values[i].end(),
-                                                    logarithmic_less_function),
-                                  logarithmic_less_function);
-
-            max_value = std::max (max_value,
-                                  *std::max_element(values[i].begin(),
-                                                    values[i].end(),
-                                                    logarithmic_less_function),
-                                  logarithmic_less_function);
-          };
-
-        break;
-      };
-
-      default:
-            Assert (false, ExcInternalError());
+      break;
     };
 
-                                   // move right bound arbitrarily if
-                                   // necessary. sometimes in logarithmic
-                                   // mode, max_value may be larger than
-                                   // min_value, but only up to rounding
-                                   // precision.
+    case logarithmic:
+    {
+      typedef bool (*comparator) (const number, const number);
+      const comparator logarithmic_less_function
+        = &Histogram::template logarithmic_less<number>;
+
+      min_value = *std::min_element(values[0].begin(),
+                                    values[0].end(),
+                                    logarithmic_less_function);
+
+      max_value = *std::max_element(values[0].begin(),
+                                    values[0].end(),
+                                    logarithmic_less_function);
+
+      for (unsigned int i=1; i<values.size(); ++i)
+        {
+          min_value = std::min (min_value,
+                                *std::min_element(values[i].begin(),
+                                                  values[i].end(),
+                                                  logarithmic_less_function),
+                                logarithmic_less_function);
+
+          max_value = std::max (max_value,
+                                *std::max_element(values[i].begin(),
+                                                  values[i].end(),
+                                                  logarithmic_less_function),
+                                logarithmic_less_function);
+        };
+
+      break;
+    };
+
+    default:
+      Assert (false, ExcInternalError());
+    };
+
+  // move right bound arbitrarily if
+  // necessary. sometimes in logarithmic
+  // mode, max_value may be larger than
+  // min_value, but only up to rounding
+  // precision.
   if (max_value <= min_value)
     max_value = min_value+1;
 
 
-                                   // now set up the intervals based on
-                                   // the min and max values
+  // now set up the intervals based on
+  // the min and max values
   intervals.clear ();
-                                   // set up one list of intervals
-                                   // for the first data vector. we will
-                                   // then produce all the other lists
-                                   // for the other data vectors by
-                                   // copying
+  // set up one list of intervals
+  // for the first data vector. we will
+  // then produce all the other lists
+  // for the other data vectors by
+  // copying
   intervals.push_back (std::vector<Interval>());
 
   switch (interval_spacing)
     {
-      case linear:
-      {
-        const float delta = (max_value-min_value)/n_intervals;
+    case linear:
+    {
+      const float delta = (max_value-min_value)/n_intervals;
 
-        for (unsigned int n=0; n<n_intervals; ++n)
-          intervals[0].push_back (Interval(min_value+n*delta,
-                                           min_value+(n+1)*delta));
+      for (unsigned int n=0; n<n_intervals; ++n)
+        intervals[0].push_back (Interval(min_value+n*delta,
+                                         min_value+(n+1)*delta));
 
-        break;
-      };
-
-      case logarithmic:
-      {
-        const float delta = (std::log(max_value)-std::log(min_value))/n_intervals;
-
-        for (unsigned int n=0; n<n_intervals; ++n)
-          intervals[0].push_back (Interval(std::exp(std::log(min_value)+n*delta),
-                                           std::exp(std::log(min_value)+(n+1)*delta)));
-
-        break;
-      };
-
-      default:
-            Assert (false, ExcInternalError());
+      break;
     };
 
-                                   // fill the other lists of intervals
+    case logarithmic:
+    {
+      const float delta = (std::log(max_value)-std::log(min_value))/n_intervals;
+
+      for (unsigned int n=0; n<n_intervals; ++n)
+        intervals[0].push_back (Interval(std::exp(std::log(min_value)+n*delta),
+                                         std::exp(std::log(min_value)+(n+1)*delta)));
+
+      break;
+    };
+
+    default:
+      Assert (false, ExcInternalError());
+    };
+
+  // fill the other lists of intervals
   for (unsigned int i=1; i<values.size(); ++i)
     intervals.push_back (intervals[0]);
 
 
-                                   // finally fill the intervals
+  // finally fill the intervals
   for (unsigned int i=0; i<values.size(); ++i)
     for (typename Vector<number>::const_iterator p=values[i].begin();
          p < values[i].end(); ++p)
       {
-                                         // find the right place for *p in
-                                         // intervals[i]. use regular
-                                         // operator< here instead of
-                                         // the logarithmic one to
-                                         // map negative or zero value
-                                         // to the leftmost interval always
+        // find the right place for *p in
+        // intervals[i]. use regular
+        // operator< here instead of
+        // the logarithmic one to
+        // map negative or zero value
+        // to the leftmost interval always
         for (unsigned int n=0; n<n_intervals; ++n)
           if (*p <= intervals[i][n].right_point)
             {
@@ -207,7 +207,7 @@ void Histogram::evaluate (const Vector<number>    &values,
                           const IntervalSpacing    interval_spacing)
 {
   std::vector<Vector<number> > values_list (1,
-                                       values);
+                                            values);
   evaluate (values_list, std::vector<double>(1,0.), n_intervals, interval_spacing);
 }
 
@@ -218,8 +218,8 @@ void Histogram::write_gnuplot (std::ostream &out) const
   AssertThrow (out, ExcIO());
   Assert (!intervals.empty(), ExcEmptyData());
 
-                                   // do a simple 2d plot, if only
-                                   // one data set is available
+  // do a simple 2d plot, if only
+  // one data set is available
   if (intervals.size()==1)
     {
       for (unsigned int n=0; n<intervals[0].size(); ++n)
@@ -233,14 +233,14 @@ void Histogram::write_gnuplot (std::ostream &out) const
             << std::endl;
     }
   else
-                                     // otherwise create a whole 3d plot
-                                     // for the data. use th patch method
-                                     // of gnuplot for this
-                                     //
-                                     // run this loop backwards since otherwise
-                                     // gnuplot thinks the upper side is the
-                                     // lower side and draws the diagram in
-                                     // strange colors
+    // otherwise create a whole 3d plot
+    // for the data. use th patch method
+    // of gnuplot for this
+    //
+    // run this loop backwards since otherwise
+    // gnuplot thinks the upper side is the
+    // lower side and draws the diagram in
+    // strange colors
     for (int i=intervals.size()-1; i>=0; --i)
       {
         for (unsigned int n=0; n<intervals[i].size(); ++n)
@@ -297,15 +297,14 @@ Histogram::parse_interval_spacing (const std::string &name)
 {
   if (name=="linear")
     return linear;
+  else if (name=="logarithmic")
+    return logarithmic;
   else
-    if (name=="logarithmic")
-      return logarithmic;
-    else
-      {
-        AssertThrow (false, ExcInvalidName(name));
+    {
+      AssertThrow (false, ExcInvalidName(name));
 
-        return linear;
-      };
+      return linear;
+    };
 }
 
 
@@ -333,7 +332,7 @@ void Histogram::evaluate<float> (const Vector<float>   &values,
 
 // explicit instantiations for double
 template
-void Histogram::evaluate<double> (const std::vector<Vector<double> >  &values,
+void Histogram::evaluate<double> (const std::vector<Vector<double> > &values,
                                   const std::vector<double>                    &y_values,
                                   const unsigned int                            n_intervals,
                                   const IntervalSpacing                         interval_spacing);

@@ -88,148 +88,148 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, class VECTOR = Vector<double>, int spacedim=dim >
 class MappingQEulerian : public MappingQ<dim, spacedim>
 {
+public:
+  /**
+   * Constructor. The first argument is
+   * the polynomical degree of the desired
+   * Qp mapping.  It then takes a
+   * <tt>Vector<double> &</tt> to specify the
+   * transformation of the domain
+   * from the reference to
+   * the current configuration.
+   * The organization of the
+   * elements in the @p Vector
+   * must follow the concept how
+   * deal.II stores solutions that
+   * are associated to a
+   * triangulation.  This is
+   * automatically the case if the
+   * @p Vector represents the
+   * solution of the previous step
+   * of a nonlinear problem.
+   * Alternatively, the @p Vector
+   * can be initialized by
+   * <tt>DoFAccessor::set_dof_values()</tt>.
+   */
+
+  MappingQEulerian (const unsigned int     degree,
+                    const VECTOR &euler_vector,
+                    const DoFHandler<dim,spacedim> &euler_dof_handler);
+
+  /**
+   * Return a pointer to a copy of the
+   * present object. The caller of this
+   * copy then assumes ownership of it.
+   */
+  virtual
+  Mapping<dim,spacedim> *clone () const;
+
+  /**
+   * Always returns @p false because
+   * MappingQ1Eulerian does not in general
+   * preserve vertex locations (unless the
+   * translation vector happens to provide
+   * for zero displacements at vertex
+   * locations).
+   */
+  bool preserves_vertex_locations () const;
+
+  /**
+   * Exception
+   */
+  DeclException0 (ExcInactiveCell);
+
+protected:
+  /**
+   * Implementation of the interface in
+   * MappingQ. Overrides the function in
+   * the base class, since we cannot use
+   * any cell similarity for this class.
+   */
+  virtual void
+  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                  const Quadrature<dim>                                     &quadrature,
+                  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+                  typename std::vector<Point<spacedim> >                    &quadrature_points,
+                  std::vector<double>                                       &JxW_values,
+                  std::vector<DerivativeForm<1,dim,spacedim> >      &jacobians,
+                  std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
+                  std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
+                  std::vector<Point<spacedim> >                             &cell_normal_vectors,
+                  CellSimilarity::Similarity                           &cell_similarity) const;
+
+  /**
+   * Reference to the vector of
+   * shifts.
+   */
+
+  SmartPointer<const VECTOR, MappingQEulerian<dim,VECTOR,spacedim> > euler_vector;
+
+  /**
+   * Pointer to the DoFHandler to
+   * which the mapping vector is
+   * associated.
+   */
+
+  SmartPointer<const DoFHandler<dim,spacedim>,MappingQEulerian<dim,VECTOR,spacedim> > euler_dof_handler;
+
+
+private:
+
+  /**
+   * Special quadrature rule used
+   * to define the support points
+   * in the reference configuration.
+   */
+
+  class SupportQuadrature : public Quadrature<dim>
+  {
   public:
-                                     /**
-                                      * Constructor. The first argument is
-                                      * the polynomical degree of the desired
-                                      * Qp mapping.  It then takes a
-                                      * <tt>Vector<double> &</tt> to specify the
-                                      * transformation of the domain
-                                      * from the reference to
-                                      * the current configuration.
-                                      * The organization of the
-                                      * elements in the @p Vector
-                                      * must follow the concept how
-                                      * deal.II stores solutions that
-                                      * are associated to a
-                                      * triangulation.  This is
-                                      * automatically the case if the
-                                      * @p Vector represents the
-                                      * solution of the previous step
-                                      * of a nonlinear problem.
-                                      * Alternatively, the @p Vector
-                                      * can be initialized by
-                                      * <tt>DoFAccessor::set_dof_values()</tt>.
-                                      */
+    /**
+     * Constructor, with an argument
+     * defining the desired polynomial
+     * degree.
+     */
 
-    MappingQEulerian (const unsigned int     degree,
-                      const VECTOR  &euler_vector,
-                      const DoFHandler<dim,spacedim>  &euler_dof_handler);
+    SupportQuadrature (const unsigned int map_degree);
 
-                                     /**
-                                      * Return a pointer to a copy of the
-                                      * present object. The caller of this
-                                      * copy then assumes ownership of it.
-                                      */
-    virtual
-    Mapping<dim,spacedim> * clone () const;
+  };
 
-                                     /**
-                                      * Always returns @p false because
-                                      * MappingQ1Eulerian does not in general
-                                      * preserve vertex locations (unless the
-                                      * translation vector happens to provide
-                                      * for zero displacements at vertex
-                                      * locations).
-                                      */
-    bool preserves_vertex_locations () const;
+  /**
+   * A member variable holding the
+   * quadrature points in the right
+   * order.
+   */
+  const SupportQuadrature support_quadrature;
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcInactiveCell);
+  /**
+   * FEValues object used to query the
+   * the given finite element field
+   * at the support points in the
+   * reference configuration.
+   *
+   * The variable is marked as
+   * mutable since we have to call
+   * FEValues::reinit from
+   * compute_mapping_support_points,
+   * a function that is 'const'.
+   */
+  mutable FEValues<dim,spacedim> fe_values;
 
-  protected:
-                                     /**
-                                      * Implementation of the interface in
-                                      * MappingQ. Overrides the function in
-                                      * the base class, since we cannot use
-                                      * any cell similarity for this class.
-                                      */
-    virtual void
-    fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                    const Quadrature<dim>                                     &quadrature,
-                    typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-                    typename std::vector<Point<spacedim> >                    &quadrature_points,
-                    std::vector<double>                                       &JxW_values,
-                    std::vector<DerivativeForm<1,dim,spacedim> >      &jacobians,
-                    std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
-                    std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
-                    std::vector<Point<spacedim> >                             &cell_normal_vectors,
-                    CellSimilarity::Similarity                           &cell_similarity) const;
+  /**
+   * A variable to guard access to
+   * the fe_values variable.
+   */
+  mutable Threads::ThreadMutex fe_values_mutex;
 
-                                     /**
-                                      * Reference to the vector of
-                                      * shifts.
-                                      */
-
-    SmartPointer<const VECTOR, MappingQEulerian<dim,VECTOR,spacedim> > euler_vector;
-
-                                     /**
-                                      * Pointer to the DoFHandler to
-                                      * which the mapping vector is
-                                      * associated.
-                                      */
-
-    SmartPointer<const DoFHandler<dim,spacedim>,MappingQEulerian<dim,VECTOR,spacedim> > euler_dof_handler;
-
-
-  private:
-
-                                     /**
-                                      * Special quadrature rule used
-                                      * to define the support points
-                                      * in the reference configuration.
-                                      */
-
-    class SupportQuadrature : public Quadrature<dim>
-    {
-      public:
-                                         /**
-                                          * Constructor, with an argument
-                                          * defining the desired polynomial
-                                          * degree.
-                                          */
-
-        SupportQuadrature (const unsigned int map_degree);
-
-    };
-
-                                     /**
-                                      * A member variable holding the
-                                      * quadrature points in the right
-                                      * order.
-                                      */
-    const SupportQuadrature support_quadrature;
-
-                                     /**
-                                      * FEValues object used to query the
-                                      * the given finite element field
-                                      * at the support points in the
-                                      * reference configuration.
-                                      *
-                                      * The variable is marked as
-                                      * mutable since we have to call
-                                      * FEValues::reinit from
-                                      * compute_mapping_support_points,
-                                      * a function that is 'const'.
-                                      */
-    mutable FEValues<dim,spacedim> fe_values;
-
-                                     /**
-                                      * A variable to guard access to
-                                      * the fe_values variable.
-                                      */
-    mutable Threads::ThreadMutex fe_values_mutex;
-
-                                     /**
-                                      * Compute the positions of the
-                                      * support points in the current
-                                      * configuration
-                                      */
-    virtual void compute_mapping_support_points(
-      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-      std::vector<Point<spacedim> > &a) const;
+  /**
+   * Compute the positions of the
+   * support points in the current
+   * configuration
+   */
+  virtual void compute_mapping_support_points(
+    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+    std::vector<Point<spacedim> > &a) const;
 
 };
 

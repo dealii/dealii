@@ -48,165 +48,165 @@ DEAL_II_NAMESPACE_OPEN
  */
 class BlockIndices : public Subscriptor
 {
-  public:
+public:
 
-                                     /**
-                                      * Default
-                                      * constructor. Initialize for
-                                      * zero blocks.
-                                      */
-    BlockIndices ();
+  /**
+   * Default
+   * constructor. Initialize for
+   * zero blocks.
+   */
+  BlockIndices ();
 
-                                     /**
-                                      * Constructor. Initialize the
-                                      * number of entries in each
-                                      * block @p i as <tt>n[i]</tt>. The
-                                      * number of blocks will be the
-                                      * size of the vector
-                                      */
-    BlockIndices (const std::vector<unsigned int> &n);
+  /**
+   * Constructor. Initialize the
+   * number of entries in each
+   * block @p i as <tt>n[i]</tt>. The
+   * number of blocks will be the
+   * size of the vector
+   */
+  BlockIndices (const std::vector<unsigned int> &n);
 
-                                     /**
-                                      * Specialized constructor for a
-                                      * structure with blocks of equal size.
-                                      */
-    explicit BlockIndices(const unsigned int n_blocks, const unsigned int block_size = 0);
+  /**
+   * Specialized constructor for a
+   * structure with blocks of equal size.
+   */
+  explicit BlockIndices(const unsigned int n_blocks, const unsigned int block_size = 0);
 
-                                     /**
-                                      * Reinitialize the number of
-                                      * blocks and assign each block
-                                      * the same number of elements.
-                                      */
-    void reinit (const unsigned int n_blocks,
-                 const unsigned int n_elements_per_block);
+  /**
+   * Reinitialize the number of
+   * blocks and assign each block
+   * the same number of elements.
+   */
+  void reinit (const unsigned int n_blocks,
+               const unsigned int n_elements_per_block);
 
-                                     /**
-                                      * Reinitialize the number of
-                                      * indices within each block from
-                                      * the given argument. The number
-                                      * of blocks will be adjusted to
-                                      * the size of @p n and the size
-                                      * of block @p i is set to
-                                      * <tt>n[i]</tt>.
-                                      */
-    void reinit (const std::vector<unsigned int> &n);
+  /**
+   * Reinitialize the number of
+   * indices within each block from
+   * the given argument. The number
+   * of blocks will be adjusted to
+   * the size of @p n and the size
+   * of block @p i is set to
+   * <tt>n[i]</tt>.
+   */
+  void reinit (const std::vector<unsigned int> &n);
 
-                                     /**
-                                      * Add another block of given
-                                      * size to the end of the block
-                                      * structure.
-                                      */
-    void push_back(const unsigned int size);
+  /**
+   * Add another block of given
+   * size to the end of the block
+   * structure.
+   */
+  void push_back(const unsigned int size);
 
-                                     /**
-                                      * @name Size information
-                                      */
-                                     //@{
+  /**
+   * @name Size information
+   */
+  //@{
 
-                                     /**
-                                      * Number of blocks in index field.
-                                      */
-    unsigned int size () const;
+  /**
+   * Number of blocks in index field.
+   */
+  unsigned int size () const;
 
-                                     /**
-                                      * Return the total number of
-                                      * indices accumulated over all
-                                      * blocks, that is, the dimension
-                                      * of the vector space of the
-                                      * block vector.
-                                      */
-    unsigned int total_size () const;
+  /**
+   * Return the total number of
+   * indices accumulated over all
+   * blocks, that is, the dimension
+   * of the vector space of the
+   * block vector.
+   */
+  unsigned int total_size () const;
 
-                                     /**
-                                      * The size of the @p ith block.
-                                      */
-    unsigned int block_size (const unsigned int i) const;
+  /**
+   * The size of the @p ith block.
+   */
+  unsigned int block_size (const unsigned int i) const;
 
-                                     //@}
+  //@}
 
-                                     /**
-                                      * @name Index conversion
-                                      *
-                                      * Functions in this group
-                                      * assume an object, which
-                                      * was created after sorting by
-                                      * block, such that each block
-                                      * forms a set of consecutive
-                                      * indices in the object.
-                                      * If applied to other objects,
-                                      * the numbers obtained from
-                                      * these functions are meaningless.
-                                      */
-                                     //@{
+  /**
+   * @name Index conversion
+   *
+   * Functions in this group
+   * assume an object, which
+   * was created after sorting by
+   * block, such that each block
+   * forms a set of consecutive
+   * indices in the object.
+   * If applied to other objects,
+   * the numbers obtained from
+   * these functions are meaningless.
+   */
+  //@{
 
-                                     /**
-                                      * Return the block and the
-                                      * index within that block
-                                      * for the global index @p i. The
-                                      * first element of the pair is
-                                      * the block, the second the
-                                      * index within it.
-                                      */
-    std::pair<unsigned int,unsigned int>
-    global_to_local (const unsigned int i) const;
+  /**
+   * Return the block and the
+   * index within that block
+   * for the global index @p i. The
+   * first element of the pair is
+   * the block, the second the
+   * index within it.
+   */
+  std::pair<unsigned int,unsigned int>
+  global_to_local (const unsigned int i) const;
 
-                                     /**
-                                      * Return the global index of
-                                      * @p index in block @p block.
-                                      */
-    unsigned int local_to_global (const unsigned int block,
-                                  const unsigned int index) const;
+  /**
+   * Return the global index of
+   * @p index in block @p block.
+   */
+  unsigned int local_to_global (const unsigned int block,
+                                const unsigned int index) const;
 
-                                     /**
-                                      * The start index of the ith block.
-                                      */
-    unsigned int block_start (const unsigned int i) const;
-                                     //@}
+  /**
+   * The start index of the ith block.
+   */
+  unsigned int block_start (const unsigned int i) const;
+  //@}
 
-                                     /**
-                                      * Copy operator.
-                                      */
-    BlockIndices & operator = (const BlockIndices &b);
+  /**
+   * Copy operator.
+   */
+  BlockIndices &operator = (const BlockIndices &b);
 
-                                     /**
-                                      * Compare whether two objects
-                                      * are the same, i.e. whether the
-                                      * number of blocks and the sizes
-                                      * of all blocks are equal.
-                                      */
-    bool operator == (const BlockIndices &b) const;
+  /**
+   * Compare whether two objects
+   * are the same, i.e. whether the
+   * number of blocks and the sizes
+   * of all blocks are equal.
+   */
+  bool operator == (const BlockIndices &b) const;
 
-                                     /**
-                                      * Swap the contents of these two
-                                      * objects.
-                                      */
-    void swap (BlockIndices &b);
+  /**
+   * Swap the contents of these two
+   * objects.
+   */
+  void swap (BlockIndices &b);
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
-    std::size_t memory_consumption () const;
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  std::size_t memory_consumption () const;
 
-  private:
-                                     /**
-                                      * Number of blocks. While this
-                                      * value could be obtained
-                                      * through
-                                      * <tt>start_indices.size()-1</tt>,
-                                      * we cache this value for faster
-                                      * access.
-                                      */
-    unsigned int n_blocks;
+private:
+  /**
+   * Number of blocks. While this
+   * value could be obtained
+   * through
+   * <tt>start_indices.size()-1</tt>,
+   * we cache this value for faster
+   * access.
+   */
+  unsigned int n_blocks;
 
-                                     /**
-                                      * Global starting index of each
-                                      * vector. The last and redundant
-                                      * value is the total number of
-                                      * entries.
-                                      */
-    std::vector<unsigned int> start_indices;
+  /**
+   * Global starting index of each
+   * vector. The last and redundant
+   * value is the total number of
+   * entries.
+   */
+  std::vector<unsigned int> start_indices;
 };
 
 
@@ -219,16 +219,16 @@ class BlockIndices : public Subscriptor
  * @date 2011
  */
 inline
-LogStream&
-operator << (LogStream& s, const BlockIndices& bi)
+LogStream &
+operator << (LogStream &s, const BlockIndices &bi)
 {
   const unsigned int n = bi.size();
   s << n << ":[";
-                                   // Write first size without leading space
+  // Write first size without leading space
   if (n>0)
     s << bi.block_size(0);
-                                   // Write all other sizes
-  for (unsigned int i=1;i<n;++i)
+  // Write all other sizes
+  for (unsigned int i=1; i<n; ++i)
     s << ' ' << bi.block_size(i);
   s << "]->" << bi.total_size();
   return s;
@@ -259,57 +259,63 @@ template <typename number>     class BlockSparseMatrixEZ;
 template <typename MatrixType>
 struct IsBlockMatrix
 {
-  private:
-    struct yes_type { char c[1]; };
-    struct no_type  { char c[2]; };
+private:
+  struct yes_type
+  {
+    char c[1];
+  };
+  struct no_type
+  {
+    char c[2];
+  };
 
-                                     /**
-                                      * Overload returning true if the class
-                                      * is derived from BlockMatrixBase,
-                                      * which is what block matrices do
-                                      * (with the exception of
-                                      * BlockSparseMatrixEZ).
-                                      */
-    template <typename T>
-    static yes_type check_for_block_matrix (const BlockMatrixBase<T> *);
+  /**
+   * Overload returning true if the class
+   * is derived from BlockMatrixBase,
+   * which is what block matrices do
+   * (with the exception of
+   * BlockSparseMatrixEZ).
+   */
+  template <typename T>
+  static yes_type check_for_block_matrix (const BlockMatrixBase<T> *);
 
-                                     /**
-                                      * Overload returning true if the class
-                                      * is derived from
-                                      * BlockSparsityPatternBase, which is
-                                      * what block sparsity patterns do.
-                                      */
-    template <typename T>
-    static yes_type check_for_block_matrix (const BlockSparsityPatternBase<T> *);
+  /**
+   * Overload returning true if the class
+   * is derived from
+   * BlockSparsityPatternBase, which is
+   * what block sparsity patterns do.
+   */
+  template <typename T>
+  static yes_type check_for_block_matrix (const BlockSparsityPatternBase<T> *);
 
-                                     /**
-                                      * Overload for BlockSparseMatrixEZ,
-                                      * which is the only block matrix not
-                                      * derived from BlockMatrixBase at the
-                                      * time of writing this class.
-                                      */
-    template <typename T>
-    static yes_type check_for_block_matrix (const BlockSparseMatrixEZ<T> *);
+  /**
+   * Overload for BlockSparseMatrixEZ,
+   * which is the only block matrix not
+   * derived from BlockMatrixBase at the
+   * time of writing this class.
+   */
+  template <typename T>
+  static yes_type check_for_block_matrix (const BlockSparseMatrixEZ<T> *);
 
-                                     /**
-                                      * Catch all for all other potential
-                                      * matrix types that are not block
-                                      * matrices.
-                                      */
-    static no_type check_for_block_matrix (...);
+  /**
+   * Catch all for all other potential
+   * matrix types that are not block
+   * matrices.
+   */
+  static no_type check_for_block_matrix (...);
 
-  public:
-                                     /**
-                                      * A statically computable value that
-                                      * indicates whether the template
-                                      * argument to this class is a block
-                                      * matrix (in fact whether the type is
-                                      * derived from BlockMatrixBase<T>).
-                                      */
-    static const bool value = (sizeof(check_for_block_matrix
-                                      ((MatrixType*)0))
-                               ==
-                               sizeof(yes_type));
+public:
+  /**
+   * A statically computable value that
+   * indicates whether the template
+   * argument to this class is a block
+   * matrix (in fact whether the type is
+   * derived from BlockMatrixBase<T>).
+   */
+  static const bool value = (sizeof(check_for_block_matrix
+                                    ((MatrixType *)0))
+                             ==
+                             sizeof(yes_type));
 };
 
 
@@ -350,9 +356,9 @@ BlockIndices::reinit (const std::vector<unsigned int> &n)
 
 inline
 BlockIndices::BlockIndices ()
-                :
-                n_blocks(0),
-                start_indices(1, 0)
+  :
+  n_blocks(0),
+  start_indices(1, 0)
 {}
 
 
@@ -361,9 +367,9 @@ inline
 BlockIndices::BlockIndices (
   const unsigned int n_blocks,
   const unsigned int block_size)
-                :
-                n_blocks(n_blocks),
-                start_indices(n_blocks+1)
+  :
+  n_blocks(n_blocks),
+  start_indices(n_blocks+1)
 {
   for (unsigned int i=0; i<=n_blocks; ++i)
     start_indices[i] = i * block_size;
@@ -373,9 +379,9 @@ BlockIndices::BlockIndices (
 
 inline
 BlockIndices::BlockIndices (const std::vector<unsigned int> &n)
-                :
-                n_blocks(n.size()),
-                start_indices(n.size()+1)
+  :
+  n_blocks(n.size()),
+  start_indices(n.size()+1)
 {
   reinit (n);
 }

@@ -176,295 +176,295 @@ template<int,int> class MGDoFHandler;
  */
 namespace MeshWorker
 {
-/**
- * The class providing the scrapbook to fill with results of local
- * integration. Depending on the task the mesh worker loop is
- * performing, local results can be of different types. They have
- * in common that they are the result of local integration over a cell
- * or face. Their actual type is determined by the Assember using
- * them. It is also the assembler setting the arrays of local results
- * to the sizes needed. Here is a list of the provided data types and
- * the assembers using them:
- *
- * <ol>
- * <li> n_values() numbers accessed with value(), and stored in the
- * data member #J.
- *
- * <li> n_vectors() vectors of the length of dofs on this cell,
- * accessed by vector(), and stored in #R.
- * <li> n_matrices() matrices of dimension dofs per cell in each
- * direction, accessed by matrix() with second argument
- * <tt>false</tt>. These are stored in #M1, and they are the matrices
- * coupling degrees of freedom in the same cell. For fluxes across
- * faces, there is an additional set #M2 of matrices of the same size, but
- * the dimension of the matrices being according to the degrees of
- * freedom on both cells. These are accessed with matrix(), using the
- * second argument <tt>true</tt>.
- * </ol>
- *
- * The local matrices initialized by reinit() of the info object and
- * then assembled into the global system by Assembler classes.
- *
- * @ingroup MeshWorker
- * @author Guido Kanschat, 2009
- */
+  /**
+   * The class providing the scrapbook to fill with results of local
+   * integration. Depending on the task the mesh worker loop is
+   * performing, local results can be of different types. They have
+   * in common that they are the result of local integration over a cell
+   * or face. Their actual type is determined by the Assember using
+   * them. It is also the assembler setting the arrays of local results
+   * to the sizes needed. Here is a list of the provided data types and
+   * the assembers using them:
+   *
+   * <ol>
+   * <li> n_values() numbers accessed with value(), and stored in the
+   * data member #J.
+   *
+   * <li> n_vectors() vectors of the length of dofs on this cell,
+   * accessed by vector(), and stored in #R.
+   * <li> n_matrices() matrices of dimension dofs per cell in each
+   * direction, accessed by matrix() with second argument
+   * <tt>false</tt>. These are stored in #M1, and they are the matrices
+   * coupling degrees of freedom in the same cell. For fluxes across
+   * faces, there is an additional set #M2 of matrices of the same size, but
+   * the dimension of the matrices being according to the degrees of
+   * freedom on both cells. These are accessed with matrix(), using the
+   * second argument <tt>true</tt>.
+   * </ol>
+   *
+   * The local matrices initialized by reinit() of the info object and
+   * then assembled into the global system by Assembler classes.
+   *
+   * @ingroup MeshWorker
+   * @author Guido Kanschat, 2009
+   */
   template <typename number>
   class LocalResults
   {
-    public:
-                                       /**
-                                        * The number of scalar values.
-                                        *
-                                        * This number is set to a
-                                        * nonzero value by Assember::CellsAndFaces
-                                        *
-                                        */
-      unsigned int n_values () const;
+  public:
+    /**
+     * The number of scalar values.
+     *
+     * This number is set to a
+     * nonzero value by Assember::CellsAndFaces
+     *
+     */
+    unsigned int n_values () const;
 
-                                       /**
-                                        * The number of vectors.
-                                        *
-                                        * This number is set to a
-                                        * nonzero value by
-                                        * Assember::ResidualSimple and
-                                        * Assember::ResidualLocalBlocksToGlobalBlocks.
-                                        */
-      unsigned int n_vectors () const;
+    /**
+     * The number of vectors.
+     *
+     * This number is set to a
+     * nonzero value by
+     * Assember::ResidualSimple and
+     * Assember::ResidualLocalBlocksToGlobalBlocks.
+     */
+    unsigned int n_vectors () const;
 
-                                       /**
-                                        * The number of matrices.
-                                        */
-      unsigned int n_matrices () const;
+    /**
+     * The number of matrices.
+     */
+    unsigned int n_matrices () const;
 
-                                       /**
-                                        * The number of quadrature
-                                        * points in quadrature_values().
-                                        */
-      unsigned int n_quadrature_points() const;
+    /**
+     * The number of quadrature
+     * points in quadrature_values().
+     */
+    unsigned int n_quadrature_points() const;
 
-                                       /**
-                                        * The number of values in each
-                                        * quadrature point in
-                                        * quadrature_values().
-                                        */
-      unsigned int n_quadrature_values() const;
+    /**
+     * The number of values in each
+     * quadrature point in
+     * quadrature_values().
+     */
+    unsigned int n_quadrature_values() const;
 
-                                       /**
-                                        * Access scalar value at index
-                                        * @p i.
-                                        */
-      number& value(unsigned int i);
+    /**
+     * Access scalar value at index
+     * @p i.
+     */
+    number &value(unsigned int i);
 
-                                       /**
-                                        * Read scalar value at index
-                                        * @p i.
-                                        */
-      number value(unsigned int i) const;
+    /**
+     * Read scalar value at index
+     * @p i.
+     */
+    number value(unsigned int i) const;
 
-                                       /**
-                                        * Access vector at index @p i.
-                                        */
-      BlockVector<number>& vector(unsigned int i);
+    /**
+     * Access vector at index @p i.
+     */
+    BlockVector<number> &vector(unsigned int i);
 
-                                       /**
-                                        * Read vector at index @p i.
-                                        */
-      const BlockVector<number>& vector(unsigned int i) const;
+    /**
+     * Read vector at index @p i.
+     */
+    const BlockVector<number> &vector(unsigned int i) const;
 
-                                       /**
-                                        * Access matrix at index @p
-                                        * i. For results on internal
-                                        * faces, a true value for @p
-                                        * external refers to the flux
-                                        * between cells, while false
-                                        * refers to entries coupling
-                                        * inside the cell.
-                                        */
-      MatrixBlock<FullMatrix<number> >& matrix(unsigned int i, bool external = false);
+    /**
+     * Access matrix at index @p
+     * i. For results on internal
+     * faces, a true value for @p
+     * external refers to the flux
+     * between cells, while false
+     * refers to entries coupling
+     * inside the cell.
+     */
+    MatrixBlock<FullMatrix<number> > &matrix(unsigned int i, bool external = false);
 
-                                       /**
-                                        * Read matrix at index @p
-                                        * i. For results on internal
-                                        * faces, a true value for @p
-                                        * external refers to the flux
-                                        * between cells, while false
-                                        * refers to entries coupling
-                                        * inside the cell.
-                                        */
-      const MatrixBlock<FullMatrix<number> >& matrix(unsigned int i, bool external = false) const;
+    /**
+     * Read matrix at index @p
+     * i. For results on internal
+     * faces, a true value for @p
+     * external refers to the flux
+     * between cells, while false
+     * refers to entries coupling
+     * inside the cell.
+     */
+    const MatrixBlock<FullMatrix<number> > &matrix(unsigned int i, bool external = false) const;
 
-                                       /**
-                                        * Access to the vector
-                                        * #quadrature_data of data
-                                        * in quadrature points,
-                                        * organized such that there is
-                                        * a vector for each point,
-                                        * containing one entry for
-                                        * each component.
-                                        */
-      Table<2, number>& quadrature_values();
+    /**
+     * Access to the vector
+     * #quadrature_data of data
+     * in quadrature points,
+     * organized such that there is
+     * a vector for each point,
+     * containing one entry for
+     * each component.
+     */
+    Table<2, number> &quadrature_values();
 
-                                       /**
-                                        * Access the <i>i</i>th value
-                                        * at quadrature point <i>k</i>
-                                        */
-      number& quadrature_value(unsigned int k, unsigned int i);
+    /**
+     * Access the <i>i</i>th value
+     * at quadrature point <i>k</i>
+     */
+    number &quadrature_value(unsigned int k, unsigned int i);
 
-                                       /**
-                                        * Read the <i>i</i>th value
-                                        * at quadrature point <i>k</i>
-                                        */
-      number quadrature_value(unsigned int k, unsigned int i) const;
+    /**
+     * Read the <i>i</i>th value
+     * at quadrature point <i>k</i>
+     */
+    number quadrature_value(unsigned int k, unsigned int i) const;
 
-                                       /**
-                                        * Initialize the vector with
-                                        * scalar values.
-                                        *
-                                        * @note This function is
-                                        * usually only called by the
-                                        * assembler.
-                                        */
-      void initialize_numbers(const unsigned int n);
-                                       /**
-                                        * Initialize the vector with
-                                        * vector values.
-                                        *
-                                        * @note This function is
-                                        * usually only called by the
-                                        * assembler.
-                                        */
-      void initialize_vectors(const unsigned int n);
-                                       /**
-                                        * Allocate @p n local
-                                        * matrices. Additionally,
-                                        * set their block row and
-                                        * column coordinates to
-                                        * zero. The matrices
-                                        * themselves are resized by
-                                        * reinit().
-                                        *
-                                        * @note This function is
-                                        * usually only called by the
-                                        * assembler.
-                                        */
-      void initialize_matrices(unsigned int n, bool both);
+    /**
+     * Initialize the vector with
+     * scalar values.
+     *
+     * @note This function is
+     * usually only called by the
+     * assembler.
+     */
+    void initialize_numbers(const unsigned int n);
+    /**
+     * Initialize the vector with
+     * vector values.
+     *
+     * @note This function is
+     * usually only called by the
+     * assembler.
+     */
+    void initialize_vectors(const unsigned int n);
+    /**
+     * Allocate @p n local
+     * matrices. Additionally,
+     * set their block row and
+     * column coordinates to
+     * zero. The matrices
+     * themselves are resized by
+     * reinit().
+     *
+     * @note This function is
+     * usually only called by the
+     * assembler.
+     */
+    void initialize_matrices(unsigned int n, bool both);
 
-                                       /**
-                                        * Allocate a local matrix
-                                        * for each of the global
-                                        * ones in @p
-                                        * matrices. Additionally,
-                                        * set their block row and
-                                        * column coordinates. The
-                                        * matrices themselves are
-                                        * resized by reinit().
-                                        *
-                                        * @note This function is
-                                        * usually only called by the
-                                        * assembler.
-                                        */
-      template <class MATRIX>
-      void initialize_matrices(const MatrixBlockVector<MATRIX>& matrices,
-                               bool both);
+    /**
+     * Allocate a local matrix
+     * for each of the global
+     * ones in @p
+     * matrices. Additionally,
+     * set their block row and
+     * column coordinates. The
+     * matrices themselves are
+     * resized by reinit().
+     *
+     * @note This function is
+     * usually only called by the
+     * assembler.
+     */
+    template <class MATRIX>
+    void initialize_matrices(const MatrixBlockVector<MATRIX> &matrices,
+                             bool both);
 
-                                       /**
-                                        * Allocate a local matrix
-                                        * for each of the global
-                                        * level objects in @p
-                                        * matrices. Additionally,
-                                        * set their block row and
-                                        * column coordinates. The
-                                        * matrices themselves are
-                                        * resized by reinit().
-                                        *
-                                        * @note This function is
-                                        * usually only called by the
-                                        * assembler.
-                                        */
-      template <class MATRIX>
-      void initialize_matrices(const MGMatrixBlockVector<MATRIX>& matrices,
-                               bool both);
+    /**
+     * Allocate a local matrix
+     * for each of the global
+     * level objects in @p
+     * matrices. Additionally,
+     * set their block row and
+     * column coordinates. The
+     * matrices themselves are
+     * resized by reinit().
+     *
+     * @note This function is
+     * usually only called by the
+     * assembler.
+     */
+    template <class MATRIX>
+    void initialize_matrices(const MGMatrixBlockVector<MATRIX> &matrices,
+                             bool both);
 
-                                       /**
-                                        * Initialize quadrature values
-                                        * to <tt>nv</tt> values in
-                                        * <tt>np</tt> quadrature points.
-                                        */
-      void initialize_quadrature(unsigned int np, unsigned int nv);
+    /**
+     * Initialize quadrature values
+     * to <tt>nv</tt> values in
+     * <tt>np</tt> quadrature points.
+     */
+    void initialize_quadrature(unsigned int np, unsigned int nv);
 
-                                       /**
-                                        * Reinitialize matrices for
-                                        * new cell. Does not resize
-                                        * any of the data vectors
-                                        * stored in this object, but
-                                        * resizes the vectors in #R
-                                        * and the matrices in #M1 and
-                                        * #M2 for hp and sets them to
-                                        * zero.
-                                        */
-      void reinit(const BlockIndices& local_sizes);
+    /**
+     * Reinitialize matrices for
+     * new cell. Does not resize
+     * any of the data vectors
+     * stored in this object, but
+     * resizes the vectors in #R
+     * and the matrices in #M1 and
+     * #M2 for hp and sets them to
+     * zero.
+     */
+    void reinit(const BlockIndices &local_sizes);
 
-      template <class STREAM>
-      void print_debug(STREAM& os) const;
+    template <class STREAM>
+    void print_debug(STREAM &os) const;
 
-                                       /**
-                                        * The memory used by this object.
-                                        */
-      std::size_t memory_consumption () const;
+    /**
+     * The memory used by this object.
+     */
+    std::size_t memory_consumption () const;
 
-    private:
-                                       /**
-                                        * Initialize a single local
-                                        * matrix block. A helper
-                                        * function for initialize()
-                                        */
-      void initialize_local(MatrixBlock<FullMatrix<number> >& M,
-                            const unsigned int row,
-                            const unsigned int col);
+  private:
+    /**
+     * Initialize a single local
+     * matrix block. A helper
+     * function for initialize()
+     */
+    void initialize_local(MatrixBlock<FullMatrix<number> > &M,
+                          const unsigned int row,
+                          const unsigned int col);
 
-                                       /**
-                                        * The local numbers,
-                                        * computed on a cell or on a
-                                        * face.
-                                        */
-      std::vector<number> J;
+    /**
+     * The local numbers,
+     * computed on a cell or on a
+     * face.
+     */
+    std::vector<number> J;
 
-                                       /**
-                                        * The local vectors. This
-                                        * field is public, so that
-                                        * local integrators can
-                                        * write to it.
-                                        */
-      std::vector<BlockVector<number> > R;
+    /**
+     * The local vectors. This
+     * field is public, so that
+     * local integrators can
+     * write to it.
+     */
+    std::vector<BlockVector<number> > R;
 
-                                       /**
-                                        * The local matrices
-                                        * coupling degrees of
-                                        * freedom in the cell
-                                        * itself or within the
-                                        * first cell on a face.
-                                        */
-      std::vector<MatrixBlock<FullMatrix<number> > > M1;
+    /**
+     * The local matrices
+     * coupling degrees of
+     * freedom in the cell
+     * itself or within the
+     * first cell on a face.
+     */
+    std::vector<MatrixBlock<FullMatrix<number> > > M1;
 
-                                       /**
-                                        * The local matrices
-                                        * coupling test functions on
-                                        * the cell with trial
-                                        * functions on the other
-                                        * cell.
-                                        *
-                                        * Only used on interior
-                                        * faces.
-                                        */
-      std::vector<MatrixBlock<FullMatrix<number> > > M2;
+    /**
+     * The local matrices
+     * coupling test functions on
+     * the cell with trial
+     * functions on the other
+     * cell.
+     *
+     * Only used on interior
+     * faces.
+     */
+    std::vector<MatrixBlock<FullMatrix<number> > > M2;
 
-                                       /**
-                                        * @todo Shouldn't this be in
-                                        * IntegrationInfo? Guido
-                                        *
-                                        * Values in quadrature points.
-                                        */
-      Table<2, number> quadrature_data;
+    /**
+     * @todo Shouldn't this be in
+     * IntegrationInfo? Guido
+     *
+     * Values in quadrature points.
+     */
+    Table<2, number> quadrature_data;
   };
 
 //----------------------------------------------------------------------//
@@ -489,13 +489,13 @@ namespace MeshWorker
   template <class MATRIX>
   inline void
   LocalResults<number>::initialize_matrices(
-    const MatrixBlockVector<MATRIX>& matrices,
+    const MatrixBlockVector<MATRIX> &matrices,
     bool both)
   {
     M1.resize(matrices.size());
     if (both)
       M2.resize(matrices.size());
-    for (unsigned int i=0;i<matrices.size();++i)
+    for (unsigned int i=0; i<matrices.size(); ++i)
       {
         const unsigned int row = matrices.block(i).row;
         const unsigned int col = matrices.block(i).column;
@@ -515,15 +515,15 @@ namespace MeshWorker
   template <class MATRIX>
   inline void
   LocalResults<number>::initialize_matrices(
-    const MGMatrixBlockVector<MATRIX>& matrices,
+    const MGMatrixBlockVector<MATRIX> &matrices,
     bool both)
   {
     M1.resize(matrices.size());
     if (both)
       M2.resize(matrices.size());
-    for (unsigned int i=0;i<matrices.size();++i)
+    for (unsigned int i=0; i<matrices.size(); ++i)
       {
-        const MGLevelObject<MatrixBlock<MATRIX> >& o = matrices.block(i);
+        const MGLevelObject<MatrixBlock<MATRIX> > &o = matrices.block(i);
         const unsigned int row = o[o.min_level()].row;
         const unsigned int col = o[o.min_level()].column;
 
@@ -546,7 +546,7 @@ namespace MeshWorker
     M1.resize(n);
     if (both)
       M2.resize(n);
-    for (unsigned int i=0;i<n;++i)
+    for (unsigned int i=0; i<n; ++i)
       {
         M1[i].row = 0;
         M1[i].column = 0;
@@ -614,7 +614,7 @@ namespace MeshWorker
 
   template <typename number>
   inline
-  number&
+  number &
   LocalResults<number>::value(unsigned int i)
   {
     AssertIndexRange(i,J.size());
@@ -624,7 +624,7 @@ namespace MeshWorker
 
   template <typename number>
   inline
-  BlockVector<number>&
+  BlockVector<number> &
   LocalResults<number>::vector(unsigned int i)
   {
     AssertIndexRange(i,R.size());
@@ -634,7 +634,7 @@ namespace MeshWorker
 
   template <typename number>
   inline
-  MatrixBlock<FullMatrix<number> >&
+  MatrixBlock<FullMatrix<number> > &
   LocalResults<number>::matrix(unsigned int i, bool external)
   {
     if (external)
@@ -649,7 +649,7 @@ namespace MeshWorker
 
   template <typename number>
   inline
-  number&
+  number &
   LocalResults<number>::quadrature_value(unsigned int k, unsigned int i)
   {
     return quadrature_data(k,i);
@@ -658,7 +658,7 @@ namespace MeshWorker
 
   template <typename number>
   inline
-  Table<2, number>&
+  Table<2, number> &
   LocalResults<number>::quadrature_values()
   {
     return quadrature_data;
@@ -677,7 +677,7 @@ namespace MeshWorker
 
   template <typename number>
   inline
-  const BlockVector<number>&
+  const BlockVector<number> &
   LocalResults<number>::vector(unsigned int i) const
   {
     AssertIndexRange(i,R.size());
@@ -687,7 +687,7 @@ namespace MeshWorker
 
   template <typename number>
   inline
-  const MatrixBlock<FullMatrix<number> >&
+  const MatrixBlock<FullMatrix<number> > &
   LocalResults<number>::matrix(unsigned int i, bool external) const
   {
     if (external)
@@ -712,19 +712,19 @@ namespace MeshWorker
   template <typename number>
   template <class STREAM>
   void
-  LocalResults<number>::print_debug(STREAM& os) const
+  LocalResults<number>::print_debug(STREAM &os) const
   {
     os << "J: " << J.size() << std::endl;
     os << "R: " << R.size() << std::endl;
-    for (unsigned int i=0;i<R.size();++i)
+    for (unsigned int i=0; i<R.size(); ++i)
       {
         os << "  " << R[i].n_blocks() << " -";
-        for (unsigned int j=0;j<R[i].n_blocks();++j)
+        for (unsigned int j=0; j<R[i].n_blocks(); ++j)
           os << ' ' << R[i].block(j).size();
         os << std::endl;
       }
     os << "M: " << M1.size() << " face " << M2.size() << std::endl;
-    for (unsigned int i=0;i<M1.size();++i)
+    for (unsigned int i=0; i<M1.size(); ++i)
       {
         os << "  " << M1[i].row << "," << M1[i].column
            << " " << M1[i].matrix.m() << 'x' << M1[i].matrix.n();
