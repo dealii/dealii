@@ -9,7 +9,7 @@
 --min-conditional-indent=0
 --pad-header
 
-# write things as 'char * p'
+# write things as 'char *p'
 --align-pointer=name
 --align-reference=name
 
