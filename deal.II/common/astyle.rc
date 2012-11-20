@@ -1,6 +1,6 @@
 # astyle 2.02 indentation style for deal.II
 # Run astyle in a command like
-#    astyle --options=lib/astyle.rc *cc *h
+#    astyle --options=lib/astyle.rc *.cc *.h
 
 --style=gnu
 
