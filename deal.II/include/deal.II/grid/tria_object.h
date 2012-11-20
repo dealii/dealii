@@ -24,98 +24,98 @@ namespace internal
   namespace Triangulation
   {
 
-/**
- * Class template for the <tt>structdim</tt>-dimensional cells constituting
- * a dealii::Triangulation of dimension <tt>structdim</tt> or lower dimensional
- * objects of higher dimensions.  They are characterized by the
- * (global) indices of their faces, which are cells of dimension
- * <tt>structdim-1</tt> or vertices if <tt>structdim=1</tt>.
- *
- * @author Guido Kanschat, 2007
- */
+    /**
+     * Class template for the <tt>structdim</tt>-dimensional cells constituting
+     * a dealii::Triangulation of dimension <tt>structdim</tt> or lower dimensional
+     * objects of higher dimensions.  They are characterized by the
+     * (global) indices of their faces, which are cells of dimension
+     * <tt>structdim-1</tt> or vertices if <tt>structdim=1</tt>.
+     *
+     * @author Guido Kanschat, 2007
+     */
     template <int structdim>
     class TriaObject
     {
-      public:
-        static const unsigned int dimension = structdim;
+    public:
+      static const unsigned int dimension = structdim;
 
-                                         /**
-                                          * Default constructor,
-                                          * setting all face indices
-                                          * to invalid values.
-                                          */
-        TriaObject ();
+      /**
+       * Default constructor,
+       * setting all face indices
+       * to invalid values.
+       */
+      TriaObject ();
 
-                                         /**
-                                          * Constructor for a line
-                                          * object with the numbers of
-                                          * its two end points.
-                                          *
-                                          * Throws an exception if
-                                          * dimension is not one.
-                                          */
-        TriaObject (const int i0, const int i1);
+      /**
+       * Constructor for a line
+       * object with the numbers of
+       * its two end points.
+       *
+       * Throws an exception if
+       * dimension is not one.
+       */
+      TriaObject (const int i0, const int i1);
 
-                                         /**
-                                          * Constructor for a quadrilateral
-                                          * object with the numbers of
-                                          * its four lines.
-                                          *
-                                          * Throws an exception if
-                                          * dimension is not two.
-                                          */
-        TriaObject (const int i0, const int i1,
-                    const int i2, const int i3);
+      /**
+       * Constructor for a quadrilateral
+       * object with the numbers of
+       * its four lines.
+       *
+       * Throws an exception if
+       * dimension is not two.
+       */
+      TriaObject (const int i0, const int i1,
+                  const int i2, const int i3);
 
-                                         /**
-                                          * Constructor for a hexahedron
-                                          * object with the numbers of
-                                          * its six quadrilaterals.
-                                          *
-                                          * Throws an exception if
-                                          * dimension is not two.
-                                          */
-        TriaObject (const int i0, const int i1,
-                    const int i2, const int i3,
-                    const int i4, const int i5);
+      /**
+       * Constructor for a hexahedron
+       * object with the numbers of
+       * its six quadrilaterals.
+       *
+       * Throws an exception if
+       * dimension is not two.
+       */
+      TriaObject (const int i0, const int i1,
+                  const int i2, const int i3,
+                  const int i4, const int i5);
 
 
-                                         /**
-                                          * Return the index of the
-                                          * ith face object.
-                                          */
-        int face (const unsigned int i) const;
+      /**
+       * Return the index of the
+       * ith face object.
+       */
+      int face (const unsigned int i) const;
 
-                                         /**
-                                          * Set the index of the ith
-                                          * face object.
-                                          */
-        void set_face (const unsigned int i, const int index);
+      /**
+       * Set the index of the ith
+       * face object.
+       */
+      void set_face (const unsigned int i, const int index);
 
-                                         /**
-                                          * Determine an estimate for the
-                                          * memory consumption (in bytes)
-                                          * of this object.
-                                          */
-        static std::size_t memory_consumption ();
+      /**
+       * Determine an estimate for the
+       * memory consumption (in bytes)
+       * of this object.
+       */
+      static std::size_t memory_consumption ();
 
-        /**
-         * Read or write the data of this object to or
-         * from a stream for the purpose of serialization
-         */
-        template <class Archive>
-        void serialize(Archive & ar,
-                       const unsigned int version);
+      /**
+       * Read or write the data of this object to or
+       * from a stream for the purpose of serialization
+       */
+      template <class Archive>
+      void serialize(Archive &ar,
+                     const unsigned int version);
 
-      protected:
-                                         /**
-                                          *  Global indices of the
-                                          *  face iterators bounding
-                                          *  this cell if dim@>1, and
-                                          *  the two vertex indices in
-                                          *  1d.
-                                          */
-        int faces[GeometryInfo<structdim>::faces_per_cell];
+    protected:
+      /**
+       *  Global indices of the
+       *  face iterators bounding
+       *  this cell if dim@>1, and
+       *  the two vertex indices in
+       *  1d.
+       */
+      int faces[GeometryInfo<structdim>::faces_per_cell];
     };
 
 //----------------------------------------------------------------------//
@@ -207,10 +207,10 @@ namespace internal
 
     template <int structdim>
     template <class Archive>
-    void TriaObject<structdim>::serialize(Archive & ar,
+    void TriaObject<structdim>::serialize(Archive &ar,
                                           const unsigned int)
     {
-      ar & faces;
+      ar &faces;
     }
 
 

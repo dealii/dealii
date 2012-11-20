@@ -28,11 +28,11 @@ namespace Functions
 
   template<int dim>
   FlowFunction<dim>::FlowFunction()
-                  :
-                  Function<dim>(dim+1),
-                  mean_pressure(0),
-                  aux_values(dim+1),
-                  aux_gradients(dim+1)
+    :
+    Function<dim>(dim+1),
+    mean_pressure(0),
+    aux_values(dim+1),
+    aux_gradients(dim+1)
   {}
 
 
@@ -57,18 +57,18 @@ namespace Functions
     const unsigned int n_points = points.size();
     Assert(values.size() == n_points, ExcDimensionMismatch(values.size(), n_points));
 
-                                     // guard access to the aux_*
-                                     // variables in multithread mode
+    // guard access to the aux_*
+    // variables in multithread mode
     Threads::Mutex::ScopedLock lock (mutex);
 
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       aux_values[d].resize(n_points);
     vector_values(points, aux_values);
 
-    for (unsigned int k=0;k<n_points;++k)
+    for (unsigned int k=0; k<n_points; ++k)
       {
         Assert(values[k].size() == dim+1, ExcDimensionMismatch(values[k].size(), dim+1));
-        for (unsigned int d=0;d<dim+1;++d)
+        for (unsigned int d=0; d<dim+1; ++d)
           values[k](d) = aux_values[d][k];
       }
   }
@@ -76,8 +76,8 @@ namespace Functions
 
   template<int dim>
   void FlowFunction<dim>::vector_value (
-    const Point<dim>& point,
-    Vector<double>& value) const
+    const Point<dim> &point,
+    Vector<double> &value) const
   {
     Assert(value.size() == dim+1, ExcDimensionMismatch(value.size(), dim+1));
 
@@ -85,22 +85,22 @@ namespace Functions
     std::vector<Point<dim> > points(1);
     points[0] = point;
 
-                                     // guard access to the aux_*
-                                     // variables in multithread mode
+    // guard access to the aux_*
+    // variables in multithread mode
     Threads::Mutex::ScopedLock lock (mutex);
 
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       aux_values[d].resize(n_points);
     vector_values(points, aux_values);
 
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       value(d) = aux_values[d][0];
   }
 
 
   template<int dim>
   double FlowFunction<dim>::value (
-    const Point<dim>& point,
+    const Point<dim> &point,
     const unsigned int comp) const
   {
     Assert(comp < dim+1, ExcIndexRange(comp, 0, dim+1));
@@ -108,11 +108,11 @@ namespace Functions
     std::vector<Point<dim> > points(1);
     points[0] = point;
 
-                                     // guard access to the aux_*
-                                     // variables in multithread mode
+    // guard access to the aux_*
+    // variables in multithread mode
     Threads::Mutex::ScopedLock lock (mutex);
 
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       aux_values[d].resize(n_points);
     vector_values(points, aux_values);
 
@@ -122,24 +122,24 @@ namespace Functions
 
   template<int dim>
   void FlowFunction<dim>::vector_gradient_list (
-    const std::vector<Point<dim> >& points,
-    std::vector<std::vector<Tensor<1,dim> > >& values) const
+    const std::vector<Point<dim> > &points,
+    std::vector<std::vector<Tensor<1,dim> > > &values) const
   {
     const unsigned int n_points = points.size();
     Assert(values.size() == n_points, ExcDimensionMismatch(values.size(), n_points));
 
-                                     // guard access to the aux_*
-                                     // variables in multithread mode
+    // guard access to the aux_*
+    // variables in multithread mode
     Threads::Mutex::ScopedLock lock (mutex);
 
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       aux_gradients[d].resize(n_points);
     vector_gradients(points, aux_gradients);
 
-    for (unsigned int k=0;k<n_points;++k)
+    for (unsigned int k=0; k<n_points; ++k)
       {
         Assert(values[k].size() == dim+1, ExcDimensionMismatch(values[k].size(), dim+1));
-        for (unsigned int d=0;d<dim+1;++d)
+        for (unsigned int d=0; d<dim+1; ++d)
           values[k][d] = aux_gradients[d][k];
       }
   }
@@ -147,24 +147,24 @@ namespace Functions
 
   template<int dim>
   void FlowFunction<dim>::vector_laplacian_list (
-    const std::vector<Point<dim> >& points,
-    std::vector<Vector<double> >& values) const
+    const std::vector<Point<dim> > &points,
+    std::vector<Vector<double> > &values) const
   {
     const unsigned int n_points = points.size();
     Assert(values.size() == n_points, ExcDimensionMismatch(values.size(), n_points));
 
-                                     // guard access to the aux_*
-                                     // variables in multithread mode
+    // guard access to the aux_*
+    // variables in multithread mode
     Threads::Mutex::ScopedLock lock (mutex);
 
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       aux_values[d].resize(n_points);
     vector_laplacians(points, aux_values);
 
-    for (unsigned int k=0;k<n_points;++k)
+    for (unsigned int k=0; k<n_points; ++k)
       {
         Assert(values[k].size() == dim+1, ExcDimensionMismatch(values[k].size(), dim+1));
-        for (unsigned int d=0;d<dim+1;++d)
+        for (unsigned int d=0; d<dim+1; ++d)
           values[k](d) = aux_values[d][k];
       }
   }
@@ -184,8 +184,8 @@ namespace Functions
   template<int dim>
   PoisseuilleFlow<dim>::PoisseuilleFlow(const double r,
                                         const double Re)
-                  :
-                  radius(r), Reynolds(Re)
+    :
+    radius(r), Reynolds(Re)
   {
     Assert(Reynolds != 0., ExcMessage("Reynolds number cannot be zero"));
   }
@@ -198,33 +198,33 @@ namespace Functions
 
   template<int dim>
   void PoisseuilleFlow<dim>::vector_values (
-    const std::vector<Point<dim> >& points,
-    std::vector<std::vector<double> >& values) const
+    const std::vector<Point<dim> > &points,
+    std::vector<std::vector<double> > &values) const
   {
     unsigned int n = points.size();
     double stretch = 1./radius;
 
     Assert(values.size() == dim+1, ExcDimensionMismatch(values.size(), dim+1));
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
-    for (unsigned int k=0;k<n;++k)
+    for (unsigned int k=0; k<n; ++k)
       {
-        const Point<dim>& p = points[k];
-                                         // First, compute the
-                                         // square of the distance to
-                                         // the x-axis divided by the
-                                         // radius.
+        const Point<dim> &p = points[k];
+        // First, compute the
+        // square of the distance to
+        // the x-axis divided by the
+        // radius.
         double r2 = 0;
-        for (unsigned int d=1;d<dim;++d)
+        for (unsigned int d=1; d<dim; ++d)
           r2 += p(d)*p(d)*stretch*stretch;
 
-                                         // x-velocity
+        // x-velocity
         values[0][k] = 1.-r2;
-                                         // other velocities
-        for (unsigned int d=1;d<dim;++d)
+        // other velocities
+        for (unsigned int d=1; d<dim; ++d)
           values[d][k] = 0.;
-                                         // pressure
+        // pressure
         values[dim][k] = -2*(dim-1)*stretch*stretch*p(0)/Reynolds + this->mean_pressure;
       }
   }
@@ -233,29 +233,29 @@ namespace Functions
 
   template<int dim>
   void PoisseuilleFlow<dim>::vector_gradients (
-    const std::vector<Point<dim> >& points,
-    std::vector<std::vector<Tensor<1,dim> > >& values) const
+    const std::vector<Point<dim> > &points,
+    std::vector<std::vector<Tensor<1,dim> > > &values) const
   {
     unsigned int n = points.size();
     double stretch = 1./radius;
 
     Assert(values.size() == dim+1, ExcDimensionMismatch(values.size(), dim+1));
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
-    for (unsigned int k=0;k<n;++k)
+    for (unsigned int k=0; k<n; ++k)
       {
-        const Point<dim>& p = points[k];
-                                         // x-velocity
+        const Point<dim> &p = points[k];
+        // x-velocity
         values[0][k][0] = 0.;
-        for (unsigned int d=1;d<dim;++d)
-        values[0][k][d] = -2.*p(d)*stretch*stretch;
-                                         // other velocities
-        for (unsigned int d=1;d<dim;++d)
+        for (unsigned int d=1; d<dim; ++d)
+          values[0][k][d] = -2.*p(d)*stretch*stretch;
+        // other velocities
+        for (unsigned int d=1; d<dim; ++d)
           values[d][k] = 0.;
-                                         // pressure
+        // pressure
         values[dim][k][0] = -2*(dim-1)*stretch*stretch/Reynolds;
-        for (unsigned int d=1;d<dim;++d)
+        for (unsigned int d=1; d<dim; ++d)
           values[dim][k][d] = 0.;
       }
   }
@@ -264,16 +264,16 @@ namespace Functions
 
   template<int dim>
   void PoisseuilleFlow<dim>::vector_laplacians (
-    const std::vector<Point<dim> >& points,
-    std::vector<std::vector<double> >& values) const
+    const std::vector<Point<dim> > &points,
+    std::vector<std::vector<double> > &values) const
   {
     unsigned int n = points.size();
     Assert(values.size() == dim+1, ExcDimensionMismatch(values.size(), dim+1));
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
-    for (unsigned int d=0;d<values.size();++d)
-      for (unsigned int k=0;k<values[d].size();++k)
+    for (unsigned int d=0; d<values.size(); ++d)
+      for (unsigned int k=0; k<values[d].size(); ++k)
         values[d][k] = 0.;
   }
 
@@ -281,8 +281,8 @@ namespace Functions
 
   template<int dim>
   StokesCosine<dim>::StokesCosine(const double nu, const double r)
-                  :
-                  viscosity(nu), reaction(r)
+    :
+    viscosity(nu), reaction(r)
   {}
 
 
@@ -302,18 +302,18 @@ namespace Functions
 
   template<int dim>
   void StokesCosine<dim>::vector_values (
-    const std::vector<Point<dim> >& points,
-    std::vector<std::vector<double> >& values) const
+    const std::vector<Point<dim> > &points,
+    std::vector<std::vector<double> > &values) const
   {
     unsigned int n = points.size();
 
     Assert(values.size() == dim+1, ExcDimensionMismatch(values.size(), dim+1));
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
-    for (unsigned int k=0;k<n;++k)
+    for (unsigned int k=0; k<n; ++k)
       {
-        const Point<dim>& p = points[k];
+        const Point<dim> &p = points[k];
         const double x = numbers::PI/2. * p(0);
         const double y = numbers::PI/2. * p(1);
         const double cx = cos(x);
@@ -349,18 +349,18 @@ namespace Functions
 
   template<int dim>
   void StokesCosine<dim>::vector_gradients (
-    const std::vector<Point<dim> >& points,
-    std::vector<std::vector<Tensor<1,dim> > >& values) const
+    const std::vector<Point<dim> > &points,
+    std::vector<std::vector<Tensor<1,dim> > > &values) const
   {
     unsigned int n = points.size();
 
     Assert(values.size() == dim+1, ExcDimensionMismatch(values.size(), dim+1));
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
-    for (unsigned int k=0;k<n;++k)
+    for (unsigned int k=0; k<n; ++k)
       {
-        const Point<dim>& p = points[k];
+        const Point<dim> &p = points[k];
         const double x = numbers::PI/2. * p(0);
         const double y = numbers::PI/2. * p(1);
         const double c2x = cos(2*x);
@@ -413,33 +413,33 @@ namespace Functions
 
   template<int dim>
   void StokesCosine<dim>::vector_laplacians (
-    const std::vector<Point<dim> >& points,
-    std::vector<std::vector<double> >& values) const
+    const std::vector<Point<dim> > &points,
+    std::vector<std::vector<double> > &values) const
   {
     unsigned int n = points.size();
 
     Assert(values.size() == dim+1, ExcDimensionMismatch(values.size(), dim+1));
-    for (unsigned int d=0;d<dim+1;++d)
+    for (unsigned int d=0; d<dim+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
     if (reaction != 0.)
       {
         vector_values(points, values);
-        for (unsigned int d=0;d<dim;++d)
-          for (unsigned int k=0;k<values[d].size();++k)
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int k=0; k<values[d].size(); ++k)
             values[d][k] *= -reaction;
       }
     else
       {
-        for (unsigned int d=0;d<dim;++d)
-          for (unsigned int k=0;k<values[d].size();++k)
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int k=0; k<values[d].size(); ++k)
             values[d][k] = 0.;
       }
 
 
-    for (unsigned int k=0;k<n;++k)
+    for (unsigned int k=0; k<n; ++k)
       {
-        const Point<dim>& p = points[k];
+        const Point<dim> &p = points[k];
         const double x = numbers::PI/2. * p(0);
         const double y = numbers::PI/2. * p(1);
         const double c2x = cos(2*x);
@@ -478,11 +478,11 @@ namespace Functions
   const double StokesLSingularity::lambda = 0.54448373678246;
 
   StokesLSingularity::StokesLSingularity()
-                  :
-                  omega (3./2.*numbers::PI),
-                  coslo (cos(lambda*omega)),
-                  lp(1.+lambda),
-                  lm(1.-lambda)
+    :
+    omega (3./2.*numbers::PI),
+    coslo (cos(lambda *omega)),
+    lp(1.+lambda),
+    lm(1.-lambda)
   {}
 
 
@@ -491,7 +491,7 @@ namespace Functions
   StokesLSingularity::Psi(double phi) const
   {
     return coslo * (sin(lp*phi)/lp - sin(lm*phi)/lm)
-      - cos(lp*phi) + cos(lm*phi);
+           - cos(lp*phi) + cos(lm*phi);
   }
 
 
@@ -500,7 +500,7 @@ namespace Functions
   StokesLSingularity::Psi_1(double phi) const
   {
     return coslo * (cos(lp*phi) - cos(lm*phi))
-      + lp*sin(lp*phi) - lm*sin(lm*phi);
+           + lp*sin(lp*phi) - lm*sin(lm*phi);
   }
 
 
@@ -509,7 +509,7 @@ namespace Functions
   StokesLSingularity::Psi_2(double phi) const
   {
     return coslo * (lm*sin(lm*phi) - lp*sin(lp*phi))
-      + lp*lp*cos(lp*phi) - lm*lm*cos(lm*phi);
+           + lp*lp*cos(lp*phi) - lm*lm*cos(lm*phi);
   }
 
 
@@ -518,7 +518,7 @@ namespace Functions
   StokesLSingularity::Psi_3(double phi) const
   {
     return coslo * (lm*lm*cos(lm*phi) - lp*lp*cos(lp*phi))
-      + lm*lm*lm*sin(lm*phi) - lp*lp*lp*sin(lp*phi);
+           + lm*lm*lm*sin(lm*phi) - lp*lp*lp*sin(lp*phi);
   }
 
 
@@ -527,23 +527,23 @@ namespace Functions
   StokesLSingularity::Psi_4(double phi) const
   {
     return coslo * (lp*lp*lp*sin(lp*phi) - lm*lm*lm*sin(lm*phi))
-      + lm*lm*lm*lm*cos(lm*phi) - lp*lp*lp*lp*cos(lp*phi);
+           + lm*lm*lm*lm*cos(lm*phi) - lp*lp*lp*lp*cos(lp*phi);
   }
 
 
   void StokesLSingularity::vector_values (
-    const std::vector<Point<2> >& points,
-    std::vector<std::vector<double> >& values) const
+    const std::vector<Point<2> > &points,
+    std::vector<std::vector<double> > &values) const
   {
     unsigned int n = points.size();
 
     Assert(values.size() == 2+1, ExcDimensionMismatch(values.size(), 2+1));
-    for (unsigned int d=0;d<2+1;++d)
+    for (unsigned int d=0; d<2+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
-    for (unsigned int k=0;k<n;++k)
+    for (unsigned int k=0; k<n; ++k)
       {
-        const Point<2>& p = points[k];
+        const Point<2> &p = points[k];
         const double x = p(0);
         const double y = p(1);
 
@@ -559,7 +559,7 @@ namespace Functions
           }
         else
           {
-            for (unsigned int d=0;d<3;++d)
+            for (unsigned int d=0; d<3; ++d)
               values[d][k] = 0.;
           }
       }
@@ -568,18 +568,18 @@ namespace Functions
 
 
   void StokesLSingularity::vector_gradients (
-    const std::vector<Point<2> >& points,
-    std::vector<std::vector<Tensor<1,2> > >& values) const
+    const std::vector<Point<2> > &points,
+    std::vector<std::vector<Tensor<1,2> > > &values) const
   {
     unsigned int n = points.size();
 
     Assert(values.size() == 2+1, ExcDimensionMismatch(values.size(), 2+1));
-    for (unsigned int d=0;d<2+1;++d)
+    for (unsigned int d=0; d<2+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
-    for (unsigned int k=0;k<n;++k)
+    for (unsigned int k=0; k<n; ++k)
       {
-        const Point<2>& p = points[k];
+        const Point<2> &p = points[k];
         const double x = p(0);
         const double y = p(1);
 
@@ -597,13 +597,13 @@ namespace Functions
             const double cosp= cos(phi);
             const double sinp= sin(phi);
 
-                                             // Derivatives of u with respect to r, phi
+            // Derivatives of u with respect to r, phi
             const double udr = lambda * rl1 * (lp*sinp*psi + cosp*psi1);
             const double udp = rl * (lp*cosp*psi + lp*sinp*psi1 - sinp*psi1 + cosp*psi2);
-                                             // Derivatives of v with respect to r, phi
+            // Derivatives of v with respect to r, phi
             const double vdr = lambda * rl1 * (lp*cosp*psi - sinp*psi1);
             const double vdp = rl * (lp*(cosp*psi1 - sinp*psi) - cosp*psi1 - sinp*psi2);
-                                             // Derivatives of p with respect to r, phi
+            // Derivatives of p with respect to r, phi
             const double pdr = -(lambda-1.) * rl2 * (lp*lp*psi1+Psi_3(phi)) / lm;
             const double pdp = -rl1 * (lp*lp*psi2+Psi_4(phi)) / lm;
             values[0][k][0] = cosp*udr - sinp/r*udp;
@@ -615,7 +615,7 @@ namespace Functions
           }
         else
           {
-            for (unsigned int d=0;d<3;++d)
+            for (unsigned int d=0; d<3; ++d)
               values[d][k] = 0.;
           }
       }
@@ -624,16 +624,16 @@ namespace Functions
 
 
   void StokesLSingularity::vector_laplacians (
-    const std::vector<Point<2> >& points,
-    std::vector<std::vector<double> >& values) const
+    const std::vector<Point<2> > &points,
+    std::vector<std::vector<double> > &values) const
   {
     unsigned int n = points.size();
     Assert(values.size() == 2+1, ExcDimensionMismatch(values.size(), 2+1));
-    for (unsigned int d=0;d<2+1;++d)
+    for (unsigned int d=0; d<2+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
-    for (unsigned int d=0;d<values.size();++d)
-      for (unsigned int k=0;k<values[d].size();++k)
+    for (unsigned int d=0; d<values.size(); ++d)
+      for (unsigned int k=0; k<values[d].size(); ++k)
         values[d][k] = 0.;
   }
 
@@ -641,17 +641,17 @@ namespace Functions
 //----------------------------------------------------------------------//
 
   Kovasznay::Kovasznay(double Re, bool stokes)
-                  :
-                  Reynolds(Re),
-                  stokes(stokes)
+    :
+    Reynolds(Re),
+    stokes(stokes)
   {
     long double r2 = Reynolds/2.;
     long double b = 4*numbers::PI*numbers::PI;
     long double l = -b/(r2+std::sqrt(r2*r2+b));
     lbda = l;
-                                     // mean pressure for a domain
-                                     // spreading from -.5 to 1.5 in
-                                     // x-direction
+    // mean pressure for a domain
+    // spreading from -.5 to 1.5 in
+    // x-direction
     p_average = 1/(8*l)*(std::exp(3.*l)-std::exp(-l));
   }
 
@@ -661,18 +661,18 @@ namespace Functions
 
 
   void Kovasznay::vector_values (
-    const std::vector<Point<2> >& points,
-    std::vector<std::vector<double> >& values) const
+    const std::vector<Point<2> > &points,
+    std::vector<std::vector<double> > &values) const
   {
     unsigned int n = points.size();
 
     Assert(values.size() == 2+1, ExcDimensionMismatch(values.size(), 2+1));
-    for (unsigned int d=0;d<2+1;++d)
+    for (unsigned int d=0; d<2+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
-    for (unsigned int k=0;k<n;++k)
+    for (unsigned int k=0; k<n; ++k)
       {
-        const Point<2>& p = points[k];
+        const Point<2> &p = points[k];
         const double x = p(0);
         const double y = 2. * numbers::PI * p(1);
         const double elx = std::exp(lbda*x);
@@ -685,8 +685,8 @@ namespace Functions
 
 
   void Kovasznay::vector_gradients (
-    const std::vector<Point<2> >& points,
-    std::vector<std::vector<Tensor<1,2> > >& gradients) const
+    const std::vector<Point<2> > &points,
+    std::vector<std::vector<Tensor<1,2> > > &gradients) const
   {
     unsigned int n = points.size();
 
@@ -694,7 +694,7 @@ namespace Functions
     Assert (gradients[0].size() == n,
             ExcDimensionMismatch(gradients[0].size(), n));
 
-    for (unsigned int i=0;i<n;++i)
+    for (unsigned int i=0; i<n; ++i)
       {
         const double x = points[i](0);
         const double y = points[i](1);
@@ -703,34 +703,34 @@ namespace Functions
         const double cy = cos(2*numbers::PI*y);
         const double sy = sin(2*numbers::PI*y);
 
-                                         // u
+        // u
         gradients[0][i][0] = -lbda*elx*cy;
         gradients[0][i][1] = 2. * numbers::PI*elx*sy;
         gradients[1][i][0] = lbda*lbda/(2*numbers::PI)*elx*sy;
         gradients[1][i][1] =lbda*elx*cy;
-                                         // p
+        // p
         gradients[2][i][0] = -lbda*elx*elx;
         gradients[2][i][1] = 0.;
-    }
+      }
   }
 
 
 
   void Kovasznay::vector_laplacians (
-    const std::vector<Point<2> >& points,
-    std::vector<std::vector<double> >& values) const
+    const std::vector<Point<2> > &points,
+    std::vector<std::vector<double> > &values) const
   {
     unsigned int n = points.size();
     Assert(values.size() == 2+1, ExcDimensionMismatch(values.size(), 2+1));
-    for (unsigned int d=0;d<2+1;++d)
+    for (unsigned int d=0; d<2+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
 
     if (stokes)
       {
         const double zp = 2. * numbers::PI;
-        for (unsigned int k=0;k<n;++k)
+        for (unsigned int k=0; k<n; ++k)
           {
-            const Point<2>& p = points[k];
+            const Point<2> &p = points[k];
             const double x = p(0);
             const double y = zp * p(1);
             const double elx = std::exp(lbda*x);
@@ -748,8 +748,8 @@ namespace Functions
       }
     else
       {
-        for (unsigned int d=0;d<values.size();++d)
-          for (unsigned int k=0;k<values[d].size();++k)
+        for (unsigned int d=0; d<values.size(); ++d)
+          for (unsigned int k=0; k<values[d].size(); ++k)
             values[d][k] = 0.;
       }
   }

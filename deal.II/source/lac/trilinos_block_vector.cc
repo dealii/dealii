@@ -119,14 +119,14 @@ namespace TrilinosWrappers
 
 
     void
-    BlockVector::reinit (const BlockVector& v,
+    BlockVector::reinit (const BlockVector &v,
                          const bool fast)
     {
       block_indices = v.get_block_indices();
       if (components.size() != n_blocks())
         components.resize(n_blocks());
 
-      for (unsigned int i=0;i<n_blocks();++i)
+      for (unsigned int i=0; i<n_blocks(); ++i)
         components[i].reinit(v.block(i), fast, false);
 
       collect_sizes();
@@ -142,7 +142,7 @@ namespace TrilinosWrappers
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
 
-      for (unsigned int i=0;i<this->n_blocks();++i)
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
         components[i].clear();
 
       collect_sizes();
@@ -152,8 +152,8 @@ namespace TrilinosWrappers
 
     void
     BlockVector::import_nonlocal_data_for_fe
-      (const TrilinosWrappers::BlockSparseMatrix &m,
-       const BlockVector                         &v)
+    (const TrilinosWrappers::BlockSparseMatrix &m,
+     const BlockVector                         &v)
     {
       Assert (m.n_block_rows() == v.n_blocks(),
               ExcDimensionMismatch(m.n_block_rows(),v.n_blocks()));
@@ -179,7 +179,7 @@ namespace TrilinosWrappers
                              const bool          scientific,
                              const bool          across) const
     {
-      for (unsigned int i=0;i<this->n_blocks();++i)
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
         {
           if (across)
             out << 'C' << i << ':';
@@ -275,7 +275,7 @@ namespace TrilinosWrappers
     if (components.size() != n_blocks())
       components.resize(n_blocks());
 
-    for (unsigned int i=0;i<n_blocks();++i)
+    for (unsigned int i=0; i<n_blocks(); ++i)
       components[i] = v.block(i);
   }
 
@@ -289,7 +289,7 @@ namespace TrilinosWrappers
     if (components.size() != n_blocks())
       components.resize(n_blocks());
 
-    for (unsigned int i=0;i<n_blocks();++i)
+    for (unsigned int i=0; i<n_blocks(); ++i)
       block(i).clear();
 
     collect_sizes();
@@ -305,7 +305,7 @@ namespace TrilinosWrappers
     if (components.size() != n_blocks())
       components.resize(n_blocks());
 
-    for (unsigned int i=0;i<n_blocks();++i)
+    for (unsigned int i=0; i<n_blocks(); ++i)
       components[i].reinit(v.block(i), fast);
 
     collect_sizes();
@@ -349,7 +349,7 @@ namespace TrilinosWrappers
                            const bool          scientific,
                            const bool          across) const
   {
-    for (unsigned int i=0;i<this->n_blocks();++i)
+    for (unsigned int i=0; i<this->n_blocks(); ++i)
       {
         if (across)
           out << 'C' << i << ':';

@@ -30,7 +30,7 @@ namespace LinearAlgebraDealII
   typedef SparseMatrix<double> SparseMatrix;
 
   typedef PreconditionSSOR<SparseMatrix > PreconditionSSOR;
-  
+
 }
 
 
@@ -41,13 +41,22 @@ namespace LinearAlgebraDealII
 // TODO: should we move this into tests/ only?
 namespace LinearAlgebraDummy
 {
-  class Vector {void compress();};
-  class BlockVector {void compress();};
+  class Vector
+  {
+    void compress();
+  };
+  class BlockVector
+  {
+    void compress();
+  };
 
-  class SparseMatrix { void compress();};
+  class SparseMatrix
+  {
+    void compress();
+  };
 
   class PreconditionSSOR {};
-  
+
 }
 
 
@@ -65,20 +74,20 @@ DEAL_II_NAMESPACE_CLOSE
 
 DEAL_II_NAMESPACE_OPEN
 
-  namespace LinearAlgebraPETSc
-  {
-    using namespace dealii;
+namespace LinearAlgebraPETSc
+{
+  using namespace dealii;
 
   typedef PETScWrappers::Vector Vector;
   typedef PETScWrappers::BlockVector BlockVector;
 
   typedef PETScWrappers::SparseMatrix SparseMatrix;
-    typedef PETScWrappers::PreconditionSSOR PreconditionSSOR;
-    
+  typedef PETScWrappers::PreconditionSSOR PreconditionSSOR;
 
-    namespace MPI
-    {
-      
+
+  namespace MPI
+  {
+
     /**
      * Typedef for the vector type used.
      */
@@ -118,9 +127,9 @@ DEAL_II_NAMESPACE_OPEN
      * for other blocks of the system matrix.
      */
     typedef PETScWrappers::PreconditionILU PreconditionILU;
-    }
-    
   }
+
+}
 DEAL_II_NAMESPACE_CLOSE
 
 
@@ -136,15 +145,15 @@ DEAL_II_NAMESPACE_CLOSE
 
 DEAL_II_NAMESPACE_OPEN
 
-  namespace LinearAlgebraTrilinos
-  {
-    using namespace dealii;
-    
-    typedef TrilinosWrappers::Vector Vector;
+namespace LinearAlgebraTrilinos
+{
+  using namespace dealii;
 
-    namespace MPI
-    {
-      
+  typedef TrilinosWrappers::Vector Vector;
+
+  namespace MPI
+  {
+
     /**
      * Typedef for the vector type used.
      */
@@ -184,9 +193,9 @@ DEAL_II_NAMESPACE_OPEN
      * for other blocks of the system matrix.
      */
     typedef TrilinosWrappers::PreconditionILU PreconditionILU;
-    }
-    
   }
+
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

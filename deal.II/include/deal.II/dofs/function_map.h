@@ -39,16 +39,16 @@ template <int spacedim> class Function;
 template<int dim>
 struct FunctionMap
 {
-                                     /**
-                                      * Declare the type as discussed
-                                      * above. Since we can't name it
-                                      * FunctionMap (as that would
-                                      * ambiguate a possible
-                                      * constructor of this class),
-                                      * name it in the fashion of the
-                                      * STL local typedefs.
-                                      */
-    typedef std::map<types::boundary_id, const Function<dim>*> type;
+  /**
+   * Declare the type as discussed
+   * above. Since we can't name it
+   * FunctionMap (as that would
+   * ambiguate a possible
+   * constructor of this class),
+   * name it in the fashion of the
+   * STL local typedefs.
+   */
+  typedef std::map<types::boundary_id, const Function<dim>*> type;
 };
 
 DEAL_II_NAMESPACE_CLOSE

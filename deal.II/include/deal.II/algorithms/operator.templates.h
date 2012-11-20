@@ -23,7 +23,7 @@ namespace Algorithms
 
 
   template <class VECTOR>
-  void Operator<VECTOR>::notify(const Event& e)
+  void Operator<VECTOR>::notify(const Event &e)
   {
     notifications += e;
   }
@@ -43,36 +43,36 @@ namespace Algorithms
 
   template <class VECTOR>
   OutputOperator<VECTOR>::OutputOperator()
-  :
+    :
     os(0)
   {}
 
   template <class VECTOR>
-  void OutputOperator<VECTOR>::initialize_stream(std::ostream& stream)
+  void OutputOperator<VECTOR>::initialize_stream(std::ostream &stream)
   {
     os =&stream;
   }
 
   template <class VECTOR>
-  OutputOperator<VECTOR>&
-  OutputOperator<VECTOR>::operator<< (const NamedData<VECTOR*>& vectors)
+  OutputOperator<VECTOR> &
+  OutputOperator<VECTOR>::operator<< (const NamedData<VECTOR *> &vectors)
   {
-    if(os == 0)
-    {
-      //TODO: make this possible
-      //deallog << ' ' << step;
-      //for (unsigned int i=0;i<vectors.size();++i)
-      //  vectors(i)->print(deallog);
-      //deallog << std::endl;
-    }
+    if (os == 0)
+      {
+        //TODO: make this possible
+        //deallog << ' ' << step;
+        //for (unsigned int i=0;i<vectors.size();++i)
+        //  vectors(i)->print(deallog);
+        //deallog << std::endl;
+      }
     else
-    {
-      (*os) << ' ' << step;
-      for (unsigned int i=0;i<vectors.size();++i)
-        for (unsigned int j=0;j<vectors(i)->size();++j)
-          (*os) << ' ' << (*vectors(i))(j);
-      (*os) << std::endl;
-    }
+      {
+        (*os) << ' ' << step;
+        for (unsigned int i=0; i<vectors.size(); ++i)
+          for (unsigned int j=0; j<vectors(i)->size(); ++j)
+            (*os) << ' ' << (*vectors(i))(j);
+        (*os) << std::endl;
+      }
     return *this;
   }
 }

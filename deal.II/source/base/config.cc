@@ -26,9 +26,9 @@ namespace numbers
 #ifdef DEAL_II_HAVE_ISFINITE
     return std::isfinite (x);
 #else
-                                     // Check against infinities. Note
-                                     // that if x is a NaN, then both
-                                     // comparisons will be false
+    // Check against infinities. Note
+    // that if x is a NaN, then both
+    // comparisons will be false
     return ((x >= -std::numeric_limits<double>::max())
             &&
             (x <= std::numeric_limits<double>::max()));
@@ -39,8 +39,8 @@ namespace numbers
 
   bool is_finite (const std::complex<double> &x)
   {
-                                        // Check complex numbers for infinity
-                                        // by testing real and imaginary part
+    // Check complex numbers for infinity
+    // by testing real and imaginary part
     return ( is_finite (x.real())
              &&
              is_finite (x.imag()) );
@@ -50,8 +50,8 @@ namespace numbers
 
   bool is_finite (const std::complex<float> &x)
   {
-                                        // Check complex numbers for infinity
-                                        // by testing real and imaginary part
+    // Check complex numbers for infinity
+    // by testing real and imaginary part
     return ( is_finite (x.real())
              &&
              is_finite (x.imag()) );
@@ -61,7 +61,7 @@ namespace numbers
 
   bool is_finite (const std::complex<long double> &x)
   {
-                                        // Same for std::complex<long double>
+    // Same for std::complex<long double>
     return ( is_finite (x.real())
              &&
              is_finite (x.imag()) );

@@ -49,65 +49,65 @@ DEAL_II_NAMESPACE_OPEN
 template <class VECTOR = Vector<double> >
 class EigenPower : private Solver<VECTOR>
 {
-  public:
-                                     /**
-                                      * Standardized data struct to
-                                      * pipe additional data to the
-                                      * solver.
-                                      */
-    struct AdditionalData
-    {
-                                         /**
-                                          * Shift parameter. This
-                                          * parameter allows to shift
-                                          * the spectrum to compute a
-                                          * different eigenvalue.
-                                          */
-        double shift;
-                                         /**
-                                          * Constructor. Set the shift parameter.
-                                          */
-        AdditionalData (const double shift = 0.)
-                        :
-                        shift(shift)
-          {}
+public:
+  /**
+   * Standardized data struct to
+   * pipe additional data to the
+   * solver.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Shift parameter. This
+     * parameter allows to shift
+     * the spectrum to compute a
+     * different eigenvalue.
+     */
+    double shift;
+    /**
+     * Constructor. Set the shift parameter.
+     */
+    AdditionalData (const double shift = 0.)
+      :
+      shift(shift)
+    {}
 
-    };
+  };
 
-                                     /**
-                                      * Constructor.
-                                      */
-    EigenPower (SolverControl &cn,
-                VectorMemory<VECTOR> &mem,
-                const AdditionalData &data=AdditionalData());
+  /**
+   * Constructor.
+   */
+  EigenPower (SolverControl &cn,
+              VectorMemory<VECTOR> &mem,
+              const AdditionalData &data=AdditionalData());
 
-                                     /**
-                                      * Virtual destructor.
-                                      */
-    virtual ~EigenPower ();
+  /**
+   * Virtual destructor.
+   */
+  virtual ~EigenPower ();
 
-                                     /**
-                                      * Power method. @p x is the
-                                      * (not necessarily normalized,
-                                      * but nonzero) start vector for
-                                      * the power method. After the
-                                      * iteration, @p value is the
-                                      * approximated eigenvalue and
-                                      * @p x is the corresponding
-                                      * eigenvector, normalized with
-                                      * respect to the l2-norm.
-                                      */
-    template <class MATRIX>
-    void
-    solve (double       &value,
-           const MATRIX &A,
-           VECTOR       &x);
+  /**
+   * Power method. @p x is the
+   * (not necessarily normalized,
+   * but nonzero) start vector for
+   * the power method. After the
+   * iteration, @p value is the
+   * approximated eigenvalue and
+   * @p x is the corresponding
+   * eigenvector, normalized with
+   * respect to the l2-norm.
+   */
+  template <class MATRIX>
+  void
+  solve (double       &value,
+         const MATRIX &A,
+         VECTOR       &x);
 
-  protected:
-                                     /**
-                                      * Shift parameter.
-                                      */
-    AdditionalData additional_data;
+protected:
+  /**
+   * Shift parameter.
+   */
+  AdditionalData additional_data;
 };
 
 /**
@@ -138,79 +138,79 @@ class EigenPower : private Solver<VECTOR>
 template <class VECTOR = Vector<double> >
 class EigenInverse : private Solver<VECTOR>
 {
-  public:
-                                     /**
-                                      * Standardized data struct to
-                                      * pipe additional data to the
-                                      * solver.
-                                      */
-    struct AdditionalData
-    {
-                                         /**
-                                          * Damping of the updated shift value.
-                                          */
-        double relaxation;
+public:
+  /**
+   * Standardized data struct to
+   * pipe additional data to the
+   * solver.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Damping of the updated shift value.
+     */
+    double relaxation;
 
-                                         /**
-                                          * Start step of adaptive
-                                          * shift parameter.
-                                          */
-        unsigned int start_adaption;
-                                         /**
-                                          * Flag for the stopping criterion.
-                                          */
-        bool use_residual;
-                                         /**
-                                          * Constructor.
-                                          */
-        AdditionalData (double relaxation = 1.,
-                        unsigned int start_adaption = 6,
-                        bool use_residual = true)
-                        :
-                        relaxation(relaxation),
-                        start_adaption(start_adaption),
-                        use_residual(use_residual)
-          {}
+    /**
+     * Start step of adaptive
+     * shift parameter.
+     */
+    unsigned int start_adaption;
+    /**
+     * Flag for the stopping criterion.
+     */
+    bool use_residual;
+    /**
+     * Constructor.
+     */
+    AdditionalData (double relaxation = 1.,
+                    unsigned int start_adaption = 6,
+                    bool use_residual = true)
+      :
+      relaxation(relaxation),
+      start_adaption(start_adaption),
+      use_residual(use_residual)
+    {}
 
-    };
+  };
 
-                                     /**
-                                      * Constructor.
-                                      */
-    EigenInverse (SolverControl &cn,
-                  VectorMemory<VECTOR> &mem,
-                  const AdditionalData &data=AdditionalData());
+  /**
+   * Constructor.
+   */
+  EigenInverse (SolverControl &cn,
+                VectorMemory<VECTOR> &mem,
+                const AdditionalData &data=AdditionalData());
 
 
-                                     /**
-                                      * Virtual destructor.
-                                      */
-    virtual ~EigenInverse ();
+  /**
+   * Virtual destructor.
+   */
+  virtual ~EigenInverse ();
 
-                                     /**
-                                      * Inverse method. @p value is
-                                      * the start guess for the
-                                      * eigenvalue and @p x is the
-                                      * (not necessarily normalized,
-                                      * but nonzero) start vector for
-                                      * the power method. After the
-                                      * iteration, @p value is the
-                                      * approximated eigenvalue and
-                                      * @p x is the corresponding
-                                      * eigenvector, normalized with
-                                      * respect to the l2-norm.
-                                      */
-    template <class MATRIX>
-    void
-    solve (double       &value,
-           const MATRIX &A,
-           VECTOR       &x);
+  /**
+   * Inverse method. @p value is
+   * the start guess for the
+   * eigenvalue and @p x is the
+   * (not necessarily normalized,
+   * but nonzero) start vector for
+   * the power method. After the
+   * iteration, @p value is the
+   * approximated eigenvalue and
+   * @p x is the corresponding
+   * eigenvector, normalized with
+   * respect to the l2-norm.
+   */
+  template <class MATRIX>
+  void
+  solve (double       &value,
+         const MATRIX &A,
+         VECTOR       &x);
 
-  protected:
-                                     /**
-                                      * Flags for execution.
-                                      */
-    AdditionalData additional_data;
+protected:
+  /**
+   * Flags for execution.
+   */
+  AdditionalData additional_data;
 };
 
 /*@}*/
@@ -221,9 +221,9 @@ template <class VECTOR>
 EigenPower<VECTOR>::EigenPower (SolverControl &cn,
                                 VectorMemory<VECTOR> &mem,
                                 const AdditionalData &data)
-                :
-                Solver<VECTOR>(cn, mem),
-                additional_data(data)
+  :
+  Solver<VECTOR>(cn, mem),
+  additional_data(data)
 {}
 
 
@@ -245,8 +245,12 @@ EigenPower<VECTOR>::solve (double       &value,
 
   deallog.push("Power method");
 
-  VECTOR* Vy = this->memory.alloc (); VECTOR& y = *Vy; y.reinit (x);
-  VECTOR* Vr = this->memory.alloc (); VECTOR& r = *Vr; r.reinit (x);
+  VECTOR *Vy = this->memory.alloc ();
+  VECTOR &y = *Vy;
+  y.reinit (x);
+  VECTOR *Vr = this->memory.alloc ();
+  VECTOR &r = *Vr;
+  r.reinit (x);
 
   double length = x.l2_norm ();
   double old_length = 0.;
@@ -254,17 +258,17 @@ EigenPower<VECTOR>::solve (double       &value,
 
   A.vmult (y,x);
 
-                                   // Main loop
-  for(int iter=0; conv==SolverControl::iterate; iter++)
+  // Main loop
+  for (int iter=0; conv==SolverControl::iterate; iter++)
     {
       y.add(additional_data.shift, x);
 
-                                       // Compute absolute value of eigenvalue
+      // Compute absolute value of eigenvalue
       old_length = length;
       length = y.l2_norm ();
 
-                                       // do a little trick to compute the sign
-                                       // with not too much effect of round-off errors.
+      // do a little trick to compute the sign
+      // with not too much effect of round-off errors.
       double entry = 0.;
       unsigned int i = 0;
       double thresh = length/x.size();
@@ -277,18 +281,18 @@ EigenPower<VECTOR>::solve (double       &value,
 
       --i;
 
-                                       // Compute unshifted eigenvalue
+      // Compute unshifted eigenvalue
       value = (entry * x (i) < 0.) ? -length : length;
       value -= additional_data.shift;
 
-                                       // Update normalized eigenvector
+      // Update normalized eigenvector
       x.equ (1/length, y);
 
-                                       // Compute residual
+      // Compute residual
       A.vmult (y,x);
 
-                                       // Check the change of the eigenvalue
-                                       // Brrr, this is not really a good criterion
+      // Check the change of the eigenvalue
+      // Brrr, this is not really a good criterion
       conv = this->control().check (iter, std::fabs(1./length-1./old_length));
     }
 
@@ -297,12 +301,12 @@ EigenPower<VECTOR>::solve (double       &value,
 
   deallog.pop();
 
-                                   // in case of failure: throw
-                                   // exception
+  // in case of failure: throw
+  // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
                                         this->control().last_value());
-                                   // otherwise exit as normal
+  // otherwise exit as normal
 }
 
 //---------------------------------------------------------------------------
@@ -311,9 +315,9 @@ template <class VECTOR>
 EigenInverse<VECTOR>::EigenInverse (SolverControl &cn,
                                     VectorMemory<VECTOR> &mem,
                                     const AdditionalData &data)
-                :
-                Solver<VECTOR>(cn, mem),
-                additional_data(data)
+  :
+  Solver<VECTOR>(cn, mem),
+  additional_data(data)
 {}
 
 
@@ -335,37 +339,41 @@ EigenInverse<VECTOR>::solve (double       &value,
 
   SolverControl::State conv=SolverControl::iterate;
 
-                                   // Prepare matrix for solver
+  // Prepare matrix for solver
   ShiftedMatrix <MATRIX> A_s(A, -value);
 
-                                   // Define solver
+  // Define solver
   ReductionControl inner_control (5000, 1.e-16, 1.e-5, false, false);
   PreconditionIdentity prec;
   SolverGMRES<VECTOR>
-    solver(inner_control, this->memory);
+  solver(inner_control, this->memory);
 
-                                   // Next step for recomputing the shift
+  // Next step for recomputing the shift
   unsigned int goal = additional_data.start_adaption;
 
-                                   // Auxiliary vector
-  VECTOR* Vy = this->memory.alloc (); VECTOR& y = *Vy; y.reinit (x);
-  VECTOR* Vr = this->memory.alloc (); VECTOR& r = *Vr; r.reinit (x);
+  // Auxiliary vector
+  VECTOR *Vy = this->memory.alloc ();
+  VECTOR &y = *Vy;
+  y.reinit (x);
+  VECTOR *Vr = this->memory.alloc ();
+  VECTOR &r = *Vr;
+  r.reinit (x);
 
   double length = x.l2_norm ();
   double old_value = value;
 
   x.scale(1./length);
 
-                                   // Main loop
+  // Main loop
   for (unsigned int iter=0; conv==SolverControl::iterate; iter++)
     {
       solver.solve (A_s, y, x, prec);
 
-                                       // Compute absolute value of eigenvalue
+      // Compute absolute value of eigenvalue
       length = y.l2_norm ();
 
-                                       // do a little trick to compute the sign
-                                       // with not too much effect of round-off errors.
+      // do a little trick to compute the sign
+      // with not too much effect of round-off errors.
       double entry = 0.;
       unsigned int i = 0;
       double thresh = length/x.size();
@@ -378,7 +386,7 @@ EigenInverse<VECTOR>::solve (double       &value,
 
       --i;
 
-                                       // Compute unshifted eigenvalue
+      // Compute unshifted eigenvalue
       value = (entry * x (i) < 0.) ? -length : length;
       value = 1./value;
       value -= A_s.shift ();
@@ -386,23 +394,25 @@ EigenInverse<VECTOR>::solve (double       &value,
       if (iter==goal)
         {
           const double new_shift = - additional_data.relaxation * value
-            + (1.-additional_data.relaxation) * A_s.shift();
+                                   + (1.-additional_data.relaxation) * A_s.shift();
           A_s.shift(new_shift);
           ++goal;
         }
 
-                                       // Update normalized eigenvector
+      // Update normalized eigenvector
       x.equ (1./length, y);
-                                       // Compute residual
+      // Compute residual
       if (additional_data.use_residual)
         {
           y.equ (value, x);
           A.vmult(r,x);
           r.sadd(-1., value, x);
           double res = r.l2_norm();
-                                           // Check the residual
+          // Check the residual
           conv = this->control().check (iter, res);
-        } else {
+        }
+      else
+        {
           conv = this->control().check (iter, std::fabs(1./value-1./old_value));
         }
       old_value = value;
@@ -413,12 +423,12 @@ EigenInverse<VECTOR>::solve (double       &value,
 
   deallog.pop();
 
-                                   // in case of failure: throw
-                                   // exception
+  // in case of failure: throw
+  // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
                                         this->control().last_value());
-                                   // otherwise exit as normal
+  // otherwise exit as normal
 }
 
 DEAL_II_NAMESPACE_CLOSE

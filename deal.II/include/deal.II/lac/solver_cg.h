@@ -70,141 +70,141 @@ DEAL_II_NAMESPACE_OPEN
 template <class VECTOR = Vector<double> >
 class SolverCG : public Solver<VECTOR>
 {
-  public:
-                                     /**
-                                      * Standardized data struct to pipe
-                                      * additional data to the solver.
-                                      */
-    struct AdditionalData
-    {
-                                         /**
-                                          * Write coefficients alpha and beta
-                                          * to the log file for later use in
-                                          * eigenvalue estimates.
-                                          */
-        bool log_coefficients;
+public:
+  /**
+   * Standardized data struct to pipe
+   * additional data to the solver.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Write coefficients alpha and beta
+     * to the log file for later use in
+     * eigenvalue estimates.
+     */
+    bool log_coefficients;
 
-                                         /**
-                                          * Compute the condition
-                                          * number of the projected
-                                          * matrix.
-                                          *
-                                          * @note Requires LAPACK support.
-                                          */
-        bool compute_condition_number;
+    /**
+     * Compute the condition
+     * number of the projected
+     * matrix.
+     *
+     * @note Requires LAPACK support.
+     */
+    bool compute_condition_number;
 
-                                         /**
-                                          * Compute the condition
-                                          * number of the projected
-                                          * matrix in each step.
-                                          *
-                                          * @note Requires LAPACK support.
-                                          */
-        bool compute_all_condition_numbers;
+    /**
+     * Compute the condition
+     * number of the projected
+     * matrix in each step.
+     *
+     * @note Requires LAPACK support.
+     */
+    bool compute_all_condition_numbers;
 
-                                         /**
-                                          * Compute all eigenvalues of
-                                          * the projected matrix.
-                                          *
-                                          * @note Requires LAPACK support.
-                                          */
-        bool compute_eigenvalues;
+    /**
+     * Compute all eigenvalues of
+     * the projected matrix.
+     *
+     * @note Requires LAPACK support.
+     */
+    bool compute_eigenvalues;
 
-                                         /**
-                                          * Constructor. Initialize data
-                                          * fields.  Confer the description of
-                                          * those.
-                                          */
-        AdditionalData (const bool log_coefficients = false,
-                        const bool compute_condition_number = false,
-                        const bool compute_all_condition_numbers = false,
-                        const bool compute_eigenvalues = false);
-    };
+    /**
+     * Constructor. Initialize data
+     * fields.  Confer the description of
+     * those.
+     */
+    AdditionalData (const bool log_coefficients = false,
+                    const bool compute_condition_number = false,
+                    const bool compute_all_condition_numbers = false,
+                    const bool compute_eigenvalues = false);
+  };
 
-                                     /**
-                                      * Constructor.
-                                      */
-    SolverCG (SolverControl        &cn,
-              VectorMemory<VECTOR> &mem,
-              const AdditionalData &data = AdditionalData());
+  /**
+   * Constructor.
+   */
+  SolverCG (SolverControl        &cn,
+            VectorMemory<VECTOR> &mem,
+            const AdditionalData &data = AdditionalData());
 
-                                     /**
-                                      * Constructor. Use an object of
-                                      * type GrowingVectorMemory as
-                                      * a default to allocate memory.
-                                      */
-    SolverCG (SolverControl        &cn,
-              const AdditionalData &data=AdditionalData());
+  /**
+   * Constructor. Use an object of
+   * type GrowingVectorMemory as
+   * a default to allocate memory.
+   */
+  SolverCG (SolverControl        &cn,
+            const AdditionalData &data=AdditionalData());
 
-                                     /**
-                                      * Virtual destructor.
-                                      */
-    virtual ~SolverCG ();
+  /**
+   * Virtual destructor.
+   */
+  virtual ~SolverCG ();
 
-                                     /**
-                                      * Solve the linear system $Ax=b$
-                                      * for x.
-                                      */
-    template <class MATRIX, class PRECONDITIONER>
-    void
-    solve (const MATRIX         &A,
-           VECTOR               &x,
-           const VECTOR         &b,
-           const PRECONDITIONER &precondition);
+  /**
+   * Solve the linear system $Ax=b$
+   * for x.
+   */
+  template <class MATRIX, class PRECONDITIONER>
+  void
+  solve (const MATRIX         &A,
+         VECTOR               &x,
+         const VECTOR         &b,
+         const PRECONDITIONER &precondition);
 
-  protected:
-                                     /**
-                                      * Implementation of the computation of
-                                      * the norm of the residual. This can be
-                                      * replaced by a more problem oriented
-                                      * functional in a derived class.
-                                      */
-    virtual double criterion();
+protected:
+  /**
+   * Implementation of the computation of
+   * the norm of the residual. This can be
+   * replaced by a more problem oriented
+   * functional in a derived class.
+   */
+  virtual double criterion();
 
-                                     /**
-                                      * Interface for derived class.
-                                      * This function gets the current
-                                      * iteration vector, the residual
-                                      * and the update vector in each
-                                      * step. It can be used for a
-                                      * graphical output of the
-                                      * convergence history.
-                                      */
-    virtual void print_vectors(const unsigned int step,
-                               const VECTOR& x,
-                               const VECTOR& r,
-                               const VECTOR& d) const;
+  /**
+   * Interface for derived class.
+   * This function gets the current
+   * iteration vector, the residual
+   * and the update vector in each
+   * step. It can be used for a
+   * graphical output of the
+   * convergence history.
+   */
+  virtual void print_vectors(const unsigned int step,
+                             const VECTOR &x,
+                             const VECTOR &r,
+                             const VECTOR &d) const;
 
-                                     /**
-                                      * Temporary vectors, allocated through
-                                      * the @p VectorMemory object at the start
-                                      * of the actual solution process and
-                                      * deallocated at the end.
-                                      */
-    VECTOR *Vr;
-    VECTOR *Vp;
-    VECTOR *Vz;
-    VECTOR *VAp;
+  /**
+   * Temporary vectors, allocated through
+   * the @p VectorMemory object at the start
+   * of the actual solution process and
+   * deallocated at the end.
+   */
+  VECTOR *Vr;
+  VECTOR *Vp;
+  VECTOR *Vz;
+  VECTOR *VAp;
 
-                                     /**
-                                      * Within the iteration loop, the
-                                      * square of the residual vector is
-                                      * stored in this variable. The
-                                      * function @p criterion uses this
-                                      * variable to compute the convergence
-                                      * value, which in this class is the
-                                      * norm of the residual vector and thus
-                                      * the square root of the @p res2 value.
-                                      */
-    double res2;
+  /**
+   * Within the iteration loop, the
+   * square of the residual vector is
+   * stored in this variable. The
+   * function @p criterion uses this
+   * variable to compute the convergence
+   * value, which in this class is the
+   * norm of the residual vector and thus
+   * the square root of the @p res2 value.
+   */
+  double res2;
 
-                                     /**
-                                      * Additional parameters.
-                                      */
-    AdditionalData additional_data;
+  /**
+   * Additional parameters.
+   */
+  AdditionalData additional_data;
 
-  private:
-    void cleanup();
+private:
+  void cleanup();
 };
 
 /*@}*/
@@ -220,11 +220,11 @@ AdditionalData (const bool log_coefficients,
                 const bool compute_condition_number,
                 const bool compute_all_condition_numbers,
                 const bool compute_eigenvalues)
-                :
-                log_coefficients (log_coefficients),
-                compute_condition_number(compute_condition_number),
-                compute_all_condition_numbers(compute_all_condition_numbers),
-                compute_eigenvalues(compute_eigenvalues)
+  :
+  log_coefficients (log_coefficients),
+  compute_condition_number(compute_condition_number),
+  compute_all_condition_numbers(compute_all_condition_numbers),
+  compute_eigenvalues(compute_eigenvalues)
 {}
 
 
@@ -233,9 +233,9 @@ template <class VECTOR>
 SolverCG<VECTOR>::SolverCG (SolverControl        &cn,
                             VectorMemory<VECTOR> &mem,
                             const AdditionalData &data)
-                :
-                Solver<VECTOR>(cn,mem),
-                additional_data(data)
+  :
+  Solver<VECTOR>(cn,mem),
+  additional_data(data)
 {}
 
 
@@ -243,9 +243,9 @@ SolverCG<VECTOR>::SolverCG (SolverControl        &cn,
 template <class VECTOR>
 SolverCG<VECTOR>::SolverCG (SolverControl        &cn,
                             const AdditionalData &data)
-                :
-                Solver<VECTOR>(cn),
-                additional_data(data)
+  :
+  Solver<VECTOR>(cn),
+  additional_data(data)
 {}
 
 
@@ -281,9 +281,9 @@ SolverCG<VECTOR>::cleanup()
 template <class VECTOR>
 void
 SolverCG<VECTOR>::print_vectors(const unsigned int,
-                                const VECTOR&,
-                                const VECTOR&,
-                                const VECTOR&) const
+                                const VECTOR &,
+                                const VECTOR &,
+                                const VECTOR &) const
 {}
 
 
@@ -300,133 +300,134 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 
   deallog.push("cg");
 
-                                   // Memory allocation
+  // Memory allocation
   Vr  = this->memory.alloc();
   Vp  = this->memory.alloc();
   Vz  = this->memory.alloc();
   VAp = this->memory.alloc();
-                                   // Should we build the matrix for
-                                   // eigenvalue computations?
+  // Should we build the matrix for
+  // eigenvalue computations?
   bool do_eigenvalues = additional_data.compute_condition_number
                         | additional_data.compute_all_condition_numbers
                         | additional_data.compute_eigenvalues;
   double eigen_beta_alpha = 0;
 
-                                   // vectors used for eigenvalue
-                                   // computations
+  // vectors used for eigenvalue
+  // computations
   std::vector<double> diagonal;
   std::vector<double> offdiagonal;
 
-  try {
-                                     // define some aliases for simpler access
-    VECTOR& g  = *Vr;
-    VECTOR& h  = *Vp;
-    VECTOR& d  = *Vz;
-    VECTOR& Ad = *VAp;
-                                     // resize the vectors, but do not set
-                                     // the values since they'd be overwritten
-                                     // soon anyway.
-    g.reinit(x, true);
-    h.reinit(x, true);
-    d.reinit(x, true);
-    Ad.reinit(x, true);
-                                     // Implementation taken from the DEAL
-                                     // library
-    int  it=0;
-    double res,gh,alpha,beta;
+  try
+    {
+      // define some aliases for simpler access
+      VECTOR &g  = *Vr;
+      VECTOR &h  = *Vp;
+      VECTOR &d  = *Vz;
+      VECTOR &Ad = *VAp;
+      // resize the vectors, but do not set
+      // the values since they'd be overwritten
+      // soon anyway.
+      g.reinit(x, true);
+      h.reinit(x, true);
+      d.reinit(x, true);
+      Ad.reinit(x, true);
+      // Implementation taken from the DEAL
+      // library
+      int  it=0;
+      double res,gh,alpha,beta;
 
-                                     // compute residual. if vector is
-                                     // zero, then short-circuit the
-                                     // full computation
-    if (!x.all_zero())
-      {
-        A.vmult(g,x);
-        g.add(-1.,b);
-      }
-    else
-      g.equ(-1.,b);
-    res = g.l2_norm();
+      // compute residual. if vector is
+      // zero, then short-circuit the
+      // full computation
+      if (!x.all_zero())
+        {
+          A.vmult(g,x);
+          g.add(-1.,b);
+        }
+      else
+        g.equ(-1.,b);
+      res = g.l2_norm();
 
-    conv = this->control().check(0,res);
-    if (conv)
-      {
-        cleanup();
-        return;
-      }
+      conv = this->control().check(0,res);
+      if (conv)
+        {
+          cleanup();
+          return;
+        }
 
-    precondition.vmult(h,g);
+      precondition.vmult(h,g);
 
-    d.equ(-1.,h);
+      d.equ(-1.,h);
 
-    gh = g*h;
+      gh = g*h;
 
-    while (conv == SolverControl::iterate)
-      {
-        it++;
-        A.vmult(Ad,d);
+      while (conv == SolverControl::iterate)
+        {
+          it++;
+          A.vmult(Ad,d);
 
-        alpha = d*Ad;
-        Assert(alpha != 0., ExcDivideByZero());
-        alpha = gh/alpha;
+          alpha = d*Ad;
+          Assert(alpha != 0., ExcDivideByZero());
+          alpha = gh/alpha;
 
-        g.add(alpha,Ad);
-        x.add(alpha,d );
-        res = g.l2_norm();
+          g.add(alpha,Ad);
+          x.add(alpha,d );
+          res = g.l2_norm();
 
-        print_vectors(it, x, g, d);
+          print_vectors(it, x, g, d);
 
-        conv = this->control().check(it,res);
-        if (conv != SolverControl::iterate)
-          break;
+          conv = this->control().check(it,res);
+          if (conv != SolverControl::iterate)
+            break;
 
-        precondition.vmult(h,g);
+          precondition.vmult(h,g);
 
-        beta = gh;
-        Assert(beta != 0., ExcDivideByZero());
-        gh   = g*h;
-        beta = gh/beta;
+          beta = gh;
+          Assert(beta != 0., ExcDivideByZero());
+          gh   = g*h;
+          beta = gh/beta;
 
-        if (additional_data.log_coefficients)
-          deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
-                                         // set up the vectors
-                                         // containing the diagonal
-                                         // and the off diagonal of
-                                         // the projected matrix.
-        if (do_eigenvalues)
-          {
-            diagonal.push_back(1./alpha + eigen_beta_alpha);
-            eigen_beta_alpha = beta/alpha;
-            offdiagonal.push_back(std::sqrt(beta)/alpha);
-          }
+          if (additional_data.log_coefficients)
+            deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
+          // set up the vectors
+          // containing the diagonal
+          // and the off diagonal of
+          // the projected matrix.
+          if (do_eigenvalues)
+            {
+              diagonal.push_back(1./alpha + eigen_beta_alpha);
+              eigen_beta_alpha = beta/alpha;
+              offdiagonal.push_back(std::sqrt(beta)/alpha);
+            }
 
-        if (additional_data.compute_all_condition_numbers && (diagonal.size()>1))
-          {
-            TridiagonalMatrix<double> T(diagonal.size(), true);
-            for (unsigned int i=0;i<diagonal.size();++i)
-              {
-                T(i,i) = diagonal[i];
-                if (i< diagonal.size()-1)
-                  T(i,i+1) = offdiagonal[i];
-              }
-            T.compute_eigenvalues();
-            deallog << "Condition number estimate: " <<
-              T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
-          }
+          if (additional_data.compute_all_condition_numbers && (diagonal.size()>1))
+            {
+              TridiagonalMatrix<double> T(diagonal.size(), true);
+              for (unsigned int i=0; i<diagonal.size(); ++i)
+                {
+                  T(i,i) = diagonal[i];
+                  if (i< diagonal.size()-1)
+                    T(i,i+1) = offdiagonal[i];
+                }
+              T.compute_eigenvalues();
+              deallog << "Condition number estimate: " <<
+                      T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
+            }
 
-        d.sadd(beta,-1.,h);
-      }
-  }
+          d.sadd(beta,-1.,h);
+        }
+    }
   catch (...)
     {
       cleanup();
       throw;
     }
 
-                                   // Write eigenvalues or condition number
+  // Write eigenvalues or condition number
   if (do_eigenvalues)
     {
       TridiagonalMatrix<double> T(diagonal.size(), true);
-      for (unsigned int i=0;i<diagonal.size();++i)
+      for (unsigned int i=0; i<diagonal.size(); ++i)
         {
           T(i,i) = diagonal[i];
           if (i< diagonal.size()-1)
@@ -437,23 +438,23 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
           && ! additional_data.compute_all_condition_numbers
           && (diagonal.size() > 1))
         deallog << "Condition number estimate: " <<
-          T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
+                T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
       if (additional_data.compute_eigenvalues)
         {
-          for (unsigned int i=0;i<T.n();++i)
+          for (unsigned int i=0; i<T.n(); ++i)
             deallog << ' ' << T.eigenvalue(i);
           deallog << std::endl;
         }
     }
 
-                                   // Deallocate Memory
+  // Deallocate Memory
   cleanup();
-                                   // in case of failure: throw
-                                   // exception
+  // in case of failure: throw
+  // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
                                         this->control().last_value());
-                                   // otherwise exit as normal
+  // otherwise exit as normal
 }
 
 #endif // DOXYGEN

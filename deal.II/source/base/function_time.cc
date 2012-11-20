@@ -18,8 +18,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 FunctionTime::FunctionTime(const double initial_time)
-                :
-                time(initial_time)
+  :
+  time(initial_time)
 {}
 
 

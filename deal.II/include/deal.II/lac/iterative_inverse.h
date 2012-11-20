@@ -75,61 +75,61 @@ DEAL_II_NAMESPACE_OPEN
 template <class VECTOR>
 class IterativeInverse : public Subscriptor
 {
-  public:
-                                     /**
-                                      * Initialization
-                                      * function. Provide a matrix and
-                                      * preconditioner for th solve in
-                                      * vmult().
-                                      */
-    template <class MATRIX, class PRECONDITION>
-    void initialize (const MATRIX&, const PRECONDITION&);
+public:
+  /**
+   * Initialization
+   * function. Provide a matrix and
+   * preconditioner for th solve in
+   * vmult().
+   */
+  template <class MATRIX, class PRECONDITION>
+  void initialize (const MATRIX &, const PRECONDITION &);
 
-                                     /**
-                                      * Delete the pointers to matrix
-                                      * and preconditioner.
-                                      */
-    void clear();
+  /**
+   * Delete the pointers to matrix
+   * and preconditioner.
+   */
+  void clear();
 
-                                     /**
-                                      * Solve for right hand side <tt>src</tt>.
-                                      */
-    void vmult (VECTOR& dst, const VECTOR& src) const;
+  /**
+   * Solve for right hand side <tt>src</tt>.
+   */
+  void vmult (VECTOR &dst, const VECTOR &src) const;
 
-                                     /**
-                                      * Solve the transposed system
-                                      * for right hand side
-                                      * <tt>src</tt>.
-                                      */
+  /**
+   * Solve the transposed system
+   * for right hand side
+   * <tt>src</tt>.
+   */
 //    void Tvmult (VECTOR& dst, const VECTOR& src) const;
 
-                                     /**
-                                      * The solver, which allows
-                                      * selection of the actual solver
-                                      * as well as adjuxtment of
-                                      * parameters.
-                                      */
-    SolverSelector<VECTOR> solver;
+  /**
+   * The solver, which allows
+   * selection of the actual solver
+   * as well as adjuxtment of
+   * parameters.
+   */
+  SolverSelector<VECTOR> solver;
 
-  private:
-                                     /**
-                                      * The matrix in use.
-                                      */
-    std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
+private:
+  /**
+   * The matrix in use.
+   */
+  std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
 
-                                     /**
-                                      * The preconditioner to use.
-                                      */
-    std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > preconditioner;
-                                     /**
-                                      * The transpose of the matrix in use.
-                                      */
-    std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_matrix;
+  /**
+   * The preconditioner to use.
+   */
+  std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > preconditioner;
+  /**
+   * The transpose of the matrix in use.
+   */
+  std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_matrix;
 
-                                     /**
-                                      * The transpose of the preconditioner to use.
-                                      */
-    std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_preconditioner;
+  /**
+   * The transpose of the preconditioner to use.
+   */
+  std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_preconditioner;
 };
 
 
@@ -137,10 +137,10 @@ template <class VECTOR>
 template <class MATRIX, class PRECONDITION>
 inline
 void
-IterativeInverse<VECTOR>::initialize(const MATRIX& m, const PRECONDITION& p)
+IterativeInverse<VECTOR>::initialize(const MATRIX &m, const PRECONDITION &p)
 {
-                                   // dummy variable
-  VECTOR* v = 0;
+  // dummy variable
+  VECTOR *v = 0;
   matrix = std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(m, *v));
   preconditioner = std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(p, *v));
 }
@@ -158,7 +158,7 @@ IterativeInverse<VECTOR>::clear()
 
 template <class VECTOR>
 inline void
-IterativeInverse<VECTOR>::vmult (VECTOR& dst, const VECTOR& src) const
+IterativeInverse<VECTOR>::vmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert(matrix.get() != 0, ExcNotInitialized());
   Assert(preconditioner.get() != 0, ExcNotInitialized());

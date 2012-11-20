@@ -81,10 +81,10 @@ namespace internal
                    double(t.real()), double(t.imag()));
   }
 
-                                   // call std::copy, except for in
-                                   // the case where we want to copy
-                                   // from std::complex to a
-                                   // non-complex type
+  // call std::copy, except for in
+  // the case where we want to copy
+  // from std::complex to a
+  // non-complex type
   template <typename T, typename U>
   void copy (const T *begin,
              const T *end,
@@ -104,7 +104,7 @@ namespace internal
   template <typename T, typename U>
   void copy (const std::complex<T> *,
              const std::complex<T> *,
-             U                     *)
+             U *)
   {
     Assert (false, ExcMessage ("Can't convert a vector of complex numbers "
                                "into a vector of reals/doubles"));
@@ -115,12 +115,12 @@ namespace internal
 
 
 template <typename Number>
-Vector<Number>::Vector (const Vector<Number>& v)
-                :
-                Subscriptor(),
-                vec_size(v.size()),
-                max_vec_size(v.size()),
-                val(0)
+Vector<Number>::Vector (const Vector<Number> &v)
+  :
+  Subscriptor(),
+  vec_size(v.size()),
+  max_vec_size(v.size()),
+  val(0)
 {
   if (vec_size != 0)
     {
@@ -135,12 +135,12 @@ Vector<Number>::Vector (const Vector<Number>& v)
 
 template <typename Number>
 template <typename OtherNumber>
-Vector<Number>::Vector (const Vector<OtherNumber>& v)
-                :
-                Subscriptor(),
-                vec_size(v.size()),
-                max_vec_size(v.size()),
-                val(0)
+Vector<Number>::Vector (const Vector<OtherNumber> &v)
+  :
+  Subscriptor(),
+  vec_size(v.size()),
+  max_vec_size(v.size()),
+  val(0)
 {
   if (vec_size != 0)
     {
@@ -157,28 +157,28 @@ Vector<Number>::Vector (const Vector<OtherNumber>& v)
 
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::Vector &v)
-                :
-                Subscriptor(),
-                vec_size(v.size()),
-                max_vec_size(v.size()),
-                val(0)
+  :
+  Subscriptor(),
+  vec_size(v.size()),
+  max_vec_size(v.size()),
+  val(0)
 {
   if (vec_size != 0)
     {
       val = new Number[max_vec_size];
       Assert (val != 0, ExcOutOfMemory());
 
-                                       // get a representation of the vector
-                                       // and copy it
+      // get a representation of the vector
+      // and copy it
       PetscScalar *start_ptr;
-      int ierr = VecGetArray (static_cast<const Vec&>(v), &start_ptr);
+      int ierr = VecGetArray (static_cast<const Vec &>(v), &start_ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       internal::copy (start_ptr, start_ptr+vec_size, begin());
 
-                                       // restore the representation of the
-                                       // vector
-      ierr = VecRestoreArray (static_cast<const Vec&>(v), &start_ptr);
+      // restore the representation of the
+      // vector
+      ierr = VecRestoreArray (static_cast<const Vec &>(v), &start_ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
     }
 }
@@ -187,17 +187,17 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
 
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
-                :
-                Subscriptor(),
-                vec_size(0),
-                max_vec_size(0),
-                val(0)
+  :
+  Subscriptor(),
+  vec_size(0),
+  max_vec_size(0),
+  val(0)
 {
   if (v.size() != 0)
     {
-                                       // do this in a two-stage process:
-                                       // first convert to a sequential petsc
-                                       // vector, then copy that
+      // do this in a two-stage process:
+      // first convert to a sequential petsc
+      // vector, then copy that
       PETScWrappers::Vector seq (v);
       *this = seq;
     }
@@ -209,27 +209,27 @@ Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
 
 template <typename Number>
 Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
-                :
-                Subscriptor(),
-                vec_size(v.size()),
-                max_vec_size(v.size()),
-                val(0)
+  :
+  Subscriptor(),
+  vec_size(v.size()),
+  max_vec_size(v.size()),
+  val(0)
 {
   if (vec_size != 0)
     {
       val = new Number[max_vec_size];
       Assert (val != 0, ExcOutOfMemory());
 
-                                       // Copy the distributed vector to
-                                       // a local one at all
-                                       // processors. TODO: There could
-                                       // be a better solution than
-                                       // this, but it has not yet been
-                                       // found.
+      // Copy the distributed vector to
+      // a local one at all
+      // processors. TODO: There could
+      // be a better solution than
+      // this, but it has not yet been
+      // found.
       TrilinosWrappers::Vector localized_vector (v);
 
-                                       // get a representation of the vector
-                                       // and copy it
+      // get a representation of the vector
+      // and copy it
       TrilinosScalar **start_ptr;
 
       int ierr = localized_vector.trilinos_vector().ExtractView (&start_ptr);
@@ -243,19 +243,19 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
 
 template <typename Number>
 Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
-                :
-                Subscriptor(),
-                vec_size(v.size()),
-                max_vec_size(v.size()),
-                val(0)
+  :
+  Subscriptor(),
+  vec_size(v.size()),
+  max_vec_size(v.size()),
+  val(0)
 {
   if (vec_size != 0)
     {
       val = new Number[max_vec_size];
       Assert (val != 0, ExcOutOfMemory());
 
-                                       // get a representation of the vector
-                                       // and copy it
+      // get a representation of the vector
+      // and copy it
       TrilinosScalar **start_ptr;
 
       int ierr = v.trilinos_vector().ExtractView (&start_ptr);
@@ -269,7 +269,7 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
 
 template <typename Number>
 template <typename Number2>
-void Vector<Number>::reinit (const Vector<Number2>& v,
+void Vector<Number>::reinit (const Vector<Number2> &v,
                              const bool fast)
 {
   reinit (v.size(), fast);
@@ -337,7 +337,7 @@ namespace internal
     template<typename T>
     void copy_subrange (const unsigned int      begin,
                         const unsigned int      end,
-                        const dealii::Vector<T>&src,
+                        const dealii::Vector<T> &src,
                         dealii::Vector<T>      &dst)
     {
       memcpy(&*(dst.begin()+begin), &*(src.begin()+begin),
@@ -347,7 +347,7 @@ namespace internal
     template<typename T, typename U>
     void copy_subrange (const unsigned int      begin,
                         const unsigned int      end,
-                        const dealii::Vector<T>&src,
+                        const dealii::Vector<T> &src,
                         dealii::Vector<U>      &dst)
     {
       const T *q = src.begin()+begin;
@@ -360,14 +360,14 @@ namespace internal
     template<typename T, typename U>
     void copy_subrange_wrap (const unsigned int      begin,
                              const unsigned int      end,
-                             const dealii::Vector<T>&src,
+                             const dealii::Vector<T> &src,
                              dealii::Vector<U>      &dst)
     {
       copy_subrange (begin, end, src, dst);
     }
 
     template <typename T, typename U>
-    void copy_vector (const dealii::Vector<T>&src,
+    void copy_vector (const dealii::Vector<T> &src,
                       dealii::Vector<U>      &dst)
     {
       const unsigned int vec_size = src.size();
@@ -449,7 +449,7 @@ Vector<Number>::scale (const Number factor)
 template <typename Number>
 void
 Vector<Number>::add (const Number a,
-                     const Vector<Number>& v)
+                     const Vector<Number> &v)
 {
   Assert (numbers::is_finite(a),ExcNumberNotFinite());
 
@@ -470,7 +470,7 @@ template <typename Number>
 void
 Vector<Number>::sadd (const Number x,
                       const Number a,
-                      const Vector<Number>& v)
+                      const Vector<Number> &v)
 {
   Assert (numbers::is_finite(x),ExcNumberNotFinite());
   Assert (numbers::is_finite(a),ExcNumberNotFinite());
@@ -498,7 +498,7 @@ namespace internal
     struct InnerProd
     {
       Number
-      operator() (const Number*&X, const Number2*&Y, const Number &) const
+      operator() (const Number *&X, const Number2 *&Y, const Number &) const
       {
         return *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
       }
@@ -508,7 +508,7 @@ namespace internal
     struct Norm2
     {
       RealType
-      operator() (const Number*&X, const Number* &, const RealType &) const
+      operator() (const Number *&X, const Number *&, const RealType &) const
       {
         return numbers::NumberTraits<Number>::abs_square(*X++);
       }
@@ -518,7 +518,7 @@ namespace internal
     struct Norm1
     {
       RealType
-      operator() (const Number*&X, const Number* &, const RealType &) const
+      operator() (const Number *&X, const Number *&, const RealType &) const
       {
         return numbers::NumberTraits<Number>::abs(*X++);
       }
@@ -528,7 +528,7 @@ namespace internal
     struct NormP
     {
       RealType
-      operator() (const Number*&X, const Number* &, const RealType &p) const
+      operator() (const Number *&X, const Number *&, const RealType &p) const
       {
         return std::pow(numbers::NumberTraits<Number>::abs(*X++), p);
       }
@@ -538,7 +538,7 @@ namespace internal
     struct MeanValue
     {
       Number
-      operator() (const Number*&X, const Number* &, const Number &) const
+      operator() (const Number *&X, const Number *&, const Number &) const
       {
         return *X++;
       }
@@ -618,29 +618,29 @@ namespace internal
                          r2 = ResultType();
               switch (inner_chunks)
                 {
-                  case 3:
-                    r2 = op(X, Y, power);
-                    for (unsigned int j=1; j<8; ++j)
-                      r2 += op(X, Y, power);
-                    // no break
-                  case 2:
-                    r1 = op(X, Y, power);
-                    for (unsigned int j=1; j<8; ++j)
-                      r1 += op(X, Y, power);
-                    r1 += r2;
-                    // no break
-                  case 1:
-                    r2 = op(X, Y, power);
-                    for (unsigned int j=1; j<8; ++j)
-                      r2 += op(X, Y, power);
-                    // no break
-                  default:
-                    for (unsigned int j=0; j<remainder_inner; ++j)
-                      r0 += op(X, Y, power);
-                    r0 += r2;
-                    r0 += r1;
-                    outer_results[n_chunks] = r0;
-                    break;
+                case 3:
+                  r2 = op(X, Y, power);
+                  for (unsigned int j=1; j<8; ++j)
+                    r2 += op(X, Y, power);
+                  // no break
+                case 2:
+                  r1 = op(X, Y, power);
+                  for (unsigned int j=1; j<8; ++j)
+                    r1 += op(X, Y, power);
+                  r1 += r2;
+                  // no break
+                case 1:
+                  r2 = op(X, Y, power);
+                  for (unsigned int j=1; j<8; ++j)
+                    r2 += op(X, Y, power);
+                  // no break
+                default:
+                  for (unsigned int j=0; j<remainder_inner; ++j)
+                    r0 += op(X, Y, power);
+                  r0 += r2;
+                  r0 += r1;
+                  outer_results[n_chunks] = r0;
+                  break;
                 }
               n_chunks++;
             }
@@ -711,7 +711,7 @@ namespace internal
 
 template <typename Number>
 template <typename Number2>
-Number Vector<Number>::operator * (const Vector<Number2>& v) const
+Number Vector<Number>::operator * (const Vector<Number2> &v) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
@@ -876,7 +876,7 @@ Vector<Number>::linfty_norm () const
 
 
 template <typename Number>
-Vector<Number>& Vector<Number>::operator += (const Vector<Number>& v)
+Vector<Number> &Vector<Number>::operator += (const Vector<Number> &v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
@@ -886,7 +886,7 @@ Vector<Number>& Vector<Number>::operator += (const Vector<Number>& v)
 
 
 template <typename Number>
-Vector<Number>& Vector<Number>::operator -= (const Vector<Number>& v)
+Vector<Number> &Vector<Number>::operator -= (const Vector<Number> &v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -924,7 +924,7 @@ void Vector<Number>::add (const Number v)
 
 
 template <typename Number>
-void Vector<Number>::add (const Vector<Number>& v)
+void Vector<Number>::add (const Vector<Number> &v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -943,8 +943,8 @@ void Vector<Number>::add (const Vector<Number>& v)
 
 
 template <typename Number>
-void Vector<Number>::add (const Number a, const Vector<Number>& v,
-                          const Number b, const Vector<Number>& w)
+void Vector<Number>::add (const Number a, const Vector<Number> &v,
+                          const Number b, const Vector<Number> &w)
 {
   Assert (numbers::is_finite(a),ExcNumberNotFinite());
   Assert (numbers::is_finite(b),ExcNumberNotFinite());
@@ -969,7 +969,7 @@ void Vector<Number>::add (const Number a, const Vector<Number>& v,
 
 template <typename Number>
 void Vector<Number>::sadd (const Number x,
-                           const Vector<Number>& v)
+                           const Vector<Number> &v)
 {
   Assert (numbers::is_finite(x),ExcNumberNotFinite());
 
@@ -992,8 +992,8 @@ void Vector<Number>::sadd (const Number x,
 
 template <typename Number>
 void Vector<Number>::sadd (const Number x, const Number a,
-                           const Vector<Number>& v, const Number b,
-                           const Vector<Number>& w)
+                           const Vector<Number> &v, const Number b,
+                           const Vector<Number> &w)
 {
   Assert (numbers::is_finite(x),ExcNumberNotFinite());
   Assert (numbers::is_finite(a),ExcNumberNotFinite());
@@ -1019,9 +1019,9 @@ void Vector<Number>::sadd (const Number x, const Number a,
 
 template <typename Number>
 void Vector<Number>::sadd (const Number x, const Number a,
-                           const Vector<Number>& v, const Number b,
-                           const Vector<Number>& w, const Number c,
-                           const Vector<Number>& y)
+                           const Vector<Number> &v, const Number b,
+                           const Vector<Number> &w, const Number c,
+                           const Vector<Number> &y)
 {
   sadd (x, a, v, b, w);
   add (c, y);
@@ -1064,7 +1064,7 @@ void Vector<Number>::scale (const Vector<Number2> &s)
 
 template <typename Number>
 void Vector<Number>::equ (const Number a,
-                          const Vector<Number>& u)
+                          const Vector<Number> &u)
 {
   Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
@@ -1087,19 +1087,19 @@ void Vector<Number>::equ (const Number a,
 template <typename Number>
 template <typename Number2>
 void Vector<Number>::equ (const Number a,
-                          const Vector<Number2>& u)
+                          const Vector<Number2> &u)
 {
   Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
 
-                                   // set the result vector to a*u. we have to
-                                   // convert the elements of u to the type of
-                                   // the result vector. this is necessary
-                                   // because
-                                   // operator*(complex<float>,complex<double>)
-                                   // is not defined by default
+  // set the result vector to a*u. we have to
+  // convert the elements of u to the type of
+  // the result vector. this is necessary
+  // because
+  // operator*(complex<float>,complex<double>)
+  // is not defined by default
   for (unsigned int i=0; i<vec_size; ++i)
     val[i] = a * Number(u.val[i]);
 }
@@ -1107,8 +1107,8 @@ void Vector<Number>::equ (const Number a,
 
 
 template <typename Number>
-void Vector<Number>::equ (const Number a, const Vector<Number>& u,
-                          const Number b, const Vector<Number>& v)
+void Vector<Number>::equ (const Number a, const Vector<Number> &u,
+                          const Number b, const Vector<Number> &v)
 {
   Assert (numbers::is_finite(a),ExcNumberNotFinite());
   Assert (numbers::is_finite(b),ExcNumberNotFinite());
@@ -1131,9 +1131,9 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 
 
 template <typename Number>
-void Vector<Number>::equ (const Number a, const Vector<Number>& u,
-                          const Number b, const Vector<Number>& v,
-                          const Number c, const Vector<Number>& w)
+void Vector<Number>::equ (const Number a, const Vector<Number> &u,
+                          const Number b, const Vector<Number> &v,
+                          const Number c, const Vector<Number> &w)
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
@@ -1162,8 +1162,8 @@ void Vector<Number>::ratio (const Vector<Number> &a,
   Assert (a.vec_size == b.vec_size,
           ExcDimensionMismatch (a.vec_size, b.vec_size));
 
-                                   // no need to reinit with zeros, since
-                                   // we overwrite them anyway
+  // no need to reinit with zeros, since
+  // we overwrite them anyway
   reinit (a.size(), true);
 
   if (vec_size>internal::Vector::minimum_parallel_grain_size)
@@ -1182,7 +1182,7 @@ void Vector<Number>::ratio (const Vector<Number> &a,
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const BlockVector<Number>& v)
+Vector<Number>::operator = (const BlockVector<Number> &v)
 {
   if (v.size() != vec_size)
     reinit (v.size(), true);
@@ -1207,10 +1207,10 @@ Vector<Number>::operator = (const PETScWrappers::Vector &v)
     reinit (v.size(), true);
   if (vec_size != 0)
     {
-                                       // get a representation of the vector
-                                       // and copy it
+      // get a representation of the vector
+      // and copy it
       PetscScalar *start_ptr;
-      int ierr = VecGetArray (static_cast<const Vec&>(v), &start_ptr);
+      int ierr = VecGetArray (static_cast<const Vec &>(v), &start_ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       internal::copy (start_ptr, start_ptr+vec_size, begin());
@@ -1230,9 +1230,9 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator = (const PETScWrappers::MPI::Vector &v)
 {
-                                   // do this in a two-stage process:
-                                   // first convert to a sequential petsc
-                                   // vector, then copy that
+  // do this in a two-stage process:
+  // first convert to a sequential petsc
+  // vector, then copy that
   PETScWrappers::Vector seq (v);
   *this = seq;
 
@@ -1248,10 +1248,10 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &v)
 {
-                                        // Generate a localized version
-                                        // of the Trilinos vectors and
-                                        // then call the other =
-                                        // operator.
+  // Generate a localized version
+  // of the Trilinos vectors and
+  // then call the other =
+  // operator.
   TrilinosWrappers::Vector localized_vector (v);
   *this = localized_vector;
   return *this;
@@ -1267,8 +1267,8 @@ Vector<Number>::operator = (const TrilinosWrappers::Vector &v)
     reinit (v.size(), true);
   if (vec_size != 0)
     {
-                                       // get a representation of the vector
-                                       // and copy it
+      // get a representation of the vector
+      // and copy it
       TrilinosScalar **start_ptr;
       int ierr = v.trilinos_vector().ExtractView (&start_ptr);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1284,17 +1284,17 @@ Vector<Number>::operator = (const TrilinosWrappers::Vector &v)
 template <typename Number>
 template <typename Number2>
 bool
-Vector<Number>::operator == (const Vector<Number2>& v) const
+Vector<Number>::operator == (const Vector<Number2> &v) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.size(), ExcDimensionMismatch(vec_size, v.size()));
 
-                                   // compare the two vector. we have to
-                                   // convert the elements of v to the type of
-                                   // the result vector. this is necessary
-                                   // because
-                                   // operator==(complex<float>,complex<double>)
-                                   // is not defined by default
+  // compare the two vector. we have to
+  // convert the elements of v to the type of
+  // the result vector. this is necessary
+  // because
+  // operator==(complex<float>,complex<double>)
+  // is not defined by default
   for (unsigned int i=0; i<vec_size; ++i)
     if (val[i] != Number(v.val[i]))
       return false;
@@ -1343,7 +1343,7 @@ void Vector<Number>::print (std::ostream      &out,
   out << std::endl;
 
   AssertThrow (out, ExcIO());
-                                   // reset output format
+  // reset output format
   out.flags (old_flags);
   out.precision(old_precision);
 }
@@ -1371,12 +1371,12 @@ void Vector<Number>::block_write (std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
 
-                                   // other version of the following
-                                   //  out << size() << std::endl << '[';
-                                   // reason: operator<< seems to use
-                                   // some resources that lead to
-                                   // problems in a multithreaded
-                                   // environment
+  // other version of the following
+  //  out << size() << std::endl << '[';
+  // reason: operator<< seems to use
+  // some resources that lead to
+  // problems in a multithreaded
+  // environment
   const unsigned int sz = size();
   char buf[16];
 
@@ -1410,8 +1410,8 @@ void Vector<Number>::block_read (std::istream &in)
   in.getline(buf,16,'\n');
   sz=std::atoi(buf);
 
-                                   // fast initialization, since the
-                                   // data elements are overwritten anyway
+  // fast initialization, since the
+  // data elements are overwritten anyway
   reinit (sz, true);
 
   char c;

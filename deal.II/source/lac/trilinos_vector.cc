@@ -56,8 +56,8 @@ namespace TrilinosWrappers
 
 
     Vector::Vector (const Vector &v)
-                    :
-                    VectorBase()
+      :
+      VectorBase()
     {
       last_action = Zero;
       vector.reset (new Epetra_FEVector(*v.vector));
@@ -68,8 +68,8 @@ namespace TrilinosWrappers
 
     Vector::Vector (const Epetra_Map &input_map,
                     const VectorBase &v)
-                    :
-                    VectorBase()
+      :
+      VectorBase()
     {
       AssertThrow (input_map.NumGlobalElements() == v.vector->Map().NumGlobalElements(),
                    ExcDimensionMismatch (input_map.NumGlobalElements(),
@@ -91,8 +91,8 @@ namespace TrilinosWrappers
     Vector::Vector (const IndexSet   &parallel_partitioner,
                     const VectorBase &v,
                     const MPI_Comm   &communicator)
-                    :
-                    VectorBase()
+      :
+      VectorBase()
     {
       AssertThrow ((int)parallel_partitioner.size() == v.vector->Map().NumGlobalElements(),
                    ExcDimensionMismatch (parallel_partitioner.size(),
@@ -109,12 +109,12 @@ namespace TrilinosWrappers
     Vector::Vector (const MPI_Comm &communicator,
                     const IndexSet &local,
                     const IndexSet &ghost)
-                    :
-                    VectorBase()
+      :
+      VectorBase()
     {
-        IndexSet parallel_partitioning = local;
-        parallel_partitioning.add_indices(ghost);
-        reinit(parallel_partitioning, communicator);
+      IndexSet parallel_partitioning = local;
+      parallel_partitioning.add_indices(ghost);
+      reinit(parallel_partitioning, communicator);
     }
 
 
@@ -159,13 +159,13 @@ namespace TrilinosWrappers
                     const bool        fast,
                     const bool        allow_different_maps)
     {
-                                        // In case we do not allow to
-                                        // have different maps, this
-                                        // call means that we have to
-                                        // reset the vector. So clear
-                                        // the vector, initialize our
-                                        // map with the map in v, and
-                                        // generate the vector.
+      // In case we do not allow to
+      // have different maps, this
+      // call means that we have to
+      // reset the vector. So clear
+      // the vector, initialize our
+      // map with the map in v, and
+      // generate the vector.
       if (allow_different_maps == false)
         {
           if (vector->Map().SameAs(v.vector->Map()) == false)
@@ -176,11 +176,11 @@ namespace TrilinosWrappers
             }
           else if (fast == false)
             {
-                                               // old and new vectors
-                                               // have exactly the
-                                               // same map, i.e. size
-                                               // and parallel
-                                               // distribution
+              // old and new vectors
+              // have exactly the
+              // same map, i.e. size
+              // and parallel
+              // distribution
               int ierr;
               ierr = vector->GlobalAssemble (last_action);
               Assert (ierr == 0, ExcTrilinosError(ierr));
@@ -192,14 +192,14 @@ namespace TrilinosWrappers
             }
         }
 
-                                        // Otherwise, we have to check
-                                        // that the two vectors are
-                                        // already of the same size,
-                                        // create an object for the data
-                                        // exchange and then insert all
-                                        // the data. The first assertion
-                                        // is only a check whether the
-                                        // user knows what she is doing.
+      // Otherwise, we have to check
+      // that the two vectors are
+      // already of the same size,
+      // create an object for the data
+      // exchange and then insert all
+      // the data. The first assertion
+      // is only a check whether the
+      // user knows what she is doing.
       else
         {
           Assert (fast == false,
@@ -226,26 +226,26 @@ namespace TrilinosWrappers
     Vector::reinit (const BlockVector &v,
                     const bool         import_data)
     {
-                                        // In case we do not allow to
-                                        // have different maps, this
-                                        // call means that we have to
-                                        // reset the vector. So clear
-                                        // the vector, initialize our
-                                        // map with the map in v, and
-                                        // generate the vector.
+      // In case we do not allow to
+      // have different maps, this
+      // call means that we have to
+      // reset the vector. So clear
+      // the vector, initialize our
+      // map with the map in v, and
+      // generate the vector.
       if (v.n_blocks() == 0)
         return;
 
-                                // create a vector that holds all the elements
-                                // contained in the block vector. need to
-                                // manually create an Epetra_Map.
+      // create a vector that holds all the elements
+      // contained in the block vector. need to
+      // manually create an Epetra_Map.
       unsigned int n_elements = 0, added_elements = 0, block_offset = 0;
-      for (unsigned int block=0; block<v.n_blocks();++block)
+      for (unsigned int block=0; block<v.n_blocks(); ++block)
         n_elements += v.block(block).local_size();
       std::vector<int> global_ids (n_elements, -1);
-      for (unsigned int block=0; block<v.n_blocks();++block)
+      for (unsigned int block=0; block<v.n_blocks(); ++block)
         {
-          int * glob_elements = v.block(block).vector_partitioner().MyGlobalElements();
+          int *glob_elements = v.block(block).vector_partitioner().MyGlobalElements();
           for (unsigned int i=0; i<v.block(block).local_size(); ++i)
             global_ids[added_elements++] = glob_elements[i] + block_offset;
           block_offset += v.block(block).size();
@@ -264,9 +264,9 @@ namespace TrilinosWrappers
           actual_vec = vector;
         }
 
-      TrilinosScalar* entries = (*actual_vec)[0];
+      TrilinosScalar *entries = (*actual_vec)[0];
       block_offset = 0;
-      for (unsigned int block=0; block<v.n_blocks();++block)
+      for (unsigned int block=0; block<v.n_blocks(); ++block)
         {
           v.block(block).trilinos_vector().ExtractCopy (entries, 0);
           entries += v.block(block).local_size();
@@ -292,37 +292,37 @@ namespace TrilinosWrappers
 
     void Vector::reinit(const MPI_Comm &communicator, const IndexSet &local, const IndexSet &ghost)
     {
-        IndexSet parallel_partitioning = local;
-        parallel_partitioning.add_indices(ghost);
-        reinit(parallel_partitioning, communicator);
+      IndexSet parallel_partitioning = local;
+      parallel_partitioning.add_indices(ghost);
+      reinit(parallel_partitioning, communicator);
     }
 
 
     Vector &
     Vector::operator = (const Vector &v)
     {
-                                // distinguish three cases. First case: both
-                                // vectors have the same layout (just need to
-                                // copy the local data, not reset the memory
-                                // and the underlying Epetra_Map). The third
-                                // case means that we have to rebuild the
-                                // calling vector.
+      // distinguish three cases. First case: both
+      // vectors have the same layout (just need to
+      // copy the local data, not reset the memory
+      // and the underlying Epetra_Map). The third
+      // case means that we have to rebuild the
+      // calling vector.
       if (vector->Map().SameAs(v.vector->Map()))
         {
           *vector = *v.vector;
           last_action = Zero;
         }
-                                // Second case: vectors have the same global
-                                // size, but different parallel layouts (and
-                                // one of them a one-to-one mapping). Then we
-                                // can call the import/export functionality.
+      // Second case: vectors have the same global
+      // size, but different parallel layouts (and
+      // one of them a one-to-one mapping). Then we
+      // can call the import/export functionality.
       else if (size() == v.size() &&
                (v.vector->Map().UniqueGIDs() || vector->Map().UniqueGIDs()))
         {
           reinit (v, false, true);
         }
-                                // Third case: Vectors do not have the same
-                                // size.
+      // Third case: Vectors do not have the same
+      // size.
       else
         {
           vector.reset (new Epetra_FEVector(*v.vector));
@@ -537,13 +537,13 @@ namespace TrilinosWrappers
                   const bool        fast,
                   const bool        allow_different_maps)
   {
-                                        // In case we do not allow to
-                                        // have different maps, this
-                                        // call means that we have to
-                                        // reset the vector. So clear
-                                        // the vector, initialize our
-                                        // map with the map in v, and
-                                        // generate the vector.
+    // In case we do not allow to
+    // have different maps, this
+    // call means that we have to
+    // reset the vector. So clear
+    // the vector, initialize our
+    // map with the map in v, and
+    // generate the vector.
     if (allow_different_maps == false)
       {
         if (local_range() != v.local_range())
@@ -570,12 +570,12 @@ namespace TrilinosWrappers
         last_action = Zero;
       }
 
-                                        // Otherwise, we have to check
-                                        // that the two vectors are
-                                        // already of the same size,
-                                        // create an object for the data
-                                        // exchange and then insert all
-                                        // the data.
+    // Otherwise, we have to check
+    // that the two vectors are
+    // already of the same size,
+    // create an object for the data
+    // exchange and then insert all
+    // the data.
     else
       {
         Assert (fast == false,

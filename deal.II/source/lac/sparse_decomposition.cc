@@ -16,13 +16,13 @@ DEAL_II_NAMESPACE_OPEN
 
 template class SparseLUDecomposition<double>;
 template void SparseLUDecomposition<double>::initialize<double> (const SparseMatrix<double> &,
-                                                                 const AdditionalData data);
+    const AdditionalData data);
 template void SparseLUDecomposition<double>::initialize<float> (const SparseMatrix<float> &,
-                                                                 const AdditionalData data);
+    const AdditionalData data);
 template void SparseLUDecomposition<double>::decompose<double> (const SparseMatrix<double> &,
-                                                                const double);
+    const double);
 template void SparseLUDecomposition<double>::decompose<float> (const SparseMatrix<float> &,
-                                                               const double);
+    const double);
 
 template void SparseLUDecomposition<double>::copy_from<double> (const SparseMatrix<double> &);
 template void SparseLUDecomposition<double>::copy_from<float> (const SparseMatrix<float> &);
@@ -30,13 +30,13 @@ template void SparseLUDecomposition<double>::copy_from<float> (const SparseMatri
 
 template class SparseLUDecomposition<float>;
 template void SparseLUDecomposition<float>::initialize<double> (const SparseMatrix<double> &,
-                                                                const AdditionalData data);
+    const AdditionalData data);
 template void SparseLUDecomposition<float>::initialize<float> (const SparseMatrix<float> &,
-                                                               const AdditionalData data);
+    const AdditionalData data);
 template void SparseLUDecomposition<float>::decompose<double> (const SparseMatrix<double> &,
-                                                               const double);
+    const double);
 template void SparseLUDecomposition<float>::decompose<float> (const SparseMatrix<float> &,
-                                                              const double);
+    const double);
 
 template void SparseLUDecomposition<float>::copy_from<double> (const SparseMatrix<double> &);
 template void SparseLUDecomposition<float>::copy_from<float> (const SparseMatrix<float> &);

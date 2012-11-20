@@ -20,13 +20,13 @@ DEAL_II_NAMESPACE_OPEN
 
 template <class POLY, int dim, int spacedim>
 FE_PolyFace<POLY,dim,spacedim>::FE_PolyFace (
-  const POLY& poly_space,
+  const POLY &poly_space,
   const FiniteElementData<dim> &fe_data,
   const std::vector<bool> &restriction_is_additive_flags):
-                FiniteElement<dim,spacedim> (fe_data,
-                                             restriction_is_additive_flags,
-                                             std::vector<ComponentMask> (1, ComponentMask(1,true))),
-                poly_space(poly_space)
+  FiniteElement<dim,spacedim> (fe_data,
+                               restriction_is_additive_flags,
+                               std::vector<ComponentMask> (1, ComponentMask(1,true))),
+  poly_space(poly_space)
 {
   AssertDimension(dim, POLY::dimension+1);
 }
@@ -51,11 +51,11 @@ template <class POLY, int dim, int spacedim>
 UpdateFlags
 FE_PolyFace<POLY,dim,spacedim>::update_once (const UpdateFlags) const
 {
-                                   // for this kind of elements, only
-                                   // the values can be precomputed
-                                   // once and for all. set this flag
-                                   // if the values are requested at
-                                   // all
+  // for this kind of elements, only
+  // the values can be precomputed
+  // once and for all. set this flag
+  // if the values are requested at
+  // all
   return update_default;
 }
 
@@ -86,10 +86,10 @@ template <class POLY, int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 FE_PolyFace<POLY,dim,spacedim>::get_data (
   const UpdateFlags,
-  const Mapping<dim,spacedim>&,
-  const Quadrature<dim>&) const
+  const Mapping<dim,spacedim> &,
+  const Quadrature<dim> &) const
 {
-  InternalData* data = new InternalData;
+  InternalData *data = new InternalData;
   return data;
 }
 
@@ -98,17 +98,17 @@ template <class POLY, int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 FE_PolyFace<POLY,dim,spacedim>::get_face_data (
   const UpdateFlags update_flags,
-  const Mapping<dim,spacedim>&,
+  const Mapping<dim,spacedim> &,
   const Quadrature<dim-1>& quadrature) const
 {
-                                   // generate a new data object and
-                                   // initialize some fields
-  InternalData* data = new InternalData;
+  // generate a new data object and
+  // initialize some fields
+  InternalData *data = new InternalData;
 
-                                   // check what needs to be
-                                   // initialized only once and what
-                                   // on every cell/face/subface we
-                                   // visit
+  // check what needs to be
+  // initialized only once and what
+  // on every cell/face/subface we
+  // visit
   data->update_once = update_once(update_flags);
   data->update_each = update_each(update_flags);
   data->update_flags = data->update_once | data->update_each;
@@ -116,14 +116,14 @@ FE_PolyFace<POLY,dim,spacedim>::get_face_data (
   const UpdateFlags flags(data->update_flags);
   const unsigned int n_q_points = quadrature.size();
 
-                                   // some scratch arrays
+  // some scratch arrays
   std::vector<double> values(0);
   std::vector<Tensor<1,dim-1> > grads(0);
   std::vector<Tensor<2,dim-1> > grad_grads(0);
 
-                                   // initialize fields only if really
-                                   // necessary. otherwise, don't
-                                   // allocate memory
+  // initialize fields only if really
+  // necessary. otherwise, don't
+  // allocate memory
   if (flags & update_values)
     {
       values.resize (poly_space.n());
@@ -138,8 +138,8 @@ FE_PolyFace<POLY,dim,spacedim>::get_face_data (
             data->shape_values[k][i] = values[k];
         }
     }
-                                   // No derivatives of this element
-                                   // are implemented.
+  // No derivatives of this element
+  // are implemented.
   if (flags & update_gradients || flags & update_hessians)
     {
       Assert(false, ExcNotImplemented());
@@ -154,7 +154,7 @@ template <class POLY, int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 FE_PolyFace<POLY,dim,spacedim>::get_subface_data (
   const UpdateFlags flags,
-  const Mapping<dim,spacedim>& mapping,
+  const Mapping<dim,spacedim> &mapping,
   const Quadrature<dim-1>& quadrature) const
 {
   return get_face_data (flags, mapping,
@@ -171,16 +171,16 @@ FE_PolyFace<POLY,dim,spacedim>::get_subface_data (
 template <class POLY, int dim, int spacedim>
 void
 FE_PolyFace<POLY,dim,spacedim>::fill_fe_values
-  (const Mapping<dim,spacedim>&,
-   const typename Triangulation<dim,spacedim>::cell_iterator&,
-   const Quadrature<dim>&,
-   typename Mapping<dim,spacedim>::InternalDataBase&,
-   typename Mapping<dim,spacedim>::InternalDataBase&,
-   FEValuesData<dim,spacedim>&,
-   CellSimilarity::Similarity&) const
+(const Mapping<dim,spacedim> &,
+ const typename Triangulation<dim,spacedim>::cell_iterator &,
+ const Quadrature<dim> &,
+ typename Mapping<dim,spacedim>::InternalDataBase &,
+ typename Mapping<dim,spacedim>::InternalDataBase &,
+ FEValuesData<dim,spacedim> &,
+ CellSimilarity::Similarity &) const
 {
-                                   // Do nothing, since we do not have
-                                   // values in the interior
+  // Do nothing, since we do not have
+  // values in the interior
 }
 
 
@@ -188,18 +188,18 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_values
 template <class POLY, int dim, int spacedim>
 void
 FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
-  const Mapping<dim,spacedim>&,
-  const typename Triangulation<dim,spacedim>::cell_iterator&,
+  const Mapping<dim,spacedim> &,
+  const typename Triangulation<dim,spacedim>::cell_iterator &,
   const unsigned int face,
   const Quadrature<dim-1>& quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase&,
-  typename Mapping<dim,spacedim>::InternalDataBase& fedata,
-  FEValuesData<dim,spacedim>& data) const
+  typename Mapping<dim,spacedim>::InternalDataBase &,
+  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+  FEValuesData<dim,spacedim> &data) const
 {
-                                   // convert data object to internal
-                                   // data for this class. fails with
-                                   // an exception if that is not
-                                   // possible
+  // convert data object to internal
+  // data for this class. fails with
+  // an exception if that is not
+  // possible
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 
@@ -220,19 +220,19 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
 template <class POLY, int dim, int spacedim>
 void
 FE_PolyFace<POLY,dim,spacedim>::fill_fe_subface_values (
-  const Mapping<dim,spacedim>&,
-  const typename Triangulation<dim,spacedim>::cell_iterator&,
+  const Mapping<dim,spacedim> &,
+  const typename Triangulation<dim,spacedim>::cell_iterator &,
   const unsigned int face,
   const unsigned int subface,
   const Quadrature<dim-1>& quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase&,
-  typename Mapping<dim,spacedim>::InternalDataBase& fedata,
-  FEValuesData<dim,spacedim>& data) const
+  typename Mapping<dim,spacedim>::InternalDataBase &,
+  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+  FEValuesData<dim,spacedim> &data) const
 {
-                                   // convert data object to internal
-                                   // data for this class. fails with
-                                   // an exception if that is not
-                                   // possible
+  // convert data object to internal
+  // data for this class. fails with
+  // an exception if that is not
+  // possible
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 

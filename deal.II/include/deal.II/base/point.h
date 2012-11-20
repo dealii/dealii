@@ -50,145 +50,145 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, typename Number>
 class Point : public Tensor<1,dim,Number>
 {
-  public:
-                                     /**
-                                      * Standard constructor. Creates
-                                      * an origin.
-                                      */
-    Point ();
+public:
+  /**
+   * Standard constructor. Creates
+   * an origin.
+   */
+  Point ();
 
-                                     /**
-                                      * Constructor. Initialize all
-                                      * entries to zero if
-                                      * <tt>initialize==true</tt>.
-                                      */
-    explicit Point (const bool initialize);
+  /**
+   * Constructor. Initialize all
+   * entries to zero if
+   * <tt>initialize==true</tt>.
+   */
+  explicit Point (const bool initialize);
 
-                                     /**
-                                      * Convert a tensor to a point. Since no
-                                      * additional data is inside a point,
-                                      * this is ok.
-                                      */
-    Point (const Tensor<1,dim,Number> &);
+  /**
+   * Convert a tensor to a point. Since no
+   * additional data is inside a point,
+   * this is ok.
+   */
+  Point (const Tensor<1,dim,Number> &);
 
-                                     /**
-                                      *  Constructor for one dimensional
-                                      *  points. This function is only
-                                      *  implemented for <tt>dim==1</tt> since
-                                      *  the usage is considered unsafe for
-                                      *  points with <tt>dim!=1</tt>.
-                                      */
-    explicit Point (const Number x);
+  /**
+   *  Constructor for one dimensional
+   *  points. This function is only
+   *  implemented for <tt>dim==1</tt> since
+   *  the usage is considered unsafe for
+   *  points with <tt>dim!=1</tt>.
+   */
+  explicit Point (const Number x);
 
-                                     /**
-                                      *  Constructor for two dimensional
-                                      *  points. This function is only
-                                      *  implemented for <tt>dim==2</tt> since
-                                      *  the usage is considered unsafe for
-                                      *  points with <tt>dim!=2</tt>.
-                                      */
-    Point (const Number x, const Number y);
+  /**
+   *  Constructor for two dimensional
+   *  points. This function is only
+   *  implemented for <tt>dim==2</tt> since
+   *  the usage is considered unsafe for
+   *  points with <tt>dim!=2</tt>.
+   */
+  Point (const Number x, const Number y);
 
-                                     /**
-                                      *  Constructor for three dimensional
-                                      *  points. This function is only
-                                      *  implemented for <tt>dim==3</tt> since
-                                      *  the usage is considered unsafe for
-                                      *  points with <tt>dim!=3</tt>.
-                                      */
-    Point (const Number x, const Number y, const Number z);
+  /**
+   *  Constructor for three dimensional
+   *  points. This function is only
+   *  implemented for <tt>dim==3</tt> since
+   *  the usage is considered unsafe for
+   *  points with <tt>dim!=3</tt>.
+   */
+  Point (const Number x, const Number y, const Number z);
 
-                                     /**
-                                      * Return a unit vector in
-                                      * coordinate direction <tt>i</tt>.
-                                      */
-    static Point<dim,Number> unit_vector(const unsigned int i);
+  /**
+   * Return a unit vector in
+   * coordinate direction <tt>i</tt>.
+   */
+  static Point<dim,Number> unit_vector(const unsigned int i);
 
-                                     /**
-                                      *  Read access to the <tt>index</tt>th
-                                      *  coordinate.
-                                      */
-    Number   operator () (const unsigned int index) const;
+  /**
+   *  Read access to the <tt>index</tt>th
+   *  coordinate.
+   */
+  Number   operator () (const unsigned int index) const;
 
-                                     /**
-                                      *  Read and write access to the
-                                      *  <tt>index</tt>th coordinate.
-                                      */
-    Number & operator () (const unsigned int index);
+  /**
+   *  Read and write access to the
+   *  <tt>index</tt>th coordinate.
+   */
+  Number &operator () (const unsigned int index);
 
-/*
- * Plus and minus operators are re-implemented from Tensor<1,dim>
- * to avoid additional casting.
- */
+  /*
+   * Plus and minus operators are re-implemented from Tensor<1,dim>
+   * to avoid additional casting.
+   */
 
-                                     /**
-                                      *  Add two point vectors. If possible,
-                                      *  use <tt>operator +=</tt> instead
-                                      *  since this does not need to copy a
-                                      *  point at least once.
-                                      */
-    Point<dim,Number>   operator + (const Tensor<1,dim,Number>&) const;
+  /**
+   *  Add two point vectors. If possible,
+   *  use <tt>operator +=</tt> instead
+   *  since this does not need to copy a
+   *  point at least once.
+   */
+  Point<dim,Number>   operator + (const Tensor<1,dim,Number> &) const;
 
-                                     /**
-                                      *  Subtract two point vectors. If
-                                      *  possible, use <tt>operator +=</tt>
-                                      *  instead since this does not need to
-                                      *  copy a point at least once.
-                                      */
-    Point<dim,Number>   operator - (const Tensor<1,dim,Number>&) const;
+  /**
+   *  Subtract two point vectors. If
+   *  possible, use <tt>operator +=</tt>
+   *  instead since this does not need to
+   *  copy a point at least once.
+   */
+  Point<dim,Number>   operator - (const Tensor<1,dim,Number> &) const;
 
-                                     /**
-                                      * The opposite vector.
-                                      */
-    Point<dim,Number>   operator - () const;
+  /**
+   * The opposite vector.
+   */
+  Point<dim,Number>   operator - () const;
 
-                                     /**
-                                      *  Multiply by a factor. If possible,
-                                      *  use <tt>operator *=</tt> instead
-                                      *  since this does not need to copy a
-                                      *  point at least once.
-                                      *
-                                      * There is a commutative complement to this
-                                      * function also
-                                      */
-    Point<dim,Number>   operator * (const Number) const;
+  /**
+   *  Multiply by a factor. If possible,
+   *  use <tt>operator *=</tt> instead
+   *  since this does not need to copy a
+   *  point at least once.
+   *
+   * There is a commutative complement to this
+   * function also
+   */
+  Point<dim,Number>   operator * (const Number) const;
 
-                                     /**
-                                      *  Returns the scalar product of two
-                                      *  vectors.
-                                      */
-    Number       operator * (const Tensor<1,dim,Number> &) const;
+  /**
+   *  Returns the scalar product of two
+   *  vectors.
+   */
+  Number       operator * (const Tensor<1,dim,Number> &) const;
 
-                                     /**
-                                      *  Divide by a factor. If possible, use
-                                      *  <tt>operator /=</tt> instead since
-                                      *  this does not need to copy a point at
-                                      *  least once.
-                                      */
-    Point<dim,Number>   operator / (const Number) const;
+  /**
+   *  Divide by a factor. If possible, use
+   *  <tt>operator /=</tt> instead since
+   *  this does not need to copy a point at
+   *  least once.
+   */
+  Point<dim,Number>   operator / (const Number) const;
 
-                                     /**
-                                      *  Returns the scalar product of this
-                                      *  point vector with itself, i.e. the
-                                      *  square, or the square of the norm.
-                                      */
-    Number              square () const;
+  /**
+   *  Returns the scalar product of this
+   *  point vector with itself, i.e. the
+   *  square, or the square of the norm.
+   */
+  Number              square () const;
 
-                                     /**
-                                      * Returns the Euclidian distance of
-                                      * <tt>this</tt> point to the point
-                                      * <tt>p</tt>, i.e. the <tt>l_2</tt> norm
-                                      * of the difference between the vectors
-                                      * representing the two points.
-                                      */
-    Number distance (const Point<dim,Number> &p) const;
+  /**
+   * Returns the Euclidian distance of
+   * <tt>this</tt> point to the point
+   * <tt>p</tt>, i.e. the <tt>l_2</tt> norm
+   * of the difference between the vectors
+   * representing the two points.
+   */
+  Number distance (const Point<dim,Number> &p) const;
 
-                     /**
-                      * Read or write the data of this object to or
-                      * from a stream for the purpose of serialization
-                      */
-    template <class Archive>
-    void serialize(Archive & ar, const unsigned int version);
+  /**
+   * Read or write the data of this object to or
+   * from a stream for the purpose of serialization
+   */
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version);
 };
 
 /*------------------------------- Inline functions: Point ---------------------------*/
@@ -205,8 +205,8 @@ Point<dim,Number>::Point ()
 template <int dim, typename Number>
 inline
 Point<dim,Number>::Point (const bool initialize)
-                          :
-                          Tensor<1,dim,Number>(initialize)
+  :
+  Tensor<1,dim,Number>(initialize)
 {}
 
 
@@ -214,8 +214,8 @@ Point<dim,Number>::Point (const bool initialize)
 template <int dim, typename Number>
 inline
 Point<dim,Number>::Point (const Tensor<1,dim,Number> &t)
-                          :
-                          Tensor<1,dim,Number>(t)
+  :
+  Tensor<1,dim,Number>(t)
 {}
 
 
@@ -224,12 +224,13 @@ template <int dim, typename Number>
 inline
 Point<dim,Number>::Point (const Number x)
 {
-  switch(dim) {
+  switch (dim)
+    {
     case 1:
       this->values[0] = x;
     default:
       Assert (dim==1, StandardExceptions::ExcInvalidConstructorCall());
-  }
+    }
 }
 
 
@@ -238,13 +239,14 @@ template <int dim, typename Number>
 inline
 Point<dim,Number>::Point (const Number x, const Number y)
 {
-  switch(dim) {
+  switch (dim)
+    {
     case 2:
       this->values[0] = x;
       this->values[1] = y;
     default:
       Assert (dim==2, StandardExceptions::ExcInvalidConstructorCall());
-  }
+    }
 }
 
 
@@ -253,14 +255,15 @@ template <int dim, typename Number>
 inline
 Point<dim,Number>::Point (const Number x, const Number y, const Number z)
 {
-  switch(dim) {
+  switch (dim)
+    {
     case 3:
       this->values[0] = x;
       this->values[1] = y;
       this->values[2] = z;
     default:
       Assert (dim==3, StandardExceptions::ExcInvalidConstructorCall());
-  }
+    }
 }
 
 
@@ -345,7 +348,7 @@ inline
 Number
 Point<dim,Number>::operator * (const Tensor<1,dim,Number> &p) const
 {
-                                   // simply pass down
+  // simply pass down
   return Tensor<1,dim,Number>::operator * (p);
 }
 
@@ -393,11 +396,11 @@ template <int dim, typename Number>
 template <class Archive>
 inline
 void
-Point<dim,Number>::serialize(Archive & ar, const unsigned int)
+Point<dim,Number>::serialize(Archive &ar, const unsigned int)
 {
-                                     // forward to serialization
-                                     // function in the base class
-  ar &  static_cast<Tensor<1,dim,Number> &>(*this);
+  // forward to serialization
+  // function in the base class
+  ar   &static_cast<Tensor<1,dim,Number> &>(*this);
 }
 
 #endif // DOXYGEN
@@ -441,8 +444,8 @@ Point<dim,double> operator * (const double             factor,
  */
 template <int dim, typename Number>
 inline
-std::ostream & operator << (std::ostream            &out,
-                            const Point<dim,Number> &p)
+std::ostream &operator << (std::ostream            &out,
+                           const Point<dim,Number> &p)
 {
   for (unsigned int i=0; i<dim-1; ++i)
     out << p[i] << ' ';
@@ -460,8 +463,8 @@ std::ostream & operator << (std::ostream            &out,
  */
 template <int dim, typename Number>
 inline
-std::istream & operator >> (std::istream      &in,
-                            Point<dim,Number> &p)
+std::istream &operator >> (std::istream      &in,
+                           Point<dim,Number> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     in >> p[i];
@@ -479,8 +482,8 @@ std::istream & operator >> (std::istream      &in,
  */
 template <typename Number>
 inline
-std::ostream & operator << (std::ostream &out,
-                            const Point<1,Number> &p)
+std::ostream &operator << (std::ostream &out,
+                           const Point<1,Number> &p)
 {
   out << p[0];
 

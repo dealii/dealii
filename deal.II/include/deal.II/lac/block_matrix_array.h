@@ -122,290 +122,290 @@ template <typename> class Vector;
 template <typename number = double>
 class BlockMatrixArray : public Subscriptor
 {
+public:
+  /**
+   * Default constructor creating a
+   * useless object. initialize()
+   * must be called before using
+   * it.
+   */
+  BlockMatrixArray ();
+
+  /**
+   * Constructor fixing the
+   * dimensions.
+   */
+  BlockMatrixArray (const unsigned int n_block_rows,
+                    const unsigned int n_block_cols);
+
+  /**
+   * Initialize object
+   * completely. This is the
+   * function to call for an object
+   * created by the default
+   * constructor.
+   *
+   * @deprecated the last argument
+   * is ignored.
+   */
+  void initialize (const unsigned int n_block_rows,
+                   const unsigned int n_block_cols);
+
+  /**
+   * Constructor fixing the
+   * dimensions.
+   *
+   * @deprecated the last argument
+   * is ignored.
+   */
+  BlockMatrixArray (const unsigned int n_block_rows,
+                    const unsigned int n_block_cols,
+                    VectorMemory<Vector<number> > &mem);
+
+  /**
+   * Initialize object
+   * completely. This is the
+   * function to call for an object
+   * created by the default
+   * constructor.
+   *
+   * @deprecated the last argument
+   * is ignored.
+   */
+  void initialize (const unsigned int n_block_rows,
+                   const unsigned int n_block_cols,
+                   VectorMemory<Vector<number> > &mem);
+
+  /**
+   * Adjust the matrix to a new
+   * size and delete all blocks.
+   */
+  void reinit (const unsigned int n_block_rows,
+               const unsigned int n_block_cols);
+
+  /**
+   * Add a block matrix entry. The
+   * <tt>matrix</tt> is entered
+   * into a list of blocks for
+   * multiplication, together with
+   * its coordinates <tt>row</tt>
+   * and <tt>col</tt> as well as
+   * optional multiplication factor
+   * <tt>prefix</tt> and transpose
+   * flag <tt>transpose</tt>.
+   *
+   * @note No check for consistency
+   * of block sizes is
+   * made. Therefore, entering a
+   * block of wrong dimension here
+   * will only lead to a
+   * ExcDimensionMismatch in one of
+   * the multiplication functions.
+   */
+  template <class MATRIX>
+  void enter (const MATRIX      &matrix,
+              const unsigned int row,
+              const unsigned int col,
+              const double       prefix = 1.,
+              const bool         transpose = false);
+
+  /**
+   * Add an entry like with enter,
+   * but use PointerMatrixAux for
+   * matrices not having functions
+   * vmult_add() and TVmult_add().
+   *
+   * @deprecated the first argument
+   * is ignored.
+   */
+  template <class MATRIX>
+  void enter_aux (VectorMemory<Vector<number> > &mem,
+                  const MATRIX      &matrix,
+                  const unsigned int row,
+                  const unsigned int col,
+                  const double       prefix = 1.,
+                  const bool         transpose = false);
+
+
+  /**
+   * Delete all entries, i.e. reset
+   * the matrix to an empty state.
+   */
+  void clear();
+
+  /**
+   * Number of block-entries per
+   * column.
+   */
+  unsigned int n_block_rows () const;
+
+  /**
+   * Number of block-entries per
+   * row.
+   */
+  unsigned int n_block_cols () const;
+
+  /**
+   * Matrix-vector multiplication.
+   */
+  void vmult (BlockVector<number> &dst,
+              const BlockVector<number> &src) const;
+
+  /**
+   * Matrix-vector multiplication
+   * adding to <tt>dst</tt>.
+   */
+  void vmult_add (BlockVector<number> &dst,
+                  const BlockVector<number> &src) const;
+
+  /**
+   * Transposed matrix-vector
+   * multiplication.
+   */
+  void Tvmult (BlockVector<number> &dst,
+               const BlockVector<number> &src) const;
+
+  /**
+   * Transposed matrix-vector
+   * multiplication adding to
+   * <tt>dst</tt>.
+   */
+  void Tvmult_add (BlockVector<number> &dst,
+                   const BlockVector<number> &src) const;
+
+  /**
+   * Matrix scalar product between
+   * two vectors (at least for a
+   * symmetric matrix).
+   */
+  number matrix_scalar_product (const BlockVector<number> &u,
+                                const BlockVector<number> &v) const;
+
+  /**
+   * Compute $u^T M u$. This is the square
+   * of the norm induced by the matrix
+   * assuming the matrix is symmetric
+   * positive definitive.
+   */
+  number matrix_norm_square (const BlockVector<number> &u) const;
+
+  /**
+   * Print the block structure as a
+   * LaTeX-array. This output will
+   * not be very intuitive, since
+   * the matrix object lacks
+   * important information. What
+   * you see is an entry for each
+   * block showing all the matrices
+   * with their multiplicaton
+   * factors and possibly transpose
+   * mark. The matrices itself are
+   * numbered successively upon
+   * being entred. If the same
+   * matrix is entered several
+   * times, it will be listed with
+   * the same number everytime.
+   */
+  template <class STREAM>
+  void print_latex (STREAM &out) const;
+
+protected:
+  /**
+   * Internal data structure.
+   *
+   * For each entry of a
+   * BlockMatrixArray, its
+   * position, matrix, prefix and
+   * optional transposition must be
+   * stored. This structure
+   * encapsulates all of them.
+   *
+   * @author Guido Kanschat, 2000, 2001
+   */
+  class Entry
+  {
   public:
-                                     /**
-                                      * Default constructor creating a
-                                      * useless object. initialize()
-                                      * must be called before using
-                                      * it.
-                                      */
-    BlockMatrixArray ();
+    /**
+     * Constructor initializing
+     * all data fields. A
+     * PointerMatrix object is
+     * generated for
+     * <tt>matrix</tt>.
+     */
+    template<class MATRIX>
+    Entry (const MATRIX &matrix,
+           unsigned row, unsigned int col,
+           double prefix, bool transpose);
 
-                                     /**
-                                      * Constructor fixing the
-                                      * dimensions.
-                                      */
-    BlockMatrixArray (const unsigned int n_block_rows,
-                      const unsigned int n_block_cols);
+    /**
+     * Copy constructor
+     * invalidating the old
+     * object. Since it is only
+     * used for entering
+     * temporary objects into a
+     * vector, this is ok.
+     *
+     * For a deep copy, we would
+     * need a reproduction
+     * operator in
+     * PointerMatixBase.
+     */
+    Entry(const Entry &);
 
-                                     /**
-                                      * Initialize object
-                                      * completely. This is the
-                                      * function to call for an object
-                                      * created by the default
-                                      * constructor.
-                                      *
-                                      * @deprecated the last argument
-                                      * is ignored.
-                                      */
-    void initialize (const unsigned int n_block_rows,
-                     const unsigned int n_block_cols);
+    /**
+     * Destructor, where we
+     * delete the PointerMatrix
+     * created by the
+     * constructor.
+     */
+    ~Entry();
 
-                                     /**
-                                      * Constructor fixing the
-                                      * dimensions.
-                                      *
-                                      * @deprecated the last argument
-                                      * is ignored.
-                                      */
-    BlockMatrixArray (const unsigned int n_block_rows,
-                      const unsigned int n_block_cols,
-                      VectorMemory<Vector<number> >& mem);
+    /**
+     * Row number in the block
+     * matrix.
+     */
+    unsigned int row;
 
-                                     /**
-                                      * Initialize object
-                                      * completely. This is the
-                                      * function to call for an object
-                                      * created by the default
-                                      * constructor.
-                                      *
-                                      * @deprecated the last argument
-                                      * is ignored.
-                                      */
-    void initialize (const unsigned int n_block_rows,
-                     const unsigned int n_block_cols,
-                     VectorMemory<Vector<number> >& mem);
+    /**
+     * Column number in the block
+     * matrix.
+     */
+    unsigned int col;
 
-                                     /**
-                                      * Adjust the matrix to a new
-                                      * size and delete all blocks.
-                                      */
-    void reinit (const unsigned int n_block_rows,
-                 const unsigned int n_block_cols);
+    /**
+     * Factor in front of the matrix
+     * block.
+     */
+    double prefix;
 
-                                     /**
-                                      * Add a block matrix entry. The
-                                      * <tt>matrix</tt> is entered
-                                      * into a list of blocks for
-                                      * multiplication, together with
-                                      * its coordinates <tt>row</tt>
-                                      * and <tt>col</tt> as well as
-                                      * optional multiplication factor
-                                      * <tt>prefix</tt> and transpose
-                                      * flag <tt>transpose</tt>.
-                                      *
-                                      * @note No check for consistency
-                                      * of block sizes is
-                                      * made. Therefore, entering a
-                                      * block of wrong dimension here
-                                      * will only lead to a
-                                      * ExcDimensionMismatch in one of
-                                      * the multiplication functions.
-                                      */
-    template <class MATRIX>
-    void enter (const MATRIX      &matrix,
-                const unsigned int row,
-                const unsigned int col,
-                const double       prefix = 1.,
-                const bool         transpose = false);
+    /**
+     * Indicates that matrix block
+     * must be transposed for
+     * multiplication.
+     */
+    bool transpose;
 
-                                     /**
-                                      * Add an entry like with enter,
-                                      * but use PointerMatrixAux for
-                                      * matrices not having functions
-                                      * vmult_add() and TVmult_add().
-                                      *
-                                      * @deprecated the first argument
-                                      * is ignored.
-                                      */
-    template <class MATRIX>
-    void enter_aux (VectorMemory<Vector<number> >& mem,
-                    const MATRIX      &matrix,
-                    const unsigned int row,
-                    const unsigned int col,
-                    const double       prefix = 1.,
-                    const bool         transpose = false);
+    /**
+     * The matrix block itself.
+     */
+    PointerMatrixBase<Vector<number> > *matrix;
+  };
 
+  /**
+   * Array of block entries in the
+   * matrix.
+   */
+  std::vector<Entry> entries;
 
-                                     /**
-                                      * Delete all entries, i.e. reset
-                                      * the matrix to an empty state.
-                                      */
-    void clear();
-
-                                     /**
-                                      * Number of block-entries per
-                                      * column.
-                                      */
-    unsigned int n_block_rows () const;
-
-                                     /**
-                                      * Number of block-entries per
-                                      * row.
-                                      */
-    unsigned int n_block_cols () const;
-
-                                     /**
-                                      * Matrix-vector multiplication.
-                                      */
-    void vmult (BlockVector<number>& dst,
-                const BlockVector<number>& src) const;
-
-                                     /**
-                                      * Matrix-vector multiplication
-                                      * adding to <tt>dst</tt>.
-                                      */
-    void vmult_add (BlockVector<number>& dst,
-                    const BlockVector<number>& src) const;
-
-                                     /**
-                                      * Transposed matrix-vector
-                                      * multiplication.
-                                      */
-    void Tvmult (BlockVector<number>& dst,
-                 const BlockVector<number>& src) const;
-
-                                     /**
-                                      * Transposed matrix-vector
-                                      * multiplication adding to
-                                      * <tt>dst</tt>.
-                                      */
-    void Tvmult_add (BlockVector<number>& dst,
-                     const BlockVector<number>& src) const;
-
-                                     /**
-                                      * Matrix scalar product between
-                                      * two vectors (at least for a
-                                      * symmetric matrix).
-                                      */
-    number matrix_scalar_product (const BlockVector<number>& u,
-                                  const BlockVector<number>& v) const;
-
-                                     /**
-                                      * Compute $u^T M u$. This is the square
-                                      * of the norm induced by the matrix
-                                      * assuming the matrix is symmetric
-                                      * positive definitive.
-                                      */
-    number matrix_norm_square (const BlockVector<number>& u) const;
-
-                                     /**
-                                      * Print the block structure as a
-                                      * LaTeX-array. This output will
-                                      * not be very intuitive, since
-                                      * the matrix object lacks
-                                      * important information. What
-                                      * you see is an entry for each
-                                      * block showing all the matrices
-                                      * with their multiplicaton
-                                      * factors and possibly transpose
-                                      * mark. The matrices itself are
-                                      * numbered successively upon
-                                      * being entred. If the same
-                                      * matrix is entered several
-                                      * times, it will be listed with
-                                      * the same number everytime.
-                                      */
-    template <class STREAM>
-    void print_latex (STREAM& out) const;
-
-  protected:
-                                     /**
-                                      * Internal data structure.
-                                      *
-                                      * For each entry of a
-                                      * BlockMatrixArray, its
-                                      * position, matrix, prefix and
-                                      * optional transposition must be
-                                      * stored. This structure
-                                      * encapsulates all of them.
-                                      *
-                                      * @author Guido Kanschat, 2000, 2001
-                                      */
-    class Entry
-    {
-      public:
-                                         /**
-                                          * Constructor initializing
-                                          * all data fields. A
-                                          * PointerMatrix object is
-                                          * generated for
-                                          * <tt>matrix</tt>.
-                                          */
-        template<class MATRIX>
-        Entry (const MATRIX& matrix,
-               unsigned row, unsigned int col,
-               double prefix, bool transpose);
-
-                                         /**
-                                          * Copy constructor
-                                          * invalidating the old
-                                          * object. Since it is only
-                                          * used for entering
-                                          * temporary objects into a
-                                          * vector, this is ok.
-                                          *
-                                          * For a deep copy, we would
-                                          * need a reproduction
-                                          * operator in
-                                          * PointerMatixBase.
-                                          */
-        Entry(const Entry&);
-
-                                         /**
-                                          * Destructor, where we
-                                          * delete the PointerMatrix
-                                          * created by the
-                                          * constructor.
-                                          */
-        ~Entry();
-
-                                         /**
-                                          * Row number in the block
-                                          * matrix.
-                                          */
-        unsigned int row;
-
-                                         /**
-                                          * Column number in the block
-                                          * matrix.
-                                          */
-        unsigned int col;
-
-                                         /**
-                                          * Factor in front of the matrix
-                                          * block.
-                                          */
-        double prefix;
-
-                                         /**
-                                          * Indicates that matrix block
-                                          * must be transposed for
-                                          * multiplication.
-                                          */
-        bool transpose;
-
-                                         /**
-                                          * The matrix block itself.
-                                          */
-        PointerMatrixBase<Vector<number> >* matrix;
-    };
-
-                                     /**
-                                      * Array of block entries in the
-                                      * matrix.
-                                      */
-    std::vector<Entry> entries;
-
-  private:
-                                     /**
-                                      * Number of blocks per column.
-                                      */
-    unsigned int block_rows;
-                                     /**
-                                      * number of blocks per row.
-                                      */
-    unsigned int block_cols;
+private:
+  /**
+   * Number of blocks per column.
+   */
+  unsigned int block_rows;
+  /**
+   * number of blocks per row.
+   */
+  unsigned int block_cols;
 };
 
 /*@}*/
@@ -472,174 +472,174 @@ template <typename number = double>
 class BlockTrianglePrecondition
   : private BlockMatrixArray<number>
 {
-  public:
-                                     /**
-                                      * Default constructor creating a
-                                      * useless object. initialize()
-                                      * must be called before using
-                                      * it.
-                                      */
-    BlockTrianglePrecondition ();
+public:
+  /**
+   * Default constructor creating a
+   * useless object. initialize()
+   * must be called before using
+   * it.
+   */
+  BlockTrianglePrecondition ();
 
-                                     /**
-                                      * Constructor. This matrix must be
-                                      * block-quadratic, and
-                                      * <tt>n_blocks</tt> is the
-                                      * number of blocks in each direction.
-                                      */
-    BlockTrianglePrecondition (unsigned int n_blocks);
+  /**
+   * Constructor. This matrix must be
+   * block-quadratic, and
+   * <tt>n_blocks</tt> is the
+   * number of blocks in each direction.
+   */
+  BlockTrianglePrecondition (unsigned int n_blocks);
 
-                                     /**
-                                      * Constructor. This matrix must be
-                                      * block-quadratic. The additional
-                                      * parameter allows for backward
-                                      * insertion instead of forward.
-                                      *
-                                      * @deprecated the second argument
-                                      * is ignored.
-                                      */
-    BlockTrianglePrecondition (unsigned int n_block_rows,
-                               VectorMemory<Vector<number> >& mem,
-                               bool backward = false);
+  /**
+   * Constructor. This matrix must be
+   * block-quadratic. The additional
+   * parameter allows for backward
+   * insertion instead of forward.
+   *
+   * @deprecated the second argument
+   * is ignored.
+   */
+  BlockTrianglePrecondition (unsigned int n_block_rows,
+                             VectorMemory<Vector<number> > &mem,
+                             bool backward = false);
 
-                                     /**
-                                      * Initialize object
-                                      * completely. This is the
-                                      * function to call for an object
-                                      * created by the default
-                                      * constructor.
-                                      *
-                                      * @deprecated the second argument
-                                      * is ignored.
-                                      */
-    void initialize (const unsigned int n_block_rows,
-                     VectorMemory<Vector<number> >& mem,
-                     bool backward = false);
+  /**
+   * Initialize object
+   * completely. This is the
+   * function to call for an object
+   * created by the default
+   * constructor.
+   *
+   * @deprecated the second argument
+   * is ignored.
+   */
+  void initialize (const unsigned int n_block_rows,
+                   VectorMemory<Vector<number> > &mem,
+                   bool backward = false);
 
-                                     /**
-                                      * Resize preconditioner to a new
-                                      * size and clear all blocks.
-                                      */
-    void reinit(const unsigned int n_block_rows);
+  /**
+   * Resize preconditioner to a new
+   * size and clear all blocks.
+   */
+  void reinit(const unsigned int n_block_rows);
 
 
-                                     /**
-                                      * Enter a block. This calls
-                                      * BlockMatrixArray::enter(). Remember
-                                      * that the diagonal blocks
-                                      * should actually be inverse
-                                      * matrices or preconditioners.
-                                      */
-    template <class MATRIX>
-    void enter (const MATRIX      &matrix,
-                const unsigned int row,
-                const unsigned int col,
-                const double       prefix = 1.,
-                const bool         transpose = false);
+  /**
+   * Enter a block. This calls
+   * BlockMatrixArray::enter(). Remember
+   * that the diagonal blocks
+   * should actually be inverse
+   * matrices or preconditioners.
+   */
+  template <class MATRIX>
+  void enter (const MATRIX      &matrix,
+              const unsigned int row,
+              const unsigned int col,
+              const double       prefix = 1.,
+              const bool         transpose = false);
 
-                                     /**
-                                      * Enter a block. This calls
-                                      * BlockMatrixArray::enter_aux(). Remember
-                                      * that the diagonal blocks
-                                      * should actually be inverse
-                                      * matrices or preconditioners.
-                                      *
-                                      * @deprecated The first
-                                      * argument is ignored. User
-                                      * enter() instead.
-                                      */
-    template <class MATRIX>
-    void enter_aux (VectorMemory<Vector<double> >& mem,
-                    const MATRIX      &matrix,
-                    const unsigned int row,
-                    const unsigned int col,
-                    const double       prefix = 1.,
-                    const bool         transpose = false);
+  /**
+   * Enter a block. This calls
+   * BlockMatrixArray::enter_aux(). Remember
+   * that the diagonal blocks
+   * should actually be inverse
+   * matrices or preconditioners.
+   *
+   * @deprecated The first
+   * argument is ignored. User
+   * enter() instead.
+   */
+  template <class MATRIX>
+  void enter_aux (VectorMemory<Vector<double> > &mem,
+                  const MATRIX      &matrix,
+                  const unsigned int row,
+                  const unsigned int col,
+                  const double       prefix = 1.,
+                  const bool         transpose = false);
 
-                                     /**
-                                      * Preconditioning.
-                                      */
-    void vmult (BlockVector<number>& dst,
-                const BlockVector<number>& src) const;
+  /**
+   * Preconditioning.
+   */
+  void vmult (BlockVector<number> &dst,
+              const BlockVector<number> &src) const;
 
-                                     /**
-                                      * Preconditioning
-                                      * adding to <tt>dst</tt>.
-                                      */
-    void vmult_add (BlockVector<number>& dst,
-                    const BlockVector<number>& src) const;
+  /**
+   * Preconditioning
+   * adding to <tt>dst</tt>.
+   */
+  void vmult_add (BlockVector<number> &dst,
+                  const BlockVector<number> &src) const;
 
-                                     /**
-                                      * Transposed preconditioning
-                                      */
-    void Tvmult (BlockVector<number>& dst,
-                 const BlockVector<number>& src) const;
+  /**
+   * Transposed preconditioning
+   */
+  void Tvmult (BlockVector<number> &dst,
+               const BlockVector<number> &src) const;
 
-                                     /**
-                                      * Transposed preconditioning
-                                      * adding to <tt>dst</tt>.
-                                      */
-    void Tvmult_add (BlockVector<number>& dst,
-                     const BlockVector<number>& src) const;
+  /**
+   * Transposed preconditioning
+   * adding to <tt>dst</tt>.
+   */
+  void Tvmult_add (BlockVector<number> &dst,
+                   const BlockVector<number> &src) const;
 
-                                     /**
-                                      * Make function of base class available.
-                                      */
-    using BlockMatrixArray<number>::print_latex;
+  /**
+   * Make function of base class available.
+   */
+  using BlockMatrixArray<number>::print_latex;
 
-                                     /**
-                                      * Make function of base class available.
-                                      */
-    using BlockMatrixArray<number>::n_block_rows;
+  /**
+   * Make function of base class available.
+   */
+  using BlockMatrixArray<number>::n_block_rows;
 
-                                     /**
-                                      * Make function of base class available.
-                                      */
-    using BlockMatrixArray<number>::n_block_cols;
-    using BlockMatrixArray<number>::clear;
-    using BlockMatrixArray<number>::Subscriptor::subscribe;
-    using BlockMatrixArray<number>::Subscriptor::unsubscribe;
+  /**
+   * Make function of base class available.
+   */
+  using BlockMatrixArray<number>::n_block_cols;
+  using BlockMatrixArray<number>::clear;
+  using BlockMatrixArray<number>::Subscriptor::subscribe;
+  using BlockMatrixArray<number>::Subscriptor::unsubscribe;
 
-                                     /** @addtogroup Exceptions
-                                      * @{ */
+  /** @addtogroup Exceptions
+   * @{ */
 
-                                     /**
-                                      * Each diagonal block must
-                                      * contain one and only one
-                                      * matrix. If this exception is
-                                      * thrown, you did not enter a
-                                      * matrix here.
-                                      */
-    DeclException1(ExcNoDiagonal,
-                   unsigned int,
-                   << "No diagonal entry was added for block " << arg1);
+  /**
+   * Each diagonal block must
+   * contain one and only one
+   * matrix. If this exception is
+   * thrown, you did not enter a
+   * matrix here.
+   */
+  DeclException1(ExcNoDiagonal,
+                 unsigned int,
+                 << "No diagonal entry was added for block " << arg1);
 
-                                     /**
-                                      * Each diagonal block must
-                                      * contain one and only one
-                                      * matrix. If this exception is
-                                      * thrown, you entered a second
-                                      * matrix here.
-                                      */
-    DeclException1(ExcMultipleDiagonal,
-                   unsigned int,
-                   << "Inverse diagonal entries may not be added in block "
-                   << arg1);
-                                     //@}
-  private:
-                                     /**
-                                      * Add all off-diagonal
-                                      * contributions and return the
-                                      * entry of the diagonal element
-                                      * for one row.
-                                      */
-    void do_row (BlockVector<number>& dst,
-                 unsigned int row_num) const;
+  /**
+   * Each diagonal block must
+   * contain one and only one
+   * matrix. If this exception is
+   * thrown, you entered a second
+   * matrix here.
+   */
+  DeclException1(ExcMultipleDiagonal,
+                 unsigned int,
+                 << "Inverse diagonal entries may not be added in block "
+                 << arg1);
+  //@}
+private:
+  /**
+   * Add all off-diagonal
+   * contributions and return the
+   * entry of the diagonal element
+   * for one row.
+   */
+  void do_row (BlockVector<number> &dst,
+               unsigned int row_num) const;
 
-                                     /**
-                                      * Flag for backward insertion.
-                                      */
-    bool backward;
+  /**
+   * Flag for backward insertion.
+   */
+  bool backward;
 };
 
 
@@ -650,17 +650,17 @@ template <typename number>
 template <class MATRIX>
 inline
 BlockMatrixArray<number>::Entry::Entry (
-  const MATRIX& m,
+  const MATRIX &m,
   unsigned int row,
   unsigned int col,
   double prefix,
   bool transpose)
-                :
-                row (row),
-                col (col),
-                prefix (prefix),
-                transpose (transpose),
-                matrix (new_pointer_matrix_base(m, Vector<number>(), typeid(*this).name()))
+  :
+  row (row),
+  col (col),
+  prefix (prefix),
+  transpose (transpose),
+  matrix (new_pointer_matrix_base(m, Vector<number>(), typeid(*this).name()))
 {}
 
 
@@ -670,7 +670,7 @@ template <class MATRIX>
 inline
 void
 BlockMatrixArray<number>::enter (
-  const MATRIX& matrix,
+  const MATRIX &matrix,
   unsigned int row,
   unsigned int col,
   double prefix,
@@ -687,8 +687,8 @@ template <class MATRIX>
 inline
 void
 BlockMatrixArray<number>::enter_aux (
-  VectorMemory<Vector<number> >& mem,
-  const MATRIX& matrix,
+  VectorMemory<Vector<number> > &mem,
+  const MATRIX &matrix,
   unsigned int row,
   unsigned int col,
   double prefix,
@@ -703,11 +703,11 @@ BlockMatrixArray<number>::enter_aux (
 template<typename number>
 struct BlockMatrixArrayPointerMatrixLess
 {
-    bool operator () (const PointerMatrixBase<Vector<number> >*a,
-                      const PointerMatrixBase<Vector<number> >* b) const
-      {
-        return *a < *b;
-      }
+  bool operator () (const PointerMatrixBase<Vector<number> > *a,
+                    const PointerMatrixBase<Vector<number> > *b) const
+  {
+    return *a < *b;
+  }
 };
 
 
@@ -715,7 +715,7 @@ template <typename number>
 template <class STREAM>
 inline
 void
-BlockMatrixArray<number>::print_latex (STREAM& out) const
+BlockMatrixArray<number>::print_latex (STREAM &out) const
 {
   out << "\\begin{array}{"
       << std::string(n_block_cols(), 'c')
@@ -723,8 +723,8 @@ BlockMatrixArray<number>::print_latex (STREAM& out) const
 
   Table<2,std::string> array(n_block_rows(), n_block_cols());
 
-  typedef std::map<const PointerMatrixBase<Vector<number> >*,
-    std::string, BlockMatrixArrayPointerMatrixLess<number> > NameMap;
+  typedef std::map<const PointerMatrixBase<Vector<number> > *,
+          std::string, BlockMatrixArrayPointerMatrixLess<number> > NameMap;
   NameMap matrix_names;
 
   typename std::vector<Entry>::const_iterator m = entries.begin();
@@ -738,7 +738,7 @@ BlockMatrixArray<number>::print_latex (STREAM& out) const
           std::pair<typename NameMap::iterator, bool> x =
             matrix_names.insert(
               std::pair<const PointerMatrixBase<Vector<number> >*, std::string> (m->matrix,
-                                                     std::string("M")));
+                  std::string("M")));
           std::ostringstream stream;
           stream << matrix_number++;
 
@@ -758,8 +758,8 @@ BlockMatrixArray<number>::print_latex (STREAM& out) const
 
       array(m->row, m->col) += stream.str();
     }
-  for (unsigned int i=0;i<n_block_rows();++i)
-    for (unsigned int j=0;j<n_block_cols();++j)
+  for (unsigned int i=0; i<n_block_rows(); ++i)
+    for (unsigned int j=0; j<n_block_cols(); ++j)
       {
         out << '\t' << array(i,j);
         if (j==n_block_cols()-1)
@@ -774,7 +774,7 @@ template <typename number>
 template <class MATRIX>
 inline
 void
-BlockTrianglePrecondition<number>::enter (const MATRIX& matrix,
+BlockTrianglePrecondition<number>::enter (const MATRIX &matrix,
                                           unsigned row, unsigned int col,
                                           double prefix, bool transpose)
 {
@@ -788,8 +788,8 @@ template <class MATRIX>
 inline
 void
 BlockTrianglePrecondition<number>::enter_aux (
-  VectorMemory<Vector<double> >& mem,
-  const MATRIX& matrix,
+  VectorMemory<Vector<double> > &mem,
+  const MATRIX &matrix,
   unsigned int row,
   unsigned int col,
   double prefix,

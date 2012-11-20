@@ -35,45 +35,45 @@ DEAL_II_NAMESPACE_OPEN
 template <int N>
 class TableIndicesBase
 {
-  public:
-                                     /**
-                                      * Access the value of the
-                                      * <tt>i</tt>th index.
-                                      */
-    unsigned int operator[] (const unsigned int i) const;
+public:
+  /**
+   * Access the value of the
+   * <tt>i</tt>th index.
+   */
+  unsigned int operator[] (const unsigned int i) const;
 
-                                     /**
-                                      * Compare two index fields for
-                                      * equality.
-                                      */
-    bool operator == (const TableIndicesBase<N> &other) const;
+  /**
+   * Compare two index fields for
+   * equality.
+   */
+  bool operator == (const TableIndicesBase<N> &other) const;
 
-                                     /**
-                                      * Compare two index fields for
-                                      * inequality.
-                                      */
-    bool operator != (const TableIndicesBase<N> &other) const;
+  /**
+   * Compare two index fields for
+   * inequality.
+   */
+  bool operator != (const TableIndicesBase<N> &other) const;
 
-                                     /**
-                                      * Sort the indices in ascending
-                                      * order. While this operation is not
-                                      * very useful for Table objects, it is
-                                      * used for the SymmetricTensor class.
-                                      */
-    void sort ();
+  /**
+   * Sort the indices in ascending
+   * order. While this operation is not
+   * very useful for Table objects, it is
+   * used for the SymmetricTensor class.
+   */
+  void sort ();
 
-                                     /**
-                                      * Write or read the data of this object to or
-                                      * from a stream for the purpose of serialization.
-                                      */
-    template <class Archive>
-    void serialize (Archive & ar, const unsigned int version);
+  /**
+   * Write or read the data of this object to or
+   * from a stream for the purpose of serialization.
+   */
+  template <class Archive>
+  void serialize (Archive &ar, const unsigned int version);
 
-  protected:
-                                     /**
-                                      * Store the indices in an array.
-                                      */
-    unsigned int indices[N];
+protected:
+  /**
+   * Store the indices in an array.
+   */
+  unsigned int indices[N];
 };
 
 
@@ -95,18 +95,18 @@ class TableIndicesBase
 template <int N>
 class TableIndices : public TableIndicesBase<N>
 {
-                                     /**
-                                      * Standard constructor, setting
-                                      * all indices to zero.
-                                      */
-    TableIndices();
-                                     /**
-                                      * The actual constructor, taking
-                                      * @p N arguments of type
-                                      * <tt>unsigned int</tt> to
-                                      * initialize the index object.
-                                      */
-    TableIndices(...);
+  /**
+   * Standard constructor, setting
+   * all indices to zero.
+   */
+  TableIndices();
+  /**
+   * The actual constructor, taking
+   * @p N arguments of type
+   * <tt>unsigned int</tt> to
+   * initialize the index object.
+   */
+  TableIndices(...);
 };
 
 
@@ -127,18 +127,18 @@ class TableIndices : public TableIndicesBase<N>
 template <>
 class TableIndices<1> : public TableIndicesBase<1>
 {
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+public:
+  /**
+   * Default constructor. Set all
+   * indices to zero.
+   */
+  TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      */
-    TableIndices (const unsigned int index1);
+  /**
+   * Constructor. Set indices to
+   * the given values.
+   */
+  TableIndices (const unsigned int index1);
 };
 
 //TODO: Remove the default arguments and trickery below and put all
@@ -159,30 +159,30 @@ class TableIndices<1> : public TableIndicesBase<1>
 template <>
 class TableIndices<2> : public TableIndicesBase<2>
 {
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+public:
+  /**
+   * Default constructor. Set all
+   * indices to zero.
+   */
+  TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      *
-                                      * The default values for the
-                                      * second and subsequent
-                                      * arguments are necessary for
-                                      * some neat template tricks in
-                                      * SymmetricTensor where we only
-                                      * want to set the first index
-                                      * and construct the subsequent
-                                      * ones later on, i.e. for the
-                                      * moment we don't care about the
-                                      * later indices.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2 = numbers::invalid_unsigned_int);
+  /**
+   * Constructor. Set indices to
+   * the given values.
+   *
+   * The default values for the
+   * second and subsequent
+   * arguments are necessary for
+   * some neat template tricks in
+   * SymmetricTensor where we only
+   * want to set the first index
+   * and construct the subsequent
+   * ones later on, i.e. for the
+   * moment we don't care about the
+   * later indices.
+   */
+  TableIndices (const unsigned int index1,
+                const unsigned int index2 = numbers::invalid_unsigned_int);
 };
 
 
@@ -202,31 +202,31 @@ class TableIndices<2> : public TableIndicesBase<2>
 template <>
 class TableIndices<3> : public TableIndicesBase<3>
 {
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+public:
+  /**
+   * Default constructor. Set all
+   * indices to zero.
+   */
+  TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      *
-                                      * The default values for the
-                                      * second and subsequent
-                                      * arguments are necessary for
-                                      * some neat template tricks in
-                                      * SymmetricTensor where we only
-                                      * want to set the first index
-                                      * and construct the subsequent
-                                      * ones later on, i.e. for the
-                                      * moment we don't care about the
-                                      * later indices.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2 = numbers::invalid_unsigned_int,
-                  const unsigned int index3 = numbers::invalid_unsigned_int);
+  /**
+   * Constructor. Set indices to
+   * the given values.
+   *
+   * The default values for the
+   * second and subsequent
+   * arguments are necessary for
+   * some neat template tricks in
+   * SymmetricTensor where we only
+   * want to set the first index
+   * and construct the subsequent
+   * ones later on, i.e. for the
+   * moment we don't care about the
+   * later indices.
+   */
+  TableIndices (const unsigned int index1,
+                const unsigned int index2 = numbers::invalid_unsigned_int,
+                const unsigned int index3 = numbers::invalid_unsigned_int);
 };
 
 
@@ -245,32 +245,32 @@ class TableIndices<3> : public TableIndicesBase<3>
 template <>
 class TableIndices<4> : public TableIndicesBase<4>
 {
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+public:
+  /**
+   * Default constructor. Set all
+   * indices to zero.
+   */
+  TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      *
-                                      * The default values for the
-                                      * second and subsequent
-                                      * arguments are necessary for
-                                      * some neat template tricks in
-                                      * SymmetricTensor where we only
-                                      * want to set the first index
-                                      * and construct the subsequent
-                                      * ones later on, i.e. for the
-                                      * moment we don't care about the
-                                      * later indices.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2 = numbers::invalid_unsigned_int,
-                  const unsigned int index3 = numbers::invalid_unsigned_int,
-                  const unsigned int index4 = numbers::invalid_unsigned_int);
+  /**
+   * Constructor. Set indices to
+   * the given values.
+   *
+   * The default values for the
+   * second and subsequent
+   * arguments are necessary for
+   * some neat template tricks in
+   * SymmetricTensor where we only
+   * want to set the first index
+   * and construct the subsequent
+   * ones later on, i.e. for the
+   * moment we don't care about the
+   * later indices.
+   */
+  TableIndices (const unsigned int index1,
+                const unsigned int index2 = numbers::invalid_unsigned_int,
+                const unsigned int index3 = numbers::invalid_unsigned_int,
+                const unsigned int index4 = numbers::invalid_unsigned_int);
 };
 
 
@@ -289,33 +289,33 @@ class TableIndices<4> : public TableIndicesBase<4>
 template <>
 class TableIndices<5> : public TableIndicesBase<5>
 {
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+public:
+  /**
+   * Default constructor. Set all
+   * indices to zero.
+   */
+  TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      *
-                                      * The default values for the
-                                      * second and subsequent
-                                      * arguments are necessary for
-                                      * some neat template tricks in
-                                      * SymmetricTensor where we only
-                                      * want to set the first index
-                                      * and construct the subsequent
-                                      * ones later on, i.e. for the
-                                      * moment we don't care about the
-                                      * later indices.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2 = numbers::invalid_unsigned_int,
-                  const unsigned int index3 = numbers::invalid_unsigned_int,
-                  const unsigned int index4 = numbers::invalid_unsigned_int,
-                  const unsigned int index5 = numbers::invalid_unsigned_int);
+  /**
+   * Constructor. Set indices to
+   * the given values.
+   *
+   * The default values for the
+   * second and subsequent
+   * arguments are necessary for
+   * some neat template tricks in
+   * SymmetricTensor where we only
+   * want to set the first index
+   * and construct the subsequent
+   * ones later on, i.e. for the
+   * moment we don't care about the
+   * later indices.
+   */
+  TableIndices (const unsigned int index1,
+                const unsigned int index2 = numbers::invalid_unsigned_int,
+                const unsigned int index3 = numbers::invalid_unsigned_int,
+                const unsigned int index4 = numbers::invalid_unsigned_int,
+                const unsigned int index5 = numbers::invalid_unsigned_int);
 };
 
 
@@ -334,34 +334,34 @@ class TableIndices<5> : public TableIndicesBase<5>
 template <>
 class TableIndices<6> : public TableIndicesBase<6>
 {
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+public:
+  /**
+   * Default constructor. Set all
+   * indices to zero.
+   */
+  TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      *
-                                      * The default values for the
-                                      * second and subsequent
-                                      * arguments are necessary for
-                                      * some neat template tricks in
-                                      * SymmetricTensor where we only
-                                      * want to set the first index
-                                      * and construct the subsequent
-                                      * ones later on, i.e. for the
-                                      * moment we don't care about the
-                                      * later indices.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2 = numbers::invalid_unsigned_int,
-                  const unsigned int index3 = numbers::invalid_unsigned_int,
-                  const unsigned int index4 = numbers::invalid_unsigned_int,
-                  const unsigned int index5 = numbers::invalid_unsigned_int,
-                  const unsigned int index6 = numbers::invalid_unsigned_int);
+  /**
+   * Constructor. Set indices to
+   * the given values.
+   *
+   * The default values for the
+   * second and subsequent
+   * arguments are necessary for
+   * some neat template tricks in
+   * SymmetricTensor where we only
+   * want to set the first index
+   * and construct the subsequent
+   * ones later on, i.e. for the
+   * moment we don't care about the
+   * later indices.
+   */
+  TableIndices (const unsigned int index1,
+                const unsigned int index2 = numbers::invalid_unsigned_int,
+                const unsigned int index3 = numbers::invalid_unsigned_int,
+                const unsigned int index4 = numbers::invalid_unsigned_int,
+                const unsigned int index5 = numbers::invalid_unsigned_int,
+                const unsigned int index6 = numbers::invalid_unsigned_int);
 };
 
 
@@ -380,35 +380,35 @@ class TableIndices<6> : public TableIndicesBase<6>
 template <>
 class TableIndices<7> : public TableIndicesBase<7>
 {
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+public:
+  /**
+   * Default constructor. Set all
+   * indices to zero.
+   */
+  TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      *
-                                      * The default values for the
-                                      * second and subsequent
-                                      * arguments are necessary for
-                                      * some neat template tricks in
-                                      * SymmetricTensor where we only
-                                      * want to set the first index
-                                      * and construct the subsequent
-                                      * ones later on, i.e. for the
-                                      * moment we don't care about the
-                                      * later indices.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2 = numbers::invalid_unsigned_int,
-                  const unsigned int index3 = numbers::invalid_unsigned_int,
-                  const unsigned int index4 = numbers::invalid_unsigned_int,
-                  const unsigned int index5 = numbers::invalid_unsigned_int,
-                  const unsigned int index6 = numbers::invalid_unsigned_int,
-                  const unsigned int index7 = numbers::invalid_unsigned_int);
+  /**
+   * Constructor. Set indices to
+   * the given values.
+   *
+   * The default values for the
+   * second and subsequent
+   * arguments are necessary for
+   * some neat template tricks in
+   * SymmetricTensor where we only
+   * want to set the first index
+   * and construct the subsequent
+   * ones later on, i.e. for the
+   * moment we don't care about the
+   * later indices.
+   */
+  TableIndices (const unsigned int index1,
+                const unsigned int index2 = numbers::invalid_unsigned_int,
+                const unsigned int index3 = numbers::invalid_unsigned_int,
+                const unsigned int index4 = numbers::invalid_unsigned_int,
+                const unsigned int index5 = numbers::invalid_unsigned_int,
+                const unsigned int index6 = numbers::invalid_unsigned_int,
+                const unsigned int index7 = numbers::invalid_unsigned_int);
 };
 
 
@@ -453,9 +453,9 @@ template <int N>
 template <class Archive>
 inline
 void
-TableIndicesBase<N>::serialize (Archive & ar, const unsigned int)
+TableIndicesBase<N>::serialize (Archive &ar, const unsigned int)
 {
-  ar & indices;
+  ar &indices;
 }
 
 
@@ -484,7 +484,7 @@ inline
 void
 TableIndicesBase<3>::sort ()
 {
-                                   // bubble sort for 3 elements
+  // bubble sort for 3 elements
   if (indices[1] < indices[0])
     std::swap (indices[0], indices[1]);
   if (indices[2] < indices[1])
@@ -576,9 +576,9 @@ inline
 TableIndices<5>::TableIndices ()
 {
   this->indices[0] = this->indices[1]
-                   = this->indices[2]
-                   = this->indices[3]
-                   = this->indices[4] = 0;
+                     = this->indices[2]
+                       = this->indices[3]
+                         = this->indices[4] = 0;
 }
 
 
@@ -603,8 +603,8 @@ inline
 TableIndices<6>::TableIndices ()
 {
   this->indices[0] = this->indices[1] = this->indices[2]
-                   = this->indices[3] = this->indices[4]
-                   = this->indices[5] = 0;
+                                        = this->indices[3] = this->indices[4]
+                                                             = this->indices[5] = 0;
 }
 
 
@@ -631,8 +631,8 @@ inline
 TableIndices<7>::TableIndices ()
 {
   this->indices[0] = this->indices[1] = this->indices[2]
-                   = this->indices[3] = this->indices[4]
-                   = this->indices[5] = this->indices[6] = 0;
+                                        = this->indices[3] = this->indices[4]
+                                                             = this->indices[5] = this->indices[6] = 0;
 }
 
 

@@ -34,8 +34,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int structdim, int dim, int spacedim>
 MGDoFAccessor<structdim, dim, spacedim>::MGDoFAccessor ()
-                :
-                BaseClass (0, -1, -1, 0)
+  :
+  BaseClass (0, -1, -1, 0)
 {
   Assert (false, ExcInvalidObject());
 }
@@ -44,12 +44,12 @@ MGDoFAccessor<structdim, dim, spacedim>::MGDoFAccessor ()
 
 template <int structdim, int dim, int spacedim>
 MGDoFAccessor<structdim, dim, spacedim>::MGDoFAccessor (const Triangulation<dim,spacedim> *tria,
-                                              const int                 level,
-                                              const int                 index,
-                                              const AccessorData       *local_data)
-                :
-                BaseClass (tria, level, index, local_data),
-                mg_dof_handler (const_cast<MGDoFHandler<dim,spacedim>*>(local_data))
+                                                        const int                 level,
+                                                        const int                 index,
+                                                        const AccessorData       *local_data)
+  :
+  BaseClass (tria, level, index, local_data),
+  mg_dof_handler (const_cast<MGDoFHandler<dim,spacedim>*>(local_data))
 {}
 
 
@@ -77,8 +77,8 @@ MGDoFAccessor<structdim, dim, spacedim>::get_mg_dof_handler () const
 template <int structdim,int dim, int spacedim>
 unsigned int
 MGDoFAccessor<structdim, dim, spacedim>::mg_vertex_dof_index (const int level,
-                                                    const unsigned int vertex,
-                                                    const unsigned int i) const
+    const unsigned int vertex,
+    const unsigned int i) const
 {
   Assert (this->dof_handler != 0,
           typename BaseClass::ExcInvalidObject());
@@ -99,9 +99,9 @@ MGDoFAccessor<structdim, dim, spacedim>::mg_vertex_dof_index (const int level,
 template <int structdim, int dim, int spacedim>
 void
 MGDoFAccessor<structdim, dim, spacedim>::set_mg_vertex_dof_index (const int level,
-                                                        const unsigned int vertex,
-                                                        const unsigned int i,
-                                                        const unsigned int index) const
+    const unsigned int vertex,
+    const unsigned int i,
+    const unsigned int index) const
 {
   Assert (this->dof_handler != 0,
           typename BaseClass::ExcInvalidObject());
@@ -115,7 +115,7 @@ MGDoFAccessor<structdim, dim, spacedim>::set_mg_vertex_dof_index (const int leve
           ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
-    .set_index (level, i, this->dof_handler->get_fe().dofs_per_vertex, index);
+  .set_index (level, i, this->dof_handler->get_fe().dofs_per_vertex, index);
 }
 
 
@@ -123,27 +123,27 @@ MGDoFAccessor<structdim, dim, spacedim>::set_mg_vertex_dof_index (const int leve
 template <int structdim, int dim, int spacedim>
 unsigned int
 MGDoFAccessor<structdim, dim, spacedim>::mg_dof_index (const int level,
-                                             const unsigned int i) const
+                                                       const unsigned int i) const
 {
   return this->mg_dof_handler
-    ->template get_dof_index<structdim>(level,
-                                        this->present_index,
-                                        0,
-                                        i);
+         ->template get_dof_index<structdim>(level,
+                                             this->present_index,
+                                             0,
+                                             i);
 }
 
 
 template <int structdim, int dim, int spacedim>
 void MGDoFAccessor<structdim, dim, spacedim>::set_mg_dof_index (const int level,
-                                                      const unsigned int i,
-                                                      const unsigned int index) const
+    const unsigned int i,
+    const unsigned int index) const
 {
   this->mg_dof_handler
-    ->template set_dof_index<structdim>(level,
-                                        this->present_index,
-                                        0,
-                                        i,
-                                        index);
+  ->template set_dof_index<structdim>(level,
+                                      this->present_index,
+                                      0,
+                                      i,
+                                      index);
 }
 
 
@@ -153,16 +153,16 @@ TriaIterator<MGDoFAccessor<structdim,dim,spacedim> >
 MGDoFAccessor<structdim, dim, spacedim>::child (const unsigned int i) const
 {
   const TriaIterator<MGDoFAccessor<structdim,dim,spacedim> >
-    q (this->tria,
-       (structdim == dim ?
-        this->level() + 1 :
-        0),
-       this->child_index (i),
-       this->mg_dof_handler);
+  q (this->tria,
+     (structdim == dim ?
+      this->level() + 1 :
+      0),
+     this->child_index (i),
+     this->mg_dof_handler);
 
-                                   // make sure that we either created
-                                   // a past-the-end iterator or one
-                                   // pointing to a used cell
+  // make sure that we either created
+  // a past-the-end iterator or one
+  // pointing to a used cell
   Assert ((q.state() == IteratorState::past_the_end)
           ||
           q->used(),
@@ -180,12 +180,12 @@ MGDoFAccessor<structdim, dim, spacedim>::parent () const
           ExcMessage ("Cell is at coarsest level."));
 
   const TriaIterator<MGDoFAccessor<structdim,dim,spacedim> >
-    q (this->tria,
-       (structdim == dim ?
-        this->level() - 1 :
-        0),
-       this->parent_index (),
-       this->mg_dof_handler);
+  q (this->tria,
+     (structdim == dim ?
+      this->level() - 1 :
+      0),
+     this->parent_index (),
+     this->mg_dof_handler);
 
   return q;
 }
@@ -215,16 +215,16 @@ typename internal::MGDoFHandler::Iterators<dim,spacedim>::line_iterator
 MGDoFAccessor<structdim,dim,spacedim>::line (const unsigned int i) const
 {
   Assert (structdim > 1, ExcImpossibleInDim(structdim));
-                                   // checking of 'i' happens in
-                                   // line_index(i)
+  // checking of 'i' happens in
+  // line_index(i)
 
   return typename internal::MGDoFHandler::Iterators<dim,spacedim>::line_iterator
-    (
-      this->tria,
-      0,  // only sub-objects are allowed, which have no level
-      this->line_index(i),
-      this->mg_dof_handler
-    );
+         (
+           this->tria,
+           0,  // only sub-objects are allowed, which have no level
+           this->line_index(i),
+           this->mg_dof_handler
+         );
 }
 
 
@@ -233,16 +233,16 @@ typename internal::MGDoFHandler::Iterators<dim,spacedim>::quad_iterator
 MGDoFAccessor<structdim,dim,spacedim>::quad (const unsigned int i) const
 {
   Assert (structdim > 2, ExcImpossibleInDim(structdim));
-                                   // checking of 'i' happens in
-                                   // quad_index(i)
+  // checking of 'i' happens in
+  // quad_index(i)
 
   return typename internal::MGDoFHandler::Iterators<dim,spacedim>::quad_iterator
-    (
-      this->tria,
-      0,  // only sub-objects are allowed, which have no level
-      this->quad_index (i),
-      this->mg_dof_handler
-    );
+         (
+           this->tria,
+           0,  // only sub-objects are allowed, which have no level
+           this->quad_index (i),
+           this->mg_dof_handler
+         );
 }
 
 
@@ -417,30 +417,30 @@ get_mg_dof_indices (const int level,
           ExcInvalidObject());
   switch (structdim)
     {
-      case 1:
-            Assert (dof_indices.size() ==
-                    (2*this->dof_handler->get_fe().dofs_per_vertex +
-                     this->dof_handler->get_fe().dofs_per_line),
-                    typename BaseClass::ExcVectorDoesNotMatch());
-            break;
-      case 2:
-            Assert (dof_indices.size() ==
-                    (4*this->dof_handler->get_fe().dofs_per_vertex +
-                     4*this->dof_handler->get_fe().dofs_per_line +
-                     this->dof_handler->get_fe().dofs_per_quad),
-                    typename BaseClass::ExcVectorDoesNotMatch());
-            break;
-      case 3:
-            Assert (dof_indices.size() ==
-                    (8*this->dof_handler->get_fe().dofs_per_vertex +
-                     12*this->dof_handler->get_fe().dofs_per_line +
-                     6*this->dof_handler->get_fe().dofs_per_quad +
-                     this->dof_handler->get_fe().dofs_per_hex),
-                    typename BaseClass::ExcVectorDoesNotMatch());
+    case 1:
+      Assert (dof_indices.size() ==
+              (2*this->dof_handler->get_fe().dofs_per_vertex +
+               this->dof_handler->get_fe().dofs_per_line),
+              typename BaseClass::ExcVectorDoesNotMatch());
+      break;
+    case 2:
+      Assert (dof_indices.size() ==
+              (4*this->dof_handler->get_fe().dofs_per_vertex +
+               4*this->dof_handler->get_fe().dofs_per_line +
+               this->dof_handler->get_fe().dofs_per_quad),
+              typename BaseClass::ExcVectorDoesNotMatch());
+      break;
+    case 3:
+      Assert (dof_indices.size() ==
+              (8*this->dof_handler->get_fe().dofs_per_vertex +
+               12*this->dof_handler->get_fe().dofs_per_line +
+               6*this->dof_handler->get_fe().dofs_per_quad +
+               this->dof_handler->get_fe().dofs_per_hex),
+              typename BaseClass::ExcVectorDoesNotMatch());
 
-            break;
-      default:
-            Assert (false, ExcNotImplemented());
+      break;
+    default:
+      Assert (false, ExcNotImplemented());
     }
 
   internal::MGDoFAccessor::get_mg_dof_indices (*this, level, dof_indices);
@@ -476,8 +476,8 @@ get_mg_dof_values (const int level,
 
 template <int spacedim>
 MGDoFAccessor<0,1,spacedim>::MGDoFAccessor ()
-                :
-                BaseClass ()
+  :
+  BaseClass ()
 {
   Assert (false, typename BaseClass::ExcInvalidObject());
 }
@@ -489,12 +489,12 @@ MGDoFAccessor<0,1,spacedim>::
 MGDoFAccessor (const Triangulation<1,spacedim> *tria,
                const typename TriaAccessor<0,1,spacedim>::VertexKind vertex_kind,
                const unsigned int    vertex_index,
-               const MGDoFHandler<1,spacedim> * dof_handler)
-                :
-                BaseClass (tria,
-                           vertex_kind,
-                           vertex_index),
-                mg_dof_handler(const_cast<MGDoFHandler<1,spacedim>*>(dof_handler))
+               const MGDoFHandler<1,spacedim> *dof_handler)
+  :
+  BaseClass (tria,
+             vertex_kind,
+             vertex_index),
+  mg_dof_handler(const_cast<MGDoFHandler<1,spacedim>*>(dof_handler))
 {}
 
 
@@ -504,9 +504,9 @@ MGDoFAccessor<0,1,spacedim>::
 MGDoFAccessor (const Triangulation<1,spacedim> *,
                const int                 ,
                const int                 ,
-               const MGDoFHandler<1,spacedim>     *)
-                :
-                mg_dof_handler(0)
+               const MGDoFHandler<1,spacedim> *)
+  :
+  mg_dof_handler(0)
 {
   Assert (false,
           ExcMessage ("This constructor can not be called for face iterators in 1d."));
@@ -545,11 +545,11 @@ MGDoFAccessor<0,1,spacedim>::MGDoFAccessor (const MGDoFCellAccessor<dim2, spaced
 
 template <int dim, int spacedim>
 MGDoFCellAccessor<dim,spacedim>::MGDoFCellAccessor (const Triangulation<dim,spacedim> *tria,
-                                           const int                 level,
-                                           const int                 index,
-                                           const AccessorData       *local_data)
-                :
-                MGDoFAccessor<dim, dim, spacedim> (tria,level,index,local_data)
+                                                    const int                 level,
+                                                    const int                 index,
+                                                    const AccessorData       *local_data)
+  :
+  MGDoFAccessor<dim, dim, spacedim> (tria,level,index,local_data)
 {}
 
 
@@ -565,7 +565,7 @@ template <int dim, int spacedim>
 template <typename number>
 void
 MGDoFCellAccessor<dim,spacedim>::get_mg_dof_values (const Vector<number> &values,
-                                           Vector<number>       &dof_values) const
+                                                    Vector<number>       &dof_values) const
 {
   MGDoFAccessor<dim,dim,spacedim>::get_mg_dof_values (this->level(), values, dof_values);
 }
@@ -577,9 +577,9 @@ TriaIterator<MGDoFCellAccessor<dim,spacedim> >
 MGDoFCellAccessor<dim,spacedim>::neighbor (const unsigned int i) const
 {
   TriaIterator<MGDoFCellAccessor<dim,spacedim> > q (this->tria,
-                                               this->neighbor_level (i),
-                                               this->neighbor_index (i),
-                                               this->mg_dof_handler);
+                                                    this->neighbor_level (i),
+                                                    this->neighbor_index (i),
+                                                    this->mg_dof_handler);
 
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -594,9 +594,9 @@ TriaIterator<MGDoFCellAccessor<dim,spacedim> >
 MGDoFCellAccessor<dim,spacedim>::child (const unsigned int i) const
 {
   TriaIterator<MGDoFCellAccessor<dim,spacedim> > q (this->tria,
-                                               this->present_level+1,
-                                               this->child_index (i),
-                                               this->mg_dof_handler);
+                                                    this->present_level+1,
+                                                    this->child_index (i),
+                                                    this->mg_dof_handler);
 
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -611,10 +611,10 @@ TriaIterator<MGDoFCellAccessor<dim,spacedim> >
 MGDoFCellAccessor<dim, spacedim>::parent () const
 {
   const TriaIterator<MGDoFCellAccessor<dim,spacedim> >
-    q (this->tria,
-           this->level() - 1,
-       this->parent_index (),
-       this->mg_dof_handler);
+  q (this->tria,
+     this->level() - 1,
+     this->parent_index (),
+     this->mg_dof_handler);
 
   return q;
 }
@@ -632,18 +632,18 @@ namespace internal
               const internal::int2type<1>)
     {
       dealii::MGDoFAccessor<0,1,spacedim>
-        a (&cell.get_triangulation(),
-           ((i == 0) && cell.at_boundary(0)
-            ?
-            dealii::TriaAccessor<0, 1, spacedim>::left_vertex
-            :
-            ((i == 1) && cell.at_boundary(1)
-             ?
-             dealii::TriaAccessor<0, 1, spacedim>::right_vertex
-             :
-             dealii::TriaAccessor<0, 1, spacedim>::interior_vertex)),
-           cell.vertex_index(i),
-           &cell.get_mg_dof_handler());
+      a (&cell.get_triangulation(),
+         ((i == 0) && cell.at_boundary(0)
+          ?
+          dealii::TriaAccessor<0, 1, spacedim>::left_vertex
+          :
+          ((i == 1) && cell.at_boundary(1)
+           ?
+           dealii::TriaAccessor<0, 1, spacedim>::right_vertex
+           :
+           dealii::TriaAccessor<0, 1, spacedim>::interior_vertex)),
+         cell.vertex_index(i),
+         &cell.get_mg_dof_handler());
       return typename internal::MGDoFHandler::Iterators<1,spacedim>::face_iterator(a);
     }
 
@@ -692,9 +692,9 @@ neighbor_child_on_subface (const unsigned int face,
   const TriaIterator<CellAccessor<dim,spacedim> > q
     = CellAccessor<dim,spacedim>::neighbor_child_on_subface (face, subface);
   return TriaIterator<MGDoFCellAccessor<dim,spacedim> > (this->tria,
-                                                    q->level (),
-                                                    q->index (),
-                                                    this->mg_dof_handler);
+                                                         q->level (),
+                                                         q->index (),
+                                                         this->mg_dof_handler);
 }
 
 

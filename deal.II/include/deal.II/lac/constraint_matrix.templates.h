@@ -35,8 +35,8 @@ void
 ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
                             SparseMatrix<number>       &condensed) const
 {
-                                   // create two dummy vectors and enter the
-                                   // other function
+  // create two dummy vectors and enter the
+  // other function
   Vector<number> dummy (0);
   condense (uncondensed, dummy, condensed, dummy);
 }
@@ -71,10 +71,10 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
   Assert (sorted == true, ExcMatrixNotClosed());
   AssertDimension (condensed.size()+n_constraints(), uncondensed.size());
 
-                                   // store for each line of the
-                                   // vector its new line number after
-                                   // compression. If the shift is -1,
-                                   // this line will be condensed away
+  // store for each line of the
+  // vector its new line number after
+  // compression. If the shift is -1,
+  // this line will be condensed away
   std::vector<int> new_line;
 
   new_line.reserve (uncondensed.size());
@@ -84,21 +84,21 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
   unsigned int n_rows = uncondensed.size();
 
   if (next_constraint == lines.end())
-                                     // if no constraint is to be handled
+    // if no constraint is to be handled
     for (unsigned int row=0; row!=n_rows; ++row)
       new_line.push_back (row);
   else
     for (unsigned int row=0; row!=n_rows; ++row)
       if (row == next_constraint->line)
         {
-                                           // this line is constrained
+          // this line is constrained
           new_line.push_back (-1);
-                                           // note that @p lines is ordered
+          // note that @p lines is ordered
           ++shift;
           ++next_constraint;
           if (next_constraint == lines.end())
-                                             // nothing more to do; finish rest
-                                             // of loop
+            // nothing more to do; finish rest
+            // of loop
             {
               for (unsigned int i=row+1; i<n_rows; ++i)
                 new_line.push_back (i-shift);
@@ -110,24 +110,24 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
 
 
   next_constraint = lines.begin();
-                                   // note: in this loop we need not check
-                                   // whether @p next_constraint is a valid
-                                   // iterator, since @p next_constraint is
-                                   // only evaluated so often as there are
-                                   // entries in new_line[*] which tells us
-                                   // which constraints exist
+  // note: in this loop we need not check
+  // whether @p next_constraint is a valid
+  // iterator, since @p next_constraint is
+  // only evaluated so often as there are
+  // entries in new_line[*] which tells us
+  // which constraints exist
   for (unsigned int row=0; row<uncondensed.size(); ++row)
     if (new_line[row] != -1)
-                                       // line not constrained
-                                       // copy entry
+      // line not constrained
+      // copy entry
       condensed(new_line[row]) += uncondensed(row);
 
     else
-                                       // line must be distributed
+      // line must be distributed
       {
         for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
           condensed(new_line[next_constraint->entries[q].first])
-            +=
+          +=
             uncondensed(row) * next_constraint->entries[q].second;
 
         ++next_constraint;
@@ -142,20 +142,20 @@ ConstraintMatrix::condense (VectorType &vec) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
 
-                                   // distribute all entries, and set them to zero
+  // distribute all entries, and set them to zero
   std::vector<ConstraintLine>::const_iterator constraint_line = lines.begin();
   for (; constraint_line!=lines.end(); ++constraint_line)
     {
       for (unsigned int q=0; q!=constraint_line->entries.size(); ++q)
         vec(constraint_line->entries[q].first)
-          += (static_cast<typename VectorType::value_type>
-              (vec(constraint_line->line)) *
-              constraint_line->entries[q].second);
+        += (static_cast<typename VectorType::value_type>
+            (vec(constraint_line->line)) *
+            constraint_line->entries[q].second);
       vec(constraint_line->line) = 0.;
 
-                                       // in case the constraint is
-                                       // inhomogeneous, this function is not
-                                       // appropriate. Throw an exception.
+      // in case the constraint is
+      // inhomogeneous, this function is not
+      // appropriate. Throw an exception.
       Assert (constraint_line->inhomogeneity == 0.,
               ExcMessage ("Inhomogeneous constraint cannot be condensed "
                           "without any matrix specified."));
@@ -171,9 +171,9 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
                             SparseMatrix<number>       &condensed,
                             VectorType                 &condensed_vector) const
 {
-                                   // check whether we work on real vectors
-                                   // or we just used a dummy when calling
-                                   // the other function above.
+  // check whether we work on real vectors
+  // or we just used a dummy when calling
+  // the other function above.
   const bool use_vectors = (uncondensed_vector.size() == 0 &&
                             condensed_vector.size() == 0) ? false : true;
 
@@ -194,10 +194,10 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
       AssertDimension (condensed_vector.size(), condensed.m());
     }
 
-                                   // store for each line of the matrix
-                                   // its new line number
-                                   // after compression. If the shift is
-                                   // -1, this line will be condensed away
+  // store for each line of the matrix
+  // its new line number
+  // after compression. If the shift is
+  // -1, this line will be condensed away
   std::vector<int> new_line;
 
   new_line.reserve (uncondensed_struct.n_rows());
@@ -207,21 +207,21 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
   const unsigned int n_rows = uncondensed_struct.n_rows();
 
   if (next_constraint == lines.end())
-                                     // if no constraint is to be handled
+    // if no constraint is to be handled
     for (unsigned int row=0; row!=n_rows; ++row)
       new_line.push_back (row);
   else
     for (unsigned int row=0; row!=n_rows; ++row)
       if (row == next_constraint->line)
         {
-                                           // this line is constrained
+          // this line is constrained
           new_line.push_back (-1);
-                                           // note that @p lines is ordered
+          // note that @p lines is ordered
           ++shift;
           ++next_constraint;
           if (next_constraint == lines.end())
-                                             // nothing more to do; finish rest
-                                             // of loop
+            // nothing more to do; finish rest
+            // of loop
             {
               for (unsigned int i=row+1; i<n_rows; ++i)
                 new_line.push_back (i-shift);
@@ -234,19 +234,19 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 
   next_constraint = lines.begin();
 
-                                   // note: in this loop we need not check
-                                   // whether @p next_constraint is a valid
-                                   // iterator, since @p next_constraint is
-                                   // only evaluated so often as there are
-                                   // entries in new_line[*] which tells us
-                                   // which constraints exist
+  // note: in this loop we need not check
+  // whether @p next_constraint is a valid
+  // iterator, since @p next_constraint is
+  // only evaluated so often as there are
+  // entries in new_line[*] which tells us
+  // which constraints exist
   for (unsigned int row=0; row<uncondensed_struct.n_rows(); ++row)
     if (new_line[row] != -1)
       {
-                                         // line not constrained
-                                         // copy entries if column will not
-                                         // be condensed away, distribute
-                                         // otherwise
+        // line not constrained
+        // copy entries if column will not
+        // be condensed away, distribute
+        // otherwise
         for (unsigned int j=uncondensed_struct.get_rowstart_indices()[row];
              j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
           if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
@@ -254,24 +254,24 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
                            uncondensed.global_entry(j));
           else
             {
-                                               // let c point to the
-                                               // constraint of this column
+              // let c point to the
+              // constraint of this column
               std::vector<ConstraintLine>::const_iterator c = lines.begin();
               while (c->line != uncondensed_struct.get_column_numbers()[j])
                 ++c;
 
               for (unsigned int q=0; q!=c->entries.size(); ++q)
-                                                 // distribute to rows with
-                                                 // appropriate weight
+                // distribute to rows with
+                // appropriate weight
                 condensed.add (new_line[row], new_line[c->entries[q].first],
                                uncondensed.global_entry(j) * c->entries[q].second);
 
-                                               // take care of inhomogeneity:
-                                               // need to subtract this element from the
-                                               // vector. this corresponds to an
-                                               // explicit elimination in the respective
-                                               // row of the inhomogeneous constraint in
-                                               // the matrix with Gauss elimination
+              // take care of inhomogeneity:
+              // need to subtract this element from the
+              // vector. this corresponds to an
+              // explicit elimination in the respective
+              // row of the inhomogeneous constraint in
+              // the matrix with Gauss elimination
               if (use_vectors == true)
                 condensed_vector(new_line[row]) -= uncondensed.global_entry(j) *
                                                    c->inhomogeneity;
@@ -281,13 +281,13 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
           condensed_vector(new_line[row]) += uncondensed_vector(row);
       }
     else
-                                       // line must be distributed
+      // line must be distributed
       {
         for (unsigned int j=uncondensed_struct.get_rowstart_indices()[row];
              j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
-                                           // for each column: distribute
+          // for each column: distribute
           if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
-                                             // column is not constrained
+            // column is not constrained
             for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
               condensed.add (new_line[next_constraint->entries[q].first],
                              new_line[uncondensed_struct.get_column_numbers()[j]],
@@ -295,11 +295,11 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
                              next_constraint->entries[q].second);
 
           else
-                                             // not only this line but
-                                             // also this col is constrained
+            // not only this line but
+            // also this col is constrained
             {
-                                               // let c point to the constraint
-                                               // of this column
+              // let c point to the constraint
+              // of this column
               std::vector<ConstraintLine>::const_iterator c = lines.begin();
               while (c->line != uncondensed_struct.get_column_numbers()[j])
                 ++c;
@@ -315,16 +315,16 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
               if (use_vectors == true)
                 for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
                   condensed_vector (new_line[next_constraint->entries[q].first])
-                    -= uncondensed.global_entry(j) *
-                    next_constraint->entries[q].second *
-                    c->inhomogeneity;
+                  -= uncondensed.global_entry(j) *
+                     next_constraint->entries[q].second *
+                     c->inhomogeneity;
             };
 
-                                         // condense the vector
+        // condense the vector
         if (use_vectors == true)
           for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
             condensed_vector(new_line[next_constraint->entries[q].first])
-              +=
+            +=
               uncondensed_vector(row) * next_constraint->entries[q].second;
 
         ++next_constraint;
@@ -338,9 +338,9 @@ void
 ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                             VectorType           &vec) const
 {
-                                   // check whether we work on real vectors
-                                   // or we just used a dummy when calling
-                                   // the other function above.
+  // check whether we work on real vectors
+  // or we just used a dummy when calling
+  // the other function above.
   const bool use_vectors = vec.size() == 0 ? false : true;
 
   const SparsityPattern &sparsity = uncondensed.get_sparsity_pattern ();
@@ -357,12 +357,12 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
     average_diagonal += std::fabs (uncondensed.diag_element(i));
   average_diagonal /= uncondensed.m();
 
-                                   // store for each index whether it must be
-                                   // distributed or not. If entry is
-                                   // invalid_unsigned_int, no distribution is
-                                   // necessary.  otherwise, the number states
-                                   // which line in the constraint matrix
-                                   // handles this index
+  // store for each index whether it must be
+  // distributed or not. If entry is
+  // invalid_unsigned_int, no distribution is
+  // necessary.  otherwise, the number states
+  // which line in the constraint matrix
+  // handles this index
   std::vector<unsigned int> distribute (sparsity.n_rows(),
                                         numbers::invalid_unsigned_int);
 
@@ -373,29 +373,29 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
   for (unsigned int row=0; row<n_rows; ++row)
     {
       if (distribute[row] == numbers::invalid_unsigned_int)
-                                         // regular line. loop over cols
+        // regular line. loop over cols
         {
           for (typename SparseMatrix<number>::iterator
-                 entry = uncondensed.begin(row);
+               entry = uncondensed.begin(row);
                entry != uncondensed.end(row); ++entry)
             {
               const unsigned int column = entry->column();
 
-                                               // end of row reached?
-                                               // this should not
-                                               // happen, since we only
-                                               // operate on compressed
-                                               // matrices!
+              // end of row reached?
+              // this should not
+              // happen, since we only
+              // operate on compressed
+              // matrices!
               Assert (column != SparsityPattern::invalid_entry,
                       ExcMatrixNotClosed());
 
               if (distribute[column] != numbers::invalid_unsigned_int)
-                                                 // distribute entry at
-                                                 // regular row @p row
-                                                 // and irregular column
-                                                 // sparsity.get_column_numbers()[j];
-                                                 // set old entry to
-                                                 // zero
+                // distribute entry at
+                // regular row @p row
+                // and irregular column
+                // sparsity.get_column_numbers()[j];
+                // set old entry to
+                // zero
                 {
                   for (unsigned int q=0;
                        q!=lines[distribute[column]].entries.size(); ++q)
@@ -404,44 +404,44 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                                      entry->value() *
                                      lines[distribute[column]].entries[q].second);
 
-                                                   // need to subtract this element from the
-                                                   // vector. this corresponds to an
-                                                   // explicit elimination in the respective
-                                                   // row of the inhomogeneous constraint in
-                                                   // the matrix with Gauss elimination
+                  // need to subtract this element from the
+                  // vector. this corresponds to an
+                  // explicit elimination in the respective
+                  // row of the inhomogeneous constraint in
+                  // the matrix with Gauss elimination
                   if (use_vectors == true)
                     vec(row) -=
                       entry->value() * lines[distribute[column]].inhomogeneity;
 
-                                                   // set old value to zero
+                  // set old value to zero
                   entry->value() = 0.;
                 }
             }
         }
       else
-                                         // row must be distributed
+        // row must be distributed
         {
           for (typename SparseMatrix<number>::iterator
-                 entry = uncondensed.begin(row);
+               entry = uncondensed.begin(row);
                entry != uncondensed.end(row); ++entry)
             {
               const unsigned int column = entry->column();
 
-                                               // end of row reached?
-                                               // this should not
-                                               // happen, since we only
-                                               // operate on compressed
-                                               // matrices!
+              // end of row reached?
+              // this should not
+              // happen, since we only
+              // operate on compressed
+              // matrices!
               Assert (column != SparsityPattern::invalid_entry,
                       ExcMatrixNotClosed());
 
               if (distribute[column] == numbers::invalid_unsigned_int)
-                                                 // distribute entry at
-                                                 // irregular row
-                                                 // @p row and regular
-                                                 // column
-                                                 // column. set
-                                                 // old entry to zero
+                // distribute entry at
+                // irregular row
+                // @p row and regular
+                // column
+                // column. set
+                // old entry to zero
                 {
                   for (unsigned int q=0;
                        q!=lines[distribute[row]].entries.size(); ++q)
@@ -450,16 +450,16 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                                      entry->value() *
                                      lines[distribute[row]].entries[q].second);
 
-                                                   // set old entry to zero
+                  // set old entry to zero
                   entry->value() = 0.;
                 }
               else
-                                                 // distribute entry at
-                                                 // irregular row @p row and
-                                                 // irregular column
-                                                 // @p column set old entry
-                                                 // to one on main
-                                                 // diagonal, zero otherwise
+                // distribute entry at
+                // irregular row @p row and
+                // irregular column
+                // @p column set old entry
+                // to one on main
+                // diagonal, zero otherwise
                 {
                   for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
                     {
@@ -477,18 +477,18 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                           lines[distribute[column]].inhomogeneity;
                     }
 
-                                                   // set old entry to correct
-                                                   // value
+                  // set old entry to correct
+                  // value
                   entry->value() = (row == column ? average_diagonal : 0. );
                 }
             }
 
-                                           // take care of vector
+          // take care of vector
           if (use_vectors == true)
             {
               for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q)
                 vec(lines[distribute[row]].entries[q].first)
-                  += (vec(row) * lines[distribute[row]].entries[q].second);
+                += (vec(row) * lines[distribute[row]].entries[q].second);
 
               vec(lines[distribute[row]].line) = 0.;
             }
@@ -503,15 +503,15 @@ void
 ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                             BlockVectorType           &vec) const
 {
-                                   // check whether we work on real vectors
-                                   // or we just used a dummy when calling
-                                   // the other function above.
+  // check whether we work on real vectors
+  // or we just used a dummy when calling
+  // the other function above.
   const bool use_vectors = vec.n_blocks() == 0 ? false : true;
 
   const unsigned int blocks = uncondensed.n_block_rows();
 
   const BlockSparsityPattern &
-    sparsity = uncondensed.get_sparsity_pattern ();
+  sparsity = uncondensed.get_sparsity_pattern ();
 
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == true, ExcMatrixNotClosed());
@@ -537,15 +537,15 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
   average_diagonal /= uncondensed.m();
 
   const BlockIndices &
-    index_mapping = sparsity.get_column_indices();
+  index_mapping = sparsity.get_column_indices();
 
-                                   // store for each index whether it must be
-                                   // distributed or not. If entry is
-                                   // numbers::invalid_unsigned_int,
-                                   // no distribution is necessary.
-                                   // otherwise, the number states which line
-                                   // in the constraint matrix handles this
-                                   // index
+  // store for each index whether it must be
+  // distributed or not. If entry is
+  // numbers::invalid_unsigned_int,
+  // no distribution is necessary.
+  // otherwise, the number states which line
+  // in the constraint matrix handles this
+  // index
   std::vector<unsigned int> distribute (sparsity.n_rows(),
                                         numbers::invalid_unsigned_int);
 
@@ -555,29 +555,29 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
   const unsigned int n_rows = sparsity.n_rows();
   for (unsigned int row=0; row<n_rows; ++row)
     {
-                                       // get index of this row
-                                       // within the blocks
+      // get index of this row
+      // within the blocks
       const std::pair<unsigned int,unsigned int>
-        block_index = index_mapping.global_to_local(row);
+      block_index = index_mapping.global_to_local(row);
       const unsigned int block_row = block_index.first;
 
       if (distribute[row] == numbers::invalid_unsigned_int)
-                                         // regular line. loop over
-                                         // all columns and see
-                                         // whether this column must
-                                         // be distributed
+        // regular line. loop over
+        // all columns and see
+        // whether this column must
+        // be distributed
         {
 
-                                           // to loop over all entries
-                                           // in this row, we have to
-                                           // loop over all blocks in
-                                           // this blockrow and the
-                                           // corresponding row
-                                           // therein
+          // to loop over all entries
+          // in this row, we have to
+          // loop over all blocks in
+          // this blockrow and the
+          // corresponding row
+          // therein
           for (unsigned int block_col=0; block_col<blocks; ++block_col)
             {
               for (typename SparseMatrix<number>::iterator
-                     entry = uncondensed.block(block_row, block_col).begin(block_index.second);
+                   entry = uncondensed.block(block_row, block_col).begin(block_index.second);
                    entry != uncondensed.block(block_row, block_col).end(block_index.second);
                    ++entry)
                 {
@@ -585,11 +585,11 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                     = index_mapping.local_to_global(block_col,entry->column());
 
                   if (distribute[global_col] != numbers::invalid_unsigned_int)
-                                                     // distribute entry at
-                                                     // regular row @p row
-                                                     // and irregular column
-                                                     // global_col; set old
-                                                     // entry to zero
+                    // distribute entry at
+                    // regular row @p row
+                    // and irregular column
+                    // global_col; set old
+                    // entry to zero
                     {
                       const double old_value = entry->value ();
 
@@ -600,11 +600,11 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                                          old_value *
                                          lines[distribute[global_col]].entries[q].second);
 
-                                                       // need to subtract this element from the
-                                                       // vector. this corresponds to an
-                                                       // explicit elimination in the respective
-                                                       // row of the inhomogeneous constraint in
-                                                       // the matrix with Gauss elimination
+                      // need to subtract this element from the
+                      // vector. this corresponds to an
+                      // explicit elimination in the respective
+                      // row of the inhomogeneous constraint in
+                      // the matrix with Gauss elimination
                       if (use_vectors == true)
                         vec(row) -= entry->value() *
                                     lines[distribute[global_col]].inhomogeneity;
@@ -616,15 +616,15 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
         }
       else
         {
-                                           // row must be
-                                           // distributed. split the
-                                           // whole row into the
-                                           // chunks defined by the
-                                           // blocks
+          // row must be
+          // distributed. split the
+          // whole row into the
+          // chunks defined by the
+          // blocks
           for (unsigned int block_col=0; block_col<blocks; ++block_col)
             {
               for (typename SparseMatrix<number>::iterator
-                     entry = uncondensed.block(block_row, block_col).begin(block_index.second);
+                   entry = uncondensed.block(block_row, block_col).begin(block_index.second);
                    entry != uncondensed.block(block_row, block_col).end(block_index.second);
                    ++entry)
                 {
@@ -633,15 +633,15 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 
                   if (distribute[global_col] ==
                       numbers::invalid_unsigned_int)
-                                                     // distribute
-                                                     // entry at
-                                                     // irregular
-                                                     // row @p row
-                                                     // and regular
-                                                     // column
-                                                     // global_col. set
-                                                     // old entry to
-                                                     // zero
+                    // distribute
+                    // entry at
+                    // irregular
+                    // row @p row
+                    // and regular
+                    // column
+                    // global_col. set
+                    // old entry to
+                    // zero
                     {
                       const double old_value = entry->value();
 
@@ -655,13 +655,13 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                       entry->value() = 0.;
                     }
                   else
-                                                     // distribute entry at
-                                                     // irregular row @p row
-                                                     // and irregular column
-                                                     // @p global_col set old
-                                                     // entry to one if on
-                                                     // main diagonal, zero
-                                                     // otherwise
+                    // distribute entry at
+                    // irregular row @p row
+                    // and irregular column
+                    // @p global_col set old
+                    // entry to one if on
+                    // main diagonal, zero
+                    // otherwise
                     {
                       const double old_value = entry->value ();
 
@@ -685,12 +685,12 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                 }
             }
 
-                                           // take care of vector
+          // take care of vector
           if (use_vectors == true)
             {
               for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q)
                 vec(lines[distribute[row]].entries[q].first)
-                  += (vec(row) * lines[distribute[row]].entries[q].second);
+                += (vec(row) * lines[distribute[row]].entries[q].second);
 
               vec(lines[distribute[row]].line) = 0.;
             }
@@ -710,86 +710,86 @@ namespace internal
   namespace ConstraintMatrix
   {
     namespace
+    {
+      // TODO: in general we should iterate over the constraints and not over all DoFs
+      // for performance reasons
+      template<class VEC>
+      void set_zero_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, unsigned int shift = 0)
       {
-	// TODO: in general we should iterate over the constraints and not over all DoFs
-	// for performance reasons
-	template<class VEC>
-	  void set_zero_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, unsigned int shift = 0)
-	  {
-	    Assert(!vec.has_ghost_elements(), ExcInternalError());//ExcGhostsPresent());
+        Assert(!vec.has_ghost_elements(), ExcInternalError());//ExcGhostsPresent());
 
-	    const unsigned int
-	      start = vec.local_range().first,
-	      end   = vec.local_range().second;
-	    for (unsigned int i=start; i<end; ++i)
-	      if (cm.is_constrained (shift + i))
-		vec(i) = 0;
-	  }
-
-	template<class VEC>
-	  void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<false>)
-	  {
-	    set_zero_parallel(cm, vec, 0);
-	  }
-
-	// in parallel for BlockVectors
-	template<class VEC>
-	  void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<true>)
-	  {
-	    unsigned int start_shift = 0;
-	    for (unsigned int j=0; j<vec.n_blocks(); ++j)
-	      {
-		set_zero_parallel(cm, vec.block(j), start_shift);
-		start_shift += vec.block(j).size();
-	      }
-	  }
-
-	template<class VEC>
-	  void set_zero_serial(const dealii::ConstraintMatrix &cm, VEC &vec)
-	  {
-	    // TODO would be faster:
-	    /* std::vector<dealii::ConstraintMatrix::ConstraintLine>::const_iterator constraint_line = cm.lines.begin();
-	       for (; constraint_line!=cm.lines.end(); ++constraint_line)
-	       vec(constraint_line->line) = 0.;*/
-	    for (unsigned int i=0; i<vec.size(); ++i)
-	      if (cm.is_constrained (i))
-		vec(i) = 0;
-	  }
-
-	template<class VEC>
-	  void set_zero_all(const dealii::ConstraintMatrix &cm, VEC &vec)
-	  {
-	    set_zero_in_parallel<VEC>(cm, vec, internal::bool2type<IsBlockVector<VEC>::value>());
-	  }
-
-
-	template<class T>
-	  void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::Vector<T> &vec)
-	  {
-	    set_zero_serial(cm, vec);
-	  }
-
-	template<class T>
-	  void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::BlockVector<T> &vec)
-	  {
-	    set_zero_serial(cm, vec);
-	  }
-
-
-	template<class T>
-	  void set_zero_all(const dealii::ConstraintMatrix &, dealii::parallel::distributed::Vector<T> &)
-	  {
-	    // should use the general template above, but requires that
-	    // some member functions are added to parallel::distributed::Vector
-	    Assert (false, ExcNotImplemented());
-	  }
-
-	template<class T>
-	  void set_zero_all(const dealii::ConstraintMatrix &, dealii::parallel::distributed::BlockVector<T> &)
-	  {
-	    Assert (false, ExcNotImplemented());
-	  }
+        const unsigned int
+        start = vec.local_range().first,
+        end   = vec.local_range().second;
+        for (unsigned int i=start; i<end; ++i)
+          if (cm.is_constrained (shift + i))
+            vec(i) = 0;
       }
+
+      template<class VEC>
+      void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<false>)
+      {
+        set_zero_parallel(cm, vec, 0);
+      }
+
+      // in parallel for BlockVectors
+      template<class VEC>
+      void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<true>)
+      {
+        unsigned int start_shift = 0;
+        for (unsigned int j=0; j<vec.n_blocks(); ++j)
+          {
+            set_zero_parallel(cm, vec.block(j), start_shift);
+            start_shift += vec.block(j).size();
+          }
+      }
+
+      template<class VEC>
+      void set_zero_serial(const dealii::ConstraintMatrix &cm, VEC &vec)
+      {
+        // TODO would be faster:
+        /* std::vector<dealii::ConstraintMatrix::ConstraintLine>::const_iterator constraint_line = cm.lines.begin();
+           for (; constraint_line!=cm.lines.end(); ++constraint_line)
+           vec(constraint_line->line) = 0.;*/
+        for (unsigned int i=0; i<vec.size(); ++i)
+          if (cm.is_constrained (i))
+            vec(i) = 0;
+      }
+
+      template<class VEC>
+      void set_zero_all(const dealii::ConstraintMatrix &cm, VEC &vec)
+      {
+        set_zero_in_parallel<VEC>(cm, vec, internal::bool2type<IsBlockVector<VEC>::value>());
+      }
+
+
+      template<class T>
+      void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::Vector<T> &vec)
+      {
+        set_zero_serial(cm, vec);
+      }
+
+      template<class T>
+      void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::BlockVector<T> &vec)
+      {
+        set_zero_serial(cm, vec);
+      }
+
+
+      template<class T>
+      void set_zero_all(const dealii::ConstraintMatrix &, dealii::parallel::distributed::Vector<T> &)
+      {
+        // should use the general template above, but requires that
+        // some member functions are added to parallel::distributed::Vector
+        Assert (false, ExcNotImplemented());
+      }
+
+      template<class T>
+      void set_zero_all(const dealii::ConstraintMatrix &, dealii::parallel::distributed::BlockVector<T> &)
+      {
+        Assert (false, ExcNotImplemented());
+      }
+    }
   }
 }
 
@@ -823,26 +823,26 @@ distribute_local_to_global (const Vector<double>            &local_vector,
   else
     for (unsigned int i=0; i<n_local_dofs; ++i)
       {
-                                         // check whether the current index is
-                                         // constrained. if not, just write the entry
-                                         // into the vector. otherwise, need to resolve
-                                         // the constraint
+        // check whether the current index is
+        // constrained. if not, just write the entry
+        // into the vector. otherwise, need to resolve
+        // the constraint
         if (is_constrained(local_dof_indices[i]) == false)
           {
             global_vector(local_dof_indices[i]) += local_vector(i);
             continue;
           }
 
-                                         // find the constraint line to the given
-                                         // global dof index
+        // find the constraint line to the given
+        // global dof index
         const unsigned int line_index = calculate_line_index (local_dof_indices[i]);
-        const ConstraintLine * position =
+        const ConstraintLine *position =
           lines_cache.size() <= line_index ? 0 : &lines[lines_cache[line_index]];
 
-                                         // Gauss elimination of the matrix columns
-                                         // with the inhomogeneity. Go through them one
-                                         // by one and again check whether they are
-                                         // constrained. If so, distribute the constraint
+        // Gauss elimination of the matrix columns
+        // with the inhomogeneity. Go through them one
+        // by one and again check whether they are
+        // constrained. If so, distribute the constraint
         const double val = position->inhomogeneity;
         if (val != 0)
           for (unsigned int j=0; j<n_local_dofs; ++j)
@@ -854,7 +854,7 @@ distribute_local_to_global (const Vector<double>            &local_vector,
                 if (matrix_entry == 0)
                   continue;
 
-                const ConstraintLine & position_j =
+                const ConstraintLine &position_j =
                   lines[lines_cache[calculate_line_index(local_dof_indices[j])]];
                 for (unsigned int q=0; q<position_j.entries.size(); ++q)
                   {
@@ -863,13 +863,13 @@ distribute_local_to_global (const Vector<double>            &local_vector,
                             || is_constrained(position_j.entries[q].first) == false,
                             ExcMessage ("Tried to distribute to a fixed dof."));
                     global_vector(position_j.entries[q].first)
-                      -= val * position_j.entries[q].second * matrix_entry;
+                    -= val * position_j.entries[q].second * matrix_entry;
                   }
               }
 
-                                         // now distribute the constraint,
-                                         // but make sure we don't touch
-                                         // the entries of fixed dofs
+        // now distribute the constraint,
+        // but make sure we don't touch
+        // the entries of fixed dofs
         for (unsigned int j=0; j<position->entries.size(); ++j)
           {
             Assert (!(!local_lines.size()
@@ -877,7 +877,7 @@ distribute_local_to_global (const Vector<double>            &local_vector,
                     || is_constrained(position->entries[j].first) == false,
                     ExcMessage ("Tried to distribute to a fixed dof."));
             global_vector(position->entries[j].first)
-              += local_vector(i) * position->entries[j].second;
+            += local_vector(i) * position->entries[j].second;
           }
       }
 }
@@ -892,10 +892,10 @@ ConstraintMatrix::distribute (const VectorType &condensed,
   Assert (sorted == true, ExcMatrixNotClosed());
   AssertDimension (condensed.size()+n_constraints(), uncondensed.size());
 
-                                   // store for each line of the new vector
-                                   // its old line number before
-                                   // distribution. If the shift is
-                                   // -1, this line was condensed away
+  // store for each line of the new vector
+  // its old line number before
+  // distribution. If the shift is
+  // -1, this line was condensed away
   std::vector<int> old_line;
 
   old_line.reserve (uncondensed.size());
@@ -905,21 +905,21 @@ ConstraintMatrix::distribute (const VectorType &condensed,
   unsigned int n_rows = uncondensed.size();
 
   if (next_constraint == lines.end())
-                                     // if no constraint is to be handled
+    // if no constraint is to be handled
     for (unsigned int row=0; row!=n_rows; ++row)
       old_line.push_back (row);
   else
     for (unsigned int row=0; row!=n_rows; ++row)
       if (row == next_constraint->line)
         {
-                                           // this line is constrained
+          // this line is constrained
           old_line.push_back (-1);
-                                           // note that @p lines is ordered
+          // note that @p lines is ordered
           ++shift;
           ++next_constraint;
           if (next_constraint == lines.end())
-                                             // nothing more to do; finish rest
-                                             // of loop
+            // nothing more to do; finish rest
+            // of loop
             {
               for (unsigned int i=row+1; i<n_rows; ++i)
                 old_line.push_back (i-shift);
@@ -931,24 +931,24 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 
 
   next_constraint = lines.begin();
-                                   // note: in this loop we need not check
-                                   // whether @p next_constraint is a valid
-                                   // iterator, since @p next_constraint is
-                                   // only evaluated so often as there are
-                                   // entries in new_line[*] which tells us
-                                   // which constraints exist
+  // note: in this loop we need not check
+  // whether @p next_constraint is a valid
+  // iterator, since @p next_constraint is
+  // only evaluated so often as there are
+  // entries in new_line[*] which tells us
+  // which constraints exist
   for (unsigned int line=0; line<uncondensed.size(); ++line)
     if (old_line[line] != -1)
-                                       // line was not condensed away
+      // line was not condensed away
       uncondensed(line) = condensed(old_line[line]);
     else
       {
-                                         // line was condensed away,
-                                         // create it newly. first set
-                                         // it to zero
+        // line was condensed away,
+        // create it newly. first set
+        // it to zero
         uncondensed(line) = next_constraint->inhomogeneity;
-                                         // then add the different
-                                         // contributions
+        // then add the different
+        // contributions
         for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
           uncondensed(line) += (condensed(old_line[next_constraint->entries[i].first]) *
                                 next_constraint->entries[i].second);
@@ -967,11 +967,11 @@ ConstraintMatrix::distribute (VectorType &vec) const
   std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   for (; next_constraint != lines.end(); ++next_constraint)
     {
-                                       // fill entry in line
-                                       // next_constraint.line by adding the
-                                       // different contributions
+      // fill entry in line
+      // next_constraint.line by adding the
+      // different contributions
       typename VectorType::value_type
-        new_value = next_constraint->inhomogeneity;
+      new_value = next_constraint->inhomogeneity;
       for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
         new_value += (static_cast<typename VectorType::value_type>
                       (vec(next_constraint->entries[i].first)) *
@@ -983,72 +983,75 @@ ConstraintMatrix::distribute (VectorType &vec) const
 
 
 
-                                 // Some helper definitions for the
-                                 // local_to_global functions.
+// Some helper definitions for the
+// local_to_global functions.
 namespace internals
 {
-                                   // this struct contains all the information
-                                   // we need to store about each of the
-                                   // global entries (global_row): are they
-                                   // obtained directly by some local entry
-                                   // (local_row) or some constraints
-                                   // (constraint_position). This is not
-                                   // directly used in the user code, but
-                                   // accessed via the
-                                   // GlobalRowsFromLocal.
-                                   //
-                                   // The actions performed here correspond to
-                                   // reshaping the constraint information
-                                   // from global degrees of freedom to local
-                                   // ones (i.e., cell-related DoFs), and also
-                                   // transforming the constraint information
-                                   // from compressed row storage (each local
-                                   // dof that is constrained has a list of
-                                   // constraint entries associated to it)
-                                   // into compressed column storage based on
-                                   // the cell-related DoFs (we have a list of
-                                   // global degrees of freedom, and to each
-                                   // we have a list of local rows where the
-                                   // entries come from). To increase the
-                                   // speed, we additionally store whether an
-                                   // entry is generated directly from the
-                                   // local degrees of freedom or whether it
-                                   // comes from a constraint.
+  // this struct contains all the information
+  // we need to store about each of the
+  // global entries (global_row): are they
+  // obtained directly by some local entry
+  // (local_row) or some constraints
+  // (constraint_position). This is not
+  // directly used in the user code, but
+  // accessed via the
+  // GlobalRowsFromLocal.
+  //
+  // The actions performed here correspond to
+  // reshaping the constraint information
+  // from global degrees of freedom to local
+  // ones (i.e., cell-related DoFs), and also
+  // transforming the constraint information
+  // from compressed row storage (each local
+  // dof that is constrained has a list of
+  // constraint entries associated to it)
+  // into compressed column storage based on
+  // the cell-related DoFs (we have a list of
+  // global degrees of freedom, and to each
+  // we have a list of local rows where the
+  // entries come from). To increase the
+  // speed, we additionally store whether an
+  // entry is generated directly from the
+  // local degrees of freedom or whether it
+  // comes from a constraint.
   struct Distributing
   {
-      Distributing (const unsigned int global_row = numbers::invalid_unsigned_int,
-                    const unsigned int local_row = numbers::invalid_unsigned_int);
-      Distributing (const Distributing &in);
-      Distributing & operator = (const Distributing &in);
-      bool operator < (const Distributing &in) const {return global_row<in.global_row;};
+    Distributing (const unsigned int global_row = numbers::invalid_unsigned_int,
+                  const unsigned int local_row = numbers::invalid_unsigned_int);
+    Distributing (const Distributing &in);
+    Distributing &operator = (const Distributing &in);
+    bool operator < (const Distributing &in) const
+    {
+      return global_row<in.global_row;
+    };
 
-      unsigned int global_row;
-      unsigned int local_row;
-      mutable unsigned int constraint_position;
+    unsigned int global_row;
+    unsigned int local_row;
+    mutable unsigned int constraint_position;
   };
 
   inline
   Distributing::Distributing (const unsigned int global_row,
                               const unsigned int local_row) :
-                  global_row (global_row),
-                  local_row (local_row),
-                  constraint_position (numbers::invalid_unsigned_int) {}
+    global_row (global_row),
+    local_row (local_row),
+    constraint_position (numbers::invalid_unsigned_int) {}
 
   inline
   Distributing::Distributing (const Distributing &in)
-                  :
-                  constraint_position (numbers::invalid_unsigned_int)
+    :
+    constraint_position (numbers::invalid_unsigned_int)
   {
     *this = (in);
   }
 
   inline
-  Distributing & Distributing::operator = (const Distributing &in)
+  Distributing &Distributing::operator = (const Distributing &in)
   {
     global_row = in.global_row;
     local_row = in.local_row;
-                                     // the constraints pointer should not
-                                     // contain any data here.
+    // the constraints pointer should not
+    // contain any data here.
     Assert (constraint_position == numbers::invalid_unsigned_int,
             ExcInternalError());
 
@@ -1062,346 +1065,346 @@ namespace internals
 
 
 
-                                   // this is a cache for constraints that
-                                   // are encountered on a local level.
-                                   // The functionality is similar to
-                                   // std::vector<std::vector<std::pair<uint,double>
-                                   // > >, but tuned so that frequent memory
-                                   // allocation for each entry is
-                                   // avoided. This is not directly used in
-                                   // the user code, but accessed via the
-                                   // GlobalRowsFromLocal.
+  // this is a cache for constraints that
+  // are encountered on a local level.
+  // The functionality is similar to
+  // std::vector<std::vector<std::pair<uint,double>
+  // > >, but tuned so that frequent memory
+  // allocation for each entry is
+  // avoided. This is not directly used in
+  // the user code, but accessed via the
+  // GlobalRowsFromLocal.
   struct DataCache
   {
-      DataCache ()
-                      :
-                      element_size (0),
-                      data (0),
-                      n_used_elements(0)
-        {}
+    DataCache ()
+      :
+      element_size (0),
+      data (0),
+      n_used_elements(0)
+    {}
 
-      ~DataCache()
+    ~DataCache()
+    {
+      delete [] data;
+      data = 0;
+    }
+
+    void reinit ()
+    {
+      Assert (element_size == 0, ExcInternalError());
+      element_size = 6;
+      data = new std::pair<unsigned int,double> [20*6];
+      individual_size.resize(20);
+      n_used_elements = 0;
+    }
+
+    unsigned int element_size;
+
+    std::pair<unsigned int,double> *data;
+
+    std::vector<unsigned int> individual_size;
+
+    unsigned int n_used_elements;
+
+    unsigned int insert_new_index (const std::pair<unsigned int,double> &pair)
+    {
+      if (element_size == 0)
+        reinit();
+      if (n_used_elements == individual_size.size())
         {
+          std::pair<unsigned int,double> *new_data =
+            new std::pair<unsigned int,double> [2*individual_size.size()*element_size];
+          memcpy (new_data, data, individual_size.size()*element_size*
+                  sizeof(std::pair<unsigned int,double>));
           delete [] data;
-          data = 0;
+          data = new_data;
+          individual_size.resize (2*individual_size.size(), 0);
         }
+      unsigned int index = n_used_elements;
+      data[index*element_size] = pair;
+      individual_size[index] = 1;
+      ++n_used_elements;
+      return index;
+    }
 
-      void reinit ()
+    void append_index (const unsigned int index,
+                       const std::pair<unsigned int,double> &pair)
+    {
+      AssertIndexRange (index, n_used_elements);
+      const unsigned int my_size = individual_size[index];
+      if (my_size == element_size)
         {
-          Assert (element_size == 0, ExcInternalError());
-          element_size = 6;
-          data = new std::pair<unsigned int,double> [20*6];
-          individual_size.resize(20);
-          n_used_elements = 0;
+          std::pair<unsigned int,double> *new_data =
+            new std::pair<unsigned int,double> [2*individual_size.size()*element_size];
+          for (unsigned int i=0; i<n_used_elements; ++i)
+            memcpy (&new_data[i*element_size*2], &data[i*element_size],
+                    element_size*sizeof(std::pair<unsigned int,double>));
+          delete [] data;
+          data = new_data;
+          element_size *= 2;
         }
+      data[index*element_size+my_size] = pair;
+      individual_size[index]++;
+    }
 
-      unsigned int element_size;
+    unsigned int
+    get_size (const unsigned int index) const
+    {
+      return individual_size[index];
+    }
 
-      std::pair<unsigned int,double> * data;
-
-      std::vector<unsigned int> individual_size;
-
-      unsigned int n_used_elements;
-
-      unsigned int insert_new_index (const std::pair<unsigned int,double> &pair)
-        {
-          if (element_size == 0)
-            reinit();
-          if (n_used_elements == individual_size.size())
-            {
-              std::pair<unsigned int,double> * new_data =
-                new std::pair<unsigned int,double> [2*individual_size.size()*element_size];
-              memcpy (new_data, data, individual_size.size()*element_size*
-                      sizeof(std::pair<unsigned int,double>));
-              delete [] data;
-              data = new_data;
-              individual_size.resize (2*individual_size.size(), 0);
-            }
-          unsigned int index = n_used_elements;
-          data[index*element_size] = pair;
-          individual_size[index] = 1;
-          ++n_used_elements;
-          return index;
-        }
-
-      void append_index (const unsigned int index,
-                         const std::pair<unsigned int,double> &pair)
-        {
-          AssertIndexRange (index, n_used_elements);
-          const unsigned int my_size = individual_size[index];
-          if (my_size == element_size)
-            {
-              std::pair<unsigned int,double> * new_data =
-                new std::pair<unsigned int,double> [2*individual_size.size()*element_size];
-              for (unsigned int i=0; i<n_used_elements; ++i)
-                memcpy (&new_data[i*element_size*2], &data[i*element_size],
-                        element_size*sizeof(std::pair<unsigned int,double>));
-              delete [] data;
-              data = new_data;
-              element_size *= 2;
-            }
-          data[index*element_size+my_size] = pair;
-          individual_size[index]++;
-        }
-
-      unsigned int
-      get_size (const unsigned int index) const
-        {
-          return individual_size[index];
-        }
-
-      const std::pair<unsigned int,double> *
-      get_entry (const unsigned int index) const
-        {
-          return &data[index*element_size];
-        }
+    const std::pair<unsigned int,double> *
+    get_entry (const unsigned int index) const
+    {
+      return &data[index*element_size];
+    }
   };
 
 
 
-                                   // collects all the global rows from a
-                                   // local contribution (cell) and their
-                                   // origin (direct/constraint). this is
-                                   // basically a vector consisting of
-                                   // "Distributing" structs using access via
-                                   // the DataCache. Provides some
-                                   // specialized sort and insert functions.
-                                   //
-                                   // in case there are no constraints, this is
-                                   // basically a list of pairs <uint,unit> with
-                                   // the first index being the global index and
-                                   // the second index the local index. The list
-                                   // is sorted with respect to the global index.
-                                   //
-                                   // in case there are constraints, a global dof
-                                   // might get a contribution also because it
-                                   // gets data from a constrained dof. This
-                                   // means that a global dof might also have
-                                   // indirect contributions from a local dof via
-                                   // a constraint, besides the direct ones.
-                                   //
-                                   // The actions performed here correspond to
-                                   // reshaping the constraint information
-                                   // from global degrees of freedom to local
-                                   // ones (i.e., cell-related DoFs), and also
-                                   // transforming the constraint information
-                                   // from compressed row storage (each local
-                                   // dof that is constrained has a list of
-                                   // constraint entries associated to it)
-                                   // into compressed column storage based on
-                                   // the cell-related DoFs (we have a list of
-                                   // global degrees of freedom, and to each
-                                   // we have a list of local rows where the
-                                   // entries come from). To increase the
-                                   // speed, we additionally store whether an
-                                   // entry is generated directly from the
-                                   // local degrees of freedom or whether it
-                                   // comes from a constraint.
+  // collects all the global rows from a
+  // local contribution (cell) and their
+  // origin (direct/constraint). this is
+  // basically a vector consisting of
+  // "Distributing" structs using access via
+  // the DataCache. Provides some
+  // specialized sort and insert functions.
+  //
+  // in case there are no constraints, this is
+  // basically a list of pairs <uint,unit> with
+  // the first index being the global index and
+  // the second index the local index. The list
+  // is sorted with respect to the global index.
+  //
+  // in case there are constraints, a global dof
+  // might get a contribution also because it
+  // gets data from a constrained dof. This
+  // means that a global dof might also have
+  // indirect contributions from a local dof via
+  // a constraint, besides the direct ones.
+  //
+  // The actions performed here correspond to
+  // reshaping the constraint information
+  // from global degrees of freedom to local
+  // ones (i.e., cell-related DoFs), and also
+  // transforming the constraint information
+  // from compressed row storage (each local
+  // dof that is constrained has a list of
+  // constraint entries associated to it)
+  // into compressed column storage based on
+  // the cell-related DoFs (we have a list of
+  // global degrees of freedom, and to each
+  // we have a list of local rows where the
+  // entries come from). To increase the
+  // speed, we additionally store whether an
+  // entry is generated directly from the
+  // local degrees of freedom or whether it
+  // comes from a constraint.
   class GlobalRowsFromLocal
   {
-    public:
-      GlobalRowsFromLocal (const unsigned int n_local_rows)
-                      :
-                      total_row_indices (n_local_rows),
-                      n_active_rows (n_local_rows),
-                      n_inhomogeneous_rows (0)
-        {}
+  public:
+    GlobalRowsFromLocal (const unsigned int n_local_rows)
+      :
+      total_row_indices (n_local_rows),
+      n_active_rows (n_local_rows),
+      n_inhomogeneous_rows (0)
+    {}
 
 
-                                       // implemented below
-      void insert_index (const unsigned int global_row,
-                         const unsigned int local_row,
-                         const double       constraint_value);
-      void sort ();
+    // implemented below
+    void insert_index (const unsigned int global_row,
+                       const unsigned int local_row,
+                       const double       constraint_value);
+    void sort ();
 
-                                       // Print object for debugging
-                                       // purpose
-      void print(std::ostream& os)
-        {
-          os << "Active rows " << n_active_rows << std::endl
-             << "Constr rows " << n_constraints() << std::endl
-             << "Inhom  rows " << n_inhomogeneous_rows << std::endl
-             << "Local: ";
-          for (unsigned int i=0 ; i<total_row_indices.size() ; ++i)
-            os << ' ' << std::setw(4) << total_row_indices[i].local_row;
-          os << std::endl
-             << "Global:";
-          for (unsigned int i=0 ; i<total_row_indices.size() ; ++i)
-            os << ' ' << std::setw(4) << total_row_indices[i].global_row;
-          os << std::endl
-             << "ConPos:";
-          for (unsigned int i=0 ; i<total_row_indices.size() ; ++i)
-            os << ' ' << std::setw(4) << total_row_indices[i].constraint_position;
-          os << std::endl;
-        }
+    // Print object for debugging
+    // purpose
+    void print(std::ostream &os)
+    {
+      os << "Active rows " << n_active_rows << std::endl
+         << "Constr rows " << n_constraints() << std::endl
+         << "Inhom  rows " << n_inhomogeneous_rows << std::endl
+         << "Local: ";
+      for (unsigned int i=0 ; i<total_row_indices.size() ; ++i)
+        os << ' ' << std::setw(4) << total_row_indices[i].local_row;
+      os << std::endl
+         << "Global:";
+      for (unsigned int i=0 ; i<total_row_indices.size() ; ++i)
+        os << ' ' << std::setw(4) << total_row_indices[i].global_row;
+      os << std::endl
+         << "ConPos:";
+      for (unsigned int i=0 ; i<total_row_indices.size() ; ++i)
+        os << ' ' << std::setw(4) << total_row_indices[i].constraint_position;
+      os << std::endl;
+    }
 
 
-                                       // return all kind of information on the
-                                       // constraints
+    // return all kind of information on the
+    // constraints
 
-                                       // returns the number of global indices in the
-                                       // struct
-      unsigned int size () const
-        {
-          return n_active_rows;
-        }
+    // returns the number of global indices in the
+    // struct
+    unsigned int size () const
+    {
+      return n_active_rows;
+    }
 
-                                       // returns the global index of the
-                                       // counter_index-th entry in the list
-      unsigned int & global_row (const unsigned int counter_index)
-        {
-          return total_row_indices[counter_index].global_row;
-        }
+    // returns the global index of the
+    // counter_index-th entry in the list
+    unsigned int &global_row (const unsigned int counter_index)
+    {
+      return total_row_indices[counter_index].global_row;
+    }
 
-                                       // returns the number of constraints that are
-                                       // associated to the counter_index-th entry in
-                                       // the list
-      unsigned int size (const unsigned int counter_index) const
-        {
-          return (total_row_indices[counter_index].constraint_position ==
-                  numbers::invalid_unsigned_int ?
-                  0 :
-                  data_cache.get_size(total_row_indices[counter_index].
-                                      constraint_position));
-        }
+    // returns the number of constraints that are
+    // associated to the counter_index-th entry in
+    // the list
+    unsigned int size (const unsigned int counter_index) const
+    {
+      return (total_row_indices[counter_index].constraint_position ==
+              numbers::invalid_unsigned_int ?
+              0 :
+              data_cache.get_size(total_row_indices[counter_index].
+                                  constraint_position));
+    }
 
-                                       // returns the global row associated with the
-                                       // counter_index-th entry in the list
-      const unsigned int & global_row (const unsigned int counter_index) const
-        {
-          return total_row_indices[counter_index].global_row;
-        }
+    // returns the global row associated with the
+    // counter_index-th entry in the list
+    const unsigned int &global_row (const unsigned int counter_index) const
+    {
+      return total_row_indices[counter_index].global_row;
+    }
 
-                                       // returns the local row in the cell matrix
-                                       // associated with the counter_index-th entry
-                                       // in the list. Returns invalid_unsigned_int
-                                       // for invalid unsigned ints
-      const unsigned int & local_row (const unsigned int counter_index) const
-        {
-          return total_row_indices[counter_index].local_row;
-        }
+    // returns the local row in the cell matrix
+    // associated with the counter_index-th entry
+    // in the list. Returns invalid_unsigned_int
+    // for invalid unsigned ints
+    const unsigned int &local_row (const unsigned int counter_index) const
+    {
+      return total_row_indices[counter_index].local_row;
+    }
 
-                                       // writable index
-      unsigned int & local_row (const unsigned int counter_index)
-        {
-          return total_row_indices[counter_index].local_row;
-        }
+    // writable index
+    unsigned int &local_row (const unsigned int counter_index)
+    {
+      return total_row_indices[counter_index].local_row;
+    }
 
-                                       // returns the local row in the cell matrix
-                                       // associated with the counter_index-th entry
-                                       // in the list in the index_in_constraint-th
-                                       // position of constraints
-      unsigned int local_row (const unsigned int counter_index,
-                              const unsigned int index_in_constraint) const
-        {
-          return (data_cache.get_entry(total_row_indices[counter_index].constraint_position)
-                  [index_in_constraint]).first;
-        }
+    // returns the local row in the cell matrix
+    // associated with the counter_index-th entry
+    // in the list in the index_in_constraint-th
+    // position of constraints
+    unsigned int local_row (const unsigned int counter_index,
+                            const unsigned int index_in_constraint) const
+    {
+      return (data_cache.get_entry(total_row_indices[counter_index].constraint_position)
+              [index_in_constraint]).first;
+    }
 
-                                       // returns the value of the constraint in the
-                                       // counter_index-th entry in the list in the
-                                       // index_in_constraint-th position of
-                                       // constraints
-      double constraint_value (const unsigned int counter_index,
-                               const unsigned int index_in_constraint) const
-        {
-          return (data_cache.get_entry(total_row_indices[counter_index].constraint_position)
-                  [index_in_constraint]).second;
-        }
+    // returns the value of the constraint in the
+    // counter_index-th entry in the list in the
+    // index_in_constraint-th position of
+    // constraints
+    double constraint_value (const unsigned int counter_index,
+                             const unsigned int index_in_constraint) const
+    {
+      return (data_cache.get_entry(total_row_indices[counter_index].constraint_position)
+              [index_in_constraint]).second;
+    }
 
-                                       // returns whether there is one row with
-                                       // indirect contributions (i.e., there has
-                                       // been at least one constraint with
-                                       // non-trivial ConstraintLine)
-      bool have_indirect_rows () const
-        {
-          return data_cache.element_size;
-        }
+    // returns whether there is one row with
+    // indirect contributions (i.e., there has
+    // been at least one constraint with
+    // non-trivial ConstraintLine)
+    bool have_indirect_rows () const
+    {
+      return data_cache.element_size;
+    }
 
-                                       // append an entry that is
-                                       // constrained. This means that
-                                       // there is one less nontrivial
-                                       // row
-      void insert_constraint (const unsigned int constrained_local_dof)
-        {
-          --n_active_rows;
-          total_row_indices[n_active_rows].local_row = constrained_local_dof;
-        }
+    // append an entry that is
+    // constrained. This means that
+    // there is one less nontrivial
+    // row
+    void insert_constraint (const unsigned int constrained_local_dof)
+    {
+      --n_active_rows;
+      total_row_indices[n_active_rows].local_row = constrained_local_dof;
+    }
 
-                                       // returns the number of constrained
-                                       // dofs in the structure. Constrained
-                                       // dofs do not contribute directly to
-                                       // the matrix, but are needed in order
-                                       // to set matrix diagonals and resolve
-                                       // inhomogeneities
-      unsigned int n_constraints () const
-        {
-          return total_row_indices.size()-n_active_rows;
-        }
+    // returns the number of constrained
+    // dofs in the structure. Constrained
+    // dofs do not contribute directly to
+    // the matrix, but are needed in order
+    // to set matrix diagonals and resolve
+    // inhomogeneities
+    unsigned int n_constraints () const
+    {
+      return total_row_indices.size()-n_active_rows;
+    }
 
-                                       // returns the number of constrained
-                                       // dofs in the structure that have an
-                                       // inhomogeneity
-      unsigned int n_inhomogeneities () const
-        {
-          return n_inhomogeneous_rows;
-        }
+    // returns the number of constrained
+    // dofs in the structure that have an
+    // inhomogeneity
+    unsigned int n_inhomogeneities () const
+    {
+      return n_inhomogeneous_rows;
+    }
 
-                                       // tells the structure that the ith
-                                       // constraint is
-                                       // inhomogeneous. inhomogeneous
-                                       // constraints contribute to right hand
-                                       // sides, so to have fast access to
-                                       // them, put them before homogeneous
-                                       // constraints
-      void set_ith_constraint_inhomogeneous (const unsigned int i)
-        {
-          Assert (i >= n_inhomogeneous_rows, ExcInternalError());
-          std::swap (total_row_indices[n_active_rows+i],
-                     total_row_indices[n_active_rows+n_inhomogeneous_rows]);
-          n_inhomogeneous_rows++;
-        }
+    // tells the structure that the ith
+    // constraint is
+    // inhomogeneous. inhomogeneous
+    // constraints contribute to right hand
+    // sides, so to have fast access to
+    // them, put them before homogeneous
+    // constraints
+    void set_ith_constraint_inhomogeneous (const unsigned int i)
+    {
+      Assert (i >= n_inhomogeneous_rows, ExcInternalError());
+      std::swap (total_row_indices[n_active_rows+i],
+                 total_row_indices[n_active_rows+n_inhomogeneous_rows]);
+      n_inhomogeneous_rows++;
+    }
 
-                                       // the local row where
-                                       // constraint number i was
-                                       // detected, to find that row
-                                       // easily when the
-                                       // GlobalRowsToLocal has been
-                                       // set up
-      unsigned int constraint_origin (unsigned int i) const
-        {
-          return total_row_indices[n_active_rows+i].local_row;
-        }
+    // the local row where
+    // constraint number i was
+    // detected, to find that row
+    // easily when the
+    // GlobalRowsToLocal has been
+    // set up
+    unsigned int constraint_origin (unsigned int i) const
+    {
+      return total_row_indices[n_active_rows+i].local_row;
+    }
 
-                                       // a vector that contains all the
-                                       // global ids and the corresponding
-                                       // local ids as well as a pointer to
-                                       // that data where we store how to
-                                       // resolve constraints.
-      std::vector<Distributing> total_row_indices;
+    // a vector that contains all the
+    // global ids and the corresponding
+    // local ids as well as a pointer to
+    // that data where we store how to
+    // resolve constraints.
+    std::vector<Distributing> total_row_indices;
 
-    private:
-                                       // holds the actual data from
-                                       // the constraints
-      DataCache                 data_cache;
+  private:
+    // holds the actual data from
+    // the constraints
+    DataCache                 data_cache;
 
-                                       // how many rows there are,
-                                       // constraints disregarded
-      unsigned int              n_active_rows;
+    // how many rows there are,
+    // constraints disregarded
+    unsigned int              n_active_rows;
 
-                                       // the number of rows with
-                                       // inhomogeneous constraints
-      unsigned int              n_inhomogeneous_rows;
-};
+    // the number of rows with
+    // inhomogeneous constraints
+    unsigned int              n_inhomogeneous_rows;
+  };
 
-                                   // a function that appends an additional
-                                   // row to the list of values, or appends a
-                                   // value to an already existing
-                                   // row. Similar functionality as for
-                                   // std::map<unsigned int,Distributing>, but
-                                   // here done for a
-                                   // std::vector<Distributing>, much faster
-                                   // for short lists as we have them here
+  // a function that appends an additional
+  // row to the list of values, or appends a
+  // value to an already existing
+  // row. Similar functionality as for
+  // std::map<unsigned int,Distributing>, but
+  // here done for a
+  // std::vector<Distributing>, much faster
+  // for short lists as we have them here
   inline
   void
   GlobalRowsFromLocal::insert_index (const unsigned int global_row,
@@ -1413,14 +1416,14 @@ namespace internals
     Distributing row_value (global_row);
     std::pair<unsigned int,double> constraint (local_row, constraint_value);
 
-                                     // check whether the list was really
-                                     // sorted before entering here
+    // check whether the list was really
+    // sorted before entering here
     for (unsigned int i=1; i<n_active_rows; ++i)
       Assert (total_row_indices[i-1] < total_row_indices[i], ExcInternalError());
 
     pos = Utilities::lower_bound (total_row_indices.begin(),
-                            total_row_indices.begin()+n_active_rows,
-                            row_value);
+                                  total_row_indices.begin()+n_active_rows,
+                                  row_value);
     if (pos->global_row == global_row)
       pos1 = pos;
     else
@@ -1435,16 +1438,16 @@ namespace internals
       data_cache.append_index (pos1->constraint_position, constraint);
   }
 
-                                   // this sort algorithm sorts
-                                   // std::vector<Distributing>, but does not
-                                   // take the constraints into account. this
-                                   // means that in case that constraints are
-                                   // already inserted, this function does not
-                                   // work as expected. Use shellsort, which
-                                   // is very fast in case the indices are
-                                   // already sorted (which is the usual case
-                                   // with DG elements), and not too slow in
-                                   // other cases
+  // this sort algorithm sorts
+  // std::vector<Distributing>, but does not
+  // take the constraints into account. this
+  // means that in case that constraints are
+  // already inserted, this function does not
+  // work as expected. Use shellsort, which
+  // is very fast in case the indices are
+  // already sorted (which is the usual case
+  // with DG elements), and not too slow in
+  // other cases
   inline
   void
   GlobalRowsFromLocal::sort ()
@@ -1452,12 +1455,12 @@ namespace internals
     unsigned int i, j, j2, temp, templ, istep;
     unsigned int step;
 
-                                     // check whether the
-                                     // constraints are really empty.
+    // check whether the
+    // constraints are really empty.
     const unsigned int length = size();
 
-                                     // make sure that we are in the
-                                     // range of the vector
+    // make sure that we are in the
+    // range of the vector
     AssertIndexRange (length, total_row_indices.size()+1);
     for (unsigned int i=0; i<length; ++i)
       Assert (total_row_indices[i].constraint_position ==
@@ -1491,16 +1494,16 @@ namespace internals
       }
   }
 
-                                   // function for block matrices: Find out
-                                   // where in the list of local dofs (sorted
-                                   // according to global ids) the individual
-                                   // blocks start. Transform the global
-                                   // indices to block-local indices in order
-                                   // to be able to use functions like
-                                   // vector.block(1)(block_local_id), instead
-                                   // of vector(global_id). This avoids
-                                   // transforming indices one-by-one later
-                                   // on.
+  // function for block matrices: Find out
+  // where in the list of local dofs (sorted
+  // according to global ids) the individual
+  // blocks start. Transform the global
+  // indices to block-local indices in order
+  // to be able to use functions like
+  // vector.block(1)(block_local_id), instead
+  // of vector(global_id). This avoids
+  // transforming indices one-by-one later
+  // on.
   template <class BlockType>
   inline
   void
@@ -1516,20 +1519,20 @@ namespace internals
     const unsigned int num_blocks = block_object.n_block_rows();
     const unsigned int n_active_rows = global_rows.size();
 
-                                     // find end of rows.
+    // find end of rows.
     block_starts[0] = 0;
-    for (unsigned int i=1;i<num_blocks;++i)
+    for (unsigned int i=1; i<num_blocks; ++i)
       {
         row_iterator first_block =
           Utilities::lower_bound (block_indices,
-                            global_rows.total_row_indices.begin()+n_active_rows,
-                            Distributing(block_object.get_row_indices().block_start(i)));
+                                  global_rows.total_row_indices.begin()+n_active_rows,
+                                  Distributing(block_object.get_row_indices().block_start(i)));
         block_starts[i] = first_block - global_rows.total_row_indices.begin();
         block_indices = first_block;
       }
 
-                                     // transform row indices to block-local
-                                     // index space
+    // transform row indices to block-local
+    // index space
     for (unsigned int i=block_starts[1]; i<n_active_rows; ++i)
       global_rows.global_row(i) = block_object.get_row_indices().
                                   global_to_local(global_rows.global_row(i)).second;
@@ -1537,10 +1540,10 @@ namespace internals
 
 
 
-                                   // same as before, but for
-                                   // std::vector<uint> instead of
-                                   // GlobalRowsFromLocal. Used in functions
-                                   // for sparsity patterns.
+  // same as before, but for
+  // std::vector<uint> instead of
+  // GlobalRowsFromLocal. Used in functions
+  // for sparsity patterns.
   template <class BlockType>
   inline
   void
@@ -1555,20 +1558,20 @@ namespace internals
 
     const unsigned int num_blocks = block_object.n_block_rows();
 
-                                     // find end of rows.
+    // find end of rows.
     block_starts[0] = 0;
-    for (unsigned int i=1;i<num_blocks;++i)
+    for (unsigned int i=1; i<num_blocks; ++i)
       {
         row_iterator first_block =
           Utilities::lower_bound (col_indices,
-                            row_indices.end(),
-                            block_object.get_row_indices().block_start(i));
+                                  row_indices.end(),
+                                  block_object.get_row_indices().block_start(i));
         block_starts[i] = first_block - row_indices.begin();
         col_indices = first_block;
       }
 
-                                     // transform row indices to local index
-                                     // space
+    // transform row indices to local index
+    // space
     for (unsigned int i=block_starts[1]; i<row_indices.size(); ++i)
       row_indices[i] = block_object.get_row_indices().
                        global_to_local(row_indices[i]).second;
@@ -1576,13 +1579,13 @@ namespace internals
 
 
 
-                                   // resolves constraints of one column at
-                                   // the innermost loop. goes through the
-                                   // origin of each global entry and finds
-                                   // out which data we need to collect.
+  // resolves constraints of one column at
+  // the innermost loop. goes through the
+  // origin of each global entry and finds
+  // out which data we need to collect.
   static inline
-  double resolve_matrix_entry (const GlobalRowsFromLocal&global_rows,
-                               const GlobalRowsFromLocal&global_cols,
+  double resolve_matrix_entry (const GlobalRowsFromLocal &global_rows,
+                               const GlobalRowsFromLocal &global_cols,
                                const unsigned int        i,
                                const unsigned int        j,
                                const unsigned int        loc_row,
@@ -1591,31 +1594,31 @@ namespace internals
     const unsigned int loc_col = global_cols.local_row(j);
     double col_val;
 
-                                     // case 1: row has direct contribution in
-                                     // local matrix. decide whether col has a
-                                     // direct contribution. if not,
-                                     // set the value to zero.
+    // case 1: row has direct contribution in
+    // local matrix. decide whether col has a
+    // direct contribution. if not,
+    // set the value to zero.
     if (loc_row != numbers::invalid_unsigned_int)
       {
         col_val = ((loc_col != numbers::invalid_unsigned_int) ?
                    local_matrix(loc_row, loc_col) : 0);
 
-                                         // account for indirect contributions by
-                                         // constraints in column
+        // account for indirect contributions by
+        // constraints in column
         for (unsigned int p=0; p<global_cols.size(j); ++p)
           col_val += (local_matrix(loc_row, global_cols.local_row(j,p)) *
                       global_cols.constraint_value(j,p));
       }
 
-                                     // case 2: row has no direct contribution in
-                                     // local matrix
+    // case 2: row has no direct contribution in
+    // local matrix
     else
       col_val = 0;
 
-                                     // account for indirect contributions by
-                                     // constraints in row, going trough the
-                                     // direct and indirect references in the
-                                     // given column.
+    // account for indirect contributions by
+    // constraints in row, going trough the
+    // direct and indirect references in the
+    // given column.
     for (unsigned int q=0; q<global_rows.size(i); ++q)
       {
         double add_this = (loc_col != numbers::invalid_unsigned_int)
@@ -1633,21 +1636,21 @@ namespace internals
 
 
 
-                                   // computes all entries that need to be
-                                   // written into global_rows[i]. Lists the
-                                   // resulting values in val_ptr, and the
-                                   // corresponding column indices in col_ptr.
+  // computes all entries that need to be
+  // written into global_rows[i]. Lists the
+  // resulting values in val_ptr, and the
+  // corresponding column indices in col_ptr.
   template <typename number>
   inline
   void
-  resolve_matrix_row (const GlobalRowsFromLocal&global_rows,
-                      const GlobalRowsFromLocal&global_cols,
+  resolve_matrix_row (const GlobalRowsFromLocal &global_rows,
+                      const GlobalRowsFromLocal &global_cols,
                       const unsigned int        i,
                       const unsigned int        column_start,
                       const unsigned int        column_end,
                       const FullMatrix<double> &local_matrix,
-                      unsigned int *           &col_ptr,
-                      number *                 &val_ptr)
+                      unsigned int *&col_ptr,
+                      number *&val_ptr)
   {
     if (column_end == column_start)
       return;
@@ -1655,17 +1658,17 @@ namespace internals
     AssertIndexRange (column_end-1, global_cols.size());
     const unsigned int loc_row = global_rows.local_row(i);
 
-                                     // fast function if there are no indirect
-                                     // references to any of the local rows at
-                                     // all on this set of dofs (saves a lot
-                                     // of checks). the only check we actually
-                                     // need to perform is whether the matrix
-                                     // element is zero.
+    // fast function if there are no indirect
+    // references to any of the local rows at
+    // all on this set of dofs (saves a lot
+    // of checks). the only check we actually
+    // need to perform is whether the matrix
+    // element is zero.
     if (global_rows.have_indirect_rows() == false &&
         global_cols.have_indirect_rows() == false)
       {
         AssertIndexRange(loc_row, local_matrix.m());
-        const double * matrix_ptr = &local_matrix(loc_row, 0);
+        const double *matrix_ptr = &local_matrix(loc_row, 0);
 
         for (unsigned int j=column_start; j<column_end; ++j)
           {
@@ -1680,9 +1683,9 @@ namespace internals
           }
       }
 
-                                     // more difficult part when there are
-                                     // indirect references and when we need
-                                     // to do some more checks.
+    // more difficult part when there are
+    // indirect references and when we need
+    // to do some more checks.
     else
       {
         for (unsigned int j=column_start; j<column_end; ++j)
@@ -1690,8 +1693,8 @@ namespace internals
             double col_val = resolve_matrix_entry (global_rows, global_cols, i, j,
                                                    loc_row, local_matrix);
 
-                                             // if we got some nontrivial value,
-                                             // append it to the array of values.
+            // if we got some nontrivial value,
+            // append it to the array of values.
             if (col_val != 0.)
               {
                 *val_ptr++ = static_cast<number> (col_val);
@@ -1703,8 +1706,8 @@ namespace internals
 
 
 
-                                   // specialized function that can write into
-                                   // the row of a SparseMatrix<number>.
+  // specialized function that can write into
+  // the row of a SparseMatrix<number>.
   namespace dealiiSparseMatrix
   {
     template <typename number>
@@ -1712,7 +1715,7 @@ namespace internals
     void add_value (const double value,
                     const unsigned int row,
                     const unsigned int column,
-                    const unsigned int * col_ptr,
+                    const unsigned int *col_ptr,
                     const bool   are_on_diagonal,
                     unsigned int &counter,
                     number       *val_ptr)
@@ -1736,15 +1739,15 @@ namespace internals
   }
 
 
-                                   // similar as before, now with shortcut for
-                                   // deal.II sparse matrices. this lets us
-                                   // avoid using extra arrays, and does all the
-                                   // operations just in place, i.e., in the
-                                   // respective matrix row
+  // similar as before, now with shortcut for
+  // deal.II sparse matrices. this lets us
+  // avoid using extra arrays, and does all the
+  // operations just in place, i.e., in the
+  // respective matrix row
   template <typename number>
   inline
   void
-  resolve_matrix_row (const GlobalRowsFromLocal&global_rows,
+  resolve_matrix_row (const GlobalRowsFromLocal &global_rows,
                       const unsigned int        i,
                       const unsigned int        column_start,
                       const unsigned int        column_end,
@@ -1755,36 +1758,36 @@ namespace internals
       return;
 
     AssertIndexRange (column_end-1, global_rows.size());
-    const SparsityPattern & sparsity = sparse_matrix->get_sparsity_pattern();
+    const SparsityPattern &sparsity = sparse_matrix->get_sparsity_pattern();
 
     if (sparsity.n_nonzero_elements() == 0)
       return;
 
-    const std::size_t * row_start = sparsity.get_rowstart_indices();
-    const unsigned int * sparsity_struct = sparsity.get_column_numbers();
+    const std::size_t *row_start = sparsity.get_rowstart_indices();
+    const unsigned int *sparsity_struct = sparsity.get_column_numbers();
 
     const unsigned int row = global_rows.global_row(i);
     const unsigned int loc_row = global_rows.local_row(i);
 
-    const unsigned int * col_ptr = sparsity.row_length(row) == 0 ? 0 :
-                                   &sparsity_struct[row_start[row]];
-    number * val_ptr = sparsity.row_length(row) == 0 ? 0 :
-                       &sparse_matrix->global_entry (row_start[row]);
+    const unsigned int *col_ptr = sparsity.row_length(row) == 0 ? 0 :
+                                  &sparsity_struct[row_start[row]];
+    number *val_ptr = sparsity.row_length(row) == 0 ? 0 :
+                      &sparse_matrix->global_entry (row_start[row]);
     const bool optimize_diagonal = sparsity.optimize_diagonal();
     unsigned int counter = optimize_diagonal;
 
-                                     // distinguish three cases about what can
-                                     // happen for checking whether the diagonal is
-                                     // the first element of the row. this avoids
-                                     // if statements at the innermost loop
-                                     // positions
+    // distinguish three cases about what can
+    // happen for checking whether the diagonal is
+    // the first element of the row. this avoids
+    // if statements at the innermost loop
+    // positions
 
     if (!optimize_diagonal) // case 1: no diagonal optimization in matrix
       {
         if (global_rows.have_indirect_rows() == false)
           {
             AssertIndexRange (loc_row, local_matrix.m());
-            const double * matrix_ptr = &local_matrix(loc_row, 0);
+            const double *matrix_ptr = &local_matrix(loc_row, 0);
 
             for (unsigned int j=column_start; j<column_end; ++j)
               {
@@ -1813,7 +1816,7 @@ namespace internals
         if (global_rows.have_indirect_rows() == false)
           {
             AssertIndexRange (loc_row, local_matrix.m());
-            const double * matrix_ptr = &local_matrix(loc_row, 0);
+            const double *matrix_ptr = &local_matrix(loc_row, 0);
 
             for (unsigned int j=column_start; j<i; ++j)
               {
@@ -1855,12 +1858,12 @@ namespace internals
               }
           }
       }
-                                     // case 3: can't say - need to check inside
-                                     // the loop
+    // case 3: can't say - need to check inside
+    // the loop
     else if (global_rows.have_indirect_rows() == false)
       {
         AssertIndexRange (loc_row, local_matrix.m());
-        const double * matrix_ptr = &local_matrix(loc_row, 0);
+        const double *matrix_ptr = &local_matrix(loc_row, 0);
 
         for (unsigned int j=column_start; j<column_end; ++j)
           {
@@ -1888,10 +1891,10 @@ namespace internals
 
 
 
-                                   // Same function to resolve all entries that
-                                   // will be added to the given global row
-                                   // global_rows[i] as before, now for sparsity
-                                   // pattern
+  // Same function to resolve all entries that
+  // will be added to the given global row
+  // global_rows[i] as before, now for sparsity
+  // pattern
   inline
   void
   resolve_matrix_row (const GlobalRowsFromLocal     &global_rows,
@@ -1906,9 +1909,9 @@ namespace internals
 
     const unsigned int loc_row = global_rows.local_row(i);
 
-                                     // fast function if there are no indirect
-                                     // references to any of the local rows at
-                                     // all on this set of dofs
+    // fast function if there are no indirect
+    // references to any of the local rows at
+    // all on this set of dofs
     if (global_rows.have_indirect_rows() == false)
       {
         Assert(loc_row < dof_mask.n_rows(),
@@ -1924,9 +1927,9 @@ namespace internals
           }
       }
 
-                                     // slower functions when there are
-                                     // indirect references and when we need
-                                     // to do some more checks.
+    // slower functions when there are
+    // indirect references and when we need
+    // to do some more checks.
     else
       {
         for (unsigned int j=column_start; j<column_end; ++j)
@@ -1963,9 +1966,9 @@ namespace internals
               }
 
             continue;
-                                             // if we got some nontrivial value,
-                                             // append it to the array of values.
-            add_this_index:
+            // if we got some nontrivial value,
+            // append it to the array of values.
+add_this_index:
             *col_ptr++ = global_rows.global_row(j);
           }
       }
@@ -1973,33 +1976,33 @@ namespace internals
 
 
 
-                                       // to make sure that the global matrix
-                                       // remains invertible, we need to do
-                                       // something with the diagonal
-                                       // elements. add the absolute value of
-                                       // the local matrix, so the resulting
-                                       // entry will always be positive and
-                                       // furthermore be in the same order of
-                                       // magnitude as the other elements of the
-                                       // matrix
-                                       //
-                                       // note that this also captures the
-                                       // special case that a dof is both
-                                       // constrained and fixed (this can
-                                       // happen for hanging nodes in 3d that
-                                       // also happen to be on the
-                                       // boundary). in that case, following
-                                       // the program flow in
-                                       // distribute_local_to_global, it is
-                                       // realized that when distributing the
-                                       // row and column no elements of the
-                                       // matrix are actually touched if all
-                                       // the degrees of freedom to which this
-                                       // dof is constrained are also
-                                       // constrained (the usual case with
-                                       // hanging nodes in 3d). however, in
-                                       // the line below, we do actually do
-                                       // something with this dof
+  // to make sure that the global matrix
+  // remains invertible, we need to do
+  // something with the diagonal
+  // elements. add the absolute value of
+  // the local matrix, so the resulting
+  // entry will always be positive and
+  // furthermore be in the same order of
+  // magnitude as the other elements of the
+  // matrix
+  //
+  // note that this also captures the
+  // special case that a dof is both
+  // constrained and fixed (this can
+  // happen for hanging nodes in 3d that
+  // also happen to be on the
+  // boundary). in that case, following
+  // the program flow in
+  // distribute_local_to_global, it is
+  // realized that when distributing the
+  // row and column no elements of the
+  // matrix are actually touched if all
+  // the degrees of freedom to which this
+  // dof is constrained are also
+  // constrained (the usual case with
+  // hanging nodes in 3d). however, in
+  // the line below, we do actually do
+  // something with this dof
   template <typename MatrixType, typename VectorType>
   inline void
   set_matrix_diagonals (const internals::GlobalRowsFromLocal &global_rows,
@@ -2026,12 +2029,12 @@ namespace internals
                  std::fabs(local_matrix(local_row,local_row)) : average_diagonal);
             global_matrix.add(global_row, global_row, new_diagonal);
 
-                                       // if the use_inhomogeneities_for_rhs flag is
-                                       // set to true, the inhomogeneities are used
-                                       // to create the global vector. instead of
-                                       // fill in a zero in the ith components with an
-                                       // inhomogeneity, we set those to:
-                                       //    inhomogeneity(i)*global_matrix (i,i).
+            // if the use_inhomogeneities_for_rhs flag is
+            // set to true, the inhomogeneities are used
+            // to create the global vector. instead of
+            // fill in a zero in the ith components with an
+            // inhomogeneity, we set those to:
+            //    inhomogeneity(i)*global_matrix (i,i).
             if (use_inhomogeneities_for_rhs == true)
               global_vector(global_row) += constraints.get_inhomogeneity(global_row) * new_diagonal;
           }
@@ -2040,14 +2043,14 @@ namespace internals
 
 
 
-                                // similar function as the one above for
-                                // setting matrix diagonals, but now doing
-                                // that for sparsity patterns when setting
-                                // them up using
-                                // add_entries_local_to_global. In case we
-                                // keep constrained entries, add all the rows
-                                // and columns related to the constrained dof,
-                                // otherwise just add the diagonal
+  // similar function as the one above for
+  // setting matrix diagonals, but now doing
+  // that for sparsity patterns when setting
+  // them up using
+  // add_entries_local_to_global. In case we
+  // keep constrained entries, add all the rows
+  // and columns related to the constrained dof,
+  // otherwise just add the diagonal
   template <typename SparsityType>
   inline void
   set_sparsity_diagonals (const internals::GlobalRowsFromLocal &global_rows,
@@ -2056,11 +2059,11 @@ namespace internals
                           const bool                            keep_constrained_entries,
                           SparsityType                         &sparsity_pattern)
   {
-                                // if we got constraints, need to add
-                                // the diagonal element and, if the
-                                // user requested so, also the rest of
-                                // the entries in rows and columns
-                                // that have been left out above
+    // if we got constraints, need to add
+    // the diagonal element and, if the
+    // user requested so, also the rest of
+    // the entries in rows and columns
+    // that have been left out above
     if (global_rows.n_constraints() > 0)
       {
         for (unsigned int i=0; i<global_rows.n_constraints(); i++)
@@ -2080,8 +2083,8 @@ namespace internals
                   }
               }
             else
-                                // don't keep constrained entries - just
-                                // add the diagonal.
+              // don't keep constrained entries - just
+              // add the diagonal.
               sparsity_pattern.add(global_row,global_row);
           }
       }
@@ -2091,12 +2094,12 @@ namespace internals
 
 
 
-                                 // Basic idea of setting up a list of
-                                 // all global dofs: first find all rows and columns
-                                 // that we are going to write touch,
-                                 // and then go through the
-                                 // lines and collect all the local rows that
-                                 // are related to it.
+// Basic idea of setting up a list of
+// all global dofs: first find all rows and columns
+// that we are going to write touch,
+// and then go through the
+// lines and collect all the local rows that
+// are related to it.
 void
 ConstraintMatrix::
 make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
@@ -2105,42 +2108,42 @@ make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
   const unsigned int n_local_dofs = local_dof_indices.size();
   AssertDimension (n_local_dofs, global_rows.size());
 
-                                   // when distributing the local data to
-                                   // the global matrix, we can quite
-                                   // cheaply sort the indices (obviously,
-                                   // this introduces the need for
-                                   // allocating some memory on the way, but
-                                   // we need to do this only for rows,
-                                   // whereas the distribution process
-                                   // itself goes over rows and
-                                   // columns). This has the advantage that
-                                   // when writing into the global matrix,
-                                   // we can make use of the sortedness.
+  // when distributing the local data to
+  // the global matrix, we can quite
+  // cheaply sort the indices (obviously,
+  // this introduces the need for
+  // allocating some memory on the way, but
+  // we need to do this only for rows,
+  // whereas the distribution process
+  // itself goes over rows and
+  // columns). This has the advantage that
+  // when writing into the global matrix,
+  // we can make use of the sortedness.
 
-                                   // so the first step is to create a
-                                   // sorted list of all row values that are
-                                   // possible. these values are either the
-                                   // rows from unconstrained dofs, or some
-                                   // indices introduced by dofs constrained
-                                   // to a combination of some other
-                                   // dofs. regarding the data type, choose
-                                   // an STL vector of a pair of unsigned
-                                   // ints (for global columns) and internal
-                                   // data (containing local columns +
-                                   // possible jumps from
-                                   // constraints). Choosing an STL map or
-                                   // anything else M.K. knows of would be
-                                   // much more expensive here!
+  // so the first step is to create a
+  // sorted list of all row values that are
+  // possible. these values are either the
+  // rows from unconstrained dofs, or some
+  // indices introduced by dofs constrained
+  // to a combination of some other
+  // dofs. regarding the data type, choose
+  // an STL vector of a pair of unsigned
+  // ints (for global columns) and internal
+  // data (containing local columns +
+  // possible jumps from
+  // constraints). Choosing an STL map or
+  // anything else M.K. knows of would be
+  // much more expensive here!
 
-                                   // cache whether we have to resolve any
-                                   // indirect rows generated from resolving
-                                   // constrained dofs.
+  // cache whether we have to resolve any
+  // indirect rows generated from resolving
+  // constrained dofs.
   unsigned int added_rows = 0;
 
-                                   // first add the indices in an unsorted
-                                   // way and only keep track of the
-                                   // constraints that appear. They are
-                                   // resolved in a second step.
+  // first add the indices in an unsorted
+  // way and only keep track of the
+  // constraints that appear. They are
+  // resolved in a second step.
   for (unsigned int i = 0; i<n_local_dofs; ++i)
     {
       if (is_constrained(local_dof_indices[i]) == false)
@@ -2160,7 +2163,7 @@ make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
       AssertIndexRange(local_row, n_local_dofs);
       const unsigned int global_row = local_dof_indices[local_row];
       Assert (is_constrained(global_row), ExcInternalError());
-      const ConstraintLine & position =
+      const ConstraintLine &position =
         lines[lines_cache[calculate_line_index(global_row)]];
       if (position.inhomogeneity != 0)
         global_rows.set_ith_constraint_inhomogeneous (i);
@@ -2173,11 +2176,11 @@ make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
 
 
 
-                                // Same function as before, but now do
-                                // only extract the global indices
-                                // that come from the local ones
-                                // without storing their origin. Used
-                                // for sparsity pattern generation.
+// Same function as before, but now do
+// only extract the global indices
+// that come from the local ones
+// without storing their origin. Used
+// for sparsity pattern generation.
 inline
 void
 ConstraintMatrix::
@@ -2203,11 +2206,11 @@ make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
     {
       const unsigned int local_row = active_dofs.back();
 
-                                // remove constrained entry since we
-                                // are going to resolve it in place
+      // remove constrained entry since we
+      // are going to resolve it in place
       active_dofs.pop_back();
       const unsigned int global_row = local_dof_indices[local_row];
-      const ConstraintLine & position =
+      const ConstraintLine &position =
         lines[lines_cache[calculate_line_index(global_row)]];
       for (unsigned int q=0; q<position.entries.size(); ++q)
         {
@@ -2215,15 +2218,15 @@ make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
           if (active_dofs[active_dofs.size()-i] < new_index)
             active_dofs.insert(active_dofs.end()-i+1,new_index);
 
-                                // make binary search to find where to
-                                // put the new index in order to keep
-                                // the list sorted
+          // make binary search to find where to
+          // put the new index in order to keep
+          // the list sorted
           else
             {
               std::vector<unsigned int>::iterator it =
                 Utilities::lower_bound(active_dofs.begin(),
-                                 active_dofs.end()-i+1,
-                                 new_index);
+                                       active_dofs.end()-i+1,
+                                       new_index);
               if (*it != new_index)
                 active_dofs.insert(it, new_index);
             }
@@ -2233,8 +2236,8 @@ make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
 
 
 
-                                 // Resolve the constraints from the vector and
-                                 // apply inhomogeneities.
+// Resolve the constraints from the vector and
+// apply inhomogeneities.
 inline
 double
 ConstraintMatrix::
@@ -2247,10 +2250,10 @@ resolve_vector_entry (const unsigned int                    i,
   const unsigned int loc_row = global_rows.local_row(i);
   const unsigned int n_inhomogeneous_rows = global_rows.n_inhomogeneities();
   double val = 0;
-                                   // has a direct contribution from some local
-                                   // entry. If we have inhomogeneous
-                                   // constraints, compute the contribution of
-                                   // the inhomogeneity in the current row.
+  // has a direct contribution from some local
+  // entry. If we have inhomogeneous
+  // constraints, compute the contribution of
+  // the inhomogeneity in the current row.
   if (loc_row != numbers::invalid_unsigned_int)
     {
       val = local_vector(loc_row);
@@ -2261,7 +2264,7 @@ resolve_vector_entry (const unsigned int                    i,
                 local_matrix(loc_row, global_rows.constraint_origin(i)));
     }
 
-                                   // go through the indirect contributions
+  // go through the indirect contributions
   for (unsigned int q=0; q<global_rows.size(i); ++q)
     {
       const unsigned int loc_row_q = global_rows.local_row(i,q);
@@ -2278,9 +2281,9 @@ resolve_vector_entry (const unsigned int                    i,
 }
 
 
-                                 // internal implementation for
-                                 // distribute_local_to_global for
-                                 // standard (non-block) matrices
+// internal implementation for
+// distribute_local_to_global for
+// standard (non-block) matrices
 template <typename MatrixType, typename VectorType>
 void
 ConstraintMatrix::distribute_local_to_global (
@@ -2292,9 +2295,9 @@ ConstraintMatrix::distribute_local_to_global (
   bool                            use_inhomogeneities_for_rhs,
   internal::bool2type<false>) const
 {
-                                   // check whether we work on real vectors
-                                   // or we just used a dummy when calling
-                                   // the other function above.
+  // check whether we work on real vectors
+  // or we just used a dummy when calling
+  // the other function above.
   const bool use_vectors = (local_vector.size() == 0 &&
                             global_vector.size() == 0) ? false : true;
   typedef typename MatrixType::value_type number;
@@ -2317,13 +2320,13 @@ ConstraintMatrix::distribute_local_to_global (
 
   const unsigned int n_actual_dofs = global_rows.size();
 
-                                   // create arrays for the column data
-                                   // (indices and values) that will then be
-                                   // written into the matrix. Shortcut for
-                                   // deal.II sparse matrix
+  // create arrays for the column data
+  // (indices and values) that will then be
+  // written into the matrix. Shortcut for
+  // deal.II sparse matrix
   std::vector<unsigned int> cols;
   std::vector<number>       vals;
-  SparseMatrix<number> * sparse_matrix
+  SparseMatrix<number> *sparse_matrix
     = dynamic_cast<SparseMatrix<number> *>(&global_matrix);
   if (use_dealii_matrix == false)
     {
@@ -2333,20 +2336,20 @@ ConstraintMatrix::distribute_local_to_global (
   else
     Assert (sparse_matrix != 0, ExcInternalError());
 
-                                   // now do the actual job. go through all
-                                   // the global rows that we will touch and
-                                   // call resolve_matrix_row for each of
-                                   // those.
+  // now do the actual job. go through all
+  // the global rows that we will touch and
+  // call resolve_matrix_row for each of
+  // those.
   for (unsigned int i=0; i<n_actual_dofs; ++i)
     {
       const unsigned int row = global_rows.global_row(i);
 
-                                       // calculate all the data that will be
-                                       // written into the matrix row.
+      // calculate all the data that will be
+      // written into the matrix row.
       if (use_dealii_matrix == false)
         {
-          unsigned int * col_ptr = &cols[0];
-          number * val_ptr = &vals[0];
+          unsigned int *col_ptr = &cols[0];
+          number *val_ptr = &vals[0];
           internals::resolve_matrix_row (global_rows, global_rows, i, 0,
                                          n_actual_dofs,
                                          local_matrix, col_ptr, val_ptr);
@@ -2360,14 +2363,14 @@ ConstraintMatrix::distribute_local_to_global (
         internals::resolve_matrix_row (global_rows, i, 0, n_actual_dofs,
                                        local_matrix, sparse_matrix);
 
-                                       // now to the vectors. besides doing the
-                                       // same job as we did above (i.e.,
-                                       // distribute the content of the local
-                                       // vector into the global one), need to
-                                       // account for inhomogeneities here: thie
-                                       // corresponds to eliminating the
-                                       // respective column in the local matrix
-                                       // with value on the right hand side.
+      // now to the vectors. besides doing the
+      // same job as we did above (i.e.,
+      // distribute the content of the local
+      // vector into the global one), need to
+      // account for inhomogeneities here: thie
+      // corresponds to eliminating the
+      // respective column in the local matrix
+      // with value on the right hand side.
       if (use_vectors == true)
         {
           const double val = resolve_vector_entry (i, global_rows,
@@ -2399,7 +2402,7 @@ ConstraintMatrix::distribute_local_to_global (
 
   AssertDimension (local_matrix.m(), row_indices.size());
   AssertDimension (local_matrix.n(), col_indices.size());
-                                   //Assert (sorted == true, ExcMatrixNotClosed());
+  //Assert (sorted == true, ExcMatrixNotClosed());
 
   const unsigned int n_local_row_dofs = row_indices.size();
   const unsigned int n_local_col_dofs = col_indices.size();
@@ -2411,22 +2414,22 @@ ConstraintMatrix::distribute_local_to_global (
   const unsigned int n_actual_row_dofs = global_rows.size();
   const unsigned int n_actual_col_dofs = global_cols.size();
 
-                                   // create arrays for the column data
-                                   // (indices and values) that will then be
-                                   // written into the matrix. Shortcut for
-                                   // deal.II sparse matrix
+  // create arrays for the column data
+  // (indices and values) that will then be
+  // written into the matrix. Shortcut for
+  // deal.II sparse matrix
   std::vector<unsigned int> cols (n_actual_col_dofs);
   std::vector<number>       vals (n_actual_col_dofs);
 
-                                   // now do the actual job.
+  // now do the actual job.
   for (unsigned int i=0; i<n_actual_row_dofs; ++i)
     {
       const unsigned int row = global_rows.global_row(i);
 
-                                       // calculate all the data that will be
-                                       // written into the matrix row.
-      unsigned int * col_ptr = &cols[0];
-      number * val_ptr = &vals[0];
+      // calculate all the data that will be
+      // written into the matrix row.
+      unsigned int *col_ptr = &cols[0];
+      number *val_ptr = &vals[0];
       internals::resolve_matrix_row (global_rows, global_cols, i, 0,
                                      n_actual_col_dofs,
                                      local_matrix, col_ptr, val_ptr);
@@ -2439,10 +2442,10 @@ ConstraintMatrix::distribute_local_to_global (
 }
 
 
-                                 // similar function as above, but now
-                                 // specialized for block matrices. See
-                                 // the other function for additional
-                                 // comments.
+// similar function as above, but now
+// specialized for block matrices. See
+// the other function for additional
+// comments.
 template <typename MatrixType, typename VectorType>
 void
 ConstraintMatrix::
@@ -2485,8 +2488,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
         global_indices[i] = global_rows.global_row(i);
     }
 
-                                   // additional construct that also takes
-                                   // care of block indices.
+  // additional construct that also takes
+  // care of block indices.
   const unsigned int num_blocks   = global_matrix.n_block_rows();
   std::vector<unsigned int> block_starts(num_blocks+1, n_actual_dofs);
   internals::make_block_starts (global_matrix, global_rows, block_starts);
@@ -2499,11 +2502,11 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
       vals.resize (n_actual_dofs);
     }
 
-                                   // the basic difference to the non-block
-                                   // variant from now onwards is that we go
-                                   // through the blocks of the matrix
-                                   // separately, which allows us to set the
-                                   // block entries individually
+  // the basic difference to the non-block
+  // variant from now onwards is that we go
+  // through the blocks of the matrix
+  // separately, which allows us to set the
+  // block entries individually
   for (unsigned int block=0; block<num_blocks; ++block)
     {
       const unsigned int next_block = block_starts[block+1];
@@ -2514,11 +2517,11 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
           for (unsigned int block_col=0; block_col<num_blocks; ++block_col)
             {
               const unsigned int start_block = block_starts[block_col],
-                                   end_block = block_starts[block_col+1];
+                                 end_block = block_starts[block_col+1];
               if (use_dealii_matrix == false)
                 {
-                  unsigned int * col_ptr = &cols[0];
-                  number * val_ptr = &vals[0];
+                  unsigned int *col_ptr = &cols[0];
+                  number *val_ptr = &vals[0];
                   internals::resolve_matrix_row (global_rows, global_rows, i,
                                                  start_block, end_block,
                                                  local_matrix, col_ptr, val_ptr);
@@ -2532,9 +2535,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                 }
               else
                 {
-                  SparseMatrix<number> * sparse_matrix
+                  SparseMatrix<number> *sparse_matrix
                     = dynamic_cast<SparseMatrix<number> *>(&global_matrix.block(block,
-                                                                                block_col));
+                                                           block_col));
                   Assert (sparse_matrix != 0, ExcInternalError());
                   internals::resolve_matrix_row (global_rows, i, start_block,
                                                  end_block, local_matrix, sparse_matrix);
@@ -2581,35 +2584,35 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       AssertDimension (dof_mask.n_cols(), n_local_dofs);
     }
 
-                                   // if the dof mask is not active, all we
-                                   // have to do is to add some indices in a
-                                   // matrix format. To do this, we first
-                                   // create an array of all the indices
-                                   // that are to be added. these indices
-                                   // are the local dof indices plus some
-                                   // indices that come from constraints.
+  // if the dof mask is not active, all we
+  // have to do is to add some indices in a
+  // matrix format. To do this, we first
+  // create an array of all the indices
+  // that are to be added. these indices
+  // are the local dof indices plus some
+  // indices that come from constraints.
   if (dof_mask_is_active == false)
     {
       std::vector<unsigned int> actual_dof_indices (n_local_dofs);
       make_sorted_row_list (local_dof_indices, actual_dof_indices);
       const unsigned int n_actual_dofs = actual_dof_indices.size();
 
-                                       // now add the indices we collected above
-                                       // to the sparsity pattern. Very easy
-                                       // here - just add the same array to all
-                                       // the rows...
+      // now add the indices we collected above
+      // to the sparsity pattern. Very easy
+      // here - just add the same array to all
+      // the rows...
       for (unsigned int i=0; i<n_actual_dofs; ++i)
         sparsity_pattern.add_entries(actual_dof_indices[i],
                                      actual_dof_indices.begin(),
                                      actual_dof_indices.end(),
                                      true);
 
-                                       // need to add the whole row and column
-                                       // structure in case we keep constrained
-                                       // entries. Unfortunately, we can't use
-                                       // the nice matrix structure we use
-                                       // elsewhere, so manually add those
-                                       // indices one by one.
+      // need to add the whole row and column
+      // structure in case we keep constrained
+      // entries. Unfortunately, we can't use
+      // the nice matrix structure we use
+      // elsewhere, so manually add those
+      // indices one by one.
       for (unsigned int i=0; i<n_local_dofs; i++)
         if (is_constrained(local_dof_indices[i]))
           {
@@ -2627,18 +2630,18 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
     }
 
 
-                                   // complicated case: we need to filter
-                                   // out some indices. then the function
-                                   // gets similar to the function for
-                                   // distributing matrix entries, see there
-                                   // for additional comments.
+  // complicated case: we need to filter
+  // out some indices. then the function
+  // gets similar to the function for
+  // distributing matrix entries, see there
+  // for additional comments.
   internals::GlobalRowsFromLocal global_rows (n_local_dofs);
   make_sorted_row_list (local_dof_indices, global_rows);
   const unsigned int n_actual_dofs = global_rows.size();
 
-                                   // create arrays for the column indices
-                                   // that will then be written into the
-                                   // sparsity pattern.
+  // create arrays for the column indices
+  // that will then be written into the
+  // sparsity pattern.
   std::vector<unsigned int> cols (n_actual_dofs);
 
   for (unsigned int i=0; i<n_actual_dofs; ++i)
@@ -2648,10 +2651,10 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       internals::resolve_matrix_row (global_rows, i, 0, n_actual_dofs,
                                      dof_mask, col_ptr);
 
-                                       // finally, write all the information
-                                       // that accumulated under the given
-                                       // process into the global matrix row and
-                                       // into the vector
+      // finally, write all the information
+      // that accumulated under the given
+      // process into the global matrix row and
+      // into the vector
       if (col_ptr != cols.begin())
         sparsity_pattern.add_entries(row, cols.begin(), col_ptr,
                                      true);
@@ -2679,13 +2682,13 @@ add_entries_local_to_global (const std::vector<unsigned int> &row_indices,
   if (dof_mask.n_rows() == n_local_rows && dof_mask.n_cols() == n_local_cols)
     dof_mask_is_active = true;
 
-                                   // if the dof mask is not active, all we
-                                   // have to do is to add some indices in a
-                                   // matrix format. To do this, we first
-                                   // create an array of all the indices
-                                   // that are to be added. these indices
-                                   // are the local dof indices plus some
-                                   // indices that come from constraints.
+  // if the dof mask is not active, all we
+  // have to do is to add some indices in a
+  // matrix format. To do this, we first
+  // create an array of all the indices
+  // that are to be added. these indices
+  // are the local dof indices plus some
+  // indices that come from constraints.
   if (dof_mask_is_active == false)
     {
       std::vector<unsigned int> actual_row_indices (n_local_rows);
@@ -2694,10 +2697,10 @@ add_entries_local_to_global (const std::vector<unsigned int> &row_indices,
       make_sorted_row_list (col_indices, actual_col_indices);
       const unsigned int n_actual_rows = actual_row_indices.size();
 
-                                       // now add the indices we collected above
-                                       // to the sparsity pattern. Very easy
-                                       // here - just add the same array to all
-                                       // the rows...
+      // now add the indices we collected above
+      // to the sparsity pattern. Very easy
+      // here - just add the same array to all
+      // the rows...
       for (unsigned int i=0; i<n_actual_rows; ++i)
         sparsity_pattern.add_entries(actual_row_indices[i],
                                      actual_col_indices.begin(),
@@ -2706,9 +2709,9 @@ add_entries_local_to_global (const std::vector<unsigned int> &row_indices,
       return;
     }
 
-                                // if constrained entries should be
-                                // kept, need to add rows and columns
-                                // of those to the sparsity pattern
+  // if constrained entries should be
+  // kept, need to add rows and columns
+  // of those to the sparsity pattern
   if (keep_constrained_entries == true)
     {
       for (unsigned int i=0; i<row_indices.size(); i++)
@@ -2722,7 +2725,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &row_indices,
     }
 
 
-                                // TODO: implement this
+  // TODO: implement this
   Assert (false, ExcNotImplemented());
 }
 
@@ -2738,10 +2741,10 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
                              const Table<2,bool>             &dof_mask,
                              internal::bool2type<true> ) const
 {
-                                   // just as the other
-                                   // add_entries_local_to_global function,
-                                   // but now specialized for block
-                                   // matrices.
+  // just as the other
+  // add_entries_local_to_global function,
+  // but now specialized for block
+  // matrices.
   Assert (sparsity_pattern.n_rows() == sparsity_pattern.n_cols(), ExcNotQuadratic());
   Assert (sparsity_pattern.n_block_rows() == sparsity_pattern.n_block_cols(),
           ExcNotQuadratic());
@@ -2762,8 +2765,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       make_sorted_row_list (local_dof_indices, actual_dof_indices);
       const unsigned int n_actual_dofs = actual_dof_indices.size();
 
-                                       // additional construct that also takes
-                                       // care of block indices.
+      // additional construct that also takes
+      // care of block indices.
       std::vector<unsigned int> block_starts(num_blocks+1, n_actual_dofs);
       internals::make_block_starts (sparsity_pattern, actual_dof_indices,
                                     block_starts);
@@ -2782,10 +2785,10 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
                 {
                   const unsigned int next_block_col = block_starts[block_col+1];
                   sparsity_pattern.block(block,block_col).
-                    add_entries(row,
-                                index_it,
-                                actual_dof_indices.begin() + next_block_col,
-                                true);
+                  add_entries(row,
+                              index_it,
+                              actual_dof_indices.begin() + next_block_col,
+                              true);
                   index_it = actual_dof_indices.begin() + next_block_col;
                 }
             }
@@ -2807,25 +2810,25 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       return;
     }
 
-                                   // difficult case with dof_mask, similar
-                                   // to the distribute_local_to_global
-                                   // function for block matrices
+  // difficult case with dof_mask, similar
+  // to the distribute_local_to_global
+  // function for block matrices
   internals::GlobalRowsFromLocal global_rows (n_local_dofs);
   make_sorted_row_list (local_dof_indices, global_rows);
   const unsigned int n_actual_dofs = global_rows.size();
 
-                                   // additional construct that also takes
-                                   // care of block indices.
+  // additional construct that also takes
+  // care of block indices.
   std::vector<unsigned int> block_starts(num_blocks+1, n_actual_dofs);
   internals::make_block_starts(sparsity_pattern, global_rows,
                                block_starts);
 
   std::vector<unsigned int> cols (n_actual_dofs);
 
-                                   // the basic difference to the
-                                   // non-block variant from now onwards
-                                   // is that we go through the blocks
-                                   // of the matrix separately.
+  // the basic difference to the
+  // non-block variant from now onwards
+  // is that we go through the blocks
+  // of the matrix separately.
   for (unsigned int block=0; block<num_blocks; ++block)
     {
       const unsigned int next_block = block_starts[block+1];
@@ -2835,7 +2838,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
           for (unsigned int block_col=0; block_col<num_blocks; ++block_col)
             {
               const unsigned int begin_block = block_starts[block_col],
-                                   end_block = block_starts[block_col+1];
+                                 end_block = block_starts[block_col+1];
               std::vector<unsigned int>::iterator col_ptr = cols.begin();
               internals::resolve_matrix_row (global_rows, i, begin_block,
                                              end_block, dof_mask, col_ptr);

@@ -25,9 +25,9 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 void
-BlockInfo::initialize(const DoFHandler<dim, spacedim>& dof)
+BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof)
 {
-  const FiniteElement<dim, spacedim>& fe = dof.get_fe();
+  const FiniteElement<dim, spacedim> &fe = dof.get_fe();
   std::vector<unsigned int> sizes(fe.n_blocks());
   DoFTools::count_dofs_per_block(dof, sizes);
   bi_global.reinit(sizes);
@@ -36,14 +36,14 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim>& dof)
 
 template <int dim, int spacedim>
 void
-BlockInfo::initialize_local(const DoFHandler<dim, spacedim>& dof)
+BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
 {
-  const FiniteElement<dim, spacedim>& fe = dof.get_fe();
+  const FiniteElement<dim, spacedim> &fe = dof.get_fe();
   std::vector<unsigned int> sizes(fe.n_blocks());
 
   base_elements.resize(fe.n_blocks());
 
-  for (unsigned int i=0;i<base_elements.size();++i)
+  for (unsigned int i=0; i<base_elements.size(); ++i)
     base_elements[i] = fe.block_to_base_index(i).first;
 
   local_renumbering.resize(fe.n_dofs_per_cell());
@@ -56,7 +56,7 @@ BlockInfo::initialize_local(const DoFHandler<dim, spacedim>& dof)
 
 template <int dim, int spacedim>
 void
-BlockInfo::initialize(const MGDoFHandler<dim, spacedim>& dof, bool levels_only)
+BlockInfo::initialize(const MGDoFHandler<dim, spacedim> &dof, bool levels_only)
 {
   if (!levels_only)
     initialize(static_cast<const DoFHandler<dim, spacedim>&>(dof));
@@ -67,7 +67,7 @@ BlockInfo::initialize(const MGDoFHandler<dim, spacedim>& dof, bool levels_only)
   MGTools::count_dofs_per_block(dof, sizes);
 
   levels.resize(sizes.size());
-  for (unsigned int i=0;i<sizes.size();++i)
+  for (unsigned int i=0; i<sizes.size(); ++i)
     levels[i].reinit(sizes[i]);
 }
 

@@ -33,10 +33,10 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values
  FEValuesData<1,2>                         &data,
  CellSimilarity::Similarity           &cell_similarity) const
 {
-                                   // convert data object to internal
-                                   // data for this class. fails with
-                                   // an exception if that is not
-                                   // possible
+  // convert data object to internal
+  // data for this class. fails with
+  // an exception if that is not
+  // possible
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 
@@ -72,8 +72,8 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values
  CellSimilarity::Similarity         &cell_similarity) const
 {
 
-                                   // assert that the following dynamics
-                                   // cast is really well-defined.
+  // assert that the following dynamics
+  // cast is really well-defined.
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 
@@ -107,10 +107,10 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
   FEValuesData<1,2>                       &data,
   CellSimilarity::Similarity         &cell_similarity) const
 {
-                                   // convert data object to internal
-                                   // data for this class. fails with
-                                   // an exception if that is not
-                                   // possible
+  // convert data object to internal
+  // data for this class. fails with
+  // an exception if that is not
+  // possible
 
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);

@@ -26,43 +26,43 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-/*! @addtogroup PETScWrappers
- *@{
- */
+  /*! @addtogroup PETScWrappers
+   *@{
+   */
 
-/**
- * Implementation of a sequential dense matrix class based on PETSC. All the
- * functionality is actually in the base class, except for the calls to
- * generate a sequential dense matrix. This is possible since PETSc only works
- * on an abstract matrix type and internally distributes to functions that do
- * the actual work depending on the actual matrix type (much like using
- * virtual functions). Only the functions creating a matrix of specific type
- * differ, and are implemented in this particular class.
- *
- * @ingroup Matrix1
- * @author Wolfgang Bangerth, 2004
- */
+  /**
+   * Implementation of a sequential dense matrix class based on PETSC. All the
+   * functionality is actually in the base class, except for the calls to
+   * generate a sequential dense matrix. This is possible since PETSc only works
+   * on an abstract matrix type and internally distributes to functions that do
+   * the actual work depending on the actual matrix type (much like using
+   * virtual functions). Only the functions creating a matrix of specific type
+   * differ, and are implemented in this particular class.
+   *
+   * @ingroup Matrix1
+   * @author Wolfgang Bangerth, 2004
+   */
   class FullMatrix : public MatrixBase
   {
-    public:
-                                       /**
-                                        * Create a full matrix of dimensions
-                                        * @p m times @p n.
-                                        */
-      FullMatrix (const unsigned int m,
-                  const unsigned int n);
+  public:
+    /**
+     * Create a full matrix of dimensions
+     * @p m times @p n.
+     */
+    FullMatrix (const unsigned int m,
+                const unsigned int n);
 
-                                       /**
-                                        * Return a reference to the MPI
-                                        * communicator object in use with this
-                                        * matrix. Since this is a sequential
-                                        * matrix, it returns the MPI_COMM_SELF
-                                        * communicator.
-                                        */
-      virtual const MPI_Comm & get_mpi_communicator () const;
+    /**
+     * Return a reference to the MPI
+     * communicator object in use with this
+     * matrix. Since this is a sequential
+     * matrix, it returns the MPI_COMM_SELF
+     * communicator.
+     */
+    virtual const MPI_Comm &get_mpi_communicator () const;
   };
 
-/*@}*/
+  /*@}*/
 }
 
 

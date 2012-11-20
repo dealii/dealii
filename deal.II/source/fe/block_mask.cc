@@ -18,8 +18,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-std::ostream & operator << (std::ostream &out,
-                            const BlockMask &mask)
+std::ostream &operator << (std::ostream &out,
+                           const BlockMask &mask)
 {
   if (mask.block_mask.size() == 0)
     out << "[all blocks selected]";

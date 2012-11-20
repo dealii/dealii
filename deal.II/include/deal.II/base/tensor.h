@@ -45,270 +45,270 @@ template <int dim, typename Number> class Tensor<1,dim,Number>;
 template <int rank_, int dim, typename Number>
 class Tensor
 {
-  public:
-                                     /**
-                                      * Provide a way to get the
-                                      * dimension of an object without
-                                      * explicit knowledge of it's
-                                      * data type. Implementation is
-                                      * this way instead of providing
-                                      * a function <tt>dimension()</tt>
-                                      * because now it is possible to
-                                      * get the dimension at compile
-                                      * time without the expansion and
-                                      * preevaluation of an inlined
-                                      * function; the compiler may
-                                      * therefore produce more
-                                      * efficient code and you may use
-                                      * this value to declare other
-                                      * data types.
-                                      */
-    static const unsigned int dimension = dim;
+public:
+  /**
+   * Provide a way to get the
+   * dimension of an object without
+   * explicit knowledge of it's
+   * data type. Implementation is
+   * this way instead of providing
+   * a function <tt>dimension()</tt>
+   * because now it is possible to
+   * get the dimension at compile
+   * time without the expansion and
+   * preevaluation of an inlined
+   * function; the compiler may
+   * therefore produce more
+   * efficient code and you may use
+   * this value to declare other
+   * data types.
+   */
+  static const unsigned int dimension = dim;
 
-                                     /**
-                                      * Publish the rank of this tensor to
-                                      * the outside world.
-                                      */
-    static const unsigned int rank      = rank_;
+  /**
+   * Publish the rank of this tensor to
+   * the outside world.
+   */
+  static const unsigned int rank      = rank_;
 
-                                     /**
-                                      * Type of stored objects. This
-                                      * is a tensor of lower rank.
-                                      */
-    typedef Tensor<rank_-1,dim,Number> value_type;
+  /**
+   * Type of stored objects. This
+   * is a tensor of lower rank.
+   */
+  typedef Tensor<rank_-1,dim,Number> value_type;
 
-                                     /**
-                                      * Declare a type that has holds
-                                      * real-valued numbers with the same
-                                      * precision as the template argument to
-                                      * this class. For std::complex<number>,
-                                      * this corresponds to type number, and
-                                      * it is equal to Number for all other
-                                      * cases. See also the respective field
-                                      * in Vector<Number>.
-                                      *
-                                      * This typedef is used to
-                                      * represent the return type of
-                                      * norms.
-                                      */
-    typedef typename numbers::NumberTraits<Number>::real_type real_type;
+  /**
+   * Declare a type that has holds
+   * real-valued numbers with the same
+   * precision as the template argument to
+   * this class. For std::complex<number>,
+   * this corresponds to type number, and
+   * it is equal to Number for all other
+   * cases. See also the respective field
+   * in Vector<Number>.
+   *
+   * This typedef is used to
+   * represent the return type of
+   * norms.
+   */
+  typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
-                                     /**
-                                      * Declare an array type which
-                                      * can be used to initialize an
-                                      * object of this type
-                                      * statically.
-                                      */
-    typedef typename Tensor<rank_-1,dim,Number>::array_type array_type[dim];
+  /**
+   * Declare an array type which
+   * can be used to initialize an
+   * object of this type
+   * statically.
+   */
+  typedef typename Tensor<rank_-1,dim,Number>::array_type array_type[dim];
 
-                                     /**
-                                      * Constructor. Initialize all entries
-                                      * to zero.
-                                      */
-    Tensor ();
+  /**
+   * Constructor. Initialize all entries
+   * to zero.
+   */
+  Tensor ();
 
-                                     /**
-                                      * Copy constructor, where the data is
-                                      * copied from a C-style array.
-                                      */
-    Tensor (const array_type &initializer);
+  /**
+   * Copy constructor, where the data is
+   * copied from a C-style array.
+   */
+  Tensor (const array_type &initializer);
 
-                                     /**
-                                      * Conversion operator from tensor of
-                                      * tensors.
-                                      */
-    Tensor (const Tensor<1,dim,Tensor<rank_-1,dim,Number> > &tensor_in);
+  /**
+   * Conversion operator from tensor of
+   * tensors.
+   */
+  Tensor (const Tensor<1,dim,Tensor<rank_-1,dim,Number> > &tensor_in);
 
-                                     /**
-                                      * Conversion operator to tensor of
-                                      * tensors.
-                                      */
-    operator Tensor<1,dim,Tensor<rank_-1,dim,Number> > () const;
+  /**
+   * Conversion operator to tensor of
+   * tensors.
+   */
+  operator Tensor<1,dim,Tensor<rank_-1,dim,Number> > () const;
 
-                                     /**
-                                      * Read-Write access operator.
-                                      */
-    Tensor<rank_-1,dim,Number> &operator [] (const unsigned int i);
+  /**
+   * Read-Write access operator.
+   */
+  Tensor<rank_-1,dim,Number> &operator [] (const unsigned int i);
 
-                                     /**
-                                      * Read-only access operator.
-                                      */
-    const Tensor<rank_-1,dim,Number> &operator [] (const unsigned int i) const;
+  /**
+   * Read-only access operator.
+   */
+  const Tensor<rank_-1,dim,Number> &operator [] (const unsigned int i) const;
 
-                                     /**
-                                      *  Assignment operator.
-                                      */
-    Tensor & operator = (const Tensor<rank_,dim,Number> &);
+  /**
+   *  Assignment operator.
+   */
+  Tensor &operator = (const Tensor<rank_,dim,Number> &);
 
-                                     /**
-                                      * This operator assigns a scalar
-                                      * to a tensor. To avoid
-                                      * confusion with what exactly it
-                                      * means to assign a scalar value
-                                      * to a tensor, zero is the only
-                                      * value allowed for <tt>d</tt>,
-                                      * allowing the intuitive
-                                      * notation <tt>t=0</tt> to reset
-                                      * all elements of the tensor to
-                                      * zero.
-                                      */
-    Tensor<rank_,dim,Number> & operator = (const Number d);
+  /**
+   * This operator assigns a scalar
+   * to a tensor. To avoid
+   * confusion with what exactly it
+   * means to assign a scalar value
+   * to a tensor, zero is the only
+   * value allowed for <tt>d</tt>,
+   * allowing the intuitive
+   * notation <tt>t=0</tt> to reset
+   * all elements of the tensor to
+   * zero.
+   */
+  Tensor<rank_,dim,Number> &operator = (const Number d);
 
-                                     /**
-                                      *  Test for equality of two tensors.
-                                      */
-    bool operator == (const Tensor<rank_,dim,Number> &) const;
+  /**
+   *  Test for equality of two tensors.
+   */
+  bool operator == (const Tensor<rank_,dim,Number> &) const;
 
-                                     /**
-                                      *  Test for inequality of two tensors.
-                                      */
-    bool operator != (const Tensor<rank_,dim,Number> &) const;
+  /**
+   *  Test for inequality of two tensors.
+   */
+  bool operator != (const Tensor<rank_,dim,Number> &) const;
 
-                                     /**
-                                      *  Add another tensor.
-                                      */
-    Tensor<rank_,dim,Number> & operator += (const Tensor<rank_,dim,Number> &);
+  /**
+   *  Add another tensor.
+   */
+  Tensor<rank_,dim,Number> &operator += (const Tensor<rank_,dim,Number> &);
 
-                                     /**
-                                      *  Subtract another tensor.
-                                      */
-    Tensor<rank_,dim,Number> & operator -= (const Tensor<rank_,dim,Number> &);
+  /**
+   *  Subtract another tensor.
+   */
+  Tensor<rank_,dim,Number> &operator -= (const Tensor<rank_,dim,Number> &);
 
-                                     /**
-                                      *  Scale the tensor by <tt>factor</tt>,
-                                      *  i.e. multiply all components by
-                                      *  <tt>factor</tt>.
-                                      */
-    Tensor<rank_,dim,Number> & operator *= (const Number factor);
+  /**
+   *  Scale the tensor by <tt>factor</tt>,
+   *  i.e. multiply all components by
+   *  <tt>factor</tt>.
+   */
+  Tensor<rank_,dim,Number> &operator *= (const Number factor);
 
-                                     /**
-                                      *  Scale the vector by
-                                      *  <tt>1/factor</tt>.
-                                      */
-    Tensor<rank_,dim,Number> & operator /= (const Number factor);
+  /**
+   *  Scale the vector by
+   *  <tt>1/factor</tt>.
+   */
+  Tensor<rank_,dim,Number> &operator /= (const Number factor);
 
-                                     /**
-                                      *  Add two tensors. If possible, you
-                                      *  should use <tt>operator +=</tt>
-                                      *  instead since this does not need the
-                                      *  creation of a temporary.
-                                      */
-    Tensor<rank_,dim,Number>   operator + (const Tensor<rank_,dim,Number> &) const;
+  /**
+   *  Add two tensors. If possible, you
+   *  should use <tt>operator +=</tt>
+   *  instead since this does not need the
+   *  creation of a temporary.
+   */
+  Tensor<rank_,dim,Number>   operator + (const Tensor<rank_,dim,Number> &) const;
 
-                                     /**
-                                      *  Subtract two tensors. If possible,
-                                      *  you should use <tt>operator -=</tt>
-                                      *  instead since this does not need the
-                                      *  creation of a temporary.
-                                      */
-    Tensor<rank_,dim,Number>   operator - (const Tensor<rank_,dim,Number> &) const;
+  /**
+   *  Subtract two tensors. If possible,
+   *  you should use <tt>operator -=</tt>
+   *  instead since this does not need the
+   *  creation of a temporary.
+   */
+  Tensor<rank_,dim,Number>   operator - (const Tensor<rank_,dim,Number> &) const;
 
-                                     /**
-                                      * Unary minus operator. Negate all
-                                      * entries of a tensor.
-                                      */
-    Tensor<rank_,dim,Number>   operator - () const;
+  /**
+   * Unary minus operator. Negate all
+   * entries of a tensor.
+   */
+  Tensor<rank_,dim,Number>   operator - () const;
 
-                                     /**
-                                      * Return the Frobenius-norm of a tensor,
-                                      * i.e. the square root of the sum of
-                                      * squares of all entries.
-                                      */
-    real_type norm () const;
+  /**
+   * Return the Frobenius-norm of a tensor,
+   * i.e. the square root of the sum of
+   * squares of all entries.
+   */
+  real_type norm () const;
 
-                                     /**
-                                      * Return the square of the
-                                      * Frobenius-norm of a tensor,
-                                      * i.e. the
-                                      * sum of squares of all entries.
-                                      *
-                                      * This function mainly exists
-                                      * because it makes computing the
-                                      * norm simpler recursively, but
-                                      * may also be useful in other
-                                      * contexts.
-                                      */
-    real_type norm_square () const;
+  /**
+   * Return the square of the
+   * Frobenius-norm of a tensor,
+   * i.e. the
+   * sum of squares of all entries.
+   *
+   * This function mainly exists
+   * because it makes computing the
+   * norm simpler recursively, but
+   * may also be useful in other
+   * contexts.
+   */
+  real_type norm_square () const;
 
-                                     /**
-                                      * Fill a vector with all tensor elements.
-                                      *
-                                      * This function unrolls all
-                                      * tensor entries into a single,
-                                      * linearly numbered vector. As
-                                      * usual in C++, the rightmost
-                                      * index of the tensor marches fastest.
-                                      */
-    template <typename Number2>
-    void unroll (Vector<Number2> & result) const;
+  /**
+   * Fill a vector with all tensor elements.
+   *
+   * This function unrolls all
+   * tensor entries into a single,
+   * linearly numbered vector. As
+   * usual in C++, the rightmost
+   * index of the tensor marches fastest.
+   */
+  template <typename Number2>
+  void unroll (Vector<Number2> &result) const;
 
 
-                                     /**
-                                      * Reset all values to zero.
-                                      *
-                                      * Note that this is partly inconsistent
-                                      * with the semantics of the @p clear()
-                                      * member functions of the STL and of
-                                      * several other classes within deal.II
-                                      * which not only reset the values of
-                                      * stored elements to zero, but release
-                                      * all memory and return the object into
-                                      * a virginial state. However, since the
-                                      * size of objects of the present type is
-                                      * determined by its template parameters,
-                                      * resizing is not an option, and indeed
-                                      * the state where all elements have a
-                                      * zero value is the state right after
-                                      * construction of such an object.
-                                      */
-    void clear ();
+  /**
+   * Reset all values to zero.
+   *
+   * Note that this is partly inconsistent
+   * with the semantics of the @p clear()
+   * member functions of the STL and of
+   * several other classes within deal.II
+   * which not only reset the values of
+   * stored elements to zero, but release
+   * all memory and return the object into
+   * a virginial state. However, since the
+   * size of objects of the present type is
+   * determined by its template parameters,
+   * resizing is not an option, and indeed
+   * the state where all elements have a
+   * zero value is the state right after
+   * construction of such an object.
+   */
+  void clear ();
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
-    static std::size_t memory_consumption ();
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  static std::size_t memory_consumption ();
 
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException1 (ExcInvalidTensorIndex,
-                    int,
-                    << "Invalid tensor index " << arg1);
+  /**
+   * Exception.
+   */
+  DeclException1 (ExcInvalidTensorIndex,
+                  int,
+                  << "Invalid tensor index " << arg1);
 
-                     /**
-                      * Read or write the data of this object to or
-                      * from a stream for the purpose of serialization
-                      */
-    template <class Archive>
-    void serialize(Archive & ar, const unsigned int version);
+  /**
+   * Read or write the data of this object to or
+   * from a stream for the purpose of serialization
+   */
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version);
 
-  private:
-                                     /**
-                                      * Array of tensors holding the
-                                      * subelements.
-                                      */
-    Tensor<rank_-1,dim,Number> subtensor[dim];
+private:
+  /**
+   * Array of tensors holding the
+   * subelements.
+   */
+  Tensor<rank_-1,dim,Number> subtensor[dim];
 
-                                     /**
-                                      * Help function for unroll.
-                                      */
-    template <typename Number2>
-    void unroll_recursion(Vector<Number2> &result,
-                          unsigned int    &start_index) const;
+  /**
+   * Help function for unroll.
+   */
+  template <typename Number2>
+  void unroll_recursion(Vector<Number2> &result,
+                        unsigned int    &start_index) const;
 
-                                     // make the following class a
-                                     // friend to this class. in principle,
-                                     // it would suffice if otherrank==rank+1,
-                                     // but then the compiler complains
-                                     // that this be an explicit specialization
-                                     // which is not what we want
-                                     //
-                                     // also, it would be sufficient to make
-                                     // the function unroll_loops a friend,
-                                     // but that seems to be impossible as well.
-    template <int, int, typename> friend class Tensor;
+  // make the following class a
+  // friend to this class. in principle,
+  // it would suffice if otherrank==rank+1,
+  // but then the compiler complains
+  // that this be an explicit specialization
+  // which is not what we want
+  //
+  // also, it would be sufficient to make
+  // the function unroll_loops a friend,
+  // but that seems to be impossible as well.
+  template <int, int, typename> friend class Tensor;
 };
 
 
@@ -351,7 +351,7 @@ Tensor<rank_,dim,Number>::Tensor
 template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number>::operator
-  Tensor<1,dim,Tensor<rank_-1,dim,Number> > () const
+Tensor<1,dim,Tensor<rank_-1,dim,Number> > () const
 {
   return Tensor<1,dim,Tensor<rank_-1,dim,Number> > (subtensor);
 }
@@ -360,7 +360,7 @@ Tensor<rank_,dim,Number>::operator
 
 template <int rank_, int dim, typename Number>
 inline
-typename Tensor<rank_,dim,Number>::value_type&
+typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 {
   Assert (i<dim, ExcIndexRange(i, 0, dim));
@@ -371,7 +371,7 @@ Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 
 template <int rank_, int dim, typename Number>
 inline
-const typename Tensor<rank_,dim,Number>::value_type&
+const typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 {
   Assert (i<dim, ExcIndexRange(i, 0, dim));
@@ -600,9 +600,9 @@ template <int rank_, int dim, typename Number>
 template <class Archive>
 inline
 void
-Tensor<rank_,dim,Number>::serialize(Archive & ar, const unsigned int)
+Tensor<rank_,dim,Number>::serialize(Archive &ar, const unsigned int)
 {
-  ar & subtensor;
+  ar &subtensor;
 }
 
 #endif // DOXYGEN
@@ -619,7 +619,7 @@ Tensor<rank_,dim,Number>::serialize(Archive & ar, const unsigned int)
  */
 template <int rank_, int dim, typename Number>
 inline
-std::ostream & operator << (std::ostream &out, const Tensor<rank_,dim,Number> &p)
+std::ostream &operator << (std::ostream &out, const Tensor<rank_,dim,Number> &p)
 {
   for (unsigned int i=0; i<dim-1; ++i)
     out << p[i] << ' ';
@@ -635,7 +635,7 @@ std::ostream & operator << (std::ostream &out, const Tensor<rank_,dim,Number> &p
  */
 template <int rank_>
 inline
-std::ostream & operator << (std::ostream &out, const Tensor<rank_,1> &p)
+std::ostream &operator << (std::ostream &out, const Tensor<rank_,1> &p)
 {
   out << p[0];
 
@@ -701,7 +701,7 @@ operator * (const Tensor<1,dim,Number> &src1,
 template <int dim, typename Number>
 inline
 Number double_contract (const Tensor<2, dim, Number> &src1,
-			const Tensor<2, dim, Number> &src2)
+                        const Tensor<2, dim, Number> &src2)
 {
   Number res = 0.;
   for (unsigned int i=0; i<dim; ++i)
@@ -899,51 +899,51 @@ void contract (Tensor<2,dim,Number>       &dest,
 
   switch (index1)
     {
-      case 1:
-            switch (index2)
-              {
-                case 1:
-                      for (unsigned int i=0; i<dim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int k=0; k<dim; ++k)
-                            dest[i][j] += src1[k][i] * src2[k][j];
-                      break;
-                case 2:
-                      for (unsigned int i=0; i<dim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int k=0; k<dim; ++k)
-                            dest[i][j] += src1[k][i] * src2[j][k];
-                      break;
+    case 1:
+      switch (index2)
+        {
+        case 1:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                dest[i][j] += src1[k][i] * src2[k][j];
+          break;
+        case 2:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                dest[i][j] += src1[k][i] * src2[j][k];
+          break;
 
-                default:
-                      Assert (false,
-                              (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
-              };
-            break;
-      case 2:
-            switch (index2)
-              {
-                case 1:
-                      for (unsigned int i=0; i<dim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int k=0; k<dim; ++k)
-                            dest[i][j] += src1[i][k] * src2[k][j];
-                      break;
-                case 2:
-                      for (unsigned int i=0; i<dim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int k=0; k<dim; ++k)
-                            dest[i][j] += src1[i][k] * src2[j][k];
-                      break;
+        default:
+          Assert (false,
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
+        };
+      break;
+    case 2:
+      switch (index2)
+        {
+        case 1:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                dest[i][j] += src1[i][k] * src2[k][j];
+          break;
+        case 2:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                dest[i][j] += src1[i][k] * src2[j][k];
+          break;
 
-                default:
-                      Assert (false,
-                              (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
-              };
-            break;
+        default:
+          Assert (false,
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
+        };
+      break;
 
-      default:
-            Assert (false, (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index1)));
+    default:
+      Assert (false, (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index1)));
     };
 }
 
@@ -969,30 +969,30 @@ void contract (Tensor<2,dim,Number>       &dest,
 
   switch (index1)
     {
-      case 1:
-            for (unsigned int i=0; i<dim; ++i)
-              for (unsigned int j=0; j<dim; ++j)
-                for (unsigned int k=0; k<dim; ++k)
-                  dest[i][j] += src1[k][i][j] * src2[k];
-            break;
+    case 1:
+      for (unsigned int i=0; i<dim; ++i)
+        for (unsigned int j=0; j<dim; ++j)
+          for (unsigned int k=0; k<dim; ++k)
+            dest[i][j] += src1[k][i][j] * src2[k];
+      break;
 
-      case 2:
-            for (unsigned int i=0; i<dim; ++i)
-              for (unsigned int j=0; j<dim; ++j)
-                for (unsigned int k=0; k<dim; ++k)
-                  dest[i][j] += src1[i][k][j] * src2[k];
-            break;
+    case 2:
+      for (unsigned int i=0; i<dim; ++i)
+        for (unsigned int j=0; j<dim; ++j)
+          for (unsigned int k=0; k<dim; ++k)
+            dest[i][j] += src1[i][k][j] * src2[k];
+      break;
 
-      case 3:
-            for (unsigned int i=0; i<dim; ++i)
-              for (unsigned int j=0; j<dim; ++j)
-                for (unsigned int k=0; k<dim; ++k)
-                  dest[i][j] += src1[i][j][k] * src2[k];
-            break;
+    case 3:
+      for (unsigned int i=0; i<dim; ++i)
+        for (unsigned int j=0; j<dim; ++j)
+          for (unsigned int k=0; k<dim; ++k)
+            dest[i][j] += src1[i][j][k] * src2[k];
+      break;
 
-      default:
-            Assert (false,
-                    (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index1)));
+    default:
+      Assert (false,
+              (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index1)));
     };
 }
 
@@ -1042,78 +1042,78 @@ void contract (Tensor<3,dim,Number>       &dest,
 
   switch (index1)
     {
-      case 1:
-            switch (index2)
-              {
-                case 1:
-                      for (unsigned int i=0; i<dim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int k=0; k<dim; ++k)
-                            for (unsigned int l=0; l<dim; ++l)
-                              dest[i][j][k] += src1[l][i][j] * src2[l][k];
-                      break;
-                case 2:
-                      for (unsigned int i=0; i<dim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int k=0; k<dim; ++k)
-                            for (unsigned int l=0; l<dim; ++l)
-                              dest[i][j][k] += src1[l][i][j] * src2[k][l];
-                      break;
-                default:
-                      Assert (false,
-                              (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
-              }
+    case 1:
+      switch (index2)
+        {
+        case 1:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[l][i][j] * src2[l][k];
+          break;
+        case 2:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[l][i][j] * src2[k][l];
+          break;
+        default:
+          Assert (false,
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
+        }
 
-            break;
-      case 2:
-            switch (index2)
-              {
-                case 1:
-                      for (unsigned int i=0; i<dim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int k=0; k<dim; ++k)
-                            for (unsigned int l=0; l<dim; ++l)
-                              dest[i][j][k] += src1[i][l][j] * src2[l][k];
-                      break;
-                case 2:
-                      for (unsigned int i=0; i<dim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int k=0; k<dim; ++k)
-                            for (unsigned int l=0; l<dim; ++l)
-                              dest[i][j][k] += src1[i][l][j] * src2[k][l];
-                      break;
-                default:
-                      Assert (false,
-                              (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
-              }
+      break;
+    case 2:
+      switch (index2)
+        {
+        case 1:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[i][l][j] * src2[l][k];
+          break;
+        case 2:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[i][l][j] * src2[k][l];
+          break;
+        default:
+          Assert (false,
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
+        }
 
-            break;
-      case 3:
-            switch (index2)
-              {
-                case 1:
-                      for (unsigned int i=0; i<dim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int k=0; k<dim; ++k)
-                            for (unsigned int l=0; l<dim; ++l)
-                              dest[i][j][k] += src1[i][j][l] * src2[l][k];
-                      break;
-                case 2:
-                      for (unsigned int i=0; i<dim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int k=0; k<dim; ++k)
-                            for (unsigned int l=0; l<dim; ++l)
-                              dest[i][j][k] += src1[i][j][l] * src2[k][l];
-                      break;
-                default:
-                      Assert (false,
-                              (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
-              }
+      break;
+    case 3:
+      switch (index2)
+        {
+        case 1:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[i][j][l] * src2[l][k];
+          break;
+        case 2:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[i][j][l] * src2[k][l];
+          break;
+        default:
+          Assert (false,
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
+        }
 
-            break;
-      default:
-            Assert (false,
-                    (typename Tensor<3,dim,Number>::ExcInvalidTensorIndex (index1)));
+      break;
+    default:
+      Assert (false,
+              (typename Tensor<3,dim,Number>::ExcInvalidTensorIndex (index1)));
     }
 }
 
@@ -1260,9 +1260,9 @@ void double_contract (Tensor<2,dim,Number>       &dest,
  */
 template <int dim, typename Number>
 inline
-Number contract3 (const Tensor<1,dim,Number>& u,
-                  const Tensor<2,dim,Number>& A,
-                  const Tensor<1,dim,Number>& v)
+Number contract3 (const Tensor<1,dim,Number> &u,
+                  const Tensor<2,dim,Number> &A,
+                  const Tensor<1,dim,Number> &v)
 {
   Number result = 0.;
 
@@ -1291,7 +1291,7 @@ contract3 (const Tensor<1,dim,Number> &t1,
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
-          s += t1[i] * t2[i][j][k] * t3[j][k];
+        s += t1[i] * t2[i][j][k] * t3[j][k];
   return s;
 }
 
@@ -1314,7 +1314,7 @@ contract3 (const Tensor<2,dim,Number> &t1,
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
-          s += t1[i][j] * t2[i][j][k] * t3[k];
+        s += t1[i][j] * t2[i][j][k] * t3[k];
   return s;
 }
 
@@ -1590,11 +1590,11 @@ template <typename Number>
 inline
 Number determinant (const Tensor<2,3,Number> &t)
 {
-                                // use exactly the same expression with the
-                                // same order of operations as for the inverse
-                                // to let the compiler use common
-                                // subexpression elimination when using
-                                // determinant and inverse in nearby code
+  // use exactly the same expression with the
+  // same order of operations as for the inverse
+  // to let the compiler use common
+  // subexpression elimination when using
+  // determinant and inverse in nearby code
   const Number t4 = t[0][0]*t[1][1],
                t6 = t[0][0]*t[1][2],
                t8 = t[0][1]*t[1][0],
@@ -1618,14 +1618,14 @@ template <int dim, typename Number>
 inline
 Number determinant (const Tensor<2,dim,Number> &t)
 {
-                                   // compute the determinant using the
-                                   // Laplace expansion of the
-                                   // determinant. this may not be the most
-                                   // efficient algorithm, but it does for
-                                   // small n.
-                                   //
-                                   // for some algorithmic simplicity, we use
-                                   // the expansion along the last row
+  // compute the determinant using the
+  // Laplace expansion of the
+  // determinant. this may not be the most
+  // efficient algorithm, but it does for
+  // small n.
+  //
+  // for some algorithmic simplicity, we use
+  // the expansion along the last row
   Number det = 0;
 
   for (unsigned int k=0; k<dim; ++k)
@@ -1681,52 +1681,52 @@ invert (const Tensor<2,dim,Number> &t)
   Number return_tensor [dim][dim];
   switch (dim)
     {
-      case 1:
-            return_tensor[0][0] = 1.0/t[0][0];
-            break;
+    case 1:
+      return_tensor[0][0] = 1.0/t[0][0];
+      break;
 
-      case 2:
-                                             // this is Maple output,
-                                             // thus a bit unstructured
-      {
-        const Number det = t[0][0]*t[1][1]-t[1][0]*t[0][1];
-        const Number t4 = 1.0/det;
-        return_tensor[0][0] = t[1][1]*t4;
-        return_tensor[0][1] = -t[0][1]*t4;
-        return_tensor[1][0] = -t[1][0]*t4;
-        return_tensor[1][1] = t[0][0]*t4;
-        break;
-      }
+    case 2:
+      // this is Maple output,
+      // thus a bit unstructured
+    {
+      const Number det = t[0][0]*t[1][1]-t[1][0]*t[0][1];
+      const Number t4 = 1.0/det;
+      return_tensor[0][0] = t[1][1]*t4;
+      return_tensor[0][1] = -t[0][1]*t4;
+      return_tensor[1][0] = -t[1][0]*t4;
+      return_tensor[1][1] = t[0][0]*t4;
+      break;
+    }
 
-      case 3:
-      {
-        const Number t4 = t[0][0]*t[1][1],
-                     t6 = t[0][0]*t[1][2],
-                     t8 = t[0][1]*t[1][0],
-                    t00 = t[0][2]*t[1][0],
-                    t01 = t[0][1]*t[2][0],
-                    t04 = t[0][2]*t[2][0],
-                    det = (t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
-                           t00*t[2][1]+t01*t[1][2]-t04*t[1][1]),
-                    t07 = 1.0/det;
-        return_tensor[0][0] = (t[1][1]*t[2][2]-t[1][2]*t[2][1])*t07;
-        return_tensor[0][1] = (t[0][2]*t[2][1]-t[0][1]*t[2][2])*t07;
-        return_tensor[0][2] = (t[0][1]*t[1][2]-t[0][2]*t[1][1])*t07;
-        return_tensor[1][0] = (t[1][2]*t[2][0]-t[1][0]*t[2][2])*t07;
-        return_tensor[1][1] = (t[0][0]*t[2][2]-t04)*t07;
-        return_tensor[1][2] = (t00-t6)*t07;
-        return_tensor[2][0] = (t[1][0]*t[2][1]-t[1][1]*t[2][0])*t07;
-        return_tensor[2][1] = (t01-t[0][0]*t[2][1])*t07;
-        return_tensor[2][2] = (t4-t8)*t07;
+    case 3:
+    {
+      const Number t4 = t[0][0]*t[1][1],
+                   t6 = t[0][0]*t[1][2],
+                   t8 = t[0][1]*t[1][0],
+                   t00 = t[0][2]*t[1][0],
+                   t01 = t[0][1]*t[2][0],
+                   t04 = t[0][2]*t[2][0],
+                   det = (t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
+                          t00*t[2][1]+t01*t[1][2]-t04*t[1][1]),
+                         t07 = 1.0/det;
+      return_tensor[0][0] = (t[1][1]*t[2][2]-t[1][2]*t[2][1])*t07;
+      return_tensor[0][1] = (t[0][2]*t[2][1]-t[0][1]*t[2][2])*t07;
+      return_tensor[0][2] = (t[0][1]*t[1][2]-t[0][2]*t[1][1])*t07;
+      return_tensor[1][0] = (t[1][2]*t[2][0]-t[1][0]*t[2][2])*t07;
+      return_tensor[1][1] = (t[0][0]*t[2][2]-t04)*t07;
+      return_tensor[1][2] = (t00-t6)*t07;
+      return_tensor[2][0] = (t[1][0]*t[2][1]-t[1][1]*t[2][0])*t07;
+      return_tensor[2][1] = (t01-t[0][0]*t[2][1])*t07;
+      return_tensor[2][2] = (t4-t8)*t07;
 
-        break;
-      }
+      break;
+    }
 
-                                        // if desired, take over the
-                                        // inversion of a 4x4 tensor
-                                        // from the FullMatrix
-      default:
-            AssertThrow (false, ExcNotImplemented());
+    // if desired, take over the
+    // inversion of a 4x4 tensor
+    // from the FullMatrix
+    default:
+      AssertThrow (false, ExcNotImplemented());
     }
   return Tensor<2,dim,Number>(return_tensor);
 }
@@ -1813,8 +1813,9 @@ Tensor<2,3,Number>
 transpose (const Tensor<2,3,Number> &t)
 {
   const Number x[3][3] = {{t[0][0], t[1][0], t[2][0]},
-                          {t[0][1], t[1][1], t[2][1]},
-                          {t[0][2], t[1][2], t[2][2]}};
+    {t[0][1], t[1][1], t[2][1]},
+    {t[0][2], t[1][2], t[2][2]}
+  };
   return Tensor<2,3,Number>(x);
 }
 

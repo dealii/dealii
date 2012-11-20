@@ -209,49 +209,49 @@ namespace TrilinosWrappers
  */
 namespace MatrixCreator
 {
-                                   /**
-                                    * Assemble the mass matrix. If no
-                                    * coefficient is given, it is assumed
-                                    * to be unity.
-                                    *
-                                    * If the library is configured
-                                    * to use multithreading, this
-                                    * function works in parallel.
-                                    *
-                                    * See the general doc of this class
-                                    * for more information.
-                                    */
+  /**
+   * Assemble the mass matrix. If no
+   * coefficient is given, it is assumed
+   * to be unity.
+   *
+   * If the library is configured
+   * to use multithreading, this
+   * function works in parallel.
+   *
+   * See the general doc of this class
+   * for more information.
+   */
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
                            const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> * const a = 0);
+                           const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Calls the create_mass_matrix()
-                                    * function, see above, with
-                                    * <tt>mapping=MappingQ1@<dim@>()</tt>.
-                                    */
+  /**
+   * Calls the create_mass_matrix()
+   * function, see above, with
+   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   */
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> * const a = 0);
+                           const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Assemble the mass matrix and a
-                                    * right hand side vector. If no
-                                    * coefficient is given, it is
-                                    * assumed to be unity.
-                                    *
-                                    * If the library is configured
-                                    * to use multithreading, this
-                                    * function works in parallel.
-                                    *
-                                    * See the general doc of this
-                                    * class for more information.
-                                    */
+  /**
+   * Assemble the mass matrix and a
+   * right hand side vector. If no
+   * coefficient is given, it is
+   * assumed to be unity.
+   *
+   * If the library is configured
+   * to use multithreading, this
+   * function works in parallel.
+   *
+   * See the general doc of this
+   * class for more information.
+   */
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
                            const DoFHandler<dim,spacedim>    &dof,
@@ -259,45 +259,45 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim>      &rhs,
                            Vector<double>           &rhs_vector,
-                           const Function<spacedim> * const a = 0);
+                           const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Calls the create_mass_matrix()
-                                    * function, see above, with
-                                    * <tt>mapping=MappingQ1@<dim@>()</tt>.
-                                    */
+  /**
+   * Calls the create_mass_matrix()
+   * function, see above, with
+   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   */
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim>      &rhs,
                            Vector<double>           &rhs_vector,
-                           const Function<spacedim> * const a = 0);
-                                   /**
-                                    * Same function as above, but for hp
-                                    * objects.
-                                    */
+                           const Function<spacedim> *const a = 0);
+  /**
+   * Same function as above, but for hp
+   * objects.
+   */
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
                            const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> * const a = 0);
+                           const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Same function as above, but for hp
-                                    * objects.
-                                    */
+  /**
+   * Same function as above, but for hp
+   * objects.
+   */
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> * const a = 0);
+                           const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Same function as above, but for hp
-                                    * objects.
-                                    */
+  /**
+   * Same function as above, but for hp
+   * objects.
+   */
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
                            const hp::DoFHandler<dim,spacedim>    &dof,
@@ -305,60 +305,60 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim>      &rhs,
                            Vector<double>           &rhs_vector,
-                           const Function<spacedim> * const a = 0);
+                           const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Same function as above, but for hp
-                                    * objects.
-                                    */
+  /**
+   * Same function as above, but for hp
+   * objects.
+   */
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim>      &rhs,
                            Vector<double>           &rhs_vector,
-                           const Function<spacedim> * const a = 0);
+                           const Function<spacedim> *const a = 0);
 
 
-                                   /**
-                                    * Assemble the mass matrix and a
-                                    * right hand side vector along
-                                    * the boundary.
-                                    *
-                                    * The matrix is assumed to
-                                    * already be initialized with a
-                                    * suiting sparsity pattern (the
-                                    * DoFHandler provides an
-                                    * appropriate function).
-                                    *
-                                    * If the library is configured
-                                    * to use multithreading, this
-                                    * function works in parallel.
-                                    *
-                                    * @arg @p weight: an optional
-                                    * weight for the computation of
-                                    * the mass matrix. If no weight
-                                    * is given, it is set to one.
-                                    *
-                                    * @arg @p component_mapping: if
-                                    * the components in @p
-                                    * boundary_functions and @p dof
-                                    * do not coincide, this vector
-                                    * allows them to be remapped. If
-                                    * the vector is not empty, it
-                                    * has to have one entry for each
-                                    * component in @p dof. This
-                                    * entry is the component number
-                                    * in @p boundary_functions that
-                                    * should be used for this
-                                    * component in @p dof. By
-                                    * default, no remapping is
-                                    * applied.
-                                    *
-                                    * @todo This function does not
-                                    * work for finite elements with
-                                    * cell-dependent shape functions.
-                                    */
+  /**
+   * Assemble the mass matrix and a
+   * right hand side vector along
+   * the boundary.
+   *
+   * The matrix is assumed to
+   * already be initialized with a
+   * suiting sparsity pattern (the
+   * DoFHandler provides an
+   * appropriate function).
+   *
+   * If the library is configured
+   * to use multithreading, this
+   * function works in parallel.
+   *
+   * @arg @p weight: an optional
+   * weight for the computation of
+   * the mass matrix. If no weight
+   * is given, it is set to one.
+   *
+   * @arg @p component_mapping: if
+   * the components in @p
+   * boundary_functions and @p dof
+   * do not coincide, this vector
+   * allows them to be remapped. If
+   * the vector is not empty, it
+   * has to have one entry for each
+   * component in @p dof. This
+   * entry is the component number
+   * in @p boundary_functions that
+   * should be used for this
+   * component in @p dof. By
+   * default, no remapping is
+   * applied.
+   *
+   * @todo This function does not
+   * work for finite elements with
+   * cell-dependent shape functions.
+   */
   template <int dim, int spacedim>
 
   void create_boundary_mass_matrix (const Mapping<dim, spacedim>       &mapping,
@@ -367,8 +367,8 @@ namespace MatrixCreator
                                     SparseMatrix<double>     &matrix,
                                     const typename FunctionMap<spacedim>::type &boundary_functions,
                                     Vector<double>           &rhs_vector,
-                                    std::vector<unsigned int>&dof_to_boundary_mapping,
-                                    const Function<spacedim> * const weight = 0,
+                                    std::vector<unsigned int> &dof_to_boundary_mapping,
+                                    const Function<spacedim> *const weight = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 //                                    * Same function, but for 1d.
@@ -395,12 +395,12 @@ namespace MatrixCreator
 
 
 
-                                   /**
-                                    * Calls the
-                                    * create_boundary_mass_matrix()
-                                    * function, see above, with
-                                    * <tt>mapping=MappingQ1@<dim@>()</tt>.
-                                    */
+  /**
+   * Calls the
+   * create_boundary_mass_matrix()
+   * function, see above, with
+   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   */
   template <int dim, int spacedim>
 
   void create_boundary_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
@@ -408,14 +408,14 @@ namespace MatrixCreator
                                     SparseMatrix<double>     &matrix,
                                     const typename FunctionMap<spacedim>::type        &boundary_functions,
                                     Vector<double>           &rhs_vector,
-                                    std::vector<unsigned int>&dof_to_boundary_mapping,
-                                    const Function<spacedim> * const a = 0,
+                                    std::vector<unsigned int> &dof_to_boundary_mapping,
+                                    const Function<spacedim> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
-                                   /**
-                                    * Same function as above, but for hp
-                                    * objects.
-                                    */
+  /**
+   * Same function as above, but for hp
+   * objects.
+   */
   template <int dim, int spacedim>
 
   void create_boundary_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
@@ -424,14 +424,14 @@ namespace MatrixCreator
                                     SparseMatrix<double>     &matrix,
                                     const typename FunctionMap<spacedim>::type &boundary_functions,
                                     Vector<double>           &rhs_vector,
-                                    std::vector<unsigned int>&dof_to_boundary_mapping,
-                                    const Function<spacedim> * const a = 0,
+                                    std::vector<unsigned int> &dof_to_boundary_mapping,
+                                    const Function<spacedim> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
-                                   /**
-                                    * Same function as above, but for hp
-                                    * objects.
-                                    */
+  /**
+   * Same function as above, but for hp
+   * objects.
+   */
 //
 //     void create_boundary_mass_matrix (const hp::MappingCollection<1,1>       &mapping,
 //                                    const hp::DoFHandler<1,1>    &dof,
@@ -442,10 +442,10 @@ namespace MatrixCreator
 //                                    std::vector<unsigned int>&dof_to_boundary_mapping,
 //                                    const Function<1> * const a = 0);
 
-                                   /**
-                                    * Same function as above, but for hp
-                                    * objects.
-                                    */
+  /**
+   * Same function as above, but for hp
+   * objects.
+   */
   template <int dim, int spacedim>
 
   void create_boundary_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
@@ -453,56 +453,56 @@ namespace MatrixCreator
                                     SparseMatrix<double>     &matrix,
                                     const typename FunctionMap<spacedim>::type        &boundary_functions,
                                     Vector<double>           &rhs_vector,
-                                    std::vector<unsigned int>&dof_to_boundary_mapping,
-                                    const Function<spacedim> * const a = 0,
+                                    std::vector<unsigned int> &dof_to_boundary_mapping,
+                                    const Function<spacedim> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
-                                   /**
-                                    * Assemble the Laplace
-                                    * matrix. If no coefficient is
-                                    * given, it is assumed to be
-                                    * constant one.
-                                    *
-                                    * If the library is configured
-                                    * to use multithreading, this
-                                    * function works in parallel.
-                                    *
-                                    * See the general doc of this
-                                    * class for more information.
-                                    */
+  /**
+   * Assemble the Laplace
+   * matrix. If no coefficient is
+   * given, it is assumed to be
+   * constant one.
+   *
+   * If the library is configured
+   * to use multithreading, this
+   * function works in parallel.
+   *
+   * See the general doc of this
+   * class for more information.
+   */
   template <int dim, int spacedim>
   void create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
                               const DoFHandler<dim,spacedim>    &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> * const a = 0);
+                              const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Calls the
-                                    * create_laplace_matrix()
-                                    * function, see above, with
-                                    * <tt>mapping=MappingQ1@<dim@>()</tt>.
-                                    */
+  /**
+   * Calls the
+   * create_laplace_matrix()
+   * function, see above, with
+   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   */
   template <int dim, int spacedim>
   void create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> * const a = 0);
+                              const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Assemble the Laplace matrix
-                                    * and a right hand side
-                                    * vector. If no coefficient is
-                                    * given, it is assumed to be
-                                    * constant one.
-                                    *
-                                    * If the library is configured
-                                    * to use multithreading, this
-                                    * function works in parallel.
-                                    *
-                                    * See the general doc of this
-                                    * class for more information.
-                                    */
+  /**
+   * Assemble the Laplace matrix
+   * and a right hand side
+   * vector. If no coefficient is
+   * given, it is assumed to be
+   * constant one.
+   *
+   * If the library is configured
+   * to use multithreading, this
+   * function works in parallel.
+   *
+   * See the general doc of this
+   * class for more information.
+   */
   template <int dim, int spacedim>
   void create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
                               const DoFHandler<dim,spacedim>    &dof,
@@ -510,50 +510,50 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> * const a = 0);
+                              const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Calls the
-                                    * create_laplace_matrix()
-                                    * function, see above, with
-                                    * <tt>mapping=MappingQ1@<dim@>()</tt>.
-                                    */
+  /**
+   * Calls the
+   * create_laplace_matrix()
+   * function, see above, with
+   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   */
   template <int dim, int spacedim>
   void create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> * const a = 0);
+                              const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Like the functions above, but for hp
-                                    * dof handlers, mappings, and quadrature
-                                    * collections.
-                                    */
+  /**
+   * Like the functions above, but for hp
+   * dof handlers, mappings, and quadrature
+   * collections.
+   */
   template <int dim, int spacedim>
   void create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
                               const hp::DoFHandler<dim,spacedim>    &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> * const a = 0);
+                              const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Like the functions above, but for hp
-                                    * dof handlers, mappings, and quadrature
-                                    * collections.
-                                    */
+  /**
+   * Like the functions above, but for hp
+   * dof handlers, mappings, and quadrature
+   * collections.
+   */
   template <int dim, int spacedim>
   void create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> * const a = 0);
+                              const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Like the functions above, but for hp
-                                    * dof handlers, mappings, and quadrature
-                                    * collections.
-                                    */
+  /**
+   * Like the functions above, but for hp
+   * dof handlers, mappings, and quadrature
+   * collections.
+   */
   template <int dim, int spacedim>
   void create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
                               const hp::DoFHandler<dim,spacedim>    &dof,
@@ -561,24 +561,24 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> * const a = 0);
+                              const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Like the functions above, but for hp
-                                    * dof handlers, mappings, and quadrature
-                                    * collections.
-                                    */
+  /**
+   * Like the functions above, but for hp
+   * dof handlers, mappings, and quadrature
+   * collections.
+   */
   template <int dim, int spacedim>
   void create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> * const a = 0);
+                              const Function<spacedim> *const a = 0);
 
-                                   /**
-                                    * Exception
-                                    */
+  /**
+   * Exception
+   */
   DeclException0 (ExcComponentMismatch);
 }
 
@@ -787,22 +787,22 @@ namespace MatrixCreator
  */
 namespace MatrixTools
 {
-                                   /**
-                                    * Import namespace MatrixCreator for
-                                    * backward compatibility with older
-                                    * versions of deal.II in which these
-                                    * namespaces were classes and class
-                                    * MatrixTools was publicly derived from
-                                    * class MatrixCreator.
-                                    */
+  /**
+   * Import namespace MatrixCreator for
+   * backward compatibility with older
+   * versions of deal.II in which these
+   * namespaces were classes and class
+   * MatrixTools was publicly derived from
+   * class MatrixCreator.
+   */
   using namespace MatrixCreator;
 
-                                   /**
-                                    * Apply dirichlet boundary conditions
-                                    * to the system matrix and vectors
-                                    * as described in the general
-                                    * documentation.
-                                    */
+  /**
+   * Apply dirichlet boundary conditions
+   * to the system matrix and vectors
+   * as described in the general
+   * documentation.
+   */
   template <typename number>
   void
   apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
@@ -811,15 +811,15 @@ namespace MatrixTools
                          Vector<number>        &right_hand_side,
                          const bool             eliminate_columns = true);
 
-                                   /**
-                                    * Apply dirichlet boundary
-                                    * conditions to the system
-                                    * matrix and vectors as
-                                    * described in the general
-                                    * documentation. This function
-                                    * works for block sparse
-                                    * matrices and block vectors
-                                    */
+  /**
+   * Apply dirichlet boundary
+   * conditions to the system
+   * matrix and vectors as
+   * described in the general
+   * documentation. This function
+   * works for block sparse
+   * matrices and block vectors
+   */
   template <typename number>
   void
   apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
@@ -829,43 +829,43 @@ namespace MatrixTools
                          const bool           eliminate_columns = true);
 
 #ifdef DEAL_II_USE_PETSC
-                                   /**
-                                    * Apply dirichlet boundary conditions to
-                                    * the system matrix and vectors as
-                                    * described in the general
-                                    * documentation. This function works on
-                                    * the classes that are used to wrap
-                                    * PETSc objects.
-                                    *
-                                    * Note that this function is not very
-                                    * efficient: it needs to alternatingly
-                                    * read and write into the matrix, a
-                                    * situation that PETSc does not handle
-                                    * too well. In addition, we only get rid
-                                    * of rows corresponding to boundary
-                                    * nodes, but the corresponding case of
-                                    * deleting the respective columns
-                                    * (i.e. if @p eliminate_columns is @p
-                                    * true) is not presently implemented,
-                                    * and probably will never because it is
-                                    * too expensive without direct access to
-                                    * the PETSc data structures. (This leads
-                                    * to the situation where the action
-                                    * indicates by the default value of the
-                                    * last argument is actually not
-                                    * implemented; that argument has
-                                    * <code>true</code> as its default value
-                                    * to stay consistent with the other
-                                    * functions of same name in this class.)
-                                    * A third reason against this function
-                                    * is that it doesn't handle the case
-                                    * where the matrix is distributed across
-                                    * an MPI system.
-                                    *
-                                    * This function is used in
-                                    * step-17 and
-                                    * step-18.
-                                    */
+  /**
+   * Apply dirichlet boundary conditions to
+   * the system matrix and vectors as
+   * described in the general
+   * documentation. This function works on
+   * the classes that are used to wrap
+   * PETSc objects.
+   *
+   * Note that this function is not very
+   * efficient: it needs to alternatingly
+   * read and write into the matrix, a
+   * situation that PETSc does not handle
+   * too well. In addition, we only get rid
+   * of rows corresponding to boundary
+   * nodes, but the corresponding case of
+   * deleting the respective columns
+   * (i.e. if @p eliminate_columns is @p
+   * true) is not presently implemented,
+   * and probably will never because it is
+   * too expensive without direct access to
+   * the PETSc data structures. (This leads
+   * to the situation where the action
+   * indicates by the default value of the
+   * last argument is actually not
+   * implemented; that argument has
+   * <code>true</code> as its default value
+   * to stay consistent with the other
+   * functions of same name in this class.)
+   * A third reason against this function
+   * is that it doesn't handle the case
+   * where the matrix is distributed across
+   * an MPI system.
+   *
+   * This function is used in
+   * step-17 and
+   * step-18.
+   */
   void
   apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                          PETScWrappers::SparseMatrix  &matrix,
@@ -873,10 +873,10 @@ namespace MatrixTools
                          PETScWrappers::Vector  &right_hand_side,
                          const bool             eliminate_columns = true);
 
-                                   /**
-                                    * Same function, but for parallel PETSc
-                                    * matrices.
-                                    */
+  /**
+   * Same function, but for parallel PETSc
+   * matrices.
+   */
   void
   apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                          PETScWrappers::MPI::SparseMatrix  &matrix,
@@ -884,31 +884,31 @@ namespace MatrixTools
                          PETScWrappers::MPI::Vector  &right_hand_side,
                          const bool             eliminate_columns = true);
 
-                                   /**
-                                    * Same function, but for
-                                    * parallel PETSc matrices. Note
-                                    * that this function only
-                                    * operates on the local range of
-                                    * the parallel matrix, i.e. it
-                                    * only eliminates rows
-                                    * corresponding to degrees of
-                                    * freedom for which the row is
-                                    * stored on the present
-                                    * processor. All other boundary
-                                    * nodes are ignored, and it
-                                    * doesn't matter whether they
-                                    * are present in the first
-                                    * argument to this function or
-                                    * not. A consequence of this,
-                                    * however, is that this function
-                                    * has to be called from all
-                                    * processors that participate in
-                                    * sharing the contents of the
-                                    * given matrices and vectors. It
-                                    * is also implied that the local
-                                    * range for all objects passed
-                                    * to this function is the same.
-                                    */
+  /**
+   * Same function, but for
+   * parallel PETSc matrices. Note
+   * that this function only
+   * operates on the local range of
+   * the parallel matrix, i.e. it
+   * only eliminates rows
+   * corresponding to degrees of
+   * freedom for which the row is
+   * stored on the present
+   * processor. All other boundary
+   * nodes are ignored, and it
+   * doesn't matter whether they
+   * are present in the first
+   * argument to this function or
+   * not. A consequence of this,
+   * however, is that this function
+   * has to be called from all
+   * processors that participate in
+   * sharing the contents of the
+   * given matrices and vectors. It
+   * is also implied that the local
+   * range for all objects passed
+   * to this function is the same.
+   */
   void
   apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                          PETScWrappers::MPI::SparseMatrix  &matrix,
@@ -916,9 +916,9 @@ namespace MatrixTools
                          PETScWrappers::MPI::Vector  &right_hand_side,
                          const bool             eliminate_columns = true);
 
-                                   /**
-                                    * Same as above but for BlockSparseMatrix.
-                                    */
+  /**
+   * Same as above but for BlockSparseMatrix.
+   */
   void
   apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
                          PETScWrappers::MPI::BlockSparseMatrix  &matrix,
@@ -929,44 +929,44 @@ namespace MatrixTools
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
-                                   /**
-                                    * Apply dirichlet boundary
-                                    * conditions to the system matrix
-                                    * and vectors as described in the
-                                    * general documentation. This
-                                    * function works on the classes
-                                    * that are used to wrap Trilinos
-                                    * objects.
-                                    *
-                                    * Note that this function is not
-                                    * very efficient: it needs to
-                                    * alternatingly read and write
-                                    * into the matrix, a situation
-                                    * that Trilinos does not handle
-                                    * too well. In addition, we only
-                                    * get rid of rows corresponding to
-                                    * boundary nodes, but the
-                                    * corresponding case of deleting
-                                    * the respective columns (i.e. if
-                                    * @p eliminate_columns is @p true)
-                                    * is not presently implemented,
-                                    * and probably will never because
-                                    * it is too expensive without
-                                    * direct access to the Trilinos
-                                    * data structures. (This leads to
-                                    * the situation where the action
-                                    * indicates by the default value
-                                    * of the last argument is actually
-                                    * not implemented; that argument
-                                    * has <code>true</code> as its
-                                    * default value to stay consistent
-                                    * with the other functions of same
-                                    * name in this class.)  A third
-                                    * reason against this function is
-                                    * that it doesn't handle the case
-                                    * where the matrix is distributed
-                                    * across an MPI system.
-                                    */
+  /**
+   * Apply dirichlet boundary
+   * conditions to the system matrix
+   * and vectors as described in the
+   * general documentation. This
+   * function works on the classes
+   * that are used to wrap Trilinos
+   * objects.
+   *
+   * Note that this function is not
+   * very efficient: it needs to
+   * alternatingly read and write
+   * into the matrix, a situation
+   * that Trilinos does not handle
+   * too well. In addition, we only
+   * get rid of rows corresponding to
+   * boundary nodes, but the
+   * corresponding case of deleting
+   * the respective columns (i.e. if
+   * @p eliminate_columns is @p true)
+   * is not presently implemented,
+   * and probably will never because
+   * it is too expensive without
+   * direct access to the Trilinos
+   * data structures. (This leads to
+   * the situation where the action
+   * indicates by the default value
+   * of the last argument is actually
+   * not implemented; that argument
+   * has <code>true</code> as its
+   * default value to stay consistent
+   * with the other functions of same
+   * name in this class.)  A third
+   * reason against this function is
+   * that it doesn't handle the case
+   * where the matrix is distributed
+   * across an MPI system.
+   */
   void
   apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                          TrilinosWrappers::SparseMatrix  &matrix,
@@ -974,11 +974,11 @@ namespace MatrixTools
                          TrilinosWrappers::Vector        &right_hand_side,
                          const bool             eliminate_columns = true);
 
-                                   /**
-                                    * This function does the same as
-                                    * the one above, except now
-                                    * working on block structures.
-                                    */
+  /**
+   * This function does the same as
+   * the one above, except now
+   * working on block structures.
+   */
   void
   apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                          TrilinosWrappers::BlockSparseMatrix  &matrix,
@@ -986,42 +986,42 @@ namespace MatrixTools
                          TrilinosWrappers::BlockVector        &right_hand_side,
                          const bool                eliminate_columns = true);
 
-                                   /**
-                                    * Apply dirichlet boundary
-                                    * conditions to the system matrix
-                                    * and vectors as described in the
-                                    * general documentation. This
-                                    * function works on the classes
-                                    * that are used to wrap Trilinos
-                                    * objects.
-                                    *
-                                    * Note that this function is not
-                                    * very efficient: it needs to
-                                    * alternatingly read and write
-                                    * into the matrix, a situation
-                                    * that Trilinos does not handle
-                                    * too well. In addition, we only
-                                    * get rid of rows corresponding to
-                                    * boundary nodes, but the
-                                    * corresponding case of deleting
-                                    * the respective columns (i.e. if
-                                    * @p eliminate_columns is @p true)
-                                    * is not presently implemented,
-                                    * and probably will never because
-                                    * it is too expensive without
-                                    * direct access to the Trilinos
-                                    * data structures. (This leads to
-                                    * the situation where the action
-                                    * indicates by the default value
-                                    * of the last argument is actually
-                                    * not implemented; that argument
-                                    * has <code>true</code> as its
-                                    * default value to stay consistent
-                                    * with the other functions of same
-                                    * name in this class.) This
-                                    * function does work on MPI vector
-                                    * types.
-                                    */
+  /**
+   * Apply dirichlet boundary
+   * conditions to the system matrix
+   * and vectors as described in the
+   * general documentation. This
+   * function works on the classes
+   * that are used to wrap Trilinos
+   * objects.
+   *
+   * Note that this function is not
+   * very efficient: it needs to
+   * alternatingly read and write
+   * into the matrix, a situation
+   * that Trilinos does not handle
+   * too well. In addition, we only
+   * get rid of rows corresponding to
+   * boundary nodes, but the
+   * corresponding case of deleting
+   * the respective columns (i.e. if
+   * @p eliminate_columns is @p true)
+   * is not presently implemented,
+   * and probably will never because
+   * it is too expensive without
+   * direct access to the Trilinos
+   * data structures. (This leads to
+   * the situation where the action
+   * indicates by the default value
+   * of the last argument is actually
+   * not implemented; that argument
+   * has <code>true</code> as its
+   * default value to stay consistent
+   * with the other functions of same
+   * name in this class.) This
+   * function does work on MPI vector
+   * types.
+   */
   void
   apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                          TrilinosWrappers::SparseMatrix  &matrix,
@@ -1029,11 +1029,11 @@ namespace MatrixTools
                          TrilinosWrappers::MPI::Vector   &right_hand_side,
                          const bool             eliminate_columns = true);
 
-                                   /**
-                                    * This function does the same as
-                                    * the one above, except now working
-                                    * on block structures.
-                                    */
+  /**
+   * This function does the same as
+   * the one above, except now working
+   * on block structures.
+   */
   void
   apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                          TrilinosWrappers::BlockSparseMatrix  &matrix,
@@ -1042,42 +1042,42 @@ namespace MatrixTools
                          const bool                eliminate_columns = true);
 #endif
 
-                                   /**
-                                    * Rather than applying boundary
-                                    * values to the global matrix
-                                    * and vector after creating the
-                                    * global matrix, this function
-                                    * does so during assembly, by
-                                    * modifying the local matrix and
-                                    * vector contributions. If you
-                                    * call this function on all
-                                    * local contributions, the
-                                    * resulting matrix will have the
-                                    * same entries, and the final
-                                    * call to
-                                    * apply_boundary_values() on the
-                                    * global system will not be
-                                    * necessary.
-                                    *
-                                    * Since this function does not
-                                    * have to work on the
-                                    * complicated data structures of
-                                    * sparse matrices, it is
-                                    * relatively cheap. It may
-                                    * therefore be a win if you have
-                                    * many fixed degrees of freedom
-                                    * (e.g. boundary nodes), or if
-                                    * access to the sparse matrix is
-                                    * expensive (e.g. for block
-                                    * sparse matrices, or for PETSc
-                                    * or trilinos
-                                    * matrices). However, it doesn't
-                                    * work as expected if there are
-                                    * also hanging nodes to be
-                                    * considered. More caveats are
-                                    * listed in the general
-                                    * documentation of this class.
-                                    */
+  /**
+   * Rather than applying boundary
+   * values to the global matrix
+   * and vector after creating the
+   * global matrix, this function
+   * does so during assembly, by
+   * modifying the local matrix and
+   * vector contributions. If you
+   * call this function on all
+   * local contributions, the
+   * resulting matrix will have the
+   * same entries, and the final
+   * call to
+   * apply_boundary_values() on the
+   * global system will not be
+   * necessary.
+   *
+   * Since this function does not
+   * have to work on the
+   * complicated data structures of
+   * sparse matrices, it is
+   * relatively cheap. It may
+   * therefore be a win if you have
+   * many fixed degrees of freedom
+   * (e.g. boundary nodes), or if
+   * access to the sparse matrix is
+   * expensive (e.g. for block
+   * sparse matrices, or for PETSc
+   * or trilinos
+   * matrices). However, it doesn't
+   * work as expected if there are
+   * also hanging nodes to be
+   * considered. More caveats are
+   * listed in the general
+   * documentation of this class.
+   */
   void
   local_apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                                const std::vector<unsigned int> &local_dof_indices,
@@ -1085,9 +1085,9 @@ namespace MatrixTools
                                Vector<double>     &local_rhs,
                                const bool          eliminate_columns);
 
-                                   /**
-                                    * Exception
-                                    */
+  /**
+   * Exception
+   */
   DeclException0 (ExcBlocksDontMatch);
 }
 

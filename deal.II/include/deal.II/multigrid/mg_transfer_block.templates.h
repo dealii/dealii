@@ -38,13 +38,13 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg (
-  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
-  BlockVector<number2>&                 dst,
-  const MGLevelObject<Vector<number> >& src) const
+  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
+  BlockVector<number2>                 &dst,
+  const MGLevelObject<Vector<number> > &src) const
 {
-  for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
     for (IT i= copy_indices[selected_block][level].begin();
-         i != copy_indices[selected_block][level].end();++i)
+         i != copy_indices[selected_block][level].end(); ++i)
       dst.block(selected_block)(i->first) = src[level](i->second);
 }
 
@@ -54,13 +54,13 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg (
-  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
-  Vector<number2>&                      dst,
-  const MGLevelObject<Vector<number> >& src) const
+  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
+  Vector<number2>                      &dst,
+  const MGLevelObject<Vector<number> > &src) const
 {
-  for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
     for (IT i= copy_indices[selected_block][level].begin();
-         i != copy_indices[selected_block][level].end();++i)
+         i != copy_indices[selected_block][level].end(); ++i)
       dst(i->first) = src[level](i->second);
 }
 
@@ -70,13 +70,13 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg_add (
-  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
-  BlockVector<number2>&                 dst,
-  const MGLevelObject<Vector<number> >& src) const
+  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
+  BlockVector<number2>                 &dst,
+  const MGLevelObject<Vector<number> > &src) const
 {
-  for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
     for (IT i= copy_indices[selected_block][level].begin();
-         i != copy_indices[selected_block][level].end();++i)
+         i != copy_indices[selected_block][level].end(); ++i)
       dst.block(selected_block)(i->first) += src[level](i->second);
 }
 
@@ -86,13 +86,13 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg_add (
-  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
-  Vector<number2>&                      dst,
-  const MGLevelObject<Vector<number> >& src) const
+  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
+  Vector<number2>                      &dst,
+  const MGLevelObject<Vector<number> > &src) const
 {
-  for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
     for (IT i= copy_indices[selected_block][level].begin();
-         i != copy_indices[selected_block][level].end();++i)
+         i != copy_indices[selected_block][level].end(); ++i)
       dst(i->first) += src[level](i->second);
 }
 
@@ -114,15 +114,15 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_from_mg (
-  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
-  BlockVector<number2>& dst,
-  const MGLevelObject<BlockVector<number> >& src) const
+  const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  BlockVector<number2> &dst,
+  const MGLevelObject<BlockVector<number> > &src) const
 {
-  for (unsigned int block=0;block<selected.size();++block)
+  for (unsigned int block=0; block<selected.size(); ++block)
     if (selected[block])
-      for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
+      for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
         for (IT i= copy_indices[block][level].begin();
-             i != copy_indices[block][level].end();++i)
+             i != copy_indices[block][level].end(); ++i)
           dst.block(block)(i->first) = src[level].block(mg_block[block])(i->second);
 }
 
@@ -132,15 +132,15 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_from_mg_add (
-  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
-  BlockVector<number2>& dst,
-  const MGLevelObject<BlockVector<number> >& src) const
+  const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  BlockVector<number2> &dst,
+  const MGLevelObject<BlockVector<number> > &src) const
 {
-  for (unsigned int block=0;block<selected.size();++block)
+  for (unsigned int block=0; block<selected.size(); ++block)
     if (selected[block])
-      for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
+      for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
         for (IT i= copy_indices[block][level].begin();
-             i != copy_indices[block][level].end();++i)
+             i != copy_indices[block][level].end(); ++i)
           dst.block(block)(i->first) += src[level].block(mg_block[block])(i->second);
 }
 

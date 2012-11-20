@@ -42,72 +42,72 @@ const unsigned int CompressedSparsityPattern::Line::cache_size;
 void
 CompressedSparsityPattern::Line::flush_cache () const
 {
-                                   // Make sure the caller checked
-                                   // necessity of this function.
+  // Make sure the caller checked
+  // necessity of this function.
   Assert(cache_entries != 0, ExcInternalError());
 
-                                   // first sort the entries in the cache, so
-                                   // that it is easier to merge it with the
-                                   // main array. note that due to the way
-                                   // add() inserts elements, there can be no
-                                   // duplicates in the cache
-                                   //
-                                   // do the sorting in a way that is fast for
-                                   // the small cache sizes we have
-                                   // here. basically, use bubble sort
+  // first sort the entries in the cache, so
+  // that it is easier to merge it with the
+  // main array. note that due to the way
+  // add() inserts elements, there can be no
+  // duplicates in the cache
+  //
+  // do the sorting in a way that is fast for
+  // the small cache sizes we have
+  // here. basically, use bubble sort
   switch (cache_entries)
     {
-      case 1:
-      {
-        break;
-      }
-
-      case 2:
-      {
-        if (cache[1] < cache[0])
-          std::swap (cache[0], cache[1]);
-        break;
-      }
-
-      case 3:
-      {
-        if (cache[1] < cache[0])
-          std::swap (cache[0], cache[1]);
-        if (cache[2] < cache[1])
-          std::swap (cache[1], cache[2]);
-        if (cache[1] < cache[0])
-          std::swap (cache[0], cache[1]);
-        break;
-      }
-
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-      {
-        for (unsigned int i=0; i<cache_entries; ++i)
-          for (unsigned int j=i+1; j<cache_entries; ++j)
-            if (cache[j] < cache[i])
-              std::swap (cache[i], cache[j]);
-        break;
-      }
-
-      default:
-      {
-        std::sort (&cache[0], &cache[cache_entries]);
-        break;
-      }
+    case 1:
+    {
+      break;
     }
 
-                                   // TODO: could use the add_entries
-                                   // function of the constraint line for
-                                   // doing this, but that one is
-                                   // non-const. Still need to figure out
-                                   // how to do that.
+    case 2:
+    {
+      if (cache[1] < cache[0])
+        std::swap (cache[0], cache[1]);
+      break;
+    }
 
-                                   // next job is to merge the two
-                                   // arrays. special case the case that the
-                                   // original array is empty.
+    case 3:
+    {
+      if (cache[1] < cache[0])
+        std::swap (cache[0], cache[1]);
+      if (cache[2] < cache[1])
+        std::swap (cache[1], cache[2]);
+      if (cache[1] < cache[0])
+        std::swap (cache[0], cache[1]);
+      break;
+    }
+
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    {
+      for (unsigned int i=0; i<cache_entries; ++i)
+        for (unsigned int j=i+1; j<cache_entries; ++j)
+          if (cache[j] < cache[i])
+            std::swap (cache[i], cache[j]);
+      break;
+    }
+
+    default:
+    {
+      std::sort (&cache[0], &cache[cache_entries]);
+      break;
+    }
+    }
+
+  // TODO: could use the add_entries
+  // function of the constraint line for
+  // doing this, but that one is
+  // non-const. Still need to figure out
+  // how to do that.
+
+  // next job is to merge the two
+  // arrays. special case the case that the
+  // original array is empty.
   if (entries.size() == 0)
     {
       entries.resize (cache_entries);
@@ -116,10 +116,10 @@ CompressedSparsityPattern::Line::flush_cache () const
     }
   else
     {
-                                       // first count how many of the cache
-                                       // entries are already in the main
-                                       // array, so that we can efficiently
-                                       // allocate memory
+      // first count how many of the cache
+      // entries are already in the main
+      // array, so that we can efficiently
+      // allocate memory
       unsigned int n_new_entries = 0;
       {
         unsigned int cache_position = 0;
@@ -139,14 +139,14 @@ CompressedSparsityPattern::Line::flush_cache () const
               ++cache_position;
           }
 
-                                         // scoop up leftovers in arrays
+        // scoop up leftovers in arrays
         n_new_entries += (entries.size() - entry_position) +
                          (cache_entries - cache_position);
       }
 
-                                       // then allocate new memory and merge
-                                       // arrays, if there are any entries at
-                                       // all that need to be merged
+      // then allocate new memory and merge
+      // arrays, if there are any entries at
+      // all that need to be merged
       Assert (n_new_entries >= entries.size(),
               ExcInternalError());
       if (n_new_entries > entries.size())
@@ -174,11 +174,11 @@ CompressedSparsityPattern::Line::flush_cache () const
                 ++cache_position;
               }
 
-                                           // copy remaining elements from the
-                                           // array that we haven't
-                                           // finished. note that at most one
-                                           // of the following loops will run
-                                           // at all
+          // copy remaining elements from the
+          // array that we haven't
+          // finished. note that at most one
+          // of the following loops will run
+          // at all
           for (; entry_position < entries.size(); ++entry_position)
             new_entries.push_back (entries[entry_position]);
           for (; cache_position < cache_entries; ++cache_position)
@@ -187,8 +187,8 @@ CompressedSparsityPattern::Line::flush_cache () const
           Assert (new_entries.size() == n_new_entries,
                   ExcInternalError());
 
-                                           // finally swap old and new array,
-                                           // and set cache size to zero
+          // finally swap old and new array,
+          // and set cache size to zero
           new_entries.swap (entries);
         }
     }
@@ -204,11 +204,11 @@ CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
                                               ForwardIterator end,
                                               const bool indices_are_sorted)
 {
-                                   // use the same code as when flushing the
-                                   // cache in case we have many (more than
-                                   // three) entries in a sorted
-                                   // list. Otherwise, go on to the single
-                                   // add() function.
+  // use the same code as when flushing the
+  // cache in case we have many (more than
+  // three) entries in a sorted
+  // list. Otherwise, go on to the single
+  // add() function.
   const int n_elements = end - begin;
   if (n_elements <= 0)
     return;
@@ -218,9 +218,9 @@ CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
   if (indices_are_sorted == true)
     {
 
-                                   // next job is to merge the two
-                                   // arrays. special case the case that the
-                                   // original array is empty.
+      // next job is to merge the two
+      // arrays. special case the case that the
+      // original array is empty.
       if (entries.size() == 0)
         {
           entries.resize (n_cols);
@@ -230,10 +230,10 @@ CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
         }
       else
         {
-                                       // first count how many of the cache
-                                       // entries are already in the main
-                                       // array, so that we can efficiently
-                                       // allocate memory
+          // first count how many of the cache
+          // entries are already in the main
+          // array, so that we can efficiently
+          // allocate memory
           unsigned int n_new_entries = 0;
           {
             unsigned int entry_position = 0;
@@ -253,14 +253,14 @@ CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
                   ++my_it;
               }
 
-                                         // scoop up leftovers in arrays
+            // scoop up leftovers in arrays
             n_new_entries += (entries.size() - entry_position) +
                              (end - my_it);
           }
 
-                                       // then allocate new memory and merge
-                                       // arrays, if there are any entries at
-                                       // all that need to be merged
+          // then allocate new memory and merge
+          // arrays, if there are any entries at
+          // all that need to be merged
           Assert (n_new_entries >= entries.size(),
                   ExcInternalError());
           if (n_new_entries > entries.size())
@@ -288,11 +288,11 @@ CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
                     ++my_it;
                   }
 
-                                           // copy remaining elements from the
-                                           // array that we haven't
-                                           // finished. note that at most one
-                                           // of the following loops will run
-                                           // at all
+              // copy remaining elements from the
+              // array that we haven't
+              // finished. note that at most one
+              // of the following loops will run
+              // at all
               for (; entry_position < entries.size(); ++entry_position)
                 new_entries.push_back (entries[entry_position]);
               for (; my_it != end; ++my_it)
@@ -301,16 +301,16 @@ CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
               Assert (new_entries.size() == n_new_entries,
                       ExcInternalError());
 
-                                           // finally swap old and new array,
-                                           // and set cache size to zero
+              // finally swap old and new array,
+              // and set cache size to zero
               new_entries.swap (entries);
             }
         }
       return;
     }
 
-                                   // otherwise, insert the indices one
-                                   // after each other
+  // otherwise, insert the indices one
+  // after each other
   for (ForwardIterator it = begin; it != end; ++it)
     add (*it);
 }
@@ -318,19 +318,19 @@ CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
 
 
 CompressedSparsityPattern::CompressedSparsityPattern ()
-                :
-                rows(0),
-                cols(0)
+  :
+  rows(0),
+  cols(0)
 {}
 
 
 
 CompressedSparsityPattern::
 CompressedSparsityPattern (const CompressedSparsityPattern &s)
-                :
-                Subscriptor(),
-                rows(0),
-                cols(0)
+  :
+  Subscriptor(),
+  rows(0),
+  cols(0)
 {
   Assert (s.rows == 0, ExcInvalidConstructorCall());
   Assert (s.cols == 0, ExcInvalidConstructorCall());
@@ -340,9 +340,9 @@ CompressedSparsityPattern (const CompressedSparsityPattern &s)
 
 CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int m,
                                                       const unsigned int n)
-                :
-                rows(0),
-                cols(0)
+  :
+  rows(0),
+  cols(0)
 {
   reinit (m,n);
 }
@@ -350,9 +350,9 @@ CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int m,
 
 
 CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int n)
-                :
-                rows(0),
-                cols(0)
+  :
+  rows(0),
+  cols(0)
 {
   reinit (n,n);
 }
@@ -437,27 +437,27 @@ CompressedSparsityPattern::symmetrize ()
 {
   Assert (rows==cols, ExcNotQuadratic());
 
-                                   // loop over all elements presently
-                                   // in the sparsity pattern and add
-                                   // the transpose element. note:
-                                   //
-                                   // 1. that the sparsity pattern
-                                   // changes which we work on, but
-                                   // not the present row
-                                   //
-                                   // 2. that the @p{add} function can
-                                   // be called on elements that
-                                   // already exist without any harm
+  // loop over all elements presently
+  // in the sparsity pattern and add
+  // the transpose element. note:
+  //
+  // 1. that the sparsity pattern
+  // changes which we work on, but
+  // not the present row
+  //
+  // 2. that the @p{add} function can
+  // be called on elements that
+  // already exist without any harm
   for (unsigned int row=0; row<rows; ++row)
     {
       if (lines[row].cache_entries != 0)
         lines[row].flush_cache ();
       for (std::vector<unsigned int>::const_iterator
-             j=lines[row].entries.begin();
+           j=lines[row].entries.begin();
            j != lines[row].entries.end();
            ++j)
-                                       // add the transpose entry if
-                                       // this is not the diagonal
+        // add the transpose entry if
+        // this is not the diagonal
         if (row != *j)
           add (*j, row);
     }
@@ -476,7 +476,7 @@ CompressedSparsityPattern::print (std::ostream &out) const
       out << '[' << row;
 
       for (std::vector<unsigned int>::const_iterator
-             j=lines[row].entries.begin();
+           j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
         out << ',' << *j;
 
@@ -496,13 +496,13 @@ CompressedSparsityPattern::print_gnuplot (std::ostream &out) const
       if (lines[row].cache_entries != 0)
         lines[row].flush_cache ();
       for (std::vector<unsigned int>::const_iterator
-             j=lines[row].entries.begin();
+           j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
-                                         // while matrix entries are usually
-                                         // written (i,j), with i vertical and
-                                         // j horizontal, gnuplot output is
-                                         // x-y, that is we have to exchange
-                                         // the order of output
+        // while matrix entries are usually
+        // written (i,j), with i vertical and
+        // j horizontal, gnuplot output is
+        // x-y, that is we have to exchange
+        // the order of output
         out << *j << " " << -static_cast<signed int>(row) << std::endl;
     }
 
@@ -521,7 +521,7 @@ CompressedSparsityPattern::bandwidth () const
         lines[row].flush_cache ();
 
       for (std::vector<unsigned int>::const_iterator
-             j=lines[row].entries.begin();
+           j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
         if (static_cast<unsigned int>(std::abs(static_cast<int>(row-*j))) > b)
           b = std::abs(static_cast<signed int>(row-*j));

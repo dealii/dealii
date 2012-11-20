@@ -21,14 +21,14 @@ using namespace dealii;
 
 double Adata[] =
 {
-      .5, .1,
-      .4, .2
+  .5, .1,
+  .4, .2
 };
 
 double Bdata[] =
 {
-      .866, .5,
-      -.5, .866
+  .866, .5,
+  -.5, .866
 };
 
 
@@ -39,9 +39,9 @@ int main()
 
   A.fill(Adata);
   B.fill(Bdata);
-  
+
   GrowingVectorMemory<Vector<double> > mem;
-  
+
   ProductMatrix<Vector<double> > AB(A,B,mem);
 
   Vector<double> u(2);

@@ -26,34 +26,34 @@ namespace internal
 {
   namespace DataOutFaces
   {
-                                     /**
-                                      * A derived class for use in the
-                                      * DataOutFaces class. This is
-                                      * a class for the
-                                      * AdditionalData kind of data
-                                      * structure discussed in the
-                                      * documentation of the
-                                      * WorkStream context.
-                                      */
+    /**
+     * A derived class for use in the
+     * DataOutFaces class. This is
+     * a class for the
+     * AdditionalData kind of data
+     * structure discussed in the
+     * documentation of the
+     * WorkStream context.
+     */
     template <int dim, int spacedim>
     struct ParallelData : public internal::DataOut::ParallelDataBase<dim,spacedim>
     {
-        template <class FE>
-        ParallelData (const Quadrature<dim-1> &quadrature,
-                      const unsigned int n_components,
-                      const unsigned int n_datasets,
-                      const unsigned int n_subdivisions,
-                      const std::vector<unsigned int> &n_postprocessor_outputs,
-                      const Mapping<dim,spacedim> &mapping,
-                      const FE &finite_elements,
-                      const UpdateFlags update_flags);
+      template <class FE>
+      ParallelData (const Quadrature<dim-1> &quadrature,
+                    const unsigned int n_components,
+                    const unsigned int n_datasets,
+                    const unsigned int n_subdivisions,
+                    const std::vector<unsigned int> &n_postprocessor_outputs,
+                    const Mapping<dim,spacedim> &mapping,
+                    const FE &finite_elements,
+                    const UpdateFlags update_flags);
 
-        const dealii::hp::QCollection<dim-1> q_collection;
-        const dealii::hp::MappingCollection<dim,spacedim> mapping_collection;
-        dealii::hp::FEFaceValues<dim> x_fe_values;
+      const dealii::hp::QCollection<dim-1> q_collection;
+      const dealii::hp::MappingCollection<dim,spacedim> mapping_collection;
+      dealii::hp::FEFaceValues<dim> x_fe_values;
 
-        std::vector<Point<dim> > patch_normals;
-        std::vector<Point<spacedim> > patch_evaluation_points;
+      std::vector<Point<dim> > patch_normals;
+      std::vector<Point<spacedim> > patch_evaluation_points;
     };
   }
 }
@@ -117,187 +117,187 @@ namespace internal
  */
 template <int dim, class DH=DoFHandler<dim> >
 class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
-                                            DH::dimension>
+  DH::dimension>
 {
-  public:
-                                     /**
-                                      * Typedef to the iterator type
-                                      * of the dof handler class under
-                                      * consideration.
-                                      */
-    typedef typename DataOut_DoFData<DH,DH::dimension-1,
-                                     DH::dimension>::cell_iterator cell_iterator;
+public:
+  /**
+   * Typedef to the iterator type
+   * of the dof handler class under
+   * consideration.
+   */
+  typedef typename DataOut_DoFData<DH,DH::dimension-1,
+          DH::dimension>::cell_iterator cell_iterator;
 
-                                     /**
-                                      * Constructor determining
-                                      * whether a surface mesh
-                                      * (default) or the whole wire
-                                      * basket is written.
-                                      */
-    DataOutFaces (const bool surface_only = true);
+  /**
+   * Constructor determining
+   * whether a surface mesh
+   * (default) or the whole wire
+   * basket is written.
+   */
+  DataOutFaces (const bool surface_only = true);
 
-                                     /**
-                                      * This is the central function
-                                      * of this class since it builds
-                                      * the list of patches to be
-                                      * written by the low-level
-                                      * functions of the base
-                                      * class. See the general
-                                      * documentation of this class
-                                      * for further information.
-                                      *
-                                      * The function supports
-                                      * multithreading, if deal.II is
-                                      * compiled in multithreading
-                                      * mode. The default number of
-                                      * threads to be used to build
-                                      * the patches is set to
-                                      * <tt>multithread_info.n_default_threads</tt>.
-                                      */
-    virtual void
-    build_patches (const unsigned int n_subdivisions = 0);
+  /**
+   * This is the central function
+   * of this class since it builds
+   * the list of patches to be
+   * written by the low-level
+   * functions of the base
+   * class. See the general
+   * documentation of this class
+   * for further information.
+   *
+   * The function supports
+   * multithreading, if deal.II is
+   * compiled in multithreading
+   * mode. The default number of
+   * threads to be used to build
+   * the patches is set to
+   * <tt>multithread_info.n_default_threads</tt>.
+   */
+  virtual void
+  build_patches (const unsigned int n_subdivisions = 0);
 
-                                     /**
-                                      * Same as above, except that the
-                                      * additional first parameter
-                                      * defines a mapping that is to
-                                      * be used in the generation of
-                                      * output. If
-                                      * <tt>n_subdivisions>1</tt>, the
-                                      * points interior of subdivided
-                                      * patches which originate from
-                                      * cells at the boundary of the
-                                      * domain can be computed using the
-                                      * mapping, i.e. a higher order
-                                      * mapping leads to a
-                                      * representation of a curved
-                                      * boundary by using more
-                                      * subdivisions.
-                                      *
-                                      * Even for non-curved cells the
-                                      * mapping argument can be used
-                                      * for the Eulerian mappings (see
-                                      * class MappingQ1Eulerian) where
-                                      * a mapping is used not only to
-                                      * determine the position of
-                                      * points interior to a cell, but
-                                      * also of the vertices.  It
-                                      * offers an opportunity to watch
-                                      * the solution on a deformed
-                                      * triangulation on which the
-                                      * computation was actually
-                                      * carried out, even if the mesh
-                                      * is internally stored in its
-                                      * undeformed configuration and
-                                      * the deformation is only
-                                      * tracked by an additional
-                                      * vector that holds the
-                                      * deformation of each vertex.
-                                      *
-                                      * @todo The @p mapping argument should be
-                                      * replaced by a hp::MappingCollection in
-                                      * case of a hp::DoFHandler.
-                                      */
-    virtual void build_patches (const Mapping<DH::dimension> &mapping,
-                                const unsigned int n_subdivisions = 0);
+  /**
+   * Same as above, except that the
+   * additional first parameter
+   * defines a mapping that is to
+   * be used in the generation of
+   * output. If
+   * <tt>n_subdivisions>1</tt>, the
+   * points interior of subdivided
+   * patches which originate from
+   * cells at the boundary of the
+   * domain can be computed using the
+   * mapping, i.e. a higher order
+   * mapping leads to a
+   * representation of a curved
+   * boundary by using more
+   * subdivisions.
+   *
+   * Even for non-curved cells the
+   * mapping argument can be used
+   * for the Eulerian mappings (see
+   * class MappingQ1Eulerian) where
+   * a mapping is used not only to
+   * determine the position of
+   * points interior to a cell, but
+   * also of the vertices.  It
+   * offers an opportunity to watch
+   * the solution on a deformed
+   * triangulation on which the
+   * computation was actually
+   * carried out, even if the mesh
+   * is internally stored in its
+   * undeformed configuration and
+   * the deformation is only
+   * tracked by an additional
+   * vector that holds the
+   * deformation of each vertex.
+   *
+   * @todo The @p mapping argument should be
+   * replaced by a hp::MappingCollection in
+   * case of a hp::DoFHandler.
+   */
+  virtual void build_patches (const Mapping<DH::dimension> &mapping,
+                              const unsigned int n_subdivisions = 0);
 
-                                     /**
-                                      * Declare a way to describe a
-                                      * face which we would like to
-                                      * generate output for. The usual
-                                      * way would, of course, be to
-                                      * use an object of type
-                                      * <tt>DoFHandler<dim>::face_iterator</tt>,
-                                      * but since we have to describe
-                                      * faces to objects of type
-                                      * FEValues, we can only
-                                      * represent faces by pairs of a
-                                      * cell and the number of the
-                                      * face. This pair is here
-                                      * aliased to a name that is
-                                      * better to type.
-                                      */
-    typedef typename std::pair<cell_iterator,unsigned int> FaceDescriptor;
+  /**
+   * Declare a way to describe a
+   * face which we would like to
+   * generate output for. The usual
+   * way would, of course, be to
+   * use an object of type
+   * <tt>DoFHandler<dim>::face_iterator</tt>,
+   * but since we have to describe
+   * faces to objects of type
+   * FEValues, we can only
+   * represent faces by pairs of a
+   * cell and the number of the
+   * face. This pair is here
+   * aliased to a name that is
+   * better to type.
+   */
+  typedef typename std::pair<cell_iterator,unsigned int> FaceDescriptor;
 
 
-                                     /**
-                                      * Return the first face which we
-                                      * want output for. The default
-                                      * implementation returns the
-                                      * first face of an active cell
-                                      * or the first such on the
-                                      * boundary.
-                                      *
-                                      * For more general sets,
-                                      * overload this function in a
-                                      * derived class.
-                                      */
-    virtual FaceDescriptor first_face ();
+  /**
+   * Return the first face which we
+   * want output for. The default
+   * implementation returns the
+   * first face of an active cell
+   * or the first such on the
+   * boundary.
+   *
+   * For more general sets,
+   * overload this function in a
+   * derived class.
+   */
+  virtual FaceDescriptor first_face ();
 
-                                     /**
-                                      * Return the next face after
-                                      * which we want output
-                                      * for. If there are no more
-                                      * faces, <tt>dofs->end()</tt> is
-                                      * returned as the first
-                                      * component of the return value.
-                                      *
-                                      * The default implementation
-                                      * returns the next face of an
-                                      * active cell, or the next such
-                                      * on the boundary.
-                                      *
-                                      * This function traverses the
-                                      * mesh cell by cell (active
-                                      * only), and then through all
-                                      * faces of the cell. As a
-                                      * result, interior faces are
-                                      * output twice.
+  /**
+   * Return the next face after
+   * which we want output
+   * for. If there are no more
+   * faces, <tt>dofs->end()</tt> is
+   * returned as the first
+   * component of the return value.
+   *
+   * The default implementation
+   * returns the next face of an
+   * active cell, or the next such
+   * on the boundary.
+   *
+   * This function traverses the
+   * mesh cell by cell (active
+   * only), and then through all
+   * faces of the cell. As a
+   * result, interior faces are
+   * output twice.
 
-                                      * This function can be
-                                      * overloaded in a derived
-                                      * class to select a different
-                                      * set of faces. Note that the
-                                      * default implementation assumes
-                                      * that the given @p face is
-                                      * active, which is guaranteed as
-                                      * long as first_face() is also
-                                      * used from the default
-                                      * implementation. Overloading
-                                      * only one of the two functions
-                                      * should be done with care.
-                                      */
-    virtual FaceDescriptor next_face (const FaceDescriptor &face);
+   * This function can be
+   * overloaded in a derived
+   * class to select a different
+   * set of faces. Note that the
+   * default implementation assumes
+   * that the given @p face is
+   * active, which is guaranteed as
+   * long as first_face() is also
+   * used from the default
+   * implementation. Overloading
+   * only one of the two functions
+   * should be done with care.
+   */
+  virtual FaceDescriptor next_face (const FaceDescriptor &face);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcInvalidNumberOfSubdivisions,
-                    int,
-                    << "The number of subdivisions per patch, " << arg1
-                    << ", is not valid.");
+  /**
+   * Exception
+   */
+  DeclException1 (ExcInvalidNumberOfSubdivisions,
+                  int,
+                  << "The number of subdivisions per patch, " << arg1
+                  << ", is not valid.");
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcCellNotActiveForCellData);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcCellNotActiveForCellData);
 
-  private:
-                                     /**
-                                      * Parameter deciding between
-                                      * surface meshes and full wire
-                                      * basket.
-                                      */
-    const bool surface_only;
+private:
+  /**
+   * Parameter deciding between
+   * surface meshes and full wire
+   * basket.
+   */
+  const bool surface_only;
 
-                                     /**
-                                      * Build one patch. This function
-                                      * is called in a WorkStream
-                                      * context.
-                                      */
-    void build_one_patch (const FaceDescriptor *cell_and_face,
-                          internal::DataOutFaces::ParallelData<DH::dimension, DH::dimension> &data,
-                          DataOutBase::Patch<DH::dimension-1,DH::space_dimension> &patch);
+  /**
+   * Build one patch. This function
+   * is called in a WorkStream
+   * context.
+   */
+  void build_one_patch (const FaceDescriptor *cell_and_face,
+                        internal::DataOutFaces::ParallelData<DH::dimension, DH::dimension> &data,
+                        DataOutBase::Patch<DH::dimension-1,DH::space_dimension> &patch);
 };
 
 

@@ -28,58 +28,58 @@ DEAL_II_NAMESPACE_OPEN
  */
 class JobIdentifier
 {
-  public:
-                                     /**
-                                      * Constructor. Set program
-                                      * identifier to value of
-                                      * <tt>program_id</tt> concatenated
-                                      * with the present time.
-                                      */
-    JobIdentifier();
+public:
+  /**
+   * Constructor. Set program
+   * identifier to value of
+   * <tt>program_id</tt> concatenated
+   * with the present time.
+   */
+  JobIdentifier();
 
-                                     /**
-                                      * This function returns an
-                                      * identifier for the running
-                                      * program. Currently, the
-                                      * library provides a function
-                                      * returning "JobID".
-                                      *
-                                      * The user may define a
-                                      * replacement of this function
-                                      * in his source code and avoid
-                                      * linking the library
-                                      * version. Unfortunately, this
-                                      * mechanism does not work with
-                                      * shared libraries.
-                                      */
-    static const char* program_id();
+  /**
+   * This function returns an
+   * identifier for the running
+   * program. Currently, the
+   * library provides a function
+   * returning "JobID".
+   *
+   * The user may define a
+   * replacement of this function
+   * in his source code and avoid
+   * linking the library
+   * version. Unfortunately, this
+   * mechanism does not work with
+   * shared libraries.
+   */
+  static const char *program_id();
 
-                                     /**
-                                      * Obtain the base name of the
-                                      * file currently being
-                                      * compiled. That is, if the file
-                                      * is <tt>mypath/file.cc</tt>
-                                      * return just
-                                      * <tt>file</tt>. Typically, this
-                                      * can be called from a program
-                                      * with the argument
-                                      * <tt>__FILE__</tt> and is used
-                                      * in the deal.II test suite.
-                                      */
-    static std::string base_name(const char* filename);
+  /**
+   * Obtain the base name of the
+   * file currently being
+   * compiled. That is, if the file
+   * is <tt>mypath/file.cc</tt>
+   * return just
+   * <tt>file</tt>. Typically, this
+   * can be called from a program
+   * with the argument
+   * <tt>__FILE__</tt> and is used
+   * in the deal.II test suite.
+   */
+  static std::string base_name(const char *filename);
 
-                                     /**
-                                      * Return the value of <tt>id</tt>.
-                                      */
-    const std::string operator () () const;
+  /**
+   * Return the value of <tt>id</tt>.
+   */
+  const std::string operator () () const;
 
-  private:
-                                     /**
-                                      * String holding the identifier
-                                      * of the presently running
-                                      * program.
-                                      */
-    std::string id;
+private:
+  /**
+   * String holding the identifier
+   * of the presently running
+   * program.
+   */
+  std::string id;
 };
 
 

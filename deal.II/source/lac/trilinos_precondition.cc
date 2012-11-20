@@ -35,21 +35,21 @@ namespace TrilinosWrappers
 
   PreconditionBase::PreconditionBase()
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                    :
-                    communicator (MPI_COMM_SELF)
+    :
+    communicator (MPI_COMM_SELF)
 #endif
   {}
 
 
 
   PreconditionBase::PreconditionBase(const PreconditionBase &base)
-                    :
-                    Subscriptor (),
-                    preconditioner (base.preconditioner),
+    :
+    Subscriptor (),
+    preconditioner (base.preconditioner),
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                    communicator (base.communicator),
+    communicator (base.communicator),
 #endif
-                    vector_distributor (new Epetra_Map(*base.vector_distributor))
+    vector_distributor (new Epetra_Map(*base.vector_distributor))
   {}
 
 
@@ -70,14 +70,14 @@ namespace TrilinosWrappers
 
 
 
-/* -------------------------- PreconditionJacobi -------------------------- */
+  /* -------------------------- PreconditionJacobi -------------------------- */
 
   PreconditionJacobi::AdditionalData::
   AdditionalData (const double omega,
                   const double min_diagonal)
-                  :
-                  omega (omega),
-                  min_diagonal (min_diagonal)
+    :
+    omega (omega),
+    min_diagonal (min_diagonal)
   {}
 
 
@@ -86,15 +86,15 @@ namespace TrilinosWrappers
   PreconditionJacobi::initialize (const SparseMatrix   &matrix,
                                   const AdditionalData &additional_data)
   {
-                                // release memory before reallocation
+    // release memory before reallocation
     preconditioner.reset ();
     preconditioner.reset (Ifpack().Create
                           ("point relaxation",
-                           const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
                            0));
 
-    Ifpack_Preconditioner * ifpack = static_cast<Ifpack_Preconditioner*>
-      (preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
     Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
                                      "preconditioner"));
 
@@ -119,16 +119,16 @@ namespace TrilinosWrappers
 
 
 
-/* -------------------------- PreconditionSSOR -------------------------- */
+  /* -------------------------- PreconditionSSOR -------------------------- */
 
   PreconditionSSOR::AdditionalData::
   AdditionalData (const double       omega,
                   const double       min_diagonal,
                   const unsigned int overlap)
-                  :
-                  omega        (omega),
-                  min_diagonal (min_diagonal),
-                  overlap      (overlap)
+    :
+    omega        (omega),
+    min_diagonal (min_diagonal),
+    overlap      (overlap)
   {}
 
 
@@ -140,11 +140,11 @@ namespace TrilinosWrappers
     preconditioner.reset ();
     preconditioner.reset (Ifpack().Create
                           ("point relaxation",
-                           const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
                            additional_data.overlap));
 
-    Ifpack_Preconditioner * ifpack = static_cast<Ifpack_Preconditioner*>
-      (preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
     Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
                                      "preconditioner"));
 
@@ -170,16 +170,16 @@ namespace TrilinosWrappers
 
 
 
-/* -------------------------- PreconditionSOR -------------------------- */
+  /* -------------------------- PreconditionSOR -------------------------- */
 
   PreconditionSOR::AdditionalData::
   AdditionalData (const double       omega,
                   const double       min_diagonal,
                   const unsigned int overlap)
-                  :
-                  omega        (omega),
-                  min_diagonal (min_diagonal),
-                  overlap      (overlap)
+    :
+    omega        (omega),
+    min_diagonal (min_diagonal),
+    overlap      (overlap)
   {}
 
 
@@ -191,11 +191,11 @@ namespace TrilinosWrappers
     preconditioner.reset ();
     preconditioner.reset (Ifpack().Create
                           ("point relaxation",
-                           const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
                            additional_data.overlap));
 
-    Ifpack_Preconditioner * ifpack = static_cast<Ifpack_Preconditioner*>
-      (preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
     Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
                                      "preconditioner"));
 
@@ -221,18 +221,18 @@ namespace TrilinosWrappers
 
 
 
-/* -------------------------- PreconditionIC -------------------------- */
+  /* -------------------------- PreconditionIC -------------------------- */
 
   PreconditionIC::AdditionalData::
   AdditionalData (const unsigned int ic_fill,
                   const double       ic_atol,
                   const double       ic_rtol,
                   const unsigned int overlap)
-                  :
-                  ic_fill (ic_fill),
-                  ic_atol (ic_atol),
-                  ic_rtol (ic_rtol),
-                  overlap (overlap)
+    :
+    ic_fill (ic_fill),
+    ic_atol (ic_atol),
+    ic_rtol (ic_rtol),
+    overlap (overlap)
   {}
 
 
@@ -244,11 +244,11 @@ namespace TrilinosWrappers
     preconditioner.reset ();
     preconditioner.reset (Ifpack().Create
                           ("IC",
-                           const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
                            additional_data.overlap));
 
-    Ifpack_Preconditioner * ifpack = static_cast<Ifpack_Preconditioner*>
-      (preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
     Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
                                      "preconditioner"));
 
@@ -272,18 +272,18 @@ namespace TrilinosWrappers
 
 
 
-/* -------------------------- PreconditionILU -------------------------- */
+  /* -------------------------- PreconditionILU -------------------------- */
 
   PreconditionILU::AdditionalData::
   AdditionalData (const unsigned int ilu_fill,
                   const double       ilu_atol,
                   const double       ilu_rtol,
                   const unsigned int overlap)
-                  :
-                  ilu_fill (ilu_fill),
-                  ilu_atol (ilu_atol),
-                  ilu_rtol (ilu_rtol),
-                  overlap  (overlap)
+    :
+    ilu_fill (ilu_fill),
+    ilu_atol (ilu_atol),
+    ilu_rtol (ilu_rtol),
+    overlap  (overlap)
   {}
 
 
@@ -295,11 +295,11 @@ namespace TrilinosWrappers
     preconditioner.reset ();
     preconditioner.reset (Ifpack().Create
                           ("ILU",
-                           const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
                            additional_data.overlap));
 
-    Ifpack_Preconditioner * ifpack = static_cast<Ifpack_Preconditioner*>
-      (preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
     Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
                                      "preconditioner"));
 
@@ -323,7 +323,7 @@ namespace TrilinosWrappers
 
 
 
-/* -------------------------- PreconditionILUT -------------------------- */
+  /* -------------------------- PreconditionILUT -------------------------- */
 
   PreconditionILUT::AdditionalData::
   AdditionalData (const double       ilut_drop,
@@ -331,12 +331,12 @@ namespace TrilinosWrappers
                   const double       ilut_atol,
                   const double       ilut_rtol,
                   const unsigned int overlap)
-                  :
-                  ilut_drop (ilut_drop),
-                  ilut_fill (ilut_fill),
-                  ilut_atol (ilut_atol),
-                  ilut_rtol (ilut_rtol),
-                  overlap  (overlap)
+    :
+    ilut_drop (ilut_drop),
+    ilut_fill (ilut_fill),
+    ilut_atol (ilut_atol),
+    ilut_rtol (ilut_rtol),
+    overlap  (overlap)
   {}
 
 
@@ -348,11 +348,11 @@ namespace TrilinosWrappers
     preconditioner.reset ();
     preconditioner.reset (Ifpack().Create
                           ("ILUT",
-                           const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
                            additional_data.overlap));
 
-    Ifpack_Preconditioner * ifpack = static_cast<Ifpack_Preconditioner*>
-      (preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
     Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
                                      "preconditioner"));
 
@@ -377,12 +377,12 @@ namespace TrilinosWrappers
 
 
 
-/* ---------------------- PreconditionBlockDirect --------------------- */
+  /* ---------------------- PreconditionBlockDirect --------------------- */
 
   PreconditionBlockwiseDirect::AdditionalData::
   AdditionalData (const unsigned int overlap)
-                  :
-                  overlap  (overlap)
+    :
+    overlap  (overlap)
   {}
 
 
@@ -394,11 +394,11 @@ namespace TrilinosWrappers
     preconditioner.reset ();
     preconditioner.reset (Ifpack().Create
                           ("Amesos",
-                           const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
                            additional_data.overlap));
 
-    Ifpack_Preconditioner * ifpack = static_cast<Ifpack_Preconditioner*>
-      (preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
     Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
                                      "preconditioner"));
 
@@ -419,7 +419,7 @@ namespace TrilinosWrappers
 
 
 
-/* ---------------------- PreconditionBlockDirect --------------------- */
+  /* ---------------------- PreconditionBlockDirect --------------------- */
 
   PreconditionChebyshev::AdditionalData::
   AdditionalData (const unsigned int degree,
@@ -428,13 +428,13 @@ namespace TrilinosWrappers
                   const double       min_eigenvalue,
                   const double       min_diagonal,
                   const bool         nonzero_starting)
-                  :
-                  degree  (degree),
-                  max_eigenvalue (max_eigenvalue),
-                  eigenvalue_ratio (eigenvalue_ratio),
-                  min_eigenvalue (min_eigenvalue),
-                  min_diagonal (min_diagonal),
-                  nonzero_starting (nonzero_starting)
+    :
+    degree  (degree),
+    max_eigenvalue (max_eigenvalue),
+    eigenvalue_ratio (eigenvalue_ratio),
+    min_eigenvalue (min_eigenvalue),
+    min_diagonal (min_diagonal),
+    nonzero_starting (nonzero_starting)
   {}
 
 
@@ -446,8 +446,8 @@ namespace TrilinosWrappers
     preconditioner.reset ();
     preconditioner.reset (new Ifpack_Chebyshev (&matrix.trilinos_matrix()));
 
-    Ifpack_Chebyshev * ifpack = static_cast<Ifpack_Chebyshev*>
-      (preconditioner.get());
+    Ifpack_Chebyshev *ifpack = static_cast<Ifpack_Chebyshev *>
+                               (preconditioner.get());
     Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
                                      "preconditioner"));
 
@@ -479,7 +479,7 @@ namespace TrilinosWrappers
 
 
 
-/* -------------------------- PreconditionAMG -------------------------- */
+  /* -------------------------- PreconditionAMG -------------------------- */
 
   PreconditionAMG::AdditionalData::
   AdditionalData (const bool                             elliptic,
@@ -491,16 +491,16 @@ namespace TrilinosWrappers
                   const unsigned int                     smoother_sweeps,
                   const unsigned int                     smoother_overlap,
                   const bool                             output_details)
-                  :
-                  elliptic (elliptic),
-                  higher_order_elements (higher_order_elements),
-                  n_cycles (n_cycles),
-                  w_cycle (w_cycle),
-                  aggregation_threshold (aggregation_threshold),
-                  constant_modes (constant_modes),
-                  smoother_sweeps (smoother_sweeps),
-                  smoother_overlap (smoother_overlap),
-                  output_details (output_details)
+    :
+    elliptic (elliptic),
+    higher_order_elements (higher_order_elements),
+    n_cycles (n_cycles),
+    w_cycle (w_cycle),
+    aggregation_threshold (aggregation_threshold),
+    constant_modes (constant_modes),
+    smoother_sweeps (smoother_sweeps),
+    smoother_overlap (smoother_overlap),
+    output_details (output_details)
   {}
 
 
@@ -511,7 +511,7 @@ namespace TrilinosWrappers
   {
     const unsigned int n_rows = matrix.m();
 
-                                        // Build the AMG preconditioner.
+    // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
 
     if (additional_data.elliptic == true)
@@ -519,24 +519,24 @@ namespace TrilinosWrappers
         ML_Epetra::SetDefaults("SA",parameter_list);
         parameter_list.set("smoother: type", "Chebyshev");
 
-                                   // uncoupled mode can give a lot of
-                                   // warnings or even fail when there
-                                   // are too many entries per row and
-                                   // aggreggation gets complicated, but
-                                   // MIS does not work if too few
-                                   // elements are located on one
-                                   // processor. work around these
-                                   // warnings by choosing the different
-                                   // strategies in different
-                                   // situations: for low order, always
-                                   // use the standard choice
-                                   // uncoupled. if higher order, right
-                                   // now we also just use Uncoupled,
-                                   // but we should be aware that maybe
-                                   // MIS might be needed
-                                   //
-                                   // TODO: Maybe there are any
-                                   // other/better options?
+        // uncoupled mode can give a lot of
+        // warnings or even fail when there
+        // are too many entries per row and
+        // aggreggation gets complicated, but
+        // MIS does not work if too few
+        // elements are located on one
+        // processor. work around these
+        // warnings by choosing the different
+        // strategies in different
+        // situations: for low order, always
+        // use the standard choice
+        // uncoupled. if higher order, right
+        // now we also just use Uncoupled,
+        // but we should be aware that maybe
+        // MIS might be needed
+        //
+        // TODO: Maybe there are any
+        // other/better options?
         if (additional_data.higher_order_elements)
           {
             //if (matrix.m()/matrix.matrix->Comm().NumProc() < 50000)
@@ -572,7 +572,7 @@ namespace TrilinosWrappers
     else
       parameter_list.set("ML output", 0);
 
-    const Epetra_Map & domain_map = matrix.domain_partitioner();
+    const Epetra_Map &domain_map = matrix.domain_partitioner();
 
     const unsigned int constant_modes_dimension =
       additional_data.constant_modes.size();
@@ -595,10 +595,10 @@ namespace TrilinosWrappers
                 ExcDimensionMismatch(n_rows,
                                      distributed_constant_modes.GlobalLength()));
 
-                                        // Reshape null space as a
-                                        // contiguous vector of
-                                        // doubles so that Trilinos
-                                        // can read from it.
+        // Reshape null space as a
+        // contiguous vector of
+        // doubles so that Trilinos
+        // can read from it.
         for (unsigned int d=0; d<constant_modes_dimension; ++d)
           for (unsigned int row=0; row<my_size; ++row)
             {
@@ -613,10 +613,10 @@ namespace TrilinosWrappers
         if (my_size > 0)
           parameter_list.set("null space: vectors",
                              distributed_constant_modes.Values());
-                                // We need to set a valid pointer to data even
-                                // if there is no data on the current
-                                // processor. Therefore, pass a dummy in that
-                                // case
+        // We need to set a valid pointer to data even
+        // if there is no data on the current
+        // processor. Therefore, pass a dummy in that
+        // case
         else
           parameter_list.set("null space: vectors",
                              &dummy[0]);
@@ -626,8 +626,8 @@ namespace TrilinosWrappers
 
     if (additional_data.output_details)
       {
-        ML_Epetra::MultiLevelPreconditioner * multilevel_operator =
-          dynamic_cast<ML_Epetra::MultiLevelPreconditioner*> (preconditioner.get());
+        ML_Epetra::MultiLevelPreconditioner *multilevel_operator =
+          dynamic_cast<ML_Epetra::MultiLevelPreconditioner *> (preconditioner.get());
         Assert (multilevel_operator != 0,
                 ExcMessage ("Preconditioner setup failed."));
         multilevel_operator->PrintUnused(0);
@@ -658,10 +658,10 @@ namespace TrilinosWrappers
     preconditioner.reset();
     const unsigned int n_rows = deal_ii_sparse_matrix.m();
 
-                                        // Init Epetra Matrix using an
-                                        // equidistributed map; avoid
-                                        // storing the nonzero
-                                        // elements.
+    // Init Epetra Matrix using an
+    // equidistributed map; avoid
+    // storing the nonzero
+    // elements.
     vector_distributor.reset (new Epetra_Map(static_cast<int>(n_rows), 0, communicator));
 
     if (trilinos_matrix.get() == 0)
@@ -678,8 +678,8 @@ namespace TrilinosWrappers
 
   void PreconditionAMG::reinit ()
   {
-    ML_Epetra::MultiLevelPreconditioner * multilevel_operator =
-      dynamic_cast<ML_Epetra::MultiLevelPreconditioner*> (preconditioner.get());
+    ML_Epetra::MultiLevelPreconditioner *multilevel_operator =
+      dynamic_cast<ML_Epetra::MultiLevelPreconditioner *> (preconditioner.get());
     multilevel_operator->ReComputePreconditioner();
   }
 
@@ -698,8 +698,8 @@ namespace TrilinosWrappers
   {
     unsigned int memory = sizeof(this);
 
-                                // todo: find a way to read out ML's data
-                                // sizes
+    // todo: find a way to read out ML's data
+    // sizes
     if (trilinos_matrix.get() != 0)
       memory += trilinos_matrix->memory_consumption();
     return memory;
@@ -708,13 +708,13 @@ namespace TrilinosWrappers
 
 
 
-                                // explicit instantiations
+  // explicit instantiations
   template void PreconditionAMG::initialize (const ::dealii::SparseMatrix<double> &,
                                              const AdditionalData &, const double,
-                                             const ::dealii::SparsityPattern*);
+                                             const ::dealii::SparsityPattern *);
   template void PreconditionAMG::initialize (const ::dealii::SparseMatrix<float> &,
                                              const AdditionalData &, const double,
-                                             const ::dealii::SparsityPattern*);
+                                             const ::dealii::SparsityPattern *);
 
 }
 

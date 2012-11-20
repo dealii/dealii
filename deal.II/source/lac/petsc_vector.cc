@@ -39,11 +39,11 @@ namespace PETScWrappers
 
 
   Vector::Vector (const Vector &v)
-                  :
-                  VectorBase ()
+    :
+    VectorBase ()
   {
-                                     // first create a dummy vector, then copy
-                                     // over the other one
+    // first create a dummy vector, then copy
+    // over the other one
     Vector::create_vector (1);
     Vector::operator = (v);
   }
@@ -52,8 +52,8 @@ namespace PETScWrappers
 
   Vector::Vector (const MPI::Vector &v)
   {
-                                     // first create a dummy vector, then copy
-                                     // over the other one
+    // first create a dummy vector, then copy
+    // over the other one
     Vector::create_vector (1);
     Vector::operator = (v);
   }
@@ -64,18 +64,18 @@ namespace PETScWrappers
   Vector::reinit (const unsigned int n,
                   const bool         fast)
   {
-                                     // only do something if the sizes
-                                     // mismatch
+    // only do something if the sizes
+    // mismatch
     if (size() != n)
       {
-                                         // FIXME: I'd like to use this here,
-                                         // but somehow it leads to odd errors
-                                         // somewhere down the line in some of
-                                         // the tests:
+        // FIXME: I'd like to use this here,
+        // but somehow it leads to odd errors
+        // somewhere down the line in some of
+        // the tests:
 //         const int ierr = VecSetSizes (vector, n, n);
 //         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                         // so let's go the slow way:
+        // so let's go the slow way:
         if (attained_ownership)
           {
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
@@ -89,8 +89,8 @@ namespace PETScWrappers
         create_vector (n);
       }
 
-                                     // finally clear the new vector if so
-                                     // desired
+    // finally clear the new vector if so
+    // desired
     if (fast == false)
       *this = 0;
   }

@@ -20,11 +20,11 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 void
-MeanValueFilter::filter(Vector<number>& v) const
+MeanValueFilter::filter(Vector<number> &v) const
 {
   number mean = v.mean_value();
 
-  for (unsigned int i=0;i<v.size();++i)
+  for (unsigned int i=0; i<v.size(); ++i)
     v(i) -= mean;
 }
 
@@ -32,15 +32,15 @@ MeanValueFilter::filter(Vector<number>& v) const
 
 template <typename number>
 void
-MeanValueFilter::vmult(Vector<number>& dst,
-                       const Vector<number>& src) const
+MeanValueFilter::vmult(Vector<number> &dst,
+                       const Vector<number> &src) const
 {
   Assert (dst.size() == src.size(),
           ExcDimensionMismatch(dst.size(), src.size()));
 
   number mean = src.mean_value();
 
-  for (unsigned int i=0;i<dst.size();++i)
+  for (unsigned int i=0; i<dst.size(); ++i)
     dst(i) = src(i) - mean;
 }
 
@@ -48,15 +48,15 @@ MeanValueFilter::vmult(Vector<number>& dst,
 
 template <typename number>
 void
-MeanValueFilter::vmult_add(Vector<number>& dst,
-                           const Vector<number>& src) const
+MeanValueFilter::vmult_add(Vector<number> &dst,
+                           const Vector<number> &src) const
 {
   Assert (dst.size() == src.size(),
           ExcDimensionMismatch(dst.size(), src.size()));
 
   number mean = src.mean_value();
 
-  for (unsigned int i=0;i<dst.size();++i)
+  for (unsigned int i=0; i<dst.size(); ++i)
     dst(i) += src(i) - mean;
 }
 
@@ -64,12 +64,12 @@ MeanValueFilter::vmult_add(Vector<number>& dst,
 
 template <typename number>
 void
-MeanValueFilter::filter(BlockVector<number>& v) const
+MeanValueFilter::filter(BlockVector<number> &v) const
 {
   Assert (component != numbers::invalid_unsigned_int,
           ExcNotInitialized());
 
-  for (unsigned int i=0;i<v.n_blocks();++i)
+  for (unsigned int i=0; i<v.n_blocks(); ++i)
     if (i == component)
       vmult(v.block(i), v.block(i));
     else
@@ -80,8 +80,8 @@ MeanValueFilter::filter(BlockVector<number>& v) const
 
 template <typename number>
 void
-MeanValueFilter::vmult(BlockVector<number>& dst,
-                           const BlockVector<number>& src) const
+MeanValueFilter::vmult(BlockVector<number> &dst,
+                       const BlockVector<number> &src) const
 {
   Assert (component != numbers::invalid_unsigned_int,
           ExcNotInitialized());
@@ -89,7 +89,7 @@ MeanValueFilter::vmult(BlockVector<number>& dst,
   Assert (dst.n_blocks() == src.n_blocks(),
           ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
 
-  for (unsigned int i=0;i<dst.n_blocks();++i)
+  for (unsigned int i=0; i<dst.n_blocks(); ++i)
     if (i == component)
       vmult(dst.block(i), src.block(i));
     else
@@ -100,8 +100,8 @@ MeanValueFilter::vmult(BlockVector<number>& dst,
 
 template <typename number>
 void
-MeanValueFilter::vmult_add(BlockVector<number>& dst,
-                           const BlockVector<number>& src) const
+MeanValueFilter::vmult_add(BlockVector<number> &dst,
+                           const BlockVector<number> &src) const
 {
   Assert (component != numbers::invalid_unsigned_int,
           ExcNotInitialized());
@@ -109,7 +109,7 @@ MeanValueFilter::vmult_add(BlockVector<number>& dst,
   Assert (dst.n_blocks() == src.n_blocks(),
           ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
 
-  for (unsigned int i=0;i<dst.n_blocks();++i)
+  for (unsigned int i=0; i<dst.n_blocks(); ++i)
     if (i == component)
       vmult_add(dst.block(i), src.block(i));
     else
@@ -122,13 +122,13 @@ MeanValueFilter::vmult_add(BlockVector<number>& dst,
 
 template <class VECTOR>
 InverseMatrixRichardson<VECTOR>::InverseMatrixRichardson(
-  SolverControl& c,
-  VectorMemory<VECTOR>& m)
-                :
-                mem(m),
-                solver(c,m),
-                matrix(0),
-                precondition(0)
+  SolverControl &c,
+  VectorMemory<VECTOR> &m)
+  :
+  mem(m),
+  solver(c,m),
+  matrix(0),
+  precondition(0)
 {}
 
 
@@ -142,7 +142,7 @@ InverseMatrixRichardson<VECTOR>::~InverseMatrixRichardson()
 
 template <class VECTOR>
 void
-InverseMatrixRichardson<VECTOR>::vmult(VECTOR& dst, const VECTOR& src) const
+InverseMatrixRichardson<VECTOR>::vmult(VECTOR &dst, const VECTOR &src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
@@ -151,7 +151,7 @@ InverseMatrixRichardson<VECTOR>::vmult(VECTOR& dst, const VECTOR& src) const
     {
       solver.solve(*matrix, dst, src, *precondition);
     }
-  catch(...)
+  catch (...)
     {}
 }
 
@@ -159,17 +159,17 @@ InverseMatrixRichardson<VECTOR>::vmult(VECTOR& dst, const VECTOR& src) const
 
 template <class VECTOR>
 void
-InverseMatrixRichardson<VECTOR>::vmult_add(VECTOR& dst, const VECTOR& src) const
+InverseMatrixRichardson<VECTOR>::vmult_add(VECTOR &dst, const VECTOR &src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
-  VECTOR* aux = mem.alloc();
+  VECTOR *aux = mem.alloc();
   aux->reinit(dst);
   try
     {
       solver.solve(*matrix, *aux, src, *precondition);
     }
-  catch(...)
+  catch (...)
     {}
   dst += *aux;
   mem.free(aux);
@@ -179,7 +179,7 @@ InverseMatrixRichardson<VECTOR>::vmult_add(VECTOR& dst, const VECTOR& src) const
 
 template <class VECTOR>
 void
-InverseMatrixRichardson<VECTOR>::Tvmult(VECTOR& dst, const VECTOR& src) const
+InverseMatrixRichardson<VECTOR>::Tvmult(VECTOR &dst, const VECTOR &src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
@@ -188,7 +188,7 @@ InverseMatrixRichardson<VECTOR>::Tvmult(VECTOR& dst, const VECTOR& src) const
     {
       solver.Tsolve(*matrix, dst, src, *precondition);
     }
-  catch(...)
+  catch (...)
     {}
 }
 
@@ -196,17 +196,17 @@ InverseMatrixRichardson<VECTOR>::Tvmult(VECTOR& dst, const VECTOR& src) const
 
 template <class VECTOR>
 void
-InverseMatrixRichardson<VECTOR>::Tvmult_add(VECTOR& dst, const VECTOR& src) const
+InverseMatrixRichardson<VECTOR>::Tvmult_add(VECTOR &dst, const VECTOR &src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
-  VECTOR* aux = mem.alloc();
+  VECTOR *aux = mem.alloc();
   aux->reinit(dst);
   try
     {
       solver.Tsolve(*matrix, *aux, src, *precondition);
     }
-  catch(...)
+  catch (...)
     {}
   dst += *aux;
   mem.free(aux);

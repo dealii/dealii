@@ -48,45 +48,45 @@ template <typename> class MGLevelObject;
 template <class VECTOR>
 class MGMatrixBase : public Subscriptor
 {
-  public:
-                                   /*
-                                    * Virtual destructor.
-                                    */
+public:
+  /*
+   * Virtual destructor.
+   */
   virtual ~MGMatrixBase();
 
-                                   /**
-                                    * Matrix-vector-multiplication on
-                                    * a certain level.
-                                    */
+  /**
+   * Matrix-vector-multiplication on
+   * a certain level.
+   */
   virtual void vmult (const unsigned int level,
-                      VECTOR& dst,
-                      const VECTOR& src) const = 0;
+                      VECTOR &dst,
+                      const VECTOR &src) const = 0;
 
-                                   /**
-                                    * Adding matrix-vector-multiplication on
-                                    * a certain level.
-                                    */
+  /**
+   * Adding matrix-vector-multiplication on
+   * a certain level.
+   */
   virtual void vmult_add (const unsigned int level,
-                          VECTOR& dst,
-                          const VECTOR& src) const = 0;
+                          VECTOR &dst,
+                          const VECTOR &src) const = 0;
 
-                                   /**
-                                    * Transpose
-                                    * matrix-vector-multiplication on
-                                    * a certain level.
-                                    */
+  /**
+   * Transpose
+   * matrix-vector-multiplication on
+   * a certain level.
+   */
   virtual void Tvmult (const unsigned int level,
-                       VECTOR& dst,
-                       const VECTOR& src) const = 0;
+                       VECTOR &dst,
+                       const VECTOR &src) const = 0;
 
-                                   /**
-                                    * Adding transpose
-                                    * matrix-vector-multiplication on
-                                    * a certain level.
-                                    */
+  /**
+   * Adding transpose
+   * matrix-vector-multiplication on
+   * a certain level.
+   */
   virtual void Tvmult_add (const unsigned int level,
-                           VECTOR& dst,
-                           const VECTOR& src) const = 0;
+                           VECTOR &dst,
+                           const VECTOR &src) const = 0;
 };
 
 
@@ -100,18 +100,18 @@ class MGMatrixBase : public Subscriptor
 template <class VECTOR>
 class MGCoarseGridBase : public Subscriptor
 {
-  public:
-                                     /**
-                                      * Virtual destructor.
-                                      */
-    virtual ~MGCoarseGridBase ();
+public:
+  /**
+   * Virtual destructor.
+   */
+  virtual ~MGCoarseGridBase ();
 
-                                     /**
-                                      * Solution operator.
-                                      */
-    virtual void operator() (const unsigned int   level,
-                             VECTOR       &dst,
-                             const VECTOR &src) const = 0;
+  /**
+   * Solution operator.
+   */
+  virtual void operator() (const unsigned int   level,
+                           VECTOR       &dst,
+                           const VECTOR &src) const = 0;
 };
 
 
@@ -162,67 +162,67 @@ class MGCoarseGridBase : public Subscriptor
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2007
  */
- template <class VECTOR>
- class MGTransferBase : public Subscriptor
- {
-   public:
-                                     /**
-                                      * Destructor. Does nothing here, but
-                                      * needs to be declared virtual anyway.
-                                      */
-     virtual ~MGTransferBase();
+template <class VECTOR>
+class MGTransferBase : public Subscriptor
+{
+public:
+  /**
+   * Destructor. Does nothing here, but
+   * needs to be declared virtual anyway.
+   */
+  virtual ~MGTransferBase();
 
-                                     /**
-                                      * Prolongate a vector from level
-                                      * <tt>to_level-1</tt> to level
-                                      * <tt>to_level</tt>. The previous
-                                      * content of <tt>dst</tt> is
-                                      * overwritten.
-                                      *
-                                      * @arg src is a vector with as
-                                      * many elements as there are
-                                      * degrees of freedom on the
-                                      * coarser level involved.
-                                      *
-                                      * @arg dst has as many elements
-                                      * as there are degrees of
-                                      * freedom on the finer level.
-                                      */
-     virtual void prolongate (const unsigned int to_level,
-                             VECTOR&            dst,
-                             const VECTOR&      src) const = 0;
+  /**
+   * Prolongate a vector from level
+   * <tt>to_level-1</tt> to level
+   * <tt>to_level</tt>. The previous
+   * content of <tt>dst</tt> is
+   * overwritten.
+   *
+   * @arg src is a vector with as
+   * many elements as there are
+   * degrees of freedom on the
+   * coarser level involved.
+   *
+   * @arg dst has as many elements
+   * as there are degrees of
+   * freedom on the finer level.
+   */
+  virtual void prolongate (const unsigned int to_level,
+                           VECTOR            &dst,
+                           const VECTOR      &src) const = 0;
 
-                                     /**
-                                      * Restrict a vector from level
-                                      * <tt>from_level</tt> to level
-                                      * <tt>from_level-1</tt> and add
-                                      * this restriction to
-                                      * <tt>dst</tt>. If the region
-                                      * covered by cells on level
-                                      * <tt>from_level</tt> is smaller
-                                      * than that of level
-                                      * <tt>from_level-1</tt> (local
-                                      * refinement), then some degrees
-                                      * of freedom in <tt>dst</tt> are
-                                      * active and will not be
-                                      * altered. For the other degress
-                                      * of freedom, the result of the
-                                      * restriction is added.
-                                      *
-                                      * @arg src is a vector with as
-                                      * many elements as there are
-                                      * degrees of freedom on the
-                                      * finer level
-                                      *
-                                      * @arg dst has as many elements as there
-                                      * are degrees of freedom on the coarser
-                                      * level.
-                                      *
-                                      */
-     virtual void restrict_and_add (const unsigned int from_level,
-                                   VECTOR&            dst,
-                                   const VECTOR&      src) const = 0;
- };
+  /**
+   * Restrict a vector from level
+   * <tt>from_level</tt> to level
+   * <tt>from_level-1</tt> and add
+   * this restriction to
+   * <tt>dst</tt>. If the region
+   * covered by cells on level
+   * <tt>from_level</tt> is smaller
+   * than that of level
+   * <tt>from_level-1</tt> (local
+   * refinement), then some degrees
+   * of freedom in <tt>dst</tt> are
+   * active and will not be
+   * altered. For the other degress
+   * of freedom, the result of the
+   * restriction is added.
+   *
+   * @arg src is a vector with as
+   * many elements as there are
+   * degrees of freedom on the
+   * finer level
+   *
+   * @arg dst has as many elements as there
+   * are degrees of freedom on the coarser
+   * level.
+   *
+   */
+  virtual void restrict_and_add (const unsigned int from_level,
+                                 VECTOR            &dst,
+                                 const VECTOR      &src) const = 0;
+};
 
 
 
@@ -235,24 +235,24 @@ class MGCoarseGridBase : public Subscriptor
 template <class VECTOR>
 class MGSmootherBase : public Subscriptor
 {
-  public:
-                                     /**
-                                      * Virtual destructor.
-                                      */
-    virtual ~MGSmootherBase();
-                                     /**
-                                      * Release matrices.
-                                      */
-    virtual void clear() = 0;
+public:
+  /**
+   * Virtual destructor.
+   */
+  virtual ~MGSmootherBase();
+  /**
+   * Release matrices.
+   */
+  virtual void clear() = 0;
 
-                                   /**
-                                    * Smoothing function. This is the
-                                    * function used in multigrid
-                                    * methods.
-                                    */
+  /**
+   * Smoothing function. This is the
+   * function used in multigrid
+   * methods.
+   */
   virtual void smooth (const unsigned int level,
-                       VECTOR&            u,
-                       const VECTOR&      rhs) const = 0;
+                       VECTOR            &u,
+                       const VECTOR      &rhs) const = 0;
 };
 
 /*@}*/

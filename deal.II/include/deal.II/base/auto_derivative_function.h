@@ -73,201 +73,201 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 class AutoDerivativeFunction : public Function<dim>
 {
-  public:
+public:
 
-                                     /**
-                                      * Names of difference formulas.
-                                      */
-    enum DifferenceFormula
-    {
-                                           /**
-                                            * The symmetric Euler
-                                            * formula of second order:
-                                            * @f[
-                                            * u'(t) \approx
-                                            * \frac{u(t+h) -
-                                            * u(t-h)}{2h}.
-                                            * @f]
-                                            */
-          Euler,
-                                           /**
-                                            * The upwind Euler
-                                            * formula of first order:
-                                            * @f[
-                                            * u'(t) \approx
-                                            * \frac{u(t) -
-                                            * u(t-h)}{h}.
-                                            * @f]
-                                            */
-          UpwindEuler,
-                                           /**
-                                            * The fourth order scheme
-                                            * @f[
-                                            * u'(t) \approx
-                                            * \frac{u(t-2h) - 8u(t-h)
-                                            * +  8u(t+h) - u(t+2h)}{12h}.
-                                            * @f]
-                                            */
-          FourthOrder
-    };
+  /**
+   * Names of difference formulas.
+   */
+  enum DifferenceFormula
+  {
+    /**
+     * The symmetric Euler
+     * formula of second order:
+     * @f[
+     * u'(t) \approx
+     * \frac{u(t+h) -
+     * u(t-h)}{2h}.
+     * @f]
+     */
+    Euler,
+    /**
+     * The upwind Euler
+     * formula of first order:
+     * @f[
+     * u'(t) \approx
+     * \frac{u(t) -
+     * u(t-h)}{h}.
+     * @f]
+     */
+    UpwindEuler,
+    /**
+     * The fourth order scheme
+     * @f[
+     * u'(t) \approx
+     * \frac{u(t-2h) - 8u(t-h)
+     * +  8u(t+h) - u(t+2h)}{12h}.
+     * @f]
+     */
+    FourthOrder
+  };
 
-                                     /**
-                                      * Constructor. Takes the
-                                      * difference step size
-                                      * <tt>h</tt>. It's within the user's
-                                      * responsibility to choose an
-                                      * appropriate value here. <tt>h</tt>
-                                      * should be chosen taking into
-                                      * account the absolute value as
-                                      * well as the amount of local
-                                      * variation of the function.
-                                      * Setting <tt>h=1e-6</tt> might be a
-                                      * good choice for functions with
-                                      * an absolute value of about 1,
-                                      * that furthermore does not vary
-                                      * to much.
-                                      *
-                                      * <tt>h</tt> can be changed later
-                                      * using the set_h() function.
-                                      *
-                                      * Sets DifferenceFormula
-                                      * <tt>formula</tt> to the default
-                                      * <tt>Euler</tt> formula of the
-                                      * set_formula()
-                                      * function. Change this preset
-                                      * formula by calling the
-                                      * set_formula() function.
-                                      */
-    AutoDerivativeFunction (const double h,
-                            const unsigned int n_components = 1,
-                            const double       initial_time = 0.0);
+  /**
+   * Constructor. Takes the
+   * difference step size
+   * <tt>h</tt>. It's within the user's
+   * responsibility to choose an
+   * appropriate value here. <tt>h</tt>
+   * should be chosen taking into
+   * account the absolute value as
+   * well as the amount of local
+   * variation of the function.
+   * Setting <tt>h=1e-6</tt> might be a
+   * good choice for functions with
+   * an absolute value of about 1,
+   * that furthermore does not vary
+   * to much.
+   *
+   * <tt>h</tt> can be changed later
+   * using the set_h() function.
+   *
+   * Sets DifferenceFormula
+   * <tt>formula</tt> to the default
+   * <tt>Euler</tt> formula of the
+   * set_formula()
+   * function. Change this preset
+   * formula by calling the
+   * set_formula() function.
+   */
+  AutoDerivativeFunction (const double h,
+                          const unsigned int n_components = 1,
+                          const double       initial_time = 0.0);
 
-                                     /**
-                                      * Virtual destructor; absolutely
-                                      * necessary in this case.
-                                      */
-    virtual ~AutoDerivativeFunction ();
+  /**
+   * Virtual destructor; absolutely
+   * necessary in this case.
+   */
+  virtual ~AutoDerivativeFunction ();
 
-                                     /**
-                                      * Choose the difference formula.
-                                      * See the enum #DifferenceFormula
-                                      * for available choices.
-                                      */
-    void set_formula (const DifferenceFormula formula = Euler);
+  /**
+   * Choose the difference formula.
+   * See the enum #DifferenceFormula
+   * for available choices.
+   */
+  void set_formula (const DifferenceFormula formula = Euler);
 
-                                     /**
-                                      * Takes the difference step size
-                                      * <tt>h</tt>. It's within the user's
-                                      * responsibility to choose an
-                                      * appropriate value here. <tt>h</tt>
-                                      * should be chosen taking into
-                                      * account the absolute value of
-                                      * as well as the amount of local
-                                      * variation of the function.
-                                      * Setting <tt>h=1e-6</tt> might be a
-                                      * good choice for functions with
-                                      * an absolute value of about 1,
-                                      * that furthermore does not vary
-                                      * to much.
-                                      */
-    void set_h (const double h);
+  /**
+   * Takes the difference step size
+   * <tt>h</tt>. It's within the user's
+   * responsibility to choose an
+   * appropriate value here. <tt>h</tt>
+   * should be chosen taking into
+   * account the absolute value of
+   * as well as the amount of local
+   * variation of the function.
+   * Setting <tt>h=1e-6</tt> might be a
+   * good choice for functions with
+   * an absolute value of about 1,
+   * that furthermore does not vary
+   * to much.
+   */
+  void set_h (const double h);
 
-                                     /**
-                                      * Return the gradient of the
-                                      * specified component of the
-                                      * function at the given point.
-                                      *
-                                      * Computes numerical difference
-                                      * quotients using the preset
-                                      * #DifferenceFormula.
-                                      */
-    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const;
+  /**
+   * Return the gradient of the
+   * specified component of the
+   * function at the given point.
+   *
+   * Computes numerical difference
+   * quotients using the preset
+   * #DifferenceFormula.
+   */
+  virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+                                  const unsigned int  component = 0) const;
 
-                                     /**
-                                      * Return the gradient of all
-                                      * components of the
-                                      * function at the given point.
-                                      *
-                                      * Computes numerical difference
-                                      * quotients using the preset
-                                      * #DifferenceFormula.
-                                      */
-    virtual void vector_gradient (const Point<dim>            &p,
-                                  std::vector<Tensor<1,dim> > &gradients) const;
+  /**
+   * Return the gradient of all
+   * components of the
+   * function at the given point.
+   *
+   * Computes numerical difference
+   * quotients using the preset
+   * #DifferenceFormula.
+   */
+  virtual void vector_gradient (const Point<dim>            &p,
+                                std::vector<Tensor<1,dim> > &gradients) const;
 
-                                     /**
-                                      * Set <tt>gradients</tt> to the
-                                      * gradients of the specified
-                                      * component of the function at
-                                      * the <tt>points</tt>.  It is assumed
-                                      * that <tt>gradients</tt> already has the
-                                      * right size, i.e.  the same
-                                      * size as the <tt>points</tt> array.
-                                      *
-                                      * Computes numerical difference
-                                      * quotients using the preset
-                                      * #DifferenceFormula.
-                                      */
-    virtual void gradient_list (const std::vector<Point<dim> > &points,
-                                std::vector<Tensor<1,dim> >    &gradients,
-                                const unsigned int              component = 0) const;
+  /**
+   * Set <tt>gradients</tt> to the
+   * gradients of the specified
+   * component of the function at
+   * the <tt>points</tt>.  It is assumed
+   * that <tt>gradients</tt> already has the
+   * right size, i.e.  the same
+   * size as the <tt>points</tt> array.
+   *
+   * Computes numerical difference
+   * quotients using the preset
+   * #DifferenceFormula.
+   */
+  virtual void gradient_list (const std::vector<Point<dim> > &points,
+                              std::vector<Tensor<1,dim> >    &gradients,
+                              const unsigned int              component = 0) const;
 
-                                     /**
-                                      * Set <tt>gradients</tt> to the gradients of
-                                      * the function at the <tt>points</tt>,
-                                      * for all components.
-                                      * It is assumed that <tt>gradients</tt>
-                                      * already has the right size, i.e.
-                                      * the same size as the <tt>points</tt> array.
-                                      *
-                                      * The outer loop over
-                                      * <tt>gradients</tt> is over the points
-                                      * in the list, the inner loop
-                                      * over the different components
-                                      * of the function.
-                                      *
-                                      * Computes numerical difference
-                                      * quotients using the preset
-                                      * #DifferenceFormula.
-                                      */
-    virtual void vector_gradient_list (const std::vector<Point<dim> > &points,
-                                       std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
+  /**
+   * Set <tt>gradients</tt> to the gradients of
+   * the function at the <tt>points</tt>,
+   * for all components.
+   * It is assumed that <tt>gradients</tt>
+   * already has the right size, i.e.
+   * the same size as the <tt>points</tt> array.
+   *
+   * The outer loop over
+   * <tt>gradients</tt> is over the points
+   * in the list, the inner loop
+   * over the different components
+   * of the function.
+   *
+   * Computes numerical difference
+   * quotients using the preset
+   * #DifferenceFormula.
+   */
+  virtual void vector_gradient_list (const std::vector<Point<dim> > &points,
+                                     std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
 
-                                     /**
-                                      * Returns a
-                                      * #DifferenceFormula of the
-                                      * order <tt>ord</tt> at minimum.
-                                      */
-    static
-    DifferenceFormula
-    get_formula_of_order (const unsigned int ord);
+  /**
+   * Returns a
+   * #DifferenceFormula of the
+   * order <tt>ord</tt> at minimum.
+   */
+  static
+  DifferenceFormula
+  get_formula_of_order (const unsigned int ord);
 
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException0(ExcInvalidFormula);
+  /**
+   * Exception.
+   */
+  DeclException0(ExcInvalidFormula);
 
-  private:
+private:
 
-                                     /**
-                                      * Step size of the difference
-                                      * formula. Set by the set_h()
-                                      * function.
-                                      */
-    double h;
+  /**
+   * Step size of the difference
+   * formula. Set by the set_h()
+   * function.
+   */
+  double h;
 
-                                     /**
-                                      * Includes the unit vectors
-                                      * scaled by <tt>h</tt>.
-                                      */
-    std::vector<Tensor<1,dim> > ht;
+  /**
+   * Includes the unit vectors
+   * scaled by <tt>h</tt>.
+   */
+  std::vector<Tensor<1,dim> > ht;
 
-                                     /**
-                                      * Difference formula. Set by the
-                                      * set_formula() function.
-                                      */
-    DifferenceFormula formula;
+  /**
+   * Difference formula. Set by the
+   * set_formula() function.
+   */
+  DifferenceFormula formula;
 };
 
 

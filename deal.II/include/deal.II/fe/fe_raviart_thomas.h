@@ -102,179 +102,179 @@ class FE_RaviartThomas
   :
   public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
 {
+public:
+  /**
+   * Constructor for the Raviart-Thomas
+   * element of degree @p p.
+   */
+  FE_RaviartThomas (const unsigned int p);
+
+  /**
+   * Return a string that uniquely
+   * identifies a finite
+   * element. This class returns
+   * <tt>FE_RaviartThomas<dim>(degree)</tt>, with
+   * @p dim and @p degree
+   * replaced by appropriate
+   * values.
+   */
+  virtual std::string get_name () const;
+
+
+  /**
+   * Check whether a shape function
+   * may be non-zero on a face.
+   *
+   * Right now, this is only
+   * implemented for RT0 in
+   * 1D. Otherwise, returns always
+   * @p true.
+   */
+  virtual bool has_support_on_face (const unsigned int shape_index,
+                                    const unsigned int face_index) const;
+
+  virtual void interpolate(std::vector<double>                &local_dofs,
+                           const std::vector<double> &values) const;
+  virtual void interpolate(std::vector<double>                &local_dofs,
+                           const std::vector<Vector<double> > &values,
+                           unsigned int offset = 0) const;
+  virtual void interpolate(
+    std::vector<double> &local_dofs,
+    const VectorSlice<const std::vector<std::vector<double> > > &values) const;
+  virtual std::size_t memory_consumption () const;
+  virtual FiniteElement<dim> *clone() const;
+
+private:
+  /**
+   * Only for internal use. Its
+   * full name is
+   * @p get_dofs_per_object_vector
+   * function and it creates the
+   * @p dofs_per_object vector that is
+   * needed within the constructor to
+   * be passed to the constructor of
+   * @p FiniteElementData.
+   */
+  static std::vector<unsigned int>
+  get_dpo_vector (const unsigned int degree);
+
+  /**
+   * Initialize the @p
+   * generalized_support_points
+   * field of the FiniteElement
+   * class and fill the tables with
+   * interpolation weights
+   * (#boundary_weights and
+   * #interior_weights). Called
+   * from the constructor.
+   */
+  void initialize_support_points (const unsigned int rt_degree);
+
+  /**
+   * Initialize the interpolation
+   * from functions on refined mesh
+   * cells onto the father
+   * cell. According to the
+   * philosophy of the
+   * Raviart-Thomas element, this
+   * restriction operator preserves
+   * the divergence of a function
+   * weakly.
+   */
+  void initialize_restriction ();
+
+  /**
+   * Fields of cell-independent data.
+   *
+   * For information about the
+   * general purpose of this class,
+   * see the documentation of the
+   * base class.
+   */
+  class InternalData : public FiniteElement<dim>::InternalDataBase
+  {
   public:
-                                     /**
-                                      * Constructor for the Raviart-Thomas
-                                      * element of degree @p p.
-                                      */
-    FE_RaviartThomas (const unsigned int p);
+    /**
+     * Array with shape function
+     * values in quadrature
+     * points. There is one row
+     * for each shape function,
+     * containing values for each
+     * quadrature point. Since
+     * the shape functions are
+     * vector-valued (with as
+     * many components as there
+     * are space dimensions), the
+     * value is a tensor.
+     *
+     * In this array, we store
+     * the values of the shape
+     * function in the quadrature
+     * points on the unit
+     * cell. The transformation
+     * to the real space cell is
+     * then simply done by
+     * multiplication with the
+     * Jacobian of the mapping.
+     */
+    std::vector<std::vector<Tensor<1,dim> > > shape_values;
 
-                                     /**
-                                      * Return a string that uniquely
-                                      * identifies a finite
-                                      * element. This class returns
-                                      * <tt>FE_RaviartThomas<dim>(degree)</tt>, with
-                                      * @p dim and @p degree
-                                      * replaced by appropriate
-                                      * values.
-                                      */
-    virtual std::string get_name () const;
+    /**
+     * Array with shape function
+     * gradients in quadrature
+     * points. There is one
+     * row for each shape
+     * function, containing
+     * values for each quadrature
+     * point.
+     *
+     * We store the gradients in
+     * the quadrature points on
+     * the unit cell. We then
+     * only have to apply the
+     * transformation (which is a
+     * matrix-vector
+     * multiplication) when
+     * visiting an actual cell.
+     */
+    std::vector<std::vector<Tensor<2,dim> > > shape_gradients;
+  };
 
+  /**
+   * These are the factors
+   * multiplied to a function in
+   * the
+   * #generalized_face_support_points
+   * when computing the
+   * integration. They are
+   * organized such that there is
+   * one row for each generalized
+   * face support point and one
+   * column for each degree of
+   * freedom on the face.
+  *
+  * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+  * for more information.
+   */
+  Table<2, double> boundary_weights;
+  /**
+   * Precomputed factors for
+   * interpolation of interior
+   * degrees of freedom. The
+   * rationale for this Table is
+   * the same as for
+   * #boundary_weights. Only, this
+   * table has a third coordinate
+   * for the space direction of the
+   * component evaluated.
+   */
+  Table<3, double> interior_weights;
 
-                                     /**
-                                      * Check whether a shape function
-                                      * may be non-zero on a face.
-                                      *
-                                      * Right now, this is only
-                                      * implemented for RT0 in
-                                      * 1D. Otherwise, returns always
-                                      * @p true.
-                                      */
-    virtual bool has_support_on_face (const unsigned int shape_index,
-                                      const unsigned int face_index) const;
-
-    virtual void interpolate(std::vector<double>&                local_dofs,
-                             const std::vector<double>& values) const;
-    virtual void interpolate(std::vector<double>&                local_dofs,
-                             const std::vector<Vector<double> >& values,
-                             unsigned int offset = 0) const;
-    virtual void interpolate(
-      std::vector<double>& local_dofs,
-      const VectorSlice<const std::vector<std::vector<double> > >& values) const;
-    virtual std::size_t memory_consumption () const;
-    virtual FiniteElement<dim> * clone() const;
-
-  private:
-                                     /**
-                                      * Only for internal use. Its
-                                      * full name is
-                                      * @p get_dofs_per_object_vector
-                                      * function and it creates the
-                                      * @p dofs_per_object vector that is
-                                      * needed within the constructor to
-                                      * be passed to the constructor of
-                                      * @p FiniteElementData.
-                                      */
-    static std::vector<unsigned int>
-    get_dpo_vector (const unsigned int degree);
-
-                                     /**
-                                      * Initialize the @p
-                                      * generalized_support_points
-                                      * field of the FiniteElement
-                                      * class and fill the tables with
-                                      * interpolation weights
-                                      * (#boundary_weights and
-                                      * #interior_weights). Called
-                                      * from the constructor.
-                                      */
-    void initialize_support_points (const unsigned int rt_degree);
-
-                                     /**
-                                      * Initialize the interpolation
-                                      * from functions on refined mesh
-                                      * cells onto the father
-                                      * cell. According to the
-                                      * philosophy of the
-                                      * Raviart-Thomas element, this
-                                      * restriction operator preserves
-                                      * the divergence of a function
-                                      * weakly.
-                                      */
-    void initialize_restriction ();
-
-                                     /**
-                                      * Fields of cell-independent data.
-                                      *
-                                      * For information about the
-                                      * general purpose of this class,
-                                      * see the documentation of the
-                                      * base class.
-                                      */
-    class InternalData : public FiniteElement<dim>::InternalDataBase
-    {
-      public:
-                                         /**
-                                          * Array with shape function
-                                          * values in quadrature
-                                          * points. There is one row
-                                          * for each shape function,
-                                          * containing values for each
-                                          * quadrature point. Since
-                                          * the shape functions are
-                                          * vector-valued (with as
-                                          * many components as there
-                                          * are space dimensions), the
-                                          * value is a tensor.
-                                          *
-                                          * In this array, we store
-                                          * the values of the shape
-                                          * function in the quadrature
-                                          * points on the unit
-                                          * cell. The transformation
-                                          * to the real space cell is
-                                          * then simply done by
-                                          * multiplication with the
-                                          * Jacobian of the mapping.
-                                          */
-        std::vector<std::vector<Tensor<1,dim> > > shape_values;
-
-                                         /**
-                                          * Array with shape function
-                                          * gradients in quadrature
-                                          * points. There is one
-                                          * row for each shape
-                                          * function, containing
-                                          * values for each quadrature
-                                          * point.
-                                          *
-                                          * We store the gradients in
-                                          * the quadrature points on
-                                          * the unit cell. We then
-                                          * only have to apply the
-                                          * transformation (which is a
-                                          * matrix-vector
-                                          * multiplication) when
-                                          * visiting an actual cell.
-                                          */
-        std::vector<std::vector<Tensor<2,dim> > > shape_gradients;
-    };
-
-                                     /**
-                                      * These are the factors
-                                      * multiplied to a function in
-                                      * the
-                                      * #generalized_face_support_points
-                                      * when computing the
-                                      * integration. They are
-                                      * organized such that there is
-                                      * one row for each generalized
-                                      * face support point and one
-                                      * column for each degree of
-                                      * freedom on the face.
-				      *
-				      * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
-				      * for more information.
-                                      */
-    Table<2, double> boundary_weights;
-                                     /**
-                                      * Precomputed factors for
-                                      * interpolation of interior
-                                      * degrees of freedom. The
-                                      * rationale for this Table is
-                                      * the same as for
-                                      * #boundary_weights. Only, this
-                                      * table has a third coordinate
-                                      * for the space direction of the
-                                      * component evaluated.
-                                      */
-    Table<3, double> interior_weights;
-
-                                     /**
-                                      * Allow access from other
-                                      * dimensions.
-                                      */
-    template <int dim1> friend class FE_RaviartThomas;
+  /**
+   * Allow access from other
+   * dimensions.
+   */
+  template <int dim1> friend class FE_RaviartThomas;
 };
 
 
@@ -326,101 +326,101 @@ class FE_RaviartThomasNodal
   :
   public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
 {
-  public:
-                                     /**
-                                      * Constructor for the Raviart-Thomas
-                                      * element of degree @p p.
-                                      */
-    FE_RaviartThomasNodal (const unsigned int p);
+public:
+  /**
+   * Constructor for the Raviart-Thomas
+   * element of degree @p p.
+   */
+  FE_RaviartThomasNodal (const unsigned int p);
 
-                                     /**
-                                      * Return a string that uniquely
-                                      * identifies a finite
-                                      * element. This class returns
-                                      * <tt>FE_RaviartThomasNodal<dim>(degree)</tt>, with
-                                      * @p dim and @p degree
-                                      * replaced by appropriate
-                                      * values.
-                                      */
-    virtual std::string get_name () const;
+  /**
+   * Return a string that uniquely
+   * identifies a finite
+   * element. This class returns
+   * <tt>FE_RaviartThomasNodal<dim>(degree)</tt>, with
+   * @p dim and @p degree
+   * replaced by appropriate
+   * values.
+   */
+  virtual std::string get_name () const;
 
-    virtual FiniteElement<dim>* clone () const;
+  virtual FiniteElement<dim> *clone () const;
 
-    virtual void interpolate(std::vector<double>&                local_dofs,
-                             const std::vector<double>& values) const;
-    virtual void interpolate(std::vector<double>&                local_dofs,
-                             const std::vector<Vector<double> >& values,
-                             unsigned int offset = 0) const;
-    virtual void interpolate(
-      std::vector<double>& local_dofs,
-      const VectorSlice<const std::vector<std::vector<double> > >& values) const;
+  virtual void interpolate(std::vector<double>                &local_dofs,
+                           const std::vector<double> &values) const;
+  virtual void interpolate(std::vector<double>                &local_dofs,
+                           const std::vector<Vector<double> > &values,
+                           unsigned int offset = 0) const;
+  virtual void interpolate(
+    std::vector<double> &local_dofs,
+    const VectorSlice<const std::vector<std::vector<double> > > &values) const;
 
 
-    virtual void get_face_interpolation_matrix (const FiniteElement<dim> &source,
-                                                FullMatrix<double>       &matrix) const;
+  virtual void get_face_interpolation_matrix (const FiniteElement<dim> &source,
+                                              FullMatrix<double>       &matrix) const;
 
-    virtual void get_subface_interpolation_matrix (const FiniteElement<dim> &source,
-                                                   const unsigned int        subface,
-                                                   FullMatrix<double>       &matrix) const;
-    virtual bool hp_constraints_are_implemented () const;
+  virtual void get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+                                                 const unsigned int        subface,
+                                                 FullMatrix<double>       &matrix) const;
+  virtual bool hp_constraints_are_implemented () const;
 
-    virtual std::vector<std::pair<unsigned int, unsigned int> >
-    hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+  virtual std::vector<std::pair<unsigned int, unsigned int> >
+  hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
 
-    virtual std::vector<std::pair<unsigned int, unsigned int> >
-    hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+  virtual std::vector<std::pair<unsigned int, unsigned int> >
+  hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
 
-    virtual std::vector<std::pair<unsigned int, unsigned int> >
-    hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+  virtual std::vector<std::pair<unsigned int, unsigned int> >
+  hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
 
-    virtual FiniteElementDomination::Domination
-    compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+  virtual FiniteElementDomination::Domination
+  compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
 
-  private:
-                                     /**
-                                      * Only for internal use. Its
-                                      * full name is
-                                      * @p get_dofs_per_object_vector
-                                      * function and it creates the
-                                      * @p dofs_per_object vector that is
-                                      * needed within the constructor to
-                                      * be passed to the constructor of
-                                      * @p FiniteElementData.
-                                      */
-    static std::vector<unsigned int>
-    get_dpo_vector (const unsigned int degree);
+private:
+  /**
+   * Only for internal use. Its
+   * full name is
+   * @p get_dofs_per_object_vector
+   * function and it creates the
+   * @p dofs_per_object vector that is
+   * needed within the constructor to
+   * be passed to the constructor of
+   * @p FiniteElementData.
+   */
+  static std::vector<unsigned int>
+  get_dpo_vector (const unsigned int degree);
 
-                                     /**
-                                      * Compute the vector used for
-                                      * the
-                                      * @p restriction_is_additive
-                                      * field passed to the base
-                                      * class's constructor.
-                                      */
-    static std::vector<bool>
-    get_ria_vector (const unsigned int degree);
-                                     /**
-                                      * Check whether a shape function
-                                      * may be non-zero on a face.
-                                      *
-                                      * Right now, this is only
-                                      * implemented for RT0 in
-                                      * 1D. Otherwise, returns always
-                                      * @p true.
-                                      */
-    virtual bool has_support_on_face (const unsigned int shape_index,
-                                      const unsigned int face_index) const;
-                                     /**
-                                      * Initialize the
-                                      * FiniteElement<dim>::generalized_support_points
-                                      * and FiniteElement<dim>::generalized_face_support_points
-                                      * fields. Called from the
-                                      * constructor.
-				      *
-				      * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
-				      * for more information.
-                                      */
-    void initialize_support_points (const unsigned int rt_degree);
+  /**
+   * Compute the vector used for
+   * the
+   * @p restriction_is_additive
+   * field passed to the base
+   * class's constructor.
+   */
+  static std::vector<bool>
+  get_ria_vector (const unsigned int degree);
+  /**
+   * Check whether a shape function
+   * may be non-zero on a face.
+   *
+   * Right now, this is only
+   * implemented for RT0 in
+   * 1D. Otherwise, returns always
+   * @p true.
+   */
+  virtual bool has_support_on_face (const unsigned int shape_index,
+                                    const unsigned int face_index) const;
+  /**
+   * Initialize the
+   * FiniteElement<dim>::generalized_support_points
+   * and FiniteElement<dim>::generalized_face_support_points
+   * fields. Called from the
+   * constructor.
+  *
+  * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+  * for more information.
+   */
+  void initialize_support_points (const unsigned int rt_degree);
 };
 
 

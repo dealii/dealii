@@ -24,11 +24,11 @@ template <int dim>
 FunctionDerivative<dim>::FunctionDerivative (const Function<dim> &f,
                                              const Point<dim>    &dir,
                                              const double         h)
-                :
-                AutoDerivativeFunction<dim> (h, f.n_components, f.get_time()),
-                f(f),
-                h(h),
-                incr(1, h*dir)
+  :
+  AutoDerivativeFunction<dim> (h, f.n_components, f.get_time()),
+  f(f),
+  h(h),
+  incr(1, h *dir)
 {
   set_formula();
 }
@@ -36,16 +36,16 @@ FunctionDerivative<dim>::FunctionDerivative (const Function<dim> &f,
 
 
 template <int dim>
-FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
-                                             const std::vector<Point<dim> >& dir,
+FunctionDerivative<dim>::FunctionDerivative (const Function<dim> &f,
+                                             const std::vector<Point<dim> > &dir,
                                              const double h)
-                :
-                AutoDerivativeFunction<dim> (h, f.n_components, f.get_time()),
+  :
+  AutoDerivativeFunction<dim> (h, f.n_components, f.get_time()),
   f(f),
   h(h),
   incr(dir.size())
 {
-  for (unsigned int i=0;i<incr.size ();++i)
+  for (unsigned int i=0; i<incr.size (); ++i)
     incr[i] = h*dir[i];
   set_formula();
 }
@@ -65,7 +65,7 @@ template <int dim>
 void
 FunctionDerivative<dim>::set_h (const double new_h)
 {
-  for (unsigned int i=0;i<incr.size ();++i)
+  for (unsigned int i=0; i<incr.size (); ++i)
     incr[i] *= new_h/h;
   h = new_h;
 }
@@ -82,15 +82,15 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
 
   switch (formula)
     {
-      case AutoDerivativeFunction<dim>::Euler:
-            return (f.value(p+incr[0], component)-f.value(p-incr[0], component))/(2*h);
-      case AutoDerivativeFunction<dim>::UpwindEuler:
-            return (f.value(p, component)-f.value(p-incr[0], component))/h;
-      case AutoDerivativeFunction<dim>::FourthOrder:
-            return (-f.value(p+2*incr[0], component) + 8*f.value(p+incr[0], component)
-                    -8*f.value(p-incr[0], component) + f.value(p-2*incr[0], component))/(12*h);
-      default:
-            Assert(false, ExcInvalidFormula());
+    case AutoDerivativeFunction<dim>::Euler:
+      return (f.value(p+incr[0], component)-f.value(p-incr[0], component))/(2*h);
+    case AutoDerivativeFunction<dim>::UpwindEuler:
+      return (f.value(p, component)-f.value(p-incr[0], component))/h;
+    case AutoDerivativeFunction<dim>::FourthOrder:
+      return (-f.value(p+2*incr[0], component) + 8*f.value(p+incr[0], component)
+              -8*f.value(p-incr[0], component) + f.value(p-2*incr[0], component))/(12*h);
+    default:
+      Assert(false, ExcInvalidFormula());
     }
   return 0.;
 }
@@ -101,39 +101,39 @@ template <int dim>
 void
 FunctionDerivative<dim>::vector_value (
   const Point<dim>   &p,
-  Vector<double>& result) const
+  Vector<double> &result) const
 {
   Assert (incr.size() == 1,
           ExcMessage ("FunctionDerivative was not initialized for constant direction"));
   Vector<double> aux(result.size());
 
-                                   // Formulas are the same as in
-                                   // value, but here we have to use
-                                   // Vector arithmetic
+  // Formulas are the same as in
+  // value, but here we have to use
+  // Vector arithmetic
   switch (formula)
     {
-      case AutoDerivativeFunction<dim>::Euler:
-            f.vector_value(p+incr[0], result);
-            f.vector_value(p-incr[0], aux);
-            result.sadd(1./(2*h), -1./(2*h), aux);
-            return;
-      case AutoDerivativeFunction<dim>::UpwindEuler:
-            f.vector_value(p, result);
-            f.vector_value(p-incr[0], aux);
-            result.sadd(1./h, -1./h, aux);
-            return;
-      case AutoDerivativeFunction<dim>::FourthOrder:
-            f.vector_value(p-2*incr[0], result);
-            f.vector_value(p+2*incr[0], aux);
-            result.add(-1., aux);
-            f.vector_value(p-incr[0], aux);
-            result.add(-8., aux);
-            f.vector_value(p+incr[0], aux);
-            result.add(8., aux);
-            result.scale(1./(12*h));
-            return;
-      default:
-            Assert(false, ExcInvalidFormula());
+    case AutoDerivativeFunction<dim>::Euler:
+      f.vector_value(p+incr[0], result);
+      f.vector_value(p-incr[0], aux);
+      result.sadd(1./(2*h), -1./(2*h), aux);
+      return;
+    case AutoDerivativeFunction<dim>::UpwindEuler:
+      f.vector_value(p, result);
+      f.vector_value(p-incr[0], aux);
+      result.sadd(1./h, -1./h, aux);
+      return;
+    case AutoDerivativeFunction<dim>::FourthOrder:
+      f.vector_value(p-2*incr[0], result);
+      f.vector_value(p+2*incr[0], aux);
+      result.add(-1., aux);
+      f.vector_value(p-incr[0], aux);
+      result.add(-8., aux);
+      f.vector_value(p+incr[0], aux);
+      result.add(8., aux);
+      result.scale(1./(12*h));
+      return;
+    default:
+      Assert(false, ExcInvalidFormula());
     }
 }
 
@@ -151,55 +151,55 @@ FunctionDerivative<dim>::value_list (const std::vector<Point<dim> > &points,
     Assert (incr.size() == points.size(),
             ExcDimensionMismatch(incr.size(), points.size()));
 
-                                   // Vector of auxiliary values
+  // Vector of auxiliary values
   std::vector<double> aux(n);
-                                   // Vector of auxiliary points
+  // Vector of auxiliary points
   std::vector<Point<dim> > paux(n);
-                                   // Use the same formulas as in
-                                   // value, but with vector
-                                   // arithmetic
+  // Use the same formulas as in
+  // value, but with vector
+  // arithmetic
   switch (formula)
     {
-      case AutoDerivativeFunction<dim>::Euler:
-            for (unsigned int i=0; i<n; ++i)
-              paux[i] = points[i]+incr[(variable_direction) ? i : 0U];
-            f.value_list(paux, values, component);
-            for (unsigned int i=0; i<n; ++i)
-              paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
-            f.value_list(paux, aux, component);
-            for (unsigned int i=0; i<n; ++i)
-              values[i] = (values[i]-aux[i])/(2*h);
-            return;
-      case AutoDerivativeFunction<dim>::UpwindEuler:
-            f.value_list(points, values, component);
-            for (unsigned int i=0; i<n; ++i)
-              paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
-            f.value_list(paux, aux, component);
-            for (unsigned int i=0; i<n; ++i)
-              values[i] = (values[i]-aux[i])/h;
-            return;
-      case AutoDerivativeFunction<dim>::FourthOrder:
-            for (unsigned int i=0; i<n; ++i)
-              paux[i] = points[i]-2*incr[(variable_direction) ? i : 0U];
-            f.value_list(paux, values, component);
-            for (unsigned int i=0; i<n; ++i)
-              paux[i] = points[i]+2*incr[(variable_direction) ? i : 0U];
-            f.value_list(paux, aux, component);
-            for (unsigned int i=0; i<n; ++i)
-              values[i] -= aux[i];
-            for (unsigned int i=0; i<n; ++i)
-              paux[i] = points[i]+incr[(variable_direction) ? i : 0U];
-            f.value_list(paux, aux, component);
-            for (unsigned int i=0; i<n; ++i)
-              values[i] += 8.*aux[i];
-            for (unsigned int i=0; i<n; ++i)
-              paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
-            f.value_list(paux, aux, component);
-            for (unsigned int i=0; i<n; ++i)
-              values[i] = (values[i] - 8.*aux[i])/(12*h);
-            return;
-      default:
-            Assert(false, ExcInvalidFormula());
+    case AutoDerivativeFunction<dim>::Euler:
+      for (unsigned int i=0; i<n; ++i)
+        paux[i] = points[i]+incr[(variable_direction) ? i : 0U];
+      f.value_list(paux, values, component);
+      for (unsigned int i=0; i<n; ++i)
+        paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
+      f.value_list(paux, aux, component);
+      for (unsigned int i=0; i<n; ++i)
+        values[i] = (values[i]-aux[i])/(2*h);
+      return;
+    case AutoDerivativeFunction<dim>::UpwindEuler:
+      f.value_list(points, values, component);
+      for (unsigned int i=0; i<n; ++i)
+        paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
+      f.value_list(paux, aux, component);
+      for (unsigned int i=0; i<n; ++i)
+        values[i] = (values[i]-aux[i])/h;
+      return;
+    case AutoDerivativeFunction<dim>::FourthOrder:
+      for (unsigned int i=0; i<n; ++i)
+        paux[i] = points[i]-2*incr[(variable_direction) ? i : 0U];
+      f.value_list(paux, values, component);
+      for (unsigned int i=0; i<n; ++i)
+        paux[i] = points[i]+2*incr[(variable_direction) ? i : 0U];
+      f.value_list(paux, aux, component);
+      for (unsigned int i=0; i<n; ++i)
+        values[i] -= aux[i];
+      for (unsigned int i=0; i<n; ++i)
+        paux[i] = points[i]+incr[(variable_direction) ? i : 0U];
+      f.value_list(paux, aux, component);
+      for (unsigned int i=0; i<n; ++i)
+        values[i] += 8.*aux[i];
+      for (unsigned int i=0; i<n; ++i)
+        paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
+      f.value_list(paux, aux, component);
+      for (unsigned int i=0; i<n; ++i)
+        values[i] = (values[i] - 8.*aux[i])/(12*h);
+      return;
+    default:
+      Assert(false, ExcInvalidFormula());
     }
 }
 
@@ -209,8 +209,8 @@ template <int dim>
 std::size_t
 FunctionDerivative<dim>::memory_consumption () const
 {
-                                   // only simple data elements, so
-                                   // use sizeof operator
+  // only simple data elements, so
+  // use sizeof operator
   return sizeof (*this);
 }
 

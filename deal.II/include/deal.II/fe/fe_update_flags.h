@@ -77,193 +77,193 @@ DEAL_II_NAMESPACE_OPEN
  */
 enum UpdateFlags
 {
-                                       //! No update
-      update_default                      = 0,
-                                       //! Shape function values
-                                       /**
-                                        * Compute the values of the
-                                        * shape functions at the
-                                        * quadrature points on the
-                                        * real space cell. For the
-                                        * usual Lagrange elements,
-                                        * these values are equal to
-                                        * the values of the shape
-                                        * functions at the quadrature
-                                        * points on the unit cell, but
-                                        * they are different for more
-                                        * complicated elements, such
-                                        * as FE_RaviartThomas
-                                        * elements.
-                                        */
-      update_values                       = 0x0001,
-                                       //! Shape function gradients
-                                       /**
-                                        * Compute the gradients of the
-                                        * shape functions in
-                                        * coordinates of the real
-                                        * cell.
-                                        */
-      update_gradients                    = 0x0002,
-                                       //! Second derivatives of shape functions
-                                       /**
-                                        * Compute the second
-                                        * derivatives of the shape
-                                        * functions in coordinates of
-                                        * the real cell.
-                                        */
-      update_hessians                     = 0x0004,
-                                       //! Outer normal vector, not normalized
-                                       /**
-                                        * Vector product of tangential
-                                        * vectors, yielding a normal
-                                        * vector with a length
-                                        * corresponding to the surface
-                                        * element; may be more
-                                        * efficient than computing
-                                        * both.
-                                        */
-      update_boundary_forms               = 0x0008,
-                                       //! Transformed quadrature points
-                                       /**
-                                        * Compute the quadrature
-                                        * points transformed into real
-                                        * cell coordinates.
-                                        */
-      update_quadrature_points            = 0x0010,
-                                       //! Transformed quadrature weights
-                                       /**
-                                        * Compute the quadrature
-                                        * weights on the real cell,
-                                        * i.e. the weights of the
-                                        * quadrature rule multiplied
-                                        * with the determinant of the
-                                        * Jacoian of the
-                                        * transformation from
-                                        * reference to realcell.
-                                        */
-      update_JxW_values                   = 0x0020,
-                                       //! Normal vectors
-                                       /**
-                                        * Compute the normal vectors,
-                                        * either for a face or for a
-                                        * cell of codimension
-                                        * one. Setting this flag for
-                                        * any other object will raise
-                                        * an error.
-                                        */
-      update_normal_vectors               = 0x0040,
-                                       /**
-                                        * @deprecated Use #update_normal_vectors
-                                        */
-      update_face_normal_vectors          = update_normal_vectors,
-                                       /**
-                                        * @deprecated Use #update_normal_vectors
-                                        */
-      update_cell_normal_vectors          = update_normal_vectors,
-                                       //! Volume element
-                                       /**
-                                        * Compute the Jacobian of the
-                                        * transformation from the
-                                        * reference cell to the real
-                                        * cell.
-                                        */
-      update_jacobians                    = 0x0080,
-                                       //! Gradient of volume element
-                                       /**
-                                        * Compute the dervatives of
-                                        * the Jacobian of the
-                                        * transformation.
-                                        */
-      update_jacobian_grads               = 0x0100,
-                                       //! Volume element
-                                       /**
-                                        * Compute the inverse
-                                        * Jacobian of the
-                                        * transformation from the
-                                        * reference cell to the real
-                                        * cell.
-                                        */
-      update_inverse_jacobians            = 0x0200,
-                                       //! Covariant transformation
-                                       /**
-                                        * Compute all values the
-                                        * Mapping needs to perform a
-                                        * contravariant transformation of
-                                        * vectors. For special
-                                        * mappings like
-                                        * MappingCartesian this may be
-                                        * simpler than
-                                        * #update_inverse_jacobians.
-                                        */
-      update_covariant_transformation     = 0x0400,
-                                       //! Contravariant transformation
-                                       /**
-                                        * Compute all values the
-                                        * Mapping needs to perform a
-                                        * contravariant transformation of
-                                        * vectors. For special
-                                        * mappings like
-                                        * MappingCartesian this may be
-                                        * simpler than
-                                        * #update_jacobians.
-                                        */
-      update_contravariant_transformation = 0x0800,
-                                       //! Shape function values of transformation
-                                       /**
-                                        * Compute the shape function
-                                        * values of the transformation
-                                        * defined by the Mapping.
-                                        */
-      update_transformation_values        = 0x1000,
-                                       //! Shape function gradients of transformation
-                                       /**
-                                        * Compute the shape function
-                                        * gradients of the
-                                        * transformation defined by
-                                        * the Mapping.
-                                        */
-      update_transformation_gradients     = 0x2000,
-                                       //! Determinant of the Jacobian
-                                       /**
-                                        * Compute the volume element
-                                        * in each quadrature point.
-                                        */
-      update_volume_elements              = 0x4000,
-                                       /**
-                                        * Update the location of the
-                                        * mapped generalized support
-                                        * points of the element.
-                                        */
-      update_support_points               = 0x10000,
-                                       /**
-                                        * Update the Jacobian of the
-                                        * mapping in generalized
-                                        * support points.
-                                        */
-      update_support_jacobians            = 0x20000,
-                                       /**
-                                        * Update the inverse Jacobian
-                                        * of the mapping in
-                                        * generalized support points.
-                                        */
-      update_support_inverse_jacobians    = 0x40000,
-                                       /**
-                                        * @deprecated Update
-                                        * quadrature points
-                                        */
-      update_q_points = update_quadrature_points,
-                                       /**
-                                        * @deprecated Update second
-                                        * derivatives.
-                                        */
-      update_second_derivatives = update_hessians,
-                                       //! Values needed for Piola transform
-                                       /**
-                                        * Combination of the flags
-                                        * needed for Piola transform
-                                        * of Hdiv elements.
-                                        */
-      update_piola = update_volume_elements | update_contravariant_transformation
+  //! No update
+  update_default                      = 0,
+  //! Shape function values
+  /**
+   * Compute the values of the
+   * shape functions at the
+   * quadrature points on the
+   * real space cell. For the
+   * usual Lagrange elements,
+   * these values are equal to
+   * the values of the shape
+   * functions at the quadrature
+   * points on the unit cell, but
+   * they are different for more
+   * complicated elements, such
+   * as FE_RaviartThomas
+   * elements.
+   */
+  update_values                       = 0x0001,
+  //! Shape function gradients
+  /**
+   * Compute the gradients of the
+   * shape functions in
+   * coordinates of the real
+   * cell.
+   */
+  update_gradients                    = 0x0002,
+  //! Second derivatives of shape functions
+  /**
+   * Compute the second
+   * derivatives of the shape
+   * functions in coordinates of
+   * the real cell.
+   */
+  update_hessians                     = 0x0004,
+  //! Outer normal vector, not normalized
+  /**
+   * Vector product of tangential
+   * vectors, yielding a normal
+   * vector with a length
+   * corresponding to the surface
+   * element; may be more
+   * efficient than computing
+   * both.
+   */
+  update_boundary_forms               = 0x0008,
+  //! Transformed quadrature points
+  /**
+   * Compute the quadrature
+   * points transformed into real
+   * cell coordinates.
+   */
+  update_quadrature_points            = 0x0010,
+  //! Transformed quadrature weights
+  /**
+   * Compute the quadrature
+   * weights on the real cell,
+   * i.e. the weights of the
+   * quadrature rule multiplied
+   * with the determinant of the
+   * Jacoian of the
+   * transformation from
+   * reference to realcell.
+   */
+  update_JxW_values                   = 0x0020,
+  //! Normal vectors
+  /**
+   * Compute the normal vectors,
+   * either for a face or for a
+   * cell of codimension
+   * one. Setting this flag for
+   * any other object will raise
+   * an error.
+   */
+  update_normal_vectors               = 0x0040,
+  /**
+   * @deprecated Use #update_normal_vectors
+   */
+  update_face_normal_vectors          = update_normal_vectors,
+  /**
+   * @deprecated Use #update_normal_vectors
+   */
+  update_cell_normal_vectors          = update_normal_vectors,
+  //! Volume element
+  /**
+   * Compute the Jacobian of the
+   * transformation from the
+   * reference cell to the real
+   * cell.
+   */
+  update_jacobians                    = 0x0080,
+  //! Gradient of volume element
+  /**
+   * Compute the dervatives of
+   * the Jacobian of the
+   * transformation.
+   */
+  update_jacobian_grads               = 0x0100,
+  //! Volume element
+  /**
+   * Compute the inverse
+   * Jacobian of the
+   * transformation from the
+   * reference cell to the real
+   * cell.
+   */
+  update_inverse_jacobians            = 0x0200,
+  //! Covariant transformation
+  /**
+   * Compute all values the
+   * Mapping needs to perform a
+   * contravariant transformation of
+   * vectors. For special
+   * mappings like
+   * MappingCartesian this may be
+   * simpler than
+   * #update_inverse_jacobians.
+   */
+  update_covariant_transformation     = 0x0400,
+  //! Contravariant transformation
+  /**
+   * Compute all values the
+   * Mapping needs to perform a
+   * contravariant transformation of
+   * vectors. For special
+   * mappings like
+   * MappingCartesian this may be
+   * simpler than
+   * #update_jacobians.
+   */
+  update_contravariant_transformation = 0x0800,
+  //! Shape function values of transformation
+  /**
+   * Compute the shape function
+   * values of the transformation
+   * defined by the Mapping.
+   */
+  update_transformation_values        = 0x1000,
+  //! Shape function gradients of transformation
+  /**
+   * Compute the shape function
+   * gradients of the
+   * transformation defined by
+   * the Mapping.
+   */
+  update_transformation_gradients     = 0x2000,
+  //! Determinant of the Jacobian
+  /**
+   * Compute the volume element
+   * in each quadrature point.
+   */
+  update_volume_elements              = 0x4000,
+  /**
+   * Update the location of the
+   * mapped generalized support
+   * points of the element.
+   */
+  update_support_points               = 0x10000,
+  /**
+   * Update the Jacobian of the
+   * mapping in generalized
+   * support points.
+   */
+  update_support_jacobians            = 0x20000,
+  /**
+   * Update the inverse Jacobian
+   * of the mapping in
+   * generalized support points.
+   */
+  update_support_inverse_jacobians    = 0x40000,
+  /**
+   * @deprecated Update
+   * quadrature points
+   */
+  update_q_points = update_quadrature_points,
+  /**
+   * @deprecated Update second
+   * derivatives.
+   */
+  update_second_derivatives = update_hessians,
+  //! Values needed for Piola transform
+  /**
+   * Combination of the flags
+   * needed for Piola transform
+   * of Hdiv elements.
+   */
+  update_piola = update_volume_elements | update_contravariant_transformation
 };
 
 
@@ -274,7 +274,7 @@ enum UpdateFlags
  */
 template <class STREAM>
 inline
-STREAM& operator << (STREAM& s, UpdateFlags u)
+STREAM &operator << (STREAM &s, UpdateFlags u)
 {
   s << " UpdateFlags|";
   if (u & update_values)                       s << "values|";
@@ -314,8 +314,8 @@ UpdateFlags
 operator | (UpdateFlags f1, UpdateFlags f2)
 {
   return static_cast<UpdateFlags> (
-    static_cast<unsigned int> (f1) |
-    static_cast<unsigned int> (f2));
+           static_cast<unsigned int> (f1) |
+           static_cast<unsigned int> (f2));
 }
 
 
@@ -351,8 +351,8 @@ UpdateFlags
 operator & (UpdateFlags f1, UpdateFlags f2)
 {
   return static_cast<UpdateFlags> (
-    static_cast<unsigned int> (f1) &
-    static_cast<unsigned int> (f2));
+           static_cast<unsigned int> (f1) &
+           static_cast<unsigned int> (f2));
 }
 
 
@@ -385,12 +385,12 @@ operator &= (UpdateFlags &f1, UpdateFlags f2)
 namespace CellSimilarity
 {
   enum Similarity
-    {
-      none,
-      translation,
-      inverted_translation,
-      invalid_next_cell
-    };
+  {
+    none,
+    translation,
+    inverted_translation,
+    invalid_next_cell
+  };
 }
 
 

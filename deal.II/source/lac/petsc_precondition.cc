@@ -28,8 +28,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace PETScWrappers
 {
   PreconditionerBase::PreconditionerBase ()
-                  :
-                  pc(NULL), matrix(NULL)
+    :
+    pc(NULL), matrix(NULL)
   {}
 
 
@@ -62,15 +62,15 @@ namespace PETScWrappers
   void
   PreconditionerBase::create_pc ()
   {
-                                     // only allow the creation of the
-                                     // preconditioner once
+    // only allow the creation of the
+    // preconditioner once
     AssertThrow (pc == NULL, StandardExceptions::ExcInvalidState ());
 
     MPI_Comm comm;
     int ierr;
-                                     // this ugly cast is necessay because the
-                                     // type Mat and PETScObject are
-                                     // unrelated.
+    // this ugly cast is necessay because the
+    // type Mat and PETScObject are
+    // unrelated.
     ierr = PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -95,7 +95,7 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionJacobi -------------------- */
+  /* ----------------- PreconditionJacobi -------------------- */
 
   PreconditionJacobi::PreconditionJacobi ()
   {}
@@ -129,7 +129,7 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionBlockJacobi -------------------- */
+  /* ----------------- PreconditionBlockJacobi -------------------- */
 
   PreconditionBlockJacobi::PreconditionBlockJacobi ()
   {}
@@ -163,12 +163,12 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionSOR -------------------- */
+  /* ----------------- PreconditionSOR -------------------- */
 
   PreconditionSOR::AdditionalData::
   AdditionalData (const double omega)
-                  :
-                  omega (omega)
+    :
+    omega (omega)
   {}
 
 
@@ -196,7 +196,7 @@ namespace PETScWrappers
     ierr = PCSetType (pc, const_cast<char *>(PCSOR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                     // then set flags as given
+    // then set flags as given
     ierr = PCSORSetOmega (pc, additional_data.omega);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -208,12 +208,12 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionSSOR -------------------- */
+  /* ----------------- PreconditionSSOR -------------------- */
 
   PreconditionSSOR::AdditionalData::
   AdditionalData (const double omega)
-                  :
-                  omega (omega)
+    :
+    omega (omega)
   {}
 
 
@@ -241,11 +241,11 @@ namespace PETScWrappers
     ierr = PCSetType (pc, const_cast<char *>(PCSOR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                     // then set flags as given
+    // then set flags as given
     ierr = PCSORSetOmega (pc, additional_data.omega);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                     // convert SOR to SSOR
+    // convert SOR to SSOR
     ierr = PCSORSetSymmetric (pc, SOR_SYMMETRIC_SWEEP);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -257,12 +257,12 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionEisenstat -------------------- */
+  /* ----------------- PreconditionEisenstat -------------------- */
 
   PreconditionEisenstat::AdditionalData::
   AdditionalData (const double omega)
-                  :
-                  omega (omega)
+    :
+    omega (omega)
   {}
 
 
@@ -290,7 +290,7 @@ namespace PETScWrappers
     ierr = PCSetType (pc, const_cast<char *>(PCEISENSTAT));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                     // then set flags as given
+    // then set flags as given
     ierr = PCEisenstatSetOmega (pc, additional_data.omega);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -302,13 +302,13 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionICC -------------------- */
+  /* ----------------- PreconditionICC -------------------- */
 
 
   PreconditionICC::AdditionalData::
   AdditionalData (const unsigned int levels)
-                  :
-                  levels (levels)
+    :
+    levels (levels)
   {}
 
 
@@ -336,7 +336,7 @@ namespace PETScWrappers
     ierr = PCSetType (pc, const_cast<char *>(PCICC));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                     // then set flags
+    // then set flags
     PCFactorSetLevels (pc, additional_data.levels);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -348,12 +348,12 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionILU -------------------- */
+  /* ----------------- PreconditionILU -------------------- */
 
   PreconditionILU::AdditionalData::
   AdditionalData (const unsigned int levels)
-                  :
-                  levels (levels)
+    :
+    levels (levels)
   {}
 
 
@@ -381,7 +381,7 @@ namespace PETScWrappers
     ierr = PCSetType (pc, const_cast<char *>(PCILU));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                     // then set flags
+    // then set flags
     PCFactorSetLevels (pc, additional_data.levels);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -393,7 +393,7 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionBoomerAMG -------------------- */
+  /* ----------------- PreconditionBoomerAMG -------------------- */
 
   PreconditionBoomerAMG::AdditionalData::
   AdditionalData(const bool symmetric_operator,
@@ -401,13 +401,13 @@ namespace PETScWrappers
                  const double max_row_sum,
                  const unsigned int aggressive_coarsening_num_levels,
                  const bool output_details
-  )
-                  :
-                  symmetric_operator(symmetric_operator),
-                  strong_threshold(strong_threshold),
-                  max_row_sum(max_row_sum),
-                  aggressive_coarsening_num_levels(aggressive_coarsening_num_levels),
-                  output_details(output_details)
+                )
+    :
+    symmetric_operator(symmetric_operator),
+    strong_threshold(strong_threshold),
+    max_row_sum(max_row_sum),
+    aggressive_coarsening_num_levels(aggressive_coarsening_num_levels),
+    output_details(output_details)
   {}
 
 
@@ -483,7 +483,7 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionParaSails -------------------- */
+  /* ----------------- PreconditionParaSails -------------------- */
 
   PreconditionParaSails::AdditionalData::
   AdditionalData(const unsigned int symmetric,
@@ -491,12 +491,12 @@ namespace PETScWrappers
                  const double threshold,
                  const double filter,
                  const bool output_details)
-                  :
-                  symmetric(symmetric),
-                  n_levels(n_levels),
-                  threshold(threshold),
-                  filter(filter),
-                  output_details(output_details)
+    :
+    symmetric(symmetric),
+    n_levels(n_levels),
+    threshold(threshold),
+    filter(filter),
+    output_details(output_details)
   {}
 
 
@@ -540,27 +540,27 @@ namespace PETScWrappers
 
     switch (additional_data.symmetric)
       {
-        case 0:
-        {
-          ssStream << "nonsymmetric";
-          break;
-        }
+      case 0:
+      {
+        ssStream << "nonsymmetric";
+        break;
+      }
 
-        case 1:
-        {
-          ssStream << "SPD";
-          break;
-        }
+      case 1:
+      {
+        ssStream << "SPD";
+        break;
+      }
 
-        case 2:
-        {
-          ssStream << "nonsymmetric,SPD";
-          break;
-        }
+      case 2:
+      {
+        ssStream << "nonsymmetric,SPD";
+        break;
+      }
 
-        default:
-          Assert (false,
-                  ExcMessage("ParaSails parameter symmetric can only be equal to 0, 1, 2!"));
+      default:
+        Assert (false,
+                ExcMessage("ParaSails parameter symmetric can only be equal to 0, 1, 2!"));
       };
 
     PetscOptionsSetValue("-pc_hypre_parasails_sym",ssStream.str().c_str());
@@ -593,7 +593,7 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionNone ------------------------- */
+  /* ----------------- PreconditionNone ------------------------- */
 
   PreconditionNone::PreconditionNone ()
   {}
@@ -627,16 +627,16 @@ namespace PETScWrappers
   }
 
 
-/* ----------------- PreconditionLU -------------------- */
+  /* ----------------- PreconditionLU -------------------- */
 
   PreconditionLU::AdditionalData::
   AdditionalData (const double pivoting,
                   const double zero_pivot,
                   const double damping)
-                  :
-                  pivoting (pivoting),
-                  zero_pivot (zero_pivot),
-                  damping (damping)
+    :
+    pivoting (pivoting),
+    zero_pivot (zero_pivot),
+    damping (damping)
   {}
 
 
@@ -664,7 +664,7 @@ namespace PETScWrappers
     ierr = PCSetType (pc, const_cast<char *>(PCLU));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                     // set flags as given
+    // set flags as given
 #if DEAL_II_PETSC_VERSION_LT(3,0,1)
     ierr = PCFactorSetPivoting (pc, additional_data.pivoting);
 #else

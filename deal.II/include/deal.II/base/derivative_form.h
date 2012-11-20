@@ -27,115 +27,115 @@ DEAL_II_NAMESPACE_OPEN
 template <int order, int dim, int spacedim>
 class DerivativeForm
 {
-  public:
-                                     /**
-                                      * Constructor. Initialize all entries
-                                      * to zero.
-                                      */
-    DerivativeForm ();
+public:
+  /**
+   * Constructor. Initialize all entries
+   * to zero.
+   */
+  DerivativeForm ();
 
-                                     /**
-                                        Constructor from a second order tensor.
-                                     */
-    DerivativeForm (const Tensor<2,dim> &);
+  /**
+     Constructor from a second order tensor.
+  */
+  DerivativeForm (const Tensor<2,dim> &);
 
-                                     /**
-                                      * Read-Write access operator.
-                                      */
-    Tensor<order,dim> &operator [] (const unsigned int i);
+  /**
+   * Read-Write access operator.
+   */
+  Tensor<order,dim> &operator [] (const unsigned int i);
 
-                                     /**
-                                      * Read-only access operator.
-                                      */
-    const Tensor<order,dim> &operator [] (const unsigned int i) const;
+  /**
+   * Read-only access operator.
+   */
+  const Tensor<order,dim> &operator [] (const unsigned int i) const;
 
-                                     /**
-                                      *  Assignment operator.
-                                      */
-    DerivativeForm  & operator = (const DerivativeForm <order, dim, spacedim> &);
-
-
-                                     /**
-                                      *  Assignment operator.
-                                      */
-    DerivativeForm  & operator = (const Tensor<2,dim> &);
-
-                                     /**
-                                      *  Assignment operator.
-                                      */
-    DerivativeForm  & operator = (const Tensor<1,dim> &);
-
-                                     /**
-                                        Converts a DerivativeForm <1,dim, dim>
-                                        to Tensor<2,dim>.
-                                        If the derivative is the Jacobian of F,
-                                        then Tensor[i] = grad(F^i).
-                                     */
-    operator Tensor<2,dim>() const;
-
-                                     /**
-                                        Converts a DerivativeForm <1, dim, 1>
-                                        to Tensor<1,dim>.
-                                     */
-    operator Tensor<1,dim>() const;
-
-                                     /**
-                                        Return the transpose of a rectangular DerivativeForm,
-                                        that is to say viewed as a two dimensional matrix.
-                                     */
-    DerivativeForm<1, spacedim, dim> transpose () const;
+  /**
+   *  Assignment operator.
+   */
+  DerivativeForm   &operator = (const DerivativeForm <order, dim, spacedim> &);
 
 
-                                     /**
-                                        Computes the volume element associated with the
-                                        jacobian of the tranformation F.
-                                        That is to say if $DF$ is square, it computes
-                                        $\det(DF)$, in case DF is not square returns
-                                        $\sqrt(\det(DF^{t} * DF))$.
-                                     */
-    double determinant () const;
+  /**
+   *  Assignment operator.
+   */
+  DerivativeForm   &operator = (const Tensor<2,dim> &);
+
+  /**
+   *  Assignment operator.
+   */
+  DerivativeForm   &operator = (const Tensor<1,dim> &);
+
+  /**
+     Converts a DerivativeForm <1,dim, dim>
+     to Tensor<2,dim>.
+     If the derivative is the Jacobian of F,
+     then Tensor[i] = grad(F^i).
+  */
+  operator Tensor<2,dim>() const;
+
+  /**
+     Converts a DerivativeForm <1, dim, 1>
+     to Tensor<1,dim>.
+  */
+  operator Tensor<1,dim>() const;
+
+  /**
+     Return the transpose of a rectangular DerivativeForm,
+     that is to say viewed as a two dimensional matrix.
+  */
+  DerivativeForm<1, spacedim, dim> transpose () const;
 
 
-                                     /**
-                                        Assuming (*this) stores the jacobian of
-                                        the mapping F, it computes its covariant
-                                        matrix, namely $DF*G^{-1}$, where
-                                        $G = DF^{t}*DF$.
-                                        If $DF$ is square, covariant from
-                                        gives $DF^{-t}$.
-                                     */
-    DerivativeForm<1, dim, spacedim> covariant_form() const;
+  /**
+     Computes the volume element associated with the
+     jacobian of the tranformation F.
+     That is to say if $DF$ is square, it computes
+     $\det(DF)$, in case DF is not square returns
+     $\sqrt(\det(DF^{t} * DF))$.
+  */
+  double determinant () const;
+
+
+  /**
+     Assuming (*this) stores the jacobian of
+     the mapping F, it computes its covariant
+     matrix, namely $DF*G^{-1}$, where
+     $G = DF^{t}*DF$.
+     If $DF$ is square, covariant from
+     gives $DF^{-t}$.
+  */
+  DerivativeForm<1, dim, spacedim> covariant_form() const;
 
 
 
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
-    static std::size_t memory_consumption ();
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  static std::size_t memory_consumption ();
 
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException1 (ExcInvalidTensorIndex,
-                    int,
-                    << "Invalid DerivativeForm index " << arg1);
-
-
-  private:
-                                     /** Auxiliary function that computes
-                                         (*this) * T^{t} */
-    DerivativeForm<1, dim, spacedim> times_T_t (Tensor<2,dim> T) const;
+  /**
+   * Exception.
+   */
+  DeclException1 (ExcInvalidTensorIndex,
+                  int,
+                  << "Invalid DerivativeForm index " << arg1);
 
 
-  private:
-                                     /**
-                                      * Array of tensors holding the
-                                      * subelements.
-                                      */
-    Tensor<order,dim> tensor[spacedim];
+private:
+  /** Auxiliary function that computes
+      (*this) * T^{t} */
+  DerivativeForm<1, dim, spacedim> times_T_t (Tensor<2,dim> T) const;
+
+
+private:
+  /**
+   * Array of tensors holding the
+   * subelements.
+   */
+  Tensor<order,dim> tensor[spacedim];
 
 
 };
@@ -187,7 +187,7 @@ operator = (const DerivativeForm<order, dim, spacedim> &ta)
 
 template <int order, int dim, int spacedim>
 inline
-DerivativeForm<order, dim, spacedim> & DerivativeForm<order, dim, spacedim>::
+DerivativeForm<order, dim, spacedim> &DerivativeForm<order, dim, spacedim>::
 operator = (const Tensor<2,dim> &ta)
 {
   Assert( (dim == spacedim) && (order==1),
@@ -203,7 +203,7 @@ operator = (const Tensor<2,dim> &ta)
 
 template <int order, int dim, int spacedim>
 inline
-DerivativeForm<order, dim, spacedim> & DerivativeForm<order, dim, spacedim>::
+DerivativeForm<order, dim, spacedim> &DerivativeForm<order, dim, spacedim>::
 operator = (const Tensor<1,dim> &T)
 {
   Assert( (1 == spacedim) && (order==1),
@@ -219,7 +219,7 @@ operator = (const Tensor<1,dim> &T)
 
 template <int order, int dim, int spacedim>
 inline
-Tensor<order,dim> & DerivativeForm<order, dim, spacedim>::
+Tensor<order,dim> &DerivativeForm<order, dim, spacedim>::
 operator[] (const unsigned int i)
 {
   Assert (i<spacedim, ExcIndexRange(i, 0, spacedim));
@@ -277,16 +277,16 @@ inline
 DerivativeForm<1,spacedim,dim>
 DerivativeForm<order,dim,spacedim>::
 transpose () const
- {
-   Assert(order==1, ExcMessage("Only for rectangular DerivativeForm."));
-   DerivativeForm<1,spacedim,dim> tt;
+{
+  Assert(order==1, ExcMessage("Only for rectangular DerivativeForm."));
+  DerivativeForm<1,spacedim,dim> tt;
 
-   for (unsigned int i=0; i<spacedim; ++i)
-     for (unsigned int j=0; j<dim; ++j)
-       tt[j][i] = (*this)[i][j];
+  for (unsigned int i=0; i<spacedim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      tt[j][i] = (*this)[i][j];
 
-   return tt;
- }
+  return tt;
+}
 
 
 
@@ -396,7 +396,7 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF,
   for (unsigned int i=0; i<spacedim; ++i)
     dest[i] = DF[i] * T;
   return dest;
-  }
+}
 
 
 
@@ -452,11 +452,11 @@ template <int dim, int spacedim>
 inline
 DerivativeForm<1,spacedim,dim>
 transpose (const DerivativeForm<1,dim,spacedim> &DF)
- {
-   DerivativeForm<1,spacedim,dim> tt;
-   tt = DF.transpose();
-   return tt;
- }
+{
+  DerivativeForm<1,spacedim,dim> tt;
+  tt = DF.transpose();
+  return tt;
+}
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -49,136 +49,136 @@ DEAL_II_NAMESPACE_OPEN
 template <class VECTOR = Vector<double> >
 class SolverRichardson : public Solver<VECTOR>
 {
-  public:
-                                     /**
-                                      * Standardized data struct to
-                                      * pipe additional data to the
-                                      * solver.
-                                      */
-    struct AdditionalData
-    {
-                                         /**
-                                          * Constructor. By default,
-                                          * set the damping parameter
-                                          * to one.
-                                          */
-        AdditionalData (const double omega                       = 1,
-                        const bool   use_preconditioned_residual = false);
+public:
+  /**
+   * Standardized data struct to
+   * pipe additional data to the
+   * solver.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Constructor. By default,
+     * set the damping parameter
+     * to one.
+     */
+    AdditionalData (const double omega                       = 1,
+                    const bool   use_preconditioned_residual = false);
 
-                                         /**
-                                          * Relaxation parameter.
-                                          */
-        double omega;
+    /**
+     * Relaxation parameter.
+     */
+    double omega;
 
-                                         /**
-                                          * Parameter for stopping criterion.
-                                          */
-        bool use_preconditioned_residual;
+    /**
+     * Parameter for stopping criterion.
+     */
+    bool use_preconditioned_residual;
 
-    };
+  };
 
-                                     /**
-                                      * Constructor.
-                                      */
-    SolverRichardson (SolverControl        &cn,
-                      VectorMemory<VECTOR> &mem,
-                      const AdditionalData &data=AdditionalData());
+  /**
+   * Constructor.
+   */
+  SolverRichardson (SolverControl        &cn,
+                    VectorMemory<VECTOR> &mem,
+                    const AdditionalData &data=AdditionalData());
 
-                                     /**
-                                      * Constructor. Use an object of
-                                      * type GrowingVectorMemory as
-                                      * a default to allocate memory.
-                                      */
-    SolverRichardson (SolverControl        &cn,
-                      const AdditionalData &data=AdditionalData());
+  /**
+   * Constructor. Use an object of
+   * type GrowingVectorMemory as
+   * a default to allocate memory.
+   */
+  SolverRichardson (SolverControl        &cn,
+                    const AdditionalData &data=AdditionalData());
 
-                                     /**
-                                      * Virtual destructor.
-                                      */
-    virtual ~SolverRichardson ();
+  /**
+   * Virtual destructor.
+   */
+  virtual ~SolverRichardson ();
 
-                                     /**
-                                      * Solve the linear system $Ax=b$
-                                      * for x.
-                                      */
-    template<class MATRIX, class PRECONDITIONER>
-    void
-    solve (const MATRIX         &A,
-           VECTOR               &x,
-           const VECTOR         &b,
-           const PRECONDITIONER &precondition);
+  /**
+   * Solve the linear system $Ax=b$
+   * for x.
+   */
+  template<class MATRIX, class PRECONDITIONER>
+  void
+  solve (const MATRIX         &A,
+         VECTOR               &x,
+         const VECTOR         &b,
+         const PRECONDITIONER &precondition);
 
-                                     /**
-                                      * Solve $A^Tx=b$ for $x$.
-                                      */
-    template<class MATRIX, class PRECONDITIONER>
-    void
-    Tsolve (const MATRIX         &A,
-            VECTOR               &x,
-            const VECTOR         &b,
-            const PRECONDITIONER &precondition);
+  /**
+   * Solve $A^Tx=b$ for $x$.
+   */
+  template<class MATRIX, class PRECONDITIONER>
+  void
+  Tsolve (const MATRIX         &A,
+          VECTOR               &x,
+          const VECTOR         &b,
+          const PRECONDITIONER &precondition);
 
-                                     /**
-                                      * Set the damping-coefficient.
-                                      * Default is 1., i.e. no damping.
-                                      */
-    void set_omega (const double om=1.);
+  /**
+   * Set the damping-coefficient.
+   * Default is 1., i.e. no damping.
+   */
+  void set_omega (const double om=1.);
 
-                                     /**
-                                      * Interface for derived class.
-                                      * This function gets the current
-                                      * iteration vector, the residual
-                                      * and the update vector in each
-                                      * step. It can be used for a
-                                      * graphical output of the
-                                      * convergence history.
-                                      */
-    virtual void print_vectors(const unsigned int step,
-                               const VECTOR& x,
-                               const VECTOR& r,
-                               const VECTOR& d) const;
+  /**
+   * Interface for derived class.
+   * This function gets the current
+   * iteration vector, the residual
+   * and the update vector in each
+   * step. It can be used for a
+   * graphical output of the
+   * convergence history.
+   */
+  virtual void print_vectors(const unsigned int step,
+                             const VECTOR &x,
+                             const VECTOR &r,
+                             const VECTOR &d) const;
 
-  protected:
-                                     /**
-                                      * Implementation of the computation of
-                                      * the norm of the residual.
-                                      */
-    virtual typename VECTOR::value_type criterion();
+protected:
+  /**
+   * Implementation of the computation of
+   * the norm of the residual.
+   */
+  virtual typename VECTOR::value_type criterion();
 
-                                     /**
-                                      * Residual. Temporary vector allocated through
-                                      * the VectorMemory object at the start
-                                      * of the actual solution process and
-                                      * deallocated at the end.
-                                      */
-    VECTOR* Vr;
-                                     /**
-                                      * Preconditioned
-                                      * residual. Temporary vector
-                                      * allocated through the
-                                      * VectorMemory object at the
-                                      * start of the actual solution
-                                      * process and deallocated at the
-                                      * end.
-                                      */
-    VECTOR* Vd;
+  /**
+   * Residual. Temporary vector allocated through
+   * the VectorMemory object at the start
+   * of the actual solution process and
+   * deallocated at the end.
+   */
+  VECTOR *Vr;
+  /**
+   * Preconditioned
+   * residual. Temporary vector
+   * allocated through the
+   * VectorMemory object at the
+   * start of the actual solution
+   * process and deallocated at the
+   * end.
+   */
+  VECTOR *Vd;
 
-                                     /**
-                                      * Control parameters.
-                                      */
-    AdditionalData additional_data;
+  /**
+   * Control parameters.
+   */
+  AdditionalData additional_data;
 
-                                     /**
-                                      * Within the iteration loop, the
-                                      * norm of the residual is
-                                      * stored in this variable. The
-                                      * function @p criterion uses this
-                                      * variable to compute the convergence
-                                      * value, which in this class is the
-                                      * norm of the residual vector and thus
-                                      * the square root of the @p res2 value.
-                                      */
-    typename VECTOR::value_type res;
+  /**
+   * Within the iteration loop, the
+   * norm of the residual is
+   * stored in this variable. The
+   * function @p criterion uses this
+   * variable to compute the convergence
+   * value, which in this class is the
+   * norm of the residual vector and thus
+   * the square root of the @p res2 value.
+   */
+  typename VECTOR::value_type res;
 };
 
 /*@}*/
@@ -191,9 +191,9 @@ inline
 SolverRichardson<VECTOR>::AdditionalData::
 AdditionalData (const double omega,
                 const bool   use_preconditioned_residual)
-                :
-                omega(omega),
-                use_preconditioned_residual(use_preconditioned_residual)
+  :
+  omega(omega),
+  use_preconditioned_residual(use_preconditioned_residual)
 {}
 
 
@@ -201,9 +201,9 @@ template <class VECTOR>
 SolverRichardson<VECTOR>::SolverRichardson(SolverControl &cn,
                                            VectorMemory<VECTOR> &mem,
                                            const AdditionalData &data)
-                :
-                Solver<VECTOR> (cn,mem),
-                additional_data(data)
+  :
+  Solver<VECTOR> (cn,mem),
+  additional_data(data)
 {}
 
 
@@ -211,9 +211,9 @@ SolverRichardson<VECTOR>::SolverRichardson(SolverControl &cn,
 template <class VECTOR>
 SolverRichardson<VECTOR>::SolverRichardson(SolverControl &cn,
                                            const AdditionalData &data)
-                :
-                Solver<VECTOR> (cn),
-                additional_data(data)
+  :
+  Solver<VECTOR> (cn),
+  additional_data(data)
 {}
 
 
@@ -233,28 +233,32 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
 {
   SolverControl::State conv=SolverControl::iterate;
 
-                                   // Memory allocation
-  Vr  = this->memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
-  Vd  = this->memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
+  // Memory allocation
+  Vr  = this->memory.alloc();
+  VECTOR &r  = *Vr;
+  r.reinit(x);
+  Vd  = this->memory.alloc();
+  VECTOR &d  = *Vd;
+  d.reinit(x);
 
   deallog.push("Richardson");
 
   try
     {
-                                       // Main loop
-      for(int iter=0; conv==SolverControl::iterate; iter++)
+      // Main loop
+      for (int iter=0; conv==SolverControl::iterate; iter++)
         {
-                                           // Do not use residual,
-                                           // but do it in 2 steps
+          // Do not use residual,
+          // but do it in 2 steps
           A.vmult(r,x);
           r.sadd(-1.,1.,b);
           precondition.vmult(d,r);
 
-                                           // The required norm of the
-                                           // (preconditioned)
-                                           // residual is computed in
-                                           // criterion() and stored
-                                           // in res.
+          // The required norm of the
+          // (preconditioned)
+          // residual is computed in
+          // criterion() and stored
+          // in res.
           conv = this->control().check (iter, criterion());
 //        conv = this->control().check (iter, std::sqrt(A.matrix_norm_square(r)));
           if (conv != SolverControl::iterate)
@@ -271,17 +275,17 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
       deallog.pop();
       throw;
     }
-                                   // Deallocate Memory
+  // Deallocate Memory
   this->memory.free(Vr);
   this->memory.free(Vd);
   deallog.pop();
 
-                                   // in case of failure: throw
-                                   // exception
+  // in case of failure: throw
+  // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
                                         this->control().last_value());
-                                   // otherwise exit as normal
+  // otherwise exit as normal
 }
 
 
@@ -295,19 +299,23 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
 {
   SolverControl::State conv=SolverControl::iterate;
 
-                                   // Memory allocation
-  Vr  = this->memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
-  Vd  =this-> memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
+  // Memory allocation
+  Vr  = this->memory.alloc();
+  VECTOR &r  = *Vr;
+  r.reinit(x);
+  Vd  =this-> memory.alloc();
+  VECTOR &d  = *Vd;
+  d.reinit(x);
 
   deallog.push("RichardsonT");
 
   try
     {
-                                       // Main loop
-      for(int iter=0; conv==SolverControl::iterate; iter++)
+      // Main loop
+      for (int iter=0; conv==SolverControl::iterate; iter++)
         {
-                                           // Do not use Tresidual,
-                                           // but do it in 2 steps
+          // Do not use Tresidual,
+          // but do it in 2 steps
           A.Tvmult(r,x);
           r.sadd(-1.,1.,b);
           precondition.Tvmult(d,r);
@@ -328,25 +336,25 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
       throw;
     }
 
-                                   // Deallocate Memory
+  // Deallocate Memory
   this->memory.free(Vr);
   this->memory.free(Vd);
   deallog.pop();
-                                   // in case of failure: throw
-                                   // exception
+  // in case of failure: throw
+  // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
                                         this->control().last_value());
-                                   // otherwise exit as normal
+  // otherwise exit as normal
 }
 
 
 template <class VECTOR>
 void
 SolverRichardson<VECTOR>::print_vectors(const unsigned int,
-                                        const VECTOR&,
-                                        const VECTOR&,
-                                        const VECTOR&) const
+                                        const VECTOR &,
+                                        const VECTOR &,
+                                        const VECTOR &) const
 {}
 
 

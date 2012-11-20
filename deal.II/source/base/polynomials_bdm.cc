@@ -21,25 +21,25 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 PolynomialsBDM<dim>::PolynomialsBDM (const unsigned int k)
-                :
-                polynomial_space (Polynomials::Legendre::generate_complete_basis(k)),
-                monomials((dim==2) ? (1) : (k+2)),
-                n_pols(compute_n_pols(k)),
-                p_values(polynomial_space.n()),
-                p_grads(polynomial_space.n()),
-                p_grad_grads(polynomial_space.n())
+  :
+  polynomial_space (Polynomials::Legendre::generate_complete_basis(k)),
+  monomials((dim==2) ? (1) : (k+2)),
+  n_pols(compute_n_pols(k)),
+  p_values(polynomial_space.n()),
+  p_grads(polynomial_space.n()),
+  p_grad_grads(polynomial_space.n())
 {
-  switch(dim)
+  switch (dim)
     {
-      case 2:
-            monomials[0] = Polynomials::Monomial<double> (k+1);
-            break;
-      case 3:
-            for (unsigned int i=0;i<monomials.size();++i)
-              monomials[i] = Polynomials::Monomial<double> (i);
-            break;
-      default:
-            Assert(false, ExcNotImplemented());
+    case 2:
+      monomials[0] = Polynomials::Monomial<double> (k+1);
+      break;
+    case 3:
+      for (unsigned int i=0; i<monomials.size(); ++i)
+        monomials[i] = Polynomials::Monomial<double> (i);
+      break;
+    default:
+      Assert(false, ExcNotImplemented());
     }
 }
 
@@ -61,11 +61,11 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
 
   const unsigned int n_sub = polynomial_space.n();
 
-                                   // guard access to the scratch
-                                   // arrays in the following block
-                                   // using a mutex to make sure they
-                                   // are not used by multiple threads
-                                   // at once
+  // guard access to the scratch
+  // arrays in the following block
+  // using a mutex to make sure they
+  // are not used by multiple threads
+  // at once
   {
     Threads::Mutex::ScopedLock lock(mutex);
 
@@ -73,42 +73,42 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
     p_grads.resize((grads.size() == 0) ? 0 : n_sub);
     p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
 
-                                     // Compute values of complete space
-                                     // and insert into tensors.  Result
-                                     // will have first all polynomials
-                                     // in the x-component, then y and
-                                     // z.
+    // Compute values of complete space
+    // and insert into tensors.  Result
+    // will have first all polynomials
+    // in the x-component, then y and
+    // z.
     polynomial_space.compute (unit_point, p_values, p_grads, p_grad_grads);
 
     std::fill(values.begin(), values.end(), Tensor<1,dim>());
-    for (unsigned int i=0;i<p_values.size();++i)
-      for (unsigned int j=0;j<dim;++j)
+    for (unsigned int i=0; i<p_values.size(); ++i)
+      for (unsigned int j=0; j<dim; ++j)
         values[i+j*n_sub][j] = p_values[i];
 
     std::fill(grads.begin(), grads.end(), Tensor<2,dim>());
-    for (unsigned int i=0;i<p_grads.size();++i)
-      for (unsigned int j=0;j<dim;++j)
+    for (unsigned int i=0; i<p_grads.size(); ++i)
+      for (unsigned int j=0; j<dim; ++j)
         grads[i+j*n_sub][j] = p_grads[i];
 
     std::fill(grad_grads.begin(), grad_grads.end(), Tensor<3,dim>());
-    for (unsigned int i=0;i<p_grad_grads.size();++i)
-      for (unsigned int j=0;j<dim;++j)
+    for (unsigned int i=0; i<p_grad_grads.size(); ++i)
+      for (unsigned int j=0; j<dim; ++j)
         grad_grads[i+j*n_sub][j] = p_grad_grads[i];
   }
 
-                                   // This is the first polynomial not
-                                   // covered by the P_k subspace
+  // This is the first polynomial not
+  // covered by the P_k subspace
   unsigned int start = dim*n_sub;
 
-                                   // Store values of auxiliary
-                                   // polynomials and their three
-                                   // derivatives
+  // Store values of auxiliary
+  // polynomials and their three
+  // derivatives
   std::vector<std::vector<double> > monovali(dim, std::vector<double>(4));
   std::vector<std::vector<double> > monovalk(dim, std::vector<double>(4));
 
   if (dim == 2)
     {
-      for (unsigned int d=0;d<dim;++d)
+      for (unsigned int d=0; d<dim; ++d)
         monomials[0].value(unit_point(d), monovali[d]);
       if (values.size() != 0)
         {
@@ -150,43 +150,43 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
     }
   else // dim == 3
     {
-                                       // The number of curls in each
-                                       // component. Note that the
-                                       // table in BrezziFortin91 has
-                                       // a typo, but the text has the
-                                       // right basis
+      // The number of curls in each
+      // component. Note that the
+      // table in BrezziFortin91 has
+      // a typo, but the text has the
+      // right basis
 
-                                       // Note that the next basis
-                                       // function is always obtained
-                                       // from the previous by cyclic
-                                       // rotation of the coordinates
+      // Note that the next basis
+      // function is always obtained
+      // from the previous by cyclic
+      // rotation of the coordinates
       const unsigned int n_curls = monomials.size() - 1;
-      for (unsigned int i=0;i<n_curls;++i, start+=dim)
+      for (unsigned int i=0; i<n_curls; ++i, start+=dim)
         {
-          for (unsigned int d=0;d<dim;++d)
+          for (unsigned int d=0; d<dim; ++d)
             {
-                                               // p(t) = t^(i+1)
+              // p(t) = t^(i+1)
               monomials[i+1].value(unit_point(d), monovali[d]);
-                                               // q(t) = t^(k-i)
+              // q(t) = t^(k-i)
               monomials[degree()-i].value(unit_point(d), monovalk[d]);
             }
           if (values.size() != 0)
             {
-                                               // x p'(y) q(z)
+              // x p'(y) q(z)
               values[start][0] = unit_point(0) * monovali[1][1] * monovalk[2][0];
-                                               // - p(y) q(z)
+              // - p(y) q(z)
               values[start][1] = -monovali[1][0] * monovalk[2][0];
               values[start][2] = 0.;
 
-                                               // y p'(z) q(x)
+              // y p'(z) q(x)
               values[start+1][1] = unit_point(1) * monovali[2][1] * monovalk[0][0];
-                                               // - p(z) q(x)
+              // - p(z) q(x)
               values[start+1][2] = -monovali[2][0] * monovalk[0][0];
               values[start+1][0] = 0.;
 
-                                               // z p'(x) q(y)
+              // z p'(x) q(y)
               values[start+2][2] = unit_point(2) * monovali[0][1] * monovalk[1][0];
-                                               // -p(x) q(y)
+              // -p(x) q(y)
               values[start+2][0] = -monovali[0][0] * monovalk[1][0];
               values[start+2][1] = 0.;
             }

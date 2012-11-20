@@ -44,12 +44,12 @@ LogStream deallog;
 
 
 LogStream::LogStream()
-                :
-                std_out(&std::cerr), file(0),
-                std_depth(10000), file_depth(10000),
-                print_utime(false), diff_utime(false),
-                last_time (0.), double_threshold(0.), float_threshold(0.),
-                offset(0), old_cerr(0)
+  :
+  std_out(&std::cerr), file(0),
+  std_depth(10000), file_depth(10000),
+  print_utime(false), diff_utime(false),
+  last_time (0.), double_threshold(0.), float_threshold(0.),
+  offset(0), old_cerr(0)
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
@@ -61,10 +61,10 @@ LogStream::LogStream()
 
 LogStream::~LogStream()
 {
-                                   // if there was anything left in
-                                   // the stream that is current to
-                                   // this thread, make sure we flush
-                                   // it before it gets lost
+  // if there was anything left in
+  // the stream that is current to
+  // this thread, make sure we flush
+  // it before it gets lost
   {
     const unsigned int id = Threads::this_thread_id();
     if ((outstreams.find(id) != outstreams.end())
@@ -73,74 +73,74 @@ LogStream::~LogStream()
         &&
         (outstreams[id]->str().length() > 0))
       {
-					 // except the situation is
-					 // not quite that simple. if
-					 // this object is the
-					 // 'deallog' object, then it
-					 // is destroyed upon exit of
-					 // the program. since it's
-					 // defined in a shared
-					 // library that depends on
-					 // libstdc++.so, destruction
-					 // happens before destruction
-					 // of std::cout/cerr, but
-					 // after all file variables
-					 // defined in user programs
-					 // have been destroyed. in
-					 // other words, if we get
-					 // here and the object being
-					 // destroyed is 'deallog' and
-					 // if 'deallog' is associated
-					 // with a file stream, then
-					 // we're in trouble: we'll
-					 // try to write to a file
-					 // that doesn't exist any
-					 // more, and we're likely
-					 // going to crash (this is
-					 // tested by
-					 // base/log_crash_01). rather
-					 // than letting it come to
-					 // this, print a message to
-					 // the screen (note that we
-					 // can't issue an assertion
-					 // here either since Assert
-					 // may want to write to
-					 // 'deallog' itself, and
-					 // AssertThrow will throw an
-					 // exception that can't be
-					 // caught)
-	if ((this == &deallog) && file)
-	  std::cerr << ("You still have content that was written to 'deallog' "
-			"but not flushed to the screen or a file while the "
-			"program is being terminated. This would lead to a "
-			"segmentation fault. Make sure you flush the "
-			"content of the 'deallog' object using 'std::endl' "
-			"before the end of the program.")
-		    << std::endl;
-	else
-	  *this << std::endl;
+        // except the situation is
+        // not quite that simple. if
+        // this object is the
+        // 'deallog' object, then it
+        // is destroyed upon exit of
+        // the program. since it's
+        // defined in a shared
+        // library that depends on
+        // libstdc++.so, destruction
+        // happens before destruction
+        // of std::cout/cerr, but
+        // after all file variables
+        // defined in user programs
+        // have been destroyed. in
+        // other words, if we get
+        // here and the object being
+        // destroyed is 'deallog' and
+        // if 'deallog' is associated
+        // with a file stream, then
+        // we're in trouble: we'll
+        // try to write to a file
+        // that doesn't exist any
+        // more, and we're likely
+        // going to crash (this is
+        // tested by
+        // base/log_crash_01). rather
+        // than letting it come to
+        // this, print a message to
+        // the screen (note that we
+        // can't issue an assertion
+        // here either since Assert
+        // may want to write to
+        // 'deallog' itself, and
+        // AssertThrow will throw an
+        // exception that can't be
+        // caught)
+        if ((this == &deallog) && file)
+          std::cerr << ("You still have content that was written to 'deallog' "
+                        "but not flushed to the screen or a file while the "
+                        "program is being terminated. This would lead to a "
+                        "segmentation fault. Make sure you flush the "
+                        "content of the 'deallog' object using 'std::endl' "
+                        "before the end of the program.")
+                    << std::endl;
+        else
+          *this << std::endl;
       }
   }
 
   if (old_cerr)
     std::cerr.rdbuf(old_cerr);
 
-                                   // on some systems, destroying the
-                                   // outstreams objects of deallog
-                                   // triggers some sort of memory
-                                   // corruption, in particular when
-                                   // we also link with Trilinos;
-                                   // since this happens at the very
-                                   // end of the program, we take the
-                                   // liberty to simply not do it by
-                                   // putting that object into a
-                                   // deliberate memory leak and
-                                   // instead destroying an empty
-                                   // object
+  // on some systems, destroying the
+  // outstreams objects of deallog
+  // triggers some sort of memory
+  // corruption, in particular when
+  // we also link with Trilinos;
+  // since this happens at the very
+  // end of the program, we take the
+  // liberty to simply not do it by
+  // putting that object into a
+  // deliberate memory leak and
+  // instead destroying an empty
+  // object
 #ifdef DEAL_II_USE_TRILINOS
   if (this == &deallog)
     {
-      stream_map_type * dummy = new stream_map_type();
+      stream_map_type *dummy = new stream_map_type();
       dummy->swap (outstreams);
       delete dummy;
     }
@@ -168,42 +168,42 @@ LogStream::test_mode(bool on)
 
 
 LogStream &
-LogStream::operator<< (std::ostream& (*p) (std::ostream&))
+LogStream::operator<< (std::ostream& (*p) (std::ostream &))
 {
-                                   // do the work that is common to
-                                   // the operator<< functions
+  // do the work that is common to
+  // the operator<< functions
   print (p);
 
-                                   // next check whether this is the
-                                   // <tt>endl</tt> manipulator, and if so
-                                   // set a flag
-  std::ostream & (* const p_endl) (std::ostream&) = &std::endl;
+  // next check whether this is the
+  // <tt>endl</tt> manipulator, and if so
+  // set a flag
+  std::ostream & (* const p_endl) (std::ostream &) = &std::endl;
   if (p == p_endl)
     {
       Threads::ThreadMutex::ScopedLock lock(write_lock);
       print_line_head();
-      std::ostringstream& stream = get_stream();
+      std::ostringstream &stream = get_stream();
       if (prefixes.size() <= std_depth)
         *std_out << stream.str();
 
       if (file && (prefixes.size() <= file_depth))
         *file << stream.str() << std::flush;
 
-                                       // Start a new string
+      // Start a new string
       stream.str("");
     }
   return *this;
 }
 
 
-std::ostringstream&
+std::ostringstream &
 LogStream::get_stream()
 {
 //TODO: use a ThreadLocalStorage object here
   Threads::ThreadMutex::ScopedLock lock(log_lock);
   const unsigned int id = Threads::this_thread_id();
 
-                                   // if necessary allocate a stream object
+  // if necessary allocate a stream object
   if (outstreams.find (id) == outstreams.end())
     {
       outstreams[id].reset (new std::ostringstream());
@@ -215,7 +215,7 @@ LogStream::get_stream()
 
 
 void
-LogStream::attach(std::ostream& o)
+LogStream::attach(std::ostream &o)
 {
   Threads::ThreadMutex::ScopedLock lock(log_lock);
   file = &o;
@@ -237,21 +237,23 @@ void LogStream::log_cerr ()
   if (old_cerr == 0)
     {
       old_cerr = std::cerr.rdbuf(file->rdbuf());
-    } else {
+    }
+  else
+    {
       std::cerr.rdbuf(old_cerr);
       old_cerr = 0;
     }
 }
 
 
-std::ostream&
+std::ostream &
 LogStream::get_console()
 {
   return *std_out;
 }
 
 
-std::ostream&
+std::ostream &
 LogStream::get_file_stream()
 {
   Assert(file, ExcNoFileStreamGiven());
@@ -266,7 +268,7 @@ LogStream::has_file() const
 }
 
 
-const std::string&
+const std::string &
 LogStream::get_prefix() const
 {
   return prefixes.top();
@@ -274,7 +276,7 @@ LogStream::get_prefix() const
 
 
 void
-LogStream::push (const std::string& text)
+LogStream::push (const std::string &text)
 {
   Threads::ThreadMutex::ScopedLock lock(log_lock);
   std::string pre=prefixes.top();
@@ -380,20 +382,20 @@ LogStream::print_line_head()
   double utime = 0.;
 #endif
 
-/*
- * The following lines were used for debugging a memory leak.
- * They work on Linux, not on Solaris, since the /proc filesystem
- * on Solaris is quite cryptic. For other systems, we don't know.
- *
- * Unfortunately, the information in /proc/pid/stat is updated slowly,
- * therefore, the information is quite unreliable.
- *
- * Furthermore, the constructor of ifstream caused another memory leak.
- *
- * Still, this code might be useful sometimes, so I kept it here.
- * When we have more information about the kernel, this should be
- * incorporated properly. Suggestions are welcome!
- */
+  /*
+   * The following lines were used for debugging a memory leak.
+   * They work on Linux, not on Solaris, since the /proc filesystem
+   * on Solaris is quite cryptic. For other systems, we don't know.
+   *
+   * Unfortunately, the information in /proc/pid/stat is updated slowly,
+   * therefore, the information is quite unreliable.
+   *
+   * Furthermore, the constructor of ifstream caused another memory leak.
+   *
+   * Still, this code might be useful sometimes, so I kept it here.
+   * When we have more information about the kernel, this should be
+   * incorporated properly. Suggestions are welcome!
+   */
 
 #ifdef DEALII_MEMORY_DEBUG
   static const pid_t id = getpid();
@@ -404,14 +406,14 @@ LogStream::print_line_head()
   static long size;
   static string dummy;
   ifstream stat(statname.str());
-                                   // ignore 22 values
+  // ignore 22 values
   stat >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
-    dummy >> dummy >> dummy >> dummy >> dummy >>
-    dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
-    dummy >> dummy >> dummy >> dummy >> dummy >> size;
+       dummy >> dummy >> dummy >> dummy >> dummy >>
+       dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
+       dummy >> dummy >> dummy >> dummy >> dummy >> size;
 #endif
 
-  const std::string& head = get_prefix();
+  const std::string &head = get_prefix();
   const unsigned int thread = Threads::this_thread_id();
 
   if (prefixes.size() <= std_depth)
@@ -474,10 +476,10 @@ std::size_t
 LogStream::memory_consumption () const
 {
   std::size_t mem = sizeof(*this);
-                                   // to determine size of stack
-                                   // elements, we have to copy the
-                                   // stack since we can't access
-                                   // elements from further below
+  // to determine size of stack
+  // elements, we have to copy the
+  // stack since we can't access
+  // elements from further below
   std::stack<std::string> tmp = prefixes;
   while (tmp.empty() == false)
     {

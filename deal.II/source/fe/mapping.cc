@@ -42,10 +42,10 @@ Mapping<dim,spacedim>::transform_covariant (
 template <int dim, int spacedim>
 void
 Mapping<dim, spacedim>::transform_covariant (
-    const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
-    const unsigned int                 offset,
-    VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-    const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
+  const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
   Assert (offset == 0, ExcInternalError());
 
@@ -90,10 +90,10 @@ Mapping<dim,spacedim>::transform_contravariant (
 
 template <int dim, int spacedim>
 Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
-                update_flags(update_default),
-                update_once(update_default),
-                update_each(update_default),
-                first_cell(true)
+  update_flags(update_default),
+  update_once(update_default),
+  update_each(update_default),
+  first_cell(true)
 {}
 
 

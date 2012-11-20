@@ -28,20 +28,20 @@ namespace Algorithms
   template <class VECTOR, int dim, int spacedim=dim>
   class DoFOutputOperator : public OutputOperator<VECTOR>
   {
-    public:
-      void initialize (DoFHandler<dim, spacedim>& dof_handler);
+  public:
+    void initialize (DoFHandler<dim, spacedim> &dof_handler);
 
-      virtual OutputOperator<VECTOR>&
-        operator<<(const NamedData<VECTOR*>& vectors);
+    virtual OutputOperator<VECTOR> &
+    operator<<(const NamedData<VECTOR *> &vectors);
 
-    private:
-      SmartPointer<DoFHandler<dim, spacedim>,
-        DoFOutputOperator<VECTOR, dim, spacedim> > dof;
+  private:
+    SmartPointer<DoFHandler<dim, spacedim>,
+                 DoFOutputOperator<VECTOR, dim, spacedim> > dof;
   };
 
   template <class VECTOR, int dim, int spacedim>
   void DoFOutputOperator<VECTOR, dim, spacedim>::initialize(
-      DoFHandler<dim, spacedim>& dof_handler)
+    DoFHandler<dim, spacedim> &dof_handler)
   {
     dof = &dof_handler;
   }
