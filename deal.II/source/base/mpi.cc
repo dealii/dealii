@@ -331,6 +331,7 @@ namespace Utilities
                                        // about these variables
       (void)argc;
       (void)argv;
+      (void)owns_mpi;
 #endif
 
       constructor_has_already_run = true;

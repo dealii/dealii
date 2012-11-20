@@ -125,7 +125,7 @@ namespace PETScWrappers
 #else
           int begin, end;
 #endif
-            
+
           ierr = VecGetOwnershipRange (vector.vector, &begin, &end);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -148,7 +148,7 @@ namespace PETScWrappers
                                          // what? what other kind of vector
                                          // exists there?
         Assert (false, ExcInternalError());
-      
+
       return -1e20;
     }
   }
@@ -379,7 +379,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::compress (::dealii::VectorOperation::values operation)
+  VectorBase::compress (::dealii::VectorOperation::values)
   {
                                      // note that one may think that
                                      // we only need to do something

@@ -241,7 +241,7 @@ SolutionTransfer<dim, VECTOR, DH>::
 prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
 {
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
-  Assert(!prepared_for!=coarsening_and_refinement,
+  Assert(prepared_for!=coarsening_and_refinement,
          ExcAlreadyPrepForCoarseAndRef());
 
   const unsigned int in_size=all_in.size();
