@@ -1743,7 +1743,7 @@ public:
    * do anything useful here and so
    * may not actually be called.
    */
-  TriaAccessor (const Triangulation<1,spacedim> *=  0,
+  TriaAccessor (const Triangulation<1,spacedim> * =  0,
                 const int = 0,
                 const int = 0,
                 const AccessorData * = 0);
