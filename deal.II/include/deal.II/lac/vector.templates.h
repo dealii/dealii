@@ -607,7 +607,7 @@ namespace internal
             }
 
           // now work on the remainder, i.e., the last
-          // 32 values. Use switch statement with
+          // up to 32 values. Use switch statement with
           // fall-through to work on these values.
           if (remainder > 0)
             {
@@ -622,7 +622,7 @@ namespace internal
                     r2 = op(X, Y, power);
                     for (unsigned int j=1; j<8; ++j)
                       r2 += op(X, Y, power);
-                      // no break
+                    // no break
                   case 2:
                     r1 = op(X, Y, power);
                     for (unsigned int j=1; j<8; ++j)
@@ -633,15 +633,15 @@ namespace internal
                     r2 = op(X, Y, power);
                     for (unsigned int j=1; j<8; ++j)
                       r2 += op(X, Y, power);
-                      // no break
+                    // no break
                   default:
                     for (unsigned int j=0; j<remainder_inner; ++j)
                       r0 += op(X, Y, power);
                     r0 += r2;
                     r0 += r1;
                     outer_results[n_chunks] = r0;
-				break;
-			}
+                    break;
+                }
               n_chunks++;
             }
           AssertDimension(X - X_original, vec_size);
@@ -691,7 +691,7 @@ namespace internal
       else
         {
           // split vector into four pieces and work on
-          // the pieces recursively. Make pieces
+          // the pieces recursively. Make pieces (except last)
           // divisible by 1024.
           const unsigned int new_size = (vec_size / 4096) * 1024;
           ResultType r0, r1, r2, r3;
