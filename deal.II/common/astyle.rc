@@ -13,7 +13,7 @@
 
 # write things as 'char* p', not 'char *p'
 --align-pointer=type
-#--align-reference=name
+--align-reference=type
 
 --max-instatement-indent=60
 --suffix=none
