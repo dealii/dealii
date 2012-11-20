@@ -893,7 +893,7 @@ public:
   DoFAccessor (const Triangulation<1,spacedim> *,
                const int = 0,
                const int = 0,
-               const DH<1,spacedim> * = 0);
+               const DH<1,spacedim> *dof_handler = 0);
 
   /**
    * Conversion constructor. This
