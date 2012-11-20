@@ -1,6 +1,4 @@
 # astyle 2.02 indentation style for deal.II
-# Run astyle in a command like
-#    astyle --options=lib/astyle.rc *cc *h
 
 --style=gnu
 
@@ -11,7 +9,7 @@
 --min-conditional-indent=0
 --pad-header
 
-# write things as 'char *p', not 'char* p'
+# write things as 'char *p'
 --align-pointer=name
 --align-reference=name
 
