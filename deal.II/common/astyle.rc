@@ -8,24 +8,13 @@
 --indent-preprocessor
 --indent=spaces=2
 --indent-namespaces
---indent-labels
-#--no-indent-col1-comments
 --min-conditional-indent=0
-#--no-break-blocks
 --pad-header
-
-# indent the 'public/protected/private' specifiers, and further indent the
-# rest of the declarations
---indent-classes
-
-# indent case labels in a switch statement
---indent-switches
 
 # write things as 'char *p', not 'char* p'
 --align-pointer=name
 --align-reference=name
 
---max-instatement-indent=80
+--max-instatement-indent=60
 --suffix=none
 --quiet
-#--verbose
